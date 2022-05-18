@@ -26,14 +26,14 @@ const readyStateCheckInterval = setInterval(function () {
     clearInterval(readyStateCheckInterval)
 
     const port = getBrowserAPI().runtime.connect()
-    const extConnection = BrowserRuntimeConnection({
+    const extConnection = new BrowserRuntimeConnection({
       connectionInfo: {
         description: 'Content Script to Extension connection',
         origin: window.origin
       },
       port
     })
-    const pageConnection = BrowserWindowMessageConnection({
+    const pageConnection = new BrowserWindowMessageConnection({
       connectionInfo: {
         description: 'Content Script to Page connection',
         origin: window.origin
@@ -43,7 +43,7 @@ const readyStateCheckInterval = setInterval(function () {
       receiveDirection: MESSAGE_DIRECTION.to_waellet
     })
 
-    const bridge = ContentScriptBridge({ pageConnection, extConnection })
+    const bridge = new ContentScriptBridge({ pageConnection, extConnection })
     bridge.run()
   }
 }, 10)
@@ -112,7 +112,7 @@ async function init () {
   }).then(wallet => {
     chrome.runtime.onConnect.addListener(async function (port) {
       // create connection
-      const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
+      const connection = new BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
       // add new aepp to wallet
       wallet.addRpcClient(connection)
       // share wallet details
@@ -194,7 +194,7 @@ async function init () {
   }).then(wallet => {
     chrome.runtime.onConnect.addListener(async function (port) {
       // create connection
-      const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
+      const connection = await new BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
       // add new aepp to wallet
       wallet.addRpcClient(connection)
       // share wallet details

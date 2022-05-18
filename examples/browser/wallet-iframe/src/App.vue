@@ -105,7 +105,7 @@ export default {
     this.address = this.aeSdk.addresses()[0]
 
     const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow
-    const connection = BrowserWindowMessageConnection({ target })
+    const connection = new BrowserWindowMessageConnection({ target })
     this.aeSdk.addRpcClient(connection)
     this.shareWalletInfo(connection.sendMessage.bind(connection))
 

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -26,7 +26,6 @@
  * import BrowserWindowMessageConnection
  * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-window-message'
  */
-import stampit from '@stamp/it'
 import WalletConnection from '.'
 import { v4 as uuid } from '@aeternity/uuid'
 import { MESSAGE_DIRECTION } from '../schema'
@@ -37,76 +36,9 @@ import {
   MessageDirectionError
 } from '../../errors'
 
-/**
- * Check if connected
- * @function isConnected
- * @instance
- * @rtype () => Boolean
- * @return {Boolean} Is connected
- */
-function isConnected () {
-  return this.listener
-}
-
-/**
- * Connect
- * @function connect
- * @instance
- * @rtype (onMessage: Function) => void
- * @param {Function} onMessage - Message handler
- * @return {void}
- */
-function connect (onMessage) {
-  const origin = this.origin
-  const receiveDirection = this.receiveDirection
-  const debug = this.debug
-  const forceOrigin = this.forceOrigin
-  if (this.listener) throw new AlreadyConnectedError('You already connected')
-
-  this.listener = (msg) => {
-    if (!msg || typeof msg.data !== 'object') return
-    if (!forceOrigin && origin && origin !== msg.origin) return
-    if (debug) console.log('Receive message: ', msg)
-    if (msg.data.type) {
-      if (msg.data.type !== receiveDirection) return
-      onMessage(msg.data.data, msg.origin, msg.source)
-    } else {
-      onMessage(msg.data, msg.origin, msg.source)
-    }
-  }
-  this.subscribeFn(this.listener)
-}
-
-/**
- * Disconnect
- * @function disconnect
- * @instance
- * @rtype () => void
- * @return {void}
- */
-function disconnect () {
-  if (!this.listener) throw new NoWalletConnectedError('You dont have connection. Please connect before')
-  this.unsubscribeFn(this.listener)
-  this.listener = null
-}
-
-/**
- * Send message
- * @function sendMessage
- * @instance
- * @rtype (msg: Object) => void
- * @param {Object} msg - Message
- * @return {void}
- */
-function sendMessage (msg) {
-  const message = this.sendDirection ? { type: this.sendDirection, data: msg } : msg
-  if (this.debug) console.log('Send message: ', message)
-  this.postFn(message)
-}
-
-const getTarget = () => {
+const getTarget = (): Window | undefined => {
   const isExtensionContext = typeof getBrowserAPI(true).extension === 'object'
-  const isWeb = window && window.location && window.location.protocol.startsWith('http')
+  const isWeb = window?.location?.protocol.startsWith('http')
   const isContentScript = isExtensionContext && isWeb
   if (isContentScript) return window
   // When we is the main page we need to decide the target by our self
@@ -117,10 +49,8 @@ const getTarget = () => {
 
 /**
  * BrowserWindowMessageConnection
- * @function
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication\
  * /connection/browser-window-message
- * @rtype Stamp
  * @param {Object} [params={}] - Initializer object
  * @param {Object} [params.target=window.parent] - Target window for message
  * @param {Object} [params.self=window] - Host window for message
@@ -135,8 +65,24 @@ const getTarget = () => {
  * @param {Boolean} [params.debug=false] - Debug flag
  * @return {Object}
  */
-export default stampit({
-  init ({
+export default class BrowserWindowMessageConnection implements WalletConnection {
+  connectionInfo: {
+    id?: string
+    description?: string
+    origin?: string
+  }
+
+  origin?: string
+  debug: boolean
+  forceOrigin: boolean
+  sendDirection?: string
+  receiveDirection: string
+  subscribeFn: (listener: (this: Window, ev: MessageEvent<any>) => any) => any
+  unsubscribeFn: (listener: (this: Window, ev: MessageEvent<any>) => any) => any
+  postFn: (msg: { type: string, data: any }) => void
+  listener: ((this: Window, ev: MessageEvent<any>) => any) | null
+
+  constructor ({
     connectionInfo = {},
     target = getTarget(),
     self = window,
@@ -145,9 +91,22 @@ export default stampit({
     receiveDirection = MESSAGE_DIRECTION.to_aepp,
     debug = false,
     forceOrigin = false
+  }: {
+    connectionInfo?: {
+      id?: string
+      description?: string
+      origin?: string
+    }
+    target?: Window
+    self?: Window
+    origin?: string
+    sendDirection?: string
+    receiveDirection?: string
+    debug?: boolean
+    forceOrigin?: boolean
   } = {}) {
-    if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new MessageDirectionError(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
-    if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new MessageDirectionError(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
+    if (sendDirection != null && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new MessageDirectionError(`sendDirection must be one of [${JSON.stringify(Object.keys(MESSAGE_DIRECTION))}]`)
+    if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new MessageDirectionError(`receiveDirection must be one of [${JSON.stringify(Object.keys(MESSAGE_DIRECTION))}]`)
     this.connectionInfo = { id: uuid(), ...connectionInfo }
 
     const selfP = self
@@ -159,7 +118,62 @@ export default stampit({
     this.receiveDirection = receiveDirection
     this.subscribeFn = (listener) => selfP.addEventListener('message', listener, false)
     this.unsubscribeFn = (listener) => selfP.removeEventListener('message', listener, false)
-    this.postFn = (msg) => targetP.postMessage(msg, this.origin || '*')
-  },
-  methods: { connect, sendMessage, disconnect, isConnected }
-}, WalletConnection)
+    this.postFn = (msg) => targetP?.postMessage(msg, this.origin ?? '*')
+  }
+
+  /**
+ * Check if connected
+ * @instance
+ * @returns is connected
+ */
+  isConnected (): boolean {
+    return this.listener != null
+  }
+
+  /**
+ * Connect
+ * @instance
+ * @param onMessage - Message handler
+ */
+  connect (onMessage: Function): void {
+    const origin = this.origin
+    const receiveDirection = this.receiveDirection
+    const debug = this.debug
+    const forceOrigin = this.forceOrigin
+    if (this.listener != null) throw new AlreadyConnectedError('You already connected')
+
+    this.listener = (msg: MessageEvent<any>) => {
+      if (msg == null || typeof msg.data !== 'object') return
+      if (!forceOrigin && origin != null && origin !== msg.origin) return
+      if (debug) console.log('Receive message: ', msg)
+      if (msg.data.type != null) {
+        if (msg.data.type !== receiveDirection) return
+        onMessage(msg.data.data, msg.origin, msg.source)
+      } else {
+        onMessage(msg.data, msg.origin, msg.source)
+      }
+    }
+    this.subscribeFn(this.listener)
+  }
+
+  /**
+ * Disconnect
+ * @instance
+ */
+  disconnect (): void {
+    if (this.listener == null) throw new NoWalletConnectedError('You dont have connection. Please connect before')
+    this.unsubscribeFn(this.listener)
+    this.listener = null
+  }
+
+  /**
+ * Send message
+ * @instance
+ * @param msg - Message
+ */
+  sendMessage (msg: MessageEvent): void {
+    const message = this.sendDirection != null ? { type: this.sendDirection, data: msg } : msg
+    if (this.debug) console.log('Send message: ', message)
+    this.postFn(message)
+  }
+}

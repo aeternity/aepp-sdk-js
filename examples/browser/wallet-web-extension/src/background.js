@@ -66,7 +66,7 @@ import {
 
   browser.runtime.onConnect.addListener((port) => {
     // create connection
-    const connection = BrowserRuntimeConnection(
+    const connection = new BrowserRuntimeConnection(
       { connectionInfo: { id: port.sender.frameId }, port }
     )
     // add new aepp to wallet

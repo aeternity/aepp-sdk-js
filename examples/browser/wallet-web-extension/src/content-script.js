@@ -17,14 +17,14 @@ import {
   console.log('Document is ready')
 
   const port = browser.runtime.connect()
-  const extConnection = BrowserRuntimeConnection({
+  const extConnection = new BrowserRuntimeConnection({
     connectionInfo: {
       description: 'Content Script to Extension connection',
       origin: window.origin
     },
     port
   })
-  const pageConnection = BrowserWindowMessageConnection({
+  const pageConnection = new BrowserWindowMessageConnection({
     connectionInfo: {
       description: 'Content Script to Page connection',
       origin: window.origin
@@ -34,6 +34,6 @@ import {
     receiveDirection: MESSAGE_DIRECTION.to_waellet
   })
 
-  const bridge = ContentScriptBridge({ pageConnection, extConnection })
+  const bridge = new ContentScriptBridge({ pageConnection, extConnection })
   bridge.run()
 })()

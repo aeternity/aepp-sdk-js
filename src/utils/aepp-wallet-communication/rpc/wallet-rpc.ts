@@ -11,16 +11,13 @@ import { v4 as uuid } from '@aeternity/uuid'
 import Ae from '../../../ae'
 // @ts-expect-error TODO remove
 import verifyTransaction from '../../../tx/validator'
-// @ts-expect-error TODO remove
 import AccountMultiple from '../../../account/multiple'
 // @ts-expect-error TODO remove
 import TxObject from '../../../tx/tx-object'
 import RpcClient, { Accounts, Connection, Message, RpcClientInfo } from './rpc-client'
-// @ts-expect-error TODO remove
 import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessage } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
-// @ts-expect-error TODO remove
 import { isAccountBase } from '../../../account/base'
 import { filterObject } from '../../other'
 
@@ -85,7 +82,7 @@ const REQUESTS = {
           }
         }
       },
-      (error: any) => {
+      (error: Error) => {
         client.updateInfo({ status: RPC_STATUS.CONNECTION_REJECTED })
         return { error: ERRORS.connectionDeny(error) }
       }
@@ -121,7 +118,7 @@ const REQUESTS = {
           return { error: ERRORS.internalError(e.message) }
         }
       },
-      (error: any) => ({ error: ERRORS.rejectedByUser(error) })
+      (error: Error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
   [METHODS.address] (callInstance: Function, instance: Ae, client: RpcClient) {
@@ -137,7 +134,7 @@ const REQUESTS = {
           [...Object.keys(client.accounts.current ?? {}),
             ...Object.keys(client.accounts.connected ?? {})]
       }),
-      (error: any) => ({ error: ERRORS.rejectedByUser(error) })
+      (error: Error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
   [METHODS.sign] (
@@ -182,7 +179,7 @@ const REQUESTS = {
           throw e
         }
       },
-      (error: any) => ({ error: ERRORS.rejectedByUser(error) })
+      (error: Error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
   [METHODS.signMessage] (
@@ -216,7 +213,7 @@ const REQUESTS = {
           return { error: ERRORS.internalError(e.message) }
         }
       },
-      (error: any) => ({ error: ERRORS.rejectedByUser(error) })
+      (error: Error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   }
 }
@@ -263,7 +260,7 @@ const handleMessage = (instance: Ae, id: string) => async (msg: Message, origin:
  * @function
  * @rtype Stamp
  * @param param Init params object
- * @param [param.name] Wallet name
+ * @param param.name Wallet name
  * @param onConnection Call-back function for incoming AEPP connection
  * @param onSubscription Call-back function for incoming AEPP account subscription
  * @param onSign Call-back function for incoming AEPP sign request
@@ -396,7 +393,7 @@ export default Ae.compose(AccountMultiple, {
      * @rtype (postFn: Function) => void
      * @param postFn Send message function like `(msg) => void`
      */
-    shareWalletInfo (postFn: (msg: Message) => void): void {
+    shareWalletInfo (postFn: (msg: Partial<Message>) => void): void {
       postFn({
         jsonrpc: '2.0',
         ...message(METHODS.readyToConnect, this.getWalletInfo())

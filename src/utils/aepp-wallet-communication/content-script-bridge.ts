@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -24,63 +24,62 @@
  * import ContentScriptBridge
  * from '@aeternity/aepp-sdk/es/utils/wallet-communication/content-script-bridge
  */
-import stampit from '@stamp/it'
-import { UnsupportedPlatformError, MissingParamError } from '../errors'
+import { UnsupportedPlatformError } from '../errors'
+import BrowserRuntimeConnection from './connection/browser-runtime'
+import BrowserWindowMessageConnection from './connection/browser-window-message'
 
 /**
- * Start message proxy
- * @function run
- * @instance
- * @return {void}
- */
-function run () {
-  const allowCrossOrigin = this.allowCrossOrigin
-  // Connect to extension using runtime
-  this.extConnection.connect((msg) => {
-    this.pageConnection.sendMessage(msg)
-  })
-  // Connect to page using window.postMessage
-  this.pageConnection.connect((msg, origin, source) => {
-    if (!allowCrossOrigin && source !== window) return
-    this.extConnection.sendMessage(msg)
-  })
-}
-
-/**
- * Stop message proxy
- * @function stop
- * @instance
- * @return {void}
- */
-function stop () {
-  this.extConnection.disconnect()
-  this.pageConnection.disconnect()
-}
-
-/**
- * ContentScriptBridge stamp
+ * ContentScriptBridge
  * Provide functionality to easly redirect messages from page to extension and from extension to
  * page through content script
  * Using Runtime(Extension) and WindowPostMessage(Web-Page) connections
- * @function
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/content-script-bridge
- * @rtype Stamp
- * @param {Object} params - Initializer object
- * @param {Object} params.pageConnection - Page connection object
+ * @param params - Initializer object
+ * @param params.pageConnection - Page connection object
  * (@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/
  * browser-window-message)
- * @param {Object} params.extConnection - Extension connection object
+ * @param params.extConnection - Extension connection object
  * (@link module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/connection/browser-runtime)
- * @return {Object}
+ * @return ContentScriptBridge object
  */
-export default stampit({
-  init ({ pageConnection, extConnection, allowCrossOrigin = false }) {
-    if (!window) throw new UnsupportedPlatformError('Window object not found, you can run bridge only in browser')
-    if (!pageConnection) throw new MissingParamError('pageConnection required')
-    if (!extConnection) throw new MissingParamError('extConnection required')
+export default class ContentScriptBridge {
+  allowCrossOrigin: boolean
+  pageConnection: BrowserWindowMessageConnection
+  extConnection: BrowserRuntimeConnection
+
+  constructor ({ pageConnection, extConnection, allowCrossOrigin = false }: {
+    pageConnection: BrowserWindowMessageConnection
+    extConnection: BrowserRuntimeConnection
+    allowCrossOrigin: boolean }) {
+    if (window == null) throw new UnsupportedPlatformError('Window object not found, you can run bridge only in browser')
     this.allowCrossOrigin = allowCrossOrigin
     this.pageConnection = pageConnection
     this.extConnection = extConnection
-  },
-  methods: { run, stop }
-})
+  }
+
+  /**
+   * Start message proxy
+   * @instance
+   */
+  run (): void {
+    const allowCrossOrigin = this.allowCrossOrigin
+    // Connect to extension using runtime
+    this.extConnection.connect((msg: MessageEvent) => {
+      this.pageConnection.sendMessage(msg)
+    })
+    // Connect to page using window.postMessage
+    this.pageConnection.connect((msg: MessageEvent, origin: string, source: Window) => {
+      if (!allowCrossOrigin && source !== window) return
+      this.extConnection.sendMessage(msg)
+    })
+  }
+
+  /**
+   * Stop message proxy
+   * @instance
+   */
+  stop (): void {
+    this.extConnection.disconnect()
+    this.pageConnection.disconnect()
+  }
+}

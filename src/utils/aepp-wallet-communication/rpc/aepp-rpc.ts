@@ -8,16 +8,13 @@
  * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
 import { v4 as uuid } from '@aeternity/uuid'
-// @ts-expect-error TODO remove
 import AccountResolver from '../../../account/resolver'
 // @ts-expect-error TODO remove
 import Ae from '../../../ae'
-// @ts-expect-error TODO remove
 import AccountRpc from '../../../account/rpc'
 import { decode, EncodedData } from '../../encoder'
 import AsyncInit from '../../../utils/async-init'
-import RpcClient, { Connection, Message } from './rpc-client'
-// @ts-expect-error TODO remove
+import RpcClient, { Accounts, Connection, Message } from './rpc-client'
 import { getHandler, message } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
 import {
@@ -30,10 +27,13 @@ import {
 } from '../../errors'
 // @ts-expect-error TODO remove
 import Node from '../../../node'
+import BrowserWindowMessageConnection from '../connection/browser-window-message'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import stampit from '@stamp/it'
 
 const NOTIFICATIONS = {
   [METHODS.updateAddress]: (instance: Ae) =>
-    ({ params }: { params: any }) => {
+    ({ params }: { params: Accounts }) => {
       instance.rpcClient.accounts = params
       instance.onAddressChange(params)
     },
@@ -87,13 +87,14 @@ const RESPONSES = {
 
 const REQUESTS = {}
 
-interface WalletInfo {
+export interface WalletInfo {
   id: string
   name: string
   networkId: string
   origin: string
   type: string
   node?: object
+  getConnection: () => Promise<BrowserWindowMessageConnection>
 }
 
 const handleMessage = (instance: Ae) => async (msg: Message) => {
@@ -109,8 +110,6 @@ const handleMessage = (instance: Ae) => async (msg: Message) => {
 /**
   * Contain functionality for wallet interaction and connect it to sdk
   * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc
-  * @function
-  * @rtype Stamp
   * @param param Init params object
   * @param [param.name] Aepp name
   * @param onAddressChange Call-back function for update address event
@@ -143,8 +142,7 @@ export default AccountResolver.compose(AsyncInit, {
     const resolveAccountBase = this._resolveAccount
     this._resolveAccount = (account = this.rpcClient?.currentAccount) => {
       if (typeof account === 'string') {
-        const prefix = 'ak'
-        decode(account as EncodedData<typeof prefix>, prefix)
+        decode(account as EncodedData<'ak'>)
         if (this.rpcClient?.hasAccessToAccount(account) === false) {
           throw new UnAuthorizedAccountError(account)
         }
@@ -160,15 +158,12 @@ export default AccountResolver.compose(AsyncInit, {
     }
   },
   methods: {
-    addresses (): string[] {
+    addresses (): Array<EncodedData<'ak'>> {
       this._ensureAccountAccess()
       return [this.rpcClient.currentAccount, ...Object.keys(this.rpcClient.accounts.connected)]
     },
     /**
       * Connect to wallet
-      * @function connectToWallet
-      * @instance
-      * @rtype (connection: Object) => void
       * @param connection Wallet connection object
       * @param options Options
       * @returns Wallet info
@@ -192,10 +187,7 @@ export default AccountResolver.compose(AsyncInit, {
     },
     /**
       * Disconnect from wallet
-      * @function disconnectWallet
-      * @instance
-      * @rtype (force: Boolean = false) => void
-      * @param sendDisconnect=false Force sending close connection message
+      * @param sendDisconnect Force sending close connection message
       */
     async disconnectWallet (sendDisconnect = true): Promise<void> {
       this._ensureConnected()
@@ -207,9 +199,6 @@ export default AccountResolver.compose(AsyncInit, {
     },
     /**
       * Ask address from wallet
-      * @function askAddresses
-      * @instance
-      * @rtype () => Promise
       * @return Address from wallet
       */
     async askAddresses (): Promise<void> {
@@ -218,9 +207,6 @@ export default AccountResolver.compose(AsyncInit, {
     },
     /**
       * Subscribe for addresses from wallet
-      * @function subscribeAddress
-      * @instance
-      * @rtype (type: String, value: String) => Promise
       * @param value Subscription action('subscribe'|'unsubscribe')
       * @param type Should be one of 'current' (the selected account), 'connected' (all)
       * @return Address from wallet
@@ -231,11 +217,8 @@ export default AccountResolver.compose(AsyncInit, {
     },
     /**
       * Send connection request to wallet
-      * @function sendConnectRequest
-      * @instance
-      * @param {Boolean} connectNode - Request wallet to bind node
-      * @rtype () => Promise
-      * @return {Promise} Connection response
+      * @param connectNode - Request wallet to bind node
+      * @return Connection response
       */
     async sendConnectRequest (connectNode: boolean): Promise<void> {
       return this.rpcClient.request(

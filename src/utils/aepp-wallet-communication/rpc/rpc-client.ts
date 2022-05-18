@@ -8,7 +8,6 @@
  */
 
 import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
-// @ts-expect-error TODO remove
 import { sendMessage, message, isValidAccounts } from '../helpers'
 import {
   InvalidRpcMessageError,
@@ -16,12 +15,29 @@ import {
   DuplicateCallbackError,
   MissingCallbackError
 } from '../../errors'
+import { EncodedData } from '../../encoder'
+
+export interface MessageError{
+  code: number
+  data?: any
+  message: string
+}
+export interface Message {
+  jsonrpc: string
+  id: number
+  method: string
+  version: number
+  params?: any
+  result?: any
+  error?: MessageError
+}
 
 export interface Connection {
+  sendMessage: (msg: Partial<Message>) => void
   isConnected: () => boolean
   disconnect: (forceConnectionClose?: boolean) => void
   connect: (
-    handleMessage: (msg: any, origin: string) => void,
+    handleMessage: (msg: Message, origin: string) => void,
     disconnect: (connection: Connection) => void
   ) => void
   connectionInfo: {id: string}
@@ -47,28 +63,13 @@ export interface RpcClientInfo {
 }
 
 export interface Accounts {
-  connected?: { [pub: string]: {} }
-  current?: { [pub: string]: {} }
-}
-
-export interface Message {
-  jsonrpc: string
-  id: number
-  method: string
-  version: number
-  params?: any
-  result?: any
-  error?: {
-    code: number
-    data?: any
-    message: string
-  }
+  connected?: { [pub: EncodedData<'ak'>]: {} }
+  current?: { [pub: EncodedData<'ak'>]: {} }
 }
 
 /**
  * Contain functionality for using RPC conection
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/rpc-client
- * @function
  * @param param Init params object
  * @param param.name Client name
  * @param param.connection Connection object
@@ -86,8 +87,21 @@ export default class RpcClient {
   addressSubscription: string[]
   accounts: Accounts
   sendMessage: Function
-  readonly addresses: string[]
-  readonly currentAccount: string
+  public get currentAccount (): string | undefined {
+    return isValidAccounts(this.accounts)
+      ? Object.keys(this.accounts.current)[0]
+      : undefined
+  }
+
+  public get addresses (): Array<EncodedData<'ak'>> {
+    return isValidAccounts(this.accounts)
+      ? [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)] as Array<EncodedData<'ak'>>
+      : []
+  }
+
+  public get origin (): Connection {
+    return this.connection
+  }
 
   constructor ({ info, id, name, icons, connection, handlers: [onMessage, onDisconnect] }: {
     id: string
@@ -121,62 +135,22 @@ export default class RpcClient {
     }
 
     this.connection.connect(handleMessage, disconnect)
-
-    Object.defineProperties(this, {
-      currentAccount: {
-        enumerable: true,
-        configurable: false,
-        get () {
-          return this.isHasAccounts() === true
-            ? Object.keys(this.accounts.current)[0]
-            : undefined
-        }
-      },
-      addresses: {
-        enumerable: true,
-        configurable: false,
-        get () {
-          return this.isHasAccounts() === true
-            ? [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
-            : []
-        }
-      },
-      origin: {
-        enumerable: true,
-        configurable: false,
-        get () {
-          return this.connection
-        }
-      }
-    })
   }
 
   /**
    * Update info
-   * @function updateInfo
-   * @instance
-   * @rtype (info: Object) => void
    * @param info Info to update (will be merged with current info object)
    */
   updateInfo (info: Partial<RpcClientInfo>): void {
     this.info = { ...this.info, ...info }
   }
 
-  isHasAccounts (): boolean {
-    return typeof this.accounts === 'object' &&
-      typeof this.accounts.connected === 'object' &&
-      typeof this.accounts.current === 'object'
-  }
-
   isSubscribed (): boolean {
-    return (this.addressSubscription.length > 0) && this.isHasAccounts()
+    return (this.addressSubscription.length > 0) && isValidAccounts(this.accounts)
   }
 
   /**
    * Check if aepp has access to account
-   * @function hasAccessToAccount
-   * @instance
-   * @rtype (address: String) => Boolean
    * @param address Account address
    * @returns is connected
    */
@@ -186,9 +160,6 @@ export default class RpcClient {
 
   /**
    * Check if is connected
-   * @function isConnected
-   * @instance
-   * @rtype () => Boolean
    * @return is connected
    */
   isConnected (): boolean {
@@ -198,9 +169,6 @@ export default class RpcClient {
 
   /**
    * Get selected account
-   * @function getCurrentAccount
-   * @instance
-   * @rtype ({ onAccount } = {}) => String
    * @param options Options
    * @return current account
    */
@@ -210,9 +178,6 @@ export default class RpcClient {
 
   /**
    * Disconnect
-   * @function disconnect
-   * @instance
-   * @rtype () => void
    */
   disconnect (forceConnectionClose: boolean = false): void {
     this.info.status = RPC_STATUS.DISCONNECTED
@@ -240,9 +205,6 @@ export default class RpcClient {
 
   /**
    * Update subscription
-   * @function updateSubscription
-   * @instance
-   * @rtype (type: String, value: String) => void
    * @param type Subscription type
    * @param value Subscription value
    */
@@ -258,14 +220,11 @@ export default class RpcClient {
 
   /**
    * Make a request
-   * @function request
-   * @instance
-   * @rtype (name: String, params: Object) => Promise
    * @param name Method name
    * @param params Method params
    * @return Promise which will be resolved after receiving response message
    */
-  async request (name: string, params: string): Promise<void> {
+  async request (name: string, params: object): Promise<void> {
     const msgId = this.sendMessage(message(name, params))
     if (this.callbacks.has(msgId)) {
       throw new DuplicateCallbackError()
@@ -277,9 +236,6 @@ export default class RpcClient {
 
   /**
    * Process response message
-   * @function processResponse
-   * @instance
-   * @rtype (msg: Object, transformResult: Function) => void
    * @param msg Message object
    * @param transformResult Optional parser function for message
    */

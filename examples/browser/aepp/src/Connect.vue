@@ -84,10 +84,10 @@ export default {
         }
       }
 
-      const scannerConnection = await BrowserWindowMessageConnection({
+      const scannerConnection = await new BrowserWindowMessageConnection({
         connectionInfo: { id: 'spy' }
       })
-      const detector = await WalletDetector({ connection: scannerConnection })
+      const detector = await new WalletDetector({ connection: scannerConnection })
       detector.scan(handleWallets.bind(this))
     },
     async connect () {

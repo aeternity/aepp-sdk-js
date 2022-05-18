@@ -1,6 +1,7 @@
 export const VERSION = 1
 
-export const enum MESSAGE_DIRECTION {
+// ? SEE https://bobbyhadz.com/blog/typescript-const-enum-member-can-only-be-accessed-using-string-literal
+export enum MESSAGE_DIRECTION {
   to_waellet = 'to_waellet',
   to_aepp = 'to_aepp'
 }
