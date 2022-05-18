@@ -14,36 +14,38 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-/* eslint-disable no-unused-expressions */
-
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import BigNumber from 'bignumber.js'
-import { getSdk, BaseAe, networkId } from './'
+// @ts-expect-error
+import { getSdk, BaseAe, networkId } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { pause } from '../../src/utils/other'
+// @ts-expect-error
 import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
+// @ts-expect-error
 import { decode } from '../../src/tx/builder/helpers'
 import Channel from '../../src/channel'
-import { send } from '../../src/channel/internal'
+import { ChannelOptions, send } from '../../src/channel/internal'
 import MemoryAccount from '../../src/account/memory'
 import {
   IllegalArgumentError,
   InsufficientBalanceError,
   ChannelConnectionError
 } from '../../src/utils/errors'
+import { EncodedData } from './../../src/utils/encoder'
 
-const wsUrl = process.env.TEST_WS_URL || 'ws://localhost:3014/channel'
+const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel'
 
 const contractSource = `
 contract Identity =
   entrypoint getArg(x : int) : int = x
 `
 
-function waitForChannel (channel) {
-  return new Promise(resolve =>
-    channel.on('statusChanged', (status) => {
+async function waitForChannel (channel: Channel): Promise<void> {
+  return await new Promise(resolve =>
+    channel.on('statusChanged', (status: string) => {
       if (status === 'open') {
         resolve()
       }
@@ -52,18 +54,18 @@ function waitForChannel (channel) {
 }
 
 describe('Channel', function () {
-  let aeSdkInitiatior
-  let aeSdkResponder
-  let initiatorCh
-  let responderCh
-  let responderShouldRejectUpdate
-  let existingChannelId
-  let offchainTx
-  let contractAddress
-  let callerNonce
-  let contract
-  const initiatorSign = sinon.spy((tag, tx) => aeSdkInitiatior.signTransaction(tx))
-  const responderSign = sinon.spy((tag, tx) => {
+  let aeSdkInitiatior: typeof BaseAe
+  let aeSdkResponder: typeof BaseAe
+  let initiatorCh: Channel
+  let responderCh: Channel
+  let responderShouldRejectUpdate: number | boolean
+  let existingChannelId: string
+  let offchainTx: string
+  let contractAddress: string
+  let callerNonce: number
+  let contract: any
+  const initiatorSign: sinon.SinonSpy = sinon.spy((_tag, tx) => aeSdkInitiatior.signTransaction(tx))
+  const responderSign: sinon.SinonSpy = sinon.spy((_tag, tx) => {
     if (typeof responderShouldRejectUpdate === 'number') {
       return responderShouldRejectUpdate
     }
@@ -72,18 +74,21 @@ describe('Channel', function () {
     }
     return aeSdkResponder.signTransaction(tx)
   })
-  const sharedParams = {
+  const sharedParams: Omit<ChannelOptions, 'sign'> = {
     url: wsUrl,
     pushAmount: 3,
-    initiatorAmount: BigNumber('100e18'),
-    responderAmount: BigNumber('100e18'),
+    initiatorAmount: new BigNumber('100e18'),
+    responderAmount: new BigNumber('100e18'),
     channelReserve: 0,
     ttl: 10000,
     host: 'localhost',
     port: 3001,
     lockPeriod: 1,
     statePassword: 'correct horse battery staple',
-    debug: false
+    debug: false,
+    initiatorId: 'ak_',
+    responderId: 'ak_',
+    role: 'initiator'
   }
 
   before(async function () {
@@ -92,7 +97,7 @@ describe('Channel', function () {
     await aeSdkResponder.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     sharedParams.initiatorId = await aeSdkInitiatior.address()
     sharedParams.responderId = await aeSdkResponder.address()
-    await aeSdkInitiatior.spend(BigNumber('500e18').toString(), await aeSdkResponder.address())
+    await aeSdkInitiatior.spend(new BigNumber('500e18').toString(), await aeSdkResponder.address())
   })
 
   after(() => {
@@ -110,19 +115,20 @@ describe('Channel', function () {
   })
 
   it('can open a channel', async () => {
-    initiatorCh = await Channel({
+    initiatorCh = await Channel.initialize({
       ...sharedParams,
       role: 'initiator',
       sign: initiatorSign
     })
-    responderCh = await Channel({
+    responderCh = await Channel.initialize({
       ...sharedParams,
       role: 'responder',
       sign: responderSign
     })
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
-    initiatorCh.round().should.equal(1)
-    responderCh.round().should.equal(1)
+    expect(initiatorCh.round()).to.equal(1)
+    expect(responderCh.round()).to.equal(1)
+
     sinon.assert.calledOnce(initiatorSign)
     sinon.assert.calledWithExactly(initiatorSign, sinon.match('initiator_sign'), sinon.match.string)
     sinon.assert.calledOnce(responderSign)
@@ -132,7 +138,7 @@ describe('Channel', function () {
       responder: await aeSdkResponder.address(),
       initiatorAmount: sharedParams.initiatorAmount.toString(),
       responderAmount: sharedParams.responderAmount.toString(),
-      channelReserve: sharedParams.channelReserve.toString(),
+      channelReserve: sharedParams?.channelReserve?.toString(),
       lockPeriod: sharedParams.lockPeriod.toString()
     }
     const { txType: initiatorTxType, tx: initiatorTx } = unpackTx(initiatorSign.firstCall.args[1])
@@ -144,19 +150,20 @@ describe('Channel', function () {
   })
 
   it('prints error on handling incoming messages', async () => {
-    const received = new Promise(resolve => sinon.stub(console, 'error').callsFake(resolve))
+    const stub = sinon.stub(console, 'error')
+    const received = new Promise(resolve => stub.callsFake(resolve))
     send(initiatorCh, {
       jsonrpc: '2.0',
       method: 'not-existing-method',
       params: {}
     })
     await received
-    expect(console.error.callCount).to.be.equal(3)
-    expect(console.error.getCall(0).firstArg).to.be.equal('Error handling incoming message:')
-    expect(console.error.getCall(1).firstArg.error.message).to.be.equal('Method not found')
-    expect(console.error.getCall(2).firstArg.toString())
+    expect(stub.callCount).to.be.equal(3)
+    expect(stub.getCall(0).firstArg).to.be.equal('Error handling incoming message:')
+    expect(stub.getCall(1).firstArg.error.message).to.be.equal('Method not found')
+    expect(stub.getCall(2).firstArg.toString())
       .to.be.equal('UnknownChannelStateError: State Channels FSM entered unknown state')
-    console.error.restore()
+    stub.restore()
   })
 
   it('can post update and accept', async () => {
@@ -170,12 +177,12 @@ describe('Channel', function () {
       amount,
       sign
     )
-    initiatorCh.round().should.equal(roundBefore + 1)
+    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1)
     result.accepted.should.equal(true)
-    result.signedTx.should.be.a('string')
+    expect(result.signedTx).to.be.a('string')
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(
+    sinon.assert.calledWithExactly<any>(
       responderSign,
       sinon.match('update_ack'),
       sinon.match.string,
@@ -203,7 +210,8 @@ describe('Channel', function () {
     )
     const { txType } = unpackTx(sign.firstCall.args[0])
     txType.should.equal('channelOffChain')
-    sign.firstCall.args[1].should.eql({
+
+    expect(sign.firstCall.args[1]).to.eql({
       updates: [
         {
           amount,
@@ -227,10 +235,10 @@ describe('Channel', function () {
       sign
     )
     result.accepted.should.equal(false)
-    initiatorCh.round().should.equal(roundBefore)
+    expect(initiatorCh.round()).to.equal(roundBefore)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(
+    sinon.assert.calledWithExactly<any>(
       responderSign,
       sinon.match('update_ack'),
       sinon.match.string,
@@ -258,7 +266,7 @@ describe('Channel', function () {
     )
     const { txType } = unpackTx(sign.firstCall.args[0])
     txType.should.equal('channelOffChain')
-    sign.firstCall.args[1].should.eql({
+    expect(sign.firstCall.args[1]).to.eql({
       updates: [
         {
           amount,
@@ -276,7 +284,7 @@ describe('Channel', function () {
       await aeSdkInitiatior.address(),
       await aeSdkResponder.address(),
       100,
-      () => errorCode
+      async () => await Promise.resolve(errorCode)
     )
     result.should.eql({ accepted: false })
   })
@@ -299,7 +307,7 @@ describe('Channel', function () {
   it('can post bignumber update and accept', async () => {
     responderShouldRejectUpdate = false
     const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior))
-    const amount = BigNumber('10e18')
+    const amount = new BigNumber('10e18')
     const result = await initiatorCh.update(
       await aeSdkInitiatior.address(),
       await aeSdkResponder.address(),
@@ -307,10 +315,10 @@ describe('Channel', function () {
       sign
     )
     result.accepted.should.equal(true)
-    result.signedTx.should.be.a('string')
+    expect(result.signedTx).to.be.a('string')
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(
+    sinon.assert.calledWithExactly<any>(
       responderSign,
       sinon.match('update_ack'),
       sinon.match.string,
@@ -336,9 +344,9 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType } = unpackTx(sign.firstCall.args[0])
+    const { txType } = unpackTx(sign.firstCall.args[0] as string)
     txType.should.equal('channelOffChain')
-    sign.firstCall.args[1].should.eql({
+    expect(sign.firstCall.args[1]).to.eql({
       updates: [
         {
           amount: amount.toString(),
@@ -353,7 +361,7 @@ describe('Channel', function () {
   it('can post update with metadata', async () => {
     responderShouldRejectUpdate = true
     const meta = 'meta 1'
-    const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior))
+    const sign: any = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior))
     await initiatorCh.update(
       await aeSdkInitiatior.address(),
       await aeSdkResponder.address(),
@@ -372,8 +380,8 @@ describe('Channel', function () {
   })
 
   it('can get proof of inclusion', async () => {
-    const initiatorAddr = await aeSdkInitiatior.address()
-    const responderAddr = await aeSdkResponder.address()
+    const initiatorAddr: EncodedData<'ak'> = await aeSdkInitiatior.address()
+    const responderAddr: EncodedData<'ak'> = await aeSdkResponder.address()
     const params = { accounts: [initiatorAddr, responderAddr] }
     const initiatorPoi = await initiatorCh.poi(params)
     const responderPoi = await responderCh.poi(params)
@@ -415,7 +423,7 @@ describe('Channel', function () {
 
   it('can request a withdraw and accept', async () => {
     const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior))
-    const amount = BigNumber('2e18')
+    const amount = new BigNumber('2e18')
     const onOnChainTx = sinon.spy()
     const onOwnWithdrawLocked = sinon.spy()
     const onWithdrawLocked = sinon.spy()
@@ -427,14 +435,14 @@ describe('Channel', function () {
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
     )
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
-    initiatorCh.round().should.equal(roundBefore + 1)
+    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1)
     sinon.assert.called(onOnChainTx)
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string)
     sinon.assert.calledOnce(onOwnWithdrawLocked)
     sinon.assert.calledOnce(onWithdrawLocked)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(
+    sinon.assert.calledWithExactly<any>(
       responderSign,
       sinon.match('withdraw_ack'),
       sinon.match.string,
@@ -458,7 +466,7 @@ describe('Channel', function () {
         }]
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0])
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as string)
     txType.should.equal('channelWithdraw')
     tx.should.eql({
       ...tx,
@@ -469,7 +477,7 @@ describe('Channel', function () {
 
   it('can request a withdraw and reject', async () => {
     const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior))
-    const amount = BigNumber('2e18')
+    const amount = new BigNumber('2e18')
     const onOnChainTx = sinon.spy()
     const onOwnWithdrawLocked = sinon.spy()
     const onWithdrawLocked = sinon.spy()
@@ -480,14 +488,14 @@ describe('Channel', function () {
       sign,
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }
     )
-    initiatorCh.round().should.equal(roundBefore)
+    expect(initiatorCh.round()).to.equal(roundBefore)
     result.should.eql({ ...result, accepted: false })
     sinon.assert.notCalled(onOnChainTx)
     sinon.assert.notCalled(onOwnWithdrawLocked)
     sinon.assert.notCalled(onWithdrawLocked)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(
+    sinon.assert.calledWithExactly<any>(
       responderSign,
       sinon.match('withdraw_ack'),
       sinon.match.string,
@@ -524,7 +532,7 @@ describe('Channel', function () {
     const errorCode = 12345
     const result = await initiatorCh.withdraw(
       100,
-      () => errorCode
+      async () => await Promise.resolve(errorCode)
     )
     result.should.eql({ accepted: false })
   })
@@ -544,7 +552,7 @@ describe('Channel', function () {
 
   it('can request a deposit and accept', async () => {
     const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior))
-    const amount = BigNumber('2e18')
+    const amount = new BigNumber('2e18')
     const onOnChainTx = sinon.spy()
     const onOwnDepositLocked = sinon.spy()
     const onDepositLocked = sinon.spy()
@@ -556,14 +564,14 @@ describe('Channel', function () {
       { onOnChainTx, onOwnDepositLocked, onDepositLocked }
     )
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
-    initiatorCh.round().should.equal(roundBefore + 1)
+    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1)
     sinon.assert.called(onOnChainTx)
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string)
     sinon.assert.calledOnce(onOwnDepositLocked)
     sinon.assert.calledOnce(onDepositLocked)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(
+    sinon.assert.calledWithExactly<any>(
       responderSign,
       sinon.match('deposit_ack'),
       sinon.match.string,
@@ -587,7 +595,7 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0])
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as string)
     txType.should.equal('channelDeposit')
     tx.should.eql({
       ...tx,
@@ -598,7 +606,7 @@ describe('Channel', function () {
 
   it('can request a deposit and reject', async () => {
     const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior))
-    const amount = BigNumber('2e18')
+    const amount = new BigNumber('2e18')
     const onOnChainTx = sinon.spy()
     const onOwnDepositLocked = sinon.spy()
     const onDepositLocked = sinon.spy()
@@ -609,14 +617,14 @@ describe('Channel', function () {
       sign,
       { onOnChainTx, onOwnDepositLocked, onDepositLocked }
     )
-    initiatorCh.round().should.equal(roundBefore)
+    expect(initiatorCh.round()).to.equal(roundBefore)
     result.should.eql({ ...result, accepted: false })
     sinon.assert.notCalled(onOnChainTx)
     sinon.assert.notCalled(onOwnDepositLocked)
     sinon.assert.notCalled(onDepositLocked)
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(
+    sinon.assert.calledWithExactly<any>(
       responderSign,
       sinon.match('deposit_ack'),
       sinon.match.string,
@@ -628,7 +636,7 @@ describe('Channel', function () {
         }]
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0])
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as string)
     txType.should.equal('channelDeposit')
     tx.should.eql({
       ...tx,
@@ -641,7 +649,7 @@ describe('Channel', function () {
     const errorCode = 12345
     const result = await initiatorCh.deposit(
       100,
-      () => errorCode
+      async () => await Promise.resolve(errorCode)
     )
     result.should.eql({ accepted: false })
   })
@@ -665,7 +673,7 @@ describe('Channel', function () {
     result.should.be.a('string')
     sinon.assert.notCalled(initiatorSign)
     sinon.assert.calledOnce(responderSign)
-    sinon.assert.calledWithExactly(
+    sinon.assert.calledWithExactly<any>(
       responderSign,
       sinon.match('shutdown_sign_ack'),
       sinon.match.string,
@@ -673,7 +681,7 @@ describe('Channel', function () {
     )
     sinon.assert.calledOnce(sign)
     sinon.assert.calledWithExactly(sign, sinon.match.string)
-    const { txType, tx } = unpackTx(sign.firstCall.args[0])
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as string)
     txType.should.equal('channelCloseMutual')
     tx.should.eql({
       ...tx,
@@ -685,16 +693,17 @@ describe('Channel', function () {
   it('can leave a channel', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await Channel({
+    initiatorCh = await Channel.initialize({
       ...sharedParams,
       role: 'initiator',
       sign: initiatorSign
     })
-    responderCh = await Channel({
+    responderCh = await Channel.initialize({
       ...sharedParams,
       role: 'responder',
       sign: responderSign
     })
+
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)])
     initiatorCh.round() // existingChannelRound
     const result = await initiatorCh.leave()
@@ -705,7 +714,7 @@ describe('Channel', function () {
   })
 
   it('can reestablish a channel', async () => {
-    initiatorCh = await Channel({
+    initiatorCh = await Channel.initialize({
       ...sharedParams,
       role: 'initiator',
       port: 3002,
@@ -723,13 +732,13 @@ describe('Channel', function () {
   it('can solo close a channel', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await Channel({
+    initiatorCh = await Channel.initialize({
       ...sharedParams,
       role: 'initiator',
       port: 3003,
       sign: initiatorSign
     })
-    responderCh = await Channel({
+    responderCh = await Channel.initialize({
       ...sharedParams,
       role: 'responder',
       port: 3003,
@@ -742,7 +751,7 @@ describe('Channel', function () {
     const { signedTx } = await initiatorCh.update(
       await aeSdkInitiatior.address(),
       await aeSdkResponder.address(),
-      BigNumber('3e18'),
+      new BigNumber('3e18'),
       tx => aeSdkInitiatior.signTransaction(tx)
     )
     const poi = await initiatorCh.poi({
@@ -790,14 +799,14 @@ describe('Channel', function () {
     const responderAddr = await aeSdkResponder.address()
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await Channel({
+    initiatorCh = await Channel.initialize({
       ...sharedParams,
       lockPeriod: 5,
       role: 'initiator',
       sign: initiatorSign,
       port: 3004
     })
-    responderCh = await Channel({
+    responderCh = await Channel.initialize({
       ...sharedParams,
       lockPeriod: 5,
       role: 'responder',
@@ -866,13 +875,13 @@ describe('Channel', function () {
   it('can create a contract and accept', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await Channel({
+    initiatorCh = await Channel.initialize({
       ...sharedParams,
       role: 'initiator',
       port: 3005,
       sign: initiatorSign
     })
-    responderCh = await Channel({
+    responderCh = await Channel.initialize({
       ...sharedParams,
       role: 'responder',
       port: 3005,
@@ -892,7 +901,7 @@ describe('Channel', function () {
     result.should.eql({
       accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx
     })
-    initiatorCh.round().should.equal(roundBefore + 1)
+    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1)
     contractAddress = result.address
   })
 
@@ -902,11 +911,11 @@ describe('Channel', function () {
     const result = await initiatorCh.createContract({
       code: contract.bytecode,
       callData: contract.calldata.encode('Identity', 'init', []),
-      deposit: BigNumber('10e18'),
+      deposit: new BigNumber('10e18'),
       vmVersion: 5,
       abiVersion: 3
     }, async (tx) => aeSdkInitiatior.signTransaction(tx))
-    initiatorCh.round().should.equal(roundBefore)
+    expect(initiatorCh.round()).to.equal(roundBefore)
     result.should.eql({ ...result, accepted: false })
   })
 
@@ -915,10 +924,11 @@ describe('Channel', function () {
     const result = await initiatorCh.createContract({
       code: contract.bytecode,
       callData: contract.calldata.encode('Identity', 'init', []),
-      deposit: BigNumber('10e18'),
+      deposit: new BigNumber('10e18'),
       vmVersion: 5,
       abiVersion: 3
-    }, () => errorCode)
+    },
+    async () => await Promise.resolve(errorCode))
     result.should.eql({ accepted: false })
   })
 
@@ -927,7 +937,7 @@ describe('Channel', function () {
     const result = await initiatorCh.createContract({
       code: contract.bytecode,
       callData: contract.calldata.encode('Identity', 'init', []),
-      deposit: BigNumber('10e18'),
+      deposit: new BigNumber('10e18'),
       vmVersion: 5,
       abiVersion: 3
     }, async (tx) => aeSdkInitiatior.signTransaction(tx))
@@ -947,8 +957,8 @@ describe('Channel', function () {
       abiVersion: 3
     }, async (tx) => aeSdkInitiatior.signTransaction(tx))
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx })
-    initiatorCh.round().should.equal(roundBefore + 1)
-    callerNonce = initiatorCh.round()
+    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1)
+    callerNonce = initiatorCh.round() as number
   })
 
   it('can call a force progress', async () => {
@@ -972,7 +982,7 @@ describe('Channel', function () {
       contract: contractAddress,
       abiVersion: 3
     }, async (tx) => aeSdkInitiatior.signTransaction(tx))
-    initiatorCh.round().should.equal(roundBefore)
+    expect(initiatorCh.round()).to.equal(roundBefore)
     result.should.eql({ ...result, accepted: false })
   })
 
@@ -983,7 +993,8 @@ describe('Channel', function () {
       callData: contract.calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
       abiVersion: 3
-    }, () => errorCode)
+    },
+    async () => await Promise.resolve(errorCode))
     result.should.eql({ accepted: false })
   })
 
@@ -1020,7 +1031,7 @@ describe('Channel', function () {
       returnValue: result.returnValue
     })
     expect(result.returnType).to.be.equal('ok')
-    expect(contract.calldata.decode('Identity', 'getArg', result.returnValue)).to.be.equal(42n)
+    expect(contract.calldata.decode('Identity', 'getArg', result.returnValue).toString()).to.be.equal('42')
   })
 
   it('can call a contract using dry-run', async () => {
@@ -1042,12 +1053,12 @@ describe('Channel', function () {
       returnValue: result.returnValue
     })
     expect(result.returnType).to.be.equal('ok')
-    expect(contract.calldata.decode('Identity', 'getArg', result.returnValue)).to.be.equal(42n)
+    expect(contract.calldata.decode('Identity', 'getArg', result.returnValue).toString()).to.be.equal('42')
   })
 
   it('can clean contract calls', async () => {
     await initiatorCh.cleanContractCalls()
-    initiatorCh.getContractCall({
+    void initiatorCh.getContractCall({
       caller: await aeSdkInitiatior.address(),
       contract: contractAddress,
       round: callerNonce
@@ -1085,13 +1096,14 @@ describe('Channel', function () {
   it('can reconnect', async () => {
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await Channel({
+    initiatorCh = await Channel.initialize({
       ...sharedParams,
       role: 'initiator',
       port: 3006,
       sign: initiatorSign
     })
-    responderCh = await Channel({
+
+    responderCh = await Channel.initialize({
       ...sharedParams,
       role: 'responder',
       port: 3006,
@@ -1104,17 +1116,19 @@ describe('Channel', function () {
       100,
       tx => aeSdkInitiatior.signTransaction(tx)
     )
-    result.accepted.should.be.true
+    expect(result.accepted).to.equal(true)
     const channelId = await initiatorCh.id()
     const fsmId = initiatorCh.fsmId()
     initiatorCh.disconnect()
-    const ch = await Channel({
+    const ch = await Channel.initialize({
+      ...sharedParams,
       url: sharedParams.url,
       host: sharedParams.host,
       port: 3006,
       role: 'initiator',
       existingChannelId: channelId,
-      existingFsmId: fsmId
+      existingFsmId: fsmId,
+      sign: responderSign
     })
     await waitForChannel(ch)
     ch.fsmId().should.equal(fsmId)
@@ -1128,12 +1142,12 @@ describe('Channel', function () {
     //   }
     //   ch.on('stateChanged', checkRound)
     // })
-    ch.state().should.eventually.be.fulfilled
+    void ch.state().should.eventually.be.fulfilled
     await pause(10 * 1000)
   })
 
   it('can post backchannel update', async () => {
-    async function appendSignature (target, source) {
+    function appendSignature (target: string, source: string): EncodedData<'tx'> {
       const { txType, tx: { signatures, encodedTx: { rlpEncoded } } } = unpackTx(target)
       return buildTx({
         signatures: signatures.concat(unpackTx(source).tx.signatures),
@@ -1143,13 +1157,13 @@ describe('Channel', function () {
 
     initiatorCh.disconnect()
     responderCh.disconnect()
-    initiatorCh = await Channel({
+    initiatorCh = await Channel.initialize({
       ...sharedParams,
       role: 'initiator',
       port: 3007,
       sign: initiatorSign
     })
-    responderCh = await Channel({
+    responderCh = await Channel.initialize({
       ...sharedParams,
       role: 'responder',
       port: 3007,
@@ -1163,7 +1177,7 @@ describe('Channel', function () {
       100,
       tx => aeSdkResponder.signTransaction(tx)
     )
-    accepted.should.be.false
+    expect(accepted).to.equal(false)
     const result = await responderCh.update(
       await aeSdkInitiatior.address(),
       await aeSdkResponder.address(),
@@ -1174,7 +1188,7 @@ describe('Channel', function () {
       )
     )
     result.accepted.should.equal(true)
-    result.signedTx.should.be.a('string')
+    expect(result.signedTx).to.be.a('string')
     initiatorCh.disconnect()
     initiatorCh.disconnect()
   })
@@ -1183,13 +1197,13 @@ describe('Channel', function () {
     before(async function () {
       initiatorCh.disconnect()
       responderCh.disconnect()
-      initiatorCh = await Channel({
+      initiatorCh = await Channel.initialize({
         ...sharedParams,
         role: 'initiator',
         port: 3008,
         sign: initiatorSign
       })
-      responderCh = await Channel({
+      responderCh = await Channel.initialize({
         ...sharedParams,
         role: 'responder',
         port: 3008,
@@ -1203,25 +1217,37 @@ describe('Channel', function () {
       responderCh.disconnect()
     })
 
-    async function update ({ from, to, amount, sign }) {
-      return initiatorCh.update(
-        from || await aeSdkInitiatior.address(),
-        to || await aeSdkResponder.address(),
-        amount || 1,
-        sign || aeSdkInitiatior.signTransaction
+    async function update (
+      { from, to, amount, sign }: {
+        from?: string
+        to?: string
+        amount?: number | BigNumber
+        sign?: (tx: string) => Promise<string>
+      }
+    ): Promise<{
+        accepted: boolean
+        signedTx?: string
+        errorCode?: number
+        errorMessage?: string
+      }> {
+      return await initiatorCh.update(
+        from ?? await aeSdkInitiatior.address(),
+        to ?? await aeSdkResponder.address(),
+        amount ?? 1,
+        sign ?? aeSdkInitiatior.signTransaction
       )
     }
 
     it('when posting an update with negative amount', async () => {
-      return update({ amount: -10 }).should.eventually.be.rejectedWith(IllegalArgumentError, 'Amount cannot be negative')
+      await update({ amount: -10 }).should.eventually.be.rejectedWith(IllegalArgumentError, 'Amount cannot be negative')
     })
 
     it('when posting an update with insufficient balance', async () => {
-      return update({ amount: BigNumber('999e18') }).should.eventually.be.rejectedWith(InsufficientBalanceError, 'Insufficient balance')
+      await update({ amount: new BigNumber('999e18') }).should.eventually.be.rejectedWith(InsufficientBalanceError, 'Insufficient balance')
     })
 
     it('when posting an update with incorrect address', async () => {
-      return update({ from: 'ak_123' }).should.eventually.be.rejectedWith(ChannelConnectionError, 'Rejected')
+      await update({ from: 'ak_123' }).should.eventually.be.rejectedWith(ChannelConnectionError, 'Rejected')
     })
   })
 })
