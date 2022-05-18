@@ -89,7 +89,6 @@ BaseError
 │   │   InvalidTxError
 │   │   InvalidTxParamsError
 │   │   NoDefaultAensPointerError
-│   │   PrefixMismatchError
 │   │   PrefixNotFoundError
 │   │   SchemaNotFoundError
 │   │   TagNotFoundError

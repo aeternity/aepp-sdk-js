@@ -555,13 +555,6 @@ export class NoDefaultAensPointerError extends TransactionError {
   }
 }
 
-export class PrefixMismatchError extends TransactionError {
-  constructor (prefix: string, requiredPrefix: string) {
-    super(`Encoded string have a wrong type: ${prefix} (expected: ${requiredPrefix})`)
-    this.name = 'PrefixMismatchError'
-  }
-}
-
 export class PrefixNotFoundError extends TransactionError {
   constructor (tag: string) {
     super(`Prefix for id-tag ${tag} not found.`)

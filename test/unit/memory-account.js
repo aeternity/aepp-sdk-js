@@ -20,7 +20,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import MemoryAccount from '../../src/account/memory'
 import { generateKeyPair } from '../../src/utils/crypto'
-import { InvalidKeypairError, PrefixMismatchError } from '../../src/utils/errors'
+import { InvalidKeypairError, DecodeError } from '../../src/utils/errors'
 
 const testAcc = generateKeyPair()
 
@@ -33,7 +33,7 @@ describe('MemoryAccount', function () {
 
     it('Fail on invalid publicKey', async () => {
       expect(() => MemoryAccount({ keypair: { publicKey: ' ', secretKey: testAcc.secretKey } }))
-        .to.throw(PrefixMismatchError, 'Encoded string have a wrong type:   (expected: ak)')
+        .to.throw(DecodeError, 'Encoded string missing payload')
     })
 
     it('Fail on invalid publicKey', async () => {

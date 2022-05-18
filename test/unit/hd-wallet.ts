@@ -23,7 +23,7 @@ import {
   getSaveHDWalletAccounts,
   DerivationError
 } from '../../src/utils/hd-wallet'
-import { encode, decode } from '../../src/utils/encoder'
+import { encode, decode, EncodedData } from '../../src/utils/encoder'
 
 describe('hd wallet', () => {
   const testMnemonicSeed = Buffer.from('Git7bFJkmfC1Ho+6YFSFuxSzmDZydmjzk8FubrPDz4PmrkORlBDlfnPTk02Wq9Pj2ZdQ5cTA0SxHKGrq3xSjOw==', 'base64')
@@ -174,7 +174,7 @@ describe('hd wallet', () => {
 
   it('get HdWalletAccount from seed', () => {
     const wallet = getHdWalletAccountFromSeed(testMnemonicSeed, 0)
-    decode(wallet.publicKey, 'ak')
+    decode(wallet.publicKey as EncodedData<'ak'>)
   })
 
   it('Derive child with invalid path', () => {

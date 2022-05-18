@@ -115,9 +115,6 @@ describe('Tx', function () {
     it('throws if invalid checksum', () => expect(() => decode('ak_23aaaaa'))
       .to.throw('Invalid checksum'))
 
-    it('throws if not matching type', () => expect(() => decode('cb_DA6sWJo=', 'ak'))
-      .to.throw('Encoded string have a wrong type: cb (expected: ak)'))
-
     it('throws if invalid size', () => expect(() => decode('ak_An6Ui6sE1F'))
       .to.throw('Payload should be 32 bytes, got 4 instead'))
   })

@@ -62,7 +62,7 @@ class _AccountMemory extends _AccountBase {
     const secretKey = typeof keypair.secretKey === 'string'
       ? Buffer.from(keypair.secretKey, 'hex')
       : keypair.secretKey
-    if (!isValidKeypair(secretKey, decode(keypair.publicKey, 'ak'))) {
+    if (!isValidKeypair(secretKey, decode(keypair.publicKey))) {
       throw new InvalidKeypairError('Invalid Key Pair')
     }
 

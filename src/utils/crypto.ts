@@ -54,7 +54,7 @@ export function getAddressFromPriv (secret: string | Uint8Array): string {
  */
 export function isAddressValid (address: string, prefix: EncodingType = 'ak'): boolean {
   try {
-    decode(address as EncodedData<typeof prefix>, prefix)
+    decode(address as EncodedData<typeof prefix>)
     return true
   } catch (e) {
     return false
@@ -102,7 +102,7 @@ export function hash (input: Data): Buffer {
  * @return {String} - Contract address
  */
 export function encodeContractAddress (owner: EncodedData<'ak'>, nonce: number): string {
-  const publicKey = decode(owner, 'ak')
+  const publicKey = decode(owner)
   const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
   return encode(hash(binary), 'ct')
 }

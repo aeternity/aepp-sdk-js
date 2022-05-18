@@ -68,7 +68,7 @@ export abstract class _AccountBase {
   ): Promise<EncodedData<'tx'>> {
     const prefixes = [this.getNetworkId({ networkId })]
     if (innerTx === true) prefixes.push('inner_tx')
-    const rlpBinaryTx = decode(tx, 'tx')
+    const rlpBinaryTx = decode(tx)
     const txWithNetworkId = Buffer.concat([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)])
 
     const signatures = [await this.sign(txWithNetworkId, options)]
