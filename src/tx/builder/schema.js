@@ -10,8 +10,6 @@ import BigNumber from 'bignumber.js'
 import { Name, NameId, NameFee, Deposit } from './field-types'
 
 export * from './constants'
-export const VSN = 1
-export const VSN_2 = 2
 
 // # TRANSACTION DEFAULT TTL
 export const TX_TTL = 0
