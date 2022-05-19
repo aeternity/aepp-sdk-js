@@ -47,7 +47,7 @@
 // ## 1. Specify imports
 // You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
-const { Universal, Node, MemoryAccount, generateKeyPair } = require('@aeternity/aepp-sdk')
+const { Universal, Node, MemoryAccount, generateKeyPair, TX_TYPE } = require('@aeternity/aepp-sdk')
 
 // **Note**:
 //
@@ -138,7 +138,7 @@ const NEW_USER_KEYPAIR = generateKeyPair();
     { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS }
   )
   const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', [])
-  const contractCallTx = await aeSdk.contractCallTx({
+  const contractCallTx = await aeSdk.buildTx(TX_TYPE.contractCall, {
     callerId: await newUserAccount.address(),
     contractId: CONTRACT_ADDRESS,
     amount: 0,

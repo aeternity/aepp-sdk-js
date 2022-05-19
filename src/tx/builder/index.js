@@ -21,12 +21,13 @@ import {
   writeId,
   writeInt,
   buildPointers,
+  buildContractId,
   encode,
   decode
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree from '../../utils/mptree'
-import { InvalidTxParamsError, SchemaNotFoundError } from '../../utils/errors'
+import { ArgumentError, InvalidTxParamsError, SchemaNotFoundError } from '../../utils/errors'
 
 /**
  * JavaScript-based Transaction builder
@@ -440,6 +441,19 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
 export function buildTxHash (rawTx) {
   const data = typeof rawTx === 'string' && rawTx.startsWith('tx_') ? decode(rawTx, 'tx') : rawTx
   return encode(hash(data), 'th')
+}
+
+/**
+ * Build a contract public key by contractCreateTx or gaAttach
+ * @param {string} contractTx Transaction
+ * @return {string} Contract public key
+ */
+export function buildContractIdByContractTx (contractTx) {
+  const { txType, tx } = unpackTx(contractTx)
+  if (![TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType)) {
+    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', txType)
+  }
+  return buildContractId(tx.ownerId, +tx.nonce)
 }
 
 export default {

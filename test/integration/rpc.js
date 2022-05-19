@@ -17,7 +17,7 @@
 
 import { before, describe, it, after } from 'mocha'
 import { expect } from 'chai'
-import { MemoryAccount, Node, RpcAepp, RpcWallet } from '../../src'
+import { MemoryAccount, Node, RpcAepp, RpcWallet, TX_TYPE } from '../../src'
 import { unpackTx } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/browser-window-message'
@@ -228,7 +228,7 @@ describe('Aepp<->Wallet', function () {
         action.deny()
       }
       const address = await aepp.address()
-      const tx = await aepp.spendTx({
+      const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
         amount: 0,
@@ -242,7 +242,7 @@ describe('Aepp<->Wallet', function () {
       wallet.onSign = (aepp, action) => {
         action.accept(null, { onAccount: {} })
       }
-      const tx = await aepp.spendTx({
+      const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: keypair.publicKey,
         recipientId: keypair.publicKey,
         amount: 0,
@@ -257,7 +257,7 @@ describe('Aepp<->Wallet', function () {
         action.accept()
       }
       const address = await aepp.address()
-      const tx = await aepp.spendTx({
+      const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
         amount: 0,
@@ -288,13 +288,13 @@ describe('Aepp<->Wallet', function () {
       wallet.onSign = (aepp, action) => {
         action.accept(tx2)
       }
-      const tx2 = await aepp.spendTx({
+      const tx2 = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
         amount: 0,
         payload: 'zerospend2'
       })
-      const tx = await aepp.spendTx({
+      const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
         amount: 0,
@@ -351,7 +351,7 @@ describe('Aepp<->Wallet', function () {
         action.accept()
       }
       const address = await aepp.address()
-      const tx = await aepp.spendTx({
+      const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
         amount: 0,
@@ -569,13 +569,13 @@ describe('Aepp<->Wallet', function () {
       wallet.onSign = (aepp, action) => {
         action.accept(tx2)
       }
-      const tx2 = await aepp.spendTx({
+      const tx2 = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
         amount: 0,
         payload: 'zerospend2'
       })
-      const tx = await aepp.spendTx({
+      const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
         amount: 0,

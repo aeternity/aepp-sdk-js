@@ -26,7 +26,6 @@ import Ae from '../ae'
 import Tx from './'
 import { buildTx, calculateFee, unpackTx } from './builder'
 import { ABI_VERSIONS, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
-import { buildContractId } from './builder/helpers'
 import {
   ArgumentError,
   UnsupportedABIversionError,
@@ -35,230 +34,57 @@ import {
   UnknownTxError
 } from '../utils/errors'
 
-async function spendTx ({ senderId, recipientId, payload = '' }) {
-  const { ttl, nonce, fee } = await this.prepareTxParams(
-    TX_TYPE.spend, { senderId, ...arguments[0], payload }
-  )
-  return buildTx({
-    ...arguments[0],
-    recipientId,
-    senderId,
-    nonce,
-    ttl,
-    fee,
-    payload
-  }, TX_TYPE.spend).tx
-}
-
-async function namePreclaimTx ({ accountId }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.namePreClaim, { senderId: accountId, ...arguments[0] }
-  )
-  return buildTx(
-    { ...arguments[0], nonce, ttl, fee },
-    TX_TYPE.namePreClaim
-  ).tx
-}
-
-async function nameClaimTx ({ accountId, vsn = 2 }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.nameClaim, { senderId: accountId, ...arguments[0], vsn }
-  )
-  return buildTx(
-    { ...arguments[0], nonce, ttl, fee },
-    TX_TYPE.nameClaim,
-    { vsn }
-  ).tx
-}
-
-async function nameTransferTx ({ accountId, recipientId }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.nameTransfer, { senderId: accountId, ...arguments[0] }
-  )
-  return buildTx(
-    { ...arguments[0], recipientId, nonce, ttl, fee },
-    TX_TYPE.nameTransfer
-  ).tx
-}
-
-async function nameUpdateTx ({ accountId }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.nameUpdate, { senderId: accountId, ...arguments[0] }
-  )
-  return buildTx(
-    { ...arguments[0], nonce, ttl, fee },
-    TX_TYPE.nameUpdate
-  ).tx
-}
-
-async function nameRevokeTx ({ accountId }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.nameRevoke, { senderId: accountId, ...arguments[0] }
-  )
-  return buildTx(
-    { ...arguments[0], nonce, ttl, fee },
-    TX_TYPE.nameRevoke
-  ).tx
-}
-
-async function contractCreateTx ({ ownerId }) {
-  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.contractCreate, { senderId: ownerId, ...arguments[0], ctVersion }
-  )
-  return {
-    tx: buildTx(
-      { ...arguments[0], nonce, ttl, fee, ctVersion },
-      TX_TYPE.contractCreate
-    ).tx,
-    contractId: buildContractId(ownerId, nonce)
+async function asyncBuildTx (txType, params) {
+  let senderKey
+  switch (txType) {
+    case TX_TYPE.spend:
+    case TX_TYPE.oracleQuery:
+      senderKey = 'senderId'
+      break
+    case TX_TYPE.nameClaim:
+    case TX_TYPE.nameUpdate:
+    case TX_TYPE.nameRevoke:
+    case TX_TYPE.nameTransfer:
+    case TX_TYPE.namePreClaim:
+    case TX_TYPE.oracleRegister:
+      senderKey = 'accountId'
+      break
+    case TX_TYPE.contractCreate:
+    case TX_TYPE.gaAttach:
+      senderKey = 'ownerId'
+      break
+    case TX_TYPE.contractCall:
+    case TX_TYPE.oracleExtend:
+    case TX_TYPE.oracleResponse:
+      senderKey = 'callerId'
+      break
+    case TX_TYPE.channelCloseSolo:
+    case TX_TYPE.channelSlash:
+    case TX_TYPE.channelSettle:
+    case TX_TYPE.channelSnapshotSolo:
+      senderKey = 'fromId'
+      break
+    case TX_TYPE.payingFor:
+      senderKey = 'payerId'
+      break
+    default:
+      throw new ArgumentError('txType', 'valid transaction type', txType)
   }
-}
-
-async function contractCallTx ({ callerId }) {
-  const ctVersion = this.getVmVersion(TX_TYPE.contractCall, arguments[0])
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.contractCall,
-    { senderId: callerId, ...arguments[0], abiVersion: ctVersion.abiVersion }
-  )
-  return buildTx(
-    { ...arguments[0], nonce, ttl, fee, abiVersion: ctVersion.abiVersion },
-    TX_TYPE.contractCall
-  ).tx
-}
-
-async function oracleRegisterTx ({
-  accountId, queryFormat, responseFormat, queryFee, oracleTtl, abiVersion = ABI_VERSIONS.NO_ABI
-}) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.oracleRegister, { senderId: accountId, ...arguments[0], abiVersion }
-  )
-  return buildTx({
-    accountId,
-    queryFee,
-    abiVersion,
-    fee,
-    oracleTtl,
-    nonce,
-    ttl,
-    queryFormat,
-    responseFormat
-  }, TX_TYPE.oracleRegister).tx
-}
-
-async function oracleExtendTx ({ oracleId, callerId, oracleTtl }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.oracleExtend, { senderId: callerId, ...arguments[0] }
-  )
-  return buildTx(
-    { oracleId, fee, oracleTtl, nonce, ttl },
-    TX_TYPE.oracleExtend
-  ).tx
-}
-
-async function oraclePostQueryTx ({ oracleId, responseTtl, query, queryTtl, queryFee, senderId }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.oracleQuery, { senderId, ...arguments[0] }
-  )
-  return buildTx(
-    { oracleId, responseTtl, query, queryTtl, fee, queryFee, ttl, nonce, senderId },
-    TX_TYPE.oracleQuery
-  ).tx
-}
-
-async function oracleRespondTx ({ oracleId, callerId, responseTtl, queryId, response }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.oracleResponse, { senderId: callerId, ...arguments[0] }
-  )
-  return buildTx(
-    { oracleId, responseTtl, queryId, response, fee, ttl, nonce },
-    TX_TYPE.oracleResponse
-  ).tx
-}
-
-async function channelCloseSoloTx ({ channelId, fromId, payload, poi }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.channelCloseSolo, { senderId: fromId, ...arguments[0], payload }
-  )
-  return buildTx({
-    ...arguments[0],
-    channelId,
-    fromId,
-    payload,
-    poi,
-    ttl,
-    fee,
-    nonce
-  }, TX_TYPE.channelCloseSolo).tx
-}
-
-async function channelSlashTx ({ channelId, fromId, payload, poi }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.channelSlash, { senderId: fromId, ...arguments[0], payload }
-  )
-  return buildTx({
-    ...arguments[0],
-    channelId,
-    fromId,
-    payload,
-    poi,
-    ttl,
-    fee,
-    nonce
-  }, TX_TYPE.channelSlash).tx
-}
-
-async function channelSettleTx ({ channelId, fromId, initiatorAmountFinal, responderAmountFinal }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.channelSettle, { senderId: fromId, ...arguments[0] }
-  )
-  return buildTx({
-    ...arguments[0],
-    channelId,
-    fromId,
-    initiatorAmountFinal,
-    responderAmountFinal,
-    ttl,
-    fee,
-    nonce
-  }, TX_TYPE.channelSettle).tx
-}
-
-async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.channelSnapshotSolo, { senderId: fromId, ...arguments[0], payload }
-  )
-  return buildTx({
-    ...arguments[0],
-    channelId,
-    fromId,
-    payload,
-    ttl,
-    fee,
-    nonce
-  }, TX_TYPE.channelSnapshotSolo).tx
-}
-
-async function gaAttachTx ({ ownerId }) {
-  const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
-  const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.gaAttach, { senderId: ownerId, ...arguments[0], ctVersion }
-  )
-  return {
-    tx: buildTx(
-      { ...arguments[0], nonce, ttl, fee, ctVersion },
-      TX_TYPE.gaAttach
-    ).tx,
-    contractId: buildContractId(ownerId, nonce)
+  // TODO: move specific cases to field-types
+  if ([TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType)) {
+    params.ctVersion = this.getVmVersion(TX_TYPE.contractCreate, params)
   }
-}
-
-async function payingForTx ({ tx, payerId, ...args }) {
-  const params = { tx: unpackTx(tx), payerId }
-  const { fee, nonce } = await this.prepareTxParams(TX_TYPE.payingFor, {
-    ...params, ...args, senderId: payerId
-  })
-  return buildTx({ ...params, ...args, fee, nonce }, TX_TYPE.payingFor).tx
+  if (txType === TX_TYPE.contractCall) {
+    params.abiVersion = this.getVmVersion(TX_TYPE.contractCall, params).abiVersion
+  }
+  if (txType === TX_TYPE.oracleRegister) {
+    params.abiVersion ??= ABI_VERSIONS.NO_ABI
+  }
+  if (txType === TX_TYPE.payingFor) {
+    params.tx = unpackTx(params.tx)
+  }
+  const extraParams = await this.prepareTxParams(txType, { ...params, senderId: params[senderKey] })
+  return buildTx({ ...params, ...extraParams }, txType).tx
 }
 
 /**
@@ -369,25 +195,8 @@ const Transaction = Ae.compose(Tx, {
     showWarning: false
   },
   methods: {
-    spendTx,
-    namePreclaimTx,
-    nameClaimTx,
-    nameTransferTx,
-    nameUpdateTx,
-    nameRevokeTx,
-    contractCreateTx,
-    contractCallTx,
+    buildTx: asyncBuildTx,
     prepareTxParams,
-    oracleRegisterTx,
-    oracleExtendTx,
-    oraclePostQueryTx,
-    oracleRespondTx,
-    channelCloseSoloTx,
-    channelSlashTx,
-    channelSettleTx,
-    channelSnapshotSoloTx,
-    gaAttachTx,
-    payingForTx,
     getAccountNonce,
     getVmVersion
   }

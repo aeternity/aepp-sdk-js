@@ -24,7 +24,7 @@
  */
 import Contract from '../../ae/contract'
 import { TX_TYPE } from '../../tx/builder/schema'
-import { buildTx, unpackTx } from '../../tx/builder'
+import { buildContractIdByContractTx, buildTx, unpackTx } from '../../tx/builder'
 import { prepareGaParams } from './helpers'
 import { hash } from '../../utils/crypto'
 import { decode } from '../../utils/encoder'
@@ -92,7 +92,7 @@ async function createGeneralizedAccount (authFnName, source, args = [], options 
 
   const contract = await this.getContractInstance({ source })
   await contract.compile()
-  const { tx, contractId } = await this.gaAttachTx({
+  const tx = await this.buildTx(TX_TYPE.gaAttach, {
     ...opt,
     gasLimit: opt.gasLimit ?? await contract._estimateGas('init', args, opt),
     ownerId,
@@ -100,6 +100,7 @@ async function createGeneralizedAccount (authFnName, source, args = [], options 
     callData: contract.calldata.encode(contract._name, 'init', args),
     authFun: hash(authFnName)
   })
+  const contractId = buildContractIdByContractTx(tx)
 
   const { hash: transaction, rawTx } = await this.send(tx, opt)
 

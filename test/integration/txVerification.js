@@ -5,6 +5,7 @@ import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 import verifyTransaction from '../../src/tx/validator'
 import { ArgumentError } from '../../src/utils/errors'
+import { TX_TYPE } from '../../src'
 
 describe('Verify Transaction', function () {
   let aeSdk, node
@@ -16,12 +17,12 @@ describe('Verify Transaction', function () {
   })
 
   it('validates params in buildRawTx', async () => {
-    return expect(aeSdk.spendTx({})).to.be.rejectedWith(ArgumentError, 'value should be a number, got undefined instead')
+    return expect(aeSdk.buildTx(TX_TYPE.spend, {})).to.be.rejectedWith(ArgumentError, 'value should be a number, got undefined instead')
     // TODO: should be /^Transaction build error./ instead
   })
 
   it('returns errors', async () => {
-    const spendTx = await aeSdk.spendTx({
+    const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
       senderId: await aeSdk.address(),
       recipientId: await aeSdk.address(),
       amount: 1e30,
@@ -41,7 +42,7 @@ describe('Verify Transaction', function () {
   })
 
   it('returns NonceHigh error', async () => {
-    const spendTx = await aeSdk.spendTx({
+    const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
       senderId: await aeSdk.address(),
       recipientId: await aeSdk.address(),
       amount: 100,
@@ -52,7 +53,7 @@ describe('Verify Transaction', function () {
   })
 
   it('verifies transactions before broadcasting', async () => {
-    const spendTx = await aeSdk.spendTx({
+    const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
       senderId: await aeSdk.address(),
       recipientId: await aeSdk.address(),
       amount: 1,

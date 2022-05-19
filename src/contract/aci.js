@@ -23,8 +23,9 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
-import { DRY_RUN_ACCOUNT, GAS_MAX } from '../tx/builder/schema'
+import { DRY_RUN_ACCOUNT, GAS_MAX, TX_TYPE } from '../tx/builder/schema'
 import { decode } from '../tx/builder/helpers'
+import { buildContractIdByContractTx, unpackTx } from '../tx/builder'
 import {
   MissingContractDefError,
   MissingContractAddressError,
@@ -43,7 +44,6 @@ import {
   AmbiguousEventDefinitionError
 } from '../utils/errors'
 import { hash } from '../utils/crypto'
-import { unpackTx } from '../tx/builder'
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
@@ -185,13 +185,14 @@ export default async function getContractInstance ({
     if (instance.deployInfo.address) throw new DuplicateContractError()
 
     const ownerId = await this.address(opt)
-    const { tx, contractId } = await this.contractCreateTx({
+    const tx = await this.buildTx(TX_TYPE.contractCreate, {
       ...opt,
       gasLimit: opt.gasLimit ?? await instance._estimateGas('init', params, opt),
       callData: instance.calldata.encode(instance._name, 'init', params),
       code: instance.bytecode,
       ownerId
     })
+    const contractId = buildContractIdByContractTx(tx)
     const { hash, rawTx, result, txData } = await sendAndProcess(tx, opt)
     instance.deployInfo = Object.freeze({
       result,
@@ -254,15 +255,15 @@ export default async function getContractInstance ({
         nonce: opt.nonce ??
           (opt.top && (await this.getAccount(callerId, { hash: opt.top })).nonce + 1)
       }
-      const tx = fn === 'init'
-        ? (await this.contractCreateTx({ ...txOpt, code: instance.bytecode, ownerId: callerId })).tx
-        : await this.contractCallTx({ ...txOpt, callerId, contractId })
+      const tx = await this.buildTx(...fn === 'init'
+        ? [TX_TYPE.contractCreate, { ...txOpt, code: instance.bytecode, ownerId: callerId }]
+        : [TX_TYPE.contractCall, { ...txOpt, callerId, contractId }])
 
       const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, opt)
       await handleCallError(callObj, tx)
       res = { ...dryRunOther, tx: unpackTx(tx), result: callObj }
     } else {
-      const tx = await this.contractCallTx({
+      const tx = await this.buildTx(TX_TYPE.contractCall, {
         ...opt,
         gasLimit: opt.gasLimit ?? await instance._estimateGas(fn, params, opt),
         callerId,

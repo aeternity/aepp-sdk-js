@@ -19,7 +19,7 @@ import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
 import { getSdk, BaseAe } from './'
-import { generateKeyPair, MemoryAccount } from '../../src'
+import { generateKeyPair, MemoryAccount, TX_TYPE } from '../../src'
 
 describe('Paying for transaction of another account', function () {
   let aeSdk
@@ -32,7 +32,7 @@ describe('Paying for transaction of another account', function () {
     const sender = MemoryAccount({ keypair: generateKeyPair() })
     const receiver = MemoryAccount({ keypair: generateKeyPair() })
     await aeSdk.spend(1e4, await sender.address())
-    const spendTx = await aeSdk.spendTx({
+    const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
       senderId: await sender.address(),
       recipientId: await receiver.address(),
       amount: 1e4
