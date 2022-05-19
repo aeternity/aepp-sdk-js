@@ -406,7 +406,8 @@ export function buildTx (
   type,
   { excludeKeys = [], prefix = 'tx', vsn = VSN, denomination = AE_AMOUNT_FORMATS.AETTOS } = {}
 ) {
-  const [schema, tag] = getSchema({ type, vsn })
+  const schema = getSchema({ type, vsn })
+  const tag = Object.entries(OBJECT_ID_TX_TYPE).find(([, t]) => t === type)[0]
   const binary = buildRawTx(
     { ...params, VSN: vsn, tag },
     schema,
@@ -438,7 +439,7 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
 
   const objId = readInt(binary[0])
   const vsn = readInt(binary[1])
-  const [schema] = getSchema({ objId, vsn })
+  const schema = getSchema({ objId, vsn })
 
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
 }
