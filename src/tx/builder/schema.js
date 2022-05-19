@@ -7,7 +7,7 @@
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
-import { Name, NameId, NameFee, Deposit } from './field-types'
+import { Name, NameId, NameFee, Deposit, GasPrice } from './field-types'
 
 export * from './constants'
 
@@ -21,7 +21,6 @@ export const RESPONSE_TTL = { type: 'delta', value: 10 }
 // # CONTRACT
 export const AMOUNT = 0
 export const GAS_MAX = 1600000 - 21000
-export const MIN_GAS_PRICE = 1e9
 export const MAX_AUTH_FUN_GAS = 50000
 export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
 
@@ -430,7 +429,7 @@ const GA_ATTACH_TX = [
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('gasLimit', FIELD_TYPES.int),
-  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', GasPrice),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
 ]
 
@@ -441,7 +440,7 @@ const GA_META_TX_2 = [
   TX_FIELD('abiVersion', FIELD_TYPES.int),
   TX_FIELD('fee', FIELD_TYPES.int),
   TX_FIELD('gasLimit', FIELD_TYPES.int),
-  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', GasPrice),
   TX_FIELD('tx', FIELD_TYPES.rlpBinary)
 ]
 
@@ -464,7 +463,7 @@ const CONTRACT_CREATE_TX = [
   TX_FIELD('deposit', Deposit),
   TX_FIELD('amount', FIELD_TYPES.amount),
   TX_FIELD('gasLimit', FIELD_TYPES.int),
-  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', GasPrice),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
 ]
 
@@ -478,7 +477,7 @@ const CONTRACT_CALL_TX = [
   TX_FIELD('ttl', FIELD_TYPES.int),
   TX_FIELD('amount', FIELD_TYPES.amount),
   TX_FIELD('gasLimit', FIELD_TYPES.int),
-  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', GasPrice),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
 ]
 
@@ -488,7 +487,7 @@ const CONTRACT_CALL_RESULT_TX = [
   TX_FIELD('callerNonce', FIELD_TYPES.int),
   TX_FIELD('height', FIELD_TYPES.int),
   TX_FIELD('contractId', FIELD_TYPES.id, 'ct'),
-  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', GasPrice),
   TX_FIELD('gasUsed', FIELD_TYPES.int),
   TX_FIELD('returnValue', FIELD_TYPES.binary, 'cb'),
   TX_FIELD('returnType', FIELD_TYPES.callReturnType),
@@ -698,7 +697,7 @@ const CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = [
   TX_FIELD('amount', FIELD_TYPES.int),
   TX_FIELD('callData', FIELD_TYPES.binary, 'cb'),
   TX_FIELD('callStack', FIELD_TYPES.callStack),
-  TX_FIELD('gasPrice', FIELD_TYPES.int),
+  TX_FIELD('gasPrice', GasPrice),
   TX_FIELD('gasLimit', FIELD_TYPES.int)
 ]
 

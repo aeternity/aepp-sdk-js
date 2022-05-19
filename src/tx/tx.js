@@ -25,7 +25,7 @@
 import Ae from '../ae'
 import Tx from './'
 import { buildTx, calculateFee, unpackTx } from './builder'
-import { ABI_VERSIONS, MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
+import { ABI_VERSIONS, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL } from './builder/schema'
 import { buildContractId } from './builder/helpers'
 import {
   ArgumentError,
@@ -101,28 +101,28 @@ async function nameRevokeTx ({ accountId }) {
   ).tx
 }
 
-async function contractCreateTx ({ ownerId, gasPrice = MIN_GAS_PRICE }) {
+async function contractCreateTx ({ ownerId }) {
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
   const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.contractCreate, { senderId: ownerId, ...arguments[0], ctVersion, gasPrice }
+    TX_TYPE.contractCreate, { senderId: ownerId, ...arguments[0], ctVersion }
   )
   return {
     tx: buildTx(
-      { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
+      { ...arguments[0], nonce, ttl, fee, ctVersion },
       TX_TYPE.contractCreate
     ).tx,
     contractId: buildContractId(ownerId, nonce)
   }
 }
 
-async function contractCallTx ({ callerId, gasPrice = MIN_GAS_PRICE }) {
+async function contractCallTx ({ callerId }) {
   const ctVersion = this.getVmVersion(TX_TYPE.contractCall, arguments[0])
   const { fee, ttl, nonce } = await this.prepareTxParams(
     TX_TYPE.contractCall,
-    { senderId: callerId, ...arguments[0], gasPrice, abiVersion: ctVersion.abiVersion }
+    { senderId: callerId, ...arguments[0], abiVersion: ctVersion.abiVersion }
   )
   return buildTx(
-    { ...arguments[0], nonce, ttl, fee, abiVersion: ctVersion.abiVersion, gasPrice },
+    { ...arguments[0], nonce, ttl, fee, abiVersion: ctVersion.abiVersion },
     TX_TYPE.contractCall
   ).tx
 }
@@ -239,14 +239,14 @@ async function channelSnapshotSoloTx ({ channelId, fromId, payload }) {
   }, TX_TYPE.channelSnapshotSolo).tx
 }
 
-async function gaAttachTx ({ ownerId, gasPrice = MIN_GAS_PRICE }) {
+async function gaAttachTx ({ ownerId }) {
   const ctVersion = this.getVmVersion(TX_TYPE.contractCreate, arguments[0])
   const { fee, ttl, nonce } = await this.prepareTxParams(
-    TX_TYPE.gaAttach, { senderId: ownerId, ...arguments[0], ctVersion, gasPrice }
+    TX_TYPE.gaAttach, { senderId: ownerId, ...arguments[0], ctVersion }
   )
   return {
     tx: buildTx(
-      { ...arguments[0], nonce, ttl, fee, ctVersion, gasPrice },
+      { ...arguments[0], nonce, ttl, fee, ctVersion },
       TX_TYPE.gaAttach
     ).tx,
     contractId: buildContractId(ownerId, nonce)

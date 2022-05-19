@@ -19,7 +19,7 @@ import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import { BaseAe, spendPromise, publicKey } from './index'
 import { commitmentHash, oracleQueryId, decode, encode } from '../../src/tx/builder/helpers'
-import { GAS_MAX, MIN_GAS_PRICE } from '../../src/tx/builder/schema'
+import { GAS_MAX } from '../../src/tx/builder/schema'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
 
 const nonce = 1
@@ -111,7 +111,6 @@ describe('Transaction', function () {
         code: await contract.compile(),
         amount,
         gasLimit: GAS_MAX,
-        gasPrice: MIN_GAS_PRICE,
         callData: contract.calldata.encode('Identity', 'init', [])
       })
       expect(nativeTx.contractId).to.be.equal(contractId)
@@ -126,7 +125,6 @@ describe('Transaction', function () {
       contractId,
       amount,
       gasLimit: GAS_MAX,
-      gasPrice: MIN_GAS_PRICE,
       callData: contract.calldata.encode('Identity', 'getArg', [2])
     })
   ], [

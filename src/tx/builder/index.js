@@ -307,7 +307,7 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
     schema
       // TODO: allow optional keys in schema
       .filter(([key]) => !excludeKeys.includes(key) &&
-        !['payload', 'nameFee', 'deposit'].includes(key))
+        !['payload', 'nameFee', 'deposit', 'gasPrice'].includes(key))
       .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
       .filter(([, message]) => message)
   )

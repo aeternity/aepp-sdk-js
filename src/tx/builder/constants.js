@@ -9,6 +9,7 @@ export const NAME_TTL = 180000
 export const NAME_MAX_TTL = 36000
 export const NAME_MAX_CLIENT_TTL = 84600
 export const CLIENT_TTL = NAME_MAX_CLIENT_TTL
+export const MIN_GAS_PRICE = 1e9
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
 export const NAME_FEE_MULTIPLIER = 1e14 // 100000000000000
 export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
