@@ -45,4 +45,8 @@ import Aens from './aens'
   address: keypair.publicKey,
 })
  */
-export default Ae.compose(Tx, Oracle, Aens, WalletRpc, ContractCompilerHttp)
+export default Ae.compose({
+  init (options) {
+    this.contractCompiler = new ContractCompilerHttp(options)
+  }
+}, Tx, Oracle, Aens, WalletRpc)

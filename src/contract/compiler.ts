@@ -23,7 +23,6 @@
  * @example import { ContractCompilerHttp } from '@aeternity/aepp-sdk'
  */
 
-import stampit from '@stamp/it'
 import semverSatisfies from '../utils/semver-satisfies'
 import { Compiler as CompilerApi } from '../apis/compiler'
 import { UnsupportedVersionError } from '../utils/errors'
@@ -40,15 +39,22 @@ interface ErrorFormatterError {
   type: string
   context?: string
 }
-
-export class _ContractCompilerHttp {
+/**
+  * Contract Compiler Class
+  *
+  * This class includes api call's related to contract compiler functionality.
+  * @alias module:@aeternity/aepp-sdk/es/contract/compiler
+  * @param options - Initializer object
+  * @returns Contract compiler instance
+  * @example ContractCompilerHttp({ compilerUrl: 'COMPILER_URL' })
+  */
+export default class ContractCompilerHttp {
   compilerApi: CompilerApi
   compilerVersion: string
 
-  // TODO: replace with constructor after dropping account stamps
-  init ({ compilerUrl, ignoreVersion }: {
+  constructor ({ compilerUrl, ignoreVersion }: {
     compilerUrl?: string
-    ignoreVersion?: boolean }): void {
+    ignoreVersion?: boolean }) {
     if (compilerUrl == null) return
     this.setCompilerUrl(compilerUrl, { ignoreVersion })
   }
@@ -93,25 +99,6 @@ export class _ContractCompilerHttp {
     })
   }
 }
-
-/**
-    * Contract Compiler Stamp
-    *
-    * This stamp include api call's related to contract compiler functionality.
-    * @alias module:@aeternity/aepp-sdk/es/contract/compiler
-    * @param options - Initializer object
-    * @returns Contract compiler instance
-    * @example ContractCompilerHttp({ compilerUrl: 'COMPILER_URL' })
-    */
-export default stampit <_ContractCompilerHttp>({
-  init: _ContractCompilerHttp.prototype.init,
-  methods: {
-    setCompilerUrl: _ContractCompilerHttp.prototype.setCompilerUrl
-  },
-  props: {
-    compilerVersion: _ContractCompilerHttp.prototype.compilerVersion
-  }
-})
 
 const COMPILER_GE_VERSION = '6.1.0'
 const COMPILER_LT_VERSION = '7.0.0'

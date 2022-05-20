@@ -37,7 +37,7 @@ import { concatBuffers } from '../../utils/other'
 import { Account } from '../../account/resolver'
 import getContractInstance, { ContractInstance } from '../aci'
 import { _AccountBase } from '../../account/base'
-import { _ContractCompilerHttp } from '../compiler'
+import ContractCompilerHttp from '../compiler'
 import NodeApi from '../../nodeApi'
 
 export interface AuthData {
@@ -83,7 +83,7 @@ export async function isGA (
 export async function createGeneralizedAccount (
   { onAccount, onCompiler, onNode }: {
     onAccount: Account
-    onCompiler: _ContractCompilerHttp & { api: any }
+    onCompiler: ContractCompilerHttp & { api: any }
     onNode: Node},
   authFnName: string,
   source: string,

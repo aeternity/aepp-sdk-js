@@ -128,7 +128,7 @@ describe('Contract', function () {
   })
 
   it('compiles Sophia code', async () => {
-    bytecode = (await aeSdk.compilerApi.compileContract({
+    bytecode = (await aeSdk.contractCompiler.compilerApi.compileContract({
       code: identityContract, options: {}
     })).bytecode
     expect(bytecode).to.satisfy(b => b.startsWith('cb_'))
@@ -276,7 +276,7 @@ describe('Contract', function () {
     let bytecode
 
     it('compile', async () => {
-      bytecode = (await aeSdk.compilerApi.compileContract({
+      bytecode = (await aeSdk.contractCompiler.compilerApi.compileContract({
         code: identityContract, options: {}
       })).bytecode
       expect(bytecode).to.be.a('string')
@@ -284,7 +284,7 @@ describe('Contract', function () {
     })
 
     it('throws clear exception if compile broken contract', async () => {
-      await expect(aeSdk.compilerApi.compileContract({
+      await expect(aeSdk.contractCompiler.compilerApi.compileContract({
         code:
           'contract Foo =\n' +
           '  entrypoint getArg(x : bar) = x\n' +
@@ -302,28 +302,29 @@ describe('Contract', function () {
     })
 
     it('generate contract ACI', async () => {
-      const aci = await aeSdk.compilerApi.generateACI({ code: identityContract, options: {} })
+      const aci = await aeSdk.contractCompiler.compilerApi.generateACI(
+        { code: identityContract, options: {} })
       expect(aci).to.have.property('encodedAci')
       expect(aci).to.have.property('externalEncodedAci')
       expect(aci).to.have.property('interface')
     })
 
     it('throws clear exception if generating ACI with no arguments', async () => {
-      await expect(aeSdk.compilerApi.generateACI({ options: {} }))
+      await expect(aeSdk.contractCompiler.compilerApi.generateACI({ options: {} }))
         .to.be.rejectedWith('Error "body.code cannot be null or undefined." occurred in serializing the payload - undefined')
     })
 
     it('validate bytecode', async () => {
-      expect(await aeSdk.compilerApi.validateByteCode({
+      expect(await aeSdk.contractCompiler.compilerApi.validateByteCode({
         bytecode, source: identityContract, options: {}
       })).to.be.eql({ body: {} })
     })
 
     it('Use invalid compiler url', async () => {
-      aeSdk.setCompilerUrl('https://compiler.aepps.comas')
-      await expect(aeSdk.compilerApi.generateACI({ code: 'test' }))
+      aeSdk.contractCompiler.setCompilerUrl('https://compiler.aepps.comas')
+      await expect(aeSdk.contractCompiler.compilerApi.generateACI({ code: 'test' }))
         .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas')
-      aeSdk.setCompilerUrl(compilerUrl)
+      aeSdk.contractCompiler.setCompilerUrl(compilerUrl)
     })
   })
 

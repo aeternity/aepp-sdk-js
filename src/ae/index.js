@@ -210,9 +210,9 @@ const Ae = stampit(NodePool, Tx, AccountResolver, {
             onNode: this.selectedNode.instance,
             onAccount: this,
             onCompiler: {
-              compilerApi: this.compilerApi,
-              api: this.api,
-              compilerVersion: this.compilerVersion
+              compilerApi: this.contractCompiler.compilerApi,
+              compilerVersion: this.contractCompiler.compilerVersion,
+              api: this.api
             }
           }
           const firstArg = args[0]

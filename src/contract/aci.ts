@@ -49,7 +49,7 @@ import {
 import { hash } from '../utils/crypto'
 import { Aci as CompiledAci } from '../apis/compiler'
 import { Account } from '../account/resolver'
-import { _ContractCompilerHttp } from './compiler'
+import ContractCompilerHttp from './compiler'
 import { getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun } from '../chain'
 import NodeApi from '../nodeApi'
 
@@ -180,7 +180,7 @@ export default async function getContractInstance ({
   ...otherOptions
 }: {
   onAccount?: Account
-  onCompiler?: _ContractCompilerHttp & {
+  onCompiler?: ContractCompilerHttp & {
     api: any
   }
   onNode?: Node
@@ -195,7 +195,8 @@ export default async function getContractInstance ({
 
   if (_aci == null && source != null) {
     // @ts-expect-error TODO should be fixed when the compiledAci interface gets updated
-    _aci = await onCompiler.compilerApi.generateACI({ code: source, options: { fileSystem } })
+    _aci = await onCompiler.compilerApi.generateACI(
+      { code: source, options: { fileSystem } })
   }
   if (_aci == null) throw new MissingContractDefError()
 
@@ -253,9 +254,10 @@ export default async function getContractInstance ({
   instance.compile = async (options = {}): Promise<string> => {
     if (instance.bytecode != null) throw new IllegalArgumentError('Contract already compiled')
     if (instance.source == null) throw new IllegalArgumentError('Can\'t compile without source code')
-    const { bytecode }: { bytecode: string } = await onCompiler.compilerApi.compileContract({
-      code: instance.source, options: { ...instance.options, ...options }
-    })
+    const { bytecode }: { bytecode: string } =
+      await onCompiler.compilerApi.compileContract({
+        code: instance.source, options: { ...instance.options, ...options }
+      })
     instance.bytecode = bytecode
     return instance.bytecode
   }

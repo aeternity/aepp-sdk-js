@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -41,4 +41,8 @@ import Oracle from './oracle'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-export default Ae.compose(Tx, Oracle, ContractCompilerHttp, Aens, AeppRpc)
+export default Ae.compose({
+  init (options) {
+    this.contractCompiler = new ContractCompilerHttp(options)
+  }
+}, Tx, Oracle, Aens, AeppRpc)

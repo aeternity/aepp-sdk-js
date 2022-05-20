@@ -80,7 +80,7 @@ export default {
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
       ([aeSdk, address]) => {
         if (!aeSdk) return
-        this.compilerVersion = aeSdk.compilerVersion
+        this.contractCompiler.compilerVersion = aeSdk.contractCompiler.compilerVersion
         this.balancePromise = aeSdk.getBalance(address)
         this.heightPromise = aeSdk.height()
         this.nodeInfoPromise = aeSdk.getNodeInfo()
