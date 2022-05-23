@@ -29,7 +29,7 @@
 import { salt } from '../utils/crypto'
 import { commitmentHash, ensureNameValid, isAuctionName } from '../tx/builder/helpers'
 import Ae from './'
-import { CLIENT_TTL, NAME_TTL } from '../tx/builder/schema'
+import { CLIENT_TTL, NAME_TTL, TX_TYPE } from '../tx/builder/schema'
 import { ArgumentError } from '../utils/errors'
 
 /**
@@ -58,7 +58,7 @@ async function revoke (name, options = {}) {
   ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
 
-  const nameRevokeTx = await this.nameRevokeTx({
+  const nameRevokeTx = await this.buildTx(TX_TYPE.nameRevoke, {
     ...opt,
     nameId: name,
     accountId: await this.address(opt)
@@ -108,7 +108,7 @@ async function update (name, pointers = {}, options = {}) {
     ...pointers
   }
 
-  const nameUpdateTx = await this.nameUpdateTx({
+  const nameUpdateTx = await this.buildTx(TX_TYPE.nameUpdate, {
     ...opt,
     nameId: name,
     accountId: await this.address(opt),
@@ -146,7 +146,7 @@ async function transfer (name, account, options = {}) {
   ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
 
-  const nameTransferTx = await this.nameTransferTx({
+  const nameTransferTx = await this.buildTx(TX_TYPE.nameTransfer, {
     ...opt,
     nameId: name,
     accountId: await this.address(opt),
@@ -237,7 +237,7 @@ async function claim (name, salt, options) {
   ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
 
-  const claimTx = await this.nameClaimTx({
+  const claimTx = await this.buildTx(TX_TYPE.nameClaim, {
     ...opt,
     accountId: await this.address(opt),
     nameSalt: salt,
@@ -285,7 +285,7 @@ async function preclaim (name, options = {}) {
   const height = await this.height()
   const commitmentId = commitmentHash(name, _salt)
 
-  const preclaimTx = await this.namePreclaimTx({
+  const preclaimTx = await this.buildTx(TX_TYPE.namePreClaim, {
     ...opt,
     accountId: await this.address(opt),
     commitmentId

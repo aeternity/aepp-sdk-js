@@ -19,7 +19,7 @@ import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import { BaseAe, spendPromise, publicKey } from './index'
 import { commitmentHash, oracleQueryId, decode, encode } from '../../src/tx/builder/helpers'
-import { GAS_MAX, MIN_GAS_PRICE } from '../../src/tx/builder/schema'
+import { GAS_MAX, TX_TYPE } from '../../src/tx/builder/schema'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
 
 const nonce = 1
@@ -67,10 +67,11 @@ describe('Transaction', function () {
 
   it('build spend tx using denomination amount', async () => {
     const params = { senderId, recipientId, nonce, payload: 'test' }
-    const spendAe = await aeSdk.spendTx(
+    const spendAe = await aeSdk.buildTx(
+      TX_TYPE.spend,
       { ...params, amount: 1, denomination: AE_AMOUNT_FORMATS.AE }
     )
-    const spendAettos = await aeSdk.spendTx({ ...params, amount: 1e18, payload: 'test' })
+    const spendAettos = await aeSdk.buildTx(TX_TYPE.spend, { ...params, amount: 1e18, payload: 'test' })
     spendAe.should.be.equal(spendAettos)
   })
 
@@ -78,77 +79,74 @@ describe('Transaction', function () {
   [[
     'spend',
     'tx_+F0MAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg9e1n8oAAABhHRlc3QLK3OW',
-    () => aeSdk.spendTx({
+    () => aeSdk.buildTx(TX_TYPE.spend, {
       senderId, recipientId, nonce, payload: 'test', amount: 2, denomination: AE_AMOUNT_FORMATS.AE
     })
   ], [
     'name pre-claim',
     'tx_+E8hAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQOvDVCf43V7alNbsUvTarXaCf7rjtWX36YLS4+JTa4jn4YPHaUyOAAAxRZ6Sg==',
-    () => aeSdk.namePreclaimTx({ accountId: senderId, nonce, commitmentId })
+    () => aeSdk.buildTx(TX_TYPE.namePreClaim, { accountId: senderId, nonce, commitmentId })
   ], [
     'name claim',
     'tx_+FEgAqEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABkXRlc3QxMjN0ZXN0LmNoYWluhw7wBz3KlPuJNjXJrcXeoAAAhg8m9WHIAABl9JBX',
-    () => aeSdk.nameClaimTx({ accountId: senderId, nonce, name, nameSalt, nameFee })
+    () => aeSdk.buildTx(TX_TYPE.nameClaim, { accountId: senderId, nonce, name, nameSalt, nameFee })
   ], [
     'name update',
     'tx_+IQiAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPAHy8Y5hY2NvdW50X3B1YmtleaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABhhAUch6gAADR52s+',
-    () => aeSdk.nameUpdateTx({ accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl })
+    () => aeSdk.buildTx(
+      TX_TYPE.nameUpdate,
+      { accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl }
+    )
   ], [
     'name revoke',
     'tx_+E8jAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPIYPHaUyOAAA94BVgw==',
-    () => aeSdk.nameRevokeTx({ accountId: senderId, nonce, nameId })
+    () => aeSdk.buildTx(TX_TYPE.nameRevoke, { accountId: senderId, nonce, nameId })
   ], [
     'name transfer',
     'tx_+HEkAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPKEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7CGD7v4WsgAAL1d+NM=',
-    () => aeSdk.nameTransferTx({ accountId: senderId, nonce, nameId, recipientId })
+    () => aeSdk.buildTx(TX_TYPE.nameTransfer, { accountId: senderId, nonce, nameId, recipientId })
   ], [
     'contract create',
     'tx_+LAqAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNi4xLjAAgwcAA4ZHcyzkwAAAAACDGBf4hDuaygCHKxFE1kQfP+Jcll0=',
-    async () => {
-      const nativeTx = await aeSdk.contractCreateTx({
-        nonce,
-        ownerId: address,
-        code: await contract.compile(),
-        amount,
-        gasLimit: GAS_MAX,
-        gasPrice: MIN_GAS_PRICE,
-        callData: contract.calldata.encode('Identity', 'init', [])
-      })
-      expect(nativeTx.contractId).to.be.equal(contractId)
-      return nativeTx.tx
-    }
+    async () => aeSdk.buildTx(TX_TYPE.contractCreate, {
+      nonce,
+      ownerId: address,
+      code: await contract.compile(),
+      amount,
+      gasLimit: GAS_MAX,
+      callData: contract.calldata.encode('Identity', 'init', [])
+    })
   ], [
     'contract call',
     'tx_+GMrAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQU7e5ChtHAGM1Nh0MVEV74SbrYb1b5FQ3WBd7OBpwALyQOGpYvVcSgAAACDGBf4hDuaygCIKxGAeCCSGwQL3c3m',
-    () => aeSdk.contractCallTx({
+    () => aeSdk.buildTx(TX_TYPE.contractCall, {
       nonce,
       callerId: address,
       contractId,
       amount,
       gasLimit: GAS_MAX,
-      gasPrice: MIN_GAS_PRICE,
       callData: contract.calldata.encode('Identity', 'getArg', [2])
     })
   ], [
     'oracle register',
     'tx_+FAWAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19gnUwAIIB9IYPN7jqmAAAAGsRIcw=',
-    () => aeSdk.oracleRegisterTx({
+    () => aeSdk.buildTx(TX_TYPE.oracleRegister, {
       nonce, accountId: address, queryFormat, responseFormat, queryFee, oracleTtl
     })
   ], [
     'oracle extend',
     'tx_8RkBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajOwEAggH0hg6itfGYAADwE/X7',
-    () => aeSdk.oracleExtendTx({ nonce, oracleId, callerId: address, oracleTtl })
+    () => aeSdk.buildTx(TX_TYPE.oracleExtend, { nonce, oracleId, callerId: address, oracleTtl })
   ], [
     'oracle post query',
     'tx_+GkXAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajO5J7J2NpdHknOiAnQmVybGluJ32CdTAAZABkhg+bJBmGAAAtn7nr',
-    () => aeSdk.oraclePostQueryTx({
+    () => aeSdk.buildTx(TX_TYPE.oracleQuery, {
       nonce, oracleId, responseTtl, query, queryTtl, queryFee, senderId: address
     })
   ], [
     'oracle respond query',
     'tx_+F0YAaEE1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoClgM30zCmbxGvUfzRbIZXGzOT8KCzYAUMRdnxbBX2Q9jHsndG1wJzogMTAxfQBkhg9jQvwmAADfRUs7',
-    () => aeSdk.oracleRespondTx({
+    () => aeSdk.buildTx(TX_TYPE.oracleResponse, {
       nonce,
       oracleId,
       callerId: address,

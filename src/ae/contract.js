@@ -29,7 +29,7 @@
 import Ae from './'
 import ContractCompilerHttp from '../contract/compiler'
 import getContractInstance from '../contract/aci'
-import { AMOUNT, MIN_GAS_PRICE } from '../tx/builder/schema'
+import { AMOUNT } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 
 /**
@@ -140,7 +140,6 @@ export default Ae.compose(ContractCompilerHttp, {
   deepProps: {
     Ae: {
       defaults: {
-        gasPrice: MIN_GAS_PRICE,
         amount: AMOUNT
       }
     }

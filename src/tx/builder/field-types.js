@@ -2,6 +2,7 @@ import {
   writeId, readId, isNameValid, produceNameId, ensureNameValid, getMinimumNameFee, readInt, writeInt
 } from './helpers'
 import { InsufficientNameFeeError, IllegalArgumentError } from '../../utils/errors'
+import { MIN_GAS_PRICE } from './constants'
 
 export class Field {
   static serialize (value) {
@@ -53,6 +54,19 @@ export class Deposit extends Field {
   static serialize (value) {
     if (+value) throw new IllegalArgumentError(`Contract deposit is not refundable, so it should be equal 0, got ${value} instead`)
     return writeInt(0)
+  }
+
+  static deserialize (value) {
+    return readInt(value)
+  }
+}
+
+export class GasPrice extends Field {
+  static serialize (value = MIN_GAS_PRICE) {
+    if (+value < MIN_GAS_PRICE) {
+      throw new IllegalArgumentError(`Gas price ${value} must be bigger then ${MIN_GAS_PRICE}`)
+    }
+    return writeInt(value)
   }
 
   static deserialize (value) {

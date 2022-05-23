@@ -12,8 +12,7 @@ import {
   TX_FEE_BASE_GAS,
   TX_FEE_OTHER_GAS,
   TX_SERIALIZATION_SCHEMA,
-  TX_TYPE,
-  VSN
+  TX_TYPE
 } from './schema'
 import {
   readInt,
@@ -22,12 +21,13 @@ import {
   writeId,
   writeInt,
   buildPointers,
+  buildContractId,
   encode,
   decode
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree from '../../utils/mptree'
-import { InvalidTxParamsError, SchemaNotFoundError } from '../../utils/errors'
+import { ArgumentError, InvalidTxParamsError, SchemaNotFoundError } from '../../utils/errors'
 
 /**
  * JavaScript-based Transaction builder
@@ -308,7 +308,7 @@ export function validateParams (params, schema, { excludeKeys = [] }) {
     schema
       // TODO: allow optional keys in schema
       .filter(([key]) => !excludeKeys.includes(key) &&
-        !['payload', 'nameFee', 'deposit'].includes(key))
+        !['payload', 'nameFee', 'deposit', 'gasPrice'].includes(key))
       .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
       .filter(([, message]) => message)
   )
@@ -366,27 +366,6 @@ export function unpackRawTx (binary, schema) {
 }
 
 /**
- * Get transaction serialization/deserialization schema
- * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param {{ vsn: String, objId: Number, type: String }}
- * @throws {Error} Schema not found error
- * @return {Object} Schema
- */
-const getSchema = ({ vsn, objId, type }) => {
-  const isDeserialize = !!objId
-  const firstKey = isDeserialize ? objId : type
-  const schema = isDeserialize ? TX_DESERIALIZATION_SCHEMA : TX_SERIALIZATION_SCHEMA
-
-  if (!schema[firstKey]) {
-    throw new SchemaNotFoundError(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type}`)
-  }
-  if (!schema[firstKey][vsn]) {
-    throw new SchemaNotFoundError(`Transaction ${isDeserialize ? 'deserialization' : 'serialization'} not implemented for ${isDeserialize ? 'tag ' + objId : type} version ${vsn}`)
-  }
-  return schema[firstKey][vsn]
-}
-
-/**
  * Build transaction hash
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
@@ -404,9 +383,15 @@ const getSchema = ({ vsn, objId, type }) => {
 export function buildTx (
   params,
   type,
-  { excludeKeys = [], prefix = 'tx', vsn = VSN, denomination = AE_AMOUNT_FORMATS.AETTOS } = {}
+  { excludeKeys = [], prefix = 'tx', vsn, denomination = AE_AMOUNT_FORMATS.AETTOS } = {}
 ) {
-  const [schema, tag] = getSchema({ type, vsn })
+  const schemas = TX_SERIALIZATION_SCHEMA[type]
+  vsn ??= schemas && Math.max(...Object.keys(schemas).map(a => +a))
+  const schema = schemas?.[vsn]
+  if (schema == null) {
+    throw new SchemaNotFoundError('serialization', type, vsn)
+  }
+  const tag = Object.entries(OBJECT_ID_TX_TYPE).find(([, t]) => t === type)[0]
   const binary = buildRawTx(
     { ...params, VSN: vsn, tag },
     schema,
@@ -438,7 +423,10 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
 
   const objId = readInt(binary[0])
   const vsn = readInt(binary[1])
-  const [schema] = getSchema({ objId, vsn })
+  const schema = TX_DESERIALIZATION_SCHEMA[objId]?.[vsn]
+  if (schema == null) {
+    throw new SchemaNotFoundError('deserialization', `tag ${objId}`, vsn)
+  }
 
   return { txType: OBJECT_ID_TX_TYPE[objId], tx: unpackRawTx(binary, schema), rlpEncoded, binary }
 }
@@ -453,6 +441,19 @@ export function unpackTx (encodedTx, fromRlpBinary = false, prefix = 'tx') {
 export function buildTxHash (rawTx) {
   const data = typeof rawTx === 'string' && rawTx.startsWith('tx_') ? decode(rawTx, 'tx') : rawTx
   return encode(hash(data), 'th')
+}
+
+/**
+ * Build a contract public key by contractCreateTx or gaAttach
+ * @param {string} contractTx Transaction
+ * @return {string} Contract public key
+ */
+export function buildContractIdByContractTx (contractTx) {
+  const { txType, tx } = unpackTx(contractTx)
+  if (![TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType)) {
+    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', txType)
+  }
+  return buildContractId(tx.ownerId, +tx.nonce)
 }
 
 export default {

@@ -26,6 +26,8 @@ import { pause } from '../../src/utils/other'
 import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
 // @ts-expect-error
 import { decode } from '../../src/tx/builder/helpers'
+// @ts-expect-error
+import { TX_TYPE } from '../../src/tx/builder/schema'
 import Channel from '../../src/channel'
 import { ChannelOptions, send } from '../../src/channel/internal'
 import MemoryAccount from '../../src/account/memory'
@@ -760,7 +762,7 @@ describe('Channel', function () {
     const balances = await initiatorCh.balances([initiatorAddr, responderAddr])
     const initiatorBalanceBeforeClose = await aeSdkInitiatior.getBalance(initiatorAddr)
     const responderBalanceBeforeClose = await aeSdkResponder.getBalance(responderAddr)
-    const closeSoloTx = await aeSdkInitiatior.channelCloseSoloTx({
+    const closeSoloTx = await aeSdkInitiatior.buildTx(TX_TYPE.channelCloseSolo, {
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
       poi,
@@ -771,7 +773,7 @@ describe('Channel', function () {
       await aeSdkInitiatior.signTransaction(closeSoloTx),
       { waitMined: true }
     )
-    const settleTx = await aeSdkInitiatior.channelSettleTx({
+    const settleTx = await aeSdkInitiatior.buildTx(TX_TYPE.channelSettle, {
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
       initiatorAmountFinal: balances[initiatorAddr],
@@ -829,7 +831,7 @@ describe('Channel', function () {
       accounts: [initiatorAddr, responderAddr]
     })
     const recentBalances = await responderCh.balances([initiatorAddr, responderAddr])
-    const closeSoloTx = await aeSdkInitiatior.channelCloseSoloTx({
+    const closeSoloTx = await aeSdkInitiatior.buildTx(TX_TYPE.channelCloseSolo, {
       channelId: initiatorCh.id(),
       fromId: initiatorAddr,
       poi: oldPoi,
@@ -839,7 +841,7 @@ describe('Channel', function () {
     await aeSdkInitiatior.sendTransaction(
       await aeSdkInitiatior.signTransaction(closeSoloTx), { waitMined: true }
     )
-    const slashTx = await aeSdkResponder.channelSlashTx({
+    const slashTx = await aeSdkResponder.buildTx(TX_TYPE.channelSlash, {
       channelId: responderCh.id(),
       fromId: responderAddr,
       poi: recentPoi,
@@ -848,7 +850,7 @@ describe('Channel', function () {
     const slashTxFee = unpackTx(slashTx).tx.fee
     await aeSdkResponder.sendTransaction(
       await aeSdkResponder.signTransaction(slashTx), { waitMined: true })
-    const settleTx = await aeSdkResponder.channelSettleTx({
+    const settleTx = await aeSdkResponder.buildTx(TX_TYPE.channelSettle, {
       channelId: responderCh.id(),
       fromId: responderAddr,
       initiatorAmountFinal: recentBalances[initiatorAddr],
@@ -1083,7 +1085,7 @@ describe('Channel', function () {
   })
   // TODO fix this
   it.skip('can post snapshot solo transaction', async () => {
-    const snapshotSoloTx = await aeSdkInitiatior.channelSnapshotSoloTx({
+    const snapshotSoloTx = await aeSdkInitiatior.buildTx(TX_TYPE.channelSnapshotSolo, {
       channelId: initiatorCh.id(),
       fromId: await aeSdkInitiatior.address(),
       payload: (await initiatorCh.state()).signedTx

@@ -20,6 +20,7 @@ import { spy } from 'sinon'
 import http from 'http'
 import { getSdk } from './'
 import { generateKeyPair } from '../../src/utils/crypto'
+import { TX_TYPE } from '../../src'
 
 describe('Node Chain', function () {
   let aeSdk, aeSdkWithoutAccount
@@ -80,7 +81,7 @@ describe('Node Chain', function () {
 
   it('polls for transactions', async () => {
     const senderId = await aeSdk.address()
-    const tx = await aeSdk.spendTx({
+    const tx = await aeSdk.buildTx(TX_TYPE.spend, {
       amount: 1,
       senderId,
       recipientId: publicKey,

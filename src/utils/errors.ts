@@ -563,8 +563,8 @@ export class PrefixNotFoundError extends TransactionError {
 }
 
 export class SchemaNotFoundError extends TransactionError {
-  constructor (message: string) {
-    super(message)
+  constructor (schemaName: string, key: string, version: number) {
+    super(`Transaction ${schemaName} not implemented for ${key} version ${version}`)
     this.name = 'SchemaNotFoundError'
   }
 }

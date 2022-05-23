@@ -32,6 +32,7 @@ import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 import { ArgumentError } from '../utils/errors'
 import { mapObject } from '../utils/other'
+import { TX_TYPE } from '../tx/builder/schema'
 
 /**
  * Sign and post a transaction to the chain
@@ -74,7 +75,7 @@ async function signUsingGA (tx, { authData, authFun, ...options } = {}) {
 async function spend (amount, recipientIdOrName, options) {
   const opt = { ...this.Ae.defaults, ...options }
   return this.send(
-    await this.spendTx({
+    await this.buildTx(TX_TYPE.spend, {
       ...opt,
       senderId: await this.address(opt),
       recipientId: await this.resolveName(recipientIdOrName, 'account_pubkey', opt),
@@ -105,11 +106,14 @@ async function transferFunds (fraction, recipientIdOrName, options) {
   const balance = new BigNumber(await this.getBalance(senderId))
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP)
   const { tx: { fee } } = unpackTx(
-    await this.spendTx({ ...opt, senderId, recipientId, amount: desiredAmount })
+    await this.buildTx(TX_TYPE.spend, { ...opt, senderId, recipientId, amount: desiredAmount })
   )
   // Reducing of the amount may reduce transaction fee, so this is not completely accurate
   const amount = desiredAmount.plus(fee).gt(balance) ? balance.minus(fee) : desiredAmount
-  return this.send(await this.spendTx({ ...opt, senderId, recipientId, amount }), opt)
+  return this.send(
+    await this.buildTx(TX_TYPE.spend, { ...opt, senderId, recipientId, amount }),
+    opt
+  )
 }
 
 /**
@@ -124,7 +128,7 @@ async function transferFunds (fraction, recipientIdOrName, options) {
 async function payForTransaction (transaction, options) {
   const opt = { ...this.Ae.defaults, ...options }
   return this.send(
-    await this.payingForTx({
+    await this.buildTx(TX_TYPE.payingFor, {
       ...opt,
       payerId: await this.address(opt),
       tx: transaction

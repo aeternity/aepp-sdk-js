@@ -30,7 +30,7 @@ import Ae from './'
 import { pause } from '../utils/other'
 import { oracleQueryId, decode } from '../tx/builder/helpers'
 import { unpackTx } from '../tx/builder'
-import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL } from '../tx/builder/schema'
+import { ORACLE_TTL, QUERY_FEE, QUERY_TTL, RESPONSE_TTL, TX_TYPE } from '../tx/builder/schema'
 import { RequestTimedOutError } from '../utils/errors'
 
 /**
@@ -167,7 +167,7 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
   const opt = { ...this.Ae.defaults, ...options } // Preset VmVersion for oracle
   const accountId = await this.address(opt)
 
-  const oracleRegisterTx = await this.oracleRegisterTx({
+  const oracleRegisterTx = await this.buildTx(TX_TYPE.oracleRegister, {
     ...opt,
     accountId,
     queryFormat,
@@ -200,15 +200,15 @@ async function postQueryToOracle (oracleId, query, options = {}) {
   const opt = { ...this.Ae.defaults, queryFee, ...options }
   const senderId = await this.address(opt)
 
-  const oracleRegisterTx = await this.oraclePostQueryTx({
+  const oracleQueryTx = await this.buildTx(TX_TYPE.oracleQuery, {
     ...opt,
     oracleId,
     senderId,
     query
   })
-  const queryId = oracleQueryId(senderId, unpackTx(oracleRegisterTx).tx.nonce, oracleId)
+  const queryId = oracleQueryId(senderId, unpackTx(oracleQueryTx).tx.nonce, oracleId)
   return {
-    ...await this.send(oracleRegisterTx, opt),
+    ...await this.send(oracleQueryTx, opt),
     ...await this.getQueryObject(oracleId, queryId)
   }
 }
@@ -230,7 +230,7 @@ async function extendOracleTtl (oracleId, oracleTtl, options = {}) {
   const opt = { ...this.Ae.defaults, ...options }
   const callerId = await this.address(opt)
 
-  const oracleExtendTx = await this.oracleExtendTx({
+  const oracleExtendTx = await this.buildTx(TX_TYPE.oracleExtend, {
     ...opt,
     oracleId,
     callerId,
@@ -261,7 +261,7 @@ async function respondToQuery (oracleId, queryId, response, options = {}) {
   const opt = { ...this.Ae.defaults, ...options }
   const callerId = await this.address(opt)
 
-  const oracleRespondTx = await this.oracleRespondTx({
+  const oracleRespondTx = await this.buildTx(TX_TYPE.oracleResponse, {
     ...opt,
     oracleId,
     queryId,

@@ -2,7 +2,7 @@ import { verify, hash } from '../utils/crypto'
 import { encode, decode } from './builder/helpers'
 
 import BigNumber from 'bignumber.js'
-import { MIN_GAS_PRICE, PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
+import { PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
 import { UnsupportedProtocolError } from '../utils/errors'
 
@@ -91,15 +91,6 @@ const validators = [
             key: 'NonceHigh'
           },
       checkedKeys: ['nonce']
-    }]
-  },
-  ({ gasPrice }) => {
-    if (gasPrice === undefined) return []
-    if (gasPrice >= MIN_GAS_PRICE) return []
-    return [{
-      message: `Gas price ${gasPrice} must be bigger then ${MIN_GAS_PRICE}`,
-      key: 'MinGasPrice',
-      checkedKeys: ['gasPrice']
     }]
   },
   ({ ctVersion, abiVersion }, { txType, node }) => {
