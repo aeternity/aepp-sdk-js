@@ -19,7 +19,9 @@ import '..'
 import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
 import * as Crypto from '../../src/utils/crypto'
+// @ts-expect-error
 import { buildTxHash, unpackTx } from '../../src/tx/builder'
+// @ts-expect-error
 import { decode } from '../../src/tx/builder/helpers'
 import { EncodedData } from '../../src/utils/encoder'
 
@@ -52,7 +54,7 @@ describe('crypto', () => {
     it('generates an account key pair', () => {
       const keyPair = Crypto.generateKeyPair()
       assert.ok(keyPair)
-      expect(keyPair.publicKey).to.satisfy(b => b.startsWith('ak_'))
+      expect(keyPair.publicKey).to.satisfy((b: string) => b.startsWith('ak_'))
       assert.isAtLeast(keyPair.publicKey.length, 51)
       assert.isAtMost(keyPair.publicKey.length, 53)
     })
