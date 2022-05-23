@@ -16,7 +16,7 @@ jobs:
             ~/.npm
             ~/.autorest
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - name: Run Commitlint
         env:
           EVENT_TYPE: ${{ github.event_name }}
