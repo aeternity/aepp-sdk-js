@@ -21,7 +21,7 @@
     "test:integration": "nyc mocha './test/integration/'",
     "test:unit": "nyc mocha './test/unit/'",
     "test:watch": "mocha './test/unit/' './test/integration/' --watch",
-    "prepack": "npm run build",
+    "prepare": "npm run build",
     "prepublishOnly": "test/examples.sh && npm run docs:examples",
     "release": "standard-version --skip.tag --infile docs/CHANGELOG.md"
   },
