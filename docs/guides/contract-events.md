@@ -60,7 +60,7 @@ Of course it is also possible to decode the event log if you request the transac
 ```js
 const txHash = 'th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET';
 // aeSdk is an instance of the Universal Stamp
-const txInfo = await aeSdk.api.getTransactionInfoByHash(txHash)
+const txInfo = await aeSdk.nodePool.api.getTransactionInfoByHash(txHash)
 
 // decode events using contract instance
 const decodedUsingInstance = contractInstance.decodeEvents(txInfo.callInfo.log)

@@ -29,7 +29,7 @@ contract Test =
   })
 
   console.log('Height:', await sdk.height())
-  console.log('Instanceof works correctly for nodes pool', sdk.pool instanceof Map)
+  console.log('Instanceof works correctly for nodes pool', sdk.nodePool.pool instanceof Map)
 
   const contract = await sdk.getContractInstance({ source: contractSource })
   const deployInfo = await contract.deploy()

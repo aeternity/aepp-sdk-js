@@ -83,7 +83,7 @@ export default {
         this.compilerVersion = aeSdk.compilerVersion
         this.balancePromise = aeSdk.getBalance(address)
         this.heightPromise = aeSdk.height()
-        this.nodeInfoPromise = aeSdk.getNodeInfo()
+        this.nodeInfoPromise = aeSdk.nodePool.getNodeInfo()
       },
       { immediate: true }
     )

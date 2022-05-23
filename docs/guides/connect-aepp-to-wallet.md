@@ -39,8 +39,8 @@ async created () {
     ],
     compilerUrl: COMPILER_URL,
     onNetworkChange: async ({ networkId }) => {
-      this.aeSdk.selectNode(networkId)
-      this.nodeInfo = await this.aeSdk.getNodeInfo()
+      this.aeSdk.nodePool.selectNode(networkId)
+      this.nodeInfo = await this.aeSdk.nodePool.getNodeInfo()
     },
     onAddressChange: async () => {
       this.address = await this.aeSdk.address()
@@ -88,7 +88,7 @@ async connect(wallet) {
   this.connectedAccounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
   this.address = await this.aeSdk.address()
   this.balance = await this.aeSdk.getBalance(this.address).catch(() => '0')
-  this.nodeInfo = await this.aeSdk.getNodeInfo()
+  this.nodeInfo = await this.aeSdk.nodePool.getNodeInfo()
 }
 ```
 

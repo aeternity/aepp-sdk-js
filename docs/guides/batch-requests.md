@@ -18,7 +18,7 @@ But this isn't the fastest approach, because on each iteration SDK would:
 
 It can be avoided by making spends as:
 ```js
-const base = (await aeSdk.api.getAccountNextNonce(await aeSdk.address())).nextNonce
+const base = (await aeSdk.nodePool.api.getAccountNextNonce(await aeSdk.address())).nextNonce
 await Promise.all(spends.map(({ amount, address }, idx) =>
    aeSdk.spend(amount, address, { nonce: base + idx, verify: false, waitMined: false }))
 )
@@ -35,7 +35,7 @@ for (const d of data) {
 ```
 will make SDK create a new dry-run request for each static call. It may be not efficient because dry-run supports executing multiple transactions at a single request. It can be done by making all calls at once:
 ```js
-const base = (await aeSdk.api.getAccountNextNonce(await aeSdk.address())).nextNonce
+const base = (await aeSdk.nodePool.api.getAccountNextNonce(await aeSdk.address())).nextNonce
 const results = await Promise.all(
   data.map((d, idx) => contractInstance.methods.foo(d, { nonce: base + idx, combine: true }))
 )

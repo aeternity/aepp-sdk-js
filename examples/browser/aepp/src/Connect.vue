@@ -107,9 +107,9 @@ export default {
           ],
           compilerUrl: COMPILER_URL,
           onNetworkChange: ({ networkId }) => {
-            const [{ name }] = this.aeSdk.getNodesInPool()
+            const [{ name }] = this.aeSdk.nodePool.getNodesInPool()
               .filter(node => node.nodeNetworkId === networkId)
-            this.aeSdk.selectNode(name)
+            this.aeSdk.nodePool.selectNode(name)
             this.$emit('networkId', networkId)
           },
           onAddressChange: ({ current }) => this.$emit('address', Object.keys(current)[0]),

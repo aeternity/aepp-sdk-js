@@ -7,7 +7,7 @@
 
 The purist uses the functions generated out of the Swagger
 file. After creating the SDK instance `aeSdk` with the Universal Stamp it exposes a mapping of all `operationId`s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
-based on its hash you would invoke `aeSdk.api.getTransactionByHash('th_...')`.
+based on its hash you would invoke `aeSdk.nodePool.api.getTransactionByHash('th_...')`.
 
 In this way the SDK is simply a mapping of the raw API calls into
 JavaScript. It's excellent for low-level control, and as a teaching tool to
@@ -60,14 +60,14 @@ async function spend (amount, recipient) {
   const signedTx = await aeSdk.signTransaction(spendTx)
 
   // broadcast the signed tx to the node
-  console.log(await aeSdk.api.postTransaction({tx: signedTx}))
+  console.log(await aeSdk.nodePool.api.postTransaction({tx: signedTx}))
 }
 ```
 
 Following functions are available with the low-level API right now:
 
 ```js
-console.log(aeSdk.api)
+console.log(aeSdk.nodePool.api)
 /*
 {
   getTopHeader: [AsyncFunction (anonymous)],
