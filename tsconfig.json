@@ -26,7 +26,6 @@
     ]
   },
   "include": [
-    "src/**/*",
-    "test/integration/*"
+    "src/**/*"
   ]
 }
