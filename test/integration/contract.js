@@ -183,7 +183,7 @@ describe('Contract', function () {
   })
 
   it('Call-Static deploy transaction on specific hash', async () => {
-    const { hash } = await aeSdk.api.getTopHeader()
+    const { hash } = await aeSdk.nodePool.api.getTopHeader()
     const res = await contract.deploy([], { callStatic: true, top: hash })
     res.result.should.have.property('gasUsed')
     res.result.should.have.property('returnType')

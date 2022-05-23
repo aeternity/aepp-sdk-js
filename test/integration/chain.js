@@ -88,7 +88,7 @@ describe('Node Chain', function () {
       ttl: Number.MAX_SAFE_INTEGER
     })
     const signed = await aeSdk.signTransaction(tx)
-    const { txHash } = await aeSdk.api.postTransaction({ tx: signed })
+    const { txHash } = await aeSdk.nodePool.api.postTransaction({ tx: signed })
 
     await aeSdk.poll(txHash).should.eventually.be.fulfilled
     return aeSdk.poll('th_xxx', { blocks: 1 }).should.eventually.be.rejected
@@ -109,7 +109,7 @@ describe('Node Chain', function () {
   const transactions = []
 
   it('multiple spends from one account', async () => {
-    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address())
+    const { nextNonce } = await aeSdk.nodePool.api.getAccountNextNonce(await aeSdk.address())
     spy(http, 'request')
     const spends = await Promise.all(accounts.map((account, idx) => aeSdk.spend(
       Math.floor(Math.random() * 1000 + 1e16),
@@ -147,7 +147,7 @@ describe('Node Chain', function () {
     })
     await contract.deploy()
     const { result: { gasUsed: gasLimit } } = await contract.methods.foo(5)
-    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address())
+    const { nextNonce } = await aeSdk.nodePool.api.getAccountNextNonce(await aeSdk.address())
     spy(http, 'request')
     const numbers = new Array(32).fill().map((v, idx) => idx * 2)
     const results = (await Promise.all(

@@ -162,7 +162,11 @@ function destroyInstance () {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(NodePool, Tx, AccountResolver, {
+const Ae = stampit({
+  init (options) {
+    this.nodePool = new NodePool(options)
+  }
+}, Tx, AccountResolver, {
   methods: {
     send,
     spend,
@@ -177,7 +181,7 @@ const Ae = stampit(NodePool, Tx, AccountResolver, {
         function (...args) {
           const instanceOptions = {
             ...this.Ae.defaults,
-            onNode: this.selectedNode.instance,
+            onNode: this.nodePool.selectedNode.instance,
             onAccount: this
           }
           const lastArg = args[args.length - 1]

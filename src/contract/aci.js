@@ -142,7 +142,7 @@ export default async function getContractInstance ({
       hash: txData.hash, tx: TxObject({ tx: txData.rawTx }), txData, rawTx: txData.rawTx
     }
     if (!txData.blockHeight) return result
-    const { callInfo } = await this.api.getTransactionInfoByHash(txData.hash)
+    const { callInfo } = await this.nodePool.api.getTransactionInfoByHash(txData.hash)
     Object.assign(result.txData, callInfo) // TODO: don't duplicate data in result
     await handleCallError(callInfo, tx)
     return { ...result, result: callInfo }

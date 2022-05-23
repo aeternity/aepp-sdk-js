@@ -4,7 +4,6 @@
  * @export NodePool
  * @example import { NodePool } from '@aeternity/aepp-sdk'
  */
-import stampit from '@stamp/it'
 // @ts-expect-error TODO remove
 import { getNetworkId } from '../node'
 import { DisconnectedError, DuplicateNodeError, NodeNotFoundError } from '../utils/errors'
@@ -19,45 +18,25 @@ interface NodeInfo {
   consensusProtocolVersion: string
 }
 
-interface NodePool {
-  pool: Map<string, Node>
-  addNode: (name: string, node: Node, select?: boolean) => void
-  selectNode: (name: string) => void
-  getNodeInfo: () => NodeInfo
-  isNodeConnected: () => boolean
-  getNetworkId: (node?: Node) => string
-  getNodesInPool: () => NodeInfo[]
-  selectedNode?: Node
-  readonly api: Node['api']
-}
-
-class _NodePool implements NodePool {
-  readonly api: Node['api']
+export default class NodePool {
   pool: Map<string, Node>
   selectedNode?: Node
 
-  init ({ nodes = [] }: { nodes: Node[] }): void {
+  constructor (options: {nodes: Node[]} = { nodes: [] }) {
+    const { nodes = [] } = options
     this.pool = new Map()
     nodes.forEach((node, i: number) => {
       const { name, instance } = node
       this.addNode(name, instance, i === 0)
     })
-
     if (nodes.length > 0) this.selectNode(nodes[0].name)
+  }
 
-    // TODO: rewrite to TypeScript getter after dropping stamp
-    Object.defineProperties(this, {
-      api: {
-        enumerable: true,
-        configurable: false,
-        get () {
-          if (this.selectedNode?.instance == null) {
-            throw new NodeNotFoundError('You can\'t use Node API. Node is not connected or not defined!')
-          }
-          return this.selectedNode.instance.api
-        }
-      }
-    })
+  public get api (): Node['api'] {
+    if (this.selectedNode == null || this.selectedNode.instance == null) {
+      throw new NodeNotFoundError('You can\'t use Node API. Node is not connected or not defined!')
+    }
+    return this.selectedNode.instance.api
   }
 
   /**
@@ -143,23 +122,3 @@ class _NodePool implements NodePool {
     }))
   }
 }
-
-/**
- * Node Pool Stamp
- * This stamp allow you to make basic manipulation (add, remove, select) on list of nodes
- * @alias module:@aeternity/aepp-sdk/es/node-pool
- * @param options - Initializer object
- * @param options.nodes - Array with Node instances
- * @return NodePool instance
- */
-export default stampit<NodePool>({
-  init: _NodePool.prototype.init,
-  methods: {
-    addNode: _NodePool.prototype.addNode,
-    selectNode: _NodePool.prototype.selectNode,
-    getNodeInfo: _NodePool.prototype.getNodeInfo,
-    isNodeConnected: _NodePool.prototype.isNodeConnected,
-    getNetworkId: _NodePool.prototype.getNetworkId,
-    getNodesInPool: _NodePool.prototype.getNodesInPool
-  }
-})

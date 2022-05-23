@@ -391,9 +391,9 @@ describe('Aepp<->Wallet', function () {
       const received = await new Promise((resolve) => {
         aepp.onNetworkChange = (msg) => {
           msg.networkId.should.be.equal(networkId)
-          resolve(wallet.selectedNode.name === 'second_node')
+          resolve(wallet.nodePool.selectedNode.name === 'second_node')
         }
-        wallet.addNode('second_node', node, true)
+        wallet.nodePool.addNode('second_node', node, true)
       })
       received.should.be.equal(true)
     })
@@ -591,9 +591,9 @@ describe('Aepp<->Wallet', function () {
         aepp.onNetworkChange = (msg) => {
           msg.networkId.should.be.equal(networkId)
           msg.node.should.be.an('object')
-          resolve(wallet.selectedNode.name === 'second_node')
+          resolve(wallet.nodePool.selectedNode.name === 'second_node')
         }
-        wallet.addNode('second_node', node, true)
+        wallet.nodePool.addNode('second_node', node, true)
       })
       received.should.be.equal(true)
     })

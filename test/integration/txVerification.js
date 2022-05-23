@@ -11,7 +11,7 @@ describe('Verify Transaction', function () {
 
   before(async () => {
     aeSdk = await getSdk()
-    node = aeSdk.selectedNode.instance
+    node = aeSdk.nodePool.selectedNode.instance
     await aeSdk.spend(1234, 'ak_LAqgfAAjAbpt4hhyrAfHyVg9xfVQWsk1kaHaii6fYXt6AJAGe')
   })
 

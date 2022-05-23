@@ -19,7 +19,7 @@ contract Test =
   })
 
   console.log('Height:', await aeSdk.height())
-  console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map)
+  console.log('Instanceof works correctly for nodes pool', aeSdk.nodePool.pool instanceof Map)
 
   const contract = await aeSdk.getContractInstance({ source: contractSource })
   const deployInfo = await contract.deploy()

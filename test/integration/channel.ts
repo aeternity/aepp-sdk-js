@@ -969,7 +969,8 @@ describe('Channel', function () {
       abiVersion: 3
     }, async (tx) => aeSdkInitiatior.signTransaction(tx))
     const hash = buildTxHash(forceTx.tx)
-    const { callInfo: { returnType } } = await aeSdkInitiatior.api.getTransactionInfoByHash(hash)
+    const { callInfo: { returnType } } = await aeSdkInitiatior
+      .nodePool.api.getTransactionInfoByHash(hash)
     expect(returnType).to.be.equal('ok')
   })
 

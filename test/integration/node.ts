@@ -54,12 +54,12 @@ describe('Node client', function () {
 
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {
-      const nodes = NodePool()
+      const nodes = new NodePool()
       expect(() => nodes.api.someAPIfn()).to.throw(NodeNotFoundError, 'You can\'t use Node API. Node is not connected or not defined!')
     })
 
     it('Can change Node', async () => {
-      const nodes = NodePool({
+      const nodes = new NodePool({
         nodes: [
           { name: 'first', instance: await Node({ url, ignoreVersion }) },
           { name: 'second', instance: node }
@@ -73,7 +73,7 @@ describe('Node client', function () {
     })
 
     it('Fail on undefined node', async () => {
-      const nodes = NodePool({
+      const nodes = new NodePool({
         nodes: [
           { name: 'first', instance: await Node({ url, ignoreVersion }) },
           { name: 'second', instance: node }
@@ -83,7 +83,7 @@ describe('Node client', function () {
     })
 
     it('Can get list of nodes', () => {
-      const nodes = NodePool({
+      const nodes = new NodePool({
         nodes: [
           { name: 'first', instance: node }
         ]

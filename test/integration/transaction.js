@@ -162,7 +162,7 @@ describe('Transaction', function () {
     }))
 
   it('Get next account nonce', async () => {
-    const { nonce: accountNonce } = await aeSdk.api.getAccountByPubkey(address)
+    const { nonce: accountNonce } = await aeSdk.nodePool.api.getAccountByPubkey(address)
     expect(await aeSdk.getAccountNonce(address)).to.be.equal(accountNonce + 1)
     expect(await aeSdk.getAccountNonce(address, 1)).to.be.equal(1)
   })

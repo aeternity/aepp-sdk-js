@@ -43,8 +43,8 @@ import { RequestTimedOutError } from '../utils/errors'
  * @return {Promise<Object>} Oracle object
  */
 async function getOracleObject (oracleId) {
-  const oracle = await this.api.getOracleByPubkey(oracleId)
-  const { oracleQueries: queries } = await this.api.getOracleQueriesByPubkey(oracleId)
+  const oracle = await this.nodePool.api.getOracleByPubkey(oracleId)
+  const { oracleQueries: queries } = await this.nodePool.api.getOracleQueriesByPubkey(oracleId)
   return {
     ...oracle,
     queries,
@@ -74,7 +74,8 @@ function pollForQueries (
 ) {
   const knownQueryIds = new Set()
   const checkNewQueries = async () => {
-    const queries = ((await this.api.getOracleQueriesByPubkey(oracleId)).oracleQueries || [])
+    const queries = ((await this.nodePool
+      .api.getOracleQueriesByPubkey(oracleId)).oracleQueries || [])
       .filter(({ id }) => !knownQueryIds.has(id))
     queries.forEach(({ id }) => knownQueryIds.add(id))
     if (queries.length) onQuery(queries)
@@ -102,7 +103,7 @@ function pollForQueries (
  * @return {Promise<Object>} OracleQuery object
  */
 async function getQueryObject (oracleId, queryId) {
-  const q = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
+  const q = await this.nodePool.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
   return {
     ...q,
     decodedQuery: decode(q.query).toString(),
@@ -138,7 +139,7 @@ export async function pollForQueryResponse (
 ) {
   for (let i = 0; i < attempts; i++) {
     if (i) await pause(interval)
-    const { response } = await this.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
+    const { response } = await this.nodePool.api.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
     const responseBuffer = decode(response, 'or')
     if (responseBuffer.length) {
       return String(responseBuffer)
@@ -196,7 +197,8 @@ async function registerOracle (queryFormat, responseFormat, options = {}) {
  * @return {Promise<Object>} Query object
  */
 async function postQueryToOracle (oracleId, query, options = {}) {
-  const queryFee = options.queryFee || (await this.api.getOracleByPubkey(oracleId)).queryFee
+  const queryFee = options.queryFee || (await this.nodePool
+    .api.getOracleByPubkey(oracleId)).queryFee
   const opt = { ...this.Ae.defaults, queryFee, ...options }
   const senderId = await this.address(opt)
 

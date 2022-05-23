@@ -65,7 +65,7 @@ const REQUESTS = {
         return {
           result: {
             ...instance.getWalletInfo(),
-            ...(shareNode && { node: instance.selectedNode })
+            ...(shareNode && { node: instance.nodePool.selectedNode })
           }
         }
       },
@@ -149,7 +149,8 @@ const REQUESTS = {
         } catch (e) {
           if (!returnSigned) {
             // Validate transaction
-            const validation = await verifyTransaction(rawTx || tx, instance.selectedNode.instance)
+            const validation = await verifyTransaction(rawTx || tx,
+              instance.nodePool.selectedNode.instance)
             if (validation.length) return { error: ERRORS.invalidTransaction(validation) }
             // Send broadcast failed error to aepp
             return { error: ERRORS.broadcastFailed(e.message) }
@@ -262,7 +263,7 @@ export default Ae.compose(AccountMultiple, {
 
     const _selectAccount = this.selectAccount.bind(this)
     const _addAccount = this.addAccount.bind(this)
-    const _selectNode = this.selectNode.bind(this)
+    const _selectNode = this.nodePool.selectNode.bind(this.nodePool)
 
     // Overwrite AE methods
     this.selectAccount = (address, { condition = () => true } = {}) => {
@@ -292,7 +293,7 @@ export default Ae.compose(AccountMultiple, {
           }
         }))
     }
-    this.selectNode = (name) => {
+    this.nodePool.selectNode = (name) => {
       _selectNode(name)
       // Send notification 'update.network' to all Aepp which connected
       Object.values(this.rpcClients)
@@ -301,7 +302,8 @@ export default Ae.compose(AccountMultiple, {
           client.sendMessage(
             message(METHODS.updateNetwork, {
               networkId: this.getNetworkId(),
-              ...client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
+              ...client.info.status === RPC_STATUS.NODE_BINDED &&
+              { node: this.nodePool.selectedNode }
             }), true)
         })
     }

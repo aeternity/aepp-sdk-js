@@ -34,7 +34,7 @@ const NOTIFICATIONS = {
   [METHODS.updateNetwork]: (instance) =>
     async ({ params }) => {
       const { node } = params
-      if (node) instance.addNode(node.name, await Node(node), true)
+      if (node) instance.nodePool.addNode(node.name, await Node(node), true)
       instance.onNetworkChange(params)
     },
   [METHODS.closeConnection]: (instance) =>
@@ -166,7 +166,7 @@ export default AccountResolver.compose(AsyncInit, {
       if (connectNode && !Object.prototype.hasOwnProperty.call(walletInfo, 'node')) {
         throw new RpcConnectionError('Missing URLs of the Node')
       }
-      if (connectNode) this.addNode(name, await Node(walletInfo.node), select)
+      if (connectNode) this.nodePool.addNode(name, await Node(walletInfo.node), select)
       return walletInfo
     },
     /**

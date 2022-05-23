@@ -274,7 +274,7 @@ async function payingForTx ({ tx, payerId, ...args }) {
  * @return {object} Object with vm/abi version ({ vmVersion: number, abiVersion: number })
  */
 function getVmVersion (txType, { vmVersion, abiVersion } = {}) {
-  const { consensusProtocolVersion } = this.getNodeInfo()
+  const { consensusProtocolVersion } = this.nodePool.getNodeInfo()
   const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
   if (!supportedProtocol) throw new UnsupportedProtocolError('Not supported consensus protocol version')
   const protocolForTX = supportedProtocol[txType]
@@ -304,7 +304,7 @@ async function calculateTtl (ttl = TX_TTL, relative = true) {
   if (ttl < 0) throw new ArgumentError('ttl', 'greater or equal to 0', ttl)
 
   if (relative) {
-    const { height } = await this.api.getCurrentKeyBlock()
+    const { height } = await this.nodePool.api.getCurrentKeyBlock()
     return +(height) + ttl
   }
   return ttl
@@ -319,7 +319,7 @@ async function calculateTtl (ttl = TX_TTL, relative = true) {
  */
 async function getAccountNonce (accountId, nonce) {
   if (nonce) return nonce
-  const { nonce: accountNonce } = await this.api.getAccountByPubkey(accountId)
+  const { nonce: accountNonce } = await this.nodePool.api.getAccountByPubkey(accountId)
     .catch(() => ({ nonce: 0 }))
   return accountNonce + 1
 }
@@ -336,7 +336,8 @@ async function prepareTxParams (
   { senderId, nonce: n, ttl: t, fee: f, gasLimit, absoluteTtl, vsn, strategy }
 ) {
   n = n || (
-    await this.api.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
+    await this.nodePool
+      .api.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
   ).nextNonce
   const ttl = await calculateTtl.call(this, t, !absoluteTtl)
   const fee = calculateFee(
