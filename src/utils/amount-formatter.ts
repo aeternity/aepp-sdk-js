@@ -58,7 +58,7 @@ export const DENOMINATION_MAGNITUDE = {
  */
 export const toAe = (
   value: string | number | BigNumber,
-  { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}
+  { denomination = AE_AMOUNT_FORMATS.AETTOS }: { denomination?: AeAmountFormats } = {}
 ): string => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
 
 /**
@@ -70,7 +70,7 @@ export const toAe = (
  */
 export const toAettos = (
   value: string | number | BigNumber,
-  { denomination = AE_AMOUNT_FORMATS.AE } = {}
+  { denomination = AE_AMOUNT_FORMATS.AE }: { denomination?: AeAmountFormats } = {}
 ): string => formatAmount(value, { denomination })
 
 /**
