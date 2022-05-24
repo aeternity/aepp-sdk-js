@@ -79,6 +79,7 @@
 
 <script>
 import Value from './Value.vue'
+import { mapState, mapGetters } from 'vuex'
 
 const contractSource = `
 contract Multiplier =
@@ -89,11 +90,6 @@ contract Multiplier =
 
 export default {
   components: { Value },
-  props: {
-    aeSdk: { type: Object, required: true },
-    address: { type: String, default: '' },
-    networkId: { type: String, default: '' },
-  },
   data: () => ({
     contractSource,
     deployArg: 5,
@@ -103,6 +99,10 @@ export default {
     deployPromise: null,
     callPromise: null
   }),
+  computed: {
+    ...mapState('aeSdk', ['address', 'networkId']),
+    ...mapGetters('aeSdk', ['aeSdk'])
+  },
   methods: {
     create () {
       return this.aeSdk.getContractInstance({ source: this.contractSource })

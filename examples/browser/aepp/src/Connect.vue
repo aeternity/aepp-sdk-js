@@ -40,22 +40,13 @@
 </template>
 
 <script>
-import { RpcAepp, Node, WalletDetector, BrowserWindowMessageConnection } from '@aeternity/aepp-sdk'
+import { WalletDetector, BrowserWindowMessageConnection } from '@aeternity/aepp-sdk'
 import Value from './Value'
-
-const TESTNET_NODE_URL = 'https://testnet.aeternity.io'
-const MAINNET_NODE_URL = 'https://mainnet.aeternity.io'
-const COMPILER_URL = 'https://compiler.aepps.com'
+import { mapGetters } from 'vuex'
 
 export default {
   components: { Value },
-  emits: {
-    aeSdk: Object,
-    address: String,
-    networkId: String,
-  },
   data: () => ({
-    aeSdk: null,
     connectMethod: 'default',
     walletConnected: false,
     connectPromise: null,
@@ -63,6 +54,7 @@ export default {
     reverseIframeWalletUrl: 'http://localhost:9000'
   }),
   computed: {
+    ...mapGetters('aeSdk', ['aeSdk']),
     walletName () {
       if (!this.aeSdk) return 'SDK is not ready'
       if (!this.walletConnected) return 'Wallet is not connected'
@@ -80,7 +72,7 @@ export default {
           await this.aeSdk.connectToWallet(await newWallet.getConnection())
           this.walletConnected = true
           const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected')
-          this.$emit('address', Object.keys(current)[0])
+          this.$store.commit('aeSdk/setAddress', Object.keys(current)[0])
         }
       }
 
@@ -97,27 +89,7 @@ export default {
         this.reverseIframe.style.display = 'none'
         document.body.appendChild(this.reverseIframe)
       }
-
-      if (!this.aeSdk) {
-        this.aeSdk = await RpcAepp({
-          name: 'Simple æpp',
-          nodes: [
-            { name: 'testnet', instance: await Node({ url: TESTNET_NODE_URL }) },
-            { name: 'mainnet', instance: await Node({ url: MAINNET_NODE_URL }) }
-          ],
-          compilerUrl: COMPILER_URL,
-          onNetworkChange: ({ networkId }) => {
-            const [{ name }] = this.aeSdk.getNodesInPool()
-              .filter(node => node.nodeNetworkId === networkId)
-            this.aeSdk.selectNode(name)
-            this.$emit('networkId', networkId)
-          },
-          onAddressChange: ({ current }) => this.$emit('address', Object.keys(current)[0]),
-          onDisconnect: () => alert('Aepp is disconnected')
-        })
-      }
-      this.$emit('aeSdk', this.aeSdk)
-
+      await this.$store.dispatch('aeSdk/initialize')
       await this.scanForWallets()
     },
     async disconnect () {

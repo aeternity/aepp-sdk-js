@@ -10,7 +10,8 @@
     "buffer": "^6.0.3",
     "core-js": "^3.22.6",
     "tailwindcss": "^2.2.19",
-    "vue": "^3.2.36"
+    "vue": "^3.2.36",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.4",

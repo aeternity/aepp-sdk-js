@@ -39,7 +39,6 @@ export default {
   data () {
     return {
       runningInFrame: window.parent !== window,
-      // aeSdk: null, see https://github.com/aeternity/aepp-sdk-js/issues/1347
       nodeName: '',
       address: '',
       balancePromise: null,

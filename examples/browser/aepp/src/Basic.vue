@@ -57,14 +57,10 @@
 
 <script>
 import Value from './Value.vue'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   components: { Value },
-  props: {
-    aeSdk: { type: Object, required: true },
-    address: { type: String, default: '' },
-    networkId: { type: String, default: '' },
-  },
   data: () => ({
     balancePromise: null,
     heightPromise: null,
@@ -75,6 +71,10 @@ export default {
     spendPayload: '',
     spendPromise: null
   }),
+  computed: {
+    ...mapState('aeSdk', ['address', 'networkId']),
+    ...mapGetters('aeSdk', ['aeSdk'])
+  },
   mounted () {
     this.$watch(
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
