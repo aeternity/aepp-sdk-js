@@ -104,16 +104,14 @@ function isConnected () {
  * @rtype Stamp
  * @param {Object} params={} - Initializer object
  * @param {Object} params.port - Runtime `port` object
- * @param {Object} [params.connectionInfo={}] - Connection info object
  * @param {Boolean} [params.debug=false] - Debug flag
  * @return {Object}
  */
 export default stampit({
-  init ({ connectionInfo = {}, port, debug = false }) {
+  init ({ port, debug = false }) {
     if (!getBrowserAPI().runtime) throw new RpcConnectionError('Runtime is not accessible in your environment')
     this.debug = debug
-    this.connectionInfo = connectionInfo
-    this.port = port || getBrowserAPI().runtime.connect(...[connectionInfo.id || undefined])
+    this.port = port || getBrowserAPI().runtime.connect()
   },
   methods: { connect, sendMessage, disconnect, isConnected }
 }, WalletConnection)

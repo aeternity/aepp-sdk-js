@@ -46,12 +46,10 @@ describe('Aepp<->Wallet', function () {
     node = await Node({ url, ignoreVersion })
     connections = getConnections()
     connectionFromWalletToAepp = BrowserWindowMessageConnection({
-      connectionInfo: { id: 'from_wallet_to_aepp' },
       self: connections.waelletConnection,
       target: connections.aeppConnection
     })
     connectionFromAeppToWallet = BrowserWindowMessageConnection({
-      connectionInfo: { id: 'from_aepp_to_wallet' },
       self: connections.aeppConnection,
       target: connections.waelletConnection
     })
@@ -448,12 +446,10 @@ describe('Aepp<->Wallet', function () {
         actions.accept()
       }
       const id = wallet.addRpcClient(BrowserWindowMessageConnection({
-        connectionInfo: { id: 'from_wallet_to_aepp_2' },
         self: connections.waelletConnection,
         target: connections.aeppConnection
       }))
       await aepp.connectToWallet(BrowserWindowMessageConnection({
-        connectionInfo: { id: 'from_aepp_to_wallet_2' },
         self: connections.aeppConnection,
         target: connections.waelletConnection
       }))

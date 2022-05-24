@@ -17,18 +17,8 @@ import {
   console.log('Document is ready')
 
   const port = browser.runtime.connect()
-  const extConnection = BrowserRuntimeConnection({
-    connectionInfo: {
-      description: 'Content Script to Extension connection',
-      origin: window.origin
-    },
-    port
-  })
+  const extConnection = BrowserRuntimeConnection({ port })
   const pageConnection = BrowserWindowMessageConnection({
-    connectionInfo: {
-      description: 'Content Script to Page connection',
-      origin: window.origin
-    },
     origin: window.origin,
     sendDirection: MESSAGE_DIRECTION.to_aepp,
     receiveDirection: MESSAGE_DIRECTION.to_waellet

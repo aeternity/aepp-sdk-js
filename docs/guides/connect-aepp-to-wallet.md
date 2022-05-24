@@ -68,9 +68,7 @@ methods: {
       }
     }
 
-    const scannerConnection = BrowserWindowMessageConnection({
-      connectionInfo: { id: 'spy' }
-    })
+    const scannerConnection = BrowserWindowMessageConnection()
 
     const detector = await WalletDetector({ connection: scannerConnection })
     detector.scan(handleWallets.bind(this))
