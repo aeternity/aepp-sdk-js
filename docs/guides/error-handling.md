@@ -13,7 +13,6 @@ BaseError
 │   InvalidDenominationError
 │   InvalidNameError
 │   MissingParamError
-│   NoBrowserFoundError
 │   NoSerializerFoundError
 │   RequestTimedOutError
 │   TxTimedOutError

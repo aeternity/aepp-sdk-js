@@ -29,7 +29,6 @@
 import stampit from '@stamp/it'
 import WalletConnection from '.'
 import { MESSAGE_DIRECTION } from '../schema'
-import { getBrowserAPI } from '../helpers'
 import {
   AlreadyConnectedError,
   NoWalletConnectedError,
@@ -104,7 +103,9 @@ function sendMessage (msg) {
 }
 
 const getTarget = () => {
-  const isExtensionContext = typeof getBrowserAPI(true).extension === 'object'
+  const { chrome, browser } = window
+  const isExtensionContext = typeof chrome !== 'undefined' && chrome === Object(chrome) ||
+    typeof browser !== 'undefined' && browser === Object(browser)
   const isWeb = window && window.location && window.location.protocol.startsWith('http')
   const isContentScript = isExtensionContext && isWeb
   if (isContentScript) return window

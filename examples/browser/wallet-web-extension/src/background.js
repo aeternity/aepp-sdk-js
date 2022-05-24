@@ -1,7 +1,6 @@
-/* global browser */
-
+import browser from 'webextension-polyfill'
 import {
-  RpcWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection
+  RpcWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection, WALLET_TYPE
 } from '@aeternity/aepp-sdk'
 
 (async () => {
@@ -11,6 +10,8 @@ import {
       name: 'testnet',
       instance: await Node({ url: 'https://testnet.aeternity.io' })
     }],
+    id: browser.runtime.id,
+    type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
     // The `ExtensionProvider` uses the first account by default.
     // You can change active account using `selectAccount(address)` function

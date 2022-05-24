@@ -17,22 +17,16 @@
 
 import { before, describe, it, after } from 'mocha'
 import { expect } from 'chai'
-import { MemoryAccount, Node, RpcAepp, RpcWallet, TX_TYPE } from '../../src'
+import { MemoryAccount, Node, RpcAepp, RpcWallet, TX_TYPE, WALLET_TYPE } from '../../src'
 import { concatBuffers } from '../../src/utils/other'
 import { unpackTx } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/browser-window-message'
-import { getBrowserAPI } from '../../src/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify, hash } from '../../src/utils/crypto'
 import { compilerUrl, account, networkId, url, ignoreVersion, spendPromise } from './'
 import {
-  NoBrowserFoundError,
-  NoWalletConnectedError,
-  TypeError,
-  UnAuthorizedAccountError,
-  UnsubscribedAccountError,
-  UnknownRpcClientError
+  NoWalletConnectedError, UnAuthorizedAccountError, UnsubscribedAccountError, UnknownRpcClientError
 } from '../../src/utils/errors'
 
 describe('Aepp<->Wallet', function () {
@@ -66,6 +60,8 @@ describe('Aepp<->Wallet', function () {
         compilerUrl,
         accounts: [MemoryAccount({ keypair: account })],
         nodes: [{ name: 'local', instance: node }],
+        id: 'test',
+        type: WALLET_TYPE.window,
         name: 'Wallet',
         onConnection () {},
         onSubscription () {},
@@ -452,25 +448,6 @@ describe('Aepp<->Wallet', function () {
       connectionFromAeppToWallet.disconnect()
     })
 
-    it('getBrowserAPI: not in browser', () => {
-      global.window = {}
-      expect(() => getBrowserAPI()).to.throw(NoBrowserFoundError, 'Browser is not detected')
-    })
-
-    it('getBrowserAPI: not in browser(force error)', () => {
-      global.window = {}
-      getBrowserAPI(true).should.be.an('object')
-    })
-
-    it('getBrowserAPI: chrome', () => {
-      global.window = { location: { origin: '//test' }, chrome: { runtime: {}, chrome: true } }
-      getBrowserAPI().chrome.should.be.equal(true)
-    })
-
-    it('getBrowserAPI: firefox', () => {
-      global.window = { location: { origin: '//test' }, browser: { runtime: {}, firefox: true } }
-      getBrowserAPI().firefox.should.be.equal(true)
-    })
     it('Send message from content script', async () => {
       connectionFromWalletToAepp.sendDirection = 'to_aepp'
       const ok = await new Promise((resolve) => {
@@ -494,6 +471,8 @@ describe('Aepp<->Wallet', function () {
         compilerUrl,
         accounts: [MemoryAccount({ keypair: account })],
         nodes: [{ name: 'local', instance: node }],
+        id: 'test',
+        type: WALLET_TYPE.window,
         name: 'Wallet',
         onConnection (aepp, { accept }) {
           accept({ shareNode: true })

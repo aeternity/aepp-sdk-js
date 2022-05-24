@@ -16,16 +16,17 @@ Note:
 First you need to create a bridge between your extension and the page. This can be done as follows:
 
 ```js
+import browser from 'webextension-polyfill'
 import {
   BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION,
-  ContentScriptBridge, getBrowserAPI
+  ContentScriptBridge
 } from '@aeternity/aepp-sdk'
 
 const readyStateCheckInterval = setInterval(function () {
   if (document.readyState === 'complete') {
     clearInterval(readyStateCheckInterval)
 
-    const port = getBrowserAPI().runtime.connect()
+    const port = browser.runtime.connect()
     const extConnection = BrowserRuntimeConnection({ port })
     const pageConnection = BrowserWindowMessageConnection({
       origin: window.origin,
@@ -44,6 +45,7 @@ Then you need to initialize `RpcWallet` Stamp in your extension and subscribe fo
 After the connection is established you can share the wallet details with the application.
 
 ```js
+import browser from 'webextension-polyfill'
 // ideally this can be configured by the users of the extension
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
@@ -57,6 +59,8 @@ async function init () {
   RpcWallet({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: await Node({ url: NODE_URL }) }],
+    id: browser.runtime.id,
+    type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
     // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
     accounts,
@@ -134,6 +138,8 @@ async function init () {
   RpcWallet({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: await Node({ url: NODE_URL }) }],
+    id: browser.runtime.id,
+    type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
     // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
     accounts,

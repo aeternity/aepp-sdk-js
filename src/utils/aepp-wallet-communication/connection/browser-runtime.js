@@ -25,14 +25,8 @@
  * @example import { BrowserRuntimeConnection } from '@aeternity/aepp-sdk'
  */
 import stampit from '@stamp/it'
-
 import WalletConnection from '.'
-import { getBrowserAPI } from '../helpers'
-import {
-  RpcConnectionError,
-  AlreadyConnectedError,
-  NoWalletConnectedError
-} from '../../errors'
+import { AlreadyConnectedError, NoWalletConnectedError } from '../../errors'
 
 /**
  * Disconnect
@@ -109,9 +103,8 @@ function isConnected () {
  */
 export default stampit({
   init ({ port, debug = false }) {
-    if (!getBrowserAPI().runtime) throw new RpcConnectionError('Runtime is not accessible in your environment')
     this.debug = debug
-    this.port = port || getBrowserAPI().runtime.connect()
+    this.port = port
   },
   methods: { connect, sendMessage, disconnect, isConnected }
 }, WalletConnection)

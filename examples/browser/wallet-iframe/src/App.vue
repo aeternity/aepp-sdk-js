@@ -30,7 +30,7 @@
 <script>
 import {
   MemoryAccount, RpcWallet, Node, generateKeyPair,
-  BrowserWindowMessageConnection, METHODS
+  BrowserWindowMessageConnection, METHODS, WALLET_TYPE
 } from '@aeternity/aepp-sdk'
 import Value from './Value'
 
@@ -76,6 +76,8 @@ export default {
       else deny()
     }
     this.aeSdk = await RpcWallet({
+      id: window.origin,
+      type: WALLET_TYPE.window,
       nodes: [
         { name: 'ae_uat', instance: await Node({ url: 'https://testnet.aeternity.io' }) },
         { name: 'ae_mainnet', instance: await Node({ url: 'https://mainnet.aeternity.io' }) },

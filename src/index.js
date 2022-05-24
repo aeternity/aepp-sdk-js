@@ -45,7 +45,6 @@ export { default as Channel } from './channel'
 export { default as Universal } from './ae/universal'
 
 export { default as ContentScriptBridge } from './utils/aepp-wallet-communication/content-script-bridge'
-export * from './utils/aepp-wallet-communication/helpers'
 export * from './utils/aepp-wallet-communication/schema'
 export { default as WalletDetector } from './utils/aepp-wallet-communication/wallet-detector'
 export { default as BrowserRuntimeConnection } from './utils/aepp-wallet-communication/connection/browser-runtime'

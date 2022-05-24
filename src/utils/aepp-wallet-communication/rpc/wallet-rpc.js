@@ -11,8 +11,7 @@ import Ae from '../../../ae'
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
 import RpcClient from './rpc-client'
-import { getBrowserAPI } from '../helpers'
-import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
+import { ERRORS, METHODS, RPC_STATUS, VERSION } from '../schema'
 import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
 import { isAccountBase } from '../../../account/base'
 import { filterObject } from '../../other'
@@ -238,6 +237,8 @@ const handleMessage = (instance, id) => async (msg, origin) => {
 export default Ae.compose(AccountMultiple, {
   init ({
     name,
+    id,
+    type,
     debug = false,
     ...other
   } = {}) {
@@ -252,7 +253,8 @@ export default Ae.compose(AccountMultiple, {
     this.debug = debug
     this.rpcClients = {}
     this.name = name
-    this.id = uuid()
+    this.id = id
+    this._type = type
 
     const _selectAccount = this.selectAccount.bind(this)
     const _addAccount = this.addAccount.bind(this)
@@ -362,13 +364,12 @@ export default Ae.compose(AccountMultiple, {
      * @return {Object} Object with wallet information(id, name, network, ...)
      */
     getWalletInfo () {
-      const runtime = getBrowserAPI(true).runtime
       return {
-        id: runtime && runtime.id ? runtime.id : this.id,
+        id: this.id,
         name: this.name,
         networkId: this.getNetworkId(),
         origin: window.location.origin,
-        type: runtime && runtime.id ? WALLET_TYPE.extension : WALLET_TYPE.window
+        type: this._type
       }
     },
     /**
