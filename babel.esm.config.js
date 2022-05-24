@@ -9,7 +9,9 @@ config.plugins.push(
   ['import-globals', {
     Buffer: { moduleName: 'buffer', exportName: 'Buffer' }
   }],
-  ['transform-default-named-imports']
+  ['transform-default-named-imports', {
+    include: ['@azure/core-rest-pipeline', '@azure/core-client']
+  }]
 )
 
 module.exports = config
