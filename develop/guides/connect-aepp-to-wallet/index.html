@@ -978,9 +978,7 @@ You can build your own wallet in the next example</li>
 <span class="w">      </span><span class="p">}</span><span class="w"></span>
 <span class="w">    </span><span class="p">}</span><span class="w"></span>
 
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">scannerConnection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">BrowserWindowMessageConnection</span><span class="p">({</span><span class="w"></span>
-<span class="w">      </span><span class="nx">connectionInfo</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;spy&#39;</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">})</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">scannerConnection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">BrowserWindowMessageConnection</span><span class="p">()</span><span class="w"></span>
 
 <span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">detector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">WalletDetector</span><span class="p">({</span><span class="w"> </span><span class="nx">connection</span><span class="o">:</span><span class="w"> </span><span class="nx">scannerConnection</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 <span class="w">    </span><span class="nx">detector</span><span class="p">.</span><span class="nx">scan</span><span class="p">(</span><span class="nx">handleWallets</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">))</span><span class="w"></span>
