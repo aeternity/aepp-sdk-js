@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { hash, salt } from '../../utils/crypto'
 import { encode, decode } from '../../utils/encoder'
 import { toBytes } from '../../utils/bytes'
+import { concatBuffers } from '../../utils/other'
 import {
   ID_TAG_PREFIX,
   PREFIX_ID_TAG,
@@ -57,7 +58,7 @@ export function buildContractId (ownerId, nonce) {
 export function oracleQueryId (senderId, nonce, oracleId) {
   function _int32 (val) {
     const nonceBE = toBytes(val, true)
-    return Buffer.concat([Buffer.alloc(32 - nonceBE.length), nonceBE])
+    return concatBuffers([Buffer.alloc(32 - nonceBE.length), nonceBE])
   }
 
   const b2bHash = hash(Buffer.from([...decode(senderId, 'ak'), ..._int32(nonce), ...decode(oracleId, 'ok')]))
@@ -101,7 +102,7 @@ export function produceNameId (name) {
  */
 export function commitmentHash (name, salt = createSalt()) {
   ensureNameValid(name)
-  return encode(hash(Buffer.concat([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm')
+  return encode(hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm')
 }
 
 /**

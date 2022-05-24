@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import { PROTOCOL_VM_ABI, TX_TYPE } from './builder/schema'
 import { calculateFee, unpackTx } from './builder'
 import { UnsupportedProtocolError } from '../utils/errors'
+import { concatBuffers } from '../utils/other'
 
 /**
  * Transaction validator
@@ -21,8 +22,8 @@ const validators = [
       node.nodeNetworkId,
       ...parentTxTypes.includes(TX_TYPE.payingFor) ? ['inner_tx'] : []
     ].join('-'))
-    const txWithNetworkId = Buffer.concat([prefix, encodedTx.rlpEncoded])
-    const txHashWithNetworkId = Buffer.concat([prefix, hash(encodedTx.rlpEncoded)])
+    const txWithNetworkId = concatBuffers([prefix, encodedTx.rlpEncoded])
+    const txHashWithNetworkId = concatBuffers([prefix, hash(encodedTx.rlpEncoded)])
     const decodedPub = decode(account.id, 'ak')
     if (verify(txWithNetworkId, signatures[0], decodedPub) ||
       verify(txHashWithNetworkId, signatures[0], decodedPub)) return []

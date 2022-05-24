@@ -31,6 +31,7 @@ import ContractCompilerHttp from '../contract/compiler'
 import getContractInstance from '../contract/aci'
 import { AMOUNT } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
+import { concatBuffers } from '../utils/other'
 
 /**
  * Utility method to create a delegate signature for a contract
@@ -44,7 +45,7 @@ import { decode, produceNameId } from '../tx/builder/helpers'
  */
 async function delegateSignatureCommon (ids = [], opt = {}) {
   const signature = await this.sign(
-    Buffer.concat([
+    concatBuffers([
       Buffer.from(this.getNetworkId(opt)),
       ...ids.map(e => decode(e))
     ]),

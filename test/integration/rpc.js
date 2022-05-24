@@ -18,6 +18,7 @@
 import { before, describe, it, after } from 'mocha'
 import { expect } from 'chai'
 import { MemoryAccount, Node, RpcAepp, RpcWallet, TX_TYPE } from '../../src'
+import { concatBuffers } from '../../src/utils/other'
 import { unpackTx } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/browser-window-message'
@@ -266,7 +267,7 @@ describe('Aepp<->Wallet', function () {
 
       const signedTx = await aepp.signTransaction(tx)
       const { tx: { signatures: [signature], encodedTx: { rlpEncoded } } } = unpackTx(signedTx)
-      const txWithNetwork = Buffer.concat([Buffer.from(networkId), hash(rlpEncoded)])
+      const txWithNetwork = concatBuffers([Buffer.from(networkId), hash(rlpEncoded)])
       const valid = verify(txWithNetwork, signature, decode(address))
       valid.should.be.equal(true)
     })

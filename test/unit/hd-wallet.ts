@@ -24,6 +24,7 @@ import {
   DerivationError
 } from '../../src/utils/hd-wallet'
 import { encode, decode, EncodedData } from '../../src/utils/encoder'
+import { concatBuffers } from '../../src/utils/other'
 
 describe('hd wallet', () => {
   const testMnemonicSeed = Buffer.from('Git7bFJkmfC1Ho+6YFSFuxSzmDZydmjzk8FubrPDz4PmrkORlBDlfnPTk02Wq9Pj2ZdQ5cTA0SxHKGrq3xSjOw==', 'base64')
@@ -166,7 +167,7 @@ describe('hd wallet', () => {
               const { secretKey, chainCode } = derivePathFromSeed(test.path, seed)
               expect(chainCode).to.eql(test.chain)
               expect(secretKey).to.eql(test.prv)
-              const pub = Buffer.concat([Buffer.alloc(1, 0), getKeyPair(secretKey).publicKey])
+              const pub = concatBuffers([Buffer.alloc(1, 0), getKeyPair(secretKey).publicKey])
               expect(pub).to.eql(test.pub)
             })))
       })

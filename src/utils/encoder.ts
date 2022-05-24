@@ -6,6 +6,7 @@ import {
   InvalidChecksumError,
   PayloadLengthError
 } from './errors'
+import { concatBuffers } from './other'
 
 /**
  * Calculate SHA256 hash of `input`
@@ -40,7 +41,7 @@ const getChecksum = (payload: Uint8Array): Buffer =>
   sha256hash(sha256hash(payload)).slice(0, 4)
 
 const addChecksum = (payload: Uint8Array): Buffer => {
-  return Buffer.concat([payload, getChecksum(payload)])
+  return concatBuffers([payload, getChecksum(payload)])
 }
 
 function getPayload (buffer: Buffer): Buffer {
