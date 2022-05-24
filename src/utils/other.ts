@@ -49,3 +49,18 @@ export const snakizeKeys = traverseKeys.bind(null, pascalToSnake)
  * @see snakeToPascal
  */
 export const pascalizeKeys = traverseKeys.bind(null, snakeToPascal)
+
+// remove after dropping webpack4 support
+const isWebpack4Buffer = (() => {
+  try {
+    Buffer.concat([Uint8Array.from([])])
+    return false
+  } catch (error) {
+    return true
+  }
+})()
+
+export const concatBuffers = isWebpack4Buffer
+  ? (list: readonly Uint8Array[], totalLength?: number): Buffer =>
+      Buffer.concat(list.map(el => Buffer.from(el)), totalLength)
+  : Buffer.concat

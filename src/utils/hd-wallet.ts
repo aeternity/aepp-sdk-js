@@ -5,6 +5,7 @@ import { decryptKey, encryptKey } from './crypto'
 import { encode } from './encoder'
 import { CryptographyError } from './errors'
 import { bytesToHex } from './bytes'
+import { concatBuffers } from './other'
 
 export class DerivationError extends CryptographyError {
   constructor (message: string) {
@@ -86,7 +87,7 @@ export function deriveChild ({ secretKey, chainCode }: KeyTreeNode, index: numbe
   const indexBuffer = Buffer.allocUnsafe(4)
   indexBuffer.writeUInt32BE(index, 0)
 
-  const data = Buffer.concat([Buffer.alloc(1, 0), secretKey, indexBuffer])
+  const data = concatBuffers([Buffer.alloc(1, 0), secretKey, indexBuffer])
 
   const I = hmac(data, chainCode)
   const IL = I.slice(0, 32)

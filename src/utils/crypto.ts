@@ -27,6 +27,7 @@ import { blake2b, Data } from 'blakejs'
 import { encode as varuintEncode } from 'varuint-bitcoin'
 
 import { str2buf } from './bytes'
+import { concatBuffers } from './other'
 import { encode, decode, sha256hash, EncodedData, EncodingType } from './encoder'
 
 export { sha256hash }
@@ -103,7 +104,7 @@ export function hash (input: Data): Buffer {
  */
 export function encodeContractAddress (owner: EncodedData<'ak'>, nonce: number): string {
   const publicKey = decode(owner)
-  const binary = Buffer.concat([publicKey, encodeUnsigned(nonce)])
+  const binary = concatBuffers([publicKey, encodeUnsigned(nonce)])
   return encode(hash(binary), 'ct')
 }
 
@@ -205,7 +206,7 @@ export function verify (
 export function messageToHash (message: string): Buffer {
   const p = Buffer.from('aeternity Signed Message:\n', 'utf8')
   const msg = Buffer.from(message, 'utf8')
-  return hash(Buffer.concat([varuintEncode(p.length), p, varuintEncode(msg.length), msg]))
+  return hash(concatBuffers([varuintEncode(p.length), p, varuintEncode(msg.length), msg]))
 }
 
 export function signMessage (message: string, privateKey: string | Buffer): Uint8Array {

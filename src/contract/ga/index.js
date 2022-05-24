@@ -29,6 +29,7 @@ import { prepareGaParams } from './helpers'
 import { hash } from '../../utils/crypto'
 import { decode } from '../../utils/encoder'
 import { IllegalArgumentError, MissingParamError } from '../../utils/errors'
+import { concatBuffers } from '../../utils/other'
 
 /**
  * GeneralizedAccount Stamp
@@ -162,6 +163,6 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
  */
 function buildAuthTxHash (transaction, options) {
   return new Uint8Array(hash(
-    Buffer.concat([Buffer.from(this.getNetworkId(options)), decode(transaction, 'tx')])
+    concatBuffers([Buffer.from(this.getNetworkId(options)), decode(transaction, 'tx')])
   ))
 }

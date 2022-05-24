@@ -34,6 +34,7 @@ import { TX_TYPE } from '../tx/builder/schema'
 // @ts-expect-error
 import { getNetworkId } from '../node'
 import { EncodedData } from '../utils/encoder'
+import { concatBuffers } from '../utils/other'
 
 /**
  * Check is provided object looks like an instance of AccountBase
@@ -69,7 +70,7 @@ export abstract class _AccountBase {
     const prefixes = [this.getNetworkId({ networkId })]
     if (innerTx === true) prefixes.push('inner_tx')
     const rlpBinaryTx = decode(tx)
-    const txWithNetworkId = Buffer.concat([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)])
+    const txWithNetworkId = concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)])
 
     const signatures = [await this.sign(txWithNetworkId, options)]
     return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
