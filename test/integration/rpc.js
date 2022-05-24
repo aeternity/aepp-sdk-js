@@ -46,12 +46,10 @@ describe('Aepp<->Wallet', function () {
     node = await Node({ url, ignoreVersion })
     connections = getConnections()
     connectionFromWalletToAepp = BrowserWindowMessageConnection({
-      connectionInfo: { id: 'from_wallet_to_aepp' },
       self: connections.waelletConnection,
       target: connections.aeppConnection
     })
     connectionFromAeppToWallet = BrowserWindowMessageConnection({
-      connectionInfo: { id: 'from_aepp_to_wallet' },
       self: connections.aeppConnection,
       target: connections.waelletConnection
     })
@@ -319,7 +317,7 @@ describe('Aepp<->Wallet', function () {
         action.accept()
       }
       const messageSig = await aepp.signMessage('test')
-      messageSig.should.be.a('string')
+      messageSig.should.be.instanceof(Buffer)
       const isValid = await aepp.verifyMessage('test', messageSig)
       isValid.should.be.equal(true)
     })
@@ -342,7 +340,7 @@ describe('Aepp<->Wallet', function () {
       }
       const onAccount = keypair.publicKey
       const messageSig = await aepp.signMessage('test', { onAccount })
-      messageSig.should.be.a('string')
+      messageSig.should.be.instanceof(Buffer)
       const isValid = await aepp.verifyMessage('test', messageSig, { onAccount })
       isValid.should.be.equal(true)
     })
@@ -448,12 +446,10 @@ describe('Aepp<->Wallet', function () {
         actions.accept()
       }
       const id = wallet.addRpcClient(BrowserWindowMessageConnection({
-        connectionInfo: { id: 'from_wallet_to_aepp_2' },
         self: connections.waelletConnection,
         target: connections.aeppConnection
       }))
       await aepp.connectToWallet(BrowserWindowMessageConnection({
-        connectionInfo: { id: 'from_aepp_to_wallet_2' },
         self: connections.aeppConnection,
         target: connections.waelletConnection
       }))

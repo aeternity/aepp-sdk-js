@@ -39,7 +39,7 @@ import { UnsupportedPlatformError } from '../errors'
 export default stampit({
   init ({ connection } = {}) {
     if (!window) throw new UnsupportedPlatformError('Window object not found, you can run wallet detector only in browser')
-    this.connection = connection || BrowserWindowMessageConnection({ connectionInfo: { id: 'spy' } })
+    this.connection = connection || BrowserWindowMessageConnection()
     this.wallets = {}
   },
   methods: {
@@ -65,7 +65,6 @@ export default stampit({
             const isExtension = this.type === 'extension'
             const origin = isExtension ? window.origin : this.origin
             return BrowserWindowMessageConnection({
-              connectionInfo: this,
               sendDirection: isExtension ? MESSAGE_DIRECTION.to_waellet : undefined,
               receiveDirection: isExtension ? MESSAGE_DIRECTION.to_aepp : undefined,
               target: source,

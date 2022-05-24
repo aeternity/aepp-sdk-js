@@ -28,7 +28,6 @@
  */
 import stampit from '@stamp/it'
 import WalletConnection from '.'
-import { v4 as uuid } from '@aeternity/uuid'
 import { MESSAGE_DIRECTION } from '../schema'
 import { getBrowserAPI, isInIframe } from '../helpers'
 import {
@@ -131,13 +130,11 @@ const getTarget = () => {
  * @param {String} [params.receiveDirection='to_aepp'] Unwrapping messages from additional struct
  * ({ type: 'to_aepp' || 'to_waellet', data })
  * Used for handling messages between content script and page
- * @param {Object} [params.connectionInfo={}] - Connection info object
  * @param {Boolean} [params.debug=false] - Debug flag
  * @return {Object}
  */
 export default stampit({
   init ({
-    connectionInfo = {},
     target = getTarget(),
     self = window,
     origin,
@@ -148,7 +145,6 @@ export default stampit({
   } = {}) {
     if (sendDirection && !Object.keys(MESSAGE_DIRECTION).includes(sendDirection)) throw new MessageDirectionError(`sendDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
     if (!Object.keys(MESSAGE_DIRECTION).includes(receiveDirection)) throw new MessageDirectionError(`receiveDirection must be one of [${Object.keys(MESSAGE_DIRECTION)}]`)
-    this.connectionInfo = { id: uuid(), ...connectionInfo }
 
     const selfP = self
     const targetP = target

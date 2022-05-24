@@ -126,7 +126,9 @@ export default AccountResolver.compose(AsyncInit, {
         if (!this.rpcClient?.hasAccessToAccount(account)) {
           throw new UnAuthorizedAccountError(account)
         }
-        account = AccountRpc({ rpcClient: this.rpcClient, address: account })
+        account = AccountRpc({
+          rpcClient: this.rpcClient, address: account, networkId: this.getNetworkId()
+        })
       }
       if (!account) this._ensureAccountAccess()
       return resolveAccountBase(account)
@@ -158,7 +160,6 @@ export default AccountResolver.compose(AsyncInit, {
       if (this.rpcClient?.isConnected()) throw new AlreadyConnectedError('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = RpcClient({
         connection,
-        ...connection.connectionInfo,
         id: uuid(),
         handlers: [handleMessage(this), this.onDisconnect]
       })
