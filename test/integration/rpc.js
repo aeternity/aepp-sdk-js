@@ -113,7 +113,9 @@ describe('Aepp<->Wallet', function () {
       wallet.onConnection = (aepp, actions) => {
         actions.deny()
       }
-      await expect(aepp.connectToWallet(connectionFromAeppToWallet)).to.be.eventually
+      await expect(
+        aepp.connectToWallet(wallet.getWalletInfo(), connectionFromAeppToWallet)
+      ).to.be.eventually
         .rejectedWith('Wallet deny your connection request')
         .with.property('code', 9)
     })
@@ -123,7 +125,9 @@ describe('Aepp<->Wallet', function () {
         actions.accept()
       }
       connectionFromAeppToWallet.disconnect()
-      const connected = await aepp.connectToWallet(connectionFromAeppToWallet)
+      const connected = await aepp.connectToWallet(
+        wallet.getWalletInfo(), connectionFromAeppToWallet
+      )
 
       connected.name.should.be.equal('Wallet')
     })
@@ -429,10 +433,13 @@ describe('Aepp<->Wallet', function () {
         self: connections.walletWindow,
         target: connections.aeppWindow
       }))
-      await aepp.connectToWallet(new BrowserWindowMessageConnection({
-        self: connections.aeppWindow,
-        target: connections.walletWindow
-      }))
+      await aepp.connectToWallet(
+        wallet.getWalletInfo(),
+        new BrowserWindowMessageConnection({
+          self: connections.aeppWindow,
+          target: connections.walletWindow
+        })
+      )
 
       wallet.removeRpcClient(id)
       Object.keys(wallet.rpcClients).length.should.be.equal(1)
@@ -495,6 +502,7 @@ describe('Aepp<->Wallet', function () {
       })
       wallet.addRpcClient(connectionFromWalletToAepp)
       await aepp.connectToWallet(
+        wallet.getWalletInfo(),
         connectionFromAeppToWallet,
         { connectNode: true, name: 'wallet-node', select: true }
       )

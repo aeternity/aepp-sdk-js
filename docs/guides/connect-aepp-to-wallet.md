@@ -79,7 +79,7 @@ Append method for wallet connection
 
 ```js
 async connect(wallet) {
-  await this.aeSdk.connectToWallet(await wallet.getConnection())
+  await this.aeSdk.connectToWallet(wallet.info, wallet.getConnection())
   this.connectedAccounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
   this.address = await this.aeSdk.address()
   this.balance = await this.aeSdk.getBalance(this.address).catch(() => '0')
@@ -93,7 +93,7 @@ Aepp can request the wallet to share its connected node URLs if any to interact 
 
 ```js
 async connect (wallet) {
-    await this.aeSdk.connectToWallet(await wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
+    await this.aeSdk.connectToWallet(wallet.info, wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
 }
 ```
 

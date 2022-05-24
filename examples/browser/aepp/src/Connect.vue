@@ -34,7 +34,7 @@
     </div>
     <div>
       <div>Wallet name</div>
-      <div>{{ walletName || 'Not connected' }}</div>
+      <div>{{ walletName }}</div>
     </div>
   </div>
 </template>
@@ -65,11 +65,11 @@ export default {
     async scanForWallets () {
       const handleWallets = async function ({ wallets, newWallet }) {
         newWallet = newWallet || Object.values(wallets)[0]
-        if (confirm(`Do you want to connect to wallet ${newWallet.name} with id ${newWallet.id}`)) {
+        if (confirm(`Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`)) {
           console.log('newWallet', newWallet)
           stopScan()
 
-          await this.aeSdk.connectToWallet(await newWallet.getConnection())
+          await this.aeSdk.connectToWallet(newWallet.info, newWallet.getConnection())
           this.walletConnected = true
           const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected')
           this.$store.commit('aeSdk/setAddress', Object.keys(current)[0])

@@ -21,9 +21,11 @@ import { MESSAGE_DIRECTION, METHODS } from './schema'
 import { UnsupportedPlatformError } from '../errors'
 
 interface Wallet {
-  id: string
-  type: string
-  origin: string
+  info: {
+    id: string
+    type: string
+    origin: string
+  }
   getConnection: () => BrowserWindowMessageConnection
 }
 interface Wallets { [key: string]: Wallet }
@@ -42,14 +44,14 @@ export default (
   const wallets: Wallets = {}
 
   connection.connect((
-    { method, params }: { method: string, params: Omit<Wallet, 'getConnection'> },
+    { method, params }: { method: string, params: Wallet['info'] },
     origin: string,
     source: Window
   ) => {
     if (method !== METHODS.readyToConnect || wallets[params.id] != null) return
 
     const wallet = {
-      ...params,
+      info: params,
       getConnection () {
         const isExtension = params.type === 'extension'
         return new BrowserWindowMessageConnection({
@@ -60,7 +62,7 @@ export default (
         })
       }
     }
-    wallets[wallet.id] = wallet
+    wallets[wallet.info.id] = wallet
     onDetected({ wallets, newWallet: wallet })
   }, () => {})
   if (Object.keys(wallets).length > 0) onDetected({ wallets })

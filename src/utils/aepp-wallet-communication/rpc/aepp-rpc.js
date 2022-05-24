@@ -149,6 +149,7 @@ export default AccountResolver.compose(AsyncInit, {
      * @function connectToWallet
      * @instance
      * @rtype (connection: Object) => void
+     * @param {Object} walletInfo Wallet info object
      * @param {Object} connection Wallet connection object
      * @param {Object} [options={}]
      * @param {Boolean} [options.connectNode=true] - Request wallet to bind node
@@ -156,18 +157,19 @@ export default AccountResolver.compose(AsyncInit, {
      * @param {Boolean} [options.select=false] - Select this node as current
      * @return {Object}
      */
-    async connectToWallet (connection, { connectNode = false, name = 'wallet-node', select = false } = {}) {
+    async connectToWallet (walletInfo, connection, { connectNode = false, name = 'wallet-node', select = false } = {}) {
       if (this.rpcClient?.isConnected()) throw new AlreadyConnectedError('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = RpcClient({
+        ...walletInfo,
         connection,
         id: uuid(),
         handlers: [handleMessage(this), this.onDisconnect]
       })
-      const walletInfo = await this.sendConnectRequest(connectNode)
-      if (connectNode && !Object.prototype.hasOwnProperty.call(walletInfo, 'node')) {
-        throw new RpcConnectionError('Missing URLs of the Node')
+      const { node } = await this.sendConnectRequest(connectNode)
+      if (connectNode) {
+        if (node == null) throw new RpcConnectionError('Missing URLs of the Node')
+        this.addNode(name, await Node(node), select)
       }
-      if (connectNode) this.addNode(name, await Node(walletInfo.node), select)
       return walletInfo
     },
     /**
