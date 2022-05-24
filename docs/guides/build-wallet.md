@@ -18,8 +18,7 @@ First you need to create a bridge between your extension and the page. This can 
 ```js
 import browser from 'webextension-polyfill'
 import {
-  BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION,
-  ContentScriptBridge
+  BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION, connectionProxy
 } from '@aeternity/aepp-sdk'
 
 const readyStateCheckInterval = setInterval(function () {
@@ -27,15 +26,14 @@ const readyStateCheckInterval = setInterval(function () {
     clearInterval(readyStateCheckInterval)
 
     const port = browser.runtime.connect()
-    const extConnection = BrowserRuntimeConnection({ port })
-    const pageConnection = BrowserWindowMessageConnection({
+    const extConnection = new BrowserRuntimeConnection({ port })
+    const pageConnection = new BrowserWindowMessageConnection({
+      target: window,
       origin: window.origin,
       sendDirection: MESSAGE_DIRECTION.to_aepp,
       receiveDirection: MESSAGE_DIRECTION.to_waellet
     })
-
-    const bridge = ContentScriptBridge({ pageConnection, extConnection })
-    bridge.run()
+    connectionProxy(pageConnection, extConnection)
   }
 }, 10)
 ```
@@ -106,7 +104,7 @@ async function init () {
   }).then(wallet => {
     chrome.runtime.onConnect.addListener(async function (port) {
       // create connection
-      const connection = await BrowserRuntimeConnection({ port })
+      const connection = new BrowserRuntimeConnection({ port })
       // add new aepp to wallet
       wallet.addRpcClient(connection)
       // share wallet details
@@ -190,7 +188,7 @@ async function init () {
   }).then(wallet => {
     chrome.runtime.onConnect.addListener(async function (port) {
       // create connection
-      const connection = await BrowserRuntimeConnection({ port })
+      const connection = new BrowserRuntimeConnection({ port })
       // add new aepp to wallet
       wallet.addRpcClient(connection)
       // share wallet details
@@ -206,7 +204,7 @@ init().then(_ => console.log('Wallet initialized!'))
 ```
 
 ## iFrame-based Wallet
-The **iFrame-based** approach works similar to the **WebExtension** approach except that the `ContentScriptBridge` in between isn't needed.
+The **iFrame-based** approach works similar to the **WebExtension** approach except that the `connectionProxy` in between isn't needed.
 
 You can take a look into the implementation of the following example to see how it works:
 

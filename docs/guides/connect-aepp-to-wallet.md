@@ -10,7 +10,7 @@ You can build your own wallet in the next example
 ## 1. Specify imports and constants and state
 
 ```js
-import { RpcAepp, WalletDetector, BrowserWindowMessageConnection, Node } from '@aeternity/aepp-sdk'
+import { RpcAepp, walletDetector, BrowserWindowMessageConnection, Node } from '@aeternity/aepp-sdk'
 
 const TESTNET_NODE_URL = 'https://testnet.aeternity.io'
 const MAINNET_NODE_URL = 'https://mainnet.aeternity.io'
@@ -62,16 +62,13 @@ methods: {
     const handleWallets = async function ({ wallets, newWallet }) {
       newWallet = newWallet || Object.values(wallets)[0]
       if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
-        detector.stopScan()
+        stopScan()
         // connect to the wallet, see step 4.
         await this.connect(newWallet)
       }
     }
-
-    const scannerConnection = BrowserWindowMessageConnection()
-
-    const detector = await WalletDetector({ connection: scannerConnection })
-    detector.scan(handleWallets.bind(this))
+    const scannerConnection = new BrowserWindowMessageConnection()
+    const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
   }
 }
 ```

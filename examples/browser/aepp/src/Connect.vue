@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { WalletDetector, BrowserWindowMessageConnection } from '@aeternity/aepp-sdk'
+import { walletDetector, BrowserWindowMessageConnection } from '@aeternity/aepp-sdk'
 import Value from './Value'
 import { mapGetters } from 'vuex'
 
@@ -67,7 +67,7 @@ export default {
         newWallet = newWallet || Object.values(wallets)[0]
         if (confirm(`Do you want to connect to wallet ${newWallet.name} with id ${newWallet.id}`)) {
           console.log('newWallet', newWallet)
-          detector.stopScan()
+          stopScan()
 
           await this.aeSdk.connectToWallet(await newWallet.getConnection())
           this.walletConnected = true
@@ -76,9 +76,8 @@ export default {
         }
       }
 
-      const scannerConnection = await BrowserWindowMessageConnection()
-      const detector = await WalletDetector({ connection: scannerConnection })
-      detector.scan(handleWallets.bind(this))
+      const scannerConnection = new BrowserWindowMessageConnection()
+      const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
     },
     async connect () {
       if (this.connectMethod === 'reverse-iframe') {

@@ -21,7 +21,7 @@ import { MemoryAccount, Node, RpcAepp, RpcWallet, TX_TYPE, WALLET_TYPE } from '.
 import { concatBuffers } from '../../src/utils/other'
 import { unpackTx } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
-import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/browser-window-message'
+import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/BrowserWindowMessage'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify, hash } from '../../src/utils/crypto'
 import { compilerUrl, account, networkId, url, ignoreVersion, spendPromise } from './'
@@ -30,7 +30,7 @@ import {
 } from '../../src/utils/errors'
 
 describe('Aepp<->Wallet', function () {
-  this.timeout(6000)
+  this.timeout(2000)
   let node
   let connections
   let connectionFromWalletToAepp
@@ -39,13 +39,13 @@ describe('Aepp<->Wallet', function () {
   before(async function () {
     node = await Node({ url, ignoreVersion })
     connections = getConnections()
-    connectionFromWalletToAepp = BrowserWindowMessageConnection({
-      self: connections.waelletConnection,
-      target: connections.aeppConnection
+    connectionFromWalletToAepp = new BrowserWindowMessageConnection({
+      self: connections.walletWindow,
+      target: connections.aeppWindow
     })
-    connectionFromAeppToWallet = BrowserWindowMessageConnection({
-      self: connections.aeppConnection,
-      target: connections.waelletConnection
+    connectionFromAeppToWallet = new BrowserWindowMessageConnection({
+      self: connections.aeppWindow,
+      target: connections.walletWindow
     })
   })
 
@@ -96,7 +96,7 @@ describe('Aepp<->Wallet', function () {
 
     it('Should receive `announcePresence` message from wallet', async () => {
       const isReceived = new Promise((resolve) => {
-        connections.aeppConnection.addEventListener('message', (msg) => {
+        connections.aeppWindow.addEventListener('message', (msg) => {
           resolve(msg.data.method === 'connection.announcePresence')
         })
       })
@@ -425,13 +425,13 @@ describe('Aepp<->Wallet', function () {
       wallet.onConnection = (aepp, actions) => {
         actions.accept()
       }
-      const id = wallet.addRpcClient(BrowserWindowMessageConnection({
-        self: connections.waelletConnection,
-        target: connections.aeppConnection
+      const id = wallet.addRpcClient(new BrowserWindowMessageConnection({
+        self: connections.walletWindow,
+        target: connections.aeppWindow
       }))
-      await aepp.connectToWallet(BrowserWindowMessageConnection({
-        self: connections.aeppConnection,
-        target: connections.waelletConnection
+      await aepp.connectToWallet(new BrowserWindowMessageConnection({
+        self: connections.aeppWindow,
+        target: connections.walletWindow
       }))
 
       wallet.removeRpcClient(id)
@@ -565,27 +565,23 @@ const WindowPostMessageFake = (name) => ({
   removeEventListener () {
     return () => null
   },
-  postMessage (msg) {
+  postMessage (source, msg) {
     this.messages.push(msg)
-    setTimeout(() => { if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin', source: this }) }, 0)
+    setTimeout(() => {
+      if (typeof this.listener === 'function') {
+        this.listener({ data: msg, origin: 'testOrigin', source })
+      }
+    })
   }
 })
 
-const getFakeConnections = (direct = false) => {
-  const waelletConnection = WindowPostMessageFake('wallet')
-  const aeppConnection = WindowPostMessageFake('aepp')
-  if (direct) {
-    const waelletP = waelletConnection.postMessage
-    const aeppP = aeppConnection.postMessage
-    waelletConnection.postMessage = aeppP.bind(aeppConnection)
-    aeppConnection.postMessage = waelletP.bind(waelletConnection)
-  }
-  return { waelletConnection, aeppConnection }
-}
-
-const getConnections = (direct) => {
+const getConnections = () => {
   global.chrome = { runtime: {} }
   global.window = { location: { origin: '//test' }, chrome: global.chrome }
   global.location = { protocol: 'http://test.com' }
-  return getFakeConnections(direct)
+  const walletWindow = WindowPostMessageFake('wallet')
+  const aeppWindow = WindowPostMessageFake('aepp')
+  walletWindow.postMessage = walletWindow.postMessage.bind(walletWindow, aeppWindow)
+  aeppWindow.postMessage = aeppWindow.postMessage.bind(aeppWindow, walletWindow)
+  return { walletWindow, aeppWindow }
 }

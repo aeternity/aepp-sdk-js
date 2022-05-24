@@ -98,7 +98,6 @@ BaseError
 │
 └̌───WalletError
 │   │   AlreadyConnectedError
-│   │   MessageDirectionError
 │   │   NoWalletConnectedError
 │   │   RpcConnectionError
 ```

@@ -605,13 +605,6 @@ export class AlreadyConnectedError extends WalletError {
   }
 }
 
-export class MessageDirectionError extends WalletError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'MessageDirectionError'
-  }
-}
-
 export class NoWalletConnectedError extends WalletError {
   constructor (message: string) {
     super(message)

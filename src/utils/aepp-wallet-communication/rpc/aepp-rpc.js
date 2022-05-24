@@ -4,7 +4,7 @@
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc
  * @export AeppRpc
  * @example
- * import ContentScriptBridge
+ * import AeppRpc
  * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
 import { v4 as uuid } from '@aeternity/uuid'

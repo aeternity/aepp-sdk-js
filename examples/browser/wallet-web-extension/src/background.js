@@ -67,7 +67,7 @@ import {
 
   browser.runtime.onConnect.addListener((port) => {
     // create connection
-    const connection = BrowserRuntimeConnection({ port })
+    const connection = new BrowserRuntimeConnection({ port })
     // add new aepp to wallet
     aeSdk.addRpcClient(connection)
     // share wallet details
