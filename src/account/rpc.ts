@@ -12,13 +12,16 @@ import type stampit from '@stamp/it' // eslint-disable-line @typescript-eslint/n
 class _AccountRpc extends _AccountBase {
   _rpcClient: any
   _address: EncodedData<'ak'>
+  _networkId: string
 
   init (
-    { rpcClient, address, ...options }: { rpcClient: any, address: EncodedData<'ak'> } & Parameters<_AccountBase['init']>[0]
+    { rpcClient, address, networkId, ...options }:
+    { rpcClient: any, address: EncodedData<'ak'>, networkId: string } & Parameters<_AccountBase['init']>[0]
   ): void {
     super.init(options)
     this._rpcClient = rpcClient
     this._address = address
+    this._networkId = networkId
   }
 
   async sign (data: string | Buffer, options?: any): Promise<Uint8Array> {
@@ -36,10 +39,12 @@ class _AccountRpc extends _AccountBase {
    * @return {Promise<String>} Signed transaction
    */
   async signTransaction (
-    tx: EncodedData<'tx'>, options: Parameters<_AccountBase['signTransaction']>[1]
+    tx: EncodedData<'tx'>,
+    { innerTx, networkId }: Parameters<_AccountBase['signTransaction']>[1] = {}
   ): Promise<EncodedData<'tx'>> {
+    if (innerTx != null) throw new NotImplementedError('innerTx option in AccountRpc')
+    if (networkId !== this._networkId) throw new NotImplementedError('networkId should be equal to current network')
     return this._rpcClient.request(METHODS.sign, {
-      ...options,
       onAccount: this._address,
       tx,
       returnSigned: true
@@ -53,11 +58,12 @@ class _AccountRpc extends _AccountBase {
    * @return {Promise<String>} Signed message
    */
   async signMessage (
-    message: string, options: Parameters<_AccountBase['signMessage']>[1]
+    message: string, { returnHex = false }: Parameters<_AccountBase['signMessage']>[1] = {}
   ): Promise<string | Uint8Array> {
-    return this._rpcClient.request(
-      METHODS.signMessage, { ...options, onAccount: this._address, message }
+    const signature = await this._rpcClient.request(
+      METHODS.signMessage, { onAccount: this._address, message }
     )
+    return returnHex ? signature : Buffer.from(signature, 'hex')
   }
 }
 

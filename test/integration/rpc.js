@@ -319,7 +319,7 @@ describe('Aepp<->Wallet', function () {
         action.accept()
       }
       const messageSig = await aepp.signMessage('test')
-      messageSig.should.be.a('string')
+      messageSig.should.be.instanceof(Buffer)
       const isValid = await aepp.verifyMessage('test', messageSig)
       isValid.should.be.equal(true)
     })
@@ -342,7 +342,7 @@ describe('Aepp<->Wallet', function () {
       }
       const onAccount = keypair.publicKey
       const messageSig = await aepp.signMessage('test', { onAccount })
-      messageSig.should.be.a('string')
+      messageSig.should.be.instanceof(Buffer)
       const isValid = await aepp.verifyMessage('test', messageSig, { onAccount })
       isValid.should.be.equal(true)
     })

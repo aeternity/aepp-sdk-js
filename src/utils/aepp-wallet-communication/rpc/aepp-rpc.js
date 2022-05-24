@@ -126,7 +126,9 @@ export default AccountResolver.compose(AsyncInit, {
         if (!this.rpcClient?.hasAccessToAccount(account)) {
           throw new UnAuthorizedAccountError(account)
         }
-        account = AccountRpc({ rpcClient: this.rpcClient, address: account })
+        account = AccountRpc({
+          rpcClient: this.rpcClient, address: account, networkId: this.getNetworkId()
+        })
       }
       if (!account) this._ensureAccountAccess()
       return resolveAccountBase(account)
