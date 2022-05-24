@@ -29,7 +29,7 @@
 import stampit from '@stamp/it'
 import WalletConnection from '.'
 import { MESSAGE_DIRECTION } from '../schema'
-import { getBrowserAPI, isInIframe } from '../helpers'
+import { getBrowserAPI } from '../helpers'
 import {
   AlreadyConnectedError,
   NoWalletConnectedError,
@@ -111,7 +111,8 @@ const getTarget = () => {
   // When we is the main page we need to decide the target by our self
   // Probably can be implemented some algo for checking DOM for Iframes and somehow decide which
   // Iframe to talk
-  return isInIframe() ? window.parent : undefined
+  const isInIframe = window !== window.parent
+  return isInIframe ? window.parent : undefined
 }
 
 /**

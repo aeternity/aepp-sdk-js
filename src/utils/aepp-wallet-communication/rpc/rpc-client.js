@@ -9,10 +9,8 @@
 import stampit from '@stamp/it'
 
 import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
-import { sendMessage, message, isValidAccounts } from '../helpers'
 import {
   InvalidRpcMessageError,
-  TypeError,
   DuplicateCallbackError,
   MissingCallbackError
 } from '../../errors'
@@ -47,7 +45,7 @@ export default stampit({
     // }
     this.accounts = {}
 
-    this.sendMessage = sendMessage(this.connection)
+    this._messageId = 0
 
     const handleMessage = (msg, origin) => {
       if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
@@ -91,6 +89,22 @@ export default stampit({
     }
   },
   methods: {
+    sendMessage ({ id, method, params, result, error }, isNotificationOrResponse = false) {
+      if (!isNotificationOrResponse) this._messageId += 1
+      id = isNotificationOrResponse ? (id ?? null) : this._messageId
+      const msgData = params
+        ? { params }
+        : result
+          ? { result }
+          : { error }
+      this.connection.sendMessage({
+        jsonrpc: '2.0',
+        ...id ? { id } : {},
+        method,
+        ...msgData
+      })
+      return id
+    },
     /**
      * Update info
      * @function updateInfo
@@ -163,13 +177,10 @@ export default stampit({
      * @param {Boolean} [options.forceNotification] Don't sent update notification to AEPP
      */
     setAccounts (accounts, { forceNotification } = {}) {
-      if (!isValidAccounts(accounts)) {
-        throw new TypeError('Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
-      }
       this.accounts = accounts
       if (!forceNotification) {
         // Sent notification about account updates
-        this.sendMessage(message(METHODS.updateAddress, this.accounts), true)
+        this.sendMessage({ method: METHODS.updateAddress, params: this.accounts }, true)
       }
     },
     /**
@@ -200,7 +211,7 @@ export default stampit({
      * @return {Promise} Promise which will be resolved after receiving response message
      */
     request (name, params) {
-      const msgId = this.sendMessage(message(name, params))
+      const msgId = this.sendMessage({ method: name, params })
       if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) {
         throw new DuplicateCallbackError()
       }

@@ -22,7 +22,7 @@ import { concatBuffers } from '../../src/utils/other'
 import { unpackTx } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
 import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/browser-window-message'
-import { getBrowserAPI, getHandler } from '../../src/utils/aepp-wallet-communication/helpers'
+import { getBrowserAPI } from '../../src/utils/aepp-wallet-communication/helpers'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify, hash } from '../../src/utils/crypto'
 import { compilerUrl, account, networkId, url, ignoreVersion, spendPromise } from './'
@@ -152,14 +152,6 @@ describe('Aepp<->Wallet', function () {
       }
       await expect(aepp.subscribeAddress('subscribe', 'connected')).to.be.eventually
         .rejectedWith('Operation rejected by user').with.property('code', 4)
-    })
-
-    it('Subscribe to address: invalid accounts', async () => {
-      wallet.onSubscription = (aepp, actions) => {
-        actions.accept({ accounts: {} })
-      }
-      await expect(aepp.subscribeAddress('subscribe', 'connected'))
-        .to.be.rejectedWith('Invalid provided accounts object')
     })
 
     it('Subscribe to address: wallet accept', async () => {
@@ -397,14 +389,6 @@ describe('Aepp<->Wallet', function () {
       received.should.be.equal(true)
     })
 
-    it('RPC client set invalid account', () => {
-      const current = aepp.rpcClient.getCurrentAccount()
-      current.should.be.equal(aepp.rpcClient.currentAccount)
-      aepp.rpcClient.origin.should.be.an('object')
-      expect(() => aepp.rpcClient.setAccounts(true))
-        .to.throw(TypeError, 'Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
-    })
-
     it('Resolve/Reject callback for undefined message', async () => {
       expect(() => aepp.rpcClient.processResponse({ id: 0 }))
         .to.throw('Can\'t find callback for this messageId 0')
@@ -466,10 +450,6 @@ describe('Aepp<->Wallet', function () {
   describe('Rpc helpers', () => {
     after(async () => {
       connectionFromAeppToWallet.disconnect()
-    })
-
-    it('receive unknown method', async () => {
-      (await getHandler({}, { method: 'hey' })()()).should.be.equal(true)
     })
 
     it('getBrowserAPI: not in browser', () => {

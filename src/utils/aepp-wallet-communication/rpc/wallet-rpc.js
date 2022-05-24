@@ -11,7 +11,7 @@ import Ae from '../../../ae'
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
 import RpcClient from './rpc-client'
-import { getBrowserAPI, getHandler, isValidAccounts, message, sendResponseMessage } from '../helpers'
+import { getBrowserAPI } from '../helpers'
 import { ERRORS, METHODS, RPC_STATUS, VERSION, WALLET_TYPE } from '../schema'
 import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
 import { isAccountBase } from '../../../account/base'
@@ -85,9 +85,6 @@ const REQUESTS = {
       async ({ accounts } = {}) => {
         try {
           const clientAccounts = accounts || instance.getAccounts()
-          if (!isValidAccounts(clientAccounts)) {
-            throw new TypeError('Invalid provided accounts object')
-          }
           const subscription = client.updateSubscription(type, value)
           client.setAccounts(clientAccounts, { forceNotification: true })
           return {
@@ -195,12 +192,10 @@ const REQUESTS = {
 const handleMessage = (instance, id) => async (msg, origin) => {
   const client = instance.rpcClients[id]
   if (!msg.id) {
-    return getHandler(
-      NOTIFICATIONS, msg, { debug: instance.debug }
-    )(instance, { client })(msg, origin)
+    return NOTIFICATIONS[msg.method](instance, { client })(msg, origin)
   }
   if (Object.prototype.hasOwnProperty.call(client.callbacks, msg.id)) {
-    return getHandler(RESPONSES, msg, { debug: instance.debug })(instance, { client })(msg, origin)
+    return RESPONSES[msg.method](instance, { client })(msg, origin)
   } else {
     const { id, method } = msg
     const callInstance = (methodName, params, accept, deny) => () => new Promise(resolve => {
@@ -217,11 +212,10 @@ const handleMessage = (instance, id) => async (msg, origin) => {
       )
     })
     // TODO make one structure for handler functions
-    const errorObjectOrHandler = getHandler(REQUESTS, msg, { debug: instance.debug })(
-      callInstance, instance, client, msg.params
-    )
+    const errorObjectOrHandler = REQUESTS[msg.method](callInstance, instance, client, msg.params)
     const response = typeof errorObjectOrHandler === 'function' ? await errorObjectOrHandler() : errorObjectOrHandler
-    sendResponseMessage(client)(id, method, response)
+    const { error, result } = response ?? {}
+    client.sendMessage({ id, method, ...error ? { error } : { result } }, true)
   }
 }
 
@@ -298,11 +292,13 @@ export default Ae.compose(AccountMultiple, {
       Object.values(this.rpcClients)
         .filter(client => client.isConnected())
         .forEach(client => {
-          client.sendMessage(
-            message(METHODS.updateNetwork, {
+          client.sendMessage({
+            method: METHODS.updateNetwork,
+            params: {
               networkId: this.getNetworkId(),
               ...client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
-            }), true)
+            }
+          }, true)
         })
     }
   },
@@ -354,7 +350,8 @@ export default Ae.compose(AccountMultiple, {
     shareWalletInfo (postFn) {
       postFn({
         jsonrpc: '2.0',
-        ...message(METHODS.readyToConnect, this.getWalletInfo())
+        method: METHODS.readyToConnect,
+        params: this.getWalletInfo()
       })
     },
     /**

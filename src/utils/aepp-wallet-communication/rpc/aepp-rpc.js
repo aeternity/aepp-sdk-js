@@ -13,7 +13,6 @@ import AccountRpc from '../../../account/rpc'
 import { decode } from '../../encoder'
 import AsyncInit from '../../../utils/async-init'
 import RpcClient from './rpc-client'
-import { getHandler, message } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
 import {
   AlreadyConnectedError,
@@ -41,7 +40,8 @@ const NOTIFICATIONS = {
     (msg) => {
       instance.disconnectWallet()
       instance.onDisconnect(msg.params)
-    }
+    },
+  [METHODS.readyToConnect]: () => () => {}
 }
 
 const RESPONSES = {
@@ -81,11 +81,11 @@ const REQUESTS = {}
 
 const handleMessage = (instance) => async (msg) => {
   if (!msg.id) {
-    return getHandler(NOTIFICATIONS, msg, { debug: instance.debug })(instance)(msg)
+    return NOTIFICATIONS[msg.method](instance)(msg)
   } else if (Object.prototype.hasOwnProperty.call(instance.rpcClient.callbacks, msg.id)) {
-    return getHandler(RESPONSES, msg, { debug: instance.debug })(instance)(msg)
+    return RESPONSES[msg.method](instance)(msg)
   } else {
-    return getHandler(REQUESTS, msg, { debug: instance.debug })(instance)(msg)
+    return REQUESTS[msg.method](instance)(msg)
   }
 }
 
@@ -181,7 +181,7 @@ export default AccountResolver.compose(AsyncInit, {
     async disconnectWallet (sendDisconnect = true) {
       this._ensureConnected()
       if (sendDisconnect) {
-        this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
+        this.rpcClient.sendMessage({ method: METHODS.closeConnection, params: { reason: 'bye' } }, true)
       }
       this.rpcClient.disconnect()
       this.rpcClient = null
