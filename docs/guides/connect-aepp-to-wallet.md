@@ -10,7 +10,7 @@ You can build your own wallet in the next example
 ## 1. Specify imports and constants and state
 
 ```js
-import { RpcAepp, WalletDetector, BrowserWindowMessageConnection, Node } from '@aeternity/aepp-sdk'
+import { RpcAepp, walletDetector, BrowserWindowMessageConnection, Node } from '@aeternity/aepp-sdk'
 
 const TESTNET_NODE_URL = 'https://testnet.aeternity.io'
 const MAINNET_NODE_URL = 'https://mainnet.aeternity.io'
@@ -62,16 +62,13 @@ methods: {
     const handleWallets = async function ({ wallets, newWallet }) {
       newWallet = newWallet || Object.values(wallets)[0]
       if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
-        detector.stopScan()
+        stopScan()
         // connect to the wallet, see step 4.
         await this.connect(newWallet)
       }
     }
-
-    const scannerConnection = BrowserWindowMessageConnection()
-
-    const detector = await WalletDetector({ connection: scannerConnection })
-    detector.scan(handleWallets.bind(this))
+    const scannerConnection = new BrowserWindowMessageConnection()
+    const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
   }
 }
 ```
@@ -82,7 +79,7 @@ Append method for wallet connection
 
 ```js
 async connect(wallet) {
-  await this.aeSdk.connectToWallet(await wallet.getConnection())
+  await this.aeSdk.connectToWallet(wallet.info, wallet.getConnection())
   this.connectedAccounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
   this.address = await this.aeSdk.address()
   this.balance = await this.aeSdk.getBalance(this.address).catch(() => '0')
@@ -96,7 +93,7 @@ Aepp can request the wallet to share its connected node URLs if any to interact 
 
 ```js
 async connect (wallet) {
-    await this.aeSdk.connectToWallet(await wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
+    await this.aeSdk.connectToWallet(wallet.info, wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
 }
 ```
 

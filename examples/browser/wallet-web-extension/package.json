@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "core-js": "^3.22.6",
-    "vue": "^2.6.14"
+    "vue": "^2.6.14",
+    "webextension-polyfill": "^0.9.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.17",

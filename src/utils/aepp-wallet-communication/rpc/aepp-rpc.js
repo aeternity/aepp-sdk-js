@@ -4,7 +4,7 @@
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc
  * @export AeppRpc
  * @example
- * import ContentScriptBridge
+ * import AeppRpc
  * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
 import { v4 as uuid } from '@aeternity/uuid'
@@ -13,7 +13,6 @@ import AccountRpc from '../../../account/rpc'
 import { decode } from '../../encoder'
 import AsyncInit from '../../../utils/async-init'
 import RpcClient from './rpc-client'
-import { getHandler, message } from '../helpers'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
 import {
   AlreadyConnectedError,
@@ -41,7 +40,8 @@ const NOTIFICATIONS = {
     (msg) => {
       instance.disconnectWallet()
       instance.onDisconnect(msg.params)
-    }
+    },
+  [METHODS.readyToConnect]: () => () => {}
 }
 
 const RESPONSES = {
@@ -81,11 +81,11 @@ const REQUESTS = {}
 
 const handleMessage = (instance) => async (msg) => {
   if (!msg.id) {
-    return getHandler(NOTIFICATIONS, msg, { debug: instance.debug })(instance)(msg)
+    return NOTIFICATIONS[msg.method](instance)(msg)
   } else if (Object.prototype.hasOwnProperty.call(instance.rpcClient.callbacks, msg.id)) {
-    return getHandler(RESPONSES, msg, { debug: instance.debug })(instance)(msg)
+    return RESPONSES[msg.method](instance)(msg)
   } else {
-    return getHandler(REQUESTS, msg, { debug: instance.debug })(instance)(msg)
+    return REQUESTS[msg.method](instance)(msg)
   }
 }
 
@@ -149,6 +149,7 @@ export default AccountResolver.compose(AsyncInit, {
      * @function connectToWallet
      * @instance
      * @rtype (connection: Object) => void
+     * @param {Object} walletInfo Wallet info object
      * @param {Object} connection Wallet connection object
      * @param {Object} [options={}]
      * @param {Boolean} [options.connectNode=true] - Request wallet to bind node
@@ -156,18 +157,19 @@ export default AccountResolver.compose(AsyncInit, {
      * @param {Boolean} [options.select=false] - Select this node as current
      * @return {Object}
      */
-    async connectToWallet (connection, { connectNode = false, name = 'wallet-node', select = false } = {}) {
+    async connectToWallet (walletInfo, connection, { connectNode = false, name = 'wallet-node', select = false } = {}) {
       if (this.rpcClient?.isConnected()) throw new AlreadyConnectedError('You are already connected to wallet ' + this.rpcClient)
       this.rpcClient = RpcClient({
+        ...walletInfo,
         connection,
         id: uuid(),
         handlers: [handleMessage(this), this.onDisconnect]
       })
-      const walletInfo = await this.sendConnectRequest(connectNode)
-      if (connectNode && !Object.prototype.hasOwnProperty.call(walletInfo, 'node')) {
-        throw new RpcConnectionError('Missing URLs of the Node')
+      const { node } = await this.sendConnectRequest(connectNode)
+      if (connectNode) {
+        if (node == null) throw new RpcConnectionError('Missing URLs of the Node')
+        this.addNode(name, await Node(node), select)
       }
-      if (connectNode) this.addNode(name, await Node(walletInfo.node), select)
       return walletInfo
     },
     /**
@@ -181,7 +183,7 @@ export default AccountResolver.compose(AsyncInit, {
     async disconnectWallet (sendDisconnect = true) {
       this._ensureConnected()
       if (sendDisconnect) {
-        this.rpcClient.sendMessage(message(METHODS.closeConnection, { reason: 'bye' }), true)
+        this.rpcClient.sendMessage({ method: METHODS.closeConnection, params: { reason: 'bye' } }, true)
       }
       this.rpcClient.disconnect()
       this.rpcClient = null

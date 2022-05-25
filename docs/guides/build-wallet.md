@@ -16,25 +16,24 @@ Note:
 First you need to create a bridge between your extension and the page. This can be done as follows:
 
 ```js
+import browser from 'webextension-polyfill'
 import {
-  BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION,
-  ContentScriptBridge, getBrowserAPI
+  BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION, connectionProxy
 } from '@aeternity/aepp-sdk'
 
 const readyStateCheckInterval = setInterval(function () {
   if (document.readyState === 'complete') {
     clearInterval(readyStateCheckInterval)
 
-    const port = getBrowserAPI().runtime.connect()
-    const extConnection = BrowserRuntimeConnection({ port })
-    const pageConnection = BrowserWindowMessageConnection({
+    const port = browser.runtime.connect()
+    const extConnection = new BrowserRuntimeConnection({ port })
+    const pageConnection = new BrowserWindowMessageConnection({
+      target: window,
       origin: window.origin,
       sendDirection: MESSAGE_DIRECTION.to_aepp,
       receiveDirection: MESSAGE_DIRECTION.to_waellet
     })
-
-    const bridge = ContentScriptBridge({ pageConnection, extConnection })
-    bridge.run()
+    connectionProxy(pageConnection, extConnection)
   }
 }, 10)
 ```
@@ -44,6 +43,7 @@ Then you need to initialize `RpcWallet` Stamp in your extension and subscribe fo
 After the connection is established you can share the wallet details with the application.
 
 ```js
+import browser from 'webextension-polyfill'
 // ideally this can be configured by the users of the extension
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
@@ -57,6 +57,8 @@ async function init () {
   RpcWallet({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: await Node({ url: NODE_URL }) }],
+    id: browser.runtime.id,
+    type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
     // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
     accounts,
@@ -102,7 +104,7 @@ async function init () {
   }).then(wallet => {
     chrome.runtime.onConnect.addListener(async function (port) {
       // create connection
-      const connection = await BrowserRuntimeConnection({ port })
+      const connection = new BrowserRuntimeConnection({ port })
       // add new aepp to wallet
       wallet.addRpcClient(connection)
       // share wallet details
@@ -134,6 +136,8 @@ async function init () {
   RpcWallet({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: await Node({ url: NODE_URL }) }],
+    id: browser.runtime.id,
+    type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
     // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
     accounts,
@@ -184,7 +188,7 @@ async function init () {
   }).then(wallet => {
     chrome.runtime.onConnect.addListener(async function (port) {
       // create connection
-      const connection = await BrowserRuntimeConnection({ port })
+      const connection = new BrowserRuntimeConnection({ port })
       // add new aepp to wallet
       wallet.addRpcClient(connection)
       // share wallet details
@@ -200,7 +204,7 @@ init().then(_ => console.log('Wallet initialized!'))
 ```
 
 ## iFrame-based Wallet
-The **iFrame-based** approach works similar to the **WebExtension** approach except that the `ContentScriptBridge` in between isn't needed.
+The **iFrame-based** approach works similar to the **WebExtension** approach except that the `connectionProxy` in between isn't needed.
 
 You can take a look into the implementation of the following example to see how it works:
 

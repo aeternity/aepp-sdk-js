@@ -134,13 +134,6 @@ export class MissingParamError extends BaseError {
   }
 }
 
-export class NoBrowserFoundError extends BaseError {
-  constructor () {
-    super('Browser is not detected')
-    this.name = 'NoBrowserFoundError'
-  }
-}
-
 export class NoSerializerFoundError extends BaseError {
   constructor () {
     super('Byte serialization not supported')
@@ -609,13 +602,6 @@ export class AlreadyConnectedError extends WalletError {
   constructor (message: string) {
     super(message)
     this.name = 'AlreadyConnectedError'
-  }
-}
-
-export class MessageDirectionError extends WalletError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'MessageDirectionError'
   }
 }
 

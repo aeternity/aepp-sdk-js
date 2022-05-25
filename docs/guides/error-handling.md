@@ -13,7 +13,6 @@ BaseError
 │   InvalidDenominationError
 │   InvalidNameError
 │   MissingParamError
-│   NoBrowserFoundError
 │   NoSerializerFoundError
 │   RequestTimedOutError
 │   TxTimedOutError
@@ -99,7 +98,6 @@ BaseError
 │
 └̌───WalletError
 │   │   AlreadyConnectedError
-│   │   MessageDirectionError
 │   │   NoWalletConnectedError
 │   │   RpcConnectionError
 ```

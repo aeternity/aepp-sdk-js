@@ -17,26 +17,20 @@
 
 import { before, describe, it, after } from 'mocha'
 import { expect } from 'chai'
-import { MemoryAccount, Node, RpcAepp, RpcWallet, TX_TYPE } from '../../src'
+import { MemoryAccount, Node, RpcAepp, RpcWallet, TX_TYPE, WALLET_TYPE } from '../../src'
 import { concatBuffers } from '../../src/utils/other'
 import { unpackTx } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
-import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/browser-window-message'
-import { getBrowserAPI, getHandler } from '../../src/utils/aepp-wallet-communication/helpers'
+import BrowserWindowMessageConnection from '../../src/utils/aepp-wallet-communication/connection/BrowserWindowMessage'
 import { METHODS, RPC_STATUS } from '../../src/utils/aepp-wallet-communication/schema'
 import { generateKeyPair, verify, hash } from '../../src/utils/crypto'
 import { compilerUrl, account, networkId, url, ignoreVersion, spendPromise } from './'
 import {
-  NoBrowserFoundError,
-  NoWalletConnectedError,
-  TypeError,
-  UnAuthorizedAccountError,
-  UnsubscribedAccountError,
-  UnknownRpcClientError
+  NoWalletConnectedError, UnAuthorizedAccountError, UnsubscribedAccountError, UnknownRpcClientError
 } from '../../src/utils/errors'
 
 describe('Aepp<->Wallet', function () {
-  this.timeout(6000)
+  this.timeout(2000)
   let node
   let connections
   let connectionFromWalletToAepp
@@ -45,13 +39,13 @@ describe('Aepp<->Wallet', function () {
   before(async function () {
     node = await Node({ url, ignoreVersion })
     connections = getConnections()
-    connectionFromWalletToAepp = BrowserWindowMessageConnection({
-      self: connections.waelletConnection,
-      target: connections.aeppConnection
+    connectionFromWalletToAepp = new BrowserWindowMessageConnection({
+      self: connections.walletWindow,
+      target: connections.aeppWindow
     })
-    connectionFromAeppToWallet = BrowserWindowMessageConnection({
-      self: connections.aeppConnection,
-      target: connections.waelletConnection
+    connectionFromAeppToWallet = new BrowserWindowMessageConnection({
+      self: connections.aeppWindow,
+      target: connections.walletWindow
     })
   })
 
@@ -66,6 +60,8 @@ describe('Aepp<->Wallet', function () {
         compilerUrl,
         accounts: [MemoryAccount({ keypair: account })],
         nodes: [{ name: 'local', instance: node }],
+        id: 'test',
+        type: WALLET_TYPE.window,
         name: 'Wallet',
         onConnection () {},
         onSubscription () {},
@@ -100,7 +96,7 @@ describe('Aepp<->Wallet', function () {
 
     it('Should receive `announcePresence` message from wallet', async () => {
       const isReceived = new Promise((resolve) => {
-        connections.aeppConnection.addEventListener('message', (msg) => {
+        connections.aeppWindow.addEventListener('message', (msg) => {
           resolve(msg.data.method === 'connection.announcePresence')
         })
       })
@@ -117,7 +113,9 @@ describe('Aepp<->Wallet', function () {
       wallet.onConnection = (aepp, actions) => {
         actions.deny()
       }
-      await expect(aepp.connectToWallet(connectionFromAeppToWallet)).to.be.eventually
+      await expect(
+        aepp.connectToWallet(wallet.getWalletInfo(), connectionFromAeppToWallet)
+      ).to.be.eventually
         .rejectedWith('Wallet deny your connection request')
         .with.property('code', 9)
     })
@@ -127,7 +125,9 @@ describe('Aepp<->Wallet', function () {
         actions.accept()
       }
       connectionFromAeppToWallet.disconnect()
-      const connected = await aepp.connectToWallet(connectionFromAeppToWallet)
+      const connected = await aepp.connectToWallet(
+        wallet.getWalletInfo(), connectionFromAeppToWallet
+      )
 
       connected.name.should.be.equal('Wallet')
     })
@@ -152,14 +152,6 @@ describe('Aepp<->Wallet', function () {
       }
       await expect(aepp.subscribeAddress('subscribe', 'connected')).to.be.eventually
         .rejectedWith('Operation rejected by user').with.property('code', 4)
-    })
-
-    it('Subscribe to address: invalid accounts', async () => {
-      wallet.onSubscription = (aepp, actions) => {
-        actions.accept({ accounts: {} })
-      }
-      await expect(aepp.subscribeAddress('subscribe', 'connected'))
-        .to.be.rejectedWith('Invalid provided accounts object')
     })
 
     it('Subscribe to address: wallet accept', async () => {
@@ -397,14 +389,6 @@ describe('Aepp<->Wallet', function () {
       received.should.be.equal(true)
     })
 
-    it('RPC client set invalid account', () => {
-      const current = aepp.rpcClient.getCurrentAccount()
-      current.should.be.equal(aepp.rpcClient.currentAccount)
-      aepp.rpcClient.origin.should.be.an('object')
-      expect(() => aepp.rpcClient.setAccounts(true))
-        .to.throw(TypeError, 'Invalid accounts object. Should be object like: `{ connected: {}, selected: {} }`')
-    })
-
     it('Resolve/Reject callback for undefined message', async () => {
       expect(() => aepp.rpcClient.processResponse({ id: 0 }))
         .to.throw('Can\'t find callback for this messageId 0')
@@ -445,14 +429,17 @@ describe('Aepp<->Wallet', function () {
       wallet.onConnection = (aepp, actions) => {
         actions.accept()
       }
-      const id = wallet.addRpcClient(BrowserWindowMessageConnection({
-        self: connections.waelletConnection,
-        target: connections.aeppConnection
+      const id = wallet.addRpcClient(new BrowserWindowMessageConnection({
+        self: connections.walletWindow,
+        target: connections.aeppWindow
       }))
-      await aepp.connectToWallet(BrowserWindowMessageConnection({
-        self: connections.aeppConnection,
-        target: connections.waelletConnection
-      }))
+      await aepp.connectToWallet(
+        wallet.getWalletInfo(),
+        new BrowserWindowMessageConnection({
+          self: connections.aeppWindow,
+          target: connections.walletWindow
+        })
+      )
 
       wallet.removeRpcClient(id)
       Object.keys(wallet.rpcClients).length.should.be.equal(1)
@@ -468,29 +455,6 @@ describe('Aepp<->Wallet', function () {
       connectionFromAeppToWallet.disconnect()
     })
 
-    it('receive unknown method', async () => {
-      (await getHandler({}, { method: 'hey' })()()).should.be.equal(true)
-    })
-
-    it('getBrowserAPI: not in browser', () => {
-      global.window = {}
-      expect(() => getBrowserAPI()).to.throw(NoBrowserFoundError, 'Browser is not detected')
-    })
-
-    it('getBrowserAPI: not in browser(force error)', () => {
-      global.window = {}
-      getBrowserAPI(true).should.be.an('object')
-    })
-
-    it('getBrowserAPI: chrome', () => {
-      global.window = { location: { origin: '//test' }, chrome: { runtime: {}, chrome: true } }
-      getBrowserAPI().chrome.should.be.equal(true)
-    })
-
-    it('getBrowserAPI: firefox', () => {
-      global.window = { location: { origin: '//test' }, browser: { runtime: {}, firefox: true } }
-      getBrowserAPI().firefox.should.be.equal(true)
-    })
     it('Send message from content script', async () => {
       connectionFromWalletToAepp.sendDirection = 'to_aepp'
       const ok = await new Promise((resolve) => {
@@ -514,6 +478,8 @@ describe('Aepp<->Wallet', function () {
         compilerUrl,
         accounts: [MemoryAccount({ keypair: account })],
         nodes: [{ name: 'local', instance: node }],
+        id: 'test',
+        type: WALLET_TYPE.window,
         name: 'Wallet',
         onConnection (aepp, { accept }) {
           accept({ shareNode: true })
@@ -536,6 +502,7 @@ describe('Aepp<->Wallet', function () {
       })
       wallet.addRpcClient(connectionFromWalletToAepp)
       await aepp.connectToWallet(
+        wallet.getWalletInfo(),
         connectionFromAeppToWallet,
         { connectNode: true, name: 'wallet-node', select: true }
       )
@@ -606,27 +573,23 @@ const WindowPostMessageFake = (name) => ({
   removeEventListener () {
     return () => null
   },
-  postMessage (msg) {
+  postMessage (source, msg) {
     this.messages.push(msg)
-    setTimeout(() => { if (typeof this.listener === 'function') this.listener({ data: msg, origin: 'testOrigin', source: this }) }, 0)
+    setTimeout(() => {
+      if (typeof this.listener === 'function') {
+        this.listener({ data: msg, origin: 'testOrigin', source })
+      }
+    })
   }
 })
 
-const getFakeConnections = (direct = false) => {
-  const waelletConnection = WindowPostMessageFake('wallet')
-  const aeppConnection = WindowPostMessageFake('aepp')
-  if (direct) {
-    const waelletP = waelletConnection.postMessage
-    const aeppP = aeppConnection.postMessage
-    waelletConnection.postMessage = aeppP.bind(aeppConnection)
-    aeppConnection.postMessage = waelletP.bind(waelletConnection)
-  }
-  return { waelletConnection, aeppConnection }
-}
-
-const getConnections = (direct) => {
+const getConnections = () => {
   global.chrome = { runtime: {} }
   global.window = { location: { origin: '//test' }, chrome: global.chrome }
   global.location = { protocol: 'http://test.com' }
-  return getFakeConnections(direct)
+  const walletWindow = WindowPostMessageFake('wallet')
+  const aeppWindow = WindowPostMessageFake('aepp')
+  walletWindow.postMessage = walletWindow.postMessage.bind(walletWindow, aeppWindow)
+  aeppWindow.postMessage = aeppWindow.postMessage.bind(aeppWindow, walletWindow)
+  return { walletWindow, aeppWindow }
 }
