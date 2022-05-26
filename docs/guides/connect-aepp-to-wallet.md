@@ -59,8 +59,8 @@ async created () {
 
 ```js
 methods: {
-  async scanForWallets()  {
-   return new Promise((resolve) => {
+  async scanForWallets() {
+    return new Promise((resolve) => {
       const handleWallets = async function ({ wallets, newWallet }) {
         newWallet = newWallet || Object.values(wallets)[0]
         if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
