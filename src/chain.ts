@@ -170,7 +170,7 @@ export async function waitForTxConfirm (
 export async function getAccount (
   address: EncodedData<'ak'>,
   { height, hash, onNode }:
-  { height?: number, hash?: EncodedData<'kh'> | EncodedData<'mh'>, onNode: Node }
+  { height?: number, hash?: EncodedData<'kh' | 'mh'>, onNode: Node }
 ): Promise<TransformNodeType<AccountNode>> {
   if (height != null) return await onNode.api.getAccountByPubkeyAndHeight(address, height)
   if (hash != null) return await onNode.api.getAccountByPubkeyAndHash(address, hash)
@@ -189,10 +189,10 @@ export async function getBalance (
   address: EncodedData<'ak'>,
   { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
   { format: AeAmountFormats } & Parameters<typeof getAccount>[1]
-): Promise<string | number> {
-  const { balance } = await getAccount(address, options).catch(() => ({ balance: 0 }))
+): Promise<string> {
+  const { balance } = await getAccount(address, options).catch(() => ({ balance: 0n }))
 
-  return formatAmount(balance, { targetDenomination: format }).toString()
+  return formatAmount(balance, { targetDenomination: format })
 }
 
 /**
@@ -440,7 +440,7 @@ export async function resolveName (
   key: string,
   { verify = true, resolveByNode, onNode }:
   { verify: boolean, resolveByNode: boolean, onNode: Node }
-): Promise<EncodedData<'ak'> | EncodedData<'nm'>> {
+): Promise<EncodedData<'ak' | 'nm'>> {
   try {
     decode(nameOrId)
     return nameOrId as EncodedData<'ak'>

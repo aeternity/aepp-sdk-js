@@ -193,10 +193,10 @@ describe('Contract instance', function () {
     })
     expect(deployInfo.address).to.satisfy(b => b.startsWith('ct_'))
     expect(deployInfo.txData.tx.gas).to.be.equal(16000)
-    expect(deployInfo.txData.tx.amount).to.be.equal(42)
+    expect(deployInfo.txData.tx.amount).to.be.equal(42n)
     expect(deployInfo.txData.gasUsed).to.be.equal(209)
-    expect(deployInfo.txData.gasPrice).to.be.equal(1000000000)
-    expect(deployInfo.txData.tx.deposit).to.be.equal(0)
+    expect(deployInfo.txData.gasPrice).to.be.equal(1000000000n)
+    expect(deployInfo.txData.tx.deposit).to.be.equal(0n)
     expect(testContract.bytecode).to.satisfy(b => b.startsWith('cb_'))
     testContractAddress = deployInfo.address
   })

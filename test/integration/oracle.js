@@ -87,7 +87,7 @@ describe('Oracle', function () {
 
   describe('Oracle query fee settings', async () => {
     let oracleWithFee
-    const queryFee = 24000
+    const queryFee = 24000n
     const account = generateKeyPair()
 
     before(async function () {
@@ -98,7 +98,7 @@ describe('Oracle', function () {
 
     it('Post Oracle Query with default query fee', async () => {
       query = await oracle.postQuery("{'city': 'Berlin'}")
-      query.tx.queryFee.should.be.equal(QUERY_FEE)
+      query.tx.queryFee.should.be.equal(BigInt(QUERY_FEE))
     })
 
     it('Post Oracle Query with registered query fee', async () => {
@@ -107,8 +107,8 @@ describe('Oracle', function () {
     })
 
     it('Post Oracle Query with custom query fee', async () => {
-      query = await oracleWithFee.postQuery("{'city': 'Berlin'}", { queryFee: queryFee + 2000 })
-      query.tx.queryFee.should.be.equal(queryFee + 2000)
+      query = await oracleWithFee.postQuery("{'city': 'Berlin'}", { queryFee: queryFee + 2000n })
+      query.tx.queryFee.should.be.equal(queryFee + 2000n)
     })
   })
 })
