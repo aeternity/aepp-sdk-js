@@ -445,7 +445,7 @@ export async function resolveName (
     decode(nameOrId)
     return nameOrId as EncodedData<'ak'>
   } catch (error) {}
-  if (isNameValid(nameOrId)) {
+  if (isNameValid(nameOrId) === true) {
     if (verify || resolveByNode) {
       const name = await onNode.api.getNameEntryByName(nameOrId)
       const pointer = name.pointers.find(pointer => pointer.key === key)

@@ -11,7 +11,6 @@ BaseError
 │   ArgumentCountMismatchError
 │   InsufficientBalanceError
 │   InvalidDenominationError
-│   InvalidNameError
 │   MissingParamError
 │   NoSerializerFoundError
 │   RequestTimedOutError

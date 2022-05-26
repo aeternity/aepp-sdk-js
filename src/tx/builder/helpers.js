@@ -16,7 +16,6 @@ import { ceil } from '../../utils/bignumber'
 import {
   TagNotFoundError,
   PrefixNotFoundError,
-  InvalidNameError,
   IllegalBidFeeError,
   NoDefaultAensPointerError,
   ArgumentError
@@ -84,7 +83,6 @@ export function formatSalt (salt) {
  * @return {String} `nm_` prefixed encoded AENS name
  */
 export function produceNameId (name) {
-  ensureNameValid(name)
   return encode(hash(name.toLowerCase()), 'nm')
 }
 
@@ -101,7 +99,6 @@ export function produceNameId (name) {
  * @return {String} Commitment hash
  */
 export function commitmentHash (name, salt = createSalt()) {
-  ensureNameValid(name)
   return encode(hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm')
 }
 
@@ -193,19 +190,6 @@ export function readPointers (pointers) {
 const AENS_SUFFIX = '.chain'
 
 /**
- * Ensure that AENS name is valid
- * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param {string} name
- * @return void
- * @throws Error
- */
-export function ensureNameValid (name) {
-  if (!name || typeof name !== 'string') throw new InvalidNameError('Name must be a string')
-  if (!name.endsWith(AENS_SUFFIX)) throw new InvalidNameError(`Name should end with ${AENS_SUFFIX}: ${name}`)
-}
-
-/**
  * Is AENS name valid
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
@@ -213,12 +197,8 @@ export function ensureNameValid (name) {
  * @return Boolean
  */
 export function isNameValid (name) {
-  try {
-    ensureNameValid(name)
-    return true
-  } catch (error) {
-    return false
-  }
+  // TODO: probably there are stronger requirements
+  return name && typeof name === 'string' && name.endsWith(AENS_SUFFIX)
 }
 
 /**
@@ -241,7 +221,6 @@ export function getDefaultPointerKey (identifier) {
  * @return {String} the minimum fee for the AENS name auction
  */
 export function getMinimumNameFee (name) {
-  ensureNameValid(name)
   const nameLength = name.length - AENS_SUFFIX.length
   return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)]
 }
@@ -273,7 +252,6 @@ export function computeBidFee (name, startFee, increment = NAME_FEE_BID_INCREMEN
  * @return {String} Auction end height
  */
 export function computeAuctionEndBlock (name, claimHeight) {
-  ensureNameValid(name)
   const length = name.length - AENS_SUFFIX.length
   const h = (length <= 4 && NAME_BID_TIMEOUTS[4]) ||
     (length <= 8 && NAME_BID_TIMEOUTS[8]) ||
@@ -290,6 +268,5 @@ export function computeAuctionEndBlock (name, claimHeight) {
  * @return {Boolean}
  */
 export function isAuctionName (name) {
-  ensureNameValid(name)
   return name.length < 13 + AENS_SUFFIX.length
 }

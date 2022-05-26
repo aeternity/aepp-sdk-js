@@ -1,5 +1,5 @@
 import {
-  writeId, readId, isNameValid, produceNameId, ensureNameValid, getMinimumNameFee, readInt, writeInt
+  writeId, readId, isNameValid, produceNameId, getMinimumNameFee, readInt, writeInt
 } from './helpers'
 import { InsufficientNameFeeError, IllegalArgumentError } from '../../utils/errors'
 import { MIN_GAS_PRICE } from './constants'
@@ -16,7 +16,6 @@ export class Field {
 
 export class Name extends Field {
   static serialize (value) {
-    ensureNameValid(value)
     return Buffer.from(value)
   }
 

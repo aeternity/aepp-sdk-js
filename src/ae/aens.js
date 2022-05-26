@@ -27,7 +27,7 @@
  */
 
 import { salt } from '../utils/crypto'
-import { commitmentHash, ensureNameValid, isAuctionName } from '../tx/builder/helpers'
+import { commitmentHash, isAuctionName } from '../tx/builder/helpers'
 import Ae from './'
 import { CLIENT_TTL, NAME_TTL, TX_TYPE } from '../tx/builder/schema'
 import { ArgumentError } from '../utils/errors'
@@ -55,7 +55,6 @@ import { ArgumentError } from '../utils/errors'
  * await nameObject.revoke({ fee, ttl, nonce })
  */
 async function revoke (name, options = {}) {
-  ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
 
   const nameRevokeTx = await this.buildTx(TX_TYPE.nameRevoke, {
@@ -99,7 +98,6 @@ async function revoke (name, options = {}) {
  * await nameObject.update(pointers, { nameTtl, ttl, fee, nonce, clientTtl })
  */
 async function update (name, pointers = {}, options = {}) {
-  ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
   const allPointers = {
     ...options.extendPointers && Object.fromEntries(
@@ -143,7 +141,6 @@ async function update (name, pointers = {}, options = {}) {
  * await nameObject.transfer(recipientPub, { ttl, fee, nonce })
  */
 async function transfer (name, account, options = {}) {
-  ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
 
   const nameTransferTx = await this.buildTx(TX_TYPE.nameTransfer, {
@@ -179,7 +176,6 @@ async function transfer (name, account, options = {}) {
  * }
  */
 async function query (name, opt = {}) {
-  ensureNameValid(name)
   const o = await this.getName(name)
 
   return Object.freeze(Object.assign(o, {
@@ -234,7 +230,6 @@ async function query (name, opt = {}) {
  * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
  */
 async function claim (name, salt, options) {
-  ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
 
   const claimTx = await this.buildTx(TX_TYPE.nameClaim, {
@@ -279,7 +274,6 @@ async function claim (name, salt, options) {
  * }
  */
 async function preclaim (name, options = {}) {
-  ensureNameValid(name)
   const opt = { ...this.Ae.defaults, ...options }
   const _salt = salt()
   const height = await this.height()

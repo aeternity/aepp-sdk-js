@@ -26,7 +26,6 @@ import {
   encode,
   getDefaultPointerKey,
   commitmentHash,
-  ensureNameValid,
   getMinimumNameFee,
   isNameValid,
   produceNameId
@@ -35,10 +34,7 @@ import BigNumber from 'bignumber.js'
 import { toBytes } from '../../src/utils/bytes'
 import { buildTx, unpackTx } from '../../src/tx/builder'
 import { NAME_BID_RANGES } from '../../src/tx/builder/schema'
-import {
-  InvalidNameError,
-  SchemaNotFoundError
-} from '../../src/utils/errors'
+import { SchemaNotFoundError } from '../../src/utils/errors'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
@@ -71,18 +67,6 @@ describe('Tx', function () {
 
   it('Produce name id for `.chain`', () => {
     produceNameId('asdas.chain').should.be.equal('nm_2DMazuJNrGkQYve9eMttgdteaigeeuBk3fmRYSThJZ2NpX3r8R')
-  })
-
-  describe('ensureNameValid', () => {
-    it('validates type', () => {
-      expect(() => ensureNameValid({})).to.throw(InvalidNameError, 'Name must be a string')
-    })
-
-    it('validates domain', () => {
-      expect(() => ensureNameValid('asdasdasd.unknown')).to.throw(InvalidNameError, 'Name should end with .chain:')
-    })
-
-    it('don\'t throws exception', () => ensureNameValid('asdasdasd.chain'))
   })
 
   describe('getMinimumNameFee', () => {
