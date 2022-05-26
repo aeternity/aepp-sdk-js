@@ -5,18 +5,18 @@ import { describe, it } from 'mocha'
 const MAGNITUDE = 18
 describe('prefixedAmount', () => {
   it('removes trailing zeros', () => {
-    (prefixedAmount(BigNumber('1.0000'))).should.be.equal('1')
+    (prefixedAmount(new BigNumber('1.0000'))).should.be.equal('1')
   })
 
   it('displays fees', () => {
-    (prefixedAmount(BigNumber(17120).shiftedBy(-MAGNITUDE), 0)).should.be.equal('0.01712 pico')
+    (prefixedAmount(new BigNumber(17120).shiftedBy(-MAGNITUDE), 0)).should.be.equal('0.01712 pico')
   })
   it('displays balance', () => {
-    (prefixedAmount(BigNumber('89.99999999000924699'))).should.be.equal('90')
+    (prefixedAmount(new BigNumber('89.99999999000924699'))).should.be.equal('90')
   })
 
   it('generates proper values', () => {
-    const t = BigNumber(`0.${'123456789'.repeat(3)}`).shiftedBy(-MAGNITUDE);
+    const t = new BigNumber(`0.${'123456789'.repeat(3)}`).shiftedBy(-MAGNITUDE);
     [
       '0.00000012 pico',
       '0.00000123 pico',

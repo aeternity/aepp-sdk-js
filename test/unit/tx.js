@@ -51,17 +51,17 @@ describe('Tx', function () {
   it('test from big number to bytes', async () => {
     // TODO investigate about float numbers serialization
     const data = [
-      BigNumber('7841237845261982793129837487239459234675231423423453451234'),
-      BigNumber('7841237845261982793129837487239459214234234534523'),
-      BigNumber('7841237845261982793129837412341231231'),
-      BigNumber('78412378452619'),
-      BigNumber('7841237845261982793129837487239459214124563456'),
-      BigNumber('7841237845261982793129837487239459214123')
+      new BigNumber('7841237845261982793129837487239459234675231423423453451234'),
+      new BigNumber('7841237845261982793129837487239459214234234534523'),
+      new BigNumber('7841237845261982793129837412341231231'),
+      new BigNumber('78412378452619'),
+      new BigNumber('7841237845261982793129837487239459214124563456'),
+      new BigNumber('7841237845261982793129837487239459214123')
     ]
 
     function bnFromBytes (bn) {
       const bytes = toBytes(bn, true)
-      return BigNumber(bytes.toString('hex'), 16).toString(10)
+      return new BigNumber(bytes.toString('hex'), 16).toString(10)
     }
 
     data.forEach(n => {

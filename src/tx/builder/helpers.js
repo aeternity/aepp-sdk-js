@@ -259,7 +259,8 @@ export function computeBidFee (name, startFee, increment = NAME_FEE_BID_INCREMEN
   if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`)
   if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
   return ceil(
-    BigNumber(startFee ?? getMinimumNameFee(name)).times(BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
+    new BigNumber(startFee ?? getMinimumNameFee(name))
+      .times(new BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
   )
 }
 

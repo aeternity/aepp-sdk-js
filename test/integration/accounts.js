@@ -144,8 +144,8 @@ describe('Accounts', function () {
     const accountBeforeSpendByHash = await aeSdk.getAccount(
       await aeSdk.address(), { height: spend.blockHeight - 1 }
     )
-    BigNumber(accountBeforeSpendByHash.balance)
-      .minus(BigNumber(accountAfterSpend.balance))
+    new BigNumber(accountBeforeSpendByHash.balance)
+      .minus(new BigNumber(accountAfterSpend.balance))
       .toString()
       .should.be
       .equal(`${spend.tx.fee + spend.tx.amount}`)

@@ -237,11 +237,11 @@ function getOracleRelativeTtl (params, txType) {
  * @example calculateMinFee('spendTx', { gasLimit, params })
  */
 export function calculateMinFee (txType, { gasLimit = 0, params, vsn }) {
-  const multiplier = BigNumber(1e9) // 10^9 GAS_PRICE
-  if (!params) return BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
+  const multiplier = new BigNumber(1e9) // 10^9 GAS_PRICE
+  if (!params) return new BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
 
   let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, gasLimit, vsn })
-  let expected = BigNumber(0)
+  let expected = new BigNumber(0)
 
   while (!actualFee.eq(expected)) {
     actualFee = buildFee(txType, {
