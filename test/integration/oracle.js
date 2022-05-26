@@ -69,7 +69,7 @@ describe('Oracle', function () {
   })
 
   it('Poll for response for query without response', async () => {
-    return query.pollForResponse().should.be.rejectedWith(Error)
+    await query.pollForResponse().should.be.rejectedWith(Error)
   })
 
   it('Respond to query', async () => {

@@ -47,7 +47,7 @@ describe('Aens', function () {
     // For some reason the node will return 404 when name is queried
     // just right after claim tx has been mined so we wait 0.5s
     await pause(500)
-    return aeSdk.aensQuery(name).should.eventually.be.an('object')
+    await aeSdk.aensQuery(name).should.eventually.be.an('object')
   })
 
   it('throws error on querying non-existent name', () => aeSdk
@@ -95,7 +95,7 @@ describe('Aens', function () {
     await preclaim.claim()
     const current = await aeSdk.address()
     const onAccount = aeSdk.addresses().find(acc => acc !== current)
-    return aeSdk.aensUpdate(name, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
+    await aeSdk.aensUpdate(name, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
   })
 
   it('updates extending pointers', async () => {
@@ -153,7 +153,7 @@ describe('Aens', function () {
     const revoke = await aensName.revoke({ onAccount })
     revoke.should.be.an('object')
 
-    return aeSdk.aensQuery(name).should.be.rejectedWith(Error)
+    await aeSdk.aensQuery(name).should.be.rejectedWith(Error)
   })
 
   it('PreClaim name using specific account', async () => {

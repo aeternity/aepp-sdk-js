@@ -50,11 +50,11 @@ describe('Accounts', function () {
     })
 
     it('determining the balance', async () => {
-      return wallet.getBalance(await wallet.address()).should.eventually.be.equal('0')
+      await wallet.getBalance(await wallet.address()).should.eventually.be.equal('0')
     })
 
     it('spending coins', async () => {
-      return wallet.spend(1, receiver).should.be.rejectedWith(Error)
+      await wallet.spend(1, receiver).should.be.rejectedWith(Error)
     })
 
     it('spending negative amount of coins', () => expect(wallet.spend(-1, receiver))
@@ -62,7 +62,7 @@ describe('Accounts', function () {
   })
 
   it('determines the balance using `balance`', async () => {
-    return aeSdk.getBalance(await aeSdk.address()).should.eventually.be.a('string')
+    await aeSdk.getBalance(await aeSdk.address()).should.eventually.be.a('string')
   })
 
   describe('transferFunds', async () => {
@@ -163,28 +163,28 @@ describe('Accounts', function () {
     })
 
     it('Fail on invalid account', async () => {
-      return expect(aeSdk.spend(1, await aeSdk.address(), { onAccount: 1 }))
+      await expect(aeSdk.spend(1, await aeSdk.address(), { onAccount: 1 }))
         .to.be.rejectedWith(
           TypeError,
           'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got 1 instead')
     })
 
     it('Fail on non exist account', async () => {
-      return expect(aeSdk.spend(1, await aeSdk.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' }))
+      await expect(aeSdk.spend(1, await aeSdk.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' }))
         .to.be.rejectedWith(
           UnavailableAccountError,
           'Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available')
     })
 
     it('Fail on no accounts', async () => {
-      return expect(aeSdkWithoutAccount.spend(1, await aeSdk.address()))
+      await expect(aeSdkWithoutAccount.spend(1, await aeSdk.address()))
         .to.be.rejectedWith(
           TypeError,
           'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got undefined instead')
     })
 
-    it('Invalid on account options', () => {
-      return expect(aeSdk.sign('tx_Aasdasd', { onAccount: 123 }))
+    it('Invalid on account options', async () => {
+      await expect(aeSdk.sign('tx_Aasdasd', { onAccount: 123 }))
         .to.be.rejectedWith(
           TypeError,
           'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got 123 instead')
