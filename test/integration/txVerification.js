@@ -17,7 +17,7 @@ describe('Verify Transaction', function () {
   })
 
   it('validates params in buildRawTx', async () => {
-    return expect(aeSdk.buildTx(TX_TYPE.spend, {})).to.be.rejectedWith(ArgumentError, 'value should be a number, got undefined instead')
+    await expect(aeSdk.buildTx(TX_TYPE.spend, {})).to.be.rejectedWith(ArgumentError, 'value should be a number, got undefined instead')
     // TODO: should be /^Transaction build error./ instead
   })
 

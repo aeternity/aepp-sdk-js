@@ -74,8 +74,6 @@ const OBJECT_TAG_GA_META = 81
 const OBJECT_TAG_PAYING_FOR = 82
 const OBJECT_TAG_SOPHIA_BYTE_CODE = 70
 
-const TX_FIELD = (name, type, prefix) => [name, type, prefix]
-
 /**
  * @constant
  * @description Object with transaction types
@@ -318,475 +316,475 @@ export const TX_FEE_OTHER_GAS = (txType, txSize, { relativeTtl, innerTxSize }) =
 }
 
 const BASE_TX = [
-  TX_FIELD('tag', FIELD_TYPES.int),
-  TX_FIELD('VSN', FIELD_TYPES.int)
+  ['tag', FIELD_TYPES.int],
+  ['VSN', FIELD_TYPES.int]
 ]
 
 export const CONTRACT_BYTE_CODE_LIMA = [
   ...BASE_TX,
-  TX_FIELD('sourceCodeHash', FIELD_TYPES.rawBinary),
-  TX_FIELD('typeInfo', FIELD_TYPES.sophiaCodeTypeInfo),
-  TX_FIELD('byteCode', FIELD_TYPES.rawBinary),
-  TX_FIELD('compilerVersion', FIELD_TYPES.string),
-  TX_FIELD('payable', FIELD_TYPES.bool)
+  ['sourceCodeHash', FIELD_TYPES.rawBinary],
+  ['typeInfo', FIELD_TYPES.sophiaCodeTypeInfo],
+  ['byteCode', FIELD_TYPES.rawBinary],
+  ['compilerVersion', FIELD_TYPES.string],
+  ['payable', FIELD_TYPES.bool]
 ]
 
 const ACCOUNT_TX_2 = [
   ...BASE_TX,
-  TX_FIELD('flags', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('balance', FIELD_TYPES.int),
-  TX_FIELD('gaContract', FIELD_TYPES.id, ['ct', 'nm']),
-  TX_FIELD('gaAuthFun', FIELD_TYPES.binary, 'cb')
+  ['flags', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int],
+  ['balance', FIELD_TYPES.int],
+  ['gaContract', FIELD_TYPES.id, ['ct', 'nm']],
+  ['gaAuthFun', FIELD_TYPES.binary, 'cb']
 ]
 
 const SPEND_TX = [
   ...BASE_TX,
-  TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
-  TX_FIELD('amount', FIELD_TYPES.amount),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('payload', FIELD_TYPES.payload)
+  ['senderId', FIELD_TYPES.id, 'ak'],
+  ['recipientId', FIELD_TYPES.id, ['ak', 'nm']],
+  ['amount', FIELD_TYPES.amount],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int],
+  ['payload', FIELD_TYPES.payload]
 ]
 
 const SIGNED_TX = [
   ...BASE_TX,
-  TX_FIELD('signatures', FIELD_TYPES.signatures),
-  TX_FIELD('encodedTx', FIELD_TYPES.rlpBinary)
+  ['signatures', FIELD_TYPES.signatures],
+  ['encodedTx', FIELD_TYPES.rlpBinary]
 ]
 
 const NAME_PRE_CLAIM_TX = [
   ...BASE_TX,
-  TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('commitmentId', FIELD_TYPES.id, 'cm'),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int)
+  ['accountId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['commitmentId', FIELD_TYPES.id, 'cm'],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int]
 ]
 
 const NAME_CLAIM_TX_2 = [
   ...BASE_TX,
-  TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('name', Name),
-  TX_FIELD('nameSalt', FIELD_TYPES.int),
-  TX_FIELD('nameFee', NameFee),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int)
+  ['accountId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['name', Name],
+  ['nameSalt', FIELD_TYPES.int],
+  ['nameFee', NameFee],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int]
 ]
 
 const NAME_UPDATE_TX = [
   ...BASE_TX,
-  TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', NameId),
-  TX_FIELD('nameTtl', FIELD_TYPES.int),
-  TX_FIELD('pointers', FIELD_TYPES.pointers),
-  TX_FIELD('clientTtl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int)
+  ['accountId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['nameId', NameId],
+  ['nameTtl', FIELD_TYPES.int],
+  ['pointers', FIELD_TYPES.pointers],
+  ['clientTtl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int]
 ]
 
 const NAME_TRANSFER_TX = [
   ...BASE_TX,
-  TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', NameId),
-  TX_FIELD('recipientId', FIELD_TYPES.id, ['ak', 'nm']),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int)
+  ['accountId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['nameId', NameId],
+  ['recipientId', FIELD_TYPES.id, ['ak', 'nm']],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int]
 ]
 
 const NAME_REVOKE_TX = [
   ...BASE_TX,
-  TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('nameId', NameId),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int)
+  ['accountId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['nameId', NameId],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int]
 ]
 
 const CONTRACT_TX = [
   ...BASE_TX,
-  TX_FIELD('owner', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('ctVersion', FIELD_TYPES.int),
-  TX_FIELD('code', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('log', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('active', FIELD_TYPES.bool),
-  TX_FIELD('referers', FIELD_TYPES.ids, 'ak'),
-  TX_FIELD('deposit', Deposit)
+  ['owner', FIELD_TYPES.id, 'ak'],
+  ['ctVersion', FIELD_TYPES.int],
+  ['code', FIELD_TYPES.binary, 'cb'],
+  ['log', FIELD_TYPES.binary, 'cb'],
+  ['active', FIELD_TYPES.bool],
+  ['referers', FIELD_TYPES.ids, 'ak'],
+  ['deposit', Deposit]
 ]
 
 const GA_ATTACH_TX = [
   ...BASE_TX,
-  TX_FIELD('ownerId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('code', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('authFun', FIELD_TYPES.rawBinary),
-  TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('gasLimit', FIELD_TYPES.int),
-  TX_FIELD('gasPrice', GasPrice),
-  TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
+  ['ownerId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['code', FIELD_TYPES.binary, 'cb'],
+  ['authFun', FIELD_TYPES.rawBinary],
+  ['ctVersion', FIELD_TYPES.ctVersion],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['gasLimit', FIELD_TYPES.int],
+  ['gasPrice', GasPrice],
+  ['callData', FIELD_TYPES.binary, 'cb']
 ]
 
 const GA_META_TX_2 = [
   ...BASE_TX,
-  TX_FIELD('gaId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('authData', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('abiVersion', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('gasLimit', FIELD_TYPES.int),
-  TX_FIELD('gasPrice', GasPrice),
-  TX_FIELD('tx', FIELD_TYPES.rlpBinary)
+  ['gaId', FIELD_TYPES.id, 'ak'],
+  ['authData', FIELD_TYPES.binary, 'cb'],
+  ['abiVersion', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['gasLimit', FIELD_TYPES.int],
+  ['gasPrice', GasPrice],
+  ['tx', FIELD_TYPES.rlpBinary]
 ]
 
 const PAYING_FOR_TX = [
   ...BASE_TX,
-  TX_FIELD('payerId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('tx', FIELD_TYPES.rlpBinary)
+  ['payerId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['tx', FIELD_TYPES.rlpBinary]
 ]
 
 const CONTRACT_CREATE_TX = [
   ...BASE_TX,
-  TX_FIELD('ownerId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('code', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('ctVersion', FIELD_TYPES.ctVersion),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('deposit', Deposit),
-  TX_FIELD('amount', FIELD_TYPES.amount),
-  TX_FIELD('gasLimit', FIELD_TYPES.int),
-  TX_FIELD('gasPrice', GasPrice),
-  TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
+  ['ownerId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['code', FIELD_TYPES.binary, 'cb'],
+  ['ctVersion', FIELD_TYPES.ctVersion],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['deposit', Deposit],
+  ['amount', FIELD_TYPES.amount],
+  ['gasLimit', FIELD_TYPES.int],
+  ['gasPrice', GasPrice],
+  ['callData', FIELD_TYPES.binary, 'cb']
 ]
 
 const CONTRACT_CALL_TX = [
   ...BASE_TX,
-  TX_FIELD('callerId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('contractId', FIELD_TYPES.id, ['ct', 'nm']),
-  TX_FIELD('abiVersion', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('amount', FIELD_TYPES.amount),
-  TX_FIELD('gasLimit', FIELD_TYPES.int),
-  TX_FIELD('gasPrice', GasPrice),
-  TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
+  ['callerId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['contractId', FIELD_TYPES.id, ['ct', 'nm']],
+  ['abiVersion', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['amount', FIELD_TYPES.amount],
+  ['gasLimit', FIELD_TYPES.int],
+  ['gasPrice', GasPrice],
+  ['callData', FIELD_TYPES.binary, 'cb']
 ]
 
 const CONTRACT_CALL_RESULT_TX = [
   ...BASE_TX,
-  TX_FIELD('callerId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('callerNonce', FIELD_TYPES.int),
-  TX_FIELD('height', FIELD_TYPES.int),
-  TX_FIELD('contractId', FIELD_TYPES.id, 'ct'),
-  TX_FIELD('gasPrice', GasPrice),
-  TX_FIELD('gasUsed', FIELD_TYPES.int),
-  TX_FIELD('returnValue', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('returnType', FIELD_TYPES.callReturnType),
+  ['callerId', FIELD_TYPES.id, 'ak'],
+  ['callerNonce', FIELD_TYPES.int],
+  ['height', FIELD_TYPES.int],
+  ['contractId', FIELD_TYPES.id, 'ct'],
+  ['gasPrice', GasPrice],
+  ['gasUsed', FIELD_TYPES.int],
+  ['returnValue', FIELD_TYPES.binary, 'cb'],
+  ['returnType', FIELD_TYPES.callReturnType],
   // TODO: add serialization for
   //  <log> :: [ { <address> :: id, [ <topics> :: binary() ], <data> :: binary() } ]
-  TX_FIELD('log', FIELD_TYPES.rawBinary)
+  ['log', FIELD_TYPES.rawBinary]
 ]
 
 const ORACLE_REGISTER_TX = [
   ...BASE_TX,
-  TX_FIELD('accountId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('queryFormat', FIELD_TYPES.string),
-  TX_FIELD('responseFormat', FIELD_TYPES.string),
-  TX_FIELD('queryFee', FIELD_TYPES.amount),
-  TX_FIELD('oracleTtlType', FIELD_TYPES.int),
-  TX_FIELD('oracleTtlValue', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('abiVersion', FIELD_TYPES.int)
+  ['accountId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['queryFormat', FIELD_TYPES.string],
+  ['responseFormat', FIELD_TYPES.string],
+  ['queryFee', FIELD_TYPES.amount],
+  ['oracleTtlType', FIELD_TYPES.int],
+  ['oracleTtlValue', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['abiVersion', FIELD_TYPES.int]
 ]
 
 const ORACLE_EXTEND_TX = [
   ...BASE_TX,
-  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('oracleTtlType', FIELD_TYPES.int),
-  TX_FIELD('oracleTtlValue', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int)
+  ['oracleId', FIELD_TYPES.id, ['ok', 'nm']],
+  ['nonce', FIELD_TYPES.int],
+  ['oracleTtlType', FIELD_TYPES.int],
+  ['oracleTtlValue', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int]
 ]
 
 const ORACLE_QUERY_TX = [
   ...BASE_TX,
-  TX_FIELD('senderId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('oracleId', FIELD_TYPES.id, ['ok', 'nm']),
-  TX_FIELD('query', FIELD_TYPES.string),
-  TX_FIELD('queryFee', FIELD_TYPES.amount),
-  TX_FIELD('queryTtlType', FIELD_TYPES.int),
-  TX_FIELD('queryTtlValue', FIELD_TYPES.int),
-  TX_FIELD('responseTtlType', FIELD_TYPES.int),
-  TX_FIELD('responseTtlValue', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int)
+  ['senderId', FIELD_TYPES.id, 'ak'],
+  ['nonce', FIELD_TYPES.int],
+  ['oracleId', FIELD_TYPES.id, ['ok', 'nm']],
+  ['query', FIELD_TYPES.string],
+  ['queryFee', FIELD_TYPES.amount],
+  ['queryTtlType', FIELD_TYPES.int],
+  ['queryTtlValue', FIELD_TYPES.int],
+  ['responseTtlType', FIELD_TYPES.int],
+  ['responseTtlValue', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int]
 ]
 const ORACLE_RESPOND_TX = [
   ...BASE_TX,
-  TX_FIELD('oracleId', FIELD_TYPES.id, 'ok'),
-  TX_FIELD('nonce', FIELD_TYPES.int),
-  TX_FIELD('queryId', FIELD_TYPES.binary, 'oq'),
-  TX_FIELD('response', FIELD_TYPES.string),
-  TX_FIELD('responseTtlType', FIELD_TYPES.int),
-  TX_FIELD('responseTtlValue', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int)
+  ['oracleId', FIELD_TYPES.id, 'ok'],
+  ['nonce', FIELD_TYPES.int],
+  ['queryId', FIELD_TYPES.binary, 'oq'],
+  ['response', FIELD_TYPES.string],
+  ['responseTtlType', FIELD_TYPES.int],
+  ['responseTtlValue', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int]
 ]
 
 const CHANNEL_CREATE_TX_2 = [
   ...BASE_TX,
-  TX_FIELD('initiator', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('initiatorAmount', FIELD_TYPES.int),
-  TX_FIELD('responder', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('responderAmount', FIELD_TYPES.int),
-  TX_FIELD('channelReserve', FIELD_TYPES.int),
-  TX_FIELD('lockPeriod', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('initiatorDelegateIds', FIELD_TYPES.string),
-  TX_FIELD('responderDelegateIds', FIELD_TYPES.string),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st'),
-  TX_FIELD('nonce', FIELD_TYPES.int)
+  ['initiator', FIELD_TYPES.id, 'ak'],
+  ['initiatorAmount', FIELD_TYPES.int],
+  ['responder', FIELD_TYPES.id, 'ak'],
+  ['responderAmount', FIELD_TYPES.int],
+  ['channelReserve', FIELD_TYPES.int],
+  ['lockPeriod', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['initiatorDelegateIds', FIELD_TYPES.string],
+  ['responderDelegateIds', FIELD_TYPES.string],
+  ['stateHash', FIELD_TYPES.binary, 'st'],
+  ['nonce', FIELD_TYPES.int]
 ]
 
 const CHANNEL_DEPOSIT_TX = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('fromId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('amount', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st'),
-  TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int)
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['fromId', FIELD_TYPES.id, 'ak'],
+  ['amount', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['stateHash', FIELD_TYPES.binary, 'st'],
+  ['round', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int]
 ]
 
 const CHANNEL_WITHDRAW_TX = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('toId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('amount', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st'),
-  TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int)
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['toId', FIELD_TYPES.id, 'ak'],
+  ['amount', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['stateHash', FIELD_TYPES.binary, 'st'],
+  ['round', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int]
 ]
 
 const CHANNEL_CLOSE_MUTUAL_TX = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('fromId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('initiatorAmountFinal', FIELD_TYPES.int),
-  TX_FIELD('responderAmountFinal', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int)
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['fromId', FIELD_TYPES.id, 'ak'],
+  ['initiatorAmountFinal', FIELD_TYPES.int],
+  ['responderAmountFinal', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int]
 ]
 
 const CHANNEL_CLOSE_SOLO_TX = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('fromId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('payload', FIELD_TYPES.binary, 'tx'),
-  TX_FIELD('poi', FIELD_TYPES.binary, 'pi'),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int)
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['fromId', FIELD_TYPES.id, 'ak'],
+  ['payload', FIELD_TYPES.binary, 'tx'],
+  ['poi', FIELD_TYPES.binary, 'pi'],
+  ['ttl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int]
 ]
 
 const CHANNEL_SLASH_TX = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('fromId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('payload', FIELD_TYPES.binary, 'tx'),
-  TX_FIELD('poi', FIELD_TYPES.binary, 'pi'),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int)
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['fromId', FIELD_TYPES.id, 'ak'],
+  ['payload', FIELD_TYPES.binary, 'tx'],
+  ['poi', FIELD_TYPES.binary, 'pi'],
+  ['ttl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int]
 ]
 
 const CHANNEL_SETTLE_TX = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('fromId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('initiatorAmountFinal', FIELD_TYPES.int),
-  TX_FIELD('responderAmountFinal', FIELD_TYPES.int),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int)
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['fromId', FIELD_TYPES.id, 'ak'],
+  ['initiatorAmountFinal', FIELD_TYPES.int],
+  ['responderAmountFinal', FIELD_TYPES.int],
+  ['ttl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int]
 ]
 
 const CHANNEL_FORCE_PROGRESS_TX = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('fromId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('payload', FIELD_TYPES.binary, 'tx'),
-  TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('update', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st'),
-  TX_FIELD('offChainTrees', FIELD_TYPES.stateTree),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int)
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['fromId', FIELD_TYPES.id, 'ak'],
+  ['payload', FIELD_TYPES.binary, 'tx'],
+  ['round', FIELD_TYPES.int],
+  ['update', FIELD_TYPES.binary, 'cb'],
+  ['stateHash', FIELD_TYPES.binary, 'st'],
+  ['offChainTrees', FIELD_TYPES.stateTree],
+  ['ttl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int]
 ]
 
 const CHANNEL_OFFCHAIN_TX_2 = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('stateHash', FIELD_TYPES.binary, 'st')
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['round', FIELD_TYPES.int],
+  ['stateHash', FIELD_TYPES.binary, 'st']
 ]
 
 const CHANNEL_TX_3 = [
   ...BASE_TX,
-  TX_FIELD('initiator', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('responder', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('channelAmount', FIELD_TYPES.int),
-  TX_FIELD('initiatorAmount', FIELD_TYPES.int),
-  TX_FIELD('responderAmount', FIELD_TYPES.int),
-  TX_FIELD('channelReserve', FIELD_TYPES.int),
-  TX_FIELD('initiatorDelegateIds', FIELD_TYPES.ids),
-  TX_FIELD('responderDelegateIds', FIELD_TYPES.ids),
-  TX_FIELD('stateHash', FIELD_TYPES.hex),
-  TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('soloRound', FIELD_TYPES.int),
-  TX_FIELD('lockPeriod', FIELD_TYPES.int),
-  TX_FIELD('lockedUntil', FIELD_TYPES.int),
-  TX_FIELD('initiatorAuth', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('responderAuth', FIELD_TYPES.binary, 'cb')
+  ['initiator', FIELD_TYPES.id, 'ak'],
+  ['responder', FIELD_TYPES.id, 'ak'],
+  ['channelAmount', FIELD_TYPES.int],
+  ['initiatorAmount', FIELD_TYPES.int],
+  ['responderAmount', FIELD_TYPES.int],
+  ['channelReserve', FIELD_TYPES.int],
+  ['initiatorDelegateIds', FIELD_TYPES.ids],
+  ['responderDelegateIds', FIELD_TYPES.ids],
+  ['stateHash', FIELD_TYPES.hex],
+  ['round', FIELD_TYPES.int],
+  ['soloRound', FIELD_TYPES.int],
+  ['lockPeriod', FIELD_TYPES.int],
+  ['lockedUntil', FIELD_TYPES.int],
+  ['initiatorAuth', FIELD_TYPES.binary, 'cb'],
+  ['responderAuth', FIELD_TYPES.binary, 'cb']
 ]
 
 const CHANNEL_SNAPSHOT_SOLO_TX = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('fromId', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('payload', FIELD_TYPES.binary, 'tx'),
-  TX_FIELD('ttl', FIELD_TYPES.int),
-  TX_FIELD('fee', FIELD_TYPES.int),
-  TX_FIELD('nonce', FIELD_TYPES.int)
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['fromId', FIELD_TYPES.id, 'ak'],
+  ['payload', FIELD_TYPES.binary, 'tx'],
+  ['ttl', FIELD_TYPES.int],
+  ['fee', FIELD_TYPES.int],
+  ['nonce', FIELD_TYPES.int]
 ]
 
 const CHANNEL_OFFCHAIN_CREATE_CONTRACT_TX = [
   ...BASE_TX,
-  TX_FIELD('owner', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('ctVersion', FIELD_TYPES.int),
-  TX_FIELD('code', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('deposit', FIELD_TYPES.int),
-  TX_FIELD('callData', FIELD_TYPES.binary, 'cb')
+  ['owner', FIELD_TYPES.id, 'ak'],
+  ['ctVersion', FIELD_TYPES.int],
+  ['code', FIELD_TYPES.binary, 'cb'],
+  ['deposit', FIELD_TYPES.int],
+  ['callData', FIELD_TYPES.binary, 'cb']
 ]
 
 const CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = [
   ...BASE_TX,
-  TX_FIELD('caller', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('contract', FIELD_TYPES.id, 'ct'),
-  TX_FIELD('abiVersion', FIELD_TYPES.int),
-  TX_FIELD('amount', FIELD_TYPES.int),
-  TX_FIELD('callData', FIELD_TYPES.binary, 'cb'),
-  TX_FIELD('callStack', FIELD_TYPES.callStack),
-  TX_FIELD('gasPrice', GasPrice),
-  TX_FIELD('gasLimit', FIELD_TYPES.int)
+  ['caller', FIELD_TYPES.id, 'ak'],
+  ['contract', FIELD_TYPES.id, 'ct'],
+  ['abiVersion', FIELD_TYPES.int],
+  ['amount', FIELD_TYPES.int],
+  ['callData', FIELD_TYPES.binary, 'cb'],
+  ['callStack', FIELD_TYPES.callStack],
+  ['gasPrice', GasPrice],
+  ['gasLimit', FIELD_TYPES.int]
 ]
 
 const CHANNEL_RECONNECT_TX = [
   ...BASE_TX,
-  TX_FIELD('channelId', FIELD_TYPES.id, 'ch'),
-  TX_FIELD('round', FIELD_TYPES.int),
-  TX_FIELD('role', FIELD_TYPES.string),
-  TX_FIELD('pubkey', FIELD_TYPES.id, 'ak')
+  ['channelId', FIELD_TYPES.id, 'ch'],
+  ['round', FIELD_TYPES.int],
+  ['role', FIELD_TYPES.string],
+  ['pubkey', FIELD_TYPES.id, 'ak']
 ]
 
 const CHANNEL_OFFCHAIN_UPDATE_TRANSFER_TX = [
   ...BASE_TX,
-  TX_FIELD('from', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('to', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('amount', FIELD_TYPES.int)
+  ['from', FIELD_TYPES.id, 'ak'],
+  ['to', FIELD_TYPES.id, 'ak'],
+  ['amount', FIELD_TYPES.int]
 ]
 
 const CHANNEL_OFFCHAIN_UPDATE_DEPOSIT_TX = [
   ...BASE_TX,
-  TX_FIELD('from', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('amount', FIELD_TYPES.int)
+  ['from', FIELD_TYPES.id, 'ak'],
+  ['amount', FIELD_TYPES.int]
 ]
 
 const CHANNEL_OFFCHAIN_UPDATE_WITHDRAWAL_TX = [
   ...BASE_TX,
-  TX_FIELD('from', FIELD_TYPES.id, 'ak'),
-  TX_FIELD('amount', FIELD_TYPES.int)
+  ['from', FIELD_TYPES.id, 'ak'],
+  ['amount', FIELD_TYPES.int]
 ]
 
 const PROOF_OF_INCLUSION_TX = [
   ...BASE_TX,
-  TX_FIELD('accounts', FIELD_TYPES.mptrees),
-  TX_FIELD('calls', FIELD_TYPES.mptrees),
-  TX_FIELD('channels', FIELD_TYPES.mptrees),
-  TX_FIELD('contracts', FIELD_TYPES.mptrees),
-  TX_FIELD('ns', FIELD_TYPES.mptrees),
-  TX_FIELD('oracles', FIELD_TYPES.mptrees)
+  ['accounts', FIELD_TYPES.mptrees],
+  ['calls', FIELD_TYPES.mptrees],
+  ['channels', FIELD_TYPES.mptrees],
+  ['contracts', FIELD_TYPES.mptrees],
+  ['ns', FIELD_TYPES.mptrees],
+  ['oracles', FIELD_TYPES.mptrees]
 ]
 
 const STATE_TREES_TX = [
   ...BASE_TX,
-  TX_FIELD('contracts', FIELD_TYPES.rlpBinary),
-  TX_FIELD('calls', FIELD_TYPES.rlpBinary),
-  TX_FIELD('channels', FIELD_TYPES.rlpBinary),
-  TX_FIELD('ns', FIELD_TYPES.rlpBinary),
-  TX_FIELD('oracles', FIELD_TYPES.rlpBinary),
-  TX_FIELD('accounts', FIELD_TYPES.rlpBinary)
+  ['contracts', FIELD_TYPES.rlpBinary],
+  ['calls', FIELD_TYPES.rlpBinary],
+  ['channels', FIELD_TYPES.rlpBinary],
+  ['ns', FIELD_TYPES.rlpBinary],
+  ['oracles', FIELD_TYPES.rlpBinary],
+  ['accounts', FIELD_TYPES.rlpBinary]
 ]
 
 const MERKLE_PATRICIA_TREE_TX = [
   ...BASE_TX,
-  TX_FIELD('values', FIELD_TYPES.rlpBinaries)
+  ['values', FIELD_TYPES.rlpBinaries]
 ]
 
 const MERKLE_PATRICIA_TREE_VALUE_TX = [
   ...BASE_TX,
-  TX_FIELD('key', FIELD_TYPES.hex),
-  TX_FIELD('value', FIELD_TYPES.rawBinary)
+  ['key', FIELD_TYPES.hex],
+  ['value', FIELD_TYPES.rawBinary]
 ]
 
 const CONTRACTS_TREE_TX = [
   ...BASE_TX,
-  TX_FIELD('contracts', FIELD_TYPES.rlpBinary)
+  ['contracts', FIELD_TYPES.rlpBinary]
 ]
 
 const CONTRACT_CALLS_TREE_TX = [
   ...BASE_TX,
-  TX_FIELD('calls', FIELD_TYPES.rlpBinary)
+  ['calls', FIELD_TYPES.rlpBinary]
 ]
 
 const CHANNELS_TREE_TX = [
   ...BASE_TX,
-  TX_FIELD('channels', FIELD_TYPES.rlpBinary)
+  ['channels', FIELD_TYPES.rlpBinary]
 ]
 
 const NAMESERVICE_TREE_TX = [
   ...BASE_TX,
-  TX_FIELD('mtree', FIELD_TYPES.rlpBinary)
+  ['mtree', FIELD_TYPES.rlpBinary]
 ]
 
 const ORACLES_TREE_TX = [
   ...BASE_TX,
-  TX_FIELD('otree', FIELD_TYPES.rlpBinary)
+  ['otree', FIELD_TYPES.rlpBinary]
 ]
 
 const ACCOUNTS_TREE_TX = [
   ...BASE_TX,
-  TX_FIELD('accounts', FIELD_TYPES.rlpBinary)
+  ['accounts', FIELD_TYPES.rlpBinary]
 ]
 
 export const TX_SERIALIZATION_SCHEMA = {

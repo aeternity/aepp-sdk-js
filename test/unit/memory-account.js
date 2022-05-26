@@ -44,7 +44,7 @@ describe('MemoryAccount', function () {
 
   it('Init with secretKey as hex string', async () => {
     const acc = MemoryAccount({ keypair: testAcc })
-    return acc.address().should.eventually.be.equal(testAcc.publicKey)
+    await acc.address().should.eventually.be.equal(testAcc.publicKey)
   })
 
   it('Init with secretKey as hex Buffer', async () => {
@@ -54,7 +54,7 @@ describe('MemoryAccount', function () {
         secretKey: Buffer.from(testAcc.secretKey, 'hex')
       }
     })
-    return acc.address().should.eventually.be.equal(testAcc.publicKey)
+    await acc.address().should.eventually.be.equal(testAcc.publicKey)
   })
 
   it('Sign message', async () => {

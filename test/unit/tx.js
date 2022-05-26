@@ -26,7 +26,6 @@ import {
   encode,
   getDefaultPointerKey,
   commitmentHash,
-  ensureNameValid,
   getMinimumNameFee,
   isNameValid,
   produceNameId
@@ -35,10 +34,7 @@ import BigNumber from 'bignumber.js'
 import { toBytes } from '../../src/utils/bytes'
 import { buildTx, unpackTx } from '../../src/tx/builder'
 import { NAME_BID_RANGES } from '../../src/tx/builder/schema'
-import {
-  InvalidNameError,
-  SchemaNotFoundError
-} from '../../src/utils/errors'
+import { SchemaNotFoundError } from '../../src/utils/errors'
 
 describe('Tx', function () {
   it('reproducible commitment hashes can be generated', async () => {
@@ -51,17 +47,17 @@ describe('Tx', function () {
   it('test from big number to bytes', async () => {
     // TODO investigate about float numbers serialization
     const data = [
-      BigNumber('7841237845261982793129837487239459234675231423423453451234'),
-      BigNumber('7841237845261982793129837487239459214234234534523'),
-      BigNumber('7841237845261982793129837412341231231'),
-      BigNumber('78412378452619'),
-      BigNumber('7841237845261982793129837487239459214124563456'),
-      BigNumber('7841237845261982793129837487239459214123')
+      new BigNumber('7841237845261982793129837487239459234675231423423453451234'),
+      new BigNumber('7841237845261982793129837487239459214234234534523'),
+      new BigNumber('7841237845261982793129837412341231231'),
+      new BigNumber('78412378452619'),
+      new BigNumber('7841237845261982793129837487239459214124563456'),
+      new BigNumber('7841237845261982793129837487239459214123')
     ]
 
     function bnFromBytes (bn) {
       const bytes = toBytes(bn, true)
-      return BigNumber(bytes.toString('hex'), 16).toString(10)
+      return new BigNumber(bytes.toString('hex'), 16).toString(10)
     }
 
     data.forEach(n => {
@@ -71,18 +67,6 @@ describe('Tx', function () {
 
   it('Produce name id for `.chain`', () => {
     produceNameId('asdas.chain').should.be.equal('nm_2DMazuJNrGkQYve9eMttgdteaigeeuBk3fmRYSThJZ2NpX3r8R')
-  })
-
-  describe('ensureNameValid', () => {
-    it('validates type', () => {
-      expect(() => ensureNameValid({})).to.throw(InvalidNameError, 'Name must be a string')
-    })
-
-    it('validates domain', () => {
-      expect(() => ensureNameValid('asdasdasd.unknown')).to.throw(InvalidNameError, 'Name should end with .chain:')
-    })
-
-    it('don\'t throws exception', () => ensureNameValid('asdasdasd.chain'))
   })
 
   describe('getMinimumNameFee', () => {

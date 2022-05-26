@@ -120,13 +120,6 @@ export class InvalidDenominationError extends BaseError {
   }
 }
 
-export class InvalidNameError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InvalidNameError'
-  }
-}
-
 export class MissingParamError extends BaseError {
   constructor (message: string) {
     super(message)

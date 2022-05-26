@@ -89,12 +89,11 @@ export default class MPTree {
       case 17:
         return { type: NodeType.Branch, payload: node, path: null }
       case 2: {
-        const path = node[0].toString('hex')
-        const nibble = parseInt(path[0], 16)
+        const nibble = node[0][0] >> 4
         if (nibble > 3) throw new UnknownPathNibbleError(nibble)
         const type = nibble <= 1 ? NodeType.Extension : NodeType.Leaf
         const slice = [0, 2].includes(nibble) ? 2 : 1
-        return { type, payload: [node[1]], path: path.slice(slice) }
+        return { type, payload: [node[1]], path: node[0].toString('hex').slice(slice) }
       }
       default:
         throw new UnknownNodeLengthError(node.length)
@@ -129,7 +128,7 @@ export default class MPTree {
       switch (type) {
         case NodeType.Branch:
           if (key.length === 0) return payload[16]
-          searchFrom = payload[parseInt(key[0], 16)].toString('hex')
+          searchFrom = payload[+`0x${key[0]}`].toString('hex')
           key = key.substr(1)
           break
         case NodeType.Extension:

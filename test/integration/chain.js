@@ -46,7 +46,7 @@ describe('Node Chain', function () {
   it('waits for specified heights', async () => {
     const target = await aeSdkWithoutAccount.height() + 1
     await aeSdkWithoutAccount.awaitHeight(target).should.eventually.be.at.least(target)
-    return aeSdkWithoutAccount.height().should.eventually.be.at.least(target)
+    await aeSdkWithoutAccount.height().should.eventually.be.at.least(target)
   })
 
   it('Can verify transaction from broadcast error', async () => {
@@ -92,7 +92,7 @@ describe('Node Chain', function () {
     const { txHash } = await aeSdk.api.postTransaction({ tx: signed })
 
     await aeSdk.poll(txHash).should.eventually.be.fulfilled
-    return aeSdk.poll('th_xxx', { blocks: 1 }).should.eventually.be.rejected
+    await aeSdk.poll('th_xxx', { blocks: 1 }).should.eventually.be.rejected
   })
 
   it('Wait for transaction confirmation', async () => {
