@@ -11,6 +11,7 @@ import { v4 as uuid } from '@aeternity/uuid'
 import AccountResolver from '../../../account/resolver'
 import AccountRpc from '../../../account/rpc'
 import { decode } from '../../encoder'
+import { mapObject } from '../../other'
 import RpcClient from './rpc-client'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
 import {
@@ -23,27 +24,21 @@ import {
 } from '../../errors'
 import Node from '../../../node'
 
-const NOTIFICATIONS = {
-  [METHODS.updateAddress]: (instance, { params }) => {
+const METHOD_HANDLERS = {
+  [METHODS.updateAddress]: (instance, params) => {
     instance.rpcClient.accounts = params
     instance.onAddressChange(params)
   },
-  [METHODS.updateNetwork]: async (instance, { params }) => {
+  [METHODS.updateNetwork]: async (instance, params) => {
     const { node } = params
     if (node) instance.addNode(node.name, await Node(node), true)
     instance.onNetworkChange(params)
   },
-  [METHODS.closeConnection]: (instance, msg) => {
+  [METHODS.closeConnection]: (instance, params) => {
     instance.disconnectWallet()
-    instance.onDisconnect(msg.params)
+    instance.onDisconnect(params)
   },
   [METHODS.readyToConnect]: () => {}
-}
-
-const handleMessage = async (instance, msg) => {
-  if (!msg.id) {
-    return NOTIFICATIONS[msg.method](instance, msg)
-  }
 }
 
 /**
@@ -113,7 +108,8 @@ export default AccountResolver.compose({
         ...walletInfo,
         connection,
         id: uuid(),
-        handlers: [handleMessage.bind(null, this), this.onDisconnect]
+        onDisconnect: this.onDisconnect,
+        methods: mapObject(METHOD_HANDLERS, ([key, value]) => [key, value.bind(null, this)])
       })
       const { node } = await this.sendConnectRequest(connectNode)
       if (connectNode) {

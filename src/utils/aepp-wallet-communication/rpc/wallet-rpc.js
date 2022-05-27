@@ -14,7 +14,7 @@ import RpcClient from './rpc-client'
 import { ERRORS, METHODS, RPC_STATUS, VERSION } from '../schema'
 import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
 import { isAccountBase } from '../../../account/base'
-import { filterObject } from '../../other'
+import { filterObject, mapObject } from '../../other'
 import { unpackTx } from '../../../tx/builder'
 
 const resolveOnAccount = (addresses, onAccount, opt = {}) => {
@@ -25,14 +25,11 @@ const resolveOnAccount = (addresses, onAccount, opt = {}) => {
   return onAccount
 }
 
-const NOTIFICATIONS = {
-  [METHODS.closeConnection]: async (instance, client, params) => {
+const METHOD_HANDLERS = {
+  [METHODS.closeConnection]: async (callInstance, instance, client, params) => {
     client.disconnect(true)
     instance.onDisconnect(params, client)
-  }
-}
-
-const REQUESTS = {
+  },
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
   [METHODS.connect] (
@@ -185,29 +182,6 @@ const REQUESTS = {
   }
 }
 
-const handleMessage = async (instance, client, { id, method, params }, origin) => {
-  if (!id) {
-    return NOTIFICATIONS[method](instance, client, params, origin)
-  }
-
-  const callInstance = (methodName, params, accept, deny) => new Promise(resolve => {
-    instance[methodName](
-      client,
-      {
-        id,
-        method,
-        params,
-        accept: (...args) => resolve(accept(...args)),
-        deny: (...args) => resolve(deny(...args))
-      },
-      origin
-    )
-  })
-  const response = await REQUESTS[method](callInstance, instance, client, params)
-  const { error, result } = response ?? {}
-  client.sendMessage({ id, method, ...error ? { error } : { result } }, true)
-}
-
 /**
  * Contain functionality for aepp interaction and managing multiple aepps
  * @alias module:@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc
@@ -322,15 +296,28 @@ export default Ae.compose(AccountMultiple, {
       // @TODO  detect if aepp has some history based on origin????
       // if yes use this instance for connection
       const id = uuid()
-      this.rpcClients[id] = RpcClient({
+      const client = RpcClient({
         id,
         info: { status: RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST },
         connection: clientConnection,
-        handlers: [
-          (message, origin) => handleMessage(this, this.rpcClients[id], message, origin),
-          this.onDisconnect
-        ]
+        onDisconnect: this.onDisconnect,
+        methods: mapObject(METHOD_HANDLERS, ([key, value]) => [key, (params, origin) => {
+          const callInstance = (methodName, params, accept, deny) => new Promise(resolve => {
+            this[methodName](
+              client,
+              {
+                method: key,
+                params,
+                accept: (...args) => resolve(accept(...args)),
+                deny: (...args) => resolve(deny(...args))
+              },
+              origin
+            )
+          })
+          return value(callInstance, this, client, params)
+        }])
       })
+      this.rpcClients[id] = client
       return id
     },
     /**

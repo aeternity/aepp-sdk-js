@@ -23,13 +23,12 @@ import {
  * @param {Object} param Init params object
  * @param {String} param.name Client name
  * @param {Object} param.connection Connection object
- * @param {Function[]} param.handlers Array with two function for message handling
- * @param {Function} param.handlers[0] Message handler
- * @param {Function} param.handlers[1] Disconnect callback
+ * @param {Function} param.onDisconnect Disconnect callback
+ * @param {Object} param.methods Object containing handlers for each request by name
  * @return {Object}
  */
 export default stampit({
-  init ({ id, name, icons, connection, handlers: [onMessage, onDisconnect] }) {
+  init ({ id, name, icons, connection, onDisconnect, methods }) {
     this.id = id
     this.connection = connection
     this.info = { name, icons }
@@ -47,12 +46,21 @@ export default stampit({
 
     this._messageId = 0
 
-    const handleMessage = (msg, origin) => {
+    const handleMessage = async (msg, origin) => {
       if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
         throw new InvalidRpcMessageError(msg)
       }
-      if ((msg.result ?? msg.error) != null) this.processResponse(msg)
-      else onMessage(msg, origin)
+      if ((msg.result ?? msg.error) != null) {
+        this.processResponse(msg)
+        return
+      }
+
+      // TODO: remove methods as far it is not required in JSON RPC
+      const response = { id: msg.id, method: msg.method }
+      const { error, result } = await methods[msg.method](msg.params, origin)
+      if (error) response.error = error
+      else response.result = result
+      if (response.id) this.sendMessage(response, true)
     }
 
     const disconnect = (aepp, connection) => {
