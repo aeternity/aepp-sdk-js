@@ -113,13 +113,6 @@ export class InsufficientBalanceError extends BaseError {
   }
 }
 
-export class InvalidDenominationError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InvalidDenominationError'
-  }
-}
-
 export class MissingParamError extends BaseError {
   constructor (message: string) {
     super(message)

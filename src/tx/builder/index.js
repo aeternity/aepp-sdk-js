@@ -156,8 +156,8 @@ function validateField (value, type, prefix) {
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int: {
-      if (isNaN(value) && !BigNumber.isBigNumber(value)) {
-        return `${value} is not of type Number or BigNumber`
+      if (typeof value !== 'bigint' && isNaN(value) && !BigNumber.isBigNumber(value)) {
+        return `${value} is not of type BigInt, Number or BigNumber`
       }
       if (new BigNumber(value).lt(0)) return `${value} must be >= 0`
       return

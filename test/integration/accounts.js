@@ -108,31 +108,25 @@ describe('Accounts', function () {
   it('spends coins', async () => {
     const ret = await aeSdk.spend(1, receiver)
     ret.should.have.property('tx')
-    ret.tx.should.include({
-      amount: 1, recipientId: receiver
-    })
+    ret.tx.should.include({ amount: 1n, recipientId: receiver })
   })
 
   it('spends coins in AE format', async () => {
     const ret = await aeSdk.spend(1, receiver, { denomination: AE_AMOUNT_FORMATS.AE })
     ret.should.have.property('tx')
-    ret.tx.should.include({
-      amount: `${1e18}`, recipientId: receiver
-    })
+    ret.tx.should.include({ amount: 10n ** 18n, recipientId: receiver })
   })
 
   it('spends big amount of coins', async () => {
-    const bigAmount = '10000000000000100000000000000000'
+    const bigAmount = 10n ** 31n + 10n ** 17n
     const genesis = await BaseAe({ networkId })
     const receiverWallet = generateKeyPair()
     const ret = await genesis.spend(bigAmount, receiverWallet.publicKey)
 
     const balanceAfter = await aeSdk.getBalance(receiverWallet.publicKey)
-    balanceAfter.should.be.equal(bigAmount)
+    balanceAfter.should.be.equal(bigAmount.toString())
     ret.should.have.property('tx')
-    ret.tx.should.include({
-      amount: bigAmount, recipientId: receiverWallet.publicKey
-    })
+    ret.tx.should.include({ amount: bigAmount, recipientId: receiverWallet.publicKey })
   })
 
   it('Get Account by block height/hash', async () => {

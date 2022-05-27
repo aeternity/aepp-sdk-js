@@ -8,13 +8,13 @@ import { mapObject } from './utils/other'
 import { EncodedData } from './utils/encoder'
 
 const bigIntPropertyNames = [
-  'balance', 'queryFee', 'fee', 'amount', 'nameSalt', 'nameFee', 'channelAmount',
+  'balance', 'queryFee', 'fee', 'amount', 'nameFee', 'channelAmount',
   'initiatorAmount', 'responderAmount', 'channelReserve', 'initiatorAmountFinal',
-  'responderAmountFinal', 'gasPrice', 'gas', 'gasUsed', 'deposit'
+  'responderAmountFinal', 'gasPrice', 'deposit'
 ] as const
 
 const numberPropertyNames = [
-  'time',
+  'time', 'gas', 'gasUsed', 'nameSalt',
   'nonce', 'nextNonce', 'height', 'blockHeight', 'top', 'topBlockHeight', 'ttl',
   'inbound', 'outbound', 'peerCount', 'pendingTransactionsCount', 'effectiveAtHeight',
   'version', 'solutions'
@@ -35,7 +35,7 @@ export type TransformNodeType<Type> =
           ? {
               [Property in keyof Type]:
               Property extends BigIntPropertyNames
-                ? PreserveOptional<string | number, Type[Property]>
+                ? PreserveOptional<bigint, Type[Property]>
                 : Property extends NumberPropertyNames
                   ? PreserveOptional<number, Type[Property]>
                   : Property extends 'txHash'
@@ -103,10 +103,7 @@ export default class extends (Node as unknown as TransformedNode) {
 
   #decodeRes (data: any): any {
     return this.#mapData(data, {
-      bigInt: value => {
-        const bn = new BigNumber(value)
-        return bn.isLessThanOrEqualTo(Number.MAX_SAFE_INTEGER) ? +bn : bn.toFixed()
-      },
+      bigInt: value => BigInt(value),
       number: value => +value
     })
   }

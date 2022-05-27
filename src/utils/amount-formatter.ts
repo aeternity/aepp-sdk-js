@@ -22,7 +22,7 @@
  */
 import BigNumber from 'bignumber.js'
 import { isBigNumber } from './bignumber'
-import { ArgumentError, InvalidDenominationError } from './errors'
+import { ArgumentError } from './errors'
 
 export type AeAmountFormats = 'ae' | 'miliAE' | 'microAE' | 'nanoAE' | 'picoAE' | 'femtoAE' | 'aettos'
 
@@ -83,16 +83,13 @@ export const toAettos = (
  * @return {String}
  */
 export const formatAmount = (
-  value: string | number | BigNumber,
+  value: string | number | bigint | BigNumber,
   { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS }:
   { denomination?: AeAmountFormats, targetDenomination?: AeAmountFormats }
 ): string => {
-  const denominations = Object.values(AE_AMOUNT_FORMATS)
-  if (!denominations.includes(denomination)) throw new InvalidDenominationError(`Invalid denomination: ${denomination}`)
-  if (!denominations.includes(targetDenomination)) throw new InvalidDenominationError(`Invalid target denomination: ${targetDenomination}`)
   if (!isBigNumber(value)) throw new ArgumentError('value', 'a number', value)
 
-  return new BigNumber(value)
+  return new BigNumber(typeof value === 'bigint' ? value.toString() : value)
     .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])
     .toFixed()
 }

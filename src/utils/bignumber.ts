@@ -6,13 +6,14 @@
 import BigNumber from 'bignumber.js'
 
 /**
- * Check if value is BigNumber, Number or number string representation
- * @param {String|Number|BigNumber} number number to convert
- * @return {Boolean}
+ * Check if value is BigNumber, Number, BigInt or number string representation
+ * @param number number to check
  */
-export const isBigNumber = (number: string | number | BigNumber): boolean =>
-  ['number', 'object', 'string', 'bigint'].includes(typeof number) &&
-  (!isNaN(number as number) || Number.isInteger(number) || BigNumber.isBigNumber(number))
+export const isBigNumber = (number: string | number | bigint | BigNumber): boolean => {
+  if (typeof number === 'bigint') return true
+  return ['number', 'object', 'string'].includes(typeof number) &&
+    (!isNaN(number as number) || Number.isInteger(number) || BigNumber.isBigNumber(number))
+}
 
 /**
  * BigNumber ceil operation
