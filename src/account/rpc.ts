@@ -44,11 +44,12 @@ class _AccountRpc extends _AccountBase {
   ): Promise<EncodedData<'tx'>> {
     if (innerTx != null) throw new NotImplementedError('innerTx option in AccountRpc')
     if (networkId !== this._networkId) throw new NotImplementedError('networkId should be equal to current network')
-    return this._rpcClient.request(METHODS.sign, {
+    const res = await this._rpcClient.request(METHODS.sign, {
       onAccount: this._address,
       tx,
       returnSigned: true
     })
+    return res.signedTransaction
   }
 
   /**
@@ -60,7 +61,7 @@ class _AccountRpc extends _AccountBase {
   async signMessage (
     message: string, { returnHex = false }: Parameters<_AccountBase['signMessage']>[1] = {}
   ): Promise<string | Uint8Array> {
-    const signature = await this._rpcClient.request(
+    const { signature } = await this._rpcClient.request(
       METHODS.signMessage, { onAccount: this._address, message }
     )
     return returnHex ? signature : Buffer.from(signature, 'hex')

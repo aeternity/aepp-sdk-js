@@ -40,39 +40,9 @@ const NOTIFICATIONS = {
   [METHODS.readyToConnect]: () => {}
 }
 
-const RESPONSES = {
-  [METHODS.address]: (instance, msg) => instance.rpcClient.processResponse(msg),
-  [METHODS.connect]: (instance, msg) => {
-    if (msg.result) instance.rpcClient.info.status = RPC_STATUS.CONNECTED
-    instance.rpcClient.processResponse(msg)
-  },
-  [METHODS.subscribeAddress]: (instance, msg) => {
-    if (msg.result) {
-      if (msg.result.address) {
-        instance.rpcClient.accounts = msg.result.address
-      }
-      if (msg.result.subscription) {
-        instance.rpcClient.addressSubscription = msg.result.subscription
-      }
-    }
-
-    instance.rpcClient.processResponse(msg, ({ result }) => [result])
-  },
-  [METHODS.sign]: (instance, msg) => {
-    instance.rpcClient.processResponse(
-      msg, ({ result }) => [result.signedTransaction || result.transactionHash]
-    )
-  },
-  [METHODS.signMessage]: (instance, msg) => {
-    instance.rpcClient.processResponse(msg, ({ result }) => [result.signature])
-  }
-}
-
 const handleMessage = async (instance, msg) => {
   if (!msg.id) {
     return NOTIFICATIONS[msg.method](instance, msg)
-  } else if (instance.rpcClient.callbacks[msg.id] != null) {
-    return RESPONSES[msg.method](instance, msg)
   }
 }
 
@@ -190,7 +160,14 @@ export default AccountResolver.compose({
      */
     async subscribeAddress (type, value) {
       this._ensureConnected()
-      return this.rpcClient.request(METHODS.subscribeAddress, { type, value })
+      const result = await this.rpcClient.request(METHODS.subscribeAddress, { type, value })
+      if (result.address) {
+        this.rpcClient.accounts = result.address
+      }
+      if (result.subscription) {
+        this.rpcClient.addressSubscription = result.subscription
+      }
+      return result
     },
     /**
      * Send connection request to wallet
@@ -201,13 +178,15 @@ export default AccountResolver.compose({
      * @return {Promise} Connection response
      */
     async sendConnectRequest (connectNode) {
-      return this.rpcClient.request(
+      const walletInfo = this.rpcClient.request(
         METHODS.connect, {
           name: this.name,
           version: VERSION,
           connectNode
         }
       )
+      this.rpcClient.info.status = RPC_STATUS.CONNECTED
+      return walletInfo
     },
     _ensureConnected () {
       if (this.rpcClient?.isConnected()) return

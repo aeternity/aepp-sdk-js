@@ -51,7 +51,8 @@ export default stampit({
       if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
         throw new InvalidRpcMessageError(msg)
       }
-      onMessage(msg, origin)
+      if ((msg.result ?? msg.error) != null) this.processResponse(msg)
+      else onMessage(msg, origin)
     }
 
     const disconnect = (aepp, connection) => {
@@ -225,18 +226,12 @@ export default stampit({
      * @instance
      * @rtype (msg: Object, transformResult: Function) => void
      * @param {Object} msg Message object
-     * @param {Function=} transformResult Optional parser function for message
      * @return {void}
      */
-    processResponse ({ id, error, result }, transformResult) {
+    processResponse ({ id, error, result }) {
       if (!this.callbacks[id]) throw new MissingCallbackError(id)
-      if (result) {
-        this.callbacks[id].resolve(...typeof transformResult === 'function'
-          ? transformResult({ id, result })
-          : [result])
-      } else {
-        this.callbacks[id].reject(error)
-      }
+      if (result) this.callbacks[id].resolve(result)
+      else this.callbacks[id].reject(error)
       delete this.callbacks[id]
     }
   }
