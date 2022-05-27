@@ -98,6 +98,16 @@ BaseError
 │   │   AlreadyConnectedError
 │   │   NoWalletConnectedError
 │   │   RpcConnectionError
+│
+└̌───RpcError
+│   │   RpcInvalidTransactionError
+│   │   RpcBroadcastError
+│   │   RpcRejectedByUserError
+│   │   RpcUnsupportedProtocolError
+│   │   RpcConnectionDenyError
+│   │   RpcNotAuthorizeError
+│   │   RpcPermissionDenyError
+│   │   RpcInternalError
 ```
 
 ## Usage

@@ -8,12 +8,8 @@
  */
 import stampit from '@stamp/it'
 
-import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
-import {
-  InvalidRpcMessageError,
-  DuplicateCallbackError,
-  MissingCallbackError
-} from '../../errors'
+import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES, RpcError, RpcInternalError } from '../schema'
+import { InvalidRpcMessageError, DuplicateCallbackError, MissingCallbackError } from '../../errors'
 
 /**
  * Contain functionality for using RPC conection
@@ -57,9 +53,11 @@ export default stampit({
 
       // TODO: remove methods as far it is not required in JSON RPC
       const response = { id: msg.id, method: msg.method }
-      const { error, result } = await methods[msg.method](msg.params, origin)
-      if (error) response.error = error
-      else response.result = result
+      try {
+        response.result = await methods[msg.method](msg.params, origin)
+      } catch (error) {
+        response.error = error instanceof RpcError ? error : new RpcInternalError()
+      }
       if (response.id) this.sendMessage(response, true)
     }
 
@@ -239,7 +237,7 @@ export default stampit({
     processResponse ({ id, error, result }) {
       if (!this.callbacks[id]) throw new MissingCallbackError(id)
       if (result) this.callbacks[id].resolve(result)
-      else this.callbacks[id].reject(error)
+      else this.callbacks[id].reject(RpcError.deserialize(error))
       delete this.callbacks[id]
     }
   }

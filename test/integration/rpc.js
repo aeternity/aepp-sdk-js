@@ -240,7 +240,7 @@ describe('Aepp<->Wallet', function () {
         payload: 'zerospend'
       })
       await expect(aepp.signTransaction(tx, { onAccount: keypair.publicKey }))
-        .to.be.rejectedWith('Provided onAccount should be an AccountBase')
+        .to.be.rejectedWith('The peer failed to execute your request due to unknown error')
     })
 
     it('Sign transaction: wallet allow', async () => {
@@ -320,7 +320,7 @@ describe('Aepp<->Wallet', function () {
       }
       const onAccount = aepp.addresses()[1]
       await expect(aepp.signMessage('test', { onAccount })).to.be.eventually
-        .rejectedWith('Provided onAccount should be an AccountBase')
+        .rejectedWith('The peer failed to execute your request due to unknown error')
         .with.property('code', 12)
     })
 

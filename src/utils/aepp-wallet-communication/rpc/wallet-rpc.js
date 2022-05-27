@@ -11,7 +11,11 @@ import Ae from '../../../ae'
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
 import RpcClient from './rpc-client'
-import { ERRORS, METHODS, RPC_STATUS, VERSION } from '../schema'
+import {
+  METHODS, RPC_STATUS, VERSION,
+  RpcBroadcastError, RpcConnectionDenyError, RpcInvalidTransactionError,
+  RpcNotAuthorizeError, RpcPermissionDenyError, RpcRejectedByUserError, RpcUnsupportedProtocolError
+} from '../schema'
 import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
 import { isAccountBase } from '../../../account/base'
 import { filterObject, mapObject } from '../../other'
@@ -37,8 +41,7 @@ const METHOD_HANDLERS = {
     instance,
     client,
     { name, version, icons, connectNode }) {
-    // Check if protocol and network is compatible with wallet
-    if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
+    if (version !== VERSION) throw new RpcUnsupportedProtocolError()
     // Store new AEPP and wait for connection approve
     client.updateInfo({
       status: RPC_STATUS.WAITING_FOR_CONNECTION_APPROVE,
@@ -56,128 +59,93 @@ const METHOD_HANDLERS = {
       ({ shareNode } = {}) => {
         client.updateInfo({ status: shareNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
         return {
-          result: {
-            ...instance.getWalletInfo(),
-            ...(shareNode && { node: instance.selectedNode })
-          }
+          ...instance.getWalletInfo(),
+          ...(shareNode && { node: instance.selectedNode })
         }
       },
       (error) => {
         client.updateInfo({ status: RPC_STATUS.CONNECTION_REJECTED })
-        return { error: ERRORS.connectionDeny(error) }
+        throw new RpcConnectionDenyError(error)
       }
     )
   },
   [METHODS.subscribeAddress] (callInstance, instance, client, { type, value }) {
-    // Authorization check
-    if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    if (!client.isConnected()) throw new RpcNotAuthorizeError()
 
     return callInstance(
       'onSubscription',
       { type, value },
       async ({ accounts } = {}) => {
-        try {
-          const clientAccounts = accounts || instance.getAccounts()
-          const subscription = client.updateSubscription(type, value)
-          client.setAccounts(clientAccounts, { forceNotification: true })
-          return {
-            result: {
-              subscription,
-              address: clientAccounts
-            }
-          }
-        } catch (e) {
-          if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError(e.message) }
+        const clientAccounts = accounts || instance.getAccounts()
+        const subscription = client.updateSubscription(type, value)
+        client.setAccounts(clientAccounts, { forceNotification: true })
+        return {
+          subscription,
+          address: clientAccounts
         }
       },
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error) => { throw new RpcRejectedByUserError(error) }
     )
   },
   [METHODS.address] (callInstance, instance, client) {
-    // Authorization check
-    if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
-    if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
+    if (!client.isConnected() || !client.isSubscribed()) throw new RpcNotAuthorizeError()
 
     return callInstance(
       'onAskAccounts',
       {},
-      ({ accounts } = {}) => ({
-        result: accounts ||
-          [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)]
-      }),
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      ({ accounts } = {}) => accounts ||
+        [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)],
+      (error) => { throw new RpcRejectedByUserError(error) }
     )
   },
   [METHODS.sign] (callInstance, instance, client, message) {
     const { tx, onAccount, returnSigned = false } = message
     const address = onAccount || client.currentAccount
-    // Authorization check
-    if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
-    // Account permission check
-    if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny(address) }
-    }
+    if (!client.isConnected()) throw new RpcNotAuthorizeError()
+    if (!client.hasAccessToAccount(address)) throw new RpcPermissionDenyError(address)
 
     return callInstance(
       'onSign',
       { tx, returnSigned, onAccount: address, txObject: unpackTx(tx) },
       async (rawTx, opt = {}) => {
-        let onAcc
-        try {
-          onAcc = resolveOnAccount(instance.addresses(), address, opt)
-        } catch (e) {
-          if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError(e.message) }
-        }
+        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
         try {
           const t = rawTx || tx
-          const result = returnSigned
+          return returnSigned
             ? { signedTransaction: await instance.signTransaction(t, { onAccount: onAcc }) }
             : { transactionHash: await instance.send(t, { onAccount: onAcc, verify: false }) }
-          return { result }
         } catch (e) {
           if (!returnSigned) {
             // Validate transaction
             const validation = await verifyTransaction(rawTx || tx, instance.selectedNode.instance)
-            if (validation.length) return { error: ERRORS.invalidTransaction(validation) }
+            if (validation.length) throw new RpcInvalidTransactionError(validation)
             // Send broadcast failed error to aepp
-            return { error: ERRORS.broadcastFailed(e.message) }
+            throw new RpcBroadcastError(e.message)
           }
           throw e
         }
       },
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error) => { throw new RpcRejectedByUserError(error) }
     )
   },
   [METHODS.signMessage] (callInstance, instance, client, { message, onAccount }) {
-    // Authorization check
-    if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    if (!client.isConnected()) throw new RpcNotAuthorizeError()
     const address = onAccount || client.currentAccount
-    if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny(address) }
-    }
+    if (!client.hasAccessToAccount(address)) throw new RpcPermissionDenyError(address)
 
     return callInstance(
       'onMessageSign',
       { message, onAccount: address },
       async (opt = {}) => {
-        try {
-          const onAcc = resolveOnAccount(instance.addresses(), address, opt)
-          return {
-            result: {
-              signature: await instance.signMessage(message, {
-                onAccount: onAcc,
-                returnHex: true
-              })
-            }
-          }
-        } catch (e) {
-          if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError(e.message) }
+        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
+        return {
+          signature: await instance.signMessage(message, {
+            onAccount: onAcc,
+            returnHex: true
+          })
         }
       },
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error) => { throw new RpcRejectedByUserError(error) }
     )
   }
 }
