@@ -24,67 +24,55 @@ import {
 import Node from '../../../node'
 
 const NOTIFICATIONS = {
-  [METHODS.updateAddress]: (instance) =>
-    ({ params }) => {
-      instance.rpcClient.accounts = params
-      instance.onAddressChange(params)
-    },
-  [METHODS.updateNetwork]: (instance) =>
-    async ({ params }) => {
-      const { node } = params
-      if (node) instance.addNode(node.name, await Node(node), true)
-      instance.onNetworkChange(params)
-    },
-  [METHODS.closeConnection]: (instance) =>
-    (msg) => {
-      instance.disconnectWallet()
-      instance.onDisconnect(msg.params)
-    },
-  [METHODS.readyToConnect]: () => () => {}
+  [METHODS.updateAddress]: (instance, { params }) => {
+    instance.rpcClient.accounts = params
+    instance.onAddressChange(params)
+  },
+  [METHODS.updateNetwork]: async (instance, { params }) => {
+    const { node } = params
+    if (node) instance.addNode(node.name, await Node(node), true)
+    instance.onNetworkChange(params)
+  },
+  [METHODS.closeConnection]: (instance, msg) => {
+    instance.disconnectWallet()
+    instance.onDisconnect(msg.params)
+  },
+  [METHODS.readyToConnect]: () => {}
 }
 
 const RESPONSES = {
-  [METHODS.address]: (instance) =>
-    (msg) => instance.rpcClient.processResponse(msg),
-  [METHODS.connect]: (instance) =>
-    (msg) => {
-      if (msg.result) instance.rpcClient.info.status = RPC_STATUS.CONNECTED
-      instance.rpcClient.processResponse(msg)
-    },
-  [METHODS.subscribeAddress]: (instance) =>
-    (msg) => {
-      if (msg.result) {
-        if (msg.result.address) {
-          instance.rpcClient.accounts = msg.result.address
-        }
-        if (msg.result.subscription) {
-          instance.rpcClient.addressSubscription = msg.result.subscription
-        }
+  [METHODS.address]: (instance, msg) => instance.rpcClient.processResponse(msg),
+  [METHODS.connect]: (instance, msg) => {
+    if (msg.result) instance.rpcClient.info.status = RPC_STATUS.CONNECTED
+    instance.rpcClient.processResponse(msg)
+  },
+  [METHODS.subscribeAddress]: (instance, msg) => {
+    if (msg.result) {
+      if (msg.result.address) {
+        instance.rpcClient.accounts = msg.result.address
       }
-
-      instance.rpcClient.processResponse(msg, ({ result }) => [result])
-    },
-  [METHODS.sign]: (instance) =>
-    (msg) => {
-      instance.rpcClient.processResponse(
-        msg, ({ result }) => [result.signedTransaction || result.transactionHash]
-      )
-    },
-  [METHODS.signMessage]: (instance) =>
-    (msg) => {
-      instance.rpcClient.processResponse(msg, ({ result }) => [result.signature])
+      if (msg.result.subscription) {
+        instance.rpcClient.addressSubscription = msg.result.subscription
+      }
     }
+
+    instance.rpcClient.processResponse(msg, ({ result }) => [result])
+  },
+  [METHODS.sign]: (instance, msg) => {
+    instance.rpcClient.processResponse(
+      msg, ({ result }) => [result.signedTransaction || result.transactionHash]
+    )
+  },
+  [METHODS.signMessage]: (instance, msg) => {
+    instance.rpcClient.processResponse(msg, ({ result }) => [result.signature])
+  }
 }
 
-const REQUESTS = {}
-
-const handleMessage = (instance) => async (msg) => {
+const handleMessage = async (instance, msg) => {
   if (!msg.id) {
-    return NOTIFICATIONS[msg.method](instance)(msg)
-  } else if (Object.prototype.hasOwnProperty.call(instance.rpcClient.callbacks, msg.id)) {
-    return RESPONSES[msg.method](instance)(msg)
-  } else {
-    return REQUESTS[msg.method](instance)(msg)
+    return NOTIFICATIONS[msg.method](instance, msg)
+  } else if (instance.rpcClient.callbacks[msg.id] != null) {
+    return RESPONSES[msg.method](instance, msg)
   }
 }
 
@@ -155,7 +143,7 @@ export default AccountResolver.compose({
         ...walletInfo,
         connection,
         id: uuid(),
-        handlers: [handleMessage(this), this.onDisconnect]
+        handlers: [handleMessage.bind(null, this), this.onDisconnect]
       })
       const { node } = await this.sendConnectRequest(connectNode)
       if (connectNode) {

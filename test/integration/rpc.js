@@ -368,14 +368,12 @@ describe('Aepp<->Wallet', function () {
 
     it('Receive update for wallet select account', async () => {
       const connectedAccount = Object.keys(aepp.rpcClient.accounts.connected)[0]
-      const received = await new Promise((resolve) => {
-        aepp.onAddressChange = ({ connected, current }) => {
-          Object.hasOwnProperty.call(current, connectedAccount).should.be.equal(true)
-          resolve(Object.keys(connected)[0] !== connectedAccount)
-        }
+      const { connected, current } = await new Promise((resolve) => {
+        aepp.onAddressChange = resolve
         wallet.selectAccount(connectedAccount)
       })
-      received.should.be.equal(true)
+      expect(current[connectedAccount]).to.be.eql({})
+      expect(Object.keys(connected).includes(connectedAccount)).to.be.equal(false)
     })
 
     it('Aepp: receive notification for network update', async () => {

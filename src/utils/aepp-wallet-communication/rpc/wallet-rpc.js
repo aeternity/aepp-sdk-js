@@ -26,14 +26,11 @@ const resolveOnAccount = (addresses, onAccount, opt = {}) => {
 }
 
 const NOTIFICATIONS = {
-  [METHODS.closeConnection]: (instance, { client }) =>
-    async (msg) => {
-      client.disconnect(true)
-      instance.onDisconnect(msg.params, client)
-    }
+  [METHODS.closeConnection]: async (instance, client, params) => {
+    client.disconnect(true)
+    instance.onDisconnect(params, client)
+  }
 }
-
-const RESPONSES = {}
 
 const REQUESTS = {
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
@@ -115,8 +112,8 @@ const REQUESTS = {
       (error) => ({ error: ERRORS.rejectedByUser(error) })
     )
   },
-  [METHODS.sign] (callInstance, instance, client, options) {
-    const { tx, onAccount, returnSigned = false } = options
+  [METHODS.sign] (callInstance, instance, client, message) {
+    const { tx, onAccount, returnSigned = false } = message
     const address = onAccount || client.currentAccount
     // Authorization check
     if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
@@ -188,34 +185,27 @@ const REQUESTS = {
   }
 }
 
-const handleMessage = (instance, id) => async (msg, origin) => {
-  const client = instance.rpcClients[id]
-  if (!msg.id) {
-    return NOTIFICATIONS[msg.method](instance, { client })(msg, origin)
+const handleMessage = async (instance, client, { id, method, params }, origin) => {
+  if (!id) {
+    return NOTIFICATIONS[method](instance, client, params, origin)
   }
-  if (Object.prototype.hasOwnProperty.call(client.callbacks, msg.id)) {
-    return RESPONSES[msg.method](instance, { client })(msg, origin)
-  } else {
-    const { id, method } = msg
-    const callInstance = (methodName, params, accept, deny) => () => new Promise(resolve => {
-      instance[methodName](
-        client,
-        {
-          id,
-          method,
-          params,
-          accept: (...args) => resolve(accept(...args)),
-          deny: (...args) => resolve(deny(...args))
-        },
-        origin
-      )
-    })
-    // TODO make one structure for handler functions
-    const errorObjectOrHandler = REQUESTS[msg.method](callInstance, instance, client, msg.params)
-    const response = typeof errorObjectOrHandler === 'function' ? await errorObjectOrHandler() : errorObjectOrHandler
-    const { error, result } = response ?? {}
-    client.sendMessage({ id, method, ...error ? { error } : { result } }, true)
-  }
+
+  const callInstance = (methodName, params, accept, deny) => new Promise(resolve => {
+    instance[methodName](
+      client,
+      {
+        id,
+        method,
+        params,
+        accept: (...args) => resolve(accept(...args)),
+        deny: (...args) => resolve(deny(...args))
+      },
+      origin
+    )
+  })
+  const response = await REQUESTS[method](callInstance, instance, client, params)
+  const { error, result } = response ?? {}
+  client.sendMessage({ id, method, ...error ? { error } : { result } }, true)
 }
 
 /**
@@ -336,7 +326,10 @@ export default Ae.compose(AccountMultiple, {
         id,
         info: { status: RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST },
         connection: clientConnection,
-        handlers: [handleMessage(this, id), this.onDisconnect]
+        handlers: [
+          (message, origin) => handleMessage(this, this.rpcClients[id], message, origin),
+          this.onDisconnect
+        ]
       })
       return id
     },

@@ -212,7 +212,7 @@ export default stampit({
      */
     request (name, params) {
       const msgId = this.sendMessage({ method: name, params })
-      if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) {
+      if (this.callbacks[msgId] != null) {
         throw new DuplicateCallbackError()
       }
       return new Promise((resolve, reject) => {
