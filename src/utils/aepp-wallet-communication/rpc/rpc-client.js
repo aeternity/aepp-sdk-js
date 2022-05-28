@@ -58,7 +58,7 @@ export default stampit({
       } catch (error) {
         response.error = error instanceof RpcError ? error : new RpcInternalError()
       }
-      if (response.id) this.sendMessage(response, true)
+      if (response.id) this._sendMessage(response, true)
     }
 
     const disconnect = (aepp, connection) => {
@@ -96,7 +96,7 @@ export default stampit({
     }
   },
   methods: {
-    sendMessage ({ id, method, params, result, error }, isNotificationOrResponse = false) {
+    _sendMessage ({ id, method, params, result, error }, isNotificationOrResponse = false) {
       if (!isNotificationOrResponse) this._messageId += 1
       id = isNotificationOrResponse ? (id ?? null) : this._messageId
       const msgData = params
@@ -185,10 +185,7 @@ export default stampit({
      */
     setAccounts (accounts, { forceNotification } = {}) {
       this.accounts = accounts
-      if (!forceNotification) {
-        // Sent notification about account updates
-        this.sendMessage({ method: METHODS.updateAddress, params: this.accounts }, true)
-      }
+      if (!forceNotification) this.notify(METHODS.updateAddress, this.accounts)
     },
     /**
      * Update subscription
@@ -218,13 +215,21 @@ export default stampit({
      * @return {Promise} Promise which will be resolved after receiving response message
      */
     request (name, params) {
-      const msgId = this.sendMessage({ method: name, params })
+      const msgId = this._sendMessage({ method: name, params })
       if (this.callbacks[msgId] != null) {
         throw new DuplicateCallbackError()
       }
       return new Promise((resolve, reject) => {
         this.callbacks[msgId] = { resolve, reject }
       })
+    },
+    /**
+     * Make a notification
+     * @param {String} name Method name
+     * @param {Object} params Method params
+     */
+    notify (name, params) {
+      this._sendMessage({ method: name, params }, true)
     },
     /**
      * Process response message

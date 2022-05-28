@@ -69,10 +69,10 @@ import {
     // create connection
     const connection = new BrowserRuntimeConnection({ port })
     // add new aepp to wallet
-    aeSdk.addRpcClient(connection)
+    const clientId = aeSdk.addRpcClient(connection)
     // share wallet details
-    aeSdk.shareWalletInfo(port.postMessage.bind(port))
-    setInterval(() => aeSdk.shareWalletInfo(port.postMessage.bind(port)), 3000)
+    aeSdk.shareWalletInfo(clientId)
+    setInterval(() => aeSdk.shareWalletInfo(clientId), 3000)
   })
 
   console.log('Wallet initialized!')

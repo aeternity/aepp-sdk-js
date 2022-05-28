@@ -226,13 +226,10 @@ export default Ae.compose(AccountMultiple, {
       Object.values(this.rpcClients)
         .filter(client => client.isConnected())
         .forEach(client => {
-          client.sendMessage({
-            method: METHODS.updateNetwork,
-            params: {
-              networkId: this.getNetworkId(),
-              ...client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
-            }
-          }, true)
+          client.notify(METHODS.updateNetwork, {
+            networkId: this.getNetworkId(),
+            ...client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
+          })
         })
     }
   },
@@ -294,15 +291,11 @@ export default Ae.compose(AccountMultiple, {
      * @function shareWalletInfo
      * @instance
      * @rtype (postFn: Function) => void
-     * @param {Function} postFn Send message function like `(msg) => void`
+     * @param {Function} clientId ID of RPC client send message to
      * @return {void}
      */
-    shareWalletInfo (postFn) {
-      postFn({
-        jsonrpc: '2.0',
-        method: METHODS.readyToConnect,
-        params: this.getWalletInfo()
-      })
+    shareWalletInfo (clientId) {
+      this.rpcClients[clientId].notify(METHODS.readyToConnect, this.getWalletInfo())
     },
     /**
      * Get Wallet info object

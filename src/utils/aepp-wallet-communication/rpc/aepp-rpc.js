@@ -129,7 +129,7 @@ export default AccountResolver.compose({
     async disconnectWallet (sendDisconnect = true) {
       this._ensureConnected()
       if (sendDisconnect) {
-        this.rpcClient.sendMessage({ method: METHODS.closeConnection, params: { reason: 'bye' } }, true)
+        this.rpcClient.notify(METHODS.closeConnection, { reason: 'bye' })
       }
       this.rpcClient.disconnect()
       this.rpcClient = null

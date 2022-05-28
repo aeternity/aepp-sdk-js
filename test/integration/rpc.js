@@ -68,11 +68,7 @@ describe('Aepp<->Wallet', function () {
         onSign () {},
         onAskAccounts () {},
         onMessageSign () {},
-        onDisconnect () {
-          this.shareWalletInfo(
-            connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp)
-          )
-        }
+        onDisconnect () {}
       })
       aepp = await RpcAepp({
         name: 'AEPP',
@@ -101,10 +97,8 @@ describe('Aepp<->Wallet', function () {
         })
       })
 
-      wallet.addRpcClient(connectionFromWalletToAepp)
-      await wallet.shareWalletInfo(
-        connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp)
-      )
+      const clientId = wallet.addRpcClient(connectionFromWalletToAepp)
+      await wallet.shareWalletInfo(clientId)
       const is = await isReceived
       is.should.be.equal(true)
     })
@@ -404,23 +398,20 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Disconnect from wallet', async () => {
-      const received = await new Promise((resolve) => {
-        let received = false
-        wallet.onDisconnect = (msg, from) => {
-          msg.reason.should.be.equal('bye')
-          from.info.status.should.be.equal('DISCONNECTED')
-          if (received) resolve(true)
-          received = true
-        }
-        aepp.onDisconnect = () => {
-          if (received) resolve(true)
-          received = true
-        }
-        connectionFromWalletToAepp.sendMessage({
-          method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0'
-        })
+      const walletDisconnect = new Promise((resolve) => {
+        wallet.onDisconnect = (...args) => resolve(args)
       })
-      received.should.be.equal(true)
+      const aeppDisconnect = new Promise((resolve) => {
+        aepp.onDisconnect = (...args) => resolve(args)
+      })
+      connectionFromWalletToAepp.sendMessage({
+        method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0'
+      })
+      const [[walletMessage, rpcClient], [aeppMessage]] =
+        await Promise.all([walletDisconnect, aeppDisconnect])
+      walletMessage.reason.should.be.equal('bye')
+      rpcClient.info.status.should.be.equal('DISCONNECTED')
+      aeppMessage.reason.should.be.equal('bye')
     })
 
     it('Remove rpc client', async () => {
@@ -486,11 +477,7 @@ describe('Aepp<->Wallet', function () {
         onSign () {},
         onAskAccounts () {},
         onMessageSign () {},
-        onDisconnect () {
-          this.shareWalletInfo(
-            connectionFromWalletToAepp.sendMessage.bind(connectionFromWalletToAepp)
-          )
-        }
+        onDisconnect () {}
       })
       aepp = await RpcAepp({
         name: 'AEPP',
