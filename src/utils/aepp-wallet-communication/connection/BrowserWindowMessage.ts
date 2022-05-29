@@ -35,9 +35,9 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
   sendDirection?: MESSAGE_DIRECTION
   receiveDirection: MESSAGE_DIRECTION
   listener?: (this: Window, ev: MessageEvent<any>) => void
-  _onDisconnect?: () => void
-  _target?: Window
-  _self: Window
+  #onDisconnect?: () => void
+  #target?: Window
+  #self: Window
 
   constructor ({
     target,
@@ -55,8 +55,8 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
     debug?: boolean
   } = {}) {
     super(options)
-    this._target = target
-    this._self = self
+    this.#target = target
+    this.#self = self
     this.origin = origin
     this.sendDirection = sendDirection
     this.receiveDirection = receiveDirection
@@ -74,7 +74,7 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
     this.listener = (message: MessageEvent<any>) => {
       if (typeof message.data !== 'object') return
       if (this.origin != null && this.origin !== message.origin) return
-      if (this._target != null && this._target !== message.source) return
+      if (this.#target != null && this.#target !== message.source) return
       this.receiveMessage(message)
       let { data } = message
       if (data.type != null) {
@@ -83,25 +83,25 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
       }
       onMessage(data, message.origin, message.source)
     }
-    this._self.addEventListener('message', this.listener)
-    this._onDisconnect = onDisconnect
+    this.#self.addEventListener('message', this.listener)
+    this.#onDisconnect = onDisconnect
   }
 
   disconnect (): void {
     super.disconnect()
-    if (this.listener == null || this._onDisconnect == null) {
+    if (this.listener == null || this.#onDisconnect == null) {
       throw new InternalError('Expected to not happen, required for TS')
     }
-    this._self.removeEventListener('message', this.listener)
+    this.#self.removeEventListener('message', this.listener)
     delete this.listener
-    this._onDisconnect()
-    delete this._onDisconnect
+    this.#onDisconnect()
+    this.#onDisconnect = undefined
   }
 
   sendMessage (msg: MessageEvent): void {
-    if (this._target == null) throw new RpcConnectionError('Can\'t send messages without target')
+    if (this.#target == null) throw new RpcConnectionError('Can\'t send messages without target')
     const message = this.sendDirection != null ? { type: this.sendDirection, data: msg } : msg
     super.sendMessage(message)
-    this._target.postMessage(message, this.origin ?? '*')
+    this.#target.postMessage(message, this.origin ?? '*')
   }
 }
