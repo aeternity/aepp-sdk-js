@@ -236,7 +236,7 @@ export class InvalidRpcMessageError extends AeppError {
 }
 
 export class MissingCallbackError extends AeppError {
-  constructor (id: string) {
+  constructor (id: number) {
     super(`Can't find callback for this messageId ${id}`)
     this.name = 'MissingCallbackError'
   }

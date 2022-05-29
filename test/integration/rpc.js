@@ -372,20 +372,10 @@ describe('Aepp<->Wallet', function () {
       received.should.be.equal(true)
     })
 
-    it('Resolve/Reject callback for undefined message', async () => {
-      expect(() => aepp.rpcClient._processResponse({ id: 0 }))
-        .to.throw('Can\'t find callback for this messageId 0')
-    })
-
     it('Try to connect unsupported protocol', async () => {
       await expect(aepp.rpcClient.request(
         METHODS.connect, { name: 'test-aepp', version: 2 }
       )).to.be.eventually.rejectedWith('Unsupported Protocol Version').with.property('code', 5)
-    })
-
-    it('Process response ', () => {
-      expect(() => aepp.rpcClient._processResponse({ id: 11, error: {} }))
-        .to.throw('Can\'t find callback for this messageId ' + 11)
     })
 
     it('Disconnect from wallet', async () => {

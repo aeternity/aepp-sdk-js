@@ -145,3 +145,12 @@ export class RpcInternalError extends RpcError {
     this.name = 'RpcInternalError'
   }
 }
+
+export class RpcMethodNotFoundError extends RpcError {
+  static code = -32601
+  code = -32601
+  constructor () {
+    super('Method not found')
+    this.name = 'RpcMethodNotFoundError'
+  }
+}
