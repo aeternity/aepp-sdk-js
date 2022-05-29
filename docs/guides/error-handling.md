@@ -31,7 +31,6 @@ BaseError
 │   │   InvalidAensNameError
 │
 └───AeppError
-│   │   DuplicateCallbackError
 │   │   InvalidRpcMessageError
 │   │   MissingCallbackError
 │   │   UnAuthorizedAccountError

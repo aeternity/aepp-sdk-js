@@ -9,7 +9,7 @@
 import stampit from '@stamp/it'
 
 import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES, RpcError, RpcInternalError } from '../schema'
-import { InvalidRpcMessageError, DuplicateCallbackError, MissingCallbackError } from '../../errors'
+import { InvalidRpcMessageError, MissingCallbackError } from '../../errors'
 
 /**
  * Contain functionality for using RPC conection
@@ -216,9 +216,6 @@ export default stampit({
      */
     request (name, params) {
       const msgId = this._sendMessage({ method: name, params })
-      if (this.callbacks[msgId] != null) {
-        throw new DuplicateCallbackError()
-      }
       return new Promise((resolve, reject) => {
         this.callbacks[msgId] = { resolve, reject }
       })

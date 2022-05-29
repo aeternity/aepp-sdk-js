@@ -228,13 +228,6 @@ export class InvalidAensNameError extends AensError {
 }
 
 /* Aepp Errors */
-export class DuplicateCallbackError extends AeppError {
-  constructor () {
-    super('Callback Already exist')
-    this.name = 'DuplicateCallbackError'
-  }
-}
-
 export class InvalidRpcMessageError extends AeppError {
   constructor (message: string) {
     super(`Received invalid message: ${message}`)
