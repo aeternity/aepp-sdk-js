@@ -51,14 +51,15 @@ export default {
     walletConnected: false,
     connectPromise: null,
     reverseIframe: null,
-    reverseIframeWalletUrl: 'http://localhost:9000'
+    reverseIframeWalletUrl: 'http://localhost:9000',
+    walletInfo: null
   }),
   computed: {
     ...mapGetters('aeSdk', ['aeSdk']),
     walletName () {
       if (!this.aeSdk) return 'SDK is not ready'
       if (!this.walletConnected) return 'Wallet is not connected'
-      return this.aeSdk.rpcClient.info.name
+      return this.walletInfo.name
     }
   },
   methods: {
@@ -69,7 +70,7 @@ export default {
           console.log('newWallet', newWallet)
           stopScan()
 
-          await this.aeSdk.connectToWallet(newWallet.info, newWallet.getConnection())
+          this.walletInfo = await this.aeSdk.connectToWallet(newWallet.getConnection())
           this.walletConnected = true
           const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected')
           this.$store.commit('aeSdk/setAddress', Object.keys(current)[0])

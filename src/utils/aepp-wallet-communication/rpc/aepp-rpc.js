@@ -7,12 +7,11 @@
  * import AeppRpc
  * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
-import { v4 as uuid } from '@aeternity/uuid'
 import AccountResolver from '../../../account/resolver'
 import AccountRpc from '../../../account/rpc'
 import { decode } from '../../encoder'
 import { mapObject } from '../../other'
-import RpcClient from './rpc-client'
+import RpcClient from './RpcClient'
 import { METHODS, RPC_STATUS, VERSION } from '../schema'
 import {
   AlreadyConnectedError,
@@ -26,7 +25,7 @@ import Node from '../../../node'
 
 const METHOD_HANDLERS = {
   [METHODS.updateAddress]: (instance, params) => {
-    instance.rpcClient.accounts = params
+    instance._accounts = params
     instance.onAddressChange(params)
   },
   [METHODS.updateNetwork]: async (instance, params) => {
@@ -35,8 +34,8 @@ const METHOD_HANDLERS = {
     instance.onNetworkChange(params)
   },
   [METHODS.closeConnection]: (instance, params) => {
-    instance.disconnectWallet()
-    instance.onDisconnect(params)
+    instance._disconnectParams = params
+    instance.rpcClient.connection.disconnect()
   },
   [METHODS.readyToConnect]: () => {}
 }
@@ -57,7 +56,6 @@ const METHOD_HANDLERS = {
 export default AccountResolver.compose({
   init ({
     name,
-    debug = false,
     ...other
   }) {
     ['onAddressChange', 'onDisconnect', 'onNetworkChange'].forEach(event => {
@@ -67,15 +65,13 @@ export default AccountResolver.compose({
     })
 
     this.name = name
-    this.debug = debug
+    this._status = RPC_STATUS.DISCONNECTED
 
     const resolveAccountBase = this._resolveAccount
-    this._resolveAccount = (account = this.rpcClient?.currentAccount) => {
+    this._resolveAccount = (account = this.addresses()[0]) => {
       if (typeof account === 'string') {
         decode(account, 'ak')
-        if (!this.rpcClient?.hasAccessToAccount(account)) {
-          throw new UnAuthorizedAccountError(account)
-        }
+        if (!this.addresses().includes(account)) throw new UnAuthorizedAccountError(account)
         account = AccountRpc({
           rpcClient: this.rpcClient, address: account, networkId: this.getNetworkId()
         })
@@ -86,8 +82,9 @@ export default AccountResolver.compose({
   },
   methods: {
     addresses () {
-      this._ensureAccountAccess()
-      return [this.rpcClient.currentAccount, ...Object.keys(this.rpcClient.accounts.connected)]
+      if (this._accounts == null) return []
+      const current = Object.keys(this._accounts.current)[0]
+      return [...current ? [current] : [], ...Object.keys(this._accounts.connected)]
     },
     /**
      * Connect to wallet
@@ -102,37 +99,40 @@ export default AccountResolver.compose({
      * @param {Boolean} [options.select=false] - Select this node as current
      * @return {Object}
      */
-    async connectToWallet (walletInfo, connection, { connectNode = false, name = 'wallet-node', select = false } = {}) {
-      if (this.rpcClient?.isConnected()) throw new AlreadyConnectedError('You are already connected to wallet ' + this.rpcClient)
+    async connectToWallet (connection, { connectNode = false, name = 'wallet-node', select = false } = {}) {
+      if (this._status === RPC_STATUS.CONNECTED) throw new AlreadyConnectedError('You are already connected to wallet')
       this.rpcClient = RpcClient({
-        ...walletInfo,
         connection,
-        id: uuid(),
-        onDisconnect: this.onDisconnect,
+        onDisconnect: () => {
+          this._status = RPC_STATUS.DISCONNECTED
+          delete this.rpcClient
+          delete this._accounts
+          this.onDisconnect(this._disconnectParams)
+          delete this._disconnectParams
+        },
         methods: mapObject(METHOD_HANDLERS, ([key, value]) => [key, value.bind(null, this)])
       })
-      const { node } = await this.sendConnectRequest(connectNode)
+      const { node, ...walletInfo } = await this.rpcClient.request(
+        METHODS.connect, { name: this.name, version: VERSION, connectNode }
+      )
       if (connectNode) {
         if (node == null) throw new RpcConnectionError('Missing URLs of the Node')
         this.addNode(name, await Node(node), select)
       }
+      this._status = RPC_STATUS.CONNECTED
       return walletInfo
     },
     /**
      * Disconnect from wallet
      * @function disconnectWallet
      * @instance
-     * @rtype (force: Boolean = false) => void
-     * @param {Boolean} sendDisconnect=false Force sending close connection message
+     * @rtype () => void
      * @return {void}
      */
-    async disconnectWallet (sendDisconnect = true) {
+    disconnectWallet () {
       this._ensureConnected()
-      if (sendDisconnect) {
-        this.rpcClient.notify(METHODS.closeConnection, { reason: 'bye' })
-      }
-      this.rpcClient.disconnect()
-      this.rpcClient = null
+      this.rpcClient.notify(METHODS.closeConnection, { reason: 'bye' })
+      this.rpcClient.connection.disconnect()
     },
     /**
      * Ask address from wallet
@@ -157,40 +157,16 @@ export default AccountResolver.compose({
     async subscribeAddress (type, value) {
       this._ensureConnected()
       const result = await this.rpcClient.request(METHODS.subscribeAddress, { type, value })
-      if (result.address) {
-        this.rpcClient.accounts = result.address
-      }
-      if (result.subscription) {
-        this.rpcClient.addressSubscription = result.subscription
-      }
+      this._accounts = result.address
       return result
     },
-    /**
-     * Send connection request to wallet
-     * @function sendConnectRequest
-     * @instance
-     * @param {Boolean} connectNode - Request wallet to bind node
-     * @rtype () => Promise
-     * @return {Promise} Connection response
-     */
-    async sendConnectRequest (connectNode) {
-      const walletInfo = this.rpcClient.request(
-        METHODS.connect, {
-          name: this.name,
-          version: VERSION,
-          connectNode
-        }
-      )
-      this.rpcClient.info.status = RPC_STATUS.CONNECTED
-      return walletInfo
-    },
     _ensureConnected () {
-      if (this.rpcClient?.isConnected()) return
+      if (this._status === RPC_STATUS.CONNECTED) return
       throw new NoWalletConnectedError('You are not connected to Wallet')
     },
     _ensureAccountAccess () {
       this._ensureConnected()
-      if (this.rpcClient?.currentAccount) return
+      if (this.addresses().length) return
       throw new UnsubscribedAccountError()
     }
   }

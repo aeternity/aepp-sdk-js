@@ -35,6 +35,7 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
   sendDirection?: MESSAGE_DIRECTION
   receiveDirection: MESSAGE_DIRECTION
   listener?: (this: Window, ev: MessageEvent<any>) => void
+  _onDisconnect?: () => void
   _target?: Window
   _self: Window
 
@@ -83,13 +84,18 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
       onMessage(data, message.origin, message.source)
     }
     this._self.addEventListener('message', this.listener)
+    this._onDisconnect = onDisconnect
   }
 
   disconnect (): void {
     super.disconnect()
-    if (this.listener == null) throw new InternalError('Expected to not happen, required for TS')
+    if (this.listener == null || this._onDisconnect == null) {
+      throw new InternalError('Expected to not happen, required for TS')
+    }
     this._self.removeEventListener('message', this.listener)
     delete this.listener
+    this._onDisconnect()
+    delete this._onDisconnect
   }
 
   sendMessage (msg: MessageEvent): void {
