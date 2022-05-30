@@ -41,13 +41,13 @@ interface ErrorFormatterError {
   context?: string
 }
 
-export abstract class _ContractCompilerHttp {
+export class _ContractCompilerHttp {
   compilerApi: CompilerApi
   compilerVersion: string
 
   // TODO: replace with constructor after dropping account stamps
   init ({ compilerUrl, ignoreVersion }: {
-    compilerUrl: string
+    compilerUrl?: string
     ignoreVersion?: boolean }): void {
     if (compilerUrl == null) return
     this.setCompilerUrl(compilerUrl, { ignoreVersion })

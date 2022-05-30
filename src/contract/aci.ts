@@ -25,11 +25,10 @@
 // @ts-expect-error TODO remove
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 // @ts-expect-error TODO remove
-import { DRY_RUN_ACCOUNT, GAS_MAX, TX_TYPE } from '../tx/builder/schema'
-// @ts-expect-error TODO remove
-import { decode } from '../tx/builder/helpers'
+import { DRY_RUN_ACCOUNT, GAS_MAX, TX_TYPE, AMOUNT } from '../tx/builder/schema'
 // @ts-expect-error TODO remove
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder'
+import { decode, EncodedData, EncodingType } from '../utils/encoder'
 import {
   MissingContractDefError,
   MissingContractAddressError,
@@ -44,9 +43,15 @@ import {
   IllegalArgumentError,
   NoSuchContractFunctionError,
   MissingEventDefinitionError,
-  AmbiguousEventDefinitionError
+  AmbiguousEventDefinitionError,
+  InternalError
 } from '../utils/errors'
 import { hash } from '../utils/crypto'
+import { Aci as CompiledAci } from '../apis/compiler'
+import { Account } from '../account/resolver'
+import { _ContractCompilerHttp } from './compiler'
+import { getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun } from '../chain'
+import NodeApi from '../nodeApi'
 
 interface FunctionACI {
   arguments: any[]
@@ -56,17 +61,18 @@ interface FunctionACI {
   stateful: boolean
 }
 
-interface Aci {
-  encodedAci: {contract: {
-    name: string
-    event: any
-    kind: string
-    state: any
-    type_defs: any[]
-    functions: FunctionACI[]
-  }}
+interface Aci extends CompiledAci {
+  encodedAci: {
+    contract: {
+      name: string
+      event: any
+      kind: string
+      state: any
+      type_defs: any[]
+      functions: FunctionACI[]
+    }
+  }
   externalEncodedAci: any[]
-  interface: string
 }
 
 interface Event {
@@ -98,11 +104,11 @@ interface TxData {
   gasUsed: number
   height: number
   log: any[]
-  returnType: string
-  returnValue: string
+  returnType: ReturnType
+  returnValue: EncodedData<EncodingType>
 }
 
-interface ContractInstance {
+export interface ContractInstance {
   _aci: Aci
   _name: string
   calldata: any
@@ -129,12 +135,19 @@ interface ContractInstance {
   options: any
   compilerVersion: string
   compile: (options?: {}) => Promise<string>
-  _estimateGas: (name: string, params: any[], options: any) => Promise<number>
+  _estimateGas: (name: string, params: any[], options: object) => Promise<number>
   deploy: (params: any[], options: object) => Promise<any>
   call: (fn: string, params?: any[], options?: {}) => Promise<any>
   decodeEvents: (events: Event[], { omitUnknown, ...opt }: {
-    omitUnknown?: boolean}) => Array<DecodedEvent | null>
+    omitUnknown?: boolean}) => DecodedEvent[]
   methods: any
+}
+
+type ReturnType = 'ok' | 'error' | 'revert'
+
+// Duplicate in Chain.ts
+interface Node {
+  api: InstanceType<typeof NodeApi>
 }
 
 /**
@@ -155,6 +168,9 @@ interface ContractInstance {
 * stateful or not
 */
 export default async function getContractInstance ({
+  onAccount,
+  onCompiler,
+  onNode,
   source,
   bytecode,
   aci: _aci,
@@ -163,26 +179,34 @@ export default async function getContractInstance ({
   validateBytecode,
   ...otherOptions
 }: {
+  onAccount?: Account
+  onCompiler?: _ContractCompilerHttp & {
+    api: any
+  }
+  onNode?: Node
   source?: string
   bytecode?: string
   aci?: Aci
-  contractAddress?: string
-  fileSystem?: object
+  contractAddress?: EncodedData<'ak' | 'ct' | 'nm'>
+  fileSystem?: Record<string, unknown>
   validateBytecode?: boolean
 } = {}): Promise<ContractInstance> {
+  if (onCompiler == null || onNode == null || onAccount == null) throw new InternalError('Expected to not happen, required for TS')
+
   if (_aci == null && source != null) {
-    _aci = await this.compilerApi.generateACI({ code: source, options: { fileSystem } })
+    // @ts-expect-error TODO should be fixed when the compiledAci interface gets updated
+    _aci = await onCompiler.compilerApi.generateACI({ code: source, options: { fileSystem } })
   }
   if (_aci == null) throw new MissingContractDefError()
 
-  if (contractAddress != null) contractAddress = await this.resolveName(contractAddress, 'contract_pubkey', { resolveByNode: true })
+  if (contractAddress != null) contractAddress = await resolveName(contractAddress as EncodedData<'ak'>, 'contract_pubkey', { resolveByNode: true, onNode })
 
   if (contractAddress == null && source == null && bytecode == null) {
     throw new MissingContractAddressError('Can\'t create instance by ACI without address')
   }
 
   if (contractAddress != null) {
-    const contract = await this.getContract(contractAddress)
+    const contract = await getContract(contractAddress as unknown as EncodedData<'ct'>, { onNode })
     if (contract.active == null) throw new InactiveContractError(contractAddress)
   }
 
@@ -194,14 +218,15 @@ export default async function getContractInstance ({
     bytecode,
     deployInfo: { address: contractAddress },
     options: {
-      ...this.Ae.defaults,
+      ...onAccount.Ae.defaults,
+      amount: AMOUNT,
       callStatic: false,
       fileSystem,
       ...otherOptions
     },
-    compilerVersion: this.compilerVersion,
+    compilerVersion: onCompiler.compilerVersion,
     compile: async function (_options?: {}): Promise<any> {},
-    _estimateGas: async function (_name: string, _params: any[], _options: any): Promise<any> {},
+    _estimateGas: async function (_name: string, _params: any[], _options: object): Promise<any> {},
     deploy: async function (_params: any[], _options: any): Promise<any> {},
     call: async function (_fn: string, _params?: any[], _options?: {}): Promise<any> {},
     decodeEvents: function (_events: Event[], { omitUnknown, ...opt }: {
@@ -211,9 +236,9 @@ export default async function getContractInstance ({
 
   if (validateBytecode != null) {
     if (contractAddress == null) throw new MissingContractAddressError('Can\'t validate bytecode without contract address')
-    const onChanBytecode = (await this.getContractByteCode(contractAddress)).bytecode
+    const onChanBytecode = (await getContractByteCode(contractAddress as unknown as EncodedData<'ct'>, { onNode })).bytecode
     const isValid: boolean = source != null
-      ? await this.compilerApi.validateByteCode(
+      ? await onCompiler.compilerApi.validateByteCode(
         { bytecode: onChanBytecode, source, options: instance.options }
       ).then(() => true, () => false)
       : bytecode === onChanBytecode
@@ -228,11 +253,11 @@ export default async function getContractInstance ({
   instance.compile = async (options = {}): Promise<string> => {
     if (instance.bytecode != null) throw new IllegalArgumentError('Contract already compiled')
     if (instance.source == null) throw new IllegalArgumentError('Can\'t compile without source code')
-    const { bytecode } = await this.compilerApi.compileContract({
+    const { bytecode }: { bytecode: string } = await onCompiler.compilerApi.compileContract({
       code: instance.source, options: { ...instance.options, ...options }
     })
     instance.bytecode = bytecode
-    return instance.bytecode ?? ''
+    return instance.bytecode
   }
 
   const sendAndProcess = async (tx: string, options: any): Promise<{
@@ -242,21 +267,19 @@ export default async function getContractInstance ({
     txData: TxData
     rawTx: string
   }> => {
-    const txData = await this.send(tx, options)
+    const txData = await onAccount.send(tx, options) // TODO onAccount shouldn't have .send method
     const result = {
       hash: txData.hash, tx: unpackTx(txData.rawTx), txData, rawTx: txData.rawTx
     }
     if (txData.blockHeight == null) return result
-    const { callInfo } = await this.api.getTransactionInfoByHash(txData.hash)
+    const { callInfo } = await onCompiler.api.getTransactionInfoByHash(txData.hash)
     Object.assign(result.txData, callInfo) // TODO: don't duplicate data in result
     handleCallError(callInfo, tx)
-    const res = { ...result, result: callInfo }
-    return res
+    return { ...result, result: callInfo }
   }
-
   const handleCallError = ({ returnType, returnValue }: {
-    returnType: 'ok' | 'error' | 'revert'
-    returnValue: string }, transaction: string): void => {
+    returnType: ReturnType
+    returnValue: EncodedData<EncodingType> }, transaction: string): void => {
     let message: string
     switch (returnType) {
       case 'ok': return
@@ -291,8 +314,9 @@ export default async function getContractInstance ({
     if (opt.callStatic === true) return await instance.call('init', params, opt)
     if (instance.deployInfo.address != null) throw new DuplicateContractError()
 
-    const ownerId: string = await this.address(opt)
-    const tx = await this.buildTx(TX_TYPE.contractCreate, {
+    const ownerId: string = await onAccount.address(opt)
+    // TODO onAccount shouldn't have .buildTx method
+    const tx = await onAccount.buildTx(TX_TYPE.contractCreate, {
       ...opt,
       gasLimit: opt.gasLimit ?? await instance._estimateGas('init', params, opt),
       callData: instance.calldata.encode(instance._name, 'init', params),
@@ -345,34 +369,39 @@ export default async function getContractInstance ({
     if (contractId == null && fn !== 'init') throw new InvalidMethodInvocationError('You need to deploy contract before calling!')
     if (fn !== 'init' && opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(opt.amount, fn)
 
-    const callerId = await this.address(opt).catch((error: any) => {
+    const callerId = await onAccount.address(opt).catch((error: any) => {
       if (opt.callStatic === true) return DRY_RUN_ACCOUNT.pub
       else throw error
     })
     const callData = instance.calldata.encode(instance._name, fn, params)
 
-    let res
+    let res: any
     if (opt.callStatic === true) {
       if (typeof opt.top === 'number') {
-        opt.top = (await this.getKeyBlock(opt.top)).hash
+        opt.top = (await getKeyBlock(opt.top, { onNode })).hash
       }
       const txOpt = {
         ...opt,
         gasLimit: opt.gasLimit ?? GAS_MAX,
         callData,
         nonce: opt.nonce ??
-          (opt.top != null &&
-            parseInt((await this.getAccount(callerId, { hash: opt.top })).nonce) + 1)
+          (opt.top != null && (await getAccount(callerId, { hash: opt.top, onNode })).nonce + 1)
       }
-      const tx = await this.buildTx(...fn === 'init'
+      // TODO onAccount shouldn't have .buildTx method
+      const tx = await onAccount.buildTx(...fn === 'init'
         ? [TX_TYPE.contractCreate, { ...txOpt, code: instance.bytecode, ownerId: callerId }]
         : [TX_TYPE.contractCall, { ...txOpt, callerId, contractId }])
 
-      const { callObj, ...dryRunOther } = await this.txDryRun(tx, callerId, opt)
-      await handleCallError(callObj, tx)
+      const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, { onNode, ...opt })
+      if (callObj == null) throw new InternalError('Expected to not happen,callObj required for TS')
+      handleCallError({
+        returnType: callObj.returnType as ReturnType,
+        returnValue: callObj.returnValue as EncodedData<EncodingType>
+      }, tx)
       res = { ...dryRunOther, tx: unpackTx(tx), result: callObj }
     } else {
-      const tx = await this.buildTx(TX_TYPE.contractCall, {
+    // TODO onAccount shouldn't have .buildTx method
+      const tx = await onAccount.buildTx(TX_TYPE.contractCall, {
         ...opt,
         gasLimit: opt.gasLimit ?? await instance._estimateGas(fn, params, opt),
         callerId,
@@ -431,7 +460,7 @@ export default async function getContractInstance ({
   instance.decodeEvents = (
     events: Event[],
     { omitUnknown, ...opt }: {omitUnknown?: boolean} = {}
-  ): Array<DecodedEvent | null> => events
+  ): DecodedEvent[] => events
     .map(event => {
       const topics = event.topics.map((t: string | number) => BigInt(t))
       let contractName
@@ -451,8 +480,7 @@ export default async function getContractInstance ({
           address: event.address
         }
       }
-    })
-    .filter(e => e)
+    }).filter((e: DecodedEvent | null): e is DecodedEvent => e != null)
 
   /**
   * Generate proto function based on contract function using Contract ACI schema

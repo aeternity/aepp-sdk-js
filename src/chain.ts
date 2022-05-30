@@ -439,7 +439,7 @@ export async function resolveName (
   nameOrId: AensName | EncodedData<'ak'>,
   key: string,
   { verify = true, resolveByNode, onNode }:
-  { verify: boolean, resolveByNode: boolean, onNode: Node }
+  { verify?: boolean, resolveByNode: boolean, onNode: Node }
 ): Promise<EncodedData<'ak' | 'nm'>> {
   try {
     decode(nameOrId)

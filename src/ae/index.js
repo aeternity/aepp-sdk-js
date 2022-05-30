@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -25,6 +25,8 @@
 import stampit from '@stamp/it'
 import Tx from '../tx'
 import * as chainMethods from '../chain'
+import * as contractMethods from './contract'
+import * as generalAccountMethods from '../contract/ga/index'
 import NodePool from '../node-pool'
 import AccountResolver from '../account/resolver'
 import { buildTxHash, unpackTx } from '../tx/builder'
@@ -194,6 +196,35 @@ const Ae = stampit(NodePool, Tx, AccountResolver, {
               ...lastArg.onAccount && { onAccount: this._resolveAccount(lastArg.onAccount) }
             })
           } else args.push(instanceOptions)
+          return handler(...args)
+        }
+      ]
+    ),
+    ...mapObject(
+      Object.assign({}, contractMethods, generalAccountMethods),
+      ([name, handler]) => [
+        name,
+        function (...args) {
+          const instanceOptions = {
+            ...this.Ae.defaults,
+            onNode: this.selectedNode.instance,
+            onAccount: this,
+            onCompiler: {
+              compilerApi: this.compilerApi,
+              api: this.api,
+              compilerVersion: this.compilerVersion
+            }
+          }
+          const firstArg = args[0]
+          if (
+            firstArg && typeof firstArg === 'object' && firstArg.constructor === Object
+          ) {
+            Object.assign(firstArg, {
+              ...instanceOptions,
+              ...firstArg,
+              ...firstArg.onAccount && { onAccount: this._resolveAccount(firstArg.onAccount) }
+            })
+          } else args.unshift(instanceOptions)
           return handler(...args)
         }
       ]

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -24,8 +24,7 @@
 
 import Ae from './'
 import Tx from '../tx/tx'
-import Contract from './contract'
-import GeneralizedAccount from '../contract/ga'
+import ContractCompilerHttp from '../contract/compiler'
 import WalletRpc from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
 import Oracle from './oracle'
 import Aens from './aens'
@@ -46,4 +45,4 @@ import Aens from './aens'
   address: keypair.publicKey,
 })
  */
-export default Ae.compose(Tx, Contract, Oracle, Aens, GeneralizedAccount, WalletRpc)
+export default Ae.compose(Tx, Oracle, Aens, WalletRpc, ContractCompilerHttp)

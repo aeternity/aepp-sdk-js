@@ -25,7 +25,7 @@ import NodePool from '../../src/node-pool'
 import { NodeNotFoundError } from '../../src/utils/errors'
 
 describe('Node client', function () {
-  let node: Node
+  let node: InstanceType<typeof Node>
 
   before(async function () {
     node = await Node({ url, ignoreVersion })
