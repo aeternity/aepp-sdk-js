@@ -888,7 +888,6 @@
 │   │   InvalidAensNameError
 │
 └───AeppError
-│   │   DuplicateCallbackError
 │   │   InvalidRpcMessageError
 │   │   MissingCallbackError
 │   │   UnAuthorizedAccountError
@@ -955,6 +954,16 @@
 │   │   AlreadyConnectedError
 │   │   NoWalletConnectedError
 │   │   RpcConnectionError
+│
+└̌───RpcError
+│   │   RpcInvalidTransactionError
+│   │   RpcBroadcastError
+│   │   RpcRejectedByUserError
+│   │   RpcUnsupportedProtocolError
+│   │   RpcConnectionDenyError
+│   │   RpcNotAuthorizeError
+│   │   RpcPermissionDenyError
+│   │   RpcInternalError
 </code></pre></div>
 <h2 id="usage">Usage</h2>
 <div class="highlight"><pre><span></span><code><span class="c1">// import required error classes</span><span class="w"></span>
