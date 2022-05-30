@@ -17,7 +17,16 @@
 
 import { before, describe, it, after } from 'mocha'
 import { expect } from 'chai'
-import { MemoryAccount, Node, RpcAepp, RpcWallet, TX_TYPE, WALLET_TYPE } from '../../src'
+import {
+  MemoryAccount,
+  Node,
+  RpcAepp,
+  RpcConnectionDenyError,
+  RpcRejectedByUserError,
+  RpcWallet,
+  TX_TYPE,
+  WALLET_TYPE
+} from '../../src'
 import { concatBuffers } from '../../src/utils/other'
 import { unpackTx } from '../../src/tx/builder'
 import { decode } from '../../src/tx/builder/helpers'
@@ -35,6 +44,7 @@ describe('Aepp<->Wallet', function () {
   let connections
   let connectionFromWalletToAepp
   let connectionFromAeppToWallet
+  const handlerReject = () => { throw new Error('test reject') }
 
   before(async function () {
     node = await Node({ url, ignoreVersion })
@@ -63,11 +73,11 @@ describe('Aepp<->Wallet', function () {
         id: 'test',
         type: WALLET_TYPE.window,
         name: 'Wallet',
-        onConnection () {},
-        onSubscription () {},
-        onSign () {},
-        onAskAccounts () {},
-        onMessageSign () {},
+        onConnection: handlerReject,
+        onSubscription: handlerReject,
+        onSign: handlerReject,
+        onAskAccounts: handlerReject,
+        onMessageSign: handlerReject,
         onDisconnect () {}
       })
       aepp = await RpcAepp({
@@ -105,8 +115,8 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('AEPP connect to wallet: wallet reject connection', async () => {
-      wallet.onConnection = (aepp, actions) => {
-        actions.deny()
+      wallet.onConnection = () => {
+        throw new RpcConnectionDenyError()
       }
       await expect(aepp.connectToWallet(connectionFromAeppToWallet)).to.be.eventually
         .rejectedWith('Wallet deny your connection request')
@@ -114,9 +124,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('AEPP connect to wallet: wallet accept connection', async () => {
-      wallet.onConnection = (aepp, actions) => {
-        actions.accept()
-      }
+      wallet.onConnection = () => {}
       connectionFromAeppToWallet.disconnect()
       const connected = await aepp.connectToWallet(connectionFromAeppToWallet)
 
@@ -138,8 +146,8 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Subscribe to address: wallet reject', async () => {
-      wallet.onSubscription = (aepp, actions) => {
-        actions.deny()
+      wallet.onSubscription = () => {
+        throw new RpcRejectedByUserError()
       }
       await expect(aepp.subscribeAddress('subscribe', 'connected')).to.be.eventually
         .rejectedWith('Operation rejected by user').with.property('code', 4)
@@ -150,8 +158,8 @@ describe('Aepp<->Wallet', function () {
         connected: { [keypair.publicKey]: {} },
         current: wallet.addresses().reduce((acc, v) => ({ ...acc, [v]: {} }), {})
       }
-      wallet.onSubscription = (aepp, actions) => {
-        actions.accept({ accounts })
+      wallet.onSubscription = () => {
+        return accounts
       }
       await aepp.subscribeAddress('subscribe', 'connected')
       await aepp.subscribeAddress('unsubscribe', 'connected')
@@ -180,17 +188,15 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Ask for address: subscribed for accounts -> wallet deny', async () => {
-      wallet.onAskAccounts = (aepp, actions) => {
-        actions.deny()
+      wallet.onAskAccounts = () => {
+        throw new RpcRejectedByUserError()
       }
       await expect(aepp.askAddresses()).to.be.eventually
         .rejectedWith('Operation rejected by user').with.property('code', 4)
     })
 
     it('Ask for address: subscribed for accounts -> wallet accept', async () => {
-      wallet.onAskAccounts = (aepp, actions) => {
-        actions.accept()
-      }
+      wallet.onAskAccounts = () => {}
       const addressees = await aepp.askAddresses()
       addressees.length.should.be.equal(2)
       addressees[0].should.be.equal(account.publicKey)
@@ -206,8 +212,8 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Sign transaction: wallet deny', async () => {
-      wallet.onSign = (aepp, action) => {
-        action.deny()
+      wallet.onSign = () => {
+        throw new RpcRejectedByUserError()
       }
       const address = await aepp.address()
       const tx = await aepp.buildTx(TX_TYPE.spend, {
@@ -221,9 +227,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Sign transaction: invalid account object in action', async () => {
-      wallet.onSign = (aepp, action) => {
-        action.accept(null, { onAccount: {} })
-      }
+      wallet.onSign = () => ({ onAccount: {} })
       const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: keypair.publicKey,
         recipientId: keypair.publicKey,
@@ -235,9 +239,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Sign transaction: wallet allow', async () => {
-      wallet.onSign = (aepp, action) => {
-        action.accept()
-      }
+      wallet.onSign = () => {}
       const address = await aepp.address()
       const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
@@ -267,9 +269,7 @@ describe('Aepp<->Wallet', function () {
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const address = await aepp.address()
-      wallet.onSign = (aepp, action) => {
-        action.accept(tx2)
-      }
+      wallet.onSign = () => ({ tx: tx2 })
       const tx2 = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
@@ -288,17 +288,15 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Sign message: rejected', async () => {
-      wallet.onMessageSign = (aepp, action) => {
-        action.deny()
+      wallet.onMessageSign = () => {
+        throw new RpcRejectedByUserError()
       }
       await expect(aepp.signMessage('test')).to.be.eventually
         .rejectedWith('Operation rejected by user').with.property('code', 4)
     })
 
     it('Sign message', async () => {
-      wallet.onMessageSign = (aepp, action) => {
-        action.accept()
-      }
+      wallet.onMessageSign = () => {}
       const messageSig = await aepp.signMessage('test')
       messageSig.should.be.instanceof(Buffer)
       const isValid = await aepp.verifyMessage('test', messageSig)
@@ -306,9 +304,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Sign message using account not from sdk instance: do not provide account', async () => {
-      wallet.onMessageSign = (aepp, action) => {
-        action.accept({})
-      }
+      wallet.onMessageSign = () => {}
       const onAccount = aepp.addresses()[1]
       await expect(aepp.signMessage('test', { onAccount })).to.be.eventually
         .rejectedWith('The peer failed to execute your request due to unknown error')
@@ -318,7 +314,7 @@ describe('Aepp<->Wallet', function () {
     it('Sign message using account not from sdk instance', async () => {
       wallet.onMessageSign = (aepp, action) => {
         if (action.params.onAccount === keypair.publicKey) {
-          action.accept({ onAccount: MemoryAccount({ keypair }) })
+          return { onAccount: MemoryAccount({ keypair }) }
         }
       }
       const onAccount = keypair.publicKey
@@ -329,9 +325,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Sign and broadcast invalid transaction', async () => {
-      wallet.onSign = (aepp, action) => {
-        action.accept()
-      }
+      wallet.onSign = () => {}
       const address = await aepp.address()
       const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
@@ -399,9 +393,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Remove rpc client', async () => {
-      wallet.onConnection = (aepp, actions) => {
-        actions.accept()
-      }
+      wallet.onConnection = () => {}
       const id = wallet.addRpcClient(new BrowserWindowMessageConnection({
         self: connections.walletWindow,
         target: connections.aeppWindow
@@ -453,13 +445,11 @@ describe('Aepp<->Wallet', function () {
         id: 'test',
         type: WALLET_TYPE.window,
         name: 'Wallet',
-        onConnection (aepp, { accept }) {
-          accept()
-        },
-        onSubscription () {},
-        onSign () {},
-        onAskAccounts () {},
-        onMessageSign () {},
+        onConnection () {},
+        onSubscription: handlerReject,
+        onSign: handlerReject,
+        onAskAccounts: handlerReject,
+        onMessageSign: handlerReject,
         onDisconnect () {}
       })
       aepp = await RpcAepp({
@@ -480,9 +470,7 @@ describe('Aepp<->Wallet', function () {
         connected: { [keypair.publicKey]: {} },
         current: wallet.addresses().reduce((acc, v) => ({ ...acc, [v]: {} }), {})
       }
-      wallet.onSubscription = (aepp, actions) => {
-        actions.accept({ accounts })
-      }
+      wallet.onSubscription = () => accounts
       await aepp.subscribeAddress('subscribe', 'connected')
       await aepp.subscribeAddress('unsubscribe', 'connected')
       const subscriptionResponse = await aepp.subscribeAddress('subscribe', 'connected')
@@ -497,9 +485,7 @@ describe('Aepp<->Wallet', function () {
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const address = await aepp.address()
-      wallet.onSign = (aepp, action) => {
-        action.accept(tx2)
-      }
+      wallet.onSign = () => ({ tx: tx2 })
       const tx2 = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,

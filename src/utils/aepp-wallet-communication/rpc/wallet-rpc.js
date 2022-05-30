@@ -13,21 +13,12 @@ import AccountMultiple from '../../../account/multiple'
 import RpcClient from './rpc-client'
 import {
   METHODS, RPC_STATUS, VERSION,
-  RpcBroadcastError, RpcConnectionDenyError, RpcInvalidTransactionError,
-  RpcNotAuthorizeError, RpcPermissionDenyError, RpcRejectedByUserError, RpcUnsupportedProtocolError
+  RpcBroadcastError, RpcInvalidTransactionError,
+  RpcNotAuthorizeError, RpcPermissionDenyError, RpcUnsupportedProtocolError
 } from '../schema'
-import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
-import { isAccountBase } from '../../../account/base'
+import { ArgumentError, UnknownRpcClientError } from '../../errors'
 import { filterObject, mapObject } from '../../other'
 import { unpackTx } from '../../../tx/builder'
-
-const resolveOnAccount = (addresses, onAccount, opt = {}) => {
-  if (!addresses.find(a => a === onAccount)) {
-    if (typeof opt.onAccount !== 'object' || !isAccountBase(opt.onAccount)) throw new TypeError('Provided onAccount should be an AccountBase')
-    onAccount = opt.onAccount
-  }
-  return onAccount
-}
 
 const METHOD_HANDLERS = {
   [METHODS.closeConnection]: async (callInstance, instance, client, params) => {
@@ -36,7 +27,7 @@ const METHOD_HANDLERS = {
   },
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
-  [METHODS.connect] (
+  async [METHODS.connect] (
     callInstance,
     instance,
     client,
@@ -51,100 +42,60 @@ const METHOD_HANDLERS = {
       connectNode
     })
 
-    // Call onConnection callBack to notice Wallet about new AEPP
-    return callInstance(
-      'onConnection',
-      { name, version },
-      () => {
-        client.updateInfo({ status: connectNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
-        return {
-          ...instance.getWalletInfo(),
-          ...connectNode && { node: instance.selectedNode }
-        }
-      },
-      (error) => {
-        throw new RpcConnectionDenyError(error)
-      }
-    )
+    await callInstance('onConnection', { name, version })
+    client.updateInfo({ status: connectNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
+    return {
+      ...instance.getWalletInfo(),
+      ...connectNode && { node: instance.selectedNode }
+    }
   },
-  [METHODS.subscribeAddress] (callInstance, instance, client, { type, value }) {
+  async [METHODS.subscribeAddress] (callInstance, instance, client, { type, value }) {
     if (!client.isConnected()) throw new RpcNotAuthorizeError()
 
-    return callInstance(
-      'onSubscription',
-      { type, value },
-      async ({ accounts } = {}) => {
-        const clientAccounts = accounts || instance.getAccounts()
-        const subscription = client.updateSubscription(type, value)
-        client.setAccounts(clientAccounts, { forceNotification: true })
-        return {
-          subscription,
-          address: clientAccounts
-        }
-      },
-      (error) => { throw new RpcRejectedByUserError(error) }
-    )
+    const accounts = await callInstance('onSubscription', { type, value })
+    const clientAccounts = accounts || instance.getAccounts()
+    const subscription = client.updateSubscription(type, value)
+    client.setAccounts(clientAccounts, { forceNotification: true })
+    return {
+      subscription,
+      address: clientAccounts
+    }
   },
-  [METHODS.address] (callInstance, instance, client) {
+  async [METHODS.address] (callInstance, instance, client) {
     if (!client.isConnected() || !client.isSubscribed()) throw new RpcNotAuthorizeError()
 
-    return callInstance(
-      'onAskAccounts',
-      {},
-      ({ accounts } = {}) => accounts ||
-        [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)],
-      (error) => { throw new RpcRejectedByUserError(error) }
-    )
+    const accounts = await callInstance('onAskAccounts') ?? client.accounts
+    return [...Object.keys(accounts.current), ...Object.keys(accounts.connected)]
   },
-  [METHODS.sign] (callInstance, instance, client, message) {
-    const { tx, onAccount, returnSigned = false } = message
-    const address = onAccount || client.currentAccount
+  async [METHODS.sign] (callInstance, instance, client, { tx, onAccount, returnSigned }) {
+    onAccount ??= client.currentAccount
     if (!client.isConnected()) throw new RpcNotAuthorizeError()
-    if (!client.hasAccessToAccount(address)) throw new RpcPermissionDenyError(address)
+    if (!client.hasAccessToAccount(onAccount)) throw new RpcPermissionDenyError(onAccount)
 
-    return callInstance(
-      'onSign',
-      { tx, returnSigned, onAccount: address, txObject: unpackTx(tx) },
-      async (rawTx, opt = {}) => {
-        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
-        try {
-          const t = rawTx || tx
-          return returnSigned
-            ? { signedTransaction: await instance.signTransaction(t, { onAccount: onAcc }) }
-            : { transactionHash: await instance.send(t, { onAccount: onAcc, verify: false }) }
-        } catch (e) {
-          if (!returnSigned) {
-            // Validate transaction
-            const validation = await verifyTransaction(rawTx || tx, instance.selectedNode.instance)
-            if (validation.length) throw new RpcInvalidTransactionError(validation)
-            // Send broadcast failed error to aepp
-            throw new RpcBroadcastError(e.message)
-          }
-          throw e
-        }
-      },
-      (error) => { throw new RpcRejectedByUserError(error) }
+    const overrides = await callInstance(
+      'onSign', { tx, returnSigned, onAccount, txObject: unpackTx(tx) }
     )
+    onAccount = overrides?.onAccount ?? onAccount
+    tx = overrides?.tx ?? tx
+    if (returnSigned) {
+      return { signedTransaction: await instance.signTransaction(tx, { onAccount }) }
+    }
+    try {
+      return { transactionHash: await instance.send(tx, { onAccount, verify: false }) }
+    } catch (error) {
+      const validation = await verifyTransaction(tx, instance.selectedNode.instance)
+      if (validation.length) throw new RpcInvalidTransactionError(validation)
+      throw new RpcBroadcastError(error.message)
+    }
   },
-  [METHODS.signMessage] (callInstance, instance, client, { message, onAccount }) {
+  async [METHODS.signMessage] (callInstance, instance, client, { message, onAccount }) {
     if (!client.isConnected()) throw new RpcNotAuthorizeError()
-    const address = onAccount || client.currentAccount
-    if (!client.hasAccessToAccount(address)) throw new RpcPermissionDenyError(address)
+    onAccount ??= client.currentAccount
+    if (!client.hasAccessToAccount(onAccount)) throw new RpcPermissionDenyError(onAccount)
 
-    return callInstance(
-      'onMessageSign',
-      { message, onAccount: address },
-      async (opt = {}) => {
-        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
-        return {
-          signature: await instance.signMessage(message, {
-            onAccount: onAcc,
-            returnHex: true
-          })
-        }
-      },
-      (error) => { throw new RpcRejectedByUserError(error) }
-    )
+    const overrides = await callInstance('onMessageSign', { message, onAccount })
+    onAccount = overrides?.onAccount ?? onAccount
+    return { signature: await instance.signMessage(message, { onAccount, returnHex: true }) }
   }
 }
 
@@ -265,18 +216,15 @@ export default Ae.compose(AccountMultiple, {
         connection: clientConnection,
         onDisconnect: this.onDisconnect,
         methods: mapObject(METHOD_HANDLERS, ([key, value]) => [key, (params, origin) => {
-          const callInstance = (methodName, params, accept, deny) => new Promise(resolve => {
+          const callInstance = (methodName, params) =>
             this[methodName](
               client,
               {
                 method: key,
-                params,
-                accept: (...args) => resolve(accept(...args)),
-                deny: (...args) => resolve(deny(...args))
+                params
               },
               origin
             )
-          })
           return value(callInstance, this, client, params)
         }])
       })
