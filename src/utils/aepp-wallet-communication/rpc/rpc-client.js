@@ -8,12 +8,8 @@
  */
 import stampit from '@stamp/it'
 
-import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES } from '../schema'
-import {
-  InvalidRpcMessageError,
-  DuplicateCallbackError,
-  MissingCallbackError
-} from '../../errors'
+import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES, RpcError, RpcInternalError } from '../schema'
+import { InvalidRpcMessageError, MissingCallbackError } from '../../errors'
 
 /**
  * Contain functionality for using RPC conection
@@ -23,13 +19,12 @@ import {
  * @param {Object} param Init params object
  * @param {String} param.name Client name
  * @param {Object} param.connection Connection object
- * @param {Function[]} param.handlers Array with two function for message handling
- * @param {Function} param.handlers[0] Message handler
- * @param {Function} param.handlers[1] Disconnect callback
+ * @param {Function} param.onDisconnect Disconnect callback
+ * @param {Object} param.methods Object containing handlers for each request by name
  * @return {Object}
  */
 export default stampit({
-  init ({ id, name, icons, connection, handlers: [onMessage, onDisconnect] }) {
+  init ({ id, name, icons, connection, onDisconnect, methods }) {
     this.id = id
     this.connection = connection
     this.info = { name, icons }
@@ -47,11 +42,23 @@ export default stampit({
 
     this._messageId = 0
 
-    const handleMessage = (msg, origin) => {
+    const handleMessage = async (msg, origin) => {
       if (!msg || !msg.jsonrpc || msg.jsonrpc !== '2.0' || !msg.method) {
         throw new InvalidRpcMessageError(msg)
       }
-      onMessage(msg, origin)
+      if ((msg.result ?? msg.error) != null) {
+        this.processResponse(msg)
+        return
+      }
+
+      // TODO: remove methods as far it is not required in JSON RPC
+      const response = { id: msg.id, method: msg.method }
+      try {
+        response.result = await methods[msg.method](msg.params, origin)
+      } catch (error) {
+        response.error = error instanceof RpcError ? error : new RpcInternalError()
+      }
+      if (response.id) this._sendMessage(response, true)
     }
 
     const disconnect = (aepp, connection) => {
@@ -89,7 +96,7 @@ export default stampit({
     }
   },
   methods: {
-    sendMessage ({ id, method, params, result, error }, isNotificationOrResponse = false) {
+    _sendMessage ({ id, method, params, result, error }, isNotificationOrResponse = false) {
       if (!isNotificationOrResponse) this._messageId += 1
       id = isNotificationOrResponse ? (id ?? null) : this._messageId
       const msgData = params
@@ -178,10 +185,7 @@ export default stampit({
      */
     setAccounts (accounts, { forceNotification } = {}) {
       this.accounts = accounts
-      if (!forceNotification) {
-        // Sent notification about account updates
-        this.sendMessage({ method: METHODS.updateAddress, params: this.accounts }, true)
-      }
+      if (!forceNotification) this.notify(METHODS.updateAddress, this.accounts)
     },
     /**
      * Update subscription
@@ -211,13 +215,18 @@ export default stampit({
      * @return {Promise} Promise which will be resolved after receiving response message
      */
     request (name, params) {
-      const msgId = this.sendMessage({ method: name, params })
-      if (Object.prototype.hasOwnProperty.call(this.callbacks, msgId)) {
-        throw new DuplicateCallbackError()
-      }
+      const msgId = this._sendMessage({ method: name, params })
       return new Promise((resolve, reject) => {
         this.callbacks[msgId] = { resolve, reject }
       })
+    },
+    /**
+     * Make a notification
+     * @param {String} name Method name
+     * @param {Object} params Method params
+     */
+    notify (name, params) {
+      this._sendMessage({ method: name, params }, true)
     },
     /**
      * Process response message
@@ -225,18 +234,12 @@ export default stampit({
      * @instance
      * @rtype (msg: Object, transformResult: Function) => void
      * @param {Object} msg Message object
-     * @param {Function=} transformResult Optional parser function for message
      * @return {void}
      */
-    processResponse ({ id, error, result }, transformResult) {
+    processResponse ({ id, error, result }) {
       if (!this.callbacks[id]) throw new MissingCallbackError(id)
-      if (result) {
-        this.callbacks[id].resolve(...typeof transformResult === 'function'
-          ? transformResult({ id, result })
-          : [result])
-      } else {
-        this.callbacks[id].reject(error)
-      }
+      if (result) this.callbacks[id].resolve(result)
+      else this.callbacks[id].reject(RpcError.deserialize(error))
       delete this.callbacks[id]
     }
   }

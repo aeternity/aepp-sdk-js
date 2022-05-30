@@ -45,17 +45,17 @@ export default {
     }
   },
   methods: {
-    async shareWalletInfo (postFn, { interval = 5000, attemps = 5 } = {}) {
-      this.aeSdk.shareWalletInfo(postFn)
+    async shareWalletInfo (clientId, { interval = 5000, attemps = 5 } = {}) {
+      this.aeSdk.shareWalletInfo(clientId)
       while (attemps -= 1) {
         await new Promise(resolve => setTimeout(resolve, interval))
-        this.aeSdk.shareWalletInfo(postFn)
+        this.aeSdk.shareWalletInfo(clientId)
       }
       console.log('Finish sharing wallet info')
     },
     disconnect () {
       Object.values(this.aeSdk.rpcClients).forEach(client => {
-        client.sendMessage({ method: METHODS.closeConnection }, true)
+        client.notify(METHODS.closeConnection)
         client.disconnect()
       })
     },
@@ -99,7 +99,7 @@ export default {
       onMessageSign: genConfirmCallback(() => 'message sign'),
       onAskAccounts: genConfirmCallback(() => 'get accounts'),
       onDisconnect (message, client) {
-        this.shareWalletInfo(connection.sendMessage.bind(connection))
+        this.shareWalletInfo(clientId)
       }
     })
     this.nodeName = this.aeSdk.selectedNode.name
@@ -107,8 +107,8 @@ export default {
 
     const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow
     const connection = new BrowserWindowMessageConnection({ target })
-    this.aeSdk.addRpcClient(connection)
-    this.shareWalletInfo(connection.sendMessage.bind(connection))
+    const clientId = this.aeSdk.addRpcClient(connection)
+    this.shareWalletInfo(clientId)
 
     this.$watch(
       ({ address, nodeName }) => [address, nodeName],

@@ -182,14 +182,14 @@ async function query (name, opt = {}) {
     pointers: o.pointers || [],
     update: async (pointers, options = {}) => {
       return {
-        ...(await this.aensUpdate(name, pointers, { ...opt, ...options })),
-        ...(await this.aensQuery(name))
+        ...await this.aensUpdate(name, pointers, { ...opt, ...options }),
+        ...await this.aensQuery(name)
       }
     },
     transfer: async (account, options = {}) => {
       return {
-        ...(await this.aensTransfer(name, account, { ...opt, ...options })),
-        ...(await this.aensQuery(name))
+        ...await this.aensTransfer(name, account, { ...opt, ...options }),
+        ...await this.aensQuery(name)
       }
     },
     revoke: async (options = {}) => this.aensRevoke(name, { ...opt, ...options }),

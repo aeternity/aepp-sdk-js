@@ -106,10 +106,10 @@ async function init () {
       // create connection
       const connection = new BrowserRuntimeConnection({ port })
       // add new aepp to wallet
-      wallet.addRpcClient(connection)
+      const clientId = aeSdk.addRpcClient(connection)
       // share wallet details
-      wallet.shareWalletInfo(port.postMessage.bind(port))
-      setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
+      aeSdk.shareWalletInfo(clientId)
+      setInterval(() => aeSdk.shareWalletInfo(clientId), 3000)
     })
   }).catch(err => {
     console.error(err)
@@ -190,10 +190,10 @@ async function init () {
       // create connection
       const connection = new BrowserRuntimeConnection({ port })
       // add new aepp to wallet
-      wallet.addRpcClient(connection)
+      const clientId = aeSdk.addRpcClient(connection)
       // share wallet details
-      wallet.shareWalletInfo(port.postMessage.bind(port))
-      setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
+      aeSdk.shareWalletInfo(clientId)
+      setInterval(() => aeSdk.shareWalletInfo(clientId), 3000)
     })
   }).catch(err => {
     console.error(err)

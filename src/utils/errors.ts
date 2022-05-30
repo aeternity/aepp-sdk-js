@@ -228,13 +228,6 @@ export class InvalidAensNameError extends AensError {
 }
 
 /* Aepp Errors */
-export class DuplicateCallbackError extends AeppError {
-  constructor () {
-    super('Callback Already exist')
-    this.name = 'DuplicateCallbackError'
-  }
-}
-
 export class InvalidRpcMessageError extends AeppError {
   constructor (message: string) {
     super(`Received invalid message: ${message}`)
@@ -243,7 +236,7 @@ export class InvalidRpcMessageError extends AeppError {
 }
 
 export class MissingCallbackError extends AeppError {
-  constructor (id: string) {
+  constructor (id: number) {
     super(`Can't find callback for this messageId ${id}`)
     this.name = 'MissingCallbackError'
   }

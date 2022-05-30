@@ -11,10 +11,14 @@ import Ae from '../../../ae'
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
 import RpcClient from './rpc-client'
-import { ERRORS, METHODS, RPC_STATUS, VERSION } from '../schema'
+import {
+  METHODS, RPC_STATUS, VERSION,
+  RpcBroadcastError, RpcConnectionDenyError, RpcInvalidTransactionError,
+  RpcNotAuthorizeError, RpcPermissionDenyError, RpcRejectedByUserError, RpcUnsupportedProtocolError
+} from '../schema'
 import { ArgumentError, TypeError, UnknownRpcClientError } from '../../errors'
 import { isAccountBase } from '../../../account/base'
-import { filterObject } from '../../other'
+import { filterObject, mapObject } from '../../other'
 import { unpackTx } from '../../../tx/builder'
 
 const resolveOnAccount = (addresses, onAccount, opt = {}) => {
@@ -25,17 +29,11 @@ const resolveOnAccount = (addresses, onAccount, opt = {}) => {
   return onAccount
 }
 
-const NOTIFICATIONS = {
-  [METHODS.closeConnection]: (instance, { client }) =>
-    async (msg) => {
-      client.disconnect(true)
-      instance.onDisconnect(msg.params, client)
-    }
-}
-
-const RESPONSES = {}
-
-const REQUESTS = {
+const METHOD_HANDLERS = {
+  [METHODS.closeConnection]: async (callInstance, instance, client, params) => {
+    client.disconnect(true)
+    instance.onDisconnect(params, client)
+  },
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
   [METHODS.connect] (
@@ -43,8 +41,7 @@ const REQUESTS = {
     instance,
     client,
     { name, version, icons, connectNode }) {
-    // Check if protocol and network is compatible with wallet
-    if (version !== VERSION) return { error: ERRORS.unsupportedProtocol() }
+    if (version !== VERSION) throw new RpcUnsupportedProtocolError()
     // Store new AEPP and wait for connection approve
     client.updateInfo({
       status: RPC_STATUS.WAITING_FOR_CONNECTION_APPROVE,
@@ -62,159 +59,94 @@ const REQUESTS = {
       ({ shareNode } = {}) => {
         client.updateInfo({ status: shareNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
         return {
-          result: {
-            ...instance.getWalletInfo(),
-            ...(shareNode && { node: instance.selectedNode })
-          }
+          ...instance.getWalletInfo(),
+          ...shareNode && { node: instance.selectedNode }
         }
       },
       (error) => {
         client.updateInfo({ status: RPC_STATUS.CONNECTION_REJECTED })
-        return { error: ERRORS.connectionDeny(error) }
+        throw new RpcConnectionDenyError(error)
       }
     )
   },
   [METHODS.subscribeAddress] (callInstance, instance, client, { type, value }) {
-    // Authorization check
-    if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    if (!client.isConnected()) throw new RpcNotAuthorizeError()
 
     return callInstance(
       'onSubscription',
       { type, value },
       async ({ accounts } = {}) => {
-        try {
-          const clientAccounts = accounts || instance.getAccounts()
-          const subscription = client.updateSubscription(type, value)
-          client.setAccounts(clientAccounts, { forceNotification: true })
-          return {
-            result: {
-              subscription,
-              address: clientAccounts
-            }
-          }
-        } catch (e) {
-          if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError(e.message) }
+        const clientAccounts = accounts || instance.getAccounts()
+        const subscription = client.updateSubscription(type, value)
+        client.setAccounts(clientAccounts, { forceNotification: true })
+        return {
+          subscription,
+          address: clientAccounts
         }
       },
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error) => { throw new RpcRejectedByUserError(error) }
     )
   },
   [METHODS.address] (callInstance, instance, client) {
-    // Authorization check
-    if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
-    if (!client.isSubscribed()) return { error: ERRORS.notAuthorize() }
+    if (!client.isConnected() || !client.isSubscribed()) throw new RpcNotAuthorizeError()
 
     return callInstance(
       'onAskAccounts',
       {},
-      ({ accounts } = {}) => ({
-        result: accounts ||
-          [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)]
-      }),
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      ({ accounts } = {}) => accounts ||
+        [...Object.keys(client.accounts.current), ...Object.keys(client.accounts.connected)],
+      (error) => { throw new RpcRejectedByUserError(error) }
     )
   },
-  [METHODS.sign] (callInstance, instance, client, options) {
-    const { tx, onAccount, returnSigned = false } = options
+  [METHODS.sign] (callInstance, instance, client, message) {
+    const { tx, onAccount, returnSigned = false } = message
     const address = onAccount || client.currentAccount
-    // Authorization check
-    if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
-    // Account permission check
-    if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny(address) }
-    }
+    if (!client.isConnected()) throw new RpcNotAuthorizeError()
+    if (!client.hasAccessToAccount(address)) throw new RpcPermissionDenyError(address)
 
     return callInstance(
       'onSign',
       { tx, returnSigned, onAccount: address, txObject: unpackTx(tx) },
       async (rawTx, opt = {}) => {
-        let onAcc
-        try {
-          onAcc = resolveOnAccount(instance.addresses(), address, opt)
-        } catch (e) {
-          if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError(e.message) }
-        }
+        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
         try {
           const t = rawTx || tx
-          const result = returnSigned
+          return returnSigned
             ? { signedTransaction: await instance.signTransaction(t, { onAccount: onAcc }) }
             : { transactionHash: await instance.send(t, { onAccount: onAcc, verify: false }) }
-          return { result }
         } catch (e) {
           if (!returnSigned) {
             // Validate transaction
             const validation = await verifyTransaction(rawTx || tx, instance.selectedNode.instance)
-            if (validation.length) return { error: ERRORS.invalidTransaction(validation) }
+            if (validation.length) throw new RpcInvalidTransactionError(validation)
             // Send broadcast failed error to aepp
-            return { error: ERRORS.broadcastFailed(e.message) }
+            throw new RpcBroadcastError(e.message)
           }
           throw e
         }
       },
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error) => { throw new RpcRejectedByUserError(error) }
     )
   },
   [METHODS.signMessage] (callInstance, instance, client, { message, onAccount }) {
-    // Authorization check
-    if (!client.isConnected()) return { error: ERRORS.notAuthorize() }
+    if (!client.isConnected()) throw new RpcNotAuthorizeError()
     const address = onAccount || client.currentAccount
-    if (!client.hasAccessToAccount(address)) {
-      return { error: ERRORS.permissionDeny(address) }
-    }
+    if (!client.hasAccessToAccount(address)) throw new RpcPermissionDenyError(address)
 
     return callInstance(
       'onMessageSign',
       { message, onAccount: address },
       async (opt = {}) => {
-        try {
-          const onAcc = resolveOnAccount(instance.addresses(), address, opt)
-          return {
-            result: {
-              signature: await instance.signMessage(message, {
-                onAccount: onAcc,
-                returnHex: true
-              })
-            }
-          }
-        } catch (e) {
-          if (instance.debug) console.error(e)
-          return { error: ERRORS.internalError(e.message) }
+        const onAcc = resolveOnAccount(instance.addresses(), address, opt)
+        return {
+          signature: await instance.signMessage(message, {
+            onAccount: onAcc,
+            returnHex: true
+          })
         }
       },
-      (error) => ({ error: ERRORS.rejectedByUser(error) })
+      (error) => { throw new RpcRejectedByUserError(error) }
     )
-  }
-}
-
-const handleMessage = (instance, id) => async (msg, origin) => {
-  const client = instance.rpcClients[id]
-  if (!msg.id) {
-    return NOTIFICATIONS[msg.method](instance, { client })(msg, origin)
-  }
-  if (Object.prototype.hasOwnProperty.call(client.callbacks, msg.id)) {
-    return RESPONSES[msg.method](instance, { client })(msg, origin)
-  } else {
-    const { id, method } = msg
-    const callInstance = (methodName, params, accept, deny) => () => new Promise(resolve => {
-      instance[methodName](
-        client,
-        {
-          id,
-          method,
-          params,
-          accept: (...args) => resolve(accept(...args)),
-          deny: (...args) => resolve(deny(...args))
-        },
-        origin
-      )
-    })
-    // TODO make one structure for handler functions
-    const errorObjectOrHandler = REQUESTS[msg.method](callInstance, instance, client, msg.params)
-    const response = typeof errorObjectOrHandler === 'function' ? await errorObjectOrHandler() : errorObjectOrHandler
-    const { error, result } = response ?? {}
-    client.sendMessage({ id, method, ...error ? { error } : { result } }, true)
   }
 }
 
@@ -294,13 +226,10 @@ export default Ae.compose(AccountMultiple, {
       Object.values(this.rpcClients)
         .filter(client => client.isConnected())
         .forEach(client => {
-          client.sendMessage({
-            method: METHODS.updateNetwork,
-            params: {
-              networkId: this.getNetworkId(),
-              ...client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
-            }
-          }, true)
+          client.notify(METHODS.updateNetwork, {
+            networkId: this.getNetworkId(),
+            ...client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
+          })
         })
     }
   },
@@ -332,12 +261,28 @@ export default Ae.compose(AccountMultiple, {
       // @TODO  detect if aepp has some history based on origin????
       // if yes use this instance for connection
       const id = uuid()
-      this.rpcClients[id] = RpcClient({
+      const client = RpcClient({
         id,
         info: { status: RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST },
         connection: clientConnection,
-        handlers: [handleMessage(this, id), this.onDisconnect]
+        onDisconnect: this.onDisconnect,
+        methods: mapObject(METHOD_HANDLERS, ([key, value]) => [key, (params, origin) => {
+          const callInstance = (methodName, params, accept, deny) => new Promise(resolve => {
+            this[methodName](
+              client,
+              {
+                method: key,
+                params,
+                accept: (...args) => resolve(accept(...args)),
+                deny: (...args) => resolve(deny(...args))
+              },
+              origin
+            )
+          })
+          return value(callInstance, this, client, params)
+        }])
       })
+      this.rpcClients[id] = client
       return id
     },
     /**
@@ -346,15 +291,11 @@ export default Ae.compose(AccountMultiple, {
      * @function shareWalletInfo
      * @instance
      * @rtype (postFn: Function) => void
-     * @param {Function} postFn Send message function like `(msg) => void`
+     * @param {Function} clientId ID of RPC client send message to
      * @return {void}
      */
-    shareWalletInfo (postFn) {
-      postFn({
-        jsonrpc: '2.0',
-        method: METHODS.readyToConnect,
-        params: this.getWalletInfo()
-      })
+    shareWalletInfo (clientId) {
+      this.rpcClients[clientId].notify(METHODS.readyToConnect, this.getWalletInfo())
     },
     /**
      * Get Wallet info object
