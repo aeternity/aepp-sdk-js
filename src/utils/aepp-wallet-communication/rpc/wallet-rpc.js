@@ -56,11 +56,11 @@ const METHOD_HANDLERS = {
     return callInstance(
       'onConnection',
       { name, version },
-      ({ shareNode } = {}) => {
-        client.updateInfo({ status: shareNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
+      () => {
+        client.updateInfo({ status: connectNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
         return {
           ...instance.getWalletInfo(),
-          ...shareNode && { node: instance.selectedNode }
+          ...connectNode && { node: instance.selectedNode }
         }
       },
       (error) => {

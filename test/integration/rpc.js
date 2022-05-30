@@ -454,7 +454,7 @@ describe('Aepp<->Wallet', function () {
         type: WALLET_TYPE.window,
         name: 'Wallet',
         onConnection (aepp, { accept }) {
-          accept({ shareNode: true })
+          accept()
         },
         onSubscription () {},
         onSign () {},
