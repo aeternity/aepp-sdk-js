@@ -44,7 +44,6 @@ const METHOD_HANDLERS = {
     if (version !== VERSION) throw new RpcUnsupportedProtocolError()
     // Store new AEPP and wait for connection approve
     client.updateInfo({
-      status: RPC_STATUS.WAITING_FOR_CONNECTION_APPROVE,
       name,
       icons,
       version,
@@ -64,7 +63,6 @@ const METHOD_HANDLERS = {
         }
       },
       (error) => {
-        client.updateInfo({ status: RPC_STATUS.CONNECTION_REJECTED })
         throw new RpcConnectionDenyError(error)
       }
     )
