@@ -26,9 +26,7 @@ import Ae from './'
 import Aens from './aens'
 import Transaction from '../tx/tx'
 import Oracle from './oracle'
-import GeneralizedAccount from '../contract/ga'
 import AccountMultiple from '../account/multiple'
-import Contract from './contract'
 
 /**
  * Universal Stamp
@@ -42,5 +40,5 @@ import Contract from './contract'
  * @return {Object} Universal instance
  */
 export default Ae.compose(
-  Transaction, Aens, Contract, Oracle, GeneralizedAccount, AccountMultiple
+  Transaction, Aens, Oracle, AccountMultiple
 )

@@ -376,9 +376,9 @@ const name = 'example.chain'
 const onAccount = await aeSdk.address()
 
 // this signature will allow the contract to perform a pre-claim on your behalf
-const preClaimSig = await aeSdk.createAensDelegationSignature({ contractId }, { onAccount })
+const preClaimSig = await aeSdk.createAensDelegationSignature(contractId, { onAccount })
 
 // this signature will allow the contract to perform
 // any name related transaction for a specific name that you own
-const aensDelegationSig = await aeSdk.createAensDelegationSignature({ contractId, name }, { onAccount })
+const aensDelegationSig = await aeSdk.createAensDelegationSignature(contractId, { name, onAccount })
 ```

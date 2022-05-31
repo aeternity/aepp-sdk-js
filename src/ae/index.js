@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -25,6 +25,8 @@
 import stampit from '@stamp/it'
 import Tx from '../tx'
 import * as chainMethods from '../chain'
+import * as contractMethods from './contract'
+import * as contractGaMethods from '../contract/ga'
 import NodePool from '../node-pool'
 import AccountResolver from '../account/resolver'
 import { buildTxHash, unpackTx } from '../tx/builder'
@@ -32,7 +34,8 @@ import BigNumber from 'bignumber.js'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 import { ArgumentError } from '../utils/errors'
 import { mapObject } from '../utils/other'
-import { TX_TYPE } from '../tx/builder/schema'
+import { AMOUNT, TX_TYPE } from '../tx/builder/schema'
+import ContractCompilerHttp from '../contract/compiler'
 
 /**
  * Sign and post a transaction to the chain
@@ -166,7 +169,7 @@ function destroyInstance () {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(NodePool, Tx, AccountResolver, {
+const Ae = stampit(NodePool, Tx, AccountResolver, ContractCompilerHttp, {
   methods: {
     send,
     spend,
@@ -175,14 +178,18 @@ const Ae = stampit(NodePool, Tx, AccountResolver, {
     destroyInstance,
     signUsingGA,
     ...mapObject(
-      chainMethods,
+      { ...chainMethods, ...contractMethods, ...contractGaMethods },
       ([name, handler]) => [
         name,
         function (...args) {
           const instanceOptions = {
             ...this.Ae.defaults,
             onNode: this.selectedNode.instance,
-            onAccount: this
+            onAccount: this,
+            onCompiler: {
+              compilerApi: this.compilerApi,
+              compilerVersion: this.compilerVersion
+            }
           }
           const lastArg = args[args.length - 1]
           if (
@@ -199,7 +206,14 @@ const Ae = stampit(NodePool, Tx, AccountResolver, {
       ]
     )
   },
-  deepProps: { Ae: { defaults: { denomination: AE_AMOUNT_FORMATS.AETTOS } } }
+  deepProps: {
+    Ae: {
+      defaults: {
+        denomination: AE_AMOUNT_FORMATS.AETTOS,
+        amount: AMOUNT
+      }
+    }
+  }
 })
 
 export default Ae

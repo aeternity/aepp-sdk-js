@@ -49,7 +49,7 @@ describe('Generalized Account', function () {
   })
 
   it('Make account GA', async () => {
-    const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', authContractSource)
+    const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', authContractSource, [])
     const isGa = await aeSdk.isGA(gaAccount.publicKey)
     isGa.should.be.equal(true)
     authContract = await aeSdk.getContractInstance({
@@ -58,7 +58,7 @@ describe('Generalized Account', function () {
   })
 
   it('Fail on make GA on already GA', async () => {
-    await aeSdk.createGeneralizedAccount('authorize', authContractSource)
+    await aeSdk.createGeneralizedAccount('authorize', authContractSource, [])
       .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`)
   })
 
