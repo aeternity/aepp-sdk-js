@@ -347,13 +347,13 @@ describe('Contract', function () {
       const commitmentId = commitmentHash(name, nameSalt)
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId, 'cm')
-      const preclaimSig = await aeSdk.createAensDelegationSignature({ contractId })
+      const preclaimSig = await aeSdk.createAensDelegationSignature(contractId)
       const preclaim = await contract.methods
         .signedPreclaim(owner, commitmentIdDecoded, preclaimSig)
       preclaim.result.returnType.should.be.equal('ok')
       await aeSdk.awaitHeight(2 + await aeSdk.height())
       // signature for any other name related operations
-      delegationSignature = await aeSdk.createAensDelegationSignature({ contractId, name })
+      delegationSignature = await aeSdk.createAensDelegationSignature(contractId, { name })
     })
 
     it('claims', async () => {
@@ -392,7 +392,8 @@ describe('Contract', function () {
 
     it('revokes', async () => {
       const revokeSig = await aeSdk.createAensDelegationSignature(
-        { contractId, name }, { onAccount: newOwner }
+        contractId,
+        { name, onAccount: newOwner }
       )
       const revoke = await contract.methods.signedRevoke(newOwner, name, revokeSig)
       revoke.result.returnType.should.be.equal('ok')
@@ -420,7 +421,7 @@ describe('Contract', function () {
     })
 
     it('registers', async () => {
-      delegationSignature = await aeSdk.createOracleDelegationSignature({ contractId })
+      delegationSignature = await aeSdk.createOracleDelegationSignature(contractId)
       const oracleRegister = await contract.methods.signedRegisterOracle(
         address, delegationSignature, queryFee, ttl
       )
@@ -455,7 +456,7 @@ describe('Contract', function () {
       const r = 'Hi!'
       const queryId = queryObject.id
       aeSdk.selectAccount(aeSdk.addresses()[1])
-      const respondSig = await aeSdk.createOracleDelegationSignature({ contractId, queryId })
+      const respondSig = await aeSdk.createOracleDelegationSignature(contractId, { queryId })
       const response = await contract.methods.respond(
         oracle.id, queryObject.id, respondSig, r
       )

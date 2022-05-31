@@ -22,7 +22,6 @@
  * @export GeneralizedAccount
  * @example import { GeneralizedAccount } from '@aeternity/aepp-sdk'
  */
-import Contract from '../../ae/contract'
 import { TX_TYPE } from '../../tx/builder/schema'
 import { buildContractIdByContractTx, buildTx, unpackTx } from '../../tx/builder'
 import { prepareGaParams } from './helpers'
@@ -31,36 +30,14 @@ import { decode } from '../../utils/encoder'
 import { IllegalArgumentError, MissingParamError } from '../../utils/errors'
 import { concatBuffers } from '../../utils/other'
 
-/**
- * GeneralizedAccount Stamp
- *
- * Provide Generalized Account implementation
- * {@link module:@aeternity/aepp-sdk/es/contract/ga} clients.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/contract/ga
- * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @return {Object} GeneralizedAccount instance
- * @example
- * const authContract = ``
- * await aeSdk.createGeneralizedAccount(authFnName, authContract, [...authFnArguments]
- * // Make spend using GA
- * const callData = 'cb_...' // encoded call data for auth contract
- * await aeSdk.spend(10000, receiverPub, { authData: { callData } })
- * // or
- * await aeSdk.spend(10000, receiverPub, {
- *   authData: { source: authContract, args: [...authContractArgs] }
- * }) // sdk will prepare callData itself
- */
-export const GeneralizedAccount = Contract.compose({
-  methods: {
-    createGeneralizedAccount,
-    createMetaTx,
-    isGA,
-    buildAuthTxHash
-  }
-})
-export default GeneralizedAccount
+export const createGeneralizedAccount = (authFnName, source, args, options) =>
+  _createGeneralizedAccount.bind(options.onAccount)(authFnName, source, args, options)
+export const createMetaTx = (rawTransaction, authData, authFnName, options) =>
+  _createMetaTx.bind(options.onAccount)(rawTransaction, authData, authFnName, options)
+export const isGA = (address, options) =>
+  _isGA.bind(options.onAccount)(address, options)
+export const buildAuthTxHash = (transaction, options) =>
+  _buildAuthTxHash.bind(options.onAccount)(transaction, options)
 
 /**
  * @alias module:@aeternity/aepp-sdk/es/contract/ga
@@ -69,7 +46,7 @@ export default GeneralizedAccount
  * @param {String} address - Account address
  * @return {Boolean}
  */
-async function isGA (address) {
+async function _isGA (address) {
   const { contractId } = await this.getAccount(address)
   return !!contractId
 }
@@ -86,7 +63,7 @@ async function isGA (address) {
  *   result: *, owner: *, address, rawTx: *, transaction: *
  * }>>}
  */
-async function createGeneralizedAccount (authFnName, source, args = [], options = {}) {
+async function _createGeneralizedAccount (authFnName, source, args, options) {
   const opt = { ...this.Ae.defaults, ...options }
   const ownerId = await this.address(opt)
   if (await this.isGA(ownerId)) throw new IllegalArgumentError(`Account ${ownerId} is already GA`)
@@ -125,7 +102,7 @@ const wrapInEmptySignedTx = (tx) => buildTx({ encodedTx: tx, signatures: [] }, T
  * @param {Object} options - Options
  * @return {String}
  */
-async function createMetaTx (rawTransaction, authData, authFnName, options = {}) {
+async function _createMetaTx (rawTransaction, authData, authFnName, options) {
   if (!authData) throw new MissingParamError('authData is required')
   // Check if authData is callData or if it's an object prepare a callData from source and args
   const { authCallData, gasLimit } = await prepareGaParams(this)(authData, authFnName)
@@ -161,7 +138,7 @@ async function createMetaTx (rawTransaction, authData, authFnName, options = {})
  * @param {Object} [options]
  * @return {Uint8Array} Transaction hash
  */
-function buildAuthTxHash (transaction, options) {
+function _buildAuthTxHash (transaction, options) {
   return new Uint8Array(hash(
     concatBuffers([Buffer.from(this.getNetworkId(options)), decode(transaction, 'tx')])
   ))
