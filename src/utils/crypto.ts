@@ -125,8 +125,8 @@ export function generateKeyPairFromSecret (secret: Uint8Array): SignKeyPair {
  * @param raw Whether to return raw (binary) keys
  * @return Key pair
  */
-export function generateKeyPair (raw?: true): { publicKey: Buffer, secretKey: Buffer }
-export function generateKeyPair (raw: false): { publicKey: EncodedData<'ak'>, secretKey: string }
+export function generateKeyPair (raw: true): { publicKey: Buffer, secretKey: Buffer }
+export function generateKeyPair (raw?: false): { publicKey: EncodedData<'ak'>, secretKey: string }
 export function generateKeyPair (raw: boolean = false): {
   publicKey: EncodedData<'ak'> | Buffer
   secretKey: string | Buffer
