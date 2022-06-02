@@ -94,7 +94,9 @@ export function decode (data: EncodedData<EncodingType>): Buffer {
  * @param {string} type Prefix of Transaction
  * @return {EncodedData<type>>} Encoded string Base58check or Base64check data
  */
-export function encode (data: Uint8Array, type: EncodingType): EncodedData<typeof type> {
+export function encode<Type extends EncodingType> (
+  data: Uint8Array, type: Type
+): EncodedData<Type> {
   const [, { encode }] = parseType(type)
   ensureValidLength(data, type)
   return `${type}_${encode(data)}`

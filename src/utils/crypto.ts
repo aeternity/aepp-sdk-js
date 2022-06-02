@@ -122,17 +122,16 @@ export function generateKeyPairFromSecret (secret: Uint8Array): SignKeyPair {
 
 /**
  * Generate a random ED25519 keypair
- * @rtype (raw: Boolean) => {publicKey: String | Buffer, secretKey: String | Buffer}
- * @param {Boolean} raw - Whether to return raw (binary) keys
- * @return {Object} Key pair
+ * @param raw Whether to return raw (binary) keys
+ * @return Key pair
  */
-export function generateKeyPair (raw = false): {
-  publicKey: string | Buffer
+export function generateKeyPair (raw?: true): { publicKey: Buffer, secretKey: Buffer }
+export function generateKeyPair (raw: false): { publicKey: EncodedData<'ak'>, secretKey: string }
+export function generateKeyPair (raw: boolean = false): {
+  publicKey: EncodedData<'ak'> | Buffer
   secretKey: string | Buffer
 } {
-  // <node>/apps/aens/test/aens_test_utils.erl
   const keyPair = nacl.sign.keyPair()
-
   const publicBuffer = Buffer.from(keyPair.publicKey)
   const secretBuffer = Buffer.from(keyPair.secretKey)
 
