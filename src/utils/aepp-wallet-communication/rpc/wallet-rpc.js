@@ -131,12 +131,11 @@ export default Ae.compose(AccountMultiple, {
     const _addAccount = this.addAccount.bind(this)
     const _selectNode = this.selectNode.bind(this)
 
-    // Overwrite AE methods
-    this.selectAccount = (address, { condition = () => true } = {}) => {
+    this.selectAccount = (address) => {
       _selectAccount(address)
       Object.values(this.rpcClients)
         .filter(client => client.isConnected() && client.isSubscribed() &&
-          client.hasAccessToAccount(address) && condition(client))
+          client.hasAccessToAccount(address))
         .forEach(client => client.setAccounts({
           current: { [address]: {} },
           connected: {
@@ -145,23 +144,21 @@ export default Ae.compose(AccountMultiple, {
           }
         }))
     }
-    this.addAccount = async (account, { select, meta = {}, condition = () => true } = {}) => {
+    this.addAccount = async (account, { select } = {}) => {
       await _addAccount(account, { select })
       const address = await account.address()
-      // Send notification 'update.address' to all Aepp which are subscribed for connected accounts
       Object.values(this.rpcClients)
-        .filter(client => client.isConnected() && client.isSubscribed() && condition(client))
+        .filter(client => client.isConnected() && client.isSubscribed())
         .forEach(client => client.setAccounts({
-          current: { ...select ? { [address]: meta } : client.accounts.current },
+          current: { ...select ? { [address]: {} } : client.accounts.current },
           connected: {
-            ...select ? client.accounts.current : { [address]: meta },
+            ...select ? client.accounts.current : { [address]: {} },
             ...client.accounts.connected
           }
         }))
     }
     this.selectNode = (name) => {
       _selectNode(name)
-      // Send notification 'update.network' to all Aepp which connected
       Object.values(this.rpcClients)
         .filter(client => client.isConnected())
         .forEach(client => {
