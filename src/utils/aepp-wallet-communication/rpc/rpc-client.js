@@ -84,13 +84,6 @@ export default stampit({
           ? [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
           : []
       }
-    },
-    origin: {
-      enumerable: true,
-      configurable: false,
-      get () {
-        return this.connection
-      }
     }
   },
   methods: {
