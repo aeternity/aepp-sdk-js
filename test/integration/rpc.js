@@ -371,9 +371,9 @@ describe('Aepp<->Wallet', function () {
       connectionFromAeppToWallet.sendMessage({
         method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0'
       })
-      const [walletMessage, rpcClient] = await walletDisconnect
+      const [walletMessage, rpcClientId] = await walletDisconnect
       walletMessage.reason.should.be.equal('bye')
-      wallet._rpcClientsInfo[rpcClient.id].status.should.be.equal('DISCONNECTED')
+      wallet._rpcClientsInfo[rpcClientId].status.should.be.equal('DISCONNECTED')
     })
 
     it('Remove rpc client', async () => {

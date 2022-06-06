@@ -10,7 +10,7 @@ import { v4 as uuid } from '@aeternity/uuid'
 import Ae from '../../../ae'
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple from '../../../account/multiple'
-import RpcClient from './rpc-client'
+import RpcClient from './RpcClient'
 import {
   METHODS, RPC_STATUS, VERSION,
   RpcBroadcastError, RpcInvalidTransactionError,
@@ -22,8 +22,8 @@ import { unpackTx } from '../../../tx/builder'
 
 const METHOD_HANDLERS = {
   [METHODS.closeConnection]: async (callInstance, instance, client, clientInfo, params) => {
-    instance._disconnectRpcClient(client.id)
-    instance.onDisconnect(params, client)
+    instance._disconnectRpcClient(clientInfo.id)
+    instance.onDisconnect(params, clientInfo.id)
   },
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
   // which automatically prepare and send response for that client
@@ -43,7 +43,7 @@ const METHOD_HANDLERS = {
     }
   },
   async [METHODS.subscribeAddress] (callInstance, instance, client, clientInfo, { type, value }) {
-    if (!instance._isRpcClientConnected(client.id)) throw new RpcNotAuthorizeError()
+    if (!instance._isRpcClientConnected(clientInfo.id)) throw new RpcNotAuthorizeError()
 
     await callInstance('onSubscription', { type, value })
 
@@ -61,15 +61,15 @@ const METHOD_HANDLERS = {
       address: instance.getAccounts()
     }
   },
-  async [METHODS.address] (callInstance, instance, client) {
-    if (!instance._isRpcClientSubscribed(client.id)) throw new RpcNotAuthorizeError()
+  async [METHODS.address] (callInstance, instance, client, clientInfo) {
+    if (!instance._isRpcClientSubscribed(clientInfo.id)) throw new RpcNotAuthorizeError()
     await callInstance('onAskAccounts')
     return instance.addresses()
   },
   async [METHODS.sign] (
     callInstance, instance, client, clientInfo, { tx, onAccount, returnSigned }
   ) {
-    if (!instance._isRpcClientConnected(client.id)) throw new RpcNotAuthorizeError()
+    if (!instance._isRpcClientConnected(clientInfo.id)) throw new RpcNotAuthorizeError()
     onAccount ??= await instance.address()
     if (!instance.addresses().includes(onAccount)) throw new RpcPermissionDenyError(onAccount)
 
@@ -90,7 +90,7 @@ const METHOD_HANDLERS = {
     }
   },
   async [METHODS.signMessage] (callInstance, instance, client, clientInfo, { message, onAccount }) {
-    if (!instance._isRpcClientConnected(client.id)) throw new RpcNotAuthorizeError()
+    if (!instance._isRpcClientConnected(clientInfo.id)) throw new RpcNotAuthorizeError()
     onAccount ??= await instance.address()
     if (!instance.addresses().includes(onAccount)) throw new RpcPermissionDenyError(onAccount)
 
@@ -209,11 +209,10 @@ export default Ae.compose(AccountMultiple, {
       // @TODO  detect if aepp has some history based on origin????
       // if yes use this instance for connection
       const id = uuid()
-      const client = RpcClient({
-        id,
-        connection: clientConnection,
-        onDisconnect: this.onDisconnect,
-        methods: mapObject(METHOD_HANDLERS, ([key, value]) => [key, (params, origin) => {
+      const client = new RpcClient(
+        clientConnection,
+        this.onDisconnect,
+        mapObject(METHOD_HANDLERS, ([key, value]) => [key, (params, origin) => {
           const callInstance = (methodName, params) =>
             this[methodName](
               client,
@@ -225,9 +224,10 @@ export default Ae.compose(AccountMultiple, {
             )
           return value(callInstance, this, client, this._rpcClientsInfo[id], params)
         }])
-      })
+      )
       this.rpcClients[id] = client
       this._rpcClientsInfo[id] = {
+        id,
         status: RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST,
         addressSubscription: new Set()
       }
