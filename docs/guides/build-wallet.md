@@ -51,6 +51,7 @@ const accounts = [
   MemoryAccount({ keypair: generateKeyPair() }), // generate keypair for account1
   MemoryAccount({ keypair: generateKeyPair() })  // generate keypair for account2
 ]
+const aeppInfo = {}
 
 async function init () {
   // Init extension stamp from sdk
@@ -63,31 +64,36 @@ async function init () {
     // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
     accounts,
     // Hook for sdk registration
-    onConnection (aepp) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
+    onConnection (aepp, { params }) {
+      if (!confirm(`Aepp ${params.name} with id ${aepp.id} wants to connect`)) {
         throw new RpcConnectionDenyError()
       }
+      aeppInfo[aepp.id] = params
     },
     onDisconnect (msg, client) {
       console.log('Disconnect client: ', client)
     },
     onSubscription (aepp) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to subscribe for accounts`)) {
         throw new RpcRejectedByUserError()
       }
     },
     onSign (aepp, { params }) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
         throw new RpcRejectedByUserError()
       }
     },
     onAskAccounts (aepp) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to get accounts`)) {
         throw new RpcRejectedByUserError()
       }
     },
     onMessageSign (aepp, { params }) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
         throw new RpcRejectedByUserError()
       }
     }
@@ -132,8 +138,8 @@ async function init () {
     // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
     accounts,
     // Hook for sdk registration
-    onConnection (aepp) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
+    onConnection (aepp, { params }) {
+      if (confirm(`Aepp ${params.name} with id ${aepp.id} wants to connect`)) {
         // Whitelist aepp domains for node connection
         const aepps = ['https://test', 'https://aepp.aeternity.com']
         if (aepp.info.connectNode && aepps.includes(aepp.info.origin)) {}
@@ -142,27 +148,32 @@ async function init () {
       } else {
         throw new RpcConnectionDenyError()
       }
+      aeppInfo[aepp.id] = params
     },
     onDisconnect (msg, client) {
       console.log('Disconnect client: ', client)
     },
     onSubscription (aepp) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to subscribe for accounts`)) {
         throw new RpcRejectedByUserError()
       }
     },
     onSign (aepp, { params }) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
         throw new RpcRejectedByUserError()
       }
     },
     onAskAccounts (aepp) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to get accounts`)) {
         throw new RpcRejectedByUserError()
       }
     },
     onMessageSign (aepp, { params }) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
         throw new RpcRejectedByUserError()
       }
     }

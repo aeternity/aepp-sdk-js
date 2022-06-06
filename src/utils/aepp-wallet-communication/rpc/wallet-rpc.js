@@ -33,17 +33,9 @@ const METHOD_HANDLERS = {
     client,
     { name, version, icons, connectNode }) {
     if (version !== VERSION) throw new RpcUnsupportedProtocolError()
-    // Store new AEPP and wait for connection approve
-    client.updateInfo({
-      name,
-      icons,
-      version,
-      origin: window.location.origin,
-      connectNode
-    })
 
-    await callInstance('onConnection', { name, version })
-    client.updateInfo({ status: connectNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED })
+    await callInstance('onConnection', { name, icons, connectNode })
+    client.status = connectNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED
     return {
       ...instance.getWalletInfo(),
       ...connectNode && { node: instance.selectedNode }
@@ -175,7 +167,7 @@ export default Ae.compose(AccountMultiple, {
         .forEach(client => {
           client.notify(METHODS.updateNetwork, {
             networkId: this.getNetworkId(),
-            ...client.info.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
+            ...client.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
           })
         })
     }
@@ -210,7 +202,6 @@ export default Ae.compose(AccountMultiple, {
       const id = uuid()
       const client = RpcClient({
         id,
-        info: { status: RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST },
         connection: clientConnection,
         onDisconnect: this.onDisconnect,
         methods: mapObject(METHOD_HANDLERS, ([key, value]) => [key, (params, origin) => {
@@ -226,6 +217,7 @@ export default Ae.compose(AccountMultiple, {
           return value(callInstance, this, client, params)
         }])
       })
+      client.status = RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST
       this.rpcClients[id] = client
       return id
     },

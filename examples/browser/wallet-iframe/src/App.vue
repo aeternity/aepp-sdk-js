@@ -72,9 +72,10 @@ export default {
     }
   },
   async mounted () {
-    const genConfirmCallback = (getActionName, Error = RpcRejectedByUserError) => (aepp, { params }) => {
-      if (!confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) {
-        throw new Error()
+    const aeppInfo = {}
+    const genConfirmCallback = (getActionName) => (aepp, { params }) => {
+      if (!confirm(`Client ${aeppInfo[aepp.id].name} with id ${aepp.id} want to ${getActionName(params)}`)) {
+        throw new RpcRejectedByUserError()
       }
     }
     this.aeSdk = await RpcWallet({
@@ -95,7 +96,12 @@ export default {
         MemoryAccount({ keypair: generateKeyPair() })
       ],
       name: 'Wallet Iframe',
-      onConnection: genConfirmCallback(() => 'connect', RpcConnectionDenyError),
+      onConnection: (aepp, { params }) => {
+        if (!confirm(`Client ${params.name} with id ${aepp.id} want to connect`)) {
+          throw new RpcConnectionDenyError()
+        }
+        aeppInfo[aepp.id] = params
+      },
       onSubscription: genConfirmCallback(() => 'subscription'),
       onSign: genConfirmCallback(({ returnSigned, tx }) => `${returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(tx)}`),
       onMessageSign: genConfirmCallback(() => 'message sign'),

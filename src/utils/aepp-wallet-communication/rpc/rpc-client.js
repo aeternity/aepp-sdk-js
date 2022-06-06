@@ -17,17 +17,15 @@ import { InvalidRpcMessageError, MissingCallbackError } from '../../errors'
  * @function
  * @rtype Stamp
  * @param {Object} param Init params object
- * @param {String} param.name Client name
  * @param {Object} param.connection Connection object
  * @param {Function} param.onDisconnect Disconnect callback
  * @param {Object} param.methods Object containing handlers for each request by name
  * @return {Object}
  */
 export default stampit({
-  init ({ id, name, icons, connection, onDisconnect, methods }) {
+  init ({ id, connection, onDisconnect, methods }) {
     this.id = id
     this.connection = connection
-    this.info = { name, icons }
     // {
     //    [msg.id]: { resolve, reject }
     // }
@@ -112,17 +110,6 @@ export default stampit({
       })
       return id
     },
-    /**
-     * Update info
-     * @function updateInfo
-     * @instance
-     * @rtype (info: Object) => void
-     * @param {Object} info Info to update (will be merged with current info object)
-     * @return {void}
-     */
-    updateInfo (info) {
-      Object.assign(this.info, info)
-    },
     isHasAccounts () {
       return typeof this.accounts === 'object' &&
         typeof this.accounts.connected === 'object' &&
@@ -151,7 +138,7 @@ export default stampit({
      */
     isConnected () {
       return this.connection.isConnected() &&
-        (this.info.status === RPC_STATUS.CONNECTED || this.info.status === RPC_STATUS.NODE_BINDED)
+        (this.status === RPC_STATUS.CONNECTED || this.status === RPC_STATUS.NODE_BINDED)
     },
     /**
      * Get selected account
@@ -172,7 +159,7 @@ export default stampit({
      * @return {void}
      */
     disconnect (forceConnectionClose = false) {
-      this.info.status = RPC_STATUS.DISCONNECTED
+      this.status = RPC_STATUS.DISCONNECTED
       this.addressSubscription = []
       this.accounts = {}
       forceConnectionClose || this.connection.disconnect()

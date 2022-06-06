@@ -204,11 +204,11 @@ describe('Aepp<->Wallet', function () {
 
     it('Not authorize', async () => {
       const client = Object.entries(wallet.rpcClients)[0][1]
-      client.updateInfo({ status: RPC_STATUS.DISCONNECTED })
+      client.status = RPC_STATUS.DISCONNECTED
       await expect(aepp.askAddresses()).to.be.eventually
         .rejectedWith('You are not connected to the wallet')
         .with.property('code', 10)
-      client.updateInfo({ status: RPC_STATUS.CONNECTED })
+      client.status = RPC_STATUS.CONNECTED
     })
 
     it('Sign transaction: wallet deny', async () => {
@@ -389,7 +389,7 @@ describe('Aepp<->Wallet', function () {
       })
       const [walletMessage, rpcClient] = await walletDisconnect
       walletMessage.reason.should.be.equal('bye')
-      rpcClient.info.status.should.be.equal('DISCONNECTED')
+      rpcClient.status.should.be.equal('DISCONNECTED')
     })
 
     it('Remove rpc client', async () => {

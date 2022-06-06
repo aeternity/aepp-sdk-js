@@ -5,6 +5,8 @@ import {
 } from '@aeternity/aepp-sdk'
 
 (async () => {
+  const aeppInfo = {}
+
   const aeSdk = await RpcWallet({
     compilerUrl: 'https://compiler.aepps.com',
     nodes: [{
@@ -26,31 +28,36 @@ import {
       MemoryAccount({ keypair: generateKeyPair() })
     ],
     // Hook for sdk registration
-    onConnection (aepp) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
+    onConnection (aepp, { params }) {
+      if (!confirm(`Aepp ${params.name} with id ${aepp.id} wants to connect`)) {
         throw new RpcConnectionDenyError()
       }
+      aeppInfo[aepp.id] = params
     },
     onDisconnect (msg, client) {
       console.log('Client disconnected:', client)
     },
     onSubscription (aepp) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to subscribe for accounts`)) {
         throw new RpcRejectedByUserError()
       }
     },
     onSign (aepp, { params }) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
         throw new RpcRejectedByUserError()
       }
     },
     onAskAccounts (aepp) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to get accounts`)) {
         throw new RpcRejectedByUserError()
       }
     },
     onMessageSign (aepp, { params }) {
-      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
+      const { name } = aeppInfo[aepp.id]
+      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
         throw new RpcRejectedByUserError()
       }
     }
