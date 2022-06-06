@@ -28,6 +28,7 @@ export * from './utils/hd-wallet'
 export * from './ae/contract'
 export * from './contract/ga'
 
+// @ts-expect-error
 export { default as Ae } from './ae'
 export { default as Node } from './node'
 export { default as NodePool } from './node-pool'
@@ -35,12 +36,17 @@ export { default as verifyTransaction } from './tx/validator'
 export { default as AccountBase } from './account/base'
 export { default as AccountMultiple } from './account/multiple'
 export { default as MemoryAccount } from './account/memory'
+// @ts-expect-error
 export { default as Aens } from './ae/aens'
 export { default as ContractCompilerHttp } from './contract/compiler'
+// @ts-expect-error
 export { default as RpcAepp } from './ae/aepp'
+// @ts-expect-error
 export { default as RpcWallet } from './ae/wallet'
+// @ts-expect-error
 export { default as Oracle } from './ae/oracle'
 export { default as Channel } from './channel'
+// @ts-expect-error
 export { default as Universal } from './ae/universal'
 
 export { default as connectionProxy } from './utils/aepp-wallet-communication/connection-proxy'

@@ -15,15 +15,16 @@ theme:
   favicon: images/favicon.png
   name: material
   custom_dir: tooling/docs/overrides
-  language: en
   palette:
     - scheme: default
+      media: "(prefers-color-scheme: light)"
       primary: pink
       accent: pink
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
     - scheme: slate
+      media: "(prefers-color-scheme: dark)"
       primary: pink
       accent: pink
       toggle:
@@ -67,7 +68,7 @@ nav:
         - examples/node/paying-for-tx-contract-call-tx.md
         - examples/node/paying-for-tx-spend-tx.md
     - tutorials/vuejs/helloworld-blockheight.md
-  - api-reference.md
+  - 'API Reference': api/
   - compatibility.md
   - Changelog: CHANGELOG.md
   - Migration Guides:

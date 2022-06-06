@@ -4,7 +4,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 function configure (filename, opts = {}) {
   return (env, argv) => ({
-    entry: './src/index.js',
+    entry: './src/index.ts',
     mode: 'development', // automatically overriden by production flag
     devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
     module: {

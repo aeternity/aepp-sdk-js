@@ -1,0 +1,7 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "out": "./docs/api",
+  "excludePrivate": true,
+  "githubPages": false,
+  "readme": "none"
+}
