@@ -8,7 +8,7 @@
  */
 import stampit from '@stamp/it'
 
-import { METHODS, RpcError, RpcInternalError } from '../schema'
+import { RpcError, RpcInternalError } from '../schema'
 import { InvalidRpcMessageError, MissingCallbackError } from '../../errors'
 
 /**
@@ -30,11 +30,6 @@ export default stampit({
     //    [msg.id]: { resolve, reject }
     // }
     this.callbacks = {}
-    // {
-    //    connected: { [pub]: {...meta} },
-    //    current: { [pub]: {...meta} }
-    // }
-    this.accounts = {}
 
     this._messageId = 0
 
@@ -59,26 +54,6 @@ export default stampit({
 
     connection.connect(handleMessage, onDisconnect)
   },
-  propertyDescriptors: {
-    currentAccount: {
-      enumerable: true,
-      configurable: false,
-      get () {
-        return this.isHasAccounts()
-          ? Object.keys(this.accounts.current)[0]
-          : undefined
-      }
-    },
-    addresses: {
-      enumerable: true,
-      configurable: false,
-      get () {
-        return this.isHasAccounts()
-          ? [...Object.keys(this.accounts.current), ...Object.keys(this.accounts.connected)]
-          : []
-      }
-    }
-  },
   methods: {
     _sendMessage ({ id, method, params, result, error }, isNotificationOrResponse = false) {
       if (!isNotificationOrResponse) this._messageId += 1
@@ -95,43 +70,6 @@ export default stampit({
         ...msgData
       })
       return id
-    },
-    isHasAccounts () {
-      return typeof this.accounts === 'object' &&
-        typeof this.accounts.connected === 'object' &&
-        typeof this.accounts.current === 'object'
-    },
-    /**
-     * Check if aepp has access to account
-     * @function hasAccessToAccount
-     * @instance
-     * @rtype (address: String) => Boolean
-     * @param {String} address Account address
-     * @return {Boolean} is connected
-     */
-    hasAccessToAccount (address) {
-      return !!address && this.addresses.find(a => a === address)
-    },
-    /**
-     * Get selected account
-     * @function getCurrentAccount
-     * @instance
-     * @rtype ({ onAccount } = {}) => String
-     * @param {Object} options Options
-     * @return {String}
-     */
-    getCurrentAccount ({ onAccount } = {}) {
-      return onAccount || Object.keys(this.accounts.current)[0]
-    },
-    /**
-     * Update accounts and sent `update.address` notification to AEPP
-     * @param {{ current: Object, connected: Object }} accounts Current and connected accounts
-     * @param {Object} [options]
-     * @param {Boolean} [options.forceNotification] Don't sent update notification to AEPP
-     */
-    setAccounts (accounts, { forceNotification } = {}) {
-      this.accounts = accounts
-      if (!forceNotification) this.notify(METHODS.updateAddress, this.accounts)
     },
     /**
      * Make a request

@@ -68,7 +68,9 @@ describe('Aepp<->Wallet', function () {
       await spendPromise
       wallet = await RpcWallet({
         compilerUrl,
-        accounts: [MemoryAccount({ keypair: account })],
+        accounts: [
+          MemoryAccount({ keypair: account }), MemoryAccount({ keypair: generateKeyPair() })
+        ],
         nodes: [{ name: 'local', instance: node }],
         id: 'test',
         type: WALLET_TYPE.window,
@@ -150,13 +152,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Subscribe to address: wallet accept', async () => {
-      const accounts = {
-        connected: { [keypair.publicKey]: {} },
-        current: wallet.addresses().reduce((acc, v) => ({ ...acc, [v]: {} }), {})
-      }
-      wallet.onSubscription = () => {
-        return accounts
-      }
+      wallet.onSubscription = () => {}
       await aepp.subscribeAddress('subscribe', 'connected')
       await aepp.subscribeAddress('unsubscribe', 'connected')
       const subscriptionResponse = await aepp.subscribeAddress('subscribe', 'connected')
@@ -230,7 +226,7 @@ describe('Aepp<->Wallet', function () {
         amount: 0,
         payload: 'zerospend'
       })
-      await expect(aepp.signTransaction(tx, { onAccount: keypair.publicKey }))
+      await expect(aepp.signTransaction(tx, { onAccount: account.publicKey }))
         .to.be.rejectedWith('The peer failed to execute your request due to unknown error')
     })
 
@@ -299,21 +295,13 @@ describe('Aepp<->Wallet', function () {
       isValid.should.be.equal(true)
     })
 
-    it('Sign message using account not from sdk instance: do not provide account', async () => {
-      wallet.onMessageSign = () => {}
-      const onAccount = aepp.addresses()[1]
-      await expect(aepp.signMessage('test', { onAccount })).to.be.eventually
-        .rejectedWith('The peer failed to execute your request due to unknown error')
-        .with.property('code', 12)
-    })
-
-    it('Sign message using account not from sdk instance', async () => {
+    it('Sign message using custom account', async () => {
       wallet.onMessageSign = (aepp, action) => {
-        if (action.params.onAccount === keypair.publicKey) {
-          return { onAccount: MemoryAccount({ keypair }) }
+        if (action.params.onAccount === account.publicKey) {
+          return { onAccount: MemoryAccount({ keypair: account }) }
         }
       }
-      const onAccount = keypair.publicKey
+      const onAccount = account.publicKey
       const messageSig = await aepp.signMessage('test', { onAccount })
       messageSig.should.be.instanceof(Buffer)
       const isValid = await aepp.verifyMessage('test', messageSig, { onAccount })
@@ -476,7 +464,7 @@ describe('Aepp<->Wallet', function () {
       subscriptionResponse.address.current.should.be.an('object')
       Object.keys(subscriptionResponse.address.current)[0].should.be.equal(account.publicKey)
       subscriptionResponse.address.connected.should.be.an('object')
-      Object.keys(subscriptionResponse.address.connected).length.should.be.equal(1)
+      Object.keys(subscriptionResponse.address.connected).length.should.be.equal(0)
     })
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
