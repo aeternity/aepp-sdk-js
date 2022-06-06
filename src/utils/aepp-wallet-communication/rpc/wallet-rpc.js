@@ -120,7 +120,6 @@ export default Ae.compose(AccountMultiple, {
     name,
     id,
     type,
-    debug = false,
     ...other
   } = {}) {
     [
@@ -131,7 +130,6 @@ export default Ae.compose(AccountMultiple, {
       this[event] = handler
     })
 
-    this.debug = debug
     this.rpcClients = {}
     this.name = name
     this.id = id
