@@ -30,7 +30,7 @@ import type stampit from '@stamp/it' // eslint-disable-line @typescript-eslint/n
 
 class _AccountMultiple extends _AccountResolver {
   accounts: { [key: EncodedData<'ak'>]: _AccountBase }
-  selectedAddress?: string
+  selectedAddress?: EncodedData<'ak'>
 
   async init (
     { accounts = [], address }: { accounts: _AccountBase[], address: EncodedData<'ak'> } & Parameters<_AccountBase['init']>[0]
