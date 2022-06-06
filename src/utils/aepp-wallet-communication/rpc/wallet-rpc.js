@@ -14,15 +14,15 @@ import RpcClient from './rpc-client'
 import {
   METHODS, RPC_STATUS, VERSION,
   RpcBroadcastError, RpcInvalidTransactionError,
-  RpcNotAuthorizeError, RpcPermissionDenyError, RpcUnsupportedProtocolError
+  RpcNotAuthorizeError, RpcPermissionDenyError, RpcUnsupportedProtocolError, SUBSCRIPTION_TYPES
 } from '../schema'
 import { ArgumentError, UnknownRpcClientError } from '../../errors'
 import { filterObject, mapObject } from '../../other'
 import { unpackTx } from '../../../tx/builder'
 
 const METHOD_HANDLERS = {
-  [METHODS.closeConnection]: async (callInstance, instance, client, params) => {
-    client.disconnect(true)
+  [METHODS.closeConnection]: async (callInstance, instance, client, clientInfo, params) => {
+    instance._disconnectRpcClient(client.id)
     instance.onDisconnect(params, client)
   },
   // Store client info and prepare two fn for each client `connect` and `denyConnection`
@@ -31,37 +31,47 @@ const METHOD_HANDLERS = {
     callInstance,
     instance,
     client,
+    clientInfo,
     { name, version, icons, connectNode }) {
     if (version !== VERSION) throw new RpcUnsupportedProtocolError()
 
     await callInstance('onConnection', { name, icons, connectNode })
-    client.status = connectNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED
+    clientInfo.status = connectNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED
     return {
       ...instance.getWalletInfo(),
       ...connectNode && { node: instance.selectedNode }
     }
   },
-  async [METHODS.subscribeAddress] (callInstance, instance, client, { type, value }) {
-    if (!client.isConnected()) throw new RpcNotAuthorizeError()
+  async [METHODS.subscribeAddress] (callInstance, instance, client, clientInfo, { type, value }) {
+    if (!instance._isRpcClientConnected(client.id)) throw new RpcNotAuthorizeError()
 
     const accounts = await callInstance('onSubscription', { type, value })
     const clientAccounts = accounts || instance.getAccounts()
-    const subscription = client.updateSubscription(type, value)
+
+    switch (type) {
+      case SUBSCRIPTION_TYPES.subscribe:
+        clientInfo.addressSubscription.add(value)
+        break
+      case SUBSCRIPTION_TYPES.unsubscribe:
+        clientInfo.addressSubscription.delete(value)
+        break
+    }
+
     client.setAccounts(clientAccounts, { forceNotification: true })
     return {
-      subscription,
+      subscription: Array.from(clientInfo.addressSubscription),
       address: clientAccounts
     }
   },
   async [METHODS.address] (callInstance, instance, client) {
-    if (!client.isConnected() || !client.isSubscribed()) throw new RpcNotAuthorizeError()
+    if (!instance._isRpcClientSubscribed(client.id)) throw new RpcNotAuthorizeError()
 
     const accounts = await callInstance('onAskAccounts') ?? client.accounts
     return [...Object.keys(accounts.current), ...Object.keys(accounts.connected)]
   },
-  async [METHODS.sign] (callInstance, instance, client, { tx, onAccount, returnSigned }) {
+  async [METHODS.sign] (callInstance, instance, client, clientInfo, { tx, onAccount, returnSigned }) {
     onAccount ??= client.currentAccount
-    if (!client.isConnected()) throw new RpcNotAuthorizeError()
+    if (!instance._isRpcClientConnected(client.id)) throw new RpcNotAuthorizeError()
     if (!client.hasAccessToAccount(onAccount)) throw new RpcPermissionDenyError(onAccount)
 
     const overrides = await callInstance(
@@ -80,8 +90,8 @@ const METHOD_HANDLERS = {
       throw new RpcBroadcastError(error.message)
     }
   },
-  async [METHODS.signMessage] (callInstance, instance, client, { message, onAccount }) {
-    if (!client.isConnected()) throw new RpcNotAuthorizeError()
+  async [METHODS.signMessage] (callInstance, instance, client, clientInfo, { message, onAccount }) {
+    if (!instance._isRpcClientConnected(client.id)) throw new RpcNotAuthorizeError()
     onAccount ??= client.currentAccount
     if (!client.hasAccessToAccount(onAccount)) throw new RpcPermissionDenyError(onAccount)
 
@@ -123,6 +133,7 @@ export default Ae.compose(AccountMultiple, {
     })
 
     this.rpcClients = {}
+    this._rpcClientsInfo = {}
     this.name = name
     this.id = id
     this._type = type
@@ -133,9 +144,12 @@ export default Ae.compose(AccountMultiple, {
 
     this.selectAccount = (address) => {
       _selectAccount(address)
-      Object.values(this.rpcClients)
-        .filter(client => client.isConnected() && client.isSubscribed() &&
-          client.hasAccessToAccount(address))
+      Object.keys(this.rpcClients)
+        .filter(clientId => {
+          return this._isRpcClientSubscribed(clientId) &&
+            this.rpcClients[clientId].hasAccessToAccount(address)
+        })
+        .map(clientId => this.rpcClients[clientId])
         .forEach(client => client.setAccounts({
           current: { [address]: {} },
           connected: {
@@ -147,8 +161,9 @@ export default Ae.compose(AccountMultiple, {
     this.addAccount = async (account, { select } = {}) => {
       await _addAccount(account, { select })
       const address = await account.address()
-      Object.values(this.rpcClients)
-        .filter(client => client.isConnected() && client.isSubscribed())
+      Object.keys(this.rpcClients)
+        .filter(clientId => this._isRpcClientSubscribed(clientId))
+        .map(clientId => this.rpcClients[clientId])
         .forEach(client => client.setAccounts({
           current: { ...select ? { [address]: {} } : client.accounts.current },
           connected: {
@@ -159,31 +174,48 @@ export default Ae.compose(AccountMultiple, {
     }
     this.selectNode = (name) => {
       _selectNode(name)
-      Object.values(this.rpcClients)
-        .filter(client => client.isConnected())
-        .forEach(client => {
-          client.notify(METHODS.updateNetwork, {
+      Object.keys(this.rpcClients)
+        .filter(clientId => this._isRpcClientConnected(clientId))
+        .forEach(clientId => {
+          this.rpcClients[clientId].notify(METHODS.updateNetwork, {
             networkId: this.getNetworkId(),
-            ...client.status === RPC_STATUS.NODE_BINDED && { node: this.selectedNode }
+            ...this._rpcClientsInfo[clientId].status === RPC_STATUS.NODE_BINDED &&
+              { node: this.selectedNode }
           })
         })
     }
   },
   methods: {
+    _isRpcClientSubscribed (clientId) {
+      return this._isRpcClientConnected(clientId) &&
+        this._rpcClientsInfo[clientId].addressSubscription.size !== 0
+    },
+    _isRpcClientConnected (clientId) {
+      return [RPC_STATUS.CONNECTED, RPC_STATUS.NODE_BINDED]
+        .includes(this._rpcClientsInfo[clientId].status) &&
+        this.rpcClients[clientId].connection.isConnected()
+    },
+    _disconnectRpcClient (clientId) {
+      const client = this.rpcClients[clientId]
+      const clientInfo = this._rpcClientsInfo[clientId]
+      if (client == null || clientInfo == null) throw new UnknownRpcClientError(clientId)
+      client.connection.disconnect()
+      client.accounts = {}
+      clientInfo.status = RPC_STATUS.DISCONNECTED
+      clientInfo.addressSubscription = new Set()
+    },
     /**
      * Remove specific RpcClient by ID
      * @function removeRpcClient
      * @instance
      * @rtype (id: string) => void
      * @param {String} id Client ID
-     * @param {Object} [opt = {}]
      * @return {void}
      */
-    removeRpcClient (id, { forceConnectionClose = false } = {}) {
-      const client = this.rpcClients[id]
-      if (!client) throw new UnknownRpcClientError(id)
-      client.disconnect(forceConnectionClose)
+    removeRpcClient (id) {
+      this._disconnectRpcClient(id)
       delete this.rpcClients[id]
+      delete this._rpcClientsInfo[id]
     },
     /**
      * Add new client by AEPP connection
@@ -211,11 +243,14 @@ export default Ae.compose(AccountMultiple, {
               },
               origin
             )
-          return value(callInstance, this, client, params)
+          return value(callInstance, this, client, this._rpcClientsInfo[id], params)
         }])
       })
-      client.status = RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST
       this.rpcClients[id] = client
+      this._rpcClientsInfo[id] = {
+        status: RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST,
+        addressSubscription: new Set()
+      }
       return id
     },
     /**

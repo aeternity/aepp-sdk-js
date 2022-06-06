@@ -8,7 +8,7 @@
  */
 import stampit from '@stamp/it'
 
-import { METHODS, RPC_STATUS, SUBSCRIPTION_TYPES, RpcError, RpcInternalError } from '../schema'
+import { METHODS, RpcError, RpcInternalError } from '../schema'
 import { InvalidRpcMessageError, MissingCallbackError } from '../../errors'
 
 /**
@@ -30,8 +30,6 @@ export default stampit({
     //    [msg.id]: { resolve, reject }
     // }
     this.callbacks = {}
-    // ['connected', 'current']
-    this.addressSubscription = []
     // {
     //    connected: { [pub]: {...meta} },
     //    current: { [pub]: {...meta} }
@@ -59,12 +57,7 @@ export default stampit({
       if (response.id) this._sendMessage(response, true)
     }
 
-    const disconnect = (aepp, connection) => {
-      this.disconnect(true)
-      typeof onDisconnect === 'function' && onDisconnect(connection, this)
-    }
-
-    connection.connect(handleMessage, disconnect)
+    connection.connect(handleMessage, onDisconnect)
   },
   propertyDescriptors: {
     currentAccount: {
@@ -108,9 +101,6 @@ export default stampit({
         typeof this.accounts.connected === 'object' &&
         typeof this.accounts.current === 'object'
     },
-    isSubscribed () {
-      return this.addressSubscription.length && this.isHasAccounts()
-    },
     /**
      * Check if aepp has access to account
      * @function hasAccessToAccount
@@ -121,17 +111,6 @@ export default stampit({
      */
     hasAccessToAccount (address) {
       return !!address && this.addresses.find(a => a === address)
-    },
-    /**
-     * Check if is connected
-     * @function isConnected
-     * @instance
-     * @rtype () => Boolean
-     * @return {Boolean} is connected
-     */
-    isConnected () {
-      return this.connection.isConnected() &&
-        (this.status === RPC_STATUS.CONNECTED || this.status === RPC_STATUS.NODE_BINDED)
     },
     /**
      * Get selected account
@@ -145,19 +124,6 @@ export default stampit({
       return onAccount || Object.keys(this.accounts.current)[0]
     },
     /**
-     * Disconnect
-     * @function disconnect
-     * @instance
-     * @rtype () => void
-     * @return {void}
-     */
-    disconnect (forceConnectionClose = false) {
-      this.status = RPC_STATUS.DISCONNECTED
-      this.addressSubscription = []
-      this.accounts = {}
-      forceConnectionClose || this.connection.disconnect()
-    },
-    /**
      * Update accounts and sent `update.address` notification to AEPP
      * @param {{ current: Object, connected: Object }} accounts Current and connected accounts
      * @param {Object} [options]
@@ -166,24 +132,6 @@ export default stampit({
     setAccounts (accounts, { forceNotification } = {}) {
       this.accounts = accounts
       if (!forceNotification) this.notify(METHODS.updateAddress, this.accounts)
-    },
-    /**
-     * Update subscription
-     * @function updateSubscription
-     * @instance
-     * @rtype (type: String, value: String) => void
-     * @param {String} type Subscription type
-     * @param {String} value Subscription value
-     * @return {String[]}
-     */
-    updateSubscription (type, value) {
-      if (type === SUBSCRIPTION_TYPES.subscribe && !this.addressSubscription.includes(value)) {
-        this.addressSubscription.push(value)
-      }
-      if (type === SUBSCRIPTION_TYPES.unsubscribe && this.addressSubscription.includes(value)) {
-        this.addressSubscription = this.addressSubscription.filter(s => s !== value)
-      }
-      return this.addressSubscription
     },
     /**
      * Make a request
