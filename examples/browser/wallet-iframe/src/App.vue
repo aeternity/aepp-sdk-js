@@ -30,7 +30,8 @@
 <script>
 import {
   MemoryAccount, RpcWallet, Node, generateKeyPair,
-  BrowserWindowMessageConnection, METHODS, WALLET_TYPE
+  BrowserWindowMessageConnection, METHODS, WALLET_TYPE,
+  RpcConnectionDenyError, RpcRejectedByUserError
 } from '@aeternity/aepp-sdk'
 import Value from './Value'
 
@@ -71,9 +72,10 @@ export default {
     }
   },
   async mounted () {
-    const genConfirmCallback = getActionName => (aepp, { accept, deny, params }) => {
-      if (confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) accept()
-      else deny()
+    const genConfirmCallback = (getActionName, Error = RpcRejectedByUserError) => (aepp, { params }) => {
+      if (!confirm(`Client ${aepp.info.name} with id ${aepp.id} want to ${getActionName(params)}`)) {
+        throw new Error()
+      }
     }
     this.aeSdk = await RpcWallet({
       id: window.origin,
@@ -93,7 +95,7 @@ export default {
         MemoryAccount({ keypair: generateKeyPair() })
       ],
       name: 'Wallet Iframe',
-      onConnection: genConfirmCallback(() => 'connect'),
+      onConnection: genConfirmCallback(() => 'connect', RpcConnectionDenyError),
       onSubscription: genConfirmCallback(() => 'subscription'),
       onSign: genConfirmCallback(({ returnSigned, tx }) => `${returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(tx)}`),
       onMessageSign: genConfirmCallback(() => 'message sign'),

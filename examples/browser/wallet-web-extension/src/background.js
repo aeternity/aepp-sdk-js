@@ -1,6 +1,7 @@
 import browser from 'webextension-polyfill'
 import {
-  RpcWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection, WALLET_TYPE
+  RpcWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection, WALLET_TYPE,
+  RpcConnectionDenyError, RpcRejectedByUserError
 } from '@aeternity/aepp-sdk'
 
 (async () => {
@@ -25,42 +26,32 @@ import {
       MemoryAccount({ keypair: generateKeyPair() })
     ],
     // Hook for sdk registration
-    onConnection (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onConnection (aepp) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
+        throw new RpcConnectionDenyError()
       }
     },
     onDisconnect (msg, client) {
       console.log('Client disconnected:', client)
     },
-    onSubscription (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSubscription (aepp) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${action.params.tx}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSign (aepp, { params }) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onAskAccounts (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onAskAccounts (aepp) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onMessageSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${action.params.message}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onMessageSign (aepp, { params }) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
+        throw new RpcRejectedByUserError()
       }
     }
   })

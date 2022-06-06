@@ -63,42 +63,32 @@ async function init () {
     // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
     accounts,
     // Hook for sdk registration
-    onConnection (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onConnection (aepp) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
+        throw new RpcConnectionDenyError()
       }
     },
     onDisconnect (msg, client) {
       console.log('Disconnect client: ', client)
     },
-    onSubscription (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSubscription (aepp) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${action.params.tx}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSign (aepp, { params }) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onAskAccounts (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onAskAccounts (aepp) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onMessageSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${action.params.message}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onMessageSign (aepp, { params }) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
+        throw new RpcRejectedByUserError()
       }
     }
   }).then(wallet => {
@@ -142,46 +132,38 @@ async function init () {
     // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
     accounts,
     // Hook for sdk registration
-    onConnection (aepp, action) {
+    onConnection (aepp) {
       if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
         // Whitelist aepp domains for node connection
         const aepps = ['https://test', 'https://aepp.aeternity.com']
-        if (aepp.info.connectNode && aepps.includes(aepp.info.origin)) action.accept()
-        else action.deny()
-        action.accept() // Accept wallet connection without sharing node URLs
+        if (aepp.info.connectNode && aepps.includes(aepp.info.origin)) {}
+        else throw new RpcConnectionDenyError()
+        // Connect to aepp without sharing node URLs
       } else {
-        action.deny()
+        throw new RpcConnectionDenyError()
       }
     },
     onDisconnect (msg, client) {
       console.log('Disconnect client: ', client)
     },
-    onSubscription (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSubscription (aepp) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${action.params.tx}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSign (aepp, { params }) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onAskAccounts (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onAskAccounts (aepp) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onMessageSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${action.params.message}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onMessageSign (aepp, { params }) {
+      if (!confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
+        throw new RpcRejectedByUserError()
       }
     }
   }).then(wallet => {
