@@ -195,7 +195,7 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Not authorize', async () => {
-      const clientInfo = Object.entries(wallet._rpcClientsInfo)[0][1]
+      const clientInfo = Array.from(wallet._clients.entries())[0][1]
       clientInfo.status = RPC_STATUS.DISCONNECTED
       await expect(aepp.askAddresses()).to.be.eventually
         .rejectedWith('You are not connected to the wallet')
@@ -373,7 +373,7 @@ describe('Aepp<->Wallet', function () {
       })
       const [walletMessage, rpcClientId] = await walletDisconnect
       walletMessage.reason.should.be.equal('bye')
-      wallet._rpcClientsInfo[rpcClientId].status.should.be.equal('DISCONNECTED')
+      wallet._clients.get(rpcClientId).status.should.be.equal('DISCONNECTED')
     })
 
     it('Remove rpc client', async () => {
@@ -390,7 +390,7 @@ describe('Aepp<->Wallet', function () {
       )
 
       wallet.removeRpcClient(id)
-      Object.keys(wallet.rpcClients).length.should.be.equal(1)
+      Array.from(wallet._clients.keys()).length.should.be.equal(1)
     })
 
     it('Remove rpc client: client not found', () => {
