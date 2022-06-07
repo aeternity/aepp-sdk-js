@@ -74,7 +74,7 @@ export default class extends (Node as unknown as TransformedNode) {
   }
 
   #mapData (
-    data: unknown, transform: {
+    data: any, transform: {
       bigInt: (v: any) => any
       number: (v: any) => any
     }
