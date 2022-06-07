@@ -36,7 +36,8 @@ const METHOD_HANDLERS = {
     if (version !== VERSION) throw new RpcUnsupportedProtocolError()
 
     await callInstance('onConnection', { name, icons, connectNode })
-    clientInfo.status = connectNode ? RPC_STATUS.NODE_BINDED : RPC_STATUS.CONNECTED
+    clientInfo.status = RPC_STATUS.CONNECTED
+    clientInfo.connectNode = connectNode
     return {
       ...instance.getWalletInfo(),
       ...connectNode && { node: instance.selectedNode }
@@ -160,8 +161,7 @@ export default Ae.compose(AccountMultiple, {
         .forEach(clientId => {
           this.rpcClients[clientId].notify(METHODS.updateNetwork, {
             networkId: this.getNetworkId(),
-            ...this._rpcClientsInfo[clientId].status === RPC_STATUS.NODE_BINDED &&
-              { node: this.selectedNode }
+            ...this._rpcClientsInfo[clientId].connectNode && { node: this.selectedNode }
           })
         })
     }
@@ -172,8 +172,7 @@ export default Ae.compose(AccountMultiple, {
         this._rpcClientsInfo[clientId].addressSubscription.size !== 0
     },
     _isRpcClientConnected (clientId) {
-      return [RPC_STATUS.CONNECTED, RPC_STATUS.NODE_BINDED]
-        .includes(this._rpcClientsInfo[clientId].status) &&
+      return RPC_STATUS.CONNECTED === this._rpcClientsInfo[clientId].status &&
         this.rpcClients[clientId].connection.isConnected()
     },
     _disconnectRpcClient (clientId) {
