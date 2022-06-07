@@ -1,9 +1,12 @@
 import browser from 'webextension-polyfill'
 import {
-  RpcWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection, WALLET_TYPE
+  RpcWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection, WALLET_TYPE,
+  RpcConnectionDenyError, RpcRejectedByUserError
 } from '@aeternity/aepp-sdk'
 
 (async () => {
+  const aeppInfo = {}
+
   const aeSdk = await RpcWallet({
     compilerUrl: 'https://compiler.aepps.com',
     nodes: [{
@@ -25,42 +28,37 @@ import {
       MemoryAccount({ keypair: generateKeyPair() })
     ],
     // Hook for sdk registration
-    onConnection (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onConnection (aeppId, params) {
+      if (!confirm(`Aepp ${params.name} with id ${aeppId} wants to connect`)) {
+        throw new RpcConnectionDenyError()
       }
+      aeppInfo[aeppId] = params
     },
     onDisconnect (msg, client) {
       console.log('Client disconnected:', client)
     },
-    onSubscription (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSubscription (aeppId) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to subscribe for accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${action.params.tx}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSign (aeppId, params) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to sign tx ${params.tx}`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onAskAccounts (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onAskAccounts (aeppId) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to get accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onMessageSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${action.params.message}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onMessageSign (aeppId, params) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to sign msg ${params.message}`)) {
+        throw new RpcRejectedByUserError()
       }
     }
   })

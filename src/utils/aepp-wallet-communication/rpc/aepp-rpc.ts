@@ -13,7 +13,7 @@ import AccountRpc from '../../../account/rpc'
 import { decode, EncodedData } from '../../encoder'
 import { Accounts, WalletInfo, Network, WalletApi, AeppApi } from './types'
 import RpcClient from './RpcClient'
-import { METHODS, VERSION } from '../schema'
+import { METHODS, VERSION, SUBSCRIPTION_TYPES } from '../schema'
 import {
   AlreadyConnectedError,
   NoWalletConnectedError,
@@ -108,16 +108,16 @@ abstract class _AeppRpc extends _AccountResolver {
         delete this._accounts
         this.onDisconnect(disconnectParams)
       }, {
-        [METHODS.updateAddress]: (params: Accounts) => {
+        [METHODS.updateAddress]: (params) => {
           this._accounts = params
           this.onAddressChange(params)
         },
-        [METHODS.updateNetwork]: async (params: Network) => {
+        [METHODS.updateNetwork]: async (params) => {
           const { node } = params
           if (node != null) this.addNode(node.name, await Node(node), true)
           this.onNetworkChange(params)
         },
-        [METHODS.closeConnection]: (params: any) => {
+        [METHODS.closeConnection]: (params) => {
           disconnectParams = params
           client.connection.disconnect()
         },
@@ -155,12 +155,12 @@ abstract class _AeppRpc extends _AccountResolver {
 
   /**
    * Subscribe for addresses from wallet
-   * @param type Should be one of 'current' (the selected account), 'connected' (all)
-   * @param value Subscription action
+   * @param type Subscription type
+   * @param value Should be one of 'current' (the selected account), 'connected' (all)
    * @return Accounts from wallet
    */
   async subscribeAddress (
-    type: 'current' | 'connected', value: 'subscribe' | 'unsubscribe'
+    type: SUBSCRIPTION_TYPES, value: 'current' | 'connected'
   ): Promise<ReturnType<WalletApi[METHODS.subscribeAddress]>> {
     this._ensureConnected()
     const result = await this.rpcClient.request(METHODS.subscribeAddress, { type, value })

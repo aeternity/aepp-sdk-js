@@ -21,8 +21,11 @@ interface JsonRpcResponse {
   }
 }
 
-type RpcApiHandler = (p?: any, origin?: string) => any | undefined
-type RpcApi<Keys> = { [k in keyof Keys]: RpcApiHandler }
+type RpcApiHandler = (p?: any) => any | undefined
+type RpcApi<Api> = { [k in keyof Api]: RpcApiHandler }
+type WithOrigin<Api extends RpcApi<Api>> = {
+  [k in keyof Api]: (p: Parameters<Api[k]>[0], origin: string) => ReturnType<Api[k]>
+}
 
 /**
  * Contain functionality for using RPC conection
@@ -36,12 +39,12 @@ export default class RpcClient <
   connection: BrowserConnection
   #callbacks = new Map<number, { resolve: (v: any) => void, reject: (e: Error) => void }>()
   #messageId = 0
-  #methods: LocalApi
+  #methods: WithOrigin<LocalApi>
 
   constructor (
     connection: BrowserConnection,
     onDisconnect: () => void,
-    methods: LocalApi
+    methods: WithOrigin<LocalApi>
   ) {
     this.connection = connection
     this.#methods = methods

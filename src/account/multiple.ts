@@ -28,9 +28,9 @@ import AccountResolver, { _AccountResolver, Account } from './resolver'
 import { UnavailableAccountError } from '../utils/errors'
 import type stampit from '@stamp/it' // eslint-disable-line @typescript-eslint/no-unused-vars
 
-class _AccountMultiple extends _AccountResolver {
+export class _AccountMultiple extends _AccountResolver {
   accounts: { [key: EncodedData<'ak'>]: _AccountBase }
-  selectedAddress?: string
+  selectedAddress?: EncodedData<'ak'>
 
   async init (
     { accounts = [], address }: { accounts: _AccountBase[], address: EncodedData<'ak'> } & Parameters<_AccountBase['init']>[0]
@@ -60,8 +60,8 @@ class _AccountMultiple extends _AccountResolver {
    * @return {String[]}
    * @example addresses()
    */
-  addresses (): string[] {
-    return Object.keys(this.accounts)
+  addresses (): Array<EncodedData<'ak'>> {
+    return Object.keys(this.accounts) as Array<EncodedData<'ak'>>
   }
 
   /**
