@@ -108,16 +108,16 @@ abstract class _AeppRpc extends _AccountResolver {
         delete this._accounts
         this.onDisconnect(disconnectParams)
       }, {
-        [METHODS.updateAddress]: (params: Accounts) => {
+        [METHODS.updateAddress]: (params) => {
           this._accounts = params
           this.onAddressChange(params)
         },
-        [METHODS.updateNetwork]: async (params: Network) => {
+        [METHODS.updateNetwork]: async (params) => {
           const { node } = params
           if (node != null) this.addNode(node.name, await Node(node), true)
           this.onNetworkChange(params)
         },
-        [METHODS.closeConnection]: (params: any) => {
+        [METHODS.closeConnection]: (params) => {
           disconnectParams = params
           client.connection.disconnect()
         },
