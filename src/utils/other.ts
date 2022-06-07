@@ -3,10 +3,12 @@ import { snakeToPascal, pascalToSnake } from './string'
 export const pause = async (duration: number): Promise<void> =>
   await new Promise(resolve => setTimeout(resolve, duration))
 
-export const mapObject = (
-  object: object,
-  fn: (value: [string, any], index: number, array: Array<[string, any]>) => Array<[string, any]>
-): object => Object.fromEntries(Object.entries(object).map(fn))
+export const mapObject = <InputV, OutputV>(
+  object: { [k: string]: InputV },
+  fn: (
+    value: [string, InputV], index: number, array: Array<[string, InputV]>
+  ) => [number | string, OutputV]
+): { [k: string]: OutputV } => Object.fromEntries(Object.entries(object).map(fn))
 
 export const filterObject = (
   object: object,
