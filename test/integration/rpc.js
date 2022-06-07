@@ -296,8 +296,8 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Sign message using custom account', async () => {
-      wallet.onMessageSign = (aepp, action) => {
-        if (action.params.onAccount === account.publicKey) {
+      wallet.onMessageSign = (aeppId, params) => {
+        if (params.onAccount === account.publicKey) {
           return { onAccount: MemoryAccount({ keypair: account }) }
         }
       }

@@ -28,36 +28,36 @@ import {
       MemoryAccount({ keypair: generateKeyPair() })
     ],
     // Hook for sdk registration
-    onConnection (aepp, { params }) {
-      if (!confirm(`Aepp ${params.name} with id ${aepp.id} wants to connect`)) {
+    onConnection (aeppId, params) {
+      if (!confirm(`Aepp ${params.name} with id ${aeppId} wants to connect`)) {
         throw new RpcConnectionDenyError()
       }
-      aeppInfo[aepp.id] = params
+      aeppInfo[aeppId] = params
     },
     onDisconnect (msg, client) {
       console.log('Client disconnected:', client)
     },
-    onSubscription (aepp) {
-      const { name } = aeppInfo[aepp.id]
-      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to subscribe for accounts`)) {
+    onSubscription (aeppId) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to subscribe for accounts`)) {
         throw new RpcRejectedByUserError()
       }
     },
-    onSign (aepp, { params }) {
-      const { name } = aeppInfo[aepp.id]
-      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to sign tx ${params.tx}`)) {
+    onSign (aeppId, params) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to sign tx ${params.tx}`)) {
         throw new RpcRejectedByUserError()
       }
     },
-    onAskAccounts (aepp) {
-      const { name } = aeppInfo[aepp.id]
-      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to get accounts`)) {
+    onAskAccounts (aeppId) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to get accounts`)) {
         throw new RpcRejectedByUserError()
       }
     },
-    onMessageSign (aepp, { params }) {
-      const { name } = aeppInfo[aepp.id]
-      if (!confirm(`Aepp ${name} with id ${aepp.id} wants to sign msg ${params.message}`)) {
+    onMessageSign (aeppId, params) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to sign msg ${params.message}`)) {
         throw new RpcRejectedByUserError()
       }
     }

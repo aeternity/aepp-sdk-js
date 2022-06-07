@@ -73,8 +73,8 @@ export default {
   },
   async mounted () {
     const aeppInfo = {}
-    const genConfirmCallback = (getActionName) => (aepp, { params }) => {
-      if (!confirm(`Client ${aeppInfo[aepp.id].name} with id ${aepp.id} want to ${getActionName(params)}`)) {
+    const genConfirmCallback = (getActionName) => (aeppId, params) => {
+      if (!confirm(`Client ${aeppInfo[aeppId].name} with id ${aeppId} want to ${getActionName(params)}`)) {
         throw new RpcRejectedByUserError()
       }
     }
@@ -96,11 +96,11 @@ export default {
         MemoryAccount({ keypair: generateKeyPair() })
       ],
       name: 'Wallet Iframe',
-      onConnection: (aepp, { params }) => {
-        if (!confirm(`Client ${params.name} with id ${aepp.id} want to connect`)) {
+      onConnection: (aeppId, params) => {
+        if (!confirm(`Client ${params.name} with id ${aeppId} want to connect`)) {
           throw new RpcConnectionDenyError()
         }
-        aeppInfo[aepp.id] = params
+        aeppInfo[aeppId] = params
       },
       onSubscription: genConfirmCallback(() => 'subscription'),
       onSign: genConfirmCallback(({ returnSigned, tx }) => `${returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(tx)}`),

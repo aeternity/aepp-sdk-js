@@ -215,11 +215,8 @@ export default Ae.compose(AccountMultiple, {
         mapObject(METHOD_HANDLERS, ([key, value]) => [key, (params, origin) => {
           const callInstance = (methodName, params) =>
             this[methodName](
-              client,
-              {
-                method: key,
-                params
-              },
+              id,
+              params,
               origin
             )
           return value(callInstance, this, this._getClient(id), params)
