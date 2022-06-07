@@ -107,6 +107,7 @@ describe('Aepp<->Wallet', function () {
       })
 
       const clientId = wallet.addRpcClient(connectionFromWalletToAepp)
+      Array.from(wallet._clients.keys()).length.should.be.equal(1)
       await wallet.shareWalletInfo(clientId)
       const is = await isReceived
       is.should.be.equal(true)
@@ -371,9 +372,8 @@ describe('Aepp<->Wallet', function () {
       connectionFromAeppToWallet.sendMessage({
         method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0'
       })
-      const [walletMessage, rpcClientId] = await walletDisconnect
+      const [, walletMessage] = await walletDisconnect
       walletMessage.reason.should.be.equal('bye')
-      wallet._clients.get(rpcClientId).status.should.be.equal('DISCONNECTED')
     })
 
     it('Remove rpc client', async () => {
@@ -390,7 +390,7 @@ describe('Aepp<->Wallet', function () {
       )
 
       wallet.removeRpcClient(id)
-      Array.from(wallet._clients.keys()).length.should.be.equal(1)
+      Array.from(wallet._clients.keys()).length.should.be.equal(0)
     })
 
     it('Remove rpc client: client not found', () => {

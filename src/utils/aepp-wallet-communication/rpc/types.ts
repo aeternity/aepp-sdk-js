@@ -1,5 +1,5 @@
 import { EncodedData } from '../../encoder'
-import { METHODS, WALLET_TYPE } from '../schema'
+import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema'
 
 export interface WalletInfo {
   id: string
@@ -29,25 +29,23 @@ type Icons = Array<{ src: string, sizes?: string, type?: string, purpose?: strin
 export interface WalletApi {
   [METHODS.connect]: (
     p: { name: string, icons?: Icons, version: 1, connectNode: boolean }
-  ) => WalletInfo & { node?: Node }
+  ) => Promise<WalletInfo & { node?: Node }>
 
   [METHODS.closeConnection]: (p: any) => void
 
   [METHODS.subscribeAddress]: (
-    p: { type: 'connected' | 'current', value: 'subscribe' | 'unsubscribe' }
-  ) => { subscription: Array<'subscribe' | 'unsubscribe'>, address: Accounts }
+    p: { type: SUBSCRIPTION_TYPES, value: 'connected' | 'current' }
+  ) => Promise<{ subscription: Array<'connected' | 'current'>, address: Accounts }>
 
-  [METHODS.address]: () => Array<EncodedData<'ak'>>
+  [METHODS.address]: () => Promise<Array<EncodedData<'ak'>>>
 
   [METHODS.sign]: ((
-    p: { tx: EncodedData<'tx'>, onAccount: EncodedData<'ak'>, returnSigned: false }
-  ) => { transactionHash: EncodedData<'th'> }) & ((
-    p: { tx: EncodedData<'tx'>, onAccount: EncodedData<'ak'>, returnSigned: true }
-  ) => { signedTransaction: EncodedData<'tx'> })
+    p: { tx: EncodedData<'tx'>, onAccount: EncodedData<'ak'>, returnSigned: boolean }
+  ) => Promise<{ transactionHash?: EncodedData<'th'>, signedTransaction?: EncodedData<'tx'> }>)
 
   [METHODS.signMessage]: (
     p: { message: string, onAccount: EncodedData<'ak'> }
-  ) => { signature: string }
+  ) => Promise<{ signature: string }>
 }
 
 export interface AeppApi {
