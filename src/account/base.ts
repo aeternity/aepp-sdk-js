@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -25,11 +25,8 @@
 import stampit from '@stamp/it'
 import { required } from '@stamp/required'
 import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto'
-// @ts-expect-error
 import { buildTx } from '../tx/builder'
-// @ts-expect-error
 import { decode } from '../tx/builder/helpers'
-// @ts-expect-error
 import { TX_TYPE } from '../tx/builder/schema'
 // @ts-expect-error
 import { getNetworkId } from '../node'

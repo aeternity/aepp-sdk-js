@@ -19,9 +19,7 @@ import '..'
 import { describe, it } from 'mocha'
 import { assert, expect } from 'chai'
 import * as Crypto from '../../src/utils/crypto'
-// @ts-expect-error
 import { buildTxHash, unpackTx } from '../../src/tx/builder'
-// @ts-expect-error
 import { decode } from '../../src/tx/builder/helpers'
 import { EncodedData } from '../../src/utils/encoder'
 

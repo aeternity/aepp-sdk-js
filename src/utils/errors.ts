@@ -190,6 +190,13 @@ export class InternalError extends BaseError {
   }
 }
 
+export class UnexpectedTsError extends InternalError {
+  constructor (message: string = 'Expected to not happen, required for TS') {
+    super(message)
+    this.name = 'UnexpectedTsError'
+  }
+}
+
 /* keypair an account related errors */
 export class InvalidKeypairError extends AccountError {
   constructor (message: string) {
@@ -520,15 +527,8 @@ export class InvalidTxParamsError extends TransactionError {
   }
 }
 
-export class NoDefaultAensPointerError extends TransactionError {
-  constructor (prefix: string) {
-    super(`Default AENS pointer key is not defined for ${prefix} prefix`)
-    this.name = 'NoDefaultAensPointerError'
-  }
-}
-
 export class PrefixNotFoundError extends TransactionError {
-  constructor (tag: string) {
+  constructor (tag: string | number) {
     super(`Prefix for id-tag ${tag} not found.`)
     this.name = 'PrefixNotFoundError'
   }

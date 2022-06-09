@@ -19,7 +19,8 @@ BaseError
 │   UnsupportedProtocolError
 │   NotImplementedError
 │   UnsupportedVersionError
-│   InternalError
+└───InternalError
+│   │   UnexpectedTsError
 │
 └───AccountError
 │   │   InvalidKeypairError
@@ -84,7 +85,6 @@ BaseError
 │   │   InvalidSignatureError
 │   │   InvalidTxError
 │   │   InvalidTxParamsError
-│   │   NoDefaultAensPointerError
 │   │   PrefixNotFoundError
 │   │   SchemaNotFoundError
 │   │   TagNotFoundError

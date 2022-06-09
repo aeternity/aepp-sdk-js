@@ -17,10 +17,12 @@
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
+// @ts-expect-error
 import { BaseAe, spendPromise, publicKey } from './index'
 import { commitmentHash, oracleQueryId, decode, encode } from '../../src/tx/builder/helpers'
 import { GAS_MAX, TX_TYPE } from '../../src/tx/builder/schema'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
+import { EncodedData } from './../../src/utils/encoder'
 
 const nonce = 1
 const nameTtl = 1
@@ -54,10 +56,10 @@ const nameSalt = 4204563566073083
 const commitmentId = commitmentHash(name, nameSalt)
 
 describe('Transaction', function () {
-  let aeSdk
-  const address = publicKey
-  const oracleId = encode(decode(address, 'ak'), 'ok')
-  let contract
+  let aeSdk: any
+  const address = publicKey as EncodedData<'ak'>
+  const oracleId = encode(decode(address), 'ok')
+  let contract: any
 
   before(async () => {
     aeSdk = await BaseAe()
@@ -75,8 +77,8 @@ describe('Transaction', function () {
     spendAe.should.be.equal(spendAettos)
   })
 
-  const contractId = 'ct_TCQVoset7Y4qEyV5tgEAJAqa2Foz8J1EXqoGpq3fB6dWH5roe';
-  [[
+  const contractId = 'ct_TCQVoset7Y4qEyV5tgEAJAqa2Foz8J1EXqoGpq3fB6dWH5roe'
+  const transactions: Array<[string, string, () => Promise<string>]> = [[
     'spend',
     'tx_+F0MAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg9e1n8oAAABhHRlc3QLK3OW',
     () => aeSdk.buildTx(TX_TYPE.spend, {
@@ -154,15 +156,17 @@ describe('Transaction', function () {
       queryId: oracleQueryId(address, nonce, oracleId),
       response: queryResponse
     })
-  ]].forEach(([name, expected, getter]) =>
+  ]]
+
+  transactions.forEach(([name, expected, getter]) =>
     it(`build of ${name} transaction`, async () => {
       expect(await getter()).to.be.equal(expected)
     }))
 
   it('Get next account nonce', async () => {
     const { nonce: accountNonce } = await aeSdk.api.getAccountByPubkey(address)
-    expect(await aeSdk.getAccountNonce(address)).to.be.equal(accountNonce + 1)
-    expect(await aeSdk.getAccountNonce(address, 1)).to.be.equal(1)
+    expect(await aeSdk.getAccountNonce(address)).to.be.equal(+accountNonce + 1)
+    expect(await aeSdk.getAccountNonce(address, { nonce: 1 })).to.be.equal(1)
   })
 
   it('Destroy instance finishes without error', () => {

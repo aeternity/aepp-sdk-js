@@ -24,7 +24,6 @@
 
 import Ae from './'
 import Aens from './aens'
-import Transaction from '../tx/tx'
 import Oracle from './oracle'
 import AccountMultiple from '../account/multiple'
 
@@ -39,6 +38,4 @@ import AccountMultiple from '../account/multiple'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-export default Ae.compose(
-  Transaction, Aens, Oracle, AccountMultiple
-)
+export default Ae.compose(Aens, Oracle, AccountMultiple)

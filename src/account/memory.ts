@@ -25,7 +25,6 @@
 import AccountBase, { _AccountBase } from './base'
 import { sign, isValidKeypair } from '../utils/crypto'
 import { isHex } from '../utils/string'
-// @ts-expect-error
 import { decode } from '../tx/builder/helpers'
 import { InvalidKeypairError, MissingParamError } from '../utils/errors'
 import { EncodedData } from '../utils/encoder'
@@ -47,7 +46,7 @@ class _AccountMemory extends _AccountBase {
     super.init(options)
 
     this.isGa = gaId != null
-    if (this.isGa) {
+    if (this.isGa && gaId != null) {
       decode(gaId)
       secrets.set(this, { publicKey: gaId })
       return

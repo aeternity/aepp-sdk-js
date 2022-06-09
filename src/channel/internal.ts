@@ -119,7 +119,7 @@ const PONG_TIMEOUT_MS = 5000
 // TODO: move to Channel instance to avoid is-null checks and for easier debugging
 export const options = new WeakMap<Channel, ChannelOptions>()
 export const status = new WeakMap<Channel, string>()
-export const state = new WeakMap<Channel, string>()
+export const state = new WeakMap<Channel, Uint8Array>()
 const fsm = new WeakMap<Channel, ChannelFsm>()
 const websockets = new WeakMap<Channel, W3CWebSocket>()
 export const eventEmitters = new WeakMap<Channel, EventEmitter>()
@@ -158,7 +158,7 @@ export function changeStatus (channel: Channel, newStatus: string): void {
   }
 }
 
-export function changeState (channel: Channel, newState: string): void {
+export function changeState (channel: Channel, newState: Uint8Array): void {
   state.set(channel, newState)
   emit(channel, 'stateChanged', newState)
 }
