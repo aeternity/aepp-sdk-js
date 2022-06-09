@@ -34,6 +34,8 @@ type GeneralCompilerError = ErrorModel & {
   parameter?: string
 }
 
+export type OnCompiler = _ContractCompilerHttp['compilerApi']
+
 export class _ContractCompilerHttp {
   compilerApi: CompilerApi
   compilerVersion: string

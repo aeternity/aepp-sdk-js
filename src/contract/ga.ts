@@ -28,6 +28,7 @@ import { concatBuffers } from '../utils/other'
 import { _AccountBase } from '../account/base'
 import { getContractInstance } from '../ae/contract'
 import { getAccount, Node } from '../chain'
+import { OnCompiler } from './compiler'
 
 /**
  * Check if account is GA
@@ -55,7 +56,11 @@ export async function createGeneralizedAccount (
   source: string,
   args: any[],
   { onAccount, onCompiler, onNode, ...options }:
-  { onAccount: _AccountBase & { send: any, buildTx: any, Ae: any }, onCompiler: any, onNode: Node }
+  {
+    onAccount: _AccountBase & { send: any, buildTx: any, Ae: any }
+    onCompiler: OnCompiler
+    onNode: Node
+  }
   & Parameters<_AccountBase['address']>[0] & Parameters<typeof buildTx>[2]
 ): Promise<Readonly<{
     owner: EncodedData<'ak'>
@@ -67,7 +72,7 @@ export async function createGeneralizedAccount (
   const ownerId = await onAccount.address(opt)
   if (await isGA(ownerId, { onNode })) throw new IllegalArgumentError(`Account ${ownerId} is already GA`)
 
-  const contract = await getContractInstance({ onAccount, source })
+  const contract = await getContractInstance({ onAccount, onCompiler, onNode, source })
 
   await contract.compile()
   const tx = await onAccount.buildTx(TX_TYPE.gaAttach, {
@@ -107,7 +112,9 @@ export async function createMetaTx (
     args?: any[]
   },
   authFnName: string,
-  { onAccount, ...options }: { onAccount: any } & Parameters<_AccountBase['address']>[0]
+  { onAccount, onCompiler, onNode, ...options }:
+  { onAccount: any, onCompiler: OnCompiler, onNode: Node }
+  & Parameters<_AccountBase['address']>[0]
 ): Promise<EncodedData<'tx'>> {
   const wrapInEmptySignedTx = (
     tx: EncodedData<'tx'> | Uint8Array | TxUnpacked<TxSchema>
@@ -122,7 +129,9 @@ export async function createMetaTx (
 
   const authCallData = authData.callData ?? await (async () => {
     if (authData.source == null || authData.args == null) throw new InvalidAuthDataError('Auth data must contain source code and arguments.')
-    const contract = await getContractInstance({ onAccount, source: authData.source })
+    const contract = await getContractInstance({
+      onAccount, onCompiler, onNode, source: authData.source
+    })
     return contract.calldata.encode(contract._name, authFnName, authData.args)
   })()
 

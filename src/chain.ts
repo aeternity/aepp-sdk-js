@@ -433,22 +433,23 @@ export async function getName (
  * @param options.onNode Node to use
  * @return Address or AENS name hash
  */
-export async function resolveName (
-  nameOrId: AensName | EncodedData<'ak'>,
+export async function resolveName <Type extends 'ak' | 'ct'> (
+  nameOrId: AensName | EncodedData<Type>,
   key: string,
   { verify = true, resolveByNode, onNode }:
-  { verify: boolean, resolveByNode: boolean, onNode: Node }
-): Promise<EncodedData<'ak' | 'nm'>> {
+  { verify?: boolean, resolveByNode: boolean, onNode: Node }
+): Promise<EncodedData<Type | 'nm'>> {
   try {
-    decode(nameOrId as EncodedData<'ak'>)
-    return nameOrId as EncodedData<'ak'>
+    const id = nameOrId as EncodedData<Type>
+    decode(id)
+    return id
   } catch (error) {}
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
       const name = await onNode.api.getNameEntryByName(nameOrId)
       const pointer = name.pointers.find(pointer => pointer.key === key)
       if (pointer == null) throw new AensPointerContextError(nameOrId, key)
-      if (resolveByNode) return pointer.id as EncodedData<'ak'>
+      if (resolveByNode) return pointer.id as EncodedData<Type>
     }
     return produceNameId(nameOrId as AensName)
   }

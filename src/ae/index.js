@@ -194,10 +194,7 @@ const Ae = stampit(NodePool, AccountResolver, ContractCompilerHttp, {
             ...this.Ae.defaults,
             onNode: this.selectedNode.instance,
             onAccount: this,
-            onCompiler: {
-              compilerApi: this.compilerApi,
-              compilerVersion: this.compilerVersion
-            }
+            onCompiler: this.compilerApi
           }
           const lastArg = args[args.length - 1]
           if (
