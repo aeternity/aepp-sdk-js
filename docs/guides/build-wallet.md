@@ -57,7 +57,7 @@ async function init () {
   // Init extension stamp from sdk
   RpcWallet({
     compilerUrl: COMPILER_URL,
-    nodes: [{ name: 'testnet', instance: await Node({ url: NODE_URL }) }],
+    nodes: [{ name: 'testnet', instance: new Node(NODE_URL) }],
     id: browser.runtime.id,
     type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
@@ -131,7 +131,7 @@ async function init () {
   // Init extension stamp from sdk
   RpcWallet({
     compilerUrl: COMPILER_URL,
-    nodes: [{ name: 'testnet', instance: await Node({ url: NODE_URL }) }],
+    nodes: [{ name: 'testnet', instance: new Node(NODE_URL) }],
     id: browser.runtime.id,
     type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',

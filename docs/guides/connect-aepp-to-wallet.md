@@ -34,8 +34,8 @@ async created () {
   this.aeSdk = await RpcAepp({
     name: 'Simple Aepp',
     nodes: [
-      { name: 'ae_uat', instance: await Node({ url: TESTNET_NODE_URL }) },
-      { name: 'ae_mainnet', instance: await Node({ url: MAINNET_NODE_URL }) }
+      { name: 'ae_uat', instance: new Node(TESTNET_NODE_URL) },
+      { name: 'ae_mainnet', instance: new Node(MAINNET_NODE_URL) }
     ],
     compilerUrl: COMPILER_URL,
     onNetworkChange: async ({ networkId }) => {

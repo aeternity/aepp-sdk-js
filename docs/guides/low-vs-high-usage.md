@@ -21,7 +21,7 @@ Example spend function, using æternity's SDK abstraction.
 import { MemoryAccount, Node, Universal } from '@aeternity/aepp-sdk'
 
 async function init () {
-  const node = await Node({ 'https://testnet.aeternity.io' }) // ideally host your own node!
+  const node = new Node('https://testnet.aeternity.io') // ideally host your own node!
 
   const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
@@ -40,7 +40,7 @@ Example spend function, using the SDK, talking directly to the [**API**](https:/
 import { MemoryAccount, Node, Universal } from '@aeternity/aepp-sdk'
 
 async function spend (amount, recipient) {
-  const node = await Node({ 'https://testnet.aeternity.io' }) // ideally host your own node!
+  const node = new Node('https://testnet.aeternity.io') // ideally host your own node!
   const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler!

@@ -40,7 +40,7 @@ const senderAccount = MemoryAccount({
 });
 
 (async function () {
-  const node = await Node({ url: NODE_URL })
+  const node = new Node(NODE_URL)
   const aeSdk = await Universal({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: node }],

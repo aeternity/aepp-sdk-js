@@ -82,8 +82,8 @@ export default {
       id: window.origin,
       type: WALLET_TYPE.window,
       nodes: [
-        { name: 'ae_uat', instance: await Node({ url: 'https://testnet.aeternity.io' }) },
-        { name: 'ae_mainnet', instance: await Node({ url: 'https://mainnet.aeternity.io' }) },
+        { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
+        { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
       ],
       compilerUrl: 'https://compiler.aepps.com',
       accounts: [

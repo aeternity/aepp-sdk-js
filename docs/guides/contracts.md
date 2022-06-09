@@ -26,9 +26,7 @@ import { Universal, MemoryAccount, Node } from '@aeternity/aepp-sdk'
 When creating an instance of the SDK you need to provide an account which will be used to sign transactions like `ContractCreateTx` and `ContractCallTx` that will be broadcasted to the network.
 
 ```js
-const node = await Node({
-  url: 'https://testnet.aeternity.io' // ideally host your own node
-})
+const node = new Node('https://testnet.aeternity.io') // ideally host your own node
 const account = MemoryAccount({
   // provide a valid keypair with your secretKey and publicKey
   keypair: { secretKey: SECRET_KEY, publicKey: PUBLIC_KEY }
