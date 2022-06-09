@@ -38,26 +38,49 @@ import {
   NoWalletConnectedError, UnAuthorizedAccountError, UnsubscribedAccountError, UnknownRpcClientError
 } from '../../src/utils/errors'
 
+const WindowPostMessageFake = (name) => ({
+  name,
+  messages: [],
+  addEventListener (onEvent, listener) {
+    this.listener = listener
+  },
+  removeEventListener () {
+    return () => null
+  },
+  postMessage (source, msg) {
+    this.messages.push(msg)
+    setTimeout(() => {
+      if (typeof this.listener === 'function') {
+        this.listener({ data: msg, origin: 'testOrigin', source })
+      }
+    })
+  }
+})
+
+const getConnections = () => {
+  global.chrome = { runtime: {} }
+  global.window = { location: { origin: '//test' }, chrome: global.chrome }
+  global.location = { protocol: 'http://test.com' }
+  const walletWindow = WindowPostMessageFake('wallet')
+  const aeppWindow = WindowPostMessageFake('aepp')
+  walletWindow.postMessage = walletWindow.postMessage.bind(walletWindow, aeppWindow)
+  aeppWindow.postMessage = aeppWindow.postMessage.bind(aeppWindow, walletWindow)
+  return { walletWindow, aeppWindow }
+}
+
 describe('Aepp<->Wallet', function () {
   this.timeout(2000)
-  let node
-  let connections
-  let connectionFromWalletToAepp
-  let connectionFromAeppToWallet
-  const handlerReject = () => { throw new Error('test reject') }
-
-  before(async function () {
-    node = await Node({ url, ignoreVersion })
-    connections = getConnections()
-    connectionFromWalletToAepp = new BrowserWindowMessageConnection({
-      self: connections.walletWindow,
-      target: connections.aeppWindow
-    })
-    connectionFromAeppToWallet = new BrowserWindowMessageConnection({
-      self: connections.aeppWindow,
-      target: connections.walletWindow
-    })
+  const node = new Node(url, { ignoreVersion })
+  const connections = getConnections()
+  const connectionFromWalletToAepp = new BrowserWindowMessageConnection({
+    self: connections.walletWindow,
+    target: connections.aeppWindow
   })
+  const connectionFromAeppToWallet = new BrowserWindowMessageConnection({
+    self: connections.aeppWindow,
+    target: connections.walletWindow
+  })
+  const handlerReject = () => { throw new Error('test reject') }
 
   describe('New RPC Wallet-AEPP: AEPP node', () => {
     const keypair = generateKeyPair()
@@ -341,14 +364,12 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Aepp: receive notification for network update', async () => {
-      const received = await new Promise((resolve) => {
-        aepp.onNetworkChange = (msg) => {
-          msg.networkId.should.be.equal(networkId)
-          resolve(wallet.selectedNode.name === 'second_node')
-        }
+      const msg = await new Promise((resolve) => {
+        aepp.onNetworkChange = (msg) => resolve(msg)
         wallet.addNode('second_node', node, true)
       })
-      received.should.be.equal(true)
+      msg.networkId.should.be.equal(networkId)
+      expect(wallet.selectedNodeName).to.be.equal('second_node')
     })
 
     it('Try to connect unsupported protocol', async () => {
@@ -488,45 +509,13 @@ describe('Aepp<->Wallet', function () {
     })
 
     it('Aepp: receive notification with node for network update', async () => {
-      const received = await new Promise((resolve) => {
-        aepp.onNetworkChange = (msg) => {
-          msg.networkId.should.be.equal(networkId)
-          msg.node.should.be.an('object')
-          resolve(wallet.selectedNode.name === 'second_node')
-        }
+      const msg = await new Promise((resolve) => {
+        aepp.onNetworkChange = (msg) => resolve(msg)
         wallet.addNode('second_node', node, true)
       })
-      received.should.be.equal(true)
+      msg.networkId.should.be.equal(networkId)
+      msg.node.should.be.an('object')
+      expect(wallet.selectedNodeName).to.be.equal('second_node')
     })
   })
 })
-
-const WindowPostMessageFake = (name) => ({
-  name,
-  messages: [],
-  addEventListener (onEvent, listener) {
-    this.listener = listener
-  },
-  removeEventListener () {
-    return () => null
-  },
-  postMessage (source, msg) {
-    this.messages.push(msg)
-    setTimeout(() => {
-      if (typeof this.listener === 'function') {
-        this.listener({ data: msg, origin: 'testOrigin', source })
-      }
-    })
-  }
-})
-
-const getConnections = () => {
-  global.chrome = { runtime: {} }
-  global.window = { location: { origin: '//test' }, chrome: global.chrome }
-  global.location = { protocol: 'http://test.com' }
-  const walletWindow = WindowPostMessageFake('wallet')
-  const aeppWindow = WindowPostMessageFake('aepp')
-  walletWindow.postMessage = walletWindow.postMessage.bind(walletWindow, aeppWindow)
-  aeppWindow.postMessage = aeppWindow.postMessage.bind(aeppWindow, walletWindow)
-  return { walletWindow, aeppWindow }
-}

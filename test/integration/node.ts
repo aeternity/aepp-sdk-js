@@ -15,7 +15,6 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-// @ts-expect-error
 import Node from '../../src/node'
 // @ts-expect-error
 import { url, ignoreVersion } from '.'
@@ -29,67 +28,63 @@ describe('Node client', function () {
   let node: InstanceType<typeof Node>
 
   before(async function () {
-    node = await Node({ url, ignoreVersion })
-  })
-
-  it('determines remote version', () => {
-    expect(node.version).to.be.a('string')
-    expect(node.revision).to.be.a('string')
+    node = new Node(url, { ignoreVersion })
   })
 
   it('wraps endpoints', () => {
-    ['postTransaction', 'getCurrentKeyBlock']
-      .map(method => expect(node.api[method]).to.be.a('function'))
+    (['postTransaction', 'getCurrentKeyBlock'] as const)
+      .map(method => expect(node[method]).to.be.a('function'))
   })
 
   it('gets key blocks by height for the first 3 blocks', async () => {
-    expect(node.api.getKeyBlockByHeight).to.be.a('function')
-    const blocks = await Promise.all([1, 2, 3].map(i => node.api.getKeyBlockByHeight(i)))
+    expect(node.getKeyBlockByHeight).to.be.a('function')
+    const blocks = await Promise.all([1, 2, 3].map(async i => await node.getKeyBlockByHeight(i)))
     expect(blocks.map(b => b.height)).to.eql([1, 2, 3])
   })
 
   it('throws clear exceptions when can\'t get transaction by hash', async () => {
-    await expect(node.api.getTransactionByHash('th_test'))
+    await expect(node.getTransactionByHash('th_test'))
       .to.be.rejectedWith('v3/transactions/th_test error: Invalid hash')
   })
 
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {
       const nodes = NodePool()
-      expect(() => nodes.api.someAPIfn()).to.throw(NodeNotFoundError, 'You can\'t use Node API. Node is not connected or not defined!')
+      expect(() => nodes.api)
+        .to.throw(NodeNotFoundError, 'You can\'t use Node API. Node is not connected or not defined!')
     })
 
     it('Can change Node', async () => {
       const nodes = NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, ignoreVersion }) },
+          { name: 'first', instance: new Node(url, { ignoreVersion }) },
           { name: 'second', instance: node }
         ]
       })
-      const activeNode = nodes.getNodeInfo()
+      const activeNode = await nodes.getNodeInfo()
       activeNode.name.should.be.equal('first')
       nodes.selectNode('second')
-      const secondNodeInfo = nodes.getNodeInfo()
+      const secondNodeInfo = await nodes.getNodeInfo()
       secondNodeInfo.name.should.be.equal('second')
     })
 
     it('Fail on undefined node', async () => {
       const nodes = NodePool({
         nodes: [
-          { name: 'first', instance: await Node({ url, ignoreVersion }) },
+          { name: 'first', instance: new Node(url, { ignoreVersion }) },
           { name: 'second', instance: node }
         ]
       })
       expect(() => nodes.selectNode('asdasd')).to.throw(NodeNotFoundError, 'Node with name asdasd not in pool')
     })
 
-    it('Can get list of nodes', () => {
+    it('Can get list of nodes', async () => {
       const nodes = NodePool({
         nodes: [
           { name: 'first', instance: node }
         ]
       })
-      const nodesList = nodes.getNodesInPool()
+      const nodesList = await nodes.getNodesInPool()
       nodesList.length.should.be.equal(1)
     })
   })

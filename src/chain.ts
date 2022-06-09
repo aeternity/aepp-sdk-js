@@ -31,13 +31,12 @@ import {
   AensPointerContextError, DryRunError, InvalidAensNameError, InvalidTxError,
   RequestTimedOutError, TxTimedOutError, TxNotInChainError, InternalError
 } from './utils/errors'
-import NodeApi, { TransformNodeType } from './nodeApi'
+import Node, { TransformNodeType } from './node'
 import {
   Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx
 } from './apis/node'
 import { EncodedData } from './utils/encoder'
-import { _NodePool } from './node-pool/index'
 
 export function _getPollInterval (
   type: 'block' | 'microblock',
@@ -52,10 +51,6 @@ export function _getPollInterval (
 
 // TODO: extract these definitions
 
-export interface Node extends Pick<_NodePool, 'getNodeInfo'> {
-  api: InstanceType<typeof NodeApi>
-  nodeNetworkId: string
-}
 interface Account {
   address: (options: any) => Promise<EncodedData<'ak'>>
 }
@@ -102,7 +97,7 @@ export async function sendTransaction (
   }
 
   try {
-    const { txHash } = await onNode.api.postTransaction({ tx }, {
+    const { txHash } = await onNode.postTransaction({ tx }, {
       requestOptions: {
         customHeaders: {
           __queue: `tx-${await onAccount?.address(options).catch(() => '')}`
@@ -144,9 +139,9 @@ export async function waitForTxConfirm (
   { confirm = 3, onNode, ...options }:
   { confirm?: number, onNode: Node } & Parameters<typeof awaitHeight>[1]
 ): Promise<number> {
-  const { blockHeight } = await onNode.api.getTransactionByHash(txHash)
+  const { blockHeight } = await onNode.getTransactionByHash(txHash)
   const height = await awaitHeight(blockHeight + confirm, { onNode, ...options })
-  const { blockHeight: newBlockHeight } = await onNode.api.getTransactionByHash(txHash)
+  const { blockHeight: newBlockHeight } = await onNode.getTransactionByHash(txHash)
   switch (newBlockHeight) {
     case -1:
       throw new TxNotInChainError(txHash)
@@ -170,9 +165,9 @@ export async function getAccount (
   { height, hash, onNode }:
   { height?: number, hash?: EncodedData<'kh' | 'mh'>, onNode: Node }
 ): Promise<TransformNodeType<AccountNode>> {
-  if (height != null) return await onNode.api.getAccountByPubkeyAndHeight(address, height)
-  if (hash != null) return await onNode.api.getAccountByPubkeyAndHash(address, hash)
-  return await onNode.api.getAccountByPubkey(address)
+  if (height != null) return await onNode.getAccountByPubkeyAndHeight(address, height)
+  if (hash != null) return await onNode.getAccountByPubkeyAndHash(address, hash)
+  return await onNode.getAccountByPubkey(address)
 }
 
 /**
@@ -198,7 +193,7 @@ export async function getBalance (
  * @return Current chain height
  */
 export async function height ({ onNode }: { onNode: Node }): Promise<number> {
-  return (await onNode.api.getCurrentKeyBlockHeight()).height
+  return (await onNode.getCurrentKeyBlockHeight()).height
 }
 
 /**
@@ -220,7 +215,7 @@ export async function awaitHeight (
   let currentHeight
   for (let i = 0; i < attempts; i++) {
     if (i !== 0) await pause(interval)
-    currentHeight = (await onNode.api.getCurrentKeyBlockHeight()).height
+    currentHeight = (await onNode.getCurrentKeyBlockHeight()).height
     if (currentHeight >= height) return currentHeight
   }
   throw new RequestTimedOutError((attempts - 1) * interval, currentHeight, height)
@@ -243,7 +238,7 @@ export async function poll (
   interval ??= _getPollInterval('microblock', options)
   const max = await height({ onNode }) + blocks
   do {
-    const tx = await onNode.api.getTransactionByHash(th)
+    const tx = await onNode.getTransactionByHash(th)
     if (tx.blockHeight !== -1) return tx
     await pause(interval)
   } while (await height({ onNode }) < max)
@@ -259,7 +254,7 @@ export async function poll (
 export async function getCurrentGeneration (
   { onNode }: { onNode: Node }
 ): Promise<TransformNodeType<Generation>> {
-  return await onNode.api.getCurrentGeneration()
+  return await onNode.getCurrentGeneration()
 }
 
 /**
@@ -272,8 +267,8 @@ export async function getCurrentGeneration (
 export async function getGeneration (
   hashOrHeight: EncodedData<'kh'> | number, { onNode }: { onNode: Node }
 ): Promise<TransformNodeType<Generation>> {
-  if (typeof hashOrHeight === 'number') return await onNode.api.getGenerationByHeight(hashOrHeight)
-  return await onNode.api.getGenerationByHash(hashOrHeight)
+  if (typeof hashOrHeight === 'number') return await onNode.getGenerationByHeight(hashOrHeight)
+  return await onNode.getGenerationByHash(hashOrHeight)
 }
 
 /**
@@ -286,7 +281,7 @@ export async function getGeneration (
 export async function getMicroBlockTransactions (
   hash: EncodedData<'mh'>, { onNode }: { onNode: Node }
 ): Promise<TransformNodeType<SignedTx[]>> {
-  return (await onNode.api.getMicroBlockTransactionsByHash(hash)).transactions
+  return (await onNode.getMicroBlockTransactionsByHash(hash)).transactions
 }
 
 /**
@@ -299,8 +294,8 @@ export async function getMicroBlockTransactions (
 export async function getKeyBlock (
   hashOrHeight: EncodedData<'kh'> | number, { onNode }: { onNode: Node }
 ): Promise<TransformNodeType<KeyBlock>> {
-  if (typeof hashOrHeight === 'number') return await onNode.api.getKeyBlockByHeight(hashOrHeight)
-  return await onNode.api.getKeyBlockByHash(hashOrHeight)
+  if (typeof hashOrHeight === 'number') return await onNode.getKeyBlockByHeight(hashOrHeight)
+  return await onNode.getKeyBlockByHash(hashOrHeight)
 }
 
 /**
@@ -313,7 +308,7 @@ export async function getKeyBlock (
 export async function getMicroBlockHeader (
   hash: EncodedData<'mh'>, { onNode }: { onNode: Node }
 ): Promise<TransformNodeType<MicroBlockHeader>> {
-  return await onNode.api.getMicroBlockHeaderByHash(hash)
+  return await onNode.getMicroBlockHeaderByHash(hash)
 }
 
 interface TxDryRunArguments {
@@ -333,7 +328,7 @@ async function txDryRunHandler (key: string, onNode: Node): Promise<void> {
 
   let dryRunRes
   try {
-    dryRunRes = await onNode.api.protectedDryRunTxs({
+    dryRunRes = await onNode.protectedDryRunTxs({
       top: rs[0].top,
       txEvents: rs[0].txEvents,
       txs: rs.map(req => ({ tx: req.tx })),
@@ -395,7 +390,7 @@ export async function txDryRun (
 export async function getContractByteCode (
   contractId: EncodedData<'ct'>, { onNode }: { onNode: Node }
 ): Promise<TransformNodeType<ByteCode>> {
-  return await onNode.api.getContractCode(contractId)
+  return await onNode.getContractCode(contractId)
 }
 
 /**
@@ -407,7 +402,7 @@ export async function getContractByteCode (
 export async function getContract (
   contractId: EncodedData<'ct'>, { onNode }: { onNode: Node }
 ): Promise<TransformNodeType<ContractObject>> {
-  return await onNode.api.getContract(contractId)
+  return await onNode.getContract(contractId)
 }
 
 /**
@@ -419,7 +414,7 @@ export async function getContract (
 export async function getName (
   name: AensName, { onNode }: { onNode: Node }
 ): Promise<TransformNodeType<NameEntry>> {
-  return await onNode.api.getNameEntryByName(name)
+  return await onNode.getNameEntryByName(name)
 }
 
 /**
@@ -446,7 +441,7 @@ export async function resolveName <Type extends 'ak' | 'ct'> (
   } catch (error) {}
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
-      const name = await onNode.api.getNameEntryByName(nameOrId)
+      const name = await onNode.getNameEntryByName(nameOrId)
       const pointer = name.pointers.find(pointer => pointer.key === key)
       if (pointer == null) throw new AensPointerContextError(nameOrId, key)
       if (resolveByNode) return pointer.id as EncodedData<Type>

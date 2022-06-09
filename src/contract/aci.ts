@@ -47,8 +47,9 @@ import {
 import { hash } from '../utils/crypto'
 import { Aci as BaseAci } from '../apis/compiler'
 import { OnCompiler } from './compiler'
+import Node from '../node'
 import {
-  getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun, Node
+  getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun
 } from '../chain'
 import { _AccountBase } from '../account/base'
 
@@ -262,7 +263,7 @@ export default async function getContractInstance ({
       hash: txData.hash, tx: unpackTx(txData.rawTx), txData, rawTx: txData.rawTx
     }
     if (txData.blockHeight == null) return result
-    const { callInfo } = await onNode.api.getTransactionInfoByHash(txData.hash)
+    const { callInfo } = await onNode.getTransactionInfoByHash(txData.hash)
     Object.assign(result.txData, callInfo) // TODO: don't duplicate data in result
     // @ts-expect-error TODO api should be updated to match types
     handleCallError(callInfo, tx)

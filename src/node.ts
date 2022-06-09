@@ -1,11 +1,22 @@
 import BigNumber from 'bignumber.js'
 import { OperationArguments, OperationSpec } from '@azure/core-client'
 import {
-  genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy
+  genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
+  genVersionCheckPolicy
 } from './utils/autorest'
 import { Node, NodeOptionalParams, ErrorModel } from './apis/node/'
 import { mapObject } from './utils/other'
 import { EncodedData } from './utils/encoder'
+import { MissingParamError } from './utils/errors'
+
+/**
+ * Obtain networkId from account or node
+ */
+export async function getNetworkId ({ networkId }: { networkId?: string } = {}): Promise<string> {
+  const res = networkId ?? this.networkId ?? (await this.api?.getStatus()).networkId
+  if (res != null) return res
+  throw new MissingParamError('networkId is not provided')
+}
 
 const bigIntPropertyNames = [
   'balance', 'queryFee', 'fee', 'amount', 'nameFee', 'channelAmount',
@@ -47,8 +58,20 @@ type TransformedNode = new (...args: ConstructorParameters<typeof Node>) => {
   [Name in keyof InstanceType<typeof Node>]: TransformNodeType<Node[Name]>
 }
 
+export interface NodeInfo {
+  url: string
+  nodeNetworkId: string
+  version: string
+  consensusProtocolVersion: number
+}
+
 export default class extends (Node as unknown as TransformedNode) {
-  constructor (url: string, options?: NodeOptionalParams) {
+  url: string
+
+  constructor (
+    url: string,
+    { ignoreVersion = false, ...options }: NodeOptionalParams & { ignoreVersion?: boolean } = {}
+  ) {
     // eslint-disable-next-line constructor-super
     super(url, {
       allowInsecureConnection: true,
@@ -59,7 +82,34 @@ export default class extends (Node as unknown as TransformedNode) {
       ],
       ...options
     })
+    this.url = url
+    if (!ignoreVersion) {
+      const versionPromise = this.getStatus().then(({ nodeVersion }) => nodeVersion)
+      this.pipeline.addPolicy(genVersionCheckPolicy('node', '/v3/status', versionPromise, '6.2.0', '7.0.0'))
+    }
     this.intAsString = true
+  }
+
+  async getNodeInfo (): Promise<NodeInfo> {
+    const {
+      nodeVersion: version,
+      networkId: nodeNetworkId,
+      protocols,
+      topBlockHeight
+    } = await this.getStatus()
+    const consensusProtocolVersion = protocols
+      .filter(({ effectiveAtHeight }) => topBlockHeight >= effectiveAtHeight)
+      .reduce(
+        (acc, p) => p.effectiveAtHeight > acc.effectiveAtHeight ? p : acc,
+        { effectiveAtHeight: -1, version: 0 }
+      )
+      .version
+    return {
+      url: this.url,
+      nodeNetworkId,
+      version,
+      consensusProtocolVersion
+    }
   }
 
   // @ts-expect-error https://github.com/microsoft/TypeScript/issues/27689

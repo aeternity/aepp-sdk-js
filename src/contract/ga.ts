@@ -27,7 +27,8 @@ import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '.
 import { concatBuffers } from '../utils/other'
 import { _AccountBase } from '../account/base'
 import { getContractInstance } from '../ae/contract'
-import { getAccount, Node } from '../chain'
+import Node from '../node'
+import { getAccount } from '../chain'
 import { OnCompiler } from './compiler'
 
 /**
@@ -136,7 +137,7 @@ export async function createMetaTx (
   })()
 
   const opt = { ...onAccount.Ae.defaults, ...options }
-  const { abiVersion } = onAccount.getVmVersion(TX_TYPE.contractCall)
+  const { abiVersion } = await onAccount.getVmVersion(TX_TYPE.contractCall)
   const wrappedTx = wrapInEmptySignedTx(unpackTx(rawTransaction, { txType: TX_TYPE.signed }))
   const params = {
     ...opt,
@@ -166,11 +167,12 @@ export async function createMetaTx (
  * @param options.onNode Node to use
  * @return Transaction hash
  */
-export function buildAuthTxHash (
+export async function buildAuthTxHash (
   transaction: EncodedData<'tx'>,
   { onNode }: { onNode: Node }
-): Uint8Array {
+): Promise<Uint8Array> {
+  const { networkId } = await onNode.getStatus()
   return new Uint8Array(hash(
-    concatBuffers([Buffer.from(onNode.nodeNetworkId), decode(transaction)])
+    concatBuffers([Buffer.from(networkId), decode(transaction)])
   ))
 }

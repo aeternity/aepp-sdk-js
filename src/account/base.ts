@@ -28,7 +28,6 @@ import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../ut
 import { buildTx } from '../tx/builder'
 import { decode } from '../tx/builder/helpers'
 import { TX_TYPE } from '../tx/builder/schema'
-// @ts-expect-error
 import { getNetworkId } from '../node'
 import { EncodedData } from '../utils/encoder'
 import { concatBuffers } from '../utils/other'
@@ -64,7 +63,7 @@ export abstract class _AccountBase {
     tx: EncodedData<'tx'>,
     { innerTx, networkId, ...options }: { innerTx?: boolean, networkId?: string } = {}
   ): Promise<EncodedData<'tx'>> {
-    const prefixes = [this.getNetworkId({ networkId })]
+    const prefixes = [await this.getNetworkId({ networkId })]
     if (innerTx === true) prefixes.push('inner_tx')
     const rlpBinaryTx = decode(tx)
     const txWithNetworkId = concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)])
@@ -79,7 +78,7 @@ export abstract class _AccountBase {
    * @function getNetworkId
    * @category async
    * @rtype () => networkId: String
-   * @return {String} Network Id
+   * @return {Promise<String>} Network Id
    */
   readonly getNetworkId = getNetworkId
 

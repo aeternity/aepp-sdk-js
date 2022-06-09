@@ -110,7 +110,7 @@ export default {
         this.shareWalletInfo(clientId)
       }
     })
-    this.nodeName = this.aeSdk.selectedNode.name
+    this.nodeName = this.aeSdk.selectedNodeName
     this.address = this.aeSdk.addresses()[0]
 
     const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow

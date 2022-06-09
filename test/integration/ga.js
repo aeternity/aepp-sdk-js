@@ -81,7 +81,7 @@ describe('Generalized Account', function () {
       10000, publicKey, { authData: { source: authContractSource, args: [r()] } }
     )
     const spendTx = encode(unpackTx(rawTx).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx')
-    expect(aeSdk.buildAuthTxHash(spendTx)).to.be
+    expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.methods.getTxHash()).decodedResult)
   })
 })

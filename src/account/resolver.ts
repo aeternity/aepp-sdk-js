@@ -28,7 +28,7 @@ export class _AccountResolver extends _AccountBase {
     { onAccount, ...options }: { onAccount?: Account } & Parameters<_AccountBase['signTransaction']>[1] = {}
   ): Promise<EncodedData<'tx'>> {
     return await this._resolveAccount(onAccount)
-      .signTransaction(tx, { ...options, networkId: this.getNetworkId(options) })
+      .signTransaction(tx, { ...options, networkId: await this.getNetworkId(options) })
   }
 
   async signMessage (

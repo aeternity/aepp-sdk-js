@@ -42,7 +42,7 @@ import {
   UnexpectedTsError
 } from '../utils/errors'
 import { BigNumber } from 'bignumber.js'
-import { Node } from '../chain'
+import Node from '../node'
 import { EncodedData } from '../utils/encoder'
 import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
 
@@ -93,10 +93,10 @@ export async function _buildTx (
   }
   // TODO: move specific cases to field-types
   if ([TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType as any)) {
-    params.ctVersion = getVmVersion(TX_TYPE.contractCreate, params)
+    params.ctVersion = await getVmVersion(TX_TYPE.contractCreate, params)
   }
   if (txType === TX_TYPE.contractCall) {
-    params.abiVersion = getVmVersion(TX_TYPE.contractCall, params).abiVersion
+    params.abiVersion = (await getVmVersion(TX_TYPE.contractCall, params)).abiVersion
   }
   if (txType === TX_TYPE.oracleRegister) {
     params.abiVersion ??= ABI_VERSIONS.NO_ABI
@@ -115,14 +115,14 @@ export async function _buildTx (
  * @param vmAbi Object with vm and abi version fields
  *  @return Object with vm/abi version
  */
-export function getVmVersion (
+export async function getVmVersion (
   txType: TxType,
   { vmVersion, abiVersion, onNode }: Partial<VmVersion> & {
     onNode: Node
   }
-): VmVersion {
+): Promise<VmVersion> {
   if (onNode == null) throw new UnexpectedTsError('onNode')
-  const { consensusProtocolVersion } = (onNode).getNodeInfo()
+  const { consensusProtocolVersion } = await onNode.getNodeInfo()
   const supportedProtocol = PROTOCOL_VM_ABI[
     +consensusProtocolVersion as keyof typeof PROTOCOL_VM_ABI
   ]
@@ -149,7 +149,7 @@ export async function calculateTtl (
   if (ttl < 0) throw new ArgumentError('ttl', 'greater or equal to 0', ttl)
 
   if (relative) {
-    const { height } = await onNode.api.getCurrentKeyBlock()
+    const { height } = await onNode.getCurrentKeyBlock()
     return +(height) + ttl
   }
   return ttl
@@ -168,7 +168,7 @@ export async function getAccountNonce (
   { nonce: number, onNode: Node }
 ): Promise<number> {
   if (nonce != null) return nonce
-  const { nonce: accountNonce } = await onNode.api.getAccountByPubkey(accountId)
+  const { nonce: accountNonce } = await onNode.getAccountByPubkey(accountId)
     .catch(() => ({ nonce: 0 }))
   return accountNonce + 1
 }
@@ -208,7 +208,7 @@ export async function prepareTxParams (
   }> {
   if (onNode == null) throw new UnexpectedTsError('onNode')
   n = n ?? (
-    await onNode.api.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
+    await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
   ).nextNonce as number
   const ttl = await calculateTtl({
     ttl: t as number,
