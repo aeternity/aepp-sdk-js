@@ -62,15 +62,6 @@ export const NAME_BID_RANGES = mapObject({
   1: 5702887
 }, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)])
 
-// # ref: https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
-// # name bid timeouts
-export const NAME_BID_TIMEOUTS = {
-  13: new BigNumber(0),
-  12: new BigNumber(NAME_BID_TIMEOUT_BLOCKS), // # 480 blocks
-  8: new BigNumber(31).times(NAME_BID_TIMEOUT_BLOCKS), // # 14880 blocks
-  4: new BigNumber(62).times(NAME_BID_TIMEOUT_BLOCKS) // # 29760 blocks
-}
-
 // # Tag constant for ids (type uint8)
 // # see https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
 // # <<Tag:1/unsigned-integer-unit:8, Hash:32/binary-unit:8>>
