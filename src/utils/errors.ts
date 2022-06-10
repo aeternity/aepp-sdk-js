@@ -1,11 +1,6 @@
 /**
- * Error module
- * @module @aeternity/aepp-sdk/es/utils/errors
- * @example import { BytecodeMismatchError } from '@aeternity/aepp-sdk'
- */
-
-/**
  * aepp-sdk originated error
+ * @category exception
  */
 export abstract class BaseError extends Error {
   constructor (message: string) {
@@ -14,6 +9,9 @@ export abstract class BaseError extends Error {
   }
 }
 
+/**
+ * @category exception
+ */
 export class AccountError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -21,6 +19,9 @@ export class AccountError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class AensError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -28,6 +29,9 @@ export class AensError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class AeppError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -35,6 +39,9 @@ export class AeppError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class ChannelError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -42,6 +49,9 @@ export class ChannelError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class CompilerError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -49,6 +59,9 @@ export class CompilerError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class ContractError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -56,6 +69,9 @@ export class ContractError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class CryptographyError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -63,6 +79,9 @@ export class CryptographyError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class NodeError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -70,6 +89,9 @@ export class NodeError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class TransactionError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -77,6 +99,9 @@ export class TransactionError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class WalletError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -84,7 +109,9 @@ export class WalletError extends BaseError {
   }
 }
 
-/* Common error patterns */
+/**
+ * @category exception
+ */
 export class ArgumentError extends BaseError {
   constructor (argumentName: string, requirement: string, argumentValue: any) {
     super(`${argumentName} should be ${requirement}, got ${String(argumentValue)} instead`)
@@ -92,6 +119,9 @@ export class ArgumentError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class IllegalArgumentError extends CryptographyError {
   constructor (message: string) {
     super(message)
@@ -99,6 +129,9 @@ export class IllegalArgumentError extends CryptographyError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class ArgumentCountMismatchError extends BaseError {
   constructor (functionName: string, requiredCount: number, providedCount: number) {
     super(`${functionName} expects ${requiredCount} arguments, got ${providedCount} instead`)
@@ -106,6 +139,9 @@ export class ArgumentCountMismatchError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InsufficientBalanceError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -113,6 +149,9 @@ export class InsufficientBalanceError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class MissingParamError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -120,6 +159,9 @@ export class MissingParamError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class NoSerializerFoundError extends BaseError {
   constructor () {
     super('Byte serialization not supported')
@@ -127,6 +169,9 @@ export class NoSerializerFoundError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RequestTimedOutError extends BaseError {
   constructor (requestTime: number, currentHeight?: number, height?: number) {
     if (currentHeight !== undefined && height !== undefined) {
@@ -138,6 +183,9 @@ export class RequestTimedOutError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class TxTimedOutError extends BaseError {
   constructor (blocks: number, th: string) {
     super([
@@ -148,6 +196,9 @@ export class TxTimedOutError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class TypeError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -155,6 +206,9 @@ export class TypeError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnsupportedPlatformError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -162,6 +216,9 @@ export class UnsupportedPlatformError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnsupportedProtocolError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -169,6 +226,9 @@ export class UnsupportedProtocolError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class NotImplementedError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -176,6 +236,9 @@ export class NotImplementedError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnsupportedVersionError extends BaseError {
   constructor (dependency: string, version: string, geVersion: string, ltVersion: string) {
     super(`Unsupported ${dependency} version ${version}. Supported: >= ${geVersion} < ${ltVersion}`)
@@ -183,6 +246,9 @@ export class UnsupportedVersionError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InternalError extends BaseError {
   constructor (message: string) {
     super(message)
@@ -190,6 +256,9 @@ export class InternalError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnexpectedTsError extends InternalError {
   constructor (message: string = 'Expected to not happen, required for TS') {
     super(message)
@@ -197,7 +266,9 @@ export class UnexpectedTsError extends InternalError {
   }
 }
 
-/* keypair an account related errors */
+/**
+ * @category exception
+ */
 export class InvalidKeypairError extends AccountError {
   constructor (message: string) {
     super(message)
@@ -205,6 +276,9 @@ export class InvalidKeypairError extends AccountError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnavailableAccountError extends AccountError {
   constructor (address: string) {
     super(`Account for ${address} not available`)
@@ -212,7 +286,9 @@ export class UnavailableAccountError extends AccountError {
   }
 }
 
-/* errors originating from AENS operation */
+/**
+ * @category exception
+ */
 export class AensPointerContextError extends AensError {
   constructor (nameOrId: string, prefix: string) {
     super(`Name ${nameOrId} don't have pointers for ${prefix}`)
@@ -220,6 +296,9 @@ export class AensPointerContextError extends AensError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InsufficientNameFeeError extends AensError {
   constructor (nameFee: number, minNameFee: number) {
     super(`the provided fee ${nameFee} is not enough to execute the claim, required: ${minNameFee}`)
@@ -227,6 +306,9 @@ export class InsufficientNameFeeError extends AensError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InvalidAensNameError extends AensError {
   constructor (message: string) {
     super(message)
@@ -234,7 +316,9 @@ export class InvalidAensNameError extends AensError {
   }
 }
 
-/* Aepp Errors */
+/**
+ * @category exception
+ */
 export class InvalidRpcMessageError extends AeppError {
   constructor (message: string) {
     super(`Received invalid message: ${message}`)
@@ -242,6 +326,9 @@ export class InvalidRpcMessageError extends AeppError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class MissingCallbackError extends AeppError {
   constructor (id: number) {
     super(`Can't find callback for this messageId ${id}`)
@@ -249,6 +336,9 @@ export class MissingCallbackError extends AeppError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnAuthorizedAccountError extends AeppError {
   constructor (onAccount: string) {
     super(`You do not have access to account ${onAccount}`)
@@ -256,6 +346,9 @@ export class UnAuthorizedAccountError extends AeppError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnknownRpcClientError extends AeppError {
   constructor (id: string) {
     super(`RpcClient with id ${id} do not exist`)
@@ -263,6 +356,9 @@ export class UnknownRpcClientError extends AeppError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnsubscribedAccountError extends AeppError {
   constructor () {
     super('You are not subscribed for an account.')
@@ -270,7 +366,9 @@ export class UnsubscribedAccountError extends AeppError {
   }
 }
 
-/* Channel originated errors */
+/**
+ * @category exception
+ */
 export class ChannelCallError extends ChannelError {
   constructor (message: string) {
     super(message)
@@ -278,6 +376,9 @@ export class ChannelCallError extends ChannelError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class ChannelConnectionError extends ChannelError {
   constructor (message: string) {
     super(message)
@@ -285,6 +386,9 @@ export class ChannelConnectionError extends ChannelError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class ChannelPingTimedOutError extends ChannelError {
   constructor () {
     super('Server pong timed out')
@@ -292,6 +396,9 @@ export class ChannelPingTimedOutError extends ChannelError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnexpectedChannelMessageError extends ChannelError {
   constructor (message: string) {
     super(message)
@@ -299,6 +406,9 @@ export class UnexpectedChannelMessageError extends ChannelError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnknownChannelStateError extends ChannelError {
   constructor () {
     super('State Channels FSM entered unknown state')
@@ -306,8 +416,9 @@ export class UnknownChannelStateError extends ChannelError {
   }
 }
 
-/* compiler issued errors */
-/* errors from option validations */
+/**
+ * @category exception
+ */
 export class InvalidAuthDataError extends CompilerError {
   constructor (message: string) {
     super(message)
@@ -315,7 +426,9 @@ export class InvalidAuthDataError extends CompilerError {
   }
 }
 
-/* contract invocation errors */
+/**
+ * @category exception
+ */
 export class BytecodeMismatchError extends ContractError {
   constructor (source: string) {
     super(`Contract ${source} do not correspond to the bytecode deployed on the chain`)
@@ -323,6 +436,9 @@ export class BytecodeMismatchError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class DuplicateContractError extends ContractError {
   constructor () {
     super('Contract already deployed')
@@ -330,6 +446,9 @@ export class DuplicateContractError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InactiveContractError extends ContractError {
   constructor (contractAddress: string) {
     super(`Contract with address ${contractAddress} not active`)
@@ -337,6 +456,9 @@ export class InactiveContractError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InvalidMethodInvocationError extends ContractError {
   constructor (message: string) {
     super(message)
@@ -344,6 +466,9 @@ export class InvalidMethodInvocationError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class MissingContractAddressError extends ContractError {
   constructor (message: string) {
     super(message)
@@ -351,6 +476,9 @@ export class MissingContractAddressError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class MissingContractDefError extends ContractError {
   constructor () {
     super('Either ACI or source code is required')
@@ -358,6 +486,9 @@ export class MissingContractDefError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class MissingFunctionNameError extends ContractError {
   constructor () {
     super('Function name is required')
@@ -365,6 +496,9 @@ export class MissingFunctionNameError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class NodeInvocationError extends ContractError {
   transaction: string
 
@@ -375,6 +509,9 @@ export class NodeInvocationError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class NoSuchContractFunctionError extends ContractError {
   constructor (name: string) {
     super(`Function ${name} doesn't exist in contract`)
@@ -382,6 +519,9 @@ export class NoSuchContractFunctionError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class NotPayableFunctionError extends ContractError {
   constructor (amount: string, fn: string) {
     super(
@@ -391,6 +531,9 @@ export class NotPayableFunctionError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class MissingEventDefinitionError extends ContractError {
   constructor (eventNameHash: string, eventAddress: string) {
     super(
@@ -401,6 +544,9 @@ export class MissingEventDefinitionError extends ContractError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class AmbiguousEventDefinitionError extends ContractError {
   constructor (eventAddress: string, matchedEvents: Array<[string, string]>) {
     super(
@@ -412,7 +558,9 @@ export class AmbiguousEventDefinitionError extends ContractError {
   }
 }
 
-/* cryptography errors */
+/**
+ * @category exception
+ */
 export class InvalidChecksumError extends CryptographyError {
   constructor () {
     super('Invalid checksum')
@@ -420,6 +568,9 @@ export class InvalidChecksumError extends CryptographyError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InvalidPasswordError extends CryptographyError {
   constructor () {
     super('Invalid password or nonce')
@@ -427,6 +578,9 @@ export class InvalidPasswordError extends CryptographyError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class MerkleTreeHashMismatchError extends CryptographyError {
   constructor () {
     super('Node hash is not equal to provided one')
@@ -434,6 +588,9 @@ export class MerkleTreeHashMismatchError extends CryptographyError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class MissingNodeInTreeError extends CryptographyError {
   constructor (message: string) {
     super(message)
@@ -441,6 +598,9 @@ export class MissingNodeInTreeError extends CryptographyError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnknownNodeLengthError extends CryptographyError {
   constructor (nodeLength: number) {
     super(`Unknown node length: ${nodeLength}`)
@@ -448,6 +608,9 @@ export class UnknownNodeLengthError extends CryptographyError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnknownPathNibbleError extends CryptographyError {
   constructor (nibble: number) {
     super(`Unknown path nibble: ${nibble}`)
@@ -455,7 +618,9 @@ export class UnknownPathNibbleError extends CryptographyError {
   }
 }
 
-/* Node errors */
+/**
+ * @category exception
+ */
 export class DisconnectedError extends NodeError {
   constructor () {
     super('Can not get node info. Node is not connected')
@@ -463,6 +628,9 @@ export class DisconnectedError extends NodeError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class DuplicateNodeError extends NodeError {
   constructor (name: string) {
     super(`Node with name ${name} already exist`)
@@ -470,6 +638,9 @@ export class DuplicateNodeError extends NodeError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class NodeNotFoundError extends NodeError {
   constructor (message: string) {
     super(message)
@@ -477,7 +648,9 @@ export class NodeNotFoundError extends NodeError {
   }
 }
 
-/* transaction related errors */
+/**
+ * @category exception
+ */
 export class DecodeError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -485,6 +658,9 @@ export class DecodeError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class PayloadLengthError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -492,6 +668,9 @@ export class PayloadLengthError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class DryRunError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -499,6 +678,9 @@ export class DryRunError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class IllegalBidFeeError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -506,6 +688,9 @@ export class IllegalBidFeeError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InvalidSignatureError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -513,6 +698,9 @@ export class InvalidSignatureError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InvalidTxError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -520,6 +708,9 @@ export class InvalidTxError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class InvalidTxParamsError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -527,6 +718,9 @@ export class InvalidTxParamsError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class PrefixNotFoundError extends TransactionError {
   constructor (tag: string | number) {
     super(`Prefix for id-tag ${tag} not found.`)
@@ -534,6 +728,9 @@ export class PrefixNotFoundError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class SchemaNotFoundError extends TransactionError {
   constructor (schemaName: string, key: string, version: number) {
     super(`Transaction ${schemaName} not implemented for ${key} version ${version}`)
@@ -541,6 +738,9 @@ export class SchemaNotFoundError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class TagNotFoundError extends TransactionError {
   constructor (prefix: string) {
     super(`Id tag for prefix ${prefix} not found.`)
@@ -548,6 +748,9 @@ export class TagNotFoundError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class TxNotInChainError extends TransactionError {
   constructor (txHash: string) {
     super(`Transaction ${txHash} is removed from chain`)
@@ -555,6 +758,9 @@ export class TxNotInChainError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnknownTxError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -562,6 +768,9 @@ export class UnknownTxError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnsupportedABIversionError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -569,6 +778,9 @@ export class UnsupportedABIversionError extends TransactionError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class UnsupportedVMversionError extends TransactionError {
   constructor (message: string) {
     super(message)
@@ -576,7 +788,9 @@ export class UnsupportedVMversionError extends TransactionError {
   }
 }
 
-/* Wallet Errors */
+/**
+ * @category exception
+ */
 export class AlreadyConnectedError extends WalletError {
   constructor (message: string) {
     super(message)
@@ -584,6 +798,9 @@ export class AlreadyConnectedError extends WalletError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class NoWalletConnectedError extends WalletError {
   constructor (message: string) {
     super(message)
@@ -591,6 +808,9 @@ export class NoWalletConnectedError extends WalletError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcConnectionError extends WalletError {
   constructor (message: string) {
     super(message)
