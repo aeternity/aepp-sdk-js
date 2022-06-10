@@ -22,8 +22,9 @@ import { _AccountBase } from '../../../account/base'
 import { Account } from '../../../account/resolver'
 import NodePool, { _NodePool } from '../../../node-pool'
 import BrowserConnection from '../connection/Browser'
-import { Accounts, AeppApi, WalletApi, WalletInfo } from './types'
+import { Accounts, Network, AeppApi, WalletApi, WalletInfo } from './types'
 import { EncodedData } from '../../encoder'
+import Node from '../../../node'
 
 type RpcClientWallet = RpcClient<AeppApi, WalletApi>
 
@@ -85,7 +86,8 @@ abstract class _WalletRpc extends _AccountMultiple {
   onAskAccounts: OnAskAccounts
   onMessageSign: OnMessageSign
 
-  get selectedNode (): any { return null }
+  get api (): Node { return null as unknown as Node }
+  get selectedNodeName (): string { return '' }
   abstract send (tx: EncodedData<'tx'>, options: any): EncodedData<'th'>
 
   async init ({
@@ -143,15 +145,20 @@ abstract class _WalletRpc extends _AccountMultiple {
     this._pushAccountsToApps()
   }
 
-  selectNode (name: string): void {
+  _getNode (): { node: Network['node'] } {
+    return { node: { url: this.api.url, name: this.selectedNodeName } }
+  }
+
+  async selectNode (name: string): Promise<void> {
     nodePool.selectNode.call(this, name)
+    const networkId = await this.getNetworkId()
     Array.from(this._clients.keys())
       .filter(clientId => this._isRpcClientConnected(clientId))
       .map(clientId => this._getClient(clientId))
       .forEach(client => {
         client.rpc.notify(METHODS.updateNetwork, {
-          networkId: this.getNetworkId(),
-          ...client.connectNode && { node: this.selectedNode }
+          networkId,
+          ...client.connectNode && this._getNode()
         })
       })
   }
@@ -222,8 +229,8 @@ abstract class _WalletRpc extends _AccountMultiple {
             client.status = RPC_STATUS.CONNECTED
             client.connectNode = connectNode
             return {
-              ...this.getWalletInfo(),
-              ...connectNode && { node: this.selectedNode }
+              ...await this.getWalletInfo(),
+              ...connectNode && this._getNode()
             }
           },
           [METHODS.subscribeAddress]: async ({ type, value }, origin) => {
@@ -266,7 +273,7 @@ abstract class _WalletRpc extends _AccountMultiple {
             try {
               return { transactionHash: await this.send(tx, { onAccount, verify: false }) }
             } catch (error) {
-              const validation = await verifyTransaction(tx, this.selectedNode.instance)
+              const validation = await verifyTransaction(tx, this.api)
               if (validation.length > 0) throw new RpcInvalidTransactionError(validation)
               throw new RpcBroadcastError(error.message)
             }
@@ -296,19 +303,19 @@ abstract class _WalletRpc extends _AccountMultiple {
    * Send shareWalletInfo message to notify AEPP about wallet
    * @param clientId ID of RPC client send message to
    */
-  shareWalletInfo (clientId: string): void {
-    this._getClient(clientId).rpc.notify(METHODS.readyToConnect, this.getWalletInfo())
+  async shareWalletInfo (clientId: string): Promise<void> {
+    this._getClient(clientId).rpc.notify(METHODS.readyToConnect, await this.getWalletInfo())
   }
 
   /**
    * Get Wallet info object
    * @return Object with wallet information
    */
-  getWalletInfo (): WalletInfo {
+  async getWalletInfo (): Promise<WalletInfo> {
     return {
       id: this.id,
       name: this.name,
-      networkId: this.getNetworkId(),
+      networkId: await this.getNetworkId(),
       origin: window.location.origin,
       type: this._type
     }
@@ -344,6 +351,7 @@ export default Ae.compose(AccountMultiple, NodePool, {
     getAccounts: _WalletRpc.prototype.getAccounts,
     selectAccount: _WalletRpc.prototype.selectAccount,
     addAccount: _WalletRpc.prototype.addAccount,
+    _getNode: _WalletRpc.prototype._getNode,
     selectNode: _WalletRpc.prototype.selectNode
   }
 })

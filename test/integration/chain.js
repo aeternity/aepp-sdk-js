@@ -156,7 +156,7 @@ describe('Node Chain', function () {
         .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true }))
     )).map(r => r.decodedResult)
     expect(results).to.be.eql(numbers.map(v => BigInt(v * 100)))
-    expect(http.request.args.length).to.be.equal(1)
+    expect(http.request.args.length).to.be.equal(2)
     http.request.restore()
   })
 })

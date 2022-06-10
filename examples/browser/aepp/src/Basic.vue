@@ -19,7 +19,7 @@
     </div>
     <div>
       <div>Compiler version</div>
-      <div>{{ compilerVersion }}</div>
+      <Value :value="compilerVersionPromise" />
     </div>
   </div>
 
@@ -65,7 +65,7 @@ export default {
     balancePromise: null,
     heightPromise: null,
     nodeInfoPromise: null,
-    compilerVersion: '',
+    compilerVersionPromise: null,
     spendTo: '',
     spendAmount: '',
     spendPayload: '',
@@ -80,7 +80,8 @@ export default {
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
       ([aeSdk, address]) => {
         if (!aeSdk) return
-        this.compilerVersion = aeSdk.compilerVersion
+        this.compilerVersionPromise = aeSdk.compilerApi.aPIVersion()
+          .then(({ apiVersion }) => apiVersion)
         this.balancePromise = aeSdk.getBalance(address)
         this.heightPromise = aeSdk.height()
         this.nodeInfoPromise = aeSdk.getNodeInfo()

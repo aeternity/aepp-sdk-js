@@ -66,7 +66,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
 (async () => {
   // ## 4. Create object instances
   const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
-  const node = await Node({ url: NODE_URL })
+  const node = new Node(NODE_URL)
   const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: COMPILER_URL,

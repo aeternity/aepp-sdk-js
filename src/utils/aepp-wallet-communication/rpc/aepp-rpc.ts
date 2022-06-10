@@ -21,7 +21,6 @@ import {
   UnAuthorizedAccountError,
   RpcConnectionError
 } from '../../errors'
-// @ts-expect-error TODO remove
 import Node from '../../../node'
 import BrowserConnection from '../connection/Browser'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -68,9 +67,7 @@ abstract class _AeppRpc extends _AccountResolver {
       const address = account as EncodedData<'ak'>
       decode(address)
       if (!this.addresses().includes(address)) throw new UnAuthorizedAccountError(address)
-      account = AccountRpc({
-        rpcClient: this.rpcClient, address, networkId: this.getNetworkId()
-      })
+      account = AccountRpc({ rpcClient: this.rpcClient, address })
     }
     if (account == null) this._ensureAccountAccess()
     return super._resolveAccount(account)
@@ -112,9 +109,9 @@ abstract class _AeppRpc extends _AccountResolver {
           this._accounts = params
           this.onAddressChange(params)
         },
-        [METHODS.updateNetwork]: async (params) => {
+        [METHODS.updateNetwork]: (params) => {
           const { node } = params
-          if (node != null) this.addNode(node.name, await Node(node), true)
+          if (node != null) this.addNode(node.name, new Node(node.url), true)
           this.onNetworkChange(params)
         },
         [METHODS.closeConnection]: (params) => {
@@ -129,7 +126,7 @@ abstract class _AeppRpc extends _AccountResolver {
     )
     if (connectNode) {
       if (node == null) throw new RpcConnectionError('Missing URLs of the Node')
-      this.addNode(name, await Node(node), select)
+      this.addNode(name, new Node(node.url), select)
     }
     this.rpcClient = client
     return walletInfo

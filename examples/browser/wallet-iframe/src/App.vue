@@ -82,8 +82,8 @@ export default {
       id: window.origin,
       type: WALLET_TYPE.window,
       nodes: [
-        { name: 'ae_uat', instance: await Node({ url: 'https://testnet.aeternity.io' }) },
-        { name: 'ae_mainnet', instance: await Node({ url: 'https://mainnet.aeternity.io' }) },
+        { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
+        { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
       ],
       compilerUrl: 'https://compiler.aepps.com',
       accounts: [
@@ -110,7 +110,7 @@ export default {
         this.shareWalletInfo(clientId)
       }
     })
-    this.nodeName = this.aeSdk.selectedNode.name
+    this.nodeName = this.aeSdk.selectedNodeName
     this.address = this.aeSdk.addresses()[0]
 
     const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow

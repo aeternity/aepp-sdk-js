@@ -11,7 +11,7 @@ import {
     compilerUrl: 'https://compiler.aepps.com',
     nodes: [{
       name: 'testnet',
-      instance: await Node({ url: 'https://testnet.aeternity.io' })
+      instance: new Node('https://testnet.aeternity.io')
     }],
     id: browser.runtime.id,
     type: WALLET_TYPE.extension,

@@ -24,10 +24,8 @@
  */
 
 import stampit from '@stamp/it'
-import semverSatisfies from '../utils/semver-satisfies'
 import { Compiler as CompilerApi, ErrorModel, CompilerError } from '../apis/compiler'
-import { UnsupportedVersionError } from '../utils/errors'
-import { genErrorFormatterPolicy } from '../utils/autorest'
+import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../utils/autorest'
 
 type GeneralCompilerError = ErrorModel & {
   info?: object
@@ -38,7 +36,6 @@ export type OnCompiler = _ContractCompilerHttp['compilerApi']
 
 export class _ContractCompilerHttp {
   compilerApi: CompilerApi
-  compilerVersion: string
 
   // TODO: replace with constructor after dropping account stamps
   init (
@@ -51,38 +48,31 @@ export class _ContractCompilerHttp {
   setCompilerUrl (compilerUrl: string, { ignoreVersion = false } = {}): void {
     this.compilerApi = new CompilerApi(compilerUrl, {
       allowInsecureConnection: true,
-      additionalPolicies: [{
-        policy: {
-          name: 'version-check',
-          async sendRequest (request, next) {
-            if (ignoreVersion || new URL(request.url).pathname === '/api-version') return await next(request)
-            const args = [await versionPromise, COMPILER_GE_VERSION, COMPILER_LT_VERSION] as const
-            if (!semverSatisfies(...args)) throw new UnsupportedVersionError('compiler', ...args)
-            return await next(request)
+      additionalPolicies: [
+        genErrorFormatterPolicy((body: GeneralCompilerError | CompilerError[]) => {
+          let message = ''
+          if ('reason' in body) {
+            message += ' ' + body.reason +
+              (body.parameter != null ? ` in ${body.parameter}` : '') +
+              // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
+              (body.info != null ? ` (${JSON.stringify(body.info)})` : '')
           }
-        },
-        position: 'perCall'
-      }, genErrorFormatterPolicy((body: GeneralCompilerError | CompilerError[]) => {
-        let message = ''
-        if ('reason' in body) {
-          message += ' ' + body.reason +
-            (body.parameter != null ? ` in ${body.parameter}` : '') +
-            // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
-            (body.info != null ? ` (${JSON.stringify(body.info)})` : '')
-        }
-        if (Array.isArray(body)) {
-          message += '\n' + body
-            .map(e => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context != null ? `(${e.context})` : ''}`)
-            .map(e => e.trim()) // TODO: remove after fixing https://github.com/aeternity/aesophia_http/issues/80
-            .join('\n')
-        }
-        return message
-      })]
+          if (Array.isArray(body)) {
+            message += '\n' + body
+              .map(e => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context != null ? `(${e.context})` : ''}`)
+              .map(e => e.trim()) // TODO: remove after fixing https://github.com/aeternity/aesophia_http/issues/80
+              .join('\n')
+          }
+          return message
+        })
+      ]
     })
-    const versionPromise = this.compilerApi.aPIVersion().then(({ apiVersion }) => {
-      this.compilerVersion = apiVersion
-      return apiVersion
-    })
+    if (!ignoreVersion) {
+      const versionPromise = this.compilerApi.aPIVersion().then(({ apiVersion }) => apiVersion)
+      this.compilerApi.pipeline.addPolicy(
+        genVersionCheckPolicy('compiler', '/api-version', versionPromise, '6.1.0', '7.0.0')
+      )
+    }
   }
 }
 
@@ -99,11 +89,5 @@ export default stampit <_ContractCompilerHttp>({
   init: _ContractCompilerHttp.prototype.init,
   methods: {
     setCompilerUrl: _ContractCompilerHttp.prototype.setCompilerUrl
-  },
-  props: {
-    compilerVersion: _ContractCompilerHttp.prototype.compilerVersion
   }
 })
-
-const COMPILER_GE_VERSION = '6.1.0'
-const COMPILER_LT_VERSION = '7.0.0'

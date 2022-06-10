@@ -34,8 +34,8 @@ export default (store) => {
         aeSdk = await RpcAepp({
           name: 'Simple æpp',
           nodes: [
-            { name: 'testnet', instance: await Node({ url: TESTNET_NODE_URL }) },
-            { name: 'mainnet', instance: await Node({ url: MAINNET_NODE_URL }) }
+            { name: 'testnet', instance: new Node(TESTNET_NODE_URL) },
+            { name: 'mainnet', instance: new Node(MAINNET_NODE_URL) }
           ],
           compilerUrl: COMPILER_URL,
           onNetworkChange: ({ networkId }) => {

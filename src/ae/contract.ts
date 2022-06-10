@@ -30,12 +30,8 @@ import { decode, produceNameId } from '../tx/builder/helpers'
 import { concatBuffers } from '../utils/other'
 import { EncodedData, EncodingType } from '../utils/encoder'
 import { _AccountBase } from '../account/base'
+import Node from '../node'
 export { default as getContractInstance } from '../contract/aci'
-
-// TODO remove and import from node once it's merged
-interface Node {
-  nodeNetworkId: string
-}
 
 /**
  * Utility method to create a delegate signature for a contract
@@ -52,7 +48,7 @@ async function delegateSignatureCommon (
 ): Promise<string> {
   const signature = await onAccount.sign(
     concatBuffers([
-      Buffer.from(onNode.nodeNetworkId),
+      Buffer.from((await onNode.getStatus()).networkId),
       ...ids.map(e => decode(e))
     ]),
     opt

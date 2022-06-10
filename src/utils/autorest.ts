@@ -1,6 +1,8 @@
-import { RestError, PipelineResponse } from '@azure/core-rest-pipeline'
+import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pipeline'
 import { AdditionalPolicyConfig } from '@azure/core-client'
 import { pause } from './other'
+import semverSatisfies from './semver-satisfies'
+import { UnsupportedVersionError } from './errors'
 
 export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
   const requestQueues = new Map<string, Promise<unknown>>()
@@ -72,4 +74,17 @@ export const genErrorFormatterPolicy = (
     }
   },
   position: 'perCall'
+})
+
+export const genVersionCheckPolicy = (
+  name: string, ignorePath: string,
+  versionPromise: Promise<string>, geVersion: string, ltVersion: string
+): PipelinePolicy => ({
+  name: 'version-check',
+  async sendRequest (request, next) {
+    if (new URL(request.url).pathname === ignorePath) return await next(request)
+    const args = [await versionPromise, geVersion, ltVersion] as const
+    if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args)
+    return await next(request)
+  }
 })

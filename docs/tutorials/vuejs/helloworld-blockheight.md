@@ -38,7 +38,7 @@ export default {
   },
   async mounted () {
     // Init required Node stamp
-    const node = await Node({ url: 'https://testnet.aeternity.io' })
+    const node = new Node('https://testnet.aeternity.io')
 
     // Init SDK instance with Universal stamp
     const aeSdk = await Universal({

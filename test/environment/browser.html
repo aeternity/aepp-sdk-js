@@ -16,7 +16,7 @@ contract Test =
 `;
 
 (async () => {
-  const node = await Node({ url: 'https://testnet.aeternity.io' })
+  const node = new Node('https://testnet.aeternity.io')
   const sdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: 'https://compiler.aepps.com',

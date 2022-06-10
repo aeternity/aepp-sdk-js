@@ -192,7 +192,7 @@ const Ae = stampit(NodePool, AccountResolver, ContractCompilerHttp, {
         function (...args) {
           const instanceOptions = {
             ...this.Ae.defaults,
-            onNode: this.selectedNode.instance,
+            onNode: this.api,
             onAccount: this,
             onCompiler: this.compilerApi
           }

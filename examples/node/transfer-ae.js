@@ -60,7 +60,7 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 (async () => {
   // ## 4. Create object instances
   const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
-  const node = await Node({ url: NODE_URL })
+  const node = new Node(NODE_URL)
   const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     accounts: [account]

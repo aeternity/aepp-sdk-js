@@ -46,7 +46,7 @@ export const BaseAe = async (params = {}, compose = {}) => Universal
       ...params.accounts || [],
       ...params.withoutGenesisAccount ? [] : [genesisAccount]
     ],
-    nodes: [{ name: 'test', instance: await Node({ url, ignoreVersion }) }]
+    nodes: [{ name: 'test', instance: new Node(url, { ignoreVersion }) }]
   })
 
 export const spendPromise = (async () => {
