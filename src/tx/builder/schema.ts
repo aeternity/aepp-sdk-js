@@ -7,7 +7,12 @@
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js'
-import { Name, NameId, NameFee, Deposit, GasPrice } from './field-types'
+import { Name, NameId, NameFee, Deposit, Field, GasPrice } from './field-types'
+import { EncodedData, EncodingType } from '../../utils/encoder'
+import { Pointer } from './helpers'
+import MPTree from '../../utils/mptree'
+import { Keypair } from '../../account/memory'
+import { VmVersion } from '..'
 
 export * from './constants'
 
@@ -22,7 +27,7 @@ export const RESPONSE_TTL = { type: 'delta', value: 10 }
 export const AMOUNT = 0
 export const GAS_MAX = 1600000 - 21000
 export const MAX_AUTH_FUN_GAS = 50000
-export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: '100000000000000000000000000000000000' }
+export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: 100000000000000000000000000000000000n }
 
 // # OBJECT tags
 // # see https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
@@ -74,23 +79,17 @@ const OBJECT_TAG_GA_META = 81
 const OBJECT_TAG_PAYING_FOR = 82
 const OBJECT_TAG_SOPHIA_BYTE_CODE = 70
 
+export type TxField = [
+  name: string,
+  type: string | typeof Field,
+  prefix?: EncodingType | EncodingType[]
+]
+
+export type OnAccount = string | Keypair
+
 /**
- * @constant
  * @description Object with transaction types
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/schema
- * @property {String} signed
- * @property {String} spend
- * @property {String} nameClaim
- * @property {String} namePreClaim
- * @property {String} nameUpdate
- * @property {String} nameRevoke
- * @property {String} nameTransfer
- * @property {String} contractCreate
- * @property {String} contractCall
- * @property {String} oracleRegister
- * @property {String} oracleExtend
- * @property {String} oracleQuery
- * @property {String} oracleResponse
  */
 export const TX_TYPE = {
   account: 'account',
@@ -144,7 +143,7 @@ export const TX_TYPE = {
   gaMeta: 'gaMeta',
   payingFor: 'payingFor',
   sophiaByteCode: 'sophiaByteCode'
-}
+} as const
 
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
 export const VM_VERSIONS = {
@@ -155,17 +154,17 @@ export const VM_VERSIONS = {
   FATE: 5,
   SOPHIA_IMPROVEMENTS_LIMA: 6,
   FATE_2: 7
-}
+} as const
 // # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
 export const ABI_VERSIONS = {
   NO_ABI: 0,
   SOPHIA: 1,
   FATE: 3
-}
+} as const
 
 export const PROTOCOL_VERSIONS = {
   IRIS: 5
-}
+} as const
 
 // First abi/vm by default
 export const PROTOCOL_VM_ABI = {
@@ -189,7 +188,7 @@ export const PROTOCOL_VM_ABI = {
       vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
     }
   }
-}
+} as const
 
 export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_ACCOUNT]: TX_TYPE.account,
@@ -243,6 +242,35 @@ export const OBJECT_ID_TX_TYPE = {
   [OBJECT_TAG_GA_META]: TX_TYPE.gaMeta,
   [OBJECT_TAG_PAYING_FOR]: TX_TYPE.payingFor,
   [OBJECT_TAG_SOPHIA_BYTE_CODE]: TX_TYPE.sophiaByteCode
+} as const
+
+type PrefixType<Prefix> = Prefix extends EncodingType
+  ? EncodedData<Prefix>
+  : Prefix extends readonly EncodingType[]
+    ? EncodedData<Prefix[number]>
+    : EncodedData<any>
+
+interface BuildFieldTypes<Prefix extends EncodingType | readonly EncodingType[]>{
+  int: number | string | BigNumber
+  amount: number | string | BigNumber
+  id: PrefixType<Prefix>
+  ids: Array<EncodedData<Prefix extends EncodingType[]? Prefix : any>>
+  string: string
+  binary: PrefixType<Prefix>
+  bool: Boolean
+  hex: string
+  rlpBinary: any
+  rlpBinaries: any[]
+  rawBinary: string
+  signatures: Uint8Array[]
+  pointers: Pointer[]
+  offChainUpdates: any
+  callStack: any
+  proofOfInclusion: any
+  mptrees: MPTree[]
+  callReturnType: any
+  ctVersion: VmVersion
+  payload: string
 }
 
 export const FIELD_TYPES = {
@@ -269,7 +297,7 @@ export const FIELD_TYPES = {
   payload: 'payload',
   any: 'any',
   stateTree: 'stateTree'
-}
+} as const
 
 // FEE CALCULATION
 export const BASE_GAS = 15000
@@ -277,9 +305,15 @@ export const GAS_PER_BYTE = 20
 export const DEFAULT_FEE = 20000
 export const KEY_BLOCK_INTERVAL = 3
 
-// MAP WITH FEE CALCULATION https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
-export const TX_FEE_BASE_GAS = (txType) => {
-  const factor = ({
+/**
+ * Calculate the Base fee gas
+ * @see {@link https://github.com/aeternity/protocol/blob/master/consensus/README.md#gas}
+ * @param txType - The transaction type
+ * @returns The base fee
+ * @example TX_FEE_BASE('channelForceProgress') => new BigNumber(30 * 15000)
+ */
+export const TX_FEE_BASE_GAS = (txType: TxType): BigNumber => {
+  const feeFactors = {
     [TX_TYPE.channelForceProgress]: 30,
     [TX_TYPE.channelOffChain]: 0,
     [TX_TYPE.channelOffChainCallContract]: 0,
@@ -292,11 +326,27 @@ export const TX_FEE_BASE_GAS = (txType) => {
     [TX_TYPE.gaAttach]: 5,
     [TX_TYPE.gaMeta]: 5,
     [TX_TYPE.payingFor]: 1 / 5
-  })[txType] || 1
+  } as const
+  const factor = feeFactors[txType as keyof typeof feeFactors] ?? 1
   return new BigNumber(factor * BASE_GAS)
 }
 
-export const TX_FEE_OTHER_GAS = (txType, txSize, { relativeTtl, innerTxSize }) => {
+/**
+ * Calculate fee for Other types of transactions
+ * @see {@link https://github.com/aeternity/protocol/blob/master/consensus/README.md#gas}
+ * @param txType - The transaction type
+ * @param txSize - The transaction size
+ * @returns parameters - The transaction parameters
+ * @returns parameters.relativeTtl - The relative ttl
+ * @returns parameters.innerTxSize - The size of the inner transaction
+ * @returns The Other fee
+ * @example TX_FEE_OTHER_GAS('oracleResponse',10, {relativeTtl:10, innerTxSize:10 })
+ *  => new BigNumber(10).times(20).plus(Math.ceil(32000 * 10 / Math.floor(60 * 24 * 365 / 2)))
+ */
+export const TX_FEE_OTHER_GAS = (txType: string, txSize: number, { relativeTtl, innerTxSize }: {
+  relativeTtl: number
+  innerTxSize: number
+}): BigNumber => {
   switch (txType) {
     case TX_TYPE.oracleRegister:
     case TX_TYPE.oracleExtend:
@@ -315,10 +365,37 @@ export const TX_FEE_OTHER_GAS = (txType, txSize, { relativeTtl, innerTxSize }) =
   }
 }
 
+// based on https://stackoverflow.com/a/50375286/6176994
+type UnionToIntersection<Union> =
+  (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
+    ? Intersection : never
+
+type TxElem = readonly [string, string | Field]
+| readonly [string, string | Field, EncodingType | readonly EncodingType[]]
+
+type BuildTxArgBySchemaType<Schema extends readonly any[]> =
+  Schema[1] extends typeof Field
+    ? Parameters<Schema[1]['serialize']>[0]
+    : Schema[1] extends keyof BuildFieldTypes<Schema[2]>
+      ? BuildFieldTypes<Schema[2]>[Schema[1]]
+      : never
+
+type BuildTxArgBySchema<SchemaLine> =
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends TxElem ? {
+      [k in Elem[0]]: BuildTxArgBySchemaType<Elem> } : never
+    : never
+  >
+
+export type RawTxObject<Tx extends TxSchema> = {
+  [k in keyof Tx]: Tx[k] extends number | BigNumber ? string: Tx[k]
+}
+
 const BASE_TX = [
   ['tag', FIELD_TYPES.int],
   ['VSN', FIELD_TYPES.int]
-]
+] as const
 
 export const CONTRACT_BYTE_CODE_LIMA = [
   ...BASE_TX,
@@ -327,7 +404,7 @@ export const CONTRACT_BYTE_CODE_LIMA = [
   ['byteCode', FIELD_TYPES.rawBinary],
   ['compilerVersion', FIELD_TYPES.string],
   ['payable', FIELD_TYPES.bool]
-]
+] as const
 
 const ACCOUNT_TX_2 = [
   ...BASE_TX,
@@ -336,7 +413,7 @@ const ACCOUNT_TX_2 = [
   ['balance', FIELD_TYPES.int],
   ['gaContract', FIELD_TYPES.id, ['ct', 'nm']],
   ['gaAuthFun', FIELD_TYPES.binary, 'cb']
-]
+] as const
 
 const SPEND_TX = [
   ...BASE_TX,
@@ -347,13 +424,13 @@ const SPEND_TX = [
   ['ttl', FIELD_TYPES.int],
   ['nonce', FIELD_TYPES.int],
   ['payload', FIELD_TYPES.payload]
-]
+] as const
 
 const SIGNED_TX = [
   ...BASE_TX,
   ['signatures', FIELD_TYPES.signatures],
   ['encodedTx', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 const NAME_PRE_CLAIM_TX = [
   ...BASE_TX,
@@ -362,7 +439,7 @@ const NAME_PRE_CLAIM_TX = [
   ['commitmentId', FIELD_TYPES.id, 'cm'],
   ['fee', FIELD_TYPES.int],
   ['ttl', FIELD_TYPES.int]
-]
+] as const
 
 const NAME_CLAIM_TX_2 = [
   ...BASE_TX,
@@ -373,7 +450,7 @@ const NAME_CLAIM_TX_2 = [
   ['nameFee', NameFee],
   ['fee', FIELD_TYPES.int],
   ['ttl', FIELD_TYPES.int]
-]
+] as const
 
 const NAME_UPDATE_TX = [
   ...BASE_TX,
@@ -385,7 +462,7 @@ const NAME_UPDATE_TX = [
   ['clientTtl', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['ttl', FIELD_TYPES.int]
-]
+] as const
 
 const NAME_TRANSFER_TX = [
   ...BASE_TX,
@@ -395,7 +472,7 @@ const NAME_TRANSFER_TX = [
   ['recipientId', FIELD_TYPES.id, ['ak', 'nm']],
   ['fee', FIELD_TYPES.int],
   ['ttl', FIELD_TYPES.int]
-]
+] as const
 
 const NAME_REVOKE_TX = [
   ...BASE_TX,
@@ -404,18 +481,18 @@ const NAME_REVOKE_TX = [
   ['nameId', NameId],
   ['fee', FIELD_TYPES.int],
   ['ttl', FIELD_TYPES.int]
-]
+] as const
 
 const CONTRACT_TX = [
   ...BASE_TX,
   ['owner', FIELD_TYPES.id, 'ak'],
-  ['ctVersion', FIELD_TYPES.int],
+  ['ctVersion', FIELD_TYPES.ctVersion],
   ['code', FIELD_TYPES.binary, 'cb'],
   ['log', FIELD_TYPES.binary, 'cb'],
   ['active', FIELD_TYPES.bool],
   ['referers', FIELD_TYPES.ids, 'ak'],
   ['deposit', Deposit]
-]
+] as const
 
 const GA_ATTACH_TX = [
   ...BASE_TX,
@@ -429,7 +506,7 @@ const GA_ATTACH_TX = [
   ['gasLimit', FIELD_TYPES.int],
   ['gasPrice', GasPrice],
   ['callData', FIELD_TYPES.binary, 'cb']
-]
+] as const
 
 const GA_META_TX_2 = [
   ...BASE_TX,
@@ -440,7 +517,7 @@ const GA_META_TX_2 = [
   ['gasLimit', FIELD_TYPES.int],
   ['gasPrice', GasPrice],
   ['tx', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 const PAYING_FOR_TX = [
   ...BASE_TX,
@@ -448,7 +525,7 @@ const PAYING_FOR_TX = [
   ['nonce', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['tx', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 const CONTRACT_CREATE_TX = [
   ...BASE_TX,
@@ -463,7 +540,7 @@ const CONTRACT_CREATE_TX = [
   ['gasLimit', FIELD_TYPES.int],
   ['gasPrice', GasPrice],
   ['callData', FIELD_TYPES.binary, 'cb']
-]
+] as const
 
 const CONTRACT_CALL_TX = [
   ...BASE_TX,
@@ -477,7 +554,7 @@ const CONTRACT_CALL_TX = [
   ['gasLimit', FIELD_TYPES.int],
   ['gasPrice', GasPrice],
   ['callData', FIELD_TYPES.binary, 'cb']
-]
+] as const
 
 const CONTRACT_CALL_RESULT_TX = [
   ...BASE_TX,
@@ -492,7 +569,7 @@ const CONTRACT_CALL_RESULT_TX = [
   // TODO: add serialization for
   //  <log> :: [ { <address> :: id, [ <topics> :: binary() ], <data> :: binary() } ]
   ['log', FIELD_TYPES.rawBinary]
-]
+] as const
 
 const ORACLE_REGISTER_TX = [
   ...BASE_TX,
@@ -506,7 +583,7 @@ const ORACLE_REGISTER_TX = [
   ['fee', FIELD_TYPES.int],
   ['ttl', FIELD_TYPES.int],
   ['abiVersion', FIELD_TYPES.int]
-]
+] as const
 
 const ORACLE_EXTEND_TX = [
   ...BASE_TX,
@@ -516,7 +593,7 @@ const ORACLE_EXTEND_TX = [
   ['oracleTtlValue', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['ttl', FIELD_TYPES.int]
-]
+] as const
 
 const ORACLE_QUERY_TX = [
   ...BASE_TX,
@@ -531,7 +608,8 @@ const ORACLE_QUERY_TX = [
   ['responseTtlValue', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['ttl', FIELD_TYPES.int]
-]
+] as const
+
 const ORACLE_RESPOND_TX = [
   ...BASE_TX,
   ['oracleId', FIELD_TYPES.id, 'ok'],
@@ -542,7 +620,7 @@ const ORACLE_RESPOND_TX = [
   ['responseTtlValue', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['ttl', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_CREATE_TX_2 = [
   ...BASE_TX,
@@ -558,7 +636,7 @@ const CHANNEL_CREATE_TX_2 = [
   ['responderDelegateIds', FIELD_TYPES.string],
   ['stateHash', FIELD_TYPES.binary, 'st'],
   ['nonce', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_DEPOSIT_TX = [
   ...BASE_TX,
@@ -570,7 +648,7 @@ const CHANNEL_DEPOSIT_TX = [
   ['stateHash', FIELD_TYPES.binary, 'st'],
   ['round', FIELD_TYPES.int],
   ['nonce', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_WITHDRAW_TX = [
   ...BASE_TX,
@@ -582,7 +660,7 @@ const CHANNEL_WITHDRAW_TX = [
   ['stateHash', FIELD_TYPES.binary, 'st'],
   ['round', FIELD_TYPES.int],
   ['nonce', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_CLOSE_MUTUAL_TX = [
   ...BASE_TX,
@@ -593,7 +671,7 @@ const CHANNEL_CLOSE_MUTUAL_TX = [
   ['ttl', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['nonce', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_CLOSE_SOLO_TX = [
   ...BASE_TX,
@@ -604,7 +682,7 @@ const CHANNEL_CLOSE_SOLO_TX = [
   ['ttl', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['nonce', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_SLASH_TX = [
   ...BASE_TX,
@@ -615,7 +693,7 @@ const CHANNEL_SLASH_TX = [
   ['ttl', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['nonce', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_SETTLE_TX = [
   ...BASE_TX,
@@ -626,7 +704,7 @@ const CHANNEL_SETTLE_TX = [
   ['ttl', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['nonce', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_FORCE_PROGRESS_TX = [
   ...BASE_TX,
@@ -640,14 +718,14 @@ const CHANNEL_FORCE_PROGRESS_TX = [
   ['ttl', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['nonce', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_OFFCHAIN_TX_2 = [
   ...BASE_TX,
   ['channelId', FIELD_TYPES.id, 'ch'],
   ['round', FIELD_TYPES.int],
   ['stateHash', FIELD_TYPES.binary, 'st']
-]
+] as const
 
 const CHANNEL_TX_3 = [
   ...BASE_TX,
@@ -666,7 +744,7 @@ const CHANNEL_TX_3 = [
   ['lockedUntil', FIELD_TYPES.int],
   ['initiatorAuth', FIELD_TYPES.binary, 'cb'],
   ['responderAuth', FIELD_TYPES.binary, 'cb']
-]
+] as const
 
 const CHANNEL_SNAPSHOT_SOLO_TX = [
   ...BASE_TX,
@@ -676,16 +754,16 @@ const CHANNEL_SNAPSHOT_SOLO_TX = [
   ['ttl', FIELD_TYPES.int],
   ['fee', FIELD_TYPES.int],
   ['nonce', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_OFFCHAIN_CREATE_CONTRACT_TX = [
   ...BASE_TX,
   ['owner', FIELD_TYPES.id, 'ak'],
-  ['ctVersion', FIELD_TYPES.int],
+  ['ctVersion', FIELD_TYPES.ctVersion],
   ['code', FIELD_TYPES.binary, 'cb'],
   ['deposit', FIELD_TYPES.int],
   ['callData', FIELD_TYPES.binary, 'cb']
-]
+] as const
 
 const CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = [
   ...BASE_TX,
@@ -697,7 +775,7 @@ const CHANNEL_OFFCHAIN_CALL_CONTRACT_TX = [
   ['callStack', FIELD_TYPES.callStack],
   ['gasPrice', GasPrice],
   ['gasLimit', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_RECONNECT_TX = [
   ...BASE_TX,
@@ -705,26 +783,26 @@ const CHANNEL_RECONNECT_TX = [
   ['round', FIELD_TYPES.int],
   ['role', FIELD_TYPES.string],
   ['pubkey', FIELD_TYPES.id, 'ak']
-]
+] as const
 
 const CHANNEL_OFFCHAIN_UPDATE_TRANSFER_TX = [
   ...BASE_TX,
   ['from', FIELD_TYPES.id, 'ak'],
   ['to', FIELD_TYPES.id, 'ak'],
   ['amount', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_OFFCHAIN_UPDATE_DEPOSIT_TX = [
   ...BASE_TX,
   ['from', FIELD_TYPES.id, 'ak'],
   ['amount', FIELD_TYPES.int]
-]
+] as const
 
 const CHANNEL_OFFCHAIN_UPDATE_WITHDRAWAL_TX = [
   ...BASE_TX,
   ['from', FIELD_TYPES.id, 'ak'],
   ['amount', FIELD_TYPES.int]
-]
+] as const
 
 const PROOF_OF_INCLUSION_TX = [
   ...BASE_TX,
@@ -734,7 +812,7 @@ const PROOF_OF_INCLUSION_TX = [
   ['contracts', FIELD_TYPES.mptrees],
   ['ns', FIELD_TYPES.mptrees],
   ['oracles', FIELD_TYPES.mptrees]
-]
+] as const
 
 const STATE_TREES_TX = [
   ...BASE_TX,
@@ -744,48 +822,48 @@ const STATE_TREES_TX = [
   ['ns', FIELD_TYPES.rlpBinary],
   ['oracles', FIELD_TYPES.rlpBinary],
   ['accounts', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 const MERKLE_PATRICIA_TREE_TX = [
   ...BASE_TX,
   ['values', FIELD_TYPES.rlpBinaries]
-]
+] as const
 
 const MERKLE_PATRICIA_TREE_VALUE_TX = [
   ...BASE_TX,
   ['key', FIELD_TYPES.hex],
   ['value', FIELD_TYPES.rawBinary]
-]
+] as const
 
 const CONTRACTS_TREE_TX = [
   ...BASE_TX,
   ['contracts', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 const CONTRACT_CALLS_TREE_TX = [
   ...BASE_TX,
   ['calls', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 const CHANNELS_TREE_TX = [
   ...BASE_TX,
   ['channels', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 const NAMESERVICE_TREE_TX = [
   ...BASE_TX,
   ['mtree', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 const ORACLES_TREE_TX = [
   ...BASE_TX,
   ['otree', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 const ACCOUNTS_TREE_TX = [
   ...BASE_TX,
   ['accounts', FIELD_TYPES.rlpBinary]
-]
+] as const
 
 export const TX_SERIALIZATION_SCHEMA = {
   [TX_TYPE.account]: {
@@ -926,7 +1004,26 @@ export const TX_SERIALIZATION_SCHEMA = {
   [TX_TYPE.payingFor]: {
     1: PAYING_FOR_TX
   }
+} as const
+
+export type TxType = keyof typeof TX_SERIALIZATION_SCHEMA
+
+export type TxTypeSchemas = {
+  [key in TxType]: BuildTxArgBySchema<
+    typeof TX_SERIALIZATION_SCHEMA[key][keyof typeof TX_SERIALIZATION_SCHEMA[key]]
+  >
 }
+
+interface TtlObject{
+  type: string
+  value: number
+}
+
+export type TxSchema = TxTypeSchemas[keyof TxTypeSchemas]
+export type TxParamsCommon = Partial<UnionToIntersection<TxSchema> & {
+  oracleTtl: TtlObject
+  queryTtl: TtlObject
+}>
 
 export const TX_DESERIALIZATION_SCHEMA = {
   [OBJECT_TAG_ACCOUNT]: {
@@ -1070,4 +1167,4 @@ export const TX_DESERIALIZATION_SCHEMA = {
   [OBJECT_TAG_SOPHIA_BYTE_CODE]: {
     3: CONTRACT_BYTE_CODE_LIMA
   }
-}
+} as const

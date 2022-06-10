@@ -1,3 +1,4 @@
+import { EncodingType } from './../../utils/encoder'
 import BigNumber from 'bignumber.js'
 import { mapObject } from '../../utils/other'
 
@@ -23,7 +24,7 @@ export const POINTER_KEY_BY_PREFIX = {
   ok: 'oracle_pubkey',
   ct: 'contract_pubkey',
   ch: 'channel'
-}
+} as const
 // # https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
 // # https://github.com/aeternity/protocol/blob/master/AENS.md#protocol-fees-and-protection-times
 // # bid ranges:
@@ -96,6 +97,8 @@ export const PREFIX_ID_TAG = {
   ok: ID_TAG.oracle,
   ct: ID_TAG.contract,
   ch: ID_TAG.channel
-}
+} as const
 
-export const ID_TAG_PREFIX = mapObject(PREFIX_ID_TAG, ([key, value]) => [value, key])
+export const ID_TAG_PREFIX = mapObject(
+  PREFIX_ID_TAG, ([key, value]: [EncodingType, number]) => [value, key]
+)

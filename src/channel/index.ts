@@ -24,9 +24,7 @@
 
 import BigNumber from 'bignumber.js'
 import { snakeToPascal } from '../utils/string'
-// @ts-expect-error TODO: remove me
 import { buildTx, unpackTx } from '../tx/builder'
-// @ts-expect-error TODO: remove me
 import { TX_TYPE } from '../tx/builder/schema'
 import * as handlers from './handlers'
 import {
@@ -230,7 +228,7 @@ export default class Channel {
     if (state == null) {
       return null
     }
-    const { txType, tx } = unpackTx(channelState.get(this)).tx.encodedTx
+    const { txType, tx } = unpackTx(state, { txType: TX_TYPE.signed }).tx.encodedTx
     switch (txType) {
       case TX_TYPE.channelCreate:
         return 1
@@ -757,7 +755,7 @@ export default class Channel {
     },
     sign: SignTx,
     { onOnChainTx }: { onOnChainTx?: Function } = {}
-  ): Promise<{ accepted: boolean, signedTx: string, tx: string | Buffer }> {
+  ): Promise<{ accepted: boolean, signedTx: string, tx: EncodedData<'tx'> | Uint8Array }> {
     return await new Promise((resolve, reject) => {
       enqueueAction(
         this,

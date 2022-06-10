@@ -9,7 +9,6 @@
 import { v4 as uuid } from '@aeternity/uuid'
 // @ts-expect-error TODO remove
 import Ae from '../../../ae'
-// @ts-expect-error TODO remove
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple, { _AccountMultiple } from '../../../account/multiple'
 import RpcClient from './RpcClient'

@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
+import '..'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import { encode as rlpEncode } from 'rlp'
@@ -55,7 +55,7 @@ describe('Tx', function () {
       new BigNumber('7841237845261982793129837487239459214123')
     ]
 
-    function bnFromBytes (bn) {
+    function bnFromBytes (bn: BigNumber): string {
       const bytes = toBytes(bn, true)
       return new BigNumber(bytes.toString('hex'), 16).toString(10)
     }
@@ -79,7 +79,6 @@ describe('Tx', function () {
   })
 
   describe('isNameValid', () => {
-    it('validates type', () => isNameValid({}).should.be.equal(false))
     it('validates domain', () => isNameValid('asdasdasd.unknown').should.be.equal(false))
     it('don\'t throws exception', () => isNameValid('asdasdasd.chain').should.be.equal(true))
   })
@@ -89,12 +88,6 @@ describe('Tx', function () {
     it('decodes base64check', () => expect(decode('ba_AQIq9Y55kw==')).to.be.eql(payload))
 
     it('decodes base58check', () => expect(decode('bf_3DZUwMat2')).to.be.eql(payload))
-
-    it('throws if invalid identifier', () => expect(() => decode('aaaaa'))
-      .to.throw('Encoded string missing payload: aaaaa'))
-
-    it('throws if unknown type', () => expect(() => decode('aa_aaaaa'))
-      .to.throw('prefix should be one of ak, bf, bs, bx, ch, cm, ct, kh, mh, nm, ok, oq, pp, sg, th, ba, cb, or, ov, pi, ss, cs, ck, cv, st, tx, got aa instead'))
 
     it('throws if invalid checksum', () => expect(() => decode('ak_23aaaaa'))
       .to.throw('Invalid checksum'))
@@ -107,36 +100,18 @@ describe('Tx', function () {
     it('encodes base64check', () => expect(encode(payload, 'ba')).to.be.equal('ba_AQIq9Y55kw=='))
 
     it('encodes base58check', () => expect(encode(payload, 'bf')).to.be.equal('bf_3DZUwMat2'))
-
-    it('throws if unknown type', () => expect(() => encode('test', 'aa'))
-      .to.throw('prefix should be one of ak, bf, bs, bx, ch, cm, ct, kh, mh, nm, ok, oq, pp, sg, th, ba, cb, or, ov, pi, ss, cs, ck, cv, st, tx, got aa instead'))
   })
 
   describe('getDefaultPointerKey', () => {
-    it('throws if unknown prefix', () =>
-      expect(() => getDefaultPointerKey('th_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
-        .to.throw('Default AENS pointer key is not defined for th prefix'))
-
     it('returns default pointer key for contract', () =>
       expect(getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
         .to.be.equal('contract_pubkey'))
   })
 
-  it('Deserialize tx: invalid tx type', () => {
-    const tx = rlpEncode([99, 99])
-    expect(() => unpackTx(tx, true))
-      .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag ' + 99)
-  })
-
   it('Deserialize tx: invalid tx VSN', () => {
     const tx = rlpEncode([10, 99])
-    expect(() => unpackTx(tx, true))
-      .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag ' + 10 + ' version ' + 99)
-  })
-
-  it('Serialize tx: invalid tx type', () => {
-    expect(() => buildTx({}, 'someTx'))
-      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for someTx')
+    expect(() => unpackTx(tx, { fromRlpBinary: true }))
+      .to.throw(SchemaNotFoundError, `Transaction deserialization not implemented for tag ${10} version ${99}`)
   })
 
   it('Serialize tx: invalid tx VSN', () => {

@@ -28,7 +28,6 @@
 
 // @ts-expect-error TODO remove
 import _getContractInstance from '../contract/aci'
-// @ts-expect-error TODO remove
 import { decode, produceNameId } from '../tx/builder/helpers'
 import { concatBuffers } from '../utils/other'
 import { EncodedData, EncodingType } from '../utils/encoder'

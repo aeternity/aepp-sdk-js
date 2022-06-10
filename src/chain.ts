@@ -23,12 +23,9 @@
  */
 
 import { AE_AMOUNT_FORMATS, AeAmountFormats, formatAmount } from './utils/amount-formatter'
-// @ts-expect-error
 import verifyTransaction from './tx/validator'
 import { pause } from './utils/other'
-// @ts-expect-error
 import { isNameValid, produceNameId, decode } from './tx/builder/helpers'
-// @ts-expect-error
 import { DRY_RUN_ACCOUNT } from './tx/builder/schema'
 import {
   AensPointerContextError, DryRunError, InvalidAensNameError, InvalidTxError,
@@ -40,6 +37,7 @@ import {
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx
 } from './apis/node'
 import { EncodedData } from './utils/encoder'
+import { _NodePool } from './node-pool/index'
 
 export function _getPollInterval (
   type: 'block' | 'microblock',
@@ -54,15 +52,15 @@ export function _getPollInterval (
 
 // TODO: extract these definitions
 
-interface Node {
+export interface Node extends Pick<_NodePool, 'getNodeInfo'> {
   api: InstanceType<typeof NodeApi>
+  nodeNetworkId: string
 }
-
 interface Account {
   address: (options: any) => Promise<EncodedData<'ak'>>
 }
 
-type AensName = `${string}.chain`
+export type AensName = `${string}.chain`
 
 /**
  * Submit a signed transaction for mining
@@ -442,17 +440,17 @@ export async function resolveName (
   { verify: boolean, resolveByNode: boolean, onNode: Node }
 ): Promise<EncodedData<'ak' | 'nm'>> {
   try {
-    decode(nameOrId)
+    decode(nameOrId as EncodedData<'ak'>)
     return nameOrId as EncodedData<'ak'>
   } catch (error) {}
-  if (isNameValid(nameOrId) === true) {
+  if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
       const name = await onNode.api.getNameEntryByName(nameOrId)
       const pointer = name.pointers.find(pointer => pointer.key === key)
       if (pointer == null) throw new AensPointerContextError(nameOrId, key)
       if (resolveByNode) return pointer.id as EncodedData<'ak'>
     }
-    return produceNameId(nameOrId)
+    return produceNameId(nameOrId as AensName)
   }
   throw new InvalidAensNameError(`Invalid name or address: ${nameOrId}`)
 }

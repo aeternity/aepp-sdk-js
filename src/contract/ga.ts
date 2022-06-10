@@ -19,24 +19,15 @@
  * Generalized Account module - routines to use generalized account
  */
 
-// @ts-expect-error TODO: remove me
-import { TX_TYPE, MAX_AUTH_FUN_GAS } from '../tx/builder/schema'
-// @ts-expect-error TODO: remove me
-import { buildContractIdByContractTx, buildTx, unpackTx } from '../tx/builder'
+import { TX_TYPE, MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema'
+import { buildContractIdByContractTx, buildTx, BuiltTx, TxUnpacked, unpackTx } from '../tx/builder'
 import { hash } from '../utils/crypto'
 import { decode, EncodedData } from '../utils/encoder'
 import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '../utils/errors'
 import { concatBuffers } from '../utils/other'
 import { _AccountBase } from '../account/base'
 import { getContractInstance } from '../ae/contract'
-import NodeApi from '../nodeApi'
-import { getAccount } from '../chain'
-
-// Duplicate in Chain.ts
-interface Node {
-  api: InstanceType<typeof NodeApi>
-  nodeNetworkId: string
-}
+import { getAccount, Node } from '../chain'
 
 /**
  * Check if account is GA
@@ -65,7 +56,7 @@ export async function createGeneralizedAccount (
   args: any[],
   { onAccount, onCompiler, onNode, ...options }:
   { onAccount: _AccountBase & { send: any, buildTx: any, Ae: any }, onCompiler: any, onNode: Node }
-  & Parameters<_AccountBase['address']>[0] & Parameters<buildTx>[2]
+  & Parameters<_AccountBase['address']>[0] & Parameters<typeof buildTx>[2]
 ): Promise<Readonly<{
     owner: EncodedData<'ak'>
     transaction: EncodedData<'th'>
@@ -118,12 +109,9 @@ export async function createMetaTx (
   authFnName: string,
   { onAccount, ...options }: { onAccount: any } & Parameters<_AccountBase['address']>[0]
 ): Promise<EncodedData<'tx'>> {
-  const wrapInEmptySignedTx = (tx: EncodedData<'tx'>): {
-    tx: EncodedData<'tx'>
-    rlpEncoded: Uint8Array
-    binary: any[]
-    txObject: object
-  } => buildTx({ encodedTx: tx, signatures: [] }, TX_TYPE.signed)
+  const wrapInEmptySignedTx = (
+    tx: EncodedData<'tx'> | Uint8Array | TxUnpacked<TxSchema>
+  ): BuiltTx<TxSchema, 'tx'> => buildTx({ encodedTx: tx, signatures: [] }, TX_TYPE.signed)
 
   if (Object.keys(authData).length <= 0) throw new MissingParamError('authData is required')
 
@@ -140,7 +128,7 @@ export async function createMetaTx (
 
   const opt = { ...onAccount.Ae.defaults, ...options }
   const { abiVersion } = onAccount.getVmVersion(TX_TYPE.contractCall)
-  const wrappedTx = wrapInEmptySignedTx(unpackTx(rawTransaction))
+  const wrappedTx = wrapInEmptySignedTx(unpackTx(rawTransaction, { txType: TX_TYPE.signed }))
   const params = {
     ...opt,
     tx: {

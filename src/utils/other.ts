@@ -66,3 +66,15 @@ export const concatBuffers = isWebpack4Buffer
   ? (list: readonly Uint8Array[], totalLength?: number): Buffer =>
       Buffer.concat(list.map(el => Buffer.from(el)), totalLength)
   : Buffer.concat
+
+/**
+ * Object key type guard
+ * @param key - Object key
+ * @param object - object
+ */
+export function isKeyOfObject<T> (
+  key: string | number | symbol,
+  object: T
+): key is keyof T {
+  return key in object
+}

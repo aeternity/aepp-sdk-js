@@ -23,7 +23,7 @@
  */
 
 import stampit from '@stamp/it'
-import Tx from '../tx'
+import * as txMethods from '../tx'
 import * as chainMethods from '../chain'
 import * as contractMethods from './contract'
 import * as contractGaMethods from '../contract/ga'
@@ -150,6 +150,8 @@ function destroyInstance () {
   destroyMethods.forEach(m => this[m] && typeof this[m] === 'function' && this[m]())
 }
 
+const { _buildTx, ...otherTxMethods } = txMethods
+
 /**
  * Basic Ae Stamp
  *
@@ -169,7 +171,7 @@ function destroyInstance () {
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Ae instance
  */
-const Ae = stampit(NodePool, Tx, AccountResolver, ContractCompilerHttp, {
+const Ae = stampit(NodePool, AccountResolver, ContractCompilerHttp, {
   methods: {
     send,
     spend,
@@ -178,7 +180,13 @@ const Ae = stampit(NodePool, Tx, AccountResolver, ContractCompilerHttp, {
     destroyInstance,
     signUsingGA,
     ...mapObject(
-      { ...chainMethods, ...contractMethods, ...contractGaMethods },
+      {
+        ...chainMethods,
+        ...contractMethods,
+        ...contractGaMethods,
+        ...otherTxMethods,
+        buildTx: _buildTx
+      },
       ([name, handler]) => [
         name,
         function (...args) {

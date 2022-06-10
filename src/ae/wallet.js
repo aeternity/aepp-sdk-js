@@ -23,7 +23,6 @@
  */
 
 import Ae from './'
-import Tx from '../tx/tx'
 import WalletRpc from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
 import Oracle from './oracle'
 import Aens from './aens'
@@ -44,4 +43,4 @@ import Aens from './aens'
   address: keypair.publicKey,
 })
  */
-export default Ae.compose(Tx, Oracle, Aens, WalletRpc)
+export default Ae.compose(Oracle, Aens, WalletRpc)
