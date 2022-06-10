@@ -203,8 +203,8 @@ export function isNameValid (name: string): boolean {
  */
 export function getDefaultPointerKey (
   identifier: EncodedData<keyof typeof POINTER_KEY_BY_PREFIX>
-): typeof POINTER_KEY_BY_PREFIX[keyof typeof POINTER_KEY_BY_PREFIX] {
-  decode(identifier as any)
+): POINTER_KEY_BY_PREFIX {
+  decode(identifier)
   const prefix = identifier.substring(0, 2) as keyof typeof POINTER_KEY_BY_PREFIX
   return POINTER_KEY_BY_PREFIX[prefix]
 }
