@@ -1,4 +1,3 @@
-import { AeAmountFormats } from './../../utils/amount-formatter'
 import { EncodedData, EncodingType } from './../../utils/encoder'
 import BigNumber from 'bignumber.js'
 import { decode as rlpDecode, encode as rlpEncode, NestedUint8Array } from 'rlp'
@@ -220,7 +219,7 @@ function validateField (
 function transformParams (
   params: TxParamsCommon,
   schema: TxField[],
-  { denomination }: {denomination?: AeAmountFormats} = {}
+  { denomination }: {denomination?: AE_AMOUNT_FORMATS} = {}
 ): any {
   params = schema
     .filter(([, t]) => t === FIELD_TYPES.amount)
@@ -373,7 +372,7 @@ export function validateParams (
 
 interface TxOptionsRaw {
   excludeKeys?: string[]
-  denomination?: AeAmountFormats
+  denomination?: AE_AMOUNT_FORMATS
 }
 /**
  * Build binary transaction
@@ -439,7 +438,7 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends EncodingType> {
 }
 
 export type TxParamsBuild = TxParamsCommon & {
-  denomination?: AeAmountFormats
+  denomination?: AE_AMOUNT_FORMATS
 }
 /**
  * Build transaction hash
@@ -463,7 +462,7 @@ export function buildTx<Prefix> (
     excludeKeys?: string[]
     prefix?: EncodingType
     vsn?: number
-    denomination?: AeAmountFormats
+    denomination?: AE_AMOUNT_FORMATS
   } = {}
 ): Prefix extends EncodingType
     ? BuiltTx<TxSchema, Prefix>

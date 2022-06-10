@@ -22,7 +22,7 @@
  * @example import { Chain } from '@aeternity/aepp-sdk'
  */
 
-import { AE_AMOUNT_FORMATS, AeAmountFormats, formatAmount } from './utils/amount-formatter'
+import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter'
 import verifyTransaction from './tx/validator'
 import { pause } from './utils/other'
 import { isNameValid, produceNameId, decode } from './tx/builder/helpers'
@@ -181,7 +181,7 @@ export async function getAccount (
 export async function getBalance (
   address: EncodedData<'ak'>,
   { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
-  { format: AeAmountFormats } & Parameters<typeof getAccount>[1]
+  { format: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1]
 ): Promise<string> {
   const { balance } = await getAccount(address, options).catch(() => ({ balance: 0n }))
 
