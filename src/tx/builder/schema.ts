@@ -145,26 +145,31 @@ export const TX_TYPE = {
   sophiaByteCode: 'sophiaByteCode'
 } as const
 
-// # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
-export const VM_VERSIONS = {
-  NO_VM: 0,
-  SOPHIA: 1,
-  SOPHIA_IMPROVEMENTS_MINERVA: 3,
-  SOPHIA_IMPROVEMENTS_FORTUNA: 4,
-  FATE: 5,
-  SOPHIA_IMPROVEMENTS_LIMA: 6,
-  FATE_2: 7
-} as const
-// # see https://github.com/aeternity/protocol/blob/minerva/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
-export const ABI_VERSIONS = {
-  NO_ABI: 0,
-  SOPHIA: 1,
-  FATE: 3
-} as const
+/**
+ * @link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+ */
+export enum VM_VERSIONS {
+  NO_VM = 0,
+  SOPHIA = 1,
+  SOPHIA_IMPROVEMENTS_MINERVA = 3,
+  SOPHIA_IMPROVEMENTS_FORTUNA = 4,
+  FATE = 5,
+  SOPHIA_IMPROVEMENTS_LIMA = 6,
+  FATE_2 = 7
+}
 
-export const PROTOCOL_VERSIONS = {
-  IRIS: 5
-} as const
+/**
+ * @link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+ */
+export enum ABI_VERSIONS {
+  NO_ABI = 0,
+  SOPHIA = 1,
+  FATE = 3
+}
+
+export enum PROTOCOL_VERSIONS {
+  IRIS = 5
+}
 
 // First abi/vm by default
 export const PROTOCOL_VM_ABI = {
