@@ -11,7 +11,6 @@ import { Name, NameId, NameFee, Deposit, Field, GasPrice } from './field-types'
 import { EncodedData, EncodingType } from '../../utils/encoder'
 import { Pointer } from './helpers'
 import MPTree from '../../utils/mptree'
-import { Keypair } from '../../account/memory'
 import { VmVersion } from '..'
 
 export * from './constants'
@@ -87,8 +86,6 @@ export type TxField = [
   type: string | typeof Field,
   prefix?: EncodingType | EncodingType[]
 ]
-
-export type OnAccount = string | Keypair
 
 /**
  * @description Object with transaction types
