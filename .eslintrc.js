@@ -46,7 +46,7 @@ module.exports = {
   plugins: [
     '@typescript-eslint'
   ],
-  ignorePatterns: ['dist', 'es', 'src/apis'],
+  ignorePatterns: ['dist', 'es', 'src/apis', 'docs/api'],
   rules: {
     'max-len': ['error', 100, 2, {
       ignoreUrls: true,
