@@ -20,7 +20,7 @@ import Node from '../../src/node'
 import { url, ignoreVersion } from '.'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import NodePool from '../../src/node-pool'
+import NodePool, { _NodePool } from '../../src/node-pool'
 import { NodeNotFoundError } from '../../src/utils/errors'
 
 describe('Node client', function () {
@@ -49,7 +49,7 @@ describe('Node client', function () {
 
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {
-      const nodes = NodePool()
+      const nodes = NodePool() as _NodePool
       expect(() => nodes.api)
         .to.throw(NodeNotFoundError, 'You can\'t use Node API. Node is not connected or not defined!')
     })
@@ -60,7 +60,7 @@ describe('Node client', function () {
           { name: 'first', instance: new Node(url, { ignoreVersion }) },
           { name: 'second', instance: node }
         ]
-      })
+      }) as _NodePool
       const activeNode = await nodes.getNodeInfo()
       activeNode.name.should.be.equal('first')
       nodes.selectNode('second')
@@ -74,7 +74,7 @@ describe('Node client', function () {
           { name: 'first', instance: new Node(url, { ignoreVersion }) },
           { name: 'second', instance: node }
         ]
-      })
+      }) as _NodePool
       expect(() => nodes.selectNode('asdasd')).to.throw(NodeNotFoundError, 'Node with name asdasd not in pool')
     })
 
@@ -83,7 +83,7 @@ describe('Node client', function () {
         nodes: [
           { name: 'first', instance: node }
         ]
-      })
+      }) as _NodePool
       const nodesList = await nodes.getNodesInPool()
       nodesList.length.should.be.equal(1)
     })

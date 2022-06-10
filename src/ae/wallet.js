@@ -26,7 +26,6 @@ import Ae from './'
 import ContractCompilerHttp from '../contract/compiler'
 import WalletRpc from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
 import Oracle from './oracle'
-import Aens from './aens'
 
 /**
  * Wallet Stamp
@@ -44,4 +43,4 @@ import Aens from './aens'
   address: keypair.publicKey,
 })
  */
-export default Ae.compose(Oracle, Aens, WalletRpc, ContractCompilerHttp)
+export default Ae.compose(Oracle, WalletRpc, ContractCompilerHttp)

@@ -531,7 +531,7 @@ export function unpackTx<TxType extends TX_TYPE> (
  * @param rawTx base64 or rlp encoded transaction
  * @return Transaction hash
  */
-export function buildTxHash (rawTx: EncodedData<'tx'> | Uint8Array): string {
+export function buildTxHash (rawTx: EncodedData<'tx'> | Uint8Array): EncodedData<'th'> {
   const data = typeof rawTx === 'string' && rawTx.startsWith('tx_')
     ? decode(rawTx)
     : rawTx

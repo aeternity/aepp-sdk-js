@@ -39,6 +39,11 @@ import { EncodedData } from '../utils/encoder'
 import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
 import { isKeyOfObject } from '../utils/other'
 
+// uses a new feature, probably typescript-eslint doesn't support it yet
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
+  Omit<Parameters<typeof _buildTx<TxType>>[1], OmitFields>
+
 // TODO: find a better name or rearrange methods
 export async function _buildTx<TxType extends TX_TYPE> (
   txType: TxType,

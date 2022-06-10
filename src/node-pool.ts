@@ -124,7 +124,7 @@ export class _NodePool {
  * @param options.nodes - Array with Node instances
  * @return NodePool instance
  */
-export default stampit({
+export default stampit<_NodePool>({
   init: _NodePool.prototype.init,
   methods: {
     addNode: _NodePool.prototype.addNode,
@@ -134,4 +134,4 @@ export default stampit({
     getNetworkId,
     getNodesInPool: _NodePool.prototype.getNodesInPool
   }
-}) as (o?: Parameters<_NodePool['init']>[0]) => _NodePool
+})

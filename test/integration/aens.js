@@ -140,14 +140,14 @@ describe('Aens', function () {
     await claim.transfer(onAccount)
 
     const claim2 = await aeSdk.aensQuery(name)
-    expect(await claim2.update({ account_pubkey: onAccount }, { onAccount })).to.deep.include({
-      pointers: [{ key: 'account_pubkey', id: onAccount }]
-    })
+    expect(
+      await claim2.update({ account_pubkey: onAccount }, { onAccount: aeSdk.accounts[onAccount] })
+    ).to.deep.include({ pointers: [{ key: 'account_pubkey', id: onAccount }] })
   })
 
   it('revoke names', async () => {
     const current = await aeSdk.address()
-    const onAccount = aeSdk.addresses().find(acc => acc !== current)
+    const onAccount = aeSdk.accounts[aeSdk.addresses().find(acc => acc !== current)]
     const aensName = await aeSdk.aensQuery(name)
 
     const revoke = await aensName.revoke({ onAccount })

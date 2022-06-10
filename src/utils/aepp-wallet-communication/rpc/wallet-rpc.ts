@@ -7,7 +7,6 @@
  * import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
  */
 import { v4 as uuid } from '@aeternity/uuid'
-// @ts-expect-error TODO remove
 import Ae from '../../../ae'
 import verifyTransaction from '../../../tx/validator'
 import AccountMultiple, { _AccountMultiple } from '../../../account/multiple'
@@ -25,6 +24,8 @@ import BrowserConnection from '../connection/Browser'
 import { Accounts, Network, AeppApi, WalletApi, WalletInfo, RPC_VERSION } from './types'
 import { EncodedData } from '../../encoder'
 import Node from '../../../node'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import stampit from '@stamp/it'
 
 type RpcClientWallet = RpcClient<AeppApi, WalletApi>
 
