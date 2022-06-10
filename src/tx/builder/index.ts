@@ -10,16 +10,13 @@ import {
   DEFAULT_FEE,
   FIELD_TYPES,
   MIN_GAS_PRICE,
-  OBJECT_ID_TX_TYPE,
   RawTxObject,
   TxField,
   TxTypeSchemas,
   TxParamsCommon,
-  TxType,
-  TX_DESERIALIZATION_SCHEMA,
   TX_FEE_BASE_GAS,
   TX_FEE_OTHER_GAS,
-  TX_SERIALIZATION_SCHEMA,
+  TX_SCHEMA,
   TX_TYPE,
   TxSchema
 } from './schema'
@@ -37,7 +34,7 @@ import {
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree, { MPTreeBinary } from '../../utils/mptree'
-import { ArgumentError, InvalidTxParamsError, SchemaNotFoundError, UnexpectedTsError } from '../../utils/errors'
+import { ArgumentError, InvalidTxParamsError, SchemaNotFoundError, DecodeError } from '../../utils/errors'
 import { isKeyOfObject } from '../../utils/other'
 
 /**
@@ -255,7 +252,7 @@ function transformParams (
     )
 }
 
-function getOracleRelativeTtl (params: any, txType: TxType): number {
+function getOracleRelativeTtl (params: any, txType: TX_TYPE): number {
   const ttlKeys = {
     [TX_TYPE.oracleRegister]: 'oracleTtl',
     [TX_TYPE.oracleExtend]: 'oracleTtl',
@@ -281,7 +278,7 @@ function getOracleRelativeTtl (params: any, txType: TxType): number {
  * @example calculateMinFee('spendTx', { gasLimit, params })
  */
 export function calculateMinFee (
-  txType: TxType,
+  txType: TX_TYPE,
   { params, vsn }: { params?: Object, vsn?: number }
 ): string {
   const multiplier = new BigNumber(1e9) // 10^9 GAS_PRICE
@@ -309,7 +306,7 @@ export function calculateMinFee (
  * @param options.vsn
  */
 function buildFee (
-  txType: TxType,
+  txType: TX_TYPE,
   { params, multiplier, vsn }: { params: TxParamsCommon, multiplier: BigNumber, vsn?: number }
 ): BigNumber {
   const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
@@ -339,7 +336,7 @@ function buildFee (
  */
 export function calculateFee (
   fee: number | BigNumber | string = 0,
-  txType: TxType,
+  txType: TX_TYPE,
   { params, showWarning = true, vsn }: {
     gasLimit?: number | string | BigNumber
     params?: TxSchema
@@ -461,7 +458,7 @@ export type TxParamsBuild = TxParamsCommon & {
  */
 export function buildTx<Prefix> (
   params: TxParamsBuild,
-  type: TxType,
+  type: TX_TYPE,
   { excludeKeys = [], prefix = 'tx', vsn, denomination = AE_AMOUNT_FORMATS.AETTOS }: {
     excludeKeys?: string[]
     prefix?: EncodingType
@@ -471,19 +468,15 @@ export function buildTx<Prefix> (
 ): Prefix extends EncodingType
     ? BuiltTx<TxSchema, Prefix>
     : BuiltTx<TxSchema, 'tx'> {
-  const schemas = TX_SERIALIZATION_SCHEMA[type]
-  if (schemas == null) throw new UnexpectedTsError()
+  const schemas = TX_SCHEMA[type]
 
   vsn ??= Math.max(...Object.keys(schemas).map(a => +a))
-  if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', type.toString(), vsn)
+  if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', TX_TYPE[type], vsn)
 
   const schema = schemas[vsn]
 
-  const tags = Object.entries(OBJECT_ID_TX_TYPE).find(([, t]) => t === type)
-  if (tags == null) { throw new UnexpectedTsError() }
-  const tag = tags[0]
   const binary = buildRawTx(
-    { ...params, VSN: vsn, tag },
+    { ...params, VSN: vsn, tag: type },
     schema,
     { excludeKeys, denomination: params.denomination ?? denomination }
   ).filter(e => e !== undefined)
@@ -494,12 +487,12 @@ export function buildTx<Prefix> (
     tx,
     rlpEncoded,
     binary,
-    txObject: unpackRawTx<TxTypeSchemas[TxType]>(binary, schema)
+    txObject: unpackRawTx<TxTypeSchemas[TX_TYPE]>(binary, schema)
   } as any
 }
 
 export interface TxUnpacked<Tx extends TxSchema> {
-  txType: TxType
+  txType: TX_TYPE
   tx: RawTxObject<Tx>
   rlpEncoded: Uint8Array
   binary: Uint8Array | NestedUint8Array
@@ -516,7 +509,7 @@ export interface TxUnpacked<Tx extends TxSchema> {
  * @returns object.rlpEncoded rlp encoded transaction
  * @returns object.binary binary transaction
  */
-export function unpackTx<TxType extends keyof TxTypeSchemas> (
+export function unpackTx<TxType extends TX_TYPE> (
   encodedTx: EncodedData<'tx'> | Uint8Array,
   { txType, fromRlpBinary = false }:
   { txType?: TxType, fromRlpBinary?: boolean } = {
@@ -525,16 +518,15 @@ export function unpackTx<TxType extends keyof TxTypeSchemas> (
 ): TxUnpacked<TxTypeSchemas[TxType]> {
   const rlpEncoded = fromRlpBinary ? encodedTx as Uint8Array : decode(encodedTx as EncodedData<'tx'>)
   const binary = rlpDecode(rlpEncoded)
-  const objId = readInt(binary[0] as Buffer) as unknown as keyof typeof TX_DESERIALIZATION_SCHEMA
-  txType ??= OBJECT_ID_TX_TYPE[objId] as TxType
-  const vsn = readInt(binary[1] as Buffer) as keyof typeof TX_DESERIALIZATION_SCHEMA[typeof objId]
-  const schema = TX_DESERIALIZATION_SCHEMA[objId][vsn]
-  if (schema == null) {
-    throw new SchemaNotFoundError('deserialization', `tag ${objId}`, vsn)
-  }
+  const objId = +readInt(binary[0] as Buffer)
+  if (!isKeyOfObject(objId, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${objId}`)
+  if (txType != null && txType !== objId) throw new DecodeError(`Expected transaction to have ${TX_TYPE[txType]} tag, got ${TX_TYPE[objId]} instead`)
+  const vsn = +readInt(binary[1] as Buffer)
+  if (!isKeyOfObject(vsn, TX_SCHEMA[objId])) throw new SchemaNotFoundError('deserialization', `tag ${objId}`, vsn)
+  const schema = TX_SCHEMA[objId][vsn]
   return {
-    txType,
-    tx: unpackRawTx<TxTypeSchemas[typeof txType]>(binary, schema),
+    txType: objId,
+    tx: unpackRawTx<TxTypeSchemas[TxType]>(binary, schema),
     rlpEncoded,
     binary
   }
@@ -560,8 +552,8 @@ export function buildTxHash (rawTx: EncodedData<'tx'> | Uint8Array): string {
  * @return Contract public key
  */
 export function buildContractIdByContractTx (contractTx: EncodedData<'tx'>): EncodedData<'ct'> {
-  const { txType, tx } = unpackTx(contractTx, { txType: TX_TYPE.contractCreate })
-  if (![TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType as any)) {
+  const { txType, tx } = unpackTx<TX_TYPE.contractCreate | TX_TYPE.gaAttach>(contractTx)
+  if (![TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType)) {
     throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', txType)
   }
   return buildContractId(tx.ownerId, +tx.nonce)
