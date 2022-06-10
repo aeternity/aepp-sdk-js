@@ -1,8 +1,6 @@
 import { EncodedData } from '../encoder'
 import { BaseError, InternalError } from '../errors'
 
-export const VERSION = 1
-
 export const enum MESSAGE_DIRECTION {
   to_waellet = 'to_waellet',
   to_aepp = 'to_aepp'

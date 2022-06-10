@@ -11,9 +11,9 @@ import AccountResolver, { _AccountResolver, Account } from '../../../account/res
 import { _AccountBase } from '../../../account/base'
 import AccountRpc from '../../../account/rpc'
 import { decode, EncodedData } from '../../encoder'
-import { Accounts, WalletInfo, Network, WalletApi, AeppApi } from './types'
+import { Accounts, WalletInfo, Network, WalletApi, AeppApi, RPC_VERSION } from './types'
 import RpcClient from './RpcClient'
-import { METHODS, VERSION, SUBSCRIPTION_TYPES } from '../schema'
+import { METHODS, SUBSCRIPTION_TYPES } from '../schema'
 import {
   AlreadyConnectedError,
   NoWalletConnectedError,
@@ -122,7 +122,7 @@ abstract class _AeppRpc extends _AccountResolver {
       }
     )
     const { node, ...walletInfo } = await client.request(
-      METHODS.connect, { name: this.name, version: VERSION, connectNode }
+      METHODS.connect, { name: this.name, version: RPC_VERSION, connectNode }
     )
     if (connectNode) {
       if (node == null) throw new RpcConnectionError('Missing URLs of the Node')

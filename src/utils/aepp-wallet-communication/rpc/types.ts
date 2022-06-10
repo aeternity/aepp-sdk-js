@@ -26,9 +26,11 @@ export interface Network {
 
 type Icons = Array<{ src: string, sizes?: string, type?: string, purpose?: string }>
 
+export const RPC_VERSION = 1
+
 export interface WalletApi {
   [METHODS.connect]: (
-    p: { name: string, icons?: Icons, version: 1, connectNode: boolean }
+    p: { name: string, icons?: Icons, version: typeof RPC_VERSION, connectNode: boolean }
   ) => Promise<WalletInfo & { node?: Node }>
 
   [METHODS.closeConnection]: (p: any) => void
