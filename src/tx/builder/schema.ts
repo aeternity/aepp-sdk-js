@@ -27,7 +27,10 @@ export const RESPONSE_TTL = { type: 'delta', value: 10 }
 export const AMOUNT = 0
 export const GAS_MAX = 1600000 - 21000
 export const MAX_AUTH_FUN_GAS = 50000
-export const DRY_RUN_ACCOUNT = { pub: 'ak_11111111111111111111111111111111273Yts', amount: 100000000000000000000000000000000000n }
+export const DRY_RUN_ACCOUNT = {
+  pub: 'ak_11111111111111111111111111111111273Yts',
+  amount: 100000000000000000000000000000000000n
+} as const
 
 // # OBJECT tags
 // # see https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization

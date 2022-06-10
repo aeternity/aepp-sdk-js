@@ -26,12 +26,11 @@
  * @example import { Contract } from '@aeternity/aepp-sdk'
  */
 
-// @ts-expect-error TODO remove
-import _getContractInstance from '../contract/aci'
 import { decode, produceNameId } from '../tx/builder/helpers'
 import { concatBuffers } from '../utils/other'
 import { EncodedData, EncodingType } from '../utils/encoder'
 import { _AccountBase } from '../account/base'
+export { default as getContractInstance } from '../contract/aci'
 
 // TODO remove and import from node once it's merged
 interface Node {
@@ -119,10 +118,4 @@ export async function createOracleDelegationSignature (
   return await delegateSignatureCommon(
     [opt.queryId ?? await opt.onAccount.address(opt), contractId], opt
   )
-}
-
-export async function getContractInstance (
-  options: { onAccount: _AccountBase } & any
-): Promise<any> {
-  return _getContractInstance.bind(options.onAccount)(options)
 }

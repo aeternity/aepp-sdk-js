@@ -25,7 +25,8 @@ import NodePool from '../../src/node-pool'
 import { NodeNotFoundError } from '../../src/utils/errors'
 
 describe('Node client', function () {
-  let node: Node
+  // TODO should be changed once Node doesn't use stamps
+  let node: InstanceType<typeof Node>
 
   before(async function () {
     node = await Node({ url, ignoreVersion })

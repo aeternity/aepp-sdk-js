@@ -9,6 +9,7 @@ import { Field } from './field-types'
 import {
   DEFAULT_FEE,
   FIELD_TYPES,
+  MIN_GAS_PRICE,
   OBJECT_ID_TX_TYPE,
   RawTxObject,
   TxField,
@@ -394,6 +395,7 @@ export function buildRawTx (
   schema: TxField[],
   { excludeKeys = [], denomination = AE_AMOUNT_FORMATS.AETTOS }: TxOptionsRaw = {}
 ): Buffer[] {
+  params.gasPrice ??= MIN_GAS_PRICE
   const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key))
 
   // Transform `amount` type fields to `aettos`
