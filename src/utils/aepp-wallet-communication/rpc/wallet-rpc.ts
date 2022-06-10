@@ -13,7 +13,7 @@ import verifyTransaction from '../../../tx/validator'
 import AccountMultiple, { _AccountMultiple } from '../../../account/multiple'
 import RpcClient from './RpcClient'
 import {
-  METHODS, RPC_STATUS, VERSION, SUBSCRIPTION_TYPES, WALLET_TYPE,
+  METHODS, RPC_STATUS, SUBSCRIPTION_TYPES, WALLET_TYPE,
   RpcBroadcastError, RpcInvalidTransactionError,
   RpcNotAuthorizeError, RpcPermissionDenyError, RpcUnsupportedProtocolError
 } from '../schema'
@@ -22,7 +22,7 @@ import { _AccountBase } from '../../../account/base'
 import { Account } from '../../../account/resolver'
 import NodePool, { _NodePool } from '../../../node-pool'
 import BrowserConnection from '../connection/Browser'
-import { Accounts, Network, AeppApi, WalletApi, WalletInfo } from './types'
+import { Accounts, Network, AeppApi, WalletApi, WalletInfo, RPC_VERSION } from './types'
 import { EncodedData } from '../../encoder'
 import Node from '../../../node'
 
@@ -223,7 +223,7 @@ abstract class _WalletRpc extends _AccountMultiple {
           // Store client info and prepare two fn for each client `connect` and `denyConnection`
           // which automatically prepare and send response for that client
           [METHODS.connect]: async ({ name, version, icons, connectNode }, origin) => {
-            if (version !== VERSION) throw new RpcUnsupportedProtocolError()
+            if (version !== RPC_VERSION) throw new RpcUnsupportedProtocolError()
 
             await this.onConnection(id, { name, icons, connectNode }, origin)
             client.status = RPC_STATUS.CONNECTED

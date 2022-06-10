@@ -33,7 +33,7 @@ import {
 import BigNumber from 'bignumber.js'
 import { toBytes } from '../../src/utils/bytes'
 import { buildTx, unpackTx } from '../../src/tx/builder'
-import { NAME_BID_RANGES } from '../../src/tx/builder/schema'
+import { NAME_BID_RANGES, TX_TYPE } from '../../src/tx/builder/schema'
 import { SchemaNotFoundError } from '../../src/utils/errors'
 
 describe('Tx', function () {
@@ -115,7 +115,7 @@ describe('Tx', function () {
   })
 
   it('Serialize tx: invalid tx VSN', () => {
-    expect(() => buildTx({}, 'spendTx', { vsn: 5 }))
-      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for spendTx version 5')
+    expect(() => buildTx({}, TX_TYPE.spend, { vsn: 5 }))
+      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for spend version 5')
   })
 })

@@ -8,7 +8,7 @@ import {
   PREFIX_ID_TAG,
   NAME_BID_RANGES,
   NAME_FEE_BID_INCREMENT,
-  NAME_BID_TIMEOUTS,
+  NAME_BID_TIMEOUT_BLOCKS,
   NAME_MAX_LENGTH_FEE,
   POINTER_KEY_BY_PREFIX
 } from './constants'
@@ -203,8 +203,8 @@ export function isNameValid (name: string): boolean {
  */
 export function getDefaultPointerKey (
   identifier: EncodedData<keyof typeof POINTER_KEY_BY_PREFIX>
-): typeof POINTER_KEY_BY_PREFIX[keyof typeof POINTER_KEY_BY_PREFIX] {
-  decode(identifier as any)
+): POINTER_KEY_BY_PREFIX {
+  decode(identifier)
   const prefix = identifier.substring(0, 2) as keyof typeof POINTER_KEY_BY_PREFIX
   return POINTER_KEY_BY_PREFIX[prefix]
 }
@@ -249,15 +249,16 @@ export function computeBidFee (
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param name
  * @param claimHeight Auction starting height
+ * @link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
  * @return Auction end height
  */
-export function computeAuctionEndBlock (name: AensName, claimHeight: number | string): string {
+export function computeAuctionEndBlock (name: AensName, claimHeight: number): number {
   const length = name.length - AENS_SUFFIX.length
-  const h = (length <= 4 && NAME_BID_TIMEOUTS[4]) ||
-    (length <= 8 && NAME_BID_TIMEOUTS[8]) ||
-    (length <= 12 && NAME_BID_TIMEOUTS[12]) ||
-    NAME_BID_TIMEOUTS[13]
-  return h.plus(claimHeight).toString(10)
+  const h = (length <= 4 && 62 * NAME_BID_TIMEOUT_BLOCKS) ||
+    (length <= 8 && 31 * NAME_BID_TIMEOUT_BLOCKS) ||
+    (length <= 12 && NAME_BID_TIMEOUT_BLOCKS) ||
+    0
+  return h + claimHeight
 }
 
 /**

@@ -142,9 +142,9 @@ describe('Channel', function () {
     }
     const { txType: initiatorTxType, tx: initiatorTx } = unpackTx(initiatorSign.firstCall.args[1])
     const { txType: responderTxType, tx: responderTx } = unpackTx(responderSign.firstCall.args[1])
-    initiatorTxType.should.equal('channelCreate')
+    initiatorTxType.should.equal(TX_TYPE.channelCreate)
     initiatorTx.should.eql({ ...initiatorTx, ...expectedTxParams })
-    responderTxType.should.equal('channelCreate')
+    responderTxType.should.equal(TX_TYPE.channelCreate)
     responderTx.should.eql({ ...responderTx, ...expectedTxParams })
   })
 
@@ -208,7 +208,7 @@ describe('Channel', function () {
       })
     )
     const { txType } = unpackTx(sign.firstCall.args[0] as Uint8Array)
-    txType.should.equal('channelOffChain')
+    txType.should.equal(TX_TYPE.channelOffChain)
 
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
@@ -264,7 +264,7 @@ describe('Channel', function () {
       })
     )
     const { txType } = unpackTx(sign.firstCall.args[0] as Uint8Array)
-    txType.should.equal('channelOffChain')
+    txType.should.equal(TX_TYPE.channelOffChain)
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
         {
@@ -344,7 +344,7 @@ describe('Channel', function () {
       })
     )
     const { txType } = unpackTx(sign.firstCall.args[0] as Uint8Array)
-    txType.should.equal('channelOffChain')
+    txType.should.equal(TX_TYPE.channelOffChain)
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
         {
@@ -468,7 +468,7 @@ describe('Channel', function () {
       })
     )
     const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
-    txType.should.equal('channelWithdraw')
+    txType.should.equal(TX_TYPE.channelWithdraw)
     tx.should.eql({
       ...tx,
       toId: await aeSdkInitiatior.address(),
@@ -521,7 +521,7 @@ describe('Channel', function () {
       })
     )
     const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
-    txType.should.equal('channelWithdraw')
+    txType.should.equal(TX_TYPE.channelWithdraw)
     tx.should.eql({
       ...tx,
       toId: await aeSdkInitiatior.address(),
@@ -597,7 +597,7 @@ describe('Channel', function () {
       })
     )
     const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
-    txType.should.equal('channelDeposit')
+    txType.should.equal(TX_TYPE.channelDeposit)
     tx.should.eql({
       ...tx,
       fromId: await aeSdkInitiatior.address(),
@@ -638,7 +638,7 @@ describe('Channel', function () {
       })
     )
     const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
-    txType.should.equal('channelDeposit')
+    txType.should.equal(TX_TYPE.channelDeposit)
     tx.should.eql({
       ...tx,
       fromId: await aeSdkInitiatior.address(),
@@ -683,7 +683,7 @@ describe('Channel', function () {
     sinon.assert.calledOnce(sign)
     sinon.assert.calledWithExactly(sign, sinon.match.string)
     const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
-    txType.should.equal('channelCloseMutual')
+    txType.should.equal(TX_TYPE.channelCloseMutual)
     tx.should.eql({
       ...tx,
       fromId: await aeSdkInitiatior.address()
@@ -778,7 +778,7 @@ describe('Channel', function () {
       initiatorAmountFinal: balances[initiatorAddr],
       responderAmountFinal: balances[responderAddr]
     })
-    const settleTxFee = unpackTx(settleTx, { txType: TX_TYPE.payingFor }).tx.fee
+    const settleTxFee = unpackTx(settleTx, { txType: TX_TYPE.channelSettle }).tx.fee
     await aeSdkInitiatior.sendTransaction(
       await aeSdkInitiatior.signTransaction(settleTx), { waitMined: true })
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr)

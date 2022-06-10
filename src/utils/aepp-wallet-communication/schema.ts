@@ -1,8 +1,6 @@
 import { EncodedData } from '../encoder'
 import { BaseError, InternalError } from '../errors'
 
-export const VERSION = 1
-
 export const enum MESSAGE_DIRECTION {
   to_waellet = 'to_waellet',
   to_aepp = 'to_aepp'
@@ -42,6 +40,9 @@ interface RpcErrorAsJson {
   data?: any
 }
 
+/**
+ * @category exception
+ */
 export abstract class RpcError extends BaseError {
   static code: number
   code: number
@@ -66,6 +67,9 @@ export abstract class RpcError extends BaseError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcInvalidTransactionError extends RpcError {
   static code = 2
   code = 2
@@ -76,6 +80,9 @@ export class RpcInvalidTransactionError extends RpcError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcBroadcastError extends RpcError {
   static code = 3
   code = 3
@@ -86,6 +93,9 @@ export class RpcBroadcastError extends RpcError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcRejectedByUserError extends RpcError {
   static code = 4
   code = 4
@@ -96,6 +106,9 @@ export class RpcRejectedByUserError extends RpcError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcUnsupportedProtocolError extends RpcError {
   static code = 5
   code = 5
@@ -105,6 +118,9 @@ export class RpcUnsupportedProtocolError extends RpcError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcConnectionDenyError extends RpcError {
   static code = 9
   code = 9
@@ -115,6 +131,9 @@ export class RpcConnectionDenyError extends RpcError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcNotAuthorizeError extends RpcError {
   static code = 10
   code = 10
@@ -124,6 +143,9 @@ export class RpcNotAuthorizeError extends RpcError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcPermissionDenyError extends RpcError {
   static code = 11
   code = 11
@@ -134,6 +156,9 @@ export class RpcPermissionDenyError extends RpcError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcInternalError extends RpcError {
   static code = 12
   code = 12
@@ -143,6 +168,9 @@ export class RpcInternalError extends RpcError {
   }
 }
 
+/**
+ * @category exception
+ */
 export class RpcMethodNotFoundError extends RpcError {
   static code = -32601
   code = -32601

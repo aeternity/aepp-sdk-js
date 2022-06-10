@@ -24,22 +24,20 @@ import BigNumber from 'bignumber.js'
 import { isBigNumber } from './bignumber'
 import { ArgumentError } from './errors'
 
-export type AeAmountFormats = 'ae' | 'miliAE' | 'microAE' | 'nanoAE' | 'picoAE' | 'femtoAE' | 'aettos'
-
-export const AE_AMOUNT_FORMATS = {
-  AE: 'ae',
-  MILI_AE: 'miliAE',
-  MICRO_AE: 'microAE',
-  NANO_AE: 'nanoAE',
-  PICO_AE: 'picoAE',
-  FEMTO_AE: 'femtoAE',
-  AETTOS: 'aettos'
-} as const
+export enum AE_AMOUNT_FORMATS {
+  AE = 'ae',
+  MILI_AE = 'miliAE',
+  MICRO_AE = 'microAE',
+  NANO_AE = 'nanoAE',
+  PICO_AE = 'picoAE',
+  FEMTO_AE = 'femtoAE',
+  AETTOS = 'aettos'
+}
 
 /**
  * DENOMINATION_MAGNITUDE
  */
-export const DENOMINATION_MAGNITUDE = {
+const DENOMINATION_MAGNITUDE = {
   [AE_AMOUNT_FORMATS.AE]: 0,
   [AE_AMOUNT_FORMATS.MILI_AE]: -3,
   [AE_AMOUNT_FORMATS.MICRO_AE]: -6,
@@ -47,7 +45,7 @@ export const DENOMINATION_MAGNITUDE = {
   [AE_AMOUNT_FORMATS.PICO_AE]: -12,
   [AE_AMOUNT_FORMATS.FEMTO_AE]: -15,
   [AE_AMOUNT_FORMATS.AETTOS]: -18
-}
+} as const
 
 /**
  * Convert amount to AE
@@ -58,7 +56,7 @@ export const DENOMINATION_MAGNITUDE = {
  */
 export const toAe = (
   value: string | number | BigNumber,
-  { denomination = AE_AMOUNT_FORMATS.AETTOS }: { denomination?: AeAmountFormats } = {}
+  { denomination = AE_AMOUNT_FORMATS.AETTOS }: { denomination?: AE_AMOUNT_FORMATS } = {}
 ): string => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
 
 /**
@@ -70,7 +68,7 @@ export const toAe = (
  */
 export const toAettos = (
   value: string | number | BigNumber,
-  { denomination = AE_AMOUNT_FORMATS.AE }: { denomination?: AeAmountFormats } = {}
+  { denomination = AE_AMOUNT_FORMATS.AE }: { denomination?: AE_AMOUNT_FORMATS } = {}
 ): string => formatAmount(value, { denomination })
 
 /**
@@ -85,7 +83,7 @@ export const toAettos = (
 export const formatAmount = (
   value: string | number | bigint | BigNumber,
   { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS }:
-  { denomination?: AeAmountFormats, targetDenomination?: AeAmountFormats }
+  { denomination?: AE_AMOUNT_FORMATS, targetDenomination?: AE_AMOUNT_FORMATS }
 ): string => {
   if (!isBigNumber(value)) throw new ArgumentError('value', 'a number', value)
 

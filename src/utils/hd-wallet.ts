@@ -7,6 +7,9 @@ import { CryptographyError } from './errors'
 import { bytesToHex } from './bytes'
 import { concatBuffers } from './other'
 
+/**
+ * @category exception
+ */
 export class DerivationError extends CryptographyError {
   constructor (message: string) {
     super(message)

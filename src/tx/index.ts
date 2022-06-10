@@ -27,19 +27,9 @@
  * must never be used for production but can be very useful to verify other
  * implementations.
  */
+import { ABI_VERSIONS, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon } from './builder/schema'
 import {
-  ABI_VERSIONS,
-  PROTOCOL_VM_ABI,
-  TX_TYPE,
-  TX_TTL,
-  TxType,
-  TxParamsCommon
-} from './builder/schema'
-import {
-  ArgumentError,
-  UnsupportedProtocolError,
-  UnknownTxError,
-  UnexpectedTsError
+  ArgumentError, UnsupportedProtocolError, UnknownTxError, UnexpectedTsError
 } from '../utils/errors'
 import { BigNumber } from 'bignumber.js'
 import Node from '../node'
@@ -53,7 +43,7 @@ export interface VmVersion {
 
 // TODO: find a better name or rearrange methods
 export async function _buildTx (
-  txType: TxType,
+  txType: TX_TYPE,
   params: TxParamsCommon & Partial<VmVersion> & { onNode: Node }
 ): Promise<EncodedData<'tx'>> {
   let senderKey: keyof TxParamsCommon
@@ -116,7 +106,7 @@ export async function _buildTx (
  *  @return Object with vm/abi version
  */
 export async function getVmVersion (
-  txType: TxType,
+  txType: TX_TYPE,
   { vmVersion, abiVersion, onNode }: Partial<VmVersion> & {
     onNode: Node
   }
@@ -181,7 +171,7 @@ export async function getAccountNonce (
  * @return Object with account nonce, absolute ttl and transaction fee
  */
 export async function prepareTxParams (
-  txType: TxType,
+  txType: TX_TYPE,
   {
     senderId,
     nonce: n,

@@ -138,7 +138,7 @@ export async function createMetaTx (
 
   const opt = { ...onAccount.Ae.defaults, ...options }
   const { abiVersion } = await onAccount.getVmVersion(TX_TYPE.contractCall)
-  const wrappedTx = wrapInEmptySignedTx(unpackTx(rawTransaction, { txType: TX_TYPE.signed }))
+  const wrappedTx = wrapInEmptySignedTx(unpackTx<TX_TYPE.signed>(rawTransaction))
   const params = {
     ...opt,
     tx: {
