@@ -34,7 +34,7 @@ export const DRY_RUN_ACCOUNT = {
 // # OBJECT tags
 // # see https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 const OBJECT_TAG_ACCOUNT = 10
-export const OBJECT_TAG_SIGNED_TRANSACTION = 11
+const OBJECT_TAG_SIGNED_TRANSACTION = 11
 const OBJECT_TAG_SPEND_TRANSACTION = 12
 const OBJECT_TAG_ORACLE_REGISTER_TRANSACTION = 22
 const OBJECT_TAG_ORACLE_QUERY_TRANSACTION = 23
