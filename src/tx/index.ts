@@ -29,7 +29,7 @@
  */
 import { ABI_VERSIONS, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon } from './builder/schema'
 import {
-  ArgumentError, UnsupportedProtocolError, UnknownTxError, UnexpectedTsError
+  ArgumentError, UnsupportedProtocolError, UnknownTxError, UnexpectedTsError, InvalidTxParamsError
 } from '../utils/errors'
 import { BigNumber } from 'bignumber.js'
 import Node from '../node'
@@ -94,7 +94,10 @@ export async function _buildTx (
   if (txType === TX_TYPE.payingFor) {
     params.tx = unpackTx(params.tx)
   }
-  const extraParams = await prepareTxParams(txType, { ...params, senderId: params[senderKey] })
+  const senderId = params[senderKey]
+  // TODO: do this check on TypeScript level
+  if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`)
+  const extraParams = await prepareTxParams(txType, { ...params, senderId })
   return syncBuildTx({ ...params, ...extraParams }, txType).tx
 }
 
@@ -183,7 +186,8 @@ export async function prepareTxParams (
     strategy,
     showWarning = false,
     onNode
-  }: TxParamsCommon & {
+  }: Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> & {
+    senderId: EncodedData<'ak'>
     vsn?: number
     gasLimit?: number | string | BigNumber
     absoluteTtl?: number

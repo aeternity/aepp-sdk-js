@@ -38,22 +38,24 @@ type PreserveOptional<NewType, OrigType> =
 export type TransformNodeType<Type> =
   Type extends (...args: infer Args) => infer Ret
     ? (...args: TransformNodeType<Args>) => TransformNodeType<Ret>
-    : Type extends Array<infer Item>
-      ? Array<TransformNodeType<Item>>
-      : Type extends Promise<infer T>
-        ? Promise<TransformNodeType<T>>
-        : Type extends { [P in any]: any }
-          ? {
-              [Property in keyof Type]:
-              Property extends BigIntPropertyNames
-                ? PreserveOptional<bigint, Type[Property]>
-                : Property extends NumberPropertyNames
-                  ? PreserveOptional<number, Type[Property]>
-                  : Property extends 'txHash'
-                    ? PreserveOptional<EncodedData<'th'>, Type[Property]>
-                    : TransformNodeType<Type[Property]>
-            }
-          : Type
+    : Type extends [infer Item, ...infer Rest]
+      ? [TransformNodeType<Item>, ...TransformNodeType<Rest>]
+      : Type extends Array<infer Item>
+        ? Array<TransformNodeType<Item>>
+        : Type extends Promise<infer T>
+          ? Promise<TransformNodeType<T>>
+          : Type extends { [P in any]: any }
+            ? {
+                [Property in keyof Type]:
+                Property extends BigIntPropertyNames
+                  ? PreserveOptional<bigint, Type[Property]>
+                  : Property extends NumberPropertyNames
+                    ? PreserveOptional<number, Type[Property]>
+                    : Property extends 'txHash'
+                      ? PreserveOptional<EncodedData<'th'>, Type[Property]>
+                      : TransformNodeType<Type[Property]>
+              }
+            : Type
 type TransformedNode = new (...args: ConstructorParameters<typeof Node>) => {
   [Name in keyof InstanceType<typeof Node>]: TransformNodeType<Node[Name]>
 }
