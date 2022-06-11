@@ -551,14 +551,3 @@ export function buildContractIdByContractTx (contractTx: EncodedData<'tx'>): Enc
   }
   return buildContractId(tx.ownerId, +tx.nonce)
 }
-
-export default {
-  calculateMinFee,
-  calculateFee,
-  unpackTx,
-  unpackRawTx,
-  buildTx,
-  buildRawTx,
-  validateParams,
-  buildTxHash
-}
