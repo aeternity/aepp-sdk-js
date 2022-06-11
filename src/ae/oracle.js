@@ -108,13 +108,7 @@ async function getQueryObject (oracleId, queryId) {
     decodedQuery: decode(q.query).toString(),
     decodedResponse: decode(q.response).toString(),
     respond: this.respondToQuery.bind(this, oracleId, queryId),
-    pollForResponse: this.pollForQueryResponse.bind(this, oracleId, queryId),
-    /**
-     * @deprecated use plain decode instead
-     * @param data
-     * @returns {Buffer}
-     */
-    decode: (data) => decode(data)
+    pollForResponse: this.pollForQueryResponse.bind(this, oracleId, queryId)
   }
 }
 
