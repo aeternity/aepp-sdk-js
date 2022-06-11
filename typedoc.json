@@ -3,5 +3,7 @@
   "out": "./docs/api",
   "excludePrivate": true,
   "githubPages": false,
+  "excludeExternals": true,
+  "treatWarningsAsErrors": true,
   "readme": "none"
 }
