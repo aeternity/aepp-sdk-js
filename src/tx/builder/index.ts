@@ -502,15 +502,13 @@ export interface TxUnpacked<Tx extends TxSchema> {
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param encodedTx Transaction to unpack
- * @param options
- * @param options.txType Expected transaction type
+ * @param txType Expected transaction type
  * @returns object
  * @returns object.tx Object with transaction param's
  * @returns object.txType Transaction type
  */
 export function unpackTx<TxType extends TX_TYPE> (
-  encodedTx: EncodedData<'tx' | 'pi'>,
-  { txType }: { txType?: TxType } = {}
+  encodedTx: EncodedData<'tx' | 'pi'>, txType?: TxType
 ): TxUnpacked<TxTypeSchemas[TxType]> {
   const rlpEncoded = decode(encodedTx)
   const binary = rlpDecode(rlpEncoded)

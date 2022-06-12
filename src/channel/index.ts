@@ -228,7 +228,7 @@ export default class Channel {
     if (state == null) {
       return null
     }
-    const { txType, tx } = unpackTx(state, { txType: TX_TYPE.signed }).tx.encodedTx
+    const { txType, tx } = unpackTx(state, TX_TYPE.signed).tx.encodedTx
     switch (txType) {
       case TX_TYPE.channelCreate:
         return 1
