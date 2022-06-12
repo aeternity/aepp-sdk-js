@@ -151,11 +151,11 @@ export enum FIELD_TYPES {
   ids,
   string,
   binary,
+  bool,
+  hex,
   rlpBinary,
   rlpBinaries,
   rawBinary,
-  bool,
-  hex,
   signatures,
   pointers,
   offChainUpdates,
@@ -167,11 +167,10 @@ export enum FIELD_TYPES {
   abiVersion,
   sophiaCodeTypeInfo,
   payload,
-  any,
   stateTree
 }
 
-interface BuildFieldTypes<Prefix extends EncodingType | readonly EncodingType[]>{
+interface BuildFieldTypes<Prefix extends undefined | EncodingType | readonly EncodingType[]>{
   [FIELD_TYPES.int]: number | string | BigNumber
   [FIELD_TYPES.amount]: number | string | BigNumber
   [FIELD_TYPES.id]: PrefixType<Prefix>
@@ -192,7 +191,9 @@ interface BuildFieldTypes<Prefix extends EncodingType | readonly EncodingType[]>
   [FIELD_TYPES.callReturnType]: any
   [FIELD_TYPES.ctVersion]: CtVersion
   [FIELD_TYPES.abiVersion]: ABI_VERSIONS
+  [FIELD_TYPES.sophiaCodeTypeInfo]: any
   [FIELD_TYPES.payload]: string
+  [FIELD_TYPES.stateTree]: any
 }
 
 // FEE CALCULATION
@@ -268,20 +269,24 @@ type UnionToIntersection<Union> =
     ? Intersection : never
 
 type TxElem = readonly [string, FIELD_TYPES | Field]
-| readonly [string, FIELD_TYPES | Field, EncodingType | readonly EncodingType[]]
+| readonly [string, FIELD_TYPES, EncodingType | readonly EncodingType[]]
 
-type BuildTxArgBySchemaType<Schema extends readonly any[]> =
-  Schema[1] extends typeof Field
-    ? Parameters<Schema[1]['serialize']>[0]
-    : Schema[1] extends keyof BuildFieldTypes<Schema[2]>
-      ? BuildFieldTypes<Schema[2]>[Schema[1]]
+type BuildTxArgBySchemaType<
+  Type extends FIELD_TYPES | Field,
+  Prefix extends undefined | EncodingType | readonly EncodingType[]
+> =
+  Type extends typeof Field
+    ? Parameters<Type['serialize']>[0]
+    : Type extends FIELD_TYPES
+      ? BuildFieldTypes<Prefix>[Type]
       : never
 
 type BuildTxArgBySchema<SchemaLine> =
   UnionToIntersection<
   SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends TxElem ? {
-      [k in Elem[0]]: BuildTxArgBySchemaType<Elem> } : never
+    ? Elem extends TxElem
+      ? { [k in Elem[0]]: BuildTxArgBySchemaType<Elem[1], Elem[2]> }
+      : never
     : never
   >
 
@@ -818,5 +823,5 @@ export type TxTypeSchemas = {
   >
 }
 
-export type TxSchema = TxTypeSchemas[keyof TxTypeSchemas]
+export type TxSchema = TxTypeSchemas[TX_TYPE]
 export type TxParamsCommon = Partial<UnionToIntersection<TxSchema>>
