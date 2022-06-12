@@ -64,6 +64,7 @@ function deserializeField (
     }
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
+    case FIELD_TYPES.abiVersion:
       return readInt(value)
     case FIELD_TYPES.id:
       return readId(value)
@@ -132,6 +133,7 @@ function serializeField (
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
+    case FIELD_TYPES.abiVersion:
       return writeInt(value)
     case FIELD_TYPES.id:
       return writeId(value)

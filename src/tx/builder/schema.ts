@@ -11,7 +11,6 @@ import { Name, NameId, NameFee, Deposit, Field, GasPrice } from './field-types'
 import { EncodedData, EncodingType } from '../../utils/encoder'
 import { Pointer } from './helpers'
 import MPTree from '../../utils/mptree'
-import { VmVersion } from '..'
 
 export * from './constants'
 
@@ -124,17 +123,9 @@ export const PROTOCOL_VM_ABI = {
     [TX_TYPE.contractCreate]: {
       vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE]
     },
-    // TODO: Ensure that AEVM is still available here
+    // TODO: Ensure that AEVM (SOPHIA?) is still available here
     [TX_TYPE.contractCall]: {
-      vmVersion: [
-        VM_VERSIONS.FATE_2,
-        VM_VERSIONS.FATE,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA,
-        VM_VERSIONS.SOPHIA,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA
-      ],
-      abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
+      vmVersion: [], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
     },
     [TX_TYPE.oracleRegister]: {
       vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
@@ -147,6 +138,11 @@ type PrefixType<Prefix> = Prefix extends EncodingType
   : Prefix extends readonly EncodingType[]
     ? EncodedData<Prefix[number]>
     : EncodedData<any>
+
+export interface CtVersion {
+  vmVersion: VM_VERSIONS
+  abiVersion: ABI_VERSIONS
+}
 
 interface BuildFieldTypes<Prefix extends EncodingType | readonly EncodingType[]>{
   int: number | string | BigNumber
@@ -167,7 +163,8 @@ interface BuildFieldTypes<Prefix extends EncodingType | readonly EncodingType[]>
   proofOfInclusion: any
   mptrees: MPTree[]
   callReturnType: any
-  ctVersion: VmVersion
+  ctVersion: CtVersion
+  abiVersion: ABI_VERSIONS
   payload: string
 }
 
@@ -191,6 +188,7 @@ export const FIELD_TYPES = {
   mptrees: 'mptrees',
   callReturnType: 'callReturnType',
   ctVersion: 'ctVersion',
+  abiVersion: 'abiVersion',
   sophiaCodeTypeInfo: 'sophiaCodeTypeInfo',
   payload: 'payload',
   any: 'any',
@@ -416,7 +414,7 @@ export const TX_SCHEMA = {
       ['callerId', FIELD_TYPES.id, 'ak'],
       ['nonce', FIELD_TYPES.int],
       ['contractId', FIELD_TYPES.id, ['ct', 'nm']],
-      ['abiVersion', FIELD_TYPES.int],
+      ['abiVersion', FIELD_TYPES.abiVersion],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.int],
       ['amount', FIELD_TYPES.amount],
@@ -453,7 +451,7 @@ export const TX_SCHEMA = {
       ['oracleTtlValue', FIELD_TYPES.int],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.int],
-      ['abiVersion', FIELD_TYPES.int]
+      ['abiVersion', FIELD_TYPES.abiVersion]
     ]
   },
   [TX_TYPE.oracleExtend]: {
@@ -678,7 +676,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['caller', FIELD_TYPES.id, 'ak'],
       ['contract', FIELD_TYPES.id, 'ct'],
-      ['abiVersion', FIELD_TYPES.int],
+      ['abiVersion', FIELD_TYPES.abiVersion],
       ['amount', FIELD_TYPES.int],
       ['callData', FIELD_TYPES.binary, 'cb'],
       ['callStack', FIELD_TYPES.callStack],
@@ -786,7 +784,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['gaId', FIELD_TYPES.id, 'ak'],
       ['authData', FIELD_TYPES.binary, 'cb'],
-      ['abiVersion', FIELD_TYPES.int],
+      ['abiVersion', FIELD_TYPES.abiVersion],
       ['fee', FIELD_TYPES.int],
       ['gasLimit', FIELD_TYPES.int],
       ['gasPrice', GasPrice],

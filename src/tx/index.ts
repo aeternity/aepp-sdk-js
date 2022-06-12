@@ -27,24 +27,22 @@
  * must never be used for production but can be very useful to verify other
  * implementations.
  */
-import { ABI_VERSIONS, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon } from './builder/schema'
 import {
-  ArgumentError, UnsupportedProtocolError, UnknownTxError, UnexpectedTsError, InvalidTxParamsError
+  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon
+} from './builder/schema'
+import {
+  ArgumentError, UnsupportedProtocolError, UnknownTxError, InvalidTxParamsError
 } from '../utils/errors'
 import { BigNumber } from 'bignumber.js'
 import Node from '../node'
 import { EncodedData } from '../utils/encoder'
 import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
-
-export interface VmVersion {
-  vmVersion: number | string | BigNumber
-  abiVersion: number | string | BigNumber
-}
+import { isKeyOfObject } from '../utils/other'
 
 // TODO: find a better name or rearrange methods
 export async function _buildTx (
   txType: TX_TYPE,
-  params: TxParamsCommon & Partial<VmVersion> & { onNode: Node }
+  params: TxParamsCommon & { onNode: Node }
 ): Promise<EncodedData<'tx'>> {
   let senderKey: keyof TxParamsCommon
   switch (txType) {
@@ -82,8 +80,10 @@ export async function _buildTx (
       throw new ArgumentError('txType', 'valid transaction type', txType)
   }
   // TODO: move specific cases to field-types
-  if ([TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType as any)) {
-    params.ctVersion = await getVmVersion(TX_TYPE.contractCreate, params)
+  if ([TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType)) {
+    params.ctVersion = await getVmVersion(
+      TX_TYPE.contractCreate, { ...params, ...params.ctVersion }
+    )
   }
   if (txType === TX_TYPE.contractCall) {
     params.abiVersion = (await getVmVersion(TX_TYPE.contractCall, params)).abiVersion
@@ -105,25 +105,30 @@ export async function _buildTx (
  * Validated vm/abi version or get default based on transaction type and NODE version
  *
  * @param txType Type of transaction
- * @param vmAbi Object with vm and abi version fields
- *  @return Object with vm/abi version
+ * @param ctVersion Object with vm and abi version fields
+ * @param options
+ * @return Object with vm/abi version
  */
 export async function getVmVersion (
-  txType: TX_TYPE,
-  { vmVersion, abiVersion, onNode }: Partial<VmVersion> & {
-    onNode: Node
-  }
-): Promise<VmVersion> {
-  if (onNode == null) throw new UnexpectedTsError('onNode')
+  txType: TX_TYPE.contractCreate, ctVersion: Partial<CtVersion> & { onNode: Node }
+): Promise<CtVersion>
+export async function getVmVersion (
+  txType: TX_TYPE, ctVersion: Partial<Pick<CtVersion, 'abiVersion'>> & { onNode: Node }
+): Promise<Pick<CtVersion, 'abiVersion'>>
+export async function getVmVersion (
+  txType: TX_TYPE, { vmVersion, abiVersion, onNode }: Partial<CtVersion> & { onNode: Node }
+): Promise<Partial<CtVersion>> {
   const { consensusProtocolVersion } = await onNode.getNodeInfo()
-  const supportedProtocol = PROTOCOL_VM_ABI[
-    +consensusProtocolVersion as keyof typeof PROTOCOL_VM_ABI
-  ]
-  if (supportedProtocol == null) throw new UnsupportedProtocolError('Not supported consensus protocol version')
-  const protocolForTX = supportedProtocol[txType as keyof typeof supportedProtocol]
-  if (protocolForTX == null) throw new UnknownTxError('Not supported tx type')
-  if (abiVersion == null || abiVersion === 0) { abiVersion = protocolForTX.abiVersion[0] }
-  if (vmVersion == null || vmVersion === 0) { vmVersion = protocolForTX.vmVersion[0] as number }
+  if (!isKeyOfObject(consensusProtocolVersion, PROTOCOL_VM_ABI)) {
+    throw new UnsupportedProtocolError('Not supported consensus protocol version')
+  }
+  const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion]
+  if (!isKeyOfObject(txType, supportedProtocol)) {
+    throw new UnknownTxError('Not supported tx type')
+  }
+  const protocolForTX = supportedProtocol[txType]
+  abiVersion ??= protocolForTX.abiVersion[0]
+  vmVersion ??= protocolForTX.vmVersion[0]
   return { vmVersion, abiVersion }
 }
 
@@ -200,7 +205,6 @@ export async function prepareTxParams (
     ttl: number
     nonce: number | string | BigNumber
   }> {
-  if (onNode == null) throw new UnexpectedTsError('onNode')
   n = n ?? (
     await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
   ).nextNonce as number
