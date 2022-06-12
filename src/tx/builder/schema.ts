@@ -174,7 +174,7 @@ interface BuildFieldTypes<Prefix extends undefined | EncodingType | readonly Enc
   [FIELD_TYPES.int]: number | string | BigNumber
   [FIELD_TYPES.amount]: number | string | BigNumber
   [FIELD_TYPES.id]: PrefixType<Prefix>
-  [FIELD_TYPES.ids]: Array<EncodedData<Prefix extends EncodingType[]? Prefix : any>>
+  [FIELD_TYPES.ids]: Array<EncodedData<Prefix extends EncodingType[] ? Prefix : any>>
   [FIELD_TYPES.string]: string
   [FIELD_TYPES.binary]: PrefixType<Prefix>
   [FIELD_TYPES.bool]: Boolean
@@ -291,7 +291,7 @@ type BuildTxArgBySchema<SchemaLine> =
   >
 
 export type RawTxObject<Tx extends TxSchema> = {
-  [k in keyof Tx]: Tx[k] extends number | BigNumber ? string: Tx[k]
+  [k in keyof Tx]: Tx[k] extends number | BigNumber ? string : Tx[k]
 }
 
 const BASE_TX = [
