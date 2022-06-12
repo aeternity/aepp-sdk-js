@@ -818,13 +818,5 @@ export type TxTypeSchemas = {
   >
 }
 
-interface TtlObject{
-  type: string
-  value: number
-}
-
 export type TxSchema = TxTypeSchemas[keyof TxTypeSchemas]
-export type TxParamsCommon = Partial<UnionToIntersection<TxSchema> & {
-  oracleTtl: TtlObject
-  queryTtl: TtlObject
-}>
+export type TxParamsCommon = Partial<UnionToIntersection<TxSchema>>
