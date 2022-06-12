@@ -50,7 +50,7 @@ enum ORACLE_TTL_TYPES {
 // SERIALIZE AND DESERIALIZE PART
 function deserializeField (
   value: any,
-  type: string | typeof Field,
+  type: FIELD_TYPES | typeof Field,
   prefix?: EncodingType | EncodingType[]
 ): any {
   if (value == null) return ''
@@ -128,7 +128,7 @@ function deserializeField (
 }
 
 function serializeField (
-  value: any, type: string | typeof Field, params: any
+  value: any, type: FIELD_TYPES | typeof Field, params: any
 ): any {
   switch (type) {
     case FIELD_TYPES.amount:
@@ -178,7 +178,7 @@ function serializeField (
 
 function validateField (
   value: any,
-  type: string | Function | typeof Field,
+  type: FIELD_TYPES | typeof Field,
   prefix?: EncodingType | EncodingType[]
 ): string | undefined {
   // All fields are required
@@ -228,8 +228,7 @@ function transformParams (
     .reduce(
       (params: TxParamsCommon, [key]) => ({
         ...params,
-        [key]: formatAmount(
-          params[key as keyof TxParamsCommon], { denomination })
+        [key]: formatAmount(params[key as keyof TxParamsCommon], { denomination })
       }),
       params
     )
@@ -405,7 +404,7 @@ export function buildRawTx (
   }
 
   return filteredSchema
-    .map(([key, fieldType]: [keyof TxSchema, string, EncodingType]) => serializeField(
+    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => serializeField(
       params[key], fieldType, params))
 }
 

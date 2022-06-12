@@ -32,7 +32,7 @@ export const DRY_RUN_ACCOUNT = {
 
 export type TxField = [
   name: string,
-  type: string | typeof Field,
+  type: FIELD_TYPES | typeof Field,
   prefix?: EncodingType | EncodingType[]
 ]
 
@@ -144,56 +144,56 @@ export interface CtVersion {
   abiVersion: ABI_VERSIONS
 }
 
-interface BuildFieldTypes<Prefix extends EncodingType | readonly EncodingType[]>{
-  int: number | string | BigNumber
-  amount: number | string | BigNumber
-  id: PrefixType<Prefix>
-  ids: Array<EncodedData<Prefix extends EncodingType[]? Prefix : any>>
-  string: string
-  binary: PrefixType<Prefix>
-  bool: Boolean
-  hex: string
-  rlpBinary: any
-  rlpBinaries: any[]
-  rawBinary: string
-  signatures: Uint8Array[]
-  pointers: Pointer[]
-  offChainUpdates: any
-  callStack: any
-  proofOfInclusion: any
-  mptrees: MPTree[]
-  callReturnType: any
-  ctVersion: CtVersion
-  abiVersion: ABI_VERSIONS
-  payload: string
+export enum FIELD_TYPES {
+  int,
+  amount,
+  id,
+  ids,
+  string,
+  binary,
+  rlpBinary,
+  rlpBinaries,
+  rawBinary,
+  bool,
+  hex,
+  signatures,
+  pointers,
+  offChainUpdates,
+  callStack,
+  proofOfInclusion,
+  mptrees,
+  callReturnType,
+  ctVersion,
+  abiVersion,
+  sophiaCodeTypeInfo,
+  payload,
+  any,
+  stateTree
 }
 
-export const FIELD_TYPES = {
-  int: 'int',
-  amount: 'amount',
-  id: 'id',
-  ids: 'ids',
-  string: 'string',
-  binary: 'binary',
-  rlpBinary: 'rlpBinary',
-  rlpBinaries: 'rlpBinaries',
-  rawBinary: 'rawBinary',
-  bool: 'bool',
-  hex: 'hex',
-  signatures: 'signatures',
-  pointers: 'pointers',
-  offChainUpdates: 'offChainUpdates',
-  callStack: 'callStack',
-  proofOfInclusion: 'proofOfInclusion',
-  mptrees: 'mptrees',
-  callReturnType: 'callReturnType',
-  ctVersion: 'ctVersion',
-  abiVersion: 'abiVersion',
-  sophiaCodeTypeInfo: 'sophiaCodeTypeInfo',
-  payload: 'payload',
-  any: 'any',
-  stateTree: 'stateTree'
-} as const
+interface BuildFieldTypes<Prefix extends EncodingType | readonly EncodingType[]>{
+  [FIELD_TYPES.int]: number | string | BigNumber
+  [FIELD_TYPES.amount]: number | string | BigNumber
+  [FIELD_TYPES.id]: PrefixType<Prefix>
+  [FIELD_TYPES.ids]: Array<EncodedData<Prefix extends EncodingType[]? Prefix : any>>
+  [FIELD_TYPES.string]: string
+  [FIELD_TYPES.binary]: PrefixType<Prefix>
+  [FIELD_TYPES.bool]: Boolean
+  [FIELD_TYPES.hex]: string
+  [FIELD_TYPES.rlpBinary]: any
+  [FIELD_TYPES.rlpBinaries]: any[]
+  [FIELD_TYPES.rawBinary]: string
+  [FIELD_TYPES.signatures]: Uint8Array[]
+  [FIELD_TYPES.pointers]: Pointer[]
+  [FIELD_TYPES.offChainUpdates]: any
+  [FIELD_TYPES.callStack]: any
+  [FIELD_TYPES.proofOfInclusion]: any
+  [FIELD_TYPES.mptrees]: MPTree[]
+  [FIELD_TYPES.callReturnType]: any
+  [FIELD_TYPES.ctVersion]: CtVersion
+  [FIELD_TYPES.abiVersion]: ABI_VERSIONS
+  [FIELD_TYPES.payload]: string
+}
 
 // FEE CALCULATION
 export const BASE_GAS = 15000
@@ -267,8 +267,8 @@ type UnionToIntersection<Union> =
   (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
     ? Intersection : never
 
-type TxElem = readonly [string, string | Field]
-| readonly [string, string | Field, EncodingType | readonly EncodingType[]]
+type TxElem = readonly [string, FIELD_TYPES | Field]
+| readonly [string, FIELD_TYPES | Field, EncodingType | readonly EncodingType[]]
 
 type BuildTxArgBySchemaType<Schema extends readonly any[]> =
   Schema[1] extends typeof Field
