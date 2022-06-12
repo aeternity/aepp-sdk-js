@@ -28,7 +28,7 @@
  * implementations.
  */
 import {
-  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon
+  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon, TxTypeSchemas
 } from './builder/schema'
 import {
   ArgumentError, UnsupportedProtocolError, UnknownTxError, InvalidTxParamsError
@@ -40,10 +40,12 @@ import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
 import { isKeyOfObject } from '../utils/other'
 
 // TODO: find a better name or rearrange methods
-export async function _buildTx (
-  txType: TX_TYPE,
-  params: TxParamsCommon & { onNode: Node }
+export async function _buildTx<TxType extends TX_TYPE> (
+  txType: TxType,
+  _params: TxTypeSchemas[TxType] & { onNode: Node }
 ): Promise<EncodedData<'tx'>> {
+  // TODO: avoid this assertion
+  const params = _params as unknown as TxParamsCommon & { onNode: Node }
   let senderKey: keyof TxParamsCommon
   switch (txType) {
     case TX_TYPE.spend:
