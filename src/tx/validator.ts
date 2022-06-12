@@ -210,14 +210,14 @@ const getSenderAddress = (
  * @example const errors = await verifyTransaction(transaction, node)
  */
 export default async function verifyTransaction (
-  transaction: Buffer | EncodedData<'tx'>,
+  transaction: EncodedData<'tx' | 'pi'>,
   node: Node,
   parentTxTypes: TX_TYPE[] = []
 ): Promise<ValidatorResult[]> {
   const { tx, txType } = unpackTx(transaction)
   const address = getSenderAddress(tx) ??
     (txType === TX_TYPE.signed
-      ? getSenderAddress((tx as TxTypeSchemas[typeof txType]).encodedTx.tx)
+      ? getSenderAddress((tx as TxTypeSchemas[TX_TYPE.signed]).encodedTx.tx)
       : undefined)
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
     address == null

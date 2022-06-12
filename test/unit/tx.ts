@@ -109,8 +109,8 @@ describe('Tx', function () {
   })
 
   it('Deserialize tx: invalid tx VSN', () => {
-    const tx = rlpEncode([10, 99])
-    expect(() => unpackTx(tx, { fromRlpBinary: true }))
+    const tx = encode(rlpEncode([10, 99]), 'tx')
+    expect(() => unpackTx(tx))
       .to.throw(SchemaNotFoundError, `Transaction deserialization not implemented for tag ${10} version ${99}`)
   })
 

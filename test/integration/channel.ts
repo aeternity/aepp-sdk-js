@@ -23,7 +23,6 @@ import { getSdk, BaseAe, networkId } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { pause } from '../../src/utils/other'
 import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
-import { decode } from '../../src/tx/builder/helpers'
 import { TX_TYPE } from '../../src/tx/builder/schema'
 import Channel from '../../src/channel'
 import { ChannelOptions, send } from '../../src/channel/internal'
@@ -207,7 +206,7 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelOffChain)
 
     expect(sign.firstCall.args[1]).to.eql({
@@ -263,7 +262,7 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelOffChain)
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
@@ -343,7 +342,7 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelOffChain)
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
@@ -386,10 +385,8 @@ describe('Channel', function () {
     const responderPoi: EncodedData<'pi'> = await responderCh.poi(params)
     initiatorPoi.should.be.a('string')
     responderPoi.should.be.a('string')
-    const unpackedInitiatorPoi = unpackTx(
-      decode(initiatorPoi), { txType: TX_TYPE.proofOfInclusion, fromRlpBinary: true })
-    const unpackedResponderPoi = unpackTx(
-      decode(responderPoi), { txType: TX_TYPE.proofOfInclusion, fromRlpBinary: true })
+    const unpackedInitiatorPoi = unpackTx(initiatorPoi, { txType: TX_TYPE.proofOfInclusion })
+    const unpackedResponderPoi = unpackTx(responderPoi, { txType: TX_TYPE.proofOfInclusion })
     buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx.should.equal(initiatorPoi)
     buildTx(unpackedResponderPoi.tx, unpackedResponderPoi.txType, { prefix: 'pi' }).tx.should.equal(responderPoi)
   })
@@ -467,7 +464,7 @@ describe('Channel', function () {
         }]
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelWithdraw)
     tx.should.eql({
       ...tx,
@@ -520,7 +517,7 @@ describe('Channel', function () {
         }]
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelWithdraw)
     tx.should.eql({
       ...tx,
@@ -596,7 +593,7 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelDeposit)
     tx.should.eql({
       ...tx,
@@ -637,7 +634,7 @@ describe('Channel', function () {
         }]
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelDeposit)
     tx.should.eql({
       ...tx,
@@ -682,7 +679,7 @@ describe('Channel', function () {
     )
     sinon.assert.calledOnce(sign)
     sinon.assert.calledWithExactly(sign, sinon.match.string)
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelCloseMutual)
     tx.should.eql({
       ...tx,
