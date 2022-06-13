@@ -1,13 +1,14 @@
 import { verify, hash } from '../utils/crypto'
 import { encode, decode } from './builder/helpers'
 import BigNumber from 'bignumber.js'
-import { PROTOCOL_VM_ABI, RawTxObject, TxSchema, TxParamsCommon, TX_TYPE, TxTypeSchemas } from './builder/schema'
+import {
+  PROTOCOL_VM_ABI, RawTxObject, TxSchema, TxParamsCommon, TX_TYPE, TxTypeSchemas, CtVersion
+} from './builder/schema'
 import { calculateFee, TxUnpacked, unpackTx } from './builder'
 import { UnsupportedProtocolError } from '../utils/errors'
 import { concatBuffers, isKeyOfObject } from '../utils/other'
 import { EncodedData } from '../utils/encoder'
 import Node from '../node'
-import { VmVersion } from '.'
 
 /**
  * Transaction validator
@@ -40,7 +41,7 @@ type Validator = (
     amount?: number
     fee?: number
     nameFee?: number
-    ctVersion?: Partial<VmVersion>
+    ctVersion?: Partial<CtVersion>
     abiVersion?: number
     contractId?: EncodedData<'ct'>
   },
@@ -209,14 +210,14 @@ const getSenderAddress = (
  * @example const errors = await verifyTransaction(transaction, node)
  */
 export default async function verifyTransaction (
-  transaction: Buffer | EncodedData<'tx'>,
+  transaction: EncodedData<'tx' | 'pi'>,
   node: Node,
   parentTxTypes: TX_TYPE[] = []
 ): Promise<ValidatorResult[]> {
   const { tx, txType } = unpackTx(transaction)
   const address = getSenderAddress(tx) ??
     (txType === TX_TYPE.signed
-      ? getSenderAddress((tx as TxTypeSchemas[typeof txType]).encodedTx.tx)
+      ? getSenderAddress((tx as TxTypeSchemas[TX_TYPE.signed]).encodedTx.tx)
       : undefined)
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
     address == null

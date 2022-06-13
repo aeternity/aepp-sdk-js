@@ -57,7 +57,7 @@ const base64 = {
 
 const base58 = {
   encode: (buffer: Uint8Array) => bs58Encode(addChecksum(buffer)),
-  decode: (string: string) => getPayload(bs58Decode(string))
+  decode: (string: string) => getPayload(Buffer.from(bs58Decode(string)))
 }
 
 const parseType = (maybeType: unknown): [EncodingType, typeof base64] => {

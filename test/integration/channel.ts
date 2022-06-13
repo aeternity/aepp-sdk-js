@@ -23,7 +23,6 @@ import { getSdk, BaseAe, networkId } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { pause } from '../../src/utils/other'
 import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
-import { decode } from '../../src/tx/builder/helpers'
 import { TX_TYPE } from '../../src/tx/builder/schema'
 import Channel from '../../src/channel'
 import { ChannelOptions, send } from '../../src/channel/internal'
@@ -207,7 +206,7 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelOffChain)
 
     expect(sign.firstCall.args[1]).to.eql({
@@ -263,7 +262,7 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelOffChain)
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
@@ -343,7 +342,7 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelOffChain)
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
@@ -386,10 +385,8 @@ describe('Channel', function () {
     const responderPoi: EncodedData<'pi'> = await responderCh.poi(params)
     initiatorPoi.should.be.a('string')
     responderPoi.should.be.a('string')
-    const unpackedInitiatorPoi = unpackTx(
-      decode(initiatorPoi), { txType: TX_TYPE.proofOfInclusion, fromRlpBinary: true })
-    const unpackedResponderPoi = unpackTx(
-      decode(responderPoi), { txType: TX_TYPE.proofOfInclusion, fromRlpBinary: true })
+    const unpackedInitiatorPoi = unpackTx(initiatorPoi, TX_TYPE.proofOfInclusion)
+    const unpackedResponderPoi = unpackTx(responderPoi, TX_TYPE.proofOfInclusion)
     buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx.should.equal(initiatorPoi)
     buildTx(unpackedResponderPoi.tx, unpackedResponderPoi.txType, { prefix: 'pi' }).tx.should.equal(responderPoi)
   })
@@ -467,7 +464,7 @@ describe('Channel', function () {
         }]
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelWithdraw)
     tx.should.eql({
       ...tx,
@@ -520,7 +517,7 @@ describe('Channel', function () {
         }]
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelWithdraw)
     tx.should.eql({
       ...tx,
@@ -596,7 +593,7 @@ describe('Channel', function () {
         }])
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelDeposit)
     tx.should.eql({
       ...tx,
@@ -637,7 +634,7 @@ describe('Channel', function () {
         }]
       })
     )
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelDeposit)
     tx.should.eql({
       ...tx,
@@ -682,7 +679,7 @@ describe('Channel', function () {
     )
     sinon.assert.calledOnce(sign)
     sinon.assert.calledWithExactly(sign, sinon.match.string)
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Uint8Array)
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>)
     txType.should.equal(TX_TYPE.channelCloseMutual)
     tx.should.eql({
       ...tx,
@@ -767,7 +764,7 @@ describe('Channel', function () {
       poi,
       payload: signedTx
     })
-    const closeSoloTxFee = unpackTx(closeSoloTx, { txType: TX_TYPE.channelCloseSolo }).tx.fee
+    const closeSoloTxFee = unpackTx(closeSoloTx, TX_TYPE.channelCloseSolo).tx.fee
     await aeSdkInitiatior.sendTransaction(
       await aeSdkInitiatior.signTransaction(closeSoloTx),
       { waitMined: true }
@@ -778,7 +775,7 @@ describe('Channel', function () {
       initiatorAmountFinal: balances[initiatorAddr],
       responderAmountFinal: balances[responderAddr]
     })
-    const settleTxFee = unpackTx(settleTx, { txType: TX_TYPE.channelSettle }).tx.fee
+    const settleTxFee = unpackTx(settleTx, TX_TYPE.channelSettle).tx.fee
     await aeSdkInitiatior.sendTransaction(
       await aeSdkInitiatior.signTransaction(settleTx), { waitMined: true })
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr)
@@ -836,7 +833,7 @@ describe('Channel', function () {
       poi: oldPoi,
       payload: oldUpdate.signedTx
     })
-    const closeSoloTxFee = unpackTx(closeSoloTx, { txType: TX_TYPE.channelCloseSolo }).tx.fee
+    const closeSoloTxFee = unpackTx(closeSoloTx, TX_TYPE.channelCloseSolo).tx.fee
     await aeSdkInitiatior.sendTransaction(
       await aeSdkInitiatior.signTransaction(closeSoloTx), { waitMined: true }
     )
@@ -846,7 +843,7 @@ describe('Channel', function () {
       poi: recentPoi,
       payload: recentUpdate.signedTx
     })
-    const slashTxFee = unpackTx(slashTx, { txType: TX_TYPE.channelSlash }).tx.fee
+    const slashTxFee = unpackTx(slashTx, TX_TYPE.channelSlash).tx.fee
     await aeSdkResponder.sendTransaction(
       await aeSdkResponder.signTransaction(slashTx), { waitMined: true })
     const settleTx = await aeSdkResponder.buildTx(TX_TYPE.channelSettle, {
@@ -855,7 +852,7 @@ describe('Channel', function () {
       initiatorAmountFinal: recentBalances[initiatorAddr],
       responderAmountFinal: recentBalances[responderAddr]
     })
-    const settleTxFee = unpackTx(settleTx, { txType: TX_TYPE.channelSettle }).tx.fee
+    const settleTxFee = unpackTx(settleTx, TX_TYPE.channelSettle).tx.fee
     await aeSdkResponder.sendTransaction(
       await aeSdkResponder.signTransaction(settleTx), { waitMined: true })
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr)
@@ -1149,12 +1146,11 @@ describe('Channel', function () {
 
   it('can post backchannel update', async () => {
     function appendSignature (target: EncodedData<'tx'>, source: EncodedData<'tx'>): EncodedData<'tx'> {
-      const { txType, tx: { signatures, encodedTx: { rlpEncoded } } } = unpackTx(
-        target, { txType: TX_TYPE.signed }
-      )
+      const { txType, tx: { signatures, encodedTx: { rlpEncoded } } } =
+        unpackTx(target, TX_TYPE.signed)
       return buildTx(
         {
-          signatures: signatures.concat(unpackTx(source, { txType: TX_TYPE.signed }).tx.signatures),
+          signatures: signatures.concat(unpackTx(source, TX_TYPE.signed).tx.signatures),
           encodedTx: rlpEncoded
         }, txType).tx
     }

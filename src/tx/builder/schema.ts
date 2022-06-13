@@ -11,7 +11,6 @@ import { Name, NameId, NameFee, Deposit, Field, GasPrice } from './field-types'
 import { EncodedData, EncodingType } from '../../utils/encoder'
 import { Pointer } from './helpers'
 import MPTree from '../../utils/mptree'
-import { VmVersion } from '..'
 
 export * from './constants'
 
@@ -33,7 +32,7 @@ export const DRY_RUN_ACCOUNT = {
 
 export type TxField = [
   name: string,
-  type: string | typeof Field,
+  type: FIELD_TYPES | typeof Field,
   prefix?: EncodingType | EncodingType[]
 ]
 
@@ -124,17 +123,9 @@ export const PROTOCOL_VM_ABI = {
     [TX_TYPE.contractCreate]: {
       vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE]
     },
-    // TODO: Ensure that AEVM is still available here
+    // TODO: Ensure that AEVM (SOPHIA?) is still available here
     [TX_TYPE.contractCall]: {
-      vmVersion: [
-        VM_VERSIONS.FATE_2,
-        VM_VERSIONS.FATE,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_LIMA,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_FORTUNA,
-        VM_VERSIONS.SOPHIA,
-        VM_VERSIONS.SOPHIA_IMPROVEMENTS_MINERVA
-      ],
-      abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
+      vmVersion: [], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA]
     },
     [TX_TYPE.oracleRegister]: {
       vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA]
@@ -148,54 +139,62 @@ type PrefixType<Prefix> = Prefix extends EncodingType
     ? EncodedData<Prefix[number]>
     : EncodedData<any>
 
-interface BuildFieldTypes<Prefix extends EncodingType | readonly EncodingType[]>{
-  int: number | string | BigNumber
-  amount: number | string | BigNumber
-  id: PrefixType<Prefix>
-  ids: Array<EncodedData<Prefix extends EncodingType[]? Prefix : any>>
-  string: string
-  binary: PrefixType<Prefix>
-  bool: Boolean
-  hex: string
-  rlpBinary: any
-  rlpBinaries: any[]
-  rawBinary: string
-  signatures: Uint8Array[]
-  pointers: Pointer[]
-  offChainUpdates: any
-  callStack: any
-  proofOfInclusion: any
-  mptrees: MPTree[]
-  callReturnType: any
-  ctVersion: VmVersion
-  payload: string
+export interface CtVersion {
+  vmVersion: VM_VERSIONS
+  abiVersion: ABI_VERSIONS
 }
 
-export const FIELD_TYPES = {
-  int: 'int',
-  amount: 'amount',
-  id: 'id',
-  ids: 'ids',
-  string: 'string',
-  binary: 'binary',
-  rlpBinary: 'rlpBinary',
-  rlpBinaries: 'rlpBinaries',
-  rawBinary: 'rawBinary',
-  bool: 'bool',
-  hex: 'hex',
-  signatures: 'signatures',
-  pointers: 'pointers',
-  offChainUpdates: 'offChainUpdates',
-  callStack: 'callStack',
-  proofOfInclusion: 'proofOfInclusion',
-  mptrees: 'mptrees',
-  callReturnType: 'callReturnType',
-  ctVersion: 'ctVersion',
-  sophiaCodeTypeInfo: 'sophiaCodeTypeInfo',
-  payload: 'payload',
-  any: 'any',
-  stateTree: 'stateTree'
-} as const
+export enum FIELD_TYPES {
+  int,
+  amount,
+  id,
+  ids,
+  string,
+  binary,
+  bool,
+  hex,
+  rlpBinary,
+  rlpBinaries,
+  rawBinary,
+  signatures,
+  pointers,
+  offChainUpdates,
+  callStack,
+  proofOfInclusion,
+  mptrees,
+  callReturnType,
+  ctVersion,
+  abiVersion,
+  sophiaCodeTypeInfo,
+  payload,
+  stateTree
+}
+
+interface BuildFieldTypes<Prefix extends undefined | EncodingType | readonly EncodingType[]>{
+  [FIELD_TYPES.int]: number | string | BigNumber
+  [FIELD_TYPES.amount]: number | string | BigNumber
+  [FIELD_TYPES.id]: PrefixType<Prefix>
+  [FIELD_TYPES.ids]: Array<EncodedData<Prefix extends EncodingType[] ? Prefix : any>>
+  [FIELD_TYPES.string]: string
+  [FIELD_TYPES.binary]: PrefixType<Prefix>
+  [FIELD_TYPES.bool]: Boolean
+  [FIELD_TYPES.hex]: string
+  [FIELD_TYPES.rlpBinary]: any
+  [FIELD_TYPES.rlpBinaries]: any[]
+  [FIELD_TYPES.rawBinary]: string
+  [FIELD_TYPES.signatures]: Uint8Array[]
+  [FIELD_TYPES.pointers]: Pointer[]
+  [FIELD_TYPES.offChainUpdates]: any
+  [FIELD_TYPES.callStack]: any
+  [FIELD_TYPES.proofOfInclusion]: any
+  [FIELD_TYPES.mptrees]: MPTree[]
+  [FIELD_TYPES.callReturnType]: any
+  [FIELD_TYPES.ctVersion]: CtVersion
+  [FIELD_TYPES.abiVersion]: ABI_VERSIONS
+  [FIELD_TYPES.sophiaCodeTypeInfo]: any
+  [FIELD_TYPES.payload]: string
+  [FIELD_TYPES.stateTree]: any
+}
 
 // FEE CALCULATION
 export const BASE_GAS = 15000
@@ -269,26 +268,30 @@ type UnionToIntersection<Union> =
   (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
     ? Intersection : never
 
-type TxElem = readonly [string, string | Field]
-| readonly [string, string | Field, EncodingType | readonly EncodingType[]]
+type TxElem = readonly [string, FIELD_TYPES | Field]
+| readonly [string, FIELD_TYPES, EncodingType | readonly EncodingType[]]
 
-type BuildTxArgBySchemaType<Schema extends readonly any[]> =
-  Schema[1] extends typeof Field
-    ? Parameters<Schema[1]['serialize']>[0]
-    : Schema[1] extends keyof BuildFieldTypes<Schema[2]>
-      ? BuildFieldTypes<Schema[2]>[Schema[1]]
+type BuildTxArgBySchemaType<
+  Type extends FIELD_TYPES | Field,
+  Prefix extends undefined | EncodingType | readonly EncodingType[]
+> =
+  Type extends typeof Field
+    ? Parameters<Type['serialize']>[0]
+    : Type extends FIELD_TYPES
+      ? BuildFieldTypes<Prefix>[Type]
       : never
 
 type BuildTxArgBySchema<SchemaLine> =
   UnionToIntersection<
   SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends TxElem ? {
-      [k in Elem[0]]: BuildTxArgBySchemaType<Elem> } : never
+    ? Elem extends TxElem
+      ? { [k in Elem[0]]: BuildTxArgBySchemaType<Elem[1], Elem[2]> }
+      : never
     : never
   >
 
 export type RawTxObject<Tx extends TxSchema> = {
-  [k in keyof Tx]: Tx[k] extends number | BigNumber ? string: Tx[k]
+  [k in keyof Tx]: Tx[k] extends number | BigNumber ? string : Tx[k]
 }
 
 const BASE_TX = [
@@ -416,7 +419,7 @@ export const TX_SCHEMA = {
       ['callerId', FIELD_TYPES.id, 'ak'],
       ['nonce', FIELD_TYPES.int],
       ['contractId', FIELD_TYPES.id, ['ct', 'nm']],
-      ['abiVersion', FIELD_TYPES.int],
+      ['abiVersion', FIELD_TYPES.abiVersion],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.int],
       ['amount', FIELD_TYPES.amount],
@@ -453,7 +456,7 @@ export const TX_SCHEMA = {
       ['oracleTtlValue', FIELD_TYPES.int],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.int],
-      ['abiVersion', FIELD_TYPES.int]
+      ['abiVersion', FIELD_TYPES.abiVersion]
     ]
   },
   [TX_TYPE.oracleExtend]: {
@@ -678,7 +681,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['caller', FIELD_TYPES.id, 'ak'],
       ['contract', FIELD_TYPES.id, 'ct'],
-      ['abiVersion', FIELD_TYPES.int],
+      ['abiVersion', FIELD_TYPES.abiVersion],
       ['amount', FIELD_TYPES.int],
       ['callData', FIELD_TYPES.binary, 'cb'],
       ['callStack', FIELD_TYPES.callStack],
@@ -786,7 +789,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['gaId', FIELD_TYPES.id, 'ak'],
       ['authData', FIELD_TYPES.binary, 'cb'],
-      ['abiVersion', FIELD_TYPES.int],
+      ['abiVersion', FIELD_TYPES.abiVersion],
       ['fee', FIELD_TYPES.int],
       ['gasLimit', FIELD_TYPES.int],
       ['gasPrice', GasPrice],
@@ -820,13 +823,5 @@ export type TxTypeSchemas = {
   >
 }
 
-interface TtlObject{
-  type: string
-  value: number
-}
-
-export type TxSchema = TxTypeSchemas[keyof TxTypeSchemas]
-export type TxParamsCommon = Partial<UnionToIntersection<TxSchema> & {
-  oracleTtl: TtlObject
-  queryTtl: TtlObject
-}>
+export type TxSchema = TxTypeSchemas[TX_TYPE]
+export type TxParamsCommon = Partial<UnionToIntersection<TxSchema>>

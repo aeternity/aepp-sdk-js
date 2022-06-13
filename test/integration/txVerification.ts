@@ -19,7 +19,8 @@ describe('Verify Transaction', function () {
   })
 
   it('validates params in buildRawTx', async () => {
-    await expect(aeSdk.buildTx(TX_TYPE.spend, {})).to.eventually.be.rejectedWith(InvalidTxParamsError, 'Transaction build error. {"senderId":"Field is required","recipientId":"Field is required"}')
+    await expect(aeSdk.buildTx(TX_TYPE.spend, {})).to.eventually.be
+      .rejectedWith(InvalidTxParamsError, 'Transaction field senderId is missed')
   })
 
   it('returns errors', async () => {

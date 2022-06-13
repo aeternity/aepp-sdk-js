@@ -50,7 +50,7 @@ enum ORACLE_TTL_TYPES {
 // SERIALIZE AND DESERIALIZE PART
 function deserializeField (
   value: any,
-  type: string | typeof Field,
+  type: FIELD_TYPES | typeof Field,
   prefix?: EncodingType | EncodingType[]
 ): any {
   if (value == null) return ''
@@ -64,6 +64,7 @@ function deserializeField (
     }
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
+    case FIELD_TYPES.abiVersion:
       return readInt(value)
     case FIELD_TYPES.id:
       return readId(value)
@@ -82,15 +83,15 @@ function deserializeField (
     case FIELD_TYPES.pointers:
       return readPointers(value)
     case FIELD_TYPES.rlpBinary:
-      return unpackTx(value, { fromRlpBinary: true })
+      return unpackTx(encode(value, 'tx'))
     case FIELD_TYPES.rlpBinaries:
-      return value.map((v: Buffer) => unpackTx(v, { fromRlpBinary: true }))
+      return value.map((v: Buffer) => unpackTx(encode(v, 'tx')))
     case FIELD_TYPES.rawBinary:
       return value
     case FIELD_TYPES.hex:
       return value.toString('hex')
     case FIELD_TYPES.offChainUpdates:
-      return value.map((v: Buffer) => unpackTx(v, { fromRlpBinary: true }))
+      return value.map((v: Buffer) => unpackTx(encode(v, 'tx')))
     case FIELD_TYPES.callStack:
       // TODO: fix this
       return [readInt(value)]
@@ -127,11 +128,12 @@ function deserializeField (
 }
 
 function serializeField (
-  value: any, type: string | typeof Field, params: any
+  value: any, type: FIELD_TYPES | typeof Field, params: any
 ): any {
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
+    case FIELD_TYPES.abiVersion:
       return writeInt(value)
     case FIELD_TYPES.id:
       return writeId(value)
@@ -176,7 +178,7 @@ function serializeField (
 
 function validateField (
   value: any,
-  type: string | Function | typeof Field,
+  type: FIELD_TYPES | typeof Field,
   prefix?: EncodingType | EncodingType[]
 ): string | undefined {
   // All fields are required
@@ -226,8 +228,7 @@ function transformParams (
     .reduce(
       (params: TxParamsCommon, [key]) => ({
         ...params,
-        [key]: formatAmount(
-          params[key as keyof TxParamsCommon], { denomination })
+        [key]: formatAmount(params[key as keyof TxParamsCommon], { denomination })
       }),
       params
     )
@@ -403,7 +404,7 @@ export function buildRawTx (
   }
 
   return filteredSchema
-    .map(([key, fieldType]: [keyof TxSchema, string, EncodingType]) => serializeField(
+    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => serializeField(
       params[key], fieldType, params))
 }
 
@@ -494,28 +495,21 @@ export interface TxUnpacked<Tx extends TxSchema> {
   txType: TX_TYPE
   tx: RawTxObject<Tx>
   rlpEncoded: Uint8Array
-  binary: Uint8Array | NestedUint8Array
 }
 /**
  * Unpack transaction hash
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param encodedTx String or RLP encoded transaction array
- * (if fromRlpBinary flag is true)
- * @param fromRlpBinary Unpack from RLP encoded transaction (default: false)
+ * @param encodedTx Transaction to unpack
+ * @param txType Expected transaction type
  * @returns object
  * @returns object.tx Object with transaction param's
- * @returns object.rlpEncoded rlp encoded transaction
- * @returns object.binary binary transaction
+ * @returns object.txType Transaction type
  */
 export function unpackTx<TxType extends TX_TYPE> (
-  encodedTx: EncodedData<'tx'> | Uint8Array,
-  { txType, fromRlpBinary = false }:
-  { txType?: TxType, fromRlpBinary?: boolean } = {
-    fromRlpBinary: false
-  }
+  encodedTx: EncodedData<'tx' | 'pi'>, txType?: TxType
 ): TxUnpacked<TxTypeSchemas[TxType]> {
-  const rlpEncoded = fromRlpBinary ? encodedTx as Uint8Array : decode(encodedTx as EncodedData<'tx'>)
+  const rlpEncoded = decode(encodedTx)
   const binary = rlpDecode(rlpEncoded)
   const objId = +readInt(binary[0] as Buffer)
   if (!isKeyOfObject(objId, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${objId}`)
@@ -526,8 +520,7 @@ export function unpackTx<TxType extends TX_TYPE> (
   return {
     txType: objId,
     tx: unpackRawTx<TxTypeSchemas[TxType]>(binary, schema),
-    rlpEncoded,
-    binary
+    rlpEncoded
   }
 }
 
@@ -556,15 +549,4 @@ export function buildContractIdByContractTx (contractTx: EncodedData<'tx'>): Enc
     throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', txType)
   }
   return buildContractId(tx.ownerId, +tx.nonce)
-}
-
-export default {
-  calculateMinFee,
-  calculateFee,
-  unpackTx,
-  unpackRawTx,
-  buildTx,
-  buildRawTx,
-  validateParams,
-  buildTxHash
 }

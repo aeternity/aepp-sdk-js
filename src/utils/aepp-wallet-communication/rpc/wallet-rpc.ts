@@ -216,7 +216,7 @@ abstract class _WalletRpc extends _AccountMultiple {
           this._clients.delete(id)
           this.onDisconnect(id, disconnectParams) // also related info
         }, {
-          [METHODS.closeConnection]: async (params) => {
+          [METHODS.closeConnection]: (params) => {
             disconnectParams = params
             this._disconnectRpcClient(id)
           },
