@@ -23,7 +23,6 @@
  */
 
 import Ae from '.'
-import ContractCompilerHttp from '../contract/compiler'
 import WalletRpc from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import stampit from '@stamp/it'
@@ -44,4 +43,4 @@ import stampit from '@stamp/it'
   address: keypair.publicKey,
 })
  */
-export default Ae.compose(WalletRpc, ContractCompilerHttp)
+export default Ae.compose(WalletRpc)
