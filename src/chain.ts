@@ -37,6 +37,7 @@ import {
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx
 } from './apis/node'
 import { EncodedData } from './utils/encoder'
+import { _AccountBase } from './account/base'
 
 export function _getPollInterval (
   type: 'block' | 'microblock',
@@ -50,11 +51,6 @@ export function _getPollInterval (
 }
 
 // TODO: extract these definitions
-
-interface Account {
-  address: (options: any) => Promise<EncodedData<'ak'>>
-}
-
 export type AensName = `${string}.chain`
 
 /**
@@ -73,16 +69,18 @@ export async function sendTransaction (
   { onNode, onAccount, verify = true, waitMined = true, confirm, ...options }:
   {
     onNode: Node
-    onAccount: Account
+    onAccount?: _AccountBase
     verify?: boolean
     waitMined?: boolean
     confirm?: boolean | number
   } & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
-): Promise<{
-    hash: EncodedData<'th'> | string
+): Promise<
+  Partial<TransformNodeType<SignedTx>> & {
+    hash: EncodedData<'th'>
     rawTx: EncodedData<'tx'>
     confirmationHeight?: number
-  } & Partial<TransformNodeType<SignedTx>>> {
+  }
+  > {
   if (verify) {
     const validation = await verifyTransaction(tx, onNode)
     if (validation.length > 0) {
@@ -100,13 +98,18 @@ export async function sendTransaction (
     const { txHash } = await onNode.postTransaction({ tx }, {
       requestOptions: {
         customHeaders: {
-          __queue: `tx-${await onAccount?.address(options).catch(() => '')}`
+          __queue: `tx-${await onAccount?.address(options).catch(() => '') ?? ''}`
         }
       }
     })
 
     if (waitMined) {
-      const txData = { ...await poll(txHash, { onNode, ...options }), rawTx: tx }
+      const pollResult = await poll(txHash, { onNode, ...options })
+      const txData = {
+        ...pollResult,
+        hash: pollResult.hash as EncodedData<'th'>,
+        rawTx: tx
+      }
       // wait for transaction confirmation
       if (confirm != null && (confirm === true || confirm > 0)) {
         const c = typeof confirm === 'boolean' ? undefined : confirm

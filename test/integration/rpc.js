@@ -116,7 +116,7 @@ describe('Aepp<->Wallet', function () {
 
     it('Fail on not connected', async () => {
       await Promise.all(
-        ['send', 'subscribeAddress', 'askAddresses', 'address']
+        ['subscribeAddress', 'askAddresses', 'address']
           .map(method => expect(aepp[method]()).to.be.rejectedWith(NoWalletConnectedError, 'You are not connected to Wallet'))
       )
       expect(() => aepp.disconnectWallet()).to.throw(NoWalletConnectedError, 'You are not connected to Wallet')
