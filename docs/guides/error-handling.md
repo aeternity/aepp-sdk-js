@@ -72,7 +72,6 @@ BaseError
 │   │   UnknownPathNibbleError
 │
 └───NodeError
-│   │   DisconnectedError
 │   │   DuplicateNodeError
 │   │   NodeNotFoundError
 │

@@ -29,7 +29,7 @@
 import { decode, produceNameId } from '../tx/builder/helpers'
 import { concatBuffers } from '../utils/other'
 import { EncodedData, EncodingType } from '../utils/encoder'
-import { _AccountBase } from '../account/base'
+import AccountBase from '../account/base'
 import Node from '../node'
 export { default as getContractInstance } from '../contract/aci'
 
@@ -44,7 +44,7 @@ export { default as getContractInstance } from '../contract/aci'
 async function delegateSignatureCommon (
   ids: Array<EncodedData<EncodingType>> = [],
   { onAccount, onNode, ...opt }:
-  { onAccount: _AccountBase, onNode: Node } & Parameters<_AccountBase['sign']>[1]
+  { onAccount: AccountBase, onNode: Node } & Parameters<AccountBase['sign']>[1]
 ): Promise<string> {
   const signature = await onAccount.sign(
     concatBuffers([
@@ -77,7 +77,7 @@ async function delegateSignatureCommon (
  */
 export async function createAensDelegationSignature (
   contractId: EncodedData<'ct'>,
-  opt: Parameters<_AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
+  opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
   { name?: `${string}.chain` }
 ): Promise<string> {
   return await delegateSignatureCommon(
@@ -108,7 +108,7 @@ export async function createAensDelegationSignature (
  */
 export async function createOracleDelegationSignature (
   contractId: EncodedData<'ct'>,
-  opt: Parameters<_AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
+  opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
   { queryId?: EncodedData<'oq'> }
 ): Promise<string> {
   return await delegateSignatureCommon(

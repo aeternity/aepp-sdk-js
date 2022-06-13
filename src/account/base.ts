@@ -22,8 +22,6 @@
  * @export isAccountBase
  */
 
-import stampit from '@stamp/it'
-import { required } from '@stamp/required'
 import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto'
 import { buildTx } from '../tx/builder'
 import { decode } from '../tx/builder/helpers'
@@ -38,14 +36,22 @@ import { concatBuffers } from '../utils/other'
  * @param {Object} acc - Object to check
  * @return {Boolean}
  */
-export const isAccountBase = (acc: _AccountBase | any): boolean =>
+export const isAccountBase = (acc: AccountBase | any): boolean =>
   !['sign', 'address', 'signTransaction', 'signMessage'].some(f => typeof acc[f] !== 'function')
 
-export abstract class _AccountBase {
+/**
+ * Account is one of the three basic building blocks of an
+ * {@link module:@aeternity/aepp-sdk/es/ae--Ae} client and provides access to a
+ * signing key pair.
+ * @function
+ * @alias module:@aeternity/aepp-sdk/es/account
+ * @param {Object} [options={}] - Initializer object
+ * @param {String} options.networkId - NETWORK_ID using for signing transaction's
+ */
+export default abstract class AccountBase {
   networkId?: string
 
-  // TODO: replace with constructor after dropping account stamps
-  init ({ networkId }: { networkId?: string } = {}): void {
+  constructor ({ networkId }: { networkId?: string } = {}) {
     this.networkId ??= networkId
   }
 
@@ -144,34 +150,3 @@ export abstract class _AccountBase {
    */
   abstract address (opt?: object): Promise<EncodedData<'ak'>>
 }
-
-/**
- * AccountBase Stamp
- *
- * Attempting to create instances from the Stamp without overwriting all
- * abstract methods using composition will result in an exception.
- *
- * Account is one of the three basic building blocks of an
- * {@link module:@aeternity/aepp-sdk/es/ae--Ae} client and provides access to a
- * signing key pair.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/account
- * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @param {String} options.networkId - NETWORK_ID using for signing transaction's
- * @return {_AccountBase} Account instance
- */
-export default stampit<_AccountBase>({
-  init: _AccountBase.prototype.init,
-  methods: {
-    signTransaction: _AccountBase.prototype.signTransaction,
-    getNetworkId,
-    signMessage: _AccountBase.prototype.signMessage,
-    verifyMessage: _AccountBase.prototype.verifyMessage
-  }
-}, required({
-  methods: {
-    sign: required,
-    address: required
-  }
-}) as stampit.Composable)

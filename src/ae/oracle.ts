@@ -44,7 +44,7 @@ import { _getPollInterval } from '../chain'
 import { _buildTx, BuildTxOptions } from '../tx'
 import Node from '../node'
 import BigNumber from 'bignumber.js'
-import { _AccountBase } from '../account/base'
+import AccountBase from '../account/base'
 
 type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['oracleQueries']
 
@@ -57,7 +57,7 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
  * @return Oracle object
  */
 export async function getOracleObject (
-  oracleId: EncodedData<'ok'>, options: { onNode: Node, onAccount: _AccountBase }
+  oracleId: EncodedData<'ok'>, options: { onNode: Node, onAccount: AccountBase }
 ): Promise<
   Awaited<ReturnType<Node['getOracleByPubkey']>> & {
     id: EncodedData<'ok'>

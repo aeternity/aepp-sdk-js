@@ -3,21 +3,28 @@
  * @module @aeternity/aepp-sdk/es/account/rpc
  * @export AccountRpc
  */
-import AccountBase, { _AccountBase } from './base'
+import AccountBase from './base'
 import { METHODS } from '../utils/aepp-wallet-communication/schema'
 import { NotImplementedError } from '../utils/errors'
 import { EncodedData } from '../utils/encoder'
-import type stampit from '@stamp/it' // eslint-disable-line @typescript-eslint/no-unused-vars
 
-class _AccountRpc extends _AccountBase {
+/**
+ * Account provided by wallet
+ * @alias module:@aeternity/aepp-sdk/es/account/rpc
+ * @param param
+ * @param param.rpcClient RpcClient instance
+ * @param param.address RPC account address
+ * @return AccountRpc instance
+ */
+export default class AccountRpc extends AccountBase {
   _rpcClient: any
   _address: EncodedData<'ak'>
 
-  init (
+  constructor (
     { rpcClient, address, ...options }:
-    { rpcClient: any, address: EncodedData<'ak'> } & Parameters<_AccountBase['init']>[0]
-  ): void {
-    super.init(options)
+    { rpcClient: any, address: EncodedData<'ak'> } & ConstructorParameters<typeof AccountBase>[0]
+  ) {
+    super(options)
     this._rpcClient = rpcClient
     this._address = address
   }
@@ -38,7 +45,7 @@ class _AccountRpc extends _AccountBase {
    */
   async signTransaction (
     tx: EncodedData<'tx'>,
-    { innerTx, networkId }: Parameters<_AccountBase['signTransaction']>[1] = {}
+    { innerTx, networkId }: Parameters<AccountBase['signTransaction']>[1] = {}
   ): Promise<EncodedData<'tx'>> {
     if (innerTx != null) throw new NotImplementedError('innerTx option in AccountRpc')
     const res = await this._rpcClient.request(METHODS.sign, {
@@ -56,7 +63,7 @@ class _AccountRpc extends _AccountBase {
    * @return {Promise<String>} Signed message
    */
   async signMessage (
-    message: string, { returnHex = false }: Parameters<_AccountBase['signMessage']>[1] = {}
+    message: string, { returnHex = false }: Parameters<AccountBase['signMessage']>[1] = {}
   ): Promise<string | Uint8Array> {
     const { signature } = await this._rpcClient.request(
       METHODS.signMessage, { onAccount: this._address, message }
@@ -64,23 +71,3 @@ class _AccountRpc extends _AccountBase {
     return returnHex ? signature : Buffer.from(signature, 'hex')
   }
 }
-
-/**
- * Account provided by wallet
- * @alias module:@aeternity/aepp-sdk/es/account/rpc
- * @function
- * @rtype Stamp
- * @param {Object} param Init params object
- * @param {Object} param.rpcClient RpcClient instance
- * @param {Object} param.address RPC account address
- * @return {Object} AccountRpc instance
- */
-export default AccountBase.compose<_AccountRpc>({
-  init: _AccountRpc.prototype.init,
-  methods: {
-    sign: _AccountRpc.prototype.sign,
-    address: _AccountRpc.prototype.address,
-    signTransaction: _AccountRpc.prototype.signTransaction,
-    signMessage: _AccountRpc.prototype.signMessage
-  }
-})
