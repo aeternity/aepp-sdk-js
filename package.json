@@ -39,8 +39,6 @@
     "@azure/core-client": "^1.6.0",
     "@azure/core-rest-pipeline": "^1.9.0",
     "@babel/runtime-corejs3": "^7.18.3",
-    "@stamp/it": "^1.1.0",
-    "@stamp/required": "^1.0.1",
     "aes-js": "^3.1.2",
     "bignumber.js": "^9.0.2",
     "bip32-path": "^0.4.2",
