@@ -20,7 +20,7 @@ import { expect } from 'chai'
 // @ts-expect-error
 import { BaseAe, spendPromise, publicKey } from './index'
 import { commitmentHash, oracleQueryId, decode, encode } from '../../src/tx/builder/helpers'
-import { GAS_MAX, TX_TYPE } from '../../src/tx/builder/schema'
+import { GAS_MAX, ORACLE_TTL_TYPES, TX_TYPE } from '../../src/tx/builder/schema'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
 import { EncodedData } from './../../src/utils/encoder'
 
@@ -39,9 +39,9 @@ const pointers = [{ key: 'account_pubkey', id: senderId }]
 const queryFormat = '{\'city\': str}'
 const responseFormat = '{\'tmp\': num}'
 const queryFee = 30000
-const oracleTtl = { type: 'delta', value: 500 }
-const responseTtl = { type: 'delta', value: 100 }
-const queryTtl = { type: 'delta', value: 100 }
+const oracleTtl = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 500 }
+const responseTtl = { responseTtlType: ORACLE_TTL_TYPES.delta, responseTtlValue: 100 }
+const queryTtl = { queryTtlType: ORACLE_TTL_TYPES.delta, queryTtlValue: 100 }
 const query = '{\'city\': \'Berlin\'}'
 const queryResponse = '{\'tmp\': 101}'
 
@@ -133,17 +133,17 @@ describe('Transaction', function () {
     'oracle register',
     'tx_+FAWAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19gnUwAIIB9IYPN7jqmAAAAGsRIcw=',
     () => aeSdk.buildTx(TX_TYPE.oracleRegister, {
-      nonce, accountId: address, queryFormat, responseFormat, queryFee, oracleTtl
+      nonce, accountId: address, queryFormat, responseFormat, queryFee, ...oracleTtl
     })
   ], [
     'oracle extend',
     'tx_8RkBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajOwEAggH0hg6itfGYAADwE/X7',
-    () => aeSdk.buildTx(TX_TYPE.oracleExtend, { nonce, oracleId, callerId: address, oracleTtl })
+    () => aeSdk.buildTx(TX_TYPE.oracleExtend, { nonce, oracleId, callerId: address, ...oracleTtl })
   ], [
     'oracle post query',
     'tx_+GkXAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajO5J7J2NpdHknOiAnQmVybGluJ32CdTAAZABkhg+bJBmGAAAtn7nr',
     () => aeSdk.buildTx(TX_TYPE.oracleQuery, {
-      nonce, oracleId, responseTtl, query, queryTtl, queryFee, senderId: address
+      nonce, oracleId, ...responseTtl, query, ...queryTtl, queryFee, senderId: address
     })
   ], [
     'oracle respond query',
@@ -152,7 +152,7 @@ describe('Transaction', function () {
       nonce,
       oracleId,
       callerId: address,
-      responseTtl,
+      ...responseTtl,
       queryId: oracleQueryId(address, nonce, oracleId),
       response: queryResponse
     })

@@ -27,6 +27,7 @@ export * from './utils/amount-formatter'
 export * from './utils/hd-wallet'
 export * from './ae/aens'
 export * from './ae/contract'
+export * from './ae/oracle'
 export * from './ae/spend'
 export * from './contract/ga'
 
@@ -38,14 +39,9 @@ export { default as AccountBase } from './account/base'
 export { default as AccountMultiple } from './account/multiple'
 export { default as MemoryAccount } from './account/memory'
 export { default as ContractCompilerHttp } from './contract/compiler'
-// @ts-expect-error
 export { default as RpcAepp } from './ae/aepp'
-// @ts-expect-error
 export { default as RpcWallet } from './ae/wallet'
-// @ts-expect-error
-export { default as Oracle } from './ae/oracle'
 export { default as Channel } from './channel'
-// @ts-expect-error
 export { default as Universal } from './ae/universal'
 
 export { default as connectionProxy } from './utils/aepp-wallet-communication/connection-proxy'
