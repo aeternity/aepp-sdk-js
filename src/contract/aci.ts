@@ -46,7 +46,7 @@ import {
 } from '../utils/errors'
 import { hash } from '../utils/crypto'
 import { Aci as BaseAci } from '../apis/compiler'
-import { OnCompiler } from './compiler'
+import Compiler from './compiler'
 import Node from '../node'
 import {
   getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun
@@ -174,7 +174,7 @@ export default async function getContractInstance ({
   ...otherOptions
 }: {
   onAccount: _AccountBase & { send: any, buildTx: any, Ae: any }
-  onCompiler: OnCompiler
+  onCompiler: Compiler
   onNode: Node
   source?: string
   bytecode?: EncodedData<'cb'>
@@ -184,8 +184,8 @@ export default async function getContractInstance ({
   validateBytecode?: boolean
 }): Promise<ContractInstance> {
   if (_aci == null && source != null) {
-    // @ts-expect-error TODO should be fixed when the compiledAci interface gets updated
-    _aci = await onCompiler.generateACI({ code: source, options: { fileSystem } })
+    // TODO: should be fixed when the compiledAci interface gets updated
+    _aci = await onCompiler.generateACI({ code: source, options: { fileSystem } }) as Aci
   }
   if (_aci == null) throw new MissingContractDefError()
 

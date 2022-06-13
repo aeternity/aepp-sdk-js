@@ -24,7 +24,6 @@
 
 import Ae from '.'
 import AccountMultiple from '../account/multiple'
-import ContractCompilerHttp from '../contract/compiler'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import stampit from '@stamp/it'
 
@@ -39,4 +38,4 @@ import stampit from '@stamp/it'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Universal instance
  */
-export default Ae.compose(AccountMultiple, ContractCompilerHttp)
+export default Ae.compose(AccountMultiple)

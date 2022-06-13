@@ -16,14 +16,13 @@
  */
 
 /**
- * ContractCompilerHttp module
+ * Compiler module
  *
  * @module @aeternity/aepp-sdk/es/contract/compiler
- * @export ContractCompilerHttp
- * @example import { ContractCompilerHttp } from '@aeternity/aepp-sdk'
+ * @export Compiler
+ * @example import { Compiler } from '@aeternity/aepp-sdk'
  */
 
-import stampit from '@stamp/it'
 import { Compiler as CompilerApi, ErrorModel, CompilerError } from '../apis/compiler'
 import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../utils/autorest'
 
@@ -32,21 +31,18 @@ type GeneralCompilerError = ErrorModel & {
   parameter?: string
 }
 
-export type OnCompiler = _ContractCompilerHttp['compilerApi']
-
-export class _ContractCompilerHttp {
-  compilerApi: CompilerApi
-
-  // TODO: replace with constructor after dropping account stamps
-  init (
-    { compilerUrl, ignoreVersion }: { compilerUrl?: string, ignoreVersion?: boolean }
-  ): void {
-    if (compilerUrl == null) return
-    this.setCompilerUrl(compilerUrl, { ignoreVersion })
-  }
-
-  setCompilerUrl (compilerUrl: string, { ignoreVersion = false } = {}): void {
-    this.compilerApi = new CompilerApi(compilerUrl, {
+/**
+ * Contract Compiler
+ *
+ * This class include api call's related to contract compiler functionality.
+ * @alias module:@aeternity/aepp-sdk/es/contract/compiler
+ * @param options - Initializer object
+ * @returns Contract compiler instance
+ * @example Compiler('COMPILER_URL')
+ */
+export default class Compiler extends CompilerApi {
+  constructor (compilerUrl: string, { ignoreVersion }: { ignoreVersion?: boolean } = {}) {
+    super(compilerUrl, {
       allowInsecureConnection: true,
       additionalPolicies: [
         genErrorFormatterPolicy((body: GeneralCompilerError | CompilerError[]) => {
@@ -67,27 +63,11 @@ export class _ContractCompilerHttp {
         })
       ]
     })
-    if (!ignoreVersion) {
-      const versionPromise = this.compilerApi.aPIVersion().then(({ apiVersion }) => apiVersion)
-      this.compilerApi.pipeline.addPolicy(
+    if (ignoreVersion !== true) {
+      const versionPromise = this.aPIVersion().then(({ apiVersion }) => apiVersion)
+      this.pipeline.addPolicy(
         genVersionCheckPolicy('compiler', '/api-version', versionPromise, '6.1.0', '7.0.0')
       )
     }
   }
 }
-
-/**
- * Contract Compiler Stamp
- *
- * This stamp include api call's related to contract compiler functionality.
- * @alias module:@aeternity/aepp-sdk/es/contract/compiler
- * @param options - Initializer object
- * @returns Contract compiler instance
- * @example ContractCompilerHttp({ compilerUrl: 'COMPILER_URL' })
- */
-export default stampit <_ContractCompilerHttp>({
-  init: _ContractCompilerHttp.prototype.init,
-  methods: {
-    setCompilerUrl: _ContractCompilerHttp.prototype.setCompilerUrl
-  }
-})

@@ -29,7 +29,7 @@ import { _AccountBase } from '../account/base'
 import { getContractInstance } from '../ae/contract'
 import Node from '../node'
 import { getAccount } from '../chain'
-import { OnCompiler } from './compiler'
+import Compiler from './compiler'
 
 /**
  * Check if account is GA
@@ -59,7 +59,7 @@ export async function createGeneralizedAccount (
   { onAccount, onCompiler, onNode, ...options }:
   {
     onAccount: _AccountBase & { send: any, buildTx: any, Ae: any }
-    onCompiler: OnCompiler
+    onCompiler: Compiler
     onNode: Node
   }
   & Parameters<_AccountBase['address']>[0] & Parameters<typeof buildTx>[2]
@@ -114,7 +114,7 @@ export async function createMetaTx (
   },
   authFnName: string,
   { onAccount, onCompiler, onNode, ...options }:
-  { onAccount: any, onCompiler: OnCompiler, onNode: Node }
+  { onAccount: any, onCompiler: Compiler, onNode: Node }
   & Parameters<_AccountBase['address']>[0]
 ): Promise<EncodedData<'tx'>> {
   const wrapInEmptySignedTx = (

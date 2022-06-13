@@ -29,6 +29,7 @@ import * as spendMethods from './spend'
 import * as oracleMethods from './oracle'
 import * as contractMethods from './contract'
 import * as contractGaMethods from '../contract/ga'
+import Compiler from '../contract/compiler'
 import NodePool from '../node-pool'
 import AccountResolver from '../account/resolver'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
@@ -37,7 +38,14 @@ import { AMOUNT } from '../tx/builder/schema'
 
 const { _buildTx, ...otherTxMethods } = txMethods
 export default stampit(NodePool, AccountResolver, {
+  init ({ compilerUrl, ignoreVersion }) {
+    if (compilerUrl == null) return
+    this.setCompilerUrl(compilerUrl, { ignoreVersion })
+  },
   methods: {
+    setCompilerUrl (compilerUrl: string, { ignoreVersion = false } = {}): void {
+      this.compilerApi = new Compiler(compilerUrl, { ignoreVersion })
+    },
     /**
      * Remove all listeners for RPC
      */
