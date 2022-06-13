@@ -38,6 +38,7 @@ import Node from '../node'
 import { EncodedData } from '../utils/encoder'
 import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
 import { isKeyOfObject } from '../utils/other'
+import { _AccountBase } from '../account/base'
 
 // uses a new feature, probably typescript-eslint doesn't support it yet
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,11 +48,11 @@ export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
 // TODO: find a better name or rearrange methods
 export async function _buildTx<TxType extends TX_TYPE> (
   txType: TxType,
-  _params: TxTypeSchemas[TxType] & { onNode: Node }
+  { onAccount, ..._params }: TxTypeSchemas[TxType] & { onNode: Node, onAccount: _AccountBase }
 ): Promise<EncodedData<'tx'>> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node }
-  let senderKey: keyof TxParamsCommon
+  let senderKey: keyof TxParamsCommon | '<absent>'
   switch (txType) {
     case TX_TYPE.spend:
     case TX_TYPE.oracleQuery:
@@ -70,9 +71,11 @@ export async function _buildTx<TxType extends TX_TYPE> (
       senderKey = 'ownerId'
       break
     case TX_TYPE.contractCall:
+      senderKey = 'callerId'
+      break
     case TX_TYPE.oracleExtend:
     case TX_TYPE.oracleResponse:
-      senderKey = 'callerId'
+      senderKey = '<absent>'
       break
     case TX_TYPE.channelCloseSolo:
     case TX_TYPE.channelSlash:
@@ -101,7 +104,7 @@ export async function _buildTx<TxType extends TX_TYPE> (
   if (txType === TX_TYPE.payingFor) {
     params.tx = unpackTx(params.tx)
   }
-  const senderId = params[senderKey]
+  const senderId = senderKey === '<absent>' ? await onAccount.address() : params[senderKey]
   // TODO: do this check on TypeScript level
   if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`)
   const extraParams = await prepareTxParams(txType, { ...params, senderId })

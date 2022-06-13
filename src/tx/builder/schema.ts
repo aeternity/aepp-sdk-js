@@ -14,13 +14,18 @@ import MPTree from '../../utils/mptree'
 
 export * from './constants'
 
+export enum ORACLE_TTL_TYPES {
+  delta = 0,
+  block = 1
+}
+
 // # TRANSACTION DEFAULT TTL
 export const TX_TTL = 0
 // # ORACLE
 export const QUERY_FEE = 30000
-export const ORACLE_TTL = { type: 'delta', value: 500 }
-export const QUERY_TTL = { type: 'delta', value: 10 }
-export const RESPONSE_TTL = { type: 'delta', value: 10 }
+export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 }
+export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 }
+export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 }
 // # CONTRACT
 export const AMOUNT = 0
 export const GAS_MAX = 1600000 - 21000
@@ -165,6 +170,7 @@ export enum FIELD_TYPES {
   callReturnType,
   ctVersion,
   abiVersion,
+  ttlType,
   sophiaCodeTypeInfo,
   payload,
   stateTree
@@ -191,6 +197,7 @@ interface BuildFieldTypes<Prefix extends undefined | EncodingType | readonly Enc
   [FIELD_TYPES.callReturnType]: any
   [FIELD_TYPES.ctVersion]: CtVersion
   [FIELD_TYPES.abiVersion]: ABI_VERSIONS
+  [FIELD_TYPES.ttlType]: ORACLE_TTL_TYPES
   [FIELD_TYPES.sophiaCodeTypeInfo]: any
   [FIELD_TYPES.payload]: string
   [FIELD_TYPES.stateTree]: any
@@ -452,7 +459,7 @@ export const TX_SCHEMA = {
       ['queryFormat', FIELD_TYPES.string],
       ['responseFormat', FIELD_TYPES.string],
       ['queryFee', FIELD_TYPES.amount],
-      ['oracleTtlType', FIELD_TYPES.int],
+      ['oracleTtlType', FIELD_TYPES.ttlType],
       ['oracleTtlValue', FIELD_TYPES.int],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.int],
@@ -464,7 +471,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['oracleId', FIELD_TYPES.id, ['ok', 'nm']],
       ['nonce', FIELD_TYPES.int],
-      ['oracleTtlType', FIELD_TYPES.int],
+      ['oracleTtlType', FIELD_TYPES.ttlType],
       ['oracleTtlValue', FIELD_TYPES.int],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.int]
@@ -478,9 +485,9 @@ export const TX_SCHEMA = {
       ['oracleId', FIELD_TYPES.id, ['ok', 'nm']],
       ['query', FIELD_TYPES.string],
       ['queryFee', FIELD_TYPES.amount],
-      ['queryTtlType', FIELD_TYPES.int],
+      ['queryTtlType', FIELD_TYPES.ttlType],
       ['queryTtlValue', FIELD_TYPES.int],
-      ['responseTtlType', FIELD_TYPES.int],
+      ['responseTtlType', FIELD_TYPES.ttlType],
       ['responseTtlValue', FIELD_TYPES.int],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.int]
@@ -493,7 +500,7 @@ export const TX_SCHEMA = {
       ['nonce', FIELD_TYPES.int],
       ['queryId', FIELD_TYPES.binary, 'oq'],
       ['response', FIELD_TYPES.string],
-      ['responseTtlType', FIELD_TYPES.int],
+      ['responseTtlType', FIELD_TYPES.ttlType],
       ['responseTtlValue', FIELD_TYPES.int],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.int]

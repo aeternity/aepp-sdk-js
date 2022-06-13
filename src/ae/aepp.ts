@@ -22,11 +22,12 @@
  * @example import { RpcAepp } from '@aeternity/aepp-sdk'
  */
 
-import Ae from './'
+import Ae from '.'
 import ContractCompilerHttp from '../contract/compiler'
 import AeppRpc from '../utils/aepp-wallet-communication/rpc/aepp-rpc'
-import Oracle from './oracle'
 import asyncInit from '../utils/async-init'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import stampit from '@stamp/it'
 
 /**
  * Aepp Stamp
@@ -40,4 +41,4 @@ import asyncInit from '../utils/async-init'
  * @param {Object} [options={}] - Initializer object
  * @return {Object} Aepp instance
  */
-export default Ae.compose(asyncInit, Oracle, ContractCompilerHttp, AeppRpc)
+export default Ae.compose(asyncInit, ContractCompilerHttp, AeppRpc)

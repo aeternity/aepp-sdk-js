@@ -42,11 +42,6 @@ import { isKeyOfObject } from '../../utils/other'
  * @example import { calculateFee } from '@aeternity/aepp-sdk'
  */
 
-enum ORACLE_TTL_TYPES {
-  delta,
-  block
-}
-
 // SERIALIZE AND DESERIALIZE PART
 function deserializeField (
   value: any,
@@ -65,6 +60,7 @@ function deserializeField (
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
     case FIELD_TYPES.abiVersion:
+    case FIELD_TYPES.ttlType:
       return readInt(value)
     case FIELD_TYPES.id:
       return readId(value)
@@ -134,6 +130,7 @@ function serializeField (
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
     case FIELD_TYPES.abiVersion:
+    case FIELD_TYPES.ttlType:
       return writeInt(value)
     case FIELD_TYPES.id:
       return writeId(value)
@@ -232,24 +229,7 @@ function transformParams (
       }),
       params
     )
-  const schemaKeys = schema.map(([k]) => k)
-  return Object
-    .entries(params)
-    .reduce(
-      (acc: any, [key, value]: [key: string,
-        value: {
-          type: string
-          value: number
-        }]) => {
-        if (schemaKeys.includes(key)) acc[key] = value
-        if (['oracleTtl', 'queryTtl', 'responseTtl'].includes(key)) {
-          acc[`${key}Type`] = Object.values(ORACLE_TTL_TYPES).indexOf(value.type)
-          acc[`${key}Value`] = value.value
-        }
-        return acc
-      },
-      {}
-    )
+  return params
 }
 
 function getOracleRelativeTtl (params: any, txType: TX_TYPE): number {

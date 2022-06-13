@@ -26,6 +26,7 @@ import * as chainMethods from '../chain'
 import * as txMethods from '../tx'
 import * as aensMethods from './aens'
 import * as spendMethods from './spend'
+import * as oracleMethods from './oracle'
 import * as contractMethods from './contract'
 import * as contractGaMethods from '../contract/ga'
 import NodePool from '../node-pool'
@@ -52,6 +53,7 @@ export default stampit(NodePool, AccountResolver, {
         ...contractMethods,
         ...contractGaMethods,
         ...aensMethods,
+        ...oracleMethods,
         buildTx: _buildTx
       },
       ([name, handler]) => [

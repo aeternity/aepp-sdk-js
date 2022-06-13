@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -16,26 +16,32 @@
  */
 
 /**
- * Universal module
- * @module @aeternity/aepp-sdk/es/ae/universal
- * @export Universal
- * @example import { Universal } from '@aeternity/aepp-sdk'
+ * Wallet module
+ * @module @aeternity/aepp-sdk/es/ae/wallet
+ * @export Wallet
+ * @example import { RpcWallet } from '@aeternity/aepp-sdk'
  */
 
-import Ae from './'
-import Oracle from './oracle'
-import AccountMultiple from '../account/multiple'
+import Ae from '.'
 import ContractCompilerHttp from '../contract/compiler'
+import WalletRpc from '../utils/aepp-wallet-communication/rpc/wallet-rpc'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import stampit from '@stamp/it'
 
 /**
- * Universal Stamp
- *
- * Universal provides Ae base functionality with Contract and Aens
- * {@link module:@aeternity/aepp-sdk/es/ae--Ae} clients.
+ * Wallet Stamp
  * @function
- * @alias module:@aeternity/aepp-sdk/es/ae/universal
+ * @alias module:@aeternity/aepp-sdk/es/ae/wallet
  * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
- * @return {Object} Universal instance
+ * @param {String} options.url - Node instance to connect to
+ * @param {Account[]} [options.accounts] - Accounts to initialize with
+ * @param {String} [options.account] - Public key of account to preselect
+ * @return {Object} Wallet instance
+ * @example Wallet({
+  url: 'https://testnet.aeternity.io/',
+  accounts: [MemoryAccount({keypair})],
+  address: keypair.publicKey,
+})
  */
-export default Ae.compose(Oracle, AccountMultiple, ContractCompilerHttp)
+export default Ae.compose(WalletRpc, ContractCompilerHttp)
