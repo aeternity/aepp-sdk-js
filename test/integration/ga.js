@@ -45,7 +45,7 @@ describe('Generalized Account', function () {
     aeSdk = await getSdk()
     await aeSdk.spend('100000000000000000000', gaAccount.publicKey)
     aeSdk.removeAccount(aeSdk.selectedAddress)
-    await aeSdk.addAccount(MemoryAccount({ keypair: gaAccount }), { select: true })
+    await aeSdk.addAccount(new MemoryAccount({ keypair: gaAccount }), { select: true })
   })
 
   it('Make account GA', async () => {
@@ -67,7 +67,7 @@ describe('Generalized Account', function () {
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
     aeSdk.removeAccount(gaAccount.publicKey)
-    await aeSdk.addAccount(MemoryAccount({ gaId: gaAccount.publicKey }), { select: true })
+    await aeSdk.addAccount(new MemoryAccount({ gaId: gaAccount.publicKey }), { select: true })
 
     const callData = authContract.calldata.encode('BlindAuth', 'authorize', [r()])
     await aeSdk.spend(10000, publicKey, { authData: { callData } })

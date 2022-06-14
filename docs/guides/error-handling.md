@@ -126,8 +126,8 @@ const NODE_URL = 'https://testnet.aeternity.io'
 const PAYER_ACCOUNT_KEYPAIR = generateKeyPair()
 const NEW_USER_KEYPAIR = generateKeyPair()
 
-const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
-const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
+const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
+const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
 const node = new Node(NODE_URL)
 const aeSdk = await Universal({
   nodes: [{ name: 'testnet', instance: node }],

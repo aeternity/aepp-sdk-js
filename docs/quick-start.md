@@ -34,7 +34,7 @@ This example shows:
 ```js
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com' // required for contract interactions
-const senderAccount = MemoryAccount({
+const senderAccount = new MemoryAccount({
   // replace <SENDER_SECRET> and <SENDER_PUBLIC_KEY> with the generated keypair from step 2
   keypair: { secretKey: '<SENDER_SECRET>', publicKey: '<SENDER_PUBLIC_KEY>' }
 });

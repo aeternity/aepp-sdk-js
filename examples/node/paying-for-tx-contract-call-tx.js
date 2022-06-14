@@ -97,8 +97,8 @@ const NEW_USER_KEYPAIR = generateKeyPair();
 // Therefore we are putting our logic into an `async` code block
 (async () => {
   // ## 4. Create object instances
-  const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
-  const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
+  const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
+  const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
   const node = new Node(NODE_URL)
   const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],

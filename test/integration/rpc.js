@@ -92,7 +92,7 @@ describe('Aepp<->Wallet', function () {
       wallet = await RpcWallet({
         compilerUrl,
         accounts: [
-          MemoryAccount({ keypair: account }), MemoryAccount({ keypair: generateKeyPair() })
+          new MemoryAccount({ keypair: account }), new MemoryAccount({ keypair: generateKeyPair() })
         ],
         nodes: [{ name: 'local', instance: node }],
         id: 'test',
@@ -322,7 +322,7 @@ describe('Aepp<->Wallet', function () {
     it('Sign message using custom account', async () => {
       wallet.onMessageSign = (aeppId, params) => {
         if (params.onAccount === account.publicKey) {
-          return { onAccount: MemoryAccount({ keypair: account }) }
+          return { onAccount: new MemoryAccount({ keypair: account }) }
         }
       }
       const onAccount = account.publicKey
@@ -350,7 +350,7 @@ describe('Aepp<->Wallet', function () {
     it('Add new account to wallet: receive notification for update accounts', async () => {
       const connectedLength = Object.keys(aepp._accounts.connected).length
       const accountsPromise = new Promise((resolve) => { aepp.onAddressChange = resolve })
-      await wallet.addAccount(MemoryAccount({ keypair: generateKeyPair() }))
+      await wallet.addAccount(new MemoryAccount({ keypair: generateKeyPair() }))
       expect(Object.keys((await accountsPromise).connected).length).to.equal(connectedLength + 1)
     })
 
@@ -445,7 +445,7 @@ describe('Aepp<->Wallet', function () {
     before(async () => {
       wallet = await RpcWallet({
         compilerUrl,
-        accounts: [MemoryAccount({ keypair: account })],
+        accounts: [new MemoryAccount({ keypair: account })],
         nodes: [{ name: 'local', instance: node }],
         id: 'test',
         type: WALLET_TYPE.window,

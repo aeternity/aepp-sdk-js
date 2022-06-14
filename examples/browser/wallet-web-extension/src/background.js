@@ -19,13 +19,13 @@ import {
     // The `ExtensionProvider` uses the first account by default.
     // You can change active account using `selectAccount(address)` function
     accounts: [
-      MemoryAccount({
+      new MemoryAccount({
         keypair: {
           publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
           secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
         }
       }),
-      MemoryAccount({ keypair: generateKeyPair() })
+      new MemoryAccount({ keypair: generateKeyPair() })
     ],
     // Hook for sdk registration
     onConnection (aeppId, params) {

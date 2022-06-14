@@ -24,7 +24,7 @@ export const publicKey = process.env.PUBLIC_KEY || 'ak_2dATVcZ9KJU5a8hdsVtTv21pY
 const secretKey = process.env.SECRET_KEY || 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
 export const networkId = process.env.TEST_NETWORK_ID || 'ae_devnet'
 export const ignoreVersion = process.env.IGNORE_VERSION || false
-export const genesisAccount = MemoryAccount({ keypair: { publicKey, secretKey } })
+export const genesisAccount = new MemoryAccount({ keypair: { publicKey, secretKey } })
 export const account = generateKeyPair()
 
 export const BaseAe = async (params = {}, compose = {}) => Universal
@@ -61,7 +61,7 @@ export async function getSdk ({ withoutAccount } = {}) {
   return BaseAe({
     ...withoutAccount
       ? { withoutGenesisAccount: true }
-      : { accounts: [MemoryAccount({ keypair: account })] },
+      : { accounts: [new MemoryAccount({ keypair: account })] },
     networkId
   })
 }
