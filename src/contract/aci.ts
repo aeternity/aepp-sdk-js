@@ -364,10 +364,12 @@ export default async function getContractInstance ({
     if (contractId == null && fn !== 'init') throw new InvalidMethodInvocationError('You need to deploy contract before calling!')
     if (fn !== 'init' && opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(opt.amount, fn)
 
-    const callerId = await opt.onAccount.address(opt).catch((error: any) => {
-      if (opt.callStatic === true) return DRY_RUN_ACCOUNT.pub
-      else throw error
-    })
+    const callerId = await Promise.resolve()
+      .then(() => opt.onAccount.address(opt))
+      .catch((error: any) => {
+        if (opt.callStatic === true) return DRY_RUN_ACCOUNT.pub
+        else throw error
+      }) as EncodedData<'ak'>
     const callData = instance.calldata.encode(instance._name, fn, params)
 
     let res: any
