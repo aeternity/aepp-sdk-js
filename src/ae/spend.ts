@@ -29,7 +29,7 @@ import { ArgumentError } from '../utils/errors'
 import { EncodedData } from '../utils/encoder'
 import { createMetaTx } from '../contract/ga'
 import { TX_TYPE } from '../tx/builder/schema'
-import { _AccountBase } from '../account/base'
+import AccountBase from '../account/base'
 
 /**
  * Sign and post a transaction to the chain
@@ -42,7 +42,7 @@ import { _AccountBase } from '../account/base'
  */
 export async function send (
   tx: EncodedData<'tx'>,
-  options: Parameters<_AccountBase['signTransaction']>[1] & Parameters<typeof sendTransaction>[1]
+  options: Parameters<AccountBase['signTransaction']>[1] & Parameters<typeof sendTransaction>[1]
   & Partial<Omit<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>>
   & Pick<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>
 ): ReturnType<typeof sendTransaction> {
@@ -83,7 +83,7 @@ export async function spend (
   amount: number | string,
   recipientIdOrName: EncodedData<'ak'> | AensName,
   options: BuildTxOptions<TX_TYPE.spend, 'senderId' | 'recipientId' | 'amount'>
-  & Parameters<typeof resolveName>[2] & { onAccount: _AccountBase } & Parameters<typeof send>[1]
+  & Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & Parameters<typeof send>[1]
 ): ReturnType<typeof send> {
   return await send(
     await _buildTx(TX_TYPE.spend, {
@@ -110,7 +110,7 @@ export async function transferFunds (
   fraction: number | string,
   recipientIdOrName: AensName,
   options: BuildTxOptions<TX_TYPE.spend, 'senderId' | 'recipientId' | 'amount'>
-  & Parameters<typeof resolveName>[2] & { onAccount: _AccountBase } & Parameters<typeof send>[1]
+  & Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & Parameters<typeof send>[1]
 ): ReturnType<typeof send> {
   if (fraction < 0 || fraction > 1) {
     throw new ArgumentError('fraction', 'a number between 0 and 1', fraction)
@@ -141,7 +141,7 @@ export async function transferFunds (
  */
 export async function payForTransaction (
   transaction: EncodedData<'tx'>,
-  options: BuildTxOptions<TX_TYPE.payingFor, 'payerId' | 'tx'> & { onAccount: _AccountBase }
+  options: BuildTxOptions<TX_TYPE.payingFor, 'payerId' | 'tx'> & { onAccount: AccountBase }
   & Parameters<typeof send>[1]
 ): ReturnType<typeof send> {
   return await send(

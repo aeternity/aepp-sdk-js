@@ -153,11 +153,11 @@ describe('Contract instance', function () {
   })
 
   it('generates by source code', async () => {
-    aeSdk.Ae.defaults.testProperty = 'test'
+    aeSdk._options.testProperty = 'test'
     testContract = await aeSdk.getContractInstance({
       source: testContractSource, fileSystem, ttl: 0, gasLimit: 15000
     })
-    delete aeSdk.Ae.defaults.testProperty
+    delete aeSdk._options.testProperty
     expect(testContract.options.testProperty).to.be.equal('test')
     testContract.should.have.property('source')
     testContract.should.have.property('bytecode')

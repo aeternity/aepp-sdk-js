@@ -123,7 +123,7 @@ describe('Contract', function () {
     aeSdk = await getSdk()
     // TODO: option of getSdk to have accounts without genesis
     aeSdk.removeAccount(aeSdk.addresses()[1])
-    await aeSdk.addAccount(MemoryAccount({ keypair: generateKeyPair() }))
+    await aeSdk.addAccount(new MemoryAccount({ keypair: generateKeyPair() }))
     await aeSdk.spend(1e18, aeSdk.addresses()[1])
   })
 

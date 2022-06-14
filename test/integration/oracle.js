@@ -33,7 +33,7 @@ describe('Oracle', function () {
   before(async function () {
     aeSdk = await getSdk()
     await aeSdk.spend(1e20, account.publicKey)
-    aeSdk.addAccount(MemoryAccount({ keypair: account }), { select: true })
+    aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true })
   })
 
   it('Register Oracle with 5000 TTL', async () => {
@@ -92,7 +92,7 @@ describe('Oracle', function () {
 
     before(async function () {
       await aeSdk.spend(1e15, account.publicKey)
-      aeSdk.addAccount(MemoryAccount({ keypair: account }), { select: true })
+      aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true })
       oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee, onAccount: account })
     })
 

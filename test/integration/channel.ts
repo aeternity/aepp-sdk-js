@@ -92,7 +92,9 @@ describe('Channel', function () {
   before(async function () {
     aeSdkInitiatior = await getSdk()
     aeSdkResponder = await BaseAe({ networkId, accounts: [] })
-    await aeSdkResponder.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
+    await aeSdkResponder.addAccount(
+      new MemoryAccount({ keypair: generateKeyPair() }), { select: true }
+    )
     sharedParams.initiatorId = await aeSdkInitiatior.address()
     sharedParams.responderId = await aeSdkResponder.address()
     await aeSdkInitiatior.spend(new BigNumber('500e18').toString(), await aeSdkResponder.address())

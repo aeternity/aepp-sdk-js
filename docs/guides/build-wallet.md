@@ -48,8 +48,8 @@ import browser from 'webextension-polyfill'
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
 const accounts = [
-  MemoryAccount({ keypair: generateKeyPair() }), // generate keypair for account1
-  MemoryAccount({ keypair: generateKeyPair() })  // generate keypair for account2
+  new MemoryAccount({ keypair: generateKeyPair() }), // generate keypair for account1
+  new MemoryAccount({ keypair: generateKeyPair() })  // generate keypair for account2
 ]
 const aeppInfo = {}
 
@@ -123,8 +123,8 @@ AEPP can request the wallet for its connected node URLs. Wallet can selectively 
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
 const accounts = [
-  MemoryAccount({ keypair: generateKeyPair() }), // generate keypair for account1
-  MemoryAccount({ keypair: generateKeyPair() })  // generate keypair for account2
+  new MemoryAccount({ keypair: generateKeyPair() }), // generate keypair for account1
+  new MemoryAccount({ keypair: generateKeyPair() })  // generate keypair for account2
 ]
 
 async function init () {

@@ -53,7 +53,7 @@ import Node from '../node'
 import {
   getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun
 } from '../chain'
-import { _AccountBase } from '../account/base'
+import AccountBase from '../account/base'
 
 interface FunctionACI {
   arguments: any[]
@@ -159,7 +159,7 @@ export default async function getContractInstance ({
   validateBytecode,
   ...otherOptions
 }: {
-  onAccount: _AccountBase
+  onAccount: AccountBase
   onCompiler: Compiler
   onNode: Node
   source?: string
@@ -301,7 +301,7 @@ export default async function getContractInstance ({
     options:
     Parameters<typeof instance.compile>[0] &
     Parameters<typeof instance.call>[2] &
-    Parameters<_AccountBase['address']>[0] &
+    Parameters<AccountBase['address']>[0] &
     Parameters<typeof sendAndProcess>[1]
   ): Promise<ContractInstance['deployInfo']> => {
     const opt = { ...instance.options, ...options }

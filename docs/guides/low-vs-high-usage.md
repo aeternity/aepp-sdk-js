@@ -26,7 +26,7 @@ async function init () {
   const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler!
-    accounts: [MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}})],
+    accounts: [new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}})],
   })
 
   // log transaction info
@@ -44,7 +44,7 @@ async function spend (amount, recipient) {
   const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler!
-    accounts: [MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}})],
+    accounts: [new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}})],
   })
 
   // builds an unsigned SpendTx using the debug endpoint of the node's API

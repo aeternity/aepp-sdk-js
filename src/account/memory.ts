@@ -22,13 +22,12 @@
  * @example import { MemoryAccount } from '@aeternity/aepp-sdk'
  */
 
-import AccountBase, { _AccountBase } from './base'
+import AccountBase from './base'
 import { sign, isValidKeypair } from '../utils/crypto'
 import { isHex } from '../utils/string'
 import { decode } from '../tx/builder/helpers'
 import { InvalidKeypairError, MissingParamError } from '../utils/errors'
 import { EncodedData } from '../utils/encoder'
-import type stampit from '@stamp/it' // eslint-disable-line @typescript-eslint/no-unused-vars
 
 const secrets = new WeakMap()
 
@@ -37,13 +36,21 @@ export interface Keypair {
   secretKey: string | Uint8Array
 }
 
-class _AccountMemory extends _AccountBase {
+/**
+ * In-memory account stamp
+ * @alias module:@aeternity/aepp-sdk/es/account/memory
+ * @param options
+ * @param options.keypair - Key pair to use
+ * @param options.keypair.publicKey - Public key
+ * @param options.keypair.secretKey - Private key
+ */
+export default class AccountMemory extends AccountBase {
   isGa: boolean
 
-  init (
-    { keypair, gaId, ...options }: { keypair?: Keypair, gaId?: EncodedData<'ak'> } & Parameters<_AccountBase['init']>[0]
-  ): void {
-    super.init(options)
+  constructor (
+    { keypair, gaId, ...options }: { keypair?: Keypair, gaId?: EncodedData<'ak'> } & ConstructorParameters<typeof AccountBase>[0]
+  ) {
+    super(options)
 
     this.isGa = gaId != null
     if (this.isGa && gaId != null) {
@@ -80,23 +87,3 @@ class _AccountMemory extends _AccountBase {
     return secrets.get(this).publicKey
   }
 }
-
-/**
- * In-memory account stamp
- * @function
- * @alias module:@aeternity/aepp-sdk/es/account/memory
- * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @param {Object} options.keypair - Key pair to use
- * @param {String} options.keypair.publicKey - Public key
- * @param {String} options.keypair.secretKey - Private key
- * @return {_AccountMemory}
- */
-export default AccountBase.compose<_AccountMemory>({
-  init: _AccountMemory.prototype.init,
-  props: { isGa: false },
-  methods: {
-    sign: _AccountMemory.prototype.sign,
-    address: _AccountMemory.prototype.address
-  }
-})

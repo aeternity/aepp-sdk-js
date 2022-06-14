@@ -38,7 +38,7 @@ import Node from '../node'
 import { EncodedData } from '../utils/encoder'
 import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
 import { isKeyOfObject } from '../utils/other'
-import { _AccountBase } from '../account/base'
+import AccountBase from '../account/base'
 
 // uses a new feature, probably typescript-eslint doesn't support it yet
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -48,7 +48,7 @@ export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
 // TODO: find a better name or rearrange methods
 export async function _buildTx<TxType extends TX_TYPE> (
   txType: TxType,
-  { onAccount, ..._params }: TxTypeSchemas[TxType] & { onNode: Node, onAccount: _AccountBase }
+  { onAccount, ..._params }: TxTypeSchemas[TxType] & { onNode: Node, onAccount: AccountBase }
 ): Promise<EncodedData<'tx'>> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node }

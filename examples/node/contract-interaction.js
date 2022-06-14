@@ -65,7 +65,7 @@ const COMPILER_URL = 'https://compiler.aepps.com';
 // Therefore you need to put the logic into an `async` code block
 (async () => {
   // ## 4. Create object instances
-  const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
+  const account = new MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
   const node = new Node(NODE_URL)
   const aeSdk = await Universal({
     nodes: [{ name: 'testnet', instance: node }],

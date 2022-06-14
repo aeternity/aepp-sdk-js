@@ -7,24 +7,22 @@
  * import AeppRpc
  * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
-import AccountResolver, { _AccountResolver, Account } from '../../../account/resolver'
-import { _AccountBase } from '../../../account/base'
-import AccountRpc from '../../../account/rpc'
-import { decode, EncodedData } from '../../encoder'
-import { Accounts, WalletInfo, Network, WalletApi, AeppApi, RPC_VERSION } from './types'
-import RpcClient from './RpcClient'
-import { METHODS, SUBSCRIPTION_TYPES } from '../schema'
+import AeSdkBase, { Account } from './AeSdkBase'
+import AccountBase from './account/base'
+import AccountRpc from './account/rpc'
+import { decode, EncodedData } from './utils/encoder'
+import { Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi } from './utils/aepp-wallet-communication/rpc/types'
+import RpcClient from './utils/aepp-wallet-communication/rpc/RpcClient'
+import { METHODS, SUBSCRIPTION_TYPES } from './utils/aepp-wallet-communication/schema'
 import {
   AlreadyConnectedError,
   NoWalletConnectedError,
   UnsubscribedAccountError,
   UnAuthorizedAccountError,
   RpcConnectionError
-} from '../../errors'
-import Node from '../../../node'
-import BrowserConnection from '../connection/Browser'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import stampit from '@stamp/it'
+} from './utils/errors'
+import Node from './node'
+import BrowserConnection from './utils/aepp-wallet-communication/connection/Browser'
 
 /**
  * RPC handler for AEPP side
@@ -35,7 +33,7 @@ import stampit from '@stamp/it'
  * @param param.onDisconnect Call-back function for disconnect event
  * @param param.onNetworkChange Call-back function for update network event
  */
-abstract class _AeppRpc extends _AccountResolver {
+export default class AeSdkAepp extends AeSdkBase {
   name: string
   onAddressChange: (a: Accounts) => void
   onDisconnect: (p: any) => void
@@ -43,7 +41,7 @@ abstract class _AeppRpc extends _AccountResolver {
   rpcClient?: RpcClient<WalletApi, AeppApi>
   _accounts?: Accounts
 
-  init ({
+  constructor ({
     name,
     onAddressChange = () => {},
     onDisconnect = () => {},
@@ -54,20 +52,20 @@ abstract class _AeppRpc extends _AccountResolver {
     onAddressChange: (a: Accounts) => void
     onDisconnect: (p: any) => void
     onNetworkChange: (a: Network) => void
-  } & Parameters<_AccountResolver['init']>[0]): void {
-    super.init(other)
+  } & ConstructorParameters<typeof AeSdkBase>[0]) {
+    super(other)
     this.onAddressChange = onAddressChange
     this.onDisconnect = onDisconnect
     this.onNetworkChange = onNetworkChange
     this.name = name
   }
 
-  _resolveAccount (account: Account = this.addresses()[0]): _AccountBase {
+  _resolveAccount (account: Account = this.addresses()[0]): AccountBase {
     if (typeof account === 'string') {
       const address = account as EncodedData<'ak'>
       decode(address)
       if (!this.addresses().includes(address)) throw new UnAuthorizedAccountError(address)
-      account = AccountRpc({ rpcClient: this.rpcClient, address })
+      account = new AccountRpc({ rpcClient: this.rpcClient, address })
     }
     if (account == null) this._ensureAccountAccess()
     return super._resolveAccount(account)
@@ -80,8 +78,6 @@ abstract class _AeppRpc extends _AccountResolver {
       ...current != null ? [current] : [], ...Object.keys(this._accounts.connected)
     ] as Array<EncodedData<'ak'>>
   }
-
-  abstract addNode (name: string, node: any, select: boolean): void
 
   /**
    * Connect to wallet
@@ -165,28 +161,14 @@ abstract class _AeppRpc extends _AccountResolver {
     return result
   }
 
-  _ensureConnected (): asserts this is _AeppRpc & { rpcClient: NonNullable<_AeppRpc['rpcClient']> } {
+  _ensureConnected (): asserts this is AeSdkAepp & { rpcClient: NonNullable<AeSdkAepp['rpcClient']> } {
     if (this.rpcClient != null) return
     throw new NoWalletConnectedError('You are not connected to Wallet')
   }
 
-  _ensureAccountAccess (): asserts this is _AeppRpc & { rpcClient: NonNullable<_AeppRpc['rpcClient']> } {
+  _ensureAccountAccess (): asserts this is AeSdkAepp & { rpcClient: NonNullable<AeSdkAepp['rpcClient']> } {
     this._ensureConnected()
     if (this.addresses().length !== 0) return
     throw new UnsubscribedAccountError()
   }
 }
-
-export default AccountResolver.compose<_AeppRpc>({
-  init: _AeppRpc.prototype.init,
-  methods: {
-    _resolveAccount: _AeppRpc.prototype._resolveAccount,
-    addresses: _AeppRpc.prototype.addresses,
-    connectToWallet: _AeppRpc.prototype.connectToWallet,
-    disconnectWallet: _AeppRpc.prototype.disconnectWallet,
-    askAddresses: _AeppRpc.prototype.askAddresses,
-    subscribeAddress: _AeppRpc.prototype.subscribeAddress,
-    _ensureConnected: _AeppRpc.prototype._ensureConnected,
-    _ensureAccountAccess: _AeppRpc.prototype._ensureAccountAccess
-  }
-})

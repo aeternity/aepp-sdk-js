@@ -7,25 +7,27 @@
  * import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
  */
 import { v4 as uuid } from '@aeternity/uuid'
-import Ae from '../../../ae'
-import verifyTransaction from '../../../tx/validator'
-import AccountMultiple, { _AccountMultiple } from '../../../account/multiple'
-import RpcClient from './RpcClient'
+import AeSdk from './AeSdk'
+import { Account } from './AeSdkBase'
+import verifyTransaction from './tx/validator'
+import RpcClient from './utils/aepp-wallet-communication/rpc/RpcClient'
 import {
   METHODS, RPC_STATUS, SUBSCRIPTION_TYPES, WALLET_TYPE,
   RpcBroadcastError, RpcInvalidTransactionError,
   RpcNotAuthorizeError, RpcPermissionDenyError, RpcUnsupportedProtocolError
-} from '../schema'
-import { UnknownRpcClientError } from '../../errors'
-import { _AccountBase } from '../../../account/base'
-import { Account } from '../../../account/resolver'
-import NodePool, { _NodePool } from '../../../node-pool'
-import BrowserConnection from '../connection/Browser'
-import { Accounts, Network, AeppApi, WalletApi, WalletInfo, RPC_VERSION } from './types'
-import { EncodedData } from '../../encoder'
-import Node from '../../../node'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import stampit from '@stamp/it'
+} from './utils/aepp-wallet-communication/schema'
+import { UnknownRpcClientError } from './utils/errors'
+import AccountBase from './account/base'
+import BrowserConnection from './utils/aepp-wallet-communication/connection/Browser'
+import {
+  Accounts,
+  AeppApi,
+  Network,
+  RPC_VERSION,
+  WalletApi,
+  WalletInfo
+} from './utils/aepp-wallet-communication/rpc/types'
+import { EncodedData } from './utils/encoder'
 
 type RpcClientWallet = RpcClient<AeppApi, WalletApi>
 
@@ -61,8 +63,6 @@ interface RpcClientsInfo {
   rpc: RpcClientWallet
 }
 
-const nodePool = new _NodePool()
-
 /**
  * Contain functionality for aepp interaction and managing multiple aepps
  * @param param Init params object
@@ -75,7 +75,7 @@ const nodePool = new _NodePool()
  * Second argument of incoming call-backs contain function for accept/deny request
  * @param onDisconnect Call-back function for disconnect event
  */
-abstract class _WalletRpc extends _AccountMultiple {
+export default class AeSdkWallet extends AeSdk {
   id: string
   _type: WALLET_TYPE
   name: string
@@ -87,11 +87,7 @@ abstract class _WalletRpc extends _AccountMultiple {
   onAskAccounts: OnAskAccounts
   onMessageSign: OnMessageSign
 
-  get api (): Node { return null as unknown as Node }
-  get selectedNodeName (): string { return '' }
-  abstract send (tx: EncodedData<'tx'>, options: any): EncodedData<'th'>
-
-  async init ({
+  constructor ({
     name,
     id,
     type,
@@ -112,8 +108,8 @@ abstract class _WalletRpc extends _AccountMultiple {
     onDisconnect: OnDisconnect
     onAskAccounts: OnAskAccounts
     onMessageSign: OnMessageSign
-  } & Parameters<_AccountMultiple['init']>[0]): Promise<void> {
-    await super.init(options)
+  } & ConstructorParameters<typeof AeSdk>[0]) {
+    super(options)
     this.onConnection = onConnection
     this.onSubscription = onSubscription
     this.onSign = onSign
@@ -139,19 +135,20 @@ abstract class _WalletRpc extends _AccountMultiple {
   }
 
   async addAccount (
-    account: _AccountBase,
-    options: Parameters<_AccountMultiple['addAccount']>[1]
+    account: AccountBase,
+    options: Parameters<AeSdk['addAccount']>[1]
   ): Promise<void> {
     await super.addAccount(account, options)
     this._pushAccountsToApps()
   }
 
   _getNode (): { node: Network['node'] } {
+    this.ensureNodeConnected()
     return { node: { url: this.api.url, name: this.selectedNodeName } }
   }
 
   async selectNode (name: string): Promise<void> {
-    nodePool.selectNode.call(this, name)
+    super.selectNode(name)
     const networkId = await this.getNetworkId()
     Array.from(this._clients.keys())
       .filter(clientId => this._isRpcClientConnected(clientId))
@@ -272,7 +269,7 @@ abstract class _WalletRpc extends _AccountMultiple {
               return { signedTransaction: await this.signTransaction(tx, { onAccount }) }
             }
             try {
-              return { transactionHash: await this.send(tx, { onAccount, verify: false }) }
+              return { transactionHash: (await this.send(tx, { onAccount, verify: false })).hash }
             } catch (error) {
               const validation = await verifyTransaction(tx, this.api)
               if (validation.length > 0) throw new RpcInvalidTransactionError(validation)
@@ -335,24 +332,3 @@ abstract class _WalletRpc extends _AccountMultiple {
     }
   }
 }
-
-export default Ae.compose(AccountMultiple, NodePool, {
-  init: _WalletRpc.prototype.init,
-  props: { _clients: new Map() },
-  methods: {
-    _disconnectRpcClient: _WalletRpc.prototype._disconnectRpcClient,
-    _isRpcClientSubscribed: _WalletRpc.prototype._isRpcClientSubscribed,
-    _isRpcClientConnected: _WalletRpc.prototype._isRpcClientConnected,
-    _getClient: _WalletRpc.prototype._getClient,
-    _pushAccountsToApps: _WalletRpc.prototype._pushAccountsToApps,
-    removeRpcClient: _WalletRpc.prototype.removeRpcClient,
-    addRpcClient: _WalletRpc.prototype.addRpcClient,
-    shareWalletInfo: _WalletRpc.prototype.shareWalletInfo,
-    getWalletInfo: _WalletRpc.prototype.getWalletInfo,
-    getAccounts: _WalletRpc.prototype.getAccounts,
-    selectAccount: _WalletRpc.prototype.selectAccount,
-    addAccount: _WalletRpc.prototype.addAccount,
-    _getNode: _WalletRpc.prototype._getNode,
-    selectNode: _WalletRpc.prototype.selectNode
-  }
-})

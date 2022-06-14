@@ -37,7 +37,7 @@ import {
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx
 } from './apis/node'
 import { EncodedData } from './utils/encoder'
-import { _AccountBase } from './account/base'
+import AccountBase from './account/base'
 
 export function _getPollInterval (
   type: 'block' | 'microblock',
@@ -69,7 +69,7 @@ export async function sendTransaction (
   { onNode, onAccount, verify = true, waitMined = true, confirm, ...options }:
   {
     onNode: Node
-    onAccount?: _AccountBase
+    onAccount?: AccountBase
     verify?: boolean
     waitMined?: boolean
     confirm?: boolean | number
@@ -211,7 +211,7 @@ export async function height ({ onNode }: { onNode: Node }): Promise<number> {
 export async function awaitHeight (
   height: number,
   { interval, attempts = 20, onNode, ...options }:
-  { interval: number, attempts: number, onNode: Node }
+  { interval?: number, attempts?: number, onNode: Node }
   & Parameters<typeof _getPollInterval>[1]
 ): Promise<number> {
   interval ??= _getPollInterval('block', options)
@@ -236,7 +236,7 @@ export async function awaitHeight (
 export async function poll (
   th: EncodedData<'th'>,
   { blocks = 10, interval, onNode, ...options }:
-  { blocks: number, interval: number, onNode: Node } & Parameters<typeof _getPollInterval>[1]
+  { blocks?: number, interval?: number, onNode: Node } & Parameters<typeof _getPollInterval>[1]
 ): Promise<TransformNodeType<SignedTx>> {
   interval ??= _getPollInterval('microblock', options)
   const max = await height({ onNode }) + blocks

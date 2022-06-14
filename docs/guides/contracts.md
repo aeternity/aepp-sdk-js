@@ -27,7 +27,7 @@ When creating an instance of the SDK you need to provide an account which will b
 
 ```js
 const node = new Node('https://testnet.aeternity.io') // ideally host your own node
-const account = MemoryAccount({
+const account = new MemoryAccount({
   // provide a valid keypair with your secretKey and publicKey
   keypair: { secretKey: SECRET_KEY, publicKey: PUBLIC_KEY }
 })

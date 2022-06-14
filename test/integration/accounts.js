@@ -46,7 +46,7 @@ describe('Accounts', function () {
 
     before(async function () {
       wallet = await getSdk()
-      await wallet.addAccount(MemoryAccount({ keypair: generateKeyPair() }), { select: true })
+      await wallet.addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: true })
     })
 
     it('determining the balance', async () => {
@@ -185,7 +185,7 @@ describe('Accounts', function () {
     })
     it('Make operation on account using keyPair/MemoryAccount', async () => {
       const keypair = generateKeyPair()
-      const memoryAccount = MemoryAccount({ keypair })
+      const memoryAccount = new MemoryAccount({ keypair })
       const data = 'Hello'
       const signature = await memoryAccount.sign(data)
       const sigUsingKeypair = await aeSdk.sign(data, { onAccount: keypair })

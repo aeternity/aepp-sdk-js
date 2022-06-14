@@ -26,7 +26,7 @@ import { hash } from '../utils/crypto'
 import { decode, EncodedData } from '../utils/encoder'
 import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '../utils/errors'
 import { concatBuffers } from '../utils/other'
-import { _AccountBase } from '../account/base'
+import AccountBase from '../account/base'
 import { getContractInstance } from '../ae/contract'
 import { send } from '../ae/spend'
 import Node from '../node'
@@ -59,7 +59,7 @@ export async function createGeneralizedAccount (
   source: string,
   args: any[],
   { onAccount, onCompiler, onNode, ...options }:
-  { onAccount: _AccountBase, onCompiler: Compiler, onNode: Node }
+  { onAccount: AccountBase, onCompiler: Compiler, onNode: Node }
   & BuildTxOptions<TX_TYPE.gaAttach, 'authFun' | 'callData' | 'code' | 'ownerId'>
   & Parameters<typeof send>[1]
 ): Promise<Readonly<{
@@ -113,8 +113,8 @@ export async function createMetaTx (
   },
   authFnName: string,
   { onAccount, onCompiler, onNode, ...options }:
-  { onAccount: _AccountBase, onCompiler: Compiler, onNode: Node }
-  & Parameters<_AccountBase['address']>[0]
+  { onAccount: AccountBase, onCompiler: Compiler, onNode: Node }
+  & Parameters<AccountBase['address']>[0]
 ): Promise<EncodedData<'tx'>> {
   const wrapInEmptySignedTx = (
     tx: EncodedData<'tx'> | Uint8Array | TxUnpacked<TxSchema>

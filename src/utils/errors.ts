@@ -621,16 +621,6 @@ export class UnknownPathNibbleError extends CryptographyError {
 /**
  * @category exception
  */
-export class DisconnectedError extends NodeError {
-  constructor () {
-    super('Can not get node info. Node is not connected')
-    this.name = 'DisconnectedError'
-  }
-}
-
-/**
- * @category exception
- */
 export class DuplicateNodeError extends NodeError {
   constructor (name: string) {
     super(`Node with name ${name} already exist`)
