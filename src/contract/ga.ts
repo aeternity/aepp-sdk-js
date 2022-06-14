@@ -21,12 +21,14 @@
 
 import { TX_TYPE, MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema'
 import { buildContractIdByContractTx, buildTx, BuiltTx, TxUnpacked, unpackTx } from '../tx/builder'
+import { _buildTx, BuildTxOptions, getVmVersion, prepareTxParams } from '../tx'
 import { hash } from '../utils/crypto'
 import { decode, EncodedData } from '../utils/encoder'
 import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '../utils/errors'
 import { concatBuffers } from '../utils/other'
 import { _AccountBase } from '../account/base'
 import { getContractInstance } from '../ae/contract'
+import { send } from '../ae/spend'
 import Node from '../node'
 import { getAccount } from '../chain'
 import Compiler from './compiler'
@@ -57,35 +59,32 @@ export async function createGeneralizedAccount (
   source: string,
   args: any[],
   { onAccount, onCompiler, onNode, ...options }:
-  {
-    onAccount: _AccountBase & { send: any, buildTx: any, Ae: any }
-    onCompiler: Compiler
-    onNode: Node
-  }
-  & Parameters<_AccountBase['address']>[0] & Parameters<typeof buildTx>[2]
+  { onAccount: _AccountBase, onCompiler: Compiler, onNode: Node }
+  & BuildTxOptions<TX_TYPE.gaAttach, 'authFun' | 'callData' | 'code' | 'ownerId'>
+  & Parameters<typeof send>[1]
 ): Promise<Readonly<{
     owner: EncodedData<'ak'>
     transaction: EncodedData<'th'>
     rawTx: EncodedData<'tx'>
     gaContractId: EncodedData<'ct'>
   }>> {
-  const opt = { ...onAccount.Ae.defaults, ...options }
-  const ownerId = await onAccount.address(opt)
+  const ownerId = await onAccount.address(options)
   if (await isGA(ownerId, { onNode })) throw new IllegalArgumentError(`Account ${ownerId} is already GA`)
 
   const contract = await getContractInstance({ onAccount, onCompiler, onNode, source })
 
-  await contract.compile()
-  const tx = await onAccount.buildTx(TX_TYPE.gaAttach, {
-    ...opt,
-    gasLimit: opt.gasLimit ?? await contract._estimateGas('init', args, opt),
+  const tx = await _buildTx(TX_TYPE.gaAttach, {
+    ...options,
+    onNode,
+    onAccount,
+    code: await contract.compile(),
+    gasLimit: options.gasLimit ?? await contract._estimateGas('init', args, options),
     ownerId,
-    code: contract.bytecode,
     callData: contract.calldata.encode(contract._name, 'init', args),
     authFun: hash(authFnName)
   })
   const contractId = buildContractIdByContractTx(tx)
-  const { hash: transaction, rawTx } = await onAccount.send(tx, opt)
+  const { hash: transaction, rawTx } = await send(tx, { onNode, onAccount, onCompiler, ...options })
 
   return Object.freeze({
     owner: ownerId,
@@ -114,7 +113,7 @@ export async function createMetaTx (
   },
   authFnName: string,
   { onAccount, onCompiler, onNode, ...options }:
-  { onAccount: any, onCompiler: Compiler, onNode: Node }
+  { onAccount: _AccountBase, onCompiler: Compiler, onNode: Node }
   & Parameters<_AccountBase['address']>[0]
 ): Promise<EncodedData<'tx'>> {
   const wrapInEmptySignedTx = (
@@ -136,27 +135,23 @@ export async function createMetaTx (
     return contract.calldata.encode(contract._name, authFnName, authData.args)
   })()
 
-  const opt = { ...onAccount.Ae.defaults, ...options }
-  const { abiVersion } = await onAccount.getVmVersion(TX_TYPE.contractCall)
+  const { abiVersion } = await getVmVersion(TX_TYPE.contractCall, { onNode })
   const wrappedTx = wrapInEmptySignedTx(unpackTx<TX_TYPE.signed>(rawTransaction))
   const params = {
-    ...opt,
+    ...options,
     tx: {
       ...wrappedTx,
       tx: wrappedTx.txObject
     },
-    gaId: await onAccount.address(opt),
+    gaId: await onAccount.address(options),
     abiVersion,
     authData: authCallData,
     gasLimit,
     vsn: 2
   }
-  const { fee }: { fee: number | string } = await onAccount.prepareTxParams(TX_TYPE.gaMeta, params)
-  const { rlpEncoded: metaTxRlp } = buildTx(
-    { ...params, fee: `${fee}` },
-    TX_TYPE.gaMeta,
-    { vsn: 2 }
-  )
+  // @ts-expect-error createMetaTx needs to be integrated into tx builder
+  const { fee } = await prepareTxParams(TX_TYPE.gaMeta, { ...params, onNode })
+  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee }, TX_TYPE.gaMeta, { vsn: 2 })
   return wrapInEmptySignedTx(metaTxRlp).tx
 }
 

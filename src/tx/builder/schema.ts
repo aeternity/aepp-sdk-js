@@ -187,7 +187,7 @@ interface BuildFieldTypes<Prefix extends undefined | EncodingType | readonly Enc
   [FIELD_TYPES.hex]: string
   [FIELD_TYPES.rlpBinary]: any
   [FIELD_TYPES.rlpBinaries]: any[]
-  [FIELD_TYPES.rawBinary]: string
+  [FIELD_TYPES.rawBinary]: Uint8Array
   [FIELD_TYPES.signatures]: Uint8Array[]
   [FIELD_TYPES.pointers]: Pointer[]
   [FIELD_TYPES.offChainUpdates]: any
