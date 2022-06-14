@@ -151,7 +151,7 @@ version: ^3.6.1
 use-extension:
   '@autorest/typescript': ^6.0.0-beta.18
   '@autorest/modelerfour': ^4.23.1
-input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.4.0/apps/aehttp/priv/oas3.yaml
+input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.5.1/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
 client-side-validation: true
