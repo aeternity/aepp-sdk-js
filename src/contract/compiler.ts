@@ -19,7 +19,6 @@
  * Compiler module
  *
  * @module @aeternity/aepp-sdk/es/contract/compiler
- * @example import { Compiler } from '@aeternity/aepp-sdk'
  */
 
 import { Compiler as CompilerApi, ErrorModel, CompilerError } from '../apis/compiler'

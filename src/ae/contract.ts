@@ -22,7 +22,6 @@
  * https://github.com/aeternity/protocol/tree/master/contracts and
  *
  * @module @aeternity/aepp-sdk/es/ae/contract
- * @example import { Contract } from '@aeternity/aepp-sdk'
  */
 
 import { decode, produceNameId } from '../tx/builder/helpers'

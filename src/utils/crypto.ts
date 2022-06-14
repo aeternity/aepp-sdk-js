@@ -18,7 +18,6 @@
 /**
  * Crypto module
  * @module @aeternity/aepp-sdk/es/utils/crypto
- * @example import { getAddressFromPriv } from '@aeternity/aepp-sdk'
  */
 
 import nacl, { SignKeyPair } from 'tweetnacl'

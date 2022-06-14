@@ -18,7 +18,6 @@
 /**
  * Ae module
  * @module @aeternity/aepp-sdk/es/ae
- * @example import { Ae } from '@aeternity/aepp-sdk'
  */
 import { sendTransaction, getAccount, getBalance, resolveName, AensName } from '../chain'
 import { _buildTx, BuildTxOptions } from '../tx'

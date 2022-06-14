@@ -39,7 +39,6 @@ import { isKeyOfObject } from '../../utils/other'
 /**
  * JavaScript-based Transaction builder
  * @module @aeternity/aepp-sdk/es/tx/builder
- * @example import { calculateFee } from '@aeternity/aepp-sdk'
  */
 
 // SERIALIZE AND DESERIALIZE PART

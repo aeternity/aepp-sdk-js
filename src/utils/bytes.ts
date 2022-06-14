@@ -21,7 +21,6 @@ import { isBase64, isHex } from './string'
 /**
  * Bytes module
  * @module @aeternity/aepp-sdk/es/utils/bytes
- * @example import { bigNumberToByteArray } from '@aeternity/aepp-sdk'
  */
 
 /**

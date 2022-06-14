@@ -18,7 +18,6 @@
 /**
  * Chain module
  * @module @aeternity/aepp-sdk/es/chain
- * @example import { Chain } from '@aeternity/aepp-sdk'
  */
 
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter'

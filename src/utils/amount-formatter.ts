@@ -18,7 +18,6 @@
 /**
  * Amount Formatter
  * @module @aeternity/aepp-sdk/es/utils/amount-formatter
- * @example import { formatAmount } from '@aeternity/aepp-sdk'
  */
 import BigNumber from 'bignumber.js'
 import { isBigNumber } from './bignumber'

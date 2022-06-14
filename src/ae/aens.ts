@@ -22,7 +22,6 @@
  * https://github.com/aeternity/protocol/blob/master/AENS.md in the protocol
  * repository.
  * @module @aeternity/aepp-sdk/es/ae/aens
- * @example import * as aensMethods from '@aeternity/aepp-sdk'
  */
 
 import { salt } from '../utils/crypto'

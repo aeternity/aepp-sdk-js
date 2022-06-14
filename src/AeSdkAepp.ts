@@ -2,9 +2,6 @@
  * RPC handler for AEPP side
  *
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc
- * @example
- * import AeppRpc
- * from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/aepp-rpc'
  */
 import AeSdkBase, { Account } from './AeSdkBase'
 import AccountBase from './account/base'

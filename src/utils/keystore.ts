@@ -8,8 +8,6 @@ import { InvalidPasswordError } from './errors'
 /**
  * KeyStore module
  * @module @aeternity/aepp-sdk/es/utils/keystore
- * @example import { recover } from '@aeternity/aepp-sdk'
- * @example const { recover } = require('@aeternity/aepp-sdk')
  */
 
 const DERIVED_KEY_FUNCTIONS = {

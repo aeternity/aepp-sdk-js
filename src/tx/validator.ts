@@ -13,7 +13,6 @@ import Node from '../node'
 /**
  * Transaction validator
  * @module @aeternity/aepp-sdk/es/tx/validator
- * @example import { verifyTransaction } from '@aeternity/aepp-sdk'
  */
 
 interface Account {

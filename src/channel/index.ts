@@ -18,7 +18,6 @@
 /**
  * Channel module
  * @module @aeternity/aepp-sdk/es/channel/index
- * @example import { Channel } from '@aeternity/aepp-sdk'
  */
 
 import BigNumber from 'bignumber.js'

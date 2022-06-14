@@ -1,7 +1,6 @@
 /**
  * Big Number Helpers
  * @module @aeternity/aepp-sdk/es/utils/bignumber
- * @example import { isBigNumber, ceil } from '@aeternity/aepp-sdk/es/utils/bignumber'
  */
 import BigNumber from 'bignumber.js'
 

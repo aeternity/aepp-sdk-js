@@ -24,7 +24,6 @@ import { AensName } from '../../chain'
 /**
  * JavaScript-based Transaction builder helper function's
  * @module @aeternity/aepp-sdk/es/tx/builder/helpers
- * @example import { buildContractId } from '@aeternity/aepp-sdk'
  */
 
 export const createSalt = salt
