@@ -46,13 +46,6 @@ export default stampit(NodePool, AccountResolver, {
     setCompilerUrl (compilerUrl: string, { ignoreVersion = false } = {}): void {
       this.compilerApi = new Compiler(compilerUrl, { ignoreVersion })
     },
-    /**
-     * Remove all listeners for RPC
-     */
-    destroyInstance (): void {
-      const destroyMethods = ['destroyClient', 'destroyServer']
-      destroyMethods.forEach((m) => typeof this[m] === 'function' && this[m]())
-    },
     ...mapObject<Function, Function>(
       {
         ...spendMethods,
