@@ -26,6 +26,8 @@
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { DRY_RUN_ACCOUNT, GAS_MAX, TX_TYPE, AMOUNT } from '../tx/builder/schema'
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder'
+import { _buildTx } from '../tx'
+import { send } from '../ae/spend'
 import { decode, EncodedData, EncodingType } from '../utils/encoder'
 import {
   MissingContractDefError,
@@ -90,30 +92,14 @@ interface DecodedEvent {
   }
 }
 
-interface TxData {
-  blockHash: string
-  blockHeight: number
-  hash: string
-  signatures: any[]
-  tx: object[]
-  rawTx: string
-  callerId: string
-  callerNonce: number
-  contractId: string
-  gasPrice: number
-  gasUsed: number
-  height: number
-  log: any[]
-  returnType: ReturnType
-  returnValue: EncodedData<EncodingType>
-}
+type TxData = Awaited<ReturnType<typeof send>>
 
 export interface ContractInstance {
   _aci: Aci
   _name: string
   calldata: any
   source?: string
-  bytecode?: string
+  bytecode?: EncodedData<'cb'>
   deployInfo: {
     address?: EncodedData<'ct'>
     result?: {
@@ -133,7 +119,7 @@ export interface ContractInstance {
     txData?: TxData
   }
   options: any
-  compile: (options?: {}) => Promise<string>
+  compile: (options?: {}) => Promise<EncodedData<'cb'>>
   _estimateGas: (name: string, params: any[], options: object) => Promise<number>
   deploy: (params: any[], options: object) => Promise<any>
   call: (fn: string, params?: any[], options?: {}) => Promise<any>
@@ -142,7 +128,7 @@ export interface ContractInstance {
   methods: any
 }
 
-type ReturnType = 'ok' | 'error' | 'revert'
+type ContractCallReturnType = 'ok' | 'error' | 'revert'
 
 /**
 * Generate contract ACI object with predefined js methods for contract usage - can be used for
@@ -173,7 +159,7 @@ export default async function getContractInstance ({
   validateBytecode,
   ...otherOptions
 }: {
-  onAccount: _AccountBase & { send: any, buildTx: any, Ae: any }
+  onAccount: _AccountBase
   onCompiler: Compiler
   onNode: Node
   source?: string
@@ -189,7 +175,11 @@ export default async function getContractInstance ({
   }
   if (_aci == null) throw new MissingContractDefError()
 
-  if (contractAddress != null) contractAddress = await resolveName(contractAddress, 'contract_pubkey', { resolveByNode: true, onNode }) as EncodedData<'ct'>
+  if (contractAddress != null) {
+    contractAddress = await resolveName(
+      contractAddress, 'contract_pubkey', { resolveByNode: true, onNode }
+    ) as EncodedData<'ct'>
+  }
 
   if (contractAddress == null && source == null && bytecode == null) {
     throw new MissingContractAddressError('Can\'t create instance by ACI without address')
@@ -208,7 +198,9 @@ export default async function getContractInstance ({
     bytecode,
     deployInfo: { address: contractAddress },
     options: {
-      ...onAccount.Ae.defaults,
+      onAccount,
+      onCompiler,
+      onNode,
       amount: AMOUNT,
       callStatic: false,
       fileSystem,
@@ -241,26 +233,29 @@ export default async function getContractInstance ({
   * @alias module:@aeternity/aepp-sdk/es/contract/aci
   * @return bytecode
   */
-  instance.compile = async (options = {}): Promise<string> => {
+  instance.compile = async (options = {}): Promise<EncodedData<'cb'>> => {
     if (instance.bytecode != null) throw new IllegalArgumentError('Contract already compiled')
     if (instance.source == null) throw new IllegalArgumentError('Can\'t compile without source code')
-    const { bytecode }: { bytecode: EncodedData<'cb'> } = await onCompiler.compileContract({
+    instance.bytecode = (await onCompiler.compileContract({
       code: instance.source, options: { ...instance.options, ...options }
-    }) as { bytecode: EncodedData<'cb'> }
-    instance.bytecode = bytecode
+    })).bytecode as EncodedData<'cb'>
     return instance.bytecode
   }
 
   const sendAndProcess = async (tx: EncodedData<'tx'>, options: any): Promise<{
     result?: ContractInstance['deployInfo']['result']
-    hash: EncodedData<'th'>
-    tx: object
+    hash: TxData['hash']
+    tx: Awaited<ReturnType<typeof unpackTx<TX_TYPE.contractCall | TX_TYPE.contractCreate>>>
     txData: TxData
     rawTx: EncodedData<'tx'>
   }> => {
-    const txData = await onAccount.send(tx, options) // TODO onAccount shouldn't have .send method
+    options = { ...instance.options, ...options }
+    const txData = await send(tx, options)
     const result = {
-      hash: txData.hash, tx: unpackTx(txData.rawTx), txData, rawTx: txData.rawTx
+      hash: txData.hash,
+      tx: unpackTx<TX_TYPE.contractCall | TX_TYPE.contractCreate>(txData.rawTx),
+      txData,
+      rawTx: txData.rawTx
     }
     if (txData.blockHeight == null) return result
     const { callInfo } = await onNode.getTransactionInfoByHash(txData.hash)
@@ -271,7 +266,7 @@ export default async function getContractInstance ({
   }
   const handleCallError = (
     { returnType, returnValue }: {
-      returnType: ReturnType
+      returnType: ContractCallReturnType
       returnValue: EncodedData<EncodingType>},
     transaction: string): void => {
     let message: string
@@ -306,7 +301,7 @@ export default async function getContractInstance ({
     options:
     Parameters<typeof instance.compile>[0] &
     Parameters<typeof instance.call>[2] &
-    Parameters<typeof onAccount.address>[0] &
+    Parameters<_AccountBase['address']>[0] &
     Parameters<typeof sendAndProcess>[1]
   ): Promise<ContractInstance['deployInfo']> => {
     const opt = { ...instance.options, ...options }
@@ -314,14 +309,14 @@ export default async function getContractInstance ({
     if (opt.callStatic === true) return await instance.call('init', params, opt)
     if (instance.deployInfo.address != null) throw new DuplicateContractError()
 
-    const ownerId: EncodedData<'ak'> = await onAccount.address(opt)
-    // TODO onAccount shouldn't have .buildTx method
-    const tx = await onAccount.buildTx(TX_TYPE.contractCreate, {
+    const ownerId = await opt.onAccount.address(options)
+    const tx = await _buildTx(TX_TYPE.contractCreate, {
       ...opt,
       gasLimit: opt.gasLimit ?? await instance._estimateGas('init', params, opt),
       callData: instance.calldata.encode(instance._name, 'init', params),
       code: instance.bytecode,
-      ownerId
+      ownerId,
+      onNode
     })
     const contractId = buildContractIdByContractTx(tx)
     const { hash, rawTx, result, txData } = await sendAndProcess(tx, opt)
@@ -369,10 +364,12 @@ export default async function getContractInstance ({
     if (contractId == null && fn !== 'init') throw new InvalidMethodInvocationError('You need to deploy contract before calling!')
     if (fn !== 'init' && opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(opt.amount, fn)
 
-    const callerId = await onAccount.address(opt).catch((error: any) => {
-      if (opt.callStatic === true) return DRY_RUN_ACCOUNT.pub
-      else throw error
-    })
+    const callerId = await Promise.resolve()
+      .then(() => opt.onAccount.address(opt))
+      .catch((error: any) => {
+        if (opt.callStatic === true) return DRY_RUN_ACCOUNT.pub
+        else throw error
+      }) as EncodedData<'ak'>
     const callData = instance.calldata.encode(instance._name, fn, params)
 
     let res: any
@@ -382,28 +379,28 @@ export default async function getContractInstance ({
       }
       const txOpt = {
         ...opt,
+        onNode,
         gasLimit: opt.gasLimit ?? GAS_MAX,
         callData
       }
       if (opt.nonce == null && opt.top != null) {
         opt.nonce = (await getAccount(callerId, { hash: opt.top, onNode })).nonce + 1
       }
-      // TODO onAccount shouldn't have .buildTx method
-      const tx = await onAccount.buildTx(...fn === 'init'
-        ? [TX_TYPE.contractCreate, { ...txOpt, code: instance.bytecode, ownerId: callerId }]
-        : [TX_TYPE.contractCall, { ...txOpt, callerId, contractId }])
+      const tx = await (fn === 'init'
+        ? _buildTx(TX_TYPE.contractCreate, { ...txOpt, code: instance.bytecode, ownerId: callerId })
+        : _buildTx(TX_TYPE.contractCall, { ...txOpt, callerId, contractId }))
 
       const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, { onNode, ...opt })
       if (callObj == null) throw new UnexpectedTsError()
       handleCallError({
-        returnType: callObj.returnType as ReturnType,
+        returnType: callObj.returnType as ContractCallReturnType,
         returnValue: callObj.returnValue as EncodedData<EncodingType>
       }, tx)
       res = { ...dryRunOther, tx: unpackTx(tx), result: callObj }
     } else {
-    // TODO onAccount shouldn't have .buildTx method
-      const tx = await onAccount.buildTx(TX_TYPE.contractCall, {
+      const tx = await _buildTx(TX_TYPE.contractCall, {
         ...opt,
+        onNode,
         gasLimit: opt.gasLimit ?? await instance._estimateGas(fn, params, opt),
         callerId,
         contractId,

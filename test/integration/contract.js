@@ -165,15 +165,17 @@ describe('Contract', function () {
 
   it('Deploy and call contract on specific account', async () => {
     contract.deployInfo = {}
-    const onAccount = aeSdk.addresses()[1]
+    const onAccount = aeSdk.accounts[aeSdk.addresses()[1]]
+    const accountBefore = contract.options.onAccount
     contract.options.onAccount = onAccount
     deployed = await contract.deploy()
-    expect(deployed.result.callerId).to.be.equal(onAccount)
+    const address = await onAccount.address()
+    expect(deployed.result.callerId).to.be.equal(address)
     expect((await contract.methods.getArg(42, { callStatic: true })).result.callerId)
-      .to.be.equal(onAccount)
+      .to.be.equal(address)
     expect((await contract.methods.getArg(42, { callStatic: false })).result.callerId)
-      .to.be.equal(onAccount)
-    delete contract.options.onAccount
+      .to.be.equal(address)
+    contract.options.onAccount = accountBefore
   })
 
   it('Call-Static deploy transaction', async () => {

@@ -168,8 +168,4 @@ describe('Transaction', function () {
     expect(await aeSdk.getAccountNonce(address)).to.be.equal(+accountNonce + 1)
     expect(await aeSdk.getAccountNonce(address, { nonce: 1 })).to.be.equal(1)
   })
-
-  it('Destroy instance finishes without error', () => {
-    aeSdk.destroyInstance()
-  })
 })

@@ -281,9 +281,9 @@ describe('Contract instance', function () {
   })
 
   it('dry-runs init function on specific account', async () => {
-    const [, onAccount] = aeSdk.addresses()
+    const onAccount = aeSdk.accounts[aeSdk.addresses()[1]]
     const { result } = await testContract.methods.init.get('test', 1, 'hahahaha', { onAccount })
-    result.callerId.should.be.equal(onAccount)
+    result.callerId.should.be.equal(await onAccount.address())
   })
 
   it('deploys and calls contract without waiting for mining', async () => {
@@ -311,9 +311,9 @@ describe('Contract instance', function () {
   })
 
   it('calls on specific account', async () => {
-    const [, onAccount] = aeSdk.addresses()
+    const onAccount = aeSdk.accounts[aeSdk.addresses()[1]]
     const { result } = await testContract.methods.intFn(123, { onAccount })
-    result.callerId.should.be.equal(onAccount)
+    result.callerId.should.be.equal(await onAccount.address())
   })
 
   describe('Gas', () => {

@@ -35,23 +35,31 @@ import AccountResolver from '../account/resolver'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 import { mapObject } from '../utils/other'
 import { AMOUNT } from '../tx/builder/schema'
+import { CompilerError } from '../utils/errors'
+
+function getValueOrErrorProxy<Value extends Object> (valueCb: () => Value): Value {
+  try {
+    return valueCb()
+  } catch (error) {
+    return new Proxy(
+      {},
+      Object.fromEntries(['get', 'set', 'has'].map(name => [name, () => { throw error }]))
+    ) as Value
+  }
+}
 
 const { _buildTx, ...otherTxMethods } = txMethods
 export default stampit(NodePool, AccountResolver, {
   init ({ compilerUrl, ignoreVersion }) {
+    this.compilerApi = getValueOrErrorProxy(() => {
+      throw new CompilerError('You can\'t use Compiler API. Compiler is not ready!')
+    })
     if (compilerUrl == null) return
     this.setCompilerUrl(compilerUrl, { ignoreVersion })
   },
   methods: {
     setCompilerUrl (compilerUrl: string, { ignoreVersion = false } = {}): void {
       this.compilerApi = new Compiler(compilerUrl, { ignoreVersion })
-    },
-    /**
-     * Remove all listeners for RPC
-     */
-    destroyInstance (): void {
-      const destroyMethods = ['destroyClient', 'destroyServer']
-      destroyMethods.forEach((m) => typeof this[m] === 'function' && this[m]())
     },
     ...mapObject<Function, Function>(
       {
@@ -66,12 +74,12 @@ export default stampit(NodePool, AccountResolver, {
       },
       ([name, handler]) => [
         name,
-        async function (...args: any) {
+        async function (...args: any[]) {
           const instanceOptions = {
             ...this.Ae.defaults,
-            onNode: this.api,
-            onAccount: this,
-            onCompiler: this.compilerApi,
+            onNode: getValueOrErrorProxy(() => this.api),
+            onAccount: getValueOrErrorProxy(() => this._resolveAccount()),
+            onCompiler: getValueOrErrorProxy(() => this.compilerApi),
             // TODO: remove networkId
             networkId: this.networkId ?? (await this.api?.getStatus()).networkId
           }
