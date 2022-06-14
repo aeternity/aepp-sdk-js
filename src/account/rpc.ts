@@ -1,7 +1,6 @@
 /**
  * AccountRpc module
  * @module @aeternity/aepp-sdk/es/account/rpc
- * @export AccountRpc
  */
 import AccountBase from './base'
 import { METHODS } from '../utils/aepp-wallet-communication/schema'

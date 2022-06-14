@@ -2,7 +2,6 @@
  * RPC handler for WAELLET side
  *
  * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc
- * @export WalletRpc
  * @example
  * import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
  */

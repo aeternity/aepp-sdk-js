@@ -19,7 +19,6 @@
  * ContractACI module
  *
  * @module @aeternity/aepp-sdk/es/contract/aci
- * @export getContractInstance
  */
 
 // @ts-expect-error TODO remove

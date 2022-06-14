@@ -19,7 +19,6 @@
  * Compiler module
  *
  * @module @aeternity/aepp-sdk/es/contract/compiler
- * @export Compiler
  * @example import { Compiler } from '@aeternity/aepp-sdk'
  */
 

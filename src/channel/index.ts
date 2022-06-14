@@ -18,7 +18,6 @@
 /**
  * Channel module
  * @module @aeternity/aepp-sdk/es/channel/index
- * @export Channel
  * @example import { Channel } from '@aeternity/aepp-sdk'
  */
 

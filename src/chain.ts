@@ -18,7 +18,6 @@
 /**
  * Chain module
  * @module @aeternity/aepp-sdk/es/chain
- * @export Chain
  * @example import { Chain } from '@aeternity/aepp-sdk'
  */
 

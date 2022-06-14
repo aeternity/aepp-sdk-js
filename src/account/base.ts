@@ -18,8 +18,6 @@
 /**
  * AccountBase module
  * @module @aeternity/aepp-sdk/es/account/base
- * @export AccountBase
- * @export isAccountBase
  */
 
 import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto'

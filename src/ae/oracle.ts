@@ -22,7 +22,6 @@
  * https://github.com/aeternity/protocol/blob/master/ORACLE.md in the protocol
  * repository.
  * @module @aeternity/aepp-sdk/es/ae/oracle
- * @export Oracle
  * @example import * as oracleMethods from '@aeternity/aepp-sdk'
  */
 
