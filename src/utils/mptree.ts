@@ -43,7 +43,6 @@ export default class MPTree {
 
   /**
    * Deserialize Merkle Patricia Tree
-   * @rtype (binary: Array) => MPTree
    * @param {Array} binary - Binary
    * @return {MPTree} Merkle Patricia Tree
    */
@@ -102,7 +101,6 @@ export default class MPTree {
 
   /**
    * Serialize Merkle Patricia Tree
-   * @rtype () => Array
    * @return {Array} Binary
    */
   serialize (): MPTreeBinary {
@@ -117,7 +115,6 @@ export default class MPTree {
 
   /**
    * Retrieve value from Merkle Patricia Tree
-   * @rtype (key: String) => Buffer
    * @param {String} key - The key of the element to retrieve
    * @return {Buffer} Value associated to the specified key
    */

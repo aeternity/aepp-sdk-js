@@ -202,7 +202,6 @@ const getSenderAddress = (
  * to make sure it can be posted it to the chain
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/validator
- * @rtype (tx: String, node) => void
  * @param {String} transaction Base64Check-encoded transaction
  * @param {Object} node Node to validate transaction against
  * @param {String[]} [parentTxTypes] Types of parent transactions

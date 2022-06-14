@@ -83,7 +83,6 @@ interface Contract {
  * Channel
  *
  * @alias module:@aeternity/aepp-sdk/es/channel/index
- * @rtype Channel
  * @param options - Channel params
  * @param options.url - Channel url (for example: "ws://localhost:3001")
  * @param options.role - Participant role ("initiator" or "responder")

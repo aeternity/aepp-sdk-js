@@ -32,7 +32,6 @@ import { concatBuffers } from '../utils/other'
 
 /**
  * Check is provided object looks like an instance of AccountBase
- * @rtype (Object) => Boolean
  * @param {Object} acc - Object to check
  * @return {Boolean}
  */
@@ -59,7 +58,6 @@ export default abstract class AccountBase {
    * Sign encoded transaction
    * @instance
    * @category async
-   * @rtype (tx: String) => tx: Promise[String], throws: Error
    * @param {String} tx - Transaction to sign
    * @param {Object} opt - Options
    * @param {Object} [opt.innerTx] - Sign as inner transaction for PayingFor
@@ -83,7 +81,6 @@ export default abstract class AccountBase {
    * @instance
    * @function getNetworkId
    * @category async
-   * @rtype () => networkId: String
    * @return {Promise<String>} Network Id
    */
   readonly getNetworkId = getNetworkId
@@ -92,7 +89,6 @@ export default abstract class AccountBase {
    * Sign message
    * @instance
    * @category async
-   * @rtype (msg: String) => signature: Promise[String], throws: Error
    * @param {String} message - Message to sign
    * @param {Object} opt - Options
    * @return {String} Signature
@@ -108,9 +104,6 @@ export default abstract class AccountBase {
    * Verify message
    * @instance
    * @category async
-   * @rtype (
-   *   msg: String, signature: String, publicKey: String
-   * ) => isValid: Promise[boolean], throws: Error
    * @param {String} message - Message to verify
    * @param {string | Uint8Array} signature - Signature
    * @param {Object} options - Options
@@ -145,7 +138,6 @@ export default abstract class AccountBase {
    * @instance
    * @abstract
    * @category async
-   * @rtype () => address: Promise[String]
    * @return {String} Public account address
    */
   abstract address (opt?: object): Promise<EncodedData<'ak'>>

@@ -103,7 +103,6 @@ export default class RpcClient <
    * Make a request
    * @function request
    * @instance
-   * @rtype (name: String, params: Object) => Promise
    * @param {String} name Method name
    * @param {Object} params Method params
    * @return {Promise} Promise which will be resolved after receiving response message
@@ -121,7 +120,6 @@ export default class RpcClient <
    * Make a notification
    * @function request
    * @instance
-   * @rtype (name: String, params: Object) => Promise
    * @param {String} name Method name
    * @param {Object} params Method params
    * @return {Promise} Promise which will be resolved after receiving response message
@@ -134,7 +132,6 @@ export default class RpcClient <
    * Process response message
    * @function processResponse
    * @instance
-   * @rtype (msg: Object, transformResult: Function) => void
    * @param {Object} msg Message object
    * @return {void}
    */

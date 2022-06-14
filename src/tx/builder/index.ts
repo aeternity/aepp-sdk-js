@@ -306,7 +306,6 @@ function buildFee (
 /**
  * Calculate fee
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @rtype (fee, txType, gasLimit = 0) => String
  * @param fee - fee
  * @param txType - Transaction type
  * @param options - Options object

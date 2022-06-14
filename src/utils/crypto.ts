@@ -36,7 +36,6 @@ const Ecb = aesjs.ModeOfOperation.ecb
 
 /**
  * Generate address from secret key
- * @rtype (secret: String) => tx: Promise[String]
  * @param {String | Uint8Array} secret - Private key
  * @return {String} Public key
  */
@@ -48,7 +47,6 @@ export function getAddressFromPriv (secret: string | Uint8Array): string {
 
 /**
  * Check if address is valid
- * @rtype (input: String) => valid: Boolean
  * @param {String} address - Address
  * @param {String} prefix Transaction prefix. Default: 'ak'
  * @return {Boolean} valid
@@ -64,7 +62,6 @@ export function isAddressValid (address: string, prefix: EncodingType = 'ak'): b
 
 /**
  * Generate a random salt (positive integer)
- * @rtype () => salt: Number
  * @return {Number} random salt
  */
 export function salt (): number {
@@ -74,7 +71,6 @@ export function salt (): number {
 /**
  * Converts a positive integer to the smallest possible
  * representation in a binary digit representation
- * @rtype (value: Number) => Buffer
  * @param {Number} value - Value to encode
  * @return {Buffer} - Encoded data
  */
@@ -86,7 +82,6 @@ export function encodeUnsigned (value: number): Buffer {
 
 /**
  * Calculate 256bits Blake2b hash of `input`
- * @rtype (input: String) => hash: String
  * @param {Data} input - Data to hash
  * @return {Buffer} Hash
  */
@@ -97,7 +92,6 @@ export function hash (input: Data): Buffer {
 // Todo Duplicated in tx builder. remove
 /**
  * Compute contract address
- * @rtype (owner: String, nonce: Number) => String
  * @param {EncodedData<'ak'>} owner - Address of contract owner
  * @param {Number} nonce - Round when contract was created
  * @return {String} - Contract address
@@ -112,7 +106,6 @@ export function encodeContractAddress (owner: EncodedData<'ak'>, nonce: number):
 
 /**
  * Generate keyPair from secret key
- * @rtype (secret: Uint8Array) => KeyPair
  * @param {Uint8Array} secret - secret key
  * @return {Object} - Object with Private(privateKey) and Public(publicKey) keys
  */
@@ -150,7 +143,6 @@ export function generateKeyPair (raw: boolean = false): {
 
 /**
  * Encrypt given data using `password`
- * @rtype (password: String, binaryData: Buffer) => Uint8Array
  * @param {String} password - Password to encrypt with
  * @param {Uint8Array} binaryData - Data to encrypt
  * @return {Uint8Array} Encrypted data
@@ -163,7 +155,6 @@ export function encryptKey (password: string, binaryData: Uint8Array): Uint8Arra
 
 /**
  * Decrypt given data using `password`
- * @rtype (password: String, encrypted: String) => Uint8Array
  * @param {String} password - Password to decrypt with
  * @param {Uint8Array} encrypted - Data to decrypt
  * @return {Uint8Array} Decrypted data
@@ -179,7 +170,6 @@ export function decryptKey (password: string, encrypted: Uint8Array): Uint8Array
 
 /**
  * Generate signature
- * @rtype (data: String | Buffer, privateKey: Buffer) => Buffer
  * @param {String | Uint8Array} data - Data to sign
  * @param {String | Uint8Array} privateKey - Key to sign with
  * @return {Uint8Array} Signature
@@ -190,14 +180,14 @@ export function sign (data: string | Uint8Array, privateKey: string | Uint8Array
 
 /**
  * Verify that signature was signed by public key
- * @rtype (data: Buffer, signature: Buffer, publicKey: Buffer) => Boolean
  * @param {Uint8Array} data - Data to verify
  * @param {Uint8Array} signature - Signature to verify
  * @param {string | Uint8Array} publicKey - Key to verify against
  * @return {Boolean} Valid?
  */
 export function verify (
-  data: Uint8Array, signature: Uint8Array, publicKey: string | Uint8Array): boolean {
+  data: Uint8Array, signature: Uint8Array, publicKey: string | Uint8Array
+): boolean {
   const publicKeyBuffer = typeof publicKey === 'string' ? str2buf(publicKey) : publicKey
   return nacl.sign.detached.verify(data, signature, publicKeyBuffer)
 }
@@ -221,7 +211,6 @@ export function verifyMessage (
  * Check key pair for validity
  *
  * Sign a message, and then verifying that signature
- * @rtype (privateKey: Buffer, publicKey: Buffer) => Boolean
  * @param {String | Uint8Array} privateKey - Private key to verify
  * @param {String | Uint8Array} publicKey - Public key to verify
  * @return {Boolean} Valid?

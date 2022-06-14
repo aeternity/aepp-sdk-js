@@ -10,7 +10,6 @@ import { concatBuffers } from './other'
 
 /**
  * Calculate SHA256 hash of `input`
- * @rtype (input: String) => hash: String
  * @param {Uint8Array|String} input - Data to hash
  * @return {String} Hash
  */

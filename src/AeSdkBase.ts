@@ -51,7 +51,6 @@ function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Valu
  * available.
  * @function
  * @alias module:@aeternity/aepp-sdk/es/ae
- * @rtype Stamp
  * @param {Object} [options={}] - Initializer object
  * @param {String} [options.compilerUrl] compilerUrl - Url for compiler API
  * @return {Object} Ae instance

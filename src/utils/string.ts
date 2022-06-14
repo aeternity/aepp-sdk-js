@@ -17,7 +17,6 @@
 
 /**
  * Convert string from snake_case to PascalCase
- * @rtype (s: String) => String
  * @param {String} s - String to convert
  * @return {String} Converted string
  */
@@ -27,7 +26,6 @@ export function snakeToPascal (s: string): string {
 
 /**
  * Convert string from PascalCase to snake_case
- * @rtype (s: String) => String
  * @param {String} s - String to convert
  * @return {String} Converted string
  */

@@ -40,7 +40,6 @@ export default class AccountRpc extends AccountBase {
   /**
    * @function signTransaction
    * @instance
-   * @rtype (tx: String, options = {}) => Promise
    * @return {Promise<String>} Signed transaction
    */
   async signTransaction (
@@ -59,7 +58,6 @@ export default class AccountRpc extends AccountBase {
   /**
    * @function signMessage
    * @instance
-   * @rtype (message: String, options = {}) => Promise
    * @return {Promise<String>} Signed message
    */
   async signMessage (
