@@ -62,9 +62,9 @@ describe('Paying for transaction of another account', function () {
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await BaseAe({
       withoutGenesisAccount: true,
-      accounts: [new MemoryAccount({ keypair: generateKeyPair() })]
-    }, {
-      deepProps: { Ae: { defaults: { waitMined: false, innerTx: true } } }
+      accounts: [new MemoryAccount({ keypair: generateKeyPair() })],
+      waitMined: false,
+      innerTx: true
     })
     const contract = await aeSdkNotPayingFee.getContractInstance({ source: contractSource })
     const { rawTx: contractDeployTx, address } = await contract.deploy([42])

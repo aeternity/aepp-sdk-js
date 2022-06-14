@@ -39,7 +39,7 @@ describe('Node Chain', function () {
     spy(http, 'request')
     const heights = await Promise.all(new Array(5).fill().map(() => aeSdk.height()))
     expect(heights).to.eql(heights.map(() => heights[0]))
-    expect(http.request.callCount).to.be.equal(1)
+    expect(http.request.callCount).to.be.equal(2)
     http.request.restore()
   })
 
@@ -118,9 +118,8 @@ describe('Node Chain', function () {
       { nonce: nextNonce + idx, verify: false, waitMined: false }
     )))
     transactions.push(...spends.map(({ hash }) => hash))
-    const accountGetCount = 1
     const txPostCount = accounts.length
-    expect(http.request.args.length).to.be.equal(accountGetCount + txPostCount)
+    expect(http.request.args.length).to.be.equal(2 + txPostCount)
     http.request.restore()
   })
 
@@ -134,7 +133,7 @@ describe('Node Chain', function () {
     transactions.push(...spends.map(({ hash }) => hash))
     const accountGetCount = accounts.length
     const txPostCount = accounts.length
-    expect(http.request.args.length).to.be.equal(accountGetCount + txPostCount)
+    expect(http.request.args.length).to.be.equal(1 + accountGetCount + txPostCount)
     http.request.restore()
   })
 

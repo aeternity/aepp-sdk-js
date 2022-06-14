@@ -20,10 +20,10 @@ import { expect } from 'chai'
 import {
   MemoryAccount,
   Node,
-  RpcAepp,
+  AeSdkAepp,
   RpcConnectionDenyError,
   RpcRejectedByUserError,
-  RpcWallet,
+  AeSdkWallet,
   TX_TYPE,
   WALLET_TYPE
 } from '../../src'
@@ -89,11 +89,8 @@ describe('Aepp<->Wallet', function () {
 
     before(async () => {
       await spendPromise
-      wallet = await RpcWallet({
+      wallet = new AeSdkWallet({
         compilerUrl,
-        accounts: [
-          new MemoryAccount({ keypair: account }), new MemoryAccount({ keypair: generateKeyPair() })
-        ],
         nodes: [{ name: 'local', instance: node }],
         id: 'test',
         type: WALLET_TYPE.window,
@@ -105,7 +102,9 @@ describe('Aepp<->Wallet', function () {
         onMessageSign: handlerReject,
         onDisconnect () {}
       })
-      aepp = await RpcAepp({
+      await wallet.addAccount(new MemoryAccount({ keypair: account }), { select: true })
+      await wallet.addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: false })
+      aepp = new AeSdkAepp({
         name: 'AEPP',
         nodes: [{ name: 'test', instance: node }],
         onNetworkChange () {},
@@ -443,9 +442,8 @@ describe('Aepp<->Wallet', function () {
     let wallet
 
     before(async () => {
-      wallet = await RpcWallet({
+      wallet = new AeSdkWallet({
         compilerUrl,
-        accounts: [new MemoryAccount({ keypair: account })],
         nodes: [{ name: 'local', instance: node }],
         id: 'test',
         type: WALLET_TYPE.window,
@@ -457,7 +455,8 @@ describe('Aepp<->Wallet', function () {
         onMessageSign: handlerReject,
         onDisconnect () {}
       })
-      aepp = await RpcAepp({
+      await wallet.addAccount(new MemoryAccount({ keypair: account }), { select: true })
+      aepp = new AeSdkAepp({
         name: 'AEPP',
         onNetworkChange () {},
         onAddressChange () {},

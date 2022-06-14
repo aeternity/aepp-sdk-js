@@ -16,11 +16,11 @@
  */
 
 import Node from '../../src/node'
+import AeSdkBase from '../../src/AeSdkBase'
 // @ts-expect-error
 import { url, ignoreVersion } from '.'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import NodePool, { _NodePool } from '../../src/node-pool'
 import { NodeNotFoundError } from '../../src/utils/errors'
 
 describe('Node client', function () {
@@ -49,18 +49,18 @@ describe('Node client', function () {
 
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {
-      const nodes = NodePool() as _NodePool
+      const nodes = new AeSdkBase({})
       expect(() => nodes.api)
         .to.throw(NodeNotFoundError, 'You can\'t use Node API. Node is not connected or not defined!')
     })
 
     it('Can change Node', async () => {
-      const nodes = NodePool({
+      const nodes = new AeSdkBase({
         nodes: [
           { name: 'first', instance: new Node(url, { ignoreVersion }) },
           { name: 'second', instance: node }
         ]
-      }) as _NodePool
+      })
       const activeNode = await nodes.getNodeInfo()
       activeNode.name.should.be.equal('first')
       nodes.selectNode('second')
@@ -69,21 +69,21 @@ describe('Node client', function () {
     })
 
     it('Fail on undefined node', async () => {
-      const nodes = NodePool({
+      const nodes = new AeSdkBase({
         nodes: [
           { name: 'first', instance: new Node(url, { ignoreVersion }) },
           { name: 'second', instance: node }
         ]
-      }) as _NodePool
+      })
       expect(() => nodes.selectNode('asdasd')).to.throw(NodeNotFoundError, 'Node with name asdasd not in pool')
     })
 
     it('Can get list of nodes', async () => {
-      const nodes = NodePool({
+      const nodes = new AeSdkBase({
         nodes: [
           { name: 'first', instance: node }
         ]
-      }) as _NodePool
+      })
       const nodesList = await nodes.getNodesInPool()
       nodesList.length.should.be.equal(1)
     })
