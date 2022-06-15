@@ -18,11 +18,6 @@ import BrowserConnection from './utils/aepp-wallet-communication/connection/Brow
 /**
  * RPC handler for AEPP side
  * Contain functionality for wallet interaction and connect it to sdk
- * @param param - Init params object
- * @param param.name - Aepp name
- * @param param.onAddressChange - Call-back function for update address event
- * @param param.onDisconnect - Call-back function for disconnect event
- * @param param.onNetworkChange - Call-back function for update network event
  */
 export default class AeSdkAepp extends AeSdkBase {
   name: string
@@ -32,6 +27,13 @@ export default class AeSdkAepp extends AeSdkBase {
   rpcClient?: RpcClient<WalletApi, AeppApi>
   _accounts?: Accounts
 
+  /**
+   * @param options - Options
+   * @param options.name - Aepp name
+   * @param options.onAddressChange - Call-back function for update address event
+   * @param options.onDisconnect - Call-back function for disconnect event
+   * @param options.onNetworkChange - Call-back function for update network event
+   */
   constructor ({
     name,
     onAddressChange = () => {},

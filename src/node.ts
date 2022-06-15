@@ -70,6 +70,11 @@ export interface NodeInfo {
 export default class extends (Node as unknown as TransformedNode) {
   url: string
 
+  /**
+   * @param url - Url for node API
+   * @param options - Options
+   * @param options.ignoreVersion - Don't check node version
+   */
   constructor (
     url: string,
     { ignoreVersion = false, ...options }: NodeOptionalParams & { ignoreVersion?: boolean } = {}

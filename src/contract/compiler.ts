@@ -26,11 +26,14 @@ type GeneralCompilerError = ErrorModel & {
  * Contract Compiler
  *
  * This class include api call's related to contract compiler functionality.
- * @param options - Initializer object
- * @returns Contract compiler instance
  * @example Compiler('COMPILER_URL')
  */
 export default class Compiler extends CompilerApi {
+  /**
+   * @param compilerUrl - Url for compiler API
+   * @param options - Options
+   * @param options.ignoreVersion - Don't check compiler version
+   */
   constructor (compilerUrl: string, { ignoreVersion }: { ignoreVersion?: boolean } = {}) {
     super(compilerUrl, {
       allowInsecureConnection: true,

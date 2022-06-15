@@ -57,15 +57,6 @@ interface RpcClientsInfo {
 
 /**
  * Contain functionality for aepp interaction and managing multiple aepps
- * @param param - Init params object
- * @param param.name - Wallet name
- * @param onConnection - Call-back function for incoming AEPP connection
- * @param onSubscription - Call-back function for incoming AEPP account subscription
- * @param onSign - Call-back function for incoming AEPP sign request
- * @param onAskAccounts - Call-back function for incoming AEPP get address request
- * @param onMessageSign - Call-back function for incoming AEPP sign message request
- * Second argument of incoming call-backs contain function for accept/deny request
- * @param onDisconnect - Call-back function for disconnect event
  */
 export default class AeSdkWallet extends AeSdk {
   id: string
@@ -79,6 +70,18 @@ export default class AeSdkWallet extends AeSdk {
   onAskAccounts: OnAskAccounts
   onMessageSign: OnMessageSign
 
+  /**
+   * @param options - Options
+   * @param options.name - Wallet name
+   * @param options.id - Wallet id
+   * @param options.type - Wallet type
+   * @param options.onConnection - Call-back function for incoming AEPP connection
+   * @param options.onSubscription - Call-back function for incoming AEPP account subscription
+   * @param options.onSign - Call-back function for incoming AEPP sign request
+   * @param options.onAskAccounts - Call-back function for incoming AEPP get address request
+   * @param options.onMessageSign - Call-back function for incoming AEPP sign message request
+   * @param options.onDisconnect - Call-back function for disconnect event
+   */
   constructor ({
     name,
     id,

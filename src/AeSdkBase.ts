@@ -50,8 +50,6 @@ function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Valu
  * Only by providing the joint functionality of them, most more advanced
  * operations, i.e. the ones with actual use value on the chain, become
  * available.
- * @param options - Initializer object
- * @param options.compilerUrl - compilerUrl - Url for compiler API
  */
 class AeSdkBase {
   _options = {
@@ -63,6 +61,12 @@ class AeSdkBase {
   selectedNodeName?: string
   compilerApi: Compiler
 
+  /**
+   * @param options - Options
+   * @param options.nodes - Array of nodes
+   * @param options.compilerUrl - Url for compiler API
+   * @param options.ignoreVersion - Don't check node or compiler version
+   */
   constructor (
     { nodes = [], compilerUrl, ignoreVersion = false, ...options }:
     {

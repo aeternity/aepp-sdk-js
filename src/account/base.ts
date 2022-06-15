@@ -16,10 +16,9 @@
  */
 import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto'
 import { buildTx } from '../tx/builder'
-import { decode } from '../tx/builder/helpers'
+import { decode, EncodedData } from '../utils/encoder'
 import { TX_TYPE } from '../tx/builder/schema'
 import { getNetworkId } from '../node'
-import { EncodedData } from '../utils/encoder'
 import { concatBuffers } from '../utils/other'
 
 /**
@@ -32,12 +31,14 @@ export const isAccountBase = (acc: AccountBase | any): boolean =>
 /**
  * Account is one of the three basic building blocks of an
  * {@link AeSdk} and provides access to a signing key pair.
- * @param options - Initializer object
- * @param options.networkId - NETWORK_ID using for signing transaction's
  */
 export default abstract class AccountBase {
   networkId?: string
 
+  /**
+   * @param options - Options
+   * @param options.networkId - Using for signing transactions
+   */
   constructor ({ networkId }: { networkId?: string } = {}) {
     this.networkId ??= networkId
   }
