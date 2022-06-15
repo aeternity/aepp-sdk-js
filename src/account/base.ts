@@ -109,7 +109,6 @@ export default abstract class AccountBase {
 
   /**
    * Sign data blob
-   * @abstract
    * @rtype (data: String) => data: Promise[String]
    * @param {String} data - Data blob to sign
    * @param {Object} options
@@ -119,7 +118,6 @@ export default abstract class AccountBase {
 
   /**
    * Obtain account address
-   * @abstract
    * @returns {String} Public account address
    */
   abstract address (opt?: object): Promise<EncodedData<'ak'>>
