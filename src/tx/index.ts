@@ -164,24 +164,6 @@ export async function calculateTtl (
 }
 
 /**
- * Get the next nonce to be used for a transaction for an account
- *
- * @param accountId
- * @param nonce
- * @returns Next Nonce
- */
-export async function getAccountNonce (
-  accountId: string,
-  { nonce, onNode }:
-  { nonce: number, onNode: Node }
-): Promise<number> {
-  if (nonce != null) return nonce
-  const { nonce: accountNonce } = await onNode.getAccountByPubkey(accountId)
-    .catch(() => ({ nonce: 0 }))
-  return accountNonce + 1
-}
-
-/**
  * Calculate fee, get absolute ttl (ttl + height), get account nonce
  *
  * @param txType - Type of transaction
