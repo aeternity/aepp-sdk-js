@@ -148,6 +148,7 @@ export interface CtVersion {
 
 export enum FIELD_TYPES {
   int,
+  shortInt,
   amount,
   id,
   ids,
@@ -175,6 +176,7 @@ export enum FIELD_TYPES {
 
 interface BuildFieldTypes<Prefix extends undefined | EncodingType | readonly EncodingType[]>{
   [FIELD_TYPES.int]: number | string | BigNumber
+  [FIELD_TYPES.shortInt]: number
   [FIELD_TYPES.amount]: number | string | BigNumber
   [FIELD_TYPES.id]: PrefixType<Prefix>
   [FIELD_TYPES.ids]: Array<EncodedData<Prefix extends EncodingType[] ? Prefix : any>>
@@ -295,12 +297,12 @@ type BuildTxArgBySchema<SchemaLine> =
   >
 
 export type RawTxObject<Tx extends TxSchema> = {
-  [k in keyof Tx]: Tx[k] extends number | BigNumber ? string : Tx[k]
+  [k in keyof Tx]: Tx[k] extends BigNumber ? string : Tx[k]
 }
 
 const BASE_TX = [
-  ['tag', FIELD_TYPES.int],
-  ['VSN', FIELD_TYPES.int]
+  ['tag', FIELD_TYPES.shortInt],
+  ['VSN', FIELD_TYPES.shortInt]
 ] as const
 
 export const TX_SCHEMA = {
@@ -308,7 +310,7 @@ export const TX_SCHEMA = {
     2: [
       ...BASE_TX,
       ['flags', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['balance', FIELD_TYPES.int],
       ['gaContract', FIELD_TYPES.id, ['ct', 'nm']],
       ['gaAuthFun', FIELD_TYPES.binary, 'cb']
@@ -328,8 +330,8 @@ export const TX_SCHEMA = {
       ['recipientId', FIELD_TYPES.id, ['ak', 'nm']],
       ['amount', FIELD_TYPES.amount],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
+      ['nonce', FIELD_TYPES.shortInt],
       ['payload', FIELD_TYPES.payload]
     ]
   },
@@ -337,56 +339,56 @@ export const TX_SCHEMA = {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['commitmentId', FIELD_TYPES.id, 'cm'],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int]
+      ['ttl', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.nameClaim]: {
     2: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['name', Name],
       ['nameSalt', FIELD_TYPES.int],
       ['nameFee', NameFee],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int]
+      ['ttl', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.nameUpdate]: {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['nameId', NameId],
       ['nameTtl', FIELD_TYPES.int],
       ['pointers', FIELD_TYPES.pointers],
-      ['clientTtl', FIELD_TYPES.int],
+      ['clientTtl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int]
+      ['ttl', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.nameTransfer]: {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['nameId', NameId],
       ['recipientId', FIELD_TYPES.id, ['ak', 'nm']],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int]
+      ['ttl', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.nameRevoke]: {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['nameId', NameId],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int]
+      ['ttl', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.contract]: {
@@ -405,14 +407,14 @@ export const TX_SCHEMA = {
     1: [
       ...BASE_TX,
       ['ownerId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['code', FIELD_TYPES.binary, 'cb'],
       ['ctVersion', FIELD_TYPES.ctVersion],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['deposit', Deposit],
       ['amount', FIELD_TYPES.amount],
-      ['gasLimit', FIELD_TYPES.int],
+      ['gasLimit', FIELD_TYPES.shortInt],
       ['gasPrice', GasPrice],
       ['callData', FIELD_TYPES.binary, 'cb']
     ]
@@ -421,13 +423,13 @@ export const TX_SCHEMA = {
     1: [
       ...BASE_TX,
       ['callerId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['contractId', FIELD_TYPES.id, ['ct', 'nm']],
       ['abiVersion', FIELD_TYPES.abiVersion],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['amount', FIELD_TYPES.amount],
-      ['gasLimit', FIELD_TYPES.int],
+      ['gasLimit', FIELD_TYPES.shortInt],
       ['gasPrice', GasPrice],
       ['callData', FIELD_TYPES.binary, 'cb']
     ]
@@ -436,11 +438,11 @@ export const TX_SCHEMA = {
     1: [
       ...BASE_TX,
       ['callerId', FIELD_TYPES.id, 'ak'],
-      ['callerNonce', FIELD_TYPES.int],
-      ['height', FIELD_TYPES.int],
+      ['callerNonce', FIELD_TYPES.shortInt],
+      ['height', FIELD_TYPES.shortInt],
       ['contractId', FIELD_TYPES.id, 'ct'],
       ['gasPrice', GasPrice],
-      ['gasUsed', FIELD_TYPES.int],
+      ['gasUsed', FIELD_TYPES.shortInt],
       ['returnValue', FIELD_TYPES.binary, 'cb'],
       ['returnType', FIELD_TYPES.callReturnType],
       // TODO: add serialization for
@@ -452,14 +454,14 @@ export const TX_SCHEMA = {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['queryFormat', FIELD_TYPES.string],
       ['responseFormat', FIELD_TYPES.string],
       ['queryFee', FIELD_TYPES.amount],
       ['oracleTtlType', FIELD_TYPES.ttlType],
-      ['oracleTtlValue', FIELD_TYPES.int],
+      ['oracleTtlValue', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['abiVersion', FIELD_TYPES.abiVersion]
     ]
   },
@@ -467,40 +469,40 @@ export const TX_SCHEMA = {
     1: [
       ...BASE_TX,
       ['oracleId', FIELD_TYPES.id, ['ok', 'nm']],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['oracleTtlType', FIELD_TYPES.ttlType],
-      ['oracleTtlValue', FIELD_TYPES.int],
+      ['oracleTtlValue', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int]
+      ['ttl', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.oracleQuery]: {
     1: [
       ...BASE_TX,
       ['senderId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['oracleId', FIELD_TYPES.id, ['ok', 'nm']],
       ['query', FIELD_TYPES.string],
       ['queryFee', FIELD_TYPES.amount],
       ['queryTtlType', FIELD_TYPES.ttlType],
-      ['queryTtlValue', FIELD_TYPES.int],
+      ['queryTtlValue', FIELD_TYPES.shortInt],
       ['responseTtlType', FIELD_TYPES.ttlType],
-      ['responseTtlValue', FIELD_TYPES.int],
+      ['responseTtlValue', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int]
+      ['ttl', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.oracleResponse]: {
     1: [
       ...BASE_TX,
       ['oracleId', FIELD_TYPES.id, 'ok'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['queryId', FIELD_TYPES.binary, 'oq'],
       ['response', FIELD_TYPES.string],
       ['responseTtlType', FIELD_TYPES.ttlType],
-      ['responseTtlValue', FIELD_TYPES.int],
+      ['responseTtlValue', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int]
+      ['ttl', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelCreate]: {
@@ -512,12 +514,12 @@ export const TX_SCHEMA = {
       ['responderAmount', FIELD_TYPES.int],
       ['channelReserve', FIELD_TYPES.int],
       ['lockPeriod', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
       ['initiatorDelegateIds', FIELD_TYPES.string],
       ['responderDelegateIds', FIELD_TYPES.string],
       ['stateHash', FIELD_TYPES.binary, 'st'],
-      ['nonce', FIELD_TYPES.int]
+      ['nonce', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelCloseMutual]: {
@@ -527,9 +529,9 @@ export const TX_SCHEMA = {
       ['fromId', FIELD_TYPES.id, 'ak'],
       ['initiatorAmountFinal', FIELD_TYPES.int],
       ['responderAmountFinal', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int]
+      ['nonce', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelCloseSolo]: {
@@ -539,9 +541,9 @@ export const TX_SCHEMA = {
       ['fromId', FIELD_TYPES.id, 'ak'],
       ['payload', FIELD_TYPES.binary, 'tx'],
       ['poi', FIELD_TYPES.binary, 'pi'],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int]
+      ['nonce', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelSlash]: {
@@ -551,9 +553,9 @@ export const TX_SCHEMA = {
       ['fromId', FIELD_TYPES.id, 'ak'],
       ['payload', FIELD_TYPES.binary, 'tx'],
       ['poi', FIELD_TYPES.binary, 'pi'],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int]
+      ['nonce', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelDeposit]: {
@@ -562,11 +564,11 @@ export const TX_SCHEMA = {
       ['channelId', FIELD_TYPES.id, 'ch'],
       ['fromId', FIELD_TYPES.id, 'ak'],
       ['amount', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
       ['stateHash', FIELD_TYPES.binary, 'st'],
       ['round', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int]
+      ['nonce', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelWithdraw]: {
@@ -575,11 +577,11 @@ export const TX_SCHEMA = {
       ['channelId', FIELD_TYPES.id, 'ch'],
       ['toId', FIELD_TYPES.id, 'ak'],
       ['amount', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
       ['stateHash', FIELD_TYPES.binary, 'st'],
       ['round', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int]
+      ['nonce', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelSettle]: {
@@ -589,9 +591,9 @@ export const TX_SCHEMA = {
       ['fromId', FIELD_TYPES.id, 'ak'],
       ['initiatorAmountFinal', FIELD_TYPES.int],
       ['responderAmountFinal', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int]
+      ['nonce', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelForceProgress]: {
@@ -604,9 +606,9 @@ export const TX_SCHEMA = {
       ['update', FIELD_TYPES.binary, 'cb'],
       ['stateHash', FIELD_TYPES.binary, 'st'],
       ['offChainTrees', FIELD_TYPES.stateTree],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int]
+      ['nonce', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelOffChain]: {
@@ -643,9 +645,9 @@ export const TX_SCHEMA = {
       ['channelId', FIELD_TYPES.id, 'ch'],
       ['fromId', FIELD_TYPES.id, 'ak'],
       ['payload', FIELD_TYPES.binary, 'tx'],
-      ['ttl', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
-      ['nonce', FIELD_TYPES.int]
+      ['nonce', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelOffChainUpdateTransfer]: {
@@ -690,7 +692,7 @@ export const TX_SCHEMA = {
       ['callData', FIELD_TYPES.binary, 'cb'],
       ['callStack', FIELD_TYPES.callStack],
       ['gasPrice', GasPrice],
-      ['gasLimit', FIELD_TYPES.int]
+      ['gasLimit', FIELD_TYPES.shortInt]
     ]
   },
   [TX_TYPE.channelReconnect]: {
@@ -777,13 +779,13 @@ export const TX_SCHEMA = {
     1: [
       ...BASE_TX,
       ['ownerId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['code', FIELD_TYPES.binary, 'cb'],
       ['authFun', FIELD_TYPES.rawBinary],
       ['ctVersion', FIELD_TYPES.ctVersion],
       ['fee', FIELD_TYPES.int],
-      ['ttl', FIELD_TYPES.int],
-      ['gasLimit', FIELD_TYPES.int],
+      ['ttl', FIELD_TYPES.shortInt],
+      ['gasLimit', FIELD_TYPES.shortInt],
       ['gasPrice', GasPrice],
       ['callData', FIELD_TYPES.binary, 'cb']
     ]
@@ -795,7 +797,7 @@ export const TX_SCHEMA = {
       ['authData', FIELD_TYPES.binary, 'cb'],
       ['abiVersion', FIELD_TYPES.abiVersion],
       ['fee', FIELD_TYPES.int],
-      ['gasLimit', FIELD_TYPES.int],
+      ['gasLimit', FIELD_TYPES.shortInt],
       ['gasPrice', GasPrice],
       ['tx', FIELD_TYPES.rlpBinary]
     ]
@@ -804,7 +806,7 @@ export const TX_SCHEMA = {
     1: [
       ...BASE_TX,
       ['payerId', FIELD_TYPES.id, 'ak'],
-      ['nonce', FIELD_TYPES.int],
+      ['nonce', FIELD_TYPES.shortInt],
       ['fee', FIELD_TYPES.int],
       ['tx', FIELD_TYPES.rlpBinary]
     ]

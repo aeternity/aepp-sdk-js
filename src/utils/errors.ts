@@ -712,7 +712,7 @@ export class InvalidTxParamsError extends TransactionError {
  * @category exception
  */
 export class PrefixNotFoundError extends TransactionError {
-  constructor (tag: string | number) {
+  constructor (tag: number) {
     super(`Prefix for id-tag ${tag} not found.`)
     this.name = 'PrefixNotFoundError'
   }
