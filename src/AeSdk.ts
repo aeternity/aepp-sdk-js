@@ -61,7 +61,6 @@ export default class AeSdk extends AeSdkBase {
   /**
    * Select specific account
    * @alias module:@aeternity/aepp-sdk/es/account/selector
-   * @instance
    * @param {String} address - Address of account to select
    * @example selectAccount('ak_xxxxxxxx')
    */

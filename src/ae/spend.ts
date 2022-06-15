@@ -70,7 +70,6 @@ export async function signUsingGA (
 
 /**
  * Send coins to another account
- * @instance
  * @param amount - Amount to spend
  * @param recipientIdOrName - Address or name of recipient account
  * @param options - Options
@@ -96,7 +95,6 @@ export async function spend (
 // TODO: Rename to spendFraction
 /**
  * Send a fraction of coin balance to another account
- * @instance
  * @param fraction - Fraction of balance to spend (between 0 and 1)
  * @param recipientIdOrName - Address or name of recipient account
  * @param options - Options

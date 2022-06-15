@@ -53,7 +53,6 @@ export default abstract class AccountBase {
 
   /**
    * Sign encoded transaction
-   * @instance
    * @param {String} tx - Transaction to sign
    * @param {Object} opt - Options
    * @param {Object} [opt.innerTx] - Sign as inner transaction for PayingFor
@@ -74,14 +73,12 @@ export default abstract class AccountBase {
 
   /**
    * Get network Id
-   * @instance
    * @returns {Promise<String>} Network Id
    */
   readonly getNetworkId = getNetworkId
 
   /**
    * Sign message
-   * @instance
    * @param {String} message - Message to sign
    * @param {Object} opt - Options
    * @returns {String} Signature
@@ -95,7 +92,6 @@ export default abstract class AccountBase {
 
   /**
    * Verify message
-   * @instance
    * @param {String} message - Message to verify
    * @param {string | Uint8Array} signature - Signature
    * @param {Object} options - Options
@@ -113,7 +109,6 @@ export default abstract class AccountBase {
 
   /**
    * Sign data blob
-   * @instance
    * @abstract
    * @rtype (data: String) => data: Promise[String]
    * @param {String} data - Data blob to sign
@@ -124,7 +119,6 @@ export default abstract class AccountBase {
 
   /**
    * Obtain account address
-   * @instance
    * @abstract
    * @returns {String} Public account address
    */

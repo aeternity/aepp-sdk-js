@@ -101,7 +101,6 @@ export default class RpcClient <
 
   /**
    * Make a request
-   * @instance
    * @param {String} name Method name
    * @param {Object} params Method params
    * @returns {Promise} Promise which will be resolved after receiving response message
@@ -117,7 +116,6 @@ export default class RpcClient <
 
   /**
    * Make a notification
-   * @instance
    * @param {String} name Method name
    * @param {Object} params Method params
    * @returns {Promise} Promise which will be resolved after receiving response message
@@ -128,7 +126,6 @@ export default class RpcClient <
 
   /**
    * Process response message
-   * @instance
    * @param {Object} msg Message object
    * @returns {void}
    */
