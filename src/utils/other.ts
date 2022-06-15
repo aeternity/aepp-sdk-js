@@ -18,7 +18,6 @@ export const filterObject = (
 /**
  * Key traversal metafunction
  * @static
- * @function
  * @param {Function} fn - Key transformation function
  * @param {Object} object - Object to traverse
  * @returns {Object} Transformed object

@@ -199,7 +199,6 @@ const getSenderAddress = (
  * Transaction Validator
  * This function validates some of transaction properties,
  * to make sure it can be posted it to the chain
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/validator
  * @param {String} transaction Base64Check-encoded transaction
  * @param {Object} node Node to validate transaction against

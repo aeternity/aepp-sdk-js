@@ -40,7 +40,6 @@ export const isAccountBase = (acc: AccountBase | any): boolean =>
  * Account is one of the three basic building blocks of an
  * {@link module:@aeternity/aepp-sdk/es/ae--Ae} client and provides access to a
  * signing key pair.
- * @function
  * @alias module:@aeternity/aepp-sdk/es/account
  * @param {Object} [options={}] - Initializer object
  * @param {String} options.networkId - NETWORK_ID using for signing transaction's
@@ -76,7 +75,6 @@ export default abstract class AccountBase {
   /**
    * Get network Id
    * @instance
-   * @function getNetworkId
    * @returns {Promise<String>} Network Id
    */
   readonly getNetworkId = getNetworkId
@@ -115,7 +113,6 @@ export default abstract class AccountBase {
 
   /**
    * Sign data blob
-   * @function sign
    * @instance
    * @abstract
    * @rtype (data: String) => data: Promise[String]
@@ -127,7 +124,6 @@ export default abstract class AccountBase {
 
   /**
    * Obtain account address
-   * @function address
    * @instance
    * @abstract
    * @returns {String} Public account address

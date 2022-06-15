@@ -330,7 +330,6 @@ export function calculateFee (
 
 /**
  * Validate transaction params
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param params Object with tx params
  * @param schema Transaction schema
@@ -356,7 +355,6 @@ interface TxOptionsRaw {
 }
 /**
  * Build binary transaction
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param params Object with tx params
  * @param schema Transaction schema
@@ -389,7 +387,6 @@ export function buildRawTx (
 
 /**
  * Unpack binary transaction
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param binary Array with binary transaction field's
  * @param schema Transaction schema
@@ -422,7 +419,6 @@ export type TxParamsBuild = TxParamsCommon & {
 }
 /**
  * Build transaction hash
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param params Object with tx params
  * @param type Transaction type
@@ -477,7 +473,6 @@ export interface TxUnpacked<Tx extends TxSchema> {
 }
 /**
  * Unpack transaction hash
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param encodedTx Transaction to unpack
  * @param txType Expected transaction type
@@ -505,7 +500,6 @@ export function unpackTx<TxType extends TX_TYPE> (
 
 /**
  * Build a transaction hash
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param rawTx base64 or rlp encoded transaction
  * @returns Transaction hash

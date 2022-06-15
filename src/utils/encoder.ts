@@ -69,7 +69,6 @@ const parseType = (maybeType: unknown): [EncodingType, typeof base64] => {
 
 /**
  * Decode data using the default encoding/decoding algorithm
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {EncodedData<EncodingType>} data An Base58/64check encoded and prefixed string
  * (ex tx_..., sg_..., ak_....)
@@ -87,7 +86,6 @@ export function decode (data: EncodedData<EncodingType>): Buffer {
 
 /**
  * Encode data using the default encoding/decoding algorithm
- * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {Buffer|String} data  An decoded data
  * @param {string} type Prefix of Transaction

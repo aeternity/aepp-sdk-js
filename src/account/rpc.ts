@@ -37,7 +37,6 @@ export default class AccountRpc extends AccountBase {
   }
 
   /**
-   * @function signTransaction
    * @instance
    * @returns {Promise<String>} Signed transaction
    */
@@ -55,7 +54,6 @@ export default class AccountRpc extends AccountBase {
   }
 
   /**
-   * @function signMessage
    * @instance
    * @returns {Promise<String>} Signed message
    */

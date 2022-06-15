@@ -101,7 +101,6 @@ export default class RpcClient <
 
   /**
    * Make a request
-   * @function request
    * @instance
    * @param {String} name Method name
    * @param {Object} params Method params
@@ -118,7 +117,6 @@ export default class RpcClient <
 
   /**
    * Make a notification
-   * @function request
    * @instance
    * @param {String} name Method name
    * @param {Object} params Method params
@@ -130,7 +128,6 @@ export default class RpcClient <
 
   /**
    * Process response message
-   * @function processResponse
    * @instance
    * @param {Object} msg Message object
    * @returns {void}

@@ -49,7 +49,6 @@ function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Valu
  * Only by providing the joint functionality of those three, most more advanced
  * operations, i.e. the ones with actual use value on the chain, become
  * available.
- * @function
  * @alias module:@aeternity/aepp-sdk/es/ae
  * @param {Object} [options={}] - Initializer object
  * @param {String} [options.compilerUrl] compilerUrl - Url for compiler API
