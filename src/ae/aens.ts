@@ -42,7 +42,6 @@ interface KeyPointers {
 
 /**
  * Revoke a name
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name - Name hash
  * @param options
  * @param options.onAccount - Make operation on specific account from sdk (you pass
@@ -73,7 +72,6 @@ export async function aensRevoke (
 
 /**
  * Update a name
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name - AENS name
  * @param pointers - Map of pointer keys to corresponding addresses
  * @param options
@@ -127,7 +125,6 @@ export async function aensUpdate (
 
 /**
  * Transfer a domain to another account
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name - AENS name
  * @param account - Recipient account publick key
  * @param options
@@ -165,7 +162,6 @@ export async function aensTransfer (
 /**
  * Query the AENS name info from the node
  * and return the object with info and predefined functions for manipulating name
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name
  * @param opt - Options
  * @returns
@@ -242,7 +238,6 @@ export async function aensQuery (
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name
  * @param salt - Salt from pre-claim, or 0 if it's a bid
  * @param options - options
@@ -284,7 +279,6 @@ export async function aensClaim (
 
 /**
  * Preclaim a name. Sends a hash of the name and a random salt to the node
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name
  * @param options
  * @param options.onAccount - Make operation on specific account from sdk (you pass
@@ -339,7 +333,6 @@ export async function aensPreclaim (
 
 /**
  * Bid to name auction
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name - Domain name
  * @param nameFee - Name fee (bid fee)
  * @param options

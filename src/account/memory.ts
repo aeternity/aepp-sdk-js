@@ -36,7 +36,6 @@ export interface Keypair {
 
 /**
  * In-memory account stamp
- * @alias module:@aeternity/aepp-sdk/es/account/memory
  * @param options
  * @param options.keypair - Key pair to use
  * @param options.keypair.publicKey - Public key

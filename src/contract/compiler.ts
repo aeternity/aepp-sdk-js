@@ -33,7 +33,6 @@ type GeneralCompilerError = ErrorModel & {
  * Contract Compiler
  *
  * This class include api call's related to contract compiler functionality.
- * @alias module:@aeternity/aepp-sdk/es/contract/compiler
  * @param options - Initializer object
  * @returns Contract compiler instance
  * @example Compiler('COMPILER_URL')

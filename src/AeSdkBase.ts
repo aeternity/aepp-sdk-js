@@ -49,7 +49,6 @@ function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Valu
  * Only by providing the joint functionality of those three, most more advanced
  * operations, i.e. the ones with actual use value on the chain, become
  * available.
- * @alias module:@aeternity/aepp-sdk/es/ae
  * @param options - Initializer object
  * @param options.compilerUrl - compilerUrl - Url for compiler API
  */
@@ -95,7 +94,6 @@ class AeSdkBase {
 
   /**
    * Add Node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @param name - Node name
    * @param node - Node instance
    * @param select - Select this node as current
@@ -114,7 +112,6 @@ class AeSdkBase {
 
   /**
    * Select Node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @param name - Node name
    * @example
    * nodePool.selectNode('testNode')
@@ -126,7 +123,6 @@ class AeSdkBase {
 
   /**
    * Get NetworkId of current Node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @example
    * nodePool.getNetworkId()
    */
@@ -134,7 +130,6 @@ class AeSdkBase {
 
   /**
    * Check if you have selected node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @example
    * nodePool.isNodeConnected()
    */
@@ -150,7 +145,6 @@ class AeSdkBase {
 
   /**
    * Get information about node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @example
    * nodePool.getNodeInfo() // { name, version, networkId, protocol, ... }
    */
@@ -164,7 +158,6 @@ class AeSdkBase {
 
   /**
    * Get array of available nodes
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @example
    * nodePool.getNodesInPool()
    */

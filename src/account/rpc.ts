@@ -9,7 +9,6 @@ import { EncodedData } from '../utils/encoder'
 
 /**
  * Account provided by wallet
- * @alias module:@aeternity/aepp-sdk/es/account/rpc
  * @param param
  * @param param.rpcClient - RpcClient instance
  * @param param.address - RPC account address

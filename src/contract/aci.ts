@@ -132,7 +132,6 @@ type ContractCallReturnType = 'ok' | 'error' | 'revert'
 /**
 * Generate contract ACI object with predefined js methods for contract usage - can be used for
 * creating a reference to already deployed contracts
-* @alias module:@aeternity/aepp-sdk/es/contract/aci
 * @param options - Options object
 * @returns JS Contract API
 * @example
@@ -229,7 +228,6 @@ export default async function getContractInstance ({
 
   /**
   * Compile contract
-  * @alias module:@aeternity/aepp-sdk/es/contract/aci
   * @returns bytecode
   */
   instance.compile = async (options = {}): Promise<EncodedData<'cb'>> => {
@@ -291,7 +289,6 @@ export default async function getContractInstance ({
 
   /**
   * Deploy contract
-  * @alias module:@aeternity/aepp-sdk/es/contract/aci
   * @param params - Contract init function arguments array
   * @param options
   * @returns deploy info
@@ -347,7 +344,6 @@ export default async function getContractInstance ({
 
   /**
   * Call contract function
-  * @alias module:@aeternity/aepp-sdk/es/contract/aci
   * @param fn - Function name
   * @param params - Array of function arguments
   * @param options - Array of function arguments
@@ -449,7 +445,6 @@ export default async function getContractInstance ({
 
   /**
   * Decode Events
-  * @alias module:@aeternity/aepp-sdk/es/contract/aci
   * @param events - Array of encoded events (callRes.result.log)
   * @param options - Options
   * @returns DecodedEvents

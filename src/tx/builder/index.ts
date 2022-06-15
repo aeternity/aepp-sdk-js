@@ -249,7 +249,6 @@ function getOracleRelativeTtl (params: any, txType: TX_TYPE): number {
 
 /**
  * Calculate min fee
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/index
  * @param txType - Transaction type
  * @param options - Options object
  * @param options.gasLimit
@@ -304,7 +303,6 @@ function buildFee (
 
 /**
  * Calculate fee
- * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param fee - fee
  * @param txType - Transaction type
  * @param options - Options object
@@ -329,7 +327,6 @@ export function calculateFee (
 
 /**
  * Validate transaction params
- * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param params - Object with tx params
  * @param schema - Transaction schema
  * @param excludeKeys  Array of keys to exclude for validation
@@ -354,7 +351,6 @@ interface TxOptionsRaw {
 }
 /**
  * Build binary transaction
- * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param params - Object with tx params
  * @param schema - Transaction schema
  * @param options - options
@@ -386,7 +382,6 @@ export function buildRawTx (
 
 /**
  * Unpack binary transaction
- * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param binary - Array with binary transaction field's
  * @param schema - Transaction schema
  * @returns Object with transaction field's
@@ -418,7 +413,6 @@ export type TxParamsBuild = TxParamsCommon & {
 }
 /**
  * Build transaction hash
- * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param params - Object with tx params
  * @param type - Transaction type
  * @param options - options
@@ -472,7 +466,6 @@ export interface TxUnpacked<Tx extends TxSchema> {
 }
 /**
  * Unpack transaction hash
- * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param encodedTx - Transaction to unpack
  * @param txType - Expected transaction type
  * @returns object
@@ -499,7 +492,6 @@ export function unpackTx<TxType extends TX_TYPE> (
 
 /**
  * Build a transaction hash
- * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param rawTx - base64 or rlp encoded transaction
  * @returns Transaction hash
  */

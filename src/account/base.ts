@@ -39,7 +39,6 @@ export const isAccountBase = (acc: AccountBase | any): boolean =>
  * Account is one of the three basic building blocks of an
  * {@link module:@aeternity/aepp-sdk/es/ae--Ae} client and provides access to a
  * signing key pair.
- * @alias module:@aeternity/aepp-sdk/es/account
  * @param options - Initializer object
  * @param options.networkId - NETWORK_ID using for signing transaction's
  */

@@ -42,7 +42,6 @@ export type TxField = [
 
 /**
  * @description Object with transaction types
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/schema
  * @link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/serializations.md#binary-serialization
  */
 export enum TX_TYPE {

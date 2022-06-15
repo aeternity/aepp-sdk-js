@@ -48,7 +48,6 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
 
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
- * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @param oracleId - Oracle public key
  * @param options
  * @returns Oracle object
@@ -93,7 +92,6 @@ export async function getOracleObject (
 
 /**
  * Poll for oracle queries
- * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @param oracleId - Oracle public key
  * @param onQuery - OnQuery callback
  * @param options - Options object
@@ -131,7 +129,6 @@ export function pollForQueries (
 
 /**
  * Constructor for OracleQuery Object (helper object for using OracleQuery)
- * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @param oracleId - Oracle public key
  * @param queryId - Oracle Query id
  * @param options
@@ -165,7 +162,6 @@ export async function getQueryObject (
 
 /**
  * Poll for oracle query response
- * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @param oracleId - Oracle public key
  * @param queryId - Oracle Query id
  * @param options - Options object
@@ -192,7 +188,6 @@ export async function pollForQueryResponse (
 
 /**
  * Register oracle
- * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @param queryFormat - Format of query
  * @param responseFormat - Format of query response
  * @param options
@@ -235,7 +230,6 @@ export async function registerOracle (
 
 /**
  * Post query to oracle
- * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @param oracleId - Oracle public key
  * @param query - Oracle query object
  * @param options - Options object
@@ -283,7 +277,6 @@ export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
 
 /**
  * Extend oracle ttl
- * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @param oracleId - Oracle public key
  * @param options - Options object
  * @param options.fee - fee Transaction fee
@@ -312,7 +305,6 @@ export async function extendOracleTtl (
 
 /**
  * Extend oracle ttl
- * @alias module:@aeternity/aepp-sdk/es/ae/oracle
  * @param oracleId - Oracle public key
  * @param queryId - Oracle query id
  * @param response - Oracle query response
