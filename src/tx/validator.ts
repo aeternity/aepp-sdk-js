@@ -201,7 +201,7 @@ const getSenderAddress = (
  * @alias module:@aeternity/aepp-sdk/es/tx/validator
  * @param transaction Base64Check-encoded transaction
  * @param node Node to validate transaction against
- * @param [parentTxTypes] Types of parent transactions
+ * @param parentTxTypes Types of parent transactions
  * @returns Array with verification errors
  * @example const errors = await verifyTransaction(transaction, node)
  */

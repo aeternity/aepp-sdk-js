@@ -30,8 +30,8 @@ export default class AeSdk extends AeSdkBase {
    * Add specific account
    * @alias module:@aeternity/aepp-sdk/es/accounts/multiple
    * @param account - Account instance
-   * @param [options={}] - Options
-   * @param [options.select] - Select account
+   * @param options - Options
+   * @param options.select - Select account
    * @example addAccount(account)
    */
   async addAccount (account: AccountBase, { select }: { select?: boolean } = {}): Promise<void> {

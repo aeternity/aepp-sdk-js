@@ -62,7 +62,7 @@ export function toBytes (val?: null | string | number | BigNumber, big: boolean 
  * will be used if the input is valid hex.  If the input is valid base64 but
  * not valid hex, base64 will be used.  Otherwise, utf8 will be used.
  * @param str String to be converted.
- * @param [enc] Encoding of the input string.
+ * @param enc Encoding of the input string.
  * @returns Buffer containing the input data.
  */
 export function str2buf (str: string, enc?: BufferEncoding): Buffer {

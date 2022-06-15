@@ -357,9 +357,9 @@ interface TxOptionsRaw {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param params Object with tx params
  * @param schema Transaction schema
- * @param [options={}] options
- * @param [options.excludeKeys=[]] Array of keys to exclude for validation and build
- * @param [options.denomination='aettos'] Denomination of amounts
+ * @param options options
+ * @param options.excludeKeys Array of keys to exclude for validation and build
+ * @param options.denomination Denomination of amounts
  * @throws {Error} Validation error
  * @returns Array with binary fields of transaction
  */
@@ -421,9 +421,9 @@ export type TxParamsBuild = TxParamsCommon & {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param params Object with tx params
  * @param type Transaction type
- * @param [options={}] options
- * @param [options.excludeKeys] Array of keys to exclude for validation and build
- * @param [options.prefix] Prefix of transaction
+ * @param options options
+ * @param options.excludeKeys Array of keys to exclude for validation and build
+ * @param options.prefix Prefix of transaction
  * @throws {Error} Validation error
  * @returns object
  * @returns object.tx Base64Check transaction hash with 'tx_' prefix

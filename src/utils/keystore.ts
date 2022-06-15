@@ -78,7 +78,7 @@ const CRYPTO_DEFAULTS = {
  * @param plaintext Data to be encrypted.
  * @param key Secret key.
  * @param nonce Randomly generated nonce.
- * @param [algo=xsalsa20-poly1305] Encryption algorithm.
+ * @param algo Encryption algorithm.
  * @returns Encrypted data.
  */
 function encrypt (
@@ -95,7 +95,7 @@ function encrypt (
  * @param ciphertext Data to be decrypted.
  * @param key Secret key.
  * @param nonce Nonce from key-object.
- * @param [algo=xsalsa20-poly1305] Encryption algorithm.
+ * @param algo Encryption algorithm.
  * @returns Decrypted data.
  */
 function decrypt (
@@ -149,9 +149,9 @@ export async function recover (
  * @param privateKey Private key as hex-string or a Buffer.
  * @param nonce Randomly generated 24byte nonce.
  * @param salt Randomly generated 16byte salt.
- * @param [options] Encryption parameters.
- * @param [options.kdf=argon2id] Key derivation function.
- * @param [options.kdf_params] KDF parameters.
+ * @param options Encryption parameters.
+ * @param options.kdf Key derivation function.
+ * @param options.kdf_params KDF parameters.
  */
 export async function dump (
   name: string,

@@ -40,7 +40,7 @@ export const isAccountBase = (acc: AccountBase | any): boolean =>
  * {@link module:@aeternity/aepp-sdk/es/ae--Ae} client and provides access to a
  * signing key pair.
  * @alias module:@aeternity/aepp-sdk/es/account
- * @param [options={}] - Initializer object
+ * @param options - Initializer object
  * @param options.networkId - NETWORK_ID using for signing transaction's
  */
 export default abstract class AccountBase {
@@ -54,7 +54,7 @@ export default abstract class AccountBase {
    * Sign encoded transaction
    * @param tx - Transaction to sign
    * @param opt - Options
-   * @param [opt.innerTx] - Sign as inner transaction for PayingFor
+   * @param opt.innerTx - Sign as inner transaction for PayingFor
    * @returns Signed transaction
    */
   async signTransaction (
