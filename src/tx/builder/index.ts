@@ -60,6 +60,8 @@ function deserializeField (
     case FIELD_TYPES.abiVersion:
     case FIELD_TYPES.ttlType:
       return readInt(value)
+    case FIELD_TYPES.shortInt:
+      return +readInt(value)
     case FIELD_TYPES.id:
       return readId(value)
     case FIELD_TYPES.ids:
@@ -127,6 +129,7 @@ function serializeField (
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
+    case FIELD_TYPES.shortInt:
     case FIELD_TYPES.abiVersion:
     case FIELD_TYPES.ttlType:
       return writeInt(value)
@@ -182,7 +185,8 @@ function validateField (
   // Validate type of value
   switch (type) {
     case FIELD_TYPES.amount:
-    case FIELD_TYPES.int: {
+    case FIELD_TYPES.int:
+    case FIELD_TYPES.shortInt: {
       if (isNaN(value) && !BigNumber.isBigNumber(value)) {
         return `${String(value)} is not of type Number or BigNumber`
       }

@@ -143,27 +143,6 @@ export async function getVmVersion (
 }
 
 /**
- * Compute the absolute ttl by adding the ttl to the current height of the chain
- *
- * @param ttl
- * @param relative - ttl is absolute or relative(default: true(relative))
- * @returns Absolute Ttl
- */
-export async function calculateTtl (
-  { ttl = TX_TTL, relative = true, onNode }:
-  { ttl?: number, relative?: boolean, onNode: Node }
-): Promise<number> {
-  if (ttl === 0) return 0
-  if (ttl < 0) throw new ArgumentError('ttl', 'greater or equal to 0', ttl)
-
-  if (relative) {
-    const { height } = await onNode.getCurrentKeyBlock()
-    return +(height) + ttl
-  }
-  return ttl
-}
-
-/**
  * Calculate fee, get absolute ttl (ttl + height), get account nonce
  *
  * @param txType - Type of transaction
@@ -174,8 +153,8 @@ export async function prepareTxParams (
   txType: TX_TYPE,
   {
     senderId,
-    nonce: n,
-    ttl: t,
+    nonce,
+    ttl = TX_TTL,
     fee: f,
     gasLimit,
     absoluteTtl,
@@ -187,7 +166,7 @@ export async function prepareTxParams (
     senderId: EncodedData<'ak'>
     vsn?: number
     gasLimit?: number | string | BigNumber
-    absoluteTtl?: number
+    absoluteTtl?: boolean
     strategy?: 'continuity' | 'max'
     showWarning?: boolean
     onNode: Node
@@ -195,20 +174,21 @@ export async function prepareTxParams (
 ): Promise<{
     fee: number | string | BigNumber
     ttl: number
-    nonce: number | string | BigNumber
+    nonce: number
   }> {
-  n = n ?? (
+  nonce ??= (
     await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
   ).nextNonce
-  const ttl = await calculateTtl({
-    ttl: t as number,
-    relative: absoluteTtl == null,
-    onNode
-  })
+
+  if (ttl !== 0) {
+    if (ttl < 0) throw new ArgumentError('ttl', 'greater or equal to 0', ttl)
+    ttl += absoluteTtl === true ? 0 : (await onNode.getCurrentKeyBlock()).height
+  }
+
   const fee = calculateFee(
     f,
     txType,
-    { showWarning, gasLimit, params: { ...arguments[1], nonce: n, ttl }, vsn }
+    { showWarning, gasLimit, params: { ...arguments[1], nonce, ttl }, vsn }
   )
-  return { fee, ttl, nonce: n }
+  return { fee, ttl, nonce }
 }

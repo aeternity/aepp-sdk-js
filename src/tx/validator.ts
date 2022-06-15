@@ -204,11 +204,9 @@ export default async function verifyTransaction (
   node: Node,
   parentTxTypes: TX_TYPE[] = []
 ): Promise<ValidatorResult[]> {
-  const { tx, txType } = unpackTx(transaction)
+  const { tx, txType } = unpackTx<TX_TYPE.signed>(transaction)
   const address = getSenderAddress(tx) ??
-    (txType === TX_TYPE.signed
-      ? getSenderAddress((tx as TxTypeSchemas[TX_TYPE.signed]).encodedTx.tx)
-      : undefined)
+    (txType === TX_TYPE.signed ? getSenderAddress(tx.encodedTx.tx) : undefined)
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
     address == null
       ? undefined
