@@ -124,7 +124,7 @@ export async function transferFunds (
 /**
  * Submit transaction of another account paying for it (fee and gas)
  * @param transaction - tx_<base64>-encoded transaction
- * @param options
+ * @param options - Options
  * @returns Object Transaction
  */
 export async function payForTransaction (

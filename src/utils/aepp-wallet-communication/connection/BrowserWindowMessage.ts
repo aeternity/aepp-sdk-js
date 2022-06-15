@@ -21,14 +21,6 @@ import { InternalError, RpcConnectionError } from '../../errors'
 
 /**
  * Browser window Post Message connector module
- * @param params - Initializer object
- * @param params.target - Target window for message
- * @param params.self - Host window for message
- * @param params.origin - Origin of receiver
- * @param params.sendDirection - Wrapping messages into additional struct
- * ({ type: 'to_aepp' || 'to_waellet', data })
- * Used for handling messages between content script and page
- * @param params.receiveDirection - Unwrapping messages from additional struct
  */
 export default class BrowserWindowMessageConnection extends BrowserConnection {
   origin?: string
@@ -39,6 +31,16 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
   #target?: Window
   #self: Window
 
+  /**
+   * @param options - Options
+   * @param options.target Target window for message
+   * @param options.self Host window for message
+   * @param options.origin Origin of receiver
+   * @param options.sendDirection Wrapping messages into additional struct
+   * `({ type: 'to_aepp' || 'to_waellet', data })`
+   * Used for handling messages between content script and page
+   * @param options.receiveDirection Unwrapping messages from additional struct
+   */
   constructor ({
     target,
     self = window,

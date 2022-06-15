@@ -48,7 +48,7 @@ export type AensName = `${string}.chain`
 /**
  * Submit a signed transaction for mining
  * @param tx - Transaction to submit
- * @param options
+ * @param options - Options
  * @param options.onNode - Node to use
  * @param options.onAccount - Account to use
  * @param options.verify - Verify transaction before sending
@@ -124,7 +124,7 @@ export async function sendTransaction (
 /**
  * Wait for transaction confirmation
  * @param txHash - Transaction hash
- * @param options
+ * @param options - Options
  * @param options.confirm - Number of micro blocks to wait for transaction confirmation
  * @param options.onNode - Node to use
  * @returns Current Height
@@ -150,7 +150,7 @@ export async function waitForTxConfirm (
 /**
  * Get account by account public key
  * @param address - Account address (public key)
- * @param options
+ * @param options - Options
  * @param options.height - Get account on specific block by block height
  * @param options.hash - Get account on specific block by micro block hash or key block hash
  * @param options.onNode - Node to use
@@ -168,7 +168,7 @@ export async function getAccount (
 /**
  * Request the balance of specified account
  * @param address - The public account address to obtain the balance for
- * @param options
+ * @param options - Options
  * @param options.format
  * @param options.height - The chain height at which to obtain the balance for
  * (default: top of chain)
@@ -195,7 +195,7 @@ export async function height ({ onNode }: { onNode: Node }): Promise<number> {
 /**
  * Wait for the chain to reach a specific height
  * @param height - Height to wait for
- * @param options
+ * @param options - Options
  * @param options.interval - Interval (in ms) at which to poll the chain
  * @param options.attempts - Number of polling attempts after which to fail
  * @param options.onNode - Node to use
@@ -220,7 +220,7 @@ export async function awaitHeight (
 /**
  * Wait for a transaction to be mined
  * @param th - The hash of transaction to poll
- * @param options
+ * @param options - Options
  * @param options.interval - Interval (in ms) at which to poll the chain
  * @param options.blocks - Number of blocks mined after which to fail
  * @param options.onNode - Node to use
@@ -243,7 +243,7 @@ export async function poll (
 
 /**
  * Obtain current generation
- * @param options
+ * @param options - Options
  * @param options.onNode - Node to use
  * @returns Current Generation
  */
@@ -256,7 +256,7 @@ export async function getCurrentGeneration (
 /**
  * Get generation by hash or height
  * @param hashOrHeight - Generation hash or height
- * @param options
+ * @param options - Options
  * @param options.onNode - Node to use
  * @returns Generation
  */
@@ -269,8 +269,8 @@ export async function getGeneration (
 
 /**
  * Get micro block transactions
- * @param hash
- * @param options
+ * @param hash - Micro block hash
+ * @param options - Options
  * @param options.onNode - Node to use
  * @returns Transactions
  */
@@ -282,8 +282,8 @@ export async function getMicroBlockTransactions (
 
 /**
  * Get key block
- * @param hashOrHeight
- * @param options
+ * @param hashOrHeight - Key block hash or height
+ * @param options - Options
  * @param options.onNode - Node to use
  * @returns Key Block
  */
@@ -296,8 +296,8 @@ export async function getKeyBlock (
 
 /**
  * Get micro block header
- * @param hash
- * @param options
+ * @param hash - Micro block hash
+ * @param options - Options
  * @param options.onNode - Node to use
  * @returns Micro block header
  */
@@ -350,7 +350,7 @@ async function txDryRunHandler (key: string, onNode: Node): Promise<void> {
  * Transaction dry-run
  * @param tx - transaction to execute
  * @param accountAddress - address that will be used to execute transaction
- * @param options
+ * @param options - Options
  * @param options.top - hash of block on which to make dry-run
  * @param options.txEvents - collect and return on-chain tx events that would result from the call
  * @param options.combine - Enables combining of similar requests to a single dry-run call
@@ -380,7 +380,7 @@ export async function txDryRun (
 /**
  * Get contract byte code
  * @param contractId - Contract address
- * @param options
+ * @param options - Options
  * @param options.onNode - Node to use
  */
 export async function getContractByteCode (
@@ -392,7 +392,7 @@ export async function getContractByteCode (
 /**
  * Get contract entry
  * @param contractId - Contract address
- * @param options
+ * @param options - Options
  * @param options.onNode - Node to use
  */
 export async function getContract (
@@ -403,8 +403,8 @@ export async function getContract (
 
 /**
  * Get name entry
- * @param name
- * @param options
+ * @param name - AENS name
+ * @param options - Options
  * @param options.onNode - Node to use
  */
 export async function getName (
@@ -415,9 +415,9 @@ export async function getName (
 
 /**
  * Resolve AENS name and return name hash
- * @param nameOrId
+ * @param nameOrId - AENS name or address
  * @param key - in AENS pointers record
- * @param options
+ * @param options - Options
  * @param options.verify - To ensure that name exist and have a corresponding pointer
  * // TODO: avoid that to don't trust to current api gateway
  * @param options.resolveByNode - Enables pointer resolving using node

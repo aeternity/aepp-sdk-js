@@ -37,20 +37,19 @@ function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Valu
 }
 
 /**
- * Basic Ae Stamp
+ * Basic AeSdk class
  *
- * Attempting to create instances from the Stamp without overwriting all
- * abstract methods using composition will result in an exception.
- *
- * Ae objects are the composition of three basic building blocks:
- * * {@link module:@aeternity/aepp-sdk/es/tx--Tx}
- * * {@link module:@aeternity/aepp-sdk/es/account--Account}
- * * {@link module:@aeternity/aepp-sdk/es/chain--Chain}
- * Only by providing the joint functionality of those three, most more advanced
+ * AeSdkBase objects are the composition of:
+ * - chain methods
+ * - tx methods
+ * - aens methods
+ * - spend methods
+ * - oracle methods
+ * - contract methods
+ * - contract ga methods
+ * Only by providing the joint functionality of them, most more advanced
  * operations, i.e. the ones with actual use value on the chain, become
  * available.
- * @param options - Initializer object
- * @param options.compilerUrl - compilerUrl - Url for compiler API
  */
 class AeSdkBase {
   _options = {
@@ -62,6 +61,12 @@ class AeSdkBase {
   selectedNodeName?: string
   compilerApi: Compiler
 
+  /**
+   * @param options - Options
+   * @param options.nodes - Array of nodes
+   * @param options.compilerUrl - Url for compiler API
+   * @param options.ignoreVersion - Don't check node or compiler version
+   */
   constructor (
     { nodes = [], compilerUrl, ignoreVersion = false, ...options }:
     {
@@ -98,8 +103,10 @@ class AeSdkBase {
    * @param node - Node instance
    * @param select - Select this node as current
    * @example
+   * ```js
    * // add and select new node with name 'testNode'
-   * nodePool.addNode('testNode', awaitNode({ url }), true)
+   * aeSdkBase.addNode('testNode', new Node({ url }), true)
+   * ```
    */
   addNode (name: string, node: Node, select = false): void {
     if (this.pool.has(name)) throw new DuplicateNodeError(name)
@@ -146,7 +153,9 @@ class AeSdkBase {
   /**
    * Get information about node
    * @example
+   * ```js
    * nodePool.getNodeInfo() // { name, version, networkId, protocol, ... }
+   * ```
    */
   async getNodeInfo (): Promise<NodeInfo> {
     this.ensureNodeConnected()
@@ -210,7 +219,6 @@ class AeSdkBase {
   /**
    * Resolves an account
    * @param account - ak-address, instance of AccountBase, or keypair
-   * @private
    */
   _resolveAccount (account?: Account): AccountBase {
     switch (account !== null && typeof account) {

@@ -32,7 +32,7 @@ export function bigNumberToByteArray (x: BigNumber): Buffer {
 
 /**
  * Convert string, number, or BigNumber to byte array
- * @param val
+ * @param val - value to convert
  * @param big - enables force conversion to BigNumber
  * @returns Buffer
  */

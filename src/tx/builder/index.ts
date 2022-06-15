@@ -256,7 +256,10 @@ function getOracleRelativeTtl (params: any, txType: TX_TYPE): number {
  * @param options - Options object
  * @param options.gasLimit
  * @param options.params - Tx params
- * @example calculateMinFee('spendTx', { gasLimit, params })
+ * @example
+ * ```js
+ * calculateMinFee('spendTx', { gasLimit, params })
+ * ```
  */
 export function calculateMinFee (
   txType: TX_TYPE,
@@ -281,10 +284,6 @@ export function calculateMinFee (
 
 /**
  * Calculate fee based on tx type and params
- * @param txType
- * @param options.params
- * @param options.multiplier
- * @param options.vsn
  */
 function buildFee (
   txType: TX_TYPE,
@@ -311,7 +310,6 @@ function buildFee (
  * @param options - Options object
  * @param options.gasLimit
  * @param options.params - Tx params
- * @example calculateFee(null, 'spendTx', { gasLimit, params })
  */
 export function calculateFee (
   fee: number | BigNumber | string = 0,
@@ -332,7 +330,7 @@ export function calculateFee (
  * Validate transaction params
  * @param params - Object with tx params
  * @param schema - Transaction schema
- * @param excludeKeys  Array of keys to exclude for validation
+ * @param excludeKeys - Array of keys to exclude for validation
  * @returns Object with validation errors
  */
 export function validateParams (
@@ -359,7 +357,7 @@ interface TxOptionsRaw {
  * @param options - options
  * @param options.excludeKeys - Array of keys to exclude for validation and build
  * @param options.denomination - Denomination of amounts
- * @throws {Error} Validation error
+ * @throws {@link InvalidTxParamsError}
  * @returns Array with binary fields of transaction
  */
 export function buildRawTx (
@@ -421,7 +419,7 @@ export type TxParamsBuild = TxParamsCommon & {
  * @param options - options
  * @param options.excludeKeys - Array of keys to exclude for validation and build
  * @param options.prefix - Prefix of transaction
- * @throws {Error} Validation error
+ * @throws {@link InvalidTxParamsError}
  * @returns object
  * @returns object.tx Base64Check transaction hash with 'tx_' prefix
  * @returns object.rlpEncoded rlp encoded transaction
@@ -507,7 +505,7 @@ export function buildTxHash (rawTx: EncodedData<'tx'> | Uint8Array): EncodedData
 
 /**
  * Build a contract public key by contractCreateTx or gaAttach
- * @param  contractTx Transaction
+ * @param contractTx - Transaction
  * @returns Contract public key
  */
 export function buildContractIdByContractTx (contractTx: EncodedData<'tx'>): EncodedData<'ct'> {

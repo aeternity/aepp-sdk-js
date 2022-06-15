@@ -30,14 +30,17 @@ export interface Keypair {
 
 /**
  * In-memory account stamp
- * @param options
- * @param options.keypair - Key pair to use
- * @param options.keypair.publicKey - Public key
- * @param options.keypair.secretKey - Private key
  */
 export default class AccountMemory extends AccountBase {
   isGa: boolean
 
+  /**
+   * @param options - Options
+   * @param options.keypair - Key pair to use
+   * @param options.keypair.publicKey - Public key
+   * @param options.keypair.secretKey - Private key
+   * @param options.gaId - Address of generalized account
+   */
   constructor (
     { keypair, gaId, ...options }: { keypair?: Keypair, gaId?: EncodedData<'ak'> } & ConstructorParameters<typeof AccountBase>[0]
   ) {

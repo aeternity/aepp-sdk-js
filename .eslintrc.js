@@ -1,4 +1,7 @@
 const configStandard = require('eslint-config-standard/.eslintrc.json')
+const path = require('path')
+
+require('eslint-plugin-rulesdir').RULES_DIR = path.resolve(__dirname, 'tooling/eslint-rules')
 
 const equivalents = [
   'comma-spacing',
@@ -44,7 +47,8 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: [
-    '@typescript-eslint'
+    '@typescript-eslint',
+    'rulesdir'
   ],
   ignorePatterns: ['dist', 'es', 'src/apis', 'docs/api'],
   rules: {
@@ -57,7 +61,8 @@ module.exports = {
     }],
     'import/no-cycle': 2,
     'no-unused-vars': 0,
-    '@typescript-eslint/no-unused-vars': 2
+    '@typescript-eslint/no-unused-vars': 2,
+    'rulesdir/tsdoc-syntax': 'error'
   },
   overrides: [{
     files: '*.ts',

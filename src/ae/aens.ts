@@ -42,7 +42,7 @@ interface KeyPointers {
 /**
  * Revoke a name
  * @param name - Name hash
- * @param options
+ * @param options - Options
  * @param options.onAccount - Make operation on specific account from sdk (you pass
  * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
  * @param options.fee - fee
@@ -50,12 +50,14 @@ interface KeyPointers {
  * @param options.nonce - nonce
  * @returns Transaction result
  * @example
+ * ```js
  * const name = 'test.chain'
  * const nameObject = await sdkInstance.aensQuery(name)
  *
  * await sdkInstance.aensRevoke(name, { fee, ttl , nonce })
  * // or
  * await nameObject.revoke({ fee, ttl, nonce })
+ * ```
  */
 export async function aensRevoke (
   name: AensName,
@@ -73,7 +75,7 @@ export async function aensRevoke (
  * Update a name
  * @param name - AENS name
  * @param pointers - Map of pointer keys to corresponding addresses
- * @param options
+ * @param options - Options
  * @param options.extendPointers - Get the pointers from the node and merge with provided
  * ones. Pointers with the same type will be overwritten
  * @param options.onAccount - Make operation on specific account from sdk (you
@@ -87,6 +89,7 @@ export async function aensRevoke (
  * clients should cache this information
  * @throws Invalid pointer array error
  * @example
+ * ```js
  * const name = 'test.chain'
  * const pointersArray = ['ak_asd23dasdas...,' 'ct_asdf34fasdasd...']
  * const nameObject = await sdkInstance.aensQuery(name)
@@ -94,6 +97,7 @@ export async function aensRevoke (
  * await sdkInstance.aensUpdate(name, pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
  * // or
  * await nameObject.update(pointers, { nameTtl, ttl, fee, nonce, clientTtl })
+ * ```
  */
 export async function aensUpdate (
   name: AensName,
@@ -126,7 +130,7 @@ export async function aensUpdate (
  * Transfer a domain to another account
  * @param name - AENS name
  * @param account - Recipient account publick key
- * @param options
+ * @param options - Options
  * @param options.onAccount - Make operation on specific account from sdk (you pass
  * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
  * @param options.fee - fee
@@ -134,6 +138,7 @@ export async function aensUpdate (
  * @param options.nonce - nonce
  * @returns Transaction result
  * @example
+ * ```js
  * const name = 'test.chain'
  * const recipientPub = 'ak_asd23dasdas...'
  * const nameObject = await sdkInstance.aensQuery(name)
@@ -141,6 +146,7 @@ export async function aensUpdate (
  * await sdkInstance.aensTransfer(name, recipientPub, { ttl, fee, nonce })
  * // or
  * await nameObject.transfer(recipientPub, { ttl, fee, nonce })
+ * ```
  */
 export async function aensTransfer (
   name: AensName,
@@ -161,10 +167,11 @@ export async function aensTransfer (
 /**
  * Query the AENS name info from the node
  * and return the object with info and predefined functions for manipulating name
- * @param name
+ * @param name - AENS name
  * @param opt - Options
  * @returns
  * @example
+ * ```js
  * const nameObject = sdkInstance.aensQuery('test.chain')
  * console.log(nameObject)
  * {
@@ -175,6 +182,7 @@ export async function aensTransfer (
  *  transfer, // Transfer name function
  *  revoke // Revoke name function
  * }
+ * ```
  */
 export async function aensQuery (
   name: AensName,
@@ -237,7 +245,7 @@ export async function aensQuery (
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
- * @param name
+ * @param name - AENS name
  * @param salt - Salt from pre-claim, or 0 if it's a bid
  * @param options - options
  * @param options.onAccount - Make operation on specific account from sdk (you pass
@@ -248,10 +256,12 @@ export async function aensQuery (
  * @param options.nameFee - Name Fee (By default calculated by sdk)
  * @returns the result of the claim
  * @example
+ * ```js
  * const name = 'test.chain'
  * const salt = preclaimResult.salt // salt from pre-claim transaction
  *
  * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
+ * ```
  */
 export async function aensClaim (
   name: AensName,
@@ -278,14 +288,15 @@ export async function aensClaim (
 
 /**
  * Preclaim a name. Sends a hash of the name and a random salt to the node
- * @param name
- * @param options
+ * @param name - AENS name
+ * @param options - Options
  * @param options.onAccount - Make operation on specific account from sdk (you pass
  * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
  * @param options.fee - fee
  * @param options.ttl - ttl
  * @param options.nonce - nonce
  * @example
+ * ```js
  * const name = 'test.chain'
  * const salt = preclaimResult.salt // salt from pre-claim transaction
  *
@@ -296,6 +307,7 @@ export async function aensClaim (
  *   salt,
  *   commitmentId
  * }
+ * ```
  */
 export async function aensPreclaim (
   name: AensName,
@@ -334,7 +346,7 @@ export async function aensPreclaim (
  * Bid to name auction
  * @param name - Domain name
  * @param nameFee - Name fee (bid fee)
- * @param options
+ * @param options - Options
  * @param options.onAccount - Make operation on specific account from sdk (you pass
  * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
  * @param options.fee - fee
@@ -342,10 +354,12 @@ export async function aensPreclaim (
  * @param options.nonce - nonce
  * @returns Transaction result
  * @example
+ * ```js
  * const name = 'test.chain'
  * const bidFee = computeBidFee(name, startFee, incrementPercentage)
  *
  * await sdkInstance.aensBid(name, 213109412839123, { ttl, fee, nonce })
+ * ```
  */
 export async function aensBid (
   name: AensName,

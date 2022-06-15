@@ -11,17 +11,10 @@ import { AensName } from '../../chain'
 export class Field {
   public prototype: any
 
-  /**
-   * @param value
-   * @param _txFields
-   */
   static serialize (value: any, _txFields: object = {}): Buffer {
     return Buffer.from(value)
   }
 
-  /**
-   * @param value
-   */
   static deserialize (value: Buffer): any {
     return value.toString()
   }

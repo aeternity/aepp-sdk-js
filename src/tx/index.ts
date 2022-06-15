@@ -19,13 +19,8 @@
  * Transaction methods
  *
  * This is implementation of [Tx](api/tx.md) relays
- * the creation of transactions to {@link module:@aeternity/aepp-sdk/es/Node}.
- * These methods provide ability to create native transaction's,
- * or transaction's using Node API.
- * As there is no built-in security between Node and client communication,
- * creating transaction using {@link module:@aeternity/aepp-sdk/es/Node} API
- * must never be used for production but can be very useful to verify other
- * implementations.
+ * the creation of transactions to {@link Node}.
+ * These methods provide ability to create native transactions.
  */
 import {
   ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon, TxTypeSchemas
@@ -116,7 +111,6 @@ export async function _buildTx<TxType extends TX_TYPE> (
  *
  * @param txType - Type of transaction
  * @param ctVersion - Object with vm and abi version fields
- * @param options
  * @returns Object with vm/abi version
  */
 export async function getVmVersion (

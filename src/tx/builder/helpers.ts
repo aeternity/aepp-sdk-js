@@ -70,7 +70,7 @@ export function oracleQueryId (
 
 /**
  * Format the salt into a 64-byte hex string
- * @param salt
+ * @param salt - Random number
  * @returns Zero-padded hex string of salt
  */
 export function formatSalt (salt: number): Buffer {
@@ -145,7 +145,7 @@ export function readInt (buf: Buffer = Buffer.from([])): string {
 /**
  * Helper function to build pointers for name update TX
  * @param pointers - Array of pointers
- * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
+ * `([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])`
  * @returns Serialized pointers array
  */
 export function buildPointers (pointers: Pointer[]): Buffer[][] {
@@ -175,7 +175,7 @@ const AENS_SUFFIX = '.chain'
 
 /**
  * Is AENS name valid
- * @param name
+ * @param name - AENS name
  */
 export function isNameValid (name: string): boolean {
   // TODO: probably there are stronger requirements
@@ -185,7 +185,6 @@ export function isNameValid (name: string): boolean {
 /**
  * @param identifier - account/oracle/contract address, or channel
  * @returns default AENS pointer key
- * @throws exception when default key not defined
  */
 export function getDefaultPointerKey (
   identifier: EncodedData<keyof typeof POINTER_KEY_BY_PREFIX>
@@ -230,9 +229,9 @@ export function computeBidFee (
 /**
  * Compute auction end height
  *
- * @param name
+ * @param name - Name to compute auction end for
  * @param claimHeight - Auction starting height
- * @link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
+ * @see {@link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273}
  * @returns Auction end height
  */
 export function computeAuctionEndBlock (name: AensName, claimHeight: number): number {
@@ -246,8 +245,6 @@ export function computeAuctionEndBlock (name: AensName, claimHeight: number): nu
 
 /**
  * Is name accept going to auction
- *
- * @param name
  */
 export function isAuctionName (name: AensName): boolean {
   return name.length < 13 + AENS_SUFFIX.length
