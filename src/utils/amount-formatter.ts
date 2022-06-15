@@ -52,7 +52,7 @@ const DENOMINATION_MAGNITUDE = {
  * @param {String|Number|BigNumber} value amount to convert
  * @param {Object} [options={}] options
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
- * @return {String}
+ * @returns {String}
  */
 export const toAe = (
   value: string | number | BigNumber,
@@ -64,7 +64,7 @@ export const toAe = (
  * @param {String|Number|BigNumber} value amount to convert
  * @param {Object} [options={}] options
  * @param {String} [options.denomination='ae'] denomination of amount, can be ['ae', 'aettos']
- * @return {String}
+ * @returns {String}
  */
 export const toAettos = (
   value: string | number | BigNumber,
@@ -78,7 +78,7 @@ export const toAettos = (
  * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
  * @param {String} [options.targetDenomination='aettos'] target denomination,
  * can be ['ae', 'aettos']
- * @return {String}
+ * @returns {String}
  */
 export const formatAmount = (
   value: string | number | bigint | BigNumber,

@@ -62,7 +62,7 @@ export default abstract class BrowserConnection {
 
   /**
    * Check if connected
-   * @return Is connected
+   * @returns Is connected
    */
   abstract isConnected (): boolean
 }

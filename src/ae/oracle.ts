@@ -54,7 +54,7 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
  * @category async
  * @param oracleId Oracle public key
  * @param options
- * @return Oracle object
+ * @returns Oracle object
  */
 export async function getOracleObject (
   oracleId: EncodedData<'ok'>, options: { onNode: Node, onAccount: AccountBase }
@@ -102,7 +102,7 @@ export async function getOracleObject (
  * @param options Options object
  * @param options.interval Poll interval(default: 5000)
  * @param options.onNode Node to use
- * @return Callback to stop polling function
+ * @returns Callback to stop polling function
  */
 export function pollForQueries (
   oracleId: EncodedData<'ok'>,
@@ -138,7 +138,7 @@ export function pollForQueries (
  * @param oracleId Oracle public key
  * @param queryId Oracle Query id
  * @param options
- * @return OracleQuery object
+ * @returns OracleQuery object
  */
 export async function getQueryObject (
   oracleId: EncodedData<'ok'>,
@@ -176,7 +176,7 @@ export async function getQueryObject (
  * @param options.attempts Poll attempts
  * @param options.interval Poll interval
  * @param options.onNode Node to use
- * @return OracleQuery object
+ * @returns OracleQuery object
  */
 export async function pollForQueryResponse (
   oracleId: EncodedData<'ok'>,
@@ -205,7 +205,7 @@ export async function pollForQueryResponse (
  * @param options.abiVersion Always 0 (do not use virtual machine)
  * @param options.fee Transaction fee
  * @param options.ttl Transaction time to leave
- * @return Oracle object
+ * @returns Oracle object
  */
 export async function registerOracle (
   queryFormat: string,
@@ -248,7 +248,7 @@ export async function registerOracle (
  * @param options.queryFee queryFee Oracle query fee
  * @param options.fee fee Transaction fee
  * @param options.ttl Transaction time to leave
- * @return Query object
+ * @returns Query object
  */
 export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
   query: string,
@@ -294,7 +294,7 @@ export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
  * @param options.ttl Transaction time to leave
  * @param options.oracleTtlType Oracle time to leave for extend
  * @param options.oracleTtlValue Oracle time to leave for extend
- * @return Oracle object
+ * @returns Oracle object
  */
 export async function extendOracleTtl (
   oracleId: EncodedData<'ok'>,
@@ -324,7 +324,7 @@ export async function extendOracleTtl (
  * @param options.responseTtl responseTtl Query response time to leave
  * @param options.fee Transaction fee
  * @param options.ttl Transaction time to leave
- * @return Oracle object
+ * @returns Oracle object
  */
 export async function respondToQuery (
   oracleId: EncodedData<'ok'>,

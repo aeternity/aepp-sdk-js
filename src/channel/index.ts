@@ -127,7 +127,7 @@ interface Contract {
  * timeout_idle's value)
  * @param options.debug=false - Log websocket communication
  * @param options.sign - Function which verifies and signs transactions
- * @return Channel instance
+ * @returns Channel instance
  * @example await Channel.initialize({
  *   url: 'ws://localhost:3001',
  *   role: 'initiator'

@@ -39,7 +39,7 @@ export { default as getContractInstance } from '../contract/aci'
  * @param opt Options
  * @param opt.onNode Node to use
  * @param opt.onAccount Account to use
- * @return Signature in hex representation
+ * @returns Signature in hex representation
  */
 async function delegateSignatureCommon (
   ids: Array<EncodedData<EncodingType>> = [],
@@ -62,7 +62,7 @@ async function delegateSignatureCommon (
  * @param contractId Contract Id
  * @param opt Options
  * @param opt.name The name
- * @return Signature for delegation
+ * @returns Signature for delegation
  * @example
  * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
@@ -95,7 +95,7 @@ export async function createAensDelegationSignature (
  * @param contractId Contract Id
  * @param opt Options
  * @param opt.queryId Oracle Query Id
- * @return Signature for delegation
+ * @returns Signature for delegation
  * @example
  * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address

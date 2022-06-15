@@ -21,7 +21,7 @@ export default class AeSdk extends AeSdkBase {
    * Get accounts addresses
    * @alias module:@aeternity/aepp-sdk/es/accounts/multiple
    * @function
-   * @return {String[]}
+   * @returns {String[]}
    * @example addresses()
    */
   addresses (): Array<EncodedData<'ak'>> {
@@ -36,7 +36,7 @@ export default class AeSdk extends AeSdkBase {
    * @param {Object} account - Account instance
    * @param {Object} [options={}] - Options
    * @param {Boolean} [options.select] - Select account
-   * @return {void}
+   * @returns {void}
    * @example addAccount(account)
    */
   async addAccount (account: AccountBase, { select }: { select?: boolean } = {}): Promise<void> {
@@ -50,7 +50,7 @@ export default class AeSdk extends AeSdkBase {
    * @alias module:@aeternity/aepp-sdk/es/accounts/multiple
    * @function
    * @param {String} address - Address of account to remove
-   * @return {void}
+   * @returns {void}
    * @example removeAccount(address)
    */
   removeAccount (address: EncodedData<'ak'>): void {

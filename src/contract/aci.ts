@@ -231,7 +231,7 @@ export default async function getContractInstance ({
   /**
   * Compile contract
   * @alias module:@aeternity/aepp-sdk/es/contract/aci
-  * @return bytecode
+  * @returns bytecode
   */
   instance.compile = async (options = {}): Promise<EncodedData<'cb'>> => {
     if (instance.bytecode != null) throw new IllegalArgumentError('Contract already compiled')
@@ -334,7 +334,7 @@ export default async function getContractInstance ({
   /**
   * Get function schema from contract ACI object
   * @param name Function name
-  * @return function ACI
+  * @returns function ACI
   */
   function getFunctionACI (name: string): Partial<FunctionACI> {
     const fn = instance._aci.encodedAci.contract.functions.find(

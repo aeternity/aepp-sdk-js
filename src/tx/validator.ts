@@ -205,7 +205,7 @@ const getSenderAddress = (
  * @param {String} transaction Base64Check-encoded transaction
  * @param {Object} node Node to validate transaction against
  * @param {String[]} [parentTxTypes] Types of parent transactions
- * @return {Promise<Object[]>} Array with verification errors
+ * @returns {Promise<Object[]>} Array with verification errors
  * @example const errors = await verifyTransaction(transaction, node)
  */
 export default async function verifyTransaction (

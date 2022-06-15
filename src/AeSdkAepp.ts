@@ -139,7 +139,7 @@ export default class AeSdkAepp extends AeSdkBase {
 
   /**
    * Ask addresses from wallet
-   * @return Addresses from wallet
+   * @returns Addresses from wallet
    */
   async askAddresses (): Promise<Array<EncodedData<'ak'>>> {
     this._ensureAccountAccess()
@@ -150,7 +150,7 @@ export default class AeSdkAepp extends AeSdkBase {
    * Subscribe for addresses from wallet
    * @param type Subscription type
    * @param value Should be one of 'current' (the selected account), 'connected' (all)
-   * @return Accounts from wallet
+   * @returns Accounts from wallet
    */
   async subscribeAddress (
     type: SUBSCRIPTION_TYPES, value: 'current' | 'connected'

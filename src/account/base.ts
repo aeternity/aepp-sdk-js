@@ -33,7 +33,7 @@ import { concatBuffers } from '../utils/other'
 /**
  * Check is provided object looks like an instance of AccountBase
  * @param {Object} acc - Object to check
- * @return {Boolean}
+ * @returns {Boolean}
  */
 export const isAccountBase = (acc: AccountBase | any): boolean =>
   !['sign', 'address', 'signTransaction', 'signMessage'].some(f => typeof acc[f] !== 'function')
@@ -61,7 +61,7 @@ export default abstract class AccountBase {
    * @param {String} tx - Transaction to sign
    * @param {Object} opt - Options
    * @param {Object} [opt.innerTx] - Sign as inner transaction for PayingFor
-   * @return {String} Signed transaction
+   * @returns {String} Signed transaction
    */
   async signTransaction (
     tx: EncodedData<'tx'>,
@@ -81,7 +81,7 @@ export default abstract class AccountBase {
    * @instance
    * @function getNetworkId
    * @category async
-   * @return {Promise<String>} Network Id
+   * @returns {Promise<String>} Network Id
    */
   readonly getNetworkId = getNetworkId
 
@@ -91,7 +91,7 @@ export default abstract class AccountBase {
    * @category async
    * @param {String} message - Message to sign
    * @param {Object} opt - Options
-   * @return {String} Signature
+   * @returns {String} Signature
    */
   async signMessage (
     message: string, { returnHex = false, ...options }: { returnHex?: boolean } = {}
@@ -107,7 +107,7 @@ export default abstract class AccountBase {
    * @param {String} message - Message to verify
    * @param {string | Uint8Array} signature - Signature
    * @param {Object} options - Options
-   * @return {Boolean}
+   * @returns {Boolean}
    */
   async verifyMessage (
     message: string, signature: string | Uint8Array, options?: object
@@ -128,7 +128,7 @@ export default abstract class AccountBase {
    * @rtype (data: String) => data: Promise[String]
    * @param {String} data - Data blob to sign
    * @param {Object} options
-   * @return {Uint8Array} Signed data blob
+   * @returns {Uint8Array} Signed data blob
    */
   abstract sign (data: string | Buffer, options?: any): Promise<Uint8Array>
 
@@ -138,7 +138,7 @@ export default abstract class AccountBase {
    * @instance
    * @abstract
    * @category async
-   * @return {String} Public account address
+   * @returns {String} Public account address
    */
   abstract address (opt?: object): Promise<EncodedData<'ak'>>
 }

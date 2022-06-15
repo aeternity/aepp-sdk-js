@@ -335,7 +335,7 @@ export function calculateFee (
  * @param params Object with tx params
  * @param schema Transaction schema
  * @param excludeKeys  Array of keys to exclude for validation
- * @return Object with validation errors
+ * @returns Object with validation errors
  */
 export function validateParams (
   params: any, schema: TxField[], { excludeKeys = [] }: { excludeKeys: string[] }
@@ -364,7 +364,7 @@ interface TxOptionsRaw {
  * @param [options.excludeKeys=[]] Array of keys to exclude for validation and build
  * @param [options.denomination='aettos'] Denomination of amounts
  * @throws {Error} Validation error
- * @return Array with binary fields of transaction
+ * @returns Array with binary fields of transaction
  */
 export function buildRawTx (
   params: TxParamsCommon,
@@ -393,7 +393,7 @@ export function buildRawTx (
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param binary Array with binary transaction field's
  * @param schema Transaction schema
- * @return Object with transaction field's
+ * @returns Object with transaction field's
  */
 export function unpackRawTx<Tx extends TxSchema> (
   binary: Uint8Array | NestedUint8Array,
@@ -508,7 +508,7 @@ export function unpackTx<TxType extends TX_TYPE> (
  * @function
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
  * @param rawTx base64 or rlp encoded transaction
- * @return Transaction hash
+ * @returns Transaction hash
  */
 export function buildTxHash (rawTx: EncodedData<'tx'> | Uint8Array): EncodedData<'th'> {
   const data = typeof rawTx === 'string' && rawTx.startsWith('tx_')
@@ -520,7 +520,7 @@ export function buildTxHash (rawTx: EncodedData<'tx'> | Uint8Array): EncodedData
 /**
  * Build a contract public key by contractCreateTx or gaAttach
  * @param  contractTx Transaction
- * @return Contract public key
+ * @returns Contract public key
  */
 export function buildContractIdByContractTx (contractTx: EncodedData<'tx'>): EncodedData<'ct'> {
   const { txType, tx } = unpackTx<TX_TYPE.contractCreate | TX_TYPE.gaAttach>(contractTx)

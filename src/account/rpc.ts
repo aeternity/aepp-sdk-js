@@ -14,7 +14,7 @@ import { EncodedData } from '../utils/encoder'
  * @param param
  * @param param.rpcClient RpcClient instance
  * @param param.address RPC account address
- * @return AccountRpc instance
+ * @returns AccountRpc instance
  */
 export default class AccountRpc extends AccountBase {
   _rpcClient: any
@@ -40,7 +40,7 @@ export default class AccountRpc extends AccountBase {
   /**
    * @function signTransaction
    * @instance
-   * @return {Promise<String>} Signed transaction
+   * @returns {Promise<String>} Signed transaction
    */
   async signTransaction (
     tx: EncodedData<'tx'>,
@@ -58,7 +58,7 @@ export default class AccountRpc extends AccountBase {
   /**
    * @function signMessage
    * @instance
-   * @return {Promise<String>} Signed message
+   * @returns {Promise<String>} Signed message
    */
   async signMessage (
     message: string, { returnHex = false }: Parameters<AccountBase['signMessage']>[1] = {}

@@ -117,7 +117,7 @@ export async function _buildTx<TxType extends TX_TYPE> (
  * @param txType Type of transaction
  * @param ctVersion Object with vm and abi version fields
  * @param options
- * @return Object with vm/abi version
+ * @returns Object with vm/abi version
  */
 export async function getVmVersion (
   txType: TX_TYPE.contractCreate, ctVersion: Partial<CtVersion> & { onNode: Node }
@@ -147,7 +147,7 @@ export async function getVmVersion (
  *
  * @param ttl
  * @param relative ttl is absolute or relative(default: true(relative))
- * @return Absolute Ttl
+ * @returns Absolute Ttl
  */
 export async function calculateTtl (
   { ttl = TX_TTL, relative = true, onNode }:
@@ -168,7 +168,7 @@ export async function calculateTtl (
  *
  * @param accountId
  * @param nonce
- * @return Next Nonce
+ * @returns Next Nonce
  */
 export async function getAccountNonce (
   accountId: string,
@@ -186,7 +186,7 @@ export async function getAccountNonce (
  *
  * @param txType Type of transaction
  * @param params Object which contains all tx data
- * @return Object with account nonce, absolute ttl and transaction fee
+ * @returns Object with account nonce, absolute ttl and transaction fee
  */
 export async function prepareTxParams (
   txType: TX_TYPE,

@@ -196,7 +196,7 @@ export default class AeSdkWallet extends AeSdk {
   /**
    * Add new client by AEPP connection
    * @param clientConnection AEPP connection object
-   * @return Client ID
+   * @returns Client ID
    */
   addRpcClient (clientConnection: BrowserConnection): string {
     // @TODO  detect if aepp has some history based on origin????
@@ -307,7 +307,7 @@ export default class AeSdkWallet extends AeSdk {
 
   /**
    * Get Wallet info object
-   * @return Object with wallet information
+   * @returns Object with wallet information
    */
   async getWalletInfo (): Promise<WalletInfo> {
     return {
@@ -321,7 +321,7 @@ export default class AeSdkWallet extends AeSdk {
 
   /**
    * Get Wallet accounts
-   * @return Object with accounts information ({ connected: Object, current: Object })
+   * @returns Object with accounts information ({ connected: Object, current: Object })
    */
   getAccounts (): Accounts {
     return {

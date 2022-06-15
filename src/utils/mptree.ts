@@ -44,7 +44,7 @@ export default class MPTree {
   /**
    * Deserialize Merkle Patricia Tree
    * @param {Array} binary - Binary
-   * @return {MPTree} Merkle Patricia Tree
+   * @returns {MPTree} Merkle Patricia Tree
    */
   constructor (binary: MPTreeBinary) {
     this.rootHash = binary[0].toString('hex')
@@ -101,7 +101,7 @@ export default class MPTree {
 
   /**
    * Serialize Merkle Patricia Tree
-   * @return {Array} Binary
+   * @returns {Array} Binary
    */
   serialize (): MPTreeBinary {
     return [
@@ -116,7 +116,7 @@ export default class MPTree {
   /**
    * Retrieve value from Merkle Patricia Tree
    * @param {String} key - The key of the element to retrieve
-   * @return {Buffer} Value associated to the specified key
+   * @returns {Buffer} Value associated to the specified key
    */
   get (key: string): Buffer | undefined {
     let searchFrom = this.rootHash

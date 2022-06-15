@@ -62,7 +62,7 @@ export type AensName = `${string}.chain`
  * @param options.verify Verify transaction before sending
  * @param options.waitMined Ensure that transaction get into block
  * @param options.confirm Number of micro blocks that should be mined after tx get included
- * @return Transaction details
+ * @returns Transaction details
  */
 export async function sendTransaction (
   tx: EncodedData<'tx'>,
@@ -135,7 +135,7 @@ export async function sendTransaction (
  * @param options
  * @param options.confirm Number of micro blocks to wait for transaction confirmation
  * @param options.onNode Node to use
- * @return Current Height
+ * @returns Current Height
  */
 export async function waitForTxConfirm (
   txHash: EncodedData<'th'>,
@@ -193,7 +193,7 @@ export async function getBalance (
 
 /**
  * Obtain current height of the chain
- * @return Current chain height
+ * @returns Current chain height
  */
 export async function height ({ onNode }: { onNode: Node }): Promise<number> {
   return (await onNode.getCurrentKeyBlockHeight()).height
@@ -206,7 +206,7 @@ export async function height ({ onNode }: { onNode: Node }): Promise<number> {
  * @param options.interval Interval (in ms) at which to poll the chain
  * @param options.attempts Number of polling attempts after which to fail
  * @param options.onNode Node to use
- * @return Current chain height
+ * @returns Current chain height
  */
 export async function awaitHeight (
   height: number,
@@ -231,7 +231,7 @@ export async function awaitHeight (
  * @param options.interval Interval (in ms) at which to poll the chain
  * @param options.blocks Number of blocks mined after which to fail
  * @param options.onNode Node to use
- * @return The transaction as it was mined
+ * @returns The transaction as it was mined
  */
 export async function poll (
   th: EncodedData<'th'>,
@@ -252,7 +252,7 @@ export async function poll (
  * Obtain current generation
  * @param options
  * @param options.onNode Node to use
- * @return Current Generation
+ * @returns Current Generation
  */
 export async function getCurrentGeneration (
   { onNode }: { onNode: Node }
@@ -265,7 +265,7 @@ export async function getCurrentGeneration (
  * @param hashOrHeight Generation hash or height
  * @param options
  * @param options.onNode Node to use
- * @return Generation
+ * @returns Generation
  */
 export async function getGeneration (
   hashOrHeight: EncodedData<'kh'> | number, { onNode }: { onNode: Node }
@@ -279,7 +279,7 @@ export async function getGeneration (
  * @param hash
  * @param options
  * @param options.onNode Node to use
- * @return Transactions
+ * @returns Transactions
  */
 export async function getMicroBlockTransactions (
   hash: EncodedData<'mh'>, { onNode }: { onNode: Node }
@@ -292,7 +292,7 @@ export async function getMicroBlockTransactions (
  * @param hashOrHeight
  * @param options
  * @param options.onNode Node to use
- * @return Key Block
+ * @returns Key Block
  */
 export async function getKeyBlock (
   hashOrHeight: EncodedData<'kh'> | number, { onNode }: { onNode: Node }
@@ -306,7 +306,7 @@ export async function getKeyBlock (
  * @param hash
  * @param options
  * @param options.onNode Node to use
- * @return Micro block header
+ * @returns Micro block header
  */
 export async function getMicroBlockHeader (
   hash: EncodedData<'mh'>, { onNode }: { onNode: Node }
@@ -429,7 +429,7 @@ export async function getName (
  * // TODO: avoid that to don't trust to current api gateway
  * @param options.resolveByNode Enables pointer resolving using node
  * @param options.onNode Node to use
- * @return Address or AENS name hash
+ * @returns Address or AENS name hash
  */
 export async function resolveName <Type extends 'ak' | 'ct'> (
   nameOrId: AensName | EncodedData<Type>,

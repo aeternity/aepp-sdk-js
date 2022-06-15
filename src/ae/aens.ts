@@ -51,7 +51,7 @@ interface KeyPointers {
  * @param options.fee fee
  * @param options.ttl ttl
  * @param options.nonce nonce
- * @return Transaction result
+ * @returns Transaction result
  * @example
  * const name = 'test.chain'
  * const nameObject = await sdkInstance.aensQuery(name)
@@ -137,7 +137,7 @@ export async function aensUpdate (
  * @param options.fee fee
  * @param options.ttl ttl
  * @param options.nonce nonce
- * @return Transaction result
+ * @returns Transaction result
  * @example
  * const name = 'test.chain'
  * const recipientPub = 'ak_asd23dasdas...'
@@ -170,7 +170,7 @@ export async function aensTransfer (
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name
  * @param opt Options
- * @return
+ * @returns
  * @example
  * const nameObject = sdkInstance.aensQuery('test.chain')
  * console.log(nameObject)
@@ -255,7 +255,7 @@ export async function aensQuery (
  * @param options.ttl ttl
  * @param options.nonce nonce
  * @param options.nameFee Name Fee (By default calculated by sdk)
- * @return the result of the claim
+ * @returns the result of the claim
  * @example
  * const name = 'test.chain'
  * const salt = preclaimResult.salt // salt from pre-claim transaction
@@ -351,7 +351,7 @@ export async function aensPreclaim (
  * @param options.fee fee
  * @param options.ttl ttl
  * @param options.nonce nonce
- * @return Transaction result
+ * @returns Transaction result
  * @example
  * const name = 'test.chain'
  * const bidFee = computeBidFee(name, startFee, incrementPercentage)

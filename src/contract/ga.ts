@@ -160,7 +160,7 @@ export async function createMetaTx (
  * @param transaction tx-encoded transaction
  * @param options Options
  * @param options.onNode Node to use
- * @return Transaction hash
+ * @returns Transaction hash
  */
 export async function buildAuthTxHash (
   transaction: EncodedData<'tx'>,

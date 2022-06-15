@@ -27,7 +27,7 @@ import { isBase64, isHex } from './string'
 /**
  * Convert bignumber to byte array
  * @param {BigNumber} x bignumber instance
- * @return Buffer
+ * @returns Buffer
  */
 export function bigNumberToByteArray (x: BigNumber): Buffer {
   if (!x.isInteger()) throw new TypeError(`Unexpected not integer value: ${x.toFixed()}`)
@@ -40,7 +40,7 @@ export function bigNumberToByteArray (x: BigNumber): Buffer {
  * Convert string, number, or BigNumber to byte array
  * @param {null|string|number|BigNumber} val
  * @param {boolean} big enables force conversion to BigNumber
- * @return Buffer
+ * @returns Buffer
  */
 export function toBytes (val?: null | string | number | BigNumber, big: boolean = false): Buffer {
   // Encode a value to bytes.
@@ -64,7 +64,7 @@ export function toBytes (val?: null | string | number | BigNumber, big: boolean 
  * not valid hex, base64 will be used.  Otherwise, utf8 will be used.
  * @param {string} str String to be converted.
  * @param {string} [enc] Encoding of the input string.
- * @return {buffer} Buffer containing the input data.
+ * @returns {buffer} Buffer containing the input data.
  */
 export function str2buf (str: string, enc?: BufferEncoding): Buffer {
   return Buffer.from(

@@ -41,7 +41,7 @@ export interface Pointer {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param ownerId The public key of the owner account
  * @param nonce the nonce of the transaction
- * @return Contract public key
+ * @returns Contract public key
  */
 export function buildContractId (ownerId: EncodedData<'ak'>, nonce: number | BigNumber): EncodedData<'ct'> {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId), ...toBytes(nonce)])
@@ -55,7 +55,7 @@ export function buildContractId (ownerId: EncodedData<'ak'>, nonce: number | Big
  * @param senderId The public key of the sender account
  * @param nonce the nonce of the transaction
  * @param oracleId The oracle public key
- * @return Contract public key
+ * @returns Contract public key
  */
 export function oracleQueryId (
   senderId: EncodedData<'ak'>,
@@ -76,7 +76,7 @@ export function oracleQueryId (
  * Format the salt into a 64-byte hex string
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param salt
- * @return Zero-padded hex string of salt
+ * @returns Zero-padded hex string of salt
  */
 export function formatSalt (salt: number): Buffer {
   return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex')
@@ -87,7 +87,7 @@ export function formatSalt (salt: number): Buffer {
  *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param name Name to encode
- * @return `nm_` prefixed encoded AENS name
+ * @returns `nm_` prefixed encoded AENS name
  */
 export function produceNameId (name: AensName): EncodedData<'nm'> {
   return encode(hash(name.toLowerCase()), 'nm')
@@ -100,7 +100,7 @@ export function produceNameId (name: AensName): EncodedData<'nm'> {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param name - Name to be registered
  * @param salt Random salt
- * @return Commitment hash
+ * @returns Commitment hash
  */
 export function commitmentHash (name: AensName, salt: number = createSalt()): EncodedData<'cm'> {
   return encode(hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm')
@@ -110,7 +110,7 @@ export function commitmentHash (name: AensName, salt: number = createSalt()): En
  * Utility function to create and _id type
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param hashId Encoded hash
- * @return Buffer Buffer with ID tag and decoded HASh
+ * @returns Buffer Buffer with ID tag and decoded HASh
  */
 export function writeId (hashId: string): Buffer {
   if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId)
@@ -124,7 +124,7 @@ export function writeId (hashId: string): Buffer {
  * Utility function to read and _id type
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param buf Data
- * @return Encoided hash string with prefix
+ * @returns Encoided hash string with prefix
  */
 export function readId (buf: Buffer): string {
   const tag = Buffer.from(buf).readUIntBE(0, 1)
@@ -137,7 +137,7 @@ export function readId (buf: Buffer): string {
  * Utility function to convert int to bytes
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param val Value
- * @return Buffer Buffer from number(BigEndian)
+ * @returns Buffer Buffer from number(BigEndian)
  */
 export function writeInt (val: number | string | BigNumber): Buffer {
   return toBytes(val, true)
@@ -147,7 +147,7 @@ export function writeInt (val: number | string | BigNumber): Buffer {
  * Utility function to convert bytes to int
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param buf Value
- * @return Buffer Buffer from number(BigEndian)
+ * @returns Buffer Buffer from number(BigEndian)
  */
 export function readInt (buf: Buffer = Buffer.from([])): string {
   return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10)
@@ -158,7 +158,7 @@ export function readInt (buf: Buffer = Buffer.from([])): string {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param pointers - Array of pointers
  * ([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])
- * @return Serialized pointers array
+ * @returns Serialized pointers array
  */
 export function buildPointers (pointers: Pointer[]): Buffer[][] {
   return pointers.map(
@@ -173,7 +173,7 @@ export function buildPointers (pointers: Pointer[]): Buffer[][] {
  * Helper function to read pointers from name update TX
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param pointers - Array of pointers
- * @return Deserialize pointer array
+ * @returns Deserialize pointer array
  */
 export function readPointers (pointers: Array<[key: string, id: Buffer]>): Pointer[] {
   return pointers.map(
@@ -214,7 +214,7 @@ export function getDefaultPointerKey (
  *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param name the AENS name to get the fee for
- * @return the minimum fee for the AENS name auction
+ * @returns the minimum fee for the AENS name auction
  */
 export function getMinimumNameFee (name: AensName): BigNumber {
   const nameLength = name.length - AENS_SUFFIX.length
@@ -228,7 +228,7 @@ export function getMinimumNameFee (name: AensName): BigNumber {
  * @param name the AENS name to get the fee for
  * @param startFee Auction start fee
  * @param increment Bid multiplier(In percentage, must be between 0 and 1)
- * @return Bid fee
+ * @returns Bid fee
  */
 export function computeBidFee (
   name: AensName,
@@ -250,7 +250,7 @@ export function computeBidFee (
  * @param name
  * @param claimHeight Auction starting height
  * @link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
- * @return Auction end height
+ * @returns Auction end height
  */
 export function computeAuctionEndBlock (name: AensName, claimHeight: number): number {
   const length = name.length - AENS_SUFFIX.length

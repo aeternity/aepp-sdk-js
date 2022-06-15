@@ -11,7 +11,7 @@ import { concatBuffers } from './other'
 /**
  * Calculate SHA256 hash of `input`
  * @param {Uint8Array|String} input - Data to hash
- * @return {String} Hash
+ * @returns {String} Hash
  */
 export function sha256hash (input: Uint8Array | string): Buffer {
   return new Sha256().update(input).digest()
@@ -73,7 +73,7 @@ const parseType = (maybeType: unknown): [EncodingType, typeof base64] => {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {EncodedData<EncodingType>} data An Base58/64check encoded and prefixed string
  * (ex tx_..., sg_..., ak_....)
- * @return {Buffer} Decoded data
+ * @returns {Buffer} Decoded data
  */
 export function decode (data: EncodedData<EncodingType>): Buffer {
   const [prefix, encodedPayload, extra] = data.split('_')
@@ -91,7 +91,7 @@ export function decode (data: EncodedData<EncodingType>): Buffer {
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param {Buffer|String} data  An decoded data
  * @param {string} type Prefix of Transaction
- * @return {EncodedData<type>>} Encoded string Base58check or Base64check data
+ * @returns {EncodedData<type>>} Encoded string Base58check or Base64check data
  */
 export function encode<Type extends EncodingType> (
   data: Uint8Array, type: Type
