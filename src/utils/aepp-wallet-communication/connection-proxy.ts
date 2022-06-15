@@ -20,8 +20,8 @@ import BrowserConnection from './connection/Browser'
 /**
  * Browser connection proxy
  * Provide functionality to easily forward messages from one connection to another and back
- * @param con1 first connection
- * @param con2 second connection
+ * @param con1 - first connection
+ * @param con2 - second connection
  * @returns a function to stop proxying
  */
 export default (con1: BrowserConnection, con2: BrowserConnection): () => void => {

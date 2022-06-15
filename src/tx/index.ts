@@ -114,8 +114,8 @@ export async function _buildTx<TxType extends TX_TYPE> (
 /**
  * Validated vm/abi version or get default based on transaction type and NODE version
  *
- * @param txType Type of transaction
- * @param ctVersion Object with vm and abi version fields
+ * @param txType - Type of transaction
+ * @param ctVersion - Object with vm and abi version fields
  * @param options
  * @returns Object with vm/abi version
  */
@@ -146,7 +146,7 @@ export async function getVmVersion (
  * Compute the absolute ttl by adding the ttl to the current height of the chain
  *
  * @param ttl
- * @param relative ttl is absolute or relative(default: true(relative))
+ * @param relative - ttl is absolute or relative(default: true(relative))
  * @returns Absolute Ttl
  */
 export async function calculateTtl (
@@ -184,8 +184,8 @@ export async function getAccountNonce (
 /**
  * Calculate fee, get absolute ttl (ttl + height), get account nonce
  *
- * @param txType Type of transaction
- * @param params Object which contains all tx data
+ * @param txType - Type of transaction
+ * @param params - Object which contains all tx data
  * @returns Object with account nonce, absolute ttl and transaction fee
  */
 export async function prepareTxParams (

@@ -29,9 +29,9 @@ type WithOrigin<Api extends RpcApi<Api>> = {
 
 /**
  * Contain functionality for using RPC conection
- * @param connection Connection object
- * @param onDisconnect Disconnect callback
- * @param methods Object containing handlers for each request by name
+ * @param connection - Connection object
+ * @param onDisconnect - Disconnect callback
+ * @param methods - Object containing handlers for each request by name
  */
 export default class RpcClient <
   RemoteApi extends RpcApi<RemoteApi>, LocalApi extends RpcApi<LocalApi>
@@ -101,8 +101,8 @@ export default class RpcClient <
 
   /**
    * Make a request
-   * @param name Method name
-   * @param params Method params
+   * @param name - Method name
+   * @param params - Method params
    * @returns Promise which will be resolved after receiving response message
    */
   async request<Name extends keyof RemoteApi> (
@@ -116,8 +116,8 @@ export default class RpcClient <
 
   /**
    * Make a notification
-   * @param name Method name
-   * @param params Method params
+   * @param name - Method name
+   * @param params - Method params
    */
   notify<Name extends keyof RemoteApi> (name: Name, params: Parameters<RemoteApi[Name]>[0]): void {
     this.#sendRequest(undefined, name, params)
@@ -125,7 +125,7 @@ export default class RpcClient <
 
   /**
    * Process response message
-   * @param msg Message object
+   * @param msg - Message object
    */
   #processResponse ({ id, error, result }: { id: number, error?: any, result?: any }): void {
     const callbacks = this.#callbacks.get(id)

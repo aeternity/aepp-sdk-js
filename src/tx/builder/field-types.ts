@@ -85,7 +85,7 @@ export class NameFee extends Field {
 
 export class Deposit extends Field {
   /**
-   * @param value Deposit value in string format. Should be equal to  '0'.
+   * @param value - Deposit value in string format. Should be equal to  '0'.
    * @returns Deposit value Buffer.
    */
   static serialize (value: string): Buffer {
@@ -95,7 +95,7 @@ export class Deposit extends Field {
   }
 
   /**
-   * @param value Deposit value Buffer.
+   * @param value - Deposit value Buffer.
    * @returns Deposit value.
    */
   static deserialize (value: Buffer): string {

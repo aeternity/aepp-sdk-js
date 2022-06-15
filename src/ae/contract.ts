@@ -33,10 +33,10 @@ export { default as getContractInstance } from '../contract/aci'
 
 /**
  * Utility method to create a delegate signature for a contract
- * @param ids The list of id's to prepend
- * @param opt Options
- * @param opt.onNode Node to use
- * @param opt.onAccount Account to use
+ * @param ids - The list of id's to prepend
+ * @param opt - Options
+ * @param opt.onNode - Node to use
+ * @param opt.onAccount - Account to use
  * @returns Signature in hex representation
  */
 async function delegateSignatureCommon (
@@ -57,9 +57,9 @@ async function delegateSignatureCommon (
 /**
  * Helper to generate a signature to delegate pre-claim/claim/transfer/revoke of a name to
  * a contract.
- * @param contractId Contract Id
- * @param opt Options
- * @param opt.name The name
+ * @param contractId - Contract Id
+ * @param opt - Options
+ * @param opt.name - The name
  * @returns Signature for delegation
  * @example
  * const aeSdk = await Universal({ ... })
@@ -90,9 +90,9 @@ export async function createAensDelegationSignature (
 
 /**
  * Helper to generate a signature to delegate register/extend/respond of a Oracle to a contract.
- * @param contractId Contract Id
- * @param opt Options
- * @param opt.queryId Oracle Query Id
+ * @param contractId - Contract Id
+ * @param opt - Options
+ * @param opt.queryId - Oracle Query Id
  * @returns Signature for delegation
  * @example
  * const aeSdk = await Universal({ ... })

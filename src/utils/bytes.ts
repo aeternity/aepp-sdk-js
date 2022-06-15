@@ -25,7 +25,7 @@ import { isBase64, isHex } from './string'
 
 /**
  * Convert bignumber to byte array
- * @param x bignumber instance
+ * @param x - bignumber instance
  * @returns Buffer
  */
 export function bigNumberToByteArray (x: BigNumber): Buffer {
@@ -38,7 +38,7 @@ export function bigNumberToByteArray (x: BigNumber): Buffer {
 /**
  * Convert string, number, or BigNumber to byte array
  * @param val
- * @param big enables force conversion to BigNumber
+ * @param big - enables force conversion to BigNumber
  * @returns Buffer
  */
 export function toBytes (val?: null | string | number | BigNumber, big: boolean = false): Buffer {
@@ -61,8 +61,8 @@ export function toBytes (val?: null | string | number | BigNumber, big: boolean 
  * Convert a string to a Buffer.  If encoding is not specified, hex-encoding
  * will be used if the input is valid hex.  If the input is valid base64 but
  * not valid hex, base64 will be used.  Otherwise, utf8 will be used.
- * @param str String to be converted.
- * @param enc Encoding of the input string.
+ * @param str - String to be converted.
+ * @param enc - Encoding of the input string.
  * @returns Buffer containing the input data.
  */
 export function str2buf (str: string, enc?: BufferEncoding): Buffer {

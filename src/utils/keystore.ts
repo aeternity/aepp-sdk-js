@@ -75,10 +75,10 @@ const CRYPTO_DEFAULTS = {
 
 /**
  * Symmetric private key encryption using secret (derived) key.
- * @param plaintext Data to be encrypted.
- * @param key Secret key.
- * @param nonce Randomly generated nonce.
- * @param algo Encryption algorithm.
+ * @param plaintext - Data to be encrypted.
+ * @param key - Secret key.
+ * @param nonce - Randomly generated nonce.
+ * @param algo - Encryption algorithm.
  * @returns Encrypted data.
  */
 function encrypt (
@@ -92,10 +92,10 @@ function encrypt (
 
 /**
  * Symmetric private key decryption using secret (derived) key.
- * @param ciphertext Data to be decrypted.
- * @param key Secret key.
- * @param nonce Nonce from key-object.
- * @param algo Encryption algorithm.
+ * @param ciphertext - Data to be decrypted.
+ * @param key - Secret key.
+ * @param nonce - Nonce from key-object.
+ * @param algo - Encryption algorithm.
  * @returns Decrypted data.
  */
 function decrypt (
@@ -109,10 +109,10 @@ function decrypt (
 
 /**
  * Derive secret key from password with key derivation function.
- * @param password User-supplied password.
- * @param nonce Randomly generated nonce.
- * @param kdf Key derivation function.
- * @param kdfParams KDF parameters.
+ * @param password - User-supplied password.
+ * @param nonce - Randomly generated nonce.
+ * @param kdf - Key derivation function.
+ * @param kdfParams - KDF parameters.
  * @returns Secret key derived from password.
  */
 async function deriveKey (
@@ -126,8 +126,8 @@ async function deriveKey (
 
 /**
  * Recover plaintext private key from secret-storage key object.
- * @param password Keystore object password.
- * @param keystore Keystore object.
+ * @param password - Keystore object password.
+ * @param keystore - Keystore object.
  * @returns Plaintext private key.
  */
 export async function recover (
@@ -144,14 +144,14 @@ export async function recover (
 
 /**
  * Export private key to keystore secret-storage format.
- * @param name Key name.
- * @param password User-supplied password.
- * @param privateKey Private key as hex-string or a Buffer.
- * @param nonce Randomly generated 24byte nonce.
- * @param salt Randomly generated 16byte salt.
- * @param options Encryption parameters.
- * @param options.kdf Key derivation function.
- * @param options.kdf_params KDF parameters.
+ * @param name - Key name.
+ * @param password - User-supplied password.
+ * @param privateKey - Private key as hex-string or a Buffer.
+ * @param nonce - Randomly generated 24byte nonce.
+ * @param salt - Randomly generated 16byte salt.
+ * @param options - Encryption parameters.
+ * @param options.kdf - Key derivation function.
+ * @param options.kdf_params - KDF parameters.
  */
 export async function dump (
   name: string,

@@ -47,7 +47,7 @@ export function getAddressFromPriv (secret: string | Uint8Array): EncodedData<'a
 /**
  * Check if address is valid
  * @param address - Address
- * @param prefix Transaction prefix. Default: 'ak'
+ * @param prefix - Transaction prefix. Default: 'ak'
  * @returns is valid
  */
 export function isAddressValid (address: string, prefix: EncodingType = 'ak'): boolean {
@@ -114,7 +114,7 @@ export function generateKeyPairFromSecret (secret: Uint8Array): SignKeyPair {
 
 /**
  * Generate a random ED25519 keypair
- * @param raw Whether to return raw (binary) keys
+ * @param raw - Whether to return raw (binary) keys
  * @returns Key pair
  */
 export function generateKeyPair (raw: true): { publicKey: Buffer, secretKey: Buffer }

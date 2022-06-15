@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js'
 
 /**
  * Check if value is BigNumber, Number, BigInt or number string representation
- * @param number number to check
+ * @param number - number to check
  */
 export const isBigNumber = (number: string | number | bigint | BigNumber): boolean => {
   if (typeof number === 'bigint') return true

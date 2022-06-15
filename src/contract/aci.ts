@@ -133,7 +133,7 @@ type ContractCallReturnType = 'ok' | 'error' | 'revert'
 * Generate contract ACI object with predefined js methods for contract usage - can be used for
 * creating a reference to already deployed contracts
 * @alias module:@aeternity/aepp-sdk/es/contract/aci
-* @param options Options object
+* @param options - Options object
 * @returns JS Contract API
 * @example
 * const contractIns = await aeSdk.getContractInstance({ source })
@@ -292,7 +292,7 @@ export default async function getContractInstance ({
   /**
   * Deploy contract
   * @alias module:@aeternity/aepp-sdk/es/contract/aci
-  * @param params Contract init function arguments array
+  * @param params - Contract init function arguments array
   * @param options
   * @returns deploy info
   */
@@ -332,7 +332,7 @@ export default async function getContractInstance ({
 
   /**
   * Get function schema from contract ACI object
-  * @param name Function name
+  * @param name - Function name
   * @returns function ACI
   */
   function getFunctionACI (name: string): Partial<FunctionACI> {
@@ -348,9 +348,9 @@ export default async function getContractInstance ({
   /**
   * Call contract function
   * @alias module:@aeternity/aepp-sdk/es/contract/aci
-  * @param fn Function name
-  * @param params Array of function arguments
-  * @param options Array of function arguments
+  * @param fn - Function name
+  * @param params - Array of function arguments
+  * @param options - Array of function arguments
   * @returns CallResult
   */
   instance.call = async (fn: string, params: any[] = [], options: object = {}) => {
@@ -416,9 +416,9 @@ export default async function getContractInstance ({
   }
 
   /**
-  * @param address Contract address that emitted event
-  * @param nameHash Hash of emitted event name
-  * @param options Options
+  * @param address - Contract address that emitted event
+  * @param nameHash - Hash of emitted event name
+  * @param options - Options
   * @returns Contract name
   * @throws {MissingEventDefinitionError}
   * @throws {AmbiguousEventDefinitionError}
@@ -450,8 +450,8 @@ export default async function getContractInstance ({
   /**
   * Decode Events
   * @alias module:@aeternity/aepp-sdk/es/contract/aci
-  * @param events Array of encoded events (callRes.result.log)
-  * @param options Options
+  * @param events - Array of encoded events (callRes.result.log)
+  * @param options - Options
   * @returns DecodedEvents
   */
   instance.decodeEvents = (

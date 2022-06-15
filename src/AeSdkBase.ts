@@ -51,7 +51,7 @@ function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Valu
  * available.
  * @alias module:@aeternity/aepp-sdk/es/ae
  * @param options - Initializer object
- * @param options.compilerUrl compilerUrl - Url for compiler API
+ * @param options.compilerUrl - compilerUrl - Url for compiler API
  */
 class AeSdkBase {
   _options = {
@@ -216,7 +216,7 @@ class AeSdkBase {
 
   /**
    * Resolves an account
-   * @param account ak-address, instance of AccountBase, or keypair
+   * @param account - ak-address, instance of AccountBase, or keypair
    * @private
    */
   _resolveAccount (account?: Account): AccountBase {

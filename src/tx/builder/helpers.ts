@@ -38,8 +38,8 @@ export interface Pointer {
 /**
  * Build a contract public key
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param ownerId The public key of the owner account
- * @param nonce the nonce of the transaction
+ * @param ownerId - The public key of the owner account
+ * @param nonce - the nonce of the transaction
  * @returns Contract public key
  */
 export function buildContractId (ownerId: EncodedData<'ak'>, nonce: number | BigNumber): EncodedData<'ct'> {
@@ -51,9 +51,9 @@ export function buildContractId (ownerId: EncodedData<'ak'>, nonce: number | Big
 /**
  * Build a oracle query id
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param senderId The public key of the sender account
- * @param nonce the nonce of the transaction
- * @param oracleId The oracle public key
+ * @param senderId - The public key of the sender account
+ * @param nonce - the nonce of the transaction
+ * @param oracleId - The oracle public key
  * @returns Contract public key
  */
 export function oracleQueryId (
@@ -85,7 +85,7 @@ export function formatSalt (salt: number): Buffer {
  * Encode an AENS name
  *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param name Name to encode
+ * @param name - Name to encode
  * @returns `nm_` prefixed encoded AENS name
  */
 export function produceNameId (name: AensName): EncodedData<'nm'> {
@@ -98,7 +98,7 @@ export function produceNameId (name: AensName): EncodedData<'nm'> {
  *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param name - Name to be registered
- * @param salt Random salt
+ * @param salt - Random salt
  * @returns Commitment hash
  */
 export function commitmentHash (name: AensName, salt: number = createSalt()): EncodedData<'cm'> {
@@ -108,7 +108,7 @@ export function commitmentHash (name: AensName, salt: number = createSalt()): En
 /**
  * Utility function to create and _id type
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param hashId Encoded hash
+ * @param hashId - Encoded hash
  * @returns Buffer Buffer with ID tag and decoded HASh
  */
 export function writeId (hashId: string): Buffer {
@@ -122,7 +122,7 @@ export function writeId (hashId: string): Buffer {
 /**
  * Utility function to read and _id type
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param buf Data
+ * @param buf - Data
  * @returns Encoided hash string with prefix
  */
 export function readId (buf: Buffer): string {
@@ -135,7 +135,7 @@ export function readId (buf: Buffer): string {
 /**
  * Utility function to convert int to bytes
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param val Value
+ * @param val - Value
  * @returns Buffer Buffer from number(BigEndian)
  */
 export function writeInt (val: number | string | BigNumber): Buffer {
@@ -145,7 +145,7 @@ export function writeInt (val: number | string | BigNumber): Buffer {
 /**
  * Utility function to convert bytes to int
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param buf Value
+ * @param buf - Value
  * @returns Buffer Buffer from number(BigEndian)
  */
 export function readInt (buf: Buffer = Buffer.from([])): string {
@@ -212,7 +212,7 @@ export function getDefaultPointerKey (
  * Get the minimum AENS name fee
  *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param name the AENS name to get the fee for
+ * @param name - the AENS name to get the fee for
  * @returns the minimum fee for the AENS name auction
  */
 export function getMinimumNameFee (name: AensName): BigNumber {
@@ -224,9 +224,9 @@ export function getMinimumNameFee (name: AensName): BigNumber {
  * Compute bid fee for AENS auction
  *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
- * @param name the AENS name to get the fee for
- * @param startFee Auction start fee
- * @param increment Bid multiplier(In percentage, must be between 0 and 1)
+ * @param name - the AENS name to get the fee for
+ * @param startFee - Auction start fee
+ * @param increment - Bid multiplier(In percentage, must be between 0 and 1)
  * @returns Bid fee
  */
 export function computeBidFee (
@@ -247,7 +247,7 @@ export function computeBidFee (
  *
  * @alias module:@aeternity/aepp-sdk/es/tx/builder/helpers
  * @param name
- * @param claimHeight Auction starting height
+ * @param claimHeight - Auction starting height
  * @link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273
  * @returns Auction end height
  */

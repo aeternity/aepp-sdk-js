@@ -330,8 +330,8 @@ export function calculateFee (
 /**
  * Validate transaction params
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param params Object with tx params
- * @param schema Transaction schema
+ * @param params - Object with tx params
+ * @param schema - Transaction schema
  * @param excludeKeys  Array of keys to exclude for validation
  * @returns Object with validation errors
  */
@@ -355,11 +355,11 @@ interface TxOptionsRaw {
 /**
  * Build binary transaction
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param params Object with tx params
- * @param schema Transaction schema
- * @param options options
- * @param options.excludeKeys Array of keys to exclude for validation and build
- * @param options.denomination Denomination of amounts
+ * @param params - Object with tx params
+ * @param schema - Transaction schema
+ * @param options - options
+ * @param options.excludeKeys - Array of keys to exclude for validation and build
+ * @param options.denomination - Denomination of amounts
  * @throws {Error} Validation error
  * @returns Array with binary fields of transaction
  */
@@ -387,8 +387,8 @@ export function buildRawTx (
 /**
  * Unpack binary transaction
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param binary Array with binary transaction field's
- * @param schema Transaction schema
+ * @param binary - Array with binary transaction field's
+ * @param schema - Transaction schema
  * @returns Object with transaction field's
  */
 export function unpackRawTx<Tx extends TxSchema> (
@@ -419,11 +419,11 @@ export type TxParamsBuild = TxParamsCommon & {
 /**
  * Build transaction hash
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param params Object with tx params
- * @param type Transaction type
- * @param options options
- * @param options.excludeKeys Array of keys to exclude for validation and build
- * @param options.prefix Prefix of transaction
+ * @param params - Object with tx params
+ * @param type - Transaction type
+ * @param options - options
+ * @param options.excludeKeys - Array of keys to exclude for validation and build
+ * @param options.prefix - Prefix of transaction
  * @throws {Error} Validation error
  * @returns object
  * @returns object.tx Base64Check transaction hash with 'tx_' prefix
@@ -473,8 +473,8 @@ export interface TxUnpacked<Tx extends TxSchema> {
 /**
  * Unpack transaction hash
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param encodedTx Transaction to unpack
- * @param txType Expected transaction type
+ * @param encodedTx - Transaction to unpack
+ * @param txType - Expected transaction type
  * @returns object
  * @returns object.tx Object with transaction param's
  * @returns object.txType Transaction type
@@ -500,7 +500,7 @@ export function unpackTx<TxType extends TX_TYPE> (
 /**
  * Build a transaction hash
  * @alias module:@aeternity/aepp-sdk/es/tx/builder
- * @param rawTx base64 or rlp encoded transaction
+ * @param rawTx - base64 or rlp encoded transaction
  * @returns Transaction hash
  */
 export function buildTxHash (rawTx: EncodedData<'tx'> | Uint8Array): EncodedData<'th'> {

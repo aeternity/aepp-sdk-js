@@ -49,7 +49,7 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @param oracleId Oracle public key
+ * @param oracleId - Oracle public key
  * @param options
  * @returns Oracle object
  */
@@ -94,11 +94,11 @@ export async function getOracleObject (
 /**
  * Poll for oracle queries
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @param oracleId Oracle public key
- * @param onQuery OnQuery callback
- * @param options Options object
- * @param options.interval Poll interval(default: 5000)
- * @param options.onNode Node to use
+ * @param oracleId - Oracle public key
+ * @param onQuery - OnQuery callback
+ * @param options - Options object
+ * @param options.interval - Poll interval(default: 5000)
+ * @param options.onNode - Node to use
  * @returns Callback to stop polling function
  */
 export function pollForQueries (
@@ -132,8 +132,8 @@ export function pollForQueries (
 /**
  * Constructor for OracleQuery Object (helper object for using OracleQuery)
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @param oracleId Oracle public key
- * @param queryId Oracle Query id
+ * @param oracleId - Oracle public key
+ * @param queryId - Oracle Query id
  * @param options
  * @returns OracleQuery object
  */
@@ -166,12 +166,12 @@ export async function getQueryObject (
 /**
  * Poll for oracle query response
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @param oracleId Oracle public key
- * @param queryId Oracle Query id
- * @param options Options object
- * @param options.attempts Poll attempts
- * @param options.interval Poll interval
- * @param options.onNode Node to use
+ * @param oracleId - Oracle public key
+ * @param queryId - Oracle Query id
+ * @param options - Options object
+ * @param options.attempts - Poll attempts
+ * @param options.interval - Poll interval
+ * @param options.onNode - Node to use
  * @returns OracleQuery object
  */
 export async function pollForQueryResponse (
@@ -193,14 +193,14 @@ export async function pollForQueryResponse (
 /**
  * Register oracle
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @param queryFormat Format of query
- * @param responseFormat Format of query response
+ * @param queryFormat - Format of query
+ * @param responseFormat - Format of query response
  * @param options
- * @param options.queryFee Oracle query Fee
- * @param options Options object
- * @param options.abiVersion Always 0 (do not use virtual machine)
- * @param options.fee Transaction fee
- * @param options.ttl Transaction time to leave
+ * @param options.queryFee - Oracle query Fee
+ * @param options - Options object
+ * @param options.abiVersion - Always 0 (do not use virtual machine)
+ * @param options.fee - Transaction fee
+ * @param options.ttl - Transaction time to leave
  * @returns Oracle object
  */
 export async function registerOracle (
@@ -236,14 +236,14 @@ export async function registerOracle (
 /**
  * Post query to oracle
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @param oracleId Oracle public key
- * @param query Oracle query object
- * @param options Options object
- * @param options.queryTtl queryTtl Oracle query time to leave
- * @param options.responseTtl queryFee Oracle query response time to leave
- * @param options.queryFee queryFee Oracle query fee
- * @param options.fee fee Transaction fee
- * @param options.ttl Transaction time to leave
+ * @param oracleId - Oracle public key
+ * @param query - Oracle query object
+ * @param options - Options object
+ * @param options.queryTtl - queryTtl Oracle query time to leave
+ * @param options.responseTtl - queryFee Oracle query response time to leave
+ * @param options.queryFee - queryFee Oracle query fee
+ * @param options.fee - fee Transaction fee
+ * @param options.ttl - Transaction time to leave
  * @returns Query object
  */
 export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
@@ -284,12 +284,12 @@ export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
 /**
  * Extend oracle ttl
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @param oracleId Oracle public key
- * @param options Options object
- * @param options.fee fee Transaction fee
- * @param options.ttl Transaction time to leave
- * @param options.oracleTtlType Oracle time to leave for extend
- * @param options.oracleTtlValue Oracle time to leave for extend
+ * @param oracleId - Oracle public key
+ * @param options - Options object
+ * @param options.fee - fee Transaction fee
+ * @param options.ttl - Transaction time to leave
+ * @param options.oracleTtlType - Oracle time to leave for extend
+ * @param options.oracleTtlValue - Oracle time to leave for extend
  * @returns Oracle object
  */
 export async function extendOracleTtl (
@@ -313,13 +313,13 @@ export async function extendOracleTtl (
 /**
  * Extend oracle ttl
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @param oracleId Oracle public key
- * @param queryId Oracle query id
- * @param response Oracle query response
- * @param options Options object
- * @param options.responseTtl responseTtl Query response time to leave
- * @param options.fee Transaction fee
- * @param options.ttl Transaction time to leave
+ * @param oracleId - Oracle public key
+ * @param queryId - Oracle query id
+ * @param response - Oracle query response
+ * @param options - Options object
+ * @param options.responseTtl - responseTtl Query response time to leave
+ * @param options.fee - Transaction fee
+ * @param options.ttl - Transaction time to leave
  * @returns Oracle object
  */
 export async function respondToQuery (
