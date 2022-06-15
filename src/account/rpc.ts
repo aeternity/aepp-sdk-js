@@ -37,7 +37,7 @@ export default class AccountRpc extends AccountBase {
   }
 
   /**
-   * @returns {Promise<String>} Signed transaction
+   * @returns Signed transaction
    */
   async signTransaction (
     tx: EncodedData<'tx'>,
@@ -53,7 +53,7 @@ export default class AccountRpc extends AccountBase {
   }
 
   /**
-   * @returns {Promise<String>} Signed message
+   * @returns Signed message
    */
   async signMessage (
     message: string, { returnHex = false }: Parameters<AccountBase['signMessage']>[1] = {}

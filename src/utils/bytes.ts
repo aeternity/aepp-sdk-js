@@ -63,7 +63,7 @@ export function toBytes (val?: null | string | number | BigNumber, big: boolean 
  * not valid hex, base64 will be used.  Otherwise, utf8 will be used.
  * @param {string} str String to be converted.
  * @param {string} [enc] Encoding of the input string.
- * @returns {buffer} Buffer containing the input data.
+ * @returns Buffer containing the input data.
  */
 export function str2buf (str: string, enc?: BufferEncoding): Buffer {
   return Buffer.from(

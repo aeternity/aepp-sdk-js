@@ -79,7 +79,7 @@ const CRYPTO_DEFAULTS = {
  * @param {Uint8Array} key Secret key.
  * @param {Uint8Array} nonce Randomly generated nonce.
  * @param {String} [algo=xsalsa20-poly1305] Encryption algorithm.
- * @returns {Uint8Array} Encrypted data.
+ * @returns Encrypted data.
  */
 function encrypt (
   plaintext: Uint8Array,
@@ -96,7 +96,7 @@ function encrypt (
  * @param {Uint8Array} key Secret key.
  * @param {Uint8Array} nonce Nonce from key-object.
  * @param {String} [algo=xsalsa20-poly1305] Encryption algorithm.
- * @returns {Buffer} Decrypted data.
+ * @returns Decrypted data.
  */
 function decrypt (
   ciphertext: Uint8Array,
@@ -113,7 +113,7 @@ function decrypt (
  * @param {String|Uint8Array} nonce Randomly generated nonce.
  * @param {String} kdf Key derivation function.
  * @param {Object} kdfParams KDF parameters.
- * @returns {Uint8Array} Secret key derived from password.
+ * @returns Secret key derived from password.
  */
 async function deriveKey (
   password: string | Uint8Array,
@@ -128,7 +128,7 @@ async function deriveKey (
  * Recover plaintext private key from secret-storage key object.
  * @param {String|Uint8Array} password Keystore object password.
  * @param {Object} keystore Keystore object.
- * @returns {Buffer} Plaintext private key.
+ * @returns Plaintext private key.
  */
 export async function recover (
   password: string | Uint8Array, { crypto }: Keystore
@@ -152,7 +152,6 @@ export async function recover (
  * @param {Partial<Keystore['crypto']>} [options] Encryption parameters.
  * @param {String} [options.kdf=argon2id] Key derivation function.
  * @param {Object} [options.kdf_params] KDF parameters.
- * @returns {Object}
  */
 export async function dump (
   name: string,

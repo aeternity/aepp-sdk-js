@@ -17,7 +17,6 @@ export const isBigNumber = (number: string | number | bigint | BigNumber): boole
 /**
  * BigNumber ceil operation
  * @param {BigNumber} bigNumber
- * @returns {BigNumber}
  */
 export const ceil = (bigNumber: BigNumber): BigNumber => bigNumber
   .integerValue(BigNumber.ROUND_CEIL)

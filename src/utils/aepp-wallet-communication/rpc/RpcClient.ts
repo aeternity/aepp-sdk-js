@@ -103,7 +103,7 @@ export default class RpcClient <
    * Make a request
    * @param {String} name Method name
    * @param {Object} params Method params
-   * @returns {Promise} Promise which will be resolved after receiving response message
+   * @returns Promise which will be resolved after receiving response message
    */
   async request<Name extends keyof RemoteApi> (
     name: Name, params: Parameters<RemoteApi[Name]>[0]
@@ -118,7 +118,6 @@ export default class RpcClient <
    * Make a notification
    * @param {String} name Method name
    * @param {Object} params Method params
-   * @returns {Promise} Promise which will be resolved after receiving response message
    */
   notify<Name extends keyof RemoteApi> (name: Name, params: Parameters<RemoteApi[Name]>[0]): void {
     this.#sendRequest(undefined, name, params)
@@ -127,7 +126,6 @@ export default class RpcClient <
   /**
    * Process response message
    * @param {Object} msg Message object
-   * @returns {void}
    */
   #processResponse ({ id, error, result }: { id: number, error?: any, result?: any }): void {
     const callbacks = this.#callbacks.get(id)

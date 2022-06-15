@@ -36,9 +36,9 @@ const Ecb = aesjs.ModeOfOperation.ecb
 /**
  * Generate address from secret key
  * @param {String | Uint8Array} secret - Private key
- * @returns {String} Public key
+ * @returns Public key encoded as address
  */
-export function getAddressFromPriv (secret: string | Uint8Array): string {
+export function getAddressFromPriv (secret: string | Uint8Array): EncodedData<'ak'> {
   const secretBuffer = typeof secret === 'string' ? str2buf(secret) : secret
   const keys = nacl.sign.keyPair.fromSecretKey(secretBuffer)
   return encode(keys.publicKey, 'ak')
@@ -48,7 +48,7 @@ export function getAddressFromPriv (secret: string | Uint8Array): string {
  * Check if address is valid
  * @param {String} address - Address
  * @param {String} prefix Transaction prefix. Default: 'ak'
- * @returns {Boolean} valid
+ * @returns is valid
  */
 export function isAddressValid (address: string, prefix: EncodingType = 'ak'): boolean {
   try {
@@ -61,7 +61,7 @@ export function isAddressValid (address: string, prefix: EncodingType = 'ak'): b
 
 /**
  * Generate a random salt (positive integer)
- * @returns {Number} random salt
+ * @returns random salt
  */
 export function salt (): number {
   return Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER))
@@ -71,7 +71,7 @@ export function salt (): number {
  * Converts a positive integer to the smallest possible
  * representation in a binary digit representation
  * @param {Number} value - Value to encode
- * @returns {Buffer} - Encoded data
+ * @returns Encoded number
  */
 export function encodeUnsigned (value: number): Buffer {
   const binary = Buffer.allocUnsafe(4)
@@ -82,7 +82,7 @@ export function encodeUnsigned (value: number): Buffer {
 /**
  * Calculate 256bits Blake2b hash of `input`
  * @param {Data} input - Data to hash
- * @returns {Buffer} Hash
+ * @returns Hash
  */
 export function hash (input: Data): Buffer {
   return Buffer.from(blake2b(input, undefined, 32)) // 256 bits
@@ -93,9 +93,9 @@ export function hash (input: Data): Buffer {
  * Compute contract address
  * @param {EncodedData<'ak'>} owner - Address of contract owner
  * @param {Number} nonce - Round when contract was created
- * @returns {String} - Contract address
+ * @returns Contract address
  */
-export function encodeContractAddress (owner: EncodedData<'ak'>, nonce: number): string {
+export function encodeContractAddress (owner: EncodedData<'ak'>, nonce: number): EncodedData<'ct'> {
   const publicKey = decode(owner)
   const binary = concatBuffers([publicKey, encodeUnsigned(nonce)])
   return encode(hash(binary), 'ct')
@@ -106,7 +106,7 @@ export function encodeContractAddress (owner: EncodedData<'ak'>, nonce: number):
 /**
  * Generate keyPair from secret key
  * @param {Uint8Array} secret - secret key
- * @returns {Object} - Object with Private(privateKey) and Public(publicKey) keys
+ * @returns Object with Private(privateKey) and Public(publicKey) keys
  */
 export function generateKeyPairFromSecret (secret: Uint8Array): SignKeyPair {
   return nacl.sign.keyPair.fromSecretKey(secret)
@@ -144,7 +144,7 @@ export function generateKeyPair (raw: boolean = false): {
  * Encrypt given data using `password`
  * @param {String} password - Password to encrypt with
  * @param {Uint8Array} binaryData - Data to encrypt
- * @returns {Uint8Array} Encrypted data
+ * @returns Encrypted data
  */
 export function encryptKey (password: string, binaryData: Uint8Array): Uint8Array {
   const hashedPasswordBytes = sha256hash(password)
@@ -156,7 +156,7 @@ export function encryptKey (password: string, binaryData: Uint8Array): Uint8Arra
  * Decrypt given data using `password`
  * @param {String} password - Password to decrypt with
  * @param {Uint8Array} encrypted - Data to decrypt
- * @returns {Uint8Array} Decrypted data
+ * @returns Decrypted data
  */
 export function decryptKey (password: string, encrypted: Uint8Array): Uint8Array {
   const encryptedBytes = Buffer.from(encrypted)
@@ -171,7 +171,7 @@ export function decryptKey (password: string, encrypted: Uint8Array): Uint8Array
  * Generate signature
  * @param {String | Uint8Array} data - Data to sign
  * @param {String | Uint8Array} privateKey - Key to sign with
- * @returns {Uint8Array} Signature
+ * @returns Signature
  */
 export function sign (data: string | Uint8Array, privateKey: string | Uint8Array): Uint8Array {
   return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey))
@@ -182,7 +182,7 @@ export function sign (data: string | Uint8Array, privateKey: string | Uint8Array
  * @param {Uint8Array} data - Data to verify
  * @param {Uint8Array} signature - Signature to verify
  * @param {string | Uint8Array} publicKey - Key to verify against
- * @returns {Boolean} Valid?
+ * @returns Valid?
  */
 export function verify (
   data: Uint8Array, signature: Uint8Array, publicKey: string | Uint8Array
@@ -212,7 +212,7 @@ export function verifyMessage (
  * Sign a message, and then verifying that signature
  * @param {String | Uint8Array} privateKey - Private key to verify
  * @param {String | Uint8Array} publicKey - Public key to verify
- * @returns {Boolean} Valid?
+ * @returns Valid?
  */
 export function isValidKeypair (
   privateKey: string | Uint8Array, publicKey: string | Uint8Array
