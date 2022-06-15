@@ -1,7 +1,7 @@
 version: '3'
 services:
   node:
-    image: davidyuk/aeternity:${NODE_TAG}-for-sdk
+    image: aeternity/aeternity:${NODE_TAG}
     hostname: node
     ports: ["3013:3013", "3113:3113", "3014:3014", "3114:3114"]
     volumes:

@@ -199,7 +199,7 @@ export async function prepareTxParams (
   }> {
   n = n ?? (
     await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
-  ).nextNonce as number
+  ).nextNonce
   const ttl = await calculateTtl({
     ttl: t as number,
     relative: absoluteTtl == null,
