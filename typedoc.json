@@ -5,5 +5,8 @@
   "githubPages": false,
   "excludeExternals": true,
   "treatWarningsAsErrors": true,
+  "validation": {
+    "invalidLink": true
+  },
   "readme": "none"
 }
