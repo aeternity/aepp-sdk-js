@@ -35,7 +35,7 @@ const Ecb = aesjs.ModeOfOperation.ecb
 
 /**
  * Generate address from secret key
- * @param {String | Uint8Array} secret - Private key
+ * @param secret - Private key
  * @returns Public key encoded as address
  */
 export function getAddressFromPriv (secret: string | Uint8Array): EncodedData<'ak'> {
@@ -46,8 +46,8 @@ export function getAddressFromPriv (secret: string | Uint8Array): EncodedData<'a
 
 /**
  * Check if address is valid
- * @param {String} address - Address
- * @param {String} prefix Transaction prefix. Default: 'ak'
+ * @param address - Address
+ * @param prefix Transaction prefix. Default: 'ak'
  * @returns is valid
  */
 export function isAddressValid (address: string, prefix: EncodingType = 'ak'): boolean {
@@ -70,7 +70,7 @@ export function salt (): number {
 /**
  * Converts a positive integer to the smallest possible
  * representation in a binary digit representation
- * @param {Number} value - Value to encode
+ * @param value - Value to encode
  * @returns Encoded number
  */
 export function encodeUnsigned (value: number): Buffer {
@@ -81,7 +81,7 @@ export function encodeUnsigned (value: number): Buffer {
 
 /**
  * Calculate 256bits Blake2b hash of `input`
- * @param {Data} input - Data to hash
+ * @param input - Data to hash
  * @returns Hash
  */
 export function hash (input: Data): Buffer {
@@ -91,8 +91,8 @@ export function hash (input: Data): Buffer {
 // Todo Duplicated in tx builder. remove
 /**
  * Compute contract address
- * @param {EncodedData<'ak'>} owner - Address of contract owner
- * @param {Number} nonce - Round when contract was created
+ * @param owner - Address of contract owner
+ * @param nonce - Round when contract was created
  * @returns Contract address
  */
 export function encodeContractAddress (owner: EncodedData<'ak'>, nonce: number): EncodedData<'ct'> {
@@ -105,7 +105,7 @@ export function encodeContractAddress (owner: EncodedData<'ak'>, nonce: number):
 
 /**
  * Generate keyPair from secret key
- * @param {Uint8Array} secret - secret key
+ * @param secret - secret key
  * @returns Object with Private(privateKey) and Public(publicKey) keys
  */
 export function generateKeyPairFromSecret (secret: Uint8Array): SignKeyPair {
@@ -142,8 +142,8 @@ export function generateKeyPair (raw: boolean = false): {
 
 /**
  * Encrypt given data using `password`
- * @param {String} password - Password to encrypt with
- * @param {Uint8Array} binaryData - Data to encrypt
+ * @param password - Password to encrypt with
+ * @param binaryData - Data to encrypt
  * @returns Encrypted data
  */
 export function encryptKey (password: string, binaryData: Uint8Array): Uint8Array {
@@ -154,8 +154,8 @@ export function encryptKey (password: string, binaryData: Uint8Array): Uint8Arra
 
 /**
  * Decrypt given data using `password`
- * @param {String} password - Password to decrypt with
- * @param {Uint8Array} encrypted - Data to decrypt
+ * @param password - Password to decrypt with
+ * @param encrypted - Data to decrypt
  * @returns Decrypted data
  */
 export function decryptKey (password: string, encrypted: Uint8Array): Uint8Array {
@@ -169,8 +169,8 @@ export function decryptKey (password: string, encrypted: Uint8Array): Uint8Array
 
 /**
  * Generate signature
- * @param {String | Uint8Array} data - Data to sign
- * @param {String | Uint8Array} privateKey - Key to sign with
+ * @param data - Data to sign
+ * @param privateKey - Key to sign with
  * @returns Signature
  */
 export function sign (data: string | Uint8Array, privateKey: string | Uint8Array): Uint8Array {
@@ -179,9 +179,9 @@ export function sign (data: string | Uint8Array, privateKey: string | Uint8Array
 
 /**
  * Verify that signature was signed by public key
- * @param {Uint8Array} data - Data to verify
- * @param {Uint8Array} signature - Signature to verify
- * @param {string | Uint8Array} publicKey - Key to verify against
+ * @param data - Data to verify
+ * @param signature - Signature to verify
+ * @param publicKey - Key to verify against
  * @returns Valid?
  */
 export function verify (
@@ -210,8 +210,8 @@ export function verifyMessage (
  * Check key pair for validity
  *
  * Sign a message, and then verifying that signature
- * @param {String | Uint8Array} privateKey - Private key to verify
- * @param {String | Uint8Array} publicKey - Public key to verify
+ * @param privateKey - Private key to verify
+ * @param publicKey - Public key to verify
  * @returns Valid?
  */
 export function isValidKeypair (

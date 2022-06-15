@@ -17,7 +17,7 @@
 
 /**
  * Convert string from snake_case to PascalCase
- * @param {String} s - String to convert
+ * @param s - String to convert
  * @returns Converted string
  */
 export function snakeToPascal (s: string): string {
@@ -26,7 +26,7 @@ export function snakeToPascal (s: string): string {
 
 /**
  * Convert string from PascalCase to snake_case
- * @param {String} s - String to convert
+ * @param s - String to convert
  * @returns Converted string
  */
 export function pascalToSnake (s: string): string {
@@ -35,7 +35,7 @@ export function pascalToSnake (s: string): string {
 
 /**
  * Check whether a string is valid hex.
- * @param {string} str String to validate.
+ * @param str String to validate.
  * @returns True if the string is valid hex, false otherwise.
  */
 export function isHex (str: string): boolean {
@@ -44,7 +44,7 @@ export function isHex (str: string): boolean {
 
 /**
  * Check whether a string is valid base-64.
- * @param {string} str String to validate.
+ * @param str String to validate.
  * @returns True if the string is valid base-64, false otherwise.
  */
 export function isBase64 (str: string): boolean {

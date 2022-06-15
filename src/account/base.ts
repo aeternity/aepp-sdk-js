@@ -30,7 +30,7 @@ import { concatBuffers } from '../utils/other'
 
 /**
  * Check is provided object looks like an instance of AccountBase
- * @param {Object} acc - Object to check
+ * @param acc - Object to check
  */
 export const isAccountBase = (acc: AccountBase | any): boolean =>
   !['sign', 'address', 'signTransaction', 'signMessage'].some(f => typeof acc[f] !== 'function')
@@ -40,8 +40,8 @@ export const isAccountBase = (acc: AccountBase | any): boolean =>
  * {@link module:@aeternity/aepp-sdk/es/ae--Ae} client and provides access to a
  * signing key pair.
  * @alias module:@aeternity/aepp-sdk/es/account
- * @param {Object} [options={}] - Initializer object
- * @param {String} options.networkId - NETWORK_ID using for signing transaction's
+ * @param [options={}] - Initializer object
+ * @param options.networkId - NETWORK_ID using for signing transaction's
  */
 export default abstract class AccountBase {
   networkId?: string
@@ -52,9 +52,9 @@ export default abstract class AccountBase {
 
   /**
    * Sign encoded transaction
-   * @param {String} tx - Transaction to sign
-   * @param {Object} opt - Options
-   * @param {Object} [opt.innerTx] - Sign as inner transaction for PayingFor
+   * @param tx - Transaction to sign
+   * @param opt - Options
+   * @param [opt.innerTx] - Sign as inner transaction for PayingFor
    * @returns Signed transaction
    */
   async signTransaction (
@@ -78,8 +78,8 @@ export default abstract class AccountBase {
 
   /**
    * Sign message
-   * @param {String} message - Message to sign
-   * @param {Object} opt - Options
+   * @param message - Message to sign
+   * @param opt - Options
    * @returns Signature as hex string of Uint8Array
    */
   async signMessage (
@@ -91,9 +91,9 @@ export default abstract class AccountBase {
 
   /**
    * Verify message
-   * @param {String} message - Message to verify
-   * @param {string | Uint8Array} signature - Signature
-   * @param {Object} options - Options
+   * @param message - Message to verify
+   * @param signature - Signature
+   * @param options - Options
    */
   async verifyMessage (
     message: string, signature: string | Uint8Array, options?: object
@@ -108,8 +108,8 @@ export default abstract class AccountBase {
   /**
    * Sign data blob
    * @rtype (data: String) => data: Promise[String]
-   * @param {String} data - Data blob to sign
-   * @param {Object} options
+   * @param data - Data blob to sign
+   * @param options
    * @returns Signed data blob
    */
   abstract sign (data: string | Buffer, options?: any): Promise<Uint8Array>

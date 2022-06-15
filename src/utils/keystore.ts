@@ -75,10 +75,10 @@ const CRYPTO_DEFAULTS = {
 
 /**
  * Symmetric private key encryption using secret (derived) key.
- * @param {Uint8Array} plaintext Data to be encrypted.
- * @param {Uint8Array} key Secret key.
- * @param {Uint8Array} nonce Randomly generated nonce.
- * @param {String} [algo=xsalsa20-poly1305] Encryption algorithm.
+ * @param plaintext Data to be encrypted.
+ * @param key Secret key.
+ * @param nonce Randomly generated nonce.
+ * @param [algo=xsalsa20-poly1305] Encryption algorithm.
  * @returns Encrypted data.
  */
 function encrypt (
@@ -92,10 +92,10 @@ function encrypt (
 
 /**
  * Symmetric private key decryption using secret (derived) key.
- * @param {Uint8Array} ciphertext Data to be decrypted.
- * @param {Uint8Array} key Secret key.
- * @param {Uint8Array} nonce Nonce from key-object.
- * @param {String} [algo=xsalsa20-poly1305] Encryption algorithm.
+ * @param ciphertext Data to be decrypted.
+ * @param key Secret key.
+ * @param nonce Nonce from key-object.
+ * @param [algo=xsalsa20-poly1305] Encryption algorithm.
  * @returns Decrypted data.
  */
 function decrypt (
@@ -109,10 +109,10 @@ function decrypt (
 
 /**
  * Derive secret key from password with key derivation function.
- * @param {String|Uint8Array} password User-supplied password.
- * @param {String|Uint8Array} nonce Randomly generated nonce.
- * @param {String} kdf Key derivation function.
- * @param {Object} kdfParams KDF parameters.
+ * @param password User-supplied password.
+ * @param nonce Randomly generated nonce.
+ * @param kdf Key derivation function.
+ * @param kdfParams KDF parameters.
  * @returns Secret key derived from password.
  */
 async function deriveKey (
@@ -126,8 +126,8 @@ async function deriveKey (
 
 /**
  * Recover plaintext private key from secret-storage key object.
- * @param {String|Uint8Array} password Keystore object password.
- * @param {Object} keystore Keystore object.
+ * @param password Keystore object password.
+ * @param keystore Keystore object.
  * @returns Plaintext private key.
  */
 export async function recover (
@@ -144,14 +144,14 @@ export async function recover (
 
 /**
  * Export private key to keystore secret-storage format.
- * @param {String} name Key name.
- * @param {String|Uint8Array} password User-supplied password.
- * @param {String|Uint8Array} privateKey Private key as hex-string or a Buffer.
- * @param {Buffer} nonce Randomly generated 24byte nonce.
- * @param {Buffer} salt Randomly generated 16byte salt.
- * @param {Partial<Keystore['crypto']>} [options] Encryption parameters.
- * @param {String} [options.kdf=argon2id] Key derivation function.
- * @param {Object} [options.kdf_params] KDF parameters.
+ * @param name Key name.
+ * @param password User-supplied password.
+ * @param privateKey Private key as hex-string or a Buffer.
+ * @param nonce Randomly generated 24byte nonce.
+ * @param salt Randomly generated 16byte salt.
+ * @param [options] Encryption parameters.
+ * @param [options.kdf=argon2id] Key derivation function.
+ * @param [options.kdf_params] KDF parameters.
  */
 export async function dump (
   name: string,

@@ -18,8 +18,8 @@ export const filterObject = (
 /**
  * Key traversal metafunction
  * @static
- * @param {Function} fn - Key transformation function
- * @param {Object} object - Object to traverse
+ * @param fn - Key transformation function
+ * @param object - Object to traverse
  * @returns Transformed object
  */
 export const traverseKeys = (fn: (s: string) => string, object: any): any => {
@@ -31,7 +31,7 @@ export const traverseKeys = (fn: (s: string) => string, object: any): any => {
 /**
  * snake_case key traversal
  * @static
- * @param {Object} object - Object to traverse
+ * @param object - Object to traverse
  * @returns Transformed object
  * @see pascalToSnake
  */
@@ -40,7 +40,7 @@ export const snakizeKeys = traverseKeys.bind(null, pascalToSnake)
 /**
  * PascalCase key traversal
  * @static
- * @param {Object} object - Object to traverse
+ * @param object - Object to traverse
  * @returns Transformed object
  * @see snakeToPascal
  */
