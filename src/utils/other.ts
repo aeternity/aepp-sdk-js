@@ -1,5 +1,3 @@
-import { snakeToPascal, pascalToSnake } from './string'
-
 export const pause = async (duration: number): Promise<void> =>
   await new Promise(resolve => setTimeout(resolve, duration))
 
@@ -9,42 +7,6 @@ export const mapObject = <InputV, OutputV>(
     value: [string, InputV], index: number, array: Array<[string, InputV]>
   ) => [number | string, OutputV]
 ): { [k: string]: OutputV } => Object.fromEntries(Object.entries(object).map(fn))
-
-export const filterObject = (
-  object: object,
-  fn: (value: [string, any], index: number, array: Array<[string, any]>) => boolean
-): object => Object.fromEntries(Object.entries(object).filter(fn))
-
-/**
- * Key traversal metafunction
- * @static
- * @param fn - Key transformation function
- * @param object - Object to traverse
- * @returns Transformed object
- */
-export const traverseKeys = (fn: (s: string) => string, object: any): any => {
-  if (typeof object !== 'object' || object === null) return object
-  if (Array.isArray(object)) return object.map(i => traverseKeys(fn, i))
-  return mapObject(object, ([key, value]) => [fn(key), traverseKeys(fn, value)])
-}
-
-/**
- * snake_case key traversal
- * @static
- * @param object - Object to traverse
- * @returns Transformed object
- * @see pascalToSnake
- */
-export const snakizeKeys = traverseKeys.bind(null, pascalToSnake)
-
-/**
- * PascalCase key traversal
- * @static
- * @param object - Object to traverse
- * @returns Transformed object
- * @see snakeToPascal
- */
-export const pascalizeKeys = traverseKeys.bind(null, snakeToPascal)
 
 // remove after dropping webpack4 support
 const isWebpack4Buffer = (() => {
