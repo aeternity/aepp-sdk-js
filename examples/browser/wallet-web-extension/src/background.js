@@ -1,13 +1,13 @@
 import browser from 'webextension-polyfill'
 import {
-  RpcWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection, WALLET_TYPE,
+  AeSdkWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection, WALLET_TYPE,
   RpcConnectionDenyError, RpcRejectedByUserError
 } from '@aeternity/aepp-sdk'
 
 (async () => {
   const aeppInfo = {}
 
-  const aeSdk = await RpcWallet({
+  const aeSdk = new AeSdkWallet({
     compilerUrl: 'https://compiler.aepps.com',
     nodes: [{
       name: 'testnet',
@@ -16,17 +16,6 @@ import {
     id: browser.runtime.id,
     type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
-    // The `ExtensionProvider` uses the first account by default.
-    // You can change active account using `selectAccount(address)` function
-    accounts: [
-      new MemoryAccount({
-        keypair: {
-          publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
-          secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
-        }
-      }),
-      new MemoryAccount({ keypair: generateKeyPair() })
-    ],
     // Hook for sdk registration
     onConnection (aeppId, params) {
       if (!confirm(`Aepp ${params.name} with id ${aeppId} wants to connect`)) {
@@ -62,6 +51,15 @@ import {
       }
     }
   })
+  // The `ExtensionProvider` uses the first account by default.
+  // You can change active account using `selectAccount(address)` function
+  await aeSdk.addAccount(new MemoryAccount({
+    keypair: {
+      publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
+      secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
+    }
+  }), { select: true })
+  await aeSdk.addAccount(new MemoryAccount({ keypair: generateKeyPair() }))
 
   browser.runtime.onConnect.addListener((port) => {
     // create connection

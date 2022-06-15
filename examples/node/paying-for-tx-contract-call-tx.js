@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -45,9 +45,9 @@
 //  - ... many more!
 
 // ## 1. Specify imports
-// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
+// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
-const { Universal, Node, MemoryAccount, generateKeyPair, TX_TYPE } = require('@aeternity/aepp-sdk')
+const { AeSdk, Node, MemoryAccount, generateKeyPair, TX_TYPE } = require('@aeternity/aepp-sdk')
 
 // **Note**:
 //
@@ -100,20 +100,12 @@ const NEW_USER_KEYPAIR = generateKeyPair();
   const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
   const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
   const node = new Node(NODE_URL)
-  const aeSdk = await Universal({
+  const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
-    compilerUrl: COMPILER_URL,
-    accounts: [payerAccount, newUserAccount]
+    compilerUrl: COMPILER_URL
   })
-
-  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
-  // asynchronous as it determines the node's version and rest interface automatically. Only once
-  // the Promise is fulfilled, you know you have a working object instance which is assigned to the
-  // `aeSdk` constant in this case.
-  //
-  // Note:
-  //
-  //  - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
+  await aeSdk.addAccount(payerAccount, { select: true })
+  await aeSdk.addAccount(newUserAccount)
 
   // ## 5. Create and sign `ContractCallTx` on behalf of new user
   // Currently there is no high-level API available that allows you to create and sign the
