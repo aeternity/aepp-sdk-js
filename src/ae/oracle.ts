@@ -51,7 +51,6 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @category async
  * @param oracleId Oracle public key
  * @param options
  * @returns Oracle object
@@ -169,7 +168,6 @@ export async function getQueryObject (
 /**
  * Poll for oracle query response
  * @alias module:@aeternity/aepp-sdk/es/ae/oracle
- * @category async
  * @param oracleId Oracle public key
  * @param queryId Oracle Query id
  * @param options Options object

@@ -166,7 +166,6 @@ export async function aensTransfer (
 /**
  * Query the AENS name info from the node
  * and return the object with info and predefined functions for manipulating name
- * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name
  * @param opt Options
@@ -244,7 +243,6 @@ export async function aensQuery (
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
- * @category async
  * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name
  * @param salt Salt from pre-claim, or 0 if it's a bid

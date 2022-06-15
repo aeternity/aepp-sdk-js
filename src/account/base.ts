@@ -57,7 +57,6 @@ export default abstract class AccountBase {
   /**
    * Sign encoded transaction
    * @instance
-   * @category async
    * @param {String} tx - Transaction to sign
    * @param {Object} opt - Options
    * @param {Object} [opt.innerTx] - Sign as inner transaction for PayingFor
@@ -80,7 +79,6 @@ export default abstract class AccountBase {
    * Get network Id
    * @instance
    * @function getNetworkId
-   * @category async
    * @returns {Promise<String>} Network Id
    */
   readonly getNetworkId = getNetworkId
@@ -88,7 +86,6 @@ export default abstract class AccountBase {
   /**
    * Sign message
    * @instance
-   * @category async
    * @param {String} message - Message to sign
    * @param {Object} opt - Options
    * @returns {String} Signature
@@ -103,7 +100,6 @@ export default abstract class AccountBase {
   /**
    * Verify message
    * @instance
-   * @category async
    * @param {String} message - Message to verify
    * @param {string | Uint8Array} signature - Signature
    * @param {Object} options - Options
@@ -124,7 +120,6 @@ export default abstract class AccountBase {
    * @function sign
    * @instance
    * @abstract
-   * @category async
    * @rtype (data: String) => data: Promise[String]
    * @param {String} data - Data blob to sign
    * @param {Object} options
@@ -137,7 +132,6 @@ export default abstract class AccountBase {
    * @function address
    * @instance
    * @abstract
-   * @category async
    * @returns {String} Public account address
    */
   abstract address (opt?: object): Promise<EncodedData<'ak'>>
