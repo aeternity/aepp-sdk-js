@@ -14,12 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Memory Account module
- * @module @aeternity/aepp-sdk/es/account/memory
- */
-
 import AccountBase from './base'
 import { sign, isValidKeypair } from '../utils/crypto'
 import { isHex } from '../utils/string'

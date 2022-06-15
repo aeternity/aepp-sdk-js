@@ -14,13 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Compiler module
- *
- * @module @aeternity/aepp-sdk/es/contract/compiler
- */
-
 import { Compiler as CompilerApi, ErrorModel, CompilerError } from '../apis/compiler'
 import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../utils/autorest'
 

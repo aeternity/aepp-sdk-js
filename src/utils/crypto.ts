@@ -14,12 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Crypto module
- * @module @aeternity/aepp-sdk/es/utils/crypto
- */
-
 import nacl, { SignKeyPair } from 'tweetnacl'
 import aesjs from 'aes-js'
 import { blake2b, Data } from 'blakejs'

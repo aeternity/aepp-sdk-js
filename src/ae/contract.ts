@@ -20,8 +20,6 @@
  *
  * High level documentation of the contracts are available at
  * https://github.com/aeternity/protocol/tree/master/contracts and
- *
- * @module @aeternity/aepp-sdk/es/ae/contract
  */
 
 import { decode, produceNameId } from '../tx/builder/helpers'

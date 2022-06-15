@@ -1,6 +1,5 @@
 /**
  * Big Number Helpers
- * @module @aeternity/aepp-sdk/es/utils/bignumber
  */
 import BigNumber from 'bignumber.js'
 

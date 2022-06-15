@@ -14,11 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Amount Formatter
- * @module @aeternity/aepp-sdk/es/utils/amount-formatter
- */
 import BigNumber from 'bignumber.js'
 import { isBigNumber } from './bignumber'
 import { ArgumentError } from './errors'

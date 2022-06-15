@@ -21,7 +21,6 @@
  * The high-level description of the naming system is
  * https://github.com/aeternity/protocol/blob/master/AENS.md in the protocol
  * repository.
- * @module @aeternity/aepp-sdk/es/ae/aens
  */
 
 import { salt } from '../utils/crypto'

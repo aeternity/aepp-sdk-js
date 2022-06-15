@@ -14,12 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Channel module
- * @module @aeternity/aepp-sdk/es/channel/index
- */
-
 import BigNumber from 'bignumber.js'
 import { snakeToPascal } from '../utils/string'
 import { buildTx, unpackTx } from '../tx/builder'

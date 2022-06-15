@@ -10,11 +10,6 @@ import { concatBuffers, isKeyOfObject } from '../utils/other'
 import { EncodedData } from '../utils/encoder'
 import Node from '../node'
 
-/**
- * Transaction validator
- * @module @aeternity/aepp-sdk/es/tx/validator
- */
-
 interface Account {
   balance: bigint
   id: EncodedData<'ak'>

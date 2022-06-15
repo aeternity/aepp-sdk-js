@@ -14,12 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Chain module
- * @module @aeternity/aepp-sdk/es/chain
- */
-
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter'
 import verifyTransaction from './tx/validator'
 import { pause } from './utils/other'

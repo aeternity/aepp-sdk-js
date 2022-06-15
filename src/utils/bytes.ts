@@ -19,11 +19,6 @@ import { NoSerializerFoundError, TypeError } from './errors'
 import { isBase64, isHex } from './string'
 
 /**
- * Bytes module
- * @module @aeternity/aepp-sdk/es/utils/bytes
- */
-
-/**
  * Convert bignumber to byte array
  * @param x - bignumber instance
  * @returns Buffer

@@ -14,13 +14,6 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
-
-/**
- * ContractACI module
- *
- * @module @aeternity/aepp-sdk/es/contract/aci
- */
-
 // @ts-expect-error TODO remove
 import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { DRY_RUN_ACCOUNT, GAS_MAX, TX_TYPE, AMOUNT } from '../tx/builder/schema'

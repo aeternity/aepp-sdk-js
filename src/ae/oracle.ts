@@ -21,7 +21,6 @@
  * The high-level description of the oracle system is
  * https://github.com/aeternity/protocol/blob/master/ORACLE.md in the protocol
  * repository.
- * @module @aeternity/aepp-sdk/es/ae/oracle
  */
 
 import { send } from './spend'

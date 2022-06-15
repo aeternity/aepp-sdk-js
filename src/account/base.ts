@@ -14,12 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * AccountBase module
- * @module @aeternity/aepp-sdk/es/account/base
- */
-
 import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto'
 import { buildTx } from '../tx/builder'
 import { decode } from '../tx/builder/helpers'

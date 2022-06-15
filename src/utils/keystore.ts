@@ -5,11 +5,6 @@ import { getAddressFromPriv } from './crypto'
 import { bytesToHex, hexToBytes } from './bytes'
 import { InvalidPasswordError } from './errors'
 
-/**
- * KeyStore module
- * @module @aeternity/aepp-sdk/es/utils/keystore
- */
-
 const DERIVED_KEY_FUNCTIONS = {
   async argon2id (
     pass: string | Uint8Array,
