@@ -73,7 +73,7 @@ export default class AeSdkAepp extends AeSdkBase {
   /**
    * Connect to wallet
    * @param connection - Wallet connection object
-   * @param options
+   * @param options - Options
    * @param options.connectNode - Request wallet to bind node
    * @param options.name - Node name
    * @param options.select - Select this node as current

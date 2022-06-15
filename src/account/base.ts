@@ -31,8 +31,7 @@ export const isAccountBase = (acc: AccountBase | any): boolean =>
 
 /**
  * Account is one of the three basic building blocks of an
- * {@link module:@aeternity/aepp-sdk/es/ae--Ae} client and provides access to a
- * signing key pair.
+ * {@link AeSdk} and provides access to a signing key pair.
  * @param options - Initializer object
  * @param options.networkId - NETWORK_ID using for signing transaction's
  */
@@ -100,9 +99,8 @@ export default abstract class AccountBase {
 
   /**
    * Sign data blob
-   * @rtype (data: String) => data: Promise[String]
    * @param data - Data blob to sign
-   * @param options
+   * @param options - Options
    * @returns Signed data blob
    */
   abstract sign (data: string | Buffer, options?: any): Promise<Uint8Array>

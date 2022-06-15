@@ -26,7 +26,7 @@ import { InternalError, RpcConnectionError } from '../../errors'
  * @param params.self - Host window for message
  * @param params.origin - Origin of receiver
  * @param params.sendDirection - Wrapping messages into additional struct
- * ({ type: 'to_aepp' || 'to_waellet', data })
+ * `({ type: 'to_aepp' || 'to_waellet', data })`
  * Used for handling messages between content script and page
  * @param params.receiveDirection - Unwrapping messages from additional struct
  */

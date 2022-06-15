@@ -119,7 +119,9 @@ interface Contract {
  * @param options.debug=false - Log websocket communication
  * @param options.sign - Function which verifies and signs transactions
  * @returns Channel instance
- * @example await Channel.initialize({
+ * @example
+ * ```js
+ * await Channel.initialize({
  *   url: 'ws://localhost:3001',
  *   role: 'initiator'
  *   initiatorId: 'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
@@ -134,6 +136,7 @@ interface Contract {
  *   lockPeriod: 10,
  *   async sign (tag, tx) => await account.signTransaction(tx)
  * })
+ * ```
  */
 export default class Channel {
   static async initialize (options: ChannelOptions): Promise<Channel> {
@@ -264,9 +267,11 @@ export default class Channel {
    * @param to - Receiver's public address
    * @param amount - Transaction amount
    * @param sign - Function which verifies and signs offchain transaction
-   * @param metadata
+   * @param metadata - Metadata
 
-   * @example channel.update(
+   * @example
+   * ```js
+   * channel.update(
    *   'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
    *   'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E',
    *   10,
@@ -276,6 +281,7 @@ export default class Channel {
    *     console.log('Update has been accepted')
    *   }
    * )
+   * ```
    */
   async update (
     from: string,
@@ -317,16 +323,19 @@ export default class Channel {
    * If a certain address of an account or a contract is not found
    * in the state tree - the response is an error.
    *
-   * @param addresses
+   * @param addresses - Addresses
    * @param addresses.accounts - List of account addresses to include in poi
    * @param addresses.contracts - List of contract addresses to include in poi
-   * @example channel.poi({
+   * @example
+   * ```js
+   * channel.poi({
    *   accounts: [
    *     'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
    *     'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E'
    *   ],
    *   contracts: ['ct_2dCUAWYZdrWfACz3a2faJeKVTVrfDYxCQHCqAt5zM15f3u2UfA']
    * }).then(poi => console.log(poi))
+   * ```
    */
   async poi (
     { accounts, contracts }: { accounts: string[], contracts?: string[] }
@@ -344,13 +353,16 @@ export default class Channel {
    * skipped in the response.
    *
    * @param accounts - List of addresses to fetch balances from
-   * @example channel.balances([
+   * @example
+   * ```js
+   * channel.balances([
    *   'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
    *   'ak_V6an1xhec1xVaAhLuak7QoEbi6t7w5hEtYWp9bMKaJ19i6A9E'
    *   'ct_2dCUAWYZdrWfACz3a2faJeKVTVrfDYxCQHCqAt5zM15f3u2UfA'
    * ]).then(balances =>
    *   console.log(balances['ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH'])
    * )
+   * ```
    */
   async balances (accounts: Array<EncodedData<'ak'>>): Promise<{ [key: EncodedData<'ak'>]: string }> {
     return Object.fromEntries(
@@ -374,10 +386,13 @@ export default class Channel {
    * with two extra params: existingChannelId and offchainTx (returned from leave
    * method as channelId and signedTx respectively).
    *
-   * @example channel.leave().then(({ channelId, signedTx }) => {
+   * @example
+   * ```js
+   * channel.leave().then(({ channelId, signedTx }) => {
    *   console.log(channelId)
    *   console.log(signedTx)
    * })
+   * ```
    */
   async leave (): Promise<{ channelId: string, signedTx: string }> {
     return await new Promise((resolve, reject) => {
@@ -401,9 +416,12 @@ export default class Channel {
    * This can be done by either of the parties. The process is similar to the off-chain updates.
    *
    * @param sign - Function which verifies and signs mutual close transaction
-   * @example channel.shutdown(
+   * @example
+   * ```js
+   * channel.shutdown(
    *   async (tx) => await account.signTransaction(tx)
    * ).then(tx => console.log('on_chain_tx', tx))
+   * ```
    */
   async shutdown (sign: Function): Promise<string> {
     return await new Promise((resolve, reject) => {
@@ -454,13 +472,14 @@ export default class Channel {
    *
    * @param amount - Amount of coins to withdraw
    * @param sign - Function which verifies and signs withdraw transaction
-   * @param callbacks
+   * @param callbacks - Callbacks
    * @param callbacks.onOnChainTx - Called when withdraw transaction has been posted
    * on chain
    * @param callbacks.onOwnWithdrawLocked
    * @param callbacks.onWithdrawLocked
-
-   * @example channel.withdraw(
+   * @example
+   * ```js
+   * channel.withdraw(
    *   100,
    *   async (tx) => await account.signTransaction(tx),
    *   { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
@@ -471,6 +490,7 @@ export default class Channel {
    *     console.log('Withdrawal has been rejected')
    *   }
    * })
+   * ```
    */
   async withdraw (
     amount: number | BigNumber,
@@ -529,12 +549,14 @@ export default class Channel {
    *
    * @param amount - Amount of coins to deposit
    * @param sign - Function which verifies and signs deposit transaction
-   * @param callbacks
+   * @param callbacks - Callbacks
    * @param callbacks.onOnChainTx - Called when deposit transaction has been posted
    * on chain
    * @param callbacks.onOwnDepositLocked
    * @param callbacks.onDepositLocked
-   * @example channel.deposit(
+   * @example
+   * ```js
+   * channel.deposit(
    *   100,
    *   async (tx) => await account.signTransaction(tx),
    *   { onOnChainTx: (tx) => console.log('on_chain_tx', tx) }
@@ -546,6 +568,7 @@ export default class Channel {
    *     console.log('Deposit has been rejected')
    *   }
    * })
+   * ```
    */
   async deposit (
     amount: number | BigNumber,
@@ -584,14 +607,16 @@ export default class Channel {
    * That would create a contract with the poster being the owner of it. Poster commits initially
    * a deposit amount of coins to the new contract.
    *
-   * @param options
+   * @param options - Options
    * @param options.code - Api encoded compiled AEVM byte code
    * @param options.callData - Api encoded compiled AEVM call data for the code
    * @param options.deposit - Initial amount the owner of the contract commits to it
    * @param options.vmVersion - Version of the Virtual Machine
    * @param options.abiVersion - Version of the Application Binary Interface
    * @param sign - Function which verifies and signs create contract transaction
-   * @example channel.createContract({
+   * @example
+   * ```js
+   * channel.createContract({
    *   code: 'cb_HKtpipK4aCgYb17wZ...',
    *   callData: 'cb_1111111111111111...',
    *   deposit: 10,
@@ -605,6 +630,7 @@ export default class Channel {
    *     console.log('New contract has been rejected')
    *   }
    * })
+   * ```
    */
   async createContract (
     { code, callData, deposit, vmVersion, abiVersion }: {
@@ -661,13 +687,15 @@ export default class Channel {
    * contract call. It would be consumed if it were an on-chain one. This could happen
    * if a call with a similar computation amount is to be forced on-chain.
    *
-   * @param options
+   * @param options - Options
    * @param options.amount - Amount the caller of the contract commits to it
    * @param options.callData - ABI encoded compiled AEVM call data for the code
    * @param options.contract - Address of the contract to call
    * @param options.abiVersion - Version of the ABI
    * @param sign - Function which verifies and signs contract call transaction
-   * @example channel.callContract({
+   * @example
+   * ```js
+   * channel.callContract({
    *   contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
    *   callData: 'cb_1111111111111111...',
    *   amount: 0,
@@ -679,6 +707,7 @@ export default class Channel {
    *     console.log('Contract call has been rejected')
    *   }
    * })
+   * ```
    */
   async callContract (
     { amount, callData, contract, abiVersion }: CallContractOptions,
@@ -711,7 +740,7 @@ export default class Channel {
   /**
    * Trigger a force progress contract call
    * This call is going on-chain
-   * @param options
+   * @param options - Options
    * @param options.amount - Amount the caller of the contract commits to it
    * @param options.callData - ABI encoded compiled AEVM call data for the code
    * @param options.contract - Address of the contract to call
@@ -719,8 +748,10 @@ export default class Channel {
    * @param options.gasPrice=1000000000]
    * @param options.gasLimit=1000000]
    * @param sign - Function which verifies and signs contract force progress transaction
-   * @param callbacks
-   * @example channel.forceProgress({
+   * @param callbacks - Callbacks
+   * @example
+   * ```js
+   * channel.forceProgress({
    *   contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
    *   callData: 'cb_1111111111111111...',
    *   amount: 0,
@@ -733,6 +764,7 @@ export default class Channel {
    *     console.log('Contract force progress call has been rejected')
    *   }
    * })
+   * ```
    */
   async forceProgress (
     { amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = 1000000000 }: {
@@ -783,12 +815,14 @@ export default class Channel {
    * whatsoever. It uses as an environment the latest channel's state and the current
    * top of the blockchain as seen by the node.
    *
-   * @param options
+   * @param options - Options
    * @param options.amount - Amount the caller of the contract commits to it
    * @param options.callData - ABI encoded compiled AEVM call data for the code
    * @param options.contract - Address of the contract to call
    * @param options.abiVersion - Version of the ABI
-   * @example channel.callContractStatic({
+   * @example
+   * ```js
+   * channel.callContractStatic({
    *   contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
    *   callData: 'cb_1111111111111111...',
    *   amount: 0,
@@ -797,6 +831,7 @@ export default class Channel {
    *   console.log('Returned value:', returnValue)
    *   console.log('Gas used:', gasUsed)
    * })
+   * ```
    */
   async callContractStatic (
     { amount, callData, contract, abiVersion }:
@@ -816,17 +851,20 @@ export default class Channel {
    * The combination of a caller, contract and a round of execution determines the
    * contract call. Providing an incorrect set of those results in an error response.
    *
-   * @param options
+   * @param options - Options
    * @param options.caller - Address of contract caller
    * @param options.contract - Address of the contract
    * @param options.round - Round when contract was called
-   * @example channel.getContractCall({
+   * @example
+   * ```js
+   * channel.getContractCall({
    *   caller: 'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH',
    *   contract: 'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa',
    *   round: 3
    * }).then(({ returnType, returnValue }) => {
    *   if (returnType === 'ok') console.log(returnValue)
    * })
+   * ```
    */
   async getContractCall (
     { caller, contract, round }: { caller: string, contract: string, round: number }
@@ -851,11 +889,14 @@ export default class Channel {
    * Get contract latest state
    *
    * @param contract - Address of the contract
-   * @example channel.getContractState(
+   * @example
+   * ```js
+   * channel.getContractState(
    *   'ct_9sRA9AVE4BYTAkh5RNfJYmwQe1NZ4MErasQLXZkFWG43TPBqa'
    * ).then(({ contract }) => {
    *   console.log('deposit:', contract.deposit)
    * })
+   * ```
    */
   async getContractState (
     contract: string
@@ -874,7 +915,6 @@ export default class Channel {
    * They consume memory and in order for the participant to free it - one can prune all messages.
    * This cleans up all locally stored contract calls and those will no longer be available for
    * fetching and inspection.
-   *
    */
   async cleanContractCalls (): Promise<void> {
     return await new Promise((resolve, reject) => {
@@ -905,12 +945,15 @@ export default class Channel {
    * If there is ongoing update that has not yet been finished the message
    * will be sent after that update is finalized.
    *
-   * @param message
+   * @param message - Message
    * @param recipient - Address of the recipient
-   * @example channel.sendMessage(
+   * @example
+   * ```js
+   * channel.sendMessage(
    *   'hello world',
    *   'ak_Y1NRjHuoc3CGMYMvCmdHSBpJsMDR6Ra2t5zjhRcbtMeXXLpLH'
    * )
+   * ```
    */
   sendMessage (message: string | ChannelMessage, recipient: string): void {
     let info = message

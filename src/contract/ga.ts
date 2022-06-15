@@ -36,7 +36,7 @@ import Compiler from './compiler'
 /**
  * Check if account is GA
  * @param address - Account address
- * @param options
+ * @param options - Options
  * @returns if account is GA
  */
 export async function isGA (

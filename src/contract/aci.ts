@@ -128,13 +128,15 @@ type ContractCallReturnType = 'ok' | 'error' | 'revert'
  * @param options - Options object
  * @returns JS Contract API
  * @example
+ * ```js
  * const contractIns = await aeSdk.getContractInstance({ source })
  * await contractIns.deploy([321]) or await contractIns.methods.init(321)
  * const callResult = await contractIns.call('setState', [123]) or
  * await contractIns.methods.setState.send(123, options)
  * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true }) or
  * await contractIns.methods.setState.get(123, options)
- * Also you can call contract like: await contractIns.methods.setState(123, options)
+ * ```
+ * Also you can call contract like: `await contractIns.methods.setState(123, options)`
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is
  * stateful or not
  */
@@ -283,7 +285,7 @@ export default async function getContractInstance ({
   /**
    * Deploy contract
    * @param params - Contract init function arguments array
-   * @param options
+   * @param options - Options
    * @returns deploy info
    */
   instance.deploy = async (params = [],
@@ -409,8 +411,8 @@ export default async function getContractInstance ({
    * @param nameHash - Hash of emitted event name
    * @param options - Options
    * @returns Contract name
-   * @throws {MissingEventDefinitionError}
-   * @throws {AmbiguousEventDefinitionError}
+   * @throws {@link MissingEventDefinitionError}
+   * @throws {@link AmbiguousEventDefinitionError}
    */
   function getContractNameByEvent (
     address: EncodedData<'ct'>,
@@ -470,11 +472,16 @@ export default async function getContractInstance ({
   /**
    * Generate proto function based on contract function using Contract ACI schema
    * All function can be called like:
-   * 'await contract.methods.testFunction()' -> then sdk will decide to use dry-run or send tx
+   * ```js
+   * await contract.methods.testFunction()
+   * ```
+   * then sdk will decide to use dry-run or send tx
    * on-chain base on if function stateful or not.
-   * Also you can manually do that:
-   * `await contract.methods.testFunction.get()` -> use call-static(dry-run)
-   * `await contract.methods.testFunction.send()` -> send tx on-chain
+   * Also, you can manually do that:
+   * ```js
+   * await contract.methods.testFunction.get() // use call-static (dry-run)
+   * await contract.methods.testFunction.send() // send tx on-chain
+   * ```
    */
   instance.methods = Object.fromEntries(instance._aci.encodedAci.contract.functions
     .map(({ name, arguments: aciArgs, stateful }: FunctionACI) => {

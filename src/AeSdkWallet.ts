@@ -313,7 +313,7 @@ export default class AeSdkWallet extends AeSdk {
 
   /**
    * Get Wallet accounts
-   * @returns Object with accounts information ({ connected: Object, current: Object })
+   * @returns Object with accounts information (\{ connected: Object, current: Object \})
    */
   getAccounts (): Accounts {
     return {

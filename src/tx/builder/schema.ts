@@ -40,8 +40,8 @@ export type TxField = [
 ]
 
 /**
- * @description Object with transaction types
- * @link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/serializations.md#binary-serialization
+ * Enum with transaction types
+ * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/serializations.md#binary-serialization}
  */
 export enum TX_TYPE {
   account = 10,
@@ -94,7 +94,7 @@ export enum TX_TYPE {
 }
 
 /**
- * @link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+ * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
  */
 export enum VM_VERSIONS {
   NO_VM = 0,
@@ -107,7 +107,7 @@ export enum VM_VERSIONS {
 }
 
 /**
- * @link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+ * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
  */
 export enum ABI_VERSIONS {
   NO_ABI = 0,
@@ -213,7 +213,10 @@ export const KEY_BLOCK_INTERVAL = 3
  * @see {@link https://github.com/aeternity/protocol/blob/master/consensus/README.md#gas}
  * @param txType - The transaction type
  * @returns The base fee
- * @example TX_FEE_BASE('channelForceProgress') => new BigNumber(30 * 15000)
+ * @example
+ * ```js
+ * TX_FEE_BASE('channelForceProgress') => new BigNumber(30 * 15000)
+ * ```
  */
 export const TX_FEE_BASE_GAS = (txType: TX_TYPE): BigNumber => {
   const feeFactors = {
@@ -243,8 +246,11 @@ export const TX_FEE_BASE_GAS = (txType: TX_TYPE): BigNumber => {
  * @returns parameters.relativeTtl - The relative ttl
  * @returns parameters.innerTxSize - The size of the inner transaction
  * @returns The Other fee
- * @example TX_FEE_OTHER_GAS('oracleResponse',10, {relativeTtl:10, innerTxSize:10 })
+ * @example
+ * ```js
+ * TX_FEE_OTHER_GAS('oracleResponse',10, { relativeTtl: 10, innerTxSize: 10 })
  *  => new BigNumber(10).times(20).plus(Math.ceil(32000 * 10 / Math.floor(60 * 24 * 365 / 2)))
+ * ```
  */
 export const TX_FEE_OTHER_GAS = (
   txType: TX_TYPE,

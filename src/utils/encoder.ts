@@ -85,7 +85,7 @@ export function decode (data: EncodedData<EncodingType>): Buffer {
 
 /**
  * Encode data using the default encoding/decoding algorithm
- * @param data  An decoded data
+ * @param data - An decoded data
  * @param type - Prefix of Transaction
  * @returns Encoded string Base58check or Base64check data
  */

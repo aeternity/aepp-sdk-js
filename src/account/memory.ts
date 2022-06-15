@@ -30,7 +30,7 @@ export interface Keypair {
 
 /**
  * In-memory account stamp
- * @param options
+ * @param options - Options
  * @param options.keypair - Key pair to use
  * @param options.keypair.publicKey - Public key
  * @param options.keypair.secretKey - Private key

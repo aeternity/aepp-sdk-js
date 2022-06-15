@@ -60,6 +60,7 @@ async function delegateSignatureCommon (
  * @param opt.name - The name
  * @returns Signature for delegation
  * @example
+ * ```js
  * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const name = 'example.chain' // AENS name
@@ -70,6 +71,7 @@ async function delegateSignatureCommon (
  * const aensDelegationSig = await contract.createAensDelegationSignature(
  *   contractId, { name, onAccount: current }
  * )
+ * ```
  */
 export async function createAensDelegationSignature (
   contractId: EncodedData<'ct'>,
@@ -93,6 +95,7 @@ export async function createAensDelegationSignature (
  * @param opt.queryId - Oracle Query Id
  * @returns Signature for delegation
  * @example
+ * ```js
  * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const queryId = 'oq_...' // Oracle Query Id
@@ -101,6 +104,7 @@ export async function createAensDelegationSignature (
  * const oracleDelegationSig = await aeSdk.createOracleDelegationSignature(contractId)
  * // Oracle respond signature
  * const respondSig = await aeSdk.createOracleDelegationSignature(contractId, { queryId })
+ * ```
  */
 export async function createOracleDelegationSignature (
   contractId: EncodedData<'ct'>,

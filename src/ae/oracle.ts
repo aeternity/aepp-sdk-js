@@ -48,7 +48,7 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
  * @param oracleId - Oracle public key
- * @param options
+ * @param options - Options
  * @returns Oracle object
  */
 export async function getOracleObject (
@@ -130,7 +130,7 @@ export function pollForQueries (
  * Constructor for OracleQuery Object (helper object for using OracleQuery)
  * @param oracleId - Oracle public key
  * @param queryId - Oracle Query id
- * @param options
+ * @param options - Options
  * @returns OracleQuery object
  */
 export async function getQueryObject (
@@ -189,7 +189,7 @@ export async function pollForQueryResponse (
  * Register oracle
  * @param queryFormat - Format of query
  * @param responseFormat - Format of query response
- * @param options
+ * @param options - Options
  * @param options.queryFee - Oracle query Fee
  * @param options - Options object
  * @param options.abiVersion - Always 0 (do not use virtual machine)

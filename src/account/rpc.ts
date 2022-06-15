@@ -5,9 +5,9 @@ import { EncodedData } from '../utils/encoder'
 
 /**
  * Account provided by wallet
- * @param param
- * @param param.rpcClient - RpcClient instance
- * @param param.address - RPC account address
+ * @param params - Params
+ * @param params.rpcClient - RpcClient instance
+ * @param params.address - RPC account address
  * @returns AccountRpc instance
  */
 export default class AccountRpc extends AccountBase {
