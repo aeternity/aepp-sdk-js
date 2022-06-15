@@ -49,12 +49,8 @@ function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Valu
  * Only by providing the joint functionality of those three, most more advanced
  * operations, i.e. the ones with actual use value on the chain, become
  * available.
- * @function
- * @alias module:@aeternity/aepp-sdk/es/ae
- * @rtype Stamp
- * @param {Object} [options={}] - Initializer object
- * @param {String} [options.compilerUrl] compilerUrl - Url for compiler API
- * @return {Object} Ae instance
+ * @param options - Initializer object
+ * @param options.compilerUrl - compilerUrl - Url for compiler API
  */
 class AeSdkBase {
   _options = {
@@ -98,7 +94,6 @@ class AeSdkBase {
 
   /**
    * Add Node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @param name - Node name
    * @param node - Node instance
    * @param select - Select this node as current
@@ -117,7 +112,6 @@ class AeSdkBase {
 
   /**
    * Select Node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @param name - Node name
    * @example
    * nodePool.selectNode('testNode')
@@ -129,7 +123,6 @@ class AeSdkBase {
 
   /**
    * Get NetworkId of current Node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @example
    * nodePool.getNetworkId()
    */
@@ -137,7 +130,6 @@ class AeSdkBase {
 
   /**
    * Check if you have selected node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @example
    * nodePool.isNodeConnected()
    */
@@ -153,7 +145,6 @@ class AeSdkBase {
 
   /**
    * Get information about node
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @example
    * nodePool.getNodeInfo() // { name, version, networkId, protocol, ... }
    */
@@ -167,7 +158,6 @@ class AeSdkBase {
 
   /**
    * Get array of available nodes
-   * @alias module:@aeternity/aepp-sdk/es/node-pool
    * @example
    * nodePool.getNodesInPool()
    */
@@ -219,8 +209,7 @@ class AeSdkBase {
 
   /**
    * Resolves an account
-   * @param {Object} account ak-address, instance of AccountBase, or keypair
-   * @returns {AccountBase}
+   * @param account - ak-address, instance of AccountBase, or keypair
    * @private
    */
   _resolveAccount (account?: Account): AccountBase {

@@ -14,12 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Amount Formatter
- * @module @aeternity/aepp-sdk/es/utils/amount-formatter
- * @example import { formatAmount } from '@aeternity/aepp-sdk'
- */
 import BigNumber from 'bignumber.js'
 import { isBigNumber } from './bignumber'
 import { ArgumentError } from './errors'
@@ -49,10 +43,9 @@ const DENOMINATION_MAGNITUDE = {
 
 /**
  * Convert amount to AE
- * @param {String|Number|BigNumber} value amount to convert
- * @param {Object} [options={}] options
- * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
- * @return {String}
+ * @param value - amount to convert
+ * @param options - options
+ * @param options.denomination - denomination of amount, can be ['ae', 'aettos']
  */
 export const toAe = (
   value: string | number | BigNumber,
@@ -61,10 +54,9 @@ export const toAe = (
 
 /**
  * Convert amount to aettos
- * @param {String|Number|BigNumber} value amount to convert
- * @param {Object} [options={}] options
- * @param {String} [options.denomination='ae'] denomination of amount, can be ['ae', 'aettos']
- * @return {String}
+ * @param value - amount to convert
+ * @param options - options
+ * @param options.denomination - denomination of amount, can be ['ae', 'aettos']
  */
 export const toAettos = (
   value: string | number | BigNumber,
@@ -73,12 +65,11 @@ export const toAettos = (
 
 /**
  * Convert amount from one to other denomination
- * @param {String|Number|BigNumber} value amount to convert
- * @param {Object} [options={}] options
- * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
- * @param {String} [options.targetDenomination='aettos'] target denomination,
+ * @param value - amount to convert
+ * @param options - options
+ * @param options.denomination - denomination of amount, can be ['ae', 'aettos']
+ * @param options.targetDenomination - target denomination,
  * can be ['ae', 'aettos']
- * @return {String}
  */
 export const formatAmount = (
   value: string | number | bigint | BigNumber,

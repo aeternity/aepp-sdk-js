@@ -162,10 +162,4 @@ describe('Transaction', function () {
     it(`build of ${name} transaction`, async () => {
       expect(await getter()).to.be.equal(expected)
     }))
-
-  it('Get next account nonce', async () => {
-    const { nonce: accountNonce } = await aeSdk.api.getAccountByPubkey(address)
-    expect(await aeSdk.getAccountNonce(address)).to.be.equal(+accountNonce + 1)
-    expect(await aeSdk.getAccountNonce(address, { nonce: 1 })).to.be.equal(1)
-  })
 })

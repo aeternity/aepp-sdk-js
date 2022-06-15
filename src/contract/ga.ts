@@ -96,11 +96,11 @@ export async function createGeneralizedAccount (
 
 /**
  * Create a metaTx transaction
- * @param rawTransaction Inner transaction
- * @param authData Object with gaMeta params
+ * @param rawTransaction - Inner transaction
+ * @param authData - Object with gaMeta params
  * @param authFnName - Authorization function name
  * @param options - Options
- * @param options.onAccount Account to use
+ * @param options.onAccount - Account to use
  * @returns Transaction string
  */
 export async function createMetaTx (
@@ -157,10 +157,10 @@ export async function createMetaTx (
 
 /**
  * Build a transaction hash the same as `Auth.tx_hash`
- * @param transaction tx-encoded transaction
- * @param options Options
- * @param options.onNode Node to use
- * @return Transaction hash
+ * @param transaction - tx-encoded transaction
+ * @param options - Options
+ * @param options.onNode - Node to use
+ * @returns Transaction hash
  */
 export async function buildAuthTxHash (
   transaction: EncodedData<'tx'>,

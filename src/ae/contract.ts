@@ -20,10 +20,6 @@
  *
  * High level documentation of the contracts are available at
  * https://github.com/aeternity/protocol/tree/master/contracts and
- *
- * @module @aeternity/aepp-sdk/es/ae/contract
- * @export Contract
- * @example import { Contract } from '@aeternity/aepp-sdk'
  */
 
 import { decode, produceNameId } from '../tx/builder/helpers'
@@ -35,11 +31,11 @@ export { default as getContractInstance } from '../contract/aci'
 
 /**
  * Utility method to create a delegate signature for a contract
- * @param ids The list of id's to prepend
- * @param opt Options
- * @param opt.onNode Node to use
- * @param opt.onAccount Account to use
- * @return Signature in hex representation
+ * @param ids - The list of id's to prepend
+ * @param opt - Options
+ * @param opt.onNode - Node to use
+ * @param opt.onAccount - Account to use
+ * @returns Signature in hex representation
  */
 async function delegateSignatureCommon (
   ids: Array<EncodedData<EncodingType>> = [],
@@ -59,10 +55,10 @@ async function delegateSignatureCommon (
 /**
  * Helper to generate a signature to delegate pre-claim/claim/transfer/revoke of a name to
  * a contract.
- * @param contractId Contract Id
- * @param opt Options
- * @param opt.name The name
- * @return Signature for delegation
+ * @param contractId - Contract Id
+ * @param opt - Options
+ * @param opt.name - The name
+ * @returns Signature for delegation
  * @example
  * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
@@ -92,10 +88,10 @@ export async function createAensDelegationSignature (
 
 /**
  * Helper to generate a signature to delegate register/extend/respond of a Oracle to a contract.
- * @param contractId Contract Id
- * @param opt Options
- * @param opt.queryId Oracle Query Id
- * @return Signature for delegation
+ * @param contractId - Contract Id
+ * @param opt - Options
+ * @param opt.queryId - Oracle Query Id
+ * @returns Signature for delegation
  * @example
  * const aeSdk = await Universal({ ... })
  * const contractId = 'ct_asd2ks...' // contract address

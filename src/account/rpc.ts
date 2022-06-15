@@ -1,8 +1,3 @@
-/**
- * AccountRpc module
- * @module @aeternity/aepp-sdk/es/account/rpc
- * @export AccountRpc
- */
 import AccountBase from './base'
 import { METHODS } from '../utils/aepp-wallet-communication/schema'
 import { NotImplementedError } from '../utils/errors'
@@ -10,11 +5,10 @@ import { EncodedData } from '../utils/encoder'
 
 /**
  * Account provided by wallet
- * @alias module:@aeternity/aepp-sdk/es/account/rpc
  * @param param
- * @param param.rpcClient RpcClient instance
- * @param param.address RPC account address
- * @return AccountRpc instance
+ * @param param.rpcClient - RpcClient instance
+ * @param param.address - RPC account address
+ * @returns AccountRpc instance
  */
 export default class AccountRpc extends AccountBase {
   _rpcClient: any
@@ -38,10 +32,7 @@ export default class AccountRpc extends AccountBase {
   }
 
   /**
-   * @function signTransaction
-   * @instance
-   * @rtype (tx: String, options = {}) => Promise
-   * @return {Promise<String>} Signed transaction
+   * @returns Signed transaction
    */
   async signTransaction (
     tx: EncodedData<'tx'>,
@@ -57,10 +48,7 @@ export default class AccountRpc extends AccountBase {
   }
 
   /**
-   * @function signMessage
-   * @instance
-   * @rtype (message: String, options = {}) => Promise
-   * @return {Promise<String>} Signed message
+   * @returns Signed message
    */
   async signMessage (
     message: string, { returnHex = false }: Parameters<AccountBase['signMessage']>[1] = {}

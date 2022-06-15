@@ -114,10 +114,10 @@ export async function _buildTx<TxType extends TX_TYPE> (
 /**
  * Validated vm/abi version or get default based on transaction type and NODE version
  *
- * @param txType Type of transaction
- * @param ctVersion Object with vm and abi version fields
+ * @param txType - Type of transaction
+ * @param ctVersion - Object with vm and abi version fields
  * @param options
- * @return Object with vm/abi version
+ * @returns Object with vm/abi version
  */
 export async function getVmVersion (
   txType: TX_TYPE.contractCreate, ctVersion: Partial<CtVersion> & { onNode: Node }
@@ -146,8 +146,8 @@ export async function getVmVersion (
  * Compute the absolute ttl by adding the ttl to the current height of the chain
  *
  * @param ttl
- * @param relative ttl is absolute or relative(default: true(relative))
- * @return Absolute Ttl
+ * @param relative - ttl is absolute or relative(default: true(relative))
+ * @returns Absolute Ttl
  */
 export async function calculateTtl (
   { ttl = TX_TTL, relative = true, onNode }:
@@ -164,29 +164,11 @@ export async function calculateTtl (
 }
 
 /**
- * Get the next nonce to be used for a transaction for an account
- *
- * @param accountId
- * @param nonce
- * @return Next Nonce
- */
-export async function getAccountNonce (
-  accountId: string,
-  { nonce, onNode }:
-  { nonce: number, onNode: Node }
-): Promise<number> {
-  if (nonce != null) return nonce
-  const { nonce: accountNonce } = await onNode.getAccountByPubkey(accountId)
-    .catch(() => ({ nonce: 0 }))
-  return accountNonce + 1
-}
-
-/**
  * Calculate fee, get absolute ttl (ttl + height), get account nonce
  *
- * @param txType Type of transaction
- * @param params Object which contains all tx data
- * @return Object with account nonce, absolute ttl and transaction fee
+ * @param txType - Type of transaction
+ * @param params - Object which contains all tx data
+ * @returns Object with account nonce, absolute ttl and transaction fee
  */
 export async function prepareTxParams (
   txType: TX_TYPE,

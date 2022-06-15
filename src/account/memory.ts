@@ -14,14 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Memory Account module
- * @module @aeternity/aepp-sdk/es/account/memory
- * @export MemoryAccount
- * @example import { MemoryAccount } from '@aeternity/aepp-sdk'
- */
-
 import AccountBase from './base'
 import { sign, isValidKeypair } from '../utils/crypto'
 import { isHex } from '../utils/string'
@@ -38,7 +30,6 @@ export interface Keypair {
 
 /**
  * In-memory account stamp
- * @alias module:@aeternity/aepp-sdk/es/account/memory
  * @param options
  * @param options.keypair - Key pair to use
  * @param options.keypair.publicKey - Public key

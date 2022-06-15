@@ -14,15 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Compiler module
- *
- * @module @aeternity/aepp-sdk/es/contract/compiler
- * @export Compiler
- * @example import { Compiler } from '@aeternity/aepp-sdk'
- */
-
 import { Compiler as CompilerApi, ErrorModel, CompilerError } from '../apis/compiler'
 import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../utils/autorest'
 
@@ -35,7 +26,6 @@ type GeneralCompilerError = ErrorModel & {
  * Contract Compiler
  *
  * This class include api call's related to contract compiler functionality.
- * @alias module:@aeternity/aepp-sdk/es/contract/compiler
  * @param options - Initializer object
  * @returns Contract compiler instance
  * @example Compiler('COMPILER_URL')

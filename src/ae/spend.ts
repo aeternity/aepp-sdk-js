@@ -14,13 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Ae module
- * @module @aeternity/aepp-sdk/es/ae
- * @export Ae
- * @example import { Ae } from '@aeternity/aepp-sdk'
- */
 import { sendTransaction, getAccount, getBalance, resolveName, AensName } from '../chain'
 import { _buildTx, BuildTxOptions } from '../tx'
 import { buildTxHash, unpackTx } from '../tx/builder'
@@ -33,12 +26,11 @@ import AccountBase from '../account/base'
 
 /**
  * Sign and post a transaction to the chain
- * @category async
  * @param tx - Transaction
  * @param options - Options
  * @param options.verify - Verify transaction before broadcast, throw error if not
  * valid
- * @return Transaction
+ * @returns Transaction
  */
 export async function send (
   tx: EncodedData<'tx'>,
@@ -72,12 +64,10 @@ export async function signUsingGA (
 
 /**
  * Send coins to another account
- * @instance
- * @category async
  * @param amount - Amount to spend
  * @param recipientIdOrName - Address or name of recipient account
  * @param options - Options
- * @return Transaction
+ * @returns Transaction
  */
 export async function spend (
   amount: number | string,
@@ -99,12 +89,10 @@ export async function spend (
 // TODO: Rename to spendFraction
 /**
  * Send a fraction of coin balance to another account
- * @instance
- * @category async
  * @param fraction - Fraction of balance to spend (between 0 and 1)
  * @param recipientIdOrName - Address or name of recipient account
  * @param options - Options
- * @return Transaction
+ * @returns Transaction
  */
 export async function transferFunds (
   fraction: number | string,
@@ -137,7 +125,7 @@ export async function transferFunds (
  * Submit transaction of another account paying for it (fee and gas)
  * @param transaction - tx_<base64>-encoded transaction
  * @param options
- * @return Object Transaction
+ * @returns Object Transaction
  */
 export async function payForTransaction (
   transaction: EncodedData<'tx'>,

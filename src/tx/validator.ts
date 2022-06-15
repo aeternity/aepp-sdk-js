@@ -10,13 +10,6 @@ import { concatBuffers, isKeyOfObject } from '../utils/other'
 import { EncodedData } from '../utils/encoder'
 import Node from '../node'
 
-/**
- * Transaction validator
- * @module @aeternity/aepp-sdk/es/tx/validator
- * @export verifyTransaction
- * @example import { verifyTransaction } from '@aeternity/aepp-sdk'
- */
-
 interface Account {
   balance: bigint
   id: EncodedData<'ak'>
@@ -200,13 +193,10 @@ const getSenderAddress = (
  * Transaction Validator
  * This function validates some of transaction properties,
  * to make sure it can be posted it to the chain
- * @function
- * @alias module:@aeternity/aepp-sdk/es/tx/validator
- * @rtype (tx: String, node) => void
- * @param {String} transaction Base64Check-encoded transaction
- * @param {Object} node Node to validate transaction against
- * @param {String[]} [parentTxTypes] Types of parent transactions
- * @return {Promise<Object[]>} Array with verification errors
+ * @param transaction - Base64Check-encoded transaction
+ * @param node - Node to validate transaction against
+ * @param parentTxTypes - Types of parent transactions
+ * @returns Array with verification errors
  * @example const errors = await verifyTransaction(transaction, node)
  */
 export default async function verifyTransaction (

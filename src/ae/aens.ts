@@ -21,8 +21,6 @@
  * The high-level description of the naming system is
  * https://github.com/aeternity/protocol/blob/master/AENS.md in the protocol
  * repository.
- * @module @aeternity/aepp-sdk/es/ae/aens
- * @example import * as aensMethods from '@aeternity/aepp-sdk'
  */
 
 import { salt } from '../utils/crypto'
@@ -43,15 +41,14 @@ interface KeyPointers {
 
 /**
  * Revoke a name
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param name Name hash
+ * @param name - Name hash
  * @param options
- * @param options.onAccount Make operation on specific account from sdk (you pass
+ * @param options.onAccount - Make operation on specific account from sdk (you pass
  * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee fee
- * @param options.ttl ttl
- * @param options.nonce nonce
- * @return Transaction result
+ * @param options.fee - fee
+ * @param options.ttl - ttl
+ * @param options.nonce - nonce
+ * @returns Transaction result
  * @example
  * const name = 'test.chain'
  * const nameObject = await sdkInstance.aensQuery(name)
@@ -74,18 +71,17 @@ export async function aensRevoke (
 
 /**
  * Update a name
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param name AENS name
- * @param pointers Map of pointer keys to corresponding addresses
+ * @param name - AENS name
+ * @param pointers - Map of pointer keys to corresponding addresses
  * @param options
- * @param options.extendPointers Get the pointers from the node and merge with provided
+ * @param options.extendPointers - Get the pointers from the node and merge with provided
  * ones. Pointers with the same type will be overwritten
- * @param options.onAccount Make operation on specific account from sdk (you
+ * @param options.onAccount - Make operation on specific account from sdk (you
  * pass publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee fee
- * @param options.ttl ttl
- * @param options.nonce nonce
- * @param options.nameTtl Name ttl represented in number of
+ * @param options.fee - fee
+ * @param options.ttl - ttl
+ * @param options.nonce - nonce
+ * @param options.nameTtl - Name ttl represented in number of
  * blocks (Max value is 50000 blocks)
  * @param options.clientTtl=84600 a suggestion as to how long any
  * clients should cache this information
@@ -128,16 +124,15 @@ export async function aensUpdate (
 
 /**
  * Transfer a domain to another account
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param name AENS name
- * @param account Recipient account publick key
+ * @param name - AENS name
+ * @param account - Recipient account publick key
  * @param options
- * @param options.onAccount Make operation on specific account from sdk (you pass
+ * @param options.onAccount - Make operation on specific account from sdk (you pass
  * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee fee
- * @param options.ttl ttl
- * @param options.nonce nonce
- * @return Transaction result
+ * @param options.fee - fee
+ * @param options.ttl - ttl
+ * @param options.nonce - nonce
+ * @returns Transaction result
  * @example
  * const name = 'test.chain'
  * const recipientPub = 'ak_asd23dasdas...'
@@ -166,11 +161,9 @@ export async function aensTransfer (
 /**
  * Query the AENS name info from the node
  * and return the object with info and predefined functions for manipulating name
- * @category async
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name
- * @param opt Options
- * @return
+ * @param opt - Options
+ * @returns
  * @example
  * const nameObject = sdkInstance.aensQuery('test.chain')
  * console.log(nameObject)
@@ -244,18 +237,16 @@ export async function aensQuery (
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
- * @category async
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name
- * @param salt Salt from pre-claim, or 0 if it's a bid
- * @param options options
- * @param options.onAccount Make operation on specific account from sdk (you pass
+ * @param salt - Salt from pre-claim, or 0 if it's a bid
+ * @param options - options
+ * @param options.onAccount - Make operation on specific account from sdk (you pass
  * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee fee
- * @param options.ttl ttl
- * @param options.nonce nonce
- * @param options.nameFee Name Fee (By default calculated by sdk)
- * @return the result of the claim
+ * @param options.fee - fee
+ * @param options.ttl - ttl
+ * @param options.nonce - nonce
+ * @param options.nameFee - Name Fee (By default calculated by sdk)
+ * @returns the result of the claim
  * @example
  * const name = 'test.chain'
  * const salt = preclaimResult.salt // salt from pre-claim transaction
@@ -287,14 +278,13 @@ export async function aensClaim (
 
 /**
  * Preclaim a name. Sends a hash of the name and a random salt to the node
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
  * @param name
  * @param options
- * @param options.onAccount Make operation on specific account from sdk (you pass
+ * @param options.onAccount - Make operation on specific account from sdk (you pass
  * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee fee
- * @param options.ttl ttl
- * @param options.nonce nonce
+ * @param options.fee - fee
+ * @param options.ttl - ttl
+ * @param options.nonce - nonce
  * @example
  * const name = 'test.chain'
  * const salt = preclaimResult.salt // salt from pre-claim transaction
@@ -342,16 +332,15 @@ export async function aensPreclaim (
 
 /**
  * Bid to name auction
- * @alias module:@aeternity/aepp-sdk/es/ae/aens
- * @param name Domain name
- * @param nameFee Name fee (bid fee)
+ * @param name - Domain name
+ * @param nameFee - Name fee (bid fee)
  * @param options
- * @param options.onAccount Make operation on specific account from sdk (you pass
+ * @param options.onAccount - Make operation on specific account from sdk (you pass
  * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee fee
- * @param options.ttl ttl
- * @param options.nonce nonce
- * @return Transaction result
+ * @param options.fee - fee
+ * @param options.ttl - ttl
+ * @param options.nonce - nonce
+ * @returns Transaction result
  * @example
  * const name = 'test.chain'
  * const bidFee = computeBidFee(name, startFee, incrementPercentage)

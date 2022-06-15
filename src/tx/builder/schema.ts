@@ -1,7 +1,5 @@
 /**
  * Transaction Schema for TxBuilder
- * @module @aeternity/aepp-sdk/es/tx/builder/schema
- * @example import { TX_TYPE } from '@aeternity/aepp-sdk'
  */
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
@@ -43,7 +41,6 @@ export type TxField = [
 
 /**
  * @description Object with transaction types
- * @alias module:@aeternity/aepp-sdk/es/tx/builder/schema
  * @link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/serializations.md#binary-serialization
  */
 export enum TX_TYPE {

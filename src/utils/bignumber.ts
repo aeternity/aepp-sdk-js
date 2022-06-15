@@ -1,13 +1,11 @@
 /**
  * Big Number Helpers
- * @module @aeternity/aepp-sdk/es/utils/bignumber
- * @example import { isBigNumber, ceil } from '@aeternity/aepp-sdk/es/utils/bignumber'
  */
 import BigNumber from 'bignumber.js'
 
 /**
  * Check if value is BigNumber, Number, BigInt or number string representation
- * @param number number to check
+ * @param number - number to check
  */
 export const isBigNumber = (number: string | number | bigint | BigNumber): boolean => {
   if (typeof number === 'bigint') return true
@@ -17,8 +15,7 @@ export const isBigNumber = (number: string | number | bigint | BigNumber): boole
 
 /**
  * BigNumber ceil operation
- * @param {BigNumber} bigNumber
- * @return {BigNumber}
+ * @param bigNumber
  */
 export const ceil = (bigNumber: BigNumber): BigNumber => bigNumber
   .integerValue(BigNumber.ROUND_CEIL)

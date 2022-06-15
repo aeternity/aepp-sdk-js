@@ -25,10 +25,10 @@ import { InternalError, RpcConnectionError } from '../../errors'
  * @param params.target - Target window for message
  * @param params.self - Host window for message
  * @param params.origin - Origin of receiver
- * @param params.sendDirection Wrapping messages into additional struct
+ * @param params.sendDirection - Wrapping messages into additional struct
  * ({ type: 'to_aepp' || 'to_waellet', data })
  * Used for handling messages between content script and page
- * @param params.receiveDirection Unwrapping messages from additional struct
+ * @param params.receiveDirection - Unwrapping messages from additional struct
  */
 export default class BrowserWindowMessageConnection extends BrowserConnection {
   origin?: string

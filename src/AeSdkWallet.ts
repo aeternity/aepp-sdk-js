@@ -1,11 +1,3 @@
-/**
- * RPC handler for WAELLET side
- *
- * @module @aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc
- * @export WalletRpc
- * @example
- * import WalletRpc from '@aeternity/aepp-sdk/es/utils/aepp-wallet-communication/rpc/wallet-rpc'
- */
 import { v4 as uuid } from '@aeternity/uuid'
 import AeSdk from './AeSdk'
 import { Account } from './AeSdkBase'
@@ -65,15 +57,15 @@ interface RpcClientsInfo {
 
 /**
  * Contain functionality for aepp interaction and managing multiple aepps
- * @param param Init params object
- * @param param.name Wallet name
- * @param onConnection Call-back function for incoming AEPP connection
- * @param onSubscription Call-back function for incoming AEPP account subscription
- * @param onSign Call-back function for incoming AEPP sign request
- * @param onAskAccounts Call-back function for incoming AEPP get address request
- * @param onMessageSign Call-back function for incoming AEPP sign message request
+ * @param param - Init params object
+ * @param param.name - Wallet name
+ * @param onConnection - Call-back function for incoming AEPP connection
+ * @param onSubscription - Call-back function for incoming AEPP account subscription
+ * @param onSign - Call-back function for incoming AEPP sign request
+ * @param onAskAccounts - Call-back function for incoming AEPP get address request
+ * @param onMessageSign - Call-back function for incoming AEPP sign message request
  * Second argument of incoming call-backs contain function for accept/deny request
- * @param onDisconnect Call-back function for disconnect event
+ * @param onDisconnect - Call-back function for disconnect event
  */
 export default class AeSdkWallet extends AeSdk {
   id: string
@@ -186,7 +178,7 @@ export default class AeSdkWallet extends AeSdk {
 
   /**
    * Remove specific RpcClient by ID
-   * @param id Client ID
+   * @param id - Client ID
    */
   removeRpcClient (id: string): void {
     this._disconnectRpcClient(id)
@@ -195,8 +187,8 @@ export default class AeSdkWallet extends AeSdk {
 
   /**
    * Add new client by AEPP connection
-   * @param clientConnection AEPP connection object
-   * @return Client ID
+   * @param clientConnection - AEPP connection object
+   * @returns Client ID
    */
   addRpcClient (clientConnection: BrowserConnection): string {
     // @TODO  detect if aepp has some history based on origin????
@@ -299,7 +291,7 @@ export default class AeSdkWallet extends AeSdk {
 
   /**
    * Send shareWalletInfo message to notify AEPP about wallet
-   * @param clientId ID of RPC client send message to
+   * @param clientId - ID of RPC client send message to
    */
   async shareWalletInfo (clientId: string): Promise<void> {
     this._getClient(clientId).rpc.notify(METHODS.readyToConnect, await this.getWalletInfo())
@@ -307,7 +299,7 @@ export default class AeSdkWallet extends AeSdk {
 
   /**
    * Get Wallet info object
-   * @return Object with wallet information
+   * @returns Object with wallet information
    */
   async getWalletInfo (): Promise<WalletInfo> {
     return {
@@ -321,7 +313,7 @@ export default class AeSdkWallet extends AeSdk {
 
   /**
    * Get Wallet accounts
-   * @return Object with accounts information ({ connected: Object, current: Object })
+   * @returns Object with accounts information ({ connected: Object, current: Object })
    */
   getAccounts (): Accounts {
     return {

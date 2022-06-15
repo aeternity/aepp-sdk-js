@@ -14,14 +14,6 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Channel module
- * @module @aeternity/aepp-sdk/es/channel/index
- * @export Channel
- * @example import { Channel } from '@aeternity/aepp-sdk'
- */
-
 import BigNumber from 'bignumber.js'
 import { snakeToPascal } from '../utils/string'
 import { buildTx, unpackTx } from '../tx/builder'
@@ -82,8 +74,6 @@ interface Contract {
 /**
  * Channel
  *
- * @alias module:@aeternity/aepp-sdk/es/channel/index
- * @rtype Channel
  * @param options - Channel params
  * @param options.url - Channel url (for example: "ws://localhost:3001")
  * @param options.role - Participant role ("initiator" or "responder")
@@ -128,7 +118,7 @@ interface Contract {
  * timeout_idle's value)
  * @param options.debug=false - Log websocket communication
  * @param options.sign - Function which verifies and signs transactions
- * @return Channel instance
+ * @returns Channel instance
  * @example await Channel.initialize({
  *   url: 'ws://localhost:3001',
  *   role: 'initiator'
