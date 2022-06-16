@@ -1,3 +1,4 @@
+import { send } from '../../../ae/spend'
 import { EncodedData } from '../../encoder'
 import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema'
 
@@ -43,7 +44,14 @@ export interface WalletApi {
 
   [METHODS.sign]: ((
     p: { tx: EncodedData<'tx'>, onAccount: EncodedData<'ak'>, returnSigned: boolean }
-  ) => Promise<{ transactionHash?: EncodedData<'th'>, signedTransaction?: EncodedData<'tx'> }>)
+  ) => Promise<{
+    /**
+     * @deprecated this is not a hash at all, will be removed later at the same time
+     * as dropping ability to broadcast transaction by wallet
+     */
+    transactionHash?: Awaited<ReturnType<typeof send>>
+    signedTransaction?: EncodedData<'tx'>
+  }>)
 
   [METHODS.signMessage]: (
     p: { message: string, onAccount: EncodedData<'ak'> }

@@ -20,6 +20,7 @@ import {
   WalletInfo
 } from './utils/aepp-wallet-communication/rpc/types'
 import { EncodedData } from './utils/encoder'
+import jsonBig from './utils/json-big'
 
 type RpcClientWallet = RpcClient<AeppApi, WalletApi>
 
@@ -264,7 +265,9 @@ export default class AeSdkWallet extends AeSdk {
               return { signedTransaction: await this.signTransaction(tx, { onAccount }) }
             }
             try {
-              return { transactionHash: (await this.send(tx, { onAccount, verify: false })).hash }
+              return jsonBig.parse(jsonBig.stringify({
+                transactionHash: await this.send(tx, { onAccount, verify: false })
+              }))
             } catch (error) {
               const validation = await verifyTransaction(tx, this.api)
               if (validation.length > 0) throw new RpcInvalidTransactionError(validation)
