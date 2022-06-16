@@ -11,6 +11,7 @@
     "@link": true,
     "@see": true,
     "@example": true,
-    "@category": true
+    "@category": true,
+    "@deprecated": true
   }
 }

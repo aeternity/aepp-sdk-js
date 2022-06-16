@@ -42,7 +42,13 @@ export default class AccountRpc extends AccountBase {
     const res = await this._rpcClient.request(METHODS.sign, {
       onAccount: this._address,
       tx,
-      returnSigned: true
+      returnSigned: true,
+      /**
+       * @deprecated Wallet provided networkId will be used (current network)
+       * required to maintain backward compatibility with wallets using SDK v11.0.1 and below
+       * @see {@link https://github.com/aeternity/aepp-sdk-js/commit/153fd89a52c4eab39fcd659b356b36d32129c1ba}
+       */
+      networkId
     })
     return res.signedTransaction
   }
