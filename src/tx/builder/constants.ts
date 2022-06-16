@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import { mapObject } from '../../utils/other'
 
 // # AENS
+export type AensName = `${string}.chain`
 export const NAME_TTL = 180000
 // # max number of block into the future that the name is going to be available
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update

@@ -3,8 +3,7 @@ import {
 } from './helpers'
 import { InsufficientNameFeeError, IllegalArgumentError } from '../../utils/errors'
 import BigNumber from 'bignumber.js'
-import { MIN_GAS_PRICE } from './constants'
-import { AensName } from '../../chain'
+import { MIN_GAS_PRICE, AensName } from './constants'
 import { EncodedData } from '../../utils/encoder'
 
 type Int = number | string | BigNumber

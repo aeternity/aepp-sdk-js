@@ -1,4 +1,4 @@
-import { AensName } from './../src/chain'
+import { AensName } from '../src'
 
 function randomString (len: number): string {
   const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
