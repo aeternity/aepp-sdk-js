@@ -33,7 +33,7 @@ type OnSubscription = (
 
 type OnSign = (
   clientId: string, params: Parameters<WalletApi[METHODS.sign]>[0], origin: string
-) => Promise<{ tx?: EncodedData<'tx'>, onAccount?: Account } | undefined>
+) => Promise<{ tx?: EncodedData<'tx'>, onAccount?: Account } | undefined> | Promise<void>
 
 type OnDisconnect = (
   clientId: string, params: Parameters<WalletApi[METHODS.closeConnection]>[0]
@@ -45,7 +45,7 @@ type OnAskAccounts = (
 
 type OnMessageSign = (
   clientId: string, params: Parameters<WalletApi[METHODS.signMessage]>[0], origin: string
-) => Promise<{ onAccount?: Account } | undefined>
+) => Promise<{ onAccount?: Account } | undefined> | Promise<void>
 
 interface RpcClientsInfo {
   id: string
@@ -131,7 +131,7 @@ export default class AeSdkWallet extends AeSdk {
 
   async addAccount (
     account: AccountBase,
-    options: Parameters<AeSdk['addAccount']>[1]
+    options?: Parameters<AeSdk['addAccount']>[1]
   ): Promise<void> {
     await super.addAccount(account, options)
     this._pushAccountsToApps()
