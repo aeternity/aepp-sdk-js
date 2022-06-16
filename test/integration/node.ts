@@ -17,7 +17,6 @@
 
 import Node from '../../src/node'
 import AeSdkBase from '../../src/AeSdkBase'
-// @ts-expect-error
 import { url, ignoreVersion } from '.'
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
@@ -25,7 +24,7 @@ import { NodeNotFoundError } from '../../src/utils/errors'
 
 describe('Node client', function () {
   // TODO should be changed once Node doesn't use stamps
-  let node: InstanceType<typeof Node>
+  let node: Node
 
   before(async function () {
     node = new Node(url, { ignoreVersion })

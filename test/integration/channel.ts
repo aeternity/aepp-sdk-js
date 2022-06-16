@@ -18,7 +18,6 @@ import { describe, it, before, after, beforeEach, afterEach } from 'mocha'
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import BigNumber from 'bignumber.js'
-// @ts-expect-error
 import { getSdk, BaseAe, networkId } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { pause } from '../../src/utils/other'

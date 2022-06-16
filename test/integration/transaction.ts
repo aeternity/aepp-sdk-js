@@ -17,12 +17,10 @@
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-// @ts-expect-error
 import { BaseAe, spendPromise, publicKey } from './index'
 import { commitmentHash, oracleQueryId, decode, encode } from '../../src/tx/builder/helpers'
 import { GAS_MAX, ORACLE_TTL_TYPES, TX_TYPE } from '../../src/tx/builder/schema'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
-import { EncodedData } from './../../src/utils/encoder'
 
 const nonce = 1
 const nameTtl = 1
@@ -57,7 +55,7 @@ const commitmentId = commitmentHash(name, nameSalt)
 
 describe('Transaction', function () {
   let aeSdk: any
-  const address = publicKey as EncodedData<'ak'>
+  const address = publicKey
   const oracleId = encode(decode(address), 'ok')
   let contract: any
 

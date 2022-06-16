@@ -15,12 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
+import '..'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import MemoryAccount from '../../src/account/memory'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { InvalidKeypairError, DecodeError } from '../../src/utils/errors'
+import { EncodedData } from '../../src/utils/encoder'
 
 const testAcc = generateKeyPair()
 
@@ -32,7 +33,7 @@ describe('MemoryAccount', function () {
     })
 
     it('Fail on invalid publicKey', async () => {
-      expect(() => new MemoryAccount({ keypair: { publicKey: ' ', secretKey: testAcc.secretKey } }))
+      expect(() => new MemoryAccount({ keypair: { publicKey: ' ' as EncodedData<'ak'>, secretKey: testAcc.secretKey } }))
         .to.throw(DecodeError, 'Encoded string missing payload')
     })
 

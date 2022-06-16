@@ -33,7 +33,8 @@ import AccountBase from './account/base'
 
 export function _getPollInterval (
   type: 'block' | 'microblock',
-  { _expectedMineRate = 180000, _microBlockCycle = 3000, _maxPollInterval = 5000 }
+  { _expectedMineRate = 180000, _microBlockCycle = 3000, _maxPollInterval = 5000 }:
+  { _expectedMineRate?: number, _microBlockCycle?: number, _maxPollInterval?: number }
 ): number {
   const base = {
     block: _expectedMineRate,

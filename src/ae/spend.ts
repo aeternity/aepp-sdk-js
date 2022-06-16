@@ -96,7 +96,7 @@ export async function spend (
  */
 export async function transferFunds (
   fraction: number | string,
-  recipientIdOrName: AensName,
+  recipientIdOrName: AensName | EncodedData<'ak'>,
   options: BuildTxOptions<TX_TYPE.spend, 'senderId' | 'recipientId' | 'amount'>
   & Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & Parameters<typeof send>[1]
 ): ReturnType<typeof send> {

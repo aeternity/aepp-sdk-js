@@ -73,6 +73,7 @@ class AeSdkBase {
       nodes?: Array<{ name: string, instance: Node }>
       compilerUrl?: string
       ignoreVersion?: boolean
+      [key: string]: any // TODO: consider combining all possible options instead
     } = {}
   ) {
     Object.assign(this._options, options)
@@ -246,11 +247,17 @@ const methods = {
   ...contractGaMethods
 } as const
 
+type RequiredKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
+}[keyof T]
+
+type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T
+
 type MakeOptional<Args extends any[]> = Args extends [infer Head, ...infer Tail]
   ? Tail extends []
     ? Head extends object
-      ? [Omit<Head, 'onNode' | 'onCompiler' | 'onAccount'>
-        & { onNode?: Node, onCompiler?: Compiler, onAccount?: AccountBase | EncodedData<'ak'> }]
+      ? OptionalIfNotRequired<[Omit<Head, 'onNode' | 'onCompiler' | 'onAccount'>
+      & { onNode?: Node, onCompiler?: Compiler, onAccount?: AccountBase | EncodedData<'ak'> | Keypair }]>
       : [Head]
     : [Head, ...MakeOptional<Tail>]
   : never
@@ -259,7 +266,6 @@ type TransformMethods <Methods extends { [key: string]: Function }> =
   {
     [Name in keyof Methods]:
     Methods[Name] extends (...args: infer Args) => infer Ret
-      // ? (...args: Args) => Ret
       ? (...args: MakeOptional<Args>) => Ret
       : never
   }

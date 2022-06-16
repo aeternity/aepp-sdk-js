@@ -9,7 +9,7 @@ describe('prefixedAmount', () => {
   })
 
   it('displays fees', () => {
-    (prefixedAmount(new BigNumber(17120).shiftedBy(-MAGNITUDE), 0)).should.be.equal('0.01712 pico')
+    (prefixedAmount(new BigNumber(17120).shiftedBy(-MAGNITUDE))).should.be.equal('0.01712 pico')
   })
   it('displays balance', () => {
     (prefixedAmount(new BigNumber('89.99999999000924699'))).should.be.equal('90')
