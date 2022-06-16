@@ -4,7 +4,7 @@ import {
   genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
   genVersionCheckPolicy
 } from './utils/autorest'
-import { Node, NodeOptionalParams, ErrorModel } from './apis/node/'
+import { Node as NodeApi, NodeOptionalParams, ErrorModel } from './apis/node/'
 import { mapObject } from './utils/other'
 import { EncodedData } from './utils/encoder'
 import { MissingParamError } from './utils/errors'
@@ -56,8 +56,8 @@ export type TransformNodeType<Type> =
                       : TransformNodeType<Type[Property]>
               }
             : Type
-type TransformedNode = new (...args: ConstructorParameters<typeof Node>) => {
-  [Name in keyof InstanceType<typeof Node>]: TransformNodeType<Node[Name]>
+type TransformedNode = new (...args: ConstructorParameters<typeof NodeApi>) => {
+  [Name in keyof InstanceType<typeof NodeApi>]: TransformNodeType<NodeApi[Name]>
 }
 
 export interface NodeInfo {
@@ -67,7 +67,7 @@ export interface NodeInfo {
   consensusProtocolVersion: number
 }
 
-export default class extends (Node as unknown as TransformedNode) {
+export default class Node extends (NodeApi as unknown as TransformedNode) {
   url: string
 
   /**
