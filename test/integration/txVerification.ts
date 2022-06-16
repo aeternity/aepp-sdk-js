@@ -1,6 +1,5 @@
 import { before, describe, it } from 'mocha'
 import { expect } from 'chai'
-// @ts-expect-error
 import { getSdk } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
