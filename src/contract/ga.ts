@@ -151,7 +151,7 @@ export async function createMetaTx (
   }
   // @ts-expect-error createMetaTx needs to be integrated into tx builder
   const { fee } = await prepareTxParams(TX_TYPE.gaMeta, { ...params, onNode })
-  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee }, TX_TYPE.gaMeta, { vsn: 2 })
+  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee }, TX_TYPE.gaMeta)
   return wrapInEmptySignedTx(metaTxRlp).tx
 }
 

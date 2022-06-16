@@ -8,7 +8,6 @@ import { Field } from './field-types'
 import {
   DEFAULT_FEE,
   FIELD_TYPES,
-  MIN_GAS_PRICE,
   RawTxObject,
   TxField,
   TxTypeSchemas,
@@ -346,41 +345,6 @@ export function validateParams (
   )
 }
 
-interface TxOptionsRaw {
-  excludeKeys?: string[]
-  denomination?: AE_AMOUNT_FORMATS
-}
-/**
- * Build binary transaction
- * @param params - Object with tx params
- * @param schema - Transaction schema
- * @param options - options
- * @param options.excludeKeys - Array of keys to exclude for validation and build
- * @param options.denomination - Denomination of amounts
- * @throws {@link InvalidTxParamsError}
- * @returns Array with binary fields of transaction
- */
-export function buildRawTx (
-  params: TxParamsCommon,
-  schema: TxField[],
-  { excludeKeys = [], denomination = AE_AMOUNT_FORMATS.AETTOS }: TxOptionsRaw = {}
-): Buffer[] {
-  params.gasPrice ??= MIN_GAS_PRICE
-  const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key))
-
-  // Transform `amount` type fields to `aettos`
-  params = transformParams(params, filteredSchema, { denomination })
-  // Validation
-  const valid = validateParams(params, schema, { excludeKeys })
-  if (Object.keys(valid).length > 0) {
-    throw new InvalidTxParamsError('Transaction build error. ' + JSON.stringify(valid))
-  }
-
-  return filteredSchema
-    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => serializeField(
-      params[key], fieldType, params))
-}
-
 /**
  * Unpack binary transaction
  * @param binary - Array with binary transaction field's
@@ -409,15 +373,13 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends EncodingType> {
   txObject: RawTxObject<Tx>
 }
 
-export type TxParamsBuild = TxParamsCommon & {
-  denomination?: AE_AMOUNT_FORMATS
-}
 /**
  * Build transaction hash
- * @param params - Object with tx params
+ * @param _params - Object with tx params
  * @param type - Transaction type
  * @param options - options
  * @param options.excludeKeys - Array of keys to exclude for validation and build
+ * @param options.denomination - Denomination of amounts
  * @param options.prefix - Prefix of transaction
  * @throws {@link InvalidTxParamsError}
  * @returns object
@@ -425,30 +387,40 @@ export type TxParamsBuild = TxParamsCommon & {
  * @returns object.rlpEncoded rlp encoded transaction
  * @returns object.binary binary transaction
  */
-export function buildTx<Prefix> (
-  params: TxParamsBuild,
-  type: TX_TYPE,
+export function buildTx<TxType extends TX_TYPE, Prefix> (
+  _params: Omit<TxTypeSchemas[TxType], 'tag' | 'VSN'> & { VSN?: number },
+  type: TxType,
   { excludeKeys = [], prefix = 'tx', vsn, denomination = AE_AMOUNT_FORMATS.AETTOS }: {
     excludeKeys?: string[]
     prefix?: EncodingType
     vsn?: number
     denomination?: AE_AMOUNT_FORMATS
   } = {}
-): Prefix extends EncodingType
-    ? BuiltTx<TxSchema, Prefix>
-    : BuiltTx<TxSchema, 'tx'> {
+): BuiltTx<TxSchema, Prefix extends EncodingType ? Prefix : 'tx'> {
   const schemas = TX_SCHEMA[type]
 
   vsn ??= Math.max(...Object.keys(schemas).map(a => +a))
   if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', TX_TYPE[type], vsn)
 
-  const schema = schemas[vsn]
+  const schema = schemas[vsn] as unknown as TxField[]
 
-  const binary = buildRawTx(
-    { ...params, VSN: vsn, tag: type },
-    schema,
-    { excludeKeys, denomination: params.denomination ?? denomination }
-  ).filter(e => e !== undefined)
+  let params = _params as TxParamsCommon & { onNode: Node }
+  params.VSN = vsn
+  params.tag = type
+  const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key))
+
+  // Transform `amount` type fields to `aettos`
+  params = transformParams(params, filteredSchema, { denomination })
+  // Validation
+  const valid = validateParams(params, schema, { excludeKeys })
+  if (Object.keys(valid).length > 0) {
+    throw new InvalidTxParamsError('Transaction build error. ' + JSON.stringify(valid))
+  }
+
+  const binary = filteredSchema
+    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => serializeField(
+      params[key], fieldType, params))
+    .filter(e => e !== undefined)
 
   const rlpEncoded = rlpEncode(binary)
   const tx = encode(rlpEncoded, prefix)

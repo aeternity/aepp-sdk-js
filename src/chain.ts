@@ -428,8 +428,8 @@ export async function getName (
 export async function resolveName <Type extends 'ak' | 'ct'> (
   nameOrId: AensName | EncodedData<Type>,
   key: string,
-  { verify = true, resolveByNode, onNode }:
-  { verify?: boolean, resolveByNode: boolean, onNode: Node }
+  { verify = true, resolveByNode = false, onNode }:
+  { verify?: boolean, resolveByNode?: boolean, onNode: Node }
 ): Promise<EncodedData<Type | 'nm'>> {
   try {
     const id = nameOrId as EncodedData<Type>

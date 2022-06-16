@@ -23,7 +23,7 @@
  * These methods provide ability to create native transactions.
  */
 import {
-  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon, TxTypeSchemas
+  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon
 } from './builder/schema'
 import {
   ArgumentError, UnsupportedProtocolError, UnknownTxError, InvalidTxParamsError
@@ -35,6 +35,8 @@ import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
 import { isKeyOfObject } from '../utils/other'
 import AccountBase from '../account/base'
 
+type Int = number | string | BigNumber
+
 // uses a new feature, probably typescript-eslint doesn't support it yet
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
@@ -43,7 +45,9 @@ export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
 // TODO: find a better name or rearrange methods
 export async function _buildTx<TxType extends TX_TYPE> (
   txType: TxType,
-  { onAccount, ..._params }: TxTypeSchemas[TxType] & { onNode: Node, onAccount: AccountBase }
+  { onAccount, ..._params }:
+  Omit<Parameters<typeof syncBuildTx<TxType, 'tx'>>[0], 'fee' | 'nonce' | 'ttl'>
+  & { onNode: Node, onAccount: AccountBase, fee?: Int, nonce?: number, ttl?: number }
 ): Promise<EncodedData<'tx'>> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node }
@@ -103,7 +107,7 @@ export async function _buildTx<TxType extends TX_TYPE> (
   // TODO: do this check on TypeScript level
   if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`)
   const extraParams = await prepareTxParams(txType, { ...params, senderId })
-  return syncBuildTx({ ...params, ...extraParams }, txType).tx
+  return syncBuildTx({ ...params, ...extraParams } as any, txType).tx
 }
 
 /**
@@ -159,17 +163,13 @@ export async function prepareTxParams (
   }: Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> & {
     senderId: EncodedData<'ak'>
     vsn?: number
-    gasLimit?: number | string | BigNumber
+    gasLimit?: Int
     absoluteTtl?: boolean
     strategy?: 'continuity' | 'max'
     showWarning?: boolean
     onNode: Node
   }
-): Promise<{
-    fee: number | string | BigNumber
-    ttl: number
-    nonce: number
-  }> {
+): Promise<{ fee: Int, ttl: number, nonce: number }> {
   nonce ??= (
     await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
   ).nextNonce

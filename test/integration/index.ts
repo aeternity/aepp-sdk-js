@@ -55,7 +55,6 @@ export const BaseAe = async (
 export const spendPromise = (async () => {
   const ae = await BaseAe({ networkId, withoutGenesisAccount: false })
   await ae.awaitHeight(2)
-  // @ts-expect-error
   await ae.spend(1e26, account.publicKey)
 })()
 

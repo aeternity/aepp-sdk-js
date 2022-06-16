@@ -366,5 +366,5 @@ export async function aensBid (
   nameFee: BigNumber,
   options: Omit<Parameters<typeof aensClaim>[2], 'nameFee' | 'VSN'>
 ): ReturnType<typeof aensClaim> {
-  return await aensClaim(name, 0, { ...options, nameFee, VSN: 2 })
+  return await aensClaim(name, 0, { ...options, nameFee })
 }

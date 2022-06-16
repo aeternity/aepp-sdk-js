@@ -97,9 +97,9 @@ export class Deposit extends Field {
 }
 
 export class GasPrice extends Field {
-  static serialize (value = MIN_GAS_PRICE): Buffer {
+  static serialize (value: number | string | BigNumber = MIN_GAS_PRICE): Buffer {
     if (+value < MIN_GAS_PRICE) {
-      throw new IllegalArgumentError(`Gas price ${value} must be bigger then ${MIN_GAS_PRICE}`)
+      throw new IllegalArgumentError(`Gas price ${value.toString()} must be bigger then ${MIN_GAS_PRICE}`)
     }
     return writeInt(value)
   }

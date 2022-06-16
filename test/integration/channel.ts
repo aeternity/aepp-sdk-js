@@ -32,6 +32,7 @@ import {
   ChannelConnectionError
 } from '../../src/utils/errors'
 import { EncodedData } from './../../src/utils/encoder'
+import { appendSignature } from '../../src/channel/handlers'
 
 const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel'
 
@@ -1146,16 +1147,6 @@ describe('Channel', function () {
   })
 
   it('can post backchannel update', async () => {
-    function appendSignature (target: EncodedData<'tx'>, source: EncodedData<'tx'>): EncodedData<'tx'> {
-      const { txType, tx: { signatures, encodedTx: { rlpEncoded } } } =
-        unpackTx(target, TX_TYPE.signed)
-      return buildTx(
-        {
-          signatures: signatures.concat(unpackTx(source, TX_TYPE.signed).tx.signatures),
-          encodedTx: rlpEncoded
-        }, txType).tx
-    }
-
     initiatorCh.disconnect()
     responderCh.disconnect()
     initiatorCh = await Channel.initialize({
@@ -1183,9 +1174,9 @@ describe('Channel', function () {
       await aeSdkInitiatior.address(),
       await aeSdkResponder.address(),
       100,
-      async (tx) => appendSignature(
+      async (tx) => await appendSignature(
         await aeSdkResponder.signTransaction(tx),
-        await aeSdkInitiatior.signTransaction(tx)
+        async tx => await (aeSdkInitiatior.signTransaction(tx) as Promise<EncodedData<'tx'>>)
       )
     )
     result.accepted.should.equal(true)

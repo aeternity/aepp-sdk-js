@@ -198,7 +198,7 @@ interface BuildFieldTypes<Prefix extends undefined | EncodingType | readonly Enc
   [FIELD_TYPES.abiVersion]: ABI_VERSIONS
   [FIELD_TYPES.ttlType]: ORACLE_TTL_TYPES
   [FIELD_TYPES.sophiaCodeTypeInfo]: any
-  [FIELD_TYPES.payload]: string
+  [FIELD_TYPES.payload]: string | undefined
   [FIELD_TYPES.stateTree]: any
 }
 
@@ -293,11 +293,16 @@ type BuildTxArgBySchemaType<
       ? BuildFieldTypes<Prefix>[Type]
       : never
 
+type NullablePartial<
+  T,
+  NK extends keyof T = { [K in keyof T]: undefined extends T[K] ? K : never }[keyof T]
+> = Partial<Pick<T, NK>> & Omit<T, NK>
+
 type BuildTxArgBySchema<SchemaLine> =
   UnionToIntersection<
   SchemaLine extends ReadonlyArray<infer Elem>
     ? Elem extends TxElem
-      ? { [k in Elem[0]]: BuildTxArgBySchemaType<Elem[1], Elem[2]> }
+      ? NullablePartial<{ [k in Elem[0]]: BuildTxArgBySchemaType<Elem[1], Elem[2]> }>
       : never
     : never
   >

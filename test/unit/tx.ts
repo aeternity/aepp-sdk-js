@@ -115,7 +115,7 @@ describe('Tx', function () {
   })
 
   it('Serialize tx: invalid tx VSN', () => {
-    expect(() => buildTx({}, TX_TYPE.spend, { vsn: 5 }))
+    expect(() => buildTx({} as any, TX_TYPE.spend, { vsn: 5 }))
       .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for spend version 5')
   })
 })
