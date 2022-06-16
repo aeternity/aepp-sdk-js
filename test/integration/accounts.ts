@@ -17,7 +17,7 @@
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import { getSdk, BaseAe, networkId } from './'
+import { getSdk, BaseAe, networkId } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import BigNumber from 'bignumber.js'
 import MemoryAccount from '../../src/account/memory'
@@ -27,11 +27,13 @@ import {
   TypeError,
   ArgumentError,
   InvalidKeypairError,
-  InvalidTxParamsError
+  InvalidTxParamsError,
+  UnexpectedTsError
 } from '../../src/utils/errors'
+import { AeSdk } from '../../src'
 
 describe('Accounts', function () {
-  let aeSdk, aeSdkWithoutAccount
+  let aeSdk: AeSdk, aeSdkWithoutAccount: AeSdk
 
   before(async function () {
     aeSdk = await getSdk()
@@ -42,7 +44,7 @@ describe('Accounts', function () {
   const receiver = receiverKey.publicKey
 
   describe('fails on unknown keypairs', () => {
-    let wallet
+    let wallet: any
 
     before(async function () {
       wallet = await getSdk()
@@ -65,16 +67,22 @@ describe('Accounts', function () {
     await aeSdk.getBalance(await aeSdk.address()).should.eventually.be.a('string')
   })
 
-  describe('transferFunds', async () => {
-    const spend = async fraction => {
+  describe('transferFunds', () => {
+    const spend = async (fraction: number): Promise<{
+      balanceBefore: BigNumber
+      balanceAfter: BigNumber
+      amount: BigNumber
+      fee: BigNumber
+    }> => {
       const balanceBefore = new BigNumber(await aeSdk.getBalance(await aeSdk.address()))
       const { tx } = await aeSdk.transferFunds(fraction, receiver)
       const balanceAfter = new BigNumber(await aeSdk.getBalance(await aeSdk.address()))
+      if (tx == null || tx.amount == null) throw new UnexpectedTsError()
       return {
         balanceBefore,
         balanceAfter,
-        amount: new BigNumber(tx.amount),
-        fee: new BigNumber(tx.fee)
+        amount: new BigNumber(tx.amount.toString()),
+        fee: new BigNumber(tx.fee.toString())
       }
     }
 
@@ -108,12 +116,14 @@ describe('Accounts', function () {
   it('spends coins', async () => {
     const ret = await aeSdk.spend(1, receiver)
     ret.should.have.property('tx')
+    if (ret.tx == null) throw new UnexpectedTsError()
     ret.tx.should.include({ amount: 1n, recipientId: receiver })
   })
 
   it('spends coins in AE format', async () => {
     const ret = await aeSdk.spend(1, receiver, { denomination: AE_AMOUNT_FORMATS.AE })
     ret.should.have.property('tx')
+    if (ret.tx == null) throw new UnexpectedTsError()
     ret.tx.should.include({ amount: 10n ** 18n, recipientId: receiver })
   })
 
@@ -121,11 +131,12 @@ describe('Accounts', function () {
     const bigAmount = 10n ** 31n + 10n ** 17n
     const genesis = await BaseAe({ networkId })
     const receiverWallet = generateKeyPair()
-    const ret = await genesis.spend(bigAmount, receiverWallet.publicKey)
+    const ret = await genesis.spend(bigAmount.toString(), receiverWallet.publicKey)
 
     const balanceAfter = await aeSdk.getBalance(receiverWallet.publicKey)
     balanceAfter.should.be.equal(bigAmount.toString())
     ret.should.have.property('tx')
+    if (ret.tx == null) throw new UnexpectedTsError()
     ret.tx.should.include({ amount: bigAmount, recipientId: receiverWallet.publicKey })
   })
 
@@ -133,16 +144,14 @@ describe('Accounts', function () {
     const h = await aeSdk.height()
     await aeSdk.awaitHeight(h + 3)
     const spend = await aeSdk.spend(123, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi')
+    if (spend.blockHeight == null || spend.tx?.amount == null) throw new UnexpectedTsError()
     await aeSdk.awaitHeight(spend.blockHeight + 2)
     const accountAfterSpend = await aeSdk.getAccount(await aeSdk.address())
     const accountBeforeSpendByHash = await aeSdk.getAccount(
       await aeSdk.address(), { height: spend.blockHeight - 1 }
     )
-    new BigNumber(accountBeforeSpendByHash.balance)
-      .minus(new BigNumber(accountAfterSpend.balance))
-      .toString()
-      .should.be
-      .equal(`${spend.tx.fee + spend.tx.amount}`)
+    expect(accountBeforeSpendByHash.balance - accountAfterSpend.balance).to.be
+      .equal(spend.tx.fee + spend.tx.amount)
   })
 
   describe('Make operation on specific account without changing of current account', () => {
@@ -152,12 +161,13 @@ describe('Accounts', function () {
       const onAccount = accounts.find(acc => acc !== current)
 
       const { tx } = await aeSdk.spend(1, await aeSdk.address(), { onAccount })
+      if (tx?.senderId == null) throw new UnexpectedTsError()
       tx.senderId.should.be.equal(onAccount)
       current.should.be.equal(current)
     })
 
     it('Fail on invalid account', async () => {
-      await expect(aeSdk.spend(1, await aeSdk.address(), { onAccount: 1 }))
+      await expect(aeSdk.spend(1, await aeSdk.address(), { onAccount: 1 as any }))
         .to.be.rejectedWith(
           TypeError,
           'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got 1 instead')
@@ -190,8 +200,8 @@ describe('Accounts', function () {
       const signature = await memoryAccount.sign(data)
       const sigUsingKeypair = await aeSdk.sign(data, { onAccount: keypair })
       const sigUsingMemoryAccount = await aeSdk.sign(data, { onAccount: memoryAccount })
-      signature.toString('hex').should.be.equal(sigUsingKeypair.toString('hex'))
-      signature.toString('hex').should.be.equal(sigUsingMemoryAccount.toString('hex'))
+      signature.toString().should.be.equal(sigUsingKeypair.toString())
+      signature.toString().should.be.equal(sigUsingMemoryAccount.toString())
       // address
       const addressFromKeypair = await aeSdk.address({ onAccount: keypair })
       const addressFrommemoryAccount = await aeSdk.address({ onAccount: memoryAccount })

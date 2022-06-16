@@ -104,7 +104,7 @@ export default abstract class AccountBase {
    * @param options - Options
    * @returns Signed data blob
    */
-  abstract sign (data: string | Buffer, options?: any): Promise<Uint8Array>
+  abstract sign (data: string | Uint8Array, options?: any): Promise<Uint8Array>
 
   /**
    * Obtain account address

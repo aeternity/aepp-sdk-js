@@ -72,7 +72,7 @@ export default class AccountMemory extends AccountBase {
     })
   }
 
-  async sign (data: string): Promise<Uint8Array> {
+  async sign (data: string | Uint8Array): Promise<Uint8Array> {
     if (this.isGa) throw new InvalidKeypairError('You are trying to sign data using generalized account without keypair')
     return sign(data, secrets.get(this).secretKey)
   }

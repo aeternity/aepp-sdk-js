@@ -61,7 +61,7 @@ export class NameFee extends Field {
    * @param txFields - Transaction fields
    * @param txFields.name - AENS Name in transaction
    */
-  static serialize (value: Int, { name }: { name: AensName }): Buffer {
+  static serialize (value: Int | undefined, { name }: { name: AensName }): Buffer {
     const minNameFee = getMinimumNameFee(name)
     value ??= minNameFee
     if (minNameFee.gt(value)) {

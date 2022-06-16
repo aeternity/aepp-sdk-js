@@ -1058,7 +1058,7 @@ describe('Channel', function () {
 
   it('can clean contract calls', async () => {
     await initiatorCh.cleanContractCalls()
-    void initiatorCh.getContractCall({
+    await initiatorCh.getContractCall({
       caller: await aeSdkInitiatior.address(),
       contract: contractAddress,
       round: callerNonce
@@ -1142,7 +1142,7 @@ describe('Channel', function () {
     //   }
     //   ch.on('stateChanged', checkRound)
     // })
-    void ch.state().should.eventually.be.fulfilled
+    await ch.state().should.eventually.be.fulfilled
     await pause(10 * 1000)
   })
 

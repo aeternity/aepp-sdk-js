@@ -34,6 +34,7 @@ import { AensName, getName, height } from '../chain'
 import { _buildTx, BuildTxOptions } from '../tx'
 import { TransformNodeType } from '../node'
 import { NameEntry } from '../apis/node'
+import AccountBase from '../account/base'
 
 interface KeyPointers {
   [key: string]: string | Buffer
@@ -101,7 +102,7 @@ export async function aensRevoke (
  */
 export async function aensUpdate (
   name: AensName,
-  pointers: KeyPointers = {},
+  pointers: KeyPointers,
   { extendPointers, ...options }: { extendPointers?: boolean } & Parameters<typeof send>[1]
   & BuildTxOptions<TX_TYPE.nameUpdate, 'nameId' | 'accountId' | 'pointers' | 'clientTtl' | 'nameTtl'>
   & { clientTtl?: number, nameTtl?: number }
@@ -109,7 +110,7 @@ export async function aensUpdate (
   const allPointers = {
     ...extendPointers === true && Object.fromEntries(
       (await getName(name, options)).pointers
-        .map(({ key, id }: {key: string, id: string}) => [key, id])
+        .map(({ key, id }: { key: string, id: string }) => [key, id])
     ),
     ...pointers
   }
@@ -196,16 +197,21 @@ export async function aensQuery (
     ttl: number
     update: (
       pointers: KeyPointers,
-      options: Parameters<typeof aensQuery>[1]
+      options?: Omit<Parameters<typeof aensQuery>[1], 'onNode' | 'onCompiler' | 'onAccount'> & {
+        onAccount?: AccountBase
+      }
     ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>
     transfer: (
       account: EncodedData<'ak'>,
-      options: Parameters<typeof aensQuery>[1]
+      options?: Parameters<typeof aensQuery>[1]
     ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>
-    revoke: (options: Parameters<typeof aensRevoke>[1]) => ReturnType<typeof aensRevoke>
+    revoke: (options?: Omit<Parameters<typeof aensRevoke>[1], 'onNode' | 'onCompiler' | 'onAccount'> & {
+      onAccount?: AccountBase
+    }
+    ) => ReturnType<typeof aensRevoke>
     extendTtl: (
       nameTtl: number,
-      options: Parameters<typeof aensQuery>[1]
+      options?: Omit<Parameters<typeof aensQuery>[1], 'onNode' | 'onCompiler' | 'onAccount'>
     ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>
   }
   >> {
@@ -318,7 +324,7 @@ export async function aensPreclaim (
     height: number
     salt: number
     commitmentId: string
-    claim: (opts: Parameters<typeof aensClaim>[2]) => ReturnType<typeof aensClaim>
+    claim: (opts?: Parameters<typeof aensClaim>[2]) => ReturnType<typeof aensClaim>
   }
   >> {
   const _salt = salt()
@@ -363,8 +369,8 @@ export async function aensPreclaim (
  */
 export async function aensBid (
   name: AensName,
-  nameFee: BigNumber,
-  options: Omit<Parameters<typeof aensClaim>[2], 'nameFee' | 'VSN'>
+  nameFee: number | string | BigNumber,
+  options: Omit<Parameters<typeof aensClaim>[2], 'nameFee'>
 ): ReturnType<typeof aensClaim> {
   return await aensClaim(name, 0, { ...options, nameFee })
 }

@@ -43,7 +43,7 @@ import { Aci as BaseAci } from '../apis/compiler'
 import Compiler from './compiler'
 import Node from '../node'
 import {
-  getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun
+  getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun, AensName
 } from '../chain'
 import AccountBase from '../account/base'
 
@@ -113,10 +113,29 @@ export interface ContractInstance {
   options: any
   compile: (options?: {}) => Promise<EncodedData<'cb'>>
   _estimateGas: (name: string, params: any[], options: object) => Promise<number>
-  deploy: (params: any[], options: object) => Promise<any>
-  call: (fn: string, params?: any[], options?: {}) => Promise<any>
-  decodeEvents: (events: Event[], { omitUnknown, ...opt }: {
-    omitUnknown?: boolean}) => DecodedEvent[]
+  deploy: (params?: any[], options?: object) => Promise<any>
+  call: (fn: string, params?: any[], options?: {}) => Promise<{
+    hash: string
+    tx: any
+    txData: TxData
+    rawTx: string
+    result: {
+      callerId: EncodedData<'ak'>
+      callerNonce: number
+      contractId: EncodedData<'ct'>
+      gasPrice: number
+      gasUsed: number
+      height: number
+      log: any[]
+      returnType: string
+      returnValue: string
+    }
+    decodedResult: any
+    decodedEvents: DecodedEvent[]
+  }>
+  decodeEvents: (
+    events: Event[], options?: { omitUnknown?: boolean, contractAddressToName?: any }
+  ) => DecodedEvent[]
   methods: any
 }
 
@@ -158,9 +177,10 @@ export default async function getContractInstance ({
   source?: string
   bytecode?: EncodedData<'cb'>
   aci?: Aci
-  contractAddress?: EncodedData<'ct'>
+  contractAddress?: EncodedData<'ct'> | AensName
   fileSystem?: Record<string, string>
   validateBytecode?: boolean
+  [key: string]: any
 }): Promise<ContractInstance> {
   if (_aci == null && source != null) {
     // TODO: should be fixed when the compiledAci interface gets updated
@@ -200,13 +220,12 @@ export default async function getContractInstance ({
       ...otherOptions
     },
     compile: async function (_options?: {}): Promise<any> {},
-    _estimateGas: async function (_name: string, _params: any[], _options: object): Promise<any> {},
-    deploy: async function (_params: any[], _options: any): Promise<any> {},
+    _estimateGas: async function (
+      _name: string, _params: any[], _options: object
+    ): Promise<any> {},
+    deploy: async function (_params?: any[], _options?: any): Promise<any> {},
     call: async function (_fn: string, _params?: any[], _options?: {}): Promise<any> {},
-    decodeEvents (
-      _events: Event[],
-      { omitUnknown, ...opt }: { omitUnknown?: boolean }
-    ): any {},
+    decodeEvents (_events: Event[], options?: { omitUnknown?: boolean }): any {},
     methods: undefined
   }
 
@@ -259,7 +278,8 @@ export default async function getContractInstance ({
   const handleCallError = (
     { returnType, returnValue }: {
       returnType: ContractCallReturnType
-      returnValue: EncodedData<EncodingType>},
+      returnValue: EncodedData<EncodingType>
+    },
     transaction: string): void => {
     let message: string
     switch (returnType) {
@@ -297,6 +317,7 @@ export default async function getContractInstance ({
   ): Promise<ContractInstance['deployInfo']> => {
     const opt = { ...instance.options, ...options }
     if (instance.bytecode == null) await instance.compile(opt)
+    // @ts-expect-error
     if (opt.callStatic === true) return await instance.call('init', params, opt)
     if (instance.deployInfo.address != null) throw new DuplicateContractError()
 
@@ -446,7 +467,7 @@ export default async function getContractInstance ({
    */
   instance.decodeEvents = (
     events: Event[],
-    { omitUnknown, ...opt }: {omitUnknown?: boolean} = {}
+    { omitUnknown, ...opt }: { omitUnknown?: boolean } = {}
   ): DecodedEvent[] => events
     .map(event => {
       const topics = event.topics.map((t: string | number) => BigInt(t))

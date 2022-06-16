@@ -79,11 +79,7 @@ export async function sendTransaction (
     if (validation.length > 0) {
       const message = 'Transaction verification errors: ' +
         validation.map((v: { message: string }) => v.message).join(', ')
-      throw Object.assign(new InvalidTxError(message), {
-        code: 'TX_VERIFICATION_ERROR',
-        validation,
-        transaction: tx
-      })
+      throw new InvalidTxError(message, validation, tx)
     }
   }
 
@@ -157,7 +153,7 @@ export async function waitForTxConfirm (
  * @param options.onNode - Node to use
  */
 export async function getAccount (
-  address: EncodedData<'ak'>,
+  address: EncodedData<'ak' | 'ct'>,
   { height, hash, onNode }:
   { height?: number, hash?: EncodedData<'kh' | 'mh'>, onNode: Node }
 ): Promise<TransformNodeType<AccountNode>> {
@@ -176,9 +172,9 @@ export async function getAccount (
  * @param options.hash - The block hash on which to obtain the balance for (default: top of chain)
  */
 export async function getBalance (
-  address: EncodedData<'ak'>,
+  address: EncodedData<'ak' | 'ct'>,
   { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
-  { format: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1]
+  { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1]
 ): Promise<string> {
   const { balance } = await getAccount(address, options).catch(() => ({ balance: 0n }))
 

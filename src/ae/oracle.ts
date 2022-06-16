@@ -58,7 +58,7 @@ export async function getOracleObject (
     id: EncodedData<'ok'>
     queries: OracleQueries
     // TODO: replace getOracleObject with a class
-    pollQueries: Function
+    pollQueries: (cb: Parameters<typeof pollForQueries>[1]) => ReturnType<typeof pollForQueries>
     postQuery: Function
     respondToQuery: Function
     extendOracle: Function
@@ -141,9 +141,9 @@ export async function getQueryObject (
   Awaited<ReturnType<Node['getOracleQueryByPubkeyAndQueryId']>> & {
     decodedQuery: string
     decodedResponse: string
-    respond: (response: string, options: Parameters<typeof respondToQuery>[3]) =>
+    respond: (response: string, options?: Parameters<typeof respondToQuery>[3]) =>
     ReturnType<typeof respondToQuery>
-    pollForResponse: (options: Parameters<typeof pollForQueryResponse>[2]) =>
+    pollForResponse: (options?: Parameters<typeof pollForQueryResponse>[2]) =>
     ReturnType<typeof pollForQueryResponse>
   }
   > {

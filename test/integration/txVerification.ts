@@ -4,12 +4,13 @@ import { getSdk } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
 import verifyTransaction from '../../src/tx/validator'
-import { InvalidTxParamsError } from '../../src/utils/errors'
+import { InvalidTxError, InvalidTxParamsError } from '../../src/utils/errors'
 import { TX_TYPE } from '../../src/tx/builder/schema'
+import { AeSdk, Node } from '../../src'
 
 describe('Verify Transaction', function () {
-  let aeSdk: any
-  let node: any
+  let aeSdk: AeSdk
+  let node: Node
 
   before(async () => {
     aeSdk = await getSdk()
@@ -18,7 +19,7 @@ describe('Verify Transaction', function () {
   })
 
   it('validates params in buildRawTx', async () => {
-    await expect(aeSdk.buildTx(TX_TYPE.spend, {})).to.eventually.be
+    await expect(aeSdk.buildTx(TX_TYPE.spend, {} as any)).to.eventually.be
       .rejectedWith(InvalidTxParamsError, 'Transaction field senderId is missed')
   })
 
@@ -28,7 +29,7 @@ describe('Verify Transaction', function () {
       recipientId: await aeSdk.address(),
       amount: 1e30,
       fee: '1000',
-      nonce: '1',
+      nonce: 1,
       ttl: 2,
       absoluteTtl: true
     })
@@ -61,7 +62,7 @@ describe('Verify Transaction', function () {
       ttl: 2,
       absoluteTtl: true
     })
-    const error = await aeSdk.send(spendTx).catch((e: Error) => e)
+    const error = await aeSdk.send(spendTx).catch((e: InvalidTxError) => e) as InvalidTxError
     expect(error.validation).to.have.lengthOf(1)
   })
 

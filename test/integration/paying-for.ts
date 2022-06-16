@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -19,10 +19,12 @@ import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
 import BigNumber from 'bignumber.js'
 import { getSdk, BaseAe } from './'
-import { generateKeyPair, MemoryAccount, TX_TYPE } from '../../src'
+import { AeSdk, generateKeyPair, MemoryAccount, TX_TYPE, UnexpectedTsError } from '../../src'
+import { ContractInstance } from '../../src/contract/aci'
+import { EncodedData } from '../../src/utils/encoder'
 
 describe('Paying for transaction of another account', function () {
-  let aeSdk
+  let aeSdk: AeSdk
 
   before(async function () {
     aeSdk = await getSdk()
@@ -39,11 +41,14 @@ describe('Paying for transaction of another account', function () {
     })
     const signedSpendTx = await aeSdk.signTransaction(spendTx, { onAccount: sender, innerTx: true })
     const payerBalanceBefore = await aeSdk.getBalance(await aeSdk.address())
-    const {
-      fee: outerFee, tx: { tx: { fee: innerFee } }
-    } = (await aeSdk.payForTransaction(signedSpendTx)).tx
+
+    const tx = (await aeSdk.payForTransaction(signedSpendTx)).tx
+    const outerFee = tx?.fee
+    const innerFee = tx?.tx?.tx.fee
+    if (outerFee == null || innerFee == null) throw new UnexpectedTsError()
     expect(await aeSdk.getBalance(await aeSdk.address())).to.equal(
-      new BigNumber(payerBalanceBefore).minus(outerFee).minus(innerFee).toFixed()
+      new BigNumber(payerBalanceBefore)
+        .minus(outerFee.toString()).minus(innerFee.toString()).toFixed()
     )
     expect(await aeSdk.getBalance(await sender.address())).to.equal('0')
     expect(await aeSdk.getBalance(await receiver.address())).to.equal('10000')
@@ -55,9 +60,9 @@ describe('Paying for transaction of another account', function () {
       entrypoint init(x: int): state = { value = x }
       entrypoint getValue(): int = state.value
       stateful entrypoint setValue(x: int) = put(state{ value = x })`
-  let contractAddress
-  let aeSdkNotPayingFee
-  let payingContract
+  let contractAddress: EncodedData<'ct'>
+  let aeSdkNotPayingFee: any
+  let payingContract: ContractInstance
 
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await BaseAe({

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -17,11 +17,13 @@
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import { getSdk } from './'
+import { getSdk } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { encode } from '../../src/utils/encoder'
 import MemoryAccount from '../../src/account/memory'
 import { unpackTx } from '../../src/tx/builder'
+import { ContractInstance } from '../../src/contract/aci'
+import { AeSdk, TX_TYPE, UnexpectedTsError } from '../../src'
 
 const authContractSource = `contract BlindAuth =
   record state = { txHash: option(hash) }
@@ -37,13 +39,14 @@ const authContractSource = `contract BlindAuth =
       Some(tx_hash) => true
 `
 describe('Generalized Account', function () {
-  let aeSdk
+  let aeSdk: AeSdk
   const gaAccount = generateKeyPair()
-  let authContract
+  let authContract: ContractInstance
 
   before(async function () {
     aeSdk = await getSdk()
     await aeSdk.spend('100000000000000000000', gaAccount.publicKey)
+    if (aeSdk.selectedAddress == null) throw new UnexpectedTsError()
     aeSdk.removeAccount(aeSdk.selectedAddress)
     await aeSdk.addAccount(new MemoryAccount({ keypair: gaAccount }), { select: true })
   })
@@ -62,7 +65,7 @@ describe('Generalized Account', function () {
       .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`)
   })
 
-  const r = () => Math.floor(Math.random() * 20).toString()
+  const r = (): string => Math.floor(Math.random() * 20).toString()
   const { publicKey } = generateKeyPair()
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
@@ -80,7 +83,7 @@ describe('Generalized Account', function () {
     const { rawTx } = await aeSdk.spend(
       10000, publicKey, { authData: { source: authContractSource, args: [r()] } }
     )
-    const spendTx = encode(unpackTx(rawTx).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx')
+    const spendTx = encode(unpackTx(rawTx, TX_TYPE.signed).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx')
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.methods.getTxHash()).decodedResult)
   })

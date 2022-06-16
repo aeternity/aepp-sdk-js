@@ -17,29 +17,32 @@
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import { getSdk } from './'
+import { getSdk } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import MemoryAccount from '../../src/account/memory'
-import { QUERY_FEE } from '../../src/tx/builder/schema'
+import { ORACLE_TTL_TYPES, QUERY_FEE } from '../../src/tx/builder/schema'
 import { decode } from '../../src/tx/builder/helpers'
+import { postQueryToOracle, registerOracle } from '../../src/ae/oracle'
+import { EncodedData } from '../../src/utils/encoder'
+import { AeSdk, UnexpectedTsError } from '../../src'
 
 describe('Oracle', function () {
-  let aeSdk
-  let oracle
-  let query
+  let aeSdk: AeSdk
+  let oracle: Awaited<ReturnType<typeof registerOracle>>
+  let query: Awaited<ReturnType<typeof postQueryToOracle>>
   const queryResponse = "{'tmp': 30}"
   const account = generateKeyPair()
 
   before(async function () {
     aeSdk = await getSdk()
     await aeSdk.spend(1e20, account.publicKey)
-    aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true })
+    await aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true })
   })
 
   it('Register Oracle with 5000 TTL', async () => {
     const expectedOracleId = `ok_${(await aeSdk.address()).slice(3)}`
     oracle = await aeSdk.registerOracle(
-      "{'city': str}", "{'tmp': num}", { oracleTtl: { type: 'delta', value: 5000 } }
+      "{'city': str}", "{'tmp': num}", { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 5000 }
     )
     oracle.id.should.be.equal(expectedOracleId)
   })
@@ -77,7 +80,7 @@ describe('Oracle', function () {
     query = await oracle.getQuery(query.id)
 
     expect(query.decodedResponse).to.be.equal(queryResponse)
-    expect(decode(query.response, 'or').toString()).to.be.equal(queryResponse)
+    expect(decode(query.response as EncodedData<'or'>).toString()).to.be.equal(queryResponse)
   })
 
   it('Poll for response', async () => {
@@ -85,29 +88,32 @@ describe('Oracle', function () {
     response.should.be.equal(queryResponse)
   })
 
-  describe('Oracle query fee settings', async () => {
-    let oracleWithFee
+  describe('Oracle query fee settings', () => {
+    let oracleWithFee: Awaited<ReturnType<typeof registerOracle>>
     const queryFee = 24000n
     const account = generateKeyPair()
 
     before(async function () {
       await aeSdk.spend(1e15, account.publicKey)
-      aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true })
-      oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee, onAccount: account })
+      await aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true })
+      oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString(), onAccount: account })
     })
 
     it('Post Oracle Query with default query fee', async () => {
       query = await oracle.postQuery("{'city': 'Berlin'}")
+      if (query.tx?.queryFee == null) throw new UnexpectedTsError()
       query.tx.queryFee.should.be.equal(BigInt(QUERY_FEE))
     })
 
     it('Post Oracle Query with registered query fee', async () => {
       query = await oracleWithFee.postQuery("{'city': 'Berlin'}")
+      if (query.tx?.queryFee == null) throw new UnexpectedTsError()
       query.tx.queryFee.should.be.equal(queryFee)
     })
 
     it('Post Oracle Query with custom query fee', async () => {
       query = await oracleWithFee.postQuery("{'city': 'Berlin'}", { queryFee: queryFee + 2000n })
+      if (query.tx?.queryFee == null) throw new UnexpectedTsError()
       query.tx.queryFee.should.be.equal(queryFee + 2000n)
     })
   })

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -26,9 +26,14 @@ import {
   MissingContractDefError,
   NotPayableFunctionError,
   MissingEventDefinitionError,
-  AmbiguousEventDefinitionError
+  AmbiguousEventDefinitionError,
+  UnexpectedTsError
 } from '../../src/utils/errors'
-import { getSdk } from './'
+import { getSdk } from '.'
+import { EncodedData } from '../../src/utils/encoder'
+import { ContractInstance } from '../../src/contract/aci'
+import { AeSdk } from '../../src'
+import { Aci } from '../../src/apis/compiler'
 
 const identityContractSource = `
 contract Identity =
@@ -137,16 +142,17 @@ const fileSystem = {
 const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT'
 
 describe('Contract instance', function () {
-  let aeSdk
-  let testContract
-  let testContractAddress
-  let testContractAci
-  let testContractBytecode
+  let aeSdk: AeSdk
+  let testContract: ContractInstance
+  let testContractAddress: EncodedData<'ct'>
+  let testContractAci: Aci
+  let testContractBytecode: EncodedData<'cb'>
 
   before(async function () {
     aeSdk = await getSdk()
     testContractAci = await aeSdk.compilerApi
       .generateACI({ code: testContractSource, options: { fileSystem } })
+    // @ts-expect-error should be changed on api
     testContractBytecode = (await aeSdk.compilerApi.compileContract({
       code: testContractSource, options: { fileSystem }
     })).bytecode
@@ -175,7 +181,7 @@ describe('Contract instance', function () {
 
   it('compiles', async () => {
     await testContract.compile()
-    expect(testContract.bytecode).to.satisfy(b => b.startsWith('cb_'))
+    expect(testContract.bytecode).to.satisfy((b: string) => b.startsWith('cb_'))
   })
 
   it('fails on calling without deployment', () => expect(testContract.methods.intFn(2))
@@ -191,13 +197,13 @@ describe('Contract instance', function () {
       gasPrice: '1e9',
       strategy: 'max'
     })
-    expect(deployInfo.address).to.satisfy(b => b.startsWith('ct_'))
+    expect(deployInfo.address).to.satisfy((b: string) => b.startsWith('ct_'))
     expect(deployInfo.txData.tx.gas).to.be.equal(16000)
     expect(deployInfo.txData.tx.amount).to.be.equal(42n)
     expect(deployInfo.txData.gasUsed).to.be.equal(209)
     expect(deployInfo.txData.gasPrice).to.be.equal(1000000000n)
     expect(deployInfo.txData.tx.deposit).to.be.equal(0n)
-    expect(testContract.bytecode).to.satisfy(b => b.startsWith('cb_'))
+    expect(testContract.bytecode).to.satisfy((b: string) => b.startsWith('cb_'))
     testContractAddress = deployInfo.address
   })
 
@@ -205,8 +211,8 @@ describe('Contract instance', function () {
     expect((await testContract.methods.intFn(2)).decodedResult).to.be.equal(2n)
   })
 
-  it('generates by aci', () =>
-    aeSdk.getContractInstance({ aci: testContractAci, contractAddress: testContractAddress }))
+  it('generates by aci', async () =>
+    await aeSdk.getContractInstance({ aci: testContractAci, contractAddress: testContractAddress }))
 
   it('fails on trying to generate with not existing contract address', () =>
     expect(aeSdk.getContractInstance(
@@ -222,8 +228,8 @@ describe('Contract instance', function () {
     expect(aeSdk.getContractInstance({ aci: testContractAci }))
       .to.be.rejectedWith(MissingContractAddressError, 'Can\'t create instance by ACI without address'))
 
-  it('generates by bytecode and aci', () =>
-    aeSdk.getContractInstance({ bytecode: testContractBytecode, aci: testContractAci }))
+  it('generates by bytecode and aci', async () =>
+    await aeSdk.getContractInstance({ bytecode: testContractBytecode, aci: testContractAci }))
 
   it('fails on generation without arguments', () =>
     expect(aeSdk.getContractInstance()).to.be.rejectedWith(MissingContractDefError, 'Either ACI or source code is required'))
@@ -243,7 +249,7 @@ describe('Contract instance', function () {
     expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n)
   })
 
-  it('accepts matching source code with enabled validation', () => aeSdk.getContractInstance({
+  it('accepts matching source code with enabled validation', async () => await aeSdk.getContractInstance({
     source: testContractSource,
     fileSystem,
     contractAddress: testContractAddress,
@@ -256,14 +262,14 @@ describe('Contract instance', function () {
     validateBytecode: true
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract source do not correspond to the bytecode deployed on the chain'))
 
-  it('accepts matching bytecode with enabled validation', () => aeSdk.getContractInstance({
+  it('accepts matching bytecode with enabled validation', async () => await aeSdk.getContractInstance({
     bytecode: testContractBytecode,
     aci: testContractAci,
     contractAddress: testContractAddress,
     validateBytecode: true
   }))
 
-  it('rejects not matching bytecode with enabled validation', async () => expect(aeSdk.getContractInstance({
+  it('rejects not matching bytecode with enabled validation', async () => await expect(aeSdk.getContractInstance({
     bytecode: (await aeSdk.compilerApi.compileContract({
       code: identityContractSource, options: {}
     })).bytecode,
@@ -304,6 +310,7 @@ describe('Contract instance', function () {
   })
 
   it('pays to payable function', async () => {
+    if (testContract.deployInfo.address == null) throw new UnexpectedTsError('testContract.deployInfo.address is null')
     const contractBalance = await aeSdk.getBalance(testContract.deployInfo.address)
     await testContract.methods.stringFn.send('test', { amount: 100 })
     const balanceAfter = await aeSdk.getBalance(testContract.deployInfo.address)
@@ -317,7 +324,7 @@ describe('Contract instance', function () {
   })
 
   describe('Gas', () => {
-    let contract
+    let contract: ContractInstance
 
     before(async () => {
       contract = await aeSdk.getContractInstance({ source: testContractSource, fileSystem })
@@ -361,8 +368,8 @@ describe('Contract instance', function () {
   })
 
   describe('Events parsing', () => {
-    let remoteContract
-    let eventResult
+    let remoteContract: ContractInstance
+    let eventResult: Awaited<ReturnType<ContractInstance['call']>>
 
     before(async () => {
       remoteContract = await aeSdk.getContractInstance({ source: remoteContractSource })
@@ -418,7 +425,7 @@ describe('Contract instance', function () {
       expect(() => testContract.decodeEvents([event])).to.throw(
         MissingEventDefinitionError,
         'Can\'t find definition of 7165442193418278913262533136158148486147352807284929017531784742205476270109' +
-        ` event emitted by ${testContract.deployInfo.address}` +
+        ` event emitted by ${testContract.deployInfo.address as string}` +
         ' (use omitUnknown option to ignore events like this)'
       )
     })
@@ -429,8 +436,12 @@ describe('Contract instance', function () {
       expect(testContract.decodeEvents([event], { omitUnknown: true })).to.be.eql([])
     })
 
-    const getDuplicateLog = () => [{
-      address: remoteContract.deployInfo.address,
+    const getDuplicateLog = (): Array<{
+      address: EncodedData<'ct'>
+      data: EncodedData<'cb'>
+      topics: Array<string | number>
+    }> => [{
+      address: remoteContract.deployInfo.address as EncodedData<'ct'>,
       data: 'cb_Xfbg4g==',
       topics: [
         '28631352549432199952459007654025571262660118571086898449909844428770770966435',
@@ -442,7 +453,7 @@ describe('Contract instance', function () {
       expect(() => testContract.decodeEvents(getDuplicateLog())).to.throw(
         AmbiguousEventDefinitionError,
         'Found multiple definitions of "Duplicate" event emitted by' +
-        ` ${remoteContract.deployInfo.address} in "StateContract", "RemoteI" contracts` +
+        ` ${remoteContract.deployInfo.address ?? ''} in "StateContract", "RemoteI" contracts` +
         ' (use contractAddressToName option to specify contract name corresponding to address)'
       )
     })
@@ -451,7 +462,7 @@ describe('Contract instance', function () {
       expect(
         testContract.decodeEvents(
           getDuplicateLog(),
-          { contractAddressToName: { [remoteContract.deployInfo.address]: 'RemoteI' } }
+          { contractAddressToName: { [remoteContract.deployInfo.address ?? '']: 'RemoteI' } }
         )
       ).to.be.eql([{
         name: 'Duplicate',
@@ -487,14 +498,15 @@ describe('Contract instance', function () {
         expect(decodedResult).to.be.equal(1n)
       })
 
-      const unsafeInt = BigInt(Number.MAX_SAFE_INTEGER + '0')
+      const unsafeInt = BigInt(Number.MAX_SAFE_INTEGER.toString() + '0')
       it('Supports unsafe integer', async () => {
         const { decodedResult } = await testContract.methods.intFn.get(unsafeInt)
         expect(decodedResult).to.be.equal(unsafeInt)
       })
 
       it('Supports BigNumber', async () => {
-        const { decodedResult } = await testContract.methods.intFn.get(new BigNumber(unsafeInt))
+        const { decodedResult } = await testContract.methods.intFn
+          .get(new BigNumber(unsafeInt.toString()))
         expect(decodedResult).to.be.equal(unsafeInt)
       })
     })
@@ -624,14 +636,13 @@ describe('Contract instance', function () {
       })
 
       it('Cast from string to int', async () => {
-        const mapArg = new Map([[address, ['someStringV', '324']]])
+        const mapArg = new Map([[address, ['someStringV', '324']]] as const)
         const result = await testContract.methods.mapFn(mapArg)
-        mapArg.set(address, ['someStringV', 324n])
-        result.decodedResult.should.be.eql(mapArg)
+        result.decodedResult.should.be.eql(new Map([[address, ['someStringV', 324n]]] as const))
       })
 
       it('Cast from array to map', async () => {
-        const mapArg = [[address, ['someStringV', 324n]]]
+        const mapArg = [[address, ['someStringV', 324n]]] as const
         const { decodedResult } = await testContract.methods.mapFn(mapArg)
         decodedResult.should.be.eql(new Map(mapArg))
       })
@@ -725,14 +736,14 @@ describe('Contract instance', function () {
 
       it('Invalid length', async () => {
         const address = await aeSdk.address()
-        const decoded = Buffer.from(decode(address, 'ak').slice(1))
+        const decoded = Buffer.from(decode(address).slice(1))
         await expect(testContract.methods.hashFn(decoded))
           .to.be.rejectedWith('Invalid length: got 31 bytes instead of 32 bytes')
       })
 
       it('Valid', async () => {
         const address = await aeSdk.address()
-        const decoded = decode(address, 'ak')
+        const decoded = decode(address)
         const hashAsBuffer = await testContract.methods.hashFn(decoded)
         const hashAsHex = await testContract.methods.hashFn(decoded.toString('hex'))
         hashAsBuffer.decodedResult.should.be.eql(decoded)
@@ -748,14 +759,14 @@ describe('Contract instance', function () {
 
       it('Invalid length', async () => {
         const address = await aeSdk.address()
-        const decoded = decode(address, 'ak')
+        const decoded = decode(address)
         await expect(testContract.methods.signatureFn(decoded))
           .to.be.rejectedWith('Invalid length: got 32 bytes instead of 64 bytes')
       })
 
       it('Valid', async () => {
         const address = await aeSdk.address()
-        const decoded = decode(address, 'ak')
+        const decoded = decode(address)
         const fakeSignature = Buffer.from(await aeSdk.sign(decoded))
         const hashAsBuffer = await testContract.methods.signatureFn(fakeSignature)
         const hashAsHex = await testContract.methods.signatureFn(fakeSignature.toString('hex'))
@@ -772,14 +783,14 @@ describe('Contract instance', function () {
 
       it('Invalid length', async () => {
         const address = await aeSdk.address()
-        const decoded = decode(address, 'ak')
+        const decoded = decode(address)
         await expect(testContract.methods.bytesFn(Buffer.from([...decoded, 2])))
           .to.be.rejectedWith('is not of type [{bytes,32}]')
       })
 
       it('Valid', async () => {
         const address = await aeSdk.address()
-        const decoded = decode(address, 'ak')
+        const decoded = decode(address)
         const hashAsBuffer = await testContract.methods.bytesFn(decoded)
         const hashAsHex = await testContract.methods.bytesFn(decoded.toString('hex'))
         hashAsBuffer.decodedResult.should.be.eql(decoded)

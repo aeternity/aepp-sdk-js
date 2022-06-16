@@ -1,4 +1,6 @@
 import BigNumber from 'bignumber.js'
+import { ValidatorResult } from '../tx/validator'
+import { EncodedData } from './encoder'
 
 /**
  * aepp-sdk originated error
@@ -694,9 +696,13 @@ export class InvalidSignatureError extends TransactionError {
  * @category exception
  */
 export class InvalidTxError extends TransactionError {
-  constructor (message: string) {
+  validation: ValidatorResult[]
+  transaction: EncodedData<'tx'>
+  constructor (message: string, validation: ValidatorResult[], transaction: EncodedData<'tx'>) {
     super(message)
     this.name = 'InvalidTxError'
+    this.validation = validation
+    this.transaction = transaction
   }
 }
 
