@@ -59,7 +59,7 @@ Note:
 Of course it is also possible to decode the event log if you request the transaction details from the node for a transaction that has been mined already. You can request the transaction details by providing the tx-hash and then decode the event log using the `contractInstance` as follows:
 ```js
 const txHash = 'th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET';
-// aeSdk is an instance of the Universal Stamp
+// aeSdk is an instance of the AeSdk class
 const txInfo = await aeSdk.api.getTransactionInfoByHash(txHash)
 
 // decode events using contract instance

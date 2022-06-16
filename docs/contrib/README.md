@@ -8,9 +8,6 @@ low-level access to it's endpoints, when necessary.
 
 It uses the following Javascript technologies and principles:
 
-- [stampit] provides composable Factories based on the [Stamp
-  Specification]. This is how aepp-sdk approached the [composition over
-  inheritance] principle.
 - [JavaScript the Good Parts] (because Crockford is always right)
 - [ES6 modules], using `export` and `import`
 - [Promises] using ES7 [async/await] syntax, where applicable
@@ -65,11 +62,11 @@ npm run docs:examples && npm run docs:api
 
 ## Building
 
-aepp-sdk is built using [pnpm]. In order to build a development version, launch the `build:dev` command.
+aepp-sdk is built using npm. In order to build a development version, launch the `build:dev` command.
 
 ```bash
-pnpm install
-pnpm run build:dev
+npm install
+npm run build:dev
 ```
 
 ## Testing
@@ -77,7 +74,7 @@ pnpm run build:dev
 To test, launch the `test` command. This will run [mocha](https://mochajs.org/)'s tests locally.
 
 ```bash
-pnpm run test
+npm test
 ```
 
 This repository also includes a docker-compose file, to allow you to **run your own æternity node locally**. If you want to do so, **from the root of the project**:
@@ -96,33 +93,10 @@ services:
 2. Run `docker-compose up node`
 3. Congrats! you're now running your own æternity node locally.
 
-
-## Composing new Flavors
-You can also "compose" your own flavor by mixing 2 or more flavors likes so:
-
-```js
-import { Wallet, Contract, MemoryAccount } from '@aeternity/aepp-sdk'
-
-// make a "mixed flavor" containing Wallet and Contracts flavors
-Wallet.compose(Contract)({
-            url: 'https://testnet.aeternity.io',
-            accounts: [new MemoryAccount({keypair: {secretKey: account.priv, publicKey: account.pub}})],
-            address: account.pub,
-            onTx: true, // or a function to Guard the Rpc client
-            onChain: true, // or a function to Guard the Rpc client
-            onAccount: true, // or a function to Guard the Rpc client
-            networkId: 'ae_uat'
-          }).then(ae => {
-            // ae is your initialised client now! :)
-            // ...
-```
-
 The WebPack compilation provides two different build artifacts in `dist/`, one
 for Node.js and one for browsers. When referencing aepp-sdk through any modern
 build tooling, it should pick the right one automatically through the entry
 points defined in `package.json`.
-
-[pnpm]: https://pnpm.js.org/
 
 ## Installation / Linking
 

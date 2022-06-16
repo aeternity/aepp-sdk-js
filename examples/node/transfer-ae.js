@@ -26,7 +26,7 @@
 //  - transfer AE to another account
 
 // ## 1. Specify imports
-// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
+// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 const { AeSdk, Node, MemoryAccount } = require('@aeternity/aepp-sdk')
 
 // **Note**:

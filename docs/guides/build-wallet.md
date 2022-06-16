@@ -38,8 +38,8 @@ const readyStateCheckInterval = setInterval(function () {
 }, 10)
 ```
 
-### 2. Initialize `RpcWallet` Stamp
-Then you need to initialize `RpcWallet` Stamp in your extension and subscribe for new `runtime` connections.
+### 2. Initialize `AeSdkWallet` class
+Then you need to initialize `AeSdkWallet` class in your extension and subscribe for new `runtime` connections.
 After the connection is established you can share the wallet details with the application.
 
 ```js
@@ -54,15 +54,12 @@ const accounts = [
 const aeppInfo = {}
 
 async function init () {
-  // Init extension stamp from sdk
-  RpcWallet({
+  const aeSdk = new AeSdkWallet({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: new Node(NODE_URL) }],
     id: browser.runtime.id,
     type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
-    // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
-    accounts,
     // Hook for sdk registration
     onConnection (aeppId, params) {
       if (!confirm(`Aepp ${params.name} with id ${aeppId} wants to connect`)) {
@@ -97,18 +94,19 @@ async function init () {
         throw new RpcRejectedByUserError()
       }
     }
-  }).then(wallet => {
-    chrome.runtime.onConnect.addListener(async function (port) {
-      // create connection
-      const connection = new BrowserRuntimeConnection({ port })
-      // add new aepp to wallet
-      const clientId = aeSdk.addRpcClient(connection)
-      // share wallet details
-      aeSdk.shareWalletInfo(clientId)
-      setInterval(() => aeSdk.shareWalletInfo(clientId), 3000)
-    })
-  }).catch(err => {
-    console.error(err)
+  })
+  // You can change active account using `selectAccount(address)` function
+  await aeSdk.addAccount(accounts[0], { select: true })
+  await aeSdk.addAccount(accounts[1])
+
+  chrome.runtime.onConnect.addListener(async function (port) {
+    // create connection
+    const connection = new BrowserRuntimeConnection({ port })
+    // add new aepp to wallet
+    const clientId = aeSdk.addRpcClient(connection)
+    // share wallet details
+    aeSdk.shareWalletInfo(clientId)
+    setInterval(() => aeSdk.shareWalletInfo(clientId), 3000)
   })
 }
 
@@ -128,20 +126,18 @@ const accounts = [
 ]
 
 async function init () {
-  // Init extension stamp from sdk
-  RpcWallet({
+  // Init extension class from sdk
+  const aeSdk = new AeSdkWallet({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: new Node(NODE_URL) }],
     id: browser.runtime.id,
     type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
-    // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
-    accounts,
     // Hook for sdk registration
     onConnection (aeppId, params, origin) {
       if (confirm(`Aepp ${params.name} with id ${aeppId} wants to connect`)) {
         // Whitelist aepp domains for node connection
-        const aepps = ['https://test', 'https://aepp.aeternity.com']
+        const aepps = ['https://aepps.superhero.com', 'https://aepp.aeternity.com']
         if (params.connectNode && aepps.includes(origin)) {}
         else throw new RpcConnectionDenyError()
         // Connect to aepp without sharing node URLs
@@ -177,18 +173,19 @@ async function init () {
         throw new RpcRejectedByUserError()
       }
     }
-  }).then(wallet => {
-    chrome.runtime.onConnect.addListener(async function (port) {
-      // create connection
-      const connection = new BrowserRuntimeConnection({ port })
-      // add new aepp to wallet
-      const clientId = aeSdk.addRpcClient(connection)
-      // share wallet details
-      aeSdk.shareWalletInfo(clientId)
-      setInterval(() => aeSdk.shareWalletInfo(clientId), 3000)
-    })
-  }).catch(err => {
-    console.error(err)
+  })
+  // You can change active account using `selectAccount(address)` function
+  await aeSdk.addAccount(accounts[0], { select: true })
+  await aeSdk.addAccount(accounts[1])
+
+  chrome.runtime.onConnect.addListener(async function (port) {
+    // create connection
+    const connection = new BrowserRuntimeConnection({ port })
+    // add new aepp to wallet
+    const clientId = aeSdk.addRpcClient(connection)
+    // share wallet details
+    aeSdk.shareWalletInfo(clientId)
+    setInterval(() => aeSdk.shareWalletInfo(clientId), 3000)
   })
 }
 

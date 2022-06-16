@@ -10,7 +10,7 @@ You can build your own wallet in the next example
 ## 1. Specify imports and constants and state
 
 ```js
-import { RpcAepp, walletDetector, BrowserWindowMessageConnection, Node } from '@aeternity/aepp-sdk'
+import { AeSdkAepp, walletDetector, BrowserWindowMessageConnection, Node } from '@aeternity/aepp-sdk'
 
 const TESTNET_NODE_URL = 'https://testnet.aeternity.io'
 const MAINNET_NODE_URL = 'https://mainnet.aeternity.io'
@@ -27,11 +27,11 @@ export default {
 }
 ```
 
-## 2. Initialize the `RpcAepp` Stamp
+## 2. Initialize the `AeSdkAepp` class
 
 ```js
-async created () {
-  this.aeSdk = await RpcAepp({
+created () {
+  this.aeSdk = new AeSdkAepp({
     name: 'Simple Aepp',
     nodes: [
       { name: 'ae_uat', instance: new Node(TESTNET_NODE_URL) },
@@ -73,7 +73,7 @@ methods: {
 }
 ```
 
-## 4. Connect to a wallet
+## 4a. Connect to a wallet
 
 Append method for wallet connection
 
@@ -87,7 +87,7 @@ async connect(wallet) {
 }
 ```
 
-## 4. Use Wallet's Node for chain communication
+## 4b. Connect to a wallet: Use Wallet's Node for chain communication
 
 Aepp can request the wallet to share its connected node URLs if any to interact with the chain.
 

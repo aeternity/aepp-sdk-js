@@ -7,13 +7,13 @@ The `options` object can be optionally passed to the respective function behind 
 const sender = 'ak_...'
 const recipient = 'ak_...'
 const options = { onAccount: sender, denomination: 'ae' } // optional options object
-// aeSdk is an instance of the Universal Stamp
+// aeSdk is an instance of the AeSdk class
 await aeSdk.spend(1, recipient, options) // amount, recipient and (optional) options
 ```
 
 Note:
 
-- Without the `options` object the sender would be the first account defined in the accounts array that is used to initialize the Universal Stamp and the recipient would receive `1 aetto` instead of `1 AE`.
+- Without the `options` object the sender would be some other account selected in the instance of AeSdk and the recipient would receive `1 aetto` instead of `1 AE`.
 
 ## Common options
 These options are common and can be provided to every tx-type:

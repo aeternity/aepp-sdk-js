@@ -2,11 +2,11 @@
 In this example we will send 1 _AE_ coin from one account to another
 
 ## 1. Specify imports
-For the following snippets in the guide you need to specify multiple imports. Most imports like `Universal`, `MemoryAccount` & `Node` are [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) that compose certain functionalities. Others utility functions like `generateKeyPair` also can be imported.
+For the following snippets in the guide you need to specify multiple imports.
 
 ```js
 const {
-  Universal,
+  AeSdk,
   MemoryAccount,
   Node,
   AE_AMOUNT_FORMATS,
@@ -28,7 +28,7 @@ To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just p
 ## 4. Interact with the æternity blockchain
 This example shows:
 
-- how to create an instance of the SDK using the `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp)
+- how to create an instance of the SDK using the `Aesdk` class
 - how to spend (send) 1 AE from the account the SDK instance was initialized with to some other AE address
 
 ```js
@@ -41,11 +41,12 @@ const senderAccount = new MemoryAccount({
 
 (async function () {
   const node = new Node(NODE_URL)
-  const aeSdk = await Universal({
+  const aeSdk = new AeSdk({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: node }],
-    accounts: [senderAccount]
   })
+  // Add sender account to the aeSdk state
+  await aeSdk.addAccount(senderAccount, { select: true })
 
   // spend one AE
   await aeSdk.spend(1, '<RECIPIENT_PUBLIC_KEY>', {

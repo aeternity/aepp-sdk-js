@@ -31,7 +31,7 @@
 //  - This can be done for ***any*** transaction type!
 
 // ## 1. Specify imports
-// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
+// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 const { AeSdk, Node, MemoryAccount, generateKeyPair, TX_TYPE } = require('@aeternity/aepp-sdk')
 
