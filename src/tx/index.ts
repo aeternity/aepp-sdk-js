@@ -31,7 +31,8 @@ import {
 import { BigNumber } from 'bignumber.js'
 import Node from '../node'
 import { EncodedData } from '../utils/encoder'
-import { buildTx as syncBuildTx, calculateMinFee, unpackTx } from './builder/index'
+import { buildTx as syncBuildTx, unpackTx } from './builder/index'
+import calculateMinFee from './min-fee'
 import { isKeyOfObject } from '../utils/other'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
@@ -155,7 +156,7 @@ export async function prepareTxParams (
     senderId,
     nonce,
     ttl = TX_TTL,
-    fee,
+    fee: f,
     absoluteTtl,
     vsn,
     strategy,
@@ -169,7 +170,7 @@ export async function prepareTxParams (
     denomination?: AE_AMOUNT_FORMATS
     onNode: Node
   }
-): Promise<{ fee: Int, ttl: number, nonce: number }> {
+): Promise<{ fee: BigNumber, ttl: number, nonce: number }> {
   nonce ??= (
     await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
   ).nextNonce
@@ -179,9 +180,8 @@ export async function prepareTxParams (
     ttl += absoluteTtl === true ? 0 : (await onNode.getCurrentKeyBlock()).height
   }
 
-  fee ??= calculateMinFee(
-    txType,
-    { params: { ...arguments[1], nonce, ttl }, vsn, denomination }
-  )
+  const fee = f != null
+    ? new BigNumber(f)
+    : calculateMinFee(txType, { params: { ...arguments[1], nonce, ttl }, vsn, denomination })
   return { fee, ttl, nonce }
 }

@@ -11,8 +11,6 @@ import {
   TxField,
   TxTypeSchemas,
   TxParamsCommon,
-  TX_FEE_BASE_GAS,
-  TX_FEE_OTHER_GAS,
   TX_SCHEMA,
   TX_TYPE,
   TxSchema
@@ -230,72 +228,6 @@ function transformParams (
       params
     )
   return params
-}
-
-function getOracleRelativeTtl (params: any, txType: TX_TYPE): number {
-  const ttlKeys = {
-    [TX_TYPE.oracleRegister]: 'oracleTtl',
-    [TX_TYPE.oracleExtend]: 'oracleTtl',
-    [TX_TYPE.oracleQuery]: 'queryTtl',
-    [TX_TYPE.oracleResponse]: 'responseTtl'
-  } as const
-
-  if (!isKeyOfObject(txType, ttlKeys)) return 1
-  else {
-    const ttlKey = ttlKeys[txType]
-    if (params[`${ttlKey}Value`] > 0) return params[`${ttlKey}Value`]
-    else return params[ttlKey].value
-  }
-}
-
-/**
- * Calculate min fee
- * @param txType - Transaction type
- * @param options - Options object
- * @param options.params - Tx params
- * @example
- * ```js
- * calculateMinFee('spendTx', { gasLimit, params })
- * ```
- */
-export function calculateMinFee (
-  txType: TX_TYPE,
-  { params, vsn, denomination }: { params: Object, vsn?: number, denomination?: AE_AMOUNT_FORMATS }
-): string {
-  const multiplier = new BigNumber(1e9) // 10^9 GAS_PRICE
-
-  let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, vsn, denomination })
-  let expected = new BigNumber(0)
-
-  while (!actualFee.eq(expected)) {
-    actualFee = buildFee(txType, {
-      params: { ...params, fee: actualFee }, multiplier, vsn, denomination
-    })
-    expected = actualFee
-  }
-  return expected.toString(10)
-}
-
-/**
- * Calculate fee based on tx type and params
- */
-function buildFee (
-  txType: TX_TYPE,
-  { params, multiplier, vsn, denomination }:
-  { params: TxParamsCommon, multiplier: BigNumber, vsn?: number, denomination?: AE_AMOUNT_FORMATS }
-): BigNumber {
-  const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { vsn, denomination })
-  const txSize = txWithOutFee.length
-  const txTypes = [TX_TYPE.gaMeta, TX_TYPE.payingFor] as const
-
-  return TX_FEE_BASE_GAS(txType)
-    .plus(TX_FEE_OTHER_GAS(txType, txSize, {
-      relativeTtl: getOracleRelativeTtl(params, txType),
-      innerTxSize: isKeyOfObject(txType, txTypes)
-        ? params.tx.tx.encodedTx.rlpEncoded.length
-        : 0
-    }))
-    .times(multiplier)
 }
 
 /**
