@@ -262,19 +262,19 @@ function getOracleRelativeTtl (params: any, txType: TX_TYPE): number {
  */
 export function calculateMinFee (
   txType: TX_TYPE,
-  { params, vsn }: { params?: Object, vsn?: number }
+  { params, vsn, denomination }: { params?: Object, vsn?: number, denomination?: AE_AMOUNT_FORMATS }
 ): string {
   const multiplier = new BigNumber(1e9) // 10^9 GAS_PRICE
   if (params == null) {
     return new BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
   }
 
-  let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, vsn })
+  let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, vsn, denomination })
   let expected = new BigNumber(0)
 
   while (!actualFee.eq(expected)) {
     actualFee = buildFee(txType, {
-      params: { ...params, fee: actualFee }, multiplier, vsn
+      params: { ...params, fee: actualFee }, multiplier, vsn, denomination
     })
     expected = actualFee
   }
@@ -286,9 +286,10 @@ export function calculateMinFee (
  */
 function buildFee (
   txType: TX_TYPE,
-  { params, multiplier, vsn }: { params: TxParamsCommon, multiplier: BigNumber, vsn?: number }
+  { params, multiplier, vsn, denomination }:
+  { params: TxParamsCommon, multiplier: BigNumber, vsn?: number, denomination?: AE_AMOUNT_FORMATS }
 ): BigNumber {
-  const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
+  const { rlpEncoded: txWithOutFee } = buildTx(params, txType, { vsn, denomination })
   const txSize = txWithOutFee.length
   const txTypes = [TX_TYPE.gaMeta, TX_TYPE.payingFor] as const
 
@@ -313,16 +314,17 @@ function buildFee (
 export function calculateFee (
   fee: number | BigNumber | string = 0,
   txType: TX_TYPE,
-  { params, showWarning = true, vsn }: {
+  { params, showWarning = true, vsn, denomination }: {
     gasLimit?: number | string | BigNumber
     params?: TxSchema
     showWarning?: boolean
     vsn?: number
+    denomination?: AE_AMOUNT_FORMATS
   } = {}
 ): number | string | BigNumber {
   if ((params == null) && showWarning) console.warn(`Can't build transaction fee, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
 
-  return fee > 0 ? fee : calculateMinFee(txType, { params, vsn })
+  return fee > 0 ? fee : calculateMinFee(txType, { params, vsn, denomination })
 }
 
 /**

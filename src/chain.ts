@@ -443,7 +443,7 @@ export async function resolveName <Type extends 'ak' | 'ct'> (
       if (pointer == null) throw new AensPointerContextError(nameOrId, key)
       if (resolveByNode) return pointer.id as EncodedData<Type>
     }
-    return produceNameId(nameOrId as AensName)
+    return produceNameId(nameOrId)
   }
   throw new InvalidAensNameError(`Invalid name or address: ${nameOrId}`)
 }

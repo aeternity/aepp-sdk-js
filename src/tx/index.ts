@@ -33,7 +33,7 @@ import Node from '../node'
 import { EncodedData } from '../utils/encoder'
 import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
 import { isKeyOfObject } from '../utils/other'
-import AccountBase from '../account/base'
+import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
 type Int = number | string | BigNumber
 
@@ -45,9 +45,13 @@ export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
 // TODO: find a better name or rearrange methods
 export async function _buildTx<TxType extends TX_TYPE> (
   txType: TxType,
-  { onAccount, ..._params }:
-  Omit<Parameters<typeof syncBuildTx<TxType, 'tx'>>[0], 'fee' | 'nonce' | 'ttl'>
-  & { onNode: Node, onAccount: AccountBase, fee?: Int, nonce?: number, ttl?: number }
+  { denomination, ..._params }:
+  Omit<Parameters<typeof syncBuildTx<TxType, 'tx'>>[0], 'fee' | 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'>
+  & { onNode: Node, fee?: Int, nonce?: number, ttl?: number, denomination?: AE_AMOUNT_FORMATS }
+  & (TxType extends TX_TYPE.oracleExtend | TX_TYPE.oracleResponse ? { callerId: EncodedData<'ak'> } : {})
+  & (TxType extends TX_TYPE.contractCreate | TX_TYPE.gaAttach ? { ctVersion?: CtVersion } : {})
+  & (TxType extends TX_TYPE.contractCall | TX_TYPE.oracleRegister
+    ? { abiVersion?: ABI_VERSIONS } : {})
 ): Promise<EncodedData<'tx'>> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node }
@@ -70,11 +74,9 @@ export async function _buildTx<TxType extends TX_TYPE> (
       senderKey = 'ownerId'
       break
     case TX_TYPE.contractCall:
-      senderKey = 'callerId'
-      break
     case TX_TYPE.oracleExtend:
     case TX_TYPE.oracleResponse:
-      senderKey = '<absent>'
+      senderKey = 'callerId'
       break
     case TX_TYPE.channelCloseSolo:
     case TX_TYPE.channelSlash:
@@ -103,11 +105,11 @@ export async function _buildTx<TxType extends TX_TYPE> (
   if (txType === TX_TYPE.payingFor) {
     params.tx = unpackTx(params.tx)
   }
-  const senderId = senderKey === '<absent>' ? await onAccount.address() : params[senderKey]
+  const senderId = params[senderKey]
   // TODO: do this check on TypeScript level
   if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`)
-  const extraParams = await prepareTxParams(txType, { ...params, senderId })
-  return syncBuildTx({ ...params, ...extraParams } as any, txType).tx
+  const extraParams = await prepareTxParams(txType, { ...params, senderId, denomination })
+  return syncBuildTx({ ...params, ...extraParams } as any, txType, { denomination }).tx
 }
 
 /**
@@ -159,6 +161,7 @@ export async function prepareTxParams (
     vsn,
     strategy,
     showWarning = false,
+    denomination,
     onNode
   }: Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> & {
     senderId: EncodedData<'ak'>
@@ -167,6 +170,7 @@ export async function prepareTxParams (
     absoluteTtl?: boolean
     strategy?: 'continuity' | 'max'
     showWarning?: boolean
+    denomination?: AE_AMOUNT_FORMATS
     onNode: Node
   }
 ): Promise<{ fee: Int, ttl: number, nonce: number }> {
@@ -182,7 +186,7 @@ export async function prepareTxParams (
   const fee = calculateFee(
     f,
     txType,
-    { showWarning, gasLimit, params: { ...arguments[1], nonce, ttl }, vsn }
+    { showWarning, gasLimit, params: { ...arguments[1], nonce, ttl }, vsn, denomination }
   )
   return { fee, ttl, nonce }
 }

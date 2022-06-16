@@ -5,10 +5,11 @@ import * as spendMethods from './ae/spend'
 import * as oracleMethods from './ae/oracle'
 import * as contractMethods from './ae/contract'
 import * as contractGaMethods from './contract/ga'
+import { _buildTx } from './tx'
 import { mapObject } from './utils/other'
 import Node, { getNetworkId } from './node'
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter'
-import { AMOUNT } from './tx/builder/schema'
+import { AMOUNT, TX_TYPE } from './tx/builder/schema'
 import MemoryAccount, { Keypair } from './account/memory'
 import AccountBase, { isAccountBase } from './account/base'
 import {
@@ -233,13 +234,36 @@ class AeSdkBase {
           `keypair, or instance of AccountBase, got ${String(account)} instead`)
     }
   }
+
+  async _getOptions (
+  ): Promise<{ onNode: Node, onAccount: AccountBase, onCompiler: Compiler, networkId: string }> {
+    return {
+      ...this._options,
+      onNode: getValueOrErrorProxy(() => this.api),
+      onAccount: getValueOrErrorProxy(() => this._resolveAccount()),
+      onCompiler: getValueOrErrorProxy(() => this.compilerApi),
+      // TODO: remove networkId
+      networkId: (await this.api?.getStatus()).networkId
+    }
+  }
+
+  async buildTx<TxType extends TX_TYPE> (
+    txType: TxType,
+    options: Omit<Parameters<typeof _buildTx<TxType>>[1], 'onNode'> & { onNode?: Node }
+  ): Promise<EncodedData<'tx'>> {
+    // @ts-expect-error
+    return await _buildTx<TxType>(txType, {
+      ...await this._getOptions(),
+      ...options
+    })
+  }
 }
 
-const { _buildTx, ...txMethodsOther } = txMethods
+const { _buildTx: _, ...txMethodsOther } = txMethods
+
 const methods = {
   ...chainMethods,
   ...txMethodsOther,
-  buildTx: _buildTx,
   ...aensMethods,
   ...spendMethods,
   ...oracleMethods,
@@ -278,14 +302,7 @@ Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
   ([name, handler]) => [
     name,
     async function (...args: any[]) {
-      const instanceOptions = {
-        ...this._options,
-        onNode: getValueOrErrorProxy(() => this.api),
-        onAccount: getValueOrErrorProxy(() => this._resolveAccount()),
-        onCompiler: getValueOrErrorProxy(() => this.compilerApi),
-        // TODO: remove networkId
-        networkId: this.networkId ?? (await this.api?.getStatus()).networkId
-      }
+      const instanceOptions = await this._getOptions()
       const lastArg = args[args.length - 1]
       if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
         Object.assign(lastArg, {
