@@ -81,7 +81,7 @@ const validators: Validator[] = [
   (tx: any, { txType }) => {
     if (tx.fee === undefined) return []
     const minFee = calculateFee(0, txType, {
-      gasLimit: +tx?.gasLimit ?? 0, params: tx, showWarning: false, vsn: tx.VSN
+      gasLimit: +tx?.gasLimit ?? 0, params: tx, vsn: tx.VSN
     })
     if (new BigNumber(minFee).lte(tx.fee)) return []
     return [{

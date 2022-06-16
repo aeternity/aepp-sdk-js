@@ -160,7 +160,6 @@ export async function prepareTxParams (
     absoluteTtl,
     vsn,
     strategy,
-    showWarning = false,
     denomination,
     onNode
   }: Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> & {
@@ -169,7 +168,6 @@ export async function prepareTxParams (
     gasLimit?: Int
     absoluteTtl?: boolean
     strategy?: 'continuity' | 'max'
-    showWarning?: boolean
     denomination?: AE_AMOUNT_FORMATS
     onNode: Node
   }
@@ -186,7 +184,7 @@ export async function prepareTxParams (
   const fee = calculateFee(
     f,
     txType,
-    { showWarning, gasLimit, params: { ...arguments[1], nonce, ttl }, vsn, denomination }
+    { gasLimit, params: { ...arguments[1], nonce, ttl }, vsn, denomination }
   )
   return { fee, ttl, nonce }
 }

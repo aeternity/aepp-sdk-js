@@ -6,7 +6,6 @@ import { hash } from '../../utils/crypto'
 import { Field } from './field-types'
 
 import {
-  DEFAULT_FEE,
   FIELD_TYPES,
   RawTxObject,
   TxField,
@@ -262,12 +261,9 @@ function getOracleRelativeTtl (params: any, txType: TX_TYPE): number {
  */
 export function calculateMinFee (
   txType: TX_TYPE,
-  { params, vsn, denomination }: { params?: Object, vsn?: number, denomination?: AE_AMOUNT_FORMATS }
+  { params, vsn, denomination }: { params: Object, vsn?: number, denomination?: AE_AMOUNT_FORMATS }
 ): string {
   const multiplier = new BigNumber(1e9) // 10^9 GAS_PRICE
-  if (params == null) {
-    return new BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
-  }
 
   let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, vsn, denomination })
   let expected = new BigNumber(0)
@@ -314,16 +310,13 @@ function buildFee (
 export function calculateFee (
   fee: number | BigNumber | string = 0,
   txType: TX_TYPE,
-  { params, showWarning = true, vsn, denomination }: {
+  { params, vsn, denomination }: {
     gasLimit?: number | string | BigNumber
-    params?: TxSchema
-    showWarning?: boolean
+    params: TxSchema
     vsn?: number
     denomination?: AE_AMOUNT_FORMATS
-  } = {}
+  }
 ): number | string | BigNumber {
-  if ((params == null) && showWarning) console.warn(`Can't build transaction fee, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
-
   return fee > 0 ? fee : calculateMinFee(txType, { params, vsn, denomination })
 }
 
