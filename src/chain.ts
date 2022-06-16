@@ -428,8 +428,8 @@ export async function getName (
 export async function resolveName <Type extends 'ak' | 'ct'> (
   nameOrId: AensName | EncodedData<Type>,
   key: string,
-  { verify = true, resolveByNode, onNode }:
-  { verify?: boolean, resolveByNode: boolean, onNode: Node }
+  { verify = true, resolveByNode = false, onNode }:
+  { verify?: boolean, resolveByNode?: boolean, onNode: Node }
 ): Promise<EncodedData<Type | 'nm'>> {
   try {
     const id = nameOrId as EncodedData<Type>
@@ -443,7 +443,7 @@ export async function resolveName <Type extends 'ak' | 'ct'> (
       if (pointer == null) throw new AensPointerContextError(nameOrId, key)
       if (resolveByNode) return pointer.id as EncodedData<Type>
     }
-    return produceNameId(nameOrId as AensName)
+    return produceNameId(nameOrId)
   }
   throw new InvalidAensNameError(`Invalid name or address: ${nameOrId}`)
 }

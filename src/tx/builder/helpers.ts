@@ -177,7 +177,7 @@ const AENS_SUFFIX = '.chain'
  * Is AENS name valid
  * @param name - AENS name
  */
-export function isNameValid (name: string): boolean {
+export function isNameValid (name: string): name is AensName {
   // TODO: probably there are stronger requirements
   return name.endsWith(AENS_SUFFIX)
 }

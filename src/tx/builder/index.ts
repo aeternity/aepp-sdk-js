@@ -6,15 +6,11 @@ import { hash } from '../../utils/crypto'
 import { Field } from './field-types'
 
 import {
-  DEFAULT_FEE,
   FIELD_TYPES,
-  MIN_GAS_PRICE,
   RawTxObject,
   TxField,
   TxTypeSchemas,
   TxParamsCommon,
-  TX_FEE_BASE_GAS,
-  TX_FEE_OTHER_GAS,
   TX_SCHEMA,
   TX_TYPE,
   TxSchema
@@ -234,98 +230,6 @@ function transformParams (
   return params
 }
 
-function getOracleRelativeTtl (params: any, txType: TX_TYPE): number {
-  const ttlKeys = {
-    [TX_TYPE.oracleRegister]: 'oracleTtl',
-    [TX_TYPE.oracleExtend]: 'oracleTtl',
-    [TX_TYPE.oracleQuery]: 'queryTtl',
-    [TX_TYPE.oracleResponse]: 'responseTtl'
-  } as const
-
-  if (!isKeyOfObject(txType, ttlKeys)) return 1
-  else {
-    const ttlKey = ttlKeys[txType]
-    if (params[`${ttlKey}Value`] > 0) return params[`${ttlKey}Value`]
-    else return params[ttlKey].value
-  }
-}
-
-/**
- * Calculate min fee
- * @param txType - Transaction type
- * @param options - Options object
- * @param options.gasLimit
- * @param options.params - Tx params
- * @example
- * ```js
- * calculateMinFee('spendTx', { gasLimit, params })
- * ```
- */
-export function calculateMinFee (
-  txType: TX_TYPE,
-  { params, vsn }: { params?: Object, vsn?: number }
-): string {
-  const multiplier = new BigNumber(1e9) // 10^9 GAS_PRICE
-  if (params == null) {
-    return new BigNumber(DEFAULT_FEE).times(multiplier).toString(10)
-  }
-
-  let actualFee = buildFee(txType, { params: { ...params, fee: 0 }, multiplier, vsn })
-  let expected = new BigNumber(0)
-
-  while (!actualFee.eq(expected)) {
-    actualFee = buildFee(txType, {
-      params: { ...params, fee: actualFee }, multiplier, vsn
-    })
-    expected = actualFee
-  }
-  return expected.toString(10)
-}
-
-/**
- * Calculate fee based on tx type and params
- */
-function buildFee (
-  txType: TX_TYPE,
-  { params, multiplier, vsn }: { params: TxParamsCommon, multiplier: BigNumber, vsn?: number }
-): BigNumber {
-  const { rlpEncoded: txWithOutFee } = buildTx({ ...params }, txType, { vsn })
-  const txSize = txWithOutFee.length
-  const txTypes = [TX_TYPE.gaMeta, TX_TYPE.payingFor] as const
-
-  return TX_FEE_BASE_GAS(txType)
-    .plus(TX_FEE_OTHER_GAS(txType, txSize, {
-      relativeTtl: getOracleRelativeTtl(params, txType),
-      innerTxSize: isKeyOfObject(txType, txTypes)
-        ? params.tx.tx.encodedTx.rlpEncoded.length
-        : 0
-    }))
-    .times(multiplier)
-}
-
-/**
- * Calculate fee
- * @param fee - fee
- * @param txType - Transaction type
- * @param options - Options object
- * @param options.gasLimit
- * @param options.params - Tx params
- */
-export function calculateFee (
-  fee: number | BigNumber | string = 0,
-  txType: TX_TYPE,
-  { params, showWarning = true, vsn }: {
-    gasLimit?: number | string | BigNumber
-    params?: TxSchema
-    showWarning?: boolean
-    vsn?: number
-  } = {}
-): number | string | BigNumber {
-  if ((params == null) && showWarning) console.warn(`Can't build transaction fee, we will use DEFAULT_FEE(${DEFAULT_FEE})`)
-
-  return fee > 0 ? fee : calculateMinFee(txType, { params, vsn })
-}
-
 /**
  * Validate transaction params
  * @param params - Object with tx params
@@ -344,41 +248,6 @@ export function validateParams (
       .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
       .filter(([, message]) => message)
   )
-}
-
-interface TxOptionsRaw {
-  excludeKeys?: string[]
-  denomination?: AE_AMOUNT_FORMATS
-}
-/**
- * Build binary transaction
- * @param params - Object with tx params
- * @param schema - Transaction schema
- * @param options - options
- * @param options.excludeKeys - Array of keys to exclude for validation and build
- * @param options.denomination - Denomination of amounts
- * @throws {@link InvalidTxParamsError}
- * @returns Array with binary fields of transaction
- */
-export function buildRawTx (
-  params: TxParamsCommon,
-  schema: TxField[],
-  { excludeKeys = [], denomination = AE_AMOUNT_FORMATS.AETTOS }: TxOptionsRaw = {}
-): Buffer[] {
-  params.gasPrice ??= MIN_GAS_PRICE
-  const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key))
-
-  // Transform `amount` type fields to `aettos`
-  params = transformParams(params, filteredSchema, { denomination })
-  // Validation
-  const valid = validateParams(params, schema, { excludeKeys })
-  if (Object.keys(valid).length > 0) {
-    throw new InvalidTxParamsError('Transaction build error. ' + JSON.stringify(valid))
-  }
-
-  return filteredSchema
-    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => serializeField(
-      params[key], fieldType, params))
 }
 
 /**
@@ -409,15 +278,13 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends EncodingType> {
   txObject: RawTxObject<Tx>
 }
 
-export type TxParamsBuild = TxParamsCommon & {
-  denomination?: AE_AMOUNT_FORMATS
-}
 /**
  * Build transaction hash
- * @param params - Object with tx params
+ * @param _params - Object with tx params
  * @param type - Transaction type
  * @param options - options
  * @param options.excludeKeys - Array of keys to exclude for validation and build
+ * @param options.denomination - Denomination of amounts
  * @param options.prefix - Prefix of transaction
  * @throws {@link InvalidTxParamsError}
  * @returns object
@@ -425,30 +292,40 @@ export type TxParamsBuild = TxParamsCommon & {
  * @returns object.rlpEncoded rlp encoded transaction
  * @returns object.binary binary transaction
  */
-export function buildTx<Prefix> (
-  params: TxParamsBuild,
-  type: TX_TYPE,
+export function buildTx<TxType extends TX_TYPE, Prefix> (
+  _params: Omit<TxTypeSchemas[TxType], 'tag' | 'VSN'> & { VSN?: number },
+  type: TxType,
   { excludeKeys = [], prefix = 'tx', vsn, denomination = AE_AMOUNT_FORMATS.AETTOS }: {
     excludeKeys?: string[]
     prefix?: EncodingType
     vsn?: number
     denomination?: AE_AMOUNT_FORMATS
   } = {}
-): Prefix extends EncodingType
-    ? BuiltTx<TxSchema, Prefix>
-    : BuiltTx<TxSchema, 'tx'> {
+): BuiltTx<TxSchema, Prefix extends EncodingType ? Prefix : 'tx'> {
   const schemas = TX_SCHEMA[type]
 
   vsn ??= Math.max(...Object.keys(schemas).map(a => +a))
   if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', TX_TYPE[type], vsn)
 
-  const schema = schemas[vsn]
+  const schema = schemas[vsn] as unknown as TxField[]
 
-  const binary = buildRawTx(
-    { ...params, VSN: vsn, tag: type },
-    schema,
-    { excludeKeys, denomination: params.denomination ?? denomination }
-  ).filter(e => e !== undefined)
+  let params = _params as TxParamsCommon & { onNode: Node }
+  params.VSN = vsn
+  params.tag = type
+  const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key))
+
+  // Transform `amount` type fields to `aettos`
+  params = transformParams(params, filteredSchema, { denomination })
+  // Validation
+  const valid = validateParams(params, schema, { excludeKeys })
+  if (Object.keys(valid).length > 0) {
+    throw new InvalidTxParamsError('Transaction build error. ' + JSON.stringify(valid))
+  }
+
+  const binary = filteredSchema
+    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => serializeField(
+      params[key], fieldType, params))
+    .filter(e => e !== undefined)
 
   const rlpEncoded = rlpEncode(binary)
   const tx = encode(rlpEncoded, prefix)

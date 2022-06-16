@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 /**
  * aepp-sdk originated error
  * @category exception
@@ -300,8 +302,8 @@ export class AensPointerContextError extends AensError {
  * @category exception
  */
 export class InsufficientNameFeeError extends AensError {
-  constructor (nameFee: number, minNameFee: number) {
-    super(`the provided fee ${nameFee} is not enough to execute the claim, required: ${minNameFee}`)
+  constructor (nameFee: BigNumber, minNameFee: BigNumber) {
+    super(`the provided fee ${nameFee.toString()} is not enough to execute the claim, required: ${minNameFee.toString()}`)
     this.name = 'InsufficientNameFeeError'
   }
 }

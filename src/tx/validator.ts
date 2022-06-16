@@ -4,7 +4,8 @@ import BigNumber from 'bignumber.js'
 import {
   PROTOCOL_VM_ABI, RawTxObject, TxSchema, TxParamsCommon, TX_TYPE, TxTypeSchemas, CtVersion
 } from './builder/schema'
-import { calculateFee, TxUnpacked, unpackTx } from './builder'
+import { TxUnpacked, unpackTx } from './builder'
+import calculateMinFee from './min-fee'
 import { UnsupportedProtocolError } from '../utils/errors'
 import { concatBuffers, isKeyOfObject } from '../utils/other'
 import { EncodedData } from '../utils/encoder'
@@ -80,10 +81,8 @@ const validators: Validator[] = [
   },
   (tx: any, { txType }) => {
     if (tx.fee === undefined) return []
-    const minFee = calculateFee(0, txType, {
-      gasLimit: +tx?.gasLimit ?? 0, params: tx, showWarning: false, vsn: tx.VSN
-    })
-    if (new BigNumber(minFee).lte(tx.fee)) return []
+    const minFee = calculateMinFee(txType, { params: tx, vsn: tx.VSN })
+    if (minFee.lte(tx.fee)) return []
     return [{
       message: `Fee ${tx.fee as string} is too low, minimum fee for this transaction is ${minFee.toString()}`,
       key: 'InsufficientFee',

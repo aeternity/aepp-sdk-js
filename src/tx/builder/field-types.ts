@@ -5,6 +5,9 @@ import { InsufficientNameFeeError, IllegalArgumentError } from '../../utils/erro
 import BigNumber from 'bignumber.js'
 import { MIN_GAS_PRICE } from './constants'
 import { AensName } from '../../chain'
+import { EncodedData } from '../../utils/encoder'
+
+type Int = number | string | BigNumber
 
 // todo: update me
 // ? This is a TS workaround because this has to be a class with only static methods
@@ -40,7 +43,7 @@ export class NameId extends Field {
   /**
    * @param value - AENS name ID
    */
-  static serialize (value: AensName): Buffer {
+  static serialize (value: AensName | EncodedData<'nm'>): Buffer {
     return writeId(isNameValid(value) ? produceNameId(value) : value)
   }
 
@@ -58,11 +61,11 @@ export class NameFee extends Field {
    * @param txFields - Transaction fields
    * @param txFields.name - AENS Name in transaction
    */
-  static serialize (value: BigNumber, { name }: { name: AensName }): Buffer {
+  static serialize (value: Int, { name }: { name: AensName }): Buffer {
     const minNameFee = getMinimumNameFee(name)
     value ??= minNameFee
     if (minNameFee.gt(value)) {
-      throw new InsufficientNameFeeError(value.toNumber(), minNameFee.toNumber())
+      throw new InsufficientNameFeeError(new BigNumber(value), minNameFee)
     }
     return writeInt(value)
   }
@@ -81,8 +84,7 @@ export class Deposit extends Field {
    * @param value - Deposit value in string format. Should be equal to  '0'.
    * @returns Deposit value Buffer.
    */
-  static serialize (value: string): Buffer {
-    value ??= '0'
+  static serialize (value: string = '0'): Buffer {
     if (parseInt(value) !== 0) throw new IllegalArgumentError(`Contract deposit is not refundable, so it should be equal 0, got ${value.toString()} instead`)
     return writeInt(0)
   }
@@ -97,9 +99,9 @@ export class Deposit extends Field {
 }
 
 export class GasPrice extends Field {
-  static serialize (value = MIN_GAS_PRICE): Buffer {
+  static serialize (value: Int = MIN_GAS_PRICE): Buffer {
     if (+value < MIN_GAS_PRICE) {
-      throw new IllegalArgumentError(`Gas price ${value} must be bigger then ${MIN_GAS_PRICE}`)
+      throw new IllegalArgumentError(`Gas price ${value.toString()} must be bigger then ${MIN_GAS_PRICE}`)
     }
     return writeInt(value)
   }

@@ -43,17 +43,17 @@ import {
 import Channel from '.'
 import { TX_TYPE } from '../tx/builder/schema'
 
-async function appendSignature (
+export async function appendSignature (
   tx: EncodedData<'tx'>, signFn: SignTx
 ): Promise<EncodedData<'tx'> | number | null> {
   const { signatures, encodedTx } = unpackTx(tx, TX_TYPE.signed).tx
   const result = await signFn(encode(encodedTx.rlpEncoded, 'tx'))
   if (typeof result === 'string') {
-    const { tx: signedTx, txType } = unpackTx(result, TX_TYPE.signed)
+    const { tx: signedTx } = unpackTx(result, TX_TYPE.signed)
     return buildTx({
       signatures: signatures.concat(signedTx.signatures),
       encodedTx: signedTx.encodedTx.rlpEncoded
-    }, txType).tx
+    }, TX_TYPE.signed).tx
   }
   return result
 }

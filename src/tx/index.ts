@@ -23,7 +23,7 @@
  * These methods provide ability to create native transactions.
  */
 import {
-  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon, TxTypeSchemas
+  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon
 } from './builder/schema'
 import {
   ArgumentError, UnsupportedProtocolError, UnknownTxError, InvalidTxParamsError
@@ -31,9 +31,12 @@ import {
 import { BigNumber } from 'bignumber.js'
 import Node from '../node'
 import { EncodedData } from '../utils/encoder'
-import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
+import { buildTx as syncBuildTx, unpackTx } from './builder/index'
+import calculateMinFee from './min-fee'
 import { isKeyOfObject } from '../utils/other'
-import AccountBase from '../account/base'
+import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
+
+type Int = number | string | BigNumber
 
 // uses a new feature, probably typescript-eslint doesn't support it yet
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,7 +46,13 @@ export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
 // TODO: find a better name or rearrange methods
 export async function _buildTx<TxType extends TX_TYPE> (
   txType: TxType,
-  { onAccount, ..._params }: TxTypeSchemas[TxType] & { onNode: Node, onAccount: AccountBase }
+  { denomination, ..._params }:
+  Omit<Parameters<typeof syncBuildTx<TxType, 'tx'>>[0], 'fee' | 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'>
+  & { onNode: Node, fee?: Int, nonce?: number, ttl?: number, denomination?: AE_AMOUNT_FORMATS }
+  & (TxType extends TX_TYPE.oracleExtend | TX_TYPE.oracleResponse ? { callerId: EncodedData<'ak'> } : {})
+  & (TxType extends TX_TYPE.contractCreate | TX_TYPE.gaAttach ? { ctVersion?: CtVersion } : {})
+  & (TxType extends TX_TYPE.contractCall | TX_TYPE.oracleRegister
+    ? { abiVersion?: ABI_VERSIONS } : {})
 ): Promise<EncodedData<'tx'>> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node }
@@ -66,11 +75,9 @@ export async function _buildTx<TxType extends TX_TYPE> (
       senderKey = 'ownerId'
       break
     case TX_TYPE.contractCall:
-      senderKey = 'callerId'
-      break
     case TX_TYPE.oracleExtend:
     case TX_TYPE.oracleResponse:
-      senderKey = '<absent>'
+      senderKey = 'callerId'
       break
     case TX_TYPE.channelCloseSolo:
     case TX_TYPE.channelSlash:
@@ -99,11 +106,11 @@ export async function _buildTx<TxType extends TX_TYPE> (
   if (txType === TX_TYPE.payingFor) {
     params.tx = unpackTx(params.tx)
   }
-  const senderId = senderKey === '<absent>' ? await onAccount.address() : params[senderKey]
+  const senderId = params[senderKey]
   // TODO: do this check on TypeScript level
   if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`)
-  const extraParams = await prepareTxParams(txType, { ...params, senderId })
-  return syncBuildTx({ ...params, ...extraParams }, txType).tx
+  const extraParams = await prepareTxParams(txType, { ...params, senderId, denomination })
+  return syncBuildTx({ ...params, ...extraParams } as any, txType, { denomination }).tx
 }
 
 /**
@@ -150,26 +157,20 @@ export async function prepareTxParams (
     nonce,
     ttl = TX_TTL,
     fee: f,
-    gasLimit,
     absoluteTtl,
     vsn,
     strategy,
-    showWarning = false,
+    denomination,
     onNode
   }: Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> & {
     senderId: EncodedData<'ak'>
     vsn?: number
-    gasLimit?: number | string | BigNumber
     absoluteTtl?: boolean
     strategy?: 'continuity' | 'max'
-    showWarning?: boolean
+    denomination?: AE_AMOUNT_FORMATS
     onNode: Node
   }
-): Promise<{
-    fee: number | string | BigNumber
-    ttl: number
-    nonce: number
-  }> {
+): Promise<{ fee: BigNumber, ttl: number, nonce: number }> {
   nonce ??= (
     await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
   ).nextNonce
@@ -179,10 +180,8 @@ export async function prepareTxParams (
     ttl += absoluteTtl === true ? 0 : (await onNode.getCurrentKeyBlock()).height
   }
 
-  const fee = calculateFee(
-    f,
-    txType,
-    { showWarning, gasLimit, params: { ...arguments[1], nonce, ttl }, vsn }
-  )
+  const fee = f != null
+    ? new BigNumber(f)
+    : calculateMinFee(txType, { params: { ...arguments[1], nonce, ttl }, vsn, denomination })
   return { fee, ttl, nonce }
 }

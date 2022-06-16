@@ -287,13 +287,14 @@ export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
 export async function extendOracleTtl (
   oracleId: EncodedData<'ok'>,
   options: Parameters<typeof send>[1] & Parameters<typeof getOracleObject>[1]
-  & BuildTxOptions<TX_TYPE.oracleExtend, 'oracleTtlType' | 'oracleTtlValue' | 'oracleId'>
+  & BuildTxOptions<TX_TYPE.oracleExtend, 'oracleTtlType' | 'oracleTtlValue' | 'callerId' | 'oracleId'>
   & { oracleTtlType?: ORACLE_TTL_TYPES, oracleTtlValue?: number }
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const oracleExtendTx = await _buildTx(TX_TYPE.oracleExtend, {
     oracleTtlType: ORACLE_TTL.type,
     oracleTtlValue: ORACLE_TTL.value,
     ...options,
+    callerId: await options.onAccount.address(options),
     oracleId
   })
   return {
@@ -318,13 +319,14 @@ export async function respondToQuery (
   queryId: EncodedData<'oq'>,
   response: string,
   options: Parameters<typeof send>[1] & Parameters<typeof getOracleObject>[1]
-  & BuildTxOptions<TX_TYPE.oracleResponse, 'oracleId' | 'queryId' | 'response' | 'responseTtlType' | 'responseTtlValue'>
+  & BuildTxOptions<TX_TYPE.oracleResponse, 'callerId' | 'oracleId' | 'queryId' | 'response' | 'responseTtlType' | 'responseTtlValue'>
   & { responseTtlType?: ORACLE_TTL_TYPES, responseTtlValue?: number }
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const oracleRespondTx = await _buildTx(TX_TYPE.oracleResponse, {
     responseTtlType: RESPONSE_TTL.type,
     responseTtlValue: RESPONSE_TTL.value,
     ...options,
+    callerId: await options.onAccount.address(options),
     oracleId,
     queryId,
     response
