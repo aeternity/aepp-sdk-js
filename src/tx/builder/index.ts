@@ -252,7 +252,6 @@ function getOracleRelativeTtl (params: any, txType: TX_TYPE): number {
  * Calculate min fee
  * @param txType - Transaction type
  * @param options - Options object
- * @param options.gasLimit
  * @param options.params - Tx params
  * @example
  * ```js
@@ -297,27 +296,6 @@ function buildFee (
         : 0
     }))
     .times(multiplier)
-}
-
-/**
- * Calculate fee
- * @param fee - fee
- * @param txType - Transaction type
- * @param options - Options object
- * @param options.gasLimit
- * @param options.params - Tx params
- */
-export function calculateFee (
-  fee: number | BigNumber | string = 0,
-  txType: TX_TYPE,
-  { params, vsn, denomination }: {
-    gasLimit?: number | string | BigNumber
-    params: TxSchema
-    vsn?: number
-    denomination?: AE_AMOUNT_FORMATS
-  }
-): number | string | BigNumber {
-  return fee > 0 ? fee : calculateMinFee(txType, { params, vsn, denomination })
 }
 
 /**

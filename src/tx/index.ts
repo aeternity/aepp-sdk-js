@@ -31,7 +31,7 @@ import {
 import { BigNumber } from 'bignumber.js'
 import Node from '../node'
 import { EncodedData } from '../utils/encoder'
-import { buildTx as syncBuildTx, calculateFee, unpackTx } from './builder/index'
+import { buildTx as syncBuildTx, calculateMinFee, unpackTx } from './builder/index'
 import { isKeyOfObject } from '../utils/other'
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
@@ -155,8 +155,7 @@ export async function prepareTxParams (
     senderId,
     nonce,
     ttl = TX_TTL,
-    fee: f,
-    gasLimit,
+    fee,
     absoluteTtl,
     vsn,
     strategy,
@@ -165,7 +164,6 @@ export async function prepareTxParams (
   }: Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> & {
     senderId: EncodedData<'ak'>
     vsn?: number
-    gasLimit?: Int
     absoluteTtl?: boolean
     strategy?: 'continuity' | 'max'
     denomination?: AE_AMOUNT_FORMATS
@@ -181,10 +179,9 @@ export async function prepareTxParams (
     ttl += absoluteTtl === true ? 0 : (await onNode.getCurrentKeyBlock()).height
   }
 
-  const fee = calculateFee(
-    f,
+  fee ??= calculateMinFee(
     txType,
-    { gasLimit, params: { ...arguments[1], nonce, ttl }, vsn, denomination }
+    { params: { ...arguments[1], nonce, ttl }, vsn, denomination }
   )
   return { fee, ttl, nonce }
 }
