@@ -14,14 +14,14 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { sendTransaction, getAccount, getBalance, resolveName, AensName } from '../chain'
+import { sendTransaction, getAccount, getBalance, resolveName } from '../chain'
 import { _buildTx, BuildTxOptions } from '../tx'
 import { buildTxHash, unpackTx } from '../tx/builder'
 import BigNumber from 'bignumber.js'
 import { ArgumentError } from '../utils/errors'
 import { EncodedData } from '../utils/encoder'
 import { createMetaTx } from '../contract/ga'
-import { TX_TYPE } from '../tx/builder/schema'
+import { TX_TYPE, AensName } from '../tx/builder/schema'
 import AccountBase from '../account/base'
 
 /**

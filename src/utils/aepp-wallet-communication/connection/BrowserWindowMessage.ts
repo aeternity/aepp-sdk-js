@@ -19,6 +19,8 @@ import BrowserConnection from './Browser'
 import { MESSAGE_DIRECTION } from '../schema'
 import { InternalError, RpcConnectionError } from '../../errors'
 
+export type ImplPostMessage = Pick<Window, 'addEventListener' | 'removeEventListener' | 'postMessage'>
+
 /**
  * Browser window Post Message connector module
  */
@@ -28,8 +30,8 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
   receiveDirection: MESSAGE_DIRECTION
   listener?: (this: Window, ev: MessageEvent<any>) => void
   #onDisconnect?: () => void
-  #target?: Window
-  #self: Window
+  #target?: ImplPostMessage
+  #self: ImplPostMessage
 
   /**
    * @param options - Options
@@ -49,8 +51,8 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
     receiveDirection = MESSAGE_DIRECTION.to_aepp,
     ...options
   }: {
-    target?: Window
-    self?: Window
+    target?: ImplPostMessage
+    self?: ImplPostMessage
     origin?: string
     sendDirection?: MESSAGE_DIRECTION
     receiveDirection?: MESSAGE_DIRECTION
@@ -100,7 +102,7 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
     this.#onDisconnect = undefined
   }
 
-  sendMessage (msg: MessageEvent): void {
+  sendMessage (msg: any): void {
     if (this.#target == null) throw new RpcConnectionError('Can\'t send messages without target')
     const message = this.sendDirection != null ? { type: this.sendDirection, data: msg } : msg
     super.sendMessage(message)

@@ -22,6 +22,7 @@
  * https://github.com/aeternity/protocol/tree/master/contracts and
  */
 
+import { AensName } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 import { concatBuffers } from '../utils/other'
 import { EncodedData, EncodingType } from '../utils/encoder'
@@ -76,7 +77,7 @@ async function delegateSignatureCommon (
 export async function createAensDelegationSignature (
   contractId: EncodedData<'ct'>,
   opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
-  { name?: `${string}.chain` }
+  { name?: AensName }
 ): Promise<string> {
   return await delegateSignatureCommon(
     [

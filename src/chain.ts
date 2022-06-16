@@ -18,7 +18,7 @@ import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter'
 import verifyTransaction from './tx/validator'
 import { pause } from './utils/other'
 import { isNameValid, produceNameId, decode } from './tx/builder/helpers'
-import { DRY_RUN_ACCOUNT } from './tx/builder/schema'
+import { DRY_RUN_ACCOUNT, AensName } from './tx/builder/schema'
 import {
   AensPointerContextError, DryRunError, InvalidAensNameError, InvalidTxError,
   RequestTimedOutError, TxTimedOutError, TxNotInChainError, InternalError
@@ -42,9 +42,6 @@ export function _getPollInterval (
   }[type]
   return Math.min(base / 3, _maxPollInterval)
 }
-
-// TODO: extract these definitions
-export type AensName = `${string}.chain`
 
 /**
  * Submit a signed transaction for mining

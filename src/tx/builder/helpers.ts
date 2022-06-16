@@ -10,7 +10,8 @@ import {
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUT_BLOCKS,
   NAME_MAX_LENGTH_FEE,
-  POINTER_KEY_BY_PREFIX
+  POINTER_KEY_BY_PREFIX,
+  AensName
 } from './constants'
 import { ceil } from '../../utils/bignumber'
 import {
@@ -19,7 +20,6 @@ import {
   IllegalBidFeeError,
   ArgumentError
 } from '../../utils/errors'
-import { AensName } from '../../chain'
 
 /**
  * JavaScript-based Transaction builder helper function's

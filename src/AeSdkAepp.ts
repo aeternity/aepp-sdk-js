@@ -23,7 +23,7 @@ export default class AeSdkAepp extends AeSdkBase {
   name: string
   onAddressChange: (a: Accounts) => void
   onDisconnect: (p: any) => void
-  onNetworkChange: (a: { networkId: string }) => void
+  onNetworkChange: (a: Network) => void
   rpcClient?: RpcClient<WalletApi, AeppApi>
   _accounts?: Accounts
 
