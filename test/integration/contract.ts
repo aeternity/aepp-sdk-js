@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -17,11 +17,13 @@
 import { expect } from 'chai'
 import { before, describe, it } from 'mocha'
 import { randomName } from '../utils'
-import { BaseAe, getSdk, publicKey, compilerUrl } from './'
+import { BaseAe, getSdk, publicKey, compilerUrl } from '.'
 import {
   IllegalArgumentError, NodeInvocationError, MemoryAccount, generateKeyPair,
-  commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, salt
+  commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, salt, UnexpectedTsError, AeSdk
 } from '../../src'
+import { EncodedData } from '../../src/utils/encoder'
+import { ContractInstance } from '../../src/contract/aci'
 
 const identityContract = `
 contract Identity =
@@ -114,10 +116,10 @@ contract Sign =
 `
 
 describe('Contract', function () {
-  let aeSdk
-  let bytecode
-  let contract
-  let deployed
+  let aeSdk: AeSdk
+  let bytecode: EncodedData<'cb'>
+  let contract: ContractInstance
+  let deployed: ContractInstance['deployInfo']
 
   before(async function () {
     aeSdk = await getSdk()
@@ -130,8 +132,8 @@ describe('Contract', function () {
   it('compiles Sophia code', async () => {
     bytecode = (await aeSdk.compilerApi.compileContract({
       code: identityContract, options: {}
-    })).bytecode
-    expect(bytecode).to.satisfy(b => b.startsWith('cb_'))
+    })).bytecode as EncodedData<'cb'>
+    expect(bytecode).to.satisfy((b: string) => b.startsWith('cb_'))
   })
 
   it('deploys precompiled bytecode', async () => {
@@ -170,6 +172,7 @@ describe('Contract', function () {
     contract.options.onAccount = onAccount
     deployed = await contract.deploy()
     const address = await onAccount.address()
+    if (deployed?.result?.callerId == null) throw new UnexpectedTsError()
     expect(deployed.result.callerId).to.be.equal(address)
     expect((await contract.methods.getArg(42, { callStatic: true })).result.callerId)
       .to.be.equal(address)
@@ -243,17 +246,17 @@ describe('Contract', function () {
   })
 
   describe('Namespaces', () => {
-    let contract
+    let contract: ContractInstance
 
     it('Can compiler contract with external deps', async () => {
       contract = await aeSdk.getContractInstance({
         source: contractWithLib, fileSystem: { testLib: libContract }
       })
-      expect(await contract.compile()).to.satisfy(b => b.startsWith('cb_'))
+      expect(await contract.compile()).to.satisfy((b: string) => b.startsWith('cb_'))
     })
 
     it('Throw error when try to compile contract without providing external deps', async () => {
-      await expect(aeSdk.getContractInstance({ source: contractWithLib, options: {} }))
+      await expect(aeSdk.getContractInstance({ source: contractWithLib }))
         .to.be.rejectedWith('Couldn\'t find include file')
     })
 
@@ -275,13 +278,12 @@ describe('Contract', function () {
   })
 
   describe('Sophia Compiler', function () {
-    let bytecode
+    let bytecode: string
 
     it('compile', async () => {
       bytecode = (await aeSdk.compilerApi.compileContract({
         code: identityContract, options: {}
       })).bytecode
-      expect(bytecode).to.be.a('string')
       expect(bytecode.split('_')[0]).to.be.equal('cb')
     })
 
@@ -311,7 +313,7 @@ describe('Contract', function () {
     })
 
     it('throws clear exception if generating ACI with no arguments', async () => {
-      await expect(aeSdk.compilerApi.generateACI({ options: {} }))
+      await expect(aeSdk.compilerApi.generateACI({ options: {} } as any))
         .to.be.rejectedWith('Error "body.code cannot be null or undefined." occurred in serializing the payload - undefined')
     })
 
@@ -323,24 +325,25 @@ describe('Contract', function () {
 
     it('Use invalid compiler url', async () => {
       aeSdk.setCompilerUrl('https://compiler.aepps.comas')
-      await expect(aeSdk.compilerApi.generateACI({ code: 'test' }))
+      await expect(aeSdk.compilerApi.generateACI({ code: 'test', options: {} }))
         .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas')
       aeSdk.setCompilerUrl(compilerUrl)
     })
   })
 
   describe('AENS operation delegation', () => {
-    let contract
-    let contractId
+    let contract: ContractInstance
+    let contractId: EncodedData<'ct'>
     const name = randomName(15)
     const nameSalt = salt()
-    let owner
-    let newOwner
-    let delegationSignature
+    let owner: EncodedData<'ak'>
+    let newOwner: EncodedData<'ak'>
+    let delegationSignature: string
 
     before(async () => {
       contract = await aeSdk.getContractInstance({ source: aensDelegationContract })
       await contract.deploy()
+      if (contract.deployInfo.address == null) throw new UnexpectedTsError()
       contractId = contract.deployInfo.address;
       [owner, newOwner] = aeSdk.addresses()
     })
@@ -348,7 +351,7 @@ describe('Contract', function () {
     it('preclaims', async () => {
       const commitmentId = commitmentHash(name, nameSalt)
       // TODO: provide more convenient way to create the decoded commitmentId ?
-      const commitmentIdDecoded = decode(commitmentId, 'cm')
+      const commitmentIdDecoded = decode(commitmentId)
       const preclaimSig = await aeSdk.createAensDelegationSignature(contractId)
       const preclaim = await contract.methods
         .signedPreclaim(owner, commitmentIdDecoded, preclaimSig)
@@ -404,19 +407,20 @@ describe('Contract', function () {
   })
 
   describe('Oracle operation delegation', () => {
-    let contract
-    let contractId
-    let address
-    let oracle
-    let oracleId
-    let queryObject
-    let delegationSignature
+    let contract: ContractInstance
+    let contractId: EncodedData<'ct'>
+    let address: EncodedData<'ak'>
+    let oracle: Awaited<ReturnType<typeof aeSdk.getOracleObject>>
+    let oracleId: EncodedData<'ok'>
+    let queryObject: Awaited<ReturnType<typeof aeSdk.getQueryObject>>
+    let delegationSignature: string
     const queryFee = 500000
     const ttl = { RelativeTTL: [50] }
 
     before(async () => {
       contract = await aeSdk.getContractInstance({ source: oracleContract })
       await contract.deploy()
+      if (contract.deployInfo.address == null) throw new UnexpectedTsError()
       contractId = contract.deployInfo.address
       address = await aeSdk.address()
       oracleId = encode(decode(address), 'ok')
@@ -463,7 +467,8 @@ describe('Contract', function () {
         oracle.id, queryObject.id, respondSig, r
       )
       response.result.returnType.should.be.equal('ok')
-      const queryObject2 = await aeSdk.getQueryObject(oracle.id, queryObject.id)
+      // TODO type should be corrected in node api
+      const queryObject2 = await aeSdk.getQueryObject(oracle.id, queryObject.id as EncodedData<'oq'>)
       queryObject2.decodedResponse.should.be.equal(r)
     })
   })

@@ -53,10 +53,11 @@ function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Valu
  * available.
  */
 class AeSdkBase {
-  _options = {
-    denomination: AE_AMOUNT_FORMATS.AETTOS,
-    amount: AMOUNT
-  }
+  _options: {
+    denomination: AE_AMOUNT_FORMATS
+    amount: number
+    [key: string]: any
+  } = { denomination: AE_AMOUNT_FORMATS.AETTOS, amount: AMOUNT }
 
   pool: Map<string, Node> = new Map()
   selectedNodeName?: string
@@ -190,7 +191,7 @@ class AeSdkBase {
   }
 
   async sign (
-    data: string, { onAccount, ...options }: { onAccount?: Account } = {}
+    data: string | Uint8Array, { onAccount, ...options }: { onAccount?: Account } = {}
   ): Promise<Uint8Array> {
     return await this._resolveAccount(onAccount).sign(data, options)
   }

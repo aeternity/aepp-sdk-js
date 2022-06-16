@@ -17,7 +17,7 @@ interface Account {
   nonce: number
 }
 
-interface ValidatorResult {
+export interface ValidatorResult {
   message: string
   key: string
   checkedKeys: string[]

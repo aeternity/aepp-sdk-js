@@ -59,8 +59,8 @@ export async function createGeneralizedAccount (
   source: string,
   args: any[],
   { onAccount, onCompiler, onNode, ...options }:
-  { onAccount: AccountBase, onCompiler: Compiler, onNode: Node }
-  & BuildTxOptions<TX_TYPE.gaAttach, 'authFun' | 'callData' | 'code' | 'ownerId'>
+  { onAccount: AccountBase, onCompiler: Compiler, onNode: Node, gasLimit?: number }
+  & BuildTxOptions<TX_TYPE.gaAttach, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>
   & Parameters<typeof send>[1]
 ): Promise<Readonly<{
     owner: EncodedData<'ak'>

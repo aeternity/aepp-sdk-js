@@ -209,17 +209,19 @@ export function getMinimumNameFee (name: AensName): BigNumber {
  * Compute bid fee for AENS auction
  *
  * @param name - the AENS name to get the fee for
- * @param startFee - Auction start fee
- * @param increment - Bid multiplier(In percentage, must be between 0 and 1)
+ * @param options - Options
+ * @param options.startFee - Auction start fee
+ * @param options.increment - Bid multiplier(In percentage, must be between 0 and 1)
  * @returns Bid fee
  */
 export function computeBidFee (
   name: AensName,
-  startFee: number | string | null,
-  increment: number = NAME_FEE_BID_INCREMENT
+  { startFee, increment = NAME_FEE_BID_INCREMENT }:
+  { startFee?: number | string | BigNumber, increment?: number } = {}
 ): BigNumber {
   if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`)
   if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
+  // FIXME: increment should be used somehow here
   return ceil(
     new BigNumber(startFee ?? getMinimumNameFee(name))
       .times(new BigNumber(NAME_FEE_BID_INCREMENT).plus(1))

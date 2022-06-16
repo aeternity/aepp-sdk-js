@@ -23,7 +23,7 @@ export default class AccountRpc extends AccountBase {
     this._address = address
   }
 
-  async sign (data: string | Buffer, options?: any): Promise<Uint8Array> {
+  async sign (data: string | Uint8Array, options?: any): Promise<Uint8Array> {
     throw new NotImplementedError('RAW signing using wallet')
   }
 

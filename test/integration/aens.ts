@@ -17,15 +17,16 @@
 
 import { describe, it, before } from 'mocha'
 import { expect } from 'chai'
-import { getSdk } from './'
+import { getSdk } from '.'
 import { randomName } from '../utils'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { buildContractId, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers'
-import { AensPointerContextError } from '../../src/utils/errors'
+import { AensPointerContextError, UnexpectedTsError } from '../../src/utils/errors'
 import { pause } from '../../src/utils/other'
+import { AeSdk } from '../../src'
 
 describe('Aens', function () {
-  let aeSdk
+  let aeSdk: AeSdk
   const account = generateKeyPair()
   const name = randomName(13) // 13 name length doesn't trigger auction
 
@@ -39,6 +40,7 @@ describe('Aens', function () {
     preclaim.should.be.an('object')
     const claimed = await preclaim.claim()
     claimed.should.be.an('object')
+    if (claimed.id == null || claimed.ttl == null) throw new UnexpectedTsError()
     claimed.id.should.be.a('string')
     claimed.ttl.should.be.an('number')
   })
@@ -69,6 +71,7 @@ describe('Aens', function () {
     const contract = await aeSdk.getContractInstance({ source })
     await contract.deploy([])
     const nameObject = await aeSdk.aensQuery(name)
+    if (contract.deployInfo.address == null) throw new UnexpectedTsError()
     await nameObject.update({ contract_pubkey: contract.deployInfo.address })
 
     const contractByName = await aeSdk.getContractInstance({ source, contractAddress: name })
@@ -95,7 +98,8 @@ describe('Aens', function () {
     await preclaim.claim()
     const current = await aeSdk.address()
     const onAccount = aeSdk.addresses().find(acc => acc !== current)
-    await aeSdk.aensUpdate(name, onAccount, { onAccount, blocks: 1 }).should.eventually.be.rejected
+    if (onAccount == null) throw new UnexpectedTsError()
+    await aeSdk.aensUpdate(name, {}, { onAccount, blocks: 1 }).should.eventually.be.rejected
   })
 
   it('updates extending pointers', async () => {
@@ -113,15 +117,17 @@ describe('Aens', function () {
   it('throws error on setting 33 pointers', async () => {
     const nameObject = await aeSdk.aensQuery(name)
     const pointers = Object.fromEntries(
-      new Array(33).fill().map((v, i) => [`pointer-${i}`, address])
+      new Array(33).fill(undefined).map((v, i) => [`pointer-${i}`, address])
     )
-    expect(nameObject.update(pointers))
+    await expect(nameObject.update(pointers))
       .to.be.rejectedWith('Expected 32 pointers or less, got 33 instead')
   })
 
   it('Extend name ttl', async () => {
     const nameObject = await aeSdk.aensQuery(name)
-    const extendResult = await nameObject.extendTtl(10000)
+    const extendResult: Awaited<ReturnType<typeof aeSdk.aensUpdate>> = await nameObject
+      .extendTtl(10000)
+    if (extendResult.blockHeight == null) throw new UnexpectedTsError()
     return extendResult.should.be.deep.include({
       ttl: extendResult.blockHeight + 10000
     })
@@ -137,6 +143,7 @@ describe('Aens', function () {
     const claim = await aeSdk.aensQuery(name)
     const current = await aeSdk.address()
     const onAccount = aeSdk.addresses().find(acc => acc !== current)
+    if (onAccount == null) throw new UnexpectedTsError()
     await claim.transfer(onAccount)
 
     const claim2 = await aeSdk.aensQuery(name)
@@ -147,7 +154,9 @@ describe('Aens', function () {
 
   it('revoke names', async () => {
     const current = await aeSdk.address()
-    const onAccount = aeSdk.accounts[aeSdk.addresses().find(acc => acc !== current)]
+    const onAccountIndex = aeSdk.addresses().find(acc => acc !== current)
+    if (onAccountIndex == null) throw new UnexpectedTsError()
+    const onAccount = aeSdk.accounts[onAccountIndex]
     const aensName = await aeSdk.aensQuery(name)
 
     const revoke = await aensName.revoke({ onAccount })
@@ -162,6 +171,7 @@ describe('Aens', function () {
 
     const preclaim = await aeSdk.aensPreclaim(name, { onAccount })
     preclaim.should.be.an('object')
+    if (preclaim.tx?.accountId == null) throw new UnexpectedTsError()
     preclaim.tx.accountId.should.be.equal(onAccount)
   })
 
@@ -178,12 +188,14 @@ describe('Aens', function () {
       claim.should.be.an('object')
 
       const bidFee = computeBidFee(name)
-      const bid = await aeSdk.aensBid(name, bidFee, { onAccount })
+      const bid: Awaited<ReturnType<typeof aeSdk.aensClaim>> =
+        await aeSdk.aensBid(name, bidFee, { onAccount })
       bid.should.be.an('object')
 
       const isAuctionFinished = await aeSdk.getName(name).catch(() => false)
       isAuctionFinished.should.be.equal(false)
 
+      if (bid.blockHeight == null) throw new UnexpectedTsError()
       const auctionEndBlock = computeAuctionEndBlock(name, bid.blockHeight)
       console.log(`BID STARTED AT ${bid.blockHeight} WILL END AT ${auctionEndBlock}`)
     })

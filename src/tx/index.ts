@@ -46,9 +46,16 @@ export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
 // TODO: find a better name or rearrange methods
 export async function _buildTx<TxType extends TX_TYPE> (
   txType: TxType,
-  { denomination, ..._params }:
+  { denomination, absoluteTtl, ..._params }:
   Omit<Parameters<typeof syncBuildTx<TxType, 'tx'>>[0], 'fee' | 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'>
-  & { onNode: Node, fee?: Int, nonce?: number, ttl?: number, denomination?: AE_AMOUNT_FORMATS }
+  & {
+    onNode: Node
+    fee?: Int
+    nonce?: number
+    ttl?: number
+    denomination?: AE_AMOUNT_FORMATS
+    absoluteTtl?: boolean
+  }
   & (TxType extends TX_TYPE.oracleExtend | TX_TYPE.oracleResponse ? { callerId: EncodedData<'ak'> } : {})
   & (TxType extends TX_TYPE.contractCreate | TX_TYPE.gaAttach ? { ctVersion?: CtVersion } : {})
   & (TxType extends TX_TYPE.contractCall | TX_TYPE.oracleRegister
@@ -109,7 +116,9 @@ export async function _buildTx<TxType extends TX_TYPE> (
   const senderId = params[senderKey]
   // TODO: do this check on TypeScript level
   if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`)
-  const extraParams = await prepareTxParams(txType, { ...params, senderId, denomination })
+  const extraParams = await prepareTxParams(
+    txType, { ...params, senderId, denomination, absoluteTtl }
+  )
   return syncBuildTx({ ...params, ...extraParams } as any, txType, { denomination }).tx
 }
 
@@ -161,7 +170,8 @@ export async function prepareTxParams (
     vsn,
     strategy,
     denomination,
-    onNode
+    onNode,
+    ...txParams
   }: Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> & {
     senderId: EncodedData<'ak'>
     vsn?: number
@@ -182,6 +192,6 @@ export async function prepareTxParams (
 
   const fee = f != null
     ? new BigNumber(f)
-    : calculateMinFee(txType, { params: { ...arguments[1], nonce, ttl }, vsn, denomination })
+    : calculateMinFee(txType, { params: { ...txParams, senderId, nonce, ttl }, vsn, denomination })
   return { fee, ttl, nonce }
 }
