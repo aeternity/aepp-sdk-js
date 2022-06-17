@@ -23,7 +23,7 @@
  * repository.
  */
 
-import { send } from './spend'
+import { send, SendOptions } from './spend'
 import { mapObject, pause } from './utils/other'
 import { oracleQueryId, decode, encode } from './tx/builder/helpers'
 import { unpackTx } from './tx/builder'
@@ -53,18 +53,7 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
  */
 export async function getOracleObject (
   oracleId: EncodedData<'ok'>, options: { onNode: Node, onAccount: AccountBase }
-): Promise<
-  Awaited<ReturnType<Node['getOracleByPubkey']>> & {
-    id: EncodedData<'ok'>
-    queries: OracleQueries
-    // TODO: replace getOracleObject with a class
-    pollQueries: (cb: Parameters<typeof pollForQueries>[1]) => ReturnType<typeof pollForQueries>
-    postQuery: Function
-    respondToQuery: Function
-    extendOracle: Function
-    getQuery: Function
-  }
-  > {
+): Promise<GetOracleObjectReturnType> {
   return {
     ...await options.onNode.getOracleByPubkey(oracleId),
     queries: (await options.onNode.getOracleQueriesByPubkey(oracleId)).oracleQueries,
@@ -87,6 +76,17 @@ export async function getOracleObject (
         }
       ])
   } as any
+}
+
+interface GetOracleObjectReturnType extends Awaited<ReturnType<Node['getOracleByPubkey']>> {
+  id: EncodedData<'ok'>
+  queries: OracleQueries
+  // TODO: replace getOracleObject with a class
+  pollQueries: (cb: Parameters<typeof pollForQueries>[1]) => ReturnType<typeof pollForQueries>
+  postQuery: Function
+  respondToQuery: Function
+  extendOracle: Function
+  getQuery: Function
 }
 
 /**
@@ -136,17 +136,8 @@ export function pollForQueries (
 export async function getQueryObject (
   oracleId: EncodedData<'ok'>,
   queryId: EncodedData<'oq'>,
-  options: Parameters<typeof respondToQuery>[3] & Parameters<typeof pollForQueryResponse>[2]
-): Promise<
-  Awaited<ReturnType<Node['getOracleQueryByPubkeyAndQueryId']>> & {
-    decodedQuery: string
-    decodedResponse: string
-    respond: (response: string, options?: Parameters<typeof respondToQuery>[3]) =>
-    ReturnType<typeof respondToQuery>
-    pollForResponse: (options?: Parameters<typeof pollForQueryResponse>[2]) =>
-    ReturnType<typeof pollForQueryResponse>
-  }
-  > {
+  options: RespondToQueryOptions & Parameters<typeof pollForQueryResponse>[2]
+): Promise<GetQueryObjectReturnType> {
   const record = await options.onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
   return {
     ...record,
@@ -157,6 +148,15 @@ export async function getQueryObject (
     pollForResponse: async (opt) =>
       await pollForQueryResponse(oracleId, queryId, { ...options, ...opt })
   }
+}
+
+interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQueryByPubkeyAndQueryId']>> {
+  decodedQuery: string
+  decodedResponse: string
+  respond: (response: string, options?: Parameters<typeof respondToQuery>[3]) =>
+  ReturnType<typeof respondToQuery>
+  pollForResponse: (options?: Parameters<typeof pollForQueryResponse>[2]) =>
+  ReturnType<typeof pollForQueryResponse>
 }
 
 /**
@@ -198,18 +198,7 @@ export async function pollForQueryResponse (
  * @returns Oracle object
  */
 export async function registerOracle (
-  queryFormat: string,
-  responseFormat: string,
-  options: Parameters<typeof send>[1] & Parameters<typeof getOracleObject>[1]
-  & BuildTxOptions<
-  TX_TYPE.oracleRegister,
-  'accountId' | 'queryFormat' | 'responseFormat' | 'queryFee' | 'oracleTtlType' | 'oracleTtlValue'
-  >
-  & {
-    queryFee?: number | string | BigNumber
-    oracleTtlType?: ORACLE_TTL_TYPES
-    oracleTtlValue?: number
-  }
+  queryFormat: string, responseFormat: string, options: RegisterOracleOptions
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const accountId = await options.onAccount.address(options)
   const oracleRegisterTx = await _buildTx(TX_TYPE.oracleRegister, {
@@ -227,6 +216,15 @@ export async function registerOracle (
   }
 }
 
+type RegisterOracleOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
+& BuildTxOptions<TX_TYPE.oracleRegister, 'accountId' | 'queryFormat' | 'responseFormat' | 'queryFee' | 'oracleTtlType' | 'oracleTtlValue'>
+& {
+  queryFee?: number | string | BigNumber
+  oracleTtlType?: ORACLE_TTL_TYPES
+  oracleTtlValue?: number
+}
+interface RegisterOracleOptions extends RegisterOracleOptionsType {}
+
 /**
  * Post query to oracle
  * @param oracleId - Oracle public key
@@ -240,18 +238,7 @@ export async function registerOracle (
  * @returns Query object
  */
 export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
-  query: string,
-  options: Parameters<typeof send>[1] & Parameters<typeof getQueryObject>[2]
-  & BuildTxOptions<
-  TX_TYPE.oracleQuery,
-  'oracleId' | 'senderId' | 'query' | 'queryTtlType' | 'queryTtlValue' | 'responseTtlType' | 'responseTtlValue'
-  >
-  & {
-    queryTtlType?: ORACLE_TTL_TYPES
-    queryTtlValue?: number
-    responseTtlType?: ORACLE_TTL_TYPES
-    responseTtlValue?: number
-  }
+  query: string, options: PostQueryToOracleOptions
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getQueryObject>>> {
   options.queryFee ??= (await options.onNode.getOracleByPubkey(oracleId)).queryFee.toString()
   const senderId = await options.onAccount.address(options)
@@ -274,6 +261,17 @@ export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
   }
 }
 
+type PostQueryToOracleOptionsType = Parameters<typeof send>[1]
+& Parameters<typeof getQueryObject>[2]
+& BuildTxOptions<TX_TYPE.oracleQuery, 'oracleId' | 'senderId' | 'query' | 'queryTtlType' | 'queryTtlValue' | 'responseTtlType' | 'responseTtlValue'>
+& {
+  queryTtlType?: ORACLE_TTL_TYPES
+  queryTtlValue?: number
+  responseTtlType?: ORACLE_TTL_TYPES
+  responseTtlValue?: number
+}
+interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
+
 /**
  * Extend oracle ttl
  * @param oracleId - Oracle public key
@@ -286,9 +284,7 @@ export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
  */
 export async function extendOracleTtl (
   oracleId: EncodedData<'ok'>,
-  options: Parameters<typeof send>[1] & Parameters<typeof getOracleObject>[1]
-  & BuildTxOptions<TX_TYPE.oracleExtend, 'oracleTtlType' | 'oracleTtlValue' | 'callerId' | 'oracleId'>
-  & { oracleTtlType?: ORACLE_TTL_TYPES, oracleTtlValue?: number }
+  options: ExtendOracleTtlOptions
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const oracleExtendTx = await _buildTx(TX_TYPE.oracleExtend, {
     oracleTtlType: ORACLE_TTL.type,
@@ -302,6 +298,11 @@ export async function extendOracleTtl (
     ...await getOracleObject(oracleId, options)
   }
 }
+
+type ExtendOracleTtlOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
+& BuildTxOptions<TX_TYPE.oracleExtend, 'oracleTtlType' | 'oracleTtlValue' | 'callerId' | 'oracleId'>
+& { oracleTtlType?: ORACLE_TTL_TYPES, oracleTtlValue?: number }
+interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
 
 /**
  * Extend oracle ttl
@@ -318,9 +319,7 @@ export async function respondToQuery (
   oracleId: EncodedData<'ok'>,
   queryId: EncodedData<'oq'>,
   response: string,
-  options: Parameters<typeof send>[1] & Parameters<typeof getOracleObject>[1]
-  & BuildTxOptions<TX_TYPE.oracleResponse, 'callerId' | 'oracleId' | 'queryId' | 'response' | 'responseTtlType' | 'responseTtlValue'>
-  & { responseTtlType?: ORACLE_TTL_TYPES, responseTtlValue?: number }
+  options: RespondToQueryOptions
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const oracleRespondTx = await _buildTx(TX_TYPE.oracleResponse, {
     responseTtlType: RESPONSE_TTL.type,
@@ -336,3 +335,8 @@ export async function respondToQuery (
     ...await getOracleObject(oracleId, options)
   }
 }
+
+type RespondToQueryOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
+& BuildTxOptions<TX_TYPE.oracleResponse, 'callerId' | 'oracleId' | 'queryId' | 'response' | 'responseTtlType' | 'responseTtlValue'>
+& { responseTtlType?: ORACLE_TTL_TYPES, responseTtlValue?: number }
+interface RespondToQueryOptions extends RespondToQueryOptionsType {}

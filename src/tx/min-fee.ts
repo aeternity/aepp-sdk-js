@@ -118,9 +118,7 @@ function buildFee (
  * ```
  */
 export default function calculateMinFee (
-  txType: TX_TYPE,
-  { params, vsn, denomination }:
-  { params: TxParamsCommon, vsn?: number, denomination?: AE_AMOUNT_FORMATS }
+  txType: TX_TYPE, { params, vsn, denomination }: CalculateMinFeeOptions
 ): BigNumber {
   let fee = new BigNumber(0)
   let previousFee
@@ -129,4 +127,10 @@ export default function calculateMinFee (
     fee = buildFee(txType, { params: { ...params, fee }, vsn, denomination })
   } while (!fee.eq(previousFee))
   return fee
+}
+
+interface CalculateMinFeeOptions {
+  params: TxParamsCommon
+  vsn?: number
+  denomination?: AE_AMOUNT_FORMATS
 }

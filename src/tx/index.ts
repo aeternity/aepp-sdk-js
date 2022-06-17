@@ -172,14 +172,7 @@ export async function prepareTxParams (
     denomination,
     onNode,
     ...txParams
-  }: Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> & {
-    senderId: EncodedData<'ak'>
-    vsn?: number
-    absoluteTtl?: boolean
-    strategy?: 'continuity' | 'max'
-    denomination?: AE_AMOUNT_FORMATS
-    onNode: Node
-  }
+  }: PrepareTxParamsOptions
 ): Promise<{ fee: BigNumber, ttl: number, nonce: number }> {
   nonce ??= (
     await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
@@ -194,4 +187,13 @@ export async function prepareTxParams (
     ? new BigNumber(f)
     : calculateMinFee(txType, { params: { ...txParams, senderId, nonce, ttl }, vsn, denomination })
   return { fee, ttl, nonce }
+}
+
+interface PrepareTxParamsOptions extends Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> {
+  senderId: EncodedData<'ak'>
+  vsn?: number
+  absoluteTtl?: boolean
+  strategy?: 'continuity' | 'max'
+  denomination?: AE_AMOUNT_FORMATS
+  onNode: Node
 }

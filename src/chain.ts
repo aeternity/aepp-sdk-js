@@ -57,20 +57,8 @@ export function _getPollInterval (
 export async function sendTransaction (
   tx: EncodedData<'tx'>,
   { onNode, onAccount, verify = true, waitMined = true, confirm, ...options }:
-  {
-    onNode: Node
-    onAccount?: AccountBase
-    verify?: boolean
-    waitMined?: boolean
-    confirm?: boolean | number
-  } & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
-): Promise<
-  Partial<TransformNodeType<SignedTx>> & {
-    hash: EncodedData<'th'>
-    rawTx: EncodedData<'tx'>
-    confirmationHeight?: number
-  }
-  > {
+  SendTransactionOptions
+): Promise<SendTransactionReturnType> {
   if (verify) {
     const validation = await verifyTransaction(tx, onNode)
     if (validation.length > 0) {
@@ -113,6 +101,20 @@ export async function sendTransaction (
       verifyTx: async () => await verifyTransaction(tx, onNode)
     })
   }
+}
+
+type SendTransactionOptionsType = {
+  onNode: Node
+  onAccount?: AccountBase
+  verify?: boolean
+  waitMined?: boolean
+  confirm?: boolean | number
+} & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
+interface SendTransactionOptions extends SendTransactionOptionsType {}
+interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
+  hash: EncodedData<'th'>
+  rawTx: EncodedData<'tx'>
+  confirmationHeight?: number
 }
 
 /**

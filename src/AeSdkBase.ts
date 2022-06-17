@@ -295,8 +295,7 @@ type TransformMethods <Methods extends { [key: string]: Function }> =
       : never
   }
 
-type AeSdkBaseWithMethods = new (options: ConstructorParameters<typeof AeSdkBase>[0]) =>
-AeSdkBase & TransformMethods<typeof methods>
+interface AeSdkBaseMethods extends TransformMethods<typeof methods> {}
 
 Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
   methods,
@@ -317,4 +316,5 @@ Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
   ]
 ))
 
-export default AeSdkBase as AeSdkBaseWithMethods
+export default AeSdkBase as new (options: ConstructorParameters<typeof AeSdkBase>[0]) =>
+AeSdkBase & AeSdkBaseMethods

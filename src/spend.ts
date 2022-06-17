@@ -32,12 +32,7 @@ import AccountBase from './account/Base'
  * valid
  * @returns Transaction
  */
-export async function send (
-  tx: EncodedData<'tx'>,
-  options: Parameters<AccountBase['signTransaction']>[1] & Parameters<typeof sendTransaction>[1]
-  & Partial<Omit<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>>
-  & Pick<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>
-): ReturnType<typeof sendTransaction> {
+export async function send (tx: EncodedData<'tx'>, options: SendOptions): Promise<SendReturnType> {
   const { contractId, authFun = undefined } = options.innerTx === true
     ? { contractId: null }
     : await getAccount(await options.onAccount.address(options), options)
@@ -51,6 +46,12 @@ export async function send (
     ? { hash: buildTxHash(signed), rawTx: signed }
     : await sendTransaction(signed, options)
 }
+
+type SendOptionsType = Parameters<AccountBase['signTransaction']>[1] & Parameters<typeof sendTransaction>[1]
+& Partial<Omit<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>>
+& Pick<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>
+export interface SendOptions extends SendOptionsType {}
+interface SendReturnType extends Awaited<ReturnType<typeof sendTransaction>> {}
 
 export async function signUsingGA (
   tx: EncodedData<'tx'>,
@@ -72,8 +73,7 @@ export async function signUsingGA (
 export async function spend (
   amount: number | string,
   recipientIdOrName: EncodedData<'ak'> | AensName,
-  options: BuildTxOptions<TX_TYPE.spend, 'senderId' | 'recipientId' | 'amount'>
-  & Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & Parameters<typeof send>[1]
+  options: SpendOptions
 ): ReturnType<typeof send> {
   return await send(
     await _buildTx(TX_TYPE.spend, {
@@ -86,6 +86,10 @@ export async function spend (
   )
 }
 
+type SpendOptionsType = BuildTxOptions<TX_TYPE.spend, 'senderId' | 'recipientId' | 'amount'>
+& Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendOptions
+interface SpendOptions extends SpendOptionsType {}
+
 // TODO: Rename to spendFraction
 /**
  * Send a fraction of coin balance to another account
@@ -97,8 +101,7 @@ export async function spend (
 export async function transferFunds (
   fraction: number | string,
   recipientIdOrName: AensName | EncodedData<'ak'>,
-  options: BuildTxOptions<TX_TYPE.spend, 'senderId' | 'recipientId' | 'amount'>
-  & Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & Parameters<typeof send>[1]
+  options: TransferFundsOptions
 ): ReturnType<typeof send> {
   if (fraction < 0 || fraction > 1) {
     throw new ArgumentError('fraction', 'a number between 0 and 1', fraction)
@@ -121,6 +124,10 @@ export async function transferFunds (
   )
 }
 
+type TransferFundsOptionsType = BuildTxOptions<TX_TYPE.spend, 'senderId' | 'recipientId' | 'amount'>
+& Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendOptions
+interface TransferFundsOptions extends TransferFundsOptionsType {}
+
 /**
  * Submit transaction of another account paying for it (fee and gas)
  * @param transaction - tx_<base64>-encoded transaction
@@ -128,9 +135,7 @@ export async function transferFunds (
  * @returns Object Transaction
  */
 export async function payForTransaction (
-  transaction: EncodedData<'tx'>,
-  options: BuildTxOptions<TX_TYPE.payingFor, 'payerId' | 'tx'> & { onAccount: AccountBase }
-  & Parameters<typeof send>[1]
+  transaction: EncodedData<'tx'>, options: PayForTransactionOptions
 ): ReturnType<typeof send> {
   return await send(
     await _buildTx(
@@ -139,4 +144,9 @@ export async function payForTransaction (
     ),
     options
   )
+}
+
+interface PayForTransactionOptions extends
+  BuildTxOptions<TX_TYPE.payingFor, 'payerId' | 'tx'>, SendOptions {
+  onAccount: AccountBase
 }
