@@ -62,7 +62,7 @@ async function delegateSignatureCommon (
  * @returns Signature for delegation
  * @example
  * ```js
- * const aeSdk = await Universal({ ... })
+ * const aeSdk = new AeSdk({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const name = 'example.chain' // AENS name
  * const onAccount = await aeSdk.address() // Sign with a specific account
@@ -97,7 +97,7 @@ export async function createAensDelegationSignature (
  * @returns Signature for delegation
  * @example
  * ```js
- * const aeSdk = await Universal({ ... })
+ * const aeSdk = new AeSdk({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const queryId = 'oq_...' // Oracle Query Id
  * const onAccount = await aeSdk.address() // Sign with a specific account

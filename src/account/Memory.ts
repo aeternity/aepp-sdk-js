@@ -29,7 +29,7 @@ export interface Keypair {
 }
 
 /**
- * In-memory account stamp
+ * In-memory account class
  */
 export default class AccountMemory extends AccountBase {
   isGa: boolean
