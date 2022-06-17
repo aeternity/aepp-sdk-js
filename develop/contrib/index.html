@@ -912,13 +912,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#composing-new-flavors" class="md-nav__link">
-    Composing new Flavors
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#installation-linking" class="md-nav__link">
     Installation / Linking
   </a>
@@ -1030,13 +1023,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#composing-new-flavors" class="md-nav__link">
-    Composing new Flavors
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#installation-linking" class="md-nav__link">
     Installation / Linking
   </a>
@@ -1071,9 +1057,6 @@
 low-level access to it's endpoints, when necessary.</p>
 <p>It uses the following Javascript technologies and principles:</p>
 <ul>
-<li><a href="http://stampit.js.org/">stampit</a> provides composable Factories based on the <a href="https://github.com/stampit-org/stamp-specification">Stamp
-  Specification</a>. This is how aepp-sdk approached the <a href="https://medium.com/front-end-hacking/classless-javascript-composition-over-inheritance-6b27c35893b1">composition over
-  inheritance</a> principle.</li>
 <li><a href="https://github.com/dwyl/Javascript-the-Good-Parts-notes">JavaScript the Good Parts</a> (because Crockford is always right)</li>
 <li><a href="https://hacks.mozilla.org/2015/08/es6-in-depth-modules/">ES6 modules</a>, using <code>export</code> and <code>import</code></li>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">Promises</a> using ES7 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function">async/await</a> syntax, where applicable</li>
@@ -1106,13 +1089,13 @@ low-level access to it's endpoints, when necessary.</p>
 npm run docs:examples <span class="o">&amp;&amp;</span> npm run docs:api
 </code></pre></div>
 <h2 id="building">Building</h2>
-<p>aepp-sdk is built using <a href="https://pnpm.js.org/">pnpm</a>. In order to build a development version, launch the <code>build:dev</code> command.</p>
-<div class="highlight"><pre><span></span><code>pnpm install
-pnpm run build:dev
+<p>aepp-sdk is built using npm. In order to build a development version, launch the <code>build:dev</code> command.</p>
+<div class="highlight"><pre><span></span><code>npm install
+npm run build:dev
 </code></pre></div>
 <h2 id="testing">Testing</h2>
 <p>To test, launch the <code>test</code> command. This will run <a href="https://mochajs.org/">mocha</a>'s tests locally.</p>
-<div class="highlight"><pre><span></span><code>pnpm run <span class="nb">test</span>
+<div class="highlight"><pre><span></span><code>npm <span class="nb">test</span>
 </code></pre></div>
 <p>This repository also includes a docker-compose file, to allow you to <strong>run your own æternity node locally</strong>. If you want to do so, <strong>from the root of the project</strong>:</p>
 <ol>
@@ -1129,23 +1112,6 @@ pnpm run build:dev
 <li>Run <code>docker-compose up node</code></li>
 <li>Congrats! you're now running your own æternity node locally.</li>
 </ol>
-<h2 id="composing-new-flavors">Composing new Flavors</h2>
-<p>You can also "compose" your own flavor by mixing 2 or more flavors likes so:</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Wallet</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
-
-<span class="c1">// make a &quot;mixed flavor&quot; containing Wallet and Contracts flavors</span><span class="w"></span>
-<span class="nx">Wallet</span><span class="p">.</span><span class="nx">compose</span><span class="p">(</span><span class="nx">Contract</span><span class="p">)({</span><span class="w"></span>
-<span class="w">            </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">secretKey</span><span class="o">:</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">priv</span><span class="p">,</span><span class="w"> </span><span class="nx">publicKey</span><span class="o">:</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">pub</span><span class="p">}})],</span><span class="w"></span>
-<span class="w">            </span><span class="nx">address</span><span class="o">:</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">pub</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nx">onTx</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// or a function to Guard the Rpc client</span><span class="w"></span>
-<span class="w">            </span><span class="nx">onChain</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// or a function to Guard the Rpc client</span><span class="w"></span>
-<span class="w">            </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// or a function to Guard the Rpc client</span><span class="w"></span>
-<span class="w">            </span><span class="nx">networkId</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ae_uat&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">ae</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="c1">// ae is your initialised client now! :)</span><span class="w"></span>
-<span class="w">            </span><span class="c1">// ...</span><span class="w"></span>
-</code></pre></div>
 <p>The WebPack compilation provides two different build artifacts in <code>dist/</code>, one
 for Node.js and one for browsers. When referencing aepp-sdk through any modern
 build tooling, it should pick the right one automatically through the entry

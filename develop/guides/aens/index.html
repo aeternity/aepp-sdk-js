@@ -1136,7 +1136,7 @@
 <h3 id="pre-claim">Pre-claim</h3>
 <div class="highlight"><pre><span></span><code><span class="c1">// imports</span><span class="w"></span>
 
-<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// init the SDK instance with Universal Stamp</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// init the SDK instance with AeSdk class</span><span class="w"></span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;testNameForTheGuide.chain&#39;</span><span class="w"></span>
 
@@ -1312,7 +1312,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="w">  </span><span class="nx">channel</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 
-<span class="c1">// using aeSdk directly (instance of Universal Stamp)</span><span class="w"></span>
+<span class="c1">// using aeSdk directly (instance of AeSdk class)</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">nameUpdateTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">pointers</span><span class="p">)</span><span class="w"></span>
 
 <span class="c1">// OR using the instance of a name</span><span class="w"></span>
@@ -1365,7 +1365,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <p>In case you want to extend a name using a custom TTL and keep the current pointers you can do this as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;testNameForTheGuide.chain&#39;</span><span class="w"></span>
 
-<span class="c1">// using aeSdk directly (instance of Universal Stamp)</span><span class="w"></span>
+<span class="c1">// using aeSdk directly (instance of AeSdk class</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">nameUpdateTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">nameTtl</span><span class="o">:</span><span class="w"> </span><span class="mf">100000</span><span class="p">,</span><span class="w"> </span><span class="nx">extendPointers</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 
 <span class="c1">// OR using the instance of a name</span><span class="w"></span>
@@ -1409,7 +1409,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <p>In some cases you might want to transfer the ownership of a name to another account. Of course this is also possible and you can do that as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">recipient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="w"></span>
 
-<span class="c1">// using aeSdk directly (instance of Universal Stamp)</span><span class="w"></span>
+<span class="c1">// using aeSdk directly (instance of AeSdk class)</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">nameTransferTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">)</span><span class="w"></span>
 
 <span class="c1">// OR using the instance of a name</span><span class="w"></span>
@@ -1441,7 +1441,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 </code></pre></div>
 <h2 id="4-revoke-a-name">4. Revoke a name</h2>
 <p>In case you want to revoke a name prior to its expiration for whatever reason you can do that as follows:
-<div class="highlight"><pre><span></span><code><span class="c1">// using aeSdk directly (instance of Universal Stamp)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// using aeSdk directly (instance of AeSdk class)</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">nameRevokeTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span><span class="w"></span>
 
 <span class="c1">// OR using the instance of a name</span><span class="w"></span>
@@ -1480,7 +1480,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <p>This functionality could for example be used to build an AENS marketplace.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// imports</span><span class="w"></span>
 
-<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// init the SDK instance with Universal Stamp</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// init the SDK instance with AeSdk class</span><span class="w"></span>
 
 <span class="c1">// contract address</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">contractId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ct_asd2ks...&#39;</span><span class="w"></span>

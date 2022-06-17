@@ -1018,7 +1018,7 @@ or obtaining it via http compiler (default) you will be able to access the <code
 </ul>
 <p>Of course it is also possible to decode the event log if you request the transaction details from the node for a transaction that has been mined already. You can request the transaction details by providing the tx-hash and then decode the event log using the <code>contractInstance</code> as follows:
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">txHash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="c1">// aeSdk is an instance of the Universal Stamp</span><span class="w"></span>
+<span class="c1">// aeSdk is an instance of the AeSdk class</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">txInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">getTransactionInfoByHash</span><span class="p">(</span><span class="nx">txHash</span><span class="p">)</span><span class="w"></span>
 
 <span class="c1">// decode events using contract instance</span><span class="w"></span>

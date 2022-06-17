@@ -1081,12 +1081,12 @@ Some of these are common and can be provided for each transaction type. Others a
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sender</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">recipient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">sender</span><span class="p">,</span><span class="w"> </span><span class="nx">denomination</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ae&#39;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="c1">// optional options object</span><span class="w"></span>
-<span class="c1">// aeSdk is an instance of the Universal Stamp</span><span class="w"></span>
+<span class="c1">// aeSdk is an instance of the AeSdk class</span><span class="w"></span>
 <span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span><span class="w"> </span><span class="c1">// amount, recipient and (optional) options</span><span class="w"></span>
 </code></pre></div></p>
 <p>Note:</p>
 <ul>
-<li>Without the <code>options</code> object the sender would be the first account defined in the accounts array that is used to initialize the Universal Stamp and the recipient would receive <code>1 aetto</code> instead of <code>1 AE</code>.</li>
+<li>Without the <code>options</code> object the sender would be some other account selected in the instance of AeSdk and the recipient would receive <code>1 aetto</code> instead of <code>1 AE</code>.</li>
 </ul>
 <h2 id="common-options">Common options</h2>
 <p>These options are common and can be provided to every tx-type:</p>

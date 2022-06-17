@@ -995,9 +995,9 @@
 <h1 id="quick-start">Quick Start</h1>
 <p>In this example we will send 1 <em>AE</em> coin from one account to another</p>
 <h2 id="1-specify-imports">1. Specify imports</h2>
-<p>For the following snippets in the guide you need to specify multiple imports. Most imports like <code>Universal</code>, <code>MemoryAccount</code> &amp; <code>Node</code> are <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamps</a> that compose certain functionalities. Others utility functions like <code>generateKeyPair</code> also can be imported.</p>
+<p>For the following snippets in the guide you need to specify multiple imports.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="nx">Universal</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"></span>
 <span class="w">  </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"></span>
 <span class="w">  </span><span class="nx">Node</span><span class="p">,</span><span class="w"></span>
 <span class="w">  </span><span class="nx">AE_AMOUNT_FORMATS</span><span class="p">,</span><span class="w"></span>
@@ -1014,7 +1014,7 @@
 <h2 id="4-interact-with-the-ternity-blockchain">4. Interact with the æternity blockchain</h2>
 <p>This example shows:</p>
 <ul>
-<li>how to create an instance of the SDK using the <code>Universal</code> <a href="https://stampit.js.org/essentials/what-is-a-stamp">Stamp</a></li>
+<li>how to create an instance of the SDK using the <code>Aesdk</code> class</li>
 <li>how to spend (send) 1 AE from the account the SDK instance was initialized with to some other AE address</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="w"></span>
@@ -1026,11 +1026,12 @@
 
 <span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">NODE_URL</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"></span>
 <span class="w">    </span><span class="nx">compilerUrl</span><span class="o">:</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="p">,</span><span class="w"></span>
 <span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
-<span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">senderAccount</span><span class="p">]</span><span class="w"></span>
 <span class="w">  </span><span class="p">})</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Add sender account to the aeSdk state</span><span class="w"></span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">addAccount</span><span class="p">(</span><span class="nx">senderAccount</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 
 <span class="w">  </span><span class="c1">// spend one AE</span><span class="w"></span>
 <span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&lt;RECIPIENT_PUBLIC_KEY&gt;&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
