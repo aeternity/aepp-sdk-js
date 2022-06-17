@@ -28,7 +28,7 @@ import {
 import {
   ArgumentError, UnsupportedProtocolError, UnknownTxError, InvalidTxParamsError
 } from '../utils/errors'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import Node from '../node'
 import { EncodedData } from '../utils/encoder'
 import { buildTx as syncBuildTx, unpackTx } from './builder/index'
