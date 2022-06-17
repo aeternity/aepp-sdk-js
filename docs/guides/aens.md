@@ -18,7 +18,7 @@ Claiming an AENS name requires you (at least) 2 transactions:
 ```js
 // imports
 
-const aeSdk = await Universal({ ... }) // init the SDK instance with Universal Stamp
+const aeSdk = new AeSdk({ ... }) // init the SDK instance with AeSdk class
 
 const name = 'testNameForTheGuide.chain'
 
@@ -188,7 +188,7 @@ const pointers = {
   channel: 'ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
 }
 
-// using aeSdk directly (instance of Universal Stamp)
+// using aeSdk directly (instance of AeSdk class)
 const nameUpdateTx = await aeSdk.aensUpdate(name, pointers)
 
 // OR using the instance of a name
@@ -244,7 +244,7 @@ In case you want to extend a name using a custom TTL and keep the current pointe
 ```js
 const name = 'testNameForTheGuide.chain'
 
-// using aeSdk directly (instance of Universal Stamp)
+// using aeSdk directly (instance of AeSdk class
 const nameUpdateTx = await aeSdk.aensUpdate(name, {}, { nameTtl: 100000, extendPointers: true })
 
 // OR using the instance of a name
@@ -289,7 +289,7 @@ In some cases you might want to transfer the ownership of a name to another acco
 ```js
 const recipient = 'ak_...'
 
-// using aeSdk directly (instance of Universal Stamp)
+// using aeSdk directly (instance of AeSdk class)
 const nameTransferTx = await aeSdk.aensTransfer(name, recipient)
 
 // OR using the instance of a name
@@ -323,7 +323,7 @@ console.log(nameTransferTx)
 ## 4. Revoke a name
 In case you want to revoke a name prior to its expiration for whatever reason you can do that as follows:
 ```js
-// using aeSdk directly (instance of Universal Stamp)
+// using aeSdk directly (instance of AeSdk class)
 const nameRevokeTx = await aeSdk.aensRevoke(name)
 
 // OR using the instance of a name
@@ -366,7 +366,7 @@ This functionality could for example be used to build an AENS marketplace.
 ```js
 // imports
 
-const aeSdk = await Universal({ ... }) // init the SDK instance with Universal Stamp
+const aeSdk = new AeSdk({ ... }) // init the SDK instance with AeSdk class
 
 // contract address
 const contractId = 'ct_asd2ks...'

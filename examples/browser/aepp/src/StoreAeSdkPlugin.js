@@ -1,4 +1,4 @@
-import { RpcAepp, Node } from '@aeternity/aepp-sdk'
+import { AeSdkAepp, Node } from '@aeternity/aepp-sdk'
 
 const TESTNET_NODE_URL = 'https://testnet.aeternity.io'
 const MAINNET_NODE_URL = 'https://mainnet.aeternity.io'
@@ -31,15 +31,15 @@ export default (store) => {
     actions: {
       async initialize ({ commit }) {
         if (aeSdk) return
-        aeSdk = await RpcAepp({
+        aeSdk = new AeSdkAepp({
           name: 'Simple æpp',
           nodes: [
             { name: 'testnet', instance: new Node(TESTNET_NODE_URL) },
             { name: 'mainnet', instance: new Node(MAINNET_NODE_URL) }
           ],
           compilerUrl: COMPILER_URL,
-          onNetworkChange: ({ networkId }) => {
-            const [{ name }] = aeSdk.getNodesInPool()
+          onNetworkChange: async ({ networkId }) => {
+            const [{ name }] = (await aeSdk.getNodesInPool())
               .filter(node => node.nodeNetworkId === networkId)
             aeSdk.selectNode(name)
             commit('setNetworkId', networkId)

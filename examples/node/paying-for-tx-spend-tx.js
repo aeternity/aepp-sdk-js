@@ -31,9 +31,9 @@
 //  - This can be done for ***any*** transaction type!
 
 // ## 1. Specify imports
-// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
+// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
-const { Universal, Node, MemoryAccount, generateKeyPair, TX_TYPE } = require('@aeternity/aepp-sdk')
+const { AeSdk, Node, MemoryAccount, generateKeyPair, TX_TYPE } = require('@aeternity/aepp-sdk')
 
 // **Note**:
 //
@@ -66,19 +66,11 @@ const AMOUNT = 1;
   const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
   const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
   const node = new Node(NODE_URL)
-  const aeSdk = await Universal({
-    nodes: [{ name: 'testnet', instance: node }],
-    accounts: [payerAccount, newUserAccount]
+  const aeSdk = new AeSdk({
+    nodes: [{ name: 'testnet', instance: node }]
   })
-
-  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
-  // asynchronous as it determines the node's version and rest interface automatically. Only once
-  // the Promise is fulfilled, you know you have a working object instance which is assigned to the
-  // `aeSdk` constant in this case.
-  //
-  // Note:
-  //
-  //   - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
+  await aeSdk.addAccount(payerAccount, { select: true })
+  await aeSdk.addAccount(newUserAccount)
 
   // ## 5. Send 1 `aetto` from payer to new user
   const spendTxResult = await aeSdk.spend(

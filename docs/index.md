@@ -30,14 +30,12 @@ Usage:
   <!-- include latest SDK version -->
   <script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
   <script type="text/javascript">
-    Ae.Node({ url: 'https://testnet.aeternity.io' }).then(node => {
-        Ae.Universal({
-              nodes: [{ name: 'testnet', instance: node }]
-            }).then(aeInstance => {
-              aeInstance.height().then(height => {
-                console.log("Current Block Height:" + height)
-              })
-            })
+    const node = new Ae.Node('https://testnet.aeternity.io')
+    const aeSdk = new Ae.AeSdk({
+      nodes: [{ name: 'testnet', instance: node }]
+    })
+    aeSdk.height().then(height => {
+      console.log("Current Block Height:" + height)
     })
   </script>
 </body>

@@ -26,8 +26,8 @@
 //  - transfer AE to another account
 
 // ## 1. Specify imports
-// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
-const { Universal, Node, MemoryAccount } = require('@aeternity/aepp-sdk')
+// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
+const { AeSdk, Node, MemoryAccount } = require('@aeternity/aepp-sdk')
 
 // **Note**:
 //
@@ -61,19 +61,10 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
   // ## 4. Create object instances
   const account = new MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
   const node = new Node(NODE_URL)
-  const aeSdk = await Universal({
-    nodes: [{ name: 'testnet', instance: node }],
-    accounts: [account]
+  const aeSdk = new AeSdk({
+    nodes: [{ name: 'testnet', instance: node }]
   })
-
-  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
-  // asynchronous as it determines the node's version and rest interface automatically. Only once
-  // the Promise is fulfilled, you know you have a working object instance
-  // which is assigned to the `aeSdk` constant in this case.
-  //
-  // Note:
-  //
-  //   - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
+  await aeSdk.addAccount(account, { select: true })
 
   // ## 5. Get AE balance of recipient (before transfer)
   // Before the transfer of AE you can check the AE balance of the recipient.

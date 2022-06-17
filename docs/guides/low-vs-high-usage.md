@@ -6,7 +6,7 @@
 *Alexander Kahl.*
 
 The purist uses the functions generated out of the Swagger
-file. After creating the SDK instance `aeSdk` with the Universal Stamp it exposes a mapping of all `operationId`s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
+file. After creating the SDK instance `aeSdk` with the AeSdk class it exposes a mapping of all `operationId`s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
 based on its hash you would invoke `aeSdk.api.getTransactionByHash('th_...')`.
 
 In this way the SDK is simply a mapping of the raw API calls into
@@ -18,16 +18,19 @@ of chain operations, so the SDK provides abstractions for these.
 Example spend function, using æternity's SDK abstraction.
 
 ```js
-import { MemoryAccount, Node, Universal } from '@aeternity/aepp-sdk'
+import { MemoryAccount, Node, AeSdk } from '@aeternity/aepp-sdk'
 
 async function init () {
   const node = new Node('https://testnet.aeternity.io') // ideally host your own node!
 
-  const aeSdk = await Universal({
+  const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler!
-    accounts: [new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}})],
   })
+  await aeSdk.addAccount(
+    new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}}),
+    { select: true }
+  )
 
   // log transaction info
   console.log(await aeSdk.spend(100, 'ak_...'))
@@ -37,15 +40,18 @@ async function init () {
 ## Low-level SDK usage (use [API](https://aeternity.com/protocol/node/api) endpoints directly)
 Example spend function, using the SDK, talking directly to the [**API**](https://aeternity.com/protocol/node/api):
 ```js
-import { MemoryAccount, Node, Universal } from '@aeternity/aepp-sdk'
+import { MemoryAccount, Node, AeSdk } from '@aeternity/aepp-sdk'
 
 async function spend (amount, recipient) {
   const node = new Node('https://testnet.aeternity.io') // ideally host your own node!
-  const aeSdk = await Universal({
+  const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
     compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler!
-    accounts: [new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}})],
   })
+  await aeSdk.addAccount(
+    new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}}),
+    { select: true }
+  )
 
   // builds an unsigned SpendTx using the debug endpoint of the node's API
   const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {

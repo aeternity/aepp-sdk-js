@@ -29,7 +29,7 @@
 
 <script>
 import {
-  MemoryAccount, RpcWallet, Node, generateKeyPair,
+  MemoryAccount, AeSdkWallet, Node, generateKeyPair,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE,
   RpcConnectionDenyError, RpcRejectedByUserError
 } from '@aeternity/aepp-sdk'
@@ -65,7 +65,7 @@ export default {
       this.aeSdk.selectAccount(this.address)
     },
     async switchNode () {
-      this.nodeName = this.aeSdk.getNodesInPool()
+      this.nodeName = (await this.aeSdk.getNodesInPool())
         .map(({ name }) => name)
         .find(name => name !== this.nodeName)
       this.aeSdk.selectNode(this.nodeName)
@@ -78,7 +78,7 @@ export default {
         throw new RpcRejectedByUserError()
       }
     }
-    this.aeSdk = await RpcWallet({
+    this.aeSdk = new AeSdkWallet({
       id: window.origin,
       type: WALLET_TYPE.window,
       nodes: [
@@ -86,15 +86,6 @@ export default {
         { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
       ],
       compilerUrl: 'https://compiler.aepps.com',
-      accounts: [
-        new MemoryAccount({
-          keypair: {
-            publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
-            secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b',
-          }
-        }),
-        new MemoryAccount({ keypair: generateKeyPair() })
-      ],
       name: 'Wallet Iframe',
       onConnection: (aeppId, params) => {
         if (!confirm(`Client ${params.name} with id ${aeppId} want to connect`)) {
@@ -110,6 +101,14 @@ export default {
         this.shareWalletInfo(clientId)
       }
     })
+    await this.aeSdk.addAccount(new MemoryAccount({
+      keypair: {
+        publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
+        secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b',
+      }
+    }), { select: true })
+    await this.aeSdk.addAccount(new MemoryAccount({ keypair: generateKeyPair() }))
+
     this.nodeName = this.aeSdk.selectedNodeName
     this.address = this.aeSdk.addresses()[0]
 

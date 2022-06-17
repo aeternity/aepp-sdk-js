@@ -113,7 +113,7 @@ BaseError
 ```js
 // import required error classes
 const {
-  Universal,
+  AeSdk,
   Node,
   MemoryAccount,
   generateKeyPair,
@@ -129,10 +129,11 @@ const NEW_USER_KEYPAIR = generateKeyPair()
 const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
 const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
 const node = new Node(NODE_URL)
-const aeSdk = await Universal({
+const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
-  accounts: [payerAccount, newUserAccount]
 })
+await aeSdk.addAccount(payerAccount, { select: true })
+await aeSdk.addAccount(newUserAccount)
 
 // catch exceptions
 try {
