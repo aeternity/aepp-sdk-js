@@ -27,7 +27,7 @@ npm install @aeternity/aepp-sdk
 <!-- src/components/HelloWorld.vue -->
 
 <script>
-import { Universal, Node } from '@aeternity/aepp-sdk'
+import { AeSdk, Node } from '@aeternity/aepp-sdk'
 
 export default {
   name: 'HelloWorld',
@@ -37,11 +37,11 @@ export default {
     }
   },
   async mounted () {
-    // Init required Node stamp
-    const node = await Node({ url: 'https://testnet.aeternity.io' })
+    // Init required Node class
+    const node = new Node('https://testnet.aeternity.io')
 
-    // Init SDK instance with Universal stamp
-    const aeSdk = await Universal({
+    // Init SDK instance with AeSdk class
+    const aeSdk = new AeSdk({
        nodes: [{ name: 'test-net', instance: node }],
     })
     // Start using the SDK

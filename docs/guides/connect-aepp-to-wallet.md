@@ -1,90 +1,107 @@
 # Connect an æpp to a wallet
 
-## Introduction
+This guide describes the 4 steps that are necessary to connect your application to a wallet using the RPC API.
 
-This guide describes the 3 steps that are necessary to connect your application to a wallet using the RPC API.
+## Prerequisites
 
-Note:
+- Install [Superhero Wallet extension](https://wallet.superhero.com/) for simplicity of example.
+You can build your own wallet in the next example
 
-- The steps below are snippets taken from the full implementation of the [Simple æpp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/aepp)
-
-## 1. Initialize the `RpcAepp` Stamp
+## 1. Specify imports and constants and state
 
 ```js
-import { RpcAepp, WalletDetector, BrowserWindowMessageConnection } from '@aeternity/aepp-sdk'
+import { AeSdkAepp, walletDetector, BrowserWindowMessageConnection, Node } from '@aeternity/aepp-sdk'
 
+const TESTNET_NODE_URL = 'https://testnet.aeternity.io'
+const MAINNET_NODE_URL = 'https://mainnet.aeternity.io'
+const COMPILER_URL = 'https://compiler.aepps.com';
+
+export default {
+  data: () => ({
+    aeSdk: null,
+    address: '',
+    balance: 0,
+    nodeInfo: null,
+    connectedAccounts: null
+  }),
+}
+```
+
+## 2. Initialize the `AeSdkAepp` class
+
+```js
 async created () {
-  this.aeSdk = await RpcAepp({
+  this.aeSdk = new AeSdkAepp({
     name: 'Simple Aepp',
     nodes: [
-      { name: 'ae_uat', instance: await Node({ url: TEST_NET_NODE_URL }) },
-      { name: 'ae_mainnet', instance: await Node({ url: MAIN_NET_NODE_INTERNAL_URL }) }
+      { name: 'ae_uat', instance: new Node(TESTNET_NODE_URL) },
+      { name: 'ae_mainnet', instance: new Node(MAINNET_NODE_URL) }
     ],
     compilerUrl: COMPILER_URL,
-    onNetworkChange: async (params) => {
-      this.aeSdk.selectNode(params.networkId)
-      this.nodeInfoResponse = await this.aeSdk.getNodeInfo()
+    onNetworkChange: async ({ networkId }) => {
+      this.aeSdk.selectNode(networkId)
+      this.nodeInfo = await this.aeSdk.getNodeInfo()
     },
-    onAddressChange:  async (addresses) => {
-      this.pub = await this.aeSdk.address()
-      this.balance = await this.aeSdk.balance(this.pub).catch(e => '0')
-      this.addressResponse = await this.aeSdk.address()
+    onAddressChange: async () => {
+      this.address = await this.aeSdk.address()
+      this.balance = await this.aeSdk.getBalance(this.address)
     },
     onDisconnect: () => {
-      this.resetState()
+      // you may want to reset state here
       alert('Disconnected')
     }
   })
-  this.height = await this.aeSdk.height()
-  // start looking for wallets, see step 2.
-  this.scanForWallets()
-  // open iframe with Wallet if run in top window
-  if (window === window.parent) this.openReverseIframe()
+  await this.scanForWallets()
 }
 ```
 
-## 2. Scan for wallets
+## 3. Scan for wallets
+
 ```js
-scanForWallets () {
-  const handleWallets = async function ({ wallets, newWallet }) {
-    newWallet = newWallet || Object.values(wallets)[0]
-    if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
-      this.detector.stopScan()
-      // connect to the wallet, see step 3.
-      await this.connectToWallet(newWallet)
-    }
+methods: {
+  async scanForWallets() {
+    return new Promise((resolve) => {
+      const handleWallets = async function ({ wallets, newWallet }) {
+        newWallet = newWallet || Object.values(wallets)[0]
+        if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
+          stopScan()
+          // connect to the wallet, see step 4.
+          await this.connect(newWallet)
+          resolve()
+        }
+      }
+      const scannerConnection = new BrowserWindowMessageConnection()
+      const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
+    })
   }
-
-  const scannerConnection = BrowserWindowMessageConnection({
-    connectionInfo: { id: 'spy' }
-  })
-  this.detector = WalletDetector({ connection: scannerConnection })
-  this.detector.scan(handleWallets.bind(this))
 }
 ```
 
-## 3. Connect to Wallet
+## 4a. Connect to a wallet
+
+Append method for wallet connection
 
 ```js
-async connectToWallet (wallet) {
-  await this.aeSdk.connectToWallet(await wallet.getConnection())
-  this.accounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
-  this.pub = await this.aeSdk.address()
-  this.onAccount = this.pub
-  this.balance = await this.aeSdk.getBalance(this.pub)
-  this.walletName = this.aeSdk.rpcClient.info.name
-  this.addressResponse = await this.aeSdk.address()
-  this.heightResponse = await this.aeSdk.height()
-  this.nodeInfoResponse = await this.aeSdk.getNodeInfo()
+async connect(wallet) {
+  await this.aeSdk.connectToWallet(wallet.getConnection())
+  this.connectedAccounts = await this.aeSdk.subscribeAddress('subscribe', 'connected')
+  this.address = await this.aeSdk.address()
+  this.balance = await this.aeSdk.getBalance(this.address).catch(() => '0')
+  this.nodeInfo = await this.aeSdk.getNodeInfo()
 }
 ```
 
-## 4. Use Wallet's Node for chain communication
+## 4b. Connect to a wallet and use Wallet's node for on chain communications
 
-AEPP can request the wallet to share its connected node URLs if any to interact with the chain.
+Aepps can ask the wallet to share node, if wallet supports node sharing then the Aepp can communicate with the chain using the same SDK instance.
 
 ```js
-async connectToWallet (wallet) {
-    await this.aeSdk.connectToWallet(await wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
+async connect (wallet) {
+    await this.aeSdk.connectToWallet(wallet.getConnection(), { connectNode: true, name: 'wallet-node', select: true })
 }
 ```
+
+Note:
+
+- The steps above are snippets taken from the full implementation of
+  the [Simple æpp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/aepp)

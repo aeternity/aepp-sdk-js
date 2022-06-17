@@ -10,8 +10,8 @@ You register an oracle that responds with the temperature of the city that is in
 To register an oracle you need to provide a `queryFormat` and a `responseFormat` to the `registerOracle` function of the SDK. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtl`, see [transaction options](../transaction-options.md#oracleregistertx).
 
 ```js
-// init an instance of the SDK using the Universal Stamp
-const aeSdk = await Universal({ ... })
+// init an instance of the SDK using the AeSdk class
+const aeSdk = new AeSdk({ ... })
 
 // set TTL with a delta of 1000 blocks
 const oracleTtl = {type: 'delta', value: 1000}
@@ -51,7 +51,7 @@ const options = {queryFee: 1337, queryTtl: {type: 'delta', value: 20}, responseT
 const oracle = await aeSdk.getOracleObject(oracleId) // in case you need to instantiate the oracle object first
 const query = await oracle.postQuery("{'city': 'Berlin'}", options) // using the oracle instance
 
-// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId
+// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
 const query = await aeSdk.postQueryToOracle(oracleId, "{'city': 'Berlin'}", options)
 ```
 
@@ -70,7 +70,7 @@ const queryId = 'oq_...';
 const query = await aeSdk.getQueryObject(oracleId, queryId) // in case you need to get the query instance first
 const response = await query.pollForResponse({ attempts: 10, interval: 6000 })
 
-// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId
+// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
 const response = await aeSdk.pollForQueryResponse(oracleId, queryId, { attempts: 10, interval: 6000 })
 
 // decode the oracle response
@@ -109,14 +109,14 @@ const options = { onAccount: 'ak_...' } // only the account of the oracle can re
 const query = await aeSdk.getQueryObject(oracleId, queryId)
 await query.respond('{ "temperature": 27.5 }', options)
 
-// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId and the queryId
+// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId and the queryId
 await aeSdk.respondToQuery(oracleId, queryId, '{ "temperature": 27.5 }', options)
 ```
 
 Note:
 
 - Of course the oracle itself would either use an API to get the current temperature for a certain city or ideally directly communicate with measuring devices located in that specific city.
-- If the Universal Stamp is initialized with the oracle's account there is no need to pass the `onAccount` option as this is done implicitely.
+- If the AeSdk class is initialized with the oracle's account there is no need to pass the `onAccount` option as this is done implicitely.
 
 ## 4. Oracle: extend
 As mentioned above an Oracle has a certain TTL that can be specified when registering it. You might want to extend the TTL of the oracle before it expires. You can do that as follows:
@@ -131,7 +131,7 @@ const oracleTtl = { type: 'delta', value: 500 }
 const oracle = await aeSdk.getOracleObject(oracleId)
 const extendedOracle = await oracle.extendOracle(oracleTtl)
 
-// OR using the aeSdk (instance of Universal stamp) directly by providing the oracleId
+// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
 const extendedOracle = await aeSdk.extendOracleTtl(oracleId, oracleTtl)
 ```
 

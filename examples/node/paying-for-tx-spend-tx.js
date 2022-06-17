@@ -31,9 +31,9 @@
 //  - This can be done for ***any*** transaction type!
 
 // ## 1. Specify imports
-// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
-// Additionally you import the `Crypto` utility module to generate a new keypair.
-const { Universal, Node, MemoryAccount, Crypto } = require('@aeternity/aepp-sdk')
+// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
+// Additionally you import the `generateKeyPair` utility function to generate a new keypair.
+const { AeSdk, Node, MemoryAccount, generateKeyPair, TX_TYPE } = require('@aeternity/aepp-sdk')
 
 // **Note**:
 //
@@ -46,7 +46,7 @@ const PAYER_ACCOUNT_KEYPAIR = {
   secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'
 }
 const NODE_URL = 'https://testnet.aeternity.io'
-const NEW_USER_KEYPAIR = Crypto.generateKeyPair()
+const NEW_USER_KEYPAIR = generateKeyPair()
 const AMOUNT = 1;
 
 // Note:
@@ -63,22 +63,14 @@ const AMOUNT = 1;
 // Therefore we are putting our logic into an `async` code block
 (async () => {
   // ## 4. Create object instances
-  const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
-  const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
-  const node = await Node({ url: NODE_URL })
-  const aeSdk = await Universal({
-    nodes: [{ name: 'testnet', instance: node }],
-    accounts: [payerAccount, newUserAccount]
+  const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
+  const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
+  const node = new Node(NODE_URL)
+  const aeSdk = new AeSdk({
+    nodes: [{ name: 'testnet', instance: node }]
   })
-
-  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
-  // asynchronous as it determines the node's version and rest interface automatically. Only once
-  // the Promise is fulfilled, you know you have a working object instance which is assigned to the
-  // `aeSdk` constant in this case.
-  //
-  // Note:
-  //
-  //   - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
+  await aeSdk.addAccount(payerAccount, { select: true })
+  await aeSdk.addAccount(newUserAccount)
 
   // ## 5. Send 1 `aetto` from payer to new user
   const spendTxResult = await aeSdk.spend(
@@ -95,7 +87,7 @@ const AMOUNT = 1;
   //  - The balance should now be 1
 
   // ## 7. Create and sign `SpendTx` on behalf of new user
-  const spendTx = await aeSdk.spendTx({
+  const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
     senderId: await newUserAccount.address(),
     recipientId: await payerAccount.address(),
     amount: AMOUNT

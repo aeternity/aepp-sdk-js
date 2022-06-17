@@ -1,11 +1,7 @@
 <template>
   <h2>Simple æpp</h2>
 
-  <Connect
-    @aeSdk="aeSdk = $event"
-    @address="address = $event"
-    @networkId="networkId = $event"
-  />
+  <Connect />
 
   <div
     v-if="aeSdk"
@@ -30,25 +26,19 @@
   <Component
     v-if="aeSdk && view"
     :is="view"
-    :aeSdk="aeSdk"
-    :address="address"
-    :networkId="networkId"
   />
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Connect from '../../aepp/src/Connect'
 import Basic from '../../aepp/src/Basic'
 import Contracts from '../../aepp/src/Contracts'
 
 export default {
   components: { Connect, Basic, Contracts },
-  data: () => ({
-    view: '',
-    aeSdk: null,
-    address: '',
-    networkId: '',
-  })
+  data: () => ({ view: '' }),
+  computed: mapGetters('aeSdk', ['aeSdk'])
 }
 </script>
 

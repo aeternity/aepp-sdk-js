@@ -7,13 +7,13 @@ The `options` object can be optionally passed to the respective function behind 
 const sender = 'ak_...'
 const recipient = 'ak_...'
 const options = { onAccount: sender, denomination: 'ae' } // optional options object
-// aeSdk is an instance of the Universal Stamp
+// aeSdk is an instance of the AeSdk class
 await aeSdk.spend(1, recipient, options) // amount, recipient and (optional) options
 ```
 
 Note:
 
-- Without the `options` object the sender would be the first account defined in the accounts array that is used to initialize the Universal Stamp and the recipient would receive `1 aetto` instead of `1 AE`.
+- Without the `options` object the sender would be some other account selected in the instance of AeSdk and the recipient would receive `1 aetto` instead of `1 AE`.
 
 ## Common options
 These options are common and can be provided to every tx-type:
@@ -51,8 +51,8 @@ The following options are sepcific for each tx-type.
     - To be used for providing `aettos` (or `AE` with respective denomination) to a contract related transaction.
 - `denomination` (default: `aettos`)
     - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
-- `gas`
-    - Max. amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
+- `gasLimit`
+    - Maximum amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
 - `gasPrice` (default: `1e9`)
     - To increase chances to get your transaction included quickly you can use a higher gasPrice.
 
@@ -91,4 +91,4 @@ The following options are sepcific for each tx-type.
 
 ## How to estimate gas?
 - As æpp developer, it is reasonable to estimate the gas consumption for a contract call using the dry-run feature of the node **once** and provide a specific offset (e.g. multiplied by 1.5 or 2) as default in the æpp to ensure that contract calls are mined. Depending on the logic of the contract the gas consumption of a specific contract call can vary and therefore you should monitor the gas consumption and increase the default for the respective contract call accordingly over time.
-- By default, SDK estimates `gas` using dry-run endpoint. This means an extra request that makes contract iterations slower, but it is more developer friendly (support of heavy requests without adjustments, and verbose error messages).
+- By default, SDK estimates `gasLimit` using dry-run endpoint. This means an extra request that makes contract iterations slower, but it is more developer friendly (support of heavy requests without adjustments, and verbose error messages).

@@ -17,7 +17,7 @@
 
 import { encode as rlpEncode } from 'rlp'
 import type { Input } from 'rlp'
-import { hash } from './crypto-ts'
+import { hash } from './crypto'
 import {
   MerkleTreeHashMismatchError,
   MissingNodeInTreeError,
@@ -43,9 +43,8 @@ export default class MPTree {
 
   /**
    * Deserialize Merkle Patricia Tree
-   * @rtype (binary: Array) => MPTree
-   * @param {Array} binary - Binary
-   * @return {MPTree} Merkle Patricia Tree
+   * @param binary - Binary
+   * @returns Merkle Patricia Tree
    */
   constructor (binary: MPTreeBinary) {
     this.rootHash = binary[0].toString('hex')
@@ -80,17 +79,20 @@ export default class MPTree {
     return this.rootHash === tree.rootHash
   }
 
-  private static parseNode (node: Buffer[]): { type: NodeType, payload: Buffer[], path: string | null } {
+  private static parseNode (node: Buffer[]): {
+    type: NodeType
+    payload: Buffer[]
+    path: string | null
+  } {
     switch (node.length) {
       case 17:
         return { type: NodeType.Branch, payload: node, path: null }
       case 2: {
-        const path = node[0].toString('hex')
-        const nibble = parseInt(path[0], 16)
+        const nibble = node[0][0] >> 4
         if (nibble > 3) throw new UnknownPathNibbleError(nibble)
         const type = nibble <= 1 ? NodeType.Extension : NodeType.Leaf
         const slice = [0, 2].includes(nibble) ? 2 : 1
-        return { type, payload: [node[1]], path: path.slice(slice) }
+        return { type, payload: [node[1]], path: node[0].toString('hex').slice(slice) }
       }
       default:
         throw new UnknownNodeLengthError(node.length)
@@ -99,8 +101,7 @@ export default class MPTree {
 
   /**
    * Serialize Merkle Patricia Tree
-   * @rtype () => Array
-   * @return {Array} Binary
+   * @returns Binary
    */
   serialize (): MPTreeBinary {
     return [
@@ -114,9 +115,8 @@ export default class MPTree {
 
   /**
    * Retrieve value from Merkle Patricia Tree
-   * @rtype (key: String) => Buffer
-   * @param {String} key - The key of the element to retrieve
-   * @return {Buffer} Value associated to the specified key
+   * @param key - The key of the element to retrieve
+   * @returns Value associated to the specified key
    */
   get (key: string): Buffer | undefined {
     let searchFrom = this.rootHash
@@ -125,7 +125,7 @@ export default class MPTree {
       switch (type) {
         case NodeType.Branch:
           if (key.length === 0) return payload[16]
-          searchFrom = payload[parseInt(key[0], 16)].toString('hex')
+          searchFrom = payload[+`0x${key[0]}`].toString('hex')
           key = key.substr(1)
           break
         case NodeType.Extension:

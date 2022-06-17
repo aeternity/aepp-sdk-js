@@ -16,193 +16,97 @@ Note:
 First you need to create a bridge between your extension and the page. This can be done as follows:
 
 ```js
+import browser from 'webextension-polyfill'
 import {
-  BrowserRuntimeConnection, BrowserWindowMessageConnection, AeppWalletSchema,
-  ContentScriptBridge, AeppWalletHelpers
+  BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION, connectionProxy
 } from '@aeternity/aepp-sdk'
 
 const readyStateCheckInterval = setInterval(function () {
   if (document.readyState === 'complete') {
     clearInterval(readyStateCheckInterval)
 
-    const port = AeppWalletHelpers.getBrowserAPI().runtime.connect()
-    const extConnection = BrowserRuntimeConnection({
-      connectionInfo: {
-        description: 'Content Script to Extension connection',
-        origin: window.origin
-      },
-      port
-    })
-    const pageConnection = BrowserWindowMessageConnection({
-      connectionInfo: {
-        description: 'Content Script to Page connection',
-        origin: window.origin
-      },
+    const port = browser.runtime.connect()
+    const extConnection = new BrowserRuntimeConnection({ port })
+    const pageConnection = new BrowserWindowMessageConnection({
+      target: window,
       origin: window.origin,
-      sendDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_aepp,
-      receiveDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_waellet
+      sendDirection: MESSAGE_DIRECTION.to_aepp,
+      receiveDirection: MESSAGE_DIRECTION.to_waellet
     })
-
-    const bridge = ContentScriptBridge({ pageConnection, extConnection })
-    bridge.run()
+    connectionProxy(pageConnection, extConnection)
   }
 }, 10)
 ```
 
-### 2. Initialize `RpcWallet` Stamp
-Then you need to initialize `RpcWallet` Stamp in your extension and subscribe for new `runtime` connections.
+### 2. Initialize `AeSdkWallet` class
+Then you need to initialize `AeSdkWallet` class in your extension and subscribe for new `runtime` connections.
 After the connection is established you can share the wallet details with the application.
 
 ```js
+import browser from 'webextension-polyfill'
 // ideally this can be configured by the users of the extension
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com'
 const accounts = [
-  MemoryAccount({ keypair: Crypto.generateKeyPair() }), // generate keypair for account1
-  MemoryAccount({ keypair: Crypto.generateKeyPair() })  // generate keypair for account2
+  new MemoryAccount({ keypair: generateKeyPair() }), // generate keypair for account1
+  new MemoryAccount({ keypair: generateKeyPair() })  // generate keypair for account2
 ]
+const aeppInfo = {}
 
 async function init () {
-  // Init extension stamp from sdk
-  RpcWallet({
+  const aeSdk = new AeSdkWallet({
     compilerUrl: COMPILER_URL,
-    nodes: [{ name: 'testnet', instance: await Node({ url: NODE_URL }) }],
+    nodes: [{ name: 'testnet', instance: new Node(NODE_URL) }],
+    id: browser.runtime.id,
+    type: WALLET_TYPE.extension,
     name: 'Wallet WebExtension',
-    // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
-    accounts,
     // Hook for sdk registration
-    onConnection (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onConnection (aeppId, params) {
+      if (!confirm(`Aepp ${params.name} with id ${aeppId} wants to connect`)) {
+        throw new RpcConnectionDenyError()
       }
+      aeppInfo[aeppId] = params
     },
     onDisconnect (msg, client) {
       console.log('Disconnect client: ', client)
     },
-    onSubscription (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSubscription (aeppId) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to subscribe for accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${action.params.tx}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onSign (aeppId, params) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to sign tx ${params.tx}`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onAskAccounts (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onAskAccounts (aeppId) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to get accounts`)) {
+        throw new RpcRejectedByUserError()
       }
     },
-    onMessageSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${action.params.message}`)) {
-        action.accept()
-      } else {
-        action.deny()
+    onMessageSign (aeppId, params) {
+      const { name } = aeppInfo[aeppId]
+      if (!confirm(`Aepp ${name} with id ${aeppId} wants to sign msg ${params.message}`)) {
+        throw new RpcRejectedByUserError()
       }
     }
-  }).then(wallet => {
-    chrome.runtime.onConnect.addListener(async function (port) {
-      // create connection
-      const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
-      // add new aepp to wallet
-      wallet.addRpcClient(connection)
-      // share wallet details
-      wallet.shareWalletInfo(port.postMessage.bind(port))
-      setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
-    })
-  }).catch(err => {
-    console.error(err)
   })
-}
+  // You can change active account using `selectAccount(address)` function
+  await aeSdk.addAccount(accounts[0], { select: true })
+  await aeSdk.addAccount(accounts[1])
 
-init().then(_ => console.log('Wallet initialized!'))
-```
-
-## 2. Sharing wallet node with AEPP
-AEPP can request the wallet for its connected node URLs. Wallet can selectively accept or reject the connection request using the AEPP information(name, id, domain)
-
-```js
-// ideally this can be configured by the users of the extension
-const NODE_URL = 'https://testnet.aeternity.io'
-const COMPILER_URL = 'https://compiler.aepps.com'
-const accounts = [
-  MemoryAccount({ keypair: Crypto.generateKeyPair() }), // generate keypair for account1
-  MemoryAccount({ keypair: Crypto.generateKeyPair() })  // generate keypair for account2
-]
-
-async function init () {
-  // Init extension stamp from sdk
-  RpcWallet({
-    compilerUrl: COMPILER_URL,
-    nodes: [{ name: 'testnet', instance: await Node({ url: NODE_URL }) }],
-    name: 'Wallet WebExtension',
-    // The `ExtensionProvider` uses the first account by default. You can change active account using `selectAccount(address)` function
-    accounts,
-    // Hook for sdk registration
-    onConnection (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to connect`)) {
-        // Whitelist aepp domains for node connection
-        const aepps = ['https://test', 'https://aepp.aeternity.com']
-        if (aepp.info.connectNode && aepps.includes(aepp.info.origin)) {
-          action.accept({ shareNode: true })
-        }
-        action.accept() // Accept wallet connection without sharing node URLs
-      } else {
-        action.deny()
-      }
-    },
-    onDisconnect (msg, client) {
-      console.log('Disconnect client: ', client)
-    },
-    onSubscription (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to subscribe for accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
-      }
-    },
-    onSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign tx ${action.params.tx}`)) {
-        action.accept()
-      } else {
-        action.deny()
-      }
-    },
-    onAskAccounts (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to get accounts`)) {
-        action.accept()
-      } else {
-        action.deny()
-      }
-    },
-    onMessageSign (aepp, action) {
-      if (confirm(`Aepp ${aepp.info.name} with id ${aepp.id} wants to sign msg ${action.params.message}`)) {
-        action.accept()
-      } else {
-        action.deny()
-      }
-    }
-  }).then(wallet => {
-    chrome.runtime.onConnect.addListener(async function (port) {
-      // create connection
-      const connection = await BrowserRuntimeConnection({ connectionInfo: { id: port.sender.frameId }, port })
-      // add new aepp to wallet
-      wallet.addRpcClient(connection)
-      // share wallet details
-      wallet.shareWalletInfo(port.postMessage.bind(port))
-      setTimeout(() => wallet.shareWalletInfo(port.postMessage.bind(port)), 3000)
-    })
-  }).catch(err => {
-    console.error(err)
+  chrome.runtime.onConnect.addListener(async function (port) {
+    // create connection
+    const connection = new BrowserRuntimeConnection({ port })
+    // add new aepp to wallet
+    const clientId = aeSdk.addRpcClient(connection)
+    // share wallet details
+    aeSdk.shareWalletInfo(clientId)
+    setInterval(() => aeSdk.shareWalletInfo(clientId), 3000)
   })
 }
 
@@ -210,7 +114,7 @@ init().then(_ => console.log('Wallet initialized!'))
 ```
 
 ## iFrame-based Wallet
-The **iFrame-based** approach works similar to the **WebExtension** approach except that the `ContentScriptBridge` in between isn't needed.
+The **iFrame-based** approach works similar to the **WebExtension** approach except that the `connectionProxy` in between isn't needed.
 
 You can take a look into the implementation of the following example to see how it works:
 

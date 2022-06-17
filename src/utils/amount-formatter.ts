@@ -14,33 +14,24 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-
-/**
- * Amount Formatter
- * @module @aeternity/aepp-sdk/es/utils/amount-formatter
- * @example import { AmountFormatter } from '@aeternity/aepp-sdk'
- */
 import BigNumber from 'bignumber.js'
 import { isBigNumber } from './bignumber'
-import { ArgumentError, InvalidDenominationError } from './errors'
+import { ArgumentError } from './errors'
 
-/**
- * AE amount formats
- */
-export const AE_AMOUNT_FORMATS = {
-  AE: 'ae',
-  MILI_AE: 'miliAE',
-  MICRO_AE: 'microAE',
-  NANO_AE: 'nanoAE',
-  PICO_AE: 'picoAE',
-  FEMTO_AE: 'femtoAE',
-  AETTOS: 'aettos'
+export enum AE_AMOUNT_FORMATS {
+  AE = 'ae',
+  MILI_AE = 'miliAE',
+  MICRO_AE = 'microAE',
+  NANO_AE = 'nanoAE',
+  PICO_AE = 'picoAE',
+  FEMTO_AE = 'femtoAE',
+  AETTOS = 'aettos'
 }
 
 /**
  * DENOMINATION_MAGNITUDE
  */
-export const DENOMINATION_MAGNITUDE = {
+const DENOMINATION_MAGNITUDE = {
   [AE_AMOUNT_FORMATS.AE]: 0,
   [AE_AMOUNT_FORMATS.MILI_AE]: -3,
   [AE_AMOUNT_FORMATS.MICRO_AE]: -6,
@@ -48,50 +39,46 @@ export const DENOMINATION_MAGNITUDE = {
   [AE_AMOUNT_FORMATS.PICO_AE]: -12,
   [AE_AMOUNT_FORMATS.FEMTO_AE]: -15,
   [AE_AMOUNT_FORMATS.AETTOS]: -18
-}
+} as const
 
 /**
  * Convert amount to AE
- * @param {String|Number|BigNumber} value amount to convert
- * @param {Object} [options={}] options
- * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
- * @return {String}
+ * @param value - amount to convert
+ * @param options - options
+ * @param options.denomination - denomination of amount, can be ['ae', 'aettos']
  */
 export const toAe = (
   value: string | number | BigNumber,
-  { denomination = AE_AMOUNT_FORMATS.AETTOS } = {}
+  { denomination = AE_AMOUNT_FORMATS.AETTOS }: { denomination?: AE_AMOUNT_FORMATS } = {}
 ): string => formatAmount(value, { denomination, targetDenomination: AE_AMOUNT_FORMATS.AE })
 
 /**
  * Convert amount to aettos
- * @param {String|Number|BigNumber} value amount to convert
- * @param {Object} [options={}] options
- * @param {String} [options.denomination='ae'] denomination of amount, can be ['ae', 'aettos']
- * @return {String}
+ * @param value - amount to convert
+ * @param options - options
+ * @param options.denomination - denomination of amount, can be ['ae', 'aettos']
  */
 export const toAettos = (
   value: string | number | BigNumber,
-  { denomination = AE_AMOUNT_FORMATS.AE } = {}
+  { denomination = AE_AMOUNT_FORMATS.AE }: { denomination?: AE_AMOUNT_FORMATS } = {}
 ): string => formatAmount(value, { denomination })
 
 /**
  * Convert amount from one to other denomination
- * @param {String|Number|BigNumber} value amount to convert
- * @param {Object} [options={}] options
- * @param {String} [options.denomination='aettos'] denomination of amount, can be ['ae', 'aettos']
- * @param {String} [options.targetDenomination='aettos'] target denomination, can be ['ae', 'aettos']
- * @return {String}
+ * @param value - amount to convert
+ * @param options - options
+ * @param options.denomination - denomination of amount, can be ['ae', 'aettos']
+ * @param options.targetDenomination - target denomination,
+ * can be ['ae', 'aettos']
  */
 export const formatAmount = (
-  value: string | number | BigNumber,
-  { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS } = {}
+  value: string | number | bigint | BigNumber,
+  { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS }:
+  { denomination?: AE_AMOUNT_FORMATS, targetDenomination?: AE_AMOUNT_FORMATS }
 ): string => {
-  const denominations = Object.values(AE_AMOUNT_FORMATS)
-  if (!denominations.includes(denomination)) throw new InvalidDenominationError(`Invalid denomination: ${denomination}`)
-  if (!denominations.includes(targetDenomination)) throw new InvalidDenominationError(`Invalid target denomination: ${targetDenomination}`)
-  if (!isBigNumber(value)) throw new ArgumentError('value', `a number`, value)
+  if (!isBigNumber(value)) throw new ArgumentError('value', 'a number', value)
 
-  return new BigNumber(value)
+  return new BigNumber(typeof value === 'bigint' ? value.toString() : value)
     .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])
     .toFixed()
 }

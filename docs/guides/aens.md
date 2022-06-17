@@ -18,7 +18,7 @@ Claiming an AENS name requires you (at least) 2 transactions:
 ```js
 // imports
 
-const aeSdk = await Universal({ ... }) // init the SDK instance with Universal Stamp
+const aeSdk = new AeSdk({ ... }) // init the SDK instance with AeSdk class
 
 const name = 'testNameForTheGuide.chain'
 
@@ -121,7 +121,7 @@ Note:
 In case there is an auction running for a name you want to claim you need to place a bid.
 
 ```js
-import { TxBuilderHelper } from '@aeternity/aepp-sdk'
+import { computeBidFee, computeAuctionEndBlock } from '@aeternity/aepp-sdk'
 
 const name = 'auctiontest1.chain'
 
@@ -131,11 +131,11 @@ const increment = 0.05 // 5%, the minimum required increment
 // startFee is OPTIONAL and defaults to minimum calculated fee for the name in general
 // startFee MUST be at least the nameFee of the last bid
 // increment is OPTIONAL and defaults to 0.05
-const nameFee = TxBuilderHelper.computeBidFee(name, startFee, increment)
+const nameFee = computeBidFee(name, startFee, increment)
 const bidTx = await aeSdk.aensBid(name, nameFee)
 
 console.log(bidTx)
-console.log(`BID PLACED AT ${bidTx.blockHeight} WILL END AT ${TxBuilderHelper.computeAuctionEndBlock(name, bidTx.blockHeight)}`)
+console.log(`BID PLACED AT ${bidTx.blockHeight} WILL END AT ${computeAuctionEndBlock(name, bidTx.blockHeight)}`)
 
 /*
 {
@@ -188,7 +188,7 @@ const pointers = {
   channel: 'ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
 }
 
-// using aeSdk directly (instance of Universal Stamp)
+// using aeSdk directly (instance of AeSdk class)
 const nameUpdateTx = await aeSdk.aensUpdate(name, pointers)
 
 // OR using the instance of a name
@@ -244,7 +244,7 @@ In case you want to extend a name using a custom TTL and keep the current pointe
 ```js
 const name = 'testNameForTheGuide.chain'
 
-// using aeSdk directly (instance of Universal Stamp)
+// using aeSdk directly (instance of AeSdk class
 const nameUpdateTx = await aeSdk.aensUpdate(name, {}, { nameTtl: 100000, extendPointers: true })
 
 // OR using the instance of a name
@@ -289,7 +289,7 @@ In some cases you might want to transfer the ownership of a name to another acco
 ```js
 const recipient = 'ak_...'
 
-// using aeSdk directly (instance of Universal Stamp)
+// using aeSdk directly (instance of AeSdk class)
 const nameTransferTx = await aeSdk.aensTransfer(name, recipient)
 
 // OR using the instance of a name
@@ -323,7 +323,7 @@ console.log(nameTransferTx)
 ## 4. Revoke a name
 In case you want to revoke a name prior to its expiration for whatever reason you can do that as follows:
 ```js
-// using aeSdk directly (instance of Universal Stamp)
+// using aeSdk directly (instance of AeSdk class)
 const nameRevokeTx = await aeSdk.aensRevoke(name)
 
 // OR using the instance of a name
@@ -366,7 +366,7 @@ This functionality could for example be used to build an AENS marketplace.
 ```js
 // imports
 
-const aeSdk = await Universal({ ... }) // init the SDK instance with Universal Stamp
+const aeSdk = new AeSdk({ ... }) // init the SDK instance with AeSdk class
 
 // contract address
 const contractId = 'ct_asd2ks...'
@@ -376,9 +376,9 @@ const name = 'example.chain'
 const onAccount = await aeSdk.address()
 
 // this signature will allow the contract to perform a pre-claim on your behalf
-const preClaimSig = await aeSdk.createAensDelegationSignature({ contractId }, { onAccount })
+const preClaimSig = await aeSdk.createAensDelegationSignature(contractId, { onAccount })
 
 // this signature will allow the contract to perform
 // any name related transaction for a specific name that you own
-const aensDelegationSig = await aeSdk.createAensDelegationSignature({ contractId, name }, { onAccount })
+const aensDelegationSig = await aeSdk.createAensDelegationSignature(contractId, { name, onAccount })
 ```

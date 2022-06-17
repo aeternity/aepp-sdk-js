@@ -8,15 +8,15 @@
   },
   "dependencies": {
     "buffer": "^6.0.3",
-    "core-js": "^3.19.2",
+    "core-js": "^3.22.6",
     "tailwindcss": "^2.2.19",
-    "vue": "^3.2.13"
+    "vue": "^3.2.36"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~5.0.0-rc.1",
-    "@vue/cli-service": "~5.0.0-rc.1",
-    "sass": "^1.44.0",
-    "sass-loader": "^12.3.0"
+    "@vue/cli-plugin-babel": "~5.0.4",
+    "@vue/cli-service": "~5.0.4",
+    "sass": "^1.52.1",
+    "sass-loader": "^13.0.0"
   },
   "browserslist": [
     "> 1%",

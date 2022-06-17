@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
 // # Compile & Deploy a Sophia Smart Contract
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/contract.js) and this page explains in detail how to:
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/contract-interaction.js) and this page explains in detail how to:
 //
 // - deal with the different phases of compiling Sophia contracts to bytecode
 // - deploy the bytecode to get a callable contract address
@@ -26,8 +26,8 @@
 
 // ## 1. Specify imports
 //
-// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
-const { Universal, Node, MemoryAccount } = require('@aeternity/aepp-sdk')
+// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
+const { AeSdk, Node, MemoryAccount } = require('@aeternity/aepp-sdk')
 
 // **Note**:
 //
@@ -65,22 +65,13 @@ const COMPILER_URL = 'https://compiler.aepps.com';
 // Therefore you need to put the logic into an `async` code block
 (async () => {
   // ## 4. Create object instances
-  const account = MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
-  const node = await Node({ url: NODE_URL })
-  const aeSdk = await Universal({
+  const account = new MemoryAccount({ keypair: ACCOUNT_KEYPAIR })
+  const node = new Node(NODE_URL)
+  const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
-    compilerUrl: COMPILER_URL,
-    accounts: [account]
+    compilerUrl: COMPILER_URL
   })
-
-  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
-  // asynchronous as it determines the node's version and rest interface automatically. Only once
-  // the Promise is fulfilled, you know you have a working object instance
-  // which is assigned to the `aeSdk` constant in this case.
-  //
-  // Note:
-  //
-  //   - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
+  await aeSdk.addAccount(account, { select: true })
 
   // ## 5. Get contract instance
   // Knowing the source code allows you to initialize a contract instance and interact with the

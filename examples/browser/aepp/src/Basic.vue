@@ -19,11 +19,11 @@
     </div>
     <div>
       <div>Compiler version</div>
-      <div>{{ compilerVersion }}</div>
+      <Value :value="compilerVersionPromise" />
     </div>
   </div>
 
-  <h2>Spend tokens</h2>
+  <h2>Spend coins</h2>
   <div class="group">
     <div>
       <div>Recipient address</div>
@@ -35,7 +35,7 @@
       </div>
     </div>
     <div>
-      <div>Tokens amount</div>
+      <div>Coins amount</div>
       <div><input v-model="spendAmount"></div>
     </div>
     <div>
@@ -57,31 +57,32 @@
 
 <script>
 import Value from './Value.vue'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   components: { Value },
-  props: {
-    aeSdk: { type: Object, required: true },
-    address: { type: String, default: '' },
-    networkId: { type: String, default: '' },
-  },
   data: () => ({
     balancePromise: null,
     heightPromise: null,
     nodeInfoPromise: null,
-    compilerVersion: '',
+    compilerVersionPromise: null,
     spendTo: '',
     spendAmount: '',
     spendPayload: '',
     spendPromise: null
   }),
+  computed: {
+    ...mapState('aeSdk', ['address', 'networkId']),
+    ...mapGetters('aeSdk', ['aeSdk'])
+  },
   mounted () {
     this.$watch(
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
       ([aeSdk, address]) => {
         if (!aeSdk) return
-        this.compilerVersion = aeSdk.compilerVersion
-        this.balancePromise = aeSdk.balance(address)
+        this.compilerVersionPromise = aeSdk.compilerApi.aPIVersion()
+          .then(({ apiVersion }) => apiVersion)
+        this.balancePromise = aeSdk.getBalance(address)
         this.heightPromise = aeSdk.height()
         this.nodeInfoPromise = aeSdk.getNodeInfo()
       },

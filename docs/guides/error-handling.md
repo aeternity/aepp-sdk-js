@@ -10,10 +10,7 @@ BaseError
 │   IllegalArgumentError
 │   ArgumentCountMismatchError
 │   InsufficientBalanceError
-│   InvalidDenominationError
-│   InvalidNameError
 │   MissingParamError
-│   NoBrowserFoundError
 │   NoSerializerFoundError
 │   RequestTimedOutError
 │   TxTimedOutError
@@ -22,7 +19,8 @@ BaseError
 │   UnsupportedProtocolError
 │   NotImplementedError
 │   UnsupportedVersionError
-│   InternalError
+└───InternalError
+│   │   UnexpectedTsError
 │
 └───AccountError
 │   │   InvalidKeypairError
@@ -34,7 +32,6 @@ BaseError
 │   │   InvalidAensNameError
 │
 └───AeppError
-│   │   DuplicateCallbackError
 │   │   InvalidRpcMessageError
 │   │   MissingCallbackError
 │   │   UnAuthorizedAccountError
@@ -67,19 +64,14 @@ BaseError
 │
 └───CryptographyError
 │   │   InvalidChecksumError
-│   │   InvalidDerivationPathError
-│   │   InvalidKeyError
+│   │   DerivationError
 │   │   InvalidPasswordError
 │   │   MerkleTreeHashMismatchError
 │   │   MissingNodeInTreeError
-│   │   UnsupportedAlgorithmError
-│   │   NotHardenedSegmentError
 │   │   UnknownNodeLengthError
 │   │   UnknownPathNibbleError
-│   │   UnsupportedChildIndexError
 │
 └───NodeError
-│   │   DisconnectedError
 │   │   DuplicateNodeError
 │   │   NodeNotFoundError
 │
@@ -92,8 +84,6 @@ BaseError
 │   │   InvalidSignatureError
 │   │   InvalidTxError
 │   │   InvalidTxParamsError
-│   │   NoDefaultAensPointerError
-│   │   PrefixMismatchError
 │   │   PrefixNotFoundError
 │   │   SchemaNotFoundError
 │   │   TagNotFoundError
@@ -104,9 +94,18 @@ BaseError
 │
 └̌───WalletError
 │   │   AlreadyConnectedError
-│   │   MessageDirectionError
 │   │   NoWalletConnectedError
 │   │   RpcConnectionError
+│
+└̌───RpcError
+│   │   RpcInvalidTransactionError
+│   │   RpcBroadcastError
+│   │   RpcRejectedByUserError
+│   │   RpcUnsupportedProtocolError
+│   │   RpcConnectionDenyError
+│   │   RpcNotAuthorizeError
+│   │   RpcPermissionDenyError
+│   │   RpcInternalError
 ```
 
 ## Usage
@@ -114,26 +113,27 @@ BaseError
 ```js
 // import required error classes
 const {
-  Universal,
+  AeSdk,
   Node,
   MemoryAccount,
-  Crypto,
+  generateKeyPair,
   InvalidTxParamsError,
   InvalidAensNameError
 } = require('@aeternity/aepp-sdk')
 
 // setup
 const NODE_URL = 'https://testnet.aeternity.io'
-const PAYER_ACCOUNT_KEYPAIR = Crypto.generateKeyPair()
-const NEW_USER_KEYPAIR = Crypto.generateKeyPair()
+const PAYER_ACCOUNT_KEYPAIR = generateKeyPair()
+const NEW_USER_KEYPAIR = generateKeyPair()
 
-const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
-const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
-const node = await Node({ url: NODE_URL })
-const aeSdk = await Universal({
+const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
+const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
+const node = new Node(NODE_URL)
+const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
-  accounts: [payerAccount, newUserAccount]
 })
+await aeSdk.addAccount(payerAccount, { select: true })
+await aeSdk.addAccount(newUserAccount)
 
 // catch exceptions
 try {

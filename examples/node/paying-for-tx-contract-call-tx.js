@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -45,9 +45,9 @@
 //  - ... many more!
 
 // ## 1. Specify imports
-// You need to import `Universal`, `Node` and `MemoryAccount` [Stamps](https://stampit.js.org/essentials/what-is-a-stamp) from the SDK.
-// Additionally you import the `Crypto` utility module to generate a new keypair.
-const { Universal, Node, MemoryAccount, Crypto } = require('@aeternity/aepp-sdk')
+// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
+// Additionally you import the `generateKeyPair` utility function to generate a new keypair.
+const { AeSdk, Node, MemoryAccount, generateKeyPair, TX_TYPE } = require('@aeternity/aepp-sdk')
 
 // **Note**:
 //
@@ -79,7 +79,7 @@ contract PayingForTxExample =
     entrypoint get_last_caller() : option(address) =
         state.last_caller
 `
-const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
+const NEW_USER_KEYPAIR = generateKeyPair();
 
 // Note:
 //
@@ -97,23 +97,15 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
 // Therefore we are putting our logic into an `async` code block
 (async () => {
   // ## 4. Create object instances
-  const payerAccount = MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
-  const newUserAccount = MemoryAccount({ keypair: NEW_USER_KEYPAIR })
-  const node = await Node({ url: NODE_URL })
-  const aeSdk = await Universal({
+  const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
+  const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
+  const node = new Node(NODE_URL)
+  const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
-    compilerUrl: COMPILER_URL,
-    accounts: [payerAccount, newUserAccount]
+    compilerUrl: COMPILER_URL
   })
-
-  // The `Universal` [Stamp](https://stampit.js.org/essentials/what-is-a-stamp) itself is
-  // asynchronous as it determines the node's version and rest interface automatically. Only once
-  // the Promise is fulfilled, you know you have a working object instance which is assigned to the
-  // `aeSdk` constant in this case.
-  //
-  // Note:
-  //
-  //  - `Universal` is not a constructor but a factory, which means it's *not* invoked with `new`.
+  await aeSdk.addAccount(payerAccount, { select: true })
+  await aeSdk.addAccount(newUserAccount)
 
   // ## 5. Create and sign `ContractCallTx` on behalf of new user
   // Currently there is no high-level API available that allows you to create and sign the
@@ -128,7 +120,7 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
   //      - The `entrypoint` with the name `set_latest_caller` doesn't require any params so you
   //        can provide an empty array
   //  1. Create the `ContractCreateTx` by providing all required params.
-  //      - You could omit `amount`, `gas` and `gasPrice` if you choose to stick to the default
+  //      - You could omit `amount`, `gasLimit` and `gasPrice` if you choose to stick to the default
   //        values (see
   //        [transaction options](../../../transaction-options#contractcreatetx-contractcalltx))
   //  1. Sign the transaction by providing `innerTx: true` as transaction option.
@@ -138,11 +130,11 @@ const NEW_USER_KEYPAIR = Crypto.generateKeyPair();
     { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS }
   )
   const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', [])
-  const contractCallTx = await aeSdk.contractCallTx({
+  const contractCallTx = await aeSdk.buildTx(TX_TYPE.contractCall, {
     callerId: await newUserAccount.address(),
     contractId: CONTRACT_ADDRESS,
     amount: 0,
-    gas: 1000000,
+    gasLimit: 1000000,
     gasPrice: 1500000000,
     callData: calldata
   })

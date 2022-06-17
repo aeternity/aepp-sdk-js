@@ -1,7 +1,7 @@
 /* global browser */
 
 import {
-  BrowserRuntimeConnection, BrowserWindowMessageConnection, AeppWalletSchema, ContentScriptBridge
+  BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION, connectionProxy
 } from '@aeternity/aepp-sdk'
 
 (async () => {
@@ -17,23 +17,12 @@ import {
   console.log('Document is ready')
 
   const port = browser.runtime.connect()
-  const extConnection = BrowserRuntimeConnection({
-    connectionInfo: {
-      description: 'Content Script to Extension connection',
-      origin: window.origin
-    },
-    port
-  })
-  const pageConnection = BrowserWindowMessageConnection({
-    connectionInfo: {
-      description: 'Content Script to Page connection',
-      origin: window.origin
-    },
+  const extConnection = new BrowserRuntimeConnection({ port })
+  const pageConnection = new BrowserWindowMessageConnection({
+    target: window,
     origin: window.origin,
-    sendDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_aepp,
-    receiveDirection: AeppWalletSchema.MESSAGE_DIRECTION.to_waellet
+    sendDirection: MESSAGE_DIRECTION.to_aepp,
+    receiveDirection: MESSAGE_DIRECTION.to_waellet
   })
-
-  const bridge = ContentScriptBridge({ pageConnection, extConnection })
-  bridge.run()
+  connectionProxy(pageConnection, extConnection)
 })()

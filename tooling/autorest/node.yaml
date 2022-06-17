@@ -1,0 +1,162 @@
+---
+directive:
+  - from: openapi-document
+    where: $.components.schemas
+    transform: >
+      ['UInt', 'UInt16', 'UInt32', 'UInt64', 'TxBlockHeight'].forEach(key => {
+        if (!$[key].oneOf) return;
+        $[key] = $[key].oneOf.find(({ type }) => type === 'string');
+      });
+    reason:
+      fix parsing of big numbers
+      remove after fixing https://github.com/aeternity/aeternity/issues/3891
+
+  - from: openapi-document
+    where: $.components.schemas
+    transform: >
+      if ($doc.info.title === 'node') return $;
+      $.Account.properties.kind['x-ms-enum'] = { name: 'AccountKind' };
+      $.Tx.allOf[0].properties.type['x-ms-enum'] = { name: 'TxType' };
+      $.TTL.properties.type['x-ms-enum'] = { name: 'TTLType' };
+      $.RelativeTTL.properties.type['x-ms-enum'] = { name: 'RelativeTTLType' };
+    reason: thread schemas enums as constants instead of strings
+
+  - from: openapi-document
+    where: $.paths
+    transform: >
+      if ($doc.info.title === 'node') return $;
+      $['/accounts/{pubkey}/next-nonce'].get.parameters.find(p => p.name === 'strategy')
+        .schema['x-ms-enum'] = { name: 'NextNonceStrategy' };
+      $['/oracles/{pubkey}/queries'].get.parameters.find(p => p.name === 'type')
+        .schema['x-ms-enum'] = { name: 'OracleQueryType' };
+    reason: thread paths enums as constants instead of strings
+
+  - from: openapi-document
+    where: $.paths
+    transform: >
+      return Object.fromEntries(Object.entries($)
+        .filter(([, p]) => Object.values(p)[0].tags.includes('external')))
+    reason: keep only external endpoints
+
+  - from: openapi-document
+    where: $.components.schemas.Header
+    transform: >
+      return {
+        "type": "object",
+        "description": "A mix of KeyBlock, MicroBlockHeader properties.",
+        "properties": {
+          ...$doc.components.schemas.KeyBlock.properties,
+          ...$doc.components.schemas.MicroBlockHeader.properties
+        },
+        "required": [
+          "hash",
+          "height",
+          "prev_hash",
+          "prev_key_hash",
+          "state_hash",
+          "time",
+          "version"
+        ]
+      };
+
+  - from: openapi-document
+    where: $.components.schemas.Tx
+    transform: >
+      if ($doc.info.title === 'node') return $;
+      const base = $.allOf[0];
+      const transactions = base.properties.type.enum.map(txName => $doc.components.schemas[txName]);
+      return {
+        ...base,
+        "description": "A mix of all transaction types.",
+        "properties": Object.assign({}, ...transactions.map(tx => tx.properties), base.properties),
+        "required": Object.entries(
+          transactions
+            .map(tx => tx.required)
+            .reduce(
+              (acc, req) => {
+                req.forEach(r => acc[r] = (acc[r] ?? 0) + 1);
+                return acc;
+              },
+              {}
+            )
+        )
+          .filter(([, count]) => count === transactions.length)
+          .map(([required]) => required)
+          .concat(base.required)
+      };
+
+  - from: openapi-document
+    where: $.components.schemas.Delegates
+    transform: >
+      if ($doc.info.title === 'node') return $;
+      return $.oneOf[1];
+    reason: use more precise form to avoid oneOf
+
+  - from: openapi-document
+    where: $.paths['/accounts/{pubkey}/next-nonce'].get.responses.200.content['application/json'].schema
+    transform: $.type = 'object';
+    reason:
+      add missed object type
+      fixed in https://github.com/aeternity/aeternity/pull/3795
+
+  - from: openapi-document
+    where: $.paths.*.*.parameters[?(@.$ref && !@.$ref.includes('intAsString'))]
+    transform: >
+      const relativePath = $.$ref.replace(/^#\//, '').split('/');
+      return relativePath.reduce((o, p) => o[p], $doc);
+    reason: remove commonly required parameters from the generated context, probably autorest bug
+
+  - from: openapi-document
+    where: $.servers
+    transform: $ = []
+    reason: remove a server with /v3 url
+
+  - from: openapi-document
+    where: $.paths
+    transform: >
+      const apiPrefix = '/v3';
+      Object.keys($)
+        .filter(a => !a.startsWith(apiPrefix))
+        .forEach(key => {
+          $[apiPrefix + key] = $[key];
+          delete $[key];
+        });
+    reason: don't add prefix to $host parameter
+
+  - from: openapi-document
+    where: $.paths.*.*.responses
+    transform: >
+      Object.entries($)
+        .filter(([key]) => key !== '200')
+        .forEach(([, value]) => value['x-ms-error-response'] = true)
+    reason: >
+      throw errors even for explained response with not 200 code
+      https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
+
+  - from: openapi-document
+    where: $.components.schemas
+    transform: >
+      $.SignedTx.required.push('block_height', 'block_hash', 'hash', 'signatures');
+      $.SignedTxs.required = ['transactions'];
+    reason: >
+      marks additional fields as required
+      remove after fixing https://github.com/aeternity/aeternity/issues/3892
+
+  - from: openapi-document
+    where: $.info.title
+    set: node
+    reason: the whole SDK already about aeternity
+
+version: ^3.6.1
+use-extension:
+  '@autorest/typescript': ^6.0.0-beta.18
+  '@autorest/modelerfour': ^4.23.1
+input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.5.1/apps/aehttp/priv/oas3.yaml
+output-folder: ../../src/apis/node
+source-code-folder-path: .
+client-side-validation: true
+generator: typescript
+generate-metadata: false
+add-credentials: false
+modelerfour:
+  seal-single-value-enum-by-default: false
