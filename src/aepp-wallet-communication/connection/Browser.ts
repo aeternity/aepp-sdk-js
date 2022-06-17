@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { AlreadyConnectedError, NoWalletConnectedError } from '../../errors'
+import { AlreadyConnectedError, NoWalletConnectedError } from '../../utils/errors'
 
 /**
  * Browser connection base interface

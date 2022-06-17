@@ -1,5 +1,5 @@
-import { send } from '../../../ae/spend'
-import { EncodedData } from '../../encoder'
+import { send } from '../../spend'
+import { EncodedData } from '../../utils/encoder'
 import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema'
 
 export interface WalletInfo {

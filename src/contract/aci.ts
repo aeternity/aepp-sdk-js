@@ -19,7 +19,7 @@ import { Encoder as Calldata } from '@aeternity/aepp-calldata'
 import { DRY_RUN_ACCOUNT, GAS_MAX, TX_TYPE, AMOUNT, AensName } from '../tx/builder/schema'
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder'
 import { _buildTx } from '../tx'
-import { send } from '../ae/spend'
+import { send } from '../spend'
 import { decode, EncodedData, EncodingType } from '../utils/encoder'
 import {
   MissingContractDefError,
@@ -40,12 +40,12 @@ import {
 } from '../utils/errors'
 import { hash } from '../utils/crypto'
 import { Aci as BaseAci } from '../apis/compiler'
-import Compiler from './compiler'
-import Node from '../node'
+import Compiler from './Compiler'
+import Node from '../Node'
 import {
   getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun
 } from '../chain'
-import AccountBase from '../account/base'
+import AccountBase from '../account/Base'
 
 interface FunctionACI {
   arguments: any[]

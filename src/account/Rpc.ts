@@ -1,5 +1,5 @@
-import AccountBase from './base'
-import { METHODS } from '../utils/aepp-wallet-communication/schema'
+import AccountBase from './Base'
+import { METHODS } from '../aepp-wallet-communication/schema'
 import { NotImplementedError } from '../utils/errors'
 import { EncodedData } from '../utils/encoder'
 

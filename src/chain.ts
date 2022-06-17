@@ -23,13 +23,13 @@ import {
   AensPointerContextError, DryRunError, InvalidAensNameError, InvalidTxError,
   RequestTimedOutError, TxTimedOutError, TxNotInChainError, InternalError
 } from './utils/errors'
-import Node, { TransformNodeType } from './node'
+import Node, { TransformNodeType } from './Node'
 import {
   Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx
 } from './apis/node'
 import { EncodedData } from './utils/encoder'
-import AccountBase from './account/base'
+import AccountBase from './account/Base'
 
 export function _getPollInterval (
   type: 'block' | 'microblock',

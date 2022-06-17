@@ -1,17 +1,17 @@
 import * as chainMethods from './chain'
 import * as txMethods from './tx'
-import * as aensMethods from './ae/aens'
-import * as spendMethods from './ae/spend'
-import * as oracleMethods from './ae/oracle'
-import * as contractMethods from './ae/contract'
+import * as aensMethods from './aens'
+import * as spendMethods from './spend'
+import * as oracleMethods from './oracle'
+import * as contractMethods from './contract/methods'
 import * as contractGaMethods from './contract/ga'
 import { _buildTx } from './tx'
 import { mapObject } from './utils/other'
-import Node, { getNetworkId } from './node'
+import Node, { getNetworkId } from './Node'
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter'
 import { AMOUNT, TX_TYPE } from './tx/builder/schema'
-import MemoryAccount, { Keypair } from './account/memory'
-import AccountBase, { isAccountBase } from './account/base'
+import MemoryAccount, { Keypair } from './account/Memory'
+import AccountBase, { isAccountBase } from './account/Base'
 import {
   CompilerError,
   DuplicateNodeError,
@@ -20,7 +20,7 @@ import {
   TypeError
 } from './utils/errors'
 import { EncodedData } from './utils/encoder'
-import Compiler from './contract/compiler'
+import Compiler from './contract/Compiler'
 
 export type Account = Keypair | AccountBase | any
 

@@ -26,12 +26,12 @@ import { hash } from '../utils/crypto'
 import { decode, EncodedData } from '../utils/encoder'
 import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '../utils/errors'
 import { concatBuffers } from '../utils/other'
-import AccountBase from '../account/base'
-import { getContractInstance } from '../ae/contract'
-import { send } from '../ae/spend'
-import Node from '../node'
+import AccountBase from '../account/Base'
+import { getContractInstance } from './methods'
+import { send } from '../spend'
+import Node from '../Node'
 import { getAccount } from '../chain'
-import Compiler from './compiler'
+import Compiler from './Compiler'
 
 /**
  * Check if account is GA

@@ -2,15 +2,15 @@ import { v4 as uuid } from '@aeternity/uuid'
 import AeSdk from './AeSdk'
 import { Account } from './AeSdkBase'
 import verifyTransaction from './tx/validator'
-import RpcClient from './utils/aepp-wallet-communication/rpc/RpcClient'
+import RpcClient from './aepp-wallet-communication/rpc/RpcClient'
 import {
   METHODS, RPC_STATUS, SUBSCRIPTION_TYPES, WALLET_TYPE,
   RpcBroadcastError, RpcInvalidTransactionError,
   RpcNotAuthorizeError, RpcPermissionDenyError, RpcUnsupportedProtocolError
-} from './utils/aepp-wallet-communication/schema'
+} from './aepp-wallet-communication/schema'
 import { UnknownRpcClientError } from './utils/errors'
-import AccountBase from './account/base'
-import BrowserConnection from './utils/aepp-wallet-communication/connection/Browser'
+import AccountBase from './account/Base'
+import BrowserConnection from './aepp-wallet-communication/connection/Browser'
 import {
   Accounts,
   AeppApi,
@@ -18,7 +18,7 @@ import {
   RPC_VERSION,
   WalletApi,
   WalletInfo
-} from './utils/aepp-wallet-communication/rpc/types'
+} from './aepp-wallet-communication/rpc/types'
 import { EncodedData } from './utils/encoder'
 import jsonBig from './utils/json-big'
 

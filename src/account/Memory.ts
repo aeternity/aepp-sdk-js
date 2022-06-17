@@ -14,7 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import AccountBase from './base'
+import AccountBase from './Base'
 import { sign, isValidKeypair } from '../utils/crypto'
 import { isHex } from '../utils/string'
 import { decode } from '../tx/builder/helpers'

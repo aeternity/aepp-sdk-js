@@ -1,10 +1,10 @@
 import AeSdkBase, { Account } from './AeSdkBase'
-import AccountBase from './account/base'
-import AccountRpc from './account/rpc'
+import AccountBase from './account/Base'
+import AccountRpc from './account/Rpc'
 import { decode, EncodedData } from './utils/encoder'
-import { Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi } from './utils/aepp-wallet-communication/rpc/types'
-import RpcClient from './utils/aepp-wallet-communication/rpc/RpcClient'
-import { METHODS, SUBSCRIPTION_TYPES } from './utils/aepp-wallet-communication/schema'
+import { Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi } from './aepp-wallet-communication/rpc/types'
+import RpcClient from './aepp-wallet-communication/rpc/RpcClient'
+import { METHODS, SUBSCRIPTION_TYPES } from './aepp-wallet-communication/schema'
 import {
   AlreadyConnectedError,
   NoWalletConnectedError,
@@ -12,8 +12,8 @@ import {
   UnAuthorizedAccountError,
   RpcConnectionError
 } from './utils/errors'
-import Node from './node'
-import BrowserConnection from './utils/aepp-wallet-communication/connection/Browser'
+import Node from './Node'
+import BrowserConnection from './aepp-wallet-communication/connection/Browser'
 
 /**
  * RPC handler for AEPP side

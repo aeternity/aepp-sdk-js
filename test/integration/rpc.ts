@@ -43,9 +43,9 @@ import {
   UnsubscribedAccountError
 } from '../../src'
 import { concatBuffers } from '../../src/utils/other'
-import { ImplPostMessage } from '../../src/utils/aepp-wallet-communication/connection/BrowserWindowMessage'
+import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage'
 import { account, compilerUrl, ignoreVersion, networkId, spendPromise, url } from '.'
-import { Accounts, Network } from '../../src/utils/aepp-wallet-communication/rpc/types'
+import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types'
 import { EncodedData, EncodingType } from '../../src/utils/encoder'
 
 const WindowPostMessageFake = (

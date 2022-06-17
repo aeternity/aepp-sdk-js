@@ -25,7 +25,7 @@ import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder'
 import { TX_TYPE } from '../../src/tx/builder/schema'
 import Channel from '../../src/channel'
 import { ChannelOptions, send } from '../../src/channel/internal'
-import MemoryAccount from '../../src/account/memory'
+import MemoryAccount from '../../src/account/Memory'
 import {
   IllegalArgumentError,
   InsufficientBalanceError,

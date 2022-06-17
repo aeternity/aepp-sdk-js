@@ -23,18 +23,18 @@
  * repository.
  */
 
-import { salt } from '../utils/crypto'
-import { commitmentHash, isAuctionName, Pointer } from '../tx/builder/helpers'
-import { CLIENT_TTL, NAME_TTL, TX_TYPE, AensName } from '../tx/builder/schema'
-import { ArgumentError } from '../utils/errors'
-import { EncodedData } from '../utils/encoder'
-import { BigNumber } from 'bignumber.js'
+import { salt } from './utils/crypto'
+import { commitmentHash, isAuctionName, Pointer } from './tx/builder/helpers'
+import { CLIENT_TTL, NAME_TTL, TX_TYPE, AensName } from './tx/builder/schema'
+import { ArgumentError } from './utils/errors'
+import { EncodedData } from './utils/encoder'
+import BigNumber from 'bignumber.js'
 import { send } from './spend'
-import { getName, height } from '../chain'
-import { _buildTx, BuildTxOptions } from '../tx'
-import { TransformNodeType } from '../node'
-import { NameEntry } from '../apis/node'
-import AccountBase from '../account/base'
+import { getName, height } from './chain'
+import { _buildTx, BuildTxOptions } from './tx'
+import { TransformNodeType } from './Node'
+import { NameEntry } from './apis/node'
+import AccountBase from './account/Base'
 
 interface KeyPointers {
   [key: string]: string | Buffer

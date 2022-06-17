@@ -1,6 +1,6 @@
 import { RpcError, RpcInternalError, RpcMethodNotFoundError } from '../schema'
 import BrowserConnection from '../connection/Browser'
-import { InvalidRpcMessageError, MissingCallbackError } from '../../errors'
+import { InvalidRpcMessageError, MissingCallbackError } from '../../utils/errors'
 
 interface JsonRpcRequest {
   jsonrpc: '2.0'
