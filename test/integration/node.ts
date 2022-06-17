@@ -23,7 +23,6 @@ import { expect } from 'chai'
 import { NodeNotFoundError } from '../../src/utils/errors'
 
 describe('Node client', function () {
-  // TODO should be changed once Node doesn't use stamps
   let node: Node
 
   before(async function () {

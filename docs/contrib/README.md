@@ -25,8 +25,6 @@ It uses the following Javascript technologies and principles:
     - bundling through webpack
 
 [Node's Swagger file]: https://github.com/aeternity/aeternity/blob/master/config/swagger.yaml
-[stampit]: http://stampit.js.org/
-[Stamp Specification]: https://github.com/stampit-org/stamp-specification
 [composition over inheritance]: https://medium.com/front-end-hacking/classless-javascript-composition-over-inheritance-6b27c35893b1
 [JavaScript the Good Parts]: https://github.com/dwyl/Javascript-the-Good-Parts-notes
 [ES6 modules]: https://hacks.mozilla.org/2015/08/es6-in-depth-modules/
