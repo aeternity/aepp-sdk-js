@@ -7,226 +7,117 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
-* **tests:** `computeBidFee` accepts `startFee`, `increment` as options
-* Fee helpers not exported anymore
-`BASE_GAS`, `GAS_PER_BYTE`, `KEY_BLOCK_INTERVAL`, `TX_FEE_BASE_GAS`, `TX_FEE_OTHER_GAS`.
-Use a general `calculateMinFee` instead.
-* `calculateMinFee` returns BigNumber instead of string
-* `calculateFee` removed
-Use `calculateMinFee` to calculate transaction fee.
-* `DEFAULT_FEE` is removed
-Use `calculateMinFee` to calculate transaction fee.
-* `buildRawTx` not exported anymore
-Use a general `buildTx` instead.
-* **prepareTxParams:** `calculateTtl` not exported anymore
-Use a general `buildTx` method instead.
-* **tx schema:** `nonce`, `ttl`, `gas` decoded and accepted as numbers instead of strings
-* `getAccountNonce` removed
-Use `node.getAccountNextNonce` instead.
-* AccountBase and inheriters are classes now
-Use `new` to create an instance.
-* Universal, RpcAepp, RpcWallet, Ae are removed
-Use AeSdk, AeSdkAepp, AeSdkWallet, AeSdbBase accordingly.
-* NodePool are removed
-Use AeSdkBase or AeSdk instead.
-* AccountMultiple removed
-Use AeSdk instead.
-* AeSdk doesn't accepts array of accounts
-Use `addAccount` method instead.
-* **aci:** Contract instance doesn't accept address in `onAccount`
-It should be instance of `AccountBase` instead.
-* `destroyInstance` method removed
-It wasn't doing anything, just remove it's usages.
-* ContractCompilerHttp stamp removed
-Use Compiler class instead.
-* **oracle:** `extendOracleTtl` accepts oracle ttl in `oracleTtlType` and `oracleTtlValue` fields
-Use `oracleTtlType` field instead of `type`, and `oracleTtlValue` field instead of `value`.
-* **ae:** `name.update`, `name.revoke` doesn't accept account as string anymore
-Pass an instance of AccountBase to `onAccount` option instead.
-* **unpackTx:** `unpackTx` not accepting transaction as buffer
-Use `unpackTx(encode(tx, 'tx'))` instead.
-* **unpackTx:** `unpackTx` deosn't return `binary`
-Use `require('rlp').decode(unpackTx(tx).rlpEncoded)` instead.
-* **getQueryObject:** `decode` method of `getQueryObject` removed
-Use `decode` function instead.
-* NAME_BID_TIMEOUTS not exposed anymore
-Use `computeAuctionEndBlock` function instead.
-* `computeAuctionEndBlock` accepts and returns height as number
-* DENOMINATION_MAGNITUDE not exposed anymore
-It is intended for internal use only.
-* TX_TYPE mapped to tag (number) instead of string
-Allways use TX_TYPE. To get type name by tag use `TX_TYPE[tag]`.
-* OBJECT_ID_TX_TYPE removed
-Use `TX_TYPE[tag]` instead.
-* TX_SERIALIZATION_SCHEMA combined with TX_DESERIALIZATION_SCHEMA
-Use `TX_SCHEMA[TX_TYPE.*]` instead.
-* **node:** Node is a class instead of a stamp
-Rewrite `await Node({ url })` to `new Node(url)`.
-* **node:** `getNetworkId` returns a promise
-* **node:** `api` is removed in Node
-Use `node.getBalance` instead of `node.api.getBalance.`
-* **node:** static properties of Node are removed
-Use `node.getStatus()` or `node.getNodeInfo()` to get values of `version`, `revision`,
-`genesisHash`, `nodeNetworkId`, `consensusProtocolVersion`.
-* **compiler:** Removed `compilerVersion` property
-Use `compilerApi.aPIVersion()` method instead.
-* **wallet-rpc:** `txObject` parameter of `onSign` callback is removed
-Use `unpackTx(tx)` on wallet side instead.
-* **wallet-rpc:** wallet callbacks accepts aeppId, params, and origin
-* **wallet-rpc:** `rpcClients` in wallet is not exposed anymore
-* **wallet-rpc:** `onDisconnect` callback on wallet side accepts client id instead of RpcClient
-Use `sdk.rpcClient[clientId]` to get the corresponding instance of RpcClient.
-* **RpcClient:** wallet-rpc can't handle specific account set for app anymore
-If you need this feature, create a custom wallet implementation.
-* **wallet-rpc:** wallet can't selectively notify aepps about selecting/adding account
-If you need this feature, create a custom wallet implementation.
-* **wallet-rpc:** wallet can't provide metadata for accounts
-If you need this feature, create a custom wallet implementation.
-* **RpcClient:** RpcClient has no `origin` property
-Use `connection` property instead.
-* **wallet-rpc:** RpcClient doesn't contain aepp info anymore
-Get aepp info in `onConnection` callback, and store somehow to use later.
-* `createAensDelegationSignature` first argument not an object
-`contractId` accepted as the first argument, `name` should be passed as option to the second one.
-* `createOracleDelegationSignature` first argument not an object
-`contractId` accepted as the first argument, `queryId` should be passed as option to the second one.
-* `Contract`, `GeneralizedAccount` not exported in the root
-Specific methods exported instead.
-* arguments in `createGeneralizedAccount` is required
-Pass an empty array if you need no arguments.
-* **wallet-rpc:** removed `action.accept` in permission callbacks on wallet side
-Return the value you passed to `accept` instead.
-* **wallet-rpc:** removed `action.deny` in permission callbacks on wallet side
-Throw instances of `RpcRejectedByUserError` instead.
-* `shareNode` argument in accept callback of `onConnection` removed
-Just `deny` the connection if you don't want to share the node url.
-* **aepp-rpc:** `connectToWallet` accepts wallet connection as the first argument
-See connect-aepp-to-wallet.md for details.
-* **aepp-rpc:** `disconnectWallet` runs in sync and `sendDisconnect` arg removed
-So, aepp would always send `closeConnection` notification.
-* **aepp-rpc:** `sendConnectRequest` removed
-Use `connectToWallet` instead.
-* **rpc-client:** `sendMessage` of RpcClient is a private method
-Use `request` or `notify` instead.
-* **rpc-client:** `shareWalletInfo` of WalletRpc accepts rpcClientId instead of callback
-For example, rewrite
-```
-const connection = new BrowserRuntimeConnection({ port })
-aeSdk.addRpcClient(connection)
-aeSdk.shareWalletInfo(port.postMessage.bind(port))
-```
-to
-```
-const connection = new BrowserRuntimeConnection({ port })
-const rpcClientId = aeSdk.addRpcClient(connection)
-aeSdk.shareWalletInfo(rpcClientId)
-```
-* **rpc-client:** `handlers` parameter is removed in RpcClient
-Provide a `methods` parameter instead of `handlers[0]`.
-Provide an `onDisconnect` parameter instead of `handlers[1]`.
-* **AeppRpc:** AeppRpc doesn't accept `connection` anymore
-Use `connectToWallet` method instead.
-* **NodeApi:** Node API returns BigInts for coin fields instead of string or number
-* removed `ensureNameValid`
-Use a TypeScript check instead.
-* **aepp rpc:** connectToWallet accepts wallet info as the first argument
-See connect-aepp-to-wallet.md for details.
-* **aepp-wallet:** BrowserRuntimeConnection, BrowserWindowMessageConnection are classes
-Create instances using new.
-* **aepp-wallet:** ContentScriptBridge, WalletDetector rewrited to plain functions
-Use `connectionProxy`, `walletDetector` respectively
-* **rpc:** `getBrowserAPI` helper removed
-Use `webextension-polyfill` package instead.
-* **rpc:** WalletRpc requires `id`, `type` in params
-`id` should be a unique string;
-`type` should be one of 'window', 'extension'.
-* **rpc:** BrowserRuntimeConnection requires `port` parameter
-Pass `require('webextension-polyfill').runtime.connect()` to it.
-* **rpc:** RPC helpers are not exposed anymore
-Use own implementation instead of `isInIframe`, `sendMessage`, `getHandler`, `message`,
-`responseMessage`, `sendResponseMessage`, `isValidAccounts`
-* **rpc account:** aepp's `signMessage` returns Buffer by default
-Use `returnHex` option to get the previous behaviour.
+#### General
+* `Universal`, `RpcAepp`, `RpcWallet` stamps replaced with `AeSdk`, `AeSdkAepp`, `AeSdkWallet` classes
+* all combined exports are inlined (`require('@aeternity/aepp-sdk').generateKeyPair()`)
+* `AccountBase` and inheritors are classes now
+* `ChainNode`, `Contract`, `Oracle`, `Aens`, `Ae`, `GeneralizedAccount` stamps not exported in
+  the root, their methods exported instead
+
+#### Node and Compiler
+* `Node`, `Compiler` (previously `ContractCompilerHttp`) are classes instead of a stamps
+* `Node`, `Compiler` doesn't check version on the first request instead of init
+* `getNetworkId` returns a promise
+* `getNetworkId` ignores `force` option
+* `api` and static properties are removed in `Node`
+* `Node` returns BigInts for coin amount fields instead of string or number
+* `Node` not accepts `internalUrl`
+* removed `mempool` method in `Node`
+* `compilerVersion` is removed in `Compiler`
+* `setCompilerUrl` changes compiler URL in sync
+* methods of `Compiler` requires `options` object according to their specification
+* methods of `Compiler` returns and accepts keys named in camelCase instead of snake_case
+
+#### Transaction builder
 * removed methods to generate a transaction of specific type
-Use sdk.buildTx(txType, params) instead.
-* Transaction schemas doesn't contain tag anymore
-Use `OBJECT_ID_TX_TYPE` to find tag by transaction type.
-* The result of `unpackTx` returned instead of `TxObject`
-In `txObject` option of `onSign` handler on wallet side.
-In `tx` field of contract call result.
-* **encoder:** since the prefix is evaluated by the type
-itself the required prefix parameter is no more required.
-
-rewrite
-```js
-decode('cb_DA6sWJo=', 'cb')
-```
-to
-```js
-decode('cb_DA6sWJo=')
-```
-* `genSwaggerClient` removed
-Use `swagger-client` package instead.
-* **utils:** `validateKeyObj` removed
-Rely TypeScript checks instead.
-* **utils:** `deriveKeyUsingArgon2id` removed
-Use `argon2-browser` package instead.
-* **chain:** Dropped `Chain`, `ChainNode` stamps
-Theirs methods added to `Ae` stamps, also they are exported by names in the package root.
-Outside of Stamp context, they accepts the `onAccount`, `onNode` options.
-* **chain:** removed `sdk.balance` method
-Use `sdk.getBalance` instead.
-* **chain:** removed `sdk.tx` method
-Use `sdk.api.getTransactionByHash/getTransactionInfoByHash` instead.
-* **chain:** removed `sdk.getTxInfo` method
-Use `sdk.api.getTransactionInfoByHash` instead.
-* **compiler:** `ContractCompilerHttp` creates and changes compiler URL in sync
-Don't tread `ContractCompilerHttp(...)` and `compiler.setCompilerUrl(...)` as a `Promise` anymore.
-* **compiler:** `ContractCompilerHttp` doesn't check version on creating and switching the url
-This would be checked before the first request.
-* `filesystem` option renamed to `fileSystem`
-* methods of `compilerApi` requires `options` object according to their specification
-* methods of `compilerApi` returns and accepts keys named in camelCase
-instead of snake_case
-* **node:** removed `internalUrl`
-`Node` doesn't accepts and stores `internalUrl`, also internal endpoints are not available anymore.
-If necessary, create a wrapper of internal API separately (using `genSwaggerClient`).
-* **node:** removed `mempool` method
-Create a wrapper of internal API by `genSwaggerClient` and use `getPendingTransactions` method
-instead.
-
-Reverts: 690db5bd2919958edcadca79fd75b5ad96b77c62
-* **getNetworkId:** `getNetworkId` ignores `force` option
-So, it would throw exception in case networkId is not provided. Use `try/catch` instead.
-* **wallet rpc:** `RpcClient` doesn't contain `networkId` anymore
-On wallet side: assume that all aepps uses the same network as the wallet connected to.
-On aepp side: use `networkId` that wallet provided.
-In case `networkId` is not compatible ask user to switch wallet to a compatible network.
+* removed ability to generate transaction on the node side
+* `nonce`, `ttl`, `gas` decoded and accepted as numbers instead of strings
 * `gas` renamed to `gasLimit`
-Use `gasLimit` instead of `gas` everywhere except for transaction details returned by node.
-* all combined exports are inlined
-Import the needed utils directly instead of importing a wrapper object firstly.
-For example, replace:
-```
-import { Crypto } from '@aeternity/aepp-sdk'
-console.log(Crypto.generateKeyPair())
-```
-with
-```
-import { generateKeyPair } from '@aeternity/aepp-sdk'
-console.log(generateKeyPair())
-```
+* `unpackTx` not accepting transaction as `Buffer`, only as tx-encoded string
+* `unpackTx` doesn't have `binary` field in result
+* **encode:** since the prefix is evaluated by the type
+    itself the required prefix parameter is no more accepted
+* `calculateMinFee` returns BigNumber instead of string
+* Fee helpers not exported anymore (`BASE_GAS`, `GAS_PER_BYTE`, `KEY_BLOCK_INTERVAL`,
+  `TX_FEE_BASE_GAS`, `TX_FEE_OTHER_GAS`, `calculateFee`, `DEFAULT_FEE`)
+* `buildRawTx`, `calculateTtl` not exported anymore
+* `TX_TYPE` mapped to tag (number) instead of string
+* `OBJECT_ID_TX_TYPE` not exported anymore
+* `TX_SERIALIZATION_SCHEMA` combined with `TX_DESERIALIZATION_SCHEMA`
+* Transaction schemas doesn't contain tag anymore
+
+#### AENS
+* `computeBidFee` accepts `startFee`, `increment` as options
+* `NAME_BID_TIMEOUTS` not exposed anymore
+* `computeAuctionEndBlock` accepts and returns height as number
+* removed `ensureNameValid`
+* `name.update`, `name.revoke` doesn't accept address in `onAccount`, only instances of `AccountBase`
+
+#### Oracle
+* `extendOracleTtl` accepts oracle ttl in `oracleTtlType` and `oracleTtlValue` fields
+* `decode` method of `getQueryObject` removed
+
+#### Contract
+* `createAensDelegationSignature` accepts `contractId`, `name`, options
+* `createOracleDelegationSignature` accepts `contractId`, `queryId` as a property of options
+* call arguments in `createGeneralizedAccount` is required
+* `filesystem` option renamed to `fileSystem`
+* Contract instance doesn't accept address in `onAccount`, only instances of `AccountBase`
+
+#### Chain
+* removed `balance`, `tx`, `getTxInfo` methods
+
+#### Other
+* `getAccountNonce` removed
+* `AeSdk` doesn't accept array of accounts
+* `destroyInstance` method removed
+* `NodePool`, `AccountMultiple` are removed (reimplemented in `AeSdk`)
+* `DENOMINATION_MAGNITUDE` not exposed anymore
+* The result of `unpackTx` returned instead of `TxObject` (in `txObject` option of `onSign` handler
+  on wallet side; in `tx` field of contract call result)
+* `validateKeyObj` removed
+* `deriveKeyUsingArgon2id` removed
 * removed extra implementation of `getAddressFromPriv` in keystore
-Use `Crypto.getAddressFromPriv` instead.
-* **aepp-rpc:** extract common error checks
+* `genSwaggerClient` removed
+
+#### Aepp Wallet communication
+* BrowserRuntimeConnection, BrowserWindowMessageConnection are classes
+* ContentScriptBridge, WalletDetector rewrited to plain functions (`connectionProxy`, `walletDetector`)
+* **RpcClient:** removed `origin` property
+* **RpcClient:** `sendMessage` is a private method
+* **RpcClient:** `handlers` parameter is removed
+* **RpcClient:** doesn't contain aepp info anymore
+* **RpcClient:** doesn't contain `networkId` anymore
+* RPC helpers are not exposed anymore (`isInIframe`, `sendMessage`, `getHandler`, `message`,
+  `responseMessage`, `sendResponseMessage`, `isValidAccounts`)
+
+#### Aepp
+* `connectToWallet` accepts wallet connection as the first argument
+* `disconnectWallet` runs in sync and `sendDisconnect` arg removed
+* `sendConnectRequest` removed
+* doesn't accept `connection` anymore
+* removed `isConnected`, `isSubscribedAccount` methods
+* `signMessage` returns Buffer by default
+
+#### Wallet
+* BrowserRuntimeConnection requires `port` parameter
+* requires `id`, `type` in params
+* `getBrowserAPI` helper removed
+* `shareWalletInfo` accepts rpcClientId instead of callback
+* `shareNode` argument in accept callback of `onConnection` removed
+* can't handle specific set of accounts for an app
+* `txObject` parameter of `onSign` callback is removed
+* callbacks accepts aeppId, params, and origin
+* `rpcClients` in wallet is not exposed anymore
+* `onDisconnect` callback on wallet side accepts client id instead of RpcClient
+* wallet can't selectively notify aepps about selecting/adding account
+* wallet can't provide metadata for accounts
+* removed `action.{accept,deny}` in permission callbacks
 
 ### Features
 
 * **aepp:** support external accounts in `onAccount` ([9745c73](https://github.com/aeternity/aepp-sdk-js/commit/9745c738fef861719e3418e9ada738cbb8d710c7))
-* **compiler:** init in sync, check version on making request ([a7fe956](https://github.com/aeternity/aepp-sdk-js/commit/a7fe9563cadeca469404bb8de13afd81242b81a2))
 * **ga:** implement buildAuthTxHash function ([73eae4e](https://github.com/aeternity/aepp-sdk-js/commit/73eae4e6d791eeca4c9afc3ad448e5e006c1f24f))
-* generate compiler api in TypeScript using autorest ([777e990](https://github.com/aeternity/aepp-sdk-js/commit/777e990f2e900b4d8df8b4c4d91c1d4e9bab6f72))
-* generate node api in TypeScript ([5576cf9](https://github.com/aeternity/aepp-sdk-js/commit/5576cf939518ad7fb45b54445738be92db8e756b))
 * **NodeInvocationError:** store tx-encoded transaction ([a74da7c](https://github.com/aeternity/aepp-sdk-js/commit/a74da7ce2eac7bb0902cebfc8831a0e3e7faa6ec))
 
 
@@ -238,6 +129,11 @@ Use `Crypto.getAddressFromPriv` instead.
 * **wallet:** revert to returning complete tx data instead of just hash in rpc wallet signing ([c3ada74](https://github.com/aeternity/aepp-sdk-js/commit/c3ada74b3086b2c3e057c1011b19c35d183c4476))
 
 
+### Refactoring with breaking changes
+
+* generate compiler api in TypeScript using autorest ([777e990](https://github.com/aeternity/aepp-sdk-js/commit/777e990f2e900b4d8df8b4c4d91c1d4e9bab6f72))
+* generate node api in TypeScript ([5576cf9](https://github.com/aeternity/aepp-sdk-js/commit/5576cf939518ad7fb45b54445738be92db8e756b))
+* **compiler:** init in sync, check version on making request ([a7fe956](https://github.com/aeternity/aepp-sdk-js/commit/a7fe9563cadeca469404bb8de13afd81242b81a2))
 * **aci:** accept onAccount as AccountBase ([e816428](https://github.com/aeternity/aepp-sdk-js/commit/e8164281a525c255d9dc74efe189dab66ad6f443))
 * **ae:** drop stamps and use plain functions ([8ed55d0](https://github.com/aeternity/aepp-sdk-js/commit/8ed55d0e8fb24eb842e1f8bd2b809f9d5a8c8996))
 * **aepp rpc:** accept wallet info separately ([baad98e](https://github.com/aeternity/aepp-sdk-js/commit/baad98e9f45ac44cf20c241158ede4276b8786ac))
