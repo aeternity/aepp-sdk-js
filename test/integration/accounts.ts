@@ -20,7 +20,7 @@ import { expect } from 'chai'
 import { getSdk, BaseAe, networkId } from '.'
 import { generateKeyPair } from '../../src/utils/crypto'
 import BigNumber from 'bignumber.js'
-import MemoryAccount from '../../src/account/memory'
+import MemoryAccount from '../../src/account/Memory'
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter'
 import {
   UnavailableAccountError,

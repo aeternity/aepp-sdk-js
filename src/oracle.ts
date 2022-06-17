@@ -24,9 +24,9 @@
  */
 
 import { send } from './spend'
-import { mapObject, pause } from '../utils/other'
-import { oracleQueryId, decode, encode } from '../tx/builder/helpers'
-import { unpackTx } from '../tx/builder'
+import { mapObject, pause } from './utils/other'
+import { oracleQueryId, decode, encode } from './tx/builder/helpers'
+import { unpackTx } from './tx/builder'
 import {
   ORACLE_TTL,
   ORACLE_TTL_TYPES,
@@ -34,14 +34,14 @@ import {
   QUERY_TTL,
   RESPONSE_TTL,
   TX_TYPE
-} from '../tx/builder/schema'
-import { RequestTimedOutError } from '../utils/errors'
-import { EncodedData } from '../utils/encoder'
-import { _getPollInterval } from '../chain'
-import { _buildTx, BuildTxOptions } from '../tx'
-import Node from '../node'
+} from './tx/builder/schema'
+import { RequestTimedOutError } from './utils/errors'
+import { EncodedData } from './utils/encoder'
+import { _getPollInterval } from './chain'
+import { _buildTx, BuildTxOptions } from './tx'
+import Node from './Node'
 import BigNumber from 'bignumber.js'
-import AccountBase from '../account/base'
+import AccountBase from './account/Base'
 
 type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['oracleQueries']
 

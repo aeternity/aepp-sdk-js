@@ -26,9 +26,9 @@ import { AensName } from '../tx/builder/schema'
 import { decode, produceNameId } from '../tx/builder/helpers'
 import { concatBuffers } from '../utils/other'
 import { EncodedData, EncodingType } from '../utils/encoder'
-import AccountBase from '../account/base'
-import Node from '../node'
-export { default as getContractInstance } from '../contract/aci'
+import AccountBase from '../account/Base'
+import Node from '../Node'
+export { default as getContractInstance } from './aci'
 
 /**
  * Utility method to create a delegate signature for a contract

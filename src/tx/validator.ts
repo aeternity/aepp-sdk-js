@@ -9,7 +9,7 @@ import calculateMinFee from './min-fee'
 import { UnsupportedProtocolError } from '../utils/errors'
 import { concatBuffers, isKeyOfObject } from '../utils/other'
 import { EncodedData } from '../utils/encoder'
-import Node from '../node'
+import Node from '../Node'
 
 interface Account {
   balance: bigint

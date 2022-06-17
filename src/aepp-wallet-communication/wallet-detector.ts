@@ -18,7 +18,7 @@
 import BrowserConnection from './connection/Browser'
 import BrowserWindowMessageConnection from './connection/BrowserWindowMessage'
 import { MESSAGE_DIRECTION, METHODS } from './schema'
-import { UnsupportedPlatformError } from '../errors'
+import { UnsupportedPlatformError } from '../utils/errors'
 
 interface Wallet {
   info: {

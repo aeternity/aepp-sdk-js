@@ -1,5 +1,5 @@
 import AeSdkBase, { Account } from './AeSdkBase'
-import AccountBase from './account/base'
+import AccountBase from './account/Base'
 import { decode, EncodedData } from './utils/encoder'
 import { UnavailableAccountError } from './utils/errors'
 

@@ -1,5 +1,5 @@
-import { EncodedData } from '../encoder'
-import { BaseError, InternalError } from '../errors'
+import { EncodedData } from '../utils/encoder'
+import { BaseError, InternalError } from '../utils/errors'
 
 export const enum MESSAGE_DIRECTION {
   to_waellet = 'to_waellet',

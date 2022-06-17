@@ -18,7 +18,7 @@ import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../ut
 import { buildTx } from '../tx/builder'
 import { decode, EncodedData } from '../utils/encoder'
 import { TX_TYPE } from '../tx/builder/schema'
-import { getNetworkId } from '../node'
+import { getNetworkId } from '../Node'
 import { concatBuffers } from '../utils/other'
 
 /**

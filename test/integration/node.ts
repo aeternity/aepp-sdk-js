@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import Node from '../../src/node'
+import Node from '../../src/Node'
 import AeSdkBase from '../../src/AeSdkBase'
 import { url, ignoreVersion } from '.'
 import { describe, it, before } from 'mocha'

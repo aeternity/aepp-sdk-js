@@ -18,7 +18,7 @@
 import '..'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import MemoryAccount from '../../src/account/memory'
+import MemoryAccount from '../../src/account/Memory'
 import { generateKeyPair } from '../../src/utils/crypto'
 import { InvalidKeypairError, DecodeError } from '../../src/utils/errors'
 import { EncodedData } from '../../src/utils/encoder'
