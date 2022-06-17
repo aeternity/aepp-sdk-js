@@ -28,7 +28,7 @@ import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '.
 import { concatBuffers } from '../utils/other'
 import AccountBase from '../account/Base'
 import { getContractInstance } from './methods'
-import { send } from '../spend'
+import { send, SendOptions } from '../spend'
 import Node from '../Node'
 import { getAccount } from '../chain'
 import Compiler from './Compiler'
@@ -58,10 +58,7 @@ export async function createGeneralizedAccount (
   authFnName: string,
   source: string,
   args: any[],
-  { onAccount, onCompiler, onNode, ...options }:
-  { onAccount: AccountBase, onCompiler: Compiler, onNode: Node, gasLimit?: number }
-  & BuildTxOptions<TX_TYPE.gaAttach, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>
-  & Parameters<typeof send>[1]
+  { onAccount, onCompiler, onNode, ...options }: CreateGeneralizedAccountOptions
 ): Promise<Readonly<{
     owner: EncodedData<'ak'>
     transaction: EncodedData<'th'>
@@ -91,6 +88,15 @@ export async function createGeneralizedAccount (
     rawTx,
     gaContractId: contractId
   })
+}
+
+interface CreateGeneralizedAccountOptions extends
+  BuildTxOptions<TX_TYPE.gaAttach, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
+  SendOptions {
+  onAccount: AccountBase
+  onCompiler: Compiler
+  onNode: Node
+  gasLimit?: number
 }
 
 /**
