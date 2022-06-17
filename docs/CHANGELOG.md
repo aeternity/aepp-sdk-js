@@ -2,6 +2,300 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v11.0.1...v12.0.0) (2022-06-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **tests:** `computeBidFee` accepts `startFee`, `increment` as options
+* Fee helpers not exported anymore
+`BASE_GAS`, `GAS_PER_BYTE`, `KEY_BLOCK_INTERVAL`, `TX_FEE_BASE_GAS`, `TX_FEE_OTHER_GAS`.
+Use a general `calculateMinFee` instead.
+* `calculateMinFee` returns BigNumber instead of string
+* `calculateFee` removed
+Use `calculateMinFee` to calculate transaction fee.
+* `DEFAULT_FEE` is removed
+Use `calculateMinFee` to calculate transaction fee.
+* `buildRawTx` not exported anymore
+Use a general `buildTx` instead.
+* **prepareTxParams:** `calculateTtl` not exported anymore
+Use a general `buildTx` method instead.
+* **tx schema:** `nonce`, `ttl`, `gas` decoded and accepted as numbers instead of strings
+* `getAccountNonce` removed
+Use `node.getAccountNextNonce` instead.
+* AccountBase and inheriters are classes now
+Use `new` to create an instance.
+* Universal, RpcAepp, RpcWallet, Ae are removed
+Use AeSdk, AeSdkAepp, AeSdkWallet, AeSdbBase accordingly.
+* NodePool are removed
+Use AeSdkBase or AeSdk instead.
+* AccountMultiple removed
+Use AeSdk instead.
+* AeSdk doesn't accepts array of accounts
+Use `addAccount` method instead.
+* **aci:** Contract instance doesn't accept address in `onAccount`
+It should be instance of `AccountBase` instead.
+* `destroyInstance` method removed
+It wasn't doing anything, just remove it's usages.
+* ContractCompilerHttp stamp removed
+Use Compiler class instead.
+* **oracle:** `extendOracleTtl` accepts oracle ttl in `oracleTtlType` and `oracleTtlValue` fields
+Use `oracleTtlType` field instead of `type`, and `oracleTtlValue` field instead of `value`.
+* **ae:** `name.update`, `name.revoke` doesn't accept account as string anymore
+Pass an instance of AccountBase to `onAccount` option instead.
+* **unpackTx:** `unpackTx` not accepting transaction as buffer
+Use `unpackTx(encode(tx, 'tx'))` instead.
+* **unpackTx:** `unpackTx` deosn't return `binary`
+Use `require('rlp').decode(unpackTx(tx).rlpEncoded)` instead.
+* **getQueryObject:** `decode` method of `getQueryObject` removed
+Use `decode` function instead.
+* NAME_BID_TIMEOUTS not exposed anymore
+Use `computeAuctionEndBlock` function instead.
+* `computeAuctionEndBlock` accepts and returns height as number
+* DENOMINATION_MAGNITUDE not exposed anymore
+It is intended for internal use only.
+* TX_TYPE mapped to tag (number) instead of string
+Allways use TX_TYPE. To get type name by tag use `TX_TYPE[tag]`.
+* OBJECT_ID_TX_TYPE removed
+Use `TX_TYPE[tag]` instead.
+* TX_SERIALIZATION_SCHEMA combined with TX_DESERIALIZATION_SCHEMA
+Use `TX_SCHEMA[TX_TYPE.*]` instead.
+* **node:** Node is a class instead of a stamp
+Rewrite `await Node({ url })` to `new Node(url)`.
+* **node:** `getNetworkId` returns a promise
+* **node:** `api` is removed in Node
+Use `node.getBalance` instead of `node.api.getBalance.`
+* **node:** static properties of Node are removed
+Use `node.getStatus()` or `node.getNodeInfo()` to get values of `version`, `revision`,
+`genesisHash`, `nodeNetworkId`, `consensusProtocolVersion`.
+* **compiler:** Removed `compilerVersion` property
+Use `compilerApi.aPIVersion()` method instead.
+* **wallet-rpc:** `txObject` parameter of `onSign` callback is removed
+Use `unpackTx(tx)` on wallet side instead.
+* **wallet-rpc:** wallet callbacks accepts aeppId, params, and origin
+* **wallet-rpc:** `rpcClients` in wallet is not exposed anymore
+* **wallet-rpc:** `onDisconnect` callback on wallet side accepts client id instead of RpcClient
+Use `sdk.rpcClient[clientId]` to get the corresponding instance of RpcClient.
+* **RpcClient:** wallet-rpc can't handle specific account set for app anymore
+If you need this feature, create a custom wallet implementation.
+* **wallet-rpc:** wallet can't selectively notify aepps about selecting/adding account
+If you need this feature, create a custom wallet implementation.
+* **wallet-rpc:** wallet can't provide metadata for accounts
+If you need this feature, create a custom wallet implementation.
+* **RpcClient:** RpcClient has no `origin` property
+Use `connection` property instead.
+* **wallet-rpc:** RpcClient doesn't contain aepp info anymore
+Get aepp info in `onConnection` callback, and store somehow to use later.
+* `createAensDelegationSignature` first argument not an object
+`contractId` accepted as the first argument, `name` should be passed as option to the second one.
+* `createOracleDelegationSignature` first argument not an object
+`contractId` accepted as the first argument, `queryId` should be passed as option to the second one.
+* `Contract`, `GeneralizedAccount` not exported in the root
+Specific methods exported instead.
+* arguments in `createGeneralizedAccount` is required
+Pass an empty array if you need no arguments.
+* **wallet-rpc:** removed `action.accept` in permission callbacks on wallet side
+Return the value you passed to `accept` instead.
+* **wallet-rpc:** removed `action.deny` in permission callbacks on wallet side
+Throw instances of `RpcRejectedByUserError` instead.
+* `shareNode` argument in accept callback of `onConnection` removed
+Just `deny` the connection if you don't want to share the node url.
+* **aepp-rpc:** `connectToWallet` accepts wallet connection as the first argument
+See connect-aepp-to-wallet.md for details.
+* **aepp-rpc:** `disconnectWallet` runs in sync and `sendDisconnect` arg removed
+So, aepp would always send `closeConnection` notification.
+* **aepp-rpc:** `sendConnectRequest` removed
+Use `connectToWallet` instead.
+* **rpc-client:** `sendMessage` of RpcClient is a private method
+Use `request` or `notify` instead.
+* **rpc-client:** `shareWalletInfo` of WalletRpc accepts rpcClientId instead of callback
+For example, rewrite
+```
+const connection = new BrowserRuntimeConnection({ port })
+aeSdk.addRpcClient(connection)
+aeSdk.shareWalletInfo(port.postMessage.bind(port))
+```
+to
+```
+const connection = new BrowserRuntimeConnection({ port })
+const rpcClientId = aeSdk.addRpcClient(connection)
+aeSdk.shareWalletInfo(rpcClientId)
+```
+* **rpc-client:** `handlers` parameter is removed in RpcClient
+Provide a `methods` parameter instead of `handlers[0]`.
+Provide an `onDisconnect` parameter instead of `handlers[1]`.
+* **AeppRpc:** AeppRpc doesn't accept `connection` anymore
+Use `connectToWallet` method instead.
+* **NodeApi:** Node API returns BigInts for coin fields instead of string or number
+* removed `ensureNameValid`
+Use a TypeScript check instead.
+* **aepp rpc:** connectToWallet accepts wallet info as the first argument
+See connect-aepp-to-wallet.md for details.
+* **aepp-wallet:** BrowserRuntimeConnection, BrowserWindowMessageConnection are classes
+Create instances using new.
+* **aepp-wallet:** ContentScriptBridge, WalletDetector rewrited to plain functions
+Use `connectionProxy`, `walletDetector` respectively
+* **rpc:** `getBrowserAPI` helper removed
+Use `webextension-polyfill` package instead.
+* **rpc:** WalletRpc requires `id`, `type` in params
+`id` should be a unique string;
+`type` should be one of 'window', 'extension'.
+* **rpc:** BrowserRuntimeConnection requires `port` parameter
+Pass `require('webextension-polyfill').runtime.connect()` to it.
+* **rpc:** RPC helpers are not exposed anymore
+Use own implementation instead of `isInIframe`, `sendMessage`, `getHandler`, `message`,
+`responseMessage`, `sendResponseMessage`, `isValidAccounts`
+* **rpc account:** aepp's `signMessage` returns Buffer by default
+Use `returnHex` option to get the previous behaviour.
+* removed methods to generate a transaction of specific type
+Use sdk.buildTx(txType, params) instead.
+* Transaction schemas doesn't contain tag anymore
+Use `OBJECT_ID_TX_TYPE` to find tag by transaction type.
+* The result of `unpackTx` returned instead of `TxObject`
+In `txObject` option of `onSign` handler on wallet side.
+In `tx` field of contract call result.
+* **encoder:** since the prefix is evaluated by the type
+itself the required prefix parameter is no more required.
+
+rewrite
+```js
+decode('cb_DA6sWJo=', 'cb')
+```
+to
+```js
+decode('cb_DA6sWJo=')
+```
+* `genSwaggerClient` removed
+Use `swagger-client` package instead.
+* **utils:** `validateKeyObj` removed
+Rely TypeScript checks instead.
+* **utils:** `deriveKeyUsingArgon2id` removed
+Use `argon2-browser` package instead.
+* **chain:** Dropped `Chain`, `ChainNode` stamps
+Theirs methods added to `Ae` stamps, also they are exported by names in the package root.
+Outside of Stamp context, they accepts the `onAccount`, `onNode` options.
+* **chain:** removed `sdk.balance` method
+Use `sdk.getBalance` instead.
+* **chain:** removed `sdk.tx` method
+Use `sdk.api.getTransactionByHash/getTransactionInfoByHash` instead.
+* **chain:** removed `sdk.getTxInfo` method
+Use `sdk.api.getTransactionInfoByHash` instead.
+* **compiler:** `ContractCompilerHttp` creates and changes compiler URL in sync
+Don't tread `ContractCompilerHttp(...)` and `compiler.setCompilerUrl(...)` as a `Promise` anymore.
+* **compiler:** `ContractCompilerHttp` doesn't check version on creating and switching the url
+This would be checked before the first request.
+* `filesystem` option renamed to `fileSystem`
+* methods of `compilerApi` requires `options` object according to their specification
+* methods of `compilerApi` returns and accepts keys named in camelCase
+instead of snake_case
+* **node:** removed `internalUrl`
+`Node` doesn't accepts and stores `internalUrl`, also internal endpoints are not available anymore.
+If necessary, create a wrapper of internal API separately (using `genSwaggerClient`).
+* **node:** removed `mempool` method
+Create a wrapper of internal API by `genSwaggerClient` and use `getPendingTransactions` method
+instead.
+
+Reverts: 690db5bd2919958edcadca79fd75b5ad96b77c62
+* **getNetworkId:** `getNetworkId` ignores `force` option
+So, it would throw exception in case networkId is not provided. Use `try/catch` instead.
+* **wallet rpc:** `RpcClient` doesn't contain `networkId` anymore
+On wallet side: assume that all aepps uses the same network as the wallet connected to.
+On aepp side: use `networkId` that wallet provided.
+In case `networkId` is not compatible ask user to switch wallet to a compatible network.
+* `gas` renamed to `gasLimit`
+Use `gasLimit` instead of `gas` everywhere except for transaction details returned by node.
+* all combined exports are inlined
+Import the needed utils directly instead of importing a wrapper object firstly.
+For example, replace:
+```
+import { Crypto } from '@aeternity/aepp-sdk'
+console.log(Crypto.generateKeyPair())
+```
+with
+```
+import { generateKeyPair } from '@aeternity/aepp-sdk'
+console.log(generateKeyPair())
+```
+* removed extra implementation of `getAddressFromPriv` in keystore
+Use `Crypto.getAddressFromPriv` instead.
+* **aepp-rpc:** extract common error checks
+
+### Features
+
+* **aepp:** support external accounts in `onAccount` ([9745c73](https://github.com/aeternity/aepp-sdk-js/commit/9745c738fef861719e3418e9ada738cbb8d710c7))
+* **compiler:** init in sync, check version on making request ([a7fe956](https://github.com/aeternity/aepp-sdk-js/commit/a7fe9563cadeca469404bb8de13afd81242b81a2))
+* **ga:** implement buildAuthTxHash function ([73eae4e](https://github.com/aeternity/aepp-sdk-js/commit/73eae4e6d791eeca4c9afc3ad448e5e006c1f24f))
+* generate compiler api in TypeScript using autorest ([777e990](https://github.com/aeternity/aepp-sdk-js/commit/777e990f2e900b4d8df8b4c4d91c1d4e9bab6f72))
+* generate node api in TypeScript ([5576cf9](https://github.com/aeternity/aepp-sdk-js/commit/5576cf939518ad7fb45b54445738be92db8e756b))
+* **NodeInvocationError:** store tx-encoded transaction ([a74da7c](https://github.com/aeternity/aepp-sdk-js/commit/a74da7ce2eac7bb0902cebfc8831a0e3e7faa6ec))
+
+
+### Bug Fixes
+
+* **aepp:** use networkId in rpc tx signing ([916dba0](https://github.com/aeternity/aepp-sdk-js/commit/916dba066907c66aa2776af64b76638b08285207))
+* importing in mjs ([0fc7418](https://github.com/aeternity/aepp-sdk-js/commit/0fc741808701167f5a56674affc0692a4965baf6))
+* **messageToHash:** support messages longer than 252 chars ([b4aa456](https://github.com/aeternity/aepp-sdk-js/commit/b4aa4566990c6b823b8a635da78707adfebd1a52))
+* **wallet:** revert to returning complete tx data instead of just hash in rpc wallet signing ([c3ada74](https://github.com/aeternity/aepp-sdk-js/commit/c3ada74b3086b2c3e057c1011b19c35d183c4476))
+
+
+* **aci:** accept onAccount as AccountBase ([e816428](https://github.com/aeternity/aepp-sdk-js/commit/e8164281a525c255d9dc74efe189dab66ad6f443))
+* **ae:** drop stamps and use plain functions ([8ed55d0](https://github.com/aeternity/aepp-sdk-js/commit/8ed55d0e8fb24eb842e1f8bd2b809f9d5a8c8996))
+* **aepp rpc:** accept wallet info separately ([baad98e](https://github.com/aeternity/aepp-sdk-js/commit/baad98e9f45ac44cf20c241158ede4276b8786ac))
+* **aepp-rpc:** depend on simplified version of RpcClient ([f329549](https://github.com/aeternity/aepp-sdk-js/commit/f329549da3362cb4f216127bbbce41eb49eb7ab7))
+* **aepp-rpc:** extract common error checks ([eaa8683](https://github.com/aeternity/aepp-sdk-js/commit/eaa86831969fb94866439893e0e1d19a0a0e53e4))
+* **aepp-wallet:** rewrite to ts all except rpc ([19cb42f](https://github.com/aeternity/aepp-sdk-js/commit/19cb42fd2766bc9bcd90cfb04b5f03f00c0c7389))
+* **AeppRpc:** make to init in sync ([86c9d6c](https://github.com/aeternity/aepp-sdk-js/commit/86c9d6c712be113ea91bd172c5d0b79bbdff6d78))
+* **chain:** drop stamps and use plain functions ([4197b3d](https://github.com/aeternity/aepp-sdk-js/commit/4197b3d5aa4728756fd6e4fb9b64fef2ee4a7366))
+* **chain:** remove deprecated methods ([cefaa55](https://github.com/aeternity/aepp-sdk-js/commit/cefaa55c9075bf50453526f8a893ead33c9002ce))
+* **compiler:** extract genVersionCheckPolicy ([ac14fd1](https://github.com/aeternity/aepp-sdk-js/commit/ac14fd1ddc0889cb45c4d15b8f09f91c5dc617c7))
+* don't provide default fee when transaction is not present ([b004694](https://github.com/aeternity/aepp-sdk-js/commit/b0046941d10959ea1029463c97edd75a9dedb07c))
+* drop `ensureNameValid` ([d0d1258](https://github.com/aeternity/aepp-sdk-js/commit/d0d12584e7a9ec4b4696857e01c407259a943351))
+* drop compiler stamp ([ddf1363](https://github.com/aeternity/aepp-sdk-js/commit/ddf136371451691615cab3108a92e5b135e82d79))
+* drop functions to generate txs with specific type ([3cf767d](https://github.com/aeternity/aepp-sdk-js/commit/3cf767dc36e77a8a9c431bc9d8bd3c579adb6dc5))
+* drop TxObject wrapper ([a083c7b](https://github.com/aeternity/aepp-sdk-js/commit/a083c7bed456281d8465112346ac4f45aa81afd0))
+* **encoder:** remove required prefix param ([dec13d7](https://github.com/aeternity/aepp-sdk-js/commit/dec13d7438ebb2468009819425f65141b6a5acb5))
+* export in tree shaking friendly way ([40aca86](https://github.com/aeternity/aepp-sdk-js/commit/40aca86578981131fb2b8b50bf0938e214f7e6f4))
+* extract all fee-related stuff into a separate module ([cebb90b](https://github.com/aeternity/aepp-sdk-js/commit/cebb90b47c7bfe78f7311f0ff3b8959960f244d6))
+* extract base sdk classes ([487cc14](https://github.com/aeternity/aepp-sdk-js/commit/487cc14571d6275c997403e3b66a137ee28d47a1))
+* fix spend types ([6b089e7](https://github.com/aeternity/aepp-sdk-js/commit/6b089e7b47ec737086c733bc581d8916ebb915cc))
+* **getNetworkId:** drop unnecessary `force` option ([7d6549a](https://github.com/aeternity/aepp-sdk-js/commit/7d6549ad57a525b314ad326b4b5b971682f88013))
+* **getQueryObject:** remove deprecated `decode` method ([7e9835c](https://github.com/aeternity/aepp-sdk-js/commit/7e9835cf21b900577bfda04222aacb001e0e4f82))
+* inline NAME_BID_TIMEOUTS into computeAuctionEndBlock ([5fdb80e](https://github.com/aeternity/aepp-sdk-js/commit/5fdb80e3374744c63574e8edd3347f9db01437b1))
+* **NodeApi:** return BigInt instead of string | number ([7f37e74](https://github.com/aeternity/aepp-sdk-js/commit/7f37e74080dc53fd394fc2e9009756834f2c7f7a))
+* **node:** drop `internalUrl` ([8336673](https://github.com/aeternity/aepp-sdk-js/commit/833667301edf5a6f81485698d26ed496df69376b))
+* **node:** rewrite to ts, drop stamp ([370635e](https://github.com/aeternity/aepp-sdk-js/commit/370635e9a9eb4d67d9b63c7aacfcbd61a50813ec))
+* **oracle:** drop stamps and use plain functions ([04ce814](https://github.com/aeternity/aepp-sdk-js/commit/04ce81434c028a7e74951a507e6ce9415cf1a601))
+* **prepareTxParams:** inline calculateTtl ([2f03793](https://github.com/aeternity/aepp-sdk-js/commit/2f03793da8fbc4f047297e69c27ea82a578341e4))
+* remove ability to connect without sharing node if requested ([7dd4af5](https://github.com/aeternity/aepp-sdk-js/commit/7dd4af5474e615f570febdd9352cd0b4cf5da4b5))
+* remove extra `getAddressFromPriv` ([0f88c39](https://github.com/aeternity/aepp-sdk-js/commit/0f88c39eee8fa69e227573154d59e07f13878c95))
+* remove getAccountNonce ([62a00e5](https://github.com/aeternity/aepp-sdk-js/commit/62a00e5faa853706d1e94ce896196f9a3f642fd6))
+* remove outdated destroyInstance method ([0213375](https://github.com/aeternity/aepp-sdk-js/commit/0213375297df16662b08f3ef7b76ce06b7403ef6))
+* rename `gas` to `gasLimit` where possible ([dece758](https://github.com/aeternity/aepp-sdk-js/commit/dece758e6347a42a0ef580fa27cfb29ea361ac76))
+* rewrite AE_AMOUNT_FORMATS to enum ([448a2a3](https://github.com/aeternity/aepp-sdk-js/commit/448a2a39d91960f34adb9b3cc3afa84305c3f369))
+* rewrite ae/contract to ts ([8159d84](https://github.com/aeternity/aepp-sdk-js/commit/8159d84598c0b7223598e09f8fc0e6309716d09d))
+* rewrite TX_TYPE to enum ([f97e479](https://github.com/aeternity/aepp-sdk-js/commit/f97e4791e510a3a18f612ec1bcfa1fb671fe39a3))
+* **rpc account:** don't pass extra options through rpc connection ([141e932](https://github.com/aeternity/aepp-sdk-js/commit/141e932542db5cecdc879fb39a849d8ca7aa4531))
+* **rpc-client:** add notify method ([9e97a1a](https://github.com/aeternity/aepp-sdk-js/commit/9e97a1a97716066ec6d87c845186c8815e409ac3))
+* **rpc-client:** provide method handlers instead of onMessage ([5f1a007](https://github.com/aeternity/aepp-sdk-js/commit/5f1a0075f35c1350d62e245317d4e5466590670f))
+* **RpcClient:** remove custom set of accounts ([5c26f3a](https://github.com/aeternity/aepp-sdk-js/commit/5c26f3a364f68032524a56cd5f8e964d20fe70ee))
+* **RpcClient:** remove origin property ([7155ed3](https://github.com/aeternity/aepp-sdk-js/commit/7155ed3f84c2e7d125d3fe07a83e7f8020e774eb))
+* **rpc:** inline extra helpers ([9a0a2eb](https://github.com/aeternity/aepp-sdk-js/commit/9a0a2eb9cfd87f5fb8f591d0f237ba738d6480a0))
+* **rpc:** use webextension-polyfill ([a54fdfd](https://github.com/aeternity/aepp-sdk-js/commit/a54fdfdbf5c108b74c2b0f9185f16c62984ddf80))
+* simplify transaction schema ([5f720ec](https://github.com/aeternity/aepp-sdk-js/commit/5f720ec17e973f153984b8d5c2f60a61d888bb7e))
+* **tests:** migrate remaining tests ts ([4e2ece7](https://github.com/aeternity/aepp-sdk-js/commit/4e2ece7045c055321e0e0aff6e7447e72cb4e5b2))
+* **tx schema:** add shortInt type for fields not needed big numbers ([0095455](https://github.com/aeternity/aepp-sdk-js/commit/0095455bf0658620397778d2f0e9d31660126eeb))
+* **unpackTx:** accept only tx_string, don't return binary ([658adee](https://github.com/aeternity/aepp-sdk-js/commit/658adeea5cbf2f67008e96eef3dfca1fffd96d1b))
+* use `calculateMinFee` instead of `calculateFee` ([4ea59d7](https://github.com/aeternity/aepp-sdk-js/commit/4ea59d7da3494bf8863c3b7b20bf796bd42b6303))
+* **utils:** migrate keystore.js to ts ([c013c01](https://github.com/aeternity/aepp-sdk-js/commit/c013c011b5e8dc02cc8721d1a5201241f474e76a))
+* **wallet rpc:** don't pass networkId from aepp to wallet ([153fd89](https://github.com/aeternity/aepp-sdk-js/commit/153fd89a52c4eab39fcd659b356b36d32129c1ba))
+* **wallet-rpc:** drop `info` object in RpcClient ([010ebbb](https://github.com/aeternity/aepp-sdk-js/commit/010ebbb963ac8058ed74bff1fd01ad2e243eb3ab))
+* **wallet-rpc:** remove `meta, condition` unused by known wallets ([4630643](https://github.com/aeternity/aepp-sdk-js/commit/46306436013a36c84d65a3a8a2f1991a8183eb2b))
+* **wallet-rpc:** return value/throw error instead of accept/deny ([98b9955](https://github.com/aeternity/aepp-sdk-js/commit/98b995563de0b91d22c50a15302b1fcc9d554d6e))
+* **wallet-rpc:** rewrite to TypeScript ([930e7d7](https://github.com/aeternity/aepp-sdk-js/commit/930e7d7e1a8b3b832e841204a4f56d7c2f656a9d))
+* **wallet-rpc:** simplify callback arguments ([5fc6f8a](https://github.com/aeternity/aepp-sdk-js/commit/5fc6f8aaab5b7f46afbc27a845ed812fcd3137ef))
+* **wallet-rpc:** store rpc data in maps instead of objects ([0d3f04f](https://github.com/aeternity/aepp-sdk-js/commit/0d3f04fdec3ace9fba93c0e7fdd82e62e1f99da9))
+* **wallet-rpc:** switch to TypeScript version of RpcClient ([7d8f6d7](https://github.com/aeternity/aepp-sdk-js/commit/7d8f6d7af760a64c5ac7825de811adb88877cf78))
+
 ### [11.0.1](https://github.com/aeternity/aepp-sdk-js/compare/v11.0.0...v11.0.1) (2022-04-07)
 
 
