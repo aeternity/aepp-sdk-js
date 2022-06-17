@@ -64,21 +64,24 @@ export default {
   },
   methods: {
     async scanForWallets () {
-      const handleWallets = async function ({ wallets, newWallet }) {
-        newWallet = newWallet || Object.values(wallets)[0]
-        if (confirm(`Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`)) {
-          console.log('newWallet', newWallet)
-          stopScan()
+      return new Promise((resolve) => {
+        const handleWallets = async function ({ wallets, newWallet }) {
+          newWallet = newWallet || Object.values(wallets)[0]
+          if (confirm(`Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`)) {
+            console.log('newWallet', newWallet)
+            stopScan()
 
-          this.walletInfo = await this.aeSdk.connectToWallet(newWallet.getConnection())
-          this.walletConnected = true
-          const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected')
-          this.$store.commit('aeSdk/setAddress', Object.keys(current)[0])
+            this.walletInfo = await this.aeSdk.connectToWallet(newWallet.getConnection())
+            this.walletConnected = true
+            const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected')
+            this.$store.commit('aeSdk/setAddress', Object.keys(current)[0])
+            resolve()
+          }
         }
-      }
 
-      const scannerConnection = new BrowserWindowMessageConnection()
-      const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
+        const scannerConnection = new BrowserWindowMessageConnection()
+        const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
+      })
     },
     async connect () {
       if (this.connectMethod === 'reverse-iframe') {

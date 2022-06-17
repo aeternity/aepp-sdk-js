@@ -30,7 +30,7 @@ export default {
 ## 2. Initialize the `AeSdkAepp` class
 
 ```js
-created () {
+async created () {
   this.aeSdk = new AeSdkAepp({
     name: 'Simple Aepp',
     nodes: [
@@ -51,24 +51,28 @@ created () {
       alert('Disconnected')
     }
   })
-  this.scanForWallets()
+  await this.scanForWallets()
 }
 ```
 
 ## 3. Scan for wallets
+
 ```js
 methods: {
-  async scanForWallets()  {
-    const handleWallets = async function ({ wallets, newWallet }) {
-      newWallet = newWallet || Object.values(wallets)[0]
-      if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
-        stopScan()
-        // connect to the wallet, see step 4.
-        await this.connect(newWallet)
+  async scanForWallets() {
+    return new Promise((resolve) => {
+      const handleWallets = async function ({ wallets, newWallet }) {
+        newWallet = newWallet || Object.values(wallets)[0]
+        if (confirm(`Do you want to connect to wallet ${newWallet.name}`)) {
+          stopScan()
+          // connect to the wallet, see step 4.
+          await this.connect(newWallet)
+          resolve()
+        }
       }
-    }
-    const scannerConnection = new BrowserWindowMessageConnection()
-    const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
+      const scannerConnection = new BrowserWindowMessageConnection()
+      const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
+    })
   }
 }
 ```
@@ -87,9 +91,9 @@ async connect(wallet) {
 }
 ```
 
-## 4b. Connect to a wallet: Use Wallet's Node for chain communication
+## 4b. Connect to a wallet and use Wallet's node for on chain communications
 
-Aepp can request the wallet to share its connected node URLs if any to interact with the chain.
+Aepps can ask the wallet to share node, if wallet supports node sharing then the Aepp can communicate with the chain using the same SDK instance.
 
 ```js
 async connect (wallet) {
@@ -101,4 +105,3 @@ Note:
 
 - The steps above are snippets taken from the full implementation of
   the [Simple æpp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/aepp)
-
