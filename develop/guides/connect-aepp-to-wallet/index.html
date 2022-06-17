@@ -518,8 +518,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4b-connect-to-a-wallet-use-wallets-node-for-chain-communication" class="md-nav__link">
-    4b. Connect to a wallet: Use Wallet's Node for chain communication
+  <a href="#4b-connect-to-a-wallet-and-use-wallets-node-for-on-chain-communications" class="md-nav__link">
+    4b. Connect to a wallet and use Wallet's node for on chain communications
   </a>
   
 </li>
@@ -1004,8 +1004,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4b-connect-to-a-wallet-use-wallets-node-for-chain-communication" class="md-nav__link">
-    4b. Connect to a wallet: Use Wallet's Node for chain communication
+  <a href="#4b-connect-to-a-wallet-and-use-wallets-node-for-on-chain-communications" class="md-nav__link">
+    4b. Connect to a wallet and use Wallet's node for on chain communications
   </a>
   
 </li>
@@ -1049,7 +1049,7 @@ You can build your own wallet in the next example</li>
 <span class="p">}</span><span class="w"></span>
 </code></pre></div>
 <h2 id="2-initialize-the-aesdkaepp-class">2. Initialize the <code>AeSdkAepp</code> class</h2>
-<div class="highlight"><pre><span></span><code><span class="nx">created</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="nx">created</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdkAepp</span><span class="p">({</span><span class="w"></span>
 <span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Simple Aepp&#39;</span><span class="p">,</span><span class="w"></span>
 <span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
@@ -1070,22 +1070,25 @@ You can build your own wallet in the next example</li>
 <span class="w">      </span><span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Disconnected&#39;</span><span class="p">)</span><span class="w"></span>
 <span class="w">    </span><span class="p">}</span><span class="w"></span>
 <span class="w">  </span><span class="p">})</span><span class="w"></span>
-<span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">scanForWallets</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">scanForWallets</span><span class="p">()</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 </code></pre></div>
 <h2 id="3-scan-for-wallets">3. Scan for wallets</h2>
 <div class="highlight"><pre><span></span><code><span class="nx">methods</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">scanForWallets</span><span class="p">()</span><span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">handleWallets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">wallets</span><span class="p">,</span><span class="w"> </span><span class="nx">newWallet</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="nx">newWallet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">newWallet</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">wallets</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span><span class="w"></span>
-<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Do you want to connect to wallet </span><span class="si">${</span><span class="nx">newWallet</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="nx">stopScan</span><span class="p">()</span><span class="w"></span>
-<span class="w">        </span><span class="c1">// connect to the wallet, see step 4.</span><span class="w"></span>
-<span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">newWallet</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">scanForWallets</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">handleWallets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">wallets</span><span class="p">,</span><span class="w"> </span><span class="nx">newWallet</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">newWallet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">newWallet</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">wallets</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Do you want to connect to wallet </span><span class="si">${</span><span class="nx">newWallet</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="nx">stopScan</span><span class="p">()</span><span class="w"></span>
+<span class="w">          </span><span class="c1">// connect to the wallet, see step 4.</span><span class="w"></span>
+<span class="w">          </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">newWallet</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="nx">resolve</span><span class="p">()</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
 <span class="w">      </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">scannerConnection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">BrowserWindowMessageConnection</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">stopScan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">walletDetector</span><span class="p">(</span><span class="nx">scannerConnection</span><span class="p">,</span><span class="w"> </span><span class="nx">handleWallets</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">scannerConnection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">BrowserWindowMessageConnection</span><span class="p">()</span><span class="w"></span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">stopScan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">walletDetector</span><span class="p">(</span><span class="nx">scannerConnection</span><span class="p">,</span><span class="w"> </span><span class="nx">handleWallets</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">})</span><span class="w"></span>
 <span class="w">  </span><span class="p">}</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 </code></pre></div>
@@ -1099,8 +1102,8 @@ You can build your own wallet in the next example</li>
 <span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">nodeInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getNodeInfo</span><span class="p">()</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 </code></pre></div>
-<h2 id="4b-connect-to-a-wallet-use-wallets-node-for-chain-communication">4b. Connect to a wallet: Use Wallet's Node for chain communication</h2>
-<p>Aepp can request the wallet to share its connected node URLs if any to interact with the chain.</p>
+<h2 id="4b-connect-to-a-wallet-and-use-wallets-node-for-on-chain-communications">4b. Connect to a wallet and use Wallet's node for on chain communications</h2>
+<p>Aepps can ask the wallet to share node, if wallet supports node sharing then the Aepp can communicate with the chain using the same SDK instance.</p>
 <div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="nx">connect</span><span class="w"> </span><span class="p">(</span><span class="nx">wallet</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">connectNode</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;wallet-node&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
