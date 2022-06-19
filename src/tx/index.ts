@@ -38,8 +38,6 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
 type Int = number | string | BigNumber
 
-// uses a new feature, probably typescript-eslint doesn't support it yet
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
   Omit<Parameters<typeof _buildTx<TxType>>[1], OmitFields>
 
