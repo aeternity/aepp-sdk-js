@@ -29,6 +29,7 @@ type WithOrigin<Api extends RpcApi<Api>> = {
 
 /**
  * Contain functionality for using RPC conection
+ * @category aepp wallet communication
  * @param connection - Connection object
  * @param onDisconnect - Disconnect callback
  * @param methods - Object containing handlers for each request by name

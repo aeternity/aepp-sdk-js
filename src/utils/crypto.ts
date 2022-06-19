@@ -85,6 +85,7 @@ export function hash (input: Data): Buffer {
 // Todo Duplicated in tx builder. remove
 /**
  * Compute contract address
+ * @category contract
  * @param owner - Address of contract owner
  * @param nonce - Round when contract was created
  * @returns Contract address

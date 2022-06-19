@@ -47,6 +47,7 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
 
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
+ * @category oracle
  * @param oracleId - Oracle public key
  * @param options - Options
  * @returns Oracle object
@@ -91,6 +92,7 @@ interface GetOracleObjectReturnType extends Awaited<ReturnType<Node['getOracleBy
 
 /**
  * Poll for oracle queries
+ * @category oracle
  * @param oracleId - Oracle public key
  * @param onQuery - OnQuery callback
  * @param options - Options object
@@ -128,6 +130,7 @@ export function pollForQueries (
 
 /**
  * Constructor for OracleQuery Object (helper object for using OracleQuery)
+ * @category oracle
  * @param oracleId - Oracle public key
  * @param queryId - Oracle Query id
  * @param options - Options
@@ -161,6 +164,7 @@ interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQue
 
 /**
  * Poll for oracle query response
+ * @category oracle
  * @param oracleId - Oracle public key
  * @param queryId - Oracle Query id
  * @param options - Options object
@@ -187,6 +191,7 @@ export async function pollForQueryResponse (
 
 /**
  * Register oracle
+ * @category oracle
  * @param queryFormat - Format of query
  * @param responseFormat - Format of query response
  * @param options - Options
@@ -227,6 +232,7 @@ interface RegisterOracleOptions extends RegisterOracleOptionsType {}
 
 /**
  * Post query to oracle
+ * @category oracle
  * @param oracleId - Oracle public key
  * @param query - Oracle query object
  * @param options - Options object
@@ -274,6 +280,7 @@ interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
 
 /**
  * Extend oracle ttl
+ * @category oracle
  * @param oracleId - Oracle public key
  * @param options - Options object
  * @param options.fee - fee Transaction fee
@@ -306,6 +313,7 @@ interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
 
 /**
  * Extend oracle ttl
+ * @category oracle
  * @param oracleId - Oracle public key
  * @param queryId - Oracle query id
  * @param response - Oracle query response

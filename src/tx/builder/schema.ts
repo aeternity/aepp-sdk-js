@@ -7,8 +7,8 @@
 import BigNumber from 'bignumber.js'
 import { Name, NameId, NameFee, Deposit, Field, GasPrice } from './field-types'
 import { EncodedData, EncodingType } from '../../utils/encoder'
-import { Pointer } from './helpers'
 import MPTree from '../../utils/mptree'
+import { NamePointer } from '../../apis/node'
 
 export * from './constants'
 
@@ -41,6 +41,7 @@ export type TxField = [
 
 /**
  * Enum with transaction types
+ * @category transaction builder
  * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/serializations.md#binary-serialization}
  */
 export enum TX_TYPE {
@@ -94,6 +95,7 @@ export enum TX_TYPE {
 }
 
 /**
+ * @category transaction builder
  * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
  */
 export enum VM_VERSIONS {
@@ -107,6 +109,7 @@ export enum VM_VERSIONS {
 }
 
 /**
+ * @category transaction builder
  * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
  */
 export enum ABI_VERSIONS {
@@ -115,6 +118,9 @@ export enum ABI_VERSIONS {
   FATE = 3
 }
 
+/**
+ * @category transaction builder
+ */
 export enum PROTOCOL_VERSIONS {
   IRIS = 5
 }
@@ -141,11 +147,17 @@ type PrefixType<Prefix> = Prefix extends EncodingType
     ? EncodedData<Prefix[number]>
     : EncodedData<any>
 
+/**
+ * @category transaction builder
+ */
 export interface CtVersion {
   vmVersion: VM_VERSIONS
   abiVersion: ABI_VERSIONS
 }
 
+/**
+ * @category transaction builder
+ */
 export enum FIELD_TYPES {
   int,
   shortInt,
@@ -188,7 +200,7 @@ interface BuildFieldTypes<Prefix extends undefined | EncodingType | readonly Enc
   [FIELD_TYPES.rlpBinaries]: any[]
   [FIELD_TYPES.rawBinary]: Uint8Array
   [FIELD_TYPES.signatures]: Uint8Array[]
-  [FIELD_TYPES.pointers]: Pointer[]
+  [FIELD_TYPES.pointers]: NamePointer[]
   [FIELD_TYPES.offChainUpdates]: any
   [FIELD_TYPES.callStack]: any
   [FIELD_TYPES.proofOfInclusion]: any

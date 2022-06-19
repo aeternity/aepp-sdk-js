@@ -30,6 +30,7 @@ export * from './contract/methods'
 export * from './oracle'
 export * from './spend'
 export * from './contract/ga'
+export * from './deprecated'
 
 export { default as AeSdkBase } from './AeSdkBase'
 export { default as AeSdk } from './AeSdk'

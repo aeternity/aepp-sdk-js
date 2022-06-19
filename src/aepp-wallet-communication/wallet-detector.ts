@@ -32,6 +32,7 @@ interface Wallets { [key: string]: Wallet }
 
 /**
  * A function to detect available wallets
+ * @category aepp wallet communication
  * @param connection - connection to use to detect wallets
  * @param onDetected - call-back function which trigger on new wallet
  * @returns a function to stop scanning

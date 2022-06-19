@@ -19,6 +19,7 @@ import { AlreadyConnectedError, NoWalletConnectedError } from '../../utils/error
 
 /**
  * Browser connection base interface
+ * @category aepp wallet communication
  */
 export default abstract class BrowserConnection {
   debug: boolean

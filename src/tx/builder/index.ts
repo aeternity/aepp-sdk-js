@@ -24,13 +24,13 @@ import {
   buildPointers,
   encode,
   decode,
-  Pointer,
   buildContractId
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree, { MPTreeBinary } from '../../utils/mptree'
 import { ArgumentError, InvalidTxParamsError, SchemaNotFoundError, DecodeError } from '../../utils/errors'
 import { isKeyOfObject } from '../../utils/other'
+import { NamePointer } from '../../apis/node'
 
 /**
  * JavaScript-based Transaction builder
@@ -204,7 +204,7 @@ function validateField (
       return
     case FIELD_TYPES.pointers:
       if (!Array.isArray(value)) return 'Value must be of type Array'
-      if (value.some((p: Pointer) => !(Boolean(p.key) && Boolean(p.id)))) {
+      if (value.some((p: NamePointer) => !(Boolean(p.key) && Boolean(p.id)))) {
         return 'Value must contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''
       }
       if (value.length > 32) {
@@ -232,6 +232,7 @@ function transformParams (
 
 /**
  * Validate transaction params
+ * @category transaction builder
  * @param params - Object with tx params
  * @param schema - Transaction schema
  * @param excludeKeys - Array of keys to exclude for validation
@@ -252,6 +253,7 @@ export function validateParams (
 
 /**
  * Unpack binary transaction
+ * @category transaction builder
  * @param binary - Array with binary transaction field's
  * @param schema - Transaction schema
  * @returns Object with transaction field's
@@ -271,6 +273,9 @@ export function unpackRawTx<Tx extends TxSchema> (
   )
 }
 
+/**
+ * @category transaction builder
+ */
 export interface BuiltTx<Tx extends TxSchema, Prefix extends EncodingType> {
   tx: EncodedData<Prefix>
   rlpEncoded: Uint8Array
@@ -280,6 +285,7 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends EncodingType> {
 
 /**
  * Build transaction hash
+ * @category transaction builder
  * @param _params - Object with tx params
  * @param type - Transaction type
  * @param options - options
@@ -337,6 +343,9 @@ export function buildTx<TxType extends TX_TYPE, Prefix> (
   } as any
 }
 
+/**
+ * @category transaction builder
+ */
 export interface TxUnpacked<Tx extends TxSchema> {
   txType: TX_TYPE
   tx: RawTxObject<Tx>
@@ -344,6 +353,7 @@ export interface TxUnpacked<Tx extends TxSchema> {
 }
 /**
  * Unpack transaction hash
+ * @category transaction builder
  * @param encodedTx - Transaction to unpack
  * @param txType - Expected transaction type
  * @returns object
@@ -370,6 +380,7 @@ export function unpackTx<TxType extends TX_TYPE> (
 
 /**
  * Build a transaction hash
+ * @category transaction builder
  * @param rawTx - base64 or rlp encoded transaction
  * @returns Transaction hash
  */
@@ -382,6 +393,7 @@ export function buildTxHash (rawTx: EncodedData<'tx'> | Uint8Array): EncodedData
 
 /**
  * Build a contract public key by contractCreateTx or gaAttach
+ * @category contract
  * @param contractTx - Transaction
  * @returns Contract public key
  */

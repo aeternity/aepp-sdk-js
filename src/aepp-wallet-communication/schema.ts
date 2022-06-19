@@ -1,21 +1,33 @@
 import { EncodedData } from '../utils/encoder'
 import { BaseError, InternalError } from '../utils/errors'
 
+/**
+ * @category aepp wallet communication
+ */
 export const enum MESSAGE_DIRECTION {
   to_waellet = 'to_waellet',
   to_aepp = 'to_aepp'
 }
 
+/**
+ * @category aepp wallet communication
+ */
 export const enum WALLET_TYPE {
   window = 'window',
   extension = 'extension'
 }
 
+/**
+ * @category aepp wallet communication
+ */
 export const enum SUBSCRIPTION_TYPES {
   subscribe = 'subscribe',
   unsubscribe = 'unsubscribe'
 }
 
+/**
+ * @category aepp wallet communication
+ */
 export const enum METHODS {
   readyToConnect = 'connection.announcePresence',
   updateAddress = 'address.update',
@@ -28,6 +40,9 @@ export const enum METHODS {
   closeConnection = 'connection.close'
 }
 
+/**
+ * @category aepp wallet communication
+ */
 export const enum RPC_STATUS {
   CONNECTED = 'CONNECTED',
   DISCONNECTED = 'DISCONNECTED',

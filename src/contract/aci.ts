@@ -144,6 +144,7 @@ type ContractCallReturnType = 'ok' | 'error' | 'revert'
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
  * creating a reference to already deployed contracts
+ * @category contract
  * @param options - Options object
  * @returns JS Contract API
  * @example

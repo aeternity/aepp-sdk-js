@@ -38,12 +38,13 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter'
 
 type Int = number | string | BigNumber
 
-// uses a new feature, probably typescript-eslint doesn't support it yet
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
   Omit<Parameters<typeof _buildTx<TxType>>[1], OmitFields>
 
 // TODO: find a better name or rearrange methods
+/**
+ * @category transaction builder
+ */
 export async function _buildTx<TxType extends TX_TYPE> (
   txType: TxType,
   { denomination, absoluteTtl, ..._params }:
@@ -124,7 +125,7 @@ export async function _buildTx<TxType extends TX_TYPE> (
 
 /**
  * Validated vm/abi version or get default based on transaction type and NODE version
- *
+ * @category transaction builder
  * @param txType - Type of transaction
  * @param ctVersion - Object with vm and abi version fields
  * @returns Object with vm/abi version
@@ -154,7 +155,7 @@ export async function getVmVersion (
 
 /**
  * Calculate fee, get absolute ttl (ttl + height), get account nonce
- *
+ * @category transaction builder
  * @param txType - Type of transaction
  * @param params - Object which contains all tx data
  * @returns Object with account nonce, absolute ttl and transaction fee
