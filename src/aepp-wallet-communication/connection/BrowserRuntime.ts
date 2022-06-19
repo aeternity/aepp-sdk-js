@@ -21,6 +21,7 @@ import BrowserConnection from './Browser'
 /**
  * BrowserRuntimeConnection
  * Handle browser runtime communication
+ * @category aepp wallet communication
  */
 export default class BrowserRuntimeConnection extends BrowserConnection {
   port: Runtime.Port

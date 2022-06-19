@@ -58,6 +58,7 @@ interface RpcClientsInfo {
 
 /**
  * Contain functionality for aepp interaction and managing multiple aepps
+ * @category aepp wallet communication
  */
 export default class AeSdkWallet extends AeSdk {
   id: string

@@ -35,6 +35,7 @@ import Compiler from './Compiler'
 
 /**
  * Check if account is GA
+ * @category contract
  * @param address - Account address
  * @param options - Options
  * @returns if account is GA
@@ -48,6 +49,7 @@ export async function isGA (
 
 /**
  * Convert current account to GA
+ * @category contract
  * @param authFnName - Authorization function name
  * @param source - Auth contract source code
  * @param args - init arguments
@@ -101,6 +103,7 @@ interface CreateGeneralizedAccountOptions extends
 
 /**
  * Create a metaTx transaction
+ * @category contract
  * @param rawTransaction - Inner transaction
  * @param authData - Object with gaMeta params
  * @param authFnName - Authorization function name
@@ -162,6 +165,7 @@ export async function createMetaTx (
 
 /**
  * Build a transaction hash the same as `Auth.tx_hash`
+ * @category contract
  * @param transaction - tx-encoded transaction
  * @param options - Options
  * @param options.onNode - Node to use

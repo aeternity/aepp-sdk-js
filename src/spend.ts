@@ -26,6 +26,7 @@ import AccountBase from './account/Base'
 
 /**
  * Sign and post a transaction to the chain
+ * @category chain
  * @param tx - Transaction
  * @param options - Options
  * @param options.verify - Verify transaction before broadcast, throw error if not
@@ -65,6 +66,7 @@ export async function signUsingGA (
 
 /**
  * Send coins to another account
+ * @category chain
  * @param amount - Amount to spend
  * @param recipientIdOrName - Address or name of recipient account
  * @param options - Options
@@ -93,6 +95,7 @@ interface SpendOptions extends SpendOptionsType {}
 // TODO: Rename to spendFraction
 /**
  * Send a fraction of coin balance to another account
+ * @category chain
  * @param fraction - Fraction of balance to spend (between 0 and 1)
  * @param recipientIdOrName - Address or name of recipient account
  * @param options - Options
@@ -130,6 +133,7 @@ interface TransferFundsOptions extends TransferFundsOptionsType {}
 
 /**
  * Submit transaction of another account paying for it (fee and gas)
+ * @category chain
  * @param transaction - tx_<base64>-encoded transaction
  * @param options - Options
  * @returns Object Transaction

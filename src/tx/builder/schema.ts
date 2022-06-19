@@ -41,6 +41,7 @@ export type TxField = [
 
 /**
  * Enum with transaction types
+ * @category transaction builder
  * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/serializations.md#binary-serialization}
  */
 export enum TX_TYPE {
@@ -94,6 +95,7 @@ export enum TX_TYPE {
 }
 
 /**
+ * @category transaction builder
  * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
  */
 export enum VM_VERSIONS {
@@ -107,6 +109,7 @@ export enum VM_VERSIONS {
 }
 
 /**
+ * @category transaction builder
  * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
  */
 export enum ABI_VERSIONS {
@@ -115,6 +118,9 @@ export enum ABI_VERSIONS {
   FATE = 3
 }
 
+/**
+ * @category transaction builder
+ */
 export enum PROTOCOL_VERSIONS {
   IRIS = 5
 }
@@ -141,11 +147,17 @@ type PrefixType<Prefix> = Prefix extends EncodingType
     ? EncodedData<Prefix[number]>
     : EncodedData<any>
 
+/**
+ * @category transaction builder
+ */
 export interface CtVersion {
   vmVersion: VM_VERSIONS
   abiVersion: ABI_VERSIONS
 }
 
+/**
+ * @category transaction builder
+ */
 export enum FIELD_TYPES {
   int,
   shortInt,

@@ -18,6 +18,7 @@ import BrowserConnection from './aepp-wallet-communication/connection/Browser'
 /**
  * RPC handler for AEPP side
  * Contain functionality for wallet interaction and connect it to sdk
+ * @category aepp wallet communication
  */
 export default class AeSdkAepp extends AeSdkBase {
   name: string

@@ -32,6 +32,7 @@ export { default as getContractInstance } from './aci'
 
 /**
  * Utility method to create a delegate signature for a contract
+ * @category contract
  * @param ids - The list of id's to prepend
  * @param opt - Options
  * @param opt.onNode - Node to use
@@ -56,6 +57,7 @@ async function delegateSignatureCommon (
 /**
  * Helper to generate a signature to delegate pre-claim/claim/transfer/revoke of a name to
  * a contract.
+ * @category contract
  * @param contractId - Contract Id
  * @param opt - Options
  * @param opt.name - The name
@@ -91,6 +93,7 @@ export async function createAensDelegationSignature (
 
 /**
  * Helper to generate a signature to delegate register/extend/respond of a Oracle to a contract.
+ * @category contract
  * @param contractId - Contract Id
  * @param opt - Options
  * @param opt.queryId - Oracle Query Id

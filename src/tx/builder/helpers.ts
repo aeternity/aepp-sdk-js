@@ -32,6 +32,7 @@ export { encode, decode }
 
 /**
  * Build a contract public key
+ * @category contract
  * @param ownerId - The public key of the owner account
  * @param nonce - the nonce of the transaction
  * @returns Contract public key
@@ -44,6 +45,7 @@ export function buildContractId (ownerId: EncodedData<'ak'>, nonce: number | Big
 
 /**
  * Build a oracle query id
+ * @category oracle
  * @param senderId - The public key of the sender account
  * @param nonce - the nonce of the transaction
  * @param oracleId - The oracle public key
@@ -66,6 +68,7 @@ export function oracleQueryId (
 
 /**
  * Format the salt into a 64-byte hex string
+ * @category transaction builder
  * @param salt - Random number
  * @returns Zero-padded hex string of salt
  */
@@ -75,7 +78,7 @@ export function formatSalt (salt: number): Buffer {
 
 /**
  * Encode an AENS name
- *
+ * @category AENS
  * @param name - Name to encode
  * @returns `nm_` prefixed encoded AENS name
  */
@@ -86,7 +89,7 @@ export function produceNameId (name: AensName): EncodedData<'nm'> {
 /**
  * Generate the commitment hash by hashing the formatted salt and
  * name, base 58 encoding the result and prepending 'cm_'
- *
+ * @category transaction builder
  * @param name - Name to be registered
  * @param salt - Random salt
  * @returns Commitment hash
@@ -97,6 +100,7 @@ export function commitmentHash (name: AensName, salt: number = createSalt()): En
 
 /**
  * Utility function to create and _id type
+ * @category transaction builder
  * @param hashId - Encoded hash
  * @returns Buffer Buffer with ID tag and decoded HASh
  */
@@ -110,6 +114,7 @@ export function writeId (hashId: string): Buffer {
 
 /**
  * Utility function to read and _id type
+ * @category transaction builder
  * @param buf - Data
  * @returns Encoided hash string with prefix
  */
@@ -122,6 +127,7 @@ export function readId (buf: Buffer): string {
 
 /**
  * Utility function to convert int to bytes
+ * @category transaction builder
  * @param val - Value
  * @returns Buffer Buffer from number(BigEndian)
  */
@@ -131,6 +137,7 @@ export function writeInt (val: number | string | BigNumber): Buffer {
 
 /**
  * Utility function to convert bytes to int
+ * @category transaction builder
  * @param buf - Value
  * @returns Buffer Buffer from number(BigEndian)
  */
@@ -140,6 +147,7 @@ export function readInt (buf: Buffer = Buffer.from([])): string {
 
 /**
  * Helper function to build pointers for name update TX
+ * @category transaction builder
  * @param pointers - Array of pointers
  * `([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])`
  * @returns Serialized pointers array
@@ -155,6 +163,7 @@ export function buildPointers (pointers: NamePointer[]): Buffer[][] {
 
 /**
  * Helper function to read pointers from name update TX
+ * @category transaction builder
  * @param pointers - Array of pointers
  * @returns Deserialize pointer array
  */
@@ -171,6 +180,7 @@ const AENS_SUFFIX = '.chain'
 
 /**
  * Is AENS name valid
+ * @category AENS
  * @param name - AENS name
  */
 export function isNameValid (name: string): name is AensName {
@@ -179,6 +189,7 @@ export function isNameValid (name: string): name is AensName {
 }
 
 /**
+ * @category AENS
  * @param identifier - account/oracle/contract address, or channel
  * @returns default AENS pointer key
  */
@@ -192,7 +203,7 @@ export function getDefaultPointerKey (
 
 /**
  * Get the minimum AENS name fee
- *
+ * @category AENS
  * @param name - the AENS name to get the fee for
  * @returns the minimum fee for the AENS name auction
  */
@@ -203,7 +214,7 @@ export function getMinimumNameFee (name: AensName): BigNumber {
 
 /**
  * Compute bid fee for AENS auction
- *
+ * @category AENS
  * @param name - the AENS name to get the fee for
  * @param options - Options
  * @param options.startFee - Auction start fee
@@ -226,7 +237,7 @@ export function computeBidFee (
 
 /**
  * Compute auction end height
- *
+ * @category AENS
  * @param name - Name to compute auction end for
  * @param claimHeight - Auction starting height
  * @see {@link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273}
@@ -243,6 +254,7 @@ export function computeAuctionEndBlock (name: AensName, claimHeight: number): nu
 
 /**
  * Is name accept going to auction
+ * @category AENS
  */
 export function isAuctionName (name: AensName): boolean {
   return name.length < 13 + AENS_SUFFIX.length

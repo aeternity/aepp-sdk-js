@@ -23,6 +23,7 @@ export type ImplPostMessage = Pick<Window, 'addEventListener' | 'removeEventList
 
 /**
  * Browser window Post Message connector module
+ * @category aepp wallet communication
  */
 export default class BrowserWindowMessageConnection extends BrowserConnection {
   origin?: string

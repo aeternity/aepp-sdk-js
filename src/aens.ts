@@ -42,6 +42,7 @@ interface KeyPointers {
 
 /**
  * Revoke a name
+ * @category AENS
  * @param name - Name hash
  * @param options - Options
  * @param options.onAccount - Make operation on specific account from sdk (you pass
@@ -77,6 +78,7 @@ interface AensRevokeOptions extends
 
 /**
  * Update a name
+ * @category AENS
  * @param name - AENS name
  * @param pointers - Map of pointer keys to corresponding addresses
  * @param options - Options
@@ -136,6 +138,7 @@ interface AensUpdateOptions extends
 
 /**
  * Transfer a domain to another account
+ * @category AENS
  * @param name - AENS name
  * @param account - Recipient account publick key
  * @param options - Options
@@ -176,6 +179,7 @@ interface AensTransferOptions extends
 /**
  * Query the AENS name info from the node
  * and return the object with info and predefined functions for manipulating name
+ * @category AENS
  * @param name - AENS name
  * @param opt - Options
  * @returns
@@ -259,6 +263,7 @@ export async function aensQuery (
 /**
  * Claim a previously preclaimed registration. This can only be done after the
  * preclaim step
+ * @category AENS
  * @param name - AENS name
  * @param salt - Salt from pre-claim, or 0 if it's a bid
  * @param options - options
@@ -306,6 +311,7 @@ interface AensClaimReturnType extends
 
 /**
  * Preclaim a name. Sends a hash of the name and a random salt to the node
+ * @category AENS
  * @param name - AENS name
  * @param options - Options
  * @param options.onAccount - Make operation on specific account from sdk (you pass
@@ -365,6 +371,7 @@ interface AensPreclaimOptions extends
 
 /**
  * Bid to name auction
+ * @category AENS
  * @param name - Domain name
  * @param nameFee - Name fee (bid fee)
  * @param options - Options

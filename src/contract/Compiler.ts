@@ -26,6 +26,7 @@ type GeneralCompilerError = ErrorModel & {
  * Contract Compiler
  *
  * This class include api call's related to contract compiler functionality.
+ * @category contract
  * @example Compiler('COMPILER_URL')
  */
 export default class Compiler extends CompilerApi {

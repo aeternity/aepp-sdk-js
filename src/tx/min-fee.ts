@@ -109,6 +109,7 @@ function buildFee (
 
 /**
  * Calculate min fee
+ * @category transaction builder
  * @param txType - Transaction type
  * @param options - Options object
  * @param options.params - Tx params

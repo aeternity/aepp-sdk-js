@@ -31,6 +31,9 @@ import {
 import { EncodedData } from './utils/encoder'
 import AccountBase from './account/Base'
 
+/**
+ * @category chain
+ */
 export function _getPollInterval (
   type: 'block' | 'microblock',
   { _expectedMineRate = 180000, _microBlockCycle = 3000, _maxPollInterval = 5000 }:
@@ -45,6 +48,7 @@ export function _getPollInterval (
 
 /**
  * Submit a signed transaction for mining
+ * @category chain
  * @param tx - Transaction to submit
  * @param options - Options
  * @param options.onNode - Node to use
@@ -119,6 +123,7 @@ interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>>
 
 /**
  * Wait for transaction confirmation
+ * @category chain
  * @param txHash - Transaction hash
  * @param options - Options
  * @param options.confirm - Number of micro blocks to wait for transaction confirmation
@@ -145,6 +150,7 @@ export async function waitForTxConfirm (
 
 /**
  * Get account by account public key
+ * @category chain
  * @param address - Account address (public key)
  * @param options - Options
  * @param options.height - Get account on specific block by block height
@@ -163,6 +169,7 @@ export async function getAccount (
 
 /**
  * Request the balance of specified account
+ * @category chain
  * @param address - The public account address to obtain the balance for
  * @param options - Options
  * @param options.format
@@ -182,6 +189,7 @@ export async function getBalance (
 
 /**
  * Obtain current height of the chain
+ * @category chain
  * @returns Current chain height
  */
 export async function height ({ onNode }: { onNode: Node }): Promise<number> {
@@ -190,6 +198,7 @@ export async function height ({ onNode }: { onNode: Node }): Promise<number> {
 
 /**
  * Wait for the chain to reach a specific height
+ * @category chain
  * @param height - Height to wait for
  * @param options - Options
  * @param options.interval - Interval (in ms) at which to poll the chain
@@ -215,6 +224,7 @@ export async function awaitHeight (
 
 /**
  * Wait for a transaction to be mined
+ * @category chain
  * @param th - The hash of transaction to poll
  * @param options - Options
  * @param options.interval - Interval (in ms) at which to poll the chain
@@ -239,6 +249,7 @@ export async function poll (
 
 /**
  * Obtain current generation
+ * @category chain
  * @param options - Options
  * @param options.onNode - Node to use
  * @returns Current Generation
@@ -251,6 +262,7 @@ export async function getCurrentGeneration (
 
 /**
  * Get generation by hash or height
+ * @category chain
  * @param hashOrHeight - Generation hash or height
  * @param options - Options
  * @param options.onNode - Node to use
@@ -265,6 +277,7 @@ export async function getGeneration (
 
 /**
  * Get micro block transactions
+ * @category chain
  * @param hash - Micro block hash
  * @param options - Options
  * @param options.onNode - Node to use
@@ -278,6 +291,7 @@ export async function getMicroBlockTransactions (
 
 /**
  * Get key block
+ * @category chain
  * @param hashOrHeight - Key block hash or height
  * @param options - Options
  * @param options.onNode - Node to use
@@ -292,6 +306,7 @@ export async function getKeyBlock (
 
 /**
  * Get micro block header
+ * @category chain
  * @param hash - Micro block hash
  * @param options - Options
  * @param options.onNode - Node to use
@@ -344,6 +359,7 @@ async function txDryRunHandler (key: string, onNode: Node): Promise<void> {
 
 /**
  * Transaction dry-run
+ * @category chain
  * @param tx - transaction to execute
  * @param accountAddress - address that will be used to execute transaction
  * @param options - Options
@@ -375,6 +391,7 @@ export async function txDryRun (
 
 /**
  * Get contract byte code
+ * @category contract
  * @param contractId - Contract address
  * @param options - Options
  * @param options.onNode - Node to use
@@ -387,6 +404,7 @@ export async function getContractByteCode (
 
 /**
  * Get contract entry
+ * @category contract
  * @param contractId - Contract address
  * @param options - Options
  * @param options.onNode - Node to use
@@ -399,6 +417,7 @@ export async function getContract (
 
 /**
  * Get name entry
+ * @category AENS
  * @param name - AENS name
  * @param options - Options
  * @param options.onNode - Node to use
@@ -411,6 +430,7 @@ export async function getName (
 
 /**
  * Resolve AENS name and return name hash
+ * @category AENS
  * @param nameOrId - AENS name or address
  * @param key - in AENS pointers record
  * @param options - Options
