@@ -24,7 +24,7 @@
  */
 
 import { salt } from './utils/crypto'
-import { commitmentHash, isAuctionName, Pointer } from './tx/builder/helpers'
+import { commitmentHash, isAuctionName } from './tx/builder/helpers'
 import { CLIENT_TTL, NAME_TTL, TX_TYPE, AensName } from './tx/builder/schema'
 import { ArgumentError } from './utils/errors'
 import { EncodedData } from './utils/encoder'
@@ -33,7 +33,7 @@ import { send, SendOptions } from './spend'
 import { getName, height } from './chain'
 import { _buildTx, BuildTxOptions } from './tx'
 import { TransformNodeType } from './Node'
-import { NameEntry } from './apis/node'
+import { NameEntry, NamePointer } from './apis/node'
 import AccountBase from './account/Base'
 
 interface KeyPointers {
@@ -201,7 +201,7 @@ export async function aensQuery (
   TransformNodeType<NameEntry> & {
     id: EncodedData<'nm'>
     owner: EncodedData<'ak'>
-    pointers: KeyPointers | Pointer[]
+    pointers: KeyPointers | NamePointer[]
     ttl: number
     update: (
       pointers: KeyPointers,

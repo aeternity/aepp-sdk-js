@@ -20,6 +20,7 @@ import {
   IllegalBidFeeError,
   ArgumentError
 } from '../../utils/errors'
+import { NamePointer } from '../../apis/node'
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -28,11 +29,6 @@ import {
 export const createSalt = salt
 
 export { encode, decode }
-
-export interface Pointer {
-  key: string
-  id: string
-}
 
 /**
  * Build a contract public key
@@ -148,7 +144,7 @@ export function readInt (buf: Buffer = Buffer.from([])): string {
  * `([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])`
  * @returns Serialized pointers array
  */
-export function buildPointers (pointers: Pointer[]): Buffer[][] {
+export function buildPointers (pointers: NamePointer[]): Buffer[][] {
   return pointers.map(
     p => [
       toBytes(p.key),
@@ -162,7 +158,7 @@ export function buildPointers (pointers: Pointer[]): Buffer[][] {
  * @param pointers - Array of pointers
  * @returns Deserialize pointer array
  */
-export function readPointers (pointers: Array<[key: string, id: Buffer]>): Pointer[] {
+export function readPointers (pointers: Array<[key: string, id: Buffer]>): NamePointer[] {
   return pointers.map(
     ([key, id]) => Object.assign({
       key: key.toString(),

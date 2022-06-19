@@ -7,8 +7,8 @@
 import BigNumber from 'bignumber.js'
 import { Name, NameId, NameFee, Deposit, Field, GasPrice } from './field-types'
 import { EncodedData, EncodingType } from '../../utils/encoder'
-import { Pointer } from './helpers'
 import MPTree from '../../utils/mptree'
+import { NamePointer } from '../../apis/node'
 
 export * from './constants'
 
@@ -188,7 +188,7 @@ interface BuildFieldTypes<Prefix extends undefined | EncodingType | readonly Enc
   [FIELD_TYPES.rlpBinaries]: any[]
   [FIELD_TYPES.rawBinary]: Uint8Array
   [FIELD_TYPES.signatures]: Uint8Array[]
-  [FIELD_TYPES.pointers]: Pointer[]
+  [FIELD_TYPES.pointers]: NamePointer[]
   [FIELD_TYPES.offChainUpdates]: any
   [FIELD_TYPES.callStack]: any
   [FIELD_TYPES.proofOfInclusion]: any

@@ -3,6 +3,9 @@
   "tagDefinitions": [{
     "tagName": "@category",
     "syntaxKind": "block"
+  }, {
+    "tagName": "@hidden",
+    "syntaxKind": "block"
   }],
   "supportForTags": {
     "@param": true,
@@ -12,6 +15,7 @@
     "@see": true,
     "@example": true,
     "@category": true,
-    "@deprecated": true
+    "@deprecated": true,
+    "@hidden": true
   }
 }

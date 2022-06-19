@@ -24,13 +24,13 @@ import {
   buildPointers,
   encode,
   decode,
-  Pointer,
   buildContractId
 } from './helpers'
 import { toBytes } from '../../utils/bytes'
 import MPTree, { MPTreeBinary } from '../../utils/mptree'
 import { ArgumentError, InvalidTxParamsError, SchemaNotFoundError, DecodeError } from '../../utils/errors'
 import { isKeyOfObject } from '../../utils/other'
+import { NamePointer } from '../../apis/node'
 
 /**
  * JavaScript-based Transaction builder
@@ -204,7 +204,7 @@ function validateField (
       return
     case FIELD_TYPES.pointers:
       if (!Array.isArray(value)) return 'Value must be of type Array'
-      if (value.some((p: Pointer) => !(Boolean(p.key) && Boolean(p.id)))) {
+      if (value.some((p: NamePointer) => !(Boolean(p.key) && Boolean(p.id)))) {
         return 'Value must contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\''
       }
       if (value.length > 32) {
