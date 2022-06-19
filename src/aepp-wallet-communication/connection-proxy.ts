@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import BrowserConnection from './connection/Browser'
+import BrowserConnection from './connection/Browser';
 
 /**
  * Browser connection proxy
@@ -26,11 +26,11 @@ import BrowserConnection from './connection/Browser'
  * @returns a function to stop proxying
  */
 export default (con1: BrowserConnection, con2: BrowserConnection): () => void => {
-  con1.connect((msg: any) => con2.sendMessage(msg), () => con2.disconnect())
-  con2.connect((msg: any) => con1.sendMessage(msg), () => con1.disconnect())
+  con1.connect((msg: any) => con2.sendMessage(msg), () => con2.disconnect());
+  con2.connect((msg: any) => con1.sendMessage(msg), () => con1.disconnect());
 
   return () => {
-    con1.disconnect()
-    con2.disconnect()
-  }
-}
+    con1.disconnect();
+    con2.disconnect();
+  };
+};

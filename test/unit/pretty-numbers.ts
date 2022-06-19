@@ -1,19 +1,19 @@
-import BigNumber from 'bignumber.js'
-import prefixedAmount from '../../src/utils/amount-formatter'
-import { describe, it } from 'mocha'
+import BigNumber from 'bignumber.js';
+import { describe, it } from 'mocha';
+import prefixedAmount from '../../src/utils/amount-formatter';
 
-const MAGNITUDE = 18
+const MAGNITUDE = 18;
 describe('prefixedAmount', () => {
   it('removes trailing zeros', () => {
-    (prefixedAmount(new BigNumber('1.0000'))).should.be.equal('1')
-  })
+    (prefixedAmount(new BigNumber('1.0000'))).should.be.equal('1');
+  });
 
   it('displays fees', () => {
-    (prefixedAmount(new BigNumber(17120).shiftedBy(-MAGNITUDE))).should.be.equal('0.01712 pico')
-  })
+    (prefixedAmount(new BigNumber(17120).shiftedBy(-MAGNITUDE))).should.be.equal('0.01712 pico');
+  });
   it('displays balance', () => {
-    (prefixedAmount(new BigNumber('89.99999999000924699'))).should.be.equal('90')
-  })
+    (prefixedAmount(new BigNumber('89.99999999000924699'))).should.be.equal('90');
+  });
 
   it('generates proper values', () => {
     const t = new BigNumber(`0.${'123456789'.repeat(3)}`).shiftedBy(-MAGNITUDE);
@@ -56,7 +56,7 @@ describe('prefixedAmount', () => {
       '12345678.9 giga',
       '123456789 giga',
       '1.23456789 exa',
-      '12.3456789 exa'
-    ].forEach((res, idx) => (prefixedAmount(t.shiftedBy(idx))).should.be.equal(res))
-  })
-})
+      '12.3456789 exa',
+    ].forEach((res, idx) => (prefixedAmount(t.shiftedBy(idx))).should.be.equal(res));
+  });
+});

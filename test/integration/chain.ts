@@ -14,149 +14,151 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { describe, it, before } from 'mocha'
-import { expect } from 'chai'
-import { spy } from 'sinon'
-import http from 'http'
-import { getSdk } from '.'
-import { generateKeyPair } from '../../src/utils/crypto'
-import { AeSdk, TX_TYPE, UnexpectedTsError } from '../../src'
-import { EncodedData } from '../../src/utils/encoder'
+import { describe, it, before } from 'mocha';
+import { expect } from 'chai';
+import { spy } from 'sinon';
+import http from 'http';
+import { getSdk } from '.';
+import { generateKeyPair } from '../../src/utils/crypto';
+import { AeSdk, TX_TYPE, UnexpectedTsError } from '../../src';
+import { EncodedData } from '../../src/utils/encoder';
 
-describe('Node Chain', function () {
-  let aeSdk: AeSdk, aeSdkWithoutAccount: AeSdk
-  const { publicKey } = generateKeyPair()
+describe('Node Chain', () => {
+  let aeSdk: AeSdk; let
+    aeSdkWithoutAccount: AeSdk;
+  const { publicKey } = generateKeyPair();
 
-  before(async function () {
-    aeSdk = await getSdk()
-    aeSdkWithoutAccount = await getSdk({ withoutAccount: true })
-  })
+  before(async () => {
+    aeSdk = await getSdk();
+    aeSdkWithoutAccount = await getSdk({ withoutAccount: true });
+  });
 
   it('determines the height', async () => {
-    expect(await aeSdkWithoutAccount.height()).to.be.a('number')
-  })
+    expect(await aeSdkWithoutAccount.height()).to.be.a('number');
+  });
 
   it('combines height queries', async () => {
-    const httpSpy = spy(http, 'request')
+    const httpSpy = spy(http, 'request');
     const heights = await Promise.all(
-      new Array(5).fill(undefined).map(async () => await aeSdk.height())
-    )
-    expect(heights).to.eql(heights.map(() => heights[0]))
-    expect(httpSpy.callCount).to.be.equal(2)
-    httpSpy.restore()
-  })
+      new Array(5).fill(undefined).map(async () => aeSdk.height()),
+    );
+    expect(heights).to.eql(heights.map(() => heights[0]));
+    expect(httpSpy.callCount).to.be.equal(2);
+    httpSpy.restore();
+  });
 
   it('waits for specified heights', async () => {
-    const target = await aeSdkWithoutAccount.height() + 1
-    await aeSdkWithoutAccount.awaitHeight(target).should.eventually.be.at.least(target)
-    await aeSdkWithoutAccount.height().should.eventually.be.at.least(target)
-  })
+    const target = await aeSdkWithoutAccount.height() + 1;
+    await aeSdkWithoutAccount.awaitHeight(target).should.eventually.be.at.least(target);
+    await aeSdkWithoutAccount.height().should.eventually.be.at.least(target);
+  });
 
   it('Can verify transaction from broadcast error', async () => {
-    const error = await aeSdk.spend(0, publicKey, { fee: 100, verify: false }).catch(e => e)
-    expect(await error.verifyTx()).to.have.lengthOf(1)
-  })
+    const error = await aeSdk.spend(0, publicKey, { fee: 100, verify: false }).catch((e) => e);
+    expect(await error.verifyTx()).to.have.lengthOf(1);
+  });
 
   it('Get current generation', async () => {
-    const generation = await aeSdkWithoutAccount.getCurrentGeneration()
-    generation.should.has.property('keyBlock')
-  })
+    const generation = await aeSdkWithoutAccount.getCurrentGeneration();
+    generation.should.has.property('keyBlock');
+  });
 
   it('Get key block', async () => {
-    const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration()
-    const keyBlockByHash = await aeSdkWithoutAccount.getKeyBlock(keyBlock.hash as EncodedData<'kh'>)
-    const keyBlockByHeight = await aeSdkWithoutAccount.getKeyBlock(keyBlock.height)
-    keyBlockByHash.should.be.an('object')
-    keyBlockByHeight.should.be.an('object')
-  })
+    const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration();
+    const keyBlockByHash = await aeSdkWithoutAccount.getKeyBlock(keyBlock.hash as EncodedData<'kh'>);
+    const keyBlockByHeight = await aeSdkWithoutAccount.getKeyBlock(keyBlock.height);
+    keyBlockByHash.should.be.an('object');
+    keyBlockByHeight.should.be.an('object');
+  });
 
   it('Get generation', async () => {
-    const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration()
-    const genByHash = await aeSdkWithoutAccount.getGeneration(keyBlock.hash as EncodedData<'kh'>)
-    const genByHeight = await aeSdkWithoutAccount.getGeneration(keyBlock.height)
-    genByHash.should.be.an('object')
-    genByHeight.should.be.an('object')
-  })
+    const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration();
+    const genByHash = await aeSdkWithoutAccount.getGeneration(keyBlock.hash as EncodedData<'kh'>);
+    const genByHeight = await aeSdkWithoutAccount.getGeneration(keyBlock.height);
+    genByHash.should.be.an('object');
+    genByHeight.should.be.an('object');
+  });
 
   it('polls for transactions', async () => {
-    const senderId = await aeSdk.address()
+    const senderId = await aeSdk.address();
     const tx = await aeSdk.buildTx(TX_TYPE.spend, {
       amount: 1,
       senderId,
       recipientId: publicKey,
       payload: '',
-      ttl: Number.MAX_SAFE_INTEGER
-    })
-    const signed = await aeSdk.signTransaction(tx)
-    const { txHash } = await aeSdk.api.postTransaction({ tx: signed })
+      ttl: Number.MAX_SAFE_INTEGER,
+    });
+    const signed = await aeSdk.signTransaction(tx);
+    const { txHash } = await aeSdk.api.postTransaction({ tx: signed });
 
-    await aeSdk.poll(txHash).should.eventually.be.fulfilled
-    await aeSdk.poll('th_xxx', { blocks: 1 }).should.eventually.be.rejected
-  })
+    await aeSdk.poll(txHash).should.eventually.be.fulfilled;
+    await aeSdk.poll('th_xxx', { blocks: 1 }).should.eventually.be.rejected;
+  });
 
   it('Wait for transaction confirmation', async () => {
-    const txData = await aeSdk.spend(1000, await aeSdk.address(), { confirm: true })
-    if (txData.blockHeight == null) throw new UnexpectedTsError()
-    const isConfirmed = (await aeSdk.height()) >= txData.blockHeight + 3
+    const txData = await aeSdk.spend(1000, await aeSdk.address(), { confirm: true });
+    if (txData.blockHeight == null) throw new UnexpectedTsError();
+    const isConfirmed = (await aeSdk.height()) >= txData.blockHeight + 3;
 
-    isConfirmed.should.be.equal(true)
+    isConfirmed.should.be.equal(true);
 
-    const txData2 = await aeSdk.spend(1000, await aeSdk.address(), { confirm: 4 })
-    if (txData2.blockHeight == null) throw new UnexpectedTsError()
-    const isConfirmed2 = (await aeSdk.height()) >= txData2.blockHeight + 4
-    isConfirmed2.should.be.equal(true)
-  })
+    const txData2 = await aeSdk.spend(1000, await aeSdk.address(), { confirm: 4 });
+    if (txData2.blockHeight == null) throw new UnexpectedTsError();
+    const isConfirmed2 = (await aeSdk.height()) >= txData2.blockHeight + 4;
+    isConfirmed2.should.be.equal(true);
+  });
 
-  const accounts = new Array(10).fill(undefined).map(() => generateKeyPair())
-  const transactions: Array<EncodedData<'th'>> = []
+  const accounts = new Array(10).fill(undefined).map(() => generateKeyPair());
+  const transactions: Array<EncodedData<'th'>> = [];
 
   it('multiple spends from one account', async () => {
-    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address())
-    const httpSpy = spy(http, 'request')
-    const spends = await Promise.all(accounts.map(async (account, idx) => await aeSdk.spend(
+    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address());
+    const httpSpy = spy(http, 'request');
+    const spends = await Promise.all(accounts.map(async (account, idx) => aeSdk.spend(
       Math.floor(Math.random() * 1000 + 1e16),
       account.publicKey,
-      { nonce: nextNonce + idx, verify: false, waitMined: false }
-    )))
-    transactions.push(...spends.map(({ hash }) => hash))
-    const txPostCount = accounts.length
-    expect(httpSpy.args.length).to.be.equal(2 + txPostCount)
-    httpSpy.restore()
-  })
+      { nonce: nextNonce + idx, verify: false, waitMined: false },
+    )));
+    transactions.push(...spends.map(({ hash }) => hash));
+    const txPostCount = accounts.length;
+    expect(httpSpy.args.length).to.be.equal(2 + txPostCount);
+    httpSpy.restore();
+  });
 
   it('multiple spends from different accounts', async () => {
-    const receiver = await aeSdk.address()
-    const httpSpy = spy(http, 'request')
-    const spends = await Promise.all(accounts.map(async onAccount =>
-      await aeSdkWithoutAccount.spend(1e15, receiver, {
-        nonce: 1, verify: false, onAccount, waitMined: false
-      })))
-    transactions.push(...spends.map(({ hash }) => hash))
-    const accountGetCount = accounts.length
-    const txPostCount = accounts.length
-    expect(httpSpy.args.length).to.be.equal(1 + accountGetCount + txPostCount)
-    httpSpy.restore()
-  })
+    const receiver = await aeSdk.address();
+    const httpSpy = spy(http, 'request');
+    const spends = await Promise.all(
+      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e15, receiver, {
+        nonce: 1, verify: false, onAccount, waitMined: false,
+      })),
+    );
+    transactions.push(...spends.map(({ hash }) => hash));
+    const accountGetCount = accounts.length;
+    const txPostCount = accounts.length;
+    expect(httpSpy.args.length).to.be.equal(1 + accountGetCount + txPostCount);
+    httpSpy.restore();
+  });
 
-  it('ensure transactions mined', async () => await Promise.all(transactions.map(async hash => await aeSdkWithoutAccount.poll(hash))))
+  it('ensure transactions mined', async () => Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));
 
   it('multiple contract dry-runs calls at one request', async () => {
     const contract = await aeSdk.getContractInstance({
       source:
-        'contract Test =\n' +
-        '  entrypoint foo(x : int) = x * 100'
-    })
-    await contract.deploy()
-    const { result: { gasUsed: gasLimit } } = await contract.methods.foo(5)
-    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address())
-    const httpSpy = spy(http, 'request')
-    const numbers = new Array(32).fill(undefined).map((v, idx) => idx * 2)
+        'contract Test =\n'
+        + '  entrypoint foo(x : int) = x * 100',
+    });
+    await contract.deploy();
+    const { result: { gasUsed: gasLimit } } = await contract.methods.foo(5);
+    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address());
+    const httpSpy = spy(http, 'request');
+    const numbers = new Array(32).fill(undefined).map((v, idx) => idx * 2);
     const results = (await Promise.all(
       numbers.map((v, idx) => contract.methods
-        .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true }))
-    )).map(r => r.decodedResult)
-    expect(results).to.be.eql(numbers.map(v => BigInt(v * 100)))
-    expect(httpSpy.args.length).to.be.equal(2)
-    httpSpy.restore()
-  })
-})
+        .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true })),
+    )).map((r) => r.decodedResult);
+    expect(results).to.be.eql(numbers.map((v) => BigInt(v * 100)));
+    expect(httpSpy.args.length).to.be.equal(2);
+    httpSpy.restore();
+  });
+});

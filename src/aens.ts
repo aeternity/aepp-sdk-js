@@ -23,21 +23,23 @@
  * repository.
  */
 
-import { salt } from './utils/crypto'
-import { commitmentHash, isAuctionName } from './tx/builder/helpers'
-import { CLIENT_TTL, NAME_TTL, TX_TYPE, AensName } from './tx/builder/schema'
-import { ArgumentError } from './utils/errors'
-import { EncodedData } from './utils/encoder'
-import BigNumber from 'bignumber.js'
-import { send, SendOptions } from './spend'
-import { getName, height } from './chain'
-import { _buildTx, BuildTxOptions } from './tx'
-import { TransformNodeType } from './Node'
-import { NameEntry, NamePointer } from './apis/node'
-import AccountBase from './account/Base'
+import BigNumber from 'bignumber.js';
+import { salt } from './utils/crypto';
+import { commitmentHash, isAuctionName } from './tx/builder/helpers';
+import {
+  CLIENT_TTL, NAME_TTL, TX_TYPE, AensName,
+} from './tx/builder/schema';
+import { ArgumentError } from './utils/errors';
+import { EncodedData } from './utils/encoder';
+import { send, SendOptions } from './spend';
+import { getName, height } from './chain';
+import { _buildTx, BuildTxOptions } from './tx';
+import { TransformNodeType } from './Node';
+import { NameEntry, NamePointer } from './apis/node';
+import AccountBase from './account/Base';
 
 interface KeyPointers {
-  [key: string]: string | Buffer
+  [key: string]: string | Buffer;
 }
 
 /**
@@ -61,15 +63,16 @@ interface KeyPointers {
  * await nameObject.revoke({ fee, ttl, nonce })
  * ```
  */
-export async function aensRevoke (
-  name: AensName, options: AensRevokeOptions
+export async function aensRevoke(
+  name: AensName,
+  options: AensRevokeOptions,
 ): ReturnType<typeof send> {
   const nameRevokeTx = await _buildTx(TX_TYPE.nameRevoke, {
     ...options,
     nameId: name,
-    accountId: await options.onAccount.address(options)
-  })
-  return await send(nameRevokeTx, options)
+    accountId: await options.onAccount.address(options),
+  });
+  return send(nameRevokeTx, options);
 }
 
 interface AensRevokeOptions extends
@@ -105,16 +108,18 @@ interface AensRevokeOptions extends
  * await nameObject.update(pointers, { nameTtl, ttl, fee, nonce, clientTtl })
  * ```
  */
-export async function aensUpdate (
-  name: AensName, pointers: KeyPointers, { extendPointers, ...options }: AensUpdateOptions
+export async function aensUpdate(
+  name: AensName,
+  pointers: KeyPointers,
+  { extendPointers, ...options }: AensUpdateOptions,
 ): ReturnType<typeof send> {
   const allPointers = {
     ...extendPointers === true && Object.fromEntries(
       (await getName(name, options)).pointers
-        .map(({ key, id }: { key: string, id: string }) => [key, id])
+        .map(({ key, id }: { key: string; id: string }) => [key, id]),
     ),
-    ...pointers
-  }
+    ...pointers,
+  };
 
   const nameUpdateTx = await _buildTx(TX_TYPE.nameUpdate, {
     clientTtl: CLIENT_TTL,
@@ -122,18 +127,18 @@ export async function aensUpdate (
     ...options,
     nameId: name,
     accountId: await options.onAccount.address(options),
-    pointers: Object.entries(allPointers).map(([key, id]) => ({ key, id: id.toString() }))
-  })
+    pointers: Object.entries(allPointers).map(([key, id]) => ({ key, id: id.toString() })),
+  });
 
-  return await send(nameUpdateTx, options)
+  return send(nameUpdateTx, options);
 }
 
 interface AensUpdateOptions extends
   BuildTxOptions<TX_TYPE.nameUpdate, 'nameId' | 'accountId' | 'pointers' | 'clientTtl' | 'nameTtl'>,
   SendOptions {
-  extendPointers?: boolean
-  clientTtl?: number
-  nameTtl?: number
+  extendPointers?: boolean;
+  clientTtl?: number;
+  nameTtl?: number;
 }
 
 /**
@@ -159,17 +164,19 @@ interface AensUpdateOptions extends
  * await nameObject.transfer(recipientPub, { ttl, fee, nonce })
  * ```
  */
-export async function aensTransfer (
-  name: AensName, account: EncodedData<'ak'>, options: AensTransferOptions
+export async function aensTransfer(
+  name: AensName,
+  account: EncodedData<'ak'>,
+  options: AensTransferOptions,
 ): ReturnType<typeof send> {
   const nameTransferTx = await _buildTx(TX_TYPE.nameTransfer, {
     ...options,
     nameId: name,
     accountId: await options.onAccount.address(options),
-    recipientId: account
-  })
+    recipientId: account,
+  });
 
-  return await send(nameTransferTx, options)
+  return send(nameTransferTx, options);
 }
 
 interface AensTransferOptions extends
@@ -197,67 +204,69 @@ interface AensTransferOptions extends
  * }
  * ```
  */
-export async function aensQuery (
+export async function aensQuery(
   name: AensName,
   opt: Parameters<typeof getName>[1] & Parameters<typeof aensUpdate>[2]
-  & Parameters<typeof aensTransfer>[2]
+  & Parameters<typeof aensTransfer>[2],
 ): Promise<Readonly<
   TransformNodeType<NameEntry> & {
-    id: EncodedData<'nm'>
-    owner: EncodedData<'ak'>
-    pointers: KeyPointers | NamePointer[]
-    ttl: number
+    id: EncodedData<'nm'>;
+    owner: EncodedData<'ak'>;
+    pointers: KeyPointers | NamePointer[];
+    ttl: number;
     update: (
       pointers: KeyPointers,
       options?: Omit<Parameters<typeof aensQuery>[1], 'onNode' | 'onCompiler' | 'onAccount'> & {
-        onAccount?: AccountBase
+        onAccount?: AccountBase;
       }
-    ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>
+    ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
     transfer: (
       account: EncodedData<'ak'>,
       options?: Parameters<typeof aensQuery>[1]
-    ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>
+    ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
     revoke: (options?: Omit<Parameters<typeof aensRevoke>[1], 'onNode' | 'onCompiler' | 'onAccount'> & {
-      onAccount?: AccountBase
+      onAccount?: AccountBase;
     }
-    ) => ReturnType<typeof aensRevoke>
+    ) => ReturnType<typeof aensRevoke>;
     extendTtl: (
       nameTtl: number,
       options?: Omit<Parameters<typeof aensQuery>[1], 'onNode' | 'onCompiler' | 'onAccount'>
-    ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>
+    ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
   }
   >> {
-  const nameEntry = await getName(name, opt)
+  const nameEntry = await getName(name, opt);
   return Object.freeze({
     ...nameEntry,
     id: nameEntry.id as EncodedData<'nm'>,
     owner: nameEntry.owner as EncodedData<'ak'>,
-    async update (pointers, options) {
+    async update(pointers, options) {
       return {
         ...await aensUpdate(name, pointers, { ...opt, ...options }),
-        ...await aensQuery(name, { ...opt, ...options })
-      }
+        ...await aensQuery(name, { ...opt, ...options }),
+      };
     },
-    async transfer (account, options) {
+    async transfer(account, options) {
       return {
         ...await aensTransfer(name, account, { ...opt, ...options }),
-        ...await aensQuery(name, { ...opt, ...options })
-      }
+        ...await aensQuery(name, { ...opt, ...options }),
+      };
     },
-    async revoke (options) {
-      return await aensRevoke(name, { ...opt, ...options })
+    async revoke(options) {
+      return aensRevoke(name, { ...opt, ...options });
     },
-    async extendTtl (nameTtl = NAME_TTL, options) {
+    async extendTtl(nameTtl = NAME_TTL, options) {
       if (nameTtl > NAME_TTL || nameTtl <= 0) {
-        throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl)
+        throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl);
       }
 
       return {
-        ...await aensUpdate(name, {}, { ...opt, ...options, nameTtl, extendPointers: true }),
-        ...await aensQuery(name, { ...opt, ...options })
-      }
-    }
-  })
+        ...await aensUpdate(name, {}, {
+          ...opt, ...options, nameTtl, extendPointers: true,
+        }),
+        ...await aensQuery(name, { ...opt, ...options }),
+      };
+    },
+  });
 }
 
 /**
@@ -282,28 +291,30 @@ export async function aensQuery (
  * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
  * ```
  */
-export async function aensClaim (
-  name: AensName, salt: number, options: AensClaimOptions
+export async function aensClaim(
+  name: AensName,
+  salt: number,
+  options: AensClaimOptions,
 ): Promise<AensClaimReturnType> {
   const claimTx = await _buildTx(TX_TYPE.nameClaim, {
     ...options,
     accountId: await options.onAccount.address(options),
     nameSalt: salt,
-    name
-  })
+    name,
+  });
 
-  const result = await send(claimTx, options)
+  const result = await send(claimTx, options);
   if (!isAuctionName(name)) {
     const nameInter = result.blockHeight != null && result.blockHeight > 0
       ? await aensQuery(name, options)
-      : {}
-    return Object.assign(result, nameInter)
+      : {};
+    return Object.assign(result, nameInter);
   }
-  return result
+  return result;
 }
 
 type AensClaimOptionsType = BuildTxOptions<TX_TYPE.nameClaim, 'accountId' | 'nameSalt' | 'name'>
-& SendOptions & Parameters<typeof aensQuery>[1]
+& SendOptions & Parameters<typeof aensQuery>[1];
 interface AensClaimOptions extends AensClaimOptionsType {}
 interface AensClaimReturnType extends
   Awaited<ReturnType<typeof send>>,
@@ -333,35 +344,33 @@ interface AensClaimReturnType extends
  * }
  * ```
  */
-export async function aensPreclaim (
-  name: AensName, options: AensPreclaimOptions
-): Promise<Readonly<
-  Awaited<ReturnType<typeof send>> & {
-    height: number
-    salt: number
-    commitmentId: string
-    claim: (opts?: Parameters<typeof aensClaim>[2]) => ReturnType<typeof aensClaim>
-  }
-  >> {
-  const _salt = salt()
-  const currentHeight = await height(options)
-  const commitmentId = commitmentHash(name, _salt)
+export async function aensPreclaim(name: AensName, options: AensPreclaimOptions): Promise<Readonly<
+Awaited<ReturnType<typeof send>> & {
+  height: number;
+  salt: number;
+  commitmentId: string;
+  claim: (opts?: Parameters<typeof aensClaim>[2]) => ReturnType<typeof aensClaim>;
+}
+>> {
+  const _salt = salt();
+  const currentHeight = await height(options);
+  const commitmentId = commitmentHash(name, _salt);
 
   const preclaimTx = await _buildTx(TX_TYPE.namePreClaim, {
     ...options,
     accountId: await options.onAccount.address(options),
-    commitmentId
-  })
+    commitmentId,
+  });
 
   return Object.freeze({
     ...await send(preclaimTx, options),
     height: currentHeight,
     salt: _salt,
     commitmentId,
-    async claim (opts?: Parameters<typeof aensClaim>[2]) {
-      return await aensClaim(name, _salt, { ...options, ...opts })
-    }
-  })
+    async claim(opts?: Parameters<typeof aensClaim>[2]) {
+      return aensClaim(name, _salt, { ...options, ...opts });
+    },
+  });
 }
 
 interface AensPreclaimOptions extends
@@ -389,10 +398,10 @@ interface AensPreclaimOptions extends
  * await sdkInstance.aensBid(name, 213109412839123, { ttl, fee, nonce })
  * ```
  */
-export async function aensBid (
+export async function aensBid(
   name: AensName,
   nameFee: number | string | BigNumber,
-  options: Omit<Parameters<typeof aensClaim>[2], 'nameFee'>
+  options: Omit<Parameters<typeof aensClaim>[2], 'nameFee'>,
 ): ReturnType<typeof aensClaim> {
-  return await aensClaim(name, 0, { ...options, nameFee })
+  return aensClaim(name, 0, { ...options, nameFee });
 }

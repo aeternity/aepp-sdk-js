@@ -23,27 +23,27 @@
  * repository.
  */
 
-import { send, SendOptions } from './spend'
-import { mapObject, pause } from './utils/other'
-import { oracleQueryId, decode, encode } from './tx/builder/helpers'
-import { unpackTx } from './tx/builder'
+import BigNumber from 'bignumber.js';
+import { send, SendOptions } from './spend';
+import { mapObject, pause } from './utils/other';
+import { oracleQueryId, decode, encode } from './tx/builder/helpers';
+import { unpackTx } from './tx/builder';
 import {
   ORACLE_TTL,
   ORACLE_TTL_TYPES,
   QUERY_FEE,
   QUERY_TTL,
   RESPONSE_TTL,
-  TX_TYPE
-} from './tx/builder/schema'
-import { RequestTimedOutError } from './utils/errors'
-import { EncodedData } from './utils/encoder'
-import { _getPollInterval } from './chain'
-import { _buildTx, BuildTxOptions } from './tx'
-import Node from './Node'
-import BigNumber from 'bignumber.js'
-import AccountBase from './account/Base'
+  TX_TYPE,
+} from './tx/builder/schema';
+import { RequestTimedOutError } from './utils/errors';
+import { EncodedData } from './utils/encoder';
+import { _getPollInterval } from './chain';
+import { _buildTx, BuildTxOptions } from './tx';
+import Node from './Node';
+import AccountBase from './account/Base';
 
-type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['oracleQueries']
+type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['oracleQueries'];
 
 /**
  * Constructor for Oracle Object (helper object for using Oracle)
@@ -52,8 +52,9 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
  * @param options - Options
  * @returns Oracle object
  */
-export async function getOracleObject (
-  oracleId: EncodedData<'ok'>, options: { onNode: Node, onAccount: AccountBase }
+export async function getOracleObject(
+  oracleId: EncodedData<'ok'>,
+  options: { onNode: Node; onAccount: AccountBase },
 ): Promise<GetOracleObjectReturnType> {
   return {
     ...await options.onNode.getOracleByPubkey(oracleId),
@@ -64,30 +65,31 @@ export async function getOracleObject (
         postQuery: postQueryToOracle,
         respondToQuery,
         extendOracle: extendOracleTtl,
-        getQuery: getQueryObject
+        getQuery: getQueryObject,
       },
       ([name, handler]) => [
         name,
-        function (...args: any) {
-          const lastArg = args[args.length - 1]
+        (...args: any) => {
+          const lastArg = args[args.length - 1];
           if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
-            Object.assign(lastArg, { ...options, ...lastArg })
-          } else args.push(options)
-          return handler(oracleId, ...args)
-        }
-      ])
-  } as any
+            Object.assign(lastArg, { ...options, ...lastArg });
+          } else args.push(options);
+          return handler(oracleId, ...args);
+        },
+      ],
+    ),
+  } as any;
 }
 
 interface GetOracleObjectReturnType extends Awaited<ReturnType<Node['getOracleByPubkey']>> {
-  id: EncodedData<'ok'>
-  queries: OracleQueries
+  id: EncodedData<'ok'>;
+  queries: OracleQueries;
   // TODO: replace getOracleObject with a class
-  pollQueries: (cb: Parameters<typeof pollForQueries>[1]) => ReturnType<typeof pollForQueries>
-  postQuery: Function
-  respondToQuery: Function
-  extendOracle: Function
-  getQuery: Function
+  pollQueries: (cb: Parameters<typeof pollForQueries>[1]) => ReturnType<typeof pollForQueries>;
+  postQuery: Function;
+  respondToQuery: Function;
+  extendOracle: Function;
+  getQuery: Function;
 }
 
 /**
@@ -100,20 +102,20 @@ interface GetOracleObjectReturnType extends Awaited<ReturnType<Node['getOracleBy
  * @param options.onNode - Node to use
  * @returns Callback to stop polling function
  */
-export function pollForQueries (
+export function pollForQueries(
   oracleId: EncodedData<'ok'>,
   onQuery: (queries: OracleQueries) => void,
-  { interval, onNode, ...options }: { interval?: number, onNode: Node }
-  & Parameters<typeof _getPollInterval>[1]
+  { interval, onNode, ...options }: { interval?: number; onNode: Node }
+  & Parameters<typeof _getPollInterval>[1],
 ): () => void {
-  interval ??= _getPollInterval('microblock', options)
-  const knownQueryIds = new Set()
+  interval ??= _getPollInterval('microblock', options);
+  const knownQueryIds = new Set();
   const checkNewQueries = async (): Promise<void> => {
     const queries = ((await onNode.getOracleQueriesByPubkey(oracleId)).oracleQueries ?? [])
-      .filter(({ id }) => !knownQueryIds.has(id))
-    queries.forEach(({ id }) => knownQueryIds.add(id))
-    if (queries.length > 0) onQuery(queries)
-  }
+      .filter(({ id }) => !knownQueryIds.has(id));
+    queries.forEach(({ id }) => knownQueryIds.add(id));
+    if (queries.length > 0) onQuery(queries);
+  };
 
   let stopped = false;
 
@@ -121,11 +123,11 @@ export function pollForQueries (
   (async () => {
     while (!stopped) { // eslint-disable-line no-unmodified-loop-condition
       // TODO: allow to handle this error somehow
-      await checkNewQueries().catch(console.error)
-      await pause(interval)
+      await checkNewQueries().catch(console.error);
+      await pause(interval);
     }
-  })()
-  return () => { stopped = true }
+  })();
+  return () => { stopped = true; };
 }
 
 /**
@@ -136,30 +138,30 @@ export function pollForQueries (
  * @param options - Options
  * @returns OracleQuery object
  */
-export async function getQueryObject (
+export async function getQueryObject(
   oracleId: EncodedData<'ok'>,
   queryId: EncodedData<'oq'>,
-  options: RespondToQueryOptions & Parameters<typeof pollForQueryResponse>[2]
+  options: RespondToQueryOptions & Parameters<typeof pollForQueryResponse>[2],
 ): Promise<GetQueryObjectReturnType> {
-  const record = await options.onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
+  const record = await options.onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId);
   return {
     ...record,
     decodedQuery: decode(record.query as EncodedData<'oq'>).toString(),
     decodedResponse: decode(record.response as EncodedData<'or'>).toString(),
-    respond: async (response, opt) =>
-      await respondToQuery(oracleId, queryId, response, { ...options, ...opt }),
-    pollForResponse: async (opt) =>
-      await pollForQueryResponse(oracleId, queryId, { ...options, ...opt })
-  }
+    respond: async (response, opt) => (
+      respondToQuery(oracleId, queryId, response, { ...options, ...opt })
+    ),
+    pollForResponse: async (opt) => pollForQueryResponse(oracleId, queryId, { ...options, ...opt }),
+  };
 }
 
 interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQueryByPubkeyAndQueryId']>> {
-  decodedQuery: string
-  decodedResponse: string
+  decodedQuery: string;
+  decodedResponse: string;
   respond: (response: string, options?: Parameters<typeof respondToQuery>[3]) =>
-  ReturnType<typeof respondToQuery>
+  ReturnType<typeof respondToQuery>;
   pollForResponse: (options?: Parameters<typeof pollForQueryResponse>[2]) =>
-  ReturnType<typeof pollForQueryResponse>
+  ReturnType<typeof pollForQueryResponse>;
 }
 
 /**
@@ -173,20 +175,22 @@ interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQue
  * @param options.onNode - Node to use
  * @returns OracleQuery object
  */
-export async function pollForQueryResponse (
+export async function pollForQueryResponse(
   oracleId: EncodedData<'ok'>,
   queryId: EncodedData<'oq'>,
-  { attempts = 20, interval, onNode, ...options }:
-  { attempts?: number, interval?: number, onNode: Node } & Parameters<typeof _getPollInterval>[1]
+  {
+    attempts = 20, interval, onNode, ...options
+  }:
+  { attempts?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<string> {
-  interval ??= _getPollInterval('microblock', options)
-  for (let i = 0; i < attempts; i++) {
-    if (i > 0) await pause(interval)
-    const { response } = await onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId)
-    const responseBuffer = decode(response as EncodedData<'or'>)
-    if (responseBuffer.length > 0) return responseBuffer.toString()
+  interval ??= _getPollInterval('microblock', options);
+  for (let i = 0; i < attempts; i += 1) {
+    if (i > 0) await pause(interval);
+    const { response } = await onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId);
+    const responseBuffer = decode(response as EncodedData<'or'>);
+    if (responseBuffer.length > 0) return responseBuffer.toString();
   }
-  throw new RequestTimedOutError((attempts - 1) * interval)
+  throw new RequestTimedOutError((attempts - 1) * interval);
 }
 
 /**
@@ -202,10 +206,12 @@ export async function pollForQueryResponse (
  * @param options.ttl - Transaction time to leave
  * @returns Oracle object
  */
-export async function registerOracle (
-  queryFormat: string, responseFormat: string, options: RegisterOracleOptions
+export async function registerOracle(
+  queryFormat: string,
+  responseFormat: string,
+  options: RegisterOracleOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
-  const accountId = await options.onAccount.address(options)
+  const accountId = await options.onAccount.address(options);
   const oracleRegisterTx = await _buildTx(TX_TYPE.oracleRegister, {
     queryFee: QUERY_FEE,
     oracleTtlValue: ORACLE_TTL.value,
@@ -213,21 +219,21 @@ export async function registerOracle (
     ...options,
     accountId,
     queryFormat,
-    responseFormat
-  })
+    responseFormat,
+  });
   return {
     ...await send(oracleRegisterTx, options),
-    ...await getOracleObject(encode(decode(accountId), 'ok'), options)
-  }
+    ...await getOracleObject(encode(decode(accountId), 'ok'), options),
+  };
 }
 
 type RegisterOracleOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
 & BuildTxOptions<TX_TYPE.oracleRegister, 'accountId' | 'queryFormat' | 'responseFormat' | 'queryFee' | 'oracleTtlType' | 'oracleTtlValue'>
 & {
-  queryFee?: number | string | BigNumber
-  oracleTtlType?: ORACLE_TTL_TYPES
-  oracleTtlValue?: number
-}
+  queryFee?: number | string | BigNumber;
+  oracleTtlType?: ORACLE_TTL_TYPES;
+  oracleTtlValue?: number;
+};
 interface RegisterOracleOptions extends RegisterOracleOptionsType {}
 
 /**
@@ -243,11 +249,13 @@ interface RegisterOracleOptions extends RegisterOracleOptionsType {}
  * @param options.ttl - Transaction time to leave
  * @returns Query object
  */
-export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
-  query: string, options: PostQueryToOracleOptions
+export async function postQueryToOracle(
+  oracleId: EncodedData<'ok'>,
+  query: string,
+  options: PostQueryToOracleOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getQueryObject>>> {
-  options.queryFee ??= (await options.onNode.getOracleByPubkey(oracleId)).queryFee.toString()
-  const senderId = await options.onAccount.address(options)
+  options.queryFee ??= (await options.onNode.getOracleByPubkey(oracleId)).queryFee.toString();
+  const senderId = await options.onAccount.address(options);
 
   const oracleQueryTx = await _buildTx(TX_TYPE.oracleQuery, {
     queryTtlType: QUERY_TTL.type,
@@ -257,25 +265,25 @@ export async function postQueryToOracle (oracleId: EncodedData<'ok'>,
     ...options,
     oracleId,
     senderId,
-    query
-  })
-  const nonce = unpackTx(oracleQueryTx, TX_TYPE.oracleQuery).tx.nonce
-  const queryId = oracleQueryId(senderId, nonce, oracleId)
+    query,
+  });
+  const { nonce } = unpackTx(oracleQueryTx, TX_TYPE.oracleQuery).tx;
+  const queryId = oracleQueryId(senderId, nonce, oracleId);
   return {
     ...await send(oracleQueryTx, options),
-    ...await getQueryObject(oracleId, queryId, options)
-  }
+    ...await getQueryObject(oracleId, queryId, options),
+  };
 }
 
 type PostQueryToOracleOptionsType = Parameters<typeof send>[1]
 & Parameters<typeof getQueryObject>[2]
 & BuildTxOptions<TX_TYPE.oracleQuery, 'oracleId' | 'senderId' | 'query' | 'queryTtlType' | 'queryTtlValue' | 'responseTtlType' | 'responseTtlValue'>
 & {
-  queryTtlType?: ORACLE_TTL_TYPES
-  queryTtlValue?: number
-  responseTtlType?: ORACLE_TTL_TYPES
-  responseTtlValue?: number
-}
+  queryTtlType?: ORACLE_TTL_TYPES;
+  queryTtlValue?: number;
+  responseTtlType?: ORACLE_TTL_TYPES;
+  responseTtlValue?: number;
+};
 interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
 
 /**
@@ -289,26 +297,26 @@ interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
  * @param options.oracleTtlValue - Oracle time to leave for extend
  * @returns Oracle object
  */
-export async function extendOracleTtl (
+export async function extendOracleTtl(
   oracleId: EncodedData<'ok'>,
-  options: ExtendOracleTtlOptions
+  options: ExtendOracleTtlOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const oracleExtendTx = await _buildTx(TX_TYPE.oracleExtend, {
     oracleTtlType: ORACLE_TTL.type,
     oracleTtlValue: ORACLE_TTL.value,
     ...options,
     callerId: await options.onAccount.address(options),
-    oracleId
-  })
+    oracleId,
+  });
   return {
     ...await send(oracleExtendTx, options),
-    ...await getOracleObject(oracleId, options)
-  }
+    ...await getOracleObject(oracleId, options),
+  };
 }
 
 type ExtendOracleTtlOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
 & BuildTxOptions<TX_TYPE.oracleExtend, 'oracleTtlType' | 'oracleTtlValue' | 'callerId' | 'oracleId'>
-& { oracleTtlType?: ORACLE_TTL_TYPES, oracleTtlValue?: number }
+& { oracleTtlType?: ORACLE_TTL_TYPES; oracleTtlValue?: number };
 interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
 
 /**
@@ -323,11 +331,11 @@ interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
  * @param options.ttl - Transaction time to leave
  * @returns Oracle object
  */
-export async function respondToQuery (
+export async function respondToQuery(
   oracleId: EncodedData<'ok'>,
   queryId: EncodedData<'oq'>,
   response: string,
-  options: RespondToQueryOptions
+  options: RespondToQueryOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const oracleRespondTx = await _buildTx(TX_TYPE.oracleResponse, {
     responseTtlType: RESPONSE_TTL.type,
@@ -336,15 +344,15 @@ export async function respondToQuery (
     callerId: await options.onAccount.address(options),
     oracleId,
     queryId,
-    response
-  })
+    response,
+  });
   return {
     ...await send(oracleRespondTx, options),
-    ...await getOracleObject(oracleId, options)
-  }
+    ...await getOracleObject(oracleId, options),
+  };
 }
 
 type RespondToQueryOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
 & BuildTxOptions<TX_TYPE.oracleResponse, 'callerId' | 'oracleId' | 'queryId' | 'response' | 'responseTtlType' | 'responseTtlValue'>
-& { responseTtlType?: ORACLE_TTL_TYPES, responseTtlValue?: number }
+& { responseTtlType?: ORACLE_TTL_TYPES; responseTtlValue?: number };
 interface RespondToQueryOptions extends RespondToQueryOptionsType {}

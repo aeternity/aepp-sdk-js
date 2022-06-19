@@ -1,8 +1,10 @@
-import BigNumber from 'bignumber.js'
-import { hash, salt } from '../../utils/crypto'
-import { encode, decode, EncodedData, EncodingType } from '../../utils/encoder'
-import { toBytes } from '../../utils/bytes'
-import { concatBuffers } from '../../utils/other'
+import BigNumber from 'bignumber.js';
+import { hash, salt } from '../../utils/crypto';
+import {
+  encode, decode, EncodedData, EncodingType,
+} from '../../utils/encoder';
+import { toBytes } from '../../utils/bytes';
+import { concatBuffers } from '../../utils/other';
 import {
   ID_TAG_PREFIX,
   PREFIX_ID_TAG,
@@ -11,24 +13,24 @@ import {
   NAME_BID_TIMEOUT_BLOCKS,
   NAME_MAX_LENGTH_FEE,
   POINTER_KEY_BY_PREFIX,
-  AensName
-} from './constants'
-import { ceil } from '../../utils/bignumber'
+  AensName,
+} from './constants';
+import { ceil } from '../../utils/bignumber';
 import {
   TagNotFoundError,
   PrefixNotFoundError,
   IllegalBidFeeError,
-  ArgumentError
-} from '../../utils/errors'
-import { NamePointer } from '../../apis/node'
+  ArgumentError,
+} from '../../utils/errors';
+import { NamePointer } from '../../apis/node';
 
 /**
  * JavaScript-based Transaction builder helper function's
  */
 
-export const createSalt = salt
+export const createSalt = salt;
 
-export { encode, decode }
+export { encode, decode };
 
 /**
  * Build a contract public key
@@ -37,10 +39,13 @@ export { encode, decode }
  * @param nonce - the nonce of the transaction
  * @returns Contract public key
  */
-export function buildContractId (ownerId: EncodedData<'ak'>, nonce: number | BigNumber): EncodedData<'ct'> {
-  const ownerIdAndNonce = Buffer.from([...decode(ownerId), ...toBytes(nonce)])
-  const b2bHash = hash(ownerIdAndNonce)
-  return encode(b2bHash, 'ct')
+export function buildContractId(
+  ownerId: EncodedData<'ak'>,
+  nonce: number | BigNumber,
+): EncodedData<'ct'> {
+  const ownerIdAndNonce = Buffer.from([...decode(ownerId), ...toBytes(nonce)]);
+  const b2bHash = hash(ownerIdAndNonce);
+  return encode(b2bHash, 'ct');
 }
 
 /**
@@ -51,19 +56,20 @@ export function buildContractId (ownerId: EncodedData<'ak'>, nonce: number | Big
  * @param oracleId - The oracle public key
  * @returns Contract public key
  */
-export function oracleQueryId (
+export function oracleQueryId(
   senderId: EncodedData<'ak'>,
   nonce: number | BigNumber | string,
-  oracleId: EncodedData<'ok'>
+  oracleId: EncodedData<'ok'>,
 ): EncodedData<'oq'> {
-  function _int32 (val: number | string | BigNumber): Buffer {
-    const nonceBE = toBytes(val, true)
-    return concatBuffers([Buffer.alloc(32 - nonceBE.length), nonceBE])
+  function _int32(val: number | string | BigNumber): Buffer {
+    const nonceBE = toBytes(val, true);
+    return concatBuffers([Buffer.alloc(32 - nonceBE.length), nonceBE]);
   }
 
   const b2bHash = hash(
-    Buffer.from([...decode(senderId), ..._int32(nonce), ...decode(oracleId)]))
-  return encode(b2bHash, 'oq')
+    Buffer.from([...decode(senderId), ..._int32(nonce), ...decode(oracleId)]),
+  );
+  return encode(b2bHash, 'oq');
 }
 
 /**
@@ -72,8 +78,8 @@ export function oracleQueryId (
  * @param salt - Random number
  * @returns Zero-padded hex string of salt
  */
-export function formatSalt (salt: number): Buffer {
-  return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex')
+export function formatSalt(salt: number): Buffer {
+  return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex');
 }
 
 /**
@@ -82,8 +88,8 @@ export function formatSalt (salt: number): Buffer {
  * @param name - Name to encode
  * @returns `nm_` prefixed encoded AENS name
  */
-export function produceNameId (name: AensName): EncodedData<'nm'> {
-  return encode(hash(name.toLowerCase()), 'nm')
+export function produceNameId(name: AensName): EncodedData<'nm'> {
+  return encode(hash(name.toLowerCase()), 'nm');
 }
 
 /**
@@ -94,8 +100,8 @@ export function produceNameId (name: AensName): EncodedData<'nm'> {
  * @param salt - Random salt
  * @returns Commitment hash
  */
-export function commitmentHash (name: AensName, salt: number = createSalt()): EncodedData<'cm'> {
-  return encode(hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm')
+export function commitmentHash(name: AensName, salt: number = createSalt()): EncodedData<'cm'> {
+  return encode(hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm');
 }
 
 /**
@@ -104,12 +110,12 @@ export function commitmentHash (name: AensName, salt: number = createSalt()): En
  * @param hashId - Encoded hash
  * @returns Buffer Buffer with ID tag and decoded HASh
  */
-export function writeId (hashId: string): Buffer {
-  if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId)
-  const prefix = hashId.slice(0, 2) as keyof typeof PREFIX_ID_TAG
-  const idTag = PREFIX_ID_TAG[prefix]
-  if (idTag == null) throw new TagNotFoundError(prefix)
-  return Buffer.from([...toBytes(idTag), ...decode(hashId as EncodedData<EncodingType>)])
+export function writeId(hashId: string): Buffer {
+  if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId);
+  const prefix = hashId.slice(0, 2) as keyof typeof PREFIX_ID_TAG;
+  const idTag = PREFIX_ID_TAG[prefix];
+  if (idTag == null) throw new TagNotFoundError(prefix);
+  return Buffer.from([...toBytes(idTag), ...decode(hashId as EncodedData<EncodingType>)]);
 }
 
 /**
@@ -118,11 +124,11 @@ export function writeId (hashId: string): Buffer {
  * @param buf - Data
  * @returns Encoided hash string with prefix
  */
-export function readId (buf: Buffer): string {
-  const tag = Buffer.from(buf).readUIntBE(0, 1)
-  const prefix = ID_TAG_PREFIX[tag]
-  if (prefix == null) throw new PrefixNotFoundError(tag)
-  return encode(buf.slice(1, buf.length), prefix)
+export function readId(buf: Buffer): string {
+  const tag = Buffer.from(buf).readUIntBE(0, 1);
+  const prefix = ID_TAG_PREFIX[tag];
+  if (prefix == null) throw new PrefixNotFoundError(tag);
+  return encode(buf.slice(1, buf.length), prefix);
 }
 
 /**
@@ -131,8 +137,8 @@ export function readId (buf: Buffer): string {
  * @param val - Value
  * @returns Buffer Buffer from number(BigEndian)
  */
-export function writeInt (val: number | string | BigNumber): Buffer {
-  return toBytes(val, true)
+export function writeInt(val: number | string | BigNumber): Buffer {
+  return toBytes(val, true);
 }
 
 /**
@@ -141,8 +147,8 @@ export function writeInt (val: number | string | BigNumber): Buffer {
  * @param buf - Value
  * @returns Buffer Buffer from number(BigEndian)
  */
-export function readInt (buf: Buffer = Buffer.from([])): string {
-  return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10)
+export function readInt(buf: Buffer = Buffer.from([])): string {
+  return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10);
 }
 
 /**
@@ -152,13 +158,13 @@ export function readInt (buf: Buffer = Buffer.from([])): string {
  * `([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])`
  * @returns Serialized pointers array
  */
-export function buildPointers (pointers: NamePointer[]): Buffer[][] {
+export function buildPointers(pointers: NamePointer[]): Buffer[][] {
   return pointers.map(
-    p => [
+    (p) => [
       toBytes(p.key),
-      writeId(p.id)
-    ]
-  )
+      writeId(p.id),
+    ],
+  );
 }
 
 /**
@@ -167,25 +173,25 @@ export function buildPointers (pointers: NamePointer[]): Buffer[][] {
  * @param pointers - Array of pointers
  * @returns Deserialize pointer array
  */
-export function readPointers (pointers: Array<[key: string, id: Buffer]>): NamePointer[] {
+export function readPointers(pointers: Array<[key: string, id: Buffer]>): NamePointer[] {
   return pointers.map(
-    ([key, id]) => Object.assign({
+    ([key, id]) => ({
       key: key.toString(),
-      id: readId(id)
-    })
-  )
+      id: readId(id),
+    }),
+  );
 }
 
-const AENS_SUFFIX = '.chain'
+const AENS_SUFFIX = '.chain';
 
 /**
  * Is AENS name valid
  * @category AENS
  * @param name - AENS name
  */
-export function isNameValid (name: string): name is AensName {
+export function isNameValid(name: string): name is AensName {
   // TODO: probably there are stronger requirements
-  return name.endsWith(AENS_SUFFIX)
+  return name.endsWith(AENS_SUFFIX);
 }
 
 /**
@@ -193,12 +199,12 @@ export function isNameValid (name: string): name is AensName {
  * @param identifier - account/oracle/contract address, or channel
  * @returns default AENS pointer key
  */
-export function getDefaultPointerKey (
-  identifier: EncodedData<keyof typeof POINTER_KEY_BY_PREFIX>
+export function getDefaultPointerKey(
+  identifier: EncodedData<keyof typeof POINTER_KEY_BY_PREFIX>,
 ): POINTER_KEY_BY_PREFIX {
-  decode(identifier)
-  const prefix = identifier.substring(0, 2) as keyof typeof POINTER_KEY_BY_PREFIX
-  return POINTER_KEY_BY_PREFIX[prefix]
+  decode(identifier);
+  const prefix = identifier.substring(0, 2) as keyof typeof POINTER_KEY_BY_PREFIX;
+  return POINTER_KEY_BY_PREFIX[prefix];
 }
 
 /**
@@ -207,9 +213,9 @@ export function getDefaultPointerKey (
  * @param name - the AENS name to get the fee for
  * @returns the minimum fee for the AENS name auction
  */
-export function getMinimumNameFee (name: AensName): BigNumber {
-  const nameLength = name.length - AENS_SUFFIX.length
-  return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)]
+export function getMinimumNameFee(name: AensName): BigNumber {
+  const nameLength = name.length - AENS_SUFFIX.length;
+  return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)];
 }
 
 /**
@@ -221,18 +227,18 @@ export function getMinimumNameFee (name: AensName): BigNumber {
  * @param options.increment - Bid multiplier(In percentage, must be between 0 and 1)
  * @returns Bid fee
  */
-export function computeBidFee (
+export function computeBidFee(
   name: AensName,
   { startFee, increment = NAME_FEE_BID_INCREMENT }:
-  { startFee?: number | string | BigNumber, increment?: number } = {}
+  { startFee?: number | string | BigNumber; increment?: number } = {},
 ): BigNumber {
-  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`)
-  if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`)
+  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`);
+  if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`);
   // FIXME: increment should be used somehow here
   return ceil(
     new BigNumber(startFee ?? getMinimumNameFee(name))
-      .times(new BigNumber(NAME_FEE_BID_INCREMENT).plus(1))
-  )
+      .times(new BigNumber(NAME_FEE_BID_INCREMENT).plus(1)),
+  );
 }
 
 /**
@@ -243,19 +249,19 @@ export function computeBidFee (
  * @see {@link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273}
  * @returns Auction end height
  */
-export function computeAuctionEndBlock (name: AensName, claimHeight: number): number {
-  const length = name.length - AENS_SUFFIX.length
-  const h = (length <= 4 && 62 * NAME_BID_TIMEOUT_BLOCKS) ||
-    (length <= 8 && 31 * NAME_BID_TIMEOUT_BLOCKS) ||
-    (length <= 12 && NAME_BID_TIMEOUT_BLOCKS) ||
-    0
-  return h + claimHeight
+export function computeAuctionEndBlock(name: AensName, claimHeight: number): number {
+  const length = name.length - AENS_SUFFIX.length;
+  const h = (length <= 4 && 62 * NAME_BID_TIMEOUT_BLOCKS)
+    || (length <= 8 && 31 * NAME_BID_TIMEOUT_BLOCKS)
+    || (length <= 12 && NAME_BID_TIMEOUT_BLOCKS)
+    || 0;
+  return h + claimHeight;
 }
 
 /**
  * Is name accept going to auction
  * @category AENS
  */
-export function isAuctionName (name: AensName): boolean {
-  return name.length < 13 + AENS_SUFFIX.length
+export function isAuctionName(name: AensName): boolean {
+  return name.length < 13 + AENS_SUFFIX.length;
 }

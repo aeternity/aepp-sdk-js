@@ -15,15 +15,15 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it, before } from 'mocha'
-import { expect } from 'chai'
-import { getSdk } from '.'
-import { generateKeyPair } from '../../src/utils/crypto'
-import { encode } from '../../src/utils/encoder'
-import MemoryAccount from '../../src/account/Memory'
-import { unpackTx } from '../../src/tx/builder'
-import { ContractInstance } from '../../src/contract/aci'
-import { AeSdk, TX_TYPE, UnexpectedTsError } from '../../src'
+import { describe, it, before } from 'mocha';
+import { expect } from 'chai';
+import { getSdk } from '.';
+import { generateKeyPair } from '../../src/utils/crypto';
+import { encode } from '../../src/utils/encoder';
+import MemoryAccount from '../../src/account/Memory';
+import { unpackTx } from '../../src/tx/builder';
+import { ContractInstance } from '../../src/contract/aci';
+import { AeSdk, TX_TYPE, UnexpectedTsError } from '../../src';
 
 const authContractSource = `contract BlindAuth =
   record state = { txHash: option(hash) }
@@ -37,54 +37,53 @@ const authContractSource = `contract BlindAuth =
     switch(Auth.tx_hash)
       None          => abort("Not in Auth context")
       Some(tx_hash) => true
-`
-describe('Generalized Account', function () {
-  let aeSdk: AeSdk
-  const gaAccount = generateKeyPair()
-  let authContract: ContractInstance
+`;
+describe('Generalized Account', () => {
+  let aeSdk: AeSdk;
+  const gaAccount = generateKeyPair();
+  let authContract: ContractInstance;
 
-  before(async function () {
-    aeSdk = await getSdk()
-    await aeSdk.spend('100000000000000000000', gaAccount.publicKey)
-    if (aeSdk.selectedAddress == null) throw new UnexpectedTsError()
-    aeSdk.removeAccount(aeSdk.selectedAddress)
-    await aeSdk.addAccount(new MemoryAccount({ keypair: gaAccount }), { select: true })
-  })
+  before(async () => {
+    aeSdk = await getSdk();
+    await aeSdk.spend('100000000000000000000', gaAccount.publicKey);
+    if (aeSdk.selectedAddress == null) throw new UnexpectedTsError();
+    aeSdk.removeAccount(aeSdk.selectedAddress);
+    await aeSdk.addAccount(new MemoryAccount({ keypair: gaAccount }), { select: true });
+  });
 
   it('Make account GA', async () => {
-    const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', authContractSource, [])
-    const isGa = await aeSdk.isGA(gaAccount.publicKey)
-    isGa.should.be.equal(true)
+    const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', authContractSource, []);
+    const isGa = await aeSdk.isGA(gaAccount.publicKey);
+    isGa.should.be.equal(true);
     authContract = await aeSdk.getContractInstance({
-      source: authContractSource, contractAddress: gaContractId
-    })
-  })
+      source: authContractSource, contractAddress: gaContractId,
+    });
+  });
 
   it('Fail on make GA on already GA', async () => {
     await aeSdk.createGeneralizedAccount('authorize', authContractSource, [])
-      .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`)
-  })
+      .should.be.rejectedWith(`Account ${gaAccount.publicKey} is already GA`);
+  });
 
-  const r = (): string => Math.floor(Math.random() * 20).toString()
-  const { publicKey } = generateKeyPair()
+  const r = (): string => Math.floor(Math.random() * 20).toString();
+  const { publicKey } = generateKeyPair();
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
-    aeSdk.removeAccount(gaAccount.publicKey)
-    await aeSdk.addAccount(new MemoryAccount({ gaId: gaAccount.publicKey }), { select: true })
+    aeSdk.removeAccount(gaAccount.publicKey);
+    await aeSdk.addAccount(new MemoryAccount({ gaId: gaAccount.publicKey }), { select: true });
 
-    const callData = authContract.calldata.encode('BlindAuth', 'authorize', [r()])
-    await aeSdk.spend(10000, publicKey, { authData: { callData } })
-    await aeSdk.spend(10000, publicKey, { authData: { source: authContractSource, args: [r()] } })
-    const balanceAfter = await aeSdk.getBalance(publicKey)
-    balanceAfter.should.be.equal('20000')
-  })
+    const callData = authContract.calldata.encode('BlindAuth', 'authorize', [r()]);
+    await aeSdk.spend(10000, publicKey, { authData: { callData } });
+    await aeSdk.spend(10000, publicKey, { authData: { source: authContractSource, args: [r()] } });
+    const balanceAfter = await aeSdk.getBalance(publicKey);
+    balanceAfter.should.be.equal('20000');
+  });
 
   it('buildAuthTxHash generates a proper hash', async () => {
-    const { rawTx } = await aeSdk.spend(
-      10000, publicKey, { authData: { source: authContractSource, args: [r()] } }
-    )
-    const spendTx = encode(unpackTx(rawTx, TX_TYPE.signed).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx')
+    const { rawTx } = await aeSdk
+      .spend(10000, publicKey, { authData: { source: authContractSource, args: [r()] } });
+    const spendTx = encode(unpackTx(rawTx, TX_TYPE.signed).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx');
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
-      .eql((await authContract.methods.getTxHash()).decodedResult)
-  })
-})
+      .eql((await authContract.methods.getTxHash()).decodedResult);
+  });
+});
