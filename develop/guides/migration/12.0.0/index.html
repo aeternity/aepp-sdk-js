@@ -2433,23 +2433,21 @@
 <h2 id="general">General</h2>
 <h4 id="universal-rpcaepp-rpcwallet-ae-stamps-are-removed"><code>Universal</code>, <code>RpcAepp</code>, <code>RpcWallet</code>, <code>Ae</code> stamps are removed</h4>
 <p>Use <code>AeSdk</code>, <code>AeSdkAepp</code>, <code>AeSdkWallet</code>, <code>AeSdbBase</code> accordingly.
-For example, replace:
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Universal</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span><span class="w"></span>
-</code></pre></div>
-with
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span><span class="w"></span>
+For example:
+<div class="highlight"><pre><span></span><code><span class="gd">-import { Universal } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+<span class="gi">+import { AeSdk } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+
+<span class="gd">-const aeSdk = await Universal(options)</span><span class="w"></span>
+<span class="gi">+const aeSdk = new AeSdk(options)</span><span class="w"></span>
 </code></pre></div></p>
 <h4 id="all-combined-exports-are-inlined-requireaeternityaepp-sdkgeneratekeypair">all combined exports are inlined (<code>require('@aeternity/aepp-sdk').generateKeyPair()</code>)</h4>
 <p>Import the needed utils directly instead of importing a wrapper object firstly.
-For example, replace:
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Crypto</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">generateKeyPair</span><span class="p">())</span><span class="w"></span>
-</code></pre></div>
-with
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">generateKeyPair</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">generateKeyPair</span><span class="p">())</span><span class="w"></span>
+For example:
+<div class="highlight"><pre><span></span><code><span class="gd">-import { Crypto } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+<span class="gi">+import { generateKeyPair } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+
+<span class="gd">-console.log(Crypto.generateKeyPair())</span><span class="w"></span>
+<span class="gi">+console.log(generateKeyPair())</span><span class="w"></span>
 </code></pre></div></p>
 <h4 id="accountbase-and-inheritors-are-classes-now"><code>AccountBase</code> and inheritors are classes now</h4>
 <p>Use <code>new</code> to create an instance.</p>
@@ -2458,13 +2456,11 @@ with
 <code>onNode</code>, <code>onCompiler</code> options.</p>
 <h2 id="node-and-compiler">Node and Compiler</h2>
 <h4 id="node-compiler-previously-contractcompilerhttp-are-classes-instead-of-a-stamps"><code>Node</code>, <code>Compiler</code> (previously <code>ContractCompilerHttp</code>) are classes instead of a stamps</h4>
-<p>For example, replace:
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="nx">ignoreVersion</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
-</code></pre></div>
-with
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ignoreVersion</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<p>For example:
+<div class="highlight"><pre><span></span><code><span class="w">import { Node } from &#39;@aeternity/aepp-sdk&#39;</span>
+
+<span class="gd">-const node = await Node({ url, ignoreVersion: false })</span><span class="w"></span>
+<span class="gi">+const node = new Node(url, { ignoreVersion: false })</span><span class="w"></span>
 </code></pre></div></p>
 <h4 id="node-compiler-doesnt-check-version-on-the-first-request-instead-of-init"><code>Node</code>, <code>Compiler</code> doesn't check version on the first request instead of init</h4>
 <p>Don't handle <code>new Node(...)</code> and <code>new Compiler(...)</code> as a <code>Promise</code>.</p>
@@ -2503,11 +2499,9 @@ instead.</p>
 <p>Use <code>require('rlp').decode(unpackTx(tx).rlpEncoded)</code> instead.</p>
 <h4 id="encode-since-the-prefix-is-evaluated-by-the-type-itself-the-required-prefix-parameter"><strong>encode:</strong> since the prefix is evaluated by the type itself the required prefix parameter</h4>
 <p>is no more accepted
-Rewrite
-<div class="highlight"><pre><span></span><code><span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;cb_DA6sWJo=&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cb&#39;</span><span class="p">)</span><span class="w"></span>
-</code></pre></div>
-to
-<div class="highlight"><pre><span></span><code><span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;cb_DA6sWJo=&#39;</span><span class="p">)</span><span class="w"></span>
+For example:
+<div class="highlight"><pre><span></span><code><span class="gd">-decode(&#39;cb_DA6sWJo=&#39;, &#39;cb&#39;)</span><span class="w"></span>
+<span class="gi">+decode(&#39;cb_DA6sWJo=&#39;)</span><span class="w"></span>
 </code></pre></div></p>
 <h4 id="calculateminfee-returns-bignumber-instead-of-string"><code>calculateMinFee</code> returns BigNumber instead of string</h4>
 <h4 id="fee-helpers-not-exported-anymore-base_gas-gas_per_byte-key_block_interval">Fee helpers not exported anymore (<code>BASE_GAS</code>, <code>GAS_PER_BYTE</code>, <code>KEY_BLOCK_INTERVAL</code>,</h4>
@@ -2621,15 +2615,12 @@ Use own implementation if needed.</p>
 <h4 id="getbrowserapi-helper-removed"><code>getBrowserAPI</code> helper removed</h4>
 <p>Use <code>webextension-polyfill</code> package instead.</p>
 <h4 id="sharewalletinfo-accepts-rpc-client-id-instead-of-callback"><code>shareWalletInfo</code> accepts rpc client id instead of callback</h4>
-<p>For example, rewrite
-<div class="highlight"><pre><span></span><code>const connection = new BrowserRuntimeConnection({ port })
-aeSdk.addRpcClient(connection)
-aeSdk.shareWalletInfo(port.postMessage.bind(port))
-</code></pre></div>
-to
-<div class="highlight"><pre><span></span><code>const connection = new BrowserRuntimeConnection({ port })
-const rpcClientId = aeSdk.addRpcClient(connection)
-aeSdk.shareWalletInfo(rpcClientId)
+<p>For example:
+<div class="highlight"><pre><span></span><code><span class="w">const connection = new BrowserRuntimeConnection({ port })</span>
+<span class="gd">-aeSdk.addRpcClient(connection)</span><span class="w"></span>
+<span class="gd">-aeSdk.shareWalletInfo(port.postMessage.bind(port))</span><span class="w"></span>
+<span class="gi">+const rpcClientId = aeSdk.addRpcClient(connection)</span><span class="w"></span>
+<span class="gi">+aeSdk.shareWalletInfo(rpcClientId)</span><span class="w"></span>
 </code></pre></div></p>
 <h4 id="sharenode-argument-in-accept-callback-of-onconnection-removed"><code>shareNode</code> argument in accept callback of <code>onConnection</code> removed</h4>
 <p>Just deny the connection if you don't want to share the node url.</p>
