@@ -39,7 +39,10 @@ export { encode, decode };
  * @param nonce - the nonce of the transaction
  * @returns Contract public key
  */
-export function buildContractId(ownerId: EncodedData<'ak'>, nonce: number | BigNumber): EncodedData<'ct'> {
+export function buildContractId(
+  ownerId: EncodedData<'ak'>,
+  nonce: number | BigNumber,
+): EncodedData<'ct'> {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId), ...toBytes(nonce)]);
   const b2bHash = hash(ownerIdAndNonce);
   return encode(b2bHash, 'ct');

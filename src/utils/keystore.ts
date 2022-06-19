@@ -1,6 +1,6 @@
 import nacl from 'tweetnacl';
 import { v4 as uuid } from '@aeternity/uuid';
-import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min.js';
+import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min';
 import { getAddressFromPriv } from './crypto';
 import { bytesToHex, hexToBytes } from './bytes';
 import { InvalidPasswordError } from './errors';
@@ -125,7 +125,10 @@ async function deriveKey(
  * @param keystore - Keystore object.
  * @returns Plaintext private key.
  */
-export async function recover(password: string | Uint8Array, { crypto }: Keystore): Promise<string> {
+export async function recover(
+  password: string | Uint8Array,
+  { crypto }: Keystore,
+): Promise<string> {
   const salt = hexToBytes(crypto.kdf_params.salt);
   return bytesToHex(decrypt(
     hexToBytes(crypto.ciphertext),

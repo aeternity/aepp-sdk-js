@@ -109,7 +109,11 @@ export function generateSaveHDWalletFromSeed(seed: Uint8Array, password: string)
   };
 }
 
-export function getSaveHDWalletAccounts(saveHDWallet: HDWallet, password: string, accountCount: number): Account[] {
+export function getSaveHDWalletAccounts(
+  saveHDWallet: HDWallet,
+  password: string,
+  accountCount: number,
+): Account[] {
   const walletKey = {
     secretKey: decryptKey(password, Buffer.from(saveHDWallet.secretKey, 'hex')),
     chainCode: decryptKey(password, Buffer.from(saveHDWallet.chainCode, 'hex')),
@@ -118,7 +122,10 @@ export function getSaveHDWalletAccounts(saveHDWallet: HDWallet, password: string
     .map((_, idx) => formatAccount(getKeyPair(derivePathFromKey(`${idx}h/0h/0h`, walletKey).secretKey)));
 }
 
-export const getHdWalletAccountFromSeed = (seed: Uint8Array, accountIdx: number): Account & { idx: number } => {
+export const getHdWalletAccountFromSeed = (
+  seed: Uint8Array,
+  accountIdx: number,
+): Account & { idx: number } => {
   const walletKey = derivePathFromSeed('m/44h/457h', seed);
   const derived = derivePathFromKey(`${accountIdx}h/0h/0h`, walletKey);
   const keyPair = getKeyPair(derived.secretKey);

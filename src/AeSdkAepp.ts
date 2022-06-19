@@ -119,7 +119,8 @@ export default class AeSdkAepp extends AeSdkBase {
         [METHODS.readyToConnect]: () => {},
       },
     );
-    const { node, ...walletInfo } = await client.request(METHODS.connect, { name: this.name, version: RPC_VERSION, connectNode });
+    const { node, ...walletInfo } = await client
+      .request(METHODS.connect, { name: this.name, version: RPC_VERSION, connectNode });
     if (connectNode) {
       if (node == null) throw new RpcConnectionError('Missing URLs of the Node');
       this.addNode(name, new Node(node.url), select);
@@ -152,7 +153,10 @@ export default class AeSdkAepp extends AeSdkBase {
    * @param value - Should be one of 'current' (the selected account), 'connected' (all)
    * @returns Accounts from wallet
    */
-  async subscribeAddress(type: SUBSCRIPTION_TYPES, value: 'current' | 'connected'): Promise<ReturnType<WalletApi[METHODS.subscribeAddress]>> {
+  async subscribeAddress(
+    type: SUBSCRIPTION_TYPES,
+    value: 'current' | 'connected',
+  ): Promise<ReturnType<WalletApi[METHODS.subscribeAddress]>> {
     this._ensureConnected();
     const result = await this.rpcClient.request(METHODS.subscribeAddress, { type, value });
     this._accounts = result.address;

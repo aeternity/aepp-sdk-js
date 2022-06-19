@@ -154,7 +154,7 @@ function serializeField(value: any, type: FIELD_TYPES | typeof Field, params: an
     case FIELD_TYPES.rlpBinary:
       return value.rlpEncoded ?? value;
     case FIELD_TYPES.mptrees:
-      return value.map((t: typeof Field) => t.serialize(''));
+      return value.map((t: MPTree) => t.serialize());
     case FIELD_TYPES.ctVersion:
       return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
     case FIELD_TYPES.callReturnType:
@@ -183,11 +183,12 @@ function validateField(
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
     case FIELD_TYPES.shortInt: {
+      // eslint-disable-next-line no-restricted-globals
       if (isNaN(value) && !BigNumber.isBigNumber(value)) {
         return `${String(value)} is not of type Number or BigNumber`;
       }
       if (new BigNumber(value).lt(0)) return `${String(value)} must be >= 0`;
-      return;
+      return undefined;
     }
     case FIELD_TYPES.id: {
       const prefixes = Array.isArray(prefix) ? prefix : [prefix];
@@ -195,13 +196,13 @@ function validateField(
         if (prefix == null) { return `'${String(value)}' prefix doesn't exist'`; }
         return `'${String(value)}' prefix doesn't match expected prefix '${prefix.toString()}'`;
       }
-      return;
+      return undefined;
     }
     case FIELD_TYPES.ctVersion:
       if (!(Boolean(value.abiVersion) && Boolean(value.vmVersion))) {
         return 'Value must be an object with "vmVersion" and "abiVersion" fields';
       }
-      return;
+      return undefined;
     case FIELD_TYPES.pointers:
       if (!Array.isArray(value)) return 'Value must be of type Array';
       if (value.some((p: NamePointer) => !(Boolean(p.key) && Boolean(p.id)))) {
@@ -210,6 +211,9 @@ function validateField(
       if (value.length > 32) {
         return `Expected 32 pointers or less, got ${value.length} instead`;
       }
+      return undefined;
+    default:
+      return undefined;
   }
 }
 
@@ -238,7 +242,11 @@ function transformParams(
  * @param excludeKeys - Array of keys to exclude for validation
  * @returns Object with validation errors
  */
-export function validateParams(params: any, schema: TxField[], { excludeKeys = [] }: { excludeKeys: string[] }): object {
+export function validateParams(
+  params: any,
+  schema: TxField[],
+  { excludeKeys = [] }: { excludeKeys: string[] },
+): object {
   return Object.fromEntries(
     schema
       // TODO: allow optional keys in schema
@@ -329,7 +337,9 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
   }
 
   const binary = filteredSchema
-    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => serializeField(params[key], fieldType, params))
+    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => (
+      serializeField(params[key], fieldType, params)
+    ))
     .filter((e) => e !== undefined);
 
   const rlpEncoded = rlpEncode(binary);
@@ -359,7 +369,10 @@ export interface TxUnpacked<Tx extends TxSchema> {
  * @returns object.tx Object with transaction param's
  * @returns object.txType Transaction type
  */
-export function unpackTx<TxType extends TX_TYPE>(encodedTx: EncodedData<'tx' | 'pi'>, txType?: TxType): TxUnpacked<TxTypeSchemas[TxType]> {
+export function unpackTx<TxType extends TX_TYPE>(
+  encodedTx: EncodedData<'tx' | 'pi'>,
+  txType?: TxType,
+): TxUnpacked<TxTypeSchemas[TxType]> {
   const rlpEncoded = decode(encodedTx);
   const binary = rlpDecode(rlpEncoded);
   const objId = +readInt(binary[0] as Buffer);

@@ -152,7 +152,8 @@ describe('Accounts', () => {
     if (spend.blockHeight == null || spend.tx?.amount == null) throw new UnexpectedTsError();
     await aeSdk.awaitHeight(spend.blockHeight + 2);
     const accountAfterSpend = await aeSdk.getAccount(await aeSdk.address());
-    const accountBeforeSpendByHash = await aeSdk.getAccount(await aeSdk.address(), { height: spend.blockHeight - 1 });
+    const accountBeforeSpendByHash = await aeSdk
+      .getAccount(await aeSdk.address(), { height: spend.blockHeight - 1 });
     expect(accountBeforeSpendByHash.balance - accountAfterSpend.balance).to.be
       .equal(spend.tx.fee + spend.tx.amount);
   });

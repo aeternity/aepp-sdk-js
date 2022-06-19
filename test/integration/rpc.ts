@@ -74,12 +74,8 @@ const WindowPostMessageFake = (
 });
 
 const getConnections = (): { walletWindow: ImplPostMessage; aeppWindow: ImplPostMessage } => {
-  // @ts-expect-error
-  global.chrome = { runtime: {} };
-  // @ts-expect-error
-  global.window = { location: { origin: '//test' }, chrome: global.chrome };
-  // @ts-expect-error
-  global.location = { protocol: 'http://test.com' };
+  // @ts-expect-error workaround for tests
+  global.window = { location: { origin: '//test' } };
   const walletWindow = WindowPostMessageFake('wallet');
   const aeppWindow = WindowPostMessageFake('aepp');
   walletWindow.postMessage = walletWindow.postMessage.bind(walletWindow, aeppWindow);
@@ -87,7 +83,7 @@ const getConnections = (): { walletWindow: ImplPostMessage; aeppWindow: ImplPost
   return { walletWindow, aeppWindow };
 };
 
-describe('Aepp<->Wallet', function () {
+describe('Aepp<->Wallet', function aeppWallet() {
   this.timeout(2000);
   const node = new Node(url, { ignoreVersion });
   const connections = getConnections();
@@ -286,7 +282,8 @@ describe('Aepp<->Wallet', function () {
       });
 
       const signedTx = await aepp.signTransaction(tx);
-      const { signatures: [signature], encodedTx: { rlpEncoded } } = unpackTx(signedTx, TX_TYPE.signed).tx;
+      const unpackedTx = unpackTx(signedTx, TX_TYPE.signed);
+      const { tx: { signatures: [signature], encodedTx: { rlpEncoded } } } = unpackedTx;
       const txWithNetwork = concatBuffers([Buffer.from(networkId), hash(rlpEncoded)]);
       const valid = verify(txWithNetwork, signature, decode(address));
       valid.should.be.equal(true);
@@ -305,13 +302,13 @@ describe('Aepp<->Wallet', function () {
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const address = await aepp.address();
-      wallet.onSign = async () => ({ tx: tx2 });
       const tx2 = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
         amount: 0,
         payload: 'zerospend2',
       });
+      wallet.onSign = async () => ({ tx: tx2 });
       const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
@@ -345,6 +342,7 @@ describe('Aepp<->Wallet', function () {
         if (params.onAccount === account.publicKey) {
           return { onAccount: new MemoryAccount({ keypair: account }) };
         }
+        throw new Error('Shouldn\'t be reachable');
       };
       const onAccount = account.publicKey;
       const messageSig = await aepp.signMessage('test', { onAccount });
@@ -371,7 +369,9 @@ describe('Aepp<->Wallet', function () {
     it('Add new account to wallet: receive notification for update accounts', async () => {
       if (aepp._accounts == null) throw new UnexpectedTsError();
       const connectedLength = Object.keys(aepp._accounts.connected).length;
-      const accountsPromise = new Promise<Accounts>((resolve) => { aepp.onAddressChange = resolve; });
+      const accountsPromise = new Promise<Accounts>((resolve) => {
+        aepp.onAddressChange = resolve;
+      });
       await wallet.addAccount(new MemoryAccount({ keypair: generateKeyPair() }));
       expect(Object.keys((await accountsPromise).connected).length).to.equal(connectedLength + 1);
     });
@@ -379,7 +379,9 @@ describe('Aepp<->Wallet', function () {
     it('Receive update for wallet select account', async () => {
       if (aepp._accounts == null) throw new UnexpectedTsError();
       const connectedAccount = Object.keys(aepp._accounts.connected)[0] as EncodedData<'ak'>;
-      const accountsPromise = new Promise<Accounts>((resolve) => { aepp.onAddressChange = resolve; });
+      const accountsPromise = new Promise<Accounts>((resolve) => {
+        aepp.onAddressChange = resolve;
+      });
       wallet.selectAccount(connectedAccount);
       const { connected, current } = await accountsPromise;
       if (current == null || connected == null) throw new UnexpectedTsError();
@@ -388,11 +390,11 @@ describe('Aepp<->Wallet', function () {
     });
 
     it('Aepp: receive notification for network update', async () => {
-      const msg = await new Promise<Network>((resolve) => {
+      const message = await new Promise<Network>((resolve) => {
         aepp.onNetworkChange = (msg: any) => resolve(msg);
         wallet.addNode('second_node', node, true);
       });
-      msg.networkId.should.be.equal(networkId);
+      message.networkId.should.be.equal(networkId);
       expect(wallet.selectedNodeName).to.be.equal('second_node');
     });
 
@@ -513,13 +515,13 @@ describe('Aepp<->Wallet', function () {
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const address = await aepp.address();
-      wallet.onSign = async () => ({ tx: tx2 });
       const tx2 = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
         amount: 0,
         payload: 'zerospend2',
       });
+      wallet.onSign = async () => ({ tx: tx2 });
       const tx = await aepp.buildTx(TX_TYPE.spend, {
         senderId: address,
         recipientId: address,
@@ -533,13 +535,13 @@ describe('Aepp<->Wallet', function () {
     });
 
     it('Aepp: receive notification with node for network update', async () => {
-      const msg = await new Promise<Network>((resolve) => {
+      const message = await new Promise<Network>((resolve) => {
         aepp.onNetworkChange = (msg) => resolve(msg);
         wallet.addNode('second_node', node, true);
       });
-      msg.networkId.should.be.equal(networkId);
-      if (msg.node == null) throw new UnexpectedTsError();
-      msg.node.should.be.an('object');
+      message.networkId.should.be.equal(networkId);
+      if (message.node == null) throw new UnexpectedTsError();
+      message.node.should.be.an('object');
       expect(wallet.selectedNodeName).to.be.equal('second_node');
     });
   });

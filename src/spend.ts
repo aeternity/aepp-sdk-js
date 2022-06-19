@@ -50,7 +50,8 @@ export async function send(tx: EncodedData<'tx'>, options: SendOptions): Promise
     : sendTransaction(signed, options);
 }
 
-type SendOptionsType = Parameters<AccountBase['signTransaction']>[1] & Parameters<typeof sendTransaction>[1]
+type SendOptionsType = Parameters<AccountBase['signTransaction']>[1]
+& Parameters<typeof sendTransaction>[1]
 & Partial<Omit<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>>
 & Pick<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>;
 export interface SendOptions extends SendOptionsType {}
@@ -144,7 +145,10 @@ interface TransferFundsOptions extends TransferFundsOptionsType {}
  * @param options - Options
  * @returns Object Transaction
  */
-export async function payForTransaction(transaction: EncodedData<'tx'>, options: PayForTransactionOptions): ReturnType<typeof send> {
+export async function payForTransaction(
+  transaction: EncodedData<'tx'>,
+  options: PayForTransactionOptions,
+): ReturnType<typeof send> {
   return send(
     await _buildTx(
       TX_TYPE.payingFor,

@@ -34,7 +34,9 @@ export default abstract class BrowserConnection {
    * @param onDisconnect - trigger when runtime connection in closed
    */
   connect(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onMessage: (message: any, origin: string, source: any) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onDisconnect: () => void,
   ): void {
     if (this.isConnected()) throw new AlreadyConnectedError('You already connected');

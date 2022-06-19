@@ -24,7 +24,7 @@ export default class AccountRpc extends AccountBase {
     this._address = address;
   }
 
-  async sign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
+  async sign(): Promise<Uint8Array> {
     throw new NotImplementedError('RAW signing using wallet');
   }
 
@@ -57,8 +57,12 @@ export default class AccountRpc extends AccountBase {
   /**
    * @returns Signed message
    */
-  async signMessage(message: string, { returnHex = false }: Parameters<AccountBase['signMessage']>[1] = {}): Promise<string | Uint8Array> {
-    const { signature } = await this._rpcClient.request(METHODS.signMessage, { onAccount: this._address, message });
+  async signMessage(
+    message: string,
+    { returnHex = false }: Parameters<AccountBase['signMessage']>[1] = {},
+  ): Promise<string | Uint8Array> {
+    const { signature } = await this._rpcClient
+      .request(METHODS.signMessage, { onAccount: this._address, message });
     return returnHex ? signature : Buffer.from(signature, 'hex');
   }
 }

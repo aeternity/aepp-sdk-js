@@ -218,7 +218,7 @@ export async function awaitHeight(
 ): Promise<number> {
   interval ??= _getPollInterval('block', options);
   let currentHeight;
-  for (let i = 0; i < attempts; i++) {
+  for (let i = 0; i < attempts; i += 1) {
     if (i !== 0) await pause(interval);
     currentHeight = (await onNode.getCurrentKeyBlockHeight()).height;
     if (currentHeight >= height) return currentHeight;
@@ -274,7 +274,10 @@ export async function getCurrentGeneration(
  * @param options.onNode - Node to use
  * @returns Generation
  */
-export async function getGeneration(hashOrHeight: EncodedData<'kh'> | number, { onNode }: { onNode: Node }): Promise<TransformNodeType<Generation>> {
+export async function getGeneration(
+  hashOrHeight: EncodedData<'kh'> | number,
+  { onNode }: { onNode: Node },
+): Promise<TransformNodeType<Generation>> {
   if (typeof hashOrHeight === 'number') return onNode.getGenerationByHeight(hashOrHeight);
   return onNode.getGenerationByHash(hashOrHeight);
 }
@@ -287,7 +290,10 @@ export async function getGeneration(hashOrHeight: EncodedData<'kh'> | number, { 
  * @param options.onNode - Node to use
  * @returns Transactions
  */
-export async function getMicroBlockTransactions(hash: EncodedData<'mh'>, { onNode }: { onNode: Node }): Promise<TransformNodeType<SignedTx[]>> {
+export async function getMicroBlockTransactions(
+  hash: EncodedData<'mh'>,
+  { onNode }: { onNode: Node },
+): Promise<TransformNodeType<SignedTx[]>> {
   return (await onNode.getMicroBlockTransactionsByHash(hash)).transactions;
 }
 
@@ -299,7 +305,10 @@ export async function getMicroBlockTransactions(hash: EncodedData<'mh'>, { onNod
  * @param options.onNode - Node to use
  * @returns Key Block
  */
-export async function getKeyBlock(hashOrHeight: EncodedData<'kh'> | number, { onNode }: { onNode: Node }): Promise<TransformNodeType<KeyBlock>> {
+export async function getKeyBlock(
+  hashOrHeight: EncodedData<'kh'> | number,
+  { onNode }: { onNode: Node },
+): Promise<TransformNodeType<KeyBlock>> {
   if (typeof hashOrHeight === 'number') return onNode.getKeyBlockByHeight(hashOrHeight);
   return onNode.getKeyBlockByHash(hashOrHeight);
 }
@@ -312,7 +321,10 @@ export async function getKeyBlock(hashOrHeight: EncodedData<'kh'> | number, { on
  * @param options.onNode - Node to use
  * @returns Micro block header
  */
-export async function getMicroBlockHeader(hash: EncodedData<'mh'>, { onNode }: { onNode: Node }): Promise<TransformNodeType<MicroBlockHeader>> {
+export async function getMicroBlockHeader(
+  hash: EncodedData<'mh'>,
+  { onNode }: { onNode: Node },
+): Promise<TransformNodeType<MicroBlockHeader>> {
   return onNode.getMicroBlockHeaderByHash(hash);
 }
 
@@ -350,8 +362,8 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
     const {
       resolve, reject, tx, accountAddress,
     } = rs[idx];
-    if (result === 'ok') return resolve({ ...resultPayload, txEvents });
-    reject(Object.assign(new DryRunError(reason as string), { tx, accountAddress }));
+    if (result === 'ok') resolve({ ...resultPayload, txEvents });
+    else reject(Object.assign(new DryRunError(reason as string), { tx, accountAddress }));
   });
 }
 
@@ -398,7 +410,10 @@ export async function txDryRun(
  * @param options - Options
  * @param options.onNode - Node to use
  */
-export async function getContractByteCode(contractId: EncodedData<'ct'>, { onNode }: { onNode: Node }): Promise<TransformNodeType<ByteCode>> {
+export async function getContractByteCode(
+  contractId: EncodedData<'ct'>,
+  { onNode }: { onNode: Node },
+): Promise<TransformNodeType<ByteCode>> {
   return onNode.getContractCode(contractId);
 }
 
@@ -409,7 +424,10 @@ export async function getContractByteCode(contractId: EncodedData<'ct'>, { onNod
  * @param options - Options
  * @param options.onNode - Node to use
  */
-export async function getContract(contractId: EncodedData<'ct'>, { onNode }: { onNode: Node }): Promise<TransformNodeType<ContractObject>> {
+export async function getContract(
+  contractId: EncodedData<'ct'>,
+  { onNode }: { onNode: Node },
+): Promise<TransformNodeType<ContractObject>> {
   return onNode.getContract(contractId);
 }
 
@@ -420,7 +438,10 @@ export async function getContract(contractId: EncodedData<'ct'>, { onNode }: { o
  * @param options - Options
  * @param options.onNode - Node to use
  */
-export async function getName(name: AensName, { onNode }: { onNode: Node }): Promise<TransformNodeType<NameEntry>> {
+export async function getName(
+  name: AensName,
+  { onNode }: { onNode: Node },
+): Promise<TransformNodeType<NameEntry>> {
   return onNode.getNameEntryByName(name);
 }
 
@@ -442,11 +463,6 @@ export async function resolveName <Type extends 'ak' | 'ct'>(
   { verify = true, resolveByNode = false, onNode }:
   { verify?: boolean; resolveByNode?: boolean; onNode: Node },
 ): Promise<EncodedData<Type | 'nm'>> {
-  try {
-    const id = nameOrId as EncodedData<Type>;
-    decode(id);
-    return id;
-  } catch (error) {}
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
       const name = await onNode.getNameEntryByName(nameOrId);
@@ -456,5 +472,10 @@ export async function resolveName <Type extends 'ak' | 'ct'>(
     }
     return produceNameId(nameOrId);
   }
-  throw new InvalidAensNameError(`Invalid name or address: ${nameOrId}`);
+  try {
+    decode(nameOrId);
+    return nameOrId;
+  } catch (error) {
+    throw new InvalidAensNameError(`Invalid name or address: ${nameOrId}`);
+  }
 }

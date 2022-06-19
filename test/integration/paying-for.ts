@@ -41,7 +41,8 @@ describe('Paying for transaction of another account', () => {
       recipientId: await receiver.address(),
       amount: 1e4,
     });
-    const signedSpendTx = await aeSdk.signTransaction(spendTx, { onAccount: sender, innerTx: true });
+    const signedSpendTx = await aeSdk
+      .signTransaction(spendTx, { onAccount: sender, innerTx: true });
     const payerBalanceBefore = await aeSdk.getBalance(await aeSdk.address());
 
     const { tx } = await aeSdk.payForTransaction(signedSpendTx);

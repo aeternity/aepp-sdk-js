@@ -41,7 +41,7 @@ export { default as getContractInstance } from './aci';
  * @returns Signature in hex representation
  */
 async function delegateSignatureCommon(
-  ids: Array<EncodedData<EncodingType>> = [],
+  ids: Array<EncodedData<EncodingType>>,
   { onAccount, onNode, ...opt }:
   { onAccount: AccountBase; onNode: Node } & Parameters<AccountBase['sign']>[1],
 ): Promise<string> {
@@ -116,5 +116,8 @@ export async function createOracleDelegationSignature(
   opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
   { queryId?: EncodedData<'oq'> },
 ): Promise<string> {
-  return delegateSignatureCommon([opt.queryId ?? await opt.onAccount.address(opt), contractId], opt);
+  return delegateSignatureCommon(
+    [opt.queryId ?? await opt.onAccount.address(opt), contractId],
+    opt,
+  );
 }

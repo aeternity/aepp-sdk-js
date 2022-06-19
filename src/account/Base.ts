@@ -25,7 +25,9 @@ import { concatBuffers } from '../utils/other';
  * Check is provided object looks like an instance of AccountBase
  * @param acc - Object to check
  */
-export const isAccountBase = (acc: AccountBase | any): boolean => !['sign', 'address', 'signTransaction', 'signMessage'].some((f) => typeof acc[f] !== 'function');
+export const isAccountBase = (acc: AccountBase | any): boolean => (
+  !['sign', 'address', 'signTransaction', 'signMessage'].some((f) => typeof acc[f] !== 'function')
+);
 
 /**
  * Account is one of the three basic building blocks of an
@@ -74,7 +76,10 @@ export default abstract class AccountBase {
    * @param opt - Options
    * @returns Signature as hex string of Uint8Array
    */
-  async signMessage(message: string, { returnHex = false, ...options }: { returnHex?: boolean } = {}): Promise<string | Uint8Array> {
+  async signMessage(
+    message: string,
+    { returnHex = false, ...options }: { returnHex?: boolean } = {},
+  ): Promise<string | Uint8Array> {
     const sig = await this.sign(messageToHash(message), options);
     return returnHex ? Buffer.from(sig).toString('hex') : sig;
   }
@@ -85,7 +90,11 @@ export default abstract class AccountBase {
    * @param signature - Signature
    * @param options - Options
    */
-  async verifyMessage(message: string, signature: string | Uint8Array, options?: object): Promise<boolean> {
+  async verifyMessage(
+    message: string,
+    signature: string | Uint8Array,
+    options?: object,
+  ): Promise<boolean> {
     return verifyMessageCrypto(
       message,
       typeof signature === 'string' ? Buffer.from(signature, 'hex') : signature,

@@ -410,7 +410,8 @@ describe('Contract instance', () => {
     });
 
     it('decodes events using decodeEvents', () => {
-      expect(testContract.decodeEvents(eventResult.result.log)).to.be.eql(eventResult.decodedEvents);
+      expect(testContract.decodeEvents(eventResult.result.log))
+        .to.be.eql(eventResult.decodedEvents);
     });
 
     it('throws error if can\'t find event definition', () => {

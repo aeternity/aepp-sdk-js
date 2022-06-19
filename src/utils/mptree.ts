@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
+/* eslint-disable default-case */
 import { encode as rlpEncode } from 'rlp';
 import type { Input } from 'rlp';
 import { hash } from './crypto';
@@ -89,7 +90,7 @@ export default class MPTree {
       case 17:
         return { type: NodeType.Branch, payload: node, path: null };
       case 2: {
-        const nibble = node[0][0] >> 4;
+        const nibble = node[0][0] >> 4; // eslint-disable-line no-bitwise
         if (nibble > 3) throw new UnknownPathNibbleError(nibble);
         const type = nibble <= 1 ? NodeType.Extension : NodeType.Leaf;
         const slice = [0, 2].includes(nibble) ? 2 : 1;
@@ -116,23 +117,24 @@ export default class MPTree {
 
   /**
    * Retrieve value from Merkle Patricia Tree
-   * @param key - The key of the element to retrieve
+   * @param _key - The key of the element to retrieve
    * @returns Value associated to the specified key
    */
-  get(key: string): Buffer | undefined {
+  get(_key: string): Buffer | undefined {
     let searchFrom = this.rootHash;
-    while (true) {
+    let key = _key;
+    while (true) { // eslint-disable-line no-constant-condition
       const { type, payload, path } = MPTree.parseNode(this.nodes[searchFrom]);
       switch (type) {
         case NodeType.Branch:
           if (key.length === 0) return payload[16];
           searchFrom = payload[+`0x${key[0]}`].toString('hex');
-          key = key.substr(1);
+          key = key.substring(1);
           break;
         case NodeType.Extension:
-          if (key.substr(0, path?.length) !== path) return undefined;
+          if (key.substring(0, path?.length) !== path) return undefined;
           searchFrom = payload[0].toString('hex');
-          key = key.substr(path.length);
+          key = key.substring(path.length);
           break;
         case NodeType.Leaf:
           if (path !== key) return undefined;

@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js';
 export const isBigNumber = (number: string | number | bigint | BigNumber): boolean => {
   if (typeof number === 'bigint') return true;
   return ['number', 'object', 'string'].includes(typeof number)
+    // eslint-disable-next-line no-restricted-globals
     && (!isNaN(number as number) || Number.isInteger(number) || BigNumber.isBigNumber(number));
 };
 

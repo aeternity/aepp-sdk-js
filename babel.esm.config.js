@@ -1,4 +1,4 @@
-const config = require('./babel.config.js');
+const config = require('./babel.config');
 
 config.presets
   .filter((plugin) => Array.isArray(plugin))

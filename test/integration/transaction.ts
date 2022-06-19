@@ -169,7 +169,7 @@ describe('Transaction', () => {
     }),
   ]];
 
-  transactions.forEach(([name, expected, getter]) => it(`build of ${name} transaction`, async () => {
+  transactions.forEach(([txName, expected, getter]) => it(`build of ${txName} transaction`, async () => {
     expect(await getter()).to.be.equal(expected);
   }));
 });

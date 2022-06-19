@@ -110,8 +110,11 @@ export default class RpcClient <
    * @param params - Method params
    * @returns Promise which will be resolved after receiving response message
    */
-  async request<Name extends keyof RemoteApi>(name: Name, params: Parameters<RemoteApi[Name]>[0]): Promise<ReturnType<RemoteApi[Name]>> {
-    this.#sendRequest(++this.#messageId, name, params);
+  async request<Name extends keyof RemoteApi>(
+    name: Name,
+    params: Parameters<RemoteApi[Name]>[0],
+  ): Promise<ReturnType<RemoteApi[Name]>> {
+    this.#sendRequest(this.#messageId += 1, name, params);
     return new Promise((resolve, reject) => {
       this.#callbacks.set(this.#messageId, { resolve, reject });
     });

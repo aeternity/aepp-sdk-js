@@ -65,7 +65,7 @@ const TX_FEE_OTHER_GAS = (
       return new BigNumber(txSize)
         .times(GAS_PER_BYTE)
         .plus(
-          Math.ceil(32000 * relativeTtl / Math.floor(60 * 24 * 365 / KEY_BLOCK_INTERVAL)),
+          Math.ceil((32000 * relativeTtl) / Math.floor((60 * 24 * 365) / KEY_BLOCK_INTERVAL)),
         );
     case TX_TYPE.gaMeta:
     case TX_TYPE.payingFor:
@@ -118,7 +118,10 @@ function buildFee(
  * calculateMinFee('spendTx', { gasLimit, params })
  * ```
  */
-export default function calculateMinFee(txType: TX_TYPE, { params, vsn, denomination }: CalculateMinFeeOptions): BigNumber {
+export default function calculateMinFee(
+  txType: TX_TYPE,
+  { params, vsn, denomination }: CalculateMinFeeOptions,
+): BigNumber {
   let fee = new BigNumber(0);
   let previousFee;
   do {

@@ -52,7 +52,10 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
  * @param options - Options
  * @returns Oracle object
  */
-export async function getOracleObject(oracleId: EncodedData<'ok'>, options: { onNode: Node; onAccount: AccountBase }): Promise<GetOracleObjectReturnType> {
+export async function getOracleObject(
+  oracleId: EncodedData<'ok'>,
+  options: { onNode: Node; onAccount: AccountBase },
+): Promise<GetOracleObjectReturnType> {
   return {
     ...await options.onNode.getOracleByPubkey(oracleId),
     queries: (await options.onNode.getOracleQueriesByPubkey(oracleId)).oracleQueries,
@@ -66,7 +69,7 @@ export async function getOracleObject(oracleId: EncodedData<'ok'>, options: { on
       },
       ([name, handler]) => [
         name,
-        function (...args: any) {
+        (...args: any) => {
           const lastArg = args[args.length - 1];
           if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
             Object.assign(lastArg, { ...options, ...lastArg });
@@ -145,7 +148,9 @@ export async function getQueryObject(
     ...record,
     decodedQuery: decode(record.query as EncodedData<'oq'>).toString(),
     decodedResponse: decode(record.response as EncodedData<'or'>).toString(),
-    respond: async (response, opt) => respondToQuery(oracleId, queryId, response, { ...options, ...opt }),
+    respond: async (response, opt) => (
+      respondToQuery(oracleId, queryId, response, { ...options, ...opt })
+    ),
     pollForResponse: async (opt) => pollForQueryResponse(oracleId, queryId, { ...options, ...opt }),
   };
 }
@@ -179,7 +184,7 @@ export async function pollForQueryResponse(
   { attempts?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<string> {
   interval ??= _getPollInterval('microblock', options);
-  for (let i = 0; i < attempts; i++) {
+  for (let i = 0; i < attempts; i += 1) {
     if (i > 0) await pause(interval);
     const { response } = await onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId);
     const responseBuffer = decode(response as EncodedData<'or'>);
@@ -201,7 +206,11 @@ export async function pollForQueryResponse(
  * @param options.ttl - Transaction time to leave
  * @returns Oracle object
  */
-export async function registerOracle(queryFormat: string, responseFormat: string, options: RegisterOracleOptions): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
+export async function registerOracle(
+  queryFormat: string,
+  responseFormat: string,
+  options: RegisterOracleOptions,
+): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const accountId = await options.onAccount.address(options);
   const oracleRegisterTx = await _buildTx(TX_TYPE.oracleRegister, {
     queryFee: QUERY_FEE,

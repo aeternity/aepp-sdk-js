@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
 import {
   writeId, readId, produceNameId, getMinimumNameFee, readInt, writeInt, isNameValid,
@@ -13,7 +14,8 @@ type Int = number | string | BigNumber;
 export class Field {
   public prototype: any;
 
-  static serialize(value: any, _txFields: object = {}): Buffer {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  static serialize(value: any, txFields: object): Buffer {
     return Buffer.from(value);
   }
 
@@ -84,7 +86,7 @@ export class Deposit extends Field {
    * @returns Deposit value Buffer.
    */
   static serialize(value = '0'): Buffer {
-    if (parseInt(value) !== 0) throw new IllegalArgumentError(`Contract deposit is not refundable, so it should be equal 0, got ${value.toString()} instead`);
+    if (+value !== 0) throw new IllegalArgumentError(`Contract deposit is not refundable, so it should be equal 0, got ${value.toString()} instead`);
     return writeInt(0);
   }
 

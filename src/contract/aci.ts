@@ -39,6 +39,7 @@ import {
   MissingEventDefinitionError,
   AmbiguousEventDefinitionError,
   UnexpectedTsError,
+  InternalError,
 } from '../utils/errors';
 import { hash } from '../utils/crypto';
 import { Aci as BaseAci } from '../apis/compiler';
@@ -192,7 +193,11 @@ export default async function getContractInstance({
   if (_aci == null) throw new MissingContractDefError();
 
   if (contractAddress != null) {
-    contractAddress = await resolveName(contractAddress, 'contract_pubkey', { resolveByNode: true, onNode }) as EncodedData<'ct'>;
+    contractAddress = await resolveName(
+      contractAddress,
+      'contract_pubkey',
+      { resolveByNode: true, onNode },
+    ) as EncodedData<'ct'>;
   }
 
   if (contractAddress == null && source == null && bytecode == null) {
@@ -220,11 +225,15 @@ export default async function getContractInstance({
       fileSystem,
       ...otherOptions,
     },
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    /* eslint-disable @typescript-eslint/no-empty-function */
     async compile(_options?: {}): Promise<any> {},
     async _estimateGas(_name: string, _params: any[], _options: object): Promise<any> {},
     async deploy(_params?: any[], _options?: any): Promise<any> {},
     async call(_fn: string, _params?: any[], _options?: {}): Promise<any> {},
     decodeEvents(_events: Event[], options?: { omitUnknown?: boolean }): any {},
+    /* eslint-enable @typescript-eslint/no-unused-vars */
+    /* eslint-enable @typescript-eslint/no-empty-function */
     methods: undefined,
   };
 
@@ -290,12 +299,15 @@ export default async function getContractInstance({
       case 'error':
         message = decode(returnValue).toString();
         break;
+      default:
+        throw new InternalError(`Unknown return type: ${returnType}`);
     }
     throw new NodeInvocationError(message, transaction);
   };
 
   instance._estimateGas = async (name: string, params: any[], options: object): Promise<number> => {
-    const { result: { gasUsed } } = await instance.call(name, params, { ...options, callStatic: true });
+    const { result: { gasUsed } } = await instance
+      .call(name, params, { ...options, callStatic: true });
     // taken from https://github.com/aeternity/aepp-sdk-js/issues/1286#issuecomment-977814771
     return Math.floor(gasUsed * 1.25);
   };
@@ -308,7 +320,7 @@ export default async function getContractInstance({
    */
   instance.deploy = async (
     params = [],
-    options:
+    options?:
     Parameters<typeof instance.compile>[0] &
     Parameters<typeof instance.call>[2] &
     Parameters<AccountBase['address']>[0] &
@@ -316,7 +328,7 @@ export default async function getContractInstance({
   ): Promise<ContractInstance['deployInfo']> => {
     const opt = { ...instance.options, ...options };
     if (instance.bytecode == null) await instance.compile(opt);
-    // @ts-expect-error
+    // @ts-expect-error TODO: need to fix compatibility between return types of `deploy` and `call`
     if (opt.callStatic === true) return instance.call('init', params, opt);
     if (instance.deployInfo.address != null) throw new DuplicateContractError();
 

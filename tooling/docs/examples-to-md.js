@@ -1,8 +1,9 @@
 const path = require('path');
 const fs = require('fs');
 
-function splitCodeIntoBlocks(text) {
+function splitCodeIntoBlocks(_text) {
   const content = [];
+  let text = _text;
   while (text) {
     const commentIndex = text.search(/\n *\//);
     switch (commentIndex) {

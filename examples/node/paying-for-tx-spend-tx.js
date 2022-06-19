@@ -75,7 +75,11 @@ const AMOUNT = 1;
   await aeSdk.addAccount(newUserAccount);
 
   // ## 5. Send 1 `aetto` from payer to new user
-  const spendTxResult = await aeSdk.spend(AMOUNT, await newUserAccount.address(), { onAccount: payerAccount });
+  const spendTxResult = await aeSdk.spend(
+    AMOUNT,
+    await newUserAccount.address(),
+    { onAccount: payerAccount },
+  );
   console.log(spendTxResult);
 
   // ## 6. Check balance of new user (before)
@@ -92,7 +96,10 @@ const AMOUNT = 1;
     recipientId: await payerAccount.address(),
     amount: AMOUNT,
   });
-  const signedSpendTx = await aeSdk.signTransaction(spendTx, { onAccount: newUserAccount, innerTx: true });
+  const signedSpendTx = await aeSdk.signTransaction(
+    spendTx,
+    { onAccount: newUserAccount, innerTx: true },
+  );
 
   // Note:
   //

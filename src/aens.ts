@@ -63,7 +63,10 @@ interface KeyPointers {
  * await nameObject.revoke({ fee, ttl, nonce })
  * ```
  */
-export async function aensRevoke(name: AensName, options: AensRevokeOptions): ReturnType<typeof send> {
+export async function aensRevoke(
+  name: AensName,
+  options: AensRevokeOptions,
+): ReturnType<typeof send> {
   const nameRevokeTx = await _buildTx(TX_TYPE.nameRevoke, {
     ...options,
     nameId: name,
@@ -105,7 +108,11 @@ interface AensRevokeOptions extends
  * await nameObject.update(pointers, { nameTtl, ttl, fee, nonce, clientTtl })
  * ```
  */
-export async function aensUpdate(name: AensName, pointers: KeyPointers, { extendPointers, ...options }: AensUpdateOptions): ReturnType<typeof send> {
+export async function aensUpdate(
+  name: AensName,
+  pointers: KeyPointers,
+  { extendPointers, ...options }: AensUpdateOptions,
+): ReturnType<typeof send> {
   const allPointers = {
     ...extendPointers === true && Object.fromEntries(
       (await getName(name, options)).pointers
@@ -157,7 +164,11 @@ interface AensUpdateOptions extends
  * await nameObject.transfer(recipientPub, { ttl, fee, nonce })
  * ```
  */
-export async function aensTransfer(name: AensName, account: EncodedData<'ak'>, options: AensTransferOptions): ReturnType<typeof send> {
+export async function aensTransfer(
+  name: AensName,
+  account: EncodedData<'ak'>,
+  options: AensTransferOptions,
+): ReturnType<typeof send> {
   const nameTransferTx = await _buildTx(TX_TYPE.nameTransfer, {
     ...options,
     nameId: name,
@@ -280,7 +291,11 @@ export async function aensQuery(
  * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
  * ```
  */
-export async function aensClaim(name: AensName, salt: number, options: AensClaimOptions): Promise<AensClaimReturnType> {
+export async function aensClaim(
+  name: AensName,
+  salt: number,
+  options: AensClaimOptions,
+): Promise<AensClaimReturnType> {
   const claimTx = await _buildTx(TX_TYPE.nameClaim, {
     ...options,
     accountId: await options.onAccount.address(options),

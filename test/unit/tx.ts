@@ -38,10 +38,10 @@ import { SchemaNotFoundError } from '../../src/utils/errors';
 
 describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {
-    const _salt = salt();
-    const hash = await commitmentHash('foobar.chain', _salt);
+    const saltValue = salt();
+    const hash = await commitmentHash('foobar.chain', saltValue);
     hash.should.be.a('string');
-    return hash.should.be.equal(await commitmentHash('foobar.chain', _salt));
+    return hash.should.be.equal(await commitmentHash('foobar.chain', saltValue));
   });
 
   it('test from big number to bytes', async () => {
@@ -71,7 +71,7 @@ describe('Tx', () => {
 
   describe('getMinimumNameFee', () => {
     it('returns correct name fees', () => {
-      for (let i = 1; i <= Object.keys(NAME_BID_RANGES).length; i++) {
+      for (let i = 1; i <= Object.keys(NAME_BID_RANGES).length; i += 1) {
         getMinimumNameFee(randomName(i)).toString()
           .should.be.equal(NAME_BID_RANGES[i].toString());
       }

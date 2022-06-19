@@ -80,7 +80,8 @@ describe('Generalized Account', () => {
   });
 
   it('buildAuthTxHash generates a proper hash', async () => {
-    const { rawTx } = await aeSdk.spend(10000, publicKey, { authData: { source: authContractSource, args: [r()] } });
+    const { rawTx } = await aeSdk
+      .spend(10000, publicKey, { authData: { source: authContractSource, args: [r()] } });
     const spendTx = encode(unpackTx(rawTx, TX_TYPE.signed).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx');
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.methods.getTxHash()).decodedResult);

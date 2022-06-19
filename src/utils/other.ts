@@ -1,4 +1,6 @@
-export const pause = async (duration: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, duration));
+export const pause = async (duration: number): Promise<void> => new Promise((resolve) => {
+  setTimeout(resolve, duration);
+});
 
 export const mapObject = <InputV, OutputV>(
   object: { [k: string]: InputV },
@@ -18,7 +20,9 @@ const isWebpack4Buffer = (() => {
 })();
 
 export const concatBuffers = isWebpack4Buffer
-  ? (list: readonly Uint8Array[], totalLength?: number): Buffer => Buffer.concat(list.map((el) => Buffer.from(el)), totalLength)
+  ? (list: readonly Uint8Array[], totalLength?: number): Buffer => (
+    Buffer.concat(list.map((el) => Buffer.from(el)), totalLength)
+  )
   : Buffer.concat;
 
 /**

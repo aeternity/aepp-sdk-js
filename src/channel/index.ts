@@ -299,7 +299,7 @@ export default class Channel {
       enqueueAction(
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
-        (channel, _state) => {
+        (channel) => {
           send(channel, {
             jsonrpc: '2.0',
             method: 'channels.update.new',
@@ -402,7 +402,7 @@ export default class Channel {
       enqueueAction(
         this,
         (channel, state) => state?.handler === handlers.channelOpen,
-        (channel, _state) => {
+        (channel) => {
           send(channel, { jsonrpc: '2.0', method: 'channels.leave', params: {} });
           return {
             handler: handlers.awaitingLeave,

@@ -365,7 +365,8 @@ describe('Contract', () => {
 
     it('claims', async () => {
       const nameFee = 20e18; // 20 AE
-      const claim = await contract.methods.signedClaim(owner, name, nameSalt, nameFee, delegationSignature);
+      const claim = await contract.methods
+        .signedClaim(owner, name, nameSalt, nameFee, delegationSignature);
       claim.result.returnType.should.be.equal('ok');
     });
 
@@ -387,7 +388,8 @@ describe('Contract', () => {
     });
 
     it('transfers', async () => {
-      const transfer = await contract.methods.signedTransfer(owner, newOwner, name, delegationSignature);
+      const transfer = await contract.methods
+        .signedTransfer(owner, newOwner, name, delegationSignature);
       transfer.result.returnType.should.be.equal('ok');
     });
 
@@ -424,14 +426,16 @@ describe('Contract', () => {
 
     it('registers', async () => {
       delegationSignature = await aeSdk.createOracleDelegationSignature(contractId);
-      const oracleRegister = await contract.methods.signedRegisterOracle(address, delegationSignature, queryFee, ttl);
+      const oracleRegister = await contract.methods
+        .signedRegisterOracle(address, delegationSignature, queryFee, ttl);
       oracleRegister.result.returnType.should.be.equal('ok');
       oracle = await aeSdk.getOracleObject(oracleId);
       oracle.id.should.be.equal(oracleId);
     });
 
     it('extends', async () => {
-      const queryExtend = await contract.methods.signedExtendOracle(oracleId, delegationSignature, ttl);
+      const queryExtend = await contract.methods
+        .signedExtendOracle(oracleId, delegationSignature, ttl);
       queryExtend.result.returnType.should.be.equal('ok');
       const oracleExtended = await aeSdk.getOracleObject(oracleId);
       oracleExtended.ttl.should.be.equal(oracle.ttl + 50);
@@ -441,7 +445,8 @@ describe('Contract', () => {
       const q = 'Hello!';
       // TODO: don't register an extra oracle after fixing https://github.com/aeternity/aepp-sdk-js/issues/1419
       oracle = await aeSdk.registerOracle('string', 'int', { queryFee, onAccount: aeSdk.addresses()[1] });
-      const query = await contract.methods.createQuery(oracle.id, q, 1000 + queryFee, ttl, ttl, { amount: 5 * queryFee });
+      const query = await contract.methods
+        .createQuery(oracle.id, q, 1000 + queryFee, ttl, ttl, { amount: 5 * queryFee });
       query.result.returnType.should.be.equal('ok');
       queryObject = await aeSdk.getQueryObject(oracle.id, query.decodedResult);
       queryObject.should.be.an('object');

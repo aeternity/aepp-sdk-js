@@ -29,9 +29,13 @@ interface ChannelAction {
   action: (channel: Channel, state?: ChannelFsm) => ChannelFsm;
 }
 
-export type SignTxWithTag = (tag: string, tx: EncodedData<'tx'>, options?: object) => Promise<EncodedData<'tx'>>;
+export type SignTxWithTag = (tag: string, tx: EncodedData<'tx'>, options?: object) => (
+  Promise<EncodedData<'tx'>>
+);
 // TODO: SignTx shouldn't return number or null
-export type SignTx = (tx: EncodedData<'tx'>, options?: object) => Promise<EncodedData<'tx'> | number | null>;
+export type SignTx = (tx: EncodedData<'tx'>, options?: object) => (
+  Promise<EncodedData<'tx'> | number | null>
+);
 
 export interface ChannelOptions {
   existingFsmId?: string;
@@ -170,7 +174,11 @@ export function send(channel: Channel, message: ChannelMessage): void {
   websockets.get(channel)?.send(JsonBig.stringify(message));
 }
 
-export function enqueueAction(channel: Channel, guard: ChannelAction['guard'], action: ChannelAction['action']): void {
+export function enqueueAction(
+  channel: Channel,
+  guard: ChannelAction['guard'],
+  action: ChannelAction['action'],
+): void {
   const queue = actionQueue.get(channel) ?? [];
   actionQueue.set(channel, [
     ...queue,
@@ -279,15 +287,16 @@ export async function call(channel: Channel, method: string, params: any): Promi
   return new Promise((resolve, reject) => {
     const currentSequence: number = sequence.get(channel) ?? 0;
     const id = sequence.set(channel, currentSequence + 1).get(channel) ?? 1;
-    rpcCallbacks.get(channel)?.set(id, (message: {
-      result: PromiseLike<any>;
-      error?: ChannelMessageError; }) => {
-      if (message.result != null) return resolve(message.result);
-      if (message.error != null) {
-        const [{ message: details } = { message: '' }] = message.error.data ?? [];
-        return reject(new ChannelCallError(message.error.message + details));
-      }
-    });
+    rpcCallbacks.get(channel)?.set(
+      id,
+      (message: { result: PromiseLike<any>; error?: ChannelMessageError }) => {
+        if (message.error != null) {
+          const [{ message: details } = { message: '' }] = message.error.data ?? [];
+          return reject(new ChannelCallError(message.error.message + details));
+        }
+        return resolve(message.result);
+      },
+    );
     send(channel, {
       jsonrpc: '2.0', method, id, params,
     });
@@ -322,26 +331,28 @@ export async function initialize(
   wsUrl.searchParams.set('protocol', 'json-rpc');
   changeStatus(channel, 'connecting');
   const ws = new W3CWebSocket(wsUrl.toString());
-  await new Promise<void>((resolve, reject) => Object.assign(ws, {
-    onerror: reject,
-    onopen: async () => {
-      resolve();
-      changeStatus(channel, 'connected');
-      if (channelOptions.reconnectTx != null) {
-        enterState(channel, { handler: openHandler });
-        const signedTx = (await call(channel, 'channels.get.offchain_state', {})).signed_tx;
-        changeState(channel, signedTx);
-      }
-      ping(channel);
-    },
-    onclose: () => {
-      changeStatus(channel, 'disconnected');
-      const pingTimeoutIdValue = pingTimeoutId.get(channel);
-      const pongTimeoutIdValue = pongTimeoutId.get(channel);
-      if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
-      if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
-    },
-    onmessage: ({ data }: { data: string }) => onMessage(channel, data),
-  }));
+  await new Promise<void>((resolve, reject) => {
+    Object.assign(ws, {
+      onerror: reject,
+      onopen: async () => {
+        resolve();
+        changeStatus(channel, 'connected');
+        if (channelOptions.reconnectTx != null) {
+          enterState(channel, { handler: openHandler });
+          const signedTx = (await call(channel, 'channels.get.offchain_state', {})).signed_tx;
+          changeState(channel, signedTx);
+        }
+        ping(channel);
+      },
+      onclose: () => {
+        changeStatus(channel, 'disconnected');
+        const pingTimeoutIdValue = pingTimeoutId.get(channel);
+        const pongTimeoutIdValue = pongTimeoutId.get(channel);
+        if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
+        if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
+      },
+      onmessage: ({ data }: { data: string }) => onMessage(channel, data),
+    });
+  });
   websockets.set(channel, ws);
 }

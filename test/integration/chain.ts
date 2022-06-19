@@ -128,9 +128,11 @@ describe('Node Chain', () => {
   it('multiple spends from different accounts', async () => {
     const receiver = await aeSdk.address();
     const httpSpy = spy(http, 'request');
-    const spends = await Promise.all(accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e15, receiver, {
-      nonce: 1, verify: false, onAccount, waitMined: false,
-    })));
+    const spends = await Promise.all(
+      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e15, receiver, {
+        nonce: 1, verify: false, onAccount, waitMined: false,
+      })),
+    );
     transactions.push(...spends.map(({ hash }) => hash));
     const accountGetCount = accounts.length;
     const txPostCount = accounts.length;

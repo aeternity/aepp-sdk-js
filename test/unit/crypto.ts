@@ -57,8 +57,7 @@ describe('crypto', () => {
       assert.isAtMost(keyPair.publicKey.length, 53);
     });
     it('Address from secret', () => {
-      const { secretKey, publicKey } = Crypto.generateKeyPair();
-      Crypto.getAddressFromPriv(secretKey).should.be.equal(publicKey);
+      Crypto.getAddressFromPriv(privateKeyAsHex).should.be.equal(publicKeyWithPrefix);
     });
   });
 

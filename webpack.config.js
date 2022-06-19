@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { dependencies } = require('./package.json');
 
 function configure(filename, opts = {}) {
   return (env, argv) => ({
@@ -49,7 +50,7 @@ function configure(filename, opts = {}) {
       },
     },
     externals: Object.fromEntries([
-      ...Object.keys(require('./package').dependencies),
+      ...Object.keys(dependencies),
       '@aeternity/argon2-browser/dist/argon2-bundled.min.js',
     ].map((dependency) => [dependency, dependency])),
     ...opts,

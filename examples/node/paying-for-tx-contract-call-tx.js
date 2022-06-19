@@ -139,7 +139,10 @@ const NEW_USER_KEYPAIR = generateKeyPair();
     gasPrice: 1500000000,
     callData: calldata,
   });
-  const signedContractCallTx = await aeSdk.signTransaction(contractCallTx, { onAccount: newUserAccount, innerTx: true });
+  const signedContractCallTx = await aeSdk.signTransaction(
+    contractCallTx,
+    { onAccount: newUserAccount, innerTx: true },
+  );
 
   // ## 6. Create, sign & broadcast the `PayingForTx` as payer
   const payForTx = await aeSdk.payForTransaction(signedContractCallTx, { onAccount: payerAccount });

@@ -35,8 +35,8 @@ const { AeSdk, Node, MemoryAccount } = require('@aeternity/aepp-sdk');
 
 // ## 2. Define constants
 // The following constants are used in the subsequent code snippets.
-const CONTRACT_SOURCE = // typically you read the source code from a separate .aes file
-`
+// typically you read the source code from a separate .aes file
+const CONTRACT_SOURCE = `
 contract Multiplier =
   record state = { factor: int }
   entrypoint init(f : int) : state = { factor = f }

@@ -8,7 +8,7 @@ import {
   RpcBroadcastError, RpcInvalidTransactionError,
   RpcNotAuthorizeError, RpcPermissionDenyError, RpcUnsupportedProtocolError,
 } from './aepp-wallet-communication/schema';
-import { UnknownRpcClientError } from './utils/errors';
+import { InternalError, UnknownRpcClientError } from './utils/errors';
 import AccountBase from './account/Base';
 import BrowserConnection from './aepp-wallet-communication/connection/Browser';
 import {
@@ -252,6 +252,8 @@ export default class AeSdkWallet extends AeSdk {
               case SUBSCRIPTION_TYPES.unsubscribe:
                 client.addressSubscription.delete(value);
                 break;
+              default:
+                throw new InternalError(`Unknown subscription type: ${type}`);
             }
 
             return {

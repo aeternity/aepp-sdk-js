@@ -44,7 +44,10 @@ import Compiler from './Compiler';
  * @param options - Options
  * @returns if account is GA
  */
-export async function isGA(address: EncodedData<'ak'>, options: Parameters<typeof getAccount>[1]): Promise<boolean> {
+export async function isGA(
+  address: EncodedData<'ak'>,
+  options: Parameters<typeof getAccount>[1],
+): Promise<boolean> {
   const { contractId } = await getAccount(address, options);
   return contractId != null;
 }

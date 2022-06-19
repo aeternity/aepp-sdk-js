@@ -31,10 +31,10 @@ describe('Oracle', () => {
   let oracle: Awaited<ReturnType<typeof registerOracle>>;
   let query: Awaited<ReturnType<typeof postQueryToOracle>>;
   const queryResponse = "{'tmp': 30}";
-  const account = generateKeyPair();
 
   before(async () => {
     aeSdk = await getSdk();
+    const account = generateKeyPair();
     await aeSdk.spend(1e20, account.publicKey);
     await aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true });
   });
@@ -89,9 +89,9 @@ describe('Oracle', () => {
   describe('Oracle query fee settings', () => {
     let oracleWithFee: Awaited<ReturnType<typeof registerOracle>>;
     const queryFee = 24000n;
-    const account = generateKeyPair();
 
     before(async () => {
+      const account = generateKeyPair();
       await aeSdk.spend(1e15, account.publicKey);
       await aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true });
       oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString(), onAccount: account });

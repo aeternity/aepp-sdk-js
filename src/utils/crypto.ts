@@ -180,7 +180,11 @@ export function sign(data: string | Uint8Array, privateKey: string | Uint8Array)
  * @param publicKey - Key to verify against
  * @returns Valid?
  */
-export function verify(data: Uint8Array, signature: Uint8Array, publicKey: string | Uint8Array): boolean {
+export function verify(
+  data: Uint8Array,
+  signature: Uint8Array,
+  publicKey: string | Uint8Array,
+): boolean {
   const publicKeyBuffer = typeof publicKey === 'string' ? str2buf(publicKey) : publicKey;
   return nacl.sign.detached.verify(data, signature, publicKeyBuffer);
 }
@@ -195,7 +199,11 @@ export function signMessage(message: string, privateKey: string | Buffer): Uint8
   return sign(messageToHash(message), privateKey);
 }
 
-export function verifyMessage(str: string, signature: Uint8Array, publicKey: string | Uint8Array): boolean {
+export function verifyMessage(
+  str: string,
+  signature: Uint8Array,
+  publicKey: string | Uint8Array,
+): boolean {
   return verify(messageToHash(str), signature, publicKey);
 }
 
@@ -207,7 +215,10 @@ export function verifyMessage(str: string, signature: Uint8Array, publicKey: str
  * @param publicKey - Public key to verify
  * @returns Valid?
  */
-export function isValidKeypair(privateKey: string | Uint8Array, publicKey: string | Uint8Array): boolean {
+export function isValidKeypair(
+  privateKey: string | Uint8Array,
+  publicKey: string | Uint8Array,
+): boolean {
   const message = Buffer.from('TheMessage');
   const signature = sign(message, privateKey);
   return verify(message, signature, publicKey);

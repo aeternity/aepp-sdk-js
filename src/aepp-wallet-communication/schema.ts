@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import { EncodedData } from '../utils/encoder';
 import { BaseError, InternalError } from '../utils/errors';
 

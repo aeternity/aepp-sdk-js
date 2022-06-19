@@ -11,7 +11,7 @@ plugin.rules.syntax.create = (context) => create(new Proxy({}, {
     if (name !== 'report') return context[name];
     return (data) => {
       if (data.messageId === 'tsdoc-param-tag-with-invalid-name') return;
-      return context.report(data);
+      context.report(data);
     };
   },
 }));

@@ -1,4 +1,8 @@
-export default function (version: string, geVersion: string, ltVersion: string): boolean {
+export default function semverSatisfies(
+  version: string,
+  geVersion: string,
+  ltVersion: string,
+): boolean {
   const getComponents = (v: string): number[] => v
     .split(/[-+]/)[0].split('.').map((i) => +i);
 

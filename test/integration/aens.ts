@@ -187,7 +187,8 @@ describe('Aens', () => {
       claim.should.be.an('object');
 
       const bidFee = computeBidFee(name);
-      const bid: Awaited<ReturnType<typeof aeSdk.aensClaim>> = await aeSdk.aensBid(name, bidFee, { onAccount });
+      const bid: Awaited<ReturnType<typeof aeSdk.aensClaim>> = await aeSdk
+        .aensBid(name, bidFee, { onAccount });
       bid.should.be.an('object');
 
       const isAuctionFinished = await aeSdk.getName(name).catch(() => false);

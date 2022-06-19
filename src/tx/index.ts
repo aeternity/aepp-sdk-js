@@ -101,7 +101,10 @@ export async function _buildTx<TxType extends TX_TYPE>(
   }
   // TODO: move specific cases to field-types
   if ([TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType)) {
-    params.ctVersion = await getVmVersion(TX_TYPE.contractCreate, { ...params, ...params.ctVersion });
+    params.ctVersion = await getVmVersion(
+      TX_TYPE.contractCreate,
+      { ...params, ...params.ctVersion },
+    );
   }
   if (txType === TX_TYPE.contractCall) {
     params.abiVersion = (await getVmVersion(TX_TYPE.contractCall, params)).abiVersion;
@@ -134,7 +137,10 @@ export async function getVmVersion(
 export async function getVmVersion(
   txType: TX_TYPE, ctVersion: Partial<Pick<CtVersion, 'abiVersion'>> & { onNode: Node }
 ): Promise<Pick<CtVersion, 'abiVersion'>>;
-export async function getVmVersion(txType: TX_TYPE, { vmVersion, abiVersion, onNode }: Partial<CtVersion> & { onNode: Node }): Promise<Partial<CtVersion>> {
+export async function getVmVersion(
+  txType: TX_TYPE,
+  { vmVersion, abiVersion, onNode }: Partial<CtVersion> & { onNode: Node },
+): Promise<Partial<CtVersion>> {
   const { consensusProtocolVersion } = await onNode.getNodeInfo();
   if (!isKeyOfObject(consensusProtocolVersion, PROTOCOL_VM_ABI)) {
     throw new UnsupportedProtocolError('Not supported consensus protocol version');

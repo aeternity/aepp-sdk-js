@@ -13,7 +13,7 @@ import { MissingParamError } from './utils/errors';
  * Obtain networkId from account or node
  */
 export async function getNetworkId({ networkId }: { networkId?: string } = {}): Promise<string> {
-  const res = networkId ?? this.networkId ?? (await this.api?.getStatus()).networkId;
+  const res = networkId ?? this.networkId ?? (await this.api.getStatus()).networkId;
   if (res != null) return res;
   throw new MissingParamError('networkId is not provided');
 }
@@ -92,7 +92,9 @@ export default class Node extends (NodeApi as unknown as TransformedNode) {
     this.url = url;
     if (!ignoreVersion) {
       const versionPromise = this.getStatus().then(({ nodeVersion }) => nodeVersion);
-      this.pipeline.addPolicy(genVersionCheckPolicy('node', '/v3/status', versionPromise, '6.2.0', '7.0.0'));
+      this.pipeline.addPolicy(
+        genVersionCheckPolicy('node', '/v3/status', versionPromise, '6.2.0', '7.0.0'),
+      );
     }
     this.intAsString = true;
   }
@@ -120,7 +122,10 @@ export default class Node extends (NodeApi as unknown as TransformedNode) {
   }
 
   // @ts-expect-error https://github.com/microsoft/TypeScript/issues/27689
-  async sendOperationRequest(operationArguments: OperationArguments, operationSpec: OperationSpec): Promise<any> {
+  async sendOperationRequest(
+    operationArguments: OperationArguments,
+    operationSpec: OperationSpec,
+  ): Promise<any> {
     const args = mapObject(
       operationArguments,
       ([key, value]) => [key, this.#encodeArg(value)],

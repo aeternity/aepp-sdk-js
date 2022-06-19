@@ -91,4 +91,7 @@ export const PREFIX_ID_TAG = {
   ch: ID_TAG.channel,
 } as const;
 
-export const ID_TAG_PREFIX = mapObject(PREFIX_ID_TAG, ([key, value]: [EncodingType, number]) => [value, key]);
+export const ID_TAG_PREFIX = mapObject(
+  PREFIX_ID_TAG,
+  ([key, value]: [EncodingType, number]) => [value, key],
+);

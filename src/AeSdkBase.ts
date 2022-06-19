@@ -93,7 +93,10 @@ class AeSdkBase {
     } else this.setCompilerUrl(compilerUrl, { ignoreVersion });
   }
 
-  setCompilerUrl(compilerUrl: string, { ignoreVersion = false }: { ignoreVersion?: boolean } = {}): void {
+  setCompilerUrl(
+    compilerUrl: string,
+    { ignoreVersion = false }: { ignoreVersion?: boolean } = {},
+  ): void {
     this.compilerApi = new Compiler(compilerUrl, { ignoreVersion });
   }
 
@@ -192,7 +195,10 @@ class AeSdkBase {
     return this._resolveAccount(onAccount).address();
   }
 
-  async sign(data: string | Uint8Array, { onAccount, ...options }: { onAccount?: Account } = {}): Promise<Uint8Array> {
+  async sign(
+    data: string | Uint8Array,
+    { onAccount, ...options }: { onAccount?: Account } = {},
+  ): Promise<Uint8Array> {
     return this._resolveAccount(onAccount).sign(data, options);
   }
 
@@ -237,14 +243,19 @@ class AeSdkBase {
     }
   }
 
-  async _getOptions(): Promise<{ onNode: Node; onAccount: AccountBase; onCompiler: Compiler; networkId: string }> {
+  async _getOptions(): Promise<{
+    onNode: Node;
+    onAccount: AccountBase;
+    onCompiler: Compiler;
+    networkId: string;
+  }> {
     return {
       ...this._options,
       onNode: getValueOrErrorProxy(() => this.api),
       onAccount: getValueOrErrorProxy(() => this._resolveAccount()),
       onCompiler: getValueOrErrorProxy(() => this.compilerApi),
       // TODO: remove networkId
-      networkId: (await this.api?.getStatus()).networkId,
+      networkId: (await this.api.getStatus()).networkId,
     };
   }
 
@@ -252,7 +263,7 @@ class AeSdkBase {
     txType: TxType,
     options: Omit<Parameters<typeof _buildTx<TxType>>[1], 'onNode'> & { onNode?: Node },
   ): Promise<EncodedData<'tx'>> {
-    // @ts-expect-error
+    // @ts-expect-error TODO: need to figure out what's wrong here
     return _buildTx<TxType>(txType, {
       ...await this._getOptions(),
       ...options,
@@ -301,7 +312,7 @@ Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
   methods,
   ([name, handler]) => [
     name,
-    async function (...args: any[]) {
+    async function methodWrapper(...args: any[]) {
       const instanceOptions = await this._getOptions();
       const lastArg = args[args.length - 1];
       if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
