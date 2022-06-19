@@ -14,33 +14,32 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto'
-import { buildTx } from '../tx/builder'
-import { decode, EncodedData } from '../utils/encoder'
-import { TX_TYPE } from '../tx/builder/schema'
-import { getNetworkId } from '../Node'
-import { concatBuffers } from '../utils/other'
+import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto';
+import { buildTx } from '../tx/builder';
+import { decode, EncodedData } from '../utils/encoder';
+import { TX_TYPE } from '../tx/builder/schema';
+import { getNetworkId } from '../Node';
+import { concatBuffers } from '../utils/other';
 
 /**
  * Check is provided object looks like an instance of AccountBase
  * @param acc - Object to check
  */
-export const isAccountBase = (acc: AccountBase | any): boolean =>
-  !['sign', 'address', 'signTransaction', 'signMessage'].some(f => typeof acc[f] !== 'function')
+export const isAccountBase = (acc: AccountBase | any): boolean => !['sign', 'address', 'signTransaction', 'signMessage'].some((f) => typeof acc[f] !== 'function');
 
 /**
  * Account is one of the three basic building blocks of an
  * {@link AeSdk} and provides access to a signing key pair.
  */
 export default abstract class AccountBase {
-  networkId?: string
+  networkId?: string;
 
   /**
    * @param options - Options
    * @param options.networkId - Using for signing transactions
    */
-  constructor ({ networkId }: { networkId?: string } = {}) {
-    this.networkId ??= networkId
+  constructor({ networkId }: { networkId?: string } = {}) {
+    this.networkId ??= networkId;
   }
 
   /**
@@ -50,24 +49,24 @@ export default abstract class AccountBase {
    * @param opt.innerTx - Sign as inner transaction for PayingFor
    * @returns Signed transaction
    */
-  async signTransaction (
+  async signTransaction(
     tx: EncodedData<'tx'>,
-    { innerTx, networkId, ...options }: { innerTx?: boolean, networkId?: string } = {}
+    { innerTx, networkId, ...options }: { innerTx?: boolean; networkId?: string } = {},
   ): Promise<EncodedData<'tx'>> {
-    const prefixes = [await this.getNetworkId({ networkId })]
-    if (innerTx === true) prefixes.push('inner_tx')
-    const rlpBinaryTx = decode(tx)
-    const txWithNetworkId = concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)])
+    const prefixes = [await this.getNetworkId({ networkId })];
+    if (innerTx === true) prefixes.push('inner_tx');
+    const rlpBinaryTx = decode(tx);
+    const txWithNetworkId = concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)]);
 
-    const signatures = [await this.sign(txWithNetworkId, options)]
-    return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx
+    const signatures = [await this.sign(txWithNetworkId, options)];
+    return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx;
   }
 
   /**
    * Get network Id
    * @returns Network Id
    */
-  readonly getNetworkId = getNetworkId
+  readonly getNetworkId = getNetworkId;
 
   /**
    * Sign message
@@ -75,11 +74,9 @@ export default abstract class AccountBase {
    * @param opt - Options
    * @returns Signature as hex string of Uint8Array
    */
-  async signMessage (
-    message: string, { returnHex = false, ...options }: { returnHex?: boolean } = {}
-  ): Promise<string | Uint8Array> {
-    const sig = await this.sign(messageToHash(message), options)
-    return returnHex ? Buffer.from(sig).toString('hex') : sig
+  async signMessage(message: string, { returnHex = false, ...options }: { returnHex?: boolean } = {}): Promise<string | Uint8Array> {
+    const sig = await this.sign(messageToHash(message), options);
+    return returnHex ? Buffer.from(sig).toString('hex') : sig;
   }
 
   /**
@@ -88,14 +85,12 @@ export default abstract class AccountBase {
    * @param signature - Signature
    * @param options - Options
    */
-  async verifyMessage (
-    message: string, signature: string | Uint8Array, options?: object
-  ): Promise<boolean> {
+  async verifyMessage(message: string, signature: string | Uint8Array, options?: object): Promise<boolean> {
     return verifyMessageCrypto(
       message,
       typeof signature === 'string' ? Buffer.from(signature, 'hex') : signature,
-      decode(await this.address(options))
-    )
+      decode(await this.address(options)),
+    );
   }
 
   /**
@@ -104,11 +99,11 @@ export default abstract class AccountBase {
    * @param options - Options
    * @returns Signed data blob
    */
-  abstract sign (data: string | Uint8Array, options?: any): Promise<Uint8Array>
+  abstract sign(data: string | Uint8Array, options?: any): Promise<Uint8Array>;
 
   /**
    * Obtain account address
    * @returns Public account address
    */
-  abstract address (opt?: object): Promise<EncodedData<'ak'>>
+  abstract address(opt?: object): Promise<EncodedData<'ak'>>;
 }

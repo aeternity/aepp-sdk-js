@@ -1,15 +1,15 @@
-import BigNumber from 'bignumber.js'
-import { ValidatorResult } from '../tx/validator'
-import { EncodedData } from './encoder'
+import BigNumber from 'bignumber.js';
+import { ValidatorResult } from '../tx/validator';
+import { EncodedData } from './encoder';
 
 /**
  * aepp-sdk originated error
  * @category exception
  */
 export abstract class BaseError extends Error {
-  constructor (message: string) {
-    super(message)
-    this.name = 'BaseError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'BaseError';
   }
 }
 
@@ -17,9 +17,9 @@ export abstract class BaseError extends Error {
  * @category exception
  */
 export class AccountError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'AccountError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'AccountError';
   }
 }
 
@@ -27,9 +27,9 @@ export class AccountError extends BaseError {
  * @category exception
  */
 export class AensError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'AensError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'AensError';
   }
 }
 
@@ -37,9 +37,9 @@ export class AensError extends BaseError {
  * @category exception
  */
 export class AeppError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'AeppError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'AeppError';
   }
 }
 
@@ -47,9 +47,9 @@ export class AeppError extends BaseError {
  * @category exception
  */
 export class ChannelError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'ChannelError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'ChannelError';
   }
 }
 
@@ -57,9 +57,9 @@ export class ChannelError extends BaseError {
  * @category exception
  */
 export class CompilerError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'CompilerError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'CompilerError';
   }
 }
 
@@ -67,9 +67,9 @@ export class CompilerError extends BaseError {
  * @category exception
  */
 export class ContractError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'ContractError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'ContractError';
   }
 }
 
@@ -77,9 +77,9 @@ export class ContractError extends BaseError {
  * @category exception
  */
 export class CryptographyError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'CryptographyError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'CryptographyError';
   }
 }
 
@@ -87,9 +87,9 @@ export class CryptographyError extends BaseError {
  * @category exception
  */
 export class NodeError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'NodeError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'NodeError';
   }
 }
 
@@ -97,9 +97,9 @@ export class NodeError extends BaseError {
  * @category exception
  */
 export class TransactionError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'TransactionError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'TransactionError';
   }
 }
 
@@ -107,9 +107,9 @@ export class TransactionError extends BaseError {
  * @category exception
  */
 export class WalletError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'WalletError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'WalletError';
   }
 }
 
@@ -117,9 +117,9 @@ export class WalletError extends BaseError {
  * @category exception
  */
 export class ArgumentError extends BaseError {
-  constructor (argumentName: string, requirement: string, argumentValue: any) {
-    super(`${argumentName} should be ${requirement}, got ${String(argumentValue)} instead`)
-    this.name = 'ArgumentError'
+  constructor(argumentName: string, requirement: string, argumentValue: any) {
+    super(`${argumentName} should be ${requirement}, got ${String(argumentValue)} instead`);
+    this.name = 'ArgumentError';
   }
 }
 
@@ -127,9 +127,9 @@ export class ArgumentError extends BaseError {
  * @category exception
  */
 export class IllegalArgumentError extends CryptographyError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'IllegalArgumentError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'IllegalArgumentError';
   }
 }
 
@@ -137,9 +137,9 @@ export class IllegalArgumentError extends CryptographyError {
  * @category exception
  */
 export class ArgumentCountMismatchError extends BaseError {
-  constructor (functionName: string, requiredCount: number, providedCount: number) {
-    super(`${functionName} expects ${requiredCount} arguments, got ${providedCount} instead`)
-    this.name = 'ArgumentCountMismatchError'
+  constructor(functionName: string, requiredCount: number, providedCount: number) {
+    super(`${functionName} expects ${requiredCount} arguments, got ${providedCount} instead`);
+    this.name = 'ArgumentCountMismatchError';
   }
 }
 
@@ -147,9 +147,9 @@ export class ArgumentCountMismatchError extends BaseError {
  * @category exception
  */
 export class InsufficientBalanceError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InsufficientBalanceError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'InsufficientBalanceError';
   }
 }
 
@@ -157,9 +157,9 @@ export class InsufficientBalanceError extends BaseError {
  * @category exception
  */
 export class MissingParamError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'MissingParamError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'MissingParamError';
   }
 }
 
@@ -167,9 +167,9 @@ export class MissingParamError extends BaseError {
  * @category exception
  */
 export class NoSerializerFoundError extends BaseError {
-  constructor () {
-    super('Byte serialization not supported')
-    this.name = 'NoSerializerFoundError'
+  constructor() {
+    super('Byte serialization not supported');
+    this.name = 'NoSerializerFoundError';
   }
 }
 
@@ -177,13 +177,13 @@ export class NoSerializerFoundError extends BaseError {
  * @category exception
  */
 export class RequestTimedOutError extends BaseError {
-  constructor (requestTime: number, currentHeight?: number, height?: number) {
+  constructor(requestTime: number, currentHeight?: number, height?: number) {
     if (currentHeight !== undefined && height !== undefined) {
-      super(`Giving up after ${requestTime}ms, current height: ${currentHeight}, desired height: ${height}`)
+      super(`Giving up after ${requestTime}ms, current height: ${currentHeight}, desired height: ${height}`);
     } else {
-      super(`Giving up after ${requestTime} ms`)
+      super(`Giving up after ${requestTime} ms`);
     }
-    this.name = 'RequestTimedOutError'
+    this.name = 'RequestTimedOutError';
   }
 }
 
@@ -191,12 +191,12 @@ export class RequestTimedOutError extends BaseError {
  * @category exception
  */
 export class TxTimedOutError extends BaseError {
-  constructor (blocks: number, th: string) {
+  constructor(blocks: number, th: string) {
     super([
       `Giving up after ${blocks} blocks mined`,
-      `transaction hash: ${th}`
-    ].join(', '))
-    this.name = 'TxTimedOutError'
+      `transaction hash: ${th}`,
+    ].join(', '));
+    this.name = 'TxTimedOutError';
   }
 }
 
@@ -204,9 +204,9 @@ export class TxTimedOutError extends BaseError {
  * @category exception
  */
 export class TypeError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'TypeError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'TypeError';
   }
 }
 
@@ -214,9 +214,9 @@ export class TypeError extends BaseError {
  * @category exception
  */
 export class UnsupportedPlatformError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'UnsupportedPlatformError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnsupportedPlatformError';
   }
 }
 
@@ -224,9 +224,9 @@ export class UnsupportedPlatformError extends BaseError {
  * @category exception
  */
 export class UnsupportedProtocolError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'UnsupportedProtocolError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnsupportedProtocolError';
   }
 }
 
@@ -234,9 +234,9 @@ export class UnsupportedProtocolError extends BaseError {
  * @category exception
  */
 export class NotImplementedError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'NotImplementedError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'NotImplementedError';
   }
 }
 
@@ -244,9 +244,9 @@ export class NotImplementedError extends BaseError {
  * @category exception
  */
 export class UnsupportedVersionError extends BaseError {
-  constructor (dependency: string, version: string, geVersion: string, ltVersion: string) {
-    super(`Unsupported ${dependency} version ${version}. Supported: >= ${geVersion} < ${ltVersion}`)
-    this.name = 'UnsupportedVersionError'
+  constructor(dependency: string, version: string, geVersion: string, ltVersion: string) {
+    super(`Unsupported ${dependency} version ${version}. Supported: >= ${geVersion} < ${ltVersion}`);
+    this.name = 'UnsupportedVersionError';
   }
 }
 
@@ -254,9 +254,9 @@ export class UnsupportedVersionError extends BaseError {
  * @category exception
  */
 export class InternalError extends BaseError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InternalError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'InternalError';
   }
 }
 
@@ -264,9 +264,9 @@ export class InternalError extends BaseError {
  * @category exception
  */
 export class UnexpectedTsError extends InternalError {
-  constructor (message: string = 'Expected to not happen, required for TS') {
-    super(message)
-    this.name = 'UnexpectedTsError'
+  constructor(message = 'Expected to not happen, required for TS') {
+    super(message);
+    this.name = 'UnexpectedTsError';
   }
 }
 
@@ -274,9 +274,9 @@ export class UnexpectedTsError extends InternalError {
  * @category exception
  */
 export class InvalidKeypairError extends AccountError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InvalidKeypairError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidKeypairError';
   }
 }
 
@@ -284,9 +284,9 @@ export class InvalidKeypairError extends AccountError {
  * @category exception
  */
 export class UnavailableAccountError extends AccountError {
-  constructor (address: string) {
-    super(`Account for ${address} not available`)
-    this.name = 'UnavailableAccountError'
+  constructor(address: string) {
+    super(`Account for ${address} not available`);
+    this.name = 'UnavailableAccountError';
   }
 }
 
@@ -294,9 +294,9 @@ export class UnavailableAccountError extends AccountError {
  * @category exception
  */
 export class AensPointerContextError extends AensError {
-  constructor (nameOrId: string, prefix: string) {
-    super(`Name ${nameOrId} don't have pointers for ${prefix}`)
-    this.name = 'AensPointerContextError'
+  constructor(nameOrId: string, prefix: string) {
+    super(`Name ${nameOrId} don't have pointers for ${prefix}`);
+    this.name = 'AensPointerContextError';
   }
 }
 
@@ -304,9 +304,9 @@ export class AensPointerContextError extends AensError {
  * @category exception
  */
 export class InsufficientNameFeeError extends AensError {
-  constructor (nameFee: BigNumber, minNameFee: BigNumber) {
-    super(`the provided fee ${nameFee.toString()} is not enough to execute the claim, required: ${minNameFee.toString()}`)
-    this.name = 'InsufficientNameFeeError'
+  constructor(nameFee: BigNumber, minNameFee: BigNumber) {
+    super(`the provided fee ${nameFee.toString()} is not enough to execute the claim, required: ${minNameFee.toString()}`);
+    this.name = 'InsufficientNameFeeError';
   }
 }
 
@@ -314,9 +314,9 @@ export class InsufficientNameFeeError extends AensError {
  * @category exception
  */
 export class InvalidAensNameError extends AensError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InvalidAensNameError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidAensNameError';
   }
 }
 
@@ -324,9 +324,9 @@ export class InvalidAensNameError extends AensError {
  * @category exception
  */
 export class InvalidRpcMessageError extends AeppError {
-  constructor (message: string) {
-    super(`Received invalid message: ${message}`)
-    this.name = 'InvalidRpcMessageError'
+  constructor(message: string) {
+    super(`Received invalid message: ${message}`);
+    this.name = 'InvalidRpcMessageError';
   }
 }
 
@@ -334,9 +334,9 @@ export class InvalidRpcMessageError extends AeppError {
  * @category exception
  */
 export class MissingCallbackError extends AeppError {
-  constructor (id: number) {
-    super(`Can't find callback for this messageId ${id}`)
-    this.name = 'MissingCallbackError'
+  constructor(id: number) {
+    super(`Can't find callback for this messageId ${id}`);
+    this.name = 'MissingCallbackError';
   }
 }
 
@@ -344,9 +344,9 @@ export class MissingCallbackError extends AeppError {
  * @category exception
  */
 export class UnAuthorizedAccountError extends AeppError {
-  constructor (onAccount: string) {
-    super(`You do not have access to account ${onAccount}`)
-    this.name = 'UnAuthorizedAccountError'
+  constructor(onAccount: string) {
+    super(`You do not have access to account ${onAccount}`);
+    this.name = 'UnAuthorizedAccountError';
   }
 }
 
@@ -354,9 +354,9 @@ export class UnAuthorizedAccountError extends AeppError {
  * @category exception
  */
 export class UnknownRpcClientError extends AeppError {
-  constructor (id: string) {
-    super(`RpcClient with id ${id} do not exist`)
-    this.name = 'UnknownRpcClientError'
+  constructor(id: string) {
+    super(`RpcClient with id ${id} do not exist`);
+    this.name = 'UnknownRpcClientError';
   }
 }
 
@@ -364,9 +364,9 @@ export class UnknownRpcClientError extends AeppError {
  * @category exception
  */
 export class UnsubscribedAccountError extends AeppError {
-  constructor () {
-    super('You are not subscribed for an account.')
-    this.name = 'UnsubscribedAccountError'
+  constructor() {
+    super('You are not subscribed for an account.');
+    this.name = 'UnsubscribedAccountError';
   }
 }
 
@@ -374,9 +374,9 @@ export class UnsubscribedAccountError extends AeppError {
  * @category exception
  */
 export class ChannelCallError extends ChannelError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'ChannelCallError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'ChannelCallError';
   }
 }
 
@@ -384,9 +384,9 @@ export class ChannelCallError extends ChannelError {
  * @category exception
  */
 export class ChannelConnectionError extends ChannelError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'ChannelConnectionError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'ChannelConnectionError';
   }
 }
 
@@ -394,9 +394,9 @@ export class ChannelConnectionError extends ChannelError {
  * @category exception
  */
 export class ChannelPingTimedOutError extends ChannelError {
-  constructor () {
-    super('Server pong timed out')
-    this.name = 'ChannelPingTimedOutError'
+  constructor() {
+    super('Server pong timed out');
+    this.name = 'ChannelPingTimedOutError';
   }
 }
 
@@ -404,9 +404,9 @@ export class ChannelPingTimedOutError extends ChannelError {
  * @category exception
  */
 export class UnexpectedChannelMessageError extends ChannelError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'UnexpectedChannelMessageError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnexpectedChannelMessageError';
   }
 }
 
@@ -414,9 +414,9 @@ export class UnexpectedChannelMessageError extends ChannelError {
  * @category exception
  */
 export class UnknownChannelStateError extends ChannelError {
-  constructor () {
-    super('State Channels FSM entered unknown state')
-    this.name = 'UnknownChannelStateError'
+  constructor() {
+    super('State Channels FSM entered unknown state');
+    this.name = 'UnknownChannelStateError';
   }
 }
 
@@ -424,9 +424,9 @@ export class UnknownChannelStateError extends ChannelError {
  * @category exception
  */
 export class InvalidAuthDataError extends CompilerError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InvalidAuthDataError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidAuthDataError';
   }
 }
 
@@ -434,9 +434,9 @@ export class InvalidAuthDataError extends CompilerError {
  * @category exception
  */
 export class BytecodeMismatchError extends ContractError {
-  constructor (source: string) {
-    super(`Contract ${source} do not correspond to the bytecode deployed on the chain`)
-    this.name = 'BytecodeMismatchError'
+  constructor(source: string) {
+    super(`Contract ${source} do not correspond to the bytecode deployed on the chain`);
+    this.name = 'BytecodeMismatchError';
   }
 }
 
@@ -444,9 +444,9 @@ export class BytecodeMismatchError extends ContractError {
  * @category exception
  */
 export class DuplicateContractError extends ContractError {
-  constructor () {
-    super('Contract already deployed')
-    this.name = 'DuplicateContractError'
+  constructor() {
+    super('Contract already deployed');
+    this.name = 'DuplicateContractError';
   }
 }
 
@@ -454,9 +454,9 @@ export class DuplicateContractError extends ContractError {
  * @category exception
  */
 export class InactiveContractError extends ContractError {
-  constructor (contractAddress: string) {
-    super(`Contract with address ${contractAddress} not active`)
-    this.name = 'InactiveContractError'
+  constructor(contractAddress: string) {
+    super(`Contract with address ${contractAddress} not active`);
+    this.name = 'InactiveContractError';
   }
 }
 
@@ -464,9 +464,9 @@ export class InactiveContractError extends ContractError {
  * @category exception
  */
 export class InvalidMethodInvocationError extends ContractError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InvalidMethodInvocationError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidMethodInvocationError';
   }
 }
 
@@ -474,9 +474,9 @@ export class InvalidMethodInvocationError extends ContractError {
  * @category exception
  */
 export class MissingContractAddressError extends ContractError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'MissingContractAddressError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'MissingContractAddressError';
   }
 }
 
@@ -484,9 +484,9 @@ export class MissingContractAddressError extends ContractError {
  * @category exception
  */
 export class MissingContractDefError extends ContractError {
-  constructor () {
-    super('Either ACI or source code is required')
-    this.name = 'MissingContractDefError'
+  constructor() {
+    super('Either ACI or source code is required');
+    this.name = 'MissingContractDefError';
   }
 }
 
@@ -494,9 +494,9 @@ export class MissingContractDefError extends ContractError {
  * @category exception
  */
 export class MissingFunctionNameError extends ContractError {
-  constructor () {
-    super('Function name is required')
-    this.name = 'MissingFunctionNameError'
+  constructor() {
+    super('Function name is required');
+    this.name = 'MissingFunctionNameError';
   }
 }
 
@@ -504,12 +504,12 @@ export class MissingFunctionNameError extends ContractError {
  * @category exception
  */
 export class NodeInvocationError extends ContractError {
-  transaction: string
+  transaction: string;
 
-  constructor (message: string, transaction: string) {
-    super(`Invocation failed${message == null ? '' : `: "${message}"`}`)
-    this.name = 'NodeInvocationError'
-    this.transaction = transaction
+  constructor(message: string, transaction: string) {
+    super(`Invocation failed${message == null ? '' : `: "${message}"`}`);
+    this.name = 'NodeInvocationError';
+    this.transaction = transaction;
   }
 }
 
@@ -517,9 +517,9 @@ export class NodeInvocationError extends ContractError {
  * @category exception
  */
 export class NoSuchContractFunctionError extends ContractError {
-  constructor (name: string) {
-    super(`Function ${name} doesn't exist in contract`)
-    this.name = 'NoSuchContractFunctionError'
+  constructor(name: string) {
+    super(`Function ${name} doesn't exist in contract`);
+    this.name = 'NoSuchContractFunctionError';
   }
 }
 
@@ -527,11 +527,12 @@ export class NoSuchContractFunctionError extends ContractError {
  * @category exception
  */
 export class NotPayableFunctionError extends ContractError {
-  constructor (amount: string, fn: string) {
+  constructor(amount: string, fn: string) {
     super(
-      `You try to pay "${amount}" to function "${fn}" which is not payable. ` +
-      'Only payable function can accept coins')
-    this.name = 'NotPayableFunctionError'
+      `You try to pay "${amount}" to function "${fn}" which is not payable. `
+      + 'Only payable function can accept coins',
+    );
+    this.name = 'NotPayableFunctionError';
   }
 }
 
@@ -539,12 +540,12 @@ export class NotPayableFunctionError extends ContractError {
  * @category exception
  */
 export class MissingEventDefinitionError extends ContractError {
-  constructor (eventNameHash: string, eventAddress: string) {
+  constructor(eventNameHash: string, eventAddress: string) {
     super(
-      `Can't find definition of ${eventNameHash} event emitted by ${eventAddress}` +
-      ' (use omitUnknown option to ignore events like this)'
-    )
-    this.name = 'MissingEventDefinitionError'
+      `Can't find definition of ${eventNameHash} event emitted by ${eventAddress}`
+      + ' (use omitUnknown option to ignore events like this)',
+    );
+    this.name = 'MissingEventDefinitionError';
   }
 }
 
@@ -552,13 +553,13 @@ export class MissingEventDefinitionError extends ContractError {
  * @category exception
  */
 export class AmbiguousEventDefinitionError extends ContractError {
-  constructor (eventAddress: string, matchedEvents: Array<[string, string]>) {
+  constructor(eventAddress: string, matchedEvents: Array<[string, string]>) {
     super(
-      `Found multiple definitions of "${matchedEvents[0][1]}" event emitted by ${eventAddress}` +
-      ` in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts` +
-      ' (use contractAddressToName option to specify contract name corresponding to address)'
-    )
-    this.name = 'AmbiguousEventDefinitionError'
+      `Found multiple definitions of "${matchedEvents[0][1]}" event emitted by ${eventAddress}`
+      + ` in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts`
+      + ' (use contractAddressToName option to specify contract name corresponding to address)',
+    );
+    this.name = 'AmbiguousEventDefinitionError';
   }
 }
 
@@ -566,9 +567,9 @@ export class AmbiguousEventDefinitionError extends ContractError {
  * @category exception
  */
 export class InvalidChecksumError extends CryptographyError {
-  constructor () {
-    super('Invalid checksum')
-    this.name = 'InvalidChecksumError'
+  constructor() {
+    super('Invalid checksum');
+    this.name = 'InvalidChecksumError';
   }
 }
 
@@ -576,9 +577,9 @@ export class InvalidChecksumError extends CryptographyError {
  * @category exception
  */
 export class InvalidPasswordError extends CryptographyError {
-  constructor () {
-    super('Invalid password or nonce')
-    this.name = 'InvalidPasswordError'
+  constructor() {
+    super('Invalid password or nonce');
+    this.name = 'InvalidPasswordError';
   }
 }
 
@@ -586,9 +587,9 @@ export class InvalidPasswordError extends CryptographyError {
  * @category exception
  */
 export class MerkleTreeHashMismatchError extends CryptographyError {
-  constructor () {
-    super('Node hash is not equal to provided one')
-    this.name = 'MerkleTreeHashMismatchError'
+  constructor() {
+    super('Node hash is not equal to provided one');
+    this.name = 'MerkleTreeHashMismatchError';
   }
 }
 
@@ -596,9 +597,9 @@ export class MerkleTreeHashMismatchError extends CryptographyError {
  * @category exception
  */
 export class MissingNodeInTreeError extends CryptographyError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'MissingNodeInTreeError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'MissingNodeInTreeError';
   }
 }
 
@@ -606,9 +607,9 @@ export class MissingNodeInTreeError extends CryptographyError {
  * @category exception
  */
 export class UnknownNodeLengthError extends CryptographyError {
-  constructor (nodeLength: number) {
-    super(`Unknown node length: ${nodeLength}`)
-    this.name = 'UnknownNodeLengthError'
+  constructor(nodeLength: number) {
+    super(`Unknown node length: ${nodeLength}`);
+    this.name = 'UnknownNodeLengthError';
   }
 }
 
@@ -616,9 +617,9 @@ export class UnknownNodeLengthError extends CryptographyError {
  * @category exception
  */
 export class UnknownPathNibbleError extends CryptographyError {
-  constructor (nibble: number) {
-    super(`Unknown path nibble: ${nibble}`)
-    this.name = 'UnknownPathNibbleError'
+  constructor(nibble: number) {
+    super(`Unknown path nibble: ${nibble}`);
+    this.name = 'UnknownPathNibbleError';
   }
 }
 
@@ -626,9 +627,9 @@ export class UnknownPathNibbleError extends CryptographyError {
  * @category exception
  */
 export class DuplicateNodeError extends NodeError {
-  constructor (name: string) {
-    super(`Node with name ${name} already exist`)
-    this.name = 'DuplicateNodeError'
+  constructor(name: string) {
+    super(`Node with name ${name} already exist`);
+    this.name = 'DuplicateNodeError';
   }
 }
 
@@ -636,9 +637,9 @@ export class DuplicateNodeError extends NodeError {
  * @category exception
  */
 export class NodeNotFoundError extends NodeError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'NodeNotFoundError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'NodeNotFoundError';
   }
 }
 
@@ -646,9 +647,9 @@ export class NodeNotFoundError extends NodeError {
  * @category exception
  */
 export class DecodeError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'DecodeError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'DecodeError';
   }
 }
 
@@ -656,9 +657,9 @@ export class DecodeError extends TransactionError {
  * @category exception
  */
 export class PayloadLengthError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'PayloadLengthError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'PayloadLengthError';
   }
 }
 
@@ -666,9 +667,9 @@ export class PayloadLengthError extends TransactionError {
  * @category exception
  */
 export class DryRunError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'DryRunError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'DryRunError';
   }
 }
 
@@ -676,9 +677,9 @@ export class DryRunError extends TransactionError {
  * @category exception
  */
 export class IllegalBidFeeError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'IllegalBidFeeError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'IllegalBidFeeError';
   }
 }
 
@@ -686,9 +687,9 @@ export class IllegalBidFeeError extends TransactionError {
  * @category exception
  */
 export class InvalidSignatureError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InvalidSignatureError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidSignatureError';
   }
 }
 
@@ -696,13 +697,15 @@ export class InvalidSignatureError extends TransactionError {
  * @category exception
  */
 export class InvalidTxError extends TransactionError {
-  validation: ValidatorResult[]
-  transaction: EncodedData<'tx'>
-  constructor (message: string, validation: ValidatorResult[], transaction: EncodedData<'tx'>) {
-    super(message)
-    this.name = 'InvalidTxError'
-    this.validation = validation
-    this.transaction = transaction
+  validation: ValidatorResult[];
+
+  transaction: EncodedData<'tx'>;
+
+  constructor(message: string, validation: ValidatorResult[], transaction: EncodedData<'tx'>) {
+    super(message);
+    this.name = 'InvalidTxError';
+    this.validation = validation;
+    this.transaction = transaction;
   }
 }
 
@@ -710,9 +713,9 @@ export class InvalidTxError extends TransactionError {
  * @category exception
  */
 export class InvalidTxParamsError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'InvalidTxParamsError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidTxParamsError';
   }
 }
 
@@ -720,9 +723,9 @@ export class InvalidTxParamsError extends TransactionError {
  * @category exception
  */
 export class PrefixNotFoundError extends TransactionError {
-  constructor (tag: number) {
-    super(`Prefix for id-tag ${tag} not found.`)
-    this.name = 'PrefixNotFoundError'
+  constructor(tag: number) {
+    super(`Prefix for id-tag ${tag} not found.`);
+    this.name = 'PrefixNotFoundError';
   }
 }
 
@@ -730,9 +733,9 @@ export class PrefixNotFoundError extends TransactionError {
  * @category exception
  */
 export class SchemaNotFoundError extends TransactionError {
-  constructor (schemaName: string, key: string, version: number) {
-    super(`Transaction ${schemaName} not implemented for ${key} version ${version}`)
-    this.name = 'SchemaNotFoundError'
+  constructor(schemaName: string, key: string, version: number) {
+    super(`Transaction ${schemaName} not implemented for ${key} version ${version}`);
+    this.name = 'SchemaNotFoundError';
   }
 }
 
@@ -740,9 +743,9 @@ export class SchemaNotFoundError extends TransactionError {
  * @category exception
  */
 export class TagNotFoundError extends TransactionError {
-  constructor (prefix: string) {
-    super(`Id tag for prefix ${prefix} not found.`)
-    this.name = 'DecodeError'
+  constructor(prefix: string) {
+    super(`Id tag for prefix ${prefix} not found.`);
+    this.name = 'DecodeError';
   }
 }
 
@@ -750,9 +753,9 @@ export class TagNotFoundError extends TransactionError {
  * @category exception
  */
 export class TxNotInChainError extends TransactionError {
-  constructor (txHash: string) {
-    super(`Transaction ${txHash} is removed from chain`)
-    this.name = 'TxNotInChainError'
+  constructor(txHash: string) {
+    super(`Transaction ${txHash} is removed from chain`);
+    this.name = 'TxNotInChainError';
   }
 }
 
@@ -760,9 +763,9 @@ export class TxNotInChainError extends TransactionError {
  * @category exception
  */
 export class UnknownTxError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'UnknownTxError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnknownTxError';
   }
 }
 
@@ -770,9 +773,9 @@ export class UnknownTxError extends TransactionError {
  * @category exception
  */
 export class UnsupportedABIversionError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'UnsupportedABIversionError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnsupportedABIversionError';
   }
 }
 
@@ -780,9 +783,9 @@ export class UnsupportedABIversionError extends TransactionError {
  * @category exception
  */
 export class UnsupportedVMversionError extends TransactionError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'UnsupportedVMversionError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'UnsupportedVMversionError';
   }
 }
 
@@ -790,9 +793,9 @@ export class UnsupportedVMversionError extends TransactionError {
  * @category exception
  */
 export class AlreadyConnectedError extends WalletError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'AlreadyConnectedError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'AlreadyConnectedError';
   }
 }
 
@@ -800,9 +803,9 @@ export class AlreadyConnectedError extends WalletError {
  * @category exception
  */
 export class NoWalletConnectedError extends WalletError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'NoWalletConnectedError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'NoWalletConnectedError';
   }
 }
 
@@ -810,8 +813,8 @@ export class NoWalletConnectedError extends WalletError {
  * @category exception
  */
 export class RpcConnectionError extends WalletError {
-  constructor (message: string) {
-    super(message)
-    this.name = 'RpcConnectionError'
+  constructor(message: string) {
+    super(message);
+    this.name = 'RpcConnectionError';
   }
 }

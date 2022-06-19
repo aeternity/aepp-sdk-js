@@ -1,12 +1,12 @@
-const path = require('path')
+const path = require('path');
 
-require('eslint-plugin-rulesdir').RULES_DIR = path.resolve(__dirname, 'tooling/eslint-rules')
+require('eslint-plugin-rulesdir').RULES_DIR = path.resolve(__dirname, 'tooling/eslint-rules');
 
 module.exports = {
   env: {
     browser: true,
     es2021: true,
-    node: true
+    node: true,
   },
   extends: [
     'airbnb-base',
@@ -19,7 +19,7 @@ module.exports = {
   },
   plugins: [
     '@typescript-eslint',
-    'rulesdir'
+    'rulesdir',
   ],
   ignorePatterns: ['dist', 'es', 'src/apis', 'docs/api'],
   rules: {

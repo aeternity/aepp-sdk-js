@@ -1,3 +1,3 @@
 declare module '@aeternity/uuid' {
-  export * from 'uuid'
+  export * from 'uuid';
 }

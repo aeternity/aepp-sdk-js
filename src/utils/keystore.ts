@@ -1,17 +1,17 @@
-import nacl from 'tweetnacl'
-import { v4 as uuid } from '@aeternity/uuid'
-import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min.js'
-import { getAddressFromPriv } from './crypto'
-import { bytesToHex, hexToBytes } from './bytes'
-import { InvalidPasswordError } from './errors'
+import nacl from 'tweetnacl';
+import { v4 as uuid } from '@aeternity/uuid';
+import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min.js';
+import { getAddressFromPriv } from './crypto';
+import { bytesToHex, hexToBytes } from './bytes';
+import { InvalidPasswordError } from './errors';
 
 const DERIVED_KEY_FUNCTIONS = {
-  async argon2id (
+  async argon2id(
     pass: string | Uint8Array,
     salt: string | Uint8Array,
-    params: Partial<Keystore['crypto']['kdf_params']>
+    params: Partial<Keystore['crypto']['kdf_params']>,
   ): Promise<Uint8Array> {
-    const { memlimit_kib: mem, opslimit: time } = params
+    const { memlimit_kib: mem, opslimit: time } = params;
 
     return (await hash({
       hashLen: 32,
@@ -19,42 +19,42 @@ const DERIVED_KEY_FUNCTIONS = {
       salt,
       time,
       mem,
-      type: ArgonType.Argon2id
-    })).hash
-  }
-}
+      type: ArgonType.Argon2id,
+    })).hash;
+  },
+};
 
 const CRYPTO_FUNCTIONS = {
   'xsalsa20-poly1305': {
     encrypt: nacl.secretbox,
-    decrypt (...args: Parameters<typeof nacl.secretbox.open>): Uint8Array {
-      const res = nacl.secretbox.open(...args)
-      if (res == null) throw new InvalidPasswordError()
-      return res
-    }
-  }
-}
+    decrypt(...args: Parameters<typeof nacl.secretbox.open>): Uint8Array {
+      const res = nacl.secretbox.open(...args);
+      if (res == null) throw new InvalidPasswordError();
+      return res;
+    },
+  },
+};
 
 export interface Keystore {
-  name: string
-  version: 1
-  public_key: string
-  id: string
+  name: string;
+  version: 1;
+  public_key: string;
+  id: string;
   crypto: {
-    secret_type: 'ed25519'
-    symmetric_alg: keyof typeof CRYPTO_FUNCTIONS
-    ciphertext: string
+    secret_type: 'ed25519';
+    symmetric_alg: keyof typeof CRYPTO_FUNCTIONS;
+    ciphertext: string;
     cipher_params: {
-      nonce: string
-    }
-    kdf: keyof typeof DERIVED_KEY_FUNCTIONS
+      nonce: string;
+    };
+    kdf: keyof typeof DERIVED_KEY_FUNCTIONS;
     kdf_params: {
-      memlimit_kib: number
-      opslimit: number
-      parallelism: number
-      salt: string
-    }
-  }
+      memlimit_kib: number;
+      opslimit: number;
+      parallelism: number;
+      salt: string;
+    };
+  };
 }
 
 const CRYPTO_DEFAULTS = {
@@ -64,9 +64,9 @@ const CRYPTO_DEFAULTS = {
   kdf_params: {
     memlimit_kib: 65536,
     opslimit: 3,
-    parallelism: 1
-  }
-} as const
+    parallelism: 1,
+  },
+} as const;
 
 /**
  * Symmetric private key encryption using secret (derived) key.
@@ -76,13 +76,13 @@ const CRYPTO_DEFAULTS = {
  * @param algo - Encryption algorithm.
  * @returns Encrypted data.
  */
-function encrypt (
+function encrypt(
   plaintext: Uint8Array,
   key: Uint8Array,
   nonce: Uint8Array,
-  algo: keyof typeof CRYPTO_FUNCTIONS = CRYPTO_DEFAULTS.symmetric_alg
+  algo: keyof typeof CRYPTO_FUNCTIONS = CRYPTO_DEFAULTS.symmetric_alg,
 ): Uint8Array {
-  return CRYPTO_FUNCTIONS[algo].encrypt(plaintext, nonce, key)
+  return CRYPTO_FUNCTIONS[algo].encrypt(plaintext, nonce, key);
 }
 
 /**
@@ -93,13 +93,13 @@ function encrypt (
  * @param algo - Encryption algorithm.
  * @returns Decrypted data.
  */
-function decrypt (
+function decrypt(
   ciphertext: Uint8Array,
   key: Uint8Array,
   nonce: Uint8Array,
-  algo: keyof typeof CRYPTO_FUNCTIONS = CRYPTO_DEFAULTS.symmetric_alg
+  algo: keyof typeof CRYPTO_FUNCTIONS = CRYPTO_DEFAULTS.symmetric_alg,
 ): Uint8Array {
-  return CRYPTO_FUNCTIONS[algo].decrypt(ciphertext, nonce, key)
+  return CRYPTO_FUNCTIONS[algo].decrypt(ciphertext, nonce, key);
 }
 
 /**
@@ -110,13 +110,13 @@ function decrypt (
  * @param kdfParams - KDF parameters.
  * @returns Secret key derived from password.
  */
-async function deriveKey (
+async function deriveKey(
   password: string | Uint8Array,
   nonce: string | Uint8Array,
   kdf: Keystore['crypto']['kdf'],
-  kdfParams: Omit<Keystore['crypto']['kdf_params'], 'salt'>
+  kdfParams: Omit<Keystore['crypto']['kdf_params'], 'salt'>,
 ): Promise<Uint8Array> {
-  return await DERIVED_KEY_FUNCTIONS[kdf](password, nonce, kdfParams)
+  return DERIVED_KEY_FUNCTIONS[kdf](password, nonce, kdfParams);
 }
 
 /**
@@ -125,16 +125,14 @@ async function deriveKey (
  * @param keystore - Keystore object.
  * @returns Plaintext private key.
  */
-export async function recover (
-  password: string | Uint8Array, { crypto }: Keystore
-): Promise<string> {
-  const salt = hexToBytes(crypto.kdf_params.salt)
+export async function recover(password: string | Uint8Array, { crypto }: Keystore): Promise<string> {
+  const salt = hexToBytes(crypto.kdf_params.salt);
   return bytesToHex(decrypt(
     hexToBytes(crypto.ciphertext),
     await deriveKey(password, salt, crypto.kdf, crypto.kdf_params),
     hexToBytes(crypto.cipher_params.nonce),
-    crypto.symmetric_alg
-  ))
+    crypto.symmetric_alg,
+  ));
 }
 
 /**
@@ -148,17 +146,17 @@ export async function recover (
  * @param options.kdf - Key derivation function.
  * @param options.kdf_params - KDF parameters.
  */
-export async function dump (
+export async function dump(
   name: string,
   password: string | Uint8Array,
   privateKey: string | Uint8Array,
   nonce: Uint8Array = nacl.randomBytes(24),
   salt: Uint8Array = nacl.randomBytes(16),
-  options?: Partial<Keystore['crypto']>
+  options?: Partial<Keystore['crypto']>,
 ): Promise<Keystore> {
-  const opt = { ...CRYPTO_DEFAULTS, ...options }
-  const derivedKey = await deriveKey(password, salt, opt.kdf, opt.kdf_params)
-  const payload = typeof privateKey === 'string' ? hexToBytes(privateKey) : privateKey
+  const opt = { ...CRYPTO_DEFAULTS, ...options };
+  const derivedKey = await deriveKey(password, salt, opt.kdf, opt.kdf_params);
+  const payload = typeof privateKey === 'string' ? hexToBytes(privateKey) : privateKey;
   return {
     name,
     version: 1,
@@ -172,8 +170,8 @@ export async function dump (
       kdf: opt.kdf,
       kdf_params: {
         ...opt.kdf_params,
-        salt: bytesToHex(salt)
-      }
-    }
-  }
+        salt: bytesToHex(salt),
+      },
+    },
+  };
 }

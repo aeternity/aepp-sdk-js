@@ -3,6 +3,6 @@
  * @hidden
  */
 export interface Pointer {
-  key: string
-  id: string
+  key: string;
+  id: string;
 }

@@ -14,11 +14,11 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import BigNumber from 'bignumber.js'
-import { snakeToPascal } from '../utils/string'
-import { buildTx, unpackTx } from '../tx/builder'
-import { TX_TYPE } from '../tx/builder/schema'
-import * as handlers from './handlers'
+import BigNumber from 'bignumber.js';
+import { snakeToPascal } from '../utils/string';
+import { buildTx, unpackTx } from '../tx/builder';
+import { TX_TYPE } from '../tx/builder/schema';
+import * as handlers from './handlers';
 import {
   eventEmitters,
   status as channelStatus,
@@ -33,42 +33,42 @@ import {
   SignTx,
   ChannelOptions,
   ChannelState,
-  ChannelMessage
-} from './internal'
-import { UnknownChannelStateError, ChannelError } from '../utils/errors'
-import { EncodedData } from '../utils/encoder'
+  ChannelMessage,
+} from './internal';
+import { UnknownChannelStateError, ChannelError } from '../utils/errors';
+import { EncodedData } from '../utils/encoder';
 
-function snakeToPascalObjKeys<Type> (obj: object): Type {
+function snakeToPascalObjKeys<Type>(obj: object): Type {
   return Object.entries(obj).reduce((result, [key, val]) => ({
     ...result,
-    [snakeToPascal(key)]: val
-  }), {}) as Type
+    [snakeToPascal(key)]: val,
+  }), {}) as Type;
 }
 
-type EventCallback = (...args: any[]) => void
+type EventCallback = (...args: any[]) => void;
 
 interface CallContractOptions {
-  amount?: number | BigNumber
-  callData?: string
-  abiVersion?: number
-  contract?: string
-  returnValue?: any
-  gasUsed?: number | BigNumber
-  gasPrice?: number | BigNumber
-  height?: number
-  callerNonce?: number
-  log?: any
-  returnType?: string
+  amount?: number | BigNumber;
+  callData?: string;
+  abiVersion?: number;
+  contract?: string;
+  returnValue?: any;
+  gasUsed?: number | BigNumber;
+  gasPrice?: number | BigNumber;
+  height?: number;
+  callerNonce?: number;
+  log?: any;
+  returnType?: string;
 }
 
 interface Contract {
-  abiVersion: number
-  active: boolean
-  deposit: number | BigNumber
-  id: string
-  ownerId: string
-  referrerIds: string[]
-  vmVersion: number
+  abiVersion: number;
+  active: boolean;
+  deposit: number | BigNumber;
+  id: string;
+  ownerId: string;
+  referrerIds: string[];
+  vmVersion: number;
 }
 
 /**
@@ -139,15 +139,15 @@ export default class Channel {
    * @param options.debug=false - Log websocket communication
    * @param options.sign - Function which verifies and signs transactions
    */
-  static async initialize (options: ChannelOptions): Promise<Channel> {
-    const channel = new Channel()
+  static async initialize(options: ChannelOptions): Promise<Channel> {
+    const channel = new Channel();
     await initialize(
       channel,
       options.existingFsmId != null ? handlers.awaitingReconnection : handlers.awaitingConnection,
       handlers.channelOpen,
-      options
-    )
-    return channel
+      options,
+    );
+    return channel;
   }
 
   /**
@@ -168,10 +168,10 @@ export default class Channel {
    * @param callback - Callback function
    */
   // TODO define specific callback type depending on the event name
-  on (eventName: string, callback: EventCallback): void {
-    const eventEmitter = eventEmitters.get(this)
-    if (eventEmitter == null) throw new UnknownChannelStateError()
-    eventEmitter.on(eventName, callback)
+  on(eventName: string, callback: EventCallback): void {
+    const eventEmitter = eventEmitters.get(this);
+    if (eventEmitter == null) throw new UnknownChannelStateError();
+    eventEmitter.on(eventName, callback);
   }
 
   /**
@@ -179,34 +179,34 @@ export default class Channel {
    * @param eventName - Event name
    * @param callback - Callback function
    */
-  off (eventName: string, callback: EventCallback): void {
-    const eventEmitter = eventEmitters.get(this)
-    if (eventEmitter == null) throw new UnknownChannelStateError()
-    eventEmitter.removeListener(eventName, callback)
+  off(eventName: string, callback: EventCallback): void {
+    const eventEmitter = eventEmitters.get(this);
+    if (eventEmitter == null) throw new UnknownChannelStateError();
+    eventEmitter.removeListener(eventName, callback);
   }
 
   /**
    * Close the connection
    */
-  disconnect (): void {
-    return channelDisconnect(this)
+  disconnect(): void {
+    return channelDisconnect(this);
   }
 
   /**
    * Get current status
    *
    */
-  status (): string {
-    const status = channelStatus.get(this)
-    if (status == null) throw new UnknownChannelStateError()
-    return status
+  status(): string {
+    const status = channelStatus.get(this);
+    if (status == null) throw new UnknownChannelStateError();
+    return status;
   }
 
   /**
    * Get current state
    */
-  async state (): Promise<ChannelState> {
-    return await snakeToPascalObjKeys(await call(this, 'channels.get.offchain_state', {}))
+  async state(): Promise<ChannelState> {
+    return snakeToPascalObjKeys(await call(this, 'channels.get.offchain_state', {}));
   }
 
   /**
@@ -216,21 +216,21 @@ export default class Channel {
    * it will return `null`.
    *
    */
-  round (): number | null {
-    const state = channelState.get(this)
+  round(): number | null {
+    const state = channelState.get(this);
     if (state == null) {
-      return null
+      return null;
     }
-    const { txType, tx } = unpackTx(state, TX_TYPE.signed).tx.encodedTx
+    const { txType, tx } = unpackTx(state, TX_TYPE.signed).tx.encodedTx;
     switch (txType) {
       case TX_TYPE.channelCreate:
-        return 1
+        return 1;
       case TX_TYPE.channelOffChain:
       case TX_TYPE.channelWithdraw:
       case TX_TYPE.channelDeposit:
-        return +tx.round
+        return +tx.round;
       default:
-        return null
+        return null;
     }
   }
 
@@ -238,20 +238,20 @@ export default class Channel {
    * Get channel id
    *
    */
-  id (): string {
-    const id = channelId.get(this)
-    if (id == null) throw new ChannelError('Channel is not initialized')
-    return id
+  id(): string {
+    const id = channelId.get(this);
+    if (id == null) throw new ChannelError('Channel is not initialized');
+    return id;
   }
 
   /**
    * Get channel's fsm id
    *
    */
-  fsmId (): string {
-    const id = channelFsmId.get(this)
-    if (id == null) throw new ChannelError('Channel is not initialized')
-    return id
+  fsmId(): string {
+    const id = channelFsmId.get(this);
+    if (id == null) throw new ChannelError('Channel is not initialized');
+    return id;
   }
 
   /**
@@ -283,18 +283,19 @@ export default class Channel {
    * )
    * ```
    */
-  async update (
+  async update(
     from: string,
     to: string,
     amount: number | BigNumber,
     sign: SignTx,
-    metadata: string[] = []): Promise<{
-      accepted: boolean
-      signedTx?: string
-      errorCode?: number
-      errorMessage?: string
+    metadata: string[] = [],
+  ): Promise<{
+      accepted: boolean;
+      signedTx?: string;
+      errorCode?: number;
+      errorMessage?: string;
     }> {
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       enqueueAction(
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
@@ -302,19 +303,21 @@ export default class Channel {
           send(channel, {
             jsonrpc: '2.0',
             method: 'channels.update.new',
-            params: { from, to, amount, meta: metadata }
-          })
+            params: {
+              from, to, amount, meta: metadata,
+            },
+          });
           return {
             handler: handlers.awaitingOffChainTx,
             state: {
               resolve,
               reject,
-              sign
-            }
-          }
-        }
-      )
-    })
+              sign,
+            },
+          };
+        },
+      );
+    });
   }
 
   /**
@@ -337,10 +340,10 @@ export default class Channel {
    * }).then(poi => console.log(poi))
    * ```
    */
-  async poi (
-    { accounts, contracts }: { accounts: string[], contracts?: string[] }
+  async poi(
+    { accounts, contracts }: { accounts: string[]; contracts?: string[] },
   ): Promise<EncodedData<'pi'>> {
-    return (await call(this, 'channels.get.poi', { accounts, contracts })).poi
+    return (await call(this, 'channels.get.poi', { accounts, contracts })).poi;
   }
 
   /**
@@ -364,14 +367,14 @@ export default class Channel {
    * )
    * ```
    */
-  async balances (accounts: Array<EncodedData<'ak'>>): Promise<{ [key: EncodedData<'ak'>]: string }> {
+  async balances(accounts: Array<EncodedData<'ak'>>): Promise<{ [key: EncodedData<'ak'>]: string }> {
     return Object.fromEntries(
       (await call(this, 'channels.get.balances', { accounts }))
         .map((item: {
-          account: EncodedData<'ak'>
-          balance: string
-        }) => [item.account, item.balance])
-    )
+          account: EncodedData<'ak'>;
+          balance: string;
+        }) => [item.account, item.balance]),
+    );
   }
 
   /**
@@ -394,19 +397,20 @@ export default class Channel {
    * })
    * ```
    */
-  async leave (): Promise<{ channelId: string, signedTx: string }> {
-    return await new Promise((resolve, reject) => {
+  async leave(): Promise<{ channelId: string; signedTx: string }> {
+    return new Promise((resolve, reject) => {
       enqueueAction(
         this,
         (channel, state) => state?.handler === handlers.channelOpen,
         (channel, _state) => {
-          send(channel, { jsonrpc: '2.0', method: 'channels.leave', params: {} })
+          send(channel, { jsonrpc: '2.0', method: 'channels.leave', params: {} });
           return {
             handler: handlers.awaitingLeave,
-            state: { resolve, reject }
-          }
-        })
-    })
+            state: { resolve, reject },
+          };
+        },
+      );
+    });
   }
 
   /**
@@ -423,24 +427,24 @@ export default class Channel {
    * ).then(tx => console.log('on_chain_tx', tx))
    * ```
    */
-  async shutdown (sign: Function): Promise<string> {
-    return await new Promise((resolve, reject) => {
+  async shutdown(sign: Function): Promise<string> {
+    return new Promise((resolve, reject) => {
       enqueueAction(
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, { jsonrpc: '2.0', method: 'channels.shutdown', params: {} })
+          send(channel, { jsonrpc: '2.0', method: 'channels.shutdown', params: {} });
           return {
             handler: handlers.awaitingShutdownTx,
             state: {
               sign,
               resolve,
-              reject
-            }
-          }
-        }
-      )
-    })
+              reject,
+            },
+          };
+        },
+      );
+    });
   }
 
   /**
@@ -492,18 +496,18 @@ export default class Channel {
    * })
    * ```
    */
-  async withdraw (
+  async withdraw(
     amount: number | BigNumber,
     sign: SignTx,
     { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }:
-    { onOnChainTx?: Function, onOwnWithdrawLocked?: Function, onWithdrawLocked?: Function } = {}
-  ): Promise<{ accepted: boolean, signedTx: string }> {
-    return await new Promise((resolve, reject) => {
+    { onOnChainTx?: Function; onOwnWithdrawLocked?: Function; onWithdrawLocked?: Function } = {},
+  ): Promise<{ accepted: boolean; signedTx: string }> {
+    return new Promise((resolve, reject) => {
       enqueueAction(
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, { jsonrpc: '2.0', method: 'channels.withdraw', params: { amount } })
+          send(channel, { jsonrpc: '2.0', method: 'channels.withdraw', params: { amount } });
           return {
             handler: handlers.awaitingWithdrawTx,
             state: {
@@ -512,12 +516,12 @@ export default class Channel {
               reject,
               onOnChainTx,
               onOwnWithdrawLocked,
-              onWithdrawLocked
-            }
-          }
-        }
-      )
-    })
+              onWithdrawLocked,
+            },
+          };
+        },
+      );
+    });
   }
 
   /**
@@ -570,18 +574,18 @@ export default class Channel {
    * })
    * ```
    */
-  async deposit (
+  async deposit(
     amount: number | BigNumber,
     sign: SignTx,
     { onOnChainTx, onOwnDepositLocked, onDepositLocked }:
-    { onOnChainTx?: Function, onOwnDepositLocked?: Function, onDepositLocked?: Function } = {}
-  ): Promise<{ accepted: boolean, state: ChannelState }> {
-    return await new Promise((resolve, reject) => {
+    { onOnChainTx?: Function; onOwnDepositLocked?: Function; onDepositLocked?: Function } = {},
+  ): Promise<{ accepted: boolean; state: ChannelState }> {
+    return new Promise((resolve, reject) => {
       enqueueAction(
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, { jsonrpc: '2.0', method: 'channels.deposit', params: { amount } })
+          send(channel, { jsonrpc: '2.0', method: 'channels.deposit', params: { amount } });
           return {
             handler: handlers.awaitingDepositTx,
             state: {
@@ -590,12 +594,12 @@ export default class Channel {
               reject,
               onOnChainTx,
               onOwnDepositLocked,
-              onDepositLocked
-            }
-          }
-        }
-      )
-    })
+              onDepositLocked,
+            },
+          };
+        },
+      );
+    });
   }
 
   /**
@@ -632,17 +636,19 @@ export default class Channel {
    * })
    * ```
    */
-  async createContract (
-    { code, callData, deposit, vmVersion, abiVersion }: {
-      code: string
-      callData: string
-      deposit: number | BigNumber
-      vmVersion: number
-      abiVersion: number
+  async createContract(
+    {
+      code, callData, deposit, vmVersion, abiVersion,
+    }: {
+      code: string;
+      callData: string;
+      deposit: number | BigNumber;
+      vmVersion: number;
+      abiVersion: number;
     },
-    sign: SignTx
-  ): Promise<{ accepted: boolean, signedTx: string, address: string }> {
-    return await new Promise((resolve, reject) => {
+    sign: SignTx,
+  ): Promise<{ accepted: boolean; signedTx: string; address: string }> {
+    return new Promise((resolve, reject) => {
       enqueueAction(
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
@@ -655,20 +661,20 @@ export default class Channel {
               call_data: callData,
               deposit,
               vm_version: vmVersion,
-              abi_version: abiVersion
-            }
-          })
+              abi_version: abiVersion,
+            },
+          });
           return {
             handler: handlers.awaitingNewContractTx,
             state: {
               sign,
               resolve,
-              reject
-            }
-          }
-        }
-      )
-    })
+              reject,
+            },
+          };
+        },
+      );
+    });
   }
 
   /**
@@ -709,11 +715,13 @@ export default class Channel {
    * })
    * ```
    */
-  async callContract (
-    { amount, callData, contract, abiVersion }: CallContractOptions,
-    sign: SignTx
-  ): Promise<{ accepted: boolean, signedTx: string }> {
-    return await new Promise((resolve, reject) => {
+  async callContract(
+    {
+      amount, callData, contract, abiVersion,
+    }: CallContractOptions,
+    sign: SignTx,
+  ): Promise<{ accepted: boolean; signedTx: string }> {
+    return new Promise((resolve, reject) => {
       enqueueAction(
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
@@ -725,16 +733,16 @@ export default class Channel {
               amount,
               call_data: callData,
               contract_id: contract,
-              abi_version: abiVersion
-            }
-          })
+              abi_version: abiVersion,
+            },
+          });
           return {
             handler: handlers.awaitingCallContractUpdateTx,
-            state: { resolve, reject, sign }
-          }
-        }
-      )
-    })
+            state: { resolve, reject, sign },
+          };
+        },
+      );
+    });
   }
 
   /**
@@ -766,19 +774,21 @@ export default class Channel {
    * })
    * ```
    */
-  async forceProgress (
-    { amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = 1000000000 }: {
-      amount: number
-      callData: string
-      contract: string
-      abiVersion: number
-      gasLimit?: number
-      gasPrice?: number
+  async forceProgress(
+    {
+      amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = 1000000000,
+    }: {
+      amount: number;
+      callData: string;
+      contract: string;
+      abiVersion: number;
+      gasLimit?: number;
+      gasPrice?: number;
     },
     sign: SignTx,
-    { onOnChainTx }: { onOnChainTx?: Function } = {}
-  ): Promise<{ accepted: boolean, signedTx: string, tx: EncodedData<'tx'> | Uint8Array }> {
-    return await new Promise((resolve, reject) => {
+    { onOnChainTx }: { onOnChainTx?: Function } = {},
+  ): Promise<{ accepted: boolean; signedTx: string; tx: EncodedData<'tx'> | Uint8Array }> {
+    return new Promise((resolve, reject) => {
       enqueueAction(
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
@@ -792,16 +802,18 @@ export default class Channel {
               contract_id: contract,
               abi_version: abiVersion,
               gas_price: gasPrice,
-              gas: gasLimit
-            }
-          })
+              gas: gasLimit,
+            },
+          });
           return {
             handler: handlers.awaitingCallContractForceProgressUpdate,
-            state: { resolve, reject, sign, onOnChainTx }
-          }
-        }
-      )
-    })
+            state: {
+              resolve, reject, sign, onOnChainTx,
+            },
+          };
+        },
+      );
+    });
   }
 
   /**
@@ -833,16 +845,18 @@ export default class Channel {
    * })
    * ```
    */
-  async callContractStatic (
-    { amount, callData, contract, abiVersion }:
-    { amount: number, callData: string, contract: string, abiVersion: number }
+  async callContractStatic(
+    {
+      amount, callData, contract, abiVersion,
+    }:
+    { amount: number; callData: string; contract: string; abiVersion: number },
   ): Promise<CallContractOptions> {
-    return await snakeToPascalObjKeys(await call(this, 'channels.dry_run.call_contract', {
+    return snakeToPascalObjKeys(await call(this, 'channels.dry_run.call_contract', {
       amount,
       call_data: callData,
       contract_id: contract,
-      abi_version: abiVersion
-    }))
+      abi_version: abiVersion,
+    }));
   }
 
   /**
@@ -866,23 +880,23 @@ export default class Channel {
    * })
    * ```
    */
-  async getContractCall (
-    { caller, contract, round }: { caller: string, contract: string, round: number }
+  async getContractCall(
+    { caller, contract, round }: { caller: string; contract: string; round: number },
   ): Promise<{
-      returnType: string
-      returnValue: string
-      gasPrice: number | BigNumber
-      gasUsed: number | BigNumber
-      height: number
-      log: string
+      returnType: string;
+      returnValue: string;
+      gasPrice: number | BigNumber;
+      gasUsed: number | BigNumber;
+      height: number;
+      log: string;
     }> {
-    return await snakeToPascalObjKeys(
+    return snakeToPascalObjKeys(
       await call(this, 'channels.get.contract_call', {
         caller_id: caller,
         contract_id: contract,
-        round
-      })
-    )
+        round,
+      }),
+    );
   }
 
   /**
@@ -898,14 +912,14 @@ export default class Channel {
    * })
    * ```
    */
-  async getContractState (
-    contract: string
-  ): Promise<{ contract: Contract, contractState: object }> {
-    const result = await call(this, 'channels.get.contract', { pubkey: contract })
-    return await snakeToPascalObjKeys({
+  async getContractState(
+    contract: string,
+  ): Promise<{ contract: Contract; contractState: object }> {
+    const result = await call(this, 'channels.get.contract', { pubkey: contract });
+    return snakeToPascalObjKeys({
       ...result,
-      contract: snakeToPascalObjKeys(result.contract)
-    })
+      contract: snakeToPascalObjKeys(result.contract),
+    });
   }
 
   /**
@@ -916,8 +930,8 @@ export default class Channel {
    * This cleans up all locally stored contract calls and those will no longer be available for
    * fetching and inspection.
    */
-  async cleanContractCalls (): Promise<void> {
-    return await new Promise((resolve, reject) => {
+  async cleanContractCalls(): Promise<void> {
+    return new Promise((resolve, reject) => {
       enqueueAction(
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
@@ -925,15 +939,15 @@ export default class Channel {
           send(channel, {
             jsonrpc: '2.0',
             method: 'channels.clean_contract_calls',
-            params: {}
-          })
+            params: {},
+          });
           return {
             handler: handlers.awaitingCallsPruned,
-            state: { resolve, reject }
-          }
-        }
-      )
-    })
+            state: { resolve, reject },
+          };
+        },
+      );
+    });
   }
 
   /**
@@ -955,37 +969,37 @@ export default class Channel {
    * )
    * ```
    */
-  sendMessage (message: string | ChannelMessage, recipient: string): void {
-    let info = message
+  sendMessage(message: string | ChannelMessage, recipient: string): void {
+    let info = message;
     if (typeof message === 'object') {
-      info = JSON.stringify(message)
+      info = JSON.stringify(message);
     }
     const doSend = (channel: Channel): void => send(channel, {
       jsonrpc: '2.0',
       method: 'channels.message',
-      params: { info, to: recipient }
-    })
+      params: { info, to: recipient },
+    });
     if (this.status() === 'connecting') {
       const onStatusChanged = (status: string): void => {
         if (status !== 'connecting') {
           // For some reason we can't immediately send a message when connection is
           // established. Thus we wait 500ms which seems to work.
-          setTimeout(() => doSend(this), 500)
-          this.off('statusChanged', onStatusChanged)
+          setTimeout(() => doSend(this), 500);
+          this.off('statusChanged', onStatusChanged);
         }
-      }
-      this.on('statusChanged', onStatusChanged)
+      };
+      this.on('statusChanged', onStatusChanged);
     } else {
-      doSend(this)
+      doSend(this);
     }
   }
 
-  static async reconnect (options: ChannelOptions, txParams: any): Promise<Channel> {
-    const { sign } = options
+  static async reconnect(options: ChannelOptions, txParams: any): Promise<Channel> {
+    const { sign } = options;
 
-    return await Channel.initialize({
+    return Channel.initialize({
       ...options,
-      reconnectTx: await sign('reconnect', buildTx(txParams, TX_TYPE.channelReconnect).tx)
-    })
+      reconnectTx: await sign('reconnect', buildTx(txParams, TX_TYPE.channelReconnect).tx),
+    });
   }
 }

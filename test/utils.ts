@@ -1,15 +1,15 @@
-import { AensName } from '../src'
+import { AensName } from '../src';
 
-function randomString (len: number): string {
-  const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let randomString = ''
+function randomString(len: number): string {
+  const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
   for (let i = 0; i < len; i++) {
-    const randomPoz = Math.floor(Math.random() * charSet.length)
-    randomString += charSet.charAt(randomPoz)
+    const randomPoz = Math.floor(Math.random() * charSet.length);
+    randomString += charSet.charAt(randomPoz);
   }
-  return randomString
+  return randomString;
 }
 
-export function randomName (length: number): AensName {
-  return `${randomString(length)}.chain`
+export function randomName(length: number): AensName {
+  return `${randomString(length)}.chain`;
 }

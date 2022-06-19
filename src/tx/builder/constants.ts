@@ -1,30 +1,30 @@
-import { EncodingType } from './../../utils/encoder'
-import BigNumber from 'bignumber.js'
-import { mapObject } from '../../utils/other'
+import BigNumber from 'bignumber.js';
+import { EncodingType } from '../../utils/encoder';
+import { mapObject } from '../../utils/other';
 
 // # AENS
-export type AensName = `${string}.chain`
-export const NAME_TTL = 180000
+export type AensName = `${string}.chain`;
+export const NAME_TTL = 180000;
 // # max number of block into the future that the name is going to be available
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
 // # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
-export const NAME_MAX_TTL = 36000
-export const NAME_MAX_CLIENT_TTL = 84600
-export const CLIENT_TTL = NAME_MAX_CLIENT_TTL
-export const MIN_GAS_PRICE = 1e9
+export const NAME_MAX_TTL = 36000;
+export const NAME_MAX_CLIENT_TTL = 84600;
+export const CLIENT_TTL = NAME_MAX_CLIENT_TTL;
+export const MIN_GAS_PRICE = 1e9;
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
-export const NAME_FEE_MULTIPLIER = 1e14 // 100000000000000
-export const NAME_FEE_BID_INCREMENT = 0.05 // # the increment is in percentage
+export const NAME_FEE_MULTIPLIER = 1e14; // 100000000000000
+export const NAME_FEE_BID_INCREMENT = 0.05; // # the increment is in percentage
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272
-export const NAME_BID_TIMEOUT_BLOCKS = 480 // # ~1 day
+export const NAME_BID_TIMEOUT_BLOCKS = 480; // # ~1 day
 // # this is the max length for a domain that requires a base fee to be paid
-export const NAME_MAX_LENGTH_FEE = 31
-export const NAME_BID_MAX_LENGTH = 12 // # this is the max length for a domain to be part of a bid
+export const NAME_MAX_LENGTH_FEE = 31;
+export const NAME_BID_MAX_LENGTH = 12; // # this is the max length for a domain to be part of a bid
 export enum POINTER_KEY_BY_PREFIX {
   ak = 'account_pubkey',
   ok = 'oracle_pubkey',
   ct = 'contract_pubkey',
-  ch = 'channel'
+  ch = 'channel',
 }
 // # https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
 // # https://github.com/aeternity/protocol/blob/master/AENS.md#protocol-fees-and-protection-times
@@ -60,18 +60,18 @@ export const NAME_BID_RANGES = mapObject({
   4: 1346269,
   3: 2178309,
   2: 3524578,
-  1: 5702887
-}, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)])
+  1: 5702887,
+}, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]);
 
 // # Tag constant for ids (type uint8)
 // # see https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
 // # <<Tag:1/unsigned-integer-unit:8, Hash:32/binary-unit:8>>
-const ID_TAG_ACCOUNT = 1
-const ID_TAG_NAME = 2
-const ID_TAG_COMMITMENT = 3
-const ID_TAG_ORACLE = 4
-const ID_TAG_CONTRACT = 5
-const ID_TAG_CHANNEL = 6
+const ID_TAG_ACCOUNT = 1;
+const ID_TAG_NAME = 2;
+const ID_TAG_COMMITMENT = 3;
+const ID_TAG_ORACLE = 4;
+const ID_TAG_CONTRACT = 5;
+const ID_TAG_CHANNEL = 6;
 
 export const ID_TAG = {
   account: ID_TAG_ACCOUNT,
@@ -79,8 +79,8 @@ export const ID_TAG = {
   commitment: ID_TAG_COMMITMENT,
   oracle: ID_TAG_ORACLE,
   contract: ID_TAG_CONTRACT,
-  channel: ID_TAG_CHANNEL
-}
+  channel: ID_TAG_CHANNEL,
+};
 
 export const PREFIX_ID_TAG = {
   ak: ID_TAG.account,
@@ -88,9 +88,7 @@ export const PREFIX_ID_TAG = {
   cm: ID_TAG.commitment,
   ok: ID_TAG.oracle,
   ct: ID_TAG.contract,
-  ch: ID_TAG.channel
-} as const
+  ch: ID_TAG.channel,
+} as const;
 
-export const ID_TAG_PREFIX = mapObject(
-  PREFIX_ID_TAG, ([key, value]: [EncodingType, number]) => [value, key]
-)
+export const ID_TAG_PREFIX = mapObject(PREFIX_ID_TAG, ([key, value]: [EncodingType, number]) => [value, key]);
