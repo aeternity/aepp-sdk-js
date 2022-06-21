@@ -30,6 +30,7 @@ type Icons = Array<{ src: string; sizes?: string; type?: string; purpose?: strin
 export const RPC_VERSION = 1;
 
 export interface WalletApi {
+  [METHODS.scan]: () => Promise<void>;
   [METHODS.connect]: (
     p: { name: string; icons?: Icons; version: typeof RPC_VERSION; connectNode: boolean }
   ) => Promise<WalletInfo & { node?: Node }>;

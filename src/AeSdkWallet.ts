@@ -221,6 +221,7 @@ export default class AeSdkWallet extends AeSdk {
           this.onDisconnect(id, disconnectParams); // also related info
         },
         {
+          [METHODS.scan]: async () => this.shareWalletInfo(id),
           [METHODS.closeConnection]: (params) => {
             disconnectParams = params;
             this._disconnectRpcClient(id);

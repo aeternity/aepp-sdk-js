@@ -16,6 +16,7 @@
  */
 
 import BrowserConnection from './connection/Browser';
+import { METHODS } from './schema';
 
 /**
  * Browser connection proxy
@@ -26,9 +27,12 @@ import BrowserConnection from './connection/Browser';
  * @returns a function to stop proxying
  */
 export default (con1: BrowserConnection, con2: BrowserConnection): () => void => {
-  con1.connect((msg: any) => con2.sendMessage(msg), () => con2.disconnect());
-  con2.connect((msg: any) => con1.sendMessage(msg), () => con1.disconnect());
-
+  con1.connect((msg: any) => {
+    if (!con2.isConnected() && msg.method === METHODS.scan) {
+      con2.connect((msg: any) => con1.sendMessage(msg), () => con1.disconnect());
+    }
+    con2.sendMessage(msg);
+  }, () => con2.disconnect());
   return () => {
     con1.disconnect();
     con2.disconnect();

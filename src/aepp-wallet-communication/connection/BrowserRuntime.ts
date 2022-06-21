@@ -24,16 +24,22 @@ import BrowserConnection from './Browser';
  * @category aepp wallet communication
  */
 export default class BrowserRuntimeConnection extends BrowserConnection {
-  port: Runtime.Port;
+  port?: Runtime.Port;
 
-  constructor({ port, ...options }: { port: Runtime.Port; debug: boolean }) {
+  setPort: () => Runtime.Port;
+
+  constructor({ port, setPort, ...options }: {
+    port: Runtime.Port; setPort: () => Runtime.Port;
+    debug: boolean;
+  }) {
     super(options);
     this.port = port;
+    this.setPort = setPort;
   }
 
   disconnect(): void {
     super.disconnect();
-    this.port.disconnect();
+    this.port?.disconnect();
   }
 
   connect(
@@ -41,19 +47,20 @@ export default class BrowserRuntimeConnection extends BrowserConnection {
     onDisconnect: () => void,
   ): void {
     super.connect(onMessage, onDisconnect);
-    this.port.onMessage.addListener((message, port) => {
+    this.port = this.port ?? this.setPort();
+    this.port?.onMessage.addListener((message, port) => {
       this.receiveMessage(message);
       onMessage(message, port.name, port);
     });
-    this.port.onDisconnect.addListener(onDisconnect);
+    this.port?.onDisconnect.addListener(onDisconnect);
   }
 
   sendMessage(message: any): void {
     super.sendMessage(message);
-    this.port.postMessage(message);
+    this.port?.postMessage(message);
   }
 
   isConnected(): boolean {
-    return this.port.onMessage.hasListeners();
+    return !!((this.port?.onMessage.hasListeners()) ?? false);
   }
 }

@@ -68,7 +68,6 @@ import {
     const clientId = aeSdk.addRpcClient(connection);
     // share wallet details
     aeSdk.shareWalletInfo(clientId);
-    setInterval(() => aeSdk.shareWalletInfo(clientId), 3000);
   });
 
   console.log('Wallet initialized!');

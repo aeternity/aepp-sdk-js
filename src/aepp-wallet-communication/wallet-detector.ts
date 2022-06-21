@@ -67,6 +67,8 @@ export default (
     onDetected({ wallets, newWallet: wallet });
   }, () => {});
   if (Object.keys(wallets).length > 0) onDetected({ wallets });
-
+  connection.sendMessage({
+    method: METHODS.scan, params: {}, jsonrpc: '2.0',
+  });
   return () => connection.disconnect();
 };

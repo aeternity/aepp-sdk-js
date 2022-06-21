@@ -79,7 +79,7 @@ export default {
           }
         }
 
-        const scannerConnection = new BrowserWindowMessageConnection()
+        const scannerConnection = new BrowserWindowMessageConnection({ target: window })
         const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
       })
     },

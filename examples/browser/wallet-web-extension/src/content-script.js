@@ -3,6 +3,7 @@
 import {
   BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION, connectionProxy,
 } from '@aeternity/aepp-sdk';
+import Browser from 'webextension-polyfill';
 
 (async () => {
   console.log('Waiting until document is ready');
@@ -16,8 +17,7 @@ import {
   });
   console.log('Document is ready');
 
-  const port = browser.runtime.connect();
-  const extConnection = new BrowserRuntimeConnection({ port });
+  const extConnection = new BrowserRuntimeConnection({ setPort: () => Browser.runtime.connect() });
   const pageConnection = new BrowserWindowMessageConnection({
     target: window,
     origin: window.origin,
