@@ -50,7 +50,7 @@ export default abstract class BrowserConnection {
   }
 
   /**
-   * Send message
+   * Receive message
    */
   protected receiveMessage(message: any): void {
     if (this.debug) console.log('Receive message:', message);
