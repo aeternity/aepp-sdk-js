@@ -1,5 +1,4 @@
-/* global browser */
-
+import browser from 'webextension-polyfill';
 import {
   BrowserRuntimeConnection, BrowserWindowMessageConnection, MESSAGE_DIRECTION, connectionProxy,
 } from '@aeternity/aepp-sdk';
