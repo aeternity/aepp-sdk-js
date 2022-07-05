@@ -26,7 +26,8 @@ const bigIntPropertyNames = [
 
 const numberPropertyNames = [
   'time', 'gas', 'gasUsed', 'nameSalt',
-  'nonce', 'nextNonce', 'height', 'blockHeight', 'top', 'topBlockHeight', 'ttl',
+  'nonce', 'nextNonce', 'height', 'blockHeight', 'top', 'topBlockHeight',
+  'ttl', 'nameTtl', 'clientTtl',
   'inbound', 'outbound', 'peerCount', 'pendingTransactionsCount', 'effectiveAtHeight',
   'version', 'solutions',
 ] as const;
