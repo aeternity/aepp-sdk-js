@@ -75,13 +75,16 @@ export async function sendTransaction(
   }
 
   try {
-    const { txHash } = await onNode.postTransaction({ tx }, {
-      requestOptions: {
-        customHeaders: {
-          __queue: `tx-${await onAccount?.address(options).catch(() => '') ?? ''}`,
-        },
-      },
-    });
+    let __queue;
+    try {
+      __queue = onAccount != null ? `tx-${await onAccount.address(options)}` : null;
+    } catch (error) {
+      __queue = null;
+    }
+    const { txHash } = await onNode.postTransaction(
+      { tx },
+      __queue != null ? { requestOptions: { customHeaders: { __queue } } } : {},
+    );
 
     if (waitMined) {
       const pollResult = await poll(txHash, { onNode, ...options });
