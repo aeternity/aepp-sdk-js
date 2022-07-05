@@ -1,6 +1,8 @@
 import nacl from 'tweetnacl';
 import { v4 as uuid } from '@aeternity/uuid';
-import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min';
+// js extension is required for mjs build
+// eslint-disable-next-line import/extensions
+import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min.js';
 import { getAddressFromPriv } from './crypto';
 import { bytesToHex, hexToBytes } from './bytes';
 import { InvalidPasswordError } from './errors';
