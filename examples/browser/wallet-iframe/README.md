@@ -9,5 +9,6 @@ This is a sample wallet that expects an æpp to be loaded into its iframe.
 3. Visit [localhost:9000](http://localhost:9000) to see the æpp included into this wallet
 
 ## Installation and running
+Prerequisite: [refer SDK installation](../README.md#setup-info)
 1. Install required dependencies with `npm install`
 1. Start the application `npm run serve`

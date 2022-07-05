@@ -10,5 +10,6 @@ This is a sample æpp that compiles contracts using the æternity JavaScript SDK
 4. Connect this æpp to a choosed wallet according to its readme
 
 ## Installation and running
+Prerequisite: [refer SDK installation](../README.md#setup-info)
 1. Install required dependencies with `npm install`
 1. Start the application `npm run serve`
