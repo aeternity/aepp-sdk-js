@@ -316,11 +316,11 @@ Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
       const instanceOptions = await this._getOptions();
       const lastArg = args[args.length - 1];
       if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
-        Object.assign(lastArg, {
+        args[args.length - 1] = {
           ...instanceOptions,
           ...lastArg,
           ...lastArg.onAccount != null && { onAccount: this._resolveAccount(lastArg.onAccount) },
-        });
+        };
       } else args.push(instanceOptions);
       return handler(...args);
     },
