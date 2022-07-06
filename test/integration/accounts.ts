@@ -225,18 +225,9 @@ describe('Accounts', () => {
     });
   });
 
-  describe('can be configured to return th', () => {
-    it('on creation', async () => {
-      const aeSdkNew = await getSdk();
-      const th = await aeSdkNew.spend(1, receiver);
-      th.should.be.a('object');
-      th.hash.slice(0, 3).should.equal('th_');
-    });
-
-    it('on call', async () => {
-      const th = await aeSdk.spend(1, receiver);
-      th.should.be.a('object');
-      th.hash.slice(0, 3).should.equal('th_');
-    });
+  it('spend without waiting for mining', async () => {
+    const th = await aeSdk.spend(1, receiver, { waitMined: false });
+    th.should.be.a('object');
+    th.hash.slice(0, 3).should.equal('th_');
   });
 });
