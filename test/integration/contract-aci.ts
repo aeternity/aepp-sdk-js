@@ -286,17 +286,6 @@ describe('Contract instance', () => {
     result.callerId.should.be.equal(await onAccount.address());
   });
 
-  it('deploys and calls contract without waiting for mining', async () => {
-    testContract.deployInfo = {};
-    const deployed = await testContract.methods.init('test', 1, 'hahahaha', { waitMined: false });
-    await aeSdk.poll(deployed.transaction);
-    expect(deployed.result).to.be.equal(undefined);
-    const result = await testContract.methods.intFn.send(2, { waitMined: false });
-    expect(result.result).to.be.equal(undefined);
-    expect(result.txData).to.not.be.equal(undefined);
-    await aeSdk.poll(result.hash);
-  });
-
   it('fails on paying to not payable function', async () => {
     const amount = 100;
     await expect(testContract.methods.intFn.send(1, { amount }))
