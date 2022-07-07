@@ -178,8 +178,8 @@ export class NoSerializerFoundError extends BaseError {
  * @category exception
  */
 export class RequestTimedOutError extends BaseError {
-  constructor(requestTime: number) {
-    super(`Giving up after ${Math.round(requestTime)} ms`);
+  constructor(height: number) {
+    super(`Giving up at height ${height}`);
     this.name = 'RequestTimedOutError';
   }
 }
