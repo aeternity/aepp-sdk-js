@@ -21,7 +21,7 @@ import { isNameValid, produceNameId, decode } from './tx/builder/helpers';
 import { DRY_RUN_ACCOUNT, AensName } from './tx/builder/schema';
 import {
   AensPointerContextError, DryRunError, InvalidAensNameError, InvalidTxError,
-  RequestTimedOutError, TxTimedOutError, TxNotInChainError, InternalError,
+  TxTimedOutError, TxNotInChainError, InternalError,
 } from './utils/errors';
 import Node, { TransformNodeType } from './Node';
 import {
@@ -207,26 +207,21 @@ export async function height({ onNode }: { onNode: Node }): Promise<number> {
  * @param height - Height to wait for
  * @param options - Options
  * @param options.interval - Interval (in ms) at which to poll the chain
- * @param options.attempts - Number of polling attempts after which to fail
  * @param options.onNode - Node to use
  * @returns Current chain height
  */
 export async function awaitHeight(
   height: number,
-  {
-    interval, attempts = 20, onNode, ...options
-  }:
-  { interval?: number; attempts?: number; onNode: Node }
-  & Parameters<typeof _getPollInterval>[1],
+  { interval, onNode, ...options }:
+  { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<number> {
   interval ??= _getPollInterval('block', options);
   let currentHeight;
-  for (let i = 0; i < attempts; i += 1) {
-    if (i !== 0) await pause(interval);
+  do {
+    if (currentHeight != null) await pause(interval);
     currentHeight = (await onNode.getCurrentKeyBlockHeight()).height;
-    if (currentHeight >= height) return currentHeight;
-  }
-  throw new RequestTimedOutError((attempts - 1) * interval, currentHeight, height);
+  } while (currentHeight < height);
+  return currentHeight;
 }
 
 /**
