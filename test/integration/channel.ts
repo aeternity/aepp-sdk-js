@@ -1144,7 +1144,7 @@ describe('Channel', () => {
     // })
     await ch.state().should.eventually.be.fulfilled;
     await pause(10 * 1000);
-  });
+  }).timeout(80000);
 
   it('can post backchannel update', async () => {
     initiatorCh.disconnect();
