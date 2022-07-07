@@ -45,6 +45,15 @@ describe('Accounts', () => {
       .addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: true });
   });
 
+  it('removes account', async () => {
+    const [address] = aeSdk.addresses();
+    const account = aeSdk.accounts[address];
+    aeSdk.removeAccount(address);
+    expect(Object.keys(aeSdk.accounts)).to.have.length(1);
+    expect(aeSdk.selectedAddress).to.be.equal(undefined);
+    await aeSdk.addAccount(account, { select: true });
+  });
+
   it('determining the balance with 0 balance', async () => {
     await aeSdkNoCoins.getBalance(await aeSdkNoCoins.address()).should.eventually.be.equal('0');
   });
