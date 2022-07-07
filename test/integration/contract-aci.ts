@@ -149,7 +149,7 @@ describe('Contract instance', () => {
   let testContractBytecode: EncodedData<'cb'>;
 
   before(async () => {
-    aeSdk = await getSdk();
+    aeSdk = await getSdk(2);
     testContractAci = await aeSdk.compilerApi
       .generateACI({ code: testContractSource, options: { fileSystem } });
     // @ts-expect-error should be changed on api

@@ -33,10 +33,7 @@ describe('Oracle', () => {
   const queryResponse = "{'tmp': 30}";
 
   before(async () => {
-    aeSdk = await getSdk();
-    const account = generateKeyPair();
-    await aeSdk.spend(1e20, account.publicKey);
-    await aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true });
+    aeSdk = await getSdk(1);
   });
 
   it('Register Oracle with 5000 TTL', async () => {

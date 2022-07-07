@@ -20,7 +20,7 @@ import {
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
-import { getSdk, BaseAe, networkId } from '.';
+import { getSdk } from '.';
 import { generateKeyPair } from '../../src/utils/crypto';
 import { pause } from '../../src/utils/other';
 import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder';
@@ -94,7 +94,7 @@ describe('Channel', () => {
 
   before(async () => {
     aeSdkInitiatior = await getSdk();
-    aeSdkResponder = await BaseAe({ networkId, accounts: [] });
+    aeSdkResponder = await getSdk(0);
     await aeSdkResponder.addAccount(
       new MemoryAccount({ keypair: generateKeyPair() }),
       { select: true },

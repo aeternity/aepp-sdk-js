@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
-import { getSdk, BaseAe, networkId } from '.';
+import { getSdk } from '.';
 import { generateKeyPair } from '../../src/utils/crypto';
 import MemoryAccount from '../../src/account/Memory';
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter';
@@ -33,36 +33,28 @@ import {
 import { AeSdk } from '../../src';
 
 describe('Accounts', () => {
-  let aeSdk: AeSdk; let
-    aeSdkWithoutAccount: AeSdk;
-
-  before(async () => {
-    aeSdk = await getSdk();
-    aeSdkWithoutAccount = await getSdk({ withoutAccount: true });
-  });
-
+  let aeSdk: AeSdk;
+  let aeSdkNoCoins: AeSdk;
   const receiverKey = generateKeyPair();
   const receiver = receiverKey.publicKey;
 
-  describe('fails on unknown keypairs', () => {
-    let wallet: any;
-
-    before(async () => {
-      wallet = await getSdk();
-      await wallet.addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: true });
-    });
-
-    it('determining the balance', async () => {
-      await wallet.getBalance(await wallet.address()).should.eventually.be.equal('0');
-    });
-
-    it('spending coins', async () => {
-      await wallet.spend(1, receiver).should.be.rejectedWith(Error);
-    });
-
-    it('spending negative amount of coins', () => expect(wallet.spend(-1, receiver))
-      .to.be.rejectedWith(InvalidTxParamsError, 'Transaction build error. {"amount":"-1 must be >= 0"}'));
+  before(async () => {
+    aeSdk = await getSdk(2);
+    aeSdkNoCoins = await getSdk(0);
+    await aeSdkNoCoins
+      .addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: true });
   });
+
+  it('determining the balance with 0 balance', async () => {
+    await aeSdkNoCoins.getBalance(await aeSdkNoCoins.address()).should.eventually.be.equal('0');
+  });
+
+  it('spending coins with 0 balance', async () => {
+    await aeSdkNoCoins.spend(1, receiver).should.be.rejectedWith(Error);
+  });
+
+  it('spending negative amount of coins', () => expect(aeSdk.spend(-1, receiver))
+    .to.be.rejectedWith(InvalidTxParamsError, 'Transaction build error. {"amount":"-1 must be >= 0"}'));
 
   it('determines the balance using `balance`', async () => {
     await aeSdk.getBalance(await aeSdk.address()).should.eventually.be.a('string');
@@ -134,15 +126,14 @@ describe('Accounts', () => {
 
   it('spends big amount of coins', async () => {
     const bigAmount = 10n ** 31n + 10n ** 17n;
-    const genesis = await BaseAe({ networkId });
-    const receiverWallet = generateKeyPair();
-    const ret = await genesis.spend(bigAmount.toString(), receiverWallet.publicKey);
+    const { publicKey } = generateKeyPair();
+    const ret = await aeSdk.spend(bigAmount.toString(), publicKey);
 
-    const balanceAfter = await aeSdk.getBalance(receiverWallet.publicKey);
+    const balanceAfter = await aeSdk.getBalance(publicKey);
     balanceAfter.should.be.equal(bigAmount.toString());
     ret.should.have.property('tx');
     if (ret.tx == null) throw new UnexpectedTsError();
-    ret.tx.should.include({ amount: bigAmount, recipientId: receiverWallet.publicKey });
+    ret.tx.should.include({ amount: bigAmount, recipientId: publicKey });
   });
 
   it('Get Account by block height/hash', async () => {
@@ -187,6 +178,7 @@ describe('Accounts', () => {
     });
 
     it('Fail on no accounts', async () => {
+      const aeSdkWithoutAccount = await getSdk(0);
       await expect(aeSdkWithoutAccount.spend(1, await aeSdk.address()))
         .to.be.rejectedWith(
           TypeError,
