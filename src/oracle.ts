@@ -170,7 +170,6 @@ interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQue
  * @param oracleId - Oracle public key
  * @param queryId - Oracle Query id
  * @param options - Options object
- * @param options.attempts - Poll attempts
  * @param options.interval - Poll interval
  * @param options.onNode - Node to use
  * @returns OracleQuery object
@@ -178,19 +177,21 @@ interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQue
 export async function pollForQueryResponse(
   oracleId: EncodedData<'ok'>,
   queryId: EncodedData<'oq'>,
-  {
-    attempts = 20, interval, onNode, ...options
-  }:
-  { attempts?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
+  { interval, onNode, ...options }:
+  { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<string> {
   interval ??= _getPollInterval('microblock', options);
-  for (let i = 0; i < attempts; i += 1) {
-    if (i > 0) await pause(interval);
-    const { response } = await onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId);
+  let height;
+  let ttl;
+  let response;
+  do {
+    if (height != null) await pause(interval);
+    ({ response, ttl } = await onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId));
     const responseBuffer = decode(response as EncodedData<'or'>);
     if (responseBuffer.length > 0) return responseBuffer.toString();
-  }
-  throw new RequestTimedOutError((attempts - 1) * interval);
+    height = await this.height();
+  } while (ttl >= height);
+  throw new RequestTimedOutError(height);
 }
 
 /**
