@@ -21,7 +21,7 @@ import { getSdk } from './index';
 import {
   commitmentHash, oracleQueryId, decode, encode,
 } from '../../src/tx/builder/helpers';
-import { GAS_MAX, ORACLE_TTL_TYPES, TX_TYPE } from '../../src/tx/builder/schema';
+import { ORACLE_TTL_TYPES, TX_TYPE } from '../../src/tx/builder/schema';
 import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter';
 import { AeSdk } from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
@@ -52,6 +52,7 @@ const contractSource = `
 contract Identity =
   entrypoint getArg(x : int) = x
 `;
+const gasLimit = 5e6;
 
 // Name
 const nameSalt = 4204563566073083;
@@ -117,24 +118,24 @@ describe('Transaction', () => {
     }),
   ], [
     'contract create',
-    'tx_+LAqAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNi4xLjAAgwcAA4ZHcyzkwAAAAACDGBf4hDuaygCHKxFE1kQfP+Jcll0=',
+    'tx_+LAqAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNi4xLjAAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfPxOlnVo=',
     async () => aeSdk.buildTx(TX_TYPE.contractCreate, {
       nonce,
       ownerId: address,
       code: await contract.compile(),
       amount,
-      gasLimit: GAS_MAX,
+      gasLimit,
       callData: contract.calldata.encode('Identity', 'init', []),
     }),
   ], [
     'contract call',
-    'tx_+GMrAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQU7e5ChtHAGM1Nh0MVEV74SbrYb1b5FQ3WBd7OBpwALyQOGpYvVcSgAAACDGBf4hDuaygCIKxGAeCCSGwQL3c3m',
+    'tx_+GMrAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQU7e5ChtHAGM1Nh0MVEV74SbrYb1b5FQ3WBd7OBpwALyQOGpYvVcSgAAACDTEtAhDuaygCIKxGAeCCSGwT8YkzY',
     async () => aeSdk.buildTx(TX_TYPE.contractCall, {
       nonce,
       callerId: address,
       contractId,
       amount,
-      gasLimit: GAS_MAX,
+      gasLimit,
       callData: contract.calldata.encode('Identity', 'getArg', [2]),
     }),
   ], [
