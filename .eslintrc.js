@@ -28,7 +28,6 @@ module.exports = {
     // TODO: enable rules from below
     'no-underscore-dangle': 'off',
     'no-param-reassign': 'off',
-    'import/no-cycle': 'off',
     'no-console': 'off',
     'no-await-in-loop': 'off',
     'no-void': 'off',

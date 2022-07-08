@@ -20,6 +20,7 @@ import { decode, EncodedData } from '../utils/encoder';
 import { TX_TYPE } from '../tx/builder/schema';
 import { getNetworkId } from '../Node';
 import { concatBuffers } from '../utils/other';
+import type { createMetaTx } from '../contract/ga';
 
 /**
  * Check is provided object looks like an instance of AccountBase
@@ -53,7 +54,12 @@ export default abstract class AccountBase {
    */
   async signTransaction(
     tx: EncodedData<'tx'>,
-    { innerTx, networkId, ...options }: { innerTx?: boolean; networkId?: string } = {},
+    { innerTx, networkId, ...options }: {
+      innerTx?: boolean;
+      networkId?: string;
+      authData?: Parameters<typeof createMetaTx>[1];
+      authFun?: Parameters<typeof createMetaTx>[2];
+    } & Omit<Partial<Parameters<typeof createMetaTx>[3]>, 'onAccount'> = {},
   ): Promise<EncodedData<'tx'>> {
     const prefixes = [await this.getNetworkId({ networkId })];
     if (innerTx === true) prefixes.push('inner_tx');

@@ -175,7 +175,7 @@ export default async function getContractInstance({
   validateBytecode,
   ...otherOptions
 }: {
-  onAccount: AccountBase;
+  onAccount?: AccountBase;
   onCompiler: Compiler;
   onNode: Node;
   source?: string;

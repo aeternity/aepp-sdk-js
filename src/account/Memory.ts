@@ -18,8 +18,9 @@ import AccountBase from './Base';
 import { sign, isValidKeypair } from '../utils/crypto';
 import { isHex } from '../utils/string';
 import { decode } from '../tx/builder/helpers';
-import { InvalidKeypairError, MissingParamError } from '../utils/errors';
+import { ArgumentError, InvalidKeypairError, MissingParamError } from '../utils/errors';
 import { EncodedData } from '../utils/encoder';
+import { createMetaTx } from '../contract/ga';
 
 const secrets = new WeakMap();
 
@@ -75,6 +76,20 @@ export default class AccountMemory extends AccountBase {
   async sign(data: string | Uint8Array): Promise<Uint8Array> {
     if (this.isGa) throw new InvalidKeypairError('You are trying to sign data using generalized account without keypair');
     return sign(data, secrets.get(this).secretKey);
+  }
+
+  async signTransaction(
+    tx: EncodedData<'tx'>,
+    options: Parameters<AccountBase['signTransaction']>[1] = {},
+  ): Promise<EncodedData<'tx'>> {
+    if (!this.isGa || options.innerTx === true) return super.signTransaction(tx, options);
+    const {
+      authData, authFun, onCompiler, onNode,
+    } = options;
+    if (authFun == null || authData == null || onCompiler == null || onNode == null) {
+      throw new ArgumentError('authData, authFun, onCompiler, onNode', 'provided', null);
+    }
+    return createMetaTx(tx, authData, authFun, { onCompiler, onNode, onAccount: this });
   }
 
   async address(): Promise<EncodedData<'ak'>> {

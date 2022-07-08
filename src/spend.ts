@@ -20,9 +20,8 @@ import {
 } from './chain';
 import { _buildTx, BuildTxOptions } from './tx';
 import { buildTxHash, unpackTx } from './tx/builder';
-import { ArgumentError, UnexpectedTsError } from './utils/errors';
+import { ArgumentError } from './utils/errors';
 import { EncodedData } from './utils/encoder';
-import { createMetaTx } from './contract/ga';
 import { TX_TYPE, AensName } from './tx/builder/schema';
 import AccountBase from './account/Base';
 
@@ -36,23 +35,12 @@ import AccountBase from './account/Base';
  * @returns Transaction
  */
 export async function send(tx: EncodedData<'tx'>, options: SendOptions): Promise<SendReturnType> {
-  const { contractId, authFun = undefined } = options.innerTx === true
-    ? { contractId: null }
-    : await getAccount(await options.onAccount.address(options), options);
+  // TODO: detect authFun in AccountGa
+  const authFun = options.innerTx === true
+    ? undefined
+    : (await getAccount(await options.onAccount.address(options), options)).authFun;
 
-  let signed;
-  if (contractId != null) {
-    // TODO: not required arguments become required depending on account type, can ga be extracted?
-    if (authFun == null) throw new UnexpectedTsError();
-    if (options.authData == null) throw new ArgumentError('authData', 'provided', options.authData);
-    const { onCompiler, onNode, onAccount } = options;
-    if (onCompiler == null || onNode == null) {
-      throw new ArgumentError('onCompiler, onNode', 'provided', null);
-    }
-    signed = await createMetaTx(tx, options.authData, authFun, { onCompiler, onNode, onAccount });
-  } else {
-    signed = await options.onAccount.signTransaction(tx, options);
-  }
+  const signed = await options.onAccount.signTransaction(tx, { ...options, authFun });
 
   return options.innerTx === true
     ? { hash: buildTxHash(signed), rawTx: signed }
@@ -60,10 +48,7 @@ export async function send(tx: EncodedData<'tx'>, options: SendOptions): Promise
 }
 
 type SendOptionsType = Parameters<AccountBase['signTransaction']>[1]
-& Parameters<typeof sendTransaction>[1] & Partial<Parameters<typeof createMetaTx>[3]> & {
-  onAccount: AccountBase;
-  authData?: Parameters<typeof createMetaTx>[1];
-};
+& Parameters<typeof sendTransaction>[1] & { onAccount: AccountBase };
 export interface SendOptions extends SendOptionsType {}
 interface SendReturnType extends Awaited<ReturnType<typeof sendTransaction>> {}
 
