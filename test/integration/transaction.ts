@@ -17,7 +17,7 @@
 
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { BaseAe, spendPromise, publicKey } from './index';
+import { getSdk } from './index';
 import {
   commitmentHash, oracleQueryId, decode, encode,
 } from '../../src/tx/builder/helpers';
@@ -59,13 +59,12 @@ const commitmentId = commitmentHash(name, nameSalt);
 
 describe('Transaction', () => {
   let aeSdk: AeSdk;
-  const address = publicKey;
+  const address = 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR';
   const oracleId = encode(decode(address), 'ok');
   let contract: any;
 
   before(async () => {
-    aeSdk = await BaseAe();
-    await spendPromise;
+    aeSdk = await getSdk(0);
     contract = await aeSdk.getContractInstance({ source: contractSource });
   });
 

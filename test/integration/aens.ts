@@ -27,12 +27,10 @@ import { AeSdk } from '../../src';
 
 describe('Aens', () => {
   let aeSdk: AeSdk;
-  const account = generateKeyPair();
   const name = randomName(13); // 13 name length doesn't trigger auction
 
   before(async () => {
-    aeSdk = await getSdk();
-    await aeSdk.spend('1000000000000000', account.publicKey);
+    aeSdk = await getSdk(2);
   });
 
   it('claims names', async () => {

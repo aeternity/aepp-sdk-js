@@ -149,7 +149,7 @@ describe('Contract instance', () => {
   let testContractBytecode: EncodedData<'cb'>;
 
   before(async () => {
-    aeSdk = await getSdk();
+    aeSdk = await getSdk(2);
     testContractAci = await aeSdk.compilerApi
       .generateACI({ code: testContractSource, options: { fileSystem } });
     // @ts-expect-error should be changed on api
@@ -284,17 +284,6 @@ describe('Contract instance', () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
     const { result } = await testContract.methods.init.get('test', 1, 'hahahaha', { onAccount });
     result.callerId.should.be.equal(await onAccount.address());
-  });
-
-  it('deploys and calls contract without waiting for mining', async () => {
-    testContract.deployInfo = {};
-    const deployed = await testContract.methods.init('test', 1, 'hahahaha', { waitMined: false });
-    await aeSdk.poll(deployed.transaction);
-    expect(deployed.result).to.be.equal(undefined);
-    const result = await testContract.methods.intFn.send(2, { waitMined: false });
-    expect(result.result).to.be.equal(undefined);
-    expect(result.txData).to.not.be.equal(undefined);
-    await aeSdk.poll(result.hash);
   });
 
   it('fails on paying to not payable function', async () => {

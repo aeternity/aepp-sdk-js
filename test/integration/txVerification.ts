@@ -27,7 +27,7 @@ describe('Verify Transaction', () => {
     const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
       senderId: await aeSdk.address(),
       recipientId: await aeSdk.address(),
-      amount: 1e30,
+      amount: 1e50,
       fee: '1000',
       nonce: 1,
       ttl: 2,

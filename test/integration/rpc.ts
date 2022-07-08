@@ -43,11 +43,12 @@ import {
   UnexpectedTsError,
   UnknownRpcClientError,
   UnsubscribedAccountError,
+  AccountBase,
 } from '../../src';
 import { concatBuffers } from '../../src/utils/other';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
 import {
-  account, compilerUrl, ignoreVersion, networkId, spendPromise, url,
+  getSdk, ignoreVersion, networkId, url,
 } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
 import { EncodedData, EncodingType } from '../../src/utils/encoder';
@@ -97,6 +98,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
   });
   const handlerReject = (): void => { throw new Error('test reject'); };
   const handlerRejectPromise = async (): Promise<void> => { throw new Error('test reject'); };
+  let account: AccountBase;
+  let accountAddress: EncodedData<'ak'>;
 
   describe('New RPC Wallet-AEPP: AEPP node', () => {
     const keypair = generateKeyPair();
@@ -104,9 +107,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
     let wallet: AeSdkWallet;
 
     before(async () => {
-      await spendPromise;
+      [account] = Object.values((await getSdk()).accounts);
+      accountAddress = await account.address();
       wallet = new AeSdkWallet({
-        compilerUrl,
         nodes: [{ name: 'local', instance: node }],
         id: 'test',
         type: WALLET_TYPE.window,
@@ -118,7 +121,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         onMessageSign: handlerRejectPromise,
         onDisconnect() {},
       });
-      await wallet.addAccount(new MemoryAccount({ keypair: account }), { select: true });
+      await wallet.addAccount(account, { select: true });
       await wallet.addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: false });
       aepp = new AeSdkAepp({
         name: 'AEPP',
@@ -201,7 +204,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       subscriptionResponse.subscription.should.be.an('array');
       subscriptionResponse.subscription.filter((e) => e === 'connected').length.should.be.equal(1);
       subscriptionResponse.address.current.should.be.an('object');
-      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(account.publicKey);
+      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(accountAddress);
       subscriptionResponse.address.connected.should.be.an('object');
       Object.keys(subscriptionResponse.address.connected).length.should.be.equal(1);
     });
@@ -217,7 +220,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Get address: subscribed for accounts', async () => {
-      (await aepp.address()).should.be.equal(account.publicKey);
+      (await aepp.address()).should.be.equal(accountAddress);
     });
 
     it('Ask for address: subscribed for accounts -> wallet deny', async () => {
@@ -232,7 +235,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       wallet.onAskAccounts = () => {};
       const addressees = await aepp.askAddresses();
       addressees.length.should.be.equal(2);
-      addressees[0].should.be.equal(account.publicKey);
+      addressees[0].should.be.equal(accountAddress);
     });
 
     it('Not authorize', async () => {
@@ -267,7 +270,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         amount: 0,
         payload: 'zerospend',
       });
-      await expect(aepp.signTransaction(tx, { onAccount: account.publicKey }))
+      await expect(aepp.signTransaction(tx, { onAccount: accountAddress }))
         .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
     });
 
@@ -339,12 +342,12 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Sign message using custom account', async () => {
       wallet.onMessageSign = async (_aeppId, params) => {
-        if (params.onAccount === account.publicKey) {
-          return { onAccount: new MemoryAccount({ keypair: account }) };
+        if (params.onAccount === accountAddress) {
+          return { onAccount: account };
         }
         throw new Error('Shouldn\'t be reachable');
       };
-      const onAccount = account.publicKey;
+      const onAccount = accountAddress;
       const messageSig = await aepp.signMessage('test', { onAccount });
       messageSig.should.be.instanceof(Buffer);
       const isValid = await aepp.verifyMessage('test', messageSig, { onAccount });
@@ -469,7 +472,6 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     before(async () => {
       wallet = new AeSdkWallet({
-        compilerUrl,
         nodes: [{ name: 'local', instance: node }],
         id: 'test',
         type: WALLET_TYPE.window,
@@ -481,7 +483,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         onMessageSign: handlerRejectPromise,
         onDisconnect() {},
       });
-      await wallet.addAccount(new MemoryAccount({ keypair: account }), { select: true });
+      await wallet.addAccount(account, { select: true });
       aepp = new AeSdkAepp({
         name: 'AEPP',
         onNetworkChange() {},
@@ -508,7 +510,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       subscriptionResponse.subscription.should.be.an('array');
       subscriptionResponse.subscription.filter((e) => e === 'connected').length.should.be.equal(1);
       subscriptionResponse.address.current.should.be.an('object');
-      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(account.publicKey);
+      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(accountAddress);
       subscriptionResponse.address.connected.should.be.an('object');
       Object.keys(subscriptionResponse.address.connected).length.should.be.equal(0);
     });

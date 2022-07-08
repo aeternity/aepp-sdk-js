@@ -17,11 +17,9 @@
 import { expect } from 'chai';
 import { before, describe, it } from 'mocha';
 import { randomName } from '../utils';
+import { getSdk } from '.';
 import {
-  BaseAe, getSdk, publicKey, compilerUrl,
-} from '.';
-import {
-  IllegalArgumentError, NodeInvocationError, MemoryAccount, generateKeyPair,
+  IllegalArgumentError, NodeInvocationError,
   commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, salt, UnexpectedTsError, AeSdk,
 } from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
@@ -124,11 +122,7 @@ describe('Contract', () => {
   let deployed: ContractInstance['deployInfo'];
 
   before(async () => {
-    aeSdk = await getSdk();
-    // TODO: option of getSdk to have accounts without genesis
-    aeSdk.removeAccount(aeSdk.addresses()[1]);
-    await aeSdk.addAccount(new MemoryAccount({ keypair: generateKeyPair() }));
-    await aeSdk.spend(1e18, aeSdk.addresses()[1]);
+    aeSdk = await getSdk(2);
   });
 
   it('compiles Sophia code', async () => {
@@ -211,11 +205,7 @@ describe('Contract', () => {
   });
 
   it('Dry-run without accounts', async () => {
-    const aeSdk = await BaseAe();
-    aeSdk.removeAccount(publicKey);
-    aeSdk.addresses().length.should.be.equal(0);
-    const address = await aeSdk.address().catch(() => false);
-    address.should.be.equal(false);
+    const aeSdk = await getSdk(0);
     const contract = await aeSdk.getContractInstance({
       source: identityContract, contractAddress: deployed.address,
     });
@@ -326,10 +316,11 @@ describe('Contract', () => {
     });
 
     it('Use invalid compiler url', async () => {
+      const url = aeSdk.compilerApi.$host;
       aeSdk.setCompilerUrl('https://compiler.aepps.comas');
       await expect(aeSdk.compilerApi.generateACI({ code: 'test', options: {} }))
         .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas');
-      aeSdk.setCompilerUrl(compilerUrl);
+      aeSdk.setCompilerUrl(url);
     });
   });
 

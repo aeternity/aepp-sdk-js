@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
-import { getSdk, BaseAe } from '.';
+import { getSdk } from '.';
 import {
   AeSdk, generateKeyPair, MemoryAccount, TX_TYPE, UnexpectedTsError,
 } from '../../src';
@@ -68,12 +68,13 @@ describe('Paying for transaction of another account', () => {
   let payingContract: ContractInstance;
 
   it('pays for contract deployment', async () => {
-    aeSdkNotPayingFee = await BaseAe({
-      withoutGenesisAccount: true,
-      accounts: [new MemoryAccount({ keypair: generateKeyPair() })],
+    aeSdkNotPayingFee = await getSdk(0);
+    await aeSdkNotPayingFee
+      .addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: true });
+    aeSdkNotPayingFee._options = {
       waitMined: false,
       innerTx: true,
-    });
+    };
     const contract = await aeSdkNotPayingFee.getContractInstance({ source: contractSource });
     const { rawTx: contractDeployTx, address } = await contract.deploy([42]);
     contractAddress = address;

@@ -24,13 +24,13 @@ import { AeSdk, TX_TYPE, UnexpectedTsError } from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
 
 describe('Node Chain', () => {
-  let aeSdk: AeSdk; let
-    aeSdkWithoutAccount: AeSdk;
+  let aeSdk: AeSdk;
+  let aeSdkWithoutAccount: AeSdk;
   const { publicKey } = generateKeyPair();
 
   before(async () => {
     aeSdk = await getSdk();
-    aeSdkWithoutAccount = await getSdk({ withoutAccount: true });
+    aeSdkWithoutAccount = await getSdk(0);
   });
 
   it('determines the height', async () => {
