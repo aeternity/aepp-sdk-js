@@ -1,7 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
-import { ValidatorResult } from '../tx/validator';
-import { EncodedData } from './encoder';
 
 /**
  * aepp-sdk originated error
@@ -687,22 +685,6 @@ export class InvalidSignatureError extends TransactionError {
   constructor(message: string) {
     super(message);
     this.name = 'InvalidSignatureError';
-  }
-}
-
-/**
- * @category exception
- */
-export class InvalidTxError extends TransactionError {
-  validation: ValidatorResult[];
-
-  transaction: EncodedData<'tx'>;
-
-  constructor(message: string, validation: ValidatorResult[], transaction: EncodedData<'tx'>) {
-    super(message);
-    this.name = 'InvalidTxError';
-    this.validation = validation;
-    this.transaction = transaction;
   }
 }
 

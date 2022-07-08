@@ -1,3 +1,5 @@
+export * from './methods';
+
 /**
  * @deprecated use NamePointer from apis/node instead
  * @hidden

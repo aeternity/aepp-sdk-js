@@ -151,7 +151,7 @@ export async function createMetaTx(
   const authCallData = authData.callData ?? await (async () => {
     if (authData.source == null || authData.args == null) throw new InvalidAuthDataError('Auth data must contain source code and arguments.');
     const contract = await getContractInstance({
-      onAccount, onCompiler, onNode, source: authData.source,
+      onCompiler, onNode, source: authData.source,
     });
     return contract.calldata.encode(contract._name, authFnName, authData.args);
   })();
@@ -164,6 +164,7 @@ export async function createMetaTx(
       ...wrappedTx,
       tx: wrappedTx.txObject,
     },
+    // TODO: accept an address instead
     gaId: await onAccount.address(options),
     abiVersion,
     authData: authCallData,

@@ -41,7 +41,7 @@ import {
   ChannelConnectionError,
   UnexpectedChannelMessageError,
 } from '../utils/errors';
-import Channel from '.';
+import type Channel from '.';
 import { TX_TYPE } from '../tx/builder/schema';
 
 export async function appendSignature(

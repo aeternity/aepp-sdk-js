@@ -18,7 +18,7 @@
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { EventEmitter } from 'events';
 import BigNumber from 'bignumber.js';
-import Channel from '.';
+import type Channel from '.';
 import JsonBig from '../utils/json-big';
 import { pascalToSnake } from '../utils/string';
 import { EncodedData } from '../utils/encoder';

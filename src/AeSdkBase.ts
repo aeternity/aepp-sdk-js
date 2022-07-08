@@ -5,6 +5,7 @@ import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
 import * as contractMethods from './contract/methods';
 import * as contractGaMethods from './contract/ga';
+import * as deprecatedMethods from './deprecated/methods';
 import { _buildTx } from './tx';
 import { mapObject } from './utils/other';
 import Node, { getNetworkId } from './Node';
@@ -272,15 +273,17 @@ class AeSdkBase {
 }
 
 const { _buildTx: _, ...txMethodsOther } = txMethods;
+const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
 
 const methods = {
-  ...chainMethods,
+  ...chainMethodsOther,
   ...txMethodsOther,
   ...aensMethods,
   ...spendMethods,
   ...oracleMethods,
   ...contractMethods,
   ...contractGaMethods,
+  ...deprecatedMethods,
 } as const;
 
 type RequiredKeys<T> = {

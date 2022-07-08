@@ -15,12 +15,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
-import verifyTransaction from './tx/validator';
+import verifyTransaction, { ValidatorResult } from './tx/validator';
 import { pause } from './utils/other';
 import { isNameValid, produceNameId, decode } from './tx/builder/helpers';
 import { DRY_RUN_ACCOUNT, AensName } from './tx/builder/schema';
 import {
-  AensPointerContextError, DryRunError, InvalidAensNameError, InvalidTxError,
+  AensPointerContextError, DryRunError, InvalidAensNameError, TransactionError,
   TxTimedOutError, TxNotInChainError, InternalError,
 } from './utils/errors';
 import Node, { TransformNodeType } from './Node';
@@ -44,6 +44,22 @@ export function _getPollInterval(
     microblock: _microBlockCycle,
   }[type];
   return Math.min(base / 3, _maxPollInterval);
+}
+
+/**
+ * @category exception
+ */
+export class InvalidTxError extends TransactionError {
+  validation: ValidatorResult[];
+
+  transaction: EncodedData<'tx'>;
+
+  constructor(message: string, validation: ValidatorResult[], transaction: EncodedData<'tx'>) {
+    super(message);
+    this.name = 'InvalidTxError';
+    this.validation = validation;
+    this.transaction = transaction;
+  }
 }
 
 /**
