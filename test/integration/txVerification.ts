@@ -4,9 +4,9 @@ import { getSdk } from '.';
 import { generateKeyPair } from '../../src/utils/crypto';
 import MemoryAccount from '../../src/account/Memory';
 import verifyTransaction from '../../src/tx/validator';
-import { InvalidTxError, InvalidTxParamsError } from '../../src/utils/errors';
+import { InvalidTxParamsError } from '../../src/utils/errors';
 import { TX_TYPE } from '../../src/tx/builder/schema';
-import { AeSdk, Node } from '../../src';
+import { AeSdk, Node, InvalidTxError } from '../../src';
 
 describe('Verify Transaction', () => {
   let aeSdk: AeSdk;

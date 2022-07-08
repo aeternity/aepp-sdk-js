@@ -272,9 +272,10 @@ class AeSdkBase {
 }
 
 const { _buildTx: _, ...txMethodsOther } = txMethods;
+const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
 
 const methods = {
-  ...chainMethods,
+  ...chainMethodsOther,
   ...txMethodsOther,
   ...aensMethods,
   ...spendMethods,
