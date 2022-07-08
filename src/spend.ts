@@ -20,7 +20,7 @@ import {
 } from './chain';
 import { _buildTx, BuildTxOptions } from './tx';
 import { buildTxHash, unpackTx } from './tx/builder';
-import { ArgumentError } from './utils/errors';
+import { ArgumentError, UnexpectedTsError } from './utils/errors';
 import { EncodedData } from './utils/encoder';
 import { createMetaTx } from './contract/ga';
 import { TX_TYPE, AensName } from './tx/builder/schema';
@@ -40,10 +40,19 @@ export async function send(tx: EncodedData<'tx'>, options: SendOptions): Promise
     ? { contractId: null }
     : await getAccount(await options.onAccount.address(options), options);
 
-  const signed = contractId != null
+  let signed;
+  if (contractId != null) {
     // TODO: not required arguments become required depending on account type, can ga be extracted?
-    ? await signUsingGA(tx, { authData: {}, ...options, authFun: authFun as string })
-    : await options.onAccount.signTransaction(tx, options);
+    if (authFun == null) throw new UnexpectedTsError();
+    if (options.authData == null) throw new ArgumentError('authData', 'provided', options.authData);
+    const { onCompiler, onNode, onAccount } = options;
+    if (onCompiler == null || onNode == null) {
+      throw new ArgumentError('onCompiler, onNode', 'provided', null);
+    }
+    signed = await createMetaTx(tx, options.authData, authFun, { onCompiler, onNode, onAccount });
+  } else {
+    signed = await options.onAccount.signTransaction(tx, options);
+  }
 
   return options.innerTx === true
     ? { hash: buildTxHash(signed), rawTx: signed }
@@ -51,21 +60,12 @@ export async function send(tx: EncodedData<'tx'>, options: SendOptions): Promise
 }
 
 type SendOptionsType = Parameters<AccountBase['signTransaction']>[1]
-& Parameters<typeof sendTransaction>[1]
-& Partial<Omit<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>>
-& Pick<Parameters<typeof signUsingGA>[1], 'onAccount' | 'onCompiler'>;
+& Parameters<typeof sendTransaction>[1] & Partial<Parameters<typeof createMetaTx>[3]> & {
+  onAccount: AccountBase;
+  authData?: Parameters<typeof createMetaTx>[1];
+};
 export interface SendOptions extends SendOptionsType {}
 interface SendReturnType extends Awaited<ReturnType<typeof sendTransaction>> {}
-
-export async function signUsingGA(
-  tx: EncodedData<'tx'>,
-  { authData, authFun, ...options }: {
-    authData: Parameters<typeof createMetaTx>[1];
-    authFun: Parameters<typeof createMetaTx>[2];
-  } & Parameters<typeof createMetaTx>[3],
-): Promise<EncodedData<'tx'>> {
-  return createMetaTx(tx, authData, authFun, options);
-}
 
 /**
  * Send coins to another account
