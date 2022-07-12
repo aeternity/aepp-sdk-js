@@ -108,7 +108,7 @@ export async function pollForQueryResponse(
     ({ response, ttl } = await onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId));
     const responseBuffer = decode(response as EncodedData<'or'>);
     if (responseBuffer.length > 0) return responseBuffer.toString();
-    height = await this.height();
+    height = await this.getHeight();
   } while (ttl >= height);
   throw new RequestTimedOutError(height);
 }

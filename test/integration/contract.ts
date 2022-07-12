@@ -349,7 +349,7 @@ describe('Contract', () => {
       const preclaim = await contract.methods
         .signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
       preclaim.result.returnType.should.be.equal('ok');
-      await aeSdk.awaitHeight(2 + await aeSdk.height());
+      await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
       // signature for any other name related operations
       delegationSignature = await aeSdk.createAensDelegationSignature(contractId, { name });
     });

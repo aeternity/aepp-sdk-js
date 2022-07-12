@@ -34,7 +34,7 @@ Usage:
     const aeSdk = new Ae.AeSdk({
       nodes: [{ name: 'testnet', instance: node }]
     })
-    aeSdk.height().then(height => {
+    aeSdk.getHeight().then(height => {
       console.log("Current Block Height:" + height)
     })
   </script>

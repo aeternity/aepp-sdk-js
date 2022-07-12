@@ -18,7 +18,7 @@ const aeSdk = new AeSdk({
     }
   }), { select: true })
 
-  console.log('Height:', await aeSdk.height())
+  console.log('Height:', await aeSdk.getHeight())
   console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map)
 
   const contract = await aeSdk.getContractInstance({ source: contractSource })

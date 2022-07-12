@@ -32,7 +32,7 @@ import {
 import { ArgumentError } from './utils/errors';
 import { EncodedData } from './utils/encoder';
 import { send, SendOptions } from './spend';
-import { getName, height } from './chain';
+import { getName, getHeight } from './chain';
 import { _buildTx, BuildTxOptions } from './tx';
 import { TransformNodeType } from './Node';
 import { NameEntry, NamePointer } from './apis/node';
@@ -353,7 +353,7 @@ Awaited<ReturnType<typeof send>> & {
 }
 >> {
   const salt = genSalt();
-  const currentHeight = await height(options);
+  const height = await getHeight(options);
   const commitmentId = commitmentHash(name, salt);
 
   const preclaimTx = await _buildTx(TX_TYPE.namePreClaim, {
@@ -364,7 +364,7 @@ Awaited<ReturnType<typeof send>> & {
 
   return Object.freeze({
     ...await send(preclaimTx, options),
-    height: currentHeight,
+    height,
     salt,
     commitmentId,
     async claim(opts?: Parameters<typeof aensClaim>[2]) {

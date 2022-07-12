@@ -67,7 +67,7 @@ export class InvalidTxError extends TransactionError {
  * @category chain
  * @returns Current chain height
  */
-export async function height({ onNode }: { onNode: Node }): Promise<number> {
+export async function getHeight({ onNode }: { onNode: Node }): Promise<number> {
   return (await onNode.getCurrentKeyBlockHeight()).height;
 }
 
@@ -89,12 +89,12 @@ export async function poll(
   { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<TransformNodeType<SignedTx>> {
   interval ??= _getPollInterval('microblock', options);
-  const max = await height({ onNode }) + blocks;
+  const max = await getHeight({ onNode }) + blocks;
   do {
     const tx = await onNode.getTransactionByHash(th);
     if (tx.blockHeight !== -1) return tx;
     await pause(interval);
-  } while (await height({ onNode }) < max);
+  } while (await getHeight({ onNode }) < max);
   throw new TxTimedOutError(blocks, th);
 }
 
