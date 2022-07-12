@@ -86,7 +86,6 @@ module.exports = {
       '@typescript-eslint/type-annotation-spacing': 'error',
       // TODO: enable rules from below
       '@typescript-eslint/naming-convention': 'off',
-      '@typescript-eslint/no-shadow': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/ban-types': 'off',
     },

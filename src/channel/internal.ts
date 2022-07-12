@@ -181,15 +181,15 @@ async function dequeueAction(channel: Channel): Promise<void> {
   if (Boolean(locked) || queue.length === 0) {
     return;
   }
-  const state = fsm.get(channel);
-  if (state == null) return;
-  const index = queue.findIndex((action: ChannelAction) => action.guard(channel, state));
+  const singleFsm = fsm.get(channel);
+  if (singleFsm == null) return;
+  const index = queue.findIndex((action: ChannelAction) => action.guard(channel, singleFsm));
   if (index === -1) {
     return;
   }
   actionQueue.set(channel, queue.filter((_: ChannelAction, i: number) => index !== i));
   actionQueueLocked.set(channel, true);
-  const nextState: ChannelFsm = await Promise.resolve(queue[index].action(channel, state));
+  const nextState: ChannelFsm = await Promise.resolve(queue[index].action(channel, singleFsm));
   actionQueueLocked.set(channel, false);
   enterState(channel, nextState);
 }
@@ -210,8 +210,8 @@ export function enqueueAction(
 async function handleMessage(channel: Channel, message: string): Promise<void> {
   const fsmState = fsm.get(channel);
   if (fsmState == null) throw new UnknownChannelStateError();
-  const { handler, state } = fsmState;
-  enterState(channel, await Promise.resolve(handler(channel, message, state)));
+  const { handler, state: st } = fsmState;
+  enterState(channel, await Promise.resolve(handler(channel, message, st)));
 }
 
 async function dequeueMessage(channel: Channel): Promise<void> {

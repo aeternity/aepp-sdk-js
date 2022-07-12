@@ -480,7 +480,7 @@ export async function resolveName <Type extends 'ak' | 'ct'>(
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
       const name = await onNode.getNameEntryByName(nameOrId);
-      const pointer = name.pointers.find((pointer) => pointer.key === key);
+      const pointer = name.pointers.find((p) => p.key === key);
       if (pointer == null) throw new AensPointerContextError(nameOrId, key);
       if (resolveByNode) return pointer.id as EncodedData<Type>;
     }

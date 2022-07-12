@@ -41,7 +41,7 @@ import {
   UnexpectedTsError,
   InternalError,
 } from '../utils/errors';
-import { hash } from '../utils/crypto';
+import { hash as calcHash } from '../utils/crypto';
 import { Aci as BaseAci } from '../apis/compiler';
 import Compiler from './Compiler';
 import Node from '../Node';
@@ -466,7 +466,7 @@ export default async function getContractInstance({
       .map(({ contract }) => [contract.name, contract.event.variant])
       .map(([name, events]) => events.map((event: {}) => [name, Object.keys(event)[0]]))
       .flat()
-      .filter(([, eventName]) => BigInt(`0x${hash(eventName).toString('hex')}`) === nameHash);
+      .filter(([, eventName]) => BigInt(`0x${calcHash(eventName).toString('hex')}`) === nameHash);
     switch (matchedEvents.length) {
       case 0: throw new MissingEventDefinitionError(nameHash.toString(), address);
       case 1: return matchedEvents[0][0];

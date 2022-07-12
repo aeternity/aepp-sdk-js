@@ -228,9 +228,9 @@ function transformParams(
   params = schema
     .filter(([, t]) => t === FIELD_TYPES.amount)
     .reduce(
-      (params: TxParamsCommon, [key]) => ({
-        ...params,
-        [key]: formatAmount(params[key as keyof TxParamsCommon], { denomination }),
+      (acc: TxParamsCommon, [key]) => ({
+        ...acc,
+        [key]: formatAmount(acc[key as keyof TxParamsCommon], { denomination }),
       }),
       params,
     );

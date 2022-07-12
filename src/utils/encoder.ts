@@ -74,8 +74,8 @@ export function decode(data: EncodedData<EncodingType>): Buffer {
   const [prefix, encodedPayload, extra] = data.split('_');
   if (encodedPayload == null) throw new DecodeError(`Encoded string missing payload: ${data}`);
   if (extra != null) throw new DecodeError(`Encoded string have extra parts: ${data}`);
-  const [type, { decode }] = parseType(prefix);
-  const payload = decode(encodedPayload);
+  const [type, encoder] = parseType(prefix);
+  const payload = encoder.decode(encodedPayload);
   ensureValidLength(payload, type);
   return payload;
 }
@@ -87,7 +87,7 @@ export function decode(data: EncodedData<EncodingType>): Buffer {
  * @returns Encoded string Base58check or Base64check data
  */
 export function encode<Type extends EncodingType>(data: Uint8Array, type: Type): EncodedData<Type> {
-  const [, { encode }] = parseType(type);
+  const [, encoder] = parseType(type);
   ensureValidLength(data, type);
-  return `${type}_${encode(data)}`;
+  return `${type}_${encoder.encode(data)}`;
 }
