@@ -87,7 +87,6 @@ module.exports = {
       // TODO: enable rules from below
       '@typescript-eslint/naming-convention': 'off',
       '@typescript-eslint/no-shadow': 'off',
-      '@typescript-eslint/default-param-last': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/ban-types': 'off',
     },

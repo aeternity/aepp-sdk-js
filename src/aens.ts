@@ -254,7 +254,7 @@ export async function aensQuery(
     async revoke(options) {
       return aensRevoke(name, { ...opt, ...options });
     },
-    async extendTtl(nameTtl = NAME_TTL, options) {
+    async extendTtl(nameTtl = NAME_TTL, options = {}) {
       if (nameTtl > NAME_TTL || nameTtl <= 0) {
         throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl);
       }
