@@ -261,6 +261,28 @@ export default async function getContractInstance({
     return instance.bytecode;
   };
 
+  const handleCallError = (
+    { returnType, returnValue }: {
+      returnType: ContractCallReturnType;
+      returnValue: EncodedData<EncodingType>;
+    },
+    transaction: string,
+  ): void => {
+    let message: string;
+    switch (returnType) {
+      case 'ok': return;
+      case 'revert':
+        message = instance.calldata.decodeFateString(returnValue);
+        break;
+      case 'error':
+        message = decode(returnValue).toString();
+        break;
+      default:
+        throw new InternalError(`Unknown return type: ${returnType}`);
+    }
+    throw new NodeInvocationError(message, transaction);
+  };
+
   const sendAndProcess = async (tx: EncodedData<'tx'>, options: any): Promise<{
     result?: ContractInstance['deployInfo']['result'];
     hash: TxData['hash'];
@@ -282,27 +304,6 @@ export default async function getContractInstance({
     // @ts-expect-error TODO api should be updated to match types
     handleCallError(callInfo, tx);
     return { ...result, result: callInfo };
-  };
-  const handleCallError = (
-    { returnType, returnValue }: {
-      returnType: ContractCallReturnType;
-      returnValue: EncodedData<EncodingType>;
-    },
-    transaction: string,
-  ): void => {
-    let message: string;
-    switch (returnType) {
-      case 'ok': return;
-      case 'revert':
-        message = instance.calldata.decodeFateString(returnValue);
-        break;
-      case 'error':
-        message = decode(returnValue).toString();
-        break;
-      default:
-        throw new InternalError(`Unknown return type: ${returnType}`);
-    }
-    throw new NodeInvocationError(message, transaction);
   };
 
   instance._estimateGas = async (name: string, params: any[], options: object): Promise<number> => {

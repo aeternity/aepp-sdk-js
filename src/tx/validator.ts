@@ -50,7 +50,59 @@ type Validator = (
   }
 ) => ValidatorResult[] | Promise<ValidatorResult[]>;
 
-const validators: Validator[] = [
+const validators: Validator[] = [];
+
+const getSenderAddress = (
+  tx: TxParamsCommon | RawTxObject<TxSchema>,
+): EncodedData<'ak'> | undefined => [
+  'senderId', 'accountId', 'ownerId', 'callerId',
+  'oracleId', 'fromId', 'initiator', 'gaId', 'payerId',
+]
+  .map((key: keyof TxSchema) => tx[key])
+  .filter((a) => a)
+  .map((a) => a?.toString().replace(/^ok_/, 'ak_'))[0] as EncodedData<'ak'> | undefined;
+
+/**
+ * Transaction Validator
+ * This function validates some of transaction properties,
+ * to make sure it can be posted it to the chain
+ * @category transaction builder
+ * @param transaction - Base64Check-encoded transaction
+ * @param node - Node to validate transaction against
+ * @param parentTxTypes - Types of parent transactions
+ * @returns Array with verification errors
+ * @example const errors = await verifyTransaction(transaction, node)
+ */
+export default async function verifyTransaction(
+  transaction: EncodedData<'tx' | 'pi'>,
+  node: Node,
+  parentTxTypes: TX_TYPE[] = [],
+): Promise<ValidatorResult[]> {
+  const { tx, txType } = unpackTx<TX_TYPE.signed>(transaction);
+  const address = getSenderAddress(tx)
+    ?? (txType === TX_TYPE.signed ? getSenderAddress(tx.encodedTx.tx) : undefined);
+  const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
+    address == null
+      ? undefined
+      : node.getAccountByPubkey(address)
+        .catch(() => ({ id: address, balance: 0n, nonce: 0 }))
+        // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
+        .then((acc) => ({ ...acc, id: acc.id as EncodedData<'ak'> })),
+    node.getCurrentKeyBlockHeight(),
+    node.getNodeInfo(),
+  ]);
+
+  return (await Promise.all(
+    validators.map((v) => v(
+      tx as any,
+      {
+        txType, node, account, height, consensusProtocolVersion, nodeNetworkId, parentTxTypes,
+      },
+    )),
+  )).flat();
+}
+
+validators.push(
   ({ encodedTx, signatures }, { account, nodeNetworkId, parentTxTypes }) => {
     if ((encodedTx ?? signatures) === undefined) return [];
     if (account == null) return [];
@@ -179,54 +231,4 @@ const validators: Validator[] = [
       }];
     }
   },
-];
-
-const getSenderAddress = (
-  tx: TxParamsCommon | RawTxObject<TxSchema>,
-): EncodedData<'ak'> | undefined => [
-  'senderId', 'accountId', 'ownerId', 'callerId',
-  'oracleId', 'fromId', 'initiator', 'gaId', 'payerId',
-]
-  .map((key: keyof TxSchema) => tx[key])
-  .filter((a) => a)
-  .map((a) => a?.toString().replace(/^ok_/, 'ak_'))[0] as EncodedData<'ak'> | undefined;
-
-/**
- * Transaction Validator
- * This function validates some of transaction properties,
- * to make sure it can be posted it to the chain
- * @category transaction builder
- * @param transaction - Base64Check-encoded transaction
- * @param node - Node to validate transaction against
- * @param parentTxTypes - Types of parent transactions
- * @returns Array with verification errors
- * @example const errors = await verifyTransaction(transaction, node)
- */
-export default async function verifyTransaction(
-  transaction: EncodedData<'tx' | 'pi'>,
-  node: Node,
-  parentTxTypes: TX_TYPE[] = [],
-): Promise<ValidatorResult[]> {
-  const { tx, txType } = unpackTx<TX_TYPE.signed>(transaction);
-  const address = getSenderAddress(tx)
-    ?? (txType === TX_TYPE.signed ? getSenderAddress(tx.encodedTx.tx) : undefined);
-  const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
-    address == null
-      ? undefined
-      : node.getAccountByPubkey(address)
-        .catch(() => ({ id: address, balance: 0n, nonce: 0 }))
-        // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
-        .then((acc) => ({ ...acc, id: acc.id as EncodedData<'ak'> })),
-    node.getCurrentKeyBlockHeight(),
-    node.getNodeInfo(),
-  ]);
-
-  return (await Promise.all(
-    validators.map((v) => v(
-      tx as any,
-      {
-        txType, node, account, height, consensusProtocolVersion, nodeNetworkId, parentTxTypes,
-      },
-    )),
-  )).flat();
-}
+);

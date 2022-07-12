@@ -151,6 +151,7 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
   if (nextState?.handler?.enter != null) {
     nextState.handler.enter(channel);
   }
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   void dequeueAction(channel);
 }
 
@@ -174,19 +175,6 @@ export function send(channel: Channel, message: ChannelMessage): void {
   websockets.get(channel)?.send(JsonBig.stringify(message));
 }
 
-export function enqueueAction(
-  channel: Channel,
-  guard: ChannelAction['guard'],
-  action: ChannelAction['action'],
-): void {
-  const queue = actionQueue.get(channel) ?? [];
-  actionQueue.set(channel, [
-    ...queue,
-    { guard, action },
-  ]);
-  void dequeueAction(channel);
-}
-
 async function dequeueAction(channel: Channel): Promise<void> {
   const locked = actionQueueLocked.get(channel);
   const queue = actionQueue.get(channel) ?? [];
@@ -204,6 +192,19 @@ async function dequeueAction(channel: Channel): Promise<void> {
   const nextState: ChannelFsm = await Promise.resolve(queue[index].action(channel, state));
   actionQueueLocked.set(channel, false);
   enterState(channel, nextState);
+}
+
+export function enqueueAction(
+  channel: Channel,
+  guard: ChannelAction['guard'],
+  action: ChannelAction['action'],
+): void {
+  const queue = actionQueue.get(channel) ?? [];
+  actionQueue.set(channel, [
+    ...queue,
+    { guard, action },
+  ]);
+  void dequeueAction(channel);
 }
 
 async function handleMessage(channel: Channel, message: string): Promise<void> {
@@ -230,6 +231,14 @@ async function dequeueMessage(channel: Channel): Promise<void> {
     }
   }
   messageQueueLocked.set(channel, false);
+}
+
+export function disconnect(channel: Channel): void {
+  websockets.get(channel)?.close();
+  const pingTimeoutIdValue = pingTimeoutId.get(channel);
+  const pongTimeoutIdValue = pongTimeoutId.get(channel);
+  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
+  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
 }
 
 function ping(channel: Channel): void {
@@ -301,14 +310,6 @@ export async function call(channel: Channel, method: string, params: any): Promi
       jsonrpc: '2.0', method, id, params,
     });
   });
-}
-
-export function disconnect(channel: Channel): void {
-  websockets.get(channel)?.close();
-  const pingTimeoutIdValue = pingTimeoutId.get(channel);
-  const pongTimeoutIdValue = pongTimeoutId.get(channel);
-  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
-  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
 }
 
 export async function initialize(

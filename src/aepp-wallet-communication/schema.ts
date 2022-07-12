@@ -56,6 +56,8 @@ interface RpcErrorAsJson {
   data?: any;
 }
 
+const rpcErrors: Array<(new (data?: any) => RpcError) & { code: number }> = [];
+
 /**
  * @category exception
  */
@@ -75,11 +77,7 @@ export abstract class RpcError extends BaseError {
   }
 
   static deserialize(json: RpcErrorAsJson): RpcError {
-    const RpcErr = [
-      RpcInvalidTransactionError, RpcBroadcastError, RpcRejectedByUserError,
-      RpcUnsupportedProtocolError, RpcConnectionDenyError, RpcNotAuthorizeError,
-      RpcPermissionDenyError, RpcInternalError,
-    ].find((cl) => cl.code === json.code);
+    const RpcErr = rpcErrors.find((cl) => cl.code === json.code);
     if (RpcErr == null) throw new InternalError(`Can't find RpcError with code: ${json.code}`);
     return new RpcErr(json.data);
   }
@@ -99,6 +97,7 @@ export class RpcInvalidTransactionError extends RpcError {
     this.name = 'RpcInvalidTransactionError';
   }
 }
+rpcErrors.push(RpcInvalidTransactionError);
 
 /**
  * @category exception
@@ -114,6 +113,7 @@ export class RpcBroadcastError extends RpcError {
     this.name = 'RpcBroadcastError';
   }
 }
+rpcErrors.push(RpcBroadcastError);
 
 /**
  * @category exception
@@ -129,6 +129,7 @@ export class RpcRejectedByUserError extends RpcError {
     this.name = 'RpcRejectedByUserError';
   }
 }
+rpcErrors.push(RpcRejectedByUserError);
 
 /**
  * @category exception
@@ -143,6 +144,7 @@ export class RpcUnsupportedProtocolError extends RpcError {
     this.name = 'RpcUnsupportedProtocolError';
   }
 }
+rpcErrors.push(RpcUnsupportedProtocolError);
 
 /**
  * @category exception
@@ -158,6 +160,7 @@ export class RpcConnectionDenyError extends RpcError {
     this.name = 'RpcConnectionDenyError';
   }
 }
+rpcErrors.push(RpcConnectionDenyError);
 
 /**
  * @category exception
@@ -172,6 +175,7 @@ export class RpcNotAuthorizeError extends RpcError {
     this.name = 'RpcNotAuthorizeError';
   }
 }
+rpcErrors.push(RpcNotAuthorizeError);
 
 /**
  * @category exception
@@ -187,6 +191,7 @@ export class RpcPermissionDenyError extends RpcError {
     this.name = 'RpcPermissionDenyError';
   }
 }
+rpcErrors.push(RpcPermissionDenyError);
 
 /**
  * @category exception
@@ -201,6 +206,7 @@ export class RpcInternalError extends RpcError {
     this.name = 'RpcInternalError';
   }
 }
+rpcErrors.push(RpcInternalError);
 
 /**
  * @category exception
@@ -215,3 +221,4 @@ export class RpcMethodNotFoundError extends RpcError {
     this.name = 'RpcMethodNotFoundError';
   }
 }
+rpcErrors.push(RpcMethodNotFoundError);
