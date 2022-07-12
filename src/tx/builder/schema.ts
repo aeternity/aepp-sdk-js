@@ -6,7 +6,7 @@
 
 import BigNumber from 'bignumber.js';
 import {
-  Name, NameId, NameFee, Deposit, Field, GasPrice,
+  Field, name, nameId, nameFee, deposit, gasPrice,
 } from './field-types';
 import { EncodedData, EncodingType } from '../../utils/encoder';
 import MPTree from '../../utils/mptree';
@@ -37,7 +37,7 @@ export const DRY_RUN_ACCOUNT = {
 
 export type TxField = [
   name: string,
-  type: FIELD_TYPES | typeof Field,
+  type: FIELD_TYPES | Field,
   prefix?: EncodingType | EncodingType[],
 ];
 
@@ -228,7 +228,7 @@ type BuildTxArgBySchemaType<
   Type extends FIELD_TYPES | Field,
   Prefix extends undefined | EncodingType | readonly EncodingType[],
 > =
-  Type extends typeof Field
+  Type extends Field
     ? Parameters<Type['serialize']>[0]
     : Type extends FIELD_TYPES
       ? BuildFieldTypes<Prefix>[Type]
@@ -302,9 +302,9 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
       ['nonce', FIELD_TYPES.shortInt],
-      ['name', Name],
+      ['name', name],
       ['nameSalt', FIELD_TYPES.int],
-      ['nameFee', NameFee],
+      ['nameFee', nameFee],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.shortInt],
     ],
@@ -314,7 +314,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
       ['nonce', FIELD_TYPES.shortInt],
-      ['nameId', NameId],
+      ['nameId', nameId],
       ['nameTtl', FIELD_TYPES.int],
       ['pointers', FIELD_TYPES.pointers],
       ['clientTtl', FIELD_TYPES.shortInt],
@@ -327,7 +327,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
       ['nonce', FIELD_TYPES.shortInt],
-      ['nameId', NameId],
+      ['nameId', nameId],
       ['recipientId', FIELD_TYPES.id, ['ak', 'nm']],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.shortInt],
@@ -338,7 +338,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
       ['nonce', FIELD_TYPES.shortInt],
-      ['nameId', NameId],
+      ['nameId', nameId],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.shortInt],
     ],
@@ -352,7 +352,7 @@ export const TX_SCHEMA = {
       ['log', FIELD_TYPES.binary, 'cb'],
       ['active', FIELD_TYPES.bool],
       ['referers', FIELD_TYPES.ids, 'ak'],
-      ['deposit', Deposit],
+      ['deposit', deposit],
     ],
   },
   [TX_TYPE.contractCreate]: {
@@ -364,10 +364,10 @@ export const TX_SCHEMA = {
       ['ctVersion', FIELD_TYPES.ctVersion],
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.shortInt],
-      ['deposit', Deposit],
+      ['deposit', deposit],
       ['amount', FIELD_TYPES.amount],
       ['gasLimit', FIELD_TYPES.shortInt],
-      ['gasPrice', GasPrice],
+      ['gasPrice', gasPrice],
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
   },
@@ -382,7 +382,7 @@ export const TX_SCHEMA = {
       ['ttl', FIELD_TYPES.shortInt],
       ['amount', FIELD_TYPES.amount],
       ['gasLimit', FIELD_TYPES.shortInt],
-      ['gasPrice', GasPrice],
+      ['gasPrice', gasPrice],
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
   },
@@ -393,7 +393,7 @@ export const TX_SCHEMA = {
       ['callerNonce', FIELD_TYPES.shortInt],
       ['height', FIELD_TYPES.shortInt],
       ['contractId', FIELD_TYPES.id, 'ct'],
-      ['gasPrice', GasPrice],
+      ['gasPrice', gasPrice],
       ['gasUsed', FIELD_TYPES.shortInt],
       ['returnValue', FIELD_TYPES.binary, 'cb'],
       ['returnType', FIELD_TYPES.callReturnType],
@@ -643,7 +643,7 @@ export const TX_SCHEMA = {
       ['amount', FIELD_TYPES.int],
       ['callData', FIELD_TYPES.binary, 'cb'],
       ['callStack', FIELD_TYPES.callStack],
-      ['gasPrice', GasPrice],
+      ['gasPrice', gasPrice],
       ['gasLimit', FIELD_TYPES.shortInt],
     ],
   },
@@ -738,7 +738,7 @@ export const TX_SCHEMA = {
       ['fee', FIELD_TYPES.int],
       ['ttl', FIELD_TYPES.shortInt],
       ['gasLimit', FIELD_TYPES.shortInt],
-      ['gasPrice', GasPrice],
+      ['gasPrice', gasPrice],
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
   },
@@ -750,7 +750,7 @@ export const TX_SCHEMA = {
       ['abiVersion', FIELD_TYPES.abiVersion],
       ['fee', FIELD_TYPES.int],
       ['gasLimit', FIELD_TYPES.shortInt],
-      ['gasPrice', GasPrice],
+      ['gasPrice', gasPrice],
       ['tx', FIELD_TYPES.rlpBinary],
     ],
   },

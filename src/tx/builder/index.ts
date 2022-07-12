@@ -41,7 +41,7 @@ import { NamePointer } from '../../apis/node';
 // SERIALIZE AND DESERIALIZE PART
 function deserializeField(
   value: any,
-  type: FIELD_TYPES | typeof Field,
+  type: FIELD_TYPES | Field,
   prefix?: EncodingType | EncodingType[],
 ): any {
   if (value == null) return '';
@@ -119,12 +119,12 @@ function deserializeField(
         {},
       );
     default:
-      if (type instanceof Object && 'deserialize' in type) return type.deserialize(value);
-      return value;
+      if (typeof type === 'number') return value;
+      return type.deserialize(value);
   }
 }
 
-function serializeField(value: any, type: FIELD_TYPES | typeof Field, params: any): any {
+function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any {
   switch (type) {
     case FIELD_TYPES.amount:
     case FIELD_TYPES.int:
@@ -168,14 +168,14 @@ function serializeField(value: any, type: FIELD_TYPES | typeof Field, params: an
         default: return value;
       }
     default:
-      if (type instanceof Object && 'serialize' in type) return type.serialize(value, params);
-      return value;
+      if (typeof type === 'number') return value;
+      return type.serialize(value, params);
   }
 }
 
 function validateField(
   value: any,
-  type: FIELD_TYPES | typeof Field,
+  type: FIELD_TYPES | Field,
   prefix?: EncodingType | EncodingType[],
 ): string | undefined {
   // All fields are required
