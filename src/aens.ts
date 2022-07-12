@@ -24,7 +24,7 @@
  */
 
 import BigNumber from 'bignumber.js';
-import { salt } from './utils/crypto';
+import { genSalt } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
 import {
   CLIENT_TTL, NAME_TTL, TX_TYPE, AensName,
@@ -352,9 +352,9 @@ Awaited<ReturnType<typeof send>> & {
   claim: (opts?: Parameters<typeof aensClaim>[2]) => ReturnType<typeof aensClaim>;
 }
 >> {
-  const _salt = salt();
+  const salt = genSalt();
   const currentHeight = await height(options);
-  const commitmentId = commitmentHash(name, _salt);
+  const commitmentId = commitmentHash(name, salt);
 
   const preclaimTx = await _buildTx(TX_TYPE.namePreClaim, {
     ...options,
@@ -365,10 +365,10 @@ Awaited<ReturnType<typeof send>> & {
   return Object.freeze({
     ...await send(preclaimTx, options),
     height: currentHeight,
-    salt: _salt,
+    salt,
     commitmentId,
     async claim(opts?: Parameters<typeof aensClaim>[2]) {
-      return aensClaim(name, _salt, { ...options, ...opts });
+      return aensClaim(name, salt, { ...options, ...opts });
     },
   });
 }

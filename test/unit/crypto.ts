@@ -134,8 +134,8 @@ describe('crypto', () => {
     Buffer.from(hash).toString('hex').should.be.equal('93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47');
   });
   it('salt produces random sequences every time', () => {
-    const salt1 = Crypto.salt();
-    const salt2 = Crypto.salt();
+    const salt1 = Crypto.genSalt();
+    const salt2 = Crypto.genSalt();
     salt1.should.be.a('Number');
     salt2.should.be.a('Number');
     salt1.should.not.be.equal(salt2);

@@ -20,7 +20,7 @@ import { randomName } from '../utils';
 import { getSdk } from '.';
 import {
   IllegalArgumentError, NodeInvocationError,
-  commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, salt, UnexpectedTsError, AeSdk,
+  commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, genSalt, UnexpectedTsError, AeSdk,
 } from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
@@ -328,7 +328,7 @@ describe('Contract', () => {
     let contract: ContractInstance;
     let contractId: EncodedData<'ct'>;
     const name = randomName(15);
-    const nameSalt = salt();
+    const salt = genSalt();
     let owner: EncodedData<'ak'>;
     let newOwner: EncodedData<'ak'>;
     let delegationSignature: string;
@@ -342,7 +342,7 @@ describe('Contract', () => {
     });
 
     it('preclaims', async () => {
-      const commitmentId = commitmentHash(name, nameSalt);
+      const commitmentId = commitmentHash(name, salt);
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId);
       const preclaimSig = await aeSdk.createAensDelegationSignature(contractId);
@@ -357,7 +357,7 @@ describe('Contract', () => {
     it('claims', async () => {
       const nameFee = 20e18; // 20 AE
       const claim = await contract.methods
-        .signedClaim(owner, name, nameSalt, nameFee, delegationSignature);
+        .signedClaim(owner, name, salt, nameFee, delegationSignature);
       claim.result.returnType.should.be.equal('ok');
     });
 
