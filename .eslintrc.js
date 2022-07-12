@@ -31,7 +31,6 @@ module.exports = {
     'no-console': 'off',
     'no-await-in-loop': 'off',
     'no-void': 'off',
-    'class-methods-use-this': 'off',
   },
   overrides: [{
     files: '*.ts',

@@ -24,6 +24,7 @@ export default class AccountRpc extends AccountBase {
     this._address = address;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async sign(): Promise<Uint8Array> {
     throw new NotImplementedError('RAW signing using wallet');
   }

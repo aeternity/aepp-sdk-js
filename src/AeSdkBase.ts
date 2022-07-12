@@ -188,6 +188,7 @@ class AeSdkBase {
     );
   }
 
+  // eslint-disable-next-line class-methods-use-this
   addresses(): Array<EncodedData<'ak'>> {
     return [];
   }
@@ -230,6 +231,7 @@ class AeSdkBase {
    * Resolves an account
    * @param account - ak-address, instance of AccountBase, or keypair
    */
+  // eslint-disable-next-line class-methods-use-this
   _resolveAccount(account?: Account): AccountBase {
     switch (account !== null && typeof account) {
       case 'string':
