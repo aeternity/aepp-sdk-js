@@ -90,7 +90,7 @@ function getOracleRelativeTtl(params: any, txType: TX_TYPE): number {
 /**
  * Calculate fee based on tx type and params
  */
-function buildFee(txType: TX_TYPE, buildTx: any): BigNumber {
+export function buildFee(txType: TX_TYPE, buildTx: any): BigNumber {
   const { rlpEncoded: { length }, txObject } = buildTx;
 
   return TX_FEE_BASE_GAS(txType)

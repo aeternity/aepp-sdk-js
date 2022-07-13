@@ -7,7 +7,7 @@
 import BigNumber from 'bignumber.js';
 import { TX_TYPE } from './constants';
 import {
-  Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasPrice, fee,
+  Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
 } from './field-types';
 import { EncodedData, EncodingType } from '../../utils/encoder';
 import MPTree from '../../utils/mptree';
@@ -29,7 +29,6 @@ export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 // # CONTRACT
 export const AMOUNT = 0;
-export const GAS_MAX = 1600000 - 21000;
 export const MAX_AUTH_FUN_GAS = 50000;
 export const DRY_RUN_ACCOUNT = {
   pub: 'ak_11111111111111111111111111111111273Yts',
@@ -306,7 +305,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
       ['deposit', deposit],
       ['amount', coinAmount],
-      ['gasLimit', shortUInt],
+      ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
@@ -321,7 +320,7 @@ export const TX_SCHEMA = {
       ['fee', fee],
       ['ttl', shortUInt],
       ['amount', coinAmount],
-      ['gasLimit', shortUInt],
+      ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
@@ -584,7 +583,7 @@ export const TX_SCHEMA = {
       ['callData', FIELD_TYPES.binary, 'cb'],
       ['callStack', FIELD_TYPES.callStack],
       ['gasPrice', gasPrice],
-      ['gasLimit', shortUInt],
+      ['gasLimit', gasLimit],
     ],
   },
   [TX_TYPE.channelReconnect]: {
@@ -677,7 +676,7 @@ export const TX_SCHEMA = {
       ['ctVersion', FIELD_TYPES.ctVersion],
       ['fee', fee],
       ['ttl', shortUInt],
-      ['gasLimit', shortUInt],
+      ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
@@ -689,7 +688,7 @@ export const TX_SCHEMA = {
       ['authData', FIELD_TYPES.binary, 'cb'],
       ['abiVersion', FIELD_TYPES.abiVersion],
       ['fee', fee],
-      ['gasLimit', shortUInt],
+      ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
       ['tx', FIELD_TYPES.rlpBinary],
     ],

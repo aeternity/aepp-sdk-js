@@ -59,3 +59,10 @@ interface CalculateMinFeeOptions {
   vsn?: number;
   denomination?: AE_AMOUNT_FORMATS;
 }
+
+/**
+ * @deprecated Maximum gas limit depends on transaction size, this value is outdated,
+ * sdk check/provides gasLimit by itself while building a transaction
+ * @hidden
+ */
+export const GAS_MAX = 1600000 - 21000;
