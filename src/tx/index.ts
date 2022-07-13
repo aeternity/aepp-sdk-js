@@ -32,7 +32,6 @@ import {
 import Node from '../Node';
 import { EncodedData } from '../utils/encoder';
 import { buildTx as syncBuildTx, unpackTx } from './builder/index';
-import calculateMinFee from './min-fee';
 import { isKeyOfObject } from '../utils/other';
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
 
@@ -85,15 +84,11 @@ export async function prepareTxParams(
     senderId,
     nonce,
     ttl = TX_TTL,
-    fee: f,
     absoluteTtl,
-    vsn,
     strategy,
-    denomination,
     onNode,
-    ...txParams
   }: PrepareTxParamsOptions,
-): Promise<{ fee: BigNumber; ttl: number; nonce: number }> {
+): Promise<{ ttl: number; nonce: number }> {
   nonce ??= (
     await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
   ).nextNonce;
@@ -103,24 +98,13 @@ export async function prepareTxParams(
     ttl += absoluteTtl === true ? 0 : (await onNode.getCurrentKeyBlock()).height;
   }
 
-  const fee = f != null
-    ? new BigNumber(f)
-    : calculateMinFee(txType, {
-      params: {
-        ...txParams, senderId, nonce, ttl,
-      },
-      vsn,
-      denomination,
-    });
-  return { fee, ttl, nonce };
+  return { ttl, nonce };
 }
 
-interface PrepareTxParamsOptions extends Pick<TxParamsCommon, 'nonce' | 'ttl' | 'fee'> {
+interface PrepareTxParamsOptions extends Pick<TxParamsCommon, 'nonce' | 'ttl'> {
   senderId: EncodedData<'ak'>;
-  vsn?: number;
   absoluteTtl?: boolean;
   strategy?: 'continuity' | 'max';
-  denomination?: AE_AMOUNT_FORMATS;
   onNode: Node;
 }
 
@@ -201,8 +185,6 @@ export async function _buildTx<TxType extends TX_TYPE>(
   const senderId = params[senderKey];
   // TODO: do this check on TypeScript level
   if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`);
-  const extraParams = await prepareTxParams(txType, {
-    ...params, senderId, denomination, absoluteTtl,
-  });
+  const extraParams = await prepareTxParams(txType, { ...params, senderId, absoluteTtl });
   return syncBuildTx({ ...params, ...extraParams } as any, txType, { denomination }).tx;
 }

@@ -38,7 +38,6 @@ export { default as AeSdkAepp } from './AeSdkAepp';
 export { default as AeSdkWallet } from './AeSdkWallet';
 export { default as Node } from './Node';
 export { default as verifyTransaction } from './tx/validator';
-export { default as calculateMinFee } from './tx/min-fee';
 export { default as AccountBase } from './account/Base';
 export { default as MemoryAccount } from './account/Memory';
 export { default as Compiler } from './contract/Compiler';

@@ -28,7 +28,6 @@ describe('Verify Transaction', () => {
       senderId: await aeSdk.address(),
       recipientId: await aeSdk.address(),
       amount: 1e50,
-      fee: '1000',
       nonce: 1,
       ttl: 2,
       absoluteTtl: true,
@@ -39,7 +38,7 @@ describe('Verify Transaction', () => {
     );
     const errors = await verifyTransaction(signedTx, node);
     expect(errors.map(({ key }) => key)).to.be.eql([
-      'InvalidSignature', 'InsufficientFee', 'ExpiredTTL', 'InsufficientBalance', 'NonceAlreadyUsed',
+      'InvalidSignature', 'ExpiredTTL', 'InsufficientBalance', 'NonceAlreadyUsed',
     ]);
   });
 

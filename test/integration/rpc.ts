@@ -361,12 +361,13 @@ describe('Aepp<->Wallet', function aeppWallet() {
         senderId: address,
         recipientId: address,
         amount: 0,
-        fee: '123',
+        ttl: 1,
+        absoluteTtl: true,
         payload: 'zerospend',
       });
 
       await expect(aepp.send(tx)).to.be
-        .rejectedWith('Transaction verification errors: Fee 123 is too low, minimum fee for this transaction is 16840000000000');
+        .rejectedWith('Transaction verification errors: TTL 1 is already expired, current height is');
     });
 
     it('Add new account to wallet: receive notification for update accounts', async () => {

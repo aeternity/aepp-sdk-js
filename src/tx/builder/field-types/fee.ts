@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js';
-import { MIN_GAS_PRICE, TX_TYPE, TxParamsCommon } from './builder/schema';
-import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
-import { buildTx } from './builder';
-import { isKeyOfObject } from '../utils/other';
+import { IllegalArgumentError } from '../../../utils/errors';
+import { MIN_GAS_PRICE, TX_TYPE } from '../constants';
+import coinAmount from './coin-amount';
+import { isKeyOfObject } from '../../../utils/other';
 
 const BASE_GAS = 15000;
 const GAS_PER_BYTE = 20;
@@ -90,18 +90,14 @@ function getOracleRelativeTtl(params: any, txType: TX_TYPE): number {
 /**
  * Calculate fee based on tx type and params
  */
-function buildFee(
-  txType: TX_TYPE,
-  { params, vsn, denomination }:
-  { params: TxParamsCommon; vsn?: number; denomination?: AE_AMOUNT_FORMATS },
-): BigNumber {
-  const { rlpEncoded: { length } } = buildTx(params, txType, { vsn, denomination });
+function buildFee(txType: TX_TYPE, buildTx: any): BigNumber {
+  const { rlpEncoded: { length }, txObject } = buildTx;
 
   return TX_FEE_BASE_GAS(txType)
     .plus(TX_FEE_OTHER_GAS(txType, length, {
-      relativeTtl: getOracleRelativeTtl(params, txType),
+      relativeTtl: getOracleRelativeTtl(txObject, txType),
       innerTxSize: [TX_TYPE.gaMeta, TX_TYPE.payingFor].includes(txType)
-        ? params.tx.tx.encodedTx.rlpEncoded.length
+        ? txObject.tx.tx.encodedTx.rlpEncoded.length
         : 0,
     }))
     .times(MIN_GAS_PRICE);
@@ -111,28 +107,37 @@ function buildFee(
  * Calculate min fee
  * @category transaction builder
  * @param txType - Transaction type
- * @param options - Options object
- * @param options.params - Tx params
- * @example
- * ```js
- * calculateMinFee('spendTx', { gasLimit, params })
- * ```
+ * @param rebuildTx - Callback to get built transaction with specific fee
  */
-export default function calculateMinFee(
+export function calculateMinFee(
   txType: TX_TYPE,
-  { params, vsn, denomination }: CalculateMinFeeOptions,
+  rebuildTx: (value: BigNumber) => any,
 ): BigNumber {
   let fee = new BigNumber(0);
   let previousFee;
   do {
     previousFee = fee;
-    fee = buildFee(txType, { params: { ...params, fee }, vsn, denomination });
+    fee = buildFee(txType, rebuildTx(fee));
   } while (!fee.eq(previousFee));
   return fee;
 }
 
-interface CalculateMinFeeOptions {
-  params: TxParamsCommon;
-  vsn?: number;
-  denomination?: AE_AMOUNT_FORMATS;
-}
+export default {
+  ...coinAmount,
+
+  serializeAettos(
+    _value: string | undefined,
+    { txType, rebuildTx, _computingMinFee }:
+    { txType: TX_TYPE; rebuildTx: (params: any) => any; _computingMinFee?: string },
+  ): string {
+    if (_computingMinFee != null) return _computingMinFee;
+    const minFee = calculateMinFee(txType, (fee) => rebuildTx({ _computingMinFee: fee }));
+    const value = new BigNumber(_value ?? minFee);
+    if (minFee.gt(value)) {
+      throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger then ${minFee}`);
+    }
+    return value.toFixed();
+  },
+
+  serialize: coinAmount.serializeOptional,
+};

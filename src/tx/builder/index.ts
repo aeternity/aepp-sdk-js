@@ -220,7 +220,7 @@ export function validateParams(
     schema
       // TODO: allow optional keys in schema
       .filter(([key]) => !excludeKeys.includes(key)
-        && !['payload', 'nameFee', 'deposit', 'gasPrice'].includes(key))
+        && !['payload', 'nameFee', 'deposit', 'gasPrice', 'fee'].includes(key))
       .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
       .filter(([, message]) => message),
   );
@@ -306,7 +306,21 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
 
   const binary = filteredSchema
     .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => (
-      serializeField(params[key], fieldType, params)
+      serializeField(
+        params[key],
+        fieldType,
+        {
+          ...params,
+          txType: type,
+          rebuildTx: (overrideParams: any) => buildTx(
+            { ...params, ...overrideParams },
+            type,
+            {
+              excludeKeys, prefix: 'tx', vsn, denomination,
+            },
+          ),
+        },
+      )
     ))
     .filter((e) => e !== undefined);
 
