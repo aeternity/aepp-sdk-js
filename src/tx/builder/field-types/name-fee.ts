@@ -8,6 +8,16 @@ import { AensName } from '../constants';
 export default {
   ...coinAmount,
 
+  serializeAettos(
+    _value: string | undefined,
+    txFields: { name: AensName },
+  ): string {
+    const minNameFee = getMinimumNameFee(txFields.name);
+    const value = new BigNumber(_value ?? minNameFee);
+    if (minNameFee.gt(value)) throw new InsufficientNameFeeError(value, minNameFee);
+    return value.toFixed();
+  },
+
   /**
    * @param value - AENS name fee Buffer
    * @param txFields - Transaction fields
@@ -15,13 +25,8 @@ export default {
    */
   serialize(
     value: Int | undefined,
-    txFields: { name: AensName },
+    txFields: { name: AensName } & Parameters<typeof coinAmount['serialize']>[1],
   ): Buffer {
-    const minNameFee = getMinimumNameFee(txFields.name);
-    value ??= minNameFee;
-    if (minNameFee.gt(value)) {
-      throw new InsufficientNameFeeError(new BigNumber(value), minNameFee);
-    }
-    return coinAmount.serialize(value);
+    return coinAmount.serializeOptional.call(this, value, txFields);
   },
 };

@@ -1,7 +1,6 @@
-import BigNumber from 'bignumber.js';
 import { decode as rlpDecode, encode as rlpEncode, NestedUint8Array } from 'rlp';
 import { EncodedData, EncodingType } from '../../utils/encoder';
-import { AE_AMOUNT_FORMATS, formatAmount } from '../../utils/amount-formatter';
+import { AE_AMOUNT_FORMATS } from '../../utils/amount-formatter';
 import { hash } from '../../utils/crypto';
 import { Field } from './field-types';
 
@@ -53,13 +52,9 @@ function deserializeField(
         abiVersion: readInt(Buffer.from([abi])),
       };
     }
-    case FIELD_TYPES.amount:
-    case FIELD_TYPES.int:
     case FIELD_TYPES.abiVersion:
     case FIELD_TYPES.ttlType:
       return readInt(value);
-    case FIELD_TYPES.shortInt:
-      return +readInt(value);
     case FIELD_TYPES.id:
       return readId(value);
     case FIELD_TYPES.ids:
@@ -126,9 +121,6 @@ function deserializeField(
 
 function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any {
   switch (type) {
-    case FIELD_TYPES.amount:
-    case FIELD_TYPES.int:
-    case FIELD_TYPES.shortInt:
     case FIELD_TYPES.abiVersion:
     case FIELD_TYPES.ttlType:
       return writeInt(value);
@@ -169,6 +161,7 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       }
     default:
       if (typeof type === 'number') return value;
+      // @ts-expect-error will be solved after removing the whole serializeField function
       return type.serialize(value, params);
   }
 }
@@ -183,16 +176,6 @@ function validateField(
 
   // Validate type of value
   switch (type) {
-    case FIELD_TYPES.amount:
-    case FIELD_TYPES.int:
-    case FIELD_TYPES.shortInt: {
-      // eslint-disable-next-line no-restricted-globals
-      if (isNaN(value) && !BigNumber.isBigNumber(value)) {
-        return `${String(value)} is not of type Number or BigNumber`;
-      }
-      if (new BigNumber(value).lt(0)) return `${String(value)} must be >= 0`;
-      return undefined;
-    }
     case FIELD_TYPES.id: {
       const prefixes = Array.isArray(prefix) ? prefix : [prefix];
       if (!prefixes.includes(value.split('_')[0])) {
@@ -218,23 +201,6 @@ function validateField(
     default:
       return undefined;
   }
-}
-
-function transformParams(
-  params: TxParamsCommon,
-  schema: TxField[],
-  { denomination }: { denomination?: AE_AMOUNT_FORMATS } = {},
-): any {
-  params = schema
-    .filter(([, t]) => t === FIELD_TYPES.amount)
-    .reduce(
-      (acc: TxParamsCommon, [key]) => ({
-        ...acc,
-        [key]: formatAmount(acc[key as keyof TxParamsCommon], { denomination }),
-      }),
-      params,
-    );
-  return params;
 }
 
 /**
@@ -326,13 +292,12 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
 
   const schema = schemas[vsn] as unknown as TxField[];
 
-  let params = _params as TxParamsCommon & { onNode: Node };
+  const params = _params as TxParamsCommon & { onNode: Node; denomination?: AE_AMOUNT_FORMATS };
   params.VSN = vsn;
   params.tag = type;
+  params.denomination = denomination;
   const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key));
 
-  // Transform `amount` type fields to `aettos`
-  params = transformParams(params, filteredSchema, { denomination });
   // Validation
   const valid = validateParams(params, schema, { excludeKeys });
   if (Object.keys(valid).length > 0) {
