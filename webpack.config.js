@@ -17,6 +17,9 @@ function configure(filename, opts = {}) {
         },
       ],
     },
+    optimization: {
+      minimize: opts.target !== 'node',
+    },
     resolve: {
       extensions: ['.ts', '.js'],
       fallback: {
