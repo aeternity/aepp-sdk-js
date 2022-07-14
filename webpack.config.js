@@ -22,9 +22,6 @@ function configure(filename, opts = {}) {
       fallback: {
         buffer: require.resolve('buffer/'),
       },
-      alias: {
-        'js-yaml': false,
-      },
     },
     plugins: [
       ...opts.target === 'node'
