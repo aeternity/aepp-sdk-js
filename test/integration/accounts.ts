@@ -31,6 +31,7 @@ import {
   UnexpectedTsError,
 } from '../../src/utils/errors';
 import { AeSdk } from '../../src';
+import { EncodedData } from '../../src/utils/encoder';
 
 describe('Accounts', () => {
   let aeSdk: AeSdk;
@@ -159,36 +160,42 @@ describe('Accounts', () => {
   });
 
   describe('Make operation on specific account without changing of current account', () => {
-    it('Can make spend on specific account', async () => {
-      const current = await aeSdk.address();
-      const accounts = aeSdk.addresses();
-      const onAccount = accounts.find((acc) => acc !== current);
+    let address: EncodedData<'ak'>;
 
-      const { tx } = await aeSdk.spend(1, await aeSdk.address(), { onAccount });
+    before(async () => {
+      address = await aeSdk.address();
+    });
+
+    it('Can make spend on specific account', async () => {
+      const accounts = aeSdk.addresses();
+      const onAccount = accounts.find((acc) => acc !== address);
+
+      const { tx } = await aeSdk.spend(1, address, { onAccount });
       if (tx?.senderId == null) throw new UnexpectedTsError();
       tx.senderId.should.be.equal(onAccount);
-      current.should.be.equal(current);
     });
 
-    it('Fail on invalid account', async () => {
-      await expect(aeSdk.spend(1, await aeSdk.address(), { onAccount: 1 as any }))
-        .to.be.rejectedWith(
-          TypeError,
-          'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got 1 instead',
-        );
+    it('Fail on invalid account', () => {
+      expect(() => {
+        aeSdk.spend(1, address, { onAccount: 1 as any });
+      }).to.throw(
+        TypeError,
+        'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got 1 instead',
+      );
     });
 
-    it('Fail on non exist account', async () => {
-      await expect(aeSdk.spend(1, await aeSdk.address(), { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' }))
-        .to.be.rejectedWith(
-          UnavailableAccountError,
-          'Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available',
-        );
+    it('Fail on non exist account', () => {
+      expect(() => {
+        aeSdk.spend(1, address, { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' });
+      }).to.throw(
+        UnavailableAccountError,
+        'Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available',
+      );
     });
 
     it('Fail on no accounts', async () => {
       const aeSdkWithoutAccount = await getSdk(0);
-      await expect(aeSdkWithoutAccount.spend(1, await aeSdk.address()))
+      await expect(aeSdkWithoutAccount.spend(1, address))
         .to.be.rejectedWith(
           TypeError,
           'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got undefined instead',
@@ -202,6 +209,7 @@ describe('Accounts', () => {
           'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got 123 instead',
         );
     });
+
     it('Make operation on account using keyPair/MemoryAccount', async () => {
       const keypair = generateKeyPair();
       const memoryAccount = new MemoryAccount({ keypair });
@@ -217,6 +225,7 @@ describe('Accounts', () => {
       addressFromKeypair.should.be.equal(keypair.publicKey);
       addressFrommemoryAccount.should.be.equal(keypair.publicKey);
     });
+
     it('Make operation on account using keyPair: Invalid keypair', async () => {
       const keypair = generateKeyPair();
       keypair.publicKey = 'ak_bev1aPMdAeJTuUiCJ7mHbdQiAizrkRGgoV9FfxHYb6pAxo5WY';

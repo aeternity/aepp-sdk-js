@@ -244,19 +244,16 @@ class AeSdkBase {
     }
   }
 
-  async _getOptions(): Promise<{
+  _getOptions(): {
     onNode: Node;
     onAccount: AccountBase;
     onCompiler: Compiler;
-    networkId: string;
-  }> {
+  } {
     return {
       ...this._options,
       onNode: getValueOrErrorProxy(() => this.api),
       onAccount: getValueOrErrorProxy(() => this._resolveAccount()),
       onCompiler: getValueOrErrorProxy(() => this.compilerApi),
-      // TODO: remove networkId
-      networkId: (await this.api.getStatus()).networkId,
     };
   }
 
@@ -266,7 +263,7 @@ class AeSdkBase {
   ): Promise<EncodedData<'tx'>> {
     // @ts-expect-error TODO: need to figure out what's wrong here
     return _buildTx<TxType>(txType, {
-      ...await this._getOptions(),
+      ...this._getOptions(),
       ...options,
     });
   }
@@ -315,8 +312,8 @@ Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
   methods,
   ([name, handler]) => [
     name,
-    async function methodWrapper(...args: any[]) {
-      const instanceOptions = await this._getOptions();
+    function methodWrapper(...args: any[]) {
+      const instanceOptions = this._getOptions();
       const lastArg = args[args.length - 1];
       if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
         args[args.length - 1] = {
@@ -330,5 +327,5 @@ Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
   ],
 ));
 
-export default AeSdkBase as new (options: ConstructorParameters<typeof AeSdkBase>[0]) =>
+export default AeSdkBase as new (options?: ConstructorParameters<typeof AeSdkBase>[0]) =>
 AeSdkBase & AeSdkBaseMethods;

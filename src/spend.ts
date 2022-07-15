@@ -40,7 +40,11 @@ export async function send(tx: EncodedData<'tx'>, options: SendOptions): Promise
     ? undefined
     : (await getAccount(await options.onAccount.address(options), options)).authFun;
 
-  const signed = await options.onAccount.signTransaction(tx, { ...options, authFun });
+  const signed = await options.onAccount.signTransaction(tx, {
+    ...options,
+    authFun,
+    networkId: (await options.onNode.getStatus()).networkId,
+  });
 
   return options.innerTx === true
     ? { hash: buildTxHash(signed), rawTx: signed }
