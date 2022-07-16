@@ -17,13 +17,13 @@ function configure(filename, opts = {}) {
         },
       ],
     },
+    optimization: {
+      minimize: opts.target !== 'node',
+    },
     resolve: {
       extensions: ['.ts', '.js'],
       fallback: {
         buffer: require.resolve('buffer/'),
-      },
-      alias: {
-        'js-yaml': false,
       },
     },
     plugins: [
