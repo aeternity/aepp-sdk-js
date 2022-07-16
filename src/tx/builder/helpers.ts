@@ -122,7 +122,7 @@ export function writeId(hashId: string): Buffer {
  * @param buf - Data
  * @returns Encoided hash string with prefix
  */
-export function readId(buf: Buffer): string {
+export function readId(buf: Buffer): EncodedData<any> {
   const tag = Buffer.from(buf).readUIntBE(0, 1);
   const prefix = ID_TAG_PREFIX[tag];
   if (prefix == null) throw new PrefixNotFoundError(tag);

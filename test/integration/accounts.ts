@@ -27,7 +27,6 @@ import {
   TypeError,
   ArgumentError,
   InvalidKeypairError,
-  InvalidTxParamsError,
   UnexpectedTsError,
 } from '../../src/utils/errors';
 import { AeSdk } from '../../src';
@@ -64,7 +63,7 @@ describe('Accounts', () => {
   });
 
   it('spending negative amount of coins', () => expect(aeSdk.spend(-1, receiver))
-    .to.be.rejectedWith(InvalidTxParamsError, 'Transaction build error. {"amount":"-1 must be >= 0"}'));
+    .to.be.rejectedWith(ArgumentError, 'value should be greater or equal to 0, got -1 instead'));
 
   it('determines the balance using `balance`', async () => {
     await aeSdk.getBalance(await aeSdk.address()).should.eventually.be.a('string');

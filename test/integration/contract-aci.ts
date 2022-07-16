@@ -28,6 +28,7 @@ import {
   MissingEventDefinitionError,
   AmbiguousEventDefinitionError,
   UnexpectedTsError,
+  IllegalArgumentError,
 } from '../../src/utils/errors';
 import { getSdk } from '.';
 import { EncodedData } from '../../src/utils/encoder';
@@ -347,6 +348,20 @@ describe('Contract instance', () => {
         .to.be.rejectedWith('Invocation failed');
       await expect(contract.methods.recursion('infinite'))
         .to.be.rejectedWith('Invocation failed: "Out of gas"');
+    });
+
+    it('validates gas limit for contract calls', async () => {
+      await expect(contract.methods.setKey(4, { gasLimit: 7e6 }))
+        .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 7000000 must be less or equal to 5818100');
+    });
+
+    it('sets maximum possible gas limit for dry-run contract calls', async () => {
+      const { tx: { tx: { gasLimit } } } = await contract.methods.intFn(4);
+      expect(gasLimit).to.be.equal(5817980);
+      await expect(contract.methods.intFn(4, { gasLimit: gasLimit + 1 }))
+        .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 5817981 must be less or equal to 5817980');
+      await expect(contract.methods.intFn(4, { gasLimit: gasLimit + 1, gasMax: 6e6 + 1 }))
+        .to.be.rejectedWith('v3/dry-run error: Over the gas limit');
     });
   });
 

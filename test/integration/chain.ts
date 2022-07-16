@@ -54,7 +54,9 @@ describe('Node Chain', () => {
   });
 
   it('Can verify transaction from broadcast error', async () => {
-    const error = await aeSdk.spend(0, publicKey, { fee: 100, verify: false }).catch((e) => e);
+    const error = await aeSdk
+      .spend(0, publicKey, { ttl: 1, absoluteTtl: true, verify: false })
+      .catch((e) => e);
     expect(await error.verifyTx()).to.have.lengthOf(1);
   });
 

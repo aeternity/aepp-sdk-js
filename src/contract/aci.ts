@@ -17,7 +17,7 @@
 // @ts-expect-error TODO remove
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
 import {
-  DRY_RUN_ACCOUNT, GAS_MAX, TX_TYPE, AMOUNT, AensName,
+  DRY_RUN_ACCOUNT, TX_TYPE, AMOUNT, AensName,
 } from '../tx/builder/schema';
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder';
 import { _buildTx } from '../tx';
@@ -403,12 +403,7 @@ export default async function getContractInstance({
       if (typeof opt.top === 'number') {
         opt.top = (await getKeyBlock(opt.top, { onNode })).hash;
       }
-      const txOpt = {
-        ...opt,
-        onNode,
-        gasLimit: opt.gasLimit ?? GAS_MAX,
-        callData,
-      };
+      const txOpt = { ...opt, onNode, callData };
       if (opt.nonce == null && opt.top != null) {
         opt.nonce = (await getAccount(callerId, { hash: opt.top, onNode })).nonce + 1;
       }
