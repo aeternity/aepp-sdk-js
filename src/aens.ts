@@ -24,7 +24,7 @@
  */
 
 import BigNumber from 'bignumber.js';
-import { salt } from './utils/crypto';
+import { genSalt } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
 import {
   CLIENT_TTL, NAME_TTL, TX_TYPE, AensName,
@@ -32,7 +32,7 @@ import {
 import { ArgumentError } from './utils/errors';
 import { EncodedData } from './utils/encoder';
 import { send, SendOptions } from './spend';
-import { getName, height } from './chain';
+import { getName, getHeight } from './chain';
 import { _buildTx, BuildTxOptions } from './tx';
 import { TransformNodeType } from './Node';
 import { NameEntry, NamePointer } from './apis/node';
@@ -254,7 +254,7 @@ export async function aensQuery(
     async revoke(options) {
       return aensRevoke(name, { ...opt, ...options });
     },
-    async extendTtl(nameTtl = NAME_TTL, options) {
+    async extendTtl(nameTtl = NAME_TTL, options = {}) {
       if (nameTtl > NAME_TTL || nameTtl <= 0) {
         throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl);
       }
@@ -352,9 +352,9 @@ Awaited<ReturnType<typeof send>> & {
   claim: (opts?: Parameters<typeof aensClaim>[2]) => ReturnType<typeof aensClaim>;
 }
 >> {
-  const _salt = salt();
-  const currentHeight = await height(options);
-  const commitmentId = commitmentHash(name, _salt);
+  const salt = genSalt();
+  const height = await getHeight(options);
+  const commitmentId = commitmentHash(name, salt);
 
   const preclaimTx = await _buildTx(TX_TYPE.namePreClaim, {
     ...options,
@@ -364,11 +364,11 @@ Awaited<ReturnType<typeof send>> & {
 
   return Object.freeze({
     ...await send(preclaimTx, options),
-    height: currentHeight,
-    salt: _salt,
+    height,
+    salt,
     commitmentId,
     async claim(opts?: Parameters<typeof aensClaim>[2]) {
-      return aensClaim(name, _salt, { ...options, ...opts });
+      return aensClaim(name, salt, { ...options, ...opts });
     },
   });
 }

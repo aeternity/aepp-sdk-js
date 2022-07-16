@@ -1174,8 +1174,8 @@ describe('Channel', () => {
       await aeSdkInitiatior.address(),
       await aeSdkResponder.address(),
       100,
-      async (tx) => appendSignature(
-        await aeSdkResponder.signTransaction(tx),
+      async (transaction) => appendSignature(
+        await aeSdkResponder.signTransaction(transaction),
         async (tx) => (aeSdkInitiatior.signTransaction(tx) as Promise<EncodedData<'tx'>>),
       ),
     );

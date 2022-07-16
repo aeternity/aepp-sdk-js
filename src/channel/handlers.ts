@@ -16,6 +16,7 @@
  */
 /* eslint-disable consistent-return */
 /* eslint-disable default-case */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { generateKeyPair, encodeContractAddress } from '../utils/crypto';
 import {
   ChannelState,

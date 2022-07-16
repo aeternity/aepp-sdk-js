@@ -42,6 +42,24 @@ type Bip32PathT<MaxLen extends number, H extends 'H' | 'h' | '\''> = MaxLen exte
 type Bip32Path<MaxLen extends number> =
   '' | Bip32PathT<MaxLen, 'H'> | Bip32PathT<MaxLen, 'h'> | Bip32PathT<MaxLen, '\''>;
 
+export function deriveChild({ secretKey, chainCode }: KeyTreeNode, index: number): KeyTreeNode {
+  if (index < HARDENED_OFFSET) {
+    throw new DerivationError(`Segment ${index} is not hardened`);
+  }
+  const indexBuffer = Buffer.allocUnsafe(4);
+  indexBuffer.writeUInt32BE(index, 0);
+
+  const data = concatBuffers([Buffer.alloc(1, 0), secretKey, indexBuffer]);
+
+  const I = hmac(data, chainCode);
+  const IL = I.slice(0, 32);
+  const IR = I.slice(32);
+  return {
+    secretKey: IL,
+    chainCode: IR,
+  };
+}
+
 export function derivePathFromKey(path: Bip32Path<5>, key: KeyTreeNode): KeyTreeNode {
   const segments = path === '' ? [] : fromString(path).toPathArray();
   segments.forEach((segment, i) => {
@@ -51,6 +69,16 @@ export function derivePathFromKey(path: Bip32Path<5>, key: KeyTreeNode): KeyTree
   });
 
   return segments.reduce((parentKey, segment) => deriveChild(parentKey, segment), key);
+}
+
+export function getMasterKeyFromSeed(seed: Uint8Array): KeyTreeNode {
+  const I = hmac(seed, ED25519_CURVE);
+  const IL = I.slice(0, 32);
+  const IR = I.slice(32);
+  return {
+    secretKey: IL,
+    chainCode: IR,
+  };
 }
 
 export function derivePathFromSeed(path: 'm' | `m/${Bip32Path<5>}`, seed: Uint8Array): KeyTreeNode {
@@ -71,34 +99,6 @@ function formatAccount(keys: nacl.SignKeyPair): Account {
 
 export function getKeyPair(secretKey: Uint8Array): nacl.SignKeyPair {
   return nacl.sign.keyPair.fromSeed(secretKey);
-}
-
-export function getMasterKeyFromSeed(seed: Uint8Array): KeyTreeNode {
-  const I = hmac(seed, ED25519_CURVE);
-  const IL = I.slice(0, 32);
-  const IR = I.slice(32);
-  return {
-    secretKey: IL,
-    chainCode: IR,
-  };
-}
-
-export function deriveChild({ secretKey, chainCode }: KeyTreeNode, index: number): KeyTreeNode {
-  if (index < HARDENED_OFFSET) {
-    throw new DerivationError(`Segment ${index} is not hardened`);
-  }
-  const indexBuffer = Buffer.allocUnsafe(4);
-  indexBuffer.writeUInt32BE(index, 0);
-
-  const data = concatBuffers([Buffer.alloc(1, 0), secretKey, indexBuffer]);
-
-  const I = hmac(data, chainCode);
-  const IL = I.slice(0, 32);
-  const IR = I.slice(32);
-  return {
-    secretKey: IL,
-    chainCode: IR,
-  };
 }
 
 export function generateSaveHDWalletFromSeed(seed: Uint8Array, password: string): HDWallet {

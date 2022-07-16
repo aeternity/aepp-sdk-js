@@ -59,7 +59,7 @@ export function isAddressValid(address: string, prefix: EncodingType = 'ak'): bo
  * Generate a random salt (positive integer)
  * @returns random salt
  */
-export function salt(): number {
+export function genSalt(): number {
   return Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER));
 }
 

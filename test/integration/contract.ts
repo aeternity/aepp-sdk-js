@@ -20,7 +20,7 @@ import { randomName } from '../utils';
 import { getSdk } from '.';
 import {
   IllegalArgumentError, NodeInvocationError,
-  commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, salt, UnexpectedTsError, AeSdk,
+  commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, genSalt, UnexpectedTsError, AeSdk,
 } from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
@@ -191,34 +191,34 @@ describe('Contract', () => {
   });
 
   it('throws error on deploy', async () => {
-    const contract = await aeSdk.getContractInstance({ source: contractWithBrokenDeploy });
-    await expect(contract.deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"');
+    const ct = await aeSdk.getContractInstance({ source: contractWithBrokenDeploy });
+    await expect(ct.deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"');
   });
 
   it('throws errors on method call', async () => {
-    const contract = await aeSdk.getContractInstance({ source: contractWithBrokenMethods });
-    await contract.deploy();
-    await expect(contract.methods.failWithoutMessage(await aeSdk.address()))
+    const ct = await aeSdk.getContractInstance({ source: contractWithBrokenMethods });
+    await ct.deploy();
+    await expect(ct.methods.failWithoutMessage(await aeSdk.address()))
       .to.be.rejectedWith('Invocation failed');
-    await expect(contract.methods.failWithMessage())
+    await expect(ct.methods.failWithMessage())
       .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"');
   });
 
   it('Dry-run without accounts', async () => {
-    const aeSdk = await getSdk(0);
-    const contract = await aeSdk.getContractInstance({
+    const sdk = await getSdk(0);
+    const ct = await sdk.getContractInstance({
       source: identityContract, contractAddress: deployed.address,
     });
-    const { result } = await contract.methods.getArg(42);
+    const { result } = await ct.methods.getArg(42);
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub);
   });
 
   it('call contract/deploy with waitMined: false', async () => {
     contract.deployInfo = {};
-    const deployed = await contract.deploy([], { waitMined: false });
-    await aeSdk.poll(deployed.transaction);
-    expect(deployed.result).to.be.equal(undefined);
-    deployed.txData.should.not.be.equal(undefined);
+    const deployInfo = await contract.deploy([], { waitMined: false });
+    await aeSdk.poll(deployInfo.transaction);
+    expect(deployInfo.result).to.be.equal(undefined);
+    deployInfo.txData.should.not.be.equal(undefined);
     const result = await contract.methods.getArg(42, { callStatic: false, waitMined: false });
     expect(result.result).to.be.equal(undefined);
     result.txData.should.not.be.equal(undefined);
@@ -231,15 +231,13 @@ describe('Contract', () => {
   });
 
   it('initializes contract state', async () => {
-    const contract = await aeSdk.getContractInstance({ source: stateContract });
+    contract = await aeSdk.getContractInstance({ source: stateContract });
     const data = 'Hello World!';
     await contract.deploy([data]);
     expect((await contract.methods.retrieve()).decodedResult).to.be.equal(data);
   });
 
   describe('Namespaces', () => {
-    let contract: ContractInstance;
-
     it('Can compiler contract with external deps', async () => {
       contract = await aeSdk.getContractInstance({
         source: contractWithLib, fileSystem: { testLib: libContract },
@@ -270,12 +268,10 @@ describe('Contract', () => {
   });
 
   describe('Sophia Compiler', () => {
-    let bytecode: string;
-
     it('compile', async () => {
       bytecode = (await aeSdk.compilerApi.compileContract({
         code: identityContract, options: {},
-      })).bytecode;
+      })).bytecode as EncodedData<'cb'>;
       expect(bytecode.split('_')[0]).to.be.equal('cb');
     });
 
@@ -325,10 +321,9 @@ describe('Contract', () => {
   });
 
   describe('AENS operation delegation', () => {
-    let contract: ContractInstance;
     let contractId: EncodedData<'ct'>;
     const name = randomName(15);
-    const nameSalt = salt();
+    const salt = genSalt();
     let owner: EncodedData<'ak'>;
     let newOwner: EncodedData<'ak'>;
     let delegationSignature: string;
@@ -342,14 +337,14 @@ describe('Contract', () => {
     });
 
     it('preclaims', async () => {
-      const commitmentId = commitmentHash(name, nameSalt);
+      const commitmentId = commitmentHash(name, salt);
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId);
       const preclaimSig = await aeSdk.createAensDelegationSignature(contractId);
       const preclaim = await contract.methods
         .signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
       preclaim.result.returnType.should.be.equal('ok');
-      await aeSdk.awaitHeight(2 + await aeSdk.height());
+      await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
       // signature for any other name related operations
       delegationSignature = await aeSdk.createAensDelegationSignature(contractId, { name });
     });
@@ -357,7 +352,7 @@ describe('Contract', () => {
     it('claims', async () => {
       const nameFee = 20e18; // 20 AE
       const claim = await contract.methods
-        .signedClaim(owner, name, nameSalt, nameFee, delegationSignature);
+        .signedClaim(owner, name, salt, nameFee, delegationSignature);
       claim.result.returnType.should.be.equal('ok');
     });
 
@@ -396,7 +391,6 @@ describe('Contract', () => {
   });
 
   describe('Oracle operation delegation', () => {
-    let contract: ContractInstance;
     let contractId: EncodedData<'ct'>;
     let address: EncodedData<'ak'>;
     let oracle: Awaited<ReturnType<typeof aeSdk.getOracleObject>>;

@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { hash, salt } from '../../utils/crypto';
+import { hash, genSalt } from '../../utils/crypto';
 import {
   encode, decode, EncodedData, EncodingType,
 } from '../../utils/encoder';
@@ -27,8 +27,6 @@ import { NamePointer } from '../../apis/node';
 /**
  * JavaScript-based Transaction builder helper function's
  */
-
-export const createSalt = salt;
 
 export { encode, decode };
 
@@ -100,7 +98,7 @@ export function produceNameId(name: AensName): EncodedData<'nm'> {
  * @param salt - Random salt
  * @returns Commitment hash
  */
-export function commitmentHash(name: AensName, salt: number = createSalt()): EncodedData<'cm'> {
+export function commitmentHash(name: AensName, salt: number = genSalt()): EncodedData<'cm'> {
   return encode(hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm');
 }
 

@@ -34,13 +34,13 @@ describe('Node Chain', () => {
   });
 
   it('determines the height', async () => {
-    expect(await aeSdkWithoutAccount.height()).to.be.a('number');
+    expect(await aeSdkWithoutAccount.getHeight()).to.be.a('number');
   });
 
   it('combines height queries', async () => {
     const httpSpy = spy(http, 'request');
     const heights = await Promise.all(
-      new Array(5).fill(undefined).map(async () => aeSdk.height()),
+      new Array(5).fill(undefined).map(async () => aeSdk.getHeight()),
     );
     expect(heights).to.eql(heights.map(() => heights[0]));
     expect(httpSpy.callCount).to.be.equal(2);
@@ -48,9 +48,9 @@ describe('Node Chain', () => {
   });
 
   it('waits for specified heights', async () => {
-    const target = await aeSdkWithoutAccount.height() + 1;
+    const target = await aeSdkWithoutAccount.getHeight() + 1;
     await aeSdkWithoutAccount.awaitHeight(target).should.eventually.be.at.least(target);
-    await aeSdkWithoutAccount.height().should.eventually.be.at.least(target);
+    await aeSdkWithoutAccount.getHeight().should.eventually.be.at.least(target);
   });
 
   it('Can verify transaction from broadcast error', async () => {
@@ -98,13 +98,13 @@ describe('Node Chain', () => {
   it('Wait for transaction confirmation', async () => {
     const txData = await aeSdk.spend(1000, await aeSdk.address(), { confirm: true });
     if (txData.blockHeight == null) throw new UnexpectedTsError();
-    const isConfirmed = (await aeSdk.height()) >= txData.blockHeight + 3;
+    const isConfirmed = (await aeSdk.getHeight()) >= txData.blockHeight + 3;
 
     isConfirmed.should.be.equal(true);
 
     const txData2 = await aeSdk.spend(1000, await aeSdk.address(), { confirm: 4 });
     if (txData2.blockHeight == null) throw new UnexpectedTsError();
-    const isConfirmed2 = (await aeSdk.height()) >= txData2.blockHeight + 4;
+    const isConfirmed2 = (await aeSdk.getHeight()) >= txData2.blockHeight + 4;
     isConfirmed2.should.be.equal(true);
   });
 

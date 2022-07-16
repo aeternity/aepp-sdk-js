@@ -146,8 +146,7 @@ describe('Accounts', () => {
   });
 
   it('Get Account by block height/hash', async () => {
-    const h = await aeSdk.height();
-    await aeSdk.awaitHeight(h + 3);
+    await aeSdk.awaitHeight(await aeSdk.getHeight() + 3);
     const spend = await aeSdk.spend(123, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi');
     if (spend.blockHeight == null || spend.tx?.amount == null) throw new UnexpectedTsError();
     await aeSdk.awaitHeight(spend.blockHeight + 2);

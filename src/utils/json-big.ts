@@ -6,7 +6,7 @@ const jsonBig = JsonBig({ storeAsString: true });
 
 const convertValuesToBigNumbers = (value: any): any => {
   if (typeof value === 'object' && value !== null && value.constructor === Object) {
-    return mapObject(value, ([key, value]) => [key, convertValuesToBigNumbers(value)]);
+    return mapObject(value, ([k, v]) => [k, convertValuesToBigNumbers(v)]);
   }
   if (Array.isArray(value)) {
     return value.map((item) => convertValuesToBigNumbers(item));

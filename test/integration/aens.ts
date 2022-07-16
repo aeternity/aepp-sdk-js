@@ -113,10 +113,10 @@ describe('Aens', () => {
 
   it('throws error on setting 33 pointers', async () => {
     const nameObject = await aeSdk.aensQuery(name);
-    const pointers = Object.fromEntries(
+    const pointers33 = Object.fromEntries(
       new Array(33).fill(undefined).map((v, i) => [`pointer-${i}`, address]),
     );
-    await expect(nameObject.update(pointers))
+    await expect(nameObject.update(pointers33))
       .to.be.rejectedWith('Expected 32 pointers or less, got 33 instead');
   });
 
@@ -176,24 +176,24 @@ describe('Aens', () => {
     it('claims names', async () => {
       const current = await aeSdk.address();
       const onAccount = aeSdk.addresses().find((acc) => acc !== current);
-      const name = randomName(12);
+      const nameShort = randomName(12);
 
-      const preclaim = await aeSdk.aensPreclaim(name);
+      const preclaim = await aeSdk.aensPreclaim(nameShort);
       preclaim.should.be.an('object');
 
       const claim = await preclaim.claim();
       claim.should.be.an('object');
 
-      const bidFee = computeBidFee(name);
+      const bidFee = computeBidFee(nameShort);
       const bid: Awaited<ReturnType<typeof aeSdk.aensClaim>> = await aeSdk
-        .aensBid(name, bidFee, { onAccount });
+        .aensBid(nameShort, bidFee, { onAccount });
       bid.should.be.an('object');
 
-      const isAuctionFinished = await aeSdk.getName(name).catch(() => false);
+      const isAuctionFinished = await aeSdk.getName(nameShort).catch(() => false);
       isAuctionFinished.should.be.equal(false);
 
       if (bid.blockHeight == null) throw new UnexpectedTsError();
-      const auctionEndBlock = computeAuctionEndBlock(name, bid.blockHeight);
+      const auctionEndBlock = computeAuctionEndBlock(nameShort, bid.blockHeight);
       console.log(`BID STARTED AT ${bid.blockHeight} WILL END AT ${auctionEndBlock}`);
     });
   });

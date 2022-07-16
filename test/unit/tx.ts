@@ -21,7 +21,7 @@ import { expect } from 'chai';
 import { encode as rlpEncode } from 'rlp';
 import BigNumber from 'bignumber.js';
 import { randomName } from '../utils';
-import { salt } from '../../src/utils/crypto';
+import { genSalt } from '../../src/utils/crypto';
 import {
   decode,
   encode,
@@ -38,10 +38,10 @@ import { SchemaNotFoundError } from '../../src/utils/errors';
 
 describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {
-    const saltValue = salt();
-    const hash = await commitmentHash('foobar.chain', saltValue);
+    const salt = genSalt();
+    const hash = await commitmentHash('foobar.chain', salt);
     hash.should.be.a('string');
-    return hash.should.be.equal(await commitmentHash('foobar.chain', saltValue));
+    hash.should.be.equal(await commitmentHash('foobar.chain', salt));
   });
 
   it('test from big number to bytes', async () => {

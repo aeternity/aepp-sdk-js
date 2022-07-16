@@ -63,6 +63,92 @@ export class InvalidTxError extends TransactionError {
 }
 
 /**
+ * Obtain current height of the chain
+ * @category chain
+ * @returns Current chain height
+ */
+export async function getHeight({ onNode }: { onNode: Node }): Promise<number> {
+  return (await onNode.getCurrentKeyBlockHeight()).height;
+}
+
+/**
+ * Wait for a transaction to be mined
+ * @category chain
+ * @param th - The hash of transaction to poll
+ * @param options - Options
+ * @param options.interval - Interval (in ms) at which to poll the chain
+ * @param options.blocks - Number of blocks mined after which to fail
+ * @param options.onNode - Node to use
+ * @returns The transaction as it was mined
+ */
+export async function poll(
+  th: EncodedData<'th'>,
+  {
+    blocks = 10, interval, onNode, ...options
+  }:
+  { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
+): Promise<TransformNodeType<SignedTx>> {
+  interval ??= _getPollInterval('microblock', options);
+  const max = await getHeight({ onNode }) + blocks;
+  do {
+    const tx = await onNode.getTransactionByHash(th);
+    if (tx.blockHeight !== -1) return tx;
+    await pause(interval);
+  } while (await getHeight({ onNode }) < max);
+  throw new TxTimedOutError(blocks, th);
+}
+
+/**
+ * Wait for the chain to reach a specific height
+ * @category chain
+ * @param height - Height to wait for
+ * @param options - Options
+ * @param options.interval - Interval (in ms) at which to poll the chain
+ * @param options.onNode - Node to use
+ * @returns Current chain height
+ */
+export async function awaitHeight(
+  height: number,
+  { interval, onNode, ...options }:
+  { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
+): Promise<number> {
+  interval ??= _getPollInterval('block', options);
+  let currentHeight;
+  do {
+    if (currentHeight != null) await pause(interval);
+    currentHeight = (await onNode.getCurrentKeyBlockHeight()).height;
+  } while (currentHeight < height);
+  return currentHeight;
+}
+
+/**
+ * Wait for transaction confirmation
+ * @category chain
+ * @param txHash - Transaction hash
+ * @param options - Options
+ * @param options.confirm - Number of micro blocks to wait for transaction confirmation
+ * @param options.onNode - Node to use
+ * @returns Current Height
+ */
+export async function waitForTxConfirm(
+  txHash: EncodedData<'th'>,
+  { confirm = 3, onNode, ...options }:
+  { confirm?: number; onNode: Node } & Parameters<typeof awaitHeight>[1],
+): Promise<number> {
+  const { blockHeight } = await onNode.getTransactionByHash(txHash);
+  const height = await awaitHeight(blockHeight + confirm, { onNode, ...options });
+  const { blockHeight: newBlockHeight } = await onNode.getTransactionByHash(txHash);
+  switch (newBlockHeight) {
+    case -1:
+      throw new TxNotInChainError(txHash);
+    case blockHeight:
+      return height;
+    default:
+      return waitForTxConfirm(txHash, { onNode, confirm, ...options });
+  }
+}
+
+/**
  * Submit a signed transaction for mining
  * @category chain
  * @param tx - Transaction to submit
@@ -143,33 +229,6 @@ interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>>
 }
 
 /**
- * Wait for transaction confirmation
- * @category chain
- * @param txHash - Transaction hash
- * @param options - Options
- * @param options.confirm - Number of micro blocks to wait for transaction confirmation
- * @param options.onNode - Node to use
- * @returns Current Height
- */
-export async function waitForTxConfirm(
-  txHash: EncodedData<'th'>,
-  { confirm = 3, onNode, ...options }:
-  { confirm?: number; onNode: Node } & Parameters<typeof awaitHeight>[1],
-): Promise<number> {
-  const { blockHeight } = await onNode.getTransactionByHash(txHash);
-  const height = await awaitHeight(blockHeight + confirm, { onNode, ...options });
-  const { blockHeight: newBlockHeight } = await onNode.getTransactionByHash(txHash);
-  switch (newBlockHeight) {
-    case -1:
-      throw new TxNotInChainError(txHash);
-    case blockHeight:
-      return height;
-    default:
-      return waitForTxConfirm(txHash, { onNode, confirm, ...options });
-  }
-}
-
-/**
  * Get account by account public key
  * @category chain
  * @param address - Account address (public key)
@@ -206,65 +265,6 @@ export async function getBalance(
   const { balance } = await getAccount(address, options).catch(() => ({ balance: 0n }));
 
   return formatAmount(balance, { targetDenomination: format });
-}
-
-/**
- * Obtain current height of the chain
- * @category chain
- * @returns Current chain height
- */
-export async function height({ onNode }: { onNode: Node }): Promise<number> {
-  return (await onNode.getCurrentKeyBlockHeight()).height;
-}
-
-/**
- * Wait for the chain to reach a specific height
- * @category chain
- * @param height - Height to wait for
- * @param options - Options
- * @param options.interval - Interval (in ms) at which to poll the chain
- * @param options.onNode - Node to use
- * @returns Current chain height
- */
-export async function awaitHeight(
-  height: number,
-  { interval, onNode, ...options }:
-  { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
-): Promise<number> {
-  interval ??= _getPollInterval('block', options);
-  let currentHeight;
-  do {
-    if (currentHeight != null) await pause(interval);
-    currentHeight = (await onNode.getCurrentKeyBlockHeight()).height;
-  } while (currentHeight < height);
-  return currentHeight;
-}
-
-/**
- * Wait for a transaction to be mined
- * @category chain
- * @param th - The hash of transaction to poll
- * @param options - Options
- * @param options.interval - Interval (in ms) at which to poll the chain
- * @param options.blocks - Number of blocks mined after which to fail
- * @param options.onNode - Node to use
- * @returns The transaction as it was mined
- */
-export async function poll(
-  th: EncodedData<'th'>,
-  {
-    blocks = 10, interval, onNode, ...options
-  }:
-  { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
-): Promise<TransformNodeType<SignedTx>> {
-  interval ??= _getPollInterval('microblock', options);
-  const max = await height({ onNode }) + blocks;
-  do {
-    const tx = await onNode.getTransactionByHash(th);
-    if (tx.blockHeight !== -1) return tx;
-    await pause(interval);
-  } while (await height({ onNode }) < max);
-  throw new TxTimedOutError(blocks, th);
 }
 
 /**
@@ -480,7 +480,7 @@ export async function resolveName <Type extends 'ak' | 'ct'>(
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
       const name = await onNode.getNameEntryByName(nameOrId);
-      const pointer = name.pointers.find((pointer) => pointer.key === key);
+      const pointer = name.pointers.find((p) => p.key === key);
       if (pointer == null) throw new AensPointerContextError(nameOrId, key);
       if (resolveByNode) return pointer.id as EncodedData<Type>;
     }

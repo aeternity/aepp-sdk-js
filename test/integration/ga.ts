@@ -23,7 +23,7 @@ import { encode, EncodedData } from '../../src/utils/encoder';
 import MemoryAccount from '../../src/account/Memory';
 import { unpackTx } from '../../src/tx/builder';
 import { ContractInstance } from '../../src/contract/aci';
-import { AeSdk, TX_TYPE, salt } from '../../src';
+import { AeSdk, TX_TYPE, genSalt } from '../../src';
 
 const authContractSource = `contract BlindAuth =
   record state = { txHash: option(hash) }
@@ -68,17 +68,17 @@ describe('Generalized Account', () => {
     aeSdk.removeAccount(gaAccountAddress);
     await aeSdk.addAccount(new MemoryAccount({ gaId: gaAccountAddress }), { select: true });
 
-    const callData = authContract.calldata.encode('BlindAuth', 'authorize', [salt()]);
+    const callData = authContract.calldata.encode('BlindAuth', 'authorize', [genSalt()]);
     await aeSdk.spend(10000, publicKey, { authData: { callData } });
     await aeSdk
-      .spend(10000, publicKey, { authData: { source: authContractSource, args: [salt()] } });
+      .spend(10000, publicKey, { authData: { source: authContractSource, args: [genSalt()] } });
     const balanceAfter = await aeSdk.getBalance(publicKey);
     balanceAfter.should.be.equal('20000');
   });
 
   it('buildAuthTxHash generates a proper hash', async () => {
     const { rawTx } = await aeSdk
-      .spend(10000, publicKey, { authData: { source: authContractSource, args: [salt()] } });
+      .spend(10000, publicKey, { authData: { source: authContractSource, args: [genSalt()] } });
     const spendTx = encode(unpackTx(rawTx, TX_TYPE.signed).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx');
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.methods.getTxHash()).decodedResult);

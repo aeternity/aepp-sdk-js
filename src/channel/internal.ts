@@ -151,6 +151,7 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
   if (nextState?.handler?.enter != null) {
     nextState.handler.enter(channel);
   }
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   void dequeueAction(channel);
 }
 
@@ -174,6 +175,25 @@ export function send(channel: Channel, message: ChannelMessage): void {
   websockets.get(channel)?.send(JsonBig.stringify(message));
 }
 
+async function dequeueAction(channel: Channel): Promise<void> {
+  const locked = actionQueueLocked.get(channel);
+  const queue = actionQueue.get(channel) ?? [];
+  if (Boolean(locked) || queue.length === 0) {
+    return;
+  }
+  const singleFsm = fsm.get(channel);
+  if (singleFsm == null) return;
+  const index = queue.findIndex((action: ChannelAction) => action.guard(channel, singleFsm));
+  if (index === -1) {
+    return;
+  }
+  actionQueue.set(channel, queue.filter((_: ChannelAction, i: number) => index !== i));
+  actionQueueLocked.set(channel, true);
+  const nextState: ChannelFsm = await Promise.resolve(queue[index].action(channel, singleFsm));
+  actionQueueLocked.set(channel, false);
+  enterState(channel, nextState);
+}
+
 export function enqueueAction(
   channel: Channel,
   guard: ChannelAction['guard'],
@@ -187,30 +207,11 @@ export function enqueueAction(
   void dequeueAction(channel);
 }
 
-async function dequeueAction(channel: Channel): Promise<void> {
-  const locked = actionQueueLocked.get(channel);
-  const queue = actionQueue.get(channel) ?? [];
-  if (Boolean(locked) || queue.length === 0) {
-    return;
-  }
-  const state = fsm.get(channel);
-  if (state == null) return;
-  const index = queue.findIndex((action: ChannelAction) => action.guard(channel, state));
-  if (index === -1) {
-    return;
-  }
-  actionQueue.set(channel, queue.filter((_: ChannelAction, i: number) => index !== i));
-  actionQueueLocked.set(channel, true);
-  const nextState: ChannelFsm = await Promise.resolve(queue[index].action(channel, state));
-  actionQueueLocked.set(channel, false);
-  enterState(channel, nextState);
-}
-
 async function handleMessage(channel: Channel, message: string): Promise<void> {
   const fsmState = fsm.get(channel);
   if (fsmState == null) throw new UnknownChannelStateError();
-  const { handler, state } = fsmState;
-  enterState(channel, await Promise.resolve(handler(channel, message, state)));
+  const { handler, state: st } = fsmState;
+  enterState(channel, await Promise.resolve(handler(channel, message, st)));
 }
 
 async function dequeueMessage(channel: Channel): Promise<void> {
@@ -230,6 +231,14 @@ async function dequeueMessage(channel: Channel): Promise<void> {
     }
   }
   messageQueueLocked.set(channel, false);
+}
+
+export function disconnect(channel: Channel): void {
+  websockets.get(channel)?.close();
+  const pingTimeoutIdValue = pingTimeoutId.get(channel);
+  const pongTimeoutIdValue = pongTimeoutId.get(channel);
+  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
+  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
 }
 
 function ping(channel: Channel): void {
@@ -301,14 +310,6 @@ export async function call(channel: Channel, method: string, params: any): Promi
       jsonrpc: '2.0', method, id, params,
     });
   });
-}
-
-export function disconnect(channel: Channel): void {
-  websockets.get(channel)?.close();
-  const pingTimeoutIdValue = pingTimeoutId.get(channel);
-  const pongTimeoutIdValue = pongTimeoutId.get(channel);
-  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
-  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
 }
 
 export async function initialize(

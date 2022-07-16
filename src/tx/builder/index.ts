@@ -77,14 +77,17 @@ function deserializeField(
     case FIELD_TYPES.pointers:
       return readPointers(value);
     case FIELD_TYPES.rlpBinary:
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return unpackTx(encode(value, 'tx'));
     case FIELD_TYPES.rlpBinaries:
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return value.map((v: Buffer) => unpackTx(encode(v, 'tx')));
     case FIELD_TYPES.rawBinary:
       return value;
     case FIELD_TYPES.hex:
       return value.toString('hex');
     case FIELD_TYPES.offChainUpdates:
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return value.map((v: Buffer) => unpackTx(encode(v, 'tx')));
     case FIELD_TYPES.callStack:
       // TODO: fix this
@@ -225,9 +228,9 @@ function transformParams(
   params = schema
     .filter(([, t]) => t === FIELD_TYPES.amount)
     .reduce(
-      (params: TxParamsCommon, [key]) => ({
-        ...params,
-        [key]: formatAmount(params[key as keyof TxParamsCommon], { denomination }),
+      (acc: TxParamsCommon, [key]) => ({
+        ...acc,
+        [key]: formatAmount(acc[key as keyof TxParamsCommon], { denomination }),
       }),
       params,
     );

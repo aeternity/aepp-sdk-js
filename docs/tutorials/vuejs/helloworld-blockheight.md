@@ -45,7 +45,7 @@ export default {
        nodes: [{ name: 'test-net', instance: node }],
     })
     // Start using the SDK
-    const height = await aeSdk.height()
+    const height = await aeSdk.getHeight()
     this.msg = 'Current Block: ' + height
   }
 }

@@ -42,6 +42,26 @@ const DENOMINATION_MAGNITUDE = {
 } as const;
 
 /**
+ * Convert amount from one to other denomination
+ * @param value - amount to convert
+ * @param options - options
+ * @param options.denomination - denomination of amount, can be ['ae', 'aettos']
+ * @param options.targetDenomination - target denomination,
+ * can be ['ae', 'aettos']
+ */
+export const formatAmount = (
+  value: string | number | bigint | BigNumber,
+  { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS }:
+  { denomination?: AE_AMOUNT_FORMATS; targetDenomination?: AE_AMOUNT_FORMATS },
+): string => {
+  if (!isBigNumber(value)) throw new ArgumentError('value', 'a number', value);
+
+  return new BigNumber(typeof value === 'bigint' ? value.toString() : value)
+    .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])
+    .toFixed();
+};
+
+/**
  * Convert amount to AE
  * @param value - amount to convert
  * @param options - options
@@ -62,26 +82,6 @@ export const toAettos = (
   value: string | number | BigNumber,
   { denomination = AE_AMOUNT_FORMATS.AE }: { denomination?: AE_AMOUNT_FORMATS } = {},
 ): string => formatAmount(value, { denomination });
-
-/**
- * Convert amount from one to other denomination
- * @param value - amount to convert
- * @param options - options
- * @param options.denomination - denomination of amount, can be ['ae', 'aettos']
- * @param options.targetDenomination - target denomination,
- * can be ['ae', 'aettos']
- */
-export const formatAmount = (
-  value: string | number | bigint | BigNumber,
-  { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS }:
-  { denomination?: AE_AMOUNT_FORMATS; targetDenomination?: AE_AMOUNT_FORMATS },
-): string => {
-  if (!isBigNumber(value)) throw new ArgumentError('value', 'a number', value);
-
-  return new BigNumber(typeof value === 'bigint' ? value.toString() : value)
-    .shiftedBy(DENOMINATION_MAGNITUDE[denomination] - DENOMINATION_MAGNITUDE[targetDenomination])
-    .toFixed();
-};
 
 interface Prefix {
   name: string;

@@ -38,7 +38,7 @@ interface Wallets { [key: string]: Wallet }
  * @returns a function to stop scanning
  */
 export default (
-  connection: BrowserConnection = new BrowserWindowMessageConnection(),
+  connection: BrowserConnection,
   onDetected: ({ wallets, newWallet }: { wallets: Wallets; newWallet?: Wallet }) => void,
 ): () => void => {
   if (window == null) throw new UnsupportedPlatformError('Window object not found, you can run wallet detector only in browser');
