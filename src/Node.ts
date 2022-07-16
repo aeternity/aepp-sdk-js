@@ -13,7 +13,7 @@ import { MissingParamError } from './utils/errors';
  * Obtain networkId from account or node
  */
 export async function getNetworkId({ networkId }: { networkId?: string } = {}): Promise<string> {
-  const res = networkId ?? this.networkId ?? (await this.api.getStatus()).networkId;
+  const res = networkId ?? this.networkId ?? (await this.api?.getStatus())?.networkId;
   if (res != null) return res;
   throw new MissingParamError('networkId is not provided');
 }

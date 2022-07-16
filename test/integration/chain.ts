@@ -43,7 +43,7 @@ describe('Node Chain', () => {
       new Array(5).fill(undefined).map(async () => aeSdk.getHeight()),
     );
     expect(heights).to.eql(heights.map(() => heights[0]));
-    expect(httpSpy.callCount).to.be.equal(2);
+    expect(httpSpy.callCount).to.be.equal(1);
     httpSpy.restore();
   });
 
