@@ -172,7 +172,7 @@ describe('Channel', () => {
     responderShouldRejectUpdate = false;
     const roundBefore = initiatorCh.round();
     const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior));
-    const amount = 1;
+    const amount = new BigNumber('10e18');
     const result = await initiatorCh.update(
       await aeSdkInitiatior.address(),
       await aeSdkResponder.address(),
@@ -190,7 +190,7 @@ describe('Channel', () => {
       sinon.match.string,
       sinon.match({
         updates: sinon.match([{
-          amount: sinon.match(amount),
+          amount: sinon.match(amount.toString()),
           from: sinon.match(await aeSdkInitiatior.address()),
           to: sinon.match(await aeSdkResponder.address()),
           op: sinon.match('OffChainTransfer'),
@@ -203,7 +203,7 @@ describe('Channel', () => {
       sinon.match.string,
       sinon.match({
         updates: sinon.match([{
-          amount: sinon.match(amount),
+          amount: sinon.match(amount.toString()),
           from: sinon.match(await aeSdkInitiatior.address()),
           to: sinon.match(await aeSdkResponder.address()),
           op: sinon.match('OffChainTransfer'),
@@ -216,7 +216,7 @@ describe('Channel', () => {
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
         {
-          amount,
+          amount: amount.toString(),
           from: await aeSdkInitiatior.address(),
           to: await aeSdkResponder.address(),
           op: 'OffChainTransfer',
@@ -306,60 +306,6 @@ describe('Channel', () => {
     });
   });
 
-  it('can post bignumber update and accept', async () => {
-    responderShouldRejectUpdate = false;
-    const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior));
-    const amount = new BigNumber('10e18');
-    const result = await initiatorCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
-      amount,
-      sign,
-    );
-    result.accepted.should.equal(true);
-    expect(result.signedTx).to.be.a('string');
-    sinon.assert.notCalled(initiatorSign);
-    sinon.assert.calledOnce(responderSign);
-    sinon.assert.calledWithExactly<any>(
-      responderSign,
-      sinon.match('update_ack'),
-      sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
-          amount: sinon.match(amount.toString()),
-          from: sinon.match(await aeSdkInitiatior.address()),
-          to: sinon.match(await aeSdkResponder.address()),
-          op: sinon.match('OffChainTransfer'),
-        }]),
-      }),
-    );
-    sinon.assert.calledOnce(sign);
-    sinon.assert.calledWithExactly(
-      sign,
-      sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
-          amount: sinon.match(amount.toString()),
-          from: sinon.match(await aeSdkInitiatior.address()),
-          to: sinon.match(await aeSdkResponder.address()),
-          op: sinon.match('OffChainTransfer'),
-        }]),
-      }),
-    );
-    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
-    txType.should.equal(TX_TYPE.channelOffChain);
-    expect(sign.firstCall.args[1]).to.eql({
-      updates: [
-        {
-          amount: amount.toString(),
-          from: await aeSdkInitiatior.address(),
-          to: await aeSdkResponder.address(),
-          op: 'OffChainTransfer',
-        },
-      ],
-    });
-  });
-
   it('can post update with metadata', async () => {
     responderShouldRejectUpdate = true;
     const meta = 'meta 1';
@@ -400,8 +346,8 @@ describe('Channel', () => {
       return balance.toString();
     }
 
-    expect(getAccountBalance(initiatorAddr)).to.eql('89999999999999999996');
-    expect(getAccountBalance(responderAddr)).to.eql('110000000000000000004');
+    expect(getAccountBalance(initiatorAddr)).to.eql('89999999999999999997');
+    expect(getAccountBalance(responderAddr)).to.eql('110000000000000000003');
     expect(buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx)
       .to.equal(initiatorPoi);
   });
