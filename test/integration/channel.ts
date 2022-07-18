@@ -61,7 +61,7 @@ describe('Channel', () => {
   let responderShouldRejectUpdate: number | boolean;
   let existingChannelId: string;
   let offchainTx: string;
-  let contractAddress: string;
+  let contractAddress: EncodedData<'ct'>;
   let callerNonce: number;
   let contract: any;
   const initiatorSign: sinon.SinonSpy = sinon
@@ -355,17 +355,6 @@ describe('Channel', () => {
     expect(getAccountBalance(responderAddr)).to.eql('110000000000000000003');
     expect(buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx)
       .to.equal(initiatorPoi);
-  });
-
-  it('can get balances', async () => {
-    const initiatorAddr = await aeSdkInitiatior.address();
-    const responderAddr = await aeSdkResponder.address();
-    const addresses = [initiatorAddr, responderAddr];
-    const balances = await initiatorCh.balances(addresses);
-    balances.should.be.an('object');
-    balances[initiatorAddr].should.be.a('string');
-    balances[responderAddr].should.be.a('string');
-    expect(balances).to.eql(await responderCh.balances(addresses));
   });
 
   it('can send a message', async () => {
@@ -922,6 +911,19 @@ describe('Channel', () => {
       errorCode: responderShouldRejectUpdate,
       errorMessage: 'user-defined',
     });
+  });
+
+  it('can get balances', async () => {
+    const initiatorAddr = await aeSdkInitiatior.address();
+    const responderAddr = await aeSdkResponder.address();
+    const contractAddr = encode(decode(contractAddress), 'ak');
+    const addresses = [initiatorAddr, responderAddr, contractAddr];
+    const balances = await initiatorCh.balances(addresses);
+    balances.should.be.an('object');
+    balances[initiatorAddr].should.be.a('string');
+    balances[responderAddr].should.be.a('string');
+    balances[contractAddr].should.be.equal(1000);
+    expect(balances).to.eql(await responderCh.balances(addresses));
   });
 
   it('can call a contract and accept', async () => {

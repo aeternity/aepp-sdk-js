@@ -17,7 +17,7 @@
 import BigNumber from 'bignumber.js';
 import { snakeToPascal } from '../utils/string';
 import { buildTx, unpackTx } from '../tx/builder';
-import { TX_TYPE } from '../tx/builder/schema';
+import { MIN_GAS_PRICE, TX_TYPE } from '../tx/builder/schema';
 import * as handlers from './handlers';
 import {
   eventEmitters,
@@ -33,10 +33,11 @@ import {
   SignTx,
   ChannelOptions,
   ChannelState,
-  ChannelMessage,
 } from './internal';
 import { UnknownChannelStateError, ChannelError } from '../utils/errors';
 import { EncodedData } from '../utils/encoder';
+import { ContractCallReturnType } from '../apis/node';
+import { pause } from '../utils/other';
 
 function snakeToPascalObjKeys<Type>(obj: object): Type {
   return Object.entries(obj).reduce((result, [key, val]) => ({
@@ -49,16 +50,16 @@ type EventCallback = (...args: any[]) => void;
 
 interface CallContractOptions {
   amount?: number | BigNumber;
-  callData?: string;
+  callData?: EncodedData<'cb'>;
   abiVersion?: number;
-  contract?: string;
+  contract?: EncodedData<'ct'>;
   returnValue?: any;
   gasUsed?: number | BigNumber;
   gasPrice?: number | BigNumber;
   height?: number;
   callerNonce?: number;
   log?: any;
-  returnType?: string;
+  returnType?: ContractCallReturnType;
 }
 
 interface Contract {
@@ -261,7 +262,7 @@ export default class Channel {
    * The update is a change to be applied on top of the latest state.
    *
    * Sender and receiver are the channel parties. Both the initiator and responder
-   * can take those roles. Any public key outside of the channel is considered invalid.
+   * can take those roles. Any public key outside the channel is considered invalid.
    *
    * @param from - Sender's public address
    * @param to - Receiver's public address
@@ -284,14 +285,14 @@ export default class Channel {
    * ```
    */
   async update(
-    from: string,
-    to: string,
+    from: EncodedData<'ak'>,
+    to: EncodedData<'ak'>,
     amount: number | BigNumber,
     sign: SignTx,
     metadata: string[] = [],
   ): Promise<{
       accepted: boolean;
-      signedTx?: string;
+      signedTx?: EncodedData<'tx'>;
       errorCode?: number;
       errorMessage?: string;
     }> {
@@ -341,7 +342,10 @@ export default class Channel {
    * ```
    */
   async poi(
-    { accounts, contracts }: { accounts: string[]; contracts?: string[] },
+    { accounts, contracts }: {
+      accounts: Array<EncodedData<'ak'>>;
+      contracts?: Array<EncodedData<'ct'>>;
+    },
   ): Promise<EncodedData<'pi'>> {
     return (await call(this, 'channels.get.poi', { accounts, contracts })).poi;
   }
@@ -349,7 +353,7 @@ export default class Channel {
   /**
    * Get balances
    *
-   * The accounts paramcontains a list of addresses to fetch balances of.
+   * The accounts param contains a list of addresses to fetch balances of.
    * Those can be either account balances or a contract ones, encoded as an account addresses.
    *
    * If a certain account address had not being found in the state tree - it is simply
@@ -397,7 +401,7 @@ export default class Channel {
    * })
    * ```
    */
-  async leave(): Promise<{ channelId: string; signedTx: string }> {
+  async leave(): Promise<{ channelId: string; signedTx: EncodedData<'tx'> }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -427,7 +431,7 @@ export default class Channel {
    * ).then(tx => console.log('on_chain_tx', tx))
    * ```
    */
-  async shutdown(sign: Function): Promise<string> {
+  async shutdown(sign: Function): Promise<EncodedData<'tx'>> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -500,8 +504,8 @@ export default class Channel {
     amount: number | BigNumber,
     sign: SignTx,
     { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }:
-    { onOnChainTx?: Function; onOwnWithdrawLocked?: Function; onWithdrawLocked?: Function } = {},
-  ): Promise<{ accepted: boolean; signedTx: string }> {
+    Pick<ChannelState, 'onOnChainTx' | 'onOwnWithdrawLocked' | 'onWithdrawLocked'> = {},
+  ): Promise<{ accepted: boolean; signedTx: EncodedData<'tx'> }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -578,7 +582,7 @@ export default class Channel {
     amount: number | BigNumber,
     sign: SignTx,
     { onOnChainTx, onOwnDepositLocked, onDepositLocked }:
-    { onOnChainTx?: Function; onOwnDepositLocked?: Function; onDepositLocked?: Function } = {},
+    Pick<ChannelState, 'onOnChainTx' | 'onOwnDepositLocked' | 'onDepositLocked'> = {},
   ): Promise<{ accepted: boolean; state: ChannelState }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
@@ -640,14 +644,14 @@ export default class Channel {
     {
       code, callData, deposit, vmVersion, abiVersion,
     }: {
-      code: string;
-      callData: string;
+      code: EncodedData<'cb'>;
+      callData: EncodedData<'cb'>;
       deposit: number | BigNumber;
       vmVersion: number;
       abiVersion: number;
     },
     sign: SignTx,
-  ): Promise<{ accepted: boolean; signedTx: string; address: string }> {
+  ): Promise<{ accepted: boolean; signedTx: EncodedData<'tx'>; address: EncodedData<'ct'> }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -720,7 +724,7 @@ export default class Channel {
       amount, callData, contract, abiVersion,
     }: CallContractOptions,
     sign: SignTx,
-  ): Promise<{ accepted: boolean; signedTx: string }> {
+  ): Promise<{ accepted: boolean; signedTx: EncodedData<'tx'> }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -776,18 +780,18 @@ export default class Channel {
    */
   async forceProgress(
     {
-      amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = 1000000000,
+      amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = MIN_GAS_PRICE,
     }: {
       amount: number;
-      callData: string;
-      contract: string;
+      callData: EncodedData<'cb'>;
+      contract: EncodedData<'ct'>;
       abiVersion: number;
       gasLimit?: number;
       gasPrice?: number;
     },
     sign: SignTx,
-    { onOnChainTx }: { onOnChainTx?: Function } = {},
-  ): Promise<{ accepted: boolean; signedTx: string; tx: EncodedData<'tx'> | Uint8Array }> {
+    { onOnChainTx }: Pick<ChannelState, 'onOnChainTx'> = {},
+  ): Promise<{ accepted: boolean; signedTx: EncodedData<'tx'>; tx: EncodedData<'tx'> | Uint8Array }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -823,7 +827,7 @@ export default class Channel {
    * dry-run a contract call. It takes the exact same arguments as a call would
    * and returns the call object.
    *
-   * The call is executed in the channel's state but it does not impact the state
+   * The call is executed in the channel's state, but it does not impact the state
    * whatsoever. It uses as an environment the latest channel's state and the current
    * top of the blockchain as seen by the node.
    *
@@ -848,8 +852,12 @@ export default class Channel {
   async callContractStatic(
     {
       amount, callData, contract, abiVersion,
-    }:
-    { amount: number; callData: string; contract: string; abiVersion: number },
+    }: {
+      amount: number;
+      callData: EncodedData<'cb'>;
+      contract: EncodedData<'ct'>;
+      abiVersion: number;
+    },
   ): Promise<CallContractOptions> {
     return snakeToPascalObjKeys(await call(this, 'channels.dry_run.call_contract', {
       amount,
@@ -881,9 +889,13 @@ export default class Channel {
    * ```
    */
   async getContractCall(
-    { caller, contract, round }: { caller: string; contract: string; round: number },
+    { caller, contract, round }: {
+      caller: EncodedData<'ak'>;
+      contract: EncodedData<'ct'>;
+      round: number;
+    },
   ): Promise<{
-      returnType: string;
+      returnType: ContractCallReturnType;
       returnValue: string;
       gasPrice: number | BigNumber;
       gasUsed: number | BigNumber;
@@ -900,7 +912,7 @@ export default class Channel {
   }
 
   /**
-   * Get contract latest state
+   * Get the latest contract state
    *
    * @param contract - Address of the contract
    * @example
@@ -913,7 +925,7 @@ export default class Channel {
    * ```
    */
   async getContractState(
-    contract: string,
+    contract: EncodedData<'ct'>,
   ): Promise<{ contract: Contract; contractState: object }> {
     const result = await call(this, 'channels.get.contract', { pubkey: contract });
     return snakeToPascalObjKeys({
@@ -969,29 +981,26 @@ export default class Channel {
    * )
    * ```
    */
-  sendMessage(message: string | ChannelMessage, recipient: string): void {
-    let info = message;
-    if (typeof message === 'object') {
-      info = JSON.stringify(message);
+  async sendMessage(message: string | object, recipient: EncodedData<'ak'>): Promise<void> {
+    const info = typeof message === 'object' ? JSON.stringify(message) : message;
+    if (this.status() === 'connecting') {
+      await new Promise<void>((resolve) => {
+        const onStatusChanged = (status: string): void => {
+          if (status === 'connecting') return;
+          resolve();
+          this.off('statusChanged', onStatusChanged);
+        };
+        this.on('statusChanged', onStatusChanged);
+      });
+      // For some reason we can't immediately send a message when connection is
+      // established. Thus we wait 500ms which seems to work.
+      await pause(500);
     }
-    const doSend = (channel: Channel): void => send(channel, {
+    send(this, {
       jsonrpc: '2.0',
       method: 'channels.message',
       params: { info, to: recipient },
     });
-    if (this.status() === 'connecting') {
-      const onStatusChanged = (status: string): void => {
-        if (status !== 'connecting') {
-          // For some reason we can't immediately send a message when connection is
-          // established. Thus we wait 500ms which seems to work.
-          setTimeout(() => doSend(this), 500);
-          this.off('statusChanged', onStatusChanged);
-        }
-      };
-      this.on('statusChanged', onStatusChanged);
-    } else {
-      doSend(this);
-    }
   }
 
   static async reconnect(options: ChannelOptions, txParams: any): Promise<Channel> {

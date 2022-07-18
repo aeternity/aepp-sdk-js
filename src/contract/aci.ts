@@ -43,6 +43,7 @@ import {
 } from '../utils/errors';
 import { hash as calcHash } from '../utils/crypto';
 import { Aci as BaseAci } from '../apis/compiler';
+import { ContractCallReturnType } from '../apis/node';
 import Compiler from './Compiler';
 import Node from '../Node';
 import {
@@ -105,7 +106,7 @@ export interface ContractInstance {
       gasUsed: number;
       height: number;
       log: any[];
-      returnType: string;
+      returnType: ContractCallReturnType;
       returnValue: string;
     };
     owner?: EncodedData<'ak'>;
@@ -130,7 +131,7 @@ export interface ContractInstance {
       gasUsed: number;
       height: number;
       log: any[];
-      returnType: string;
+      returnType: ContractCallReturnType;
       returnValue: string;
     };
     decodedResult: any;
@@ -141,8 +142,6 @@ export interface ContractInstance {
   ) => DecodedEvent[];
   methods: any;
 }
-
-type ContractCallReturnType = 'ok' | 'error' | 'revert';
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
