@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -22,7 +22,7 @@ import {
   getMasterKeyFromSeed,
   getSaveHDWalletAccounts,
   DerivationError,
-} from '../../src/utils/hd-wallet';
+} from '../../src';
 import { encode, decode, EncodedData } from '../../src/utils/encoder';
 import { concatBuffers } from '../../src/utils/other';
 

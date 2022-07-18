@@ -19,8 +19,9 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import http from 'http';
 import { getSdk } from '.';
-import { generateKeyPair } from '../../src/utils/crypto';
-import { AeSdk, TX_TYPE, UnexpectedTsError } from '../../src';
+import {
+  generateKeyPair, AeSdk, TX_TYPE, UnexpectedTsError,
+} from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
 
 describe('Node Chain', () => {

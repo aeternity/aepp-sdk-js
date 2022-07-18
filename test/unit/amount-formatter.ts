@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -21,7 +21,7 @@ import BigNumber from 'bignumber.js';
 import '..';
 import {
   AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos,
-} from '../../src/utils/amount-formatter';
+} from '../../src';
 
 describe('Amount Formatter', () => {
   it('to aettos', () => {

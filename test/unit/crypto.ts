@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -19,8 +19,7 @@ import '..';
 import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
 import * as Crypto from '../../src/utils/crypto';
-import { buildTxHash, unpackTx } from '../../src/tx/builder';
-import { decode } from '../../src/tx/builder/helpers';
+import { buildTxHash, unpackTx, decode } from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
 
 // These keys are fixations for the encryption lifecycle tests and will

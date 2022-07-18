@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -19,17 +19,11 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
-import { generateKeyPair } from '../../src/utils/crypto';
-import MemoryAccount from '../../src/account/Memory';
-import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter';
 import {
-  UnavailableAccountError,
-  TypeError,
-  ArgumentError,
-  InvalidKeypairError,
-  UnexpectedTsError,
-} from '../../src/utils/errors';
-import { AeSdk } from '../../src';
+  AeSdk, MemoryAccount,
+  generateKeyPair, AE_AMOUNT_FORMATS,
+  UnavailableAccountError, TypeError, ArgumentError, InvalidKeypairError, UnexpectedTsError,
+} from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
 
 describe('Accounts', () => {

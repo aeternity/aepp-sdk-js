@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -19,11 +19,11 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import { randomName } from '../utils';
-import { generateKeyPair } from '../../src/utils/crypto';
-import { buildContractId, computeAuctionEndBlock, computeBidFee } from '../../src/tx/builder/helpers';
-import { AensPointerContextError, UnexpectedTsError } from '../../src/utils/errors';
+import {
+  AeSdk, generateKeyPair, buildContractId, computeAuctionEndBlock, computeBidFee,
+  AensPointerContextError, UnexpectedTsError,
+} from '../../src';
 import { pause } from '../../src/utils/other';
-import { AeSdk } from '../../src';
 
 describe('Aens', () => {
   let aeSdk: AeSdk;

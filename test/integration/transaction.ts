@@ -19,11 +19,10 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from './index';
 import {
+  AeSdk,
   commitmentHash, oracleQueryId, decode, encode,
-} from '../../src/tx/builder/helpers';
-import { ORACLE_TTL_TYPES, TX_TYPE } from '../../src/tx/builder/schema';
-import { AE_AMOUNT_FORMATS } from '../../src/utils/amount-formatter';
-import { AeSdk } from '../../src';
+  ORACLE_TTL_TYPES, TX_TYPE, AE_AMOUNT_FORMATS,
+} from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
 
 const nonce = 1;

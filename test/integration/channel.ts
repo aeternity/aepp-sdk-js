@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -21,18 +21,14 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
-import { generateKeyPair } from '../../src/utils/crypto';
+import {
+  generateKeyPair, unpackTx, buildTx, buildTxHash, TX_TYPE,
+  IllegalArgumentError, InsufficientBalanceError, ChannelConnectionError,
+} from '../../src';
 import { pause } from '../../src/utils/other';
-import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder';
-import { TX_TYPE } from '../../src/tx/builder/schema';
 import Channel from '../../src/channel';
 import { ChannelOptions, send } from '../../src/channel/internal';
 import MemoryAccount from '../../src/account/Memory';
-import {
-  IllegalArgumentError,
-  InsufficientBalanceError,
-  ChannelConnectionError,
-} from '../../src/utils/errors';
 import { EncodedData } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
 

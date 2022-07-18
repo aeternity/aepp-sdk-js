@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -22,7 +22,7 @@ import { decode as rlpDecode } from 'rlp';
 import type { Input } from 'rlp';
 import MPTree from '../../src/utils/mptree';
 import type { MPTreeBinary } from '../../src/utils/mptree';
-import { MerkleTreeHashMismatchError, MissingNodeInTreeError, UnknownNodeLengthError } from '../../src/utils/errors';
+import { MerkleTreeHashMismatchError, MissingNodeInTreeError, UnknownNodeLengthError } from '../../src';
 
 const hexToTreeBinary = (hex: string): MPTreeBinary => rlpDecode(Buffer.from(hex, 'hex') as Input) as MPTreeBinary;
 
