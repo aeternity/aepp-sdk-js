@@ -228,7 +228,7 @@ export default class Channel {
       case TX_TYPE.channelOffChain:
       case TX_TYPE.channelWithdraw:
       case TX_TYPE.channelDeposit:
-        return +tx.round;
+        return tx.round;
       default:
         return null;
     }
