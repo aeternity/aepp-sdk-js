@@ -49,6 +49,10 @@ async function waitForChannel(channel: Channel): Promise<void> {
   });
 }
 
+function assertNotNull(value: any): asserts value {
+  if (value == null) throw new Error('Expected to be not null');
+}
+
 describe('Channel', () => {
   let aeSdkInitiatior: any;
   let aeSdkResponder: any;
@@ -171,6 +175,7 @@ describe('Channel', () => {
   it('can post update and accept', async () => {
     responderShouldRejectUpdate = false;
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
     const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior));
     const amount = new BigNumber('10e18');
     const result = await initiatorCh.update(
@@ -179,7 +184,7 @@ describe('Channel', () => {
       amount,
       sign,
     );
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
+    expect(initiatorCh.round()).to.equal(roundBefore + 1);
     result.accepted.should.equal(true);
     expect(result.signedTx).to.be.a('string');
     sinon.assert.notCalled(initiatorSign);
@@ -340,7 +345,7 @@ describe('Channel', () => {
     function getAccountBalance(address: EncodedData<'ak'>): string {
       const addressHex = decode(address).toString('hex');
       const treeNode = unpackedInitiatorPoi.tx.accounts[0].get(addressHex);
-      if (treeNode == null) throw new Error(); // TODO: extract not null check
+      assertNotNull(treeNode);
       const { balance, ...account } = unpackTx(encode(treeNode, 'tx'), TX_TYPE.account).tx;
       expect(account).to.eql({ tag: 10, VSN: 1, nonce: 0 });
       return balance.toString();
@@ -387,13 +392,14 @@ describe('Channel', () => {
     const onWithdrawLocked = sinon.spy();
     responderShouldRejectUpdate = false;
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
     const result = await initiatorCh.withdraw(
       amount,
       sign,
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked },
     );
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
+    expect(initiatorCh.round()).to.equal(roundBefore + 1);
     sinon.assert.called(onOnChainTx);
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string);
     sinon.assert.calledOnce(onOwnWithdrawLocked);
@@ -516,13 +522,14 @@ describe('Channel', () => {
     const onDepositLocked = sinon.spy();
     responderShouldRejectUpdate = false;
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
     const result = await initiatorCh.deposit(
       amount,
       sign,
       { onOnChainTx, onOwnDepositLocked, onDepositLocked },
     );
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
+    expect(initiatorCh.round()).to.equal(roundBefore + 1);
     sinon.assert.called(onOnChainTx);
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string);
     sinon.assert.calledOnce(onOwnDepositLocked);
@@ -839,6 +846,7 @@ describe('Channel', () => {
     contract = await aeSdkInitiatior.getContractInstance({ source: contractSource });
     await contract.compile();
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
     const callData = contract.calldata.encode('Identity', 'init', []);
     const result = await initiatorCh.createContract({
       code: contract.bytecode,
@@ -850,7 +858,7 @@ describe('Channel', () => {
     result.should.eql({
       accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx,
     });
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
+    expect(initiatorCh.round()).to.equal(roundBefore + 1);
     sinon.assert.calledTwice(responderSign);
     sinon.assert.calledWithExactly<any>(
       responderSign,
@@ -918,6 +926,7 @@ describe('Channel', () => {
 
   it('can call a contract and accept', async () => {
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
     const result = await initiatorCh.callContract({
       amount: 0,
       callData: contract.calldata.encode('Identity', 'getArg', [42]),
@@ -925,8 +934,10 @@ describe('Channel', () => {
       abiVersion: 3,
     }, async (tx) => aeSdkInitiatior.signTransaction(tx));
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
-    callerNonce = initiatorCh.round() as number;
+    const round = initiatorCh.round();
+    assertNotNull(round);
+    expect(round).to.equal(roundBefore + 1);
+    callerNonce = round;
   });
 
   it('can call a force progress', async () => {
