@@ -889,9 +889,10 @@ describe('Channel', () => {
     contract = await aeSdkInitiatior.getContractInstance({ source: contractSource });
     await contract.compile();
     const roundBefore = initiatorCh.round();
+    const callData = contract.calldata.encode('Identity', 'init', []);
     const result = await initiatorCh.createContract({
       code: contract.bytecode,
-      callData: contract.calldata.encode('Identity', 'init', []),
+      callData,
       deposit: 1000,
       vmVersion: 5,
       abiVersion: 3,
@@ -900,6 +901,23 @@ describe('Channel', () => {
       accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx,
     });
     expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
+    sinon.assert.calledTwice(responderSign);
+    sinon.assert.calledWithExactly<any>(
+      responderSign,
+      sinon.match('update_ack'),
+      sinon.match.string,
+      sinon.match({
+        updates: sinon.match([{
+          abi_version: 3,
+          call_data: callData,
+          code: contract.bytecode,
+          deposit: 1000,
+          op: 'OffChainNewContract',
+          owner: sinon.match.string,
+          vm_version: 5,
+        }]),
+      }),
+    );
     contractAddress = result.address;
   });
 
