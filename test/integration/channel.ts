@@ -399,14 +399,11 @@ describe('Channel', () => {
     const initiatorAddr = await aeSdkInitiatior.address();
     const responderAddr = await aeSdkResponder.address();
     const addresses = [initiatorAddr, responderAddr];
-    const initiatorBalances = await initiatorCh.balances(addresses);
-    const responderBalances = await responderCh.balances(addresses);
-    initiatorBalances.should.be.an('object');
-    responderBalances.should.be.an('object');
-    initiatorBalances[initiatorAddr].should.be.a('string');
-    initiatorBalances[responderAddr].should.be.a('string');
-    responderBalances[initiatorAddr].should.be.a('string');
-    responderBalances[responderAddr].should.be.a('string');
+    const balances = await initiatorCh.balances(addresses);
+    balances.should.be.an('object');
+    balances[initiatorAddr].should.be.a('string');
+    balances[responderAddr].should.be.a('string');
+    expect(balances).to.eql(await responderCh.balances(addresses));
   });
 
   it('can send a message', async () => {
