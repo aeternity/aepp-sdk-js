@@ -198,6 +198,11 @@ const BASE_TX = [
 
 export const TX_SCHEMA = {
   [TX_TYPE.account]: {
+    1: [
+      ...BASE_TX,
+      ['nonce', shortUInt],
+      ['balance', uInt],
+    ],
     2: [
       ...BASE_TX,
       ['flags', uInt],

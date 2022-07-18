@@ -22,7 +22,7 @@ import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
-  generateKeyPair, unpackTx, buildTx, buildTxHash, TX_TYPE,
+  generateKeyPair, unpackTx, buildTx, buildTxHash, encode, decode, TX_TYPE,
   IllegalArgumentError, InsufficientBalanceError, ChannelConnectionError,
 } from '../../src';
 import { pause } from '../../src/utils/other';
@@ -386,13 +386,24 @@ describe('Channel', () => {
     const responderAddr: EncodedData<'ak'> = await aeSdkResponder.address();
     const params = { accounts: [initiatorAddr, responderAddr] };
     const initiatorPoi: EncodedData<'pi'> = await initiatorCh.poi(params);
-    const responderPoi: EncodedData<'pi'> = await responderCh.poi(params);
+    expect(initiatorPoi).to.be.equal(await responderCh.poi(params));
     initiatorPoi.should.be.a('string');
-    responderPoi.should.be.a('string');
     const unpackedInitiatorPoi = unpackTx(initiatorPoi, TX_TYPE.proofOfInclusion);
-    const unpackedResponderPoi = unpackTx(responderPoi, TX_TYPE.proofOfInclusion);
-    buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx.should.equal(initiatorPoi);
-    buildTx(unpackedResponderPoi.tx, unpackedResponderPoi.txType, { prefix: 'pi' }).tx.should.equal(responderPoi);
+
+    // TODO: move to `unpackTx`/`MPTree`
+    function getAccountBalance(address: EncodedData<'ak'>): string {
+      const addressHex = decode(address).toString('hex');
+      const treeNode = unpackedInitiatorPoi.tx.accounts[0].get(addressHex);
+      if (treeNode == null) throw new Error(); // TODO: extract not null check
+      const { balance, ...account } = unpackTx(encode(treeNode, 'tx'), TX_TYPE.account).tx;
+      expect(account).to.eql({ tag: 10, VSN: 1, nonce: 0 });
+      return balance.toString();
+    }
+
+    expect(getAccountBalance(initiatorAddr)).to.eql('89999999999999999996');
+    expect(getAccountBalance(responderAddr)).to.eql('110000000000000000004');
+    expect(buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx)
+      .to.equal(initiatorPoi);
   });
 
   it('can get balances', async () => {
