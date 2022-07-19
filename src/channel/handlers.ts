@@ -66,12 +66,10 @@ function handleUnexpectedMessage(
   message: ChannelMessage,
   state: ChannelState,
 ): ChannelFsm {
-  if (state?.reject != null) {
-    state.reject(Object.assign(
-      new UnexpectedChannelMessageError(`Unexpected message received:\n\n${JSON.stringify(message)}`),
-      { wsMessage: message },
-    ));
-  }
+  state?.reject?.(Object.assign(
+    new UnexpectedChannelMessageError(`Unexpected message received:\n\n${JSON.stringify(message)}`),
+    { wsMessage: message },
+  ));
   return { handler: channelOpen };
 }
 
@@ -517,9 +515,7 @@ export function awaitingWithdrawCompletion(
   state: ChannelState,
 ): ChannelFsm {
   if (message.method === 'channels.on_chain_tx') {
-    if (state.onOnChainTx != null) {
-      state.onOnChainTx(message.params.data.tx);
-    }
+    state.onOnChainTx?.(message.params.data.tx);
     return { handler: awaitingWithdrawCompletion, state };
   }
   if (message.method === 'channels.info') {
@@ -530,10 +526,7 @@ export function awaitingWithdrawCompletion(
         own_withdraw_locked: state.onOwnWithdrawLocked,
         withdraw_locked: state.onWithdrawLocked,
       };
-      const callback = callbacks[message.params.data.event];
-      if (callback != null) {
-        callback();
-      }
+      callbacks[message.params.data.event]?.();
       return { handler: awaitingWithdrawCompletion, state };
     }
   }
@@ -596,9 +589,7 @@ export function awaitingDepositCompletion(
   state: ChannelState,
 ): ChannelFsm {
   if (message.method === 'channels.on_chain_tx') {
-    if (state.onOnChainTx != null) {
-      state.onOnChainTx(message.params.data.tx);
-    }
+    state.onOnChainTx?.(message.params.data.tx);
     return { handler: awaitingDepositCompletion, state };
   }
   if (message.method === 'channels.info') {
@@ -609,10 +600,7 @@ export function awaitingDepositCompletion(
         own_deposit_locked: state.onOwnDepositLocked,
         deposit_locked: state.onDepositLocked,
       };
-      const callback = callbacks[message.params.data.event];
-      if (callback != null) {
-        callback();
-      }
+      callbacks[message.params.data.event]?.();
       return { handler: awaitingDepositCompletion, state };
     }
   }
@@ -761,9 +749,7 @@ export function awaitingForceProgressCompletion(
   state: ChannelState,
 ): ChannelFsm {
   if (message.method === 'channels.on_chain_tx') {
-    if (state.onOnChainTx != null) {
-      state.onOnChainTx(message.params.data);
-    }
+    state.onOnChainTx?.(message.params.data.tx);
     emit(channel, 'onChainTx', message.params.data.tx, {
       info: message.params.data.info,
       type: message.params.data.type,

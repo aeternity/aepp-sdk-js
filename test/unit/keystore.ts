@@ -18,9 +18,9 @@
 import '..';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { dump, recover, Keystore } from '../../src/utils/keystore';
-import { getAddressFromPriv } from '../../src/utils/crypto';
-import { InvalidPasswordError } from '../../src/utils/errors';
+import {
+  dump, recover, Keystore, getAddressFromPriv, InvalidPasswordError,
+} from '../../src';
 
 const password = 'test';
 const secretKey = Buffer.from('35bdc4b31d75aebea2693760a2c96afe87d99dc571ddc4666db0ac8a2b59b30ef1e0c4e567f3d08eff8330c57d70ad457e9f31fa221e14fcc851273ec9af50ae', 'hex');

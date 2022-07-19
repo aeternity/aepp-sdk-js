@@ -198,6 +198,11 @@ const BASE_TX = [
 
 export const TX_SCHEMA = {
   [TX_TYPE.account]: {
+    1: [
+      ...BASE_TX,
+      ['nonce', shortUInt],
+      ['balance', uInt],
+    ],
     2: [
       ...BASE_TX,
       ['flags', uInt],
@@ -458,7 +463,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
       ['fee', fee],
       ['stateHash', FIELD_TYPES.binary, 'st'],
-      ['round', uInt],
+      ['round', shortUInt],
       ['nonce', shortUInt],
     ],
   },
@@ -471,7 +476,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
       ['fee', fee],
       ['stateHash', FIELD_TYPES.binary, 'st'],
-      ['round', uInt],
+      ['round', shortUInt],
       ['nonce', shortUInt],
     ],
   },
@@ -493,7 +498,7 @@ export const TX_SCHEMA = {
       ['channelId', FIELD_TYPES.id, 'ch'],
       ['fromId', FIELD_TYPES.id, 'ak'],
       ['payload', FIELD_TYPES.binary, 'tx'],
-      ['round', uInt],
+      ['round', shortUInt],
       ['update', FIELD_TYPES.binary, 'cb'],
       ['stateHash', FIELD_TYPES.binary, 'st'],
       ['offChainTrees', FIELD_TYPES.stateTree],
@@ -506,7 +511,7 @@ export const TX_SCHEMA = {
     2: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
-      ['round', uInt],
+      ['round', shortUInt],
       ['stateHash', FIELD_TYPES.binary, 'st'],
     ],
   },
@@ -522,7 +527,7 @@ export const TX_SCHEMA = {
       ['initiatorDelegateIds', FIELD_TYPES.ids],
       ['responderDelegateIds', FIELD_TYPES.ids],
       ['stateHash', FIELD_TYPES.hex],
-      ['round', uInt],
+      ['round', shortUInt],
       ['soloRound', uInt],
       ['lockPeriod', uInt],
       ['lockedUntil', uInt],
@@ -590,7 +595,7 @@ export const TX_SCHEMA = {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
-      ['round', uInt],
+      ['round', shortUInt],
       ['role', FIELD_TYPES.string],
       ['pubkey', FIELD_TYPES.id, 'ak'],
     ],

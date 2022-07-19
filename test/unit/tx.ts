@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -21,20 +21,15 @@ import { expect } from 'chai';
 import { encode as rlpEncode } from 'rlp';
 import BigNumber from 'bignumber.js';
 import { randomName } from '../utils';
-import { genSalt } from '../../src/utils/crypto';
 import {
-  decode,
-  encode,
-  getDefaultPointerKey,
-  commitmentHash,
-  getMinimumNameFee,
-  isNameValid,
-  produceNameId,
-} from '../../src/tx/builder/helpers';
-import { toBytes } from '../../src/utils/bytes';
-import { buildTx, unpackTx } from '../../src/tx/builder';
-import { NAME_BID_RANGES, TX_TYPE } from '../../src/tx/builder/schema';
-import { SchemaNotFoundError } from '../../src/utils/errors';
+  genSalt,
+  decode, encode,
+  getDefaultPointerKey, commitmentHash, getMinimumNameFee, isNameValid, produceNameId,
+  toBytes,
+  buildTx, unpackTx,
+  NAME_BID_RANGES, TX_TYPE,
+  SchemaNotFoundError,
+} from '../../src';
 
 describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {

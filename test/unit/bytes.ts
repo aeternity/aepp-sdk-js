@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -19,9 +19,8 @@ import '..';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
-import { toBytes, bigNumberToByteArray } from '../../src/utils/bytes';
+import { toBytes, bigNumberToByteArray, TypeError } from '../../src';
 import { isBase64, snakeToPascal, pascalToSnake } from '../../src/utils/string';
-import { TypeError } from '../../src/utils/errors';
 
 describe('Bytes', () => {
   const bytes = Buffer.from('hello');

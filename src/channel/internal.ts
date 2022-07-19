@@ -22,7 +22,9 @@ import type Channel from '.';
 import JsonBig from '../utils/json-big';
 import { pascalToSnake } from '../utils/string';
 import { EncodedData } from '../utils/encoder';
-import { ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError } from '../utils/errors';
+import {
+  BaseError, ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError,
+} from '../utils/errors';
 
 interface ChannelAction {
   guard: (channel: Channel, state?: ChannelFsm) => boolean;
@@ -75,15 +77,15 @@ export interface ChannelHandler extends Function {
 
 export interface ChannelState {
   signedTx: any;
-  resolve: Function;
-  reject: Function;
+  resolve: (r?: any) => void;
+  reject: (e: BaseError) => void;
   sign: SignTx;
   handler?: ChannelHandler;
-  onOnChainTx?: Function;
-  onOwnWithdrawLocked?: Function;
-  onWithdrawLocked?: Function;
-  onOwnDepositLocked?: Function;
-  onDepositLocked?: Function;
+  onOnChainTx?: (tx: EncodedData<'tx'>) => void;
+  onOwnWithdrawLocked?: () => void;
+  onWithdrawLocked?: () => void;
+  onOwnDepositLocked?: () => void;
+  onDepositLocked?: () => void;
   closeTx?: string;
 }
 

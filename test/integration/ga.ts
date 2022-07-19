@@ -18,12 +18,12 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
-import { generateKeyPair } from '../../src/utils/crypto';
+import {
+  AeSdk, TX_TYPE, genSalt, generateKeyPair, unpackTx,
+} from '../../src';
 import { encode, EncodedData } from '../../src/utils/encoder';
 import MemoryAccount from '../../src/account/Memory';
-import { unpackTx } from '../../src/tx/builder';
 import { ContractInstance } from '../../src/contract/aci';
-import { AeSdk, TX_TYPE, genSalt } from '../../src';
 
 const authContractSource = `contract BlindAuth =
   record state = { txHash: option(hash) }

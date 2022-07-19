@@ -29,7 +29,7 @@ const numberPropertyNames = [
   'nonce', 'nextNonce', 'height', 'blockHeight', 'top', 'topBlockHeight',
   'ttl', 'nameTtl', 'clientTtl',
   'inbound', 'outbound', 'peerCount', 'pendingTransactionsCount', 'effectiveAtHeight',
-  'version', 'solutions',
+  'version', 'solutions', 'round',
 ] as const;
 
 type BigIntPropertyNames = typeof bigIntPropertyNames[number];

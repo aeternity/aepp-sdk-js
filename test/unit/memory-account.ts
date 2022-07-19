@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -19,8 +19,7 @@ import '..';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import MemoryAccount from '../../src/account/Memory';
-import { generateKeyPair } from '../../src/utils/crypto';
-import { InvalidKeypairError, DecodeError } from '../../src/utils/errors';
+import { generateKeyPair, InvalidKeypairError, DecodeError } from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
 
 const testAcc = generateKeyPair();

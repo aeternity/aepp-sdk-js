@@ -15,10 +15,20 @@ directive:
     where: $.components.schemas
     transform: >
       if ($doc.info.title === 'node') return $;
+      $.ContractCallObject.properties.return_type.enum = ['ok', 'error', 'revert'];
+      $.GAObject.properties.return_type.enum = ['ok', 'error'];
+    reason: add missed enums https://github.com/aeternity/aeternity/pull/3953
+
+  - from: openapi-document
+    where: $.components.schemas
+    transform: >
+      if ($doc.info.title === 'node') return $;
       $.Account.properties.kind['x-ms-enum'] = { name: 'AccountKind' };
       $.Tx.allOf[0].properties.type['x-ms-enum'] = { name: 'TxType' };
       $.TTL.properties.type['x-ms-enum'] = { name: 'TTLType' };
       $.RelativeTTL.properties.type['x-ms-enum'] = { name: 'RelativeTTLType' };
+      $.ContractCallObject.properties.return_type['x-ms-enum'] = { name: 'ContractCallReturnType' };
+      $.GAObject.properties.return_type['x-ms-enum'] = { name: 'GAReturnType' };
     reason: thread schemas enums as constants instead of strings
 
   - from: openapi-document
@@ -151,7 +161,7 @@ version: ^3.6.1
 use-extension:
   '@autorest/typescript': ^6.0.0-beta.18
   '@autorest/modelerfour': ^4.23.1
-input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.5.1/apps/aehttp/priv/oas3.yaml
+input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.5.2/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
 client-side-validation: true

@@ -17,8 +17,9 @@
 import { expect } from 'chai';
 import { before, describe, it } from 'mocha';
 import BigNumber from 'bignumber.js';
-import { decode } from '../../src/tx/builder/helpers';
 import {
+  AeSdk,
+  decode,
   BytecodeMismatchError,
   InvalidAensNameError,
   InvalidMethodInvocationError,
@@ -29,11 +30,10 @@ import {
   AmbiguousEventDefinitionError,
   UnexpectedTsError,
   IllegalArgumentError,
-} from '../../src/utils/errors';
+} from '../../src';
 import { getSdk } from '.';
 import { EncodedData } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
-import { AeSdk } from '../../src';
 import { Aci } from '../../src/apis/compiler';
 
 const identityContractSource = `

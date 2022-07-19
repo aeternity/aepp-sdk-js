@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -21,18 +21,14 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
-import { generateKeyPair } from '../../src/utils/crypto';
+import {
+  generateKeyPair, unpackTx, buildTx, buildTxHash, encode, decode, TX_TYPE,
+  IllegalArgumentError, InsufficientBalanceError, ChannelConnectionError,
+} from '../../src';
 import { pause } from '../../src/utils/other';
-import { unpackTx, buildTx, buildTxHash } from '../../src/tx/builder';
-import { TX_TYPE } from '../../src/tx/builder/schema';
 import Channel from '../../src/channel';
 import { ChannelOptions, send } from '../../src/channel/internal';
 import MemoryAccount from '../../src/account/Memory';
-import {
-  IllegalArgumentError,
-  InsufficientBalanceError,
-  ChannelConnectionError,
-} from '../../src/utils/errors';
 import { EncodedData } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
 
@@ -53,6 +49,10 @@ async function waitForChannel(channel: Channel): Promise<void> {
   });
 }
 
+function assertNotNull(value: any): asserts value {
+  if (value == null) throw new Error('Expected to be not null');
+}
+
 describe('Channel', () => {
   let aeSdkInitiatior: any;
   let aeSdkResponder: any;
@@ -61,7 +61,7 @@ describe('Channel', () => {
   let responderShouldRejectUpdate: number | boolean;
   let existingChannelId: string;
   let offchainTx: string;
-  let contractAddress: string;
+  let contractAddress: EncodedData<'ct'>;
   let callerNonce: number;
   let contract: any;
   const initiatorSign: sinon.SinonSpy = sinon
@@ -175,15 +175,16 @@ describe('Channel', () => {
   it('can post update and accept', async () => {
     responderShouldRejectUpdate = false;
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
     const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior));
-    const amount = 1;
+    const amount = new BigNumber('10e18');
     const result = await initiatorCh.update(
       await aeSdkInitiatior.address(),
       await aeSdkResponder.address(),
       amount,
       sign,
     );
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
+    expect(initiatorCh.round()).to.equal(roundBefore + 1);
     result.accepted.should.equal(true);
     expect(result.signedTx).to.be.a('string');
     sinon.assert.notCalled(initiatorSign);
@@ -194,7 +195,7 @@ describe('Channel', () => {
       sinon.match.string,
       sinon.match({
         updates: sinon.match([{
-          amount: sinon.match(amount),
+          amount: sinon.match(amount.toString()),
           from: sinon.match(await aeSdkInitiatior.address()),
           to: sinon.match(await aeSdkResponder.address()),
           op: sinon.match('OffChainTransfer'),
@@ -207,7 +208,7 @@ describe('Channel', () => {
       sinon.match.string,
       sinon.match({
         updates: sinon.match([{
-          amount: sinon.match(amount),
+          amount: sinon.match(amount.toString()),
           from: sinon.match(await aeSdkInitiatior.address()),
           to: sinon.match(await aeSdkResponder.address()),
           op: sinon.match('OffChainTransfer'),
@@ -220,7 +221,7 @@ describe('Channel', () => {
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
         {
-          amount,
+          amount: amount.toString(),
           from: await aeSdkInitiatior.address(),
           to: await aeSdkResponder.address(),
           op: 'OffChainTransfer',
@@ -310,60 +311,6 @@ describe('Channel', () => {
     });
   });
 
-  it('can post bignumber update and accept', async () => {
-    responderShouldRejectUpdate = false;
-    const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior));
-    const amount = new BigNumber('10e18');
-    const result = await initiatorCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
-      amount,
-      sign,
-    );
-    result.accepted.should.equal(true);
-    expect(result.signedTx).to.be.a('string');
-    sinon.assert.notCalled(initiatorSign);
-    sinon.assert.calledOnce(responderSign);
-    sinon.assert.calledWithExactly<any>(
-      responderSign,
-      sinon.match('update_ack'),
-      sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
-          amount: sinon.match(amount.toString()),
-          from: sinon.match(await aeSdkInitiatior.address()),
-          to: sinon.match(await aeSdkResponder.address()),
-          op: sinon.match('OffChainTransfer'),
-        }]),
-      }),
-    );
-    sinon.assert.calledOnce(sign);
-    sinon.assert.calledWithExactly(
-      sign,
-      sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
-          amount: sinon.match(amount.toString()),
-          from: sinon.match(await aeSdkInitiatior.address()),
-          to: sinon.match(await aeSdkResponder.address()),
-          op: sinon.match('OffChainTransfer'),
-        }]),
-      }),
-    );
-    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
-    txType.should.equal(TX_TYPE.channelOffChain);
-    expect(sign.firstCall.args[1]).to.eql({
-      updates: [
-        {
-          amount: amount.toString(),
-          from: await aeSdkInitiatior.address(),
-          to: await aeSdkResponder.address(),
-          op: 'OffChainTransfer',
-        },
-      ],
-    });
-  });
-
   it('can post update with metadata', async () => {
     responderShouldRejectUpdate = true;
     const meta = 'meta 1';
@@ -390,27 +337,24 @@ describe('Channel', () => {
     const responderAddr: EncodedData<'ak'> = await aeSdkResponder.address();
     const params = { accounts: [initiatorAddr, responderAddr] };
     const initiatorPoi: EncodedData<'pi'> = await initiatorCh.poi(params);
-    const responderPoi: EncodedData<'pi'> = await responderCh.poi(params);
+    expect(initiatorPoi).to.be.equal(await responderCh.poi(params));
     initiatorPoi.should.be.a('string');
-    responderPoi.should.be.a('string');
     const unpackedInitiatorPoi = unpackTx(initiatorPoi, TX_TYPE.proofOfInclusion);
-    const unpackedResponderPoi = unpackTx(responderPoi, TX_TYPE.proofOfInclusion);
-    buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx.should.equal(initiatorPoi);
-    buildTx(unpackedResponderPoi.tx, unpackedResponderPoi.txType, { prefix: 'pi' }).tx.should.equal(responderPoi);
-  });
 
-  it('can get balances', async () => {
-    const initiatorAddr = await aeSdkInitiatior.address();
-    const responderAddr = await aeSdkResponder.address();
-    const addresses = [initiatorAddr, responderAddr];
-    const initiatorBalances = await initiatorCh.balances(addresses);
-    const responderBalances = await responderCh.balances(addresses);
-    initiatorBalances.should.be.an('object');
-    responderBalances.should.be.an('object');
-    initiatorBalances[initiatorAddr].should.be.a('string');
-    initiatorBalances[responderAddr].should.be.a('string');
-    responderBalances[initiatorAddr].should.be.a('string');
-    responderBalances[responderAddr].should.be.a('string');
+    // TODO: move to `unpackTx`/`MPTree`
+    function getAccountBalance(address: EncodedData<'ak'>): string {
+      const addressHex = decode(address).toString('hex');
+      const treeNode = unpackedInitiatorPoi.tx.accounts[0].get(addressHex);
+      assertNotNull(treeNode);
+      const { balance, ...account } = unpackTx(encode(treeNode, 'tx'), TX_TYPE.account).tx;
+      expect(account).to.eql({ tag: 10, VSN: 1, nonce: 0 });
+      return balance.toString();
+    }
+
+    expect(getAccountBalance(initiatorAddr)).to.eql('89999999999999999997');
+    expect(getAccountBalance(responderAddr)).to.eql('110000000000000000003');
+    expect(buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx)
+      .to.equal(initiatorPoi);
   });
 
   it('can send a message', async () => {
@@ -437,13 +381,14 @@ describe('Channel', () => {
     const onWithdrawLocked = sinon.spy();
     responderShouldRejectUpdate = false;
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
     const result = await initiatorCh.withdraw(
       amount,
       sign,
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked },
     );
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
+    expect(initiatorCh.round()).to.equal(roundBefore + 1);
     sinon.assert.called(onOnChainTx);
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string);
     sinon.assert.calledOnce(onOwnWithdrawLocked);
@@ -566,13 +511,14 @@ describe('Channel', () => {
     const onDepositLocked = sinon.spy();
     responderShouldRejectUpdate = false;
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
     const result = await initiatorCh.deposit(
       amount,
       sign,
       { onOnChainTx, onOwnDepositLocked, onDepositLocked },
     );
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
+    expect(initiatorCh.round()).to.equal(roundBefore + 1);
     sinon.assert.called(onOnChainTx);
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string);
     sinon.assert.calledOnce(onOwnDepositLocked);
@@ -889,9 +835,11 @@ describe('Channel', () => {
     contract = await aeSdkInitiatior.getContractInstance({ source: contractSource });
     await contract.compile();
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
+    const callData = contract.calldata.encode('Identity', 'init', []);
     const result = await initiatorCh.createContract({
       code: contract.bytecode,
-      callData: contract.calldata.encode('Identity', 'init', []),
+      callData,
       deposit: 1000,
       vmVersion: 5,
       abiVersion: 3,
@@ -899,7 +847,24 @@ describe('Channel', () => {
     result.should.eql({
       accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx,
     });
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
+    expect(initiatorCh.round()).to.equal(roundBefore + 1);
+    sinon.assert.calledTwice(responderSign);
+    sinon.assert.calledWithExactly<any>(
+      responderSign,
+      sinon.match('update_ack'),
+      sinon.match.string,
+      sinon.match({
+        updates: sinon.match([{
+          abi_version: 3,
+          call_data: callData,
+          code: contract.bytecode,
+          deposit: 1000,
+          op: 'OffChainNewContract',
+          owner: sinon.match.string,
+          vm_version: 5,
+        }]),
+      }),
+    );
     contractAddress = result.address;
   });
 
@@ -948,8 +913,22 @@ describe('Channel', () => {
     });
   });
 
+  it('can get balances', async () => {
+    const initiatorAddr = await aeSdkInitiatior.address();
+    const responderAddr = await aeSdkResponder.address();
+    const contractAddr = encode(decode(contractAddress), 'ak');
+    const addresses = [initiatorAddr, responderAddr, contractAddr];
+    const balances = await initiatorCh.balances(addresses);
+    balances.should.be.an('object');
+    balances[initiatorAddr].should.be.a('string');
+    balances[responderAddr].should.be.a('string');
+    balances[contractAddr].should.be.equal(1000);
+    expect(balances).to.eql(await responderCh.balances(addresses));
+  });
+
   it('can call a contract and accept', async () => {
     const roundBefore = initiatorCh.round();
+    assertNotNull(roundBefore);
     const result = await initiatorCh.callContract({
       amount: 0,
       callData: contract.calldata.encode('Identity', 'getArg', [42]),
@@ -957,8 +936,10 @@ describe('Channel', () => {
       abiVersion: 3,
     }, async (tx) => aeSdkInitiatior.signTransaction(tx));
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
-    expect(initiatorCh.round()).to.equal((roundBefore as number) + 1);
-    callerNonce = initiatorCh.round() as number;
+    const round = initiatorCh.round();
+    assertNotNull(round);
+    expect(round).to.equal(roundBefore + 1);
+    callerNonce = round;
   });
 
   it('can call a force progress', async () => {

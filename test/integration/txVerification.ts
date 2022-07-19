@@ -1,12 +1,11 @@
 import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
-import { generateKeyPair } from '../../src/utils/crypto';
+import {
+  AeSdk, Node, InvalidTxError, InvalidTxParamsError, generateKeyPair, TX_TYPE,
+} from '../../src';
 import MemoryAccount from '../../src/account/Memory';
 import verifyTransaction from '../../src/tx/validator';
-import { InvalidTxParamsError } from '../../src/utils/errors';
-import { TX_TYPE } from '../../src/tx/builder/schema';
-import { AeSdk, Node, InvalidTxError } from '../../src';
 
 describe('Verify Transaction', () => {
   let aeSdk: AeSdk;

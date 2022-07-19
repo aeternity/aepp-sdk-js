@@ -17,10 +17,8 @@
 
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import Node from '../../src/Node';
-import AeSdkBase from '../../src/AeSdkBase';
 import { url, ignoreVersion } from '.';
-import { NodeNotFoundError } from '../../src/utils/errors';
+import { AeSdkBase, Node, NodeNotFoundError } from '../../src';
 
 describe('Node client', () => {
   let node: Node;

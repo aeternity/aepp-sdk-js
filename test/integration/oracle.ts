@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -18,13 +18,13 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
-import { generateKeyPair } from '../../src/utils/crypto';
+import {
+  AeSdk, UnexpectedTsError,
+  generateKeyPair, decode, postQueryToOracle, registerOracle,
+  ORACLE_TTL_TYPES, QUERY_FEE,
+} from '../../src';
 import MemoryAccount from '../../src/account/Memory';
-import { ORACLE_TTL_TYPES, QUERY_FEE } from '../../src/tx/builder/schema';
-import { decode } from '../../src/tx/builder/helpers';
-import { postQueryToOracle, registerOracle } from '../../src/oracle';
 import { EncodedData } from '../../src/utils/encoder';
-import { AeSdk, UnexpectedTsError } from '../../src';
 
 describe('Oracle', () => {
   let aeSdk: AeSdk;
