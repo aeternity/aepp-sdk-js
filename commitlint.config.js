@@ -11,6 +11,7 @@ module.exports = {
         'channel',
         'compiler',
         'contract',
+        'deps',
         'node',
         'oracle',
         'tx-builder',
