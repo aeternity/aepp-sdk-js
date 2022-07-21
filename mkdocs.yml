@@ -4,6 +4,7 @@ plugins:
   - mkdocs-simple-hooks:
       hooks:
         on_pre_build: 'docs.hooks:pre_build'
+        on_page_markdown: 'docs.hooks:page_markdown'
 repo_url: 'https://github.com/aeternity/aepp-sdk-js'
 edit_uri: ''
 
