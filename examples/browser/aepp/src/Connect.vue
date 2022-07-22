@@ -65,7 +65,7 @@ export default {
   methods: {
     async scanForWallets () {
       return new Promise((resolve) => {
-        const handleWallets = async function ({ wallets, newWallet }) {
+        const handleWallets = async ({ wallets, newWallet }) => {
           newWallet = newWallet || Object.values(wallets)[0]
           if (confirm(`Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`)) {
             console.log('newWallet', newWallet)
@@ -80,7 +80,7 @@ export default {
         }
 
         const scannerConnection = new BrowserWindowMessageConnection()
-        const stopScan = walletDetector(scannerConnection, handleWallets.bind(this))
+        const stopScan = walletDetector(scannerConnection, handleWallets)
       })
     },
     async connect () {

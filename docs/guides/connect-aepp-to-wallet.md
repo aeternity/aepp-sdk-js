@@ -9,15 +9,15 @@ You can build your own wallet in the next example
 
 ## 1. Specify imports and constants
 
-https://github.com/aeternity/aepp-sdk-js/blob/32fbb8b44b08025d7abe53bdfa275893271cbf56/examples/browser/aepp/src/StoreAeSdkPlugin.js#L1-L5
+https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b32781769342e4941c8dacf6ad53/examples/browser/aepp/src/StoreAeSdkPlugin.js#L1-L5
 
 ## 2. Initialize the `AeSdkAepp` class
 
-https://github.com/aeternity/aepp-sdk-js/blob/32fbb8b44b08025d7abe53bdfa275893271cbf56/examples/browser/aepp/src/StoreAeSdkPlugin.js#L34-L49
+https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b32781769342e4941c8dacf6ad53/examples/browser/aepp/src/StoreAeSdkPlugin.js#L34-L49
 
 ## 3. Scan for wallets and connect to a wallet
 
-https://github.com/aeternity/aepp-sdk-js/blob/32fbb8b44b08025d7abe53bdfa275893271cbf56/examples/browser/aepp/src/Connect.vue#L66-L85
+https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b32781769342e4941c8dacf6ad53/examples/browser/aepp/src/Connect.vue#L66-L85
 
 Alternatively, aepp can request wallet to share node url it connected to. If agreed, then aepp can
 connect to the wallet's node.

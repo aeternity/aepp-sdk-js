@@ -27,5 +27,17 @@
   },
   "include": [
     "src/**/*"
-  ]
+  ],
+  "typedocOptions": {
+    "entryPoints": ["src/index.ts"],
+    "out": "./docs/api",
+    "excludePrivate": true,
+    "githubPages": false,
+    "excludeExternals": true,
+    "treatWarningsAsErrors": true,
+    "validation": {
+      "invalidLink": true
+    },
+    "readme": "none"
+  }
 }
