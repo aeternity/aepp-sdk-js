@@ -23,7 +23,7 @@ import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
   generateKeyPair, unpackTx, buildTx, buildTxHash, encode, decode, TX_TYPE,
-  IllegalArgumentError, InsufficientBalanceError, ChannelConnectionError,
+  IllegalArgumentError, InsufficientBalanceError, ChannelConnectionError, encodeContractAddress,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 import Channel from '../../src/channel';
@@ -865,6 +865,9 @@ describe('Channel', () => {
         }]),
       }),
     );
+    const { updates: [{ owner }] } = responderSign.lastCall.lastArg;
+    // TODO: extract this calculation https://github.com/aeternity/aepp-sdk-js/issues/1619
+    expect(encodeContractAddress(owner, roundBefore + 1)).to.equal(result.address);
     contractAddress = result.address;
   });
 
