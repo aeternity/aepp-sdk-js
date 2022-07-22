@@ -490,8 +490,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#1-specify-imports-and-constants-and-state" class="md-nav__link">
-    1. Specify imports and constants and state
+  <a href="#1-specify-imports-and-constants" class="md-nav__link">
+    1. Specify imports and constants
   </a>
   
 </li>
@@ -504,22 +504,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-scan-for-wallets" class="md-nav__link">
-    3. Scan for wallets
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4a-connect-to-a-wallet" class="md-nav__link">
-    4a. Connect to a wallet
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4b-connect-to-a-wallet-and-use-wallets-node-for-on-chain-communications" class="md-nav__link">
-    4b. Connect to a wallet and use Wallet's node for on chain communications
+  <a href="#3-scan-for-wallets-and-connect-to-a-wallet" class="md-nav__link">
+    3. Scan for wallets and connect to a wallet
   </a>
   
 </li>
@@ -990,8 +976,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#1-specify-imports-and-constants-and-state" class="md-nav__link">
-    1. Specify imports and constants and state
+  <a href="#1-specify-imports-and-constants" class="md-nav__link">
+    1. Specify imports and constants
   </a>
   
 </li>
@@ -1004,22 +990,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-scan-for-wallets" class="md-nav__link">
-    3. Scan for wallets
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4a-connect-to-a-wallet" class="md-nav__link">
-    4a. Connect to a wallet
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4b-connect-to-a-wallet-and-use-wallets-node-for-on-chain-communications" class="md-nav__link">
-    4b. Connect to a wallet and use Wallet's node for on chain communications
+  <a href="#3-scan-for-wallets-and-connect-to-a-wallet" class="md-nav__link">
+    3. Scan for wallets and connect to a wallet
   </a>
   
 </li>
@@ -1045,83 +1017,69 @@
 <li>Install <a href="https://wallet.superhero.com/">Superhero Wallet extension</a> for simplicity of example.
 You can build your own wallet in the next example</li>
 </ul>
-<h2 id="1-specify-imports-and-constants-and-state">1. Specify imports and constants and state</h2>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdkAepp</span><span class="p">,</span><span class="w"> </span><span class="nx">walletDetector</span><span class="p">,</span><span class="w"> </span><span class="nx">BrowserWindowMessageConnection</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+<h2 id="1-specify-imports-and-constants">1. Specify imports and constants</h2>
+<p><div class="highlight"><span class="filename">examples/browser/aepp/src/StoreAeSdkPlugin.js</span><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdkAepp</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span><span class="w"></span>
 
-<span class="kd">const</span><span class="w"> </span><span class="nx">TESTNET_NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">MAINNET_NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://mainnet.aeternity.io&#39;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">TESTNET_NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">MAINNET_NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://mainnet.aeternity.io&#39;</span><span class="p">;</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">;</span><span class="w"></span>
-
-<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">({</span><span class="w"></span>
-<span class="w">    </span><span class="nx">aeSdk</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">address</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">balance</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">nodeInfo</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">connectedAccounts</span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="w"></span>
-<span class="w">  </span><span class="p">}),</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
 </code></pre></div>
+View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b32781769342e4941c8dacf6ad53/examples/browser/aepp/src/StoreAeSdkPlugin.js#L1-L5">GitHub</a></p>
 <h2 id="2-initialize-the-aesdkaepp-class">2. Initialize the <code>AeSdkAepp</code> class</h2>
-<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="nx">created</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdkAepp</span><span class="p">({</span><span class="w"></span>
-<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Simple Aepp&#39;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ae_uat&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">TESTNET_NODE_URL</span><span class="p">)</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ae_mainnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">MAINNET_NODE_URL</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">],</span><span class="w"></span>
-<span class="w">    </span><span class="nx">compilerUrl</span><span class="o">:</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">onNetworkChange</span><span class="o">:</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">networkId</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">selectNode</span><span class="p">(</span><span class="nx">networkId</span><span class="p">)</span><span class="w"></span>
-<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">nodeInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getNodeInfo</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="nx">onAddressChange</span><span class="o">:</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span><span class="w"></span>
-<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">address</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="nx">onDisconnect</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="c1">// you may want to reset state here</span><span class="w"></span>
-<span class="w">      </span><span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Disconnected&#39;</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="p">})</span><span class="w"></span>
-<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">scanForWallets</span><span class="p">()</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<p><div class="highlight"><span class="filename">examples/browser/aepp/src/StoreAeSdkPlugin.js</span><pre><span></span><code><span class="w">        </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdkAepp</span><span class="p">({</span><span class="w"></span>
+<span class="w">          </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Simple æpp&#39;</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">TESTNET_NODE_URL</span><span class="p">)</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;mainnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">MAINNET_NODE_URL</span><span class="p">)</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">          </span><span class="p">],</span><span class="w"></span>
+<span class="w">          </span><span class="nx">compilerUrl</span><span class="o">:</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="nx">onNetworkChange</span><span class="o">:</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">networkId</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="kd">const</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="p">}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getNodesInPool</span><span class="p">())</span><span class="w"></span>
+<span class="w">              </span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">node</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">node</span><span class="p">.</span><span class="nx">nodeNetworkId</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">networkId</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">selectNode</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="nx">commit</span><span class="p">(</span><span class="s1">&#39;setNetworkId&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">networkId</span><span class="p">);</span><span class="w"></span>
+<span class="w">          </span><span class="p">},</span><span class="w"></span>
+<span class="w">          </span><span class="nx">onAddressChange</span><span class="o">:</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">current</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">commit</span><span class="p">(</span><span class="s1">&#39;setAddress&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">current</span><span class="p">)[</span><span class="mf">0</span><span class="p">]),</span><span class="w"></span>
+<span class="w">          </span><span class="nx">onDisconnect</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Aepp is disconnected&#39;</span><span class="p">),</span><span class="w"></span>
+<span class="w">        </span><span class="p">});</span><span class="w"></span>
 </code></pre></div>
-<h2 id="3-scan-for-wallets">3. Scan for wallets</h2>
-<div class="highlight"><pre><span></span><code><span class="nx">methods</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">scanForWallets</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">handleWallets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">wallets</span><span class="p">,</span><span class="w"> </span><span class="nx">newWallet</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="nx">newWallet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">newWallet</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">wallets</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span><span class="w"></span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Do you want to connect to wallet </span><span class="si">${</span><span class="nx">newWallet</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">          </span><span class="nx">stopScan</span><span class="p">()</span><span class="w"></span>
-<span class="w">          </span><span class="c1">// connect to the wallet, see step 4.</span><span class="w"></span>
-<span class="w">          </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">newWallet</span><span class="p">)</span><span class="w"></span>
-<span class="w">          </span><span class="nx">resolve</span><span class="p">()</span><span class="w"></span>
+View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b32781769342e4941c8dacf6ad53/examples/browser/aepp/src/StoreAeSdkPlugin.js#L34-L49">GitHub</a></p>
+<h2 id="3-scan-for-wallets-and-connect-to-a-wallet">3. Scan for wallets and connect to a wallet</h2>
+<p><div class="highlight"><span class="filename">examples/browser/aepp/src/Connect.vue</span><pre><span></span><code><span class="w">    </span><span class="k">async</span><span class="w"> </span><span class="nx">scanForWallets</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">handleWallets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">wallets</span><span class="p">,</span><span class="w"> </span><span class="nx">newWallet</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="nx">newWallet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">newWallet</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">wallets</span><span class="p">)[</span><span class="mf">0</span><span class="p">]</span><span class="w"></span>
+<span class="w">          </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="sb">`Do you want to connect to wallet </span><span class="si">${</span><span class="nx">newWallet</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with id </span><span class="si">${</span><span class="nx">newWallet</span><span class="p">.</span><span class="nx">info</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;newWallet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">newWallet</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="nx">stopScan</span><span class="p">()</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="nx">walletInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="nx">newWallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">())</span><span class="w"></span>
+<span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="nx">walletConnected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="w">            </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">address</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">current</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">subscribeAddress</span><span class="p">(</span><span class="s1">&#39;subscribe&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;connected&#39;</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="nx">$store</span><span class="p">.</span><span class="nx">commit</span><span class="p">(</span><span class="s1">&#39;aeSdk/setAddress&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">current</span><span class="p">)[</span><span class="mf">0</span><span class="p">])</span><span class="w"></span>
+<span class="w">            </span><span class="nx">resolve</span><span class="p">()</span><span class="w"></span>
+<span class="w">          </span><span class="p">}</span><span class="w"></span>
 <span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">      </span><span class="p">}</span><span class="w"></span>
-<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">scannerConnection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">BrowserWindowMessageConnection</span><span class="p">()</span><span class="w"></span>
-<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">stopScan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">walletDetector</span><span class="p">(</span><span class="nx">scannerConnection</span><span class="p">,</span><span class="w"> </span><span class="nx">handleWallets</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">))</span><span class="w"></span>
-<span class="w">    </span><span class="p">})</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">scannerConnection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">BrowserWindowMessageConnection</span><span class="p">()</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">stopScan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">walletDetector</span><span class="p">(</span><span class="nx">scannerConnection</span><span class="p">,</span><span class="w"> </span><span class="nx">handleWallets</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">})</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
 </code></pre></div>
-<h2 id="4a-connect-to-a-wallet">4a. Connect to a wallet</h2>
-<p>Append method for wallet connection</p>
-<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="nx">connect</span><span class="p">(</span><span class="nx">wallet</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">())</span><span class="w"></span>
-<span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">connectedAccounts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">subscribeAddress</span><span class="p">(</span><span class="s1">&#39;subscribe&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;connected&#39;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">address</span><span class="p">).</span><span class="k">catch</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">nodeInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getNodeInfo</span><span class="p">()</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b32781769342e4941c8dacf6ad53/examples/browser/aepp/src/Connect.vue#L66-L85">GitHub</a></p>
+<p>Alternatively, aepp can request wallet to share node url it connected to. If agreed, then aepp can
+connect to the wallet's node.</p>
+<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="w"></span>
+<span class="w">  </span><span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">(),</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">connectNode</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;wallet-node&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </code></pre></div>
-<h2 id="4b-connect-to-a-wallet-and-use-wallets-node-for-on-chain-communications">4b. Connect to a wallet and use Wallet's node for on chain communications</h2>
-<p>Aepps can ask the wallet to share node, if wallet supports node sharing then the Aepp can communicate with the chain using the same SDK instance.</p>
-<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="nx">connect</span><span class="w"> </span><span class="p">(</span><span class="nx">wallet</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">connectNode</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;wallet-node&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
-</code></pre></div>
+<p>It can be used to</p>
+<ul>
+<li>improve responsiveness by connecting to the exact node that wallet uses;</li>
+<li>allow to connect aepps to private/development networks without changing their configuration;</li>
+<li>simplify configuration on aepp side.</li>
+</ul>
 <p>Note:</p>
 <ul>
 <li>The steps above are snippets taken from the full implementation of
