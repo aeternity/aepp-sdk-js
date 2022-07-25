@@ -34,7 +34,7 @@ import {
   QUERY_FEE,
   QUERY_TTL,
   RESPONSE_TTL,
-  TX_TYPE,
+  Tag,
 } from './tx/builder/schema';
 import { RequestTimedOutError } from './utils/errors';
 import { EncodedData } from './utils/encoder';
@@ -169,7 +169,7 @@ export async function postQueryToOracle(
   options.queryFee ??= (await options.onNode.getOracleByPubkey(oracleId)).queryFee.toString();
   const senderId = await options.onAccount.address(options);
 
-  const oracleQueryTx = await _buildTx(TX_TYPE.oracleQuery, {
+  const oracleQueryTx = await _buildTx(Tag.OracleQueryTx, {
     queryTtlType: QUERY_TTL.type,
     queryTtlValue: QUERY_TTL.value,
     responseTtlType: RESPONSE_TTL.type,
@@ -179,7 +179,7 @@ export async function postQueryToOracle(
     senderId,
     query,
   });
-  const { nonce } = unpackTx(oracleQueryTx, TX_TYPE.oracleQuery).tx;
+  const { nonce } = unpackTx(oracleQueryTx, Tag.OracleQueryTx).tx;
   const queryId = oracleQueryId(senderId, nonce, oracleId);
   return {
     ...await send(oracleQueryTx, options),
@@ -189,7 +189,7 @@ export async function postQueryToOracle(
 
 type PostQueryToOracleOptionsType = Parameters<typeof send>[1]
 & Parameters<typeof getQueryObject>[2]
-& BuildTxOptions<TX_TYPE.oracleQuery, 'oracleId' | 'senderId' | 'query' | 'queryTtlType' | 'queryTtlValue' | 'responseTtlType' | 'responseTtlValue'>
+& BuildTxOptions<Tag.OracleQueryTx, 'oracleId' | 'senderId' | 'query' | 'queryTtlType' | 'queryTtlValue' | 'responseTtlType' | 'responseTtlValue'>
 & {
   queryTtlType?: ORACLE_TTL_TYPES;
   queryTtlValue?: number;
@@ -213,7 +213,7 @@ export async function extendOracleTtl(
   oracleId: EncodedData<'ok'>,
   options: ExtendOracleTtlOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
-  const oracleExtendTx = await _buildTx(TX_TYPE.oracleExtend, {
+  const oracleExtendTx = await _buildTx(Tag.OracleExtendTx, {
     oracleTtlType: ORACLE_TTL.type,
     oracleTtlValue: ORACLE_TTL.value,
     ...options,
@@ -228,7 +228,7 @@ export async function extendOracleTtl(
 }
 
 type ExtendOracleTtlOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
-& BuildTxOptions<TX_TYPE.oracleExtend, 'oracleTtlType' | 'oracleTtlValue' | 'callerId' | 'oracleId'>
+& BuildTxOptions<Tag.OracleExtendTx, 'oracleTtlType' | 'oracleTtlValue' | 'callerId' | 'oracleId'>
 & { oracleTtlType?: ORACLE_TTL_TYPES; oracleTtlValue?: number };
 interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
 
@@ -250,7 +250,7 @@ export async function respondToQuery(
   response: string,
   options: RespondToQueryOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
-  const oracleRespondTx = await _buildTx(TX_TYPE.oracleResponse, {
+  const oracleRespondTx = await _buildTx(Tag.OracleResponseTx, {
     responseTtlType: RESPONSE_TTL.type,
     responseTtlValue: RESPONSE_TTL.value,
     ...options,
@@ -267,7 +267,7 @@ export async function respondToQuery(
 }
 
 type RespondToQueryOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
-& BuildTxOptions<TX_TYPE.oracleResponse, 'callerId' | 'oracleId' | 'queryId' | 'response' | 'responseTtlType' | 'responseTtlValue'>
+& BuildTxOptions<Tag.OracleResponseTx, 'callerId' | 'oracleId' | 'queryId' | 'response' | 'responseTtlType' | 'responseTtlValue'>
 & { responseTtlType?: ORACLE_TTL_TYPES; responseTtlValue?: number };
 interface RespondToQueryOptions extends RespondToQueryOptionsType {}
 
@@ -337,7 +337,7 @@ export async function registerOracle(
   options: RegisterOracleOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const accountId = await options.onAccount.address(options);
-  const oracleRegisterTx = await _buildTx(TX_TYPE.oracleRegister, {
+  const oracleRegisterTx = await _buildTx(Tag.OracleRegisterTx, {
     queryFee: QUERY_FEE,
     oracleTtlValue: ORACLE_TTL.value,
     oracleTtlType: ORACLE_TTL.type,
@@ -353,7 +353,7 @@ export async function registerOracle(
 }
 
 type RegisterOracleOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
-& BuildTxOptions<TX_TYPE.oracleRegister, 'accountId' | 'queryFormat' | 'responseFormat' | 'queryFee' | 'oracleTtlType' | 'oracleTtlValue'>
+& BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat' | 'queryFee' | 'oracleTtlType' | 'oracleTtlValue'>
 & {
   queryFee?: number | string | BigNumber;
   oracleTtlType?: ORACLE_TTL_TYPES;

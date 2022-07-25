@@ -17,7 +17,7 @@
 import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto';
 import { buildTx } from '../tx/builder';
 import { decode, EncodedData } from '../utils/encoder';
-import { TX_TYPE } from '../tx/builder/schema';
+import { Tag } from '../tx/builder/schema';
 import { getNetworkId } from '../Node';
 import { concatBuffers } from '../utils/other';
 import type { createMetaTx } from '../contract/ga';
@@ -67,7 +67,7 @@ export default abstract class AccountBase {
     const txWithNetworkId = concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)]);
 
     const signatures = [await this.sign(txWithNetworkId, options)];
-    return buildTx({ encodedTx: rlpBinaryTx, signatures }, TX_TYPE.signed).tx;
+    return buildTx({ encodedTx: rlpBinaryTx, signatures }, Tag.SignedTx).tx;
   }
 
   /**

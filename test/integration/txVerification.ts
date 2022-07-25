@@ -2,7 +2,7 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, Node, InvalidTxError, InvalidTxParamsError, generateKeyPair, TX_TYPE,
+  AeSdk, Node, InvalidTxError, InvalidTxParamsError, generateKeyPair, Tag,
 } from '../../src';
 import MemoryAccount from '../../src/account/Memory';
 import verifyTransaction from '../../src/tx/validator';
@@ -18,12 +18,12 @@ describe('Verify Transaction', () => {
   });
 
   it('validates params in buildRawTx', async () => {
-    await expect(aeSdk.buildTx(TX_TYPE.spend, {} as any)).to.eventually.be
+    await expect(aeSdk.buildTx(Tag.SpendTx, {} as any)).to.eventually.be
       .rejectedWith(InvalidTxParamsError, 'Transaction field senderId is missed');
   });
 
   it('returns errors', async () => {
-    const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
+    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
       senderId: await aeSdk.address(),
       recipientId: await aeSdk.address(),
       amount: 1e50,
@@ -42,7 +42,7 @@ describe('Verify Transaction', () => {
   });
 
   it('returns NonceHigh error', async () => {
-    const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
+    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
       senderId: await aeSdk.address(),
       recipientId: await aeSdk.address(),
       amount: 100,
@@ -53,7 +53,7 @@ describe('Verify Transaction', () => {
   });
 
   it('verifies transactions before broadcasting', async () => {
-    const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
+    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
       senderId: await aeSdk.address(),
       recipientId: await aeSdk.address(),
       amount: 1,

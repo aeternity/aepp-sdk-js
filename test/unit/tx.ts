@@ -27,7 +27,7 @@ import {
   getDefaultPointerKey, commitmentHash, getMinimumNameFee, isNameValid, produceNameId,
   toBytes,
   buildTx, unpackTx,
-  NAME_BID_RANGES, TX_TYPE,
+  NAME_BID_RANGES, Tag,
   SchemaNotFoundError,
 } from '../../src';
 
@@ -109,7 +109,7 @@ describe('Tx', () => {
   });
 
   it('Serialize tx: invalid tx VSN', () => {
-    expect(() => buildTx({} as any, TX_TYPE.spend, { vsn: 5 }))
-      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for spend version 5');
+    expect(() => buildTx({} as any, Tag.SpendTx, { vsn: 5 }))
+      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
   });
 });

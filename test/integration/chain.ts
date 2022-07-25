@@ -20,7 +20,7 @@ import { spy } from 'sinon';
 import http from 'http';
 import { getSdk } from '.';
 import {
-  generateKeyPair, AeSdk, TX_TYPE, UnexpectedTsError,
+  generateKeyPair, AeSdk, Tag, UnexpectedTsError,
 } from '../../src';
 import { EncodedData } from '../../src/utils/encoder';
 
@@ -84,7 +84,7 @@ describe('Node Chain', () => {
 
   it('polls for transactions', async () => {
     const senderId = await aeSdk.address();
-    const tx = await aeSdk.buildTx(TX_TYPE.spend, {
+    const tx = await aeSdk.buildTx(Tag.SpendTx, {
       amount: 1,
       senderId,
       recipientId: publicKey,

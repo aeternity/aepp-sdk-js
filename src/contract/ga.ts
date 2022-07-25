@@ -19,7 +19,7 @@
  * Generalized Account module - routines to use generalized account
  */
 
-import { TX_TYPE, MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema';
+import { Tag, MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema';
 import {
   buildContractIdByContractTx, buildTx, BuiltTx, TxUnpacked, unpackTx,
 } from '../tx/builder';
@@ -81,7 +81,7 @@ export async function createGeneralizedAccount(
     onAccount, onCompiler, onNode, source,
   });
 
-  const tx = await _buildTx(TX_TYPE.gaAttach, {
+  const tx = await _buildTx(Tag.GaAttachTx, {
     ...options,
     onNode,
     code: await contract.compile(),
@@ -104,7 +104,7 @@ export async function createGeneralizedAccount(
 }
 
 interface CreateGeneralizedAccountOptions extends
-  BuildTxOptions<TX_TYPE.gaAttach, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
+  BuildTxOptions<Tag.GaAttachTx, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
   SendOptions {
   onAccount: AccountBase;
   onCompiler: Compiler;
@@ -139,7 +139,7 @@ export async function createMetaTx(
 ): Promise<EncodedData<'tx'>> {
   const wrapInEmptySignedTx = (
     tx: EncodedData<'tx'> | Uint8Array | TxUnpacked<TxSchema>,
-  ): BuiltTx<TxSchema, 'tx'> => buildTx({ encodedTx: tx, signatures: [] }, TX_TYPE.signed);
+  ): BuiltTx<TxSchema, 'tx'> => buildTx({ encodedTx: tx, signatures: [] }, Tag.SignedTx);
 
   if (Object.keys(authData).length <= 0) throw new MissingParamError('authData is required');
 
@@ -156,8 +156,8 @@ export async function createMetaTx(
     return contract.calldata.encode(contract._name, authFnName, authData.args);
   })();
 
-  const { abiVersion } = await getVmVersion(TX_TYPE.contractCall, { onNode });
-  const wrappedTx = wrapInEmptySignedTx(unpackTx<TX_TYPE.signed>(rawTransaction));
+  const { abiVersion } = await getVmVersion(Tag.ContractCallTx, { onNode });
+  const wrappedTx = wrapInEmptySignedTx(unpackTx<Tag.SignedTx>(rawTransaction));
   const params = {
     ...options,
     tx: {
@@ -172,8 +172,8 @@ export async function createMetaTx(
     vsn: 2,
   };
   // @ts-expect-error createMetaTx needs to be integrated into tx builder
-  const { fee } = await prepareTxParams(TX_TYPE.gaMeta, { ...params, onNode });
-  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee }, TX_TYPE.gaMeta);
+  const { fee } = await prepareTxParams(Tag.GaMetaTx, { ...params, onNode });
+  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee }, Tag.GaMetaTx);
   return wrapInEmptySignedTx(metaTxRlp).tx;
 }
 

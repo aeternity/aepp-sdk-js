@@ -24,7 +24,7 @@
  */
 import BigNumber from 'bignumber.js';
 import {
-  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TYPE, TX_TTL, TxParamsCommon,
+  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, Tag, TX_TTL, TxParamsCommon,
 } from './builder/schema';
 import {
   ArgumentError, UnsupportedProtocolError, UnknownTxError, InvalidTxParamsError,
@@ -37,7 +37,7 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
 
 type Int = number | string | BigNumber;
 
-export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
+export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
   Omit<Parameters<typeof _buildTx<TxType>>[1], OmitFields>;
 
 /**
@@ -48,13 +48,13 @@ export type BuildTxOptions <TxType extends TX_TYPE, OmitFields extends string> =
  * @returns Object with vm/abi version
  */
 export async function getVmVersion(
-  txType: TX_TYPE.contractCreate, ctVersion: Partial<CtVersion> & { onNode: Node }
+  txType: Tag.ContractCreateTx, ctVersion: Partial<CtVersion> & { onNode: Node }
 ): Promise<CtVersion>;
 export async function getVmVersion(
-  txType: TX_TYPE, ctVersion: Partial<Pick<CtVersion, 'abiVersion'>> & { onNode: Node }
+  txType: Tag, ctVersion: Partial<Pick<CtVersion, 'abiVersion'>> & { onNode: Node }
 ): Promise<Pick<CtVersion, 'abiVersion'>>;
 export async function getVmVersion(
-  txType: TX_TYPE,
+  txType: Tag,
   { vmVersion, abiVersion, onNode }: Partial<CtVersion> & { onNode: Node },
 ): Promise<Partial<CtVersion>> {
   const { consensusProtocolVersion } = await onNode.getNodeInfo();
@@ -79,7 +79,7 @@ export async function getVmVersion(
  * @returns Object with account nonce, absolute ttl and transaction fee
  */
 export async function prepareTxParams(
-  txType: TX_TYPE,
+  txType: Tag,
   {
     senderId,
     nonce,
@@ -112,7 +112,7 @@ interface PrepareTxParamsOptions extends Pick<TxParamsCommon, 'nonce' | 'ttl'> {
 /**
  * @category transaction builder
  */
-export async function _buildTx<TxType extends TX_TYPE>(
+export async function _buildTx<TxType extends Tag>(
   txType: TxType,
   { denomination, absoluteTtl, ..._params }:
   Omit<Parameters<typeof syncBuildTx<TxType, 'tx'>>[0], 'fee' | 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'>
@@ -124,62 +124,62 @@ export async function _buildTx<TxType extends TX_TYPE>(
     denomination?: AE_AMOUNT_FORMATS;
     absoluteTtl?: boolean;
   }
-  & (TxType extends TX_TYPE.oracleExtend | TX_TYPE.oracleResponse ? { callerId: EncodedData<'ak'> } : {})
-  & (TxType extends TX_TYPE.contractCreate | TX_TYPE.gaAttach ? { ctVersion?: CtVersion } : {})
-  & (TxType extends TX_TYPE.contractCall | TX_TYPE.oracleRegister
+  & (TxType extends Tag.OracleExtendTx | Tag.OracleResponseTx ? { callerId: EncodedData<'ak'> } : {})
+  & (TxType extends Tag.ContractCreateTx | Tag.GaAttachTx ? { ctVersion?: CtVersion } : {})
+  & (TxType extends Tag.ContractCallTx | Tag.OracleRegisterTx
     ? { abiVersion?: ABI_VERSIONS } : {}),
 ): Promise<EncodedData<'tx'>> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node };
   let senderKey: keyof TxParamsCommon | '<absent>';
   switch (txType) {
-    case TX_TYPE.spend:
-    case TX_TYPE.oracleQuery:
+    case Tag.SpendTx:
+    case Tag.OracleQueryTx:
       senderKey = 'senderId';
       break;
-    case TX_TYPE.nameClaim:
-    case TX_TYPE.nameUpdate:
-    case TX_TYPE.nameRevoke:
-    case TX_TYPE.nameTransfer:
-    case TX_TYPE.namePreClaim:
-    case TX_TYPE.oracleRegister:
+    case Tag.NameClaimTx:
+    case Tag.NameUpdateTx:
+    case Tag.NameRevokeTx:
+    case Tag.NameTransferTx:
+    case Tag.NamePreclaimTx:
+    case Tag.OracleRegisterTx:
       senderKey = 'accountId';
       break;
-    case TX_TYPE.contractCreate:
-    case TX_TYPE.gaAttach:
+    case Tag.ContractCreateTx:
+    case Tag.GaAttachTx:
       senderKey = 'ownerId';
       break;
-    case TX_TYPE.contractCall:
-    case TX_TYPE.oracleExtend:
-    case TX_TYPE.oracleResponse:
+    case Tag.ContractCallTx:
+    case Tag.OracleExtendTx:
+    case Tag.OracleResponseTx:
       senderKey = 'callerId';
       break;
-    case TX_TYPE.channelCloseSolo:
-    case TX_TYPE.channelSlash:
-    case TX_TYPE.channelSettle:
-    case TX_TYPE.channelSnapshotSolo:
+    case Tag.ChannelCloseSoloTx:
+    case Tag.ChannelSlashTx:
+    case Tag.ChannelSettleTx:
+    case Tag.ChannelSnapshotSoloTx:
       senderKey = 'fromId';
       break;
-    case TX_TYPE.payingFor:
+    case Tag.PayingForTx:
       senderKey = 'payerId';
       break;
     default:
       throw new ArgumentError('txType', 'valid transaction type', txType);
   }
   // TODO: move specific cases to field-types
-  if ([TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType)) {
+  if ([Tag.ContractCreateTx, Tag.GaAttachTx].includes(txType)) {
     params.ctVersion = await getVmVersion(
-      TX_TYPE.contractCreate,
+      Tag.ContractCreateTx,
       { ...params, ...params.ctVersion },
     );
   }
-  if (txType === TX_TYPE.contractCall) {
-    params.abiVersion = (await getVmVersion(TX_TYPE.contractCall, params)).abiVersion;
+  if (txType === Tag.ContractCallTx) {
+    params.abiVersion = (await getVmVersion(Tag.ContractCallTx, params)).abiVersion;
   }
-  if (txType === TX_TYPE.oracleRegister) {
+  if (txType === Tag.OracleRegisterTx) {
     params.abiVersion ??= ABI_VERSIONS.NO_ABI;
   }
-  if (txType === TX_TYPE.payingFor) {
+  if (txType === Tag.PayingForTx) {
     params.tx = unpackTx(params.tx);
   }
   const senderId = params[senderKey];

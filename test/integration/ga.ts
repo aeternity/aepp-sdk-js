@@ -19,7 +19,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, TX_TYPE, genSalt, generateKeyPair, unpackTx,
+  AeSdk, Tag, genSalt, generateKeyPair, unpackTx,
 } from '../../src';
 import { encode, EncodedData } from '../../src/utils/encoder';
 import MemoryAccount from '../../src/account/Memory';
@@ -79,7 +79,7 @@ describe('Generalized Account', () => {
   it('buildAuthTxHash generates a proper hash', async () => {
     const { rawTx } = await aeSdk
       .spend(10000, publicKey, { authData: { source: authContractSource, args: [genSalt()] } });
-    const spendTx = encode(unpackTx(rawTx, TX_TYPE.signed).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx');
+    const spendTx = encode(unpackTx(rawTx, Tag.SignedTx).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx');
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.methods.getTxHash()).decodedResult);
   });

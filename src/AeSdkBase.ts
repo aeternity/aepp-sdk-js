@@ -10,7 +10,7 @@ import { _buildTx } from './tx';
 import { mapObject } from './utils/other';
 import Node, { getNetworkId } from './Node';
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
-import { AMOUNT, TX_TYPE } from './tx/builder/schema';
+import { AMOUNT, Tag } from './tx/builder/schema';
 import MemoryAccount, { Keypair } from './account/Memory';
 import AccountBase, { isAccountBase } from './account/Base';
 import {
@@ -259,7 +259,7 @@ class AeSdkBase {
     };
   }
 
-  async buildTx<TxType extends TX_TYPE>(
+  async buildTx<TxType extends Tag>(
     txType: TxType,
     options: Omit<Parameters<typeof _buildTx<TxType>>[1], 'onNode'> & { onNode?: Node },
   ): Promise<EncodedData<'tx'>> {

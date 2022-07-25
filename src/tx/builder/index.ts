@@ -11,7 +11,7 @@ import {
   TxTypeSchemas,
   TxParamsCommon,
   TX_SCHEMA,
-  TX_TYPE,
+  Tag,
   TxSchema,
 } from './schema';
 import {
@@ -273,7 +273,7 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends EncodingType> {
  * @returns object.rlpEncoded rlp encoded transaction
  * @returns object.binary binary transaction
  */
-export function buildTx<TxType extends TX_TYPE, Prefix>(
+export function buildTx<TxType extends Tag, Prefix>(
   _params: Omit<TxTypeSchemas[TxType], 'tag' | 'VSN'> & { VSN?: number },
   type: TxType,
   {
@@ -288,7 +288,7 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
   const schemas = TX_SCHEMA[type];
 
   vsn ??= Math.max(...Object.keys(schemas).map((a) => +a));
-  if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', TX_TYPE[type], vsn);
+  if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', Tag[type], vsn);
 
   const schema = schemas[vsn] as unknown as TxField[];
 
@@ -330,7 +330,7 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
     tx,
     rlpEncoded,
     binary,
-    txObject: unpackRawTx<TxTypeSchemas[TX_TYPE]>(binary, schema),
+    txObject: unpackRawTx<TxTypeSchemas[Tag]>(binary, schema),
   } as any;
 }
 
@@ -338,7 +338,7 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
  * @category transaction builder
  */
 export interface TxUnpacked<Tx extends TxSchema> {
-  txType: TX_TYPE;
+  txType: Tag;
   tx: RawTxObject<Tx>;
   rlpEncoded: Uint8Array;
 }
@@ -351,7 +351,7 @@ export interface TxUnpacked<Tx extends TxSchema> {
  * @returns object.tx Object with transaction param's
  * @returns object.txType Transaction type
  */
-export function unpackTx<TxType extends TX_TYPE>(
+export function unpackTx<TxType extends Tag>(
   encodedTx: EncodedData<'tx' | 'pi'>,
   txType?: TxType,
 ): TxUnpacked<TxTypeSchemas[TxType]> {
@@ -359,7 +359,7 @@ export function unpackTx<TxType extends TX_TYPE>(
   const binary = rlpDecode(rlpEncoded);
   const objId = +readInt(binary[0] as Buffer);
   if (!isKeyOfObject(objId, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${objId}`);
-  if (txType != null && txType !== objId) throw new DecodeError(`Expected transaction to have ${TX_TYPE[txType]} tag, got ${TX_TYPE[objId]} instead`);
+  if (txType != null && txType !== objId) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[objId]} instead`);
   const vsn = +readInt(binary[1] as Buffer);
   if (!isKeyOfObject(vsn, TX_SCHEMA[objId])) throw new SchemaNotFoundError('deserialization', `tag ${objId}`, vsn);
   const schema = TX_SCHEMA[objId][vsn];
@@ -390,8 +390,8 @@ export function buildTxHash(rawTx: EncodedData<'tx'> | Uint8Array): EncodedData<
  * @returns Contract public key
  */
 export function buildContractIdByContractTx(contractTx: EncodedData<'tx'>): EncodedData<'ct'> {
-  const { txType, tx } = unpackTx<TX_TYPE.contractCreate | TX_TYPE.gaAttach>(contractTx);
-  if (![TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType)) {
+  const { txType, tx } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
+  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(txType)) {
     throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', txType);
   }
   return buildContractId(tx.ownerId, +tx.nonce);

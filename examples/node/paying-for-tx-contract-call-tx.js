@@ -48,7 +48,7 @@
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 const {
-  AeSdk, Node, MemoryAccount, generateKeyPair, TX_TYPE,
+  AeSdk, Node, MemoryAccount, generateKeyPair, Tag,
 } = require('@aeternity/aepp-sdk');
 
 // **Note**:
@@ -131,7 +131,7 @@ const NEW_USER_KEYPAIR = generateKeyPair();
     { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS },
   );
   const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', []);
-  const contractCallTx = await aeSdk.buildTx(TX_TYPE.contractCall, {
+  const contractCallTx = await aeSdk.buildTx(Tag.ContractCallTx, {
     callerId: await newUserAccount.address(),
     contractId: CONTRACT_ADDRESS,
     amount: 0,

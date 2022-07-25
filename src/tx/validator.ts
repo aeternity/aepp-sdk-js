@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import { verify, hash } from '../utils/crypto';
 import { encode, decode } from './builder/helpers';
 import {
-  PROTOCOL_VM_ABI, RawTxObject, TxSchema, TxParamsCommon, TX_TYPE, TxTypeSchemas, CtVersion,
+  PROTOCOL_VM_ABI, RawTxObject, TxSchema, TxParamsCommon, Tag, TxTypeSchemas, CtVersion,
 } from './builder/schema';
 import { TxUnpacked, unpackTx } from './builder';
 import { UnsupportedProtocolError } from '../utils/errors';
@@ -27,7 +27,7 @@ type Validator = (
     encodedTx: TxUnpacked<TxSchema>;
     signatures: Buffer[];
     tx: TxUnpacked<TxSchema> & {
-      tx: TxTypeSchemas[TX_TYPE.signed];
+      tx: TxTypeSchemas[Tag.SignedTx];
     };
     nonce?: number;
     ttl?: number;
@@ -41,9 +41,9 @@ type Validator = (
   options: {
     account?: Account;
     nodeNetworkId: string;
-    parentTxTypes: TX_TYPE[];
+    parentTxTypes: Tag[];
     node: Node;
-    txType: TX_TYPE;
+    txType: Tag;
     height: number;
     consensusProtocolVersion: number;
   }
@@ -75,11 +75,11 @@ const getSenderAddress = (
 export default async function verifyTransaction(
   transaction: EncodedData<'tx' | 'pi'>,
   node: Node,
-  parentTxTypes: TX_TYPE[] = [],
+  parentTxTypes: Tag[] = [],
 ): Promise<ValidatorResult[]> {
-  const { tx, txType } = unpackTx<TX_TYPE.signed>(transaction);
+  const { tx, txType } = unpackTx<Tag.SignedTx>(transaction);
   const address = getSenderAddress(tx)
-    ?? (txType === TX_TYPE.signed ? getSenderAddress(tx.encodedTx.tx) : undefined);
+    ?? (txType === Tag.SignedTx ? getSenderAddress(tx.encodedTx.tx) : undefined);
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
     address == null
       ? undefined
@@ -108,7 +108,7 @@ validators.push(
     if (signatures.length !== 1) return []; // TODO: Support multisignature?
     const prefix = Buffer.from([
       nodeNetworkId,
-      ...parentTxTypes.includes(TX_TYPE.payingFor) ? ['inner_tx'] : [],
+      ...parentTxTypes.includes(Tag.PayingForTx) ? ['inner_tx'] : [],
     ].join('-'));
     const txWithNetworkId = concatBuffers([prefix, encodedTx.rlpEncoded]);
     const txHashWithNetworkId = concatBuffers([prefix, hash(encodedTx.rlpEncoded)]);
@@ -147,8 +147,8 @@ validators.push(
     if ((amount ?? fee ?? nameFee) === undefined) return [];
     fee ??= 0;
     const cost = new BigNumber(fee).plus(nameFee ?? 0).plus(amount ?? 0)
-      .plus(txType === TX_TYPE.payingFor ? (tx.tx.encodedTx.tx).fee : 0)
-      .minus(parentTxTypes.includes(TX_TYPE.payingFor) ? fee : 0);
+      .plus(txType === Tag.PayingForTx ? (tx.tx.encodedTx.tx).fee : 0)
+      .minus(parentTxTypes.includes(Tag.PayingForTx) ? fee : 0);
     if (cost.lte(account.balance.toString())) return [];
     return [{
       message: `Account balance ${account.balance.toString()} is not enough to execute the transaction that costs ${cost.toFixed()}`,
@@ -157,7 +157,7 @@ validators.push(
     }];
   },
   ({ nonce }, { account, parentTxTypes }) => {
-    if (nonce == null || account == null || parentTxTypes.includes(TX_TYPE.gaMeta)) return [];
+    if (nonce == null || account == null || parentTxTypes.includes(Tag.GaMetaTx)) return [];
     nonce = +nonce;
     const validNonce = account.nonce + 1;
     if (nonce === validNonce) return [];
@@ -201,7 +201,7 @@ validators.push(
     return [];
   },
   async ({ contractId }, { txType, node }) => {
-    if (TX_TYPE.contractCall !== txType) return [];
+    if (Tag.ContractCallTx !== txType) return [];
     contractId = contractId as EncodedData<'ct'>;
     try {
       const { active } = await node.getContract(contractId);

@@ -17,7 +17,7 @@
 import BigNumber from 'bignumber.js';
 import { snakeToPascal } from '../utils/string';
 import { buildTx, unpackTx } from '../tx/builder';
-import { MIN_GAS_PRICE, TX_TYPE } from '../tx/builder/schema';
+import { MIN_GAS_PRICE, Tag } from '../tx/builder/schema';
 import * as handlers from './handlers';
 import {
   eventEmitters,
@@ -222,13 +222,13 @@ export default class Channel {
     if (state == null) {
       return null;
     }
-    const { txType, tx } = unpackTx(state, TX_TYPE.signed).tx.encodedTx;
+    const { txType, tx } = unpackTx(state, Tag.SignedTx).tx.encodedTx;
     switch (txType) {
-      case TX_TYPE.channelCreate:
+      case Tag.ChannelCreateTx:
         return 1;
-      case TX_TYPE.channelOffChain:
-      case TX_TYPE.channelWithdraw:
-      case TX_TYPE.channelDeposit:
+      case Tag.ChannelOffChainTx:
+      case Tag.ChannelWithdrawTx:
+      case Tag.ChannelDepositTx:
         return tx.round;
       default:
         return null;
@@ -1008,7 +1008,7 @@ export default class Channel {
 
     return Channel.initialize({
       ...options,
-      reconnectTx: await sign('reconnect', buildTx(txParams, TX_TYPE.channelReconnect).tx),
+      reconnectTx: await sign('reconnect', buildTx(txParams, Tag.ChannelClientReconnectTx).tx),
     });
   }
 }

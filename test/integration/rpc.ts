@@ -28,7 +28,7 @@ import {
   RpcConnectionDenyError,
   RpcRejectedByUserError,
   SUBSCRIPTION_TYPES,
-  TX_TYPE,
+  Tag,
   WALLET_TYPE,
   unpackTx,
   decode,
@@ -253,7 +253,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         throw new RpcRejectedByUserError();
       };
       const address = await aepp.address();
-      const tx = await aepp.buildTx(TX_TYPE.spend, {
+      const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: address,
         recipientId: address,
         amount: 0,
@@ -265,7 +265,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Sign transaction: invalid account object in action', async () => {
       wallet.onSign = async () => ({ onAccount: {} });
-      const tx = await aepp.buildTx(TX_TYPE.spend, {
+      const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: keypair.publicKey,
         recipientId: keypair.publicKey,
         amount: 0,
@@ -278,7 +278,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     it('Sign transaction: wallet allow', async () => {
       wallet.onSign = async () => {};
       const address = await aepp.address();
-      const tx = await aepp.buildTx(TX_TYPE.spend, {
+      const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: address,
         recipientId: address,
         amount: 0,
@@ -286,7 +286,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       });
 
       const signedTx = await aepp.signTransaction(tx);
-      const unpackedTx = unpackTx(signedTx, TX_TYPE.signed);
+      const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
       const { tx: { signatures: [signature], encodedTx: { rlpEncoded } } } = unpackedTx;
       const txWithNetwork = concatBuffers([Buffer.from(networkId), hash(rlpEncoded)]);
       const valid = verify(txWithNetwork, signature, decode(address));
@@ -306,14 +306,14 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const address = await aepp.address();
-      const tx2 = await aepp.buildTx(TX_TYPE.spend, {
+      const tx2 = await aepp.buildTx(Tag.SpendTx, {
         senderId: address,
         recipientId: address,
         amount: 0,
         payload: 'zerospend2',
       });
       wallet.onSign = async () => ({ tx: tx2 });
-      const tx = await aepp.buildTx(TX_TYPE.spend, {
+      const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: address,
         recipientId: address,
         amount: 0,
@@ -358,7 +358,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     it('Sign and broadcast invalid transaction', async () => {
       wallet.onSign = async () => {};
       const address = await aepp.address();
-      const tx = await aepp.buildTx(TX_TYPE.spend, {
+      const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: address,
         recipientId: address,
         amount: 0,
@@ -519,14 +519,14 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const address = await aepp.address();
-      const tx2 = await aepp.buildTx(TX_TYPE.spend, {
+      const tx2 = await aepp.buildTx(Tag.SpendTx, {
         senderId: address,
         recipientId: address,
         amount: 0,
         payload: 'zerospend2',
       });
       wallet.onSign = async () => ({ tx: tx2 });
-      const tx = await aepp.buildTx(TX_TYPE.spend, {
+      const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: address,
         recipientId: address,
         amount: 0,

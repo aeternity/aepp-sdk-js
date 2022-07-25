@@ -17,7 +17,7 @@
 // @ts-expect-error TODO remove
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
 import {
-  DRY_RUN_ACCOUNT, TX_TYPE, AMOUNT, AensName,
+  DRY_RUN_ACCOUNT, Tag, AMOUNT, AensName,
 } from '../tx/builder/schema';
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder';
 import { _buildTx } from '../tx';
@@ -285,7 +285,7 @@ export default async function getContractInstance({
   const sendAndProcess = async (tx: EncodedData<'tx'>, options: any): Promise<{
     result?: ContractInstance['deployInfo']['result'];
     hash: TxData['hash'];
-    tx: Awaited<ReturnType<typeof unpackTx<TX_TYPE.contractCall | TX_TYPE.contractCreate>>>;
+    tx: Awaited<ReturnType<typeof unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>>>;
     txData: TxData;
     rawTx: EncodedData<'tx'>;
   }> => {
@@ -293,7 +293,7 @@ export default async function getContractInstance({
     const txData = await send(tx, options);
     const result = {
       hash: txData.hash,
-      tx: unpackTx<TX_TYPE.contractCall | TX_TYPE.contractCreate>(txData.rawTx),
+      tx: unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>(txData.rawTx),
       txData,
       rawTx: txData.rawTx,
     };
@@ -333,7 +333,7 @@ export default async function getContractInstance({
     if (instance.deployInfo.address != null) throw new DuplicateContractError();
 
     const ownerId = await opt.onAccount.address(options);
-    const tx = await _buildTx(TX_TYPE.contractCreate, {
+    const tx = await _buildTx(Tag.ContractCreateTx, {
       ...opt,
       gasLimit: opt.gasLimit ?? await instance._estimateGas('init', params, opt),
       callData: instance.calldata.encode(instance._name, 'init', params),
@@ -407,8 +407,8 @@ export default async function getContractInstance({
         opt.nonce = (await getAccount(callerId, { hash: opt.top, onNode })).nonce + 1;
       }
       const tx = await (fn === 'init'
-        ? _buildTx(TX_TYPE.contractCreate, { ...txOpt, code: instance.bytecode, ownerId: callerId })
-        : _buildTx(TX_TYPE.contractCall, { ...txOpt, callerId, contractId }));
+        ? _buildTx(Tag.ContractCreateTx, { ...txOpt, code: instance.bytecode, ownerId: callerId })
+        : _buildTx(Tag.ContractCallTx, { ...txOpt, callerId, contractId }));
 
       const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, { onNode, ...opt });
       if (callObj == null) throw new UnexpectedTsError();
@@ -418,7 +418,7 @@ export default async function getContractInstance({
       }, tx);
       res = { ...dryRunOther, tx: unpackTx(tx), result: callObj };
     } else {
-      const tx = await _buildTx(TX_TYPE.contractCall, {
+      const tx = await _buildTx(Tag.ContractCallTx, {
         ...opt,
         onNode,
         gasLimit: opt.gasLimit ?? await instance._estimateGas(fn, params, opt),

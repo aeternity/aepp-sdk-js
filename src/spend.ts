@@ -22,7 +22,7 @@ import { _buildTx, BuildTxOptions } from './tx';
 import { buildTxHash, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
 import { EncodedData } from './utils/encoder';
-import { TX_TYPE, AensName } from './tx/builder/schema';
+import { Tag, AensName } from './tx/builder/schema';
 import AccountBase from './account/Base';
 
 /**
@@ -70,7 +70,7 @@ export async function spend(
   options: SpendOptions,
 ): ReturnType<typeof send> {
   return send(
-    await _buildTx(TX_TYPE.spend, {
+    await _buildTx(Tag.SpendTx, {
       ...options,
       senderId: await options.onAccount.address(options),
       recipientId: await resolveName(recipientIdOrName, 'account_pubkey', options),
@@ -80,7 +80,7 @@ export async function spend(
   );
 }
 
-type SpendOptionsType = BuildTxOptions<TX_TYPE.spend, 'senderId' | 'recipientId' | 'amount'>
+type SpendOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount'>
 & Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendOptions;
 interface SpendOptions extends SpendOptionsType {}
 
@@ -108,22 +108,22 @@ export async function transferFunds(
   );
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP);
   const { tx: { fee } } = unpackTx(
-    await _buildTx(TX_TYPE.spend, {
+    await _buildTx(Tag.SpendTx, {
       ...options, senderId, recipientId, amount: desiredAmount,
     }),
-    TX_TYPE.spend,
+    Tag.SpendTx,
   );
   // Reducing of the amount may reduce transaction fee, so this is not completely accurate
   const amount = desiredAmount.plus(fee).gt(balance) ? balance.minus(fee) : desiredAmount;
   return send(
-    await _buildTx(TX_TYPE.spend, {
+    await _buildTx(Tag.SpendTx, {
       ...options, senderId, recipientId, amount,
     }),
     options,
   );
 }
 
-type TransferFundsOptionsType = BuildTxOptions<TX_TYPE.spend, 'senderId' | 'recipientId' | 'amount'>
+type TransferFundsOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount'>
 & Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendOptions;
 interface TransferFundsOptions extends TransferFundsOptionsType {}
 
@@ -140,7 +140,7 @@ export async function payForTransaction(
 ): ReturnType<typeof send> {
   return send(
     await _buildTx(
-      TX_TYPE.payingFor,
+      Tag.PayingForTx,
       { ...options, payerId: await options.onAccount.address(options), tx: transaction },
     ),
     options,
@@ -148,6 +148,6 @@ export async function payForTransaction(
 }
 
 interface PayForTransactionOptions extends
-  BuildTxOptions<TX_TYPE.payingFor, 'payerId' | 'tx'>, SendOptions {
+  BuildTxOptions<Tag.PayingForTx, 'payerId' | 'tx'>, SendOptions {
   onAccount: AccountBase;
 }

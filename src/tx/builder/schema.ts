@@ -5,7 +5,7 @@
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import BigNumber from 'bignumber.js';
-import { TX_TYPE } from './constants';
+import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
 } from './field-types';
@@ -75,14 +75,14 @@ export enum PROTOCOL_VERSIONS {
 // First abi/vm by default
 export const PROTOCOL_VM_ABI = {
   [PROTOCOL_VERSIONS.IRIS]: {
-    [TX_TYPE.contractCreate]: {
+    [Tag.ContractCreateTx]: {
       vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE],
     },
     // TODO: Ensure that AEVM (SOPHIA?) is still available here
-    [TX_TYPE.contractCall]: {
+    [Tag.ContractCallTx]: {
       vmVersion: [], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA],
     },
-    [TX_TYPE.oracleRegister]: {
+    [Tag.OracleRegisterTx]: {
       vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA],
     },
   },
@@ -197,7 +197,7 @@ const BASE_TX = [
 ] as const;
 
 export const TX_SCHEMA = {
-  [TX_TYPE.account]: {
+  [Tag.Account]: {
     1: [
       ...BASE_TX,
       ['nonce', shortUInt],
@@ -212,14 +212,14 @@ export const TX_SCHEMA = {
       ['gaAuthFun', FIELD_TYPES.binary, 'cb'],
     ],
   },
-  [TX_TYPE.signed]: {
+  [Tag.SignedTx]: {
     1: [
       ...BASE_TX,
       ['signatures', FIELD_TYPES.signatures],
       ['encodedTx', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.spend]: {
+  [Tag.SpendTx]: {
     1: [
       ...BASE_TX,
       ['senderId', FIELD_TYPES.id, 'ak'],
@@ -231,7 +231,7 @@ export const TX_SCHEMA = {
       ['payload', FIELD_TYPES.payload],
     ],
   },
-  [TX_TYPE.namePreClaim]: {
+  [Tag.NamePreclaimTx]: {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
@@ -241,7 +241,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
     ],
   },
-  [TX_TYPE.nameClaim]: {
+  [Tag.NameClaimTx]: {
     2: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
@@ -253,7 +253,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
     ],
   },
-  [TX_TYPE.nameUpdate]: {
+  [Tag.NameUpdateTx]: {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
@@ -266,7 +266,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
     ],
   },
-  [TX_TYPE.nameTransfer]: {
+  [Tag.NameTransferTx]: {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
@@ -277,7 +277,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
     ],
   },
-  [TX_TYPE.nameRevoke]: {
+  [Tag.NameRevokeTx]: {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
@@ -287,7 +287,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
     ],
   },
-  [TX_TYPE.contract]: {
+  [Tag.Contract]: {
     1: [
       ...BASE_TX,
       ['owner', FIELD_TYPES.id, 'ak'],
@@ -299,7 +299,7 @@ export const TX_SCHEMA = {
       ['deposit', deposit],
     ],
   },
-  [TX_TYPE.contractCreate]: {
+  [Tag.ContractCreateTx]: {
     1: [
       ...BASE_TX,
       ['ownerId', FIELD_TYPES.id, 'ak'],
@@ -315,7 +315,7 @@ export const TX_SCHEMA = {
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
   },
-  [TX_TYPE.contractCall]: {
+  [Tag.ContractCallTx]: {
     1: [
       ...BASE_TX,
       ['callerId', FIELD_TYPES.id, 'ak'],
@@ -330,7 +330,7 @@ export const TX_SCHEMA = {
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
   },
-  [TX_TYPE.contractCallResult]: {
+  [Tag.ContractCall]: {
     1: [
       ...BASE_TX,
       ['callerId', FIELD_TYPES.id, 'ak'],
@@ -346,7 +346,7 @@ export const TX_SCHEMA = {
       ['log', FIELD_TYPES.rawBinary],
     ],
   },
-  [TX_TYPE.oracleRegister]: {
+  [Tag.OracleRegisterTx]: {
     1: [
       ...BASE_TX,
       ['accountId', FIELD_TYPES.id, 'ak'],
@@ -361,7 +361,7 @@ export const TX_SCHEMA = {
       ['abiVersion', FIELD_TYPES.abiVersion],
     ],
   },
-  [TX_TYPE.oracleExtend]: {
+  [Tag.OracleExtendTx]: {
     1: [
       ...BASE_TX,
       ['oracleId', FIELD_TYPES.id, ['ok', 'nm']],
@@ -372,7 +372,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
     ],
   },
-  [TX_TYPE.oracleQuery]: {
+  [Tag.OracleQueryTx]: {
     1: [
       ...BASE_TX,
       ['senderId', FIELD_TYPES.id, 'ak'],
@@ -388,7 +388,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
     ],
   },
-  [TX_TYPE.oracleResponse]: {
+  [Tag.OracleResponseTx]: {
     1: [
       ...BASE_TX,
       ['oracleId', FIELD_TYPES.id, 'ok'],
@@ -401,7 +401,7 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
     ],
   },
-  [TX_TYPE.channelCreate]: {
+  [Tag.ChannelCreateTx]: {
     2: [
       ...BASE_TX,
       ['initiator', FIELD_TYPES.id, 'ak'],
@@ -418,7 +418,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
     ],
   },
-  [TX_TYPE.channelCloseMutual]: {
+  [Tag.ChannelCloseMutualTx]: {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -430,7 +430,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
     ],
   },
-  [TX_TYPE.channelCloseSolo]: {
+  [Tag.ChannelCloseSoloTx]: {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -442,7 +442,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
     ],
   },
-  [TX_TYPE.channelSlash]: {
+  [Tag.ChannelSlashTx]: {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -454,7 +454,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
     ],
   },
-  [TX_TYPE.channelDeposit]: {
+  [Tag.ChannelDepositTx]: {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -467,7 +467,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
     ],
   },
-  [TX_TYPE.channelWithdraw]: {
+  [Tag.ChannelWithdrawTx]: {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -480,7 +480,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
     ],
   },
-  [TX_TYPE.channelSettle]: {
+  [Tag.ChannelSettleTx]: {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -492,7 +492,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
     ],
   },
-  [TX_TYPE.channelForceProgress]: {
+  [Tag.ChannelForceProgressTx]: {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -507,7 +507,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
     ],
   },
-  [TX_TYPE.channelOffChain]: {
+  [Tag.ChannelOffChainTx]: {
     2: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -515,7 +515,7 @@ export const TX_SCHEMA = {
       ['stateHash', FIELD_TYPES.binary, 'st'],
     ],
   },
-  [TX_TYPE.channel]: {
+  [Tag.Channel]: {
     3: [
       ...BASE_TX,
       ['initiator', FIELD_TYPES.id, 'ak'],
@@ -535,7 +535,7 @@ export const TX_SCHEMA = {
       ['responderAuth', FIELD_TYPES.binary, 'cb'],
     ],
   },
-  [TX_TYPE.channelSnapshotSolo]: {
+  [Tag.ChannelSnapshotSoloTx]: {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -546,7 +546,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
     ],
   },
-  [TX_TYPE.channelOffChainUpdateTransfer]: {
+  [Tag.ChannelOffChainUpdateTransfer]: {
     1: [
       ...BASE_TX,
       ['from', FIELD_TYPES.id, 'ak'],
@@ -554,21 +554,21 @@ export const TX_SCHEMA = {
       ['amount', uInt],
     ],
   },
-  [TX_TYPE.channelOffChainUpdateDeposit]: {
+  [Tag.ChannelOffChainUpdateDeposit]: {
     1: [
       ...BASE_TX,
       ['from', FIELD_TYPES.id, 'ak'],
       ['amount', uInt],
     ],
   },
-  [TX_TYPE.channelOffChainUpdateWithdrawal]: {
+  [Tag.ChannelOffChainUpdateWithdraw]: {
     1: [
       ...BASE_TX,
       ['from', FIELD_TYPES.id, 'ak'],
       ['amount', uInt],
     ],
   },
-  [TX_TYPE.channelOffChainCreateContract]: {
+  [Tag.ChannelOffChainUpdateCreateContract]: {
     1: [
       ...BASE_TX,
       ['owner', FIELD_TYPES.id, 'ak'],
@@ -578,7 +578,7 @@ export const TX_SCHEMA = {
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
   },
-  [TX_TYPE.channelOffChainCallContract]: {
+  [Tag.ChannelOffChainUpdateCallContract]: {
     1: [
       ...BASE_TX,
       ['caller', FIELD_TYPES.id, 'ak'],
@@ -591,7 +591,7 @@ export const TX_SCHEMA = {
       ['gasLimit', gasLimit],
     ],
   },
-  [TX_TYPE.channelReconnect]: {
+  [Tag.ChannelClientReconnectTx]: {
     1: [
       ...BASE_TX,
       ['channelId', FIELD_TYPES.id, 'ch'],
@@ -600,7 +600,7 @@ export const TX_SCHEMA = {
       ['pubkey', FIELD_TYPES.id, 'ak'],
     ],
   },
-  [TX_TYPE.proofOfInclusion]: {
+  [Tag.TreesPoi]: {
     1: [
       ...BASE_TX,
       ['accounts', FIELD_TYPES.mptrees],
@@ -611,7 +611,7 @@ export const TX_SCHEMA = {
       ['oracles', FIELD_TYPES.mptrees],
     ],
   },
-  [TX_TYPE.stateTrees]: {
+  [Tag.StateTrees]: {
     1: [
       ...BASE_TX,
       ['contracts', FIELD_TYPES.rlpBinary],
@@ -622,56 +622,56 @@ export const TX_SCHEMA = {
       ['accounts', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.merklePatriciaTree]: {
+  [Tag.Mtree]: {
     1: [
       ...BASE_TX,
       ['values', FIELD_TYPES.rlpBinaries],
     ],
   },
-  [TX_TYPE.merklePatriciaTreeValue]: {
+  [Tag.MtreeValue]: {
     1: [
       ...BASE_TX,
       ['key', FIELD_TYPES.hex],
       ['value', FIELD_TYPES.rawBinary],
     ],
   },
-  [TX_TYPE.contractsTree]: {
+  [Tag.ContractsMtree]: {
     1: [
       ...BASE_TX,
       ['contracts', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.contractCallsTree]: {
+  [Tag.CallsMtree]: {
     1: [
       ...BASE_TX,
       ['calls', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.channelsTree]: {
+  [Tag.ChannelsMtree]: {
     1: [
       ...BASE_TX,
       ['channels', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.nameserviceTree]: {
+  [Tag.NameserviceMtree]: {
     1: [
       ...BASE_TX,
       ['mtree', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.oraclesTree]: {
+  [Tag.OraclesMtree]: {
     1: [
       ...BASE_TX,
       ['otree', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.accountsTree]: {
+  [Tag.AccountsMtree]: {
     1: [
       ...BASE_TX,
       ['accounts', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.gaAttach]: {
+  [Tag.GaAttachTx]: {
     1: [
       ...BASE_TX,
       ['ownerId', FIELD_TYPES.id, 'ak'],
@@ -686,7 +686,7 @@ export const TX_SCHEMA = {
       ['callData', FIELD_TYPES.binary, 'cb'],
     ],
   },
-  [TX_TYPE.gaMeta]: {
+  [Tag.GaMetaTx]: {
     2: [
       ...BASE_TX,
       ['gaId', FIELD_TYPES.id, 'ak'],
@@ -698,7 +698,7 @@ export const TX_SCHEMA = {
       ['tx', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.payingFor]: {
+  [Tag.PayingForTx]: {
     1: [
       ...BASE_TX,
       ['payerId', FIELD_TYPES.id, 'ak'],
@@ -707,7 +707,7 @@ export const TX_SCHEMA = {
       ['tx', FIELD_TYPES.rlpBinary],
     ],
   },
-  [TX_TYPE.sophiaByteCode]: {
+  [Tag.CompilerSophia]: {
     3: [
       ...BASE_TX,
       ['sourceCodeHash', FIELD_TYPES.rawBinary],
@@ -720,10 +720,10 @@ export const TX_SCHEMA = {
 } as const;
 
 export type TxTypeSchemas = {
-  [key in TX_TYPE]: BuildTxArgBySchema<
+  [key in Tag]: BuildTxArgBySchema<
     typeof TX_SCHEMA[key][keyof typeof TX_SCHEMA[key]]
   >
 };
 
-export type TxSchema = TxTypeSchemas[TX_TYPE];
+export type TxSchema = TxTypeSchemas[Tag];
 export type TxParamsCommon = Partial<UnionToIntersection<TxSchema>>;

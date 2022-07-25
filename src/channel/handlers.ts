@@ -43,20 +43,20 @@ import {
   UnexpectedChannelMessageError,
 } from '../utils/errors';
 import type Channel from '.';
-import { TX_TYPE } from '../tx/builder/schema';
+import { Tag } from '../tx/builder/schema';
 
 export async function appendSignature(
   tx: EncodedData<'tx'>,
   signFn: SignTx,
 ): Promise<EncodedData<'tx'> | number | null> {
-  const { signatures, encodedTx } = unpackTx(tx, TX_TYPE.signed).tx;
+  const { signatures, encodedTx } = unpackTx(tx, Tag.SignedTx).tx;
   const result = await signFn(encode(encodedTx.rlpEncoded, 'tx'));
   if (typeof result === 'string') {
-    const { tx: signedTx } = unpackTx(result, TX_TYPE.signed);
+    const { tx: signedTx } = unpackTx(result, Tag.SignedTx);
     return buildTx({
       signatures: signatures.concat(signedTx.signatures),
       encodedTx: signedTx.encodedTx.rlpEncoded,
-    }, TX_TYPE.signed).tx;
+    }, Tag.SignedTx).tx;
   }
   return result;
 }
@@ -660,7 +660,7 @@ export function awaitingNewContractCompletion(
 ): ChannelFsm {
   const channelOptions = options.get(channel);
   if (message.method === 'channels.update') {
-    const { round } = unpackTx(message.params.data.state, TX_TYPE.signed).tx.encodedTx.tx;
+    const { round } = unpackTx(message.params.data.state, Tag.SignedTx).tx.encodedTx.tx;
     if (channelOptions?.role != null) {
       let role: null | 'initiatorId' | 'responderId' = null;
       if (channelOptions.role === 'initiator') role = 'initiatorId';
