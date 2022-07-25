@@ -23,15 +23,30 @@ const base58Types = ['ak', 'bf', 'bs', 'bx', 'ch', 'cm', 'ct', 'kh', 'mh', 'nm',
 
 export type EncodingType = typeof base64Types[number] | typeof base58Types[number];
 export type EncodedData<Type extends EncodingType> = `${Type}_${string}`;
-// TODO: add all types with a fixed length
-const typesLength: { [name in EncodingType]?: number } = {
-  ak: 32,
+
+/**
+ * @see {@link https://github.com/aeternity/aeserialization/blob/eb68fe331bd476910394966b7f5ede7a74d37e35/src/aeser_api_encoder.erl#L261-L286}
+ */
+const byteSizeForType: { [name in EncodingType]?: number } = {
+  kh: 32,
+  mh: 32,
+  bf: 32,
+  bx: 32,
+  bs: 32,
+  ch: 32,
   ct: 32,
+  th: 32,
   ok: 32,
+  oq: 32,
+  ak: 32,
+  sg: 64,
+  cm: 32,
+  pp: 32,
+  st: 32,
 } as const;
 
 function ensureValidLength(data: Uint8Array, type: EncodingType): void {
-  const reqLen = typesLength[type];
+  const reqLen = byteSizeForType[type];
   if (reqLen == null || data.length === reqLen) return;
   throw new PayloadLengthError(`Payload should be ${reqLen} bytes, got ${data.length} instead`);
 }

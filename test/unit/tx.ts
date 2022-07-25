@@ -82,7 +82,7 @@ describe('Tx', () => {
   describe('decode', () => {
     it('decodes base64check', () => expect(decode('ba_AQIq9Y55kw==')).to.be.eql(payload));
 
-    it('decodes base58check', () => expect(decode('bf_3DZUwMat2')).to.be.eql(payload));
+    it('decodes base58check', () => expect(decode('nm_3DZUwMat2')).to.be.eql(payload));
 
     it('throws if invalid checksum', () => expect(() => decode('ak_23aaaaa'))
       .to.throw('Invalid checksum'));
@@ -94,7 +94,7 @@ describe('Tx', () => {
   describe('encode', () => {
     it('encodes base64check', () => expect(encode(payload, 'ba')).to.be.equal('ba_AQIq9Y55kw=='));
 
-    it('encodes base58check', () => expect(encode(payload, 'bf')).to.be.equal('bf_3DZUwMat2'));
+    it('encodes base58check', () => expect(encode(payload, 'nm')).to.be.equal('nm_3DZUwMat2'));
   });
 
   describe('getDefaultPointerKey', () => {
