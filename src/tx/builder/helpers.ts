@@ -1,13 +1,9 @@
 import BigNumber from 'bignumber.js';
 import { hash, genSalt } from '../../utils/crypto';
-import {
-  encode, decode, EncodedData, EncodingType,
-} from '../../utils/encoder';
+import { encode, decode, EncodedData } from '../../utils/encoder';
 import { toBytes } from '../../utils/bytes';
 import { concatBuffers } from '../../utils/other';
 import {
-  ID_TAG_PREFIX,
-  PREFIX_ID_TAG,
   NAME_BID_RANGES,
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUT_BLOCKS,
@@ -16,13 +12,9 @@ import {
   AensName,
 } from './constants';
 import { ceil } from '../../utils/bignumber';
-import {
-  TagNotFoundError,
-  PrefixNotFoundError,
-  IllegalBidFeeError,
-  ArgumentError,
-} from '../../utils/errors';
+import { IllegalBidFeeError } from '../../utils/errors';
 import { NamePointer } from '../../apis/node';
+import { readId, writeId } from './address';
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -103,33 +95,6 @@ export function commitmentHash(name: AensName, salt: number = genSalt()): Encode
 }
 
 /**
- * Utility function to create and _id type
- * @category transaction builder
- * @param hashId - Encoded hash
- * @returns Buffer Buffer with ID tag and decoded HASh
- */
-export function writeId(hashId: string): Buffer {
-  if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId);
-  const prefix = hashId.slice(0, 2) as keyof typeof PREFIX_ID_TAG;
-  const idTag = PREFIX_ID_TAG[prefix];
-  if (idTag == null) throw new TagNotFoundError(prefix);
-  return Buffer.from([...toBytes(idTag), ...decode(hashId as EncodedData<EncodingType>)]);
-}
-
-/**
- * Utility function to read and _id type
- * @category transaction builder
- * @param buf - Data
- * @returns Encoided hash string with prefix
- */
-export function readId(buf: Buffer): EncodedData<any> {
-  const tag = Buffer.from(buf).readUIntBE(0, 1);
-  const prefix = ID_TAG_PREFIX[tag];
-  if (prefix == null) throw new PrefixNotFoundError(tag);
-  return encode(buf.slice(1, buf.length), prefix);
-}
-
-/**
  * Utility function to convert int to bytes
  * @category transaction builder
  * @param val - Value
@@ -160,7 +125,7 @@ export function buildPointers(pointers: NamePointer[]): Buffer[][] {
   return pointers.map(
     (p) => [
       toBytes(p.key),
-      writeId(p.id),
+      writeId(p.id as Parameters<typeof writeId>[0]),
     ],
   );
 }

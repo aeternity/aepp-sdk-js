@@ -4,6 +4,8 @@ import { Tag } from '../tx/builder/constants';
 import { calculateMinFee as calculateMinFeeInternal } from '../tx/builder/field-types/fee';
 import { TxParamsCommon } from '../tx/builder/schema';
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
+import { mapObject } from '../utils/other';
+import { EncodingType } from '../utils/encoder';
 
 export * from './methods';
 
@@ -120,3 +122,38 @@ export enum TX_TYPE {
   oraclesTree = 625,
   accountsTree = 626,
 }
+
+/**
+ * @deprecated use `readId`, `writeId`
+ * @hidden
+ */
+export const ID_TAG = {
+  account: 1,
+  name: 2,
+  commitment: 3,
+  oracle: 4,
+  contract: 5,
+  channel: 6,
+} as const;
+
+/**
+ * @deprecated use `readId`, `writeId`
+ * @hidden
+ */
+export const PREFIX_ID_TAG = {
+  ak: ID_TAG.account,
+  nm: ID_TAG.name,
+  cm: ID_TAG.commitment,
+  ok: ID_TAG.oracle,
+  ct: ID_TAG.contract,
+  ch: ID_TAG.channel,
+} as const;
+
+/**
+ * @deprecated use `readId`, `writeId`
+ * @hidden
+ */
+export const ID_TAG_PREFIX = mapObject(
+  PREFIX_ID_TAG,
+  ([key, value]: [EncodingType, number]) => [value, key],
+);

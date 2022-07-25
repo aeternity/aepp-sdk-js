@@ -16,15 +16,14 @@ import {
 } from './schema';
 import {
   readInt,
-  readId,
   readPointers,
-  writeId,
   writeInt,
   buildPointers,
   encode,
   decode,
   buildContractId,
 } from './helpers';
+import { readId, writeId } from './address';
 import { toBytes } from '../../utils/bytes';
 import MPTree, { MPTreeBinary } from '../../utils/mptree';
 import {

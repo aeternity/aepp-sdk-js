@@ -23,6 +23,7 @@ export * from './tx';
 export * from './tx/builder';
 export * from './tx/builder/helpers';
 export * from './tx/builder/schema';
+export * from './tx/builder/address';
 export * from './utils/amount-formatter';
 export * from './utils/hd-wallet';
 export * from './aens';

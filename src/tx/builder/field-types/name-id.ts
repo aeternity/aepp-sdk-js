@@ -1,7 +1,6 @@
 import { AensName } from '../constants';
-import {
-  writeId, readId, produceNameId, isNameValid,
-} from '../helpers';
+import { produceNameId, isNameValid } from '../helpers';
+import { writeId, readId } from '../address';
 import { EncodedData } from '../../../utils/encoder';
 
 export default {

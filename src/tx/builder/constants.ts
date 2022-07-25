@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { EncodingType } from '../../utils/encoder';
 import { mapObject } from '../../utils/other';
 
 // # AENS
@@ -62,39 +61,6 @@ export const NAME_BID_RANGES = mapObject({
   2: 3524578,
   1: 5702887,
 }, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]);
-
-// # Tag constant for ids (type uint8)
-// # see https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
-// # <<Tag:1/unsigned-integer-unit:8, Hash:32/binary-unit:8>>
-const ID_TAG_ACCOUNT = 1;
-const ID_TAG_NAME = 2;
-const ID_TAG_COMMITMENT = 3;
-const ID_TAG_ORACLE = 4;
-const ID_TAG_CONTRACT = 5;
-const ID_TAG_CHANNEL = 6;
-
-export const ID_TAG = {
-  account: ID_TAG_ACCOUNT,
-  name: ID_TAG_NAME,
-  commitment: ID_TAG_COMMITMENT,
-  oracle: ID_TAG_ORACLE,
-  contract: ID_TAG_CONTRACT,
-  channel: ID_TAG_CHANNEL,
-};
-
-export const PREFIX_ID_TAG = {
-  ak: ID_TAG.account,
-  nm: ID_TAG.name,
-  cm: ID_TAG.commitment,
-  ok: ID_TAG.oracle,
-  ct: ID_TAG.contract,
-  ch: ID_TAG.channel,
-} as const;
-
-export const ID_TAG_PREFIX = mapObject(
-  PREFIX_ID_TAG,
-  ([key, value]: [EncodingType, number]) => [value, key],
-);
 
 /**
  * Enum with tag types
