@@ -10,7 +10,8 @@ import { _buildTx } from './tx';
 import { mapObject } from './utils/other';
 import Node, { getNetworkId } from './Node';
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
-import { AMOUNT, Tag } from './tx/builder/schema';
+import { AMOUNT } from './tx/builder/schema';
+import { Tag } from './tx/builder/constants';
 import MemoryAccount, { Keypair } from './account/Memory';
 import AccountBase, { isAccountBase } from './account/Base';
 import {

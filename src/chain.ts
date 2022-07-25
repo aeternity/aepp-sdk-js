@@ -17,8 +17,9 @@
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
 import verifyTransaction, { ValidatorResult } from './tx/validator';
 import { pause } from './utils/other';
-import { isNameValid, produceNameId, decode } from './tx/builder/helpers';
-import { DRY_RUN_ACCOUNT, AensName } from './tx/builder/schema';
+import { isNameValid, produceNameId } from './tx/builder/helpers';
+import { DRY_RUN_ACCOUNT } from './tx/builder/schema';
+import { AensName } from './tx/builder/constants';
 import {
   AensPointerContextError, DryRunError, InvalidAensNameError, TransactionError,
   TxTimedOutError, TxNotInChainError, InternalError,
@@ -28,7 +29,7 @@ import {
   Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx,
 } from './apis/node';
-import { EncodedData } from './utils/encoder';
+import { decode, EncodedData } from './utils/encoder';
 import AccountBase from './account/Base';
 
 /**

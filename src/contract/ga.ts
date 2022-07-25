@@ -19,7 +19,8 @@
  * Generalized Account module - routines to use generalized account
  */
 
-import { Tag, MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema';
+import { MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema';
+import { Tag } from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, buildTx, BuiltTx, TxUnpacked, unpackTx,
 } from '../tx/builder';

@@ -13,8 +13,6 @@ import { EncodedData, EncodingType } from '../../utils/encoder';
 import MPTree from '../../utils/mptree';
 import { NamePointer } from '../../apis/node';
 
-export * from './constants';
-
 export enum ORACLE_TTL_TYPES {
   delta = 0,
   block = 1,

@@ -22,7 +22,7 @@ import { _buildTx, BuildTxOptions } from './tx';
 import { buildTxHash, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
 import { EncodedData } from './utils/encoder';
-import { Tag, AensName } from './tx/builder/schema';
+import { Tag, AensName } from './tx/builder/constants';
 import AccountBase from './account/Base';
 
 /**

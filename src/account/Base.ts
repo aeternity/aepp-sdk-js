@@ -17,7 +17,7 @@
 import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto';
 import { buildTx } from '../tx/builder';
 import { decode, EncodedData } from '../utils/encoder';
-import { Tag } from '../tx/builder/schema';
+import { Tag } from '../tx/builder/constants';
 import { getNetworkId } from '../Node';
 import { concatBuffers } from '../utils/other';
 import type { createMetaTx } from '../contract/ga';

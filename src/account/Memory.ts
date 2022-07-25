@@ -17,9 +17,8 @@
 import AccountBase from './Base';
 import { sign, isValidKeypair } from '../utils/crypto';
 import { isHex } from '../utils/string';
-import { decode } from '../tx/builder/helpers';
 import { ArgumentError, InvalidKeypairError, MissingParamError } from '../utils/errors';
-import { EncodedData } from '../utils/encoder';
+import { decode, EncodedData } from '../utils/encoder';
 import { createMetaTx } from '../contract/ga';
 
 const secrets = new WeakMap();

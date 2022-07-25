@@ -17,7 +17,7 @@
 import BigNumber from 'bignumber.js';
 import { snakeToPascal } from '../utils/string';
 import { buildTx, unpackTx } from '../tx/builder';
-import { MIN_GAS_PRICE, Tag } from '../tx/builder/schema';
+import { MIN_GAS_PRICE, Tag } from '../tx/builder/constants';
 import * as handlers from './handlers';
 import {
   eventEmitters,

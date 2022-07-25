@@ -26,7 +26,7 @@
 import BigNumber from 'bignumber.js';
 import { send, SendOptions } from './spend';
 import { mapObject, pause } from './utils/other';
-import { oracleQueryId, decode, encode } from './tx/builder/helpers';
+import { oracleQueryId } from './tx/builder/helpers';
 import { unpackTx } from './tx/builder';
 import {
   ORACLE_TTL,
@@ -34,10 +34,10 @@ import {
   QUERY_FEE,
   QUERY_TTL,
   RESPONSE_TTL,
-  Tag,
 } from './tx/builder/schema';
+import { Tag } from './tx/builder/constants';
 import { RequestTimedOutError } from './utils/errors';
-import { EncodedData } from './utils/encoder';
+import { decode, encode, EncodedData } from './utils/encoder';
 import { _getPollInterval } from './chain';
 import { _buildTx, BuildTxOptions } from './tx';
 import Node from './Node';

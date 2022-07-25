@@ -28,7 +28,7 @@ import { genSalt } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
 import {
   CLIENT_TTL, NAME_TTL, Tag, AensName,
-} from './tx/builder/schema';
+} from './tx/builder/constants';
 import { ArgumentError } from './utils/errors';
 import { EncodedData } from './utils/encoder';
 import { send, SendOptions } from './spend';

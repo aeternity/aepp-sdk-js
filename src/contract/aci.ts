@@ -16,9 +16,8 @@
 */
 // @ts-expect-error TODO remove
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import {
-  DRY_RUN_ACCOUNT, Tag, AMOUNT, AensName,
-} from '../tx/builder/schema';
+import { DRY_RUN_ACCOUNT, AMOUNT } from '../tx/builder/schema';
+import { Tag, AensName } from '../tx/builder/constants';
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder';
 import { _buildTx } from '../tx';
 import { send } from '../spend';

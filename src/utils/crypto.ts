@@ -25,8 +25,6 @@ import {
   encode, decode, sha256hash, EncodedData, EncodingType,
 } from './encoder';
 
-export { sha256hash };
-
 const Ecb = aesjs.ModeOfOperation.ecb;
 
 /**

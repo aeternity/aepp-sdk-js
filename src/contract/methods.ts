@@ -22,10 +22,10 @@
  * https://github.com/aeternity/protocol/tree/master/contracts and
  */
 
-import { AensName } from '../tx/builder/schema';
-import { decode, produceNameId } from '../tx/builder/helpers';
+import { AensName } from '../tx/builder/constants';
+import { produceNameId } from '../tx/builder/helpers';
 import { concatBuffers } from '../utils/other';
-import { EncodedData, EncodingType } from '../utils/encoder';
+import { decode, EncodedData, EncodingType } from '../utils/encoder';
 import AccountBase from '../account/Base';
 import Node from '../Node';
 

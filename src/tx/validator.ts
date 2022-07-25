@@ -1,13 +1,13 @@
 import BigNumber from 'bignumber.js';
 import { verify, hash } from '../utils/crypto';
-import { encode, decode } from './builder/helpers';
 import {
-  PROTOCOL_VM_ABI, RawTxObject, TxSchema, TxParamsCommon, Tag, TxTypeSchemas, CtVersion,
+  PROTOCOL_VM_ABI, RawTxObject, TxSchema, TxParamsCommon, TxTypeSchemas, CtVersion,
 } from './builder/schema';
+import { Tag } from './builder/constants';
 import { TxUnpacked, unpackTx } from './builder';
 import { UnsupportedProtocolError } from '../utils/errors';
 import { concatBuffers, isKeyOfObject } from '../utils/other';
-import { EncodedData } from '../utils/encoder';
+import { encode, decode, EncodedData } from '../utils/encoder';
 import Node from '../Node';
 
 interface Account {

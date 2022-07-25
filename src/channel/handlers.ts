@@ -34,8 +34,7 @@ import {
   SignTx,
 } from './internal';
 import { unpackTx, buildTx } from '../tx/builder';
-import { encode } from '../tx/builder/helpers';
-import { EncodedData } from '../utils/encoder';
+import { encode, EncodedData } from '../utils/encoder';
 import {
   IllegalArgumentError,
   InsufficientBalanceError,
@@ -43,7 +42,7 @@ import {
   UnexpectedChannelMessageError,
 } from '../utils/errors';
 import type Channel from '.';
-import { Tag } from '../tx/builder/schema';
+import { Tag } from '../tx/builder/constants';
 
 export async function appendSignature(
   tx: EncodedData<'tx'>,

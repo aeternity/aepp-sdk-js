@@ -24,8 +24,9 @@
  */
 import BigNumber from 'bignumber.js';
 import {
-  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, Tag, TX_TTL, TxParamsCommon,
+  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TTL, TxParamsCommon,
 } from './builder/schema';
+import { Tag } from './builder/constants';
 import {
   ArgumentError, UnsupportedProtocolError, UnknownTxError, InvalidTxParamsError,
 } from '../utils/errors';

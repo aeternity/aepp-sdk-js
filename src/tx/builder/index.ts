@@ -1,9 +1,10 @@
 import { decode as rlpDecode, encode as rlpEncode, NestedUint8Array } from 'rlp';
-import { EncodedData, EncodingType } from '../../utils/encoder';
+import {
+  encode, decode, EncodedData, EncodingType,
+} from '../../utils/encoder';
 import { AE_AMOUNT_FORMATS } from '../../utils/amount-formatter';
 import { hash } from '../../utils/crypto';
 import { Field } from './field-types';
-
 import {
   FIELD_TYPES,
   RawTxObject,
@@ -11,16 +12,14 @@ import {
   TxTypeSchemas,
   TxParamsCommon,
   TX_SCHEMA,
-  Tag,
   TxSchema,
 } from './schema';
+import { Tag } from './constants';
 import {
   readInt,
   readPointers,
   writeInt,
   buildPointers,
-  encode,
-  decode,
   buildContractId,
 } from './helpers';
 import { readId, writeId } from './address';

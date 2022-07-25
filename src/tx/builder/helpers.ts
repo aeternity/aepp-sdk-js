@@ -20,8 +20,6 @@ import { readId, writeId } from './address';
  * JavaScript-based Transaction builder helper function's
  */
 
-export { encode, decode };
-
 /**
  * Build a contract public key
  * @category contract
