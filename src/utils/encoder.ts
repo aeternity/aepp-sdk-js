@@ -1,5 +1,7 @@
 import { encode as bs58Encode, decode as bs58Decode } from 'bs58';
-import { sha256 as Sha256 } from 'sha.js';
+// js extension is required for mjs build, not importing the whole package to reduce bundle size
+// eslint-disable-next-line import/extensions
+import Sha256 from 'sha.js/sha256.js';
 import {
   DecodeError,
   ArgumentError,

@@ -15,7 +15,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import nacl, { SignKeyPair } from 'tweetnacl';
-import { blake2b, Data } from 'blakejs';
+// js extension is required for mjs build, not importing the whole package to reduce bundle size
+// eslint-disable-next-line import/extensions
+import { blake2b, Data } from 'blakejs/blake2b.js';
 import { encode as varuintEncode } from 'varuint-bitcoin';
 
 import { str2buf } from './bytes';
