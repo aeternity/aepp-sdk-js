@@ -1,5 +1,7 @@
 import { encode as bs58Encode, decode as bs58Decode } from 'bs58';
-import { sha256 as Sha256 } from 'sha.js';
+// js extension is required for mjs build, not importing the whole package to reduce bundle size
+// eslint-disable-next-line import/extensions
+import Sha256 from 'sha.js/sha256.js';
 import {
   DecodeError,
   ArgumentError,
@@ -16,6 +18,7 @@ export { Encoded, Encoding };
  * Calculate SHA256 hash of `input`
  * @param input - Data to hash
  * @returns Hash
+ * @deprecated use `SubtleCrypto.digest` or `sha.js` package instead
  */
 export function sha256hash(input: Uint8Array | string): Buffer {
   return new Sha256().update(input).digest();

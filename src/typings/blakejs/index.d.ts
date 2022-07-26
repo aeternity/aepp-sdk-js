@@ -1,4 +1,4 @@
-declare module 'blakejs' {
+declare module 'blakejs/blake2b.js' {
   interface Context {
     b: Uint8Array;
     h: Uint32Array;
@@ -20,14 +20,4 @@ declare module 'blakejs' {
   export const blake2bInit: (outlen?: number, key?: Key) => Context;
 
   export const blake2bUpdate: (context: Context, data: Data) => void;
-
-  export const blake2s: (data: Data, key?: Key, outlen?: number) => Uint8Array;
-
-  export const blake2sFinal: (context: Context) => Uint8Array;
-
-  export const blake2sHex: (data: Data, key?: Key, outlen?: number) => string;
-
-  export const blake2sInit: (outlen?: number, key?: Key) => Context;
-
-  export const blake2sUpdate: (context: Context, data: Data) => void;
 }
