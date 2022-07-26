@@ -1,11 +1,41 @@
 import nacl from 'tweetnacl';
 import { full as hmac } from 'tweetnacl-auth';
 import { fromString } from 'bip32-path';
-import { decryptKey, encryptKey } from './crypto';
-import { encode, Encoding } from './encoder';
+import aesjs from 'aes-js';
+import { sha256hash, encode, Encoding } from './encoder';
 import { CryptographyError } from './errors';
 import { bytesToHex } from './bytes';
 import { concatBuffers } from './other';
+
+const Ecb = aesjs.ModeOfOperation.ecb;
+
+// TODO: at least don't export `encryptKey` and `decryptKey`
+/**
+ * Encrypt given data using `password`
+ * @param password - Password to encrypt with
+ * @param binaryData - Data to encrypt
+ * @returns Encrypted data
+ * @deprecated use 'sha.js' and 'aes-js' packages directly instead
+ */
+export function encryptKey(password: string, binaryData: Uint8Array): Uint8Array {
+  const hashedPasswordBytes = sha256hash(password);
+  const aesEcb = new Ecb(hashedPasswordBytes);
+  return aesEcb.encrypt(binaryData);
+}
+
+/**
+ * Decrypt given data using `password`
+ * @param password - Password to decrypt with
+ * @param encrypted - Data to decrypt
+ * @returns Decrypted data
+ * @deprecated use 'sha.js' and 'aes-js' packages directly instead
+ */
+export function decryptKey(password: string, encrypted: Uint8Array): Uint8Array {
+  const encryptedBytes = Buffer.from(encrypted);
+  const hashedPasswordBytes = sha256hash(password);
+  const aesEcb = new Ecb(hashedPasswordBytes);
+  return aesEcb.decrypt(encryptedBytes);
+}
 
 /**
  * @category exception

@@ -15,17 +15,14 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import nacl, { SignKeyPair } from 'tweetnacl';
-import aesjs from 'aes-js';
 import { blake2b, Data } from 'blakejs';
 import { encode as varuintEncode } from 'varuint-bitcoin';
 
 import { str2buf } from './bytes';
 import { concatBuffers } from './other';
 import {
-  decode, encode, Encoded, Encoding, sha256hash,
+  decode, encode, Encoded, Encoding,
 } from './encoder';
-
-const Ecb = aesjs.ModeOfOperation.ecb;
 
 /**
  * Generate address from secret key
@@ -140,31 +137,6 @@ export function generateKeyPair(raw = false): {
     publicKey: encode(publicBuffer, Encoding.AccountAddress),
     secretKey: secretBuffer.toString('hex'),
   };
-}
-
-/**
- * Encrypt given data using `password`
- * @param password - Password to encrypt with
- * @param binaryData - Data to encrypt
- * @returns Encrypted data
- */
-export function encryptKey(password: string, binaryData: Uint8Array): Uint8Array {
-  const hashedPasswordBytes = sha256hash(password);
-  const aesEcb = new Ecb(hashedPasswordBytes);
-  return aesEcb.encrypt(binaryData);
-}
-
-/**
- * Decrypt given data using `password`
- * @param password - Password to decrypt with
- * @param encrypted - Data to decrypt
- * @returns Decrypted data
- */
-export function decryptKey(password: string, encrypted: Uint8Array): Uint8Array {
-  const encryptedBytes = Buffer.from(encrypted);
-  const hashedPasswordBytes = sha256hash(password);
-  const aesEcb = new Ecb(hashedPasswordBytes);
-  return aesEcb.decrypt(encryptedBytes);
 }
 
 // SIGNATURES
