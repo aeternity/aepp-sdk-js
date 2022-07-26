@@ -8,7 +8,6 @@ import {
   NAME_FEE_BID_INCREMENT,
   NAME_BID_TIMEOUT_BLOCKS,
   NAME_MAX_LENGTH_FEE,
-  POINTER_KEY_BY_PREFIX,
   AensName,
 } from './constants';
 import { ceil } from '../../utils/bignumber';
@@ -155,17 +154,24 @@ export function isNameValid(name: string): name is AensName {
   return name.endsWith(AENS_SUFFIX);
 }
 
+enum PointerKeyByPrefix {
+  ak = 'account_pubkey',
+  ok = 'oracle_pubkey',
+  ct = 'contract_pubkey',
+  ch = 'channel',
+}
+
 /**
  * @category AENS
  * @param identifier - account/oracle/contract address, or channel
  * @returns default AENS pointer key
  */
 export function getDefaultPointerKey(
-  identifier: EncodedData<keyof typeof POINTER_KEY_BY_PREFIX>,
-): POINTER_KEY_BY_PREFIX {
+  identifier: EncodedData<keyof typeof PointerKeyByPrefix>,
+): PointerKeyByPrefix {
   decode(identifier);
-  const prefix = identifier.substring(0, 2) as keyof typeof POINTER_KEY_BY_PREFIX;
-  return POINTER_KEY_BY_PREFIX[prefix];
+  const prefix = identifier.substring(0, 2) as keyof typeof PointerKeyByPrefix;
+  return PointerKeyByPrefix[prefix];
 }
 
 /**

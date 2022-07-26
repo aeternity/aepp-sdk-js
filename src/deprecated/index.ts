@@ -157,3 +157,14 @@ export const ID_TAG_PREFIX = mapObject(
   PREFIX_ID_TAG,
   ([key, value]: [EncodingType, number]) => [value, key],
 );
+
+/**
+ * @deprecated use `getDefaultPointerKey`
+ * @hidden
+ */
+export enum POINTER_KEY_BY_PREFIX {
+  ak = 'account_pubkey',
+  ok = 'oracle_pubkey',
+  ct = 'contract_pubkey',
+  ch = 'channel',
+}
