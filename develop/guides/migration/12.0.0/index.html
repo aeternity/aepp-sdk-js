@@ -795,6 +795,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#node-rpcclient-browserwindowmessage-classes-are-using-private-fields" class="md-nav__link">
+    Node, RpcClient, BrowserWindowMessage classes are using private fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#all-combined-exports-are-inlined-requireaeternityaepp-sdkgeneratekeypair" class="md-nav__link">
     all combined exports are inlined (require('@aeternity/aepp-sdk').generateKeyPair())
   </a>
@@ -1692,6 +1699,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#node-rpcclient-browserwindowmessage-classes-are-using-private-fields" class="md-nav__link">
+    Node, RpcClient, BrowserWindowMessage classes are using private fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#all-combined-exports-are-inlined-requireaeternityaepp-sdkgeneratekeypair" class="md-nav__link">
     all combined exports are inlined (require('@aeternity/aepp-sdk').generateKeyPair())
   </a>
@@ -2440,6 +2454,12 @@ For example:
 <span class="gd">-const aeSdk = await Universal(options)</span><span class="w"></span>
 <span class="gi">+const aeSdk = new AeSdk(options)</span><span class="w"></span>
 </code></pre></div></p>
+<h4 id="node-rpcclient-browserwindowmessage-classes-are-using-private-fields"><code>Node</code>, <code>RpcClient</code>, <code>BrowserWindowMessage</code> classes are using private fields</h4>
+<p>Accessing private fields through <code>Proxy</code> will lead to "TypeError: attempted to set private
+field on non-instance" (<a href="https://github.com/tc39/proposal-class-fields/issues/106">tc39</a>).
+This may be an issue if you are using aepp-sdk with Vue@3, because Vue@3 introduced reactivity based
+on <code>Proxy</code> class (<a href="https://vuejs.org/guide/extras/reactivity-in-depth.html#how-reactivity-works-in-vue">Vue docs</a>).
+Avoid the above error by not making instances of these classes reactive.</p>
 <h4 id="all-combined-exports-are-inlined-requireaeternityaepp-sdkgeneratekeypair">all combined exports are inlined (<code>require('@aeternity/aepp-sdk').generateKeyPair()</code>)</h4>
 <p>Import the needed utils directly instead of importing a wrapper object firstly.
 For example:
