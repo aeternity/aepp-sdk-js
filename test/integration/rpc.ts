@@ -462,7 +462,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
           msg.method.should.be.equal('hey');
           resolve(true);
         }, () => {});
-        connectionFromWalletToAepp.sendMessage({ method: 'hey' });
+        connectionFromWalletToAepp.sendMessage({ jsonrpc: '2.0', method: 'hey' });
       });
       ok.should.be.equal(true);
     });

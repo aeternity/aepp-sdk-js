@@ -83,7 +83,11 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
   ): void {
     super.connect(onMessage, onDisconnect);
     this.listener = (message: MessageEvent<any>) => {
-      if (typeof message.data !== 'object') return;
+      // TODO: strict validate origin and source instead of checking message structure
+      if (
+        typeof message.data !== 'object'
+        || (message.data.jsonrpc ?? message.data.data?.jsonrpc) !== '2.0'
+      ) return;
       if (this.origin != null && this.origin !== message.origin) return;
       if (this.#target != null && this.#target !== message.source) return;
       this.receiveMessage(message);
