@@ -22,7 +22,7 @@ import { getSdk } from '.';
 import {
   generateKeyPair, AeSdk, Tag, UnexpectedTsError,
 } from '../../src';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded } from '../../src/utils/encoder';
 
 describe('Node Chain', () => {
   let aeSdk: AeSdk;
@@ -68,7 +68,9 @@ describe('Node Chain', () => {
 
   it('Get key block', async () => {
     const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration();
-    const keyBlockByHash = await aeSdkWithoutAccount.getKeyBlock(keyBlock.hash as EncodedData<'kh'>);
+    // TODO type should be corrected in node api
+    const keyBlockByHash = await aeSdkWithoutAccount
+      .getKeyBlock(keyBlock.hash as Encoded.KeyBlockHash);
     const keyBlockByHeight = await aeSdkWithoutAccount.getKeyBlock(keyBlock.height);
     keyBlockByHash.should.be.an('object');
     keyBlockByHeight.should.be.an('object');
@@ -76,7 +78,9 @@ describe('Node Chain', () => {
 
   it('Get generation', async () => {
     const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration();
-    const genByHash = await aeSdkWithoutAccount.getGeneration(keyBlock.hash as EncodedData<'kh'>);
+    // TODO type should be corrected in node api
+    const genByHash = await aeSdkWithoutAccount
+      .getGeneration(keyBlock.hash as Encoded.KeyBlockHash);
     const genByHeight = await aeSdkWithoutAccount.getGeneration(keyBlock.height);
     genByHash.should.be.an('object');
     genByHeight.should.be.an('object');
@@ -112,7 +116,7 @@ describe('Node Chain', () => {
   });
 
   const accounts = new Array(10).fill(undefined).map(() => generateKeyPair());
-  const transactions: Array<EncodedData<'th'>> = [];
+  const transactions: Encoded.TxHash[] = [];
 
   it('multiple spends from one account', async () => {
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address());

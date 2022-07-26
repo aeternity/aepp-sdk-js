@@ -1,7 +1,7 @@
 import AeSdkBase, { Account } from './AeSdkBase';
 import AccountBase from './account/Base';
 import AccountRpc from './account/Rpc';
-import { decode, EncodedData } from './utils/encoder';
+import { decode, Encoded } from './utils/encoder';
 import {
   Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi,
 } from './aepp-wallet-communication/rpc/types';
@@ -63,7 +63,7 @@ export default class AeSdkAepp extends AeSdkBase {
 
   _resolveAccount(account: Account = this.addresses()[0]): AccountBase {
     if (typeof account === 'string') {
-      const address = account as EncodedData<'ak'>;
+      const address = account as Encoded.AccountAddress;
       decode(address);
       if (!this.addresses().includes(address)) throw new UnAuthorizedAccountError(address);
       account = new AccountRpc({ rpcClient: this.rpcClient, address });
@@ -72,12 +72,12 @@ export default class AeSdkAepp extends AeSdkBase {
     return super._resolveAccount(account);
   }
 
-  addresses(): Array<EncodedData<'ak'>> {
+  addresses(): Encoded.AccountAddress[] {
     if (this._accounts == null) return [];
     const current = Object.keys(this._accounts.current)[0];
     return [
       ...current != null ? [current] : [], ...Object.keys(this._accounts.connected),
-    ] as Array<EncodedData<'ak'>>;
+    ] as Encoded.AccountAddress[];
   }
 
   /**
@@ -142,7 +142,7 @@ export default class AeSdkAepp extends AeSdkBase {
    * Ask addresses from wallet
    * @returns Addresses from wallet
    */
-  async askAddresses(): Promise<Array<EncodedData<'ak'>>> {
+  async askAddresses(): Promise<Encoded.AccountAddress[]> {
     this._ensureAccountAccess();
     return this.rpcClient.request(METHODS.address, undefined);
   }

@@ -29,7 +29,7 @@ import {
   Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx,
 } from './apis/node';
-import { decode, EncodedData } from './utils/encoder';
+import { decode, Encoded, Encoding } from './utils/encoder';
 import AccountBase from './account/Base';
 
 /**
@@ -53,9 +53,13 @@ export function _getPollInterval(
 export class InvalidTxError extends TransactionError {
   validation: ValidatorResult[];
 
-  transaction: EncodedData<'tx'>;
+  transaction: Encoded.Transaction;
 
-  constructor(message: string, validation: ValidatorResult[], transaction: EncodedData<'tx'>) {
+  constructor(
+    message: string,
+    validation: ValidatorResult[],
+    transaction: Encoded.Transaction,
+  ) {
     super(message);
     this.name = 'InvalidTxError';
     this.validation = validation;
@@ -83,7 +87,7 @@ export async function getHeight({ onNode }: { onNode: Node }): Promise<number> {
  * @returns The transaction as it was mined
  */
 export async function poll(
-  th: EncodedData<'th'>,
+  th: Encoded.TxHash,
   {
     blocks = 10, interval, onNode, ...options
   }:
@@ -132,7 +136,7 @@ export async function awaitHeight(
  * @returns Current Height
  */
 export async function waitForTxConfirm(
-  txHash: EncodedData<'th'>,
+  txHash: Encoded.TxHash,
   { confirm = 3, onNode, ...options }:
   { confirm?: number; onNode: Node } & Parameters<typeof awaitHeight>[1],
 ): Promise<number> {
@@ -162,7 +166,7 @@ export async function waitForTxConfirm(
  * @returns Transaction details
  */
 export async function sendTransaction(
-  tx: EncodedData<'tx'>,
+  tx: Encoded.Transaction,
   {
     onNode, onAccount, verify = true, waitMined = true, confirm, ...options
   }:
@@ -193,7 +197,7 @@ export async function sendTransaction(
       const pollResult = await poll(txHash, { onNode, ...options });
       const txData = {
         ...pollResult,
-        hash: pollResult.hash as EncodedData<'th'>,
+        hash: pollResult.hash as Encoded.TxHash,
         rawTx: tx,
       };
       // wait for transaction confirmation
@@ -224,8 +228,8 @@ type SendTransactionOptionsType = {
 } & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>;
 interface SendTransactionOptions extends SendTransactionOptionsType {}
 interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
-  hash: EncodedData<'th'>;
-  rawTx: EncodedData<'tx'>;
+  hash: Encoded.TxHash;
+  rawTx: Encoded.Transaction;
   confirmationHeight?: number;
 }
 
@@ -239,9 +243,9 @@ interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>>
  * @param options.onNode - Node to use
  */
 export async function getAccount(
-  address: EncodedData<'ak' | 'ct'>,
+  address: Encoded.AccountAddress | Encoded.ContractAddress,
   { height, hash, onNode }:
-  { height?: number; hash?: EncodedData<'kh' | 'mh'>; onNode: Node },
+  { height?: number; hash?: Encoded.KeyBlockHash | Encoded.MicroBlockHash; onNode: Node },
 ): Promise<TransformNodeType<AccountNode>> {
   if (height != null) return onNode.getAccountByPubkeyAndHeight(address, height);
   if (hash != null) return onNode.getAccountByPubkeyAndHash(address, hash);
@@ -259,7 +263,7 @@ export async function getAccount(
  * @param options.hash - The block hash on which to obtain the balance for (default: top of chain)
  */
 export async function getBalance(
-  address: EncodedData<'ak' | 'ct'>,
+  address: Encoded.AccountAddress | Encoded.ContractAddress,
   { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
   { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1],
 ): Promise<string> {
@@ -290,7 +294,7 @@ export async function getCurrentGeneration(
  * @returns Generation
  */
 export async function getGeneration(
-  hashOrHeight: EncodedData<'kh'> | number,
+  hashOrHeight: Encoded.KeyBlockHash | number,
   { onNode }: { onNode: Node },
 ): Promise<TransformNodeType<Generation>> {
   if (typeof hashOrHeight === 'number') return onNode.getGenerationByHeight(hashOrHeight);
@@ -306,7 +310,7 @@ export async function getGeneration(
  * @returns Transactions
  */
 export async function getMicroBlockTransactions(
-  hash: EncodedData<'mh'>,
+  hash: Encoded.MicroBlockHash,
   { onNode }: { onNode: Node },
 ): Promise<TransformNodeType<SignedTx[]>> {
   return (await onNode.getMicroBlockTransactionsByHash(hash)).transactions;
@@ -321,7 +325,7 @@ export async function getMicroBlockTransactions(
  * @returns Key Block
  */
 export async function getKeyBlock(
-  hashOrHeight: EncodedData<'kh'> | number,
+  hashOrHeight: Encoded.KeyBlockHash | number,
   { onNode }: { onNode: Node },
 ): Promise<TransformNodeType<KeyBlock>> {
   if (typeof hashOrHeight === 'number') return onNode.getKeyBlockByHeight(hashOrHeight);
@@ -337,15 +341,15 @@ export async function getKeyBlock(
  * @returns Micro block header
  */
 export async function getMicroBlockHeader(
-  hash: EncodedData<'mh'>,
+  hash: Encoded.MicroBlockHash,
   { onNode }: { onNode: Node },
 ): Promise<TransformNodeType<MicroBlockHeader>> {
   return onNode.getMicroBlockHeaderByHash(hash);
 }
 
 interface TxDryRunArguments {
-  tx: EncodedData<'tx'>;
-  accountAddress: EncodedData<'ak'>;
+  tx: Encoded.Transaction;
+  accountAddress: Encoded.AccountAddress;
   top?: number;
   txEvents?: any;
   resolve: Function;
@@ -394,8 +398,8 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
  * @param options.onNode - Node to use
  */
 export async function txDryRun(
-  tx: EncodedData<'tx'>,
-  accountAddress: EncodedData<'ak'>,
+  tx: Encoded.Transaction,
+  accountAddress: Encoded.AccountAddress,
   {
     top, txEvents, combine, onNode,
   }:
@@ -426,7 +430,7 @@ export async function txDryRun(
  * @param options.onNode - Node to use
  */
 export async function getContractByteCode(
-  contractId: EncodedData<'ct'>,
+  contractId: Encoded.ContractAddress,
   { onNode }: { onNode: Node },
 ): Promise<TransformNodeType<ByteCode>> {
   return onNode.getContractCode(contractId);
@@ -440,7 +444,7 @@ export async function getContractByteCode(
  * @param options.onNode - Node to use
  */
 export async function getContract(
-  contractId: EncodedData<'ct'>,
+  contractId: Encoded.ContractAddress,
   { onNode }: { onNode: Node },
 ): Promise<TransformNodeType<ContractObject>> {
   return onNode.getContract(contractId);
@@ -472,18 +476,20 @@ export async function getName(
  * @param options.onNode - Node to use
  * @returns Address or AENS name hash
  */
-export async function resolveName <Type extends 'ak' | 'ct'>(
-  nameOrId: AensName | EncodedData<Type>,
+export async function resolveName <
+  Type extends Encoding.AccountAddress | Encoding.ContractAddress,
+>(
+  nameOrId: AensName | Encoded.Generic<Type>,
   key: string,
   { verify = true, resolveByNode = false, onNode }:
   { verify?: boolean; resolveByNode?: boolean; onNode: Node },
-): Promise<EncodedData<Type | 'nm'>> {
+): Promise<Encoded.Generic<Type | Encoding.Name>> {
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {
       const name = await onNode.getNameEntryByName(nameOrId);
       const pointer = name.pointers.find((p) => p.key === key);
       if (pointer == null) throw new AensPointerContextError(nameOrId, key);
-      if (resolveByNode) return pointer.id as EncodedData<Type>;
+      if (resolveByNode) return pointer.id as Encoded.Generic<Type>;
     }
     return produceNameId(nameOrId);
   }

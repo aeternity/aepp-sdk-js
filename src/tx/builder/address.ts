@@ -1,7 +1,9 @@
 import { ArgumentError, PrefixNotFoundError, TagNotFoundError } from '../../utils/errors';
-import { isKeyOfObject } from '../../utils/other';
 import { toBytes } from '../../utils/bytes';
-import { decode, encode, EncodedData } from '../../utils/encoder';
+import {
+  decode, encode, Encoded, Encoding,
+} from '../../utils/encoder';
+import { isItemOfArray } from '../../utils/other';
 
 /**
  * Map of prefix to ID tag constant
@@ -9,16 +11,16 @@ import { decode, encode, EncodedData } from '../../utils/encoder';
  * @see {@link https://github.com/aeternity/aeserialization/blob/eb68fe331bd476910394966b7f5ede7a74d37e35/src/aeser_id.erl#L97-L102}
  * @see {@link https://github.com/aeternity/aeserialization/blob/eb68fe331bd476910394966b7f5ede7a74d37e35/src/aeser_api_encoder.erl#L163-L168}
  */
-enum PrefixToIdTag {
-  ak = 1,
-  nm = 2,
-  cm = 3,
-  ok = 4,
-  ct = 5,
-  ch = 6,
-}
+const idTagToEncoding = [
+  Encoding.AccountAddress,
+  Encoding.Name,
+  Encoding.Commitment,
+  Encoding.OracleAddress,
+  Encoding.ContractAddress,
+  Encoding.Channel,
+] as const;
 
-type AddressPrefixes = keyof typeof PrefixToIdTag;
+type AddressEncodings = typeof idTagToEncoding[number];
 
 /**
  * Utility function to create and _id type
@@ -26,11 +28,11 @@ type AddressPrefixes = keyof typeof PrefixToIdTag;
  * @param hashId - Encoded hash
  * @returns Buffer Buffer with ID tag and decoded HASh
  */
-export function writeId(hashId: EncodedData<AddressPrefixes>): Buffer {
+export function writeId(hashId: Encoded.Generic<AddressEncodings>): Buffer {
   if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId);
-  const prefix = hashId.slice(0, 2);
-  if (!isKeyOfObject(prefix, PrefixToIdTag)) throw new TagNotFoundError(prefix);
-  const idTag = PrefixToIdTag[prefix];
+  const encoding = hashId.slice(0, 2);
+  if (!isItemOfArray(encoding, idTagToEncoding)) throw new TagNotFoundError(encoding);
+  const idTag = idTagToEncoding.indexOf(encoding) + 1;
   return Buffer.from([...toBytes(idTag), ...decode(hashId)]);
 }
 
@@ -40,9 +42,9 @@ export function writeId(hashId: EncodedData<AddressPrefixes>): Buffer {
  * @param buf - Data
  * @returns Encoided hash string with prefix
  */
-export function readId(buf: Buffer): EncodedData<AddressPrefixes> {
+export function readId(buf: Buffer): Encoded.Generic<AddressEncodings> {
   const idTag = Buffer.from(buf).readUIntBE(0, 1);
-  const prefix = PrefixToIdTag[idTag] as AddressPrefixes;
-  if (prefix == null) throw new PrefixNotFoundError(idTag);
-  return encode(buf.slice(1, buf.length), prefix);
+  const encoding = idTagToEncoding[idTag - 1];
+  if (encoding == null) throw new PrefixNotFoundError(idTag);
+  return encode(buf.slice(1, buf.length), encoding);
 }

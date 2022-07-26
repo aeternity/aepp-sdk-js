@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { EncodedData } from '../utils/encoder';
+import { Encoded } from '../utils/encoder';
 import { BaseError, InternalError } from '../utils/errors';
 
 /**
@@ -185,7 +185,7 @@ export class RpcPermissionDenyError extends RpcError {
 
   code = 11;
 
-  constructor(address: EncodedData<'ak'>) {
+  constructor(address: Encoded.AccountAddress) {
     super(`You are not subscribed for account ${address}`);
     this.data = address;
     this.name = 'RpcPermissionDenyError';

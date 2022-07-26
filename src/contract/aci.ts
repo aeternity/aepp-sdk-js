@@ -21,7 +21,7 @@ import { Tag, AensName } from '../tx/builder/constants';
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder';
 import { _buildTx } from '../tx';
 import { send } from '../spend';
-import { decode, EncodedData, EncodingType } from '../utils/encoder';
+import { decode, Encoded } from '../utils/encoder';
 import {
   MissingContractDefError,
   MissingContractAddressError,
@@ -73,7 +73,7 @@ interface Aci extends BaseAci {
 }
 
 interface Event {
-  address: EncodedData<'ct'>;
+  address: Encoded.ContractAddress;
   data: string;
   topics: Array<string | number>;
 }
@@ -83,7 +83,7 @@ interface DecodedEvent {
   args: unknown;
   contract: {
     name: string;
-    address: EncodedData<'ct'>;
+    address: Encoded.ContractAddress;
   };
 }
 
@@ -94,9 +94,9 @@ export interface ContractInstance {
   _name: string;
   calldata: any;
   source?: string;
-  bytecode?: EncodedData<'cb'>;
+  bytecode?: Encoded.ContractBytearray;
   deployInfo: {
-    address?: EncodedData<'ct'>;
+    address?: Encoded.ContractAddress;
     result?: {
       callerId: string;
       callerNonce: string;
@@ -108,13 +108,13 @@ export interface ContractInstance {
       returnType: ContractCallReturnType;
       returnValue: string;
     };
-    owner?: EncodedData<'ak'>;
+    owner?: Encoded.AccountAddress;
     transaction?: string;
     rawTx?: string;
     txData?: TxData;
   };
   options: any;
-  compile: (options?: {}) => Promise<EncodedData<'cb'>>;
+  compile: (options?: {}) => Promise<Encoded.ContractBytearray>;
   _estimateGas: (name: string, params: any[], options: object) => Promise<number>;
   deploy: (params?: any[], options?: object) => Promise<any>;
   call: (fn: string, params?: any[], options?: {}) => Promise<{
@@ -123,9 +123,9 @@ export interface ContractInstance {
     txData: TxData;
     rawTx: string;
     result: {
-      callerId: EncodedData<'ak'>;
+      callerId: Encoded.AccountAddress;
       callerNonce: number;
-      contractId: EncodedData<'ct'>;
+      contractId: Encoded.ContractAddress;
       gasPrice: number;
       gasUsed: number;
       height: number;
@@ -177,9 +177,9 @@ export default async function getContractInstance({
   onCompiler: Compiler;
   onNode: Node;
   source?: string;
-  bytecode?: EncodedData<'cb'>;
+  bytecode?: Encoded.ContractBytearray;
   aci?: Aci;
-  contractAddress?: EncodedData<'ct'> | AensName;
+  contractAddress?: Encoded.ContractAddress | AensName;
   fileSystem?: Record<string, string>;
   validateBytecode?: boolean;
   [key: string]: any;
@@ -195,7 +195,7 @@ export default async function getContractInstance({
       contractAddress,
       'contract_pubkey',
       { resolveByNode: true, onNode },
-    ) as EncodedData<'ct'>;
+    ) as Encoded.ContractAddress;
   }
 
   if (contractAddress == null && source == null && bytecode == null) {
@@ -250,19 +250,19 @@ export default async function getContractInstance({
    * Compile contract
    * @returns bytecode
    */
-  instance.compile = async (options = {}): Promise<EncodedData<'cb'>> => {
+  instance.compile = async (options = {}): Promise<Encoded.ContractBytearray> => {
     if (instance.bytecode != null) throw new IllegalArgumentError('Contract already compiled');
     if (instance.source == null) throw new IllegalArgumentError('Can\'t compile without source code');
     instance.bytecode = (await onCompiler.compileContract({
       code: instance.source, options: { ...instance.options, ...options },
-    })).bytecode as EncodedData<'cb'>;
+    })).bytecode as Encoded.ContractBytearray;
     return instance.bytecode;
   };
 
   const handleCallError = (
     { returnType, returnValue }: {
       returnType: ContractCallReturnType;
-      returnValue: EncodedData<EncodingType>;
+      returnValue: Encoded.ContractBytearray;
     },
     transaction: string,
   ): void => {
@@ -281,12 +281,12 @@ export default async function getContractInstance({
     throw new NodeInvocationError(message, transaction);
   };
 
-  const sendAndProcess = async (tx: EncodedData<'tx'>, options: any): Promise<{
+  const sendAndProcess = async (tx: Encoded.Transaction, options: any): Promise<{
     result?: ContractInstance['deployInfo']['result'];
     hash: TxData['hash'];
     tx: Awaited<ReturnType<typeof unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>>>;
     txData: TxData;
-    rawTx: EncodedData<'tx'>;
+    rawTx: Encoded.Transaction;
   }> => {
     options = { ...instance.options, ...options };
     const txData = await send(tx, options);
@@ -393,7 +393,7 @@ export default async function getContractInstance({
       .catch((error: any) => {
         if (opt.callStatic === true) return DRY_RUN_ACCOUNT.pub;
         throw error;
-      }) as EncodedData<'ak'>;
+      }) as Encoded.AccountAddress;
     const callData = instance.calldata.encode(instance._name, fn, params);
 
     let res: any;
@@ -413,7 +413,7 @@ export default async function getContractInstance({
       if (callObj == null) throw new UnexpectedTsError();
       handleCallError({
         returnType: callObj.returnType as ContractCallReturnType,
-        returnValue: callObj.returnValue as EncodedData<EncodingType>,
+        returnValue: callObj.returnValue as Encoded.ContractBytearray,
       }, tx);
       res = { ...dryRunOther, tx: unpackTx(tx), result: callObj };
     } else {
@@ -444,9 +444,11 @@ export default async function getContractInstance({
    * @throws {@link AmbiguousEventDefinitionError}
    */
   function getContractNameByEvent(
-    address: EncodedData<'ct'>,
+    address: Encoded.ContractAddress,
     nameHash: BigInt,
-    { contractAddressToName }: { contractAddressToName?: { [key: EncodedData<'ct'>]: string } },
+    { contractAddressToName }: {
+      contractAddressToName?: { [key: Encoded.ContractAddress]: string };
+    },
   ): string {
     const addressToName = { ...instance.options.contractAddressToName, ...contractAddressToName };
     if (addressToName[address] != null) return addressToName[address];

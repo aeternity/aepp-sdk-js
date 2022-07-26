@@ -23,7 +23,7 @@ import {
   AeSdk, generateKeyPair, MemoryAccount, Tag, UnexpectedTsError,
 } from '../../src';
 import { ContractInstance } from '../../src/contract/aci';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded } from '../../src/utils/encoder';
 
 describe('Paying for transaction of another account', () => {
   let aeSdk: AeSdk;
@@ -63,7 +63,7 @@ describe('Paying for transaction of another account', () => {
       entrypoint init(x: int): state = { value = x }
       entrypoint getValue(): int = state.value
       stateful entrypoint setValue(x: int) = put(state{ value = x })`;
-  let contractAddress: EncodedData<'ct'>;
+  let contractAddress: Encoded.ContractAddress;
   let aeSdkNotPayingFee: any;
   let payingContract: ContractInstance;
 

@@ -30,6 +30,7 @@ import {
   NAME_BID_RANGES, Tag,
   SchemaNotFoundError,
 } from '../../src';
+import { Encoding } from '../../src/utils/encoder';
 
 describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {
@@ -92,9 +93,11 @@ describe('Tx', () => {
   });
 
   describe('encode', () => {
-    it('encodes base64check', () => expect(encode(payload, 'ba')).to.be.equal('ba_AQIq9Y55kw=='));
+    it('encodes base64check', () => expect(encode(payload, Encoding.Bytearray))
+      .to.be.equal('ba_AQIq9Y55kw=='));
 
-    it('encodes base58check', () => expect(encode(payload, 'nm')).to.be.equal('nm_3DZUwMat2'));
+    it('encodes base58check', () => expect(encode(payload, Encoding.Name))
+      .to.be.equal('nm_3DZUwMat2'));
   });
 
   describe('getDefaultPointerKey', () => {
@@ -103,7 +106,7 @@ describe('Tx', () => {
   });
 
   it('Deserialize tx: invalid tx VSN', () => {
-    const tx = encode(rlpEncode([10, 99]), 'tx');
+    const tx = encode(rlpEncode([10, 99]), Encoding.Transaction);
     expect(() => unpackTx(tx))
       .to.throw(SchemaNotFoundError, `Transaction deserialization not implemented for tag ${10} version ${99}`);
   });

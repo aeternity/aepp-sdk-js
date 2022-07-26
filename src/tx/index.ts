@@ -31,7 +31,7 @@ import {
   ArgumentError, UnsupportedProtocolError, UnknownTxError, InvalidTxParamsError,
 } from '../utils/errors';
 import Node from '../Node';
-import { EncodedData } from '../utils/encoder';
+import { Encoded } from '../utils/encoder';
 import { buildTx as syncBuildTx, unpackTx } from './builder/index';
 import { isKeyOfObject } from '../utils/other';
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
@@ -103,7 +103,7 @@ export async function prepareTxParams(
 }
 
 interface PrepareTxParamsOptions extends Pick<TxParamsCommon, 'nonce' | 'ttl'> {
-  senderId: EncodedData<'ak'>;
+  senderId: Encoded.AccountAddress;
   absoluteTtl?: boolean;
   strategy?: 'continuity' | 'max';
   onNode: Node;
@@ -125,11 +125,12 @@ export async function _buildTx<TxType extends Tag>(
     denomination?: AE_AMOUNT_FORMATS;
     absoluteTtl?: boolean;
   }
-  & (TxType extends Tag.OracleExtendTx | Tag.OracleResponseTx ? { callerId: EncodedData<'ak'> } : {})
+  & (TxType extends Tag.OracleExtendTx | Tag.OracleResponseTx
+    ? { callerId: Encoded.AccountAddress } : {})
   & (TxType extends Tag.ContractCreateTx | Tag.GaAttachTx ? { ctVersion?: CtVersion } : {})
   & (TxType extends Tag.ContractCallTx | Tag.OracleRegisterTx
     ? { abiVersion?: ABI_VERSIONS } : {}),
-): Promise<EncodedData<'tx'>> {
+): Promise<Encoded.Transaction> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node };
   let senderKey: keyof TxParamsCommon | '<absent>';

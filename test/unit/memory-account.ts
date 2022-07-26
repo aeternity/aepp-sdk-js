@@ -20,7 +20,7 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import MemoryAccount from '../../src/account/Memory';
 import { generateKeyPair, InvalidKeypairError, DecodeError } from '../../src';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded } from '../../src/utils/encoder';
 
 const testAcc = generateKeyPair();
 
@@ -32,7 +32,7 @@ describe('MemoryAccount', () => {
     });
 
     it('Fail on invalid publicKey', async () => {
-      expect(() => new MemoryAccount({ keypair: { publicKey: ' ' as EncodedData<'ak'>, secretKey: testAcc.secretKey } }))
+      expect(() => new MemoryAccount({ keypair: { publicKey: ' ' as Encoded.AccountAddress, secretKey: testAcc.secretKey } }))
         .to.throw(DecodeError, 'Encoded string missing payload');
     });
 

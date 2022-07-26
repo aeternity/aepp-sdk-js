@@ -1,18 +1,25 @@
 import BigNumber from 'bignumber.js';
-import { verify, hash } from '../utils/crypto';
+import { hash, verify } from '../utils/crypto';
 import {
-  PROTOCOL_VM_ABI, RawTxObject, TxSchema, TxParamsCommon, TxTypeSchemas, CtVersion,
+  CtVersion,
+  PROTOCOL_VM_ABI,
+  RawTxObject,
+  TxParamsCommon,
+  TxSchema,
+  TxTypeSchemas,
 } from './builder/schema';
 import { Tag } from './builder/constants';
 import { TxUnpacked, unpackTx } from './builder';
 import { UnsupportedProtocolError } from '../utils/errors';
 import { concatBuffers, isKeyOfObject } from '../utils/other';
-import { encode, decode, EncodedData } from '../utils/encoder';
+import {
+  decode, encode, Encoded, Encoding,
+} from '../utils/encoder';
 import Node from '../Node';
 
 interface Account {
   balance: bigint;
-  id: EncodedData<'ak'>;
+  id: Encoded.AccountAddress;
   nonce: number;
 }
 
@@ -36,7 +43,7 @@ type Validator = (
     nameFee?: number;
     ctVersion?: Partial<CtVersion>;
     abiVersion?: number;
-    contractId?: EncodedData<'ct'>;
+    contractId?: Encoded.ContractAddress;
   },
   options: {
     account?: Account;
@@ -53,13 +60,13 @@ const validators: Validator[] = [];
 
 const getSenderAddress = (
   tx: TxParamsCommon | RawTxObject<TxSchema>,
-): EncodedData<'ak'> | undefined => [
+): Encoded.AccountAddress | undefined => [
   'senderId', 'accountId', 'ownerId', 'callerId',
   'oracleId', 'fromId', 'initiator', 'gaId', 'payerId',
 ]
   .map((key: keyof TxSchema) => tx[key])
   .filter((a) => a)
-  .map((a) => a?.toString().replace(/^ok_/, 'ak_'))[0] as EncodedData<'ak'> | undefined;
+  .map((a) => a?.toString().replace(/^ok_/, 'ak_'))[0] as Encoded.AccountAddress | undefined;
 
 /**
  * Transaction Validator
@@ -73,7 +80,7 @@ const getSenderAddress = (
  * @example const errors = await verifyTransaction(transaction, node)
  */
 export default async function verifyTransaction(
-  transaction: EncodedData<'tx' | 'pi'>,
+  transaction: Encoded.Transaction | Encoded.Poi,
   node: Node,
   parentTxTypes: Tag[] = [],
 ): Promise<ValidatorResult[]> {
@@ -86,7 +93,7 @@ export default async function verifyTransaction(
       : node.getAccountByPubkey(address)
         .catch(() => ({ id: address, balance: 0n, nonce: 0 }))
         // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
-        .then((acc) => ({ ...acc, id: acc.id as EncodedData<'ak'> })),
+        .then((acc) => ({ ...acc, id: acc.id as Encoded.AccountAddress })),
     node.getCurrentKeyBlockHeight(),
     node.getNodeInfo(),
   ]);
@@ -125,7 +132,7 @@ validators.push(
   async ({ encodedTx, tx }, { node, parentTxTypes, txType }) => {
     if ((encodedTx ?? tx) === undefined) return [];
     return verifyTransaction(
-      encode((encodedTx ?? tx).rlpEncoded, 'tx'),
+      encode((encodedTx ?? tx).rlpEncoded, Encoding.Transaction),
       node,
       [...parentTxTypes, txType],
     );
@@ -202,7 +209,7 @@ validators.push(
   },
   async ({ contractId }, { txType, node }) => {
     if (Tag.ContractCallTx !== txType) return [];
-    contractId = contractId as EncodedData<'ct'>;
+    contractId = contractId as Encoded.ContractAddress;
     try {
       const { active } = await node.getContract(contractId);
       if (active) return [];

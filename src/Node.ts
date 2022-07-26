@@ -6,7 +6,7 @@ import {
 } from './utils/autorest';
 import { Node as NodeApi, NodeOptionalParams, ErrorModel } from './apis/node';
 import { mapObject } from './utils/other';
-import { EncodedData } from './utils/encoder';
+import { Encoded } from './utils/encoder';
 import { MissingParamError } from './utils/errors';
 
 /**
@@ -53,7 +53,7 @@ export type TransformNodeType<Type> =
                 : Property extends NumberPropertyNames
                   ? PreserveOptional<number, Type[Property]>
                   : Property extends 'txHash'
-                    ? PreserveOptional<EncodedData<'th'>, Type[Property]>
+                    ? PreserveOptional<Encoded.TxHash, Type[Property]>
                     : TransformNodeType<Type[Property]>
             }
             : Type;

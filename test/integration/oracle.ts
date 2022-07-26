@@ -24,7 +24,7 @@ import {
   ORACLE_TTL_TYPES, QUERY_FEE,
 } from '../../src';
 import MemoryAccount from '../../src/account/Memory';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded } from '../../src/utils/encoder';
 
 describe('Oracle', () => {
   let aeSdk: AeSdk;
@@ -75,7 +75,7 @@ describe('Oracle', () => {
     query = await oracle.getQuery(query.id);
 
     expect(query.decodedResponse).to.be.equal(queryResponse);
-    expect(decode(query.response as EncodedData<'or'>).toString()).to.be.equal(queryResponse);
+    expect(decode(query.response as Encoded.OracleResponse).toString()).to.be.equal(queryResponse);
   });
 
   it('Poll for response', async () => {

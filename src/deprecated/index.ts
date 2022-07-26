@@ -5,7 +5,7 @@ import { calculateMinFee as calculateMinFeeInternal } from '../tx/builder/field-
 import { TxParamsCommon } from '../tx/builder/schema';
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
 import { mapObject } from '../utils/other';
-import { EncodingType } from '../utils/encoder';
+import { Encoding } from '../utils/encoder';
 
 export * from './methods';
 
@@ -155,7 +155,7 @@ export const PREFIX_ID_TAG = {
  */
 export const ID_TAG_PREFIX = mapObject(
   PREFIX_ID_TAG,
-  ([key, value]: [EncodingType, number]) => [value, key],
+  ([key, value]: [Encoding, number]) => [value, key],
 );
 
 /**

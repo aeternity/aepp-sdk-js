@@ -21,7 +21,7 @@ import {
   NotImplementedError,
   TypeError,
 } from './utils/errors';
-import { EncodedData } from './utils/encoder';
+import { Encoded } from './utils/encoder';
 import Compiler from './contract/Compiler';
 
 export type Account = Keypair | AccountBase | any;
@@ -190,11 +190,11 @@ class AeSdkBase {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  addresses(): Array<EncodedData<'ak'>> {
+  addresses(): Encoded.AccountAddress[] {
     return [];
   }
 
-  async address({ onAccount }: { onAccount?: Account } = {}): Promise<EncodedData<'ak'>> {
+  async address({ onAccount }: { onAccount?: Account } = {}): Promise<Encoded.AccountAddress> {
     return this._resolveAccount(onAccount).address();
   }
 
@@ -206,9 +206,9 @@ class AeSdkBase {
   }
 
   async signTransaction(
-    tx: EncodedData<'tx'>,
+    tx: Encoded.Transaction,
     { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['signTransaction']>[1] = {},
-  ): Promise<EncodedData<'tx'>> {
+  ): Promise<Encoded.Transaction> {
     return this._resolveAccount(onAccount)
       .signTransaction(tx, { ...options, networkId: await this.getNetworkId(options) });
   }
@@ -263,7 +263,7 @@ class AeSdkBase {
   async buildTx<TxType extends Tag>(
     txType: TxType,
     options: Omit<Parameters<typeof _buildTx<TxType>>[1], 'onNode'> & { onNode?: Node },
-  ): Promise<EncodedData<'tx'>> {
+  ): Promise<Encoded.Transaction> {
     // @ts-expect-error TODO: need to figure out what's wrong here
     return _buildTx<TxType>(txType, {
       ...this._getOptions(),
@@ -296,7 +296,11 @@ type MakeOptional<Args extends any[]> = Args extends [infer Head, ...infer Tail]
   ? Tail extends []
     ? Head extends object
       ? OptionalIfNotRequired<[Omit<Head, 'onNode' | 'onCompiler' | 'onAccount'>
-      & { onNode?: Node; onCompiler?: Compiler; onAccount?: AccountBase | EncodedData<'ak'> | Keypair }]>
+      & {
+        onNode?: Node;
+        onCompiler?: Compiler;
+        onAccount?: AccountBase | Encoded.AccountAddress | Keypair;
+      }]>
       : [Head]
     : [Head, ...MakeOptional<Tail>]
   : never;

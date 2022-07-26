@@ -21,7 +21,7 @@ import { getSdk } from '.';
 import {
   AeSdk, Tag, genSalt, generateKeyPair, unpackTx,
 } from '../../src';
-import { encode, EncodedData } from '../../src/utils/encoder';
+import { encode, Encoded, Encoding } from '../../src/utils/encoder';
 import MemoryAccount from '../../src/account/Memory';
 import { ContractInstance } from '../../src/contract/aci';
 
@@ -40,7 +40,7 @@ const authContractSource = `contract BlindAuth =
 `;
 describe('Generalized Account', () => {
   let aeSdk: AeSdk;
-  let gaAccountAddress: EncodedData<'ak'>;
+  let gaAccountAddress: Encoded.AccountAddress;
   let authContract: ContractInstance;
 
   before(async () => {
@@ -79,7 +79,10 @@ describe('Generalized Account', () => {
   it('buildAuthTxHash generates a proper hash', async () => {
     const { rawTx } = await aeSdk
       .spend(10000, publicKey, { authData: { source: authContractSource, args: [genSalt()] } });
-    const spendTx = encode(unpackTx(rawTx, Tag.SignedTx).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded, 'tx');
+    const spendTx = encode(
+      unpackTx(rawTx, Tag.SignedTx).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded,
+      Encoding.Transaction,
+    );
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.methods.getTxHash()).decodedResult);
   });

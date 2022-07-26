@@ -21,7 +21,7 @@ import BigNumber from 'bignumber.js';
 import type Channel from '.';
 import JsonBig from '../utils/json-big';
 import { pascalToSnake } from '../utils/string';
-import { EncodedData } from '../utils/encoder';
+import { Encoded } from '../utils/encoder';
 import {
   BaseError, ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError,
 } from '../utils/errors';
@@ -31,20 +31,20 @@ interface ChannelAction {
   action: (channel: Channel, state?: ChannelFsm) => ChannelFsm;
 }
 
-export type SignTxWithTag = (tag: string, tx: EncodedData<'tx'>, options?: object) => (
-  Promise<EncodedData<'tx'>>
+export type SignTxWithTag = (tag: string, tx: Encoded.Transaction, options?: object) => (
+  Promise<Encoded.Transaction>
 );
 // TODO: SignTx shouldn't return number or null
-export type SignTx = (tx: EncodedData<'tx'>, options?: object) => (
-  Promise<EncodedData<'tx'> | number | null>
+export type SignTx = (tx: Encoded.Transaction, options?: object) => (
+  Promise<Encoded.Transaction | number | null>
 );
 
 export interface ChannelOptions {
   existingFsmId?: string;
   url: string;
   role: 'initiator' | 'responder';
-  initiatorId: EncodedData<'ak'>;
-  responderId: EncodedData<'ak'>;
+  initiatorId: Encoded.AccountAddress;
+  responderId: Encoded.AccountAddress;
   pushAmount: number;
   initiatorAmount: BigNumber;
   responderAmount: BigNumber;
@@ -81,7 +81,7 @@ export interface ChannelState {
   reject: (e: BaseError) => void;
   sign: SignTx;
   handler?: ChannelHandler;
-  onOnChainTx?: (tx: EncodedData<'tx'>) => void;
+  onOnChainTx?: (tx: Encoded.Transaction) => void;
   onOwnWithdrawLocked?: () => void;
   onWithdrawLocked?: () => void;
   onOwnDepositLocked?: () => void;
@@ -125,7 +125,7 @@ const PONG_TIMEOUT_MS = 5000;
 // TODO: move to Channel instance to avoid is-null checks and for easier debugging
 export const options = new WeakMap<Channel, ChannelOptions>();
 export const status = new WeakMap<Channel, string>();
-export const state = new WeakMap<Channel, EncodedData<'tx'>>();
+export const state = new WeakMap<Channel, Encoded.Transaction>();
 const fsm = new WeakMap<Channel, ChannelFsm>();
 const websockets = new WeakMap<Channel, W3CWebSocket>();
 export const eventEmitters = new WeakMap<Channel, EventEmitter>();
@@ -165,7 +165,7 @@ export function changeStatus(channel: Channel, newStatus: string): void {
   }
 }
 
-export function changeState(channel: Channel, newState: EncodedData<'tx'>): void {
+export function changeState(channel: Channel, newState: Encoded.Transaction): void {
   state.set(channel, newState);
   emit(channel, 'stateChanged', newState);
 }

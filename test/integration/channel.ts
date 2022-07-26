@@ -29,7 +29,7 @@ import { pause } from '../../src/utils/other';
 import Channel from '../../src/channel';
 import { ChannelOptions, send } from '../../src/channel/internal';
 import MemoryAccount from '../../src/account/Memory';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
 
 const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
@@ -61,7 +61,7 @@ describe('Channel', () => {
   let responderShouldRejectUpdate: number | boolean;
   let existingChannelId: string;
   let offchainTx: string;
-  let contractAddress: EncodedData<'ct'>;
+  let contractAddress: Encoded.ContractAddress;
   let callerNonce: number;
   let contract: any;
   const initiatorSign: sinon.SinonSpy = sinon
@@ -215,7 +215,7 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
+    const { txType } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
     txType.should.equal(Tag.ChannelOffChainTx);
 
     expect(sign.firstCall.args[1]).to.eql({
@@ -271,7 +271,7 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
+    const { txType } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
     txType.should.equal(Tag.ChannelOffChainTx);
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
@@ -333,28 +333,32 @@ describe('Channel', () => {
   });
 
   it('can get proof of inclusion', async () => {
-    const initiatorAddr: EncodedData<'ak'> = await aeSdkInitiatior.address();
-    const responderAddr: EncodedData<'ak'> = await aeSdkResponder.address();
+    const initiatorAddr: Encoded.AccountAddress = await aeSdkInitiatior.address();
+    const responderAddr: Encoded.AccountAddress = await aeSdkResponder.address();
     const params = { accounts: [initiatorAddr, responderAddr] };
-    const initiatorPoi: EncodedData<'pi'> = await initiatorCh.poi(params);
+    const initiatorPoi: Encoded.Poi = await initiatorCh.poi(params);
     expect(initiatorPoi).to.be.equal(await responderCh.poi(params));
     initiatorPoi.should.be.a('string');
     const unpackedInitiatorPoi = unpackTx(initiatorPoi, Tag.TreesPoi);
 
     // TODO: move to `unpackTx`/`MPTree`
-    function getAccountBalance(address: EncodedData<'ak'>): string {
+    function getAccountBalance(address: Encoded.AccountAddress): string {
       const addressHex = decode(address).toString('hex');
       const treeNode = unpackedInitiatorPoi.tx.accounts[0].get(addressHex);
       assertNotNull(treeNode);
-      const { balance, ...account } = unpackTx(encode(treeNode, 'tx'), Tag.Account).tx;
+      const { balance, ...account } = unpackTx(
+        encode(treeNode, Encoding.Transaction),
+        Tag.Account,
+      ).tx;
       expect(account).to.eql({ tag: 10, VSN: 1, nonce: 0 });
       return balance.toString();
     }
 
     expect(getAccountBalance(initiatorAddr)).to.eql('89999999999999999997');
     expect(getAccountBalance(responderAddr)).to.eql('110000000000000000003');
-    expect(buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx)
-      .to.equal(initiatorPoi);
+    expect(
+      buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: Encoding.Poi }).tx,
+    ).to.equal(initiatorPoi);
   });
 
   it('can send a message', async () => {
@@ -419,7 +423,7 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
     txType.should.equal(Tag.ChannelWithdrawTx);
     tx.should.eql({
       ...tx,
@@ -472,7 +476,7 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
     txType.should.equal(Tag.ChannelWithdrawTx);
     tx.should.eql({
       ...tx,
@@ -549,7 +553,7 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
     txType.should.equal(Tag.ChannelDepositTx);
     tx.should.eql({
       ...tx,
@@ -590,7 +594,7 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
     txType.should.equal(Tag.ChannelDepositTx);
     tx.should.eql({
       ...tx,
@@ -635,7 +639,7 @@ describe('Channel', () => {
     );
     sinon.assert.calledOnce(sign);
     sinon.assert.calledWithExactly(sign, sinon.match.string);
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
     txType.should.equal(Tag.ChannelCloseMutualTx);
     tx.should.eql({
       ...tx,
@@ -919,7 +923,7 @@ describe('Channel', () => {
   it('can get balances', async () => {
     const initiatorAddr = await aeSdkInitiatior.address();
     const responderAddr = await aeSdkResponder.address();
-    const contractAddr = encode(decode(contractAddress), 'ak');
+    const contractAddr = encode(decode(contractAddress), Encoding.AccountAddress);
     const addresses = [initiatorAddr, responderAddr, contractAddr];
     const balances = await initiatorCh.balances(addresses);
     balances.should.be.an('object');
@@ -1160,7 +1164,7 @@ describe('Channel', () => {
       100,
       async (transaction) => appendSignature(
         await aeSdkResponder.signTransaction(transaction),
-        async (tx) => (aeSdkInitiatior.signTransaction(tx) as Promise<EncodedData<'tx'>>),
+        async (tx) => (aeSdkInitiatior.signTransaction(tx) as Promise<Encoded.Transaction>),
       ),
     );
     result.accepted.should.equal(true);

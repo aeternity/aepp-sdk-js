@@ -21,7 +21,7 @@ import {
 import { _buildTx, BuildTxOptions } from './tx';
 import { buildTxHash, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
-import { EncodedData } from './utils/encoder';
+import { Encoded, Encoding } from './utils/encoder';
 import { Tag, AensName } from './tx/builder/constants';
 import AccountBase from './account/Base';
 
@@ -34,7 +34,10 @@ import AccountBase from './account/Base';
  * valid
  * @returns Transaction
  */
-export async function send(tx: EncodedData<'tx'>, options: SendOptions): Promise<SendReturnType> {
+export async function send(
+  tx: Encoded.Transaction,
+  options: SendOptions,
+): Promise<SendReturnType> {
   // TODO: detect authFun in AccountGa
   const authFun = options.innerTx === true
     ? undefined
@@ -66,14 +69,18 @@ interface SendReturnType extends Awaited<ReturnType<typeof sendTransaction>> {}
  */
 export async function spend(
   amount: number | string,
-  recipientIdOrName: EncodedData<'ak'> | AensName,
+  recipientIdOrName: Encoded.AccountAddress | AensName,
   options: SpendOptions,
 ): ReturnType<typeof send> {
   return send(
     await _buildTx(Tag.SpendTx, {
       ...options,
       senderId: await options.onAccount.address(options),
-      recipientId: await resolveName(recipientIdOrName, 'account_pubkey', options),
+      recipientId: await resolveName<Encoding.AccountAddress>(
+        recipientIdOrName,
+        'account_pubkey',
+        options,
+      ),
       amount,
     }),
     options,
@@ -95,13 +102,17 @@ interface SpendOptions extends SpendOptionsType {}
  */
 export async function transferFunds(
   fraction: number | string,
-  recipientIdOrName: AensName | EncodedData<'ak'>,
+  recipientIdOrName: AensName | Encoded.AccountAddress,
   options: TransferFundsOptions,
 ): ReturnType<typeof send> {
   if (fraction < 0 || fraction > 1) {
     throw new ArgumentError('fraction', 'a number between 0 and 1', fraction);
   }
-  const recipientId = await resolveName<'ak'>(recipientIdOrName, 'account_pubkey', options);
+  const recipientId = await resolveName<Encoding.AccountAddress>(
+    recipientIdOrName,
+    'account_pubkey',
+    options,
+  );
   const senderId = await options.onAccount.address(options);
   const balance = new BigNumber(
     await getBalance.bind(options.onAccount)(senderId, options),
@@ -135,7 +146,7 @@ interface TransferFundsOptions extends TransferFundsOptionsType {}
  * @returns Object Transaction
  */
 export async function payForTransaction(
-  transaction: EncodedData<'tx'>,
+  transaction: Encoded.Transaction,
   options: PayForTransactionOptions,
 ): ReturnType<typeof send> {
   return send(

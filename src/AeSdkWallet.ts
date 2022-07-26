@@ -19,7 +19,7 @@ import {
   WalletApi,
   WalletInfo,
 } from './aepp-wallet-communication/rpc/types';
-import { EncodedData } from './utils/encoder';
+import { Encoded } from './utils/encoder';
 import jsonBig from './utils/json-big';
 
 type RpcClientWallet = RpcClient<AeppApi, WalletApi>;
@@ -34,7 +34,7 @@ type OnSubscription = (
 
 type OnSign = (
   clientId: string, params: Parameters<WalletApi[METHODS.sign]>[0], origin: string
-) => Promise<{ tx?: EncodedData<'tx'>; onAccount?: Account } | undefined> | Promise<void>;
+) => Promise<{ tx?: Encoded.Transaction; onAccount?: Account } | undefined> | Promise<void>;
 
 type OnDisconnect = (
   clientId: string, params: Parameters<WalletApi[METHODS.closeConnection]>[0]
@@ -135,7 +135,7 @@ export default class AeSdkWallet extends AeSdk {
       .forEach((client) => client.notify(METHODS.updateAddress, this.getAccounts()));
   }
 
-  selectAccount(address: EncodedData<'ak'>): void {
+  selectAccount(address: Encoded.AccountAddress): void {
     super.selectAccount(address);
     this._pushAccountsToApps();
   }

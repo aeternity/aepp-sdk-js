@@ -24,7 +24,7 @@ import {
   generateKeyPair, AE_AMOUNT_FORMATS,
   UnavailableAccountError, TypeError, ArgumentError, InvalidKeypairError, UnexpectedTsError,
 } from '../../src';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded } from '../../src/utils/encoder';
 
 describe('Accounts', () => {
   let aeSdk: AeSdk;
@@ -152,7 +152,7 @@ describe('Accounts', () => {
   });
 
   describe('Make operation on specific account without changing of current account', () => {
-    let address: EncodedData<'ak'>;
+    let address: Encoded.AccountAddress;
 
     before(async () => {
       address = await aeSdk.address();

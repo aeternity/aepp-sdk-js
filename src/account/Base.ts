@@ -16,7 +16,7 @@
  */
 import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto';
 import { buildTx } from '../tx/builder';
-import { decode, EncodedData } from '../utils/encoder';
+import { decode, Encoded } from '../utils/encoder';
 import { Tag } from '../tx/builder/constants';
 import { getNetworkId } from '../Node';
 import { concatBuffers } from '../utils/other';
@@ -53,14 +53,14 @@ export default abstract class AccountBase {
    * @returns Signed transaction
    */
   async signTransaction(
-    tx: EncodedData<'tx'>,
+    tx: Encoded.Transaction,
     { innerTx, networkId, ...options }: {
       innerTx?: boolean;
       networkId?: string;
       authData?: Parameters<typeof createMetaTx>[1];
       authFun?: Parameters<typeof createMetaTx>[2];
     } & Omit<Partial<Parameters<typeof createMetaTx>[3]>, 'onAccount'> = {},
-  ): Promise<EncodedData<'tx'>> {
+  ): Promise<Encoded.Transaction> {
     const prefixes = [await this.getNetworkId({ networkId })];
     if (innerTx === true) prefixes.push('inner_tx');
     const rlpBinaryTx = decode(tx);
@@ -120,5 +120,5 @@ export default abstract class AccountBase {
    * Obtain account address
    * @returns Public account address
    */
-  abstract address(opt?: object): Promise<EncodedData<'ak'>>;
+  abstract address(opt?: object): Promise<Encoded.AccountAddress>;
 }

@@ -51,7 +51,7 @@ import {
   getSdk, ignoreVersion, networkId, url,
 } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
-import { EncodedData, EncodingType } from '../../src/utils/encoder';
+import { Encoded } from '../../src/utils/encoder';
 
 const WindowPostMessageFake = (
   name: string,
@@ -99,7 +99,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
   const handlerReject = (): void => { throw new Error('test reject'); };
   const handlerRejectPromise = async (): Promise<void> => { throw new Error('test reject'); };
   let account: AccountBase;
-  let accountAddress: EncodedData<'ak'>;
+  let accountAddress: Encoded.AccountAddress;
 
   describe('New RPC Wallet-AEPP: AEPP node', () => {
     const keypair = generateKeyPair();
@@ -321,7 +321,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       });
       const res = await aepp.send(tx);
       if (res.tx?.payload == null || res.blockHeight == null) throw new UnexpectedTsError();
-      decode(res.tx.payload as EncodedData<EncodingType>).toString().should.be.equal('zerospend2');
+      decode(res.tx.payload as Encoded.Any).toString().should.be.equal('zerospend2');
       res.blockHeight.should.be.a('number');
     });
 
@@ -383,7 +383,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Receive update for wallet select account', async () => {
       if (aepp._accounts == null) throw new UnexpectedTsError();
-      const connectedAccount = Object.keys(aepp._accounts.connected)[0] as EncodedData<'ak'>;
+      const connectedAccount = Object
+        .keys(aepp._accounts.connected)[0] as Encoded.AccountAddress;
       const accountsPromise = new Promise<Accounts>((resolve) => {
         aepp.onAddressChange = resolve;
       });
@@ -534,7 +535,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       });
       const res = await aepp.send(tx);
       if (res.tx?.payload == null || res.blockHeight == null) throw new UnexpectedTsError();
-      decode(res.tx.payload as EncodedData<EncodingType>).toString().should.be.equal('zerospend2');
+      decode(res.tx.payload as Encoded.Any).toString().should.be.equal('zerospend2');
       res.blockHeight.should.be.a('number');
     });
 

@@ -34,7 +34,7 @@ import {
   SignTx,
 } from './internal';
 import { unpackTx, buildTx } from '../tx/builder';
-import { encode, EncodedData } from '../utils/encoder';
+import { encode, Encoded, Encoding } from '../utils/encoder';
 import {
   IllegalArgumentError,
   InsufficientBalanceError,
@@ -45,11 +45,11 @@ import type Channel from '.';
 import { Tag } from '../tx/builder/constants';
 
 export async function appendSignature(
-  tx: EncodedData<'tx'>,
+  tx: Encoded.Transaction,
   signFn: SignTx,
-): Promise<EncodedData<'tx'> | number | null> {
+): Promise<Encoded.Transaction | number | null> {
   const { signatures, encodedTx } = unpackTx(tx, Tag.SignedTx).tx;
-  const result = await signFn(encode(encodedTx.rlpEncoded, 'tx'));
+  const result = await signFn(encode(encodedTx.rlpEncoded, Encoding.Transaction));
   if (typeof result === 'string') {
     const { tx: signedTx } = unpackTx(result, Tag.SignedTx);
     return buildTx({

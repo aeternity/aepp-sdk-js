@@ -23,14 +23,14 @@ import {
   commitmentHash, oracleQueryId, decode, encode,
   ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS,
 } from '../../src';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded, Encoding } from '../../src/utils/encoder';
 
 const nonce = 1;
 const nameTtl = 1;
 const clientTtl = 1;
 const amount = 0;
-const senderId: EncodedData<'ak'> = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688';
-const recipientId: EncodedData<'ak'> = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688';
+const senderId: Encoded.AccountAddress = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688';
+const recipientId: Encoded.AccountAddress = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688';
 const name = 'test123test.chain';
 const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC';
 const nameFee = '1000000000000000000000';
@@ -60,7 +60,7 @@ const commitmentId = commitmentHash(name, nameSalt);
 describe('Transaction', () => {
   let aeSdk: AeSdk;
   const address = 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR';
-  const oracleId = encode(decode(address), 'ok');
+  const oracleId = encode(decode(address), Encoding.OracleAddress);
   let contract: any;
 
   before(async () => {

@@ -23,7 +23,9 @@ import {
   getSaveHDWalletAccounts,
   DerivationError,
 } from '../../src';
-import { encode, decode, EncodedData } from '../../src/utils/encoder';
+import {
+  encode, decode, Encoded, Encoding,
+} from '../../src/utils/encoder';
 import { concatBuffers } from '../../src/utils/other';
 
 describe('hd wallet', () => {
@@ -62,7 +64,7 @@ describe('hd wallet', () => {
 
     expect(accounts).to.eql(testAccounts.map((acc) => ({
       secretKey: acc.secretKey,
-      publicKey: encode(Buffer.from(acc.publicKey, 'hex'), 'ak'),
+      publicKey: encode(Buffer.from(acc.publicKey, 'hex'), Encoding.AccountAddress),
     })));
   }));
 
@@ -165,7 +167,7 @@ describe('hd wallet', () => {
 
   it('get HdWalletAccount from seed', () => {
     const wallet = getHdWalletAccountFromSeed(testMnemonicSeed, 0);
-    decode(wallet.publicKey as EncodedData<'ak'>);
+    decode(wallet.publicKey as Encoded.AccountAddress);
   });
 
   it('Derive child with invalid path', () => {

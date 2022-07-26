@@ -30,7 +30,7 @@ import {
   CLIENT_TTL, NAME_TTL, Tag, AensName,
 } from './tx/builder/constants';
 import { ArgumentError } from './utils/errors';
-import { EncodedData } from './utils/encoder';
+import { Encoded } from './utils/encoder';
 import { send, SendOptions } from './spend';
 import { getName, getHeight } from './chain';
 import { _buildTx, BuildTxOptions } from './tx';
@@ -166,7 +166,7 @@ interface AensUpdateOptions extends
  */
 export async function aensTransfer(
   name: AensName,
-  account: EncodedData<'ak'>,
+  account: Encoded.AccountAddress,
   options: AensTransferOptions,
 ): ReturnType<typeof send> {
   const nameTransferTx = await _buildTx(Tag.NameTransferTx, {
@@ -210,8 +210,8 @@ export async function aensQuery(
   & Parameters<typeof aensTransfer>[2],
 ): Promise<Readonly<
   TransformNodeType<NameEntry> & {
-    id: EncodedData<'nm'>;
-    owner: EncodedData<'ak'>;
+    id: Encoded.Name;
+    owner: Encoded.AccountAddress;
     pointers: KeyPointers | NamePointer[];
     ttl: number;
     update: (
@@ -221,7 +221,7 @@ export async function aensQuery(
       }
     ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
     transfer: (
-      account: EncodedData<'ak'>,
+      account: Encoded.AccountAddress,
       options?: Parameters<typeof aensQuery>[1]
     ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
     revoke: (options?: Omit<Parameters<typeof aensRevoke>[1], 'onNode' | 'onCompiler' | 'onAccount'> & {
@@ -237,8 +237,8 @@ export async function aensQuery(
   const nameEntry = await getName(name, opt);
   return Object.freeze({
     ...nameEntry,
-    id: nameEntry.id as EncodedData<'nm'>,
-    owner: nameEntry.owner as EncodedData<'ak'>,
+    id: nameEntry.id as Encoded.Name,
+    owner: nameEntry.owner as Encoded.AccountAddress,
     async update(pointers, options) {
       return {
         ...await aensUpdate(name, pointers, { ...opt, ...options }),
