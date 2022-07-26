@@ -21,16 +21,16 @@ import { getSdk } from './index';
 import {
   AeSdk,
   commitmentHash, oracleQueryId, decode, encode,
-  ORACLE_TTL_TYPES, TX_TYPE, AE_AMOUNT_FORMATS,
+  ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS,
 } from '../../src';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded, Encoding } from '../../src/utils/encoder';
 
 const nonce = 1;
 const nameTtl = 1;
 const clientTtl = 1;
 const amount = 0;
-const senderId: EncodedData<'ak'> = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688';
-const recipientId: EncodedData<'ak'> = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688';
+const senderId: Encoded.AccountAddress = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688';
+const recipientId: Encoded.AccountAddress = 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688';
 const name = 'test123test.chain';
 const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC';
 const nameFee = '1000000000000000000000';
@@ -60,7 +60,7 @@ const commitmentId = commitmentHash(name, nameSalt);
 describe('Transaction', () => {
   let aeSdk: AeSdk;
   const address = 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR';
-  const oracleId = encode(decode(address), 'ok');
+  const oracleId = encode(decode(address), Encoding.OracleAddress);
   let contract: any;
 
   before(async () => {
@@ -73,10 +73,10 @@ describe('Transaction', () => {
       senderId, recipientId, nonce, payload: 'test',
     };
     const spendAe = await aeSdk.buildTx(
-      TX_TYPE.spend,
+      Tag.SpendTx,
       { ...params, amount: 1, denomination: AE_AMOUNT_FORMATS.AE },
     );
-    const spendAettos = await aeSdk.buildTx(TX_TYPE.spend, { ...params, amount: 1e18 });
+    const spendAettos = await aeSdk.buildTx(Tag.SpendTx, { ...params, amount: 1e18 });
     spendAe.should.be.equal(spendAettos);
   });
 
@@ -84,41 +84,41 @@ describe('Transaction', () => {
   const transactions: Array<[string, string, () => Promise<string>]> = [[
     'spend',
     'tx_+F0MAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg9e1n8oAAABhHRlc3QLK3OW',
-    async () => aeSdk.buildTx(TX_TYPE.spend, {
+    async () => aeSdk.buildTx(Tag.SpendTx, {
       senderId, recipientId, nonce, payload: 'test', amount: 2, denomination: AE_AMOUNT_FORMATS.AE,
     }),
   ], [
     'name pre-claim',
     'tx_+E8hAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQOvDVCf43V7alNbsUvTarXaCf7rjtWX36YLS4+JTa4jn4YPHaUyOAAAxRZ6Sg==',
-    async () => aeSdk.buildTx(TX_TYPE.namePreClaim, {
+    async () => aeSdk.buildTx(Tag.NamePreclaimTx, {
       accountId: senderId, nonce, commitmentId,
     }),
   ], [
     'name claim',
     'tx_+FEgAqEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABkXRlc3QxMjN0ZXN0LmNoYWluhw7wBz3KlPuJNjXJrcXeoAAAhg8m9WHIAABl9JBX',
-    async () => aeSdk.buildTx(TX_TYPE.nameClaim, {
+    async () => aeSdk.buildTx(Tag.NameClaimTx, {
       accountId: senderId, nonce, name, nameSalt, nameFee,
     }),
   ], [
     'name update',
     'tx_+IQiAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPAHy8Y5hY2NvdW50X3B1YmtleaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABhhAUch6gAADR52s+',
-    async () => aeSdk.buildTx(TX_TYPE.nameUpdate, {
+    async () => aeSdk.buildTx(Tag.NameUpdateTx, {
       accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl,
     }),
   ], [
     'name revoke',
     'tx_+E8jAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPIYPHaUyOAAA94BVgw==',
-    async () => aeSdk.buildTx(TX_TYPE.nameRevoke, { accountId: senderId, nonce, nameId }),
+    async () => aeSdk.buildTx(Tag.NameRevokeTx, { accountId: senderId, nonce, nameId }),
   ], [
     'name transfer',
     'tx_+HEkAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPKEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7CGD7v4WsgAAL1d+NM=',
-    async () => aeSdk.buildTx(TX_TYPE.nameTransfer, {
+    async () => aeSdk.buildTx(Tag.NameTransferTx, {
       accountId: senderId, nonce, nameId, recipientId,
     }),
   ], [
     'contract create',
     'tx_+LAqAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNi4xLjAAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfPxOlnVo=',
-    async () => aeSdk.buildTx(TX_TYPE.contractCreate, {
+    async () => aeSdk.buildTx(Tag.ContractCreateTx, {
       nonce,
       ownerId: address,
       code: await contract.compile(),
@@ -129,7 +129,7 @@ describe('Transaction', () => {
   ], [
     'contract call',
     'tx_+GMrAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQU7e5ChtHAGM1Nh0MVEV74SbrYb1b5FQ3WBd7OBpwALyQOGpYvVcSgAAACDTEtAhDuaygCIKxGAeCCSGwT8YkzY',
-    async () => aeSdk.buildTx(TX_TYPE.contractCall, {
+    async () => aeSdk.buildTx(Tag.ContractCallTx, {
       nonce,
       callerId: address,
       contractId,
@@ -140,25 +140,25 @@ describe('Transaction', () => {
   ], [
     'oracle register',
     'tx_+FAWAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19gnUwAIIB9IYPN7jqmAAAAGsRIcw=',
-    async () => aeSdk.buildTx(TX_TYPE.oracleRegister, {
+    async () => aeSdk.buildTx(Tag.OracleRegisterTx, {
       nonce, accountId: address, queryFormat, responseFormat, queryFee, ...oracleTtl,
     }),
   ], [
     'oracle extend',
     'tx_8RkBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajOwEAggH0hg6itfGYAADwE/X7',
-    async () => aeSdk.buildTx(TX_TYPE.oracleExtend, {
+    async () => aeSdk.buildTx(Tag.OracleExtendTx, {
       nonce, oracleId, callerId: address, ...oracleTtl,
     }),
   ], [
     'oracle post query',
     'tx_+GkXAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajO5J7J2NpdHknOiAnQmVybGluJ32CdTAAZABkhg+bJBmGAAAtn7nr',
-    async () => aeSdk.buildTx(TX_TYPE.oracleQuery, {
+    async () => aeSdk.buildTx(Tag.OracleQueryTx, {
       nonce, oracleId, ...responseTtl, query, ...queryTtl, queryFee, senderId: address,
     }),
   ], [
     'oracle respond query',
     'tx_+F0YAaEE1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoClgM30zCmbxGvUfzRbIZXGzOT8KCzYAUMRdnxbBX2Q9jHsndG1wJzogMTAxfQBkhg9jQvwmAADfRUs7',
-    async () => aeSdk.buildTx(TX_TYPE.oracleResponse, {
+    async () => aeSdk.buildTx(Tag.OracleResponseTx, {
       nonce,
       oracleId,
       callerId: address,

@@ -1,5 +1,5 @@
 import { send } from '../../spend';
-import { EncodedData } from '../../utils/encoder';
+import { Encoded } from '../../utils/encoder';
 import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema';
 
 export interface WalletInfo {
@@ -11,8 +11,8 @@ export interface WalletInfo {
 }
 
 export interface Accounts {
-  connected: { [pub: EncodedData<'ak'>]: {} };
-  current: { [pub: EncodedData<'ak'>]: {} };
+  connected: { [pub: Encoded.AccountAddress]: {} };
+  current: { [pub: Encoded.AccountAddress]: {} };
 }
 
 export interface Node {
@@ -40,21 +40,21 @@ export interface WalletApi {
     p: { type: SUBSCRIPTION_TYPES; value: 'connected' | 'current' }
   ) => Promise<{ subscription: Array<'connected' | 'current'>; address: Accounts }>;
 
-  [METHODS.address]: () => Promise<Array<EncodedData<'ak'>>>;
+  [METHODS.address]: () => Promise<Encoded.AccountAddress[]>;
 
   [METHODS.sign]: ((
-    p: { tx: EncodedData<'tx'>; onAccount: EncodedData<'ak'>; returnSigned: boolean }
+    p: { tx: Encoded.Transaction; onAccount: Encoded.AccountAddress; returnSigned: boolean }
   ) => Promise<{
     /**
      * @deprecated this is not a hash at all, will be removed later at the same time
      * as dropping ability to broadcast transaction by wallet
      */
     transactionHash?: Awaited<ReturnType<typeof send>>;
-    signedTransaction?: EncodedData<'tx'>;
+    signedTransaction?: Encoded.Transaction;
   }>);
 
   [METHODS.signMessage]: (
-    p: { message: string; onAccount: EncodedData<'ak'> }
+    p: { message: string; onAccount: Encoded.AccountAddress }
   ) => Promise<{ signature: string }>;
 }
 

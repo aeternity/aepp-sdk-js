@@ -1,4 +1,4 @@
-import { EncodedData } from '../utils/encoder';
+import { Encoded } from '../utils/encoder';
 import { createMetaTx } from '../contract/ga';
 import Node from '../Node';
 
@@ -7,12 +7,12 @@ import Node from '../Node';
  * @hidden
  */
 export async function signUsingGA(
-  tx: EncodedData<'tx'>,
+  tx: Encoded.Transaction,
   { authData, authFun, ...options }: {
     authData: Parameters<typeof createMetaTx>[1];
     authFun: Parameters<typeof createMetaTx>[2];
   } & Parameters<typeof createMetaTx>[3],
-): Promise<EncodedData<'tx'>> {
+): Promise<Encoded.Transaction> {
   return createMetaTx(tx, authData, authFun, options);
 }
 

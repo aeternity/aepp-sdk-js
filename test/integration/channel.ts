@@ -22,14 +22,14 @@ import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
-  generateKeyPair, unpackTx, buildTx, buildTxHash, encode, decode, TX_TYPE,
+  generateKeyPair, unpackTx, buildTx, buildTxHash, encode, decode, Tag,
   IllegalArgumentError, InsufficientBalanceError, ChannelConnectionError, encodeContractAddress,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 import Channel from '../../src/channel';
 import { ChannelOptions, send } from '../../src/channel/internal';
 import MemoryAccount from '../../src/account/Memory';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
 
 const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
@@ -61,7 +61,7 @@ describe('Channel', () => {
   let responderShouldRejectUpdate: number | boolean;
   let existingChannelId: string;
   let offchainTx: string;
-  let contractAddress: EncodedData<'ct'>;
+  let contractAddress: Encoded.ContractAddress;
   let callerNonce: number;
   let contract: any;
   const initiatorSign: sinon.SinonSpy = sinon
@@ -147,9 +147,9 @@ describe('Channel', () => {
     };
     const { txType: initiatorTxType, tx: initiatorTx } = unpackTx(initiatorSign.firstCall.args[1]);
     const { txType: responderTxType, tx: responderTx } = unpackTx(responderSign.firstCall.args[1]);
-    initiatorTxType.should.equal(TX_TYPE.channelCreate);
+    initiatorTxType.should.equal(Tag.ChannelCreateTx);
     initiatorTx.should.eql({ ...initiatorTx, ...expectedTxParams });
-    responderTxType.should.equal(TX_TYPE.channelCreate);
+    responderTxType.should.equal(Tag.ChannelCreateTx);
     responderTx.should.eql({ ...responderTx, ...expectedTxParams });
   });
 
@@ -215,8 +215,8 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
-    txType.should.equal(TX_TYPE.channelOffChain);
+    const { txType } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
+    txType.should.equal(Tag.ChannelOffChainTx);
 
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
@@ -271,8 +271,8 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { txType } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
-    txType.should.equal(TX_TYPE.channelOffChain);
+    const { txType } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
+    txType.should.equal(Tag.ChannelOffChainTx);
     expect(sign.firstCall.args[1]).to.eql({
       updates: [
         {
@@ -333,28 +333,32 @@ describe('Channel', () => {
   });
 
   it('can get proof of inclusion', async () => {
-    const initiatorAddr: EncodedData<'ak'> = await aeSdkInitiatior.address();
-    const responderAddr: EncodedData<'ak'> = await aeSdkResponder.address();
+    const initiatorAddr: Encoded.AccountAddress = await aeSdkInitiatior.address();
+    const responderAddr: Encoded.AccountAddress = await aeSdkResponder.address();
     const params = { accounts: [initiatorAddr, responderAddr] };
-    const initiatorPoi: EncodedData<'pi'> = await initiatorCh.poi(params);
+    const initiatorPoi: Encoded.Poi = await initiatorCh.poi(params);
     expect(initiatorPoi).to.be.equal(await responderCh.poi(params));
     initiatorPoi.should.be.a('string');
-    const unpackedInitiatorPoi = unpackTx(initiatorPoi, TX_TYPE.proofOfInclusion);
+    const unpackedInitiatorPoi = unpackTx(initiatorPoi, Tag.TreesPoi);
 
     // TODO: move to `unpackTx`/`MPTree`
-    function getAccountBalance(address: EncodedData<'ak'>): string {
+    function getAccountBalance(address: Encoded.AccountAddress): string {
       const addressHex = decode(address).toString('hex');
       const treeNode = unpackedInitiatorPoi.tx.accounts[0].get(addressHex);
       assertNotNull(treeNode);
-      const { balance, ...account } = unpackTx(encode(treeNode, 'tx'), TX_TYPE.account).tx;
+      const { balance, ...account } = unpackTx(
+        encode(treeNode, Encoding.Transaction),
+        Tag.Account,
+      ).tx;
       expect(account).to.eql({ tag: 10, VSN: 1, nonce: 0 });
       return balance.toString();
     }
 
     expect(getAccountBalance(initiatorAddr)).to.eql('89999999999999999997');
     expect(getAccountBalance(responderAddr)).to.eql('110000000000000000003');
-    expect(buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: 'pi' }).tx)
-      .to.equal(initiatorPoi);
+    expect(
+      buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: Encoding.Poi }).tx,
+    ).to.equal(initiatorPoi);
   });
 
   it('can send a message', async () => {
@@ -419,8 +423,8 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
-    txType.should.equal(TX_TYPE.channelWithdraw);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
+    txType.should.equal(Tag.ChannelWithdrawTx);
     tx.should.eql({
       ...tx,
       toId: await aeSdkInitiatior.address(),
@@ -472,8 +476,8 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
-    txType.should.equal(TX_TYPE.channelWithdraw);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
+    txType.should.equal(Tag.ChannelWithdrawTx);
     tx.should.eql({
       ...tx,
       toId: await aeSdkInitiatior.address(),
@@ -549,8 +553,8 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
-    txType.should.equal(TX_TYPE.channelDeposit);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
+    txType.should.equal(Tag.ChannelDepositTx);
     tx.should.eql({
       ...tx,
       fromId: await aeSdkInitiatior.address(),
@@ -590,8 +594,8 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
-    txType.should.equal(TX_TYPE.channelDeposit);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
+    txType.should.equal(Tag.ChannelDepositTx);
     tx.should.eql({
       ...tx,
       fromId: await aeSdkInitiatior.address(),
@@ -635,8 +639,8 @@ describe('Channel', () => {
     );
     sinon.assert.calledOnce(sign);
     sinon.assert.calledWithExactly(sign, sinon.match.string);
-    const { txType, tx } = unpackTx(sign.firstCall.args[0] as EncodedData<'tx'>);
-    txType.should.equal(TX_TYPE.channelCloseMutual);
+    const { txType, tx } = unpackTx(sign.firstCall.args[0] as Encoded.Transaction);
+    txType.should.equal(Tag.ChannelCloseMutualTx);
     tx.should.eql({
       ...tx,
       fromId: await aeSdkInitiatior.address(),
@@ -714,21 +718,21 @@ describe('Channel', () => {
     const balances = await initiatorCh.balances([initiatorAddr, responderAddr]);
     const initiatorBalanceBeforeClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceBeforeClose = await aeSdkResponder.getBalance(responderAddr);
-    const closeSoloTx = await aeSdkInitiatior.buildTx(TX_TYPE.channelCloseSolo, {
+    const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
       poi,
       payload: signedTx,
     });
-    const closeSoloTxFee = unpackTx(closeSoloTx, TX_TYPE.channelCloseSolo).tx.fee;
+    const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).tx.fee;
     await aeSdkInitiatior.sendTransaction(await aeSdkInitiatior.signTransaction(closeSoloTx));
-    const settleTx = await aeSdkInitiatior.buildTx(TX_TYPE.channelSettle, {
+    const settleTx = await aeSdkInitiatior.buildTx(Tag.ChannelSettleTx, {
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
       initiatorAmountFinal: balances[initiatorAddr],
       responderAmountFinal: balances[responderAddr],
     });
-    const settleTxFee = unpackTx(settleTx, TX_TYPE.channelSettle).tx.fee;
+    const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).tx.fee;
     await aeSdkInitiatior.sendTransaction(await aeSdkInitiatior.signTransaction(settleTx));
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);
@@ -777,29 +781,29 @@ describe('Channel', () => {
       accounts: [initiatorAddr, responderAddr],
     });
     const recentBalances = await responderCh.balances([initiatorAddr, responderAddr]);
-    const closeSoloTx = await aeSdkInitiatior.buildTx(TX_TYPE.channelCloseSolo, {
+    const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
       channelId: initiatorCh.id(),
       fromId: initiatorAddr,
       poi: oldPoi,
       payload: oldUpdate.signedTx,
     });
-    const closeSoloTxFee = unpackTx(closeSoloTx, TX_TYPE.channelCloseSolo).tx.fee;
+    const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).tx.fee;
     await aeSdkInitiatior.sendTransaction(await aeSdkInitiatior.signTransaction(closeSoloTx));
-    const slashTx = await aeSdkResponder.buildTx(TX_TYPE.channelSlash, {
+    const slashTx = await aeSdkResponder.buildTx(Tag.ChannelSlashTx, {
       channelId: responderCh.id(),
       fromId: responderAddr,
       poi: recentPoi,
       payload: recentUpdate.signedTx,
     });
-    const slashTxFee = unpackTx(slashTx, TX_TYPE.channelSlash).tx.fee;
+    const slashTxFee = unpackTx(slashTx, Tag.ChannelSlashTx).tx.fee;
     await aeSdkResponder.sendTransaction(await aeSdkResponder.signTransaction(slashTx));
-    const settleTx = await aeSdkResponder.buildTx(TX_TYPE.channelSettle, {
+    const settleTx = await aeSdkResponder.buildTx(Tag.ChannelSettleTx, {
       channelId: responderCh.id(),
       fromId: responderAddr,
       initiatorAmountFinal: recentBalances[initiatorAddr],
       responderAmountFinal: recentBalances[responderAddr],
     });
-    const settleTxFee = unpackTx(settleTx, TX_TYPE.channelSettle).tx.fee;
+    const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).tx.fee;
     await aeSdkResponder.sendTransaction(await aeSdkResponder.signTransaction(settleTx));
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);
@@ -919,7 +923,7 @@ describe('Channel', () => {
   it('can get balances', async () => {
     const initiatorAddr = await aeSdkInitiatior.address();
     const responderAddr = await aeSdkResponder.address();
-    const contractAddr = encode(decode(contractAddress), 'ak');
+    const contractAddr = encode(decode(contractAddress), Encoding.AccountAddress);
     const addresses = [initiatorAddr, responderAddr, contractAddr];
     const balances = await initiatorCh.balances(addresses);
     balances.should.be.an('object');
@@ -1069,7 +1073,7 @@ describe('Channel', () => {
   });
   // TODO fix this
   it.skip('can post snapshot solo transaction', async () => {
-    const snapshotSoloTx = await aeSdkInitiatior.buildTx(TX_TYPE.channelSnapshotSolo, {
+    const snapshotSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelSnapshotSoloTx, {
       channelId: initiatorCh.id(),
       fromId: await aeSdkInitiatior.address(),
       payload: (await initiatorCh.state()).signedTx,
@@ -1160,7 +1164,7 @@ describe('Channel', () => {
       100,
       async (transaction) => appendSignature(
         await aeSdkResponder.signTransaction(transaction),
-        async (tx) => (aeSdkInitiatior.signTransaction(tx) as Promise<EncodedData<'tx'>>),
+        async (tx) => (aeSdkInitiatior.signTransaction(tx) as Promise<Encoded.Transaction>),
       ),
     );
     result.accepted.should.equal(true);

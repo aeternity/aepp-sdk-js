@@ -27,9 +27,10 @@ import {
   getDefaultPointerKey, commitmentHash, getMinimumNameFee, isNameValid, produceNameId,
   toBytes,
   buildTx, unpackTx,
-  NAME_BID_RANGES, TX_TYPE,
+  NAME_BID_RANGES, Tag,
   SchemaNotFoundError,
 } from '../../src';
+import { Encoding } from '../../src/utils/encoder';
 
 describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {
@@ -82,7 +83,7 @@ describe('Tx', () => {
   describe('decode', () => {
     it('decodes base64check', () => expect(decode('ba_AQIq9Y55kw==')).to.be.eql(payload));
 
-    it('decodes base58check', () => expect(decode('bf_3DZUwMat2')).to.be.eql(payload));
+    it('decodes base58check', () => expect(decode('nm_3DZUwMat2')).to.be.eql(payload));
 
     it('throws if invalid checksum', () => expect(() => decode('ak_23aaaaa'))
       .to.throw('Invalid checksum'));
@@ -92,9 +93,11 @@ describe('Tx', () => {
   });
 
   describe('encode', () => {
-    it('encodes base64check', () => expect(encode(payload, 'ba')).to.be.equal('ba_AQIq9Y55kw=='));
+    it('encodes base64check', () => expect(encode(payload, Encoding.Bytearray))
+      .to.be.equal('ba_AQIq9Y55kw=='));
 
-    it('encodes base58check', () => expect(encode(payload, 'bf')).to.be.equal('bf_3DZUwMat2'));
+    it('encodes base58check', () => expect(encode(payload, Encoding.Name))
+      .to.be.equal('nm_3DZUwMat2'));
   });
 
   describe('getDefaultPointerKey', () => {
@@ -103,13 +106,13 @@ describe('Tx', () => {
   });
 
   it('Deserialize tx: invalid tx VSN', () => {
-    const tx = encode(rlpEncode([10, 99]), 'tx');
+    const tx = encode(rlpEncode([10, 99]), Encoding.Transaction);
     expect(() => unpackTx(tx))
       .to.throw(SchemaNotFoundError, `Transaction deserialization not implemented for tag ${10} version ${99}`);
   });
 
   it('Serialize tx: invalid tx VSN', () => {
-    expect(() => buildTx({} as any, TX_TYPE.spend, { vsn: 5 }))
-      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for spend version 5');
+    expect(() => buildTx({} as any, Tag.SpendTx, { vsn: 5 }))
+      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
   });
 });

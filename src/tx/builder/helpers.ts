@@ -1,34 +1,25 @@
 import BigNumber from 'bignumber.js';
-import { hash, genSalt } from '../../utils/crypto';
+import { genSalt, hash } from '../../utils/crypto';
 import {
-  encode, decode, EncodedData, EncodingType,
+  decode, encode, Encoded, Encoding,
 } from '../../utils/encoder';
 import { toBytes } from '../../utils/bytes';
 import { concatBuffers } from '../../utils/other';
 import {
-  ID_TAG_PREFIX,
-  PREFIX_ID_TAG,
-  NAME_BID_RANGES,
-  NAME_FEE_BID_INCREMENT,
-  NAME_BID_TIMEOUT_BLOCKS,
-  NAME_MAX_LENGTH_FEE,
-  POINTER_KEY_BY_PREFIX,
   AensName,
+  NAME_BID_RANGES,
+  NAME_BID_TIMEOUT_BLOCKS,
+  NAME_FEE_BID_INCREMENT,
+  NAME_MAX_LENGTH_FEE,
 } from './constants';
 import { ceil } from '../../utils/bignumber';
-import {
-  TagNotFoundError,
-  PrefixNotFoundError,
-  IllegalBidFeeError,
-  ArgumentError,
-} from '../../utils/errors';
+import { IllegalBidFeeError } from '../../utils/errors';
 import { NamePointer } from '../../apis/node';
+import { readId, writeId } from './address';
 
 /**
  * JavaScript-based Transaction builder helper function's
  */
-
-export { encode, decode };
 
 /**
  * Build a contract public key
@@ -38,12 +29,12 @@ export { encode, decode };
  * @returns Contract public key
  */
 export function buildContractId(
-  ownerId: EncodedData<'ak'>,
+  ownerId: Encoded.AccountAddress,
   nonce: number | BigNumber,
-): EncodedData<'ct'> {
+): Encoded.ContractAddress {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId), ...toBytes(nonce)]);
   const b2bHash = hash(ownerIdAndNonce);
-  return encode(b2bHash, 'ct');
+  return encode(b2bHash, Encoding.ContractAddress);
 }
 
 /**
@@ -55,10 +46,10 @@ export function buildContractId(
  * @returns Contract public key
  */
 export function oracleQueryId(
-  senderId: EncodedData<'ak'>,
+  senderId: Encoded.AccountAddress,
   nonce: number | BigNumber | string,
-  oracleId: EncodedData<'ok'>,
-): EncodedData<'oq'> {
+  oracleId: Encoded.OracleAddress,
+): Encoded.OracleQueryId {
   function _int32(val: number | string | BigNumber): Buffer {
     const nonceBE = toBytes(val, true);
     return concatBuffers([Buffer.alloc(32 - nonceBE.length), nonceBE]);
@@ -67,7 +58,7 @@ export function oracleQueryId(
   const b2bHash = hash(
     Buffer.from([...decode(senderId), ..._int32(nonce), ...decode(oracleId)]),
   );
-  return encode(b2bHash, 'oq');
+  return encode(b2bHash, Encoding.OracleQueryId);
 }
 
 /**
@@ -86,8 +77,8 @@ export function formatSalt(salt: number): Buffer {
  * @param name - Name to encode
  * @returns `nm_` prefixed encoded AENS name
  */
-export function produceNameId(name: AensName): EncodedData<'nm'> {
-  return encode(hash(name.toLowerCase()), 'nm');
+export function produceNameId(name: AensName): Encoded.Name {
+  return encode(hash(name.toLowerCase()), Encoding.Name);
 }
 
 /**
@@ -98,35 +89,14 @@ export function produceNameId(name: AensName): EncodedData<'nm'> {
  * @param salt - Random salt
  * @returns Commitment hash
  */
-export function commitmentHash(name: AensName, salt: number = genSalt()): EncodedData<'cm'> {
-  return encode(hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])), 'cm');
-}
-
-/**
- * Utility function to create and _id type
- * @category transaction builder
- * @param hashId - Encoded hash
- * @returns Buffer Buffer with ID tag and decoded HASh
- */
-export function writeId(hashId: string): Buffer {
-  if (typeof hashId !== 'string') throw new ArgumentError('hashId', 'a string', hashId);
-  const prefix = hashId.slice(0, 2) as keyof typeof PREFIX_ID_TAG;
-  const idTag = PREFIX_ID_TAG[prefix];
-  if (idTag == null) throw new TagNotFoundError(prefix);
-  return Buffer.from([...toBytes(idTag), ...decode(hashId as EncodedData<EncodingType>)]);
-}
-
-/**
- * Utility function to read and _id type
- * @category transaction builder
- * @param buf - Data
- * @returns Encoided hash string with prefix
- */
-export function readId(buf: Buffer): EncodedData<any> {
-  const tag = Buffer.from(buf).readUIntBE(0, 1);
-  const prefix = ID_TAG_PREFIX[tag];
-  if (prefix == null) throw new PrefixNotFoundError(tag);
-  return encode(buf.slice(1, buf.length), prefix);
+export function commitmentHash(
+  name: AensName,
+  salt: number = genSalt(),
+): Encoded.Commitment {
+  return encode(
+    hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])),
+    Encoding.Commitment,
+  );
 }
 
 /**
@@ -160,7 +130,7 @@ export function buildPointers(pointers: NamePointer[]): Buffer[][] {
   return pointers.map(
     (p) => [
       toBytes(p.key),
-      writeId(p.id),
+      writeId(p.id as Parameters<typeof writeId>[0]),
     ],
   );
 }
@@ -192,17 +162,24 @@ export function isNameValid(name: string): name is AensName {
   return name.endsWith(AENS_SUFFIX);
 }
 
+const encodingToPointerKey = {
+  [Encoding.AccountAddress]: 'account_pubkey',
+  [Encoding.OracleAddress]: 'oracle_pubkey',
+  [Encoding.ContractAddress]: 'contract_pubkey',
+  [Encoding.Channel]: 'channel',
+} as const;
+
 /**
  * @category AENS
  * @param identifier - account/oracle/contract address, or channel
  * @returns default AENS pointer key
  */
 export function getDefaultPointerKey(
-  identifier: EncodedData<keyof typeof POINTER_KEY_BY_PREFIX>,
-): POINTER_KEY_BY_PREFIX {
+  identifier: Encoded.Generic<keyof typeof encodingToPointerKey>,
+): typeof encodingToPointerKey[keyof typeof encodingToPointerKey] {
   decode(identifier);
-  const prefix = identifier.substring(0, 2) as keyof typeof POINTER_KEY_BY_PREFIX;
-  return POINTER_KEY_BY_PREFIX[prefix];
+  const prefix = identifier.substring(0, 2) as keyof typeof encodingToPointerKey;
+  return encodingToPointerKey[prefix];
 }
 
 /**

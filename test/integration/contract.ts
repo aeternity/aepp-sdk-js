@@ -22,7 +22,7 @@ import {
   IllegalArgumentError, NodeInvocationError,
   commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, genSalt, UnexpectedTsError, AeSdk,
 } from '../../src';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded, Encoding } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
 
 const identityContract = `
@@ -117,7 +117,7 @@ contract Sign =
 
 describe('Contract', () => {
   let aeSdk: AeSdk;
-  let bytecode: EncodedData<'cb'>;
+  let bytecode: Encoded.ContractBytearray;
   let contract: ContractInstance;
   let deployed: ContractInstance['deployInfo'];
 
@@ -128,7 +128,7 @@ describe('Contract', () => {
   it('compiles Sophia code', async () => {
     bytecode = (await aeSdk.compilerApi.compileContract({
       code: identityContract, options: {},
-    })).bytecode as EncodedData<'cb'>;
+    })).bytecode as Encoded.ContractBytearray;
     expect(bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
   });
 
@@ -271,7 +271,7 @@ describe('Contract', () => {
     it('compile', async () => {
       bytecode = (await aeSdk.compilerApi.compileContract({
         code: identityContract, options: {},
-      })).bytecode as EncodedData<'cb'>;
+      })).bytecode as Encoded.ContractBytearray;
       expect(bytecode.split('_')[0]).to.be.equal('cb');
     });
 
@@ -321,11 +321,11 @@ describe('Contract', () => {
   });
 
   describe('AENS operation delegation', () => {
-    let contractId: EncodedData<'ct'>;
+    let contractId: Encoded.ContractAddress;
     const name = randomName(15);
     const salt = genSalt();
-    let owner: EncodedData<'ak'>;
-    let newOwner: EncodedData<'ak'>;
+    let owner: Encoded.AccountAddress;
+    let newOwner: Encoded.AccountAddress;
     let delegationSignature: string;
 
     before(async () => {
@@ -391,10 +391,10 @@ describe('Contract', () => {
   });
 
   describe('Oracle operation delegation', () => {
-    let contractId: EncodedData<'ct'>;
-    let address: EncodedData<'ak'>;
+    let contractId: Encoded.ContractAddress;
+    let address: Encoded.AccountAddress;
     let oracle: Awaited<ReturnType<typeof aeSdk.getOracleObject>>;
-    let oracleId: EncodedData<'ok'>;
+    let oracleId: Encoded.OracleAddress;
     let queryObject: Awaited<ReturnType<typeof aeSdk.getQueryObject>>;
     let delegationSignature: string;
     const queryFee = 500000;
@@ -406,7 +406,7 @@ describe('Contract', () => {
       if (contract.deployInfo.address == null) throw new UnexpectedTsError();
       contractId = contract.deployInfo.address;
       address = await aeSdk.address();
-      oracleId = encode(decode(address), 'ok');
+      oracleId = encode(decode(address), Encoding.OracleAddress);
     });
 
     it('registers', async () => {
@@ -446,7 +446,8 @@ describe('Contract', () => {
       const response = await contract.methods.respond(oracle.id, queryObject.id, respondSig, r);
       response.result.returnType.should.be.equal('ok');
       // TODO type should be corrected in node api
-      const queryObject2 = await aeSdk.getQueryObject(oracle.id, queryObject.id as EncodedData<'oq'>);
+      const queryObject2 = await aeSdk
+        .getQueryObject(oracle.id, queryObject.id as Encoded.OracleQueryId);
       queryObject2.decodedResponse.should.be.equal(r);
     });
   });

@@ -1,34 +1,31 @@
 import { decode as rlpDecode, encode as rlpEncode, NestedUint8Array } from 'rlp';
-import { EncodedData, EncodingType } from '../../utils/encoder';
+import {
+  decode, encode, Encoded, Encoding,
+} from '../../utils/encoder';
 import { AE_AMOUNT_FORMATS } from '../../utils/amount-formatter';
 import { hash } from '../../utils/crypto';
 import { Field } from './field-types';
-
 import {
   FIELD_TYPES,
   RawTxObject,
-  TxField,
-  TxTypeSchemas,
-  TxParamsCommon,
   TX_SCHEMA,
-  TX_TYPE,
+  TxField,
+  TxParamsCommon,
   TxSchema,
+  TxTypeSchemas,
 } from './schema';
+import { Tag } from './constants';
 import {
-  readInt,
-  readId,
-  readPointers,
-  writeId,
-  writeInt,
-  buildPointers,
-  encode,
-  decode,
-  buildContractId,
+  buildContractId, buildPointers, readInt, readPointers, writeInt,
 } from './helpers';
+import { readId, writeId } from './address';
 import { toBytes } from '../../utils/bytes';
 import MPTree, { MPTreeBinary } from '../../utils/mptree';
 import {
-  ArgumentError, InvalidTxParamsError, SchemaNotFoundError, DecodeError,
+  ArgumentError,
+  DecodeError,
+  InvalidTxParamsError,
+  SchemaNotFoundError,
 } from '../../utils/errors';
 import { isKeyOfObject } from '../../utils/other';
 import { NamePointer } from '../../apis/node';
@@ -41,7 +38,7 @@ import { NamePointer } from '../../apis/node';
 function deserializeField(
   value: any,
   type: FIELD_TYPES | Field,
-  prefix?: EncodingType | EncodingType[],
+  prefix?: Encoding | Encoding[],
 ): any {
   if (value == null) return '';
   switch (type) {
@@ -62,28 +59,28 @@ function deserializeField(
     case FIELD_TYPES.bool:
       return value[0] === 1;
     case FIELD_TYPES.binary:
-      return encode(value, prefix as EncodingType);
+      return encode(value, prefix as Encoding);
     case FIELD_TYPES.stateTree:
-      return encode(value, 'ss');
+      return encode(value, Encoding.StateTrees);
     case FIELD_TYPES.string:
       return value.toString();
     case FIELD_TYPES.payload:
-      return encode(value, 'ba');
+      return encode(value, Encoding.Bytearray);
     case FIELD_TYPES.pointers:
       return readPointers(value);
     case FIELD_TYPES.rlpBinary:
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return unpackTx(encode(value, 'tx'));
+      return unpackTx(encode(value, Encoding.Transaction));
     case FIELD_TYPES.rlpBinaries:
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return value.map((v: Buffer) => unpackTx(encode(v, 'tx')));
+      return value.map((v: Buffer) => unpackTx(encode(v, Encoding.Transaction)));
     case FIELD_TYPES.rawBinary:
       return value;
     case FIELD_TYPES.hex:
       return value.toString('hex');
     case FIELD_TYPES.offChainUpdates:
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return value.map((v: Buffer) => unpackTx(encode(v, 'tx')));
+      return value.map((v: Buffer) => unpackTx(encode(v, Encoding.Transaction)));
     case FIELD_TYPES.callStack:
       // TODO: fix this
       return [readInt(value)];
@@ -140,7 +137,7 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       return value.map(Buffer.from);
     case FIELD_TYPES.payload:
       return typeof value === 'string' && value.split('_')[0] === 'ba'
-        ? decode(value as EncodedData<'ba'>)
+        ? decode(value as Encoded.Bytearray)
         : toBytes(value);
     case FIELD_TYPES.string:
       return toBytes(value);
@@ -169,7 +166,7 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
 function validateField(
   value: any,
   type: FIELD_TYPES | Field,
-  prefix?: EncodingType | EncodingType[],
+  prefix?: Encoding | Encoding[],
 ): string | undefined {
   // All fields are required
   if (value == null) return 'Field is required';
@@ -251,8 +248,8 @@ export function unpackRawTx<Tx extends TxSchema>(
 /**
  * @category transaction builder
  */
-export interface BuiltTx<Tx extends TxSchema, Prefix extends EncodingType> {
-  tx: EncodedData<Prefix>;
+export interface BuiltTx<Tx extends TxSchema, Prefix extends Encoding> {
+  tx: Encoded.Generic<Prefix>;
   rlpEncoded: Uint8Array;
   binary: Uint8Array;
   txObject: RawTxObject<Tx>;
@@ -273,22 +270,25 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends EncodingType> {
  * @returns object.rlpEncoded rlp encoded transaction
  * @returns object.binary binary transaction
  */
-export function buildTx<TxType extends TX_TYPE, Prefix>(
+export function buildTx<TxType extends Tag, Prefix>(
   _params: Omit<TxTypeSchemas[TxType], 'tag' | 'VSN'> & { VSN?: number },
   type: TxType,
   {
-    excludeKeys = [], prefix = 'tx', vsn, denomination = AE_AMOUNT_FORMATS.AETTOS,
+    excludeKeys = [],
+    prefix = Encoding.Transaction,
+    vsn,
+    denomination = AE_AMOUNT_FORMATS.AETTOS,
   }: {
     excludeKeys?: string[];
-    prefix?: EncodingType;
+    prefix?: Encoding;
     vsn?: number;
     denomination?: AE_AMOUNT_FORMATS;
   } = {},
-): BuiltTx<TxSchema, Prefix extends EncodingType ? Prefix : 'tx'> {
+): BuiltTx<TxSchema, Prefix extends Encoding ? Prefix : Encoding.Transaction> {
   const schemas = TX_SCHEMA[type];
 
   vsn ??= Math.max(...Object.keys(schemas).map((a) => +a));
-  if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', TX_TYPE[type], vsn);
+  if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', Tag[type], vsn);
 
   const schema = schemas[vsn] as unknown as TxField[];
 
@@ -305,7 +305,7 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
   }
 
   const binary = filteredSchema
-    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, EncodingType]) => (
+    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, Encoding]) => (
       serializeField(
         params[key],
         fieldType,
@@ -316,7 +316,7 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
             { ...params, ...overrideParams },
             type,
             {
-              excludeKeys, prefix: 'tx', vsn, denomination,
+              excludeKeys, prefix: Encoding.Transaction, vsn, denomination,
             },
           ),
         },
@@ -330,7 +330,7 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
     tx,
     rlpEncoded,
     binary,
-    txObject: unpackRawTx<TxTypeSchemas[TX_TYPE]>(binary, schema),
+    txObject: unpackRawTx<TxTypeSchemas[Tag]>(binary, schema),
   } as any;
 }
 
@@ -338,7 +338,7 @@ export function buildTx<TxType extends TX_TYPE, Prefix>(
  * @category transaction builder
  */
 export interface TxUnpacked<Tx extends TxSchema> {
-  txType: TX_TYPE;
+  txType: Tag;
   tx: RawTxObject<Tx>;
   rlpEncoded: Uint8Array;
 }
@@ -351,15 +351,15 @@ export interface TxUnpacked<Tx extends TxSchema> {
  * @returns object.tx Object with transaction param's
  * @returns object.txType Transaction type
  */
-export function unpackTx<TxType extends TX_TYPE>(
-  encodedTx: EncodedData<'tx' | 'pi'>,
+export function unpackTx<TxType extends Tag>(
+  encodedTx: Encoded.Transaction | Encoded.Poi,
   txType?: TxType,
 ): TxUnpacked<TxTypeSchemas[TxType]> {
   const rlpEncoded = decode(encodedTx);
   const binary = rlpDecode(rlpEncoded);
   const objId = +readInt(binary[0] as Buffer);
   if (!isKeyOfObject(objId, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${objId}`);
-  if (txType != null && txType !== objId) throw new DecodeError(`Expected transaction to have ${TX_TYPE[txType]} tag, got ${TX_TYPE[objId]} instead`);
+  if (txType != null && txType !== objId) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[objId]} instead`);
   const vsn = +readInt(binary[1] as Buffer);
   if (!isKeyOfObject(vsn, TX_SCHEMA[objId])) throw new SchemaNotFoundError('deserialization', `tag ${objId}`, vsn);
   const schema = TX_SCHEMA[objId][vsn];
@@ -376,11 +376,11 @@ export function unpackTx<TxType extends TX_TYPE>(
  * @param rawTx - base64 or rlp encoded transaction
  * @returns Transaction hash
  */
-export function buildTxHash(rawTx: EncodedData<'tx'> | Uint8Array): EncodedData<'th'> {
+export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.TxHash {
   const data = typeof rawTx === 'string' && rawTx.startsWith('tx_')
     ? decode(rawTx)
     : rawTx;
-  return encode(hash(data), 'th');
+  return encode(hash(data), Encoding.TxHash);
 }
 
 /**
@@ -389,9 +389,11 @@ export function buildTxHash(rawTx: EncodedData<'tx'> | Uint8Array): EncodedData<
  * @param contractTx - Transaction
  * @returns Contract public key
  */
-export function buildContractIdByContractTx(contractTx: EncodedData<'tx'>): EncodedData<'ct'> {
-  const { txType, tx } = unpackTx<TX_TYPE.contractCreate | TX_TYPE.gaAttach>(contractTx);
-  if (![TX_TYPE.contractCreate, TX_TYPE.gaAttach].includes(txType)) {
+export function buildContractIdByContractTx(
+  contractTx: Encoded.Transaction,
+): Encoded.ContractAddress {
+  const { txType, tx } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
+  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(txType)) {
     throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', txType);
   }
   return buildContractId(tx.ownerId, +tx.nonce);

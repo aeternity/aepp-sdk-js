@@ -22,10 +22,10 @@
  * https://github.com/aeternity/protocol/tree/master/contracts and
  */
 
-import { AensName } from '../tx/builder/schema';
-import { decode, produceNameId } from '../tx/builder/helpers';
+import { AensName } from '../tx/builder/constants';
+import { produceNameId } from '../tx/builder/helpers';
 import { concatBuffers } from '../utils/other';
-import { EncodedData, EncodingType } from '../utils/encoder';
+import { decode, Encoded } from '../utils/encoder';
 import AccountBase from '../account/Base';
 import Node from '../Node';
 
@@ -41,7 +41,7 @@ export { default as getContractInstance } from './aci';
  * @returns Signature in hex representation
  */
 async function delegateSignatureCommon(
-  ids: Array<EncodedData<EncodingType>>,
+  ids: Encoded.Any[],
   { onAccount, onNode, ...opt }:
   { onAccount: AccountBase; onNode: Node } & Parameters<AccountBase['sign']>[1],
 ): Promise<string> {
@@ -78,7 +78,7 @@ async function delegateSignatureCommon(
  * ```
  */
 export async function createAensDelegationSignature(
-  contractId: EncodedData<'ct'>,
+  contractId: Encoded.ContractAddress,
   opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
   { name?: AensName },
 ): Promise<string> {
@@ -112,9 +112,9 @@ export async function createAensDelegationSignature(
  * ```
  */
 export async function createOracleDelegationSignature(
-  contractId: EncodedData<'ct'>,
+  contractId: Encoded.ContractAddress,
   opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
-  { queryId?: EncodedData<'oq'> },
+  { queryId?: Encoded.OracleQueryId },
 ): Promise<string> {
   return delegateSignatureCommon(
     [opt.queryId ?? await opt.onAccount.address(opt), contractId],

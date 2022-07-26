@@ -32,7 +32,7 @@ import {
   IllegalArgumentError,
 } from '../../src';
 import { getSdk } from '.';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
 import { Aci } from '../../src/apis/compiler';
 
@@ -145,9 +145,9 @@ const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUW
 describe('Contract instance', () => {
   let aeSdk: AeSdk;
   let testContract: ContractInstance;
-  let testContractAddress: EncodedData<'ct'>;
+  let testContractAddress: Encoded.ContractAddress;
   let testContractAci: Aci;
-  let testContractBytecode: EncodedData<'cb'>;
+  let testContractBytecode: Encoded.ContractBytearray;
 
   before(async () => {
     aeSdk = await getSdk(2);
@@ -436,11 +436,11 @@ describe('Contract instance', () => {
     });
 
     const getDuplicateLog = (): Array<{
-      address: EncodedData<'ct'>;
-      data: EncodedData<'cb'>;
+      address: Encoded.ContractAddress;
+      data: Encoded.ContractBytearray;
       topics: Array<string | number>;
     }> => [{
-      address: remoteContract.deployInfo.address as EncodedData<'ct'>,
+      address: remoteContract.deployInfo.address as Encoded.ContractAddress,
       data: 'cb_Xfbg4g==',
       topics: [
         '28631352549432199952459007654025571262660118571086898449909844428770770966435',

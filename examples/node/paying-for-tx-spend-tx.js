@@ -34,7 +34,7 @@
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 const {
-  AeSdk, Node, MemoryAccount, generateKeyPair, TX_TYPE,
+  AeSdk, Node, MemoryAccount, generateKeyPair, Tag,
 } = require('@aeternity/aepp-sdk');
 
 // **Note**:
@@ -91,7 +91,7 @@ const AMOUNT = 1;
   //  - The balance should now be 1
 
   // ## 7. Create and sign `SpendTx` on behalf of new user
-  const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
+  const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
     senderId: await newUserAccount.address(),
     recipientId: await payerAccount.address(),
     amount: AMOUNT,

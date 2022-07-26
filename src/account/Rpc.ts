@@ -1,7 +1,7 @@
 import AccountBase from './Base';
 import { METHODS } from '../aepp-wallet-communication/schema';
 import { NotImplementedError } from '../utils/errors';
-import { EncodedData } from '../utils/encoder';
+import { Encoded } from '../utils/encoder';
 
 /**
  * Account provided by wallet
@@ -13,11 +13,11 @@ import { EncodedData } from '../utils/encoder';
 export default class AccountRpc extends AccountBase {
   _rpcClient: any;
 
-  _address: EncodedData<'ak'>;
+  _address: Encoded.AccountAddress;
 
   constructor(
-    { rpcClient, address, ...options }:
-    { rpcClient: any; address: EncodedData<'ak'> } & ConstructorParameters<typeof AccountBase>[0],
+    { rpcClient, address, ...options }: { rpcClient: any; address: Encoded.AccountAddress }
+    & ConstructorParameters<typeof AccountBase>[0],
   ) {
     super(options);
     this._rpcClient = rpcClient;
@@ -29,7 +29,7 @@ export default class AccountRpc extends AccountBase {
     throw new NotImplementedError('RAW signing using wallet');
   }
 
-  async address(): Promise<EncodedData<'ak'>> {
+  async address(): Promise<Encoded.AccountAddress> {
     return this._address;
   }
 
@@ -37,9 +37,9 @@ export default class AccountRpc extends AccountBase {
    * @returns Signed transaction
    */
   async signTransaction(
-    tx: EncodedData<'tx'>,
+    tx: Encoded.Transaction,
     { innerTx, networkId }: Parameters<AccountBase['signTransaction']>[1] = {},
-  ): Promise<EncodedData<'tx'>> {
+  ): Promise<Encoded.Transaction> {
     if (innerTx != null) throw new NotImplementedError('innerTx option in AccountRpc');
     const res = await this._rpcClient.request(METHODS.sign, {
       onAccount: this._address,

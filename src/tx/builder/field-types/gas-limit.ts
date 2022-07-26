@@ -1,10 +1,10 @@
 import { IllegalArgumentError } from '../../../utils/errors';
-import { MIN_GAS_PRICE, TX_TYPE } from '../constants';
+import { MIN_GAS_PRICE, Tag } from '../constants';
 import shortUInt from './short-u-int';
 import { buildFee } from './fee';
 
 function calculateGasLimitMax(
-  txType: TX_TYPE,
+  txType: Tag,
   gasMax: number,
   rebuildTx: (value: number) => any,
 ): number {
@@ -19,7 +19,7 @@ export default {
     {
       txType, rebuildTx, gasMax = 6e6, _computingGasLimit,
     }: {
-      txType: TX_TYPE;
+      txType: Tag;
       rebuildTx: (params: any) => any;
       gasMax: number;
       _computingGasLimit?: number;

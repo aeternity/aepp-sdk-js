@@ -19,7 +19,8 @@
  * Generalized Account module - routines to use generalized account
  */
 
-import { TX_TYPE, MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema';
+import { MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema';
+import { Tag } from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, buildTx, BuiltTx, TxUnpacked, unpackTx,
 } from '../tx/builder';
@@ -27,7 +28,7 @@ import {
   _buildTx, BuildTxOptions, getVmVersion, prepareTxParams,
 } from '../tx';
 import { hash } from '../utils/crypto';
-import { decode, EncodedData } from '../utils/encoder';
+import { decode, Encoded, Encoding } from '../utils/encoder';
 import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
@@ -45,7 +46,7 @@ import Compiler from './Compiler';
  * @returns if account is GA
  */
 export async function isGA(
-  address: EncodedData<'ak'>,
+  address: Encoded.AccountAddress,
   options: Parameters<typeof getAccount>[1],
 ): Promise<boolean> {
   const { contractId } = await getAccount(address, options);
@@ -69,10 +70,10 @@ export async function createGeneralizedAccount(
     onAccount, onCompiler, onNode, ...options
   }: CreateGeneralizedAccountOptions,
 ): Promise<Readonly<{
-    owner: EncodedData<'ak'>;
-    transaction: EncodedData<'th'>;
-    rawTx: EncodedData<'tx'>;
-    gaContractId: EncodedData<'ct'>;
+    owner: Encoded.AccountAddress;
+    transaction: Encoded.TxHash;
+    rawTx: Encoded.Transaction;
+    gaContractId: Encoded.ContractAddress;
   }>> {
   const ownerId = await onAccount.address(options);
   if (await isGA(ownerId, { onNode })) throw new IllegalArgumentError(`Account ${ownerId} is already GA`);
@@ -81,7 +82,7 @@ export async function createGeneralizedAccount(
     onAccount, onCompiler, onNode, source,
   });
 
-  const tx = await _buildTx(TX_TYPE.gaAttach, {
+  const tx = await _buildTx(Tag.GaAttachTx, {
     ...options,
     onNode,
     code: await contract.compile(),
@@ -104,7 +105,7 @@ export async function createGeneralizedAccount(
 }
 
 interface CreateGeneralizedAccountOptions extends
-  BuildTxOptions<TX_TYPE.gaAttach, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
+  BuildTxOptions<Tag.GaAttachTx, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
   SendOptions {
   onAccount: AccountBase;
   onCompiler: Compiler;
@@ -123,10 +124,10 @@ interface CreateGeneralizedAccountOptions extends
  * @returns Transaction string
  */
 export async function createMetaTx(
-  rawTransaction: EncodedData<'tx'>,
+  rawTransaction: Encoded.Transaction,
   authData: {
     gasLimit?: number;
-    callData?: EncodedData<'cb'>;
+    callData?: Encoded.ContractBytearray;
     source?: string;
     args?: any[];
   },
@@ -136,10 +137,12 @@ export async function createMetaTx(
   }:
   { onAccount: AccountBase; onCompiler: Compiler; onNode: Node }
   & Parameters<AccountBase['address']>[0],
-): Promise<EncodedData<'tx'>> {
+): Promise<Encoded.Transaction> {
   const wrapInEmptySignedTx = (
-    tx: EncodedData<'tx'> | Uint8Array | TxUnpacked<TxSchema>,
-  ): BuiltTx<TxSchema, 'tx'> => buildTx({ encodedTx: tx, signatures: [] }, TX_TYPE.signed);
+    tx: Encoded.Transaction | Uint8Array | TxUnpacked<TxSchema>,
+  ): BuiltTx<TxSchema, Encoding.Transaction> => (
+    buildTx({ encodedTx: tx, signatures: [] }, Tag.SignedTx)
+  );
 
   if (Object.keys(authData).length <= 0) throw new MissingParamError('authData is required');
 
@@ -156,8 +159,8 @@ export async function createMetaTx(
     return contract.calldata.encode(contract._name, authFnName, authData.args);
   })();
 
-  const { abiVersion } = await getVmVersion(TX_TYPE.contractCall, { onNode });
-  const wrappedTx = wrapInEmptySignedTx(unpackTx<TX_TYPE.signed>(rawTransaction));
+  const { abiVersion } = await getVmVersion(Tag.ContractCallTx, { onNode });
+  const wrappedTx = wrapInEmptySignedTx(unpackTx<Tag.SignedTx>(rawTransaction));
   const params = {
     ...options,
     tx: {
@@ -172,8 +175,8 @@ export async function createMetaTx(
     vsn: 2,
   };
   // @ts-expect-error createMetaTx needs to be integrated into tx builder
-  const { fee } = await prepareTxParams(TX_TYPE.gaMeta, { ...params, onNode });
-  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee }, TX_TYPE.gaMeta);
+  const { fee } = await prepareTxParams(Tag.GaMetaTx, { ...params, onNode });
+  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee }, Tag.GaMetaTx);
   return wrapInEmptySignedTx(metaTxRlp).tx;
 }
 
@@ -186,7 +189,7 @@ export async function createMetaTx(
  * @returns Transaction hash
  */
 export async function buildAuthTxHash(
-  transaction: EncodedData<'tx'>,
+  transaction: Encoded.Transaction,
   { onNode }: { onNode: Node },
 ): Promise<Uint8Array> {
   const { networkId } = await onNode.getStatus();

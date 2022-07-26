@@ -20,13 +20,13 @@ import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
 import * as Crypto from '../../src/utils/crypto';
 import { buildTxHash, unpackTx, decode } from '../../src';
-import { EncodedData } from '../../src/utils/encoder';
+import { Encoded } from '../../src/utils/encoder';
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
 const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8';
 const privateKey = Buffer.from(privateKeyAsHex, 'hex');
-const publicKeyWithPrefix: EncodedData<'ak'> = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm';
+const publicKeyWithPrefix: Encoded.AccountAddress = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm';
 const publicKey = decode(publicKeyWithPrefix);
 
 const txBinaryAsArray = [

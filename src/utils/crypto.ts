@@ -22,10 +22,8 @@ import { encode as varuintEncode } from 'varuint-bitcoin';
 import { str2buf } from './bytes';
 import { concatBuffers } from './other';
 import {
-  encode, decode, sha256hash, EncodedData, EncodingType,
+  decode, encode, Encoded, Encoding, sha256hash,
 } from './encoder';
-
-export { sha256hash };
 
 const Ecb = aesjs.ModeOfOperation.ecb;
 
@@ -34,10 +32,10 @@ const Ecb = aesjs.ModeOfOperation.ecb;
  * @param secret - Private key
  * @returns Public key encoded as address
  */
-export function getAddressFromPriv(secret: string | Uint8Array): EncodedData<'ak'> {
+export function getAddressFromPriv(secret: string | Uint8Array): Encoded.AccountAddress {
   const secretBuffer = typeof secret === 'string' ? str2buf(secret) : secret;
   const keys = nacl.sign.keyPair.fromSecretKey(secretBuffer);
-  return encode(keys.publicKey, 'ak');
+  return encode(keys.publicKey, Encoding.AccountAddress);
 }
 
 /**
@@ -46,9 +44,12 @@ export function getAddressFromPriv(secret: string | Uint8Array): EncodedData<'ak
  * @param prefix - Transaction prefix. Default: 'ak'
  * @returns is valid
  */
-export function isAddressValid(address: string, prefix: EncodingType = 'ak'): boolean {
+export function isAddressValid(
+  address: string,
+  prefix: Encoding = Encoding.AccountAddress,
+): boolean {
   try {
-    decode(address as EncodedData<typeof prefix>);
+    decode(address as Encoded.Generic<typeof prefix>);
     return true;
   } catch (e) {
     return false;
@@ -92,10 +93,13 @@ export function hash(input: Data): Buffer {
  * @param nonce - Round when contract was created
  * @returns Contract address
  */
-export function encodeContractAddress(owner: EncodedData<'ak'>, nonce: number): EncodedData<'ct'> {
+export function encodeContractAddress(
+  owner: Encoded.AccountAddress,
+  nonce: number,
+): Encoded.ContractAddress {
   const publicKey = decode(owner);
   const binary = concatBuffers([publicKey, encodeUnsigned(nonce)]);
-  return encode(hash(binary), 'ct');
+  return encode(hash(binary), Encoding.ContractAddress);
 }
 
 // KEY-PAIR HELPERS
@@ -115,9 +119,11 @@ export function generateKeyPairFromSecret(secret: Uint8Array): SignKeyPair {
  * @returns Key pair
  */
 export function generateKeyPair(raw: true): { publicKey: Buffer; secretKey: Buffer };
-export function generateKeyPair(raw?: false): { publicKey: EncodedData<'ak'>; secretKey: string };
+export function generateKeyPair(raw?: false): {
+  publicKey: Encoded.AccountAddress; secretKey: string;
+};
 export function generateKeyPair(raw = false): {
-  publicKey: EncodedData<'ak'> | Buffer;
+  publicKey: Encoded.AccountAddress | Buffer;
   secretKey: string | Buffer;
 } {
   const keyPair = nacl.sign.keyPair();
@@ -131,7 +137,7 @@ export function generateKeyPair(raw = false): {
     };
   }
   return {
-    publicKey: encode(publicBuffer, 'ak'),
+    publicKey: encode(publicBuffer, Encoding.AccountAddress),
     secretKey: secretBuffer.toString('hex'),
   };
 }

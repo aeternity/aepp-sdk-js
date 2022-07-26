@@ -17,15 +17,14 @@
 import AccountBase from './Base';
 import { sign, isValidKeypair } from '../utils/crypto';
 import { isHex } from '../utils/string';
-import { decode } from '../tx/builder/helpers';
 import { ArgumentError, InvalidKeypairError, MissingParamError } from '../utils/errors';
-import { EncodedData } from '../utils/encoder';
+import { decode, Encoded } from '../utils/encoder';
 import { createMetaTx } from '../contract/ga';
 
 const secrets = new WeakMap();
 
 export interface Keypair {
-  publicKey: EncodedData<'ak'>;
+  publicKey: Encoded.AccountAddress;
   secretKey: string | Uint8Array;
 }
 
@@ -43,7 +42,8 @@ export default class AccountMemory extends AccountBase {
    * @param options.gaId - Address of generalized account
    */
   constructor(
-    { keypair, gaId, ...options }: { keypair?: Keypair; gaId?: EncodedData<'ak'> } & ConstructorParameters<typeof AccountBase>[0],
+    { keypair, gaId, ...options }: { keypair?: Keypair; gaId?: Encoded.AccountAddress }
+    & ConstructorParameters<typeof AccountBase>[0],
   ) {
     super(options);
 
@@ -79,9 +79,9 @@ export default class AccountMemory extends AccountBase {
   }
 
   async signTransaction(
-    tx: EncodedData<'tx'>,
+    tx: Encoded.Transaction,
     options: Parameters<AccountBase['signTransaction']>[1] = {},
-  ): Promise<EncodedData<'tx'>> {
+  ): Promise<Encoded.Transaction> {
     if (!this.isGa || options.innerTx === true) return super.signTransaction(tx, options);
     const {
       authData, authFun, onCompiler, onNode,
@@ -92,7 +92,7 @@ export default class AccountMemory extends AccountBase {
     return createMetaTx(tx, authData, authFun, { onCompiler, onNode, onAccount: this });
   }
 
-  async address(): Promise<EncodedData<'ak'>> {
+  async address(): Promise<Encoded.AccountAddress> {
     return secrets.get(this).publicKey;
   }
 }

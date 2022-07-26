@@ -1,16 +1,18 @@
 import AeSdkBase, { Account } from './AeSdkBase';
 import AccountBase from './account/Base';
-import { decode, EncodedData } from './utils/encoder';
+import { decode, Encoded } from './utils/encoder';
 import { UnavailableAccountError } from './utils/errors';
 
 export default class AeSdk extends AeSdkBase {
-  accounts: { [key: EncodedData<'ak'>]: AccountBase } = {};
+  accounts: { [key: Encoded.AccountAddress]: AccountBase } = {};
 
-  selectedAddress?: EncodedData<'ak'>;
+  selectedAddress?: Encoded.AccountAddress;
 
-  _resolveAccount(account: Account | EncodedData<'ak'> = this.selectedAddress): AccountBase {
+  _resolveAccount(
+    account: Account | Encoded.AccountAddress = this.selectedAddress,
+  ): AccountBase {
     if (typeof account === 'string') {
-      const address = account as EncodedData<'ak'>;
+      const address = account as Encoded.AccountAddress;
       decode(address);
       if (this.accounts[address] == null) throw new UnavailableAccountError(account);
       account = this.accounts[address];
@@ -22,8 +24,8 @@ export default class AeSdk extends AeSdkBase {
    * Get accounts addresses
    * @example addresses()
    */
-  addresses(): Array<EncodedData<'ak'>> {
-    return Object.keys(this.accounts) as Array<EncodedData<'ak'>>;
+  addresses(): Encoded.AccountAddress[] {
+    return Object.keys(this.accounts) as Encoded.AccountAddress[];
   }
 
   /**
@@ -44,7 +46,7 @@ export default class AeSdk extends AeSdkBase {
    * @param address - Address of account to remove
    * @example removeAccount(address)
    */
-  removeAccount(address: EncodedData<'ak'>): void {
+  removeAccount(address: Encoded.AccountAddress): void {
     if (this.accounts[address] == null) {
       console.warn(`removeAccount: Account for ${address} not available`);
       return;
@@ -58,7 +60,7 @@ export default class AeSdk extends AeSdkBase {
    * @param address - Address of account to select
    * @example selectAccount('ak_xxxxxxxx')
    */
-  selectAccount(address: EncodedData<'ak'>): void {
+  selectAccount(address: Encoded.AccountAddress): void {
     decode(address);
     if (this.accounts[address] == null) throw new UnavailableAccountError(address);
     this.selectedAddress = address;

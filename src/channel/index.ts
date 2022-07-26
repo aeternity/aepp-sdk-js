@@ -17,7 +17,7 @@
 import BigNumber from 'bignumber.js';
 import { snakeToPascal } from '../utils/string';
 import { buildTx, unpackTx } from '../tx/builder';
-import { MIN_GAS_PRICE, TX_TYPE } from '../tx/builder/schema';
+import { MIN_GAS_PRICE, Tag } from '../tx/builder/constants';
 import * as handlers from './handlers';
 import {
   eventEmitters,
@@ -35,7 +35,7 @@ import {
   ChannelState,
 } from './internal';
 import { UnknownChannelStateError, ChannelError } from '../utils/errors';
-import { EncodedData } from '../utils/encoder';
+import { Encoded } from '../utils/encoder';
 import { ContractCallReturnType } from '../apis/node';
 import { pause } from '../utils/other';
 
@@ -50,9 +50,9 @@ type EventCallback = (...args: any[]) => void;
 
 interface CallContractOptions {
   amount?: number | BigNumber;
-  callData?: EncodedData<'cb'>;
+  callData?: Encoded.ContractBytearray;
   abiVersion?: number;
-  contract?: EncodedData<'ct'>;
+  contract?: Encoded.ContractAddress;
   returnValue?: any;
   gasUsed?: number | BigNumber;
   gasPrice?: number | BigNumber;
@@ -222,13 +222,13 @@ export default class Channel {
     if (state == null) {
       return null;
     }
-    const { txType, tx } = unpackTx(state, TX_TYPE.signed).tx.encodedTx;
+    const { txType, tx } = unpackTx(state, Tag.SignedTx).tx.encodedTx;
     switch (txType) {
-      case TX_TYPE.channelCreate:
+      case Tag.ChannelCreateTx:
         return 1;
-      case TX_TYPE.channelOffChain:
-      case TX_TYPE.channelWithdraw:
-      case TX_TYPE.channelDeposit:
+      case Tag.ChannelOffChainTx:
+      case Tag.ChannelWithdrawTx:
+      case Tag.ChannelDepositTx:
         return tx.round;
       default:
         return null;
@@ -285,14 +285,14 @@ export default class Channel {
    * ```
    */
   async update(
-    from: EncodedData<'ak'>,
-    to: EncodedData<'ak'>,
+    from: Encoded.AccountAddress,
+    to: Encoded.AccountAddress,
     amount: number | BigNumber,
     sign: SignTx,
     metadata: string[] = [],
   ): Promise<{
       accepted: boolean;
-      signedTx?: EncodedData<'tx'>;
+      signedTx?: Encoded.Transaction;
       errorCode?: number;
       errorMessage?: string;
     }> {
@@ -343,10 +343,10 @@ export default class Channel {
    */
   async poi(
     { accounts, contracts }: {
-      accounts: Array<EncodedData<'ak'>>;
-      contracts?: Array<EncodedData<'ct'>>;
+      accounts: Encoded.AccountAddress[];
+      contracts?: Encoded.ContractAddress[];
     },
-  ): Promise<EncodedData<'pi'>> {
+  ): Promise<Encoded.Poi> {
     return (await call(this, 'channels.get.poi', { accounts, contracts })).poi;
   }
 
@@ -371,11 +371,13 @@ export default class Channel {
    * )
    * ```
    */
-  async balances(accounts: Array<EncodedData<'ak'>>): Promise<{ [key: EncodedData<'ak'>]: string }> {
+  async balances(
+    accounts: Encoded.AccountAddress[],
+  ): Promise<{ [key: Encoded.AccountAddress]: string }> {
     return Object.fromEntries(
       (await call(this, 'channels.get.balances', { accounts }))
         .map((item: {
-          account: EncodedData<'ak'>;
+          account: Encoded.AccountAddress;
           balance: string;
         }) => [item.account, item.balance]),
     );
@@ -401,7 +403,7 @@ export default class Channel {
    * })
    * ```
    */
-  async leave(): Promise<{ channelId: string; signedTx: EncodedData<'tx'> }> {
+  async leave(): Promise<{ channelId: string; signedTx: Encoded.Transaction }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -431,7 +433,7 @@ export default class Channel {
    * ).then(tx => console.log('on_chain_tx', tx))
    * ```
    */
-  async shutdown(sign: Function): Promise<EncodedData<'tx'>> {
+  async shutdown(sign: Function): Promise<Encoded.Transaction> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -505,7 +507,7 @@ export default class Channel {
     sign: SignTx,
     { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }:
     Pick<ChannelState, 'onOnChainTx' | 'onOwnWithdrawLocked' | 'onWithdrawLocked'> = {},
-  ): Promise<{ accepted: boolean; signedTx: EncodedData<'tx'> }> {
+  ): Promise<{ accepted: boolean; signedTx: Encoded.Transaction }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -644,14 +646,16 @@ export default class Channel {
     {
       code, callData, deposit, vmVersion, abiVersion,
     }: {
-      code: EncodedData<'cb'>;
-      callData: EncodedData<'cb'>;
+      code: Encoded.ContractBytearray;
+      callData: Encoded.ContractBytearray;
       deposit: number | BigNumber;
       vmVersion: number;
       abiVersion: number;
     },
     sign: SignTx,
-  ): Promise<{ accepted: boolean; signedTx: EncodedData<'tx'>; address: EncodedData<'ct'> }> {
+  ): Promise<{
+      accepted: boolean; signedTx: Encoded.Transaction; address: Encoded.ContractAddress;
+    }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -724,7 +728,7 @@ export default class Channel {
       amount, callData, contract, abiVersion,
     }: CallContractOptions,
     sign: SignTx,
-  ): Promise<{ accepted: boolean; signedTx: EncodedData<'tx'> }> {
+  ): Promise<{ accepted: boolean; signedTx: Encoded.Transaction }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -783,15 +787,19 @@ export default class Channel {
       amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = MIN_GAS_PRICE,
     }: {
       amount: number;
-      callData: EncodedData<'cb'>;
-      contract: EncodedData<'ct'>;
+      callData: Encoded.ContractBytearray;
+      contract: Encoded.ContractAddress;
       abiVersion: number;
       gasLimit?: number;
       gasPrice?: number;
     },
     sign: SignTx,
     { onOnChainTx }: Pick<ChannelState, 'onOnChainTx'> = {},
-  ): Promise<{ accepted: boolean; signedTx: EncodedData<'tx'>; tx: EncodedData<'tx'> | Uint8Array }> {
+  ): Promise<{
+      accepted: boolean;
+      signedTx: Encoded.Transaction;
+      tx: Encoded.Transaction | Uint8Array;
+    }> {
     return new Promise((resolve, reject) => {
       enqueueAction(
         this,
@@ -854,8 +862,8 @@ export default class Channel {
       amount, callData, contract, abiVersion,
     }: {
       amount: number;
-      callData: EncodedData<'cb'>;
-      contract: EncodedData<'ct'>;
+      callData: Encoded.ContractBytearray;
+      contract: Encoded.ContractAddress;
       abiVersion: number;
     },
   ): Promise<CallContractOptions> {
@@ -890,8 +898,8 @@ export default class Channel {
    */
   async getContractCall(
     { caller, contract, round }: {
-      caller: EncodedData<'ak'>;
-      contract: EncodedData<'ct'>;
+      caller: Encoded.AccountAddress;
+      contract: Encoded.ContractAddress;
       round: number;
     },
   ): Promise<{
@@ -925,7 +933,7 @@ export default class Channel {
    * ```
    */
   async getContractState(
-    contract: EncodedData<'ct'>,
+    contract: Encoded.ContractAddress,
   ): Promise<{ contract: Contract; contractState: object }> {
     const result = await call(this, 'channels.get.contract', { pubkey: contract });
     return snakeToPascalObjKeys({
@@ -981,7 +989,10 @@ export default class Channel {
    * )
    * ```
    */
-  async sendMessage(message: string | object, recipient: EncodedData<'ak'>): Promise<void> {
+  async sendMessage(
+    message: string | object,
+    recipient: Encoded.AccountAddress,
+  ): Promise<void> {
     const info = typeof message === 'object' ? JSON.stringify(message) : message;
     if (this.status() === 'connecting') {
       await new Promise<void>((resolve) => {
@@ -1008,7 +1019,7 @@ export default class Channel {
 
     return Channel.initialize({
       ...options,
-      reconnectTx: await sign('reconnect', buildTx(txParams, TX_TYPE.channelReconnect).tx),
+      reconnectTx: await sign('reconnect', buildTx(txParams, Tag.ChannelClientReconnectTx).tx),
     });
   }
 }

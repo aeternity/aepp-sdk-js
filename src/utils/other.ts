@@ -27,12 +27,18 @@ export const concatBuffers = isWebpack4Buffer
 
 /**
  * Object key type guard
- * @param key - Object key
- * @param object - object
+ * @param key - Maybe object key
+ * @param object - Object
  */
-export function isKeyOfObject<T>(
-  key: string | number | symbol,
-  object: T,
-): key is keyof T {
+export function isKeyOfObject<T>(key: string | number | symbol, object: T): key is keyof T {
   return key in object;
+}
+
+/**
+ * Array item type guard
+ * @param item - Maybe array item
+ * @param array - Array
+ */
+export function isItemOfArray<T>(item: any, array: readonly T[]): item is T {
+  return array.includes(item);
 }

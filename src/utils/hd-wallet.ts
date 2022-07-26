@@ -2,7 +2,7 @@ import nacl from 'tweetnacl';
 import { full as hmac } from 'tweetnacl-auth';
 import { fromString } from 'bip32-path';
 import { decryptKey, encryptKey } from './crypto';
-import { encode } from './encoder';
+import { encode, Encoding } from './encoder';
 import { CryptographyError } from './errors';
 import { bytesToHex } from './bytes';
 import { concatBuffers } from './other';
@@ -93,7 +93,7 @@ function formatAccount(keys: nacl.SignKeyPair): Account {
   const { secretKey, publicKey } = keys;
   return {
     secretKey: bytesToHex(secretKey),
-    publicKey: encode(publicKey, 'ak'),
+    publicKey: encode(publicKey, Encoding.AccountAddress),
   };
 }
 

@@ -54,7 +54,7 @@ async function spend (amount, recipient) {
   )
 
   // builds an unsigned SpendTx using the debug endpoint of the node's API
-  const spendTx = await aeSdk.buildTx(TX_TYPE.spend, {
+  const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
     senderId: await aeSdk.address(),
     recipientId: recipient,
     fee: 18000000000000, // you must provide enough fee

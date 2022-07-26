@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { EncodingType } from '../../utils/encoder';
 import { mapObject } from '../../utils/other';
 
 // # AENS
@@ -20,12 +19,6 @@ export const NAME_BID_TIMEOUT_BLOCKS = 480; // # ~1 day
 // # this is the max length for a domain that requires a base fee to be paid
 export const NAME_MAX_LENGTH_FEE = 31;
 export const NAME_BID_MAX_LENGTH = 12; // # this is the max length for a domain to be part of a bid
-export enum POINTER_KEY_BY_PREFIX {
-  ak = 'account_pubkey',
-  ok = 'oracle_pubkey',
-  ct = 'contract_pubkey',
-  ch = 'channel',
-}
 // # https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
 // # https://github.com/aeternity/protocol/blob/master/AENS.md#protocol-fees-and-protection-times
 // # bid ranges:
@@ -63,90 +56,71 @@ export const NAME_BID_RANGES = mapObject({
   1: 5702887,
 }, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]);
 
-// # Tag constant for ids (type uint8)
-// # see https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
-// # <<Tag:1/unsigned-integer-unit:8, Hash:32/binary-unit:8>>
-const ID_TAG_ACCOUNT = 1;
-const ID_TAG_NAME = 2;
-const ID_TAG_COMMITMENT = 3;
-const ID_TAG_ORACLE = 4;
-const ID_TAG_CONTRACT = 5;
-const ID_TAG_CHANNEL = 6;
-
-export const ID_TAG = {
-  account: ID_TAG_ACCOUNT,
-  name: ID_TAG_NAME,
-  commitment: ID_TAG_COMMITMENT,
-  oracle: ID_TAG_ORACLE,
-  contract: ID_TAG_CONTRACT,
-  channel: ID_TAG_CHANNEL,
-};
-
-export const PREFIX_ID_TAG = {
-  ak: ID_TAG.account,
-  nm: ID_TAG.name,
-  cm: ID_TAG.commitment,
-  ok: ID_TAG.oracle,
-  ct: ID_TAG.contract,
-  ch: ID_TAG.channel,
-} as const;
-
-export const ID_TAG_PREFIX = mapObject(
-  PREFIX_ID_TAG,
-  ([key, value]: [EncodingType, number]) => [value, key],
-);
-
 /**
- * Enum with transaction types
+ * Enum with tag types
  * @category transaction builder
  * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/serializations.md#binary-serialization}
+ * @see {@link https://github.com/aeternity/aeserialization/blob/eb68fe331bd476910394966b7f5ede7a74d37e35/src/aeser_chain_objects.erl#L39-L97}
  */
-export enum TX_TYPE {
-  account = 10,
-  signed = 11,
-  spend = 12,
-  oracleRegister = 22,
-  oracleQuery = 23,
-  oracleResponse = 24,
-  oracleExtend = 25,
-  nameClaim = 32,
-  namePreClaim = 33,
-  nameUpdate = 34,
-  nameRevoke = 35,
-  nameTransfer = 36,
-  contract = 40,
-  contractCallResult = 41,
-  contractCreate = 42,
-  contractCall = 43,
-  channelCreate = 50,
-  channelDeposit = 51,
-  channelWithdraw = 52,
-  channelCloseMutual = 53,
-  channelCloseSolo = 54,
-  channelSlash = 55,
-  channelSettle = 56,
-  channelOffChain = 57,
-  channel = 58,
-  channelSnapshotSolo = 59,
-  proofOfInclusion = 60,
-  stateTrees = 62,
-  merklePatriciaTree = 63,
-  merklePatriciaTreeValue = 64,
-  sophiaByteCode = 70,
-  gaAttach = 80,
-  gaMeta = 81,
-  payingFor = 82,
-  channelForceProgress = 521,
-  channelOffChainUpdateTransfer = 570,
-  channelOffChainUpdateDeposit = 571,
-  channelOffChainUpdateWithdrawal = 572,
-  channelOffChainCreateContract = 573,
-  channelOffChainCallContract = 574,
-  channelReconnect = 575,
-  contractsTree = 621,
-  contractCallsTree = 622,
-  channelsTree = 623,
-  nameserviceTree = 624,
-  oraclesTree = 625,
-  accountsTree = 626,
+// TODO: implement serialisation for commented-out tags
+export enum Tag {
+  Account = 10,
+  SignedTx = 11,
+  SpendTx = 12,
+  // Oracle = 20,
+  // OracleQuery = 21,
+  OracleRegisterTx = 22,
+  OracleQueryTx = 23,
+  OracleResponseTx = 24,
+  OracleExtendTx = 25,
+  // Name = 30,
+  // NameCommitment = 31,
+  NameClaimTx = 32,
+  NamePreclaimTx = 33,
+  NameUpdateTx = 34,
+  NameRevokeTx = 35,
+  NameTransferTx = 36,
+  // NameAuction = 37,
+  Contract = 40,
+  ContractCall = 41,
+  ContractCreateTx = 42,
+  ContractCallTx = 43,
+  ChannelCreateTx = 50,
+  // ChannelSetDelegatesTx = 501,
+  ChannelDepositTx = 51,
+  ChannelWithdrawTx = 52,
+  ChannelForceProgressTx = 521,
+  ChannelCloseMutualTx = 53,
+  ChannelCloseSoloTx = 54,
+  ChannelSlashTx = 55,
+  ChannelSettleTx = 56,
+  ChannelOffChainTx = 57,
+  ChannelOffChainUpdateTransfer = 570,
+  ChannelOffChainUpdateDeposit = 571,
+  ChannelOffChainUpdateWithdraw = 572,
+  ChannelOffChainUpdateCreateContract = 573,
+  ChannelOffChainUpdateCallContract = 574,
+  // ChannelOffChainUpdateMeta = 576,
+  ChannelClientReconnectTx = 575,
+  Channel = 58,
+  ChannelSnapshotSoloTx = 59,
+  TreesPoi = 60,
+  // TreesDb = 61,
+  StateTrees = 62,
+  Mtree = 63,
+  MtreeValue = 64,
+  ContractsMtree = 621,
+  CallsMtree = 622,
+  ChannelsMtree = 623,
+  NameserviceMtree = 624,
+  OraclesMtree = 625,
+  AccountsMtree = 626,
+  CompilerSophia = 70,
+  GaAttachTx = 80,
+  GaMetaTx = 81,
+  PayingForTx = 82,
+  // KeyBlock = 100,
+  // MicroBlock = 101,
+  // LightMicroBlock = 102,
+  // Pof = 200,
 }
