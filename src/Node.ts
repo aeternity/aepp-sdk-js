@@ -58,7 +58,9 @@ export type TransformNodeType<Type> =
             }
             : Type;
 type TransformedNode = new (...args: ConstructorParameters<typeof NodeApi>) => {
-  [Name in keyof InstanceType<typeof NodeApi>]: TransformNodeType<NodeApi[Name]>
+  [Name in keyof InstanceType<typeof NodeApi>]:
+  Name extends 'pipeline' | 'sendRequest' | 'sendOperationRequest'
+    ? NodeApi[Name] : TransformNodeType<NodeApi[Name]>
 };
 
 export interface NodeInfo {
