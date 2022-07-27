@@ -17,7 +17,7 @@
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
     "docs:api": "typedoc",
     "commitlint": "commitlint --from develop",
-    "lint": "eslint . --ext .ts,.js",
+    "lint": "eslint . --ext .ts,.js,.mjs",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test": "nyc mocha './test/unit/' './test/integration/'",
     "test:integration": "nyc mocha './test/integration/'",
