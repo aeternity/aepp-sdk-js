@@ -20,7 +20,7 @@ import BrowserWindowMessageConnection from './connection/BrowserWindowMessage';
 import { MESSAGE_DIRECTION, METHODS } from './schema';
 import { UnsupportedPlatformError } from '../utils/errors';
 
-interface Wallet {
+export interface Wallet {
   info: {
     id: string;
     type: string;
@@ -28,7 +28,7 @@ interface Wallet {
   };
   getConnection: () => BrowserWindowMessageConnection;
 }
-interface Wallets { [key: string]: Wallet }
+export interface Wallets { [key: string]: Wallet }
 
 /**
  * A function to detect available wallets
