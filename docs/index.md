@@ -62,6 +62,23 @@ You can also install a version coming from a specific branch. In this case you w
 npm i github:aeternity/aepp-sdk-js#develop
 ```
 
+### TypeScript projects
+To work properly, sdk requires to enable `allowSyntheticDefaultImports` flag and register folder
+that contains type definitions for third-party packages sdk depends on.
+This may be done in `tsconfig.json`:
+```diff
+{
+  "compilerOptions": {
+    ...
++   "typeRoots": [
++     "node_modules/@types",
++     "node_modules/@aeternity/aepp-sdk/src/typings"
++   ],
++   "allowSyntheticDefaultImports": true
+  }
+}
+```
+
 ------------------------------
 
 **Note**: If you experience errors during the installation, you might need to install build tools for your OS.
