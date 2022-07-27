@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
 import { OperationArguments, OperationSpec } from '@azure/core-client';
 import {
@@ -32,6 +33,52 @@ const numberPropertyNames = [
   'version', 'solutions', 'round',
 ] as const;
 
+class NodeTransformed extends NodeApi {
+  async sendOperationRequest(
+    operationArguments: OperationArguments,
+    operationSpec: OperationSpec,
+  ): Promise<any> {
+    const args = mapObject(
+      operationArguments,
+      ([key, value]) => [key, this.#encodeArg(value)],
+    ) as OperationArguments;
+    return this.#decodeRes(await super.sendOperationRequest(args, operationSpec));
+  }
+
+  #mapData(data: any, transform: {
+    bigInt: (v: any) => any;
+    number: (v: any) => any;
+  }): unknown {
+    if (Array.isArray(data)) return data.map((d) => this.#mapData(d, transform));
+    if (data != null && typeof data === 'object') {
+      return mapObject(data, ([key, value]) => {
+        if (value == null) return [key, value];
+        if (bigIntPropertyNames.some((k) => k === key)) return [key, transform.bigInt(value)];
+        if (numberPropertyNames.some((k) => k === key)) return [key, transform.number(value)];
+        return [key, this.#mapData(value, transform)];
+      });
+    }
+    return data;
+  }
+
+  #encodeArg(data: any): any {
+    return this.#mapData(data, {
+      bigInt: (value) => {
+        if (value instanceof BigNumber) return value.toFixed();
+        return value.toString();
+      },
+      number: (value) => value.toString(),
+    });
+  }
+
+  #decodeRes(data: any): any {
+    return this.#mapData(data, {
+      bigInt: (value) => BigInt(value),
+      number: (value) => +value,
+    });
+  }
+}
+
 type BigIntPropertyNames = typeof bigIntPropertyNames[number];
 type NumberPropertyNames = typeof numberPropertyNames[number];
 type PreserveOptional<NewType, OrigType> =
@@ -57,7 +104,7 @@ export type TransformNodeType<Type> =
                     : TransformNodeType<Type[Property]>
             }
             : Type;
-type TransformedNode = new (...args: ConstructorParameters<typeof NodeApi>) => {
+type NodeTransformedApi = new (...args: ConstructorParameters<typeof NodeApi>) => {
   [Name in keyof InstanceType<typeof NodeApi>]:
   Name extends 'pipeline' | 'sendRequest' | 'sendOperationRequest'
     ? NodeApi[Name] : TransformNodeType<NodeApi[Name]>
@@ -70,7 +117,7 @@ export interface NodeInfo {
   consensusProtocolVersion: number;
 }
 
-export default class Node extends (NodeApi as unknown as TransformedNode) {
+export default class Node extends (NodeTransformed as unknown as NodeTransformedApi) {
   url: string;
 
   /**
@@ -122,50 +169,5 @@ export default class Node extends (NodeApi as unknown as TransformedNode) {
       version,
       consensusProtocolVersion,
     };
-  }
-
-  // @ts-expect-error https://github.com/microsoft/TypeScript/issues/27689
-  async sendOperationRequest(
-    operationArguments: OperationArguments,
-    operationSpec: OperationSpec,
-  ): Promise<any> {
-    const args = mapObject(
-      operationArguments,
-      ([key, value]) => [key, this.#encodeArg(value)],
-    ) as OperationArguments;
-    return this.#decodeRes(await super.sendOperationRequest(args, operationSpec));
-  }
-
-  #mapData(data: any, transform: {
-    bigInt: (v: any) => any;
-    number: (v: any) => any;
-  }): unknown {
-    if (Array.isArray(data)) return data.map((d) => this.#mapData(d, transform));
-    if (data != null && typeof data === 'object') {
-      return mapObject(data, ([key, value]) => {
-        if (value == null) return [key, value];
-        if (bigIntPropertyNames.some((k) => k === key)) return [key, transform.bigInt(value)];
-        if (numberPropertyNames.some((k) => k === key)) return [key, transform.number(value)];
-        return [key, this.#mapData(value, transform)];
-      });
-    }
-    return data;
-  }
-
-  #encodeArg(data: any): any {
-    return this.#mapData(data, {
-      bigInt: (value) => {
-        if (value instanceof BigNumber) return value.toFixed();
-        return value.toString();
-      },
-      number: (value) => value.toString(),
-    });
-  }
-
-  #decodeRes(data: any): any {
-    return this.#mapData(data, {
-      bigInt: (value) => BigInt(value),
-      number: (value) => +value,
-    });
   }
 }
