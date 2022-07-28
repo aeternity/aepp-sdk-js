@@ -67,12 +67,12 @@ export enum ABI_VERSIONS {
  * @category transaction builder
  */
 export enum PROTOCOL_VERSIONS {
-  IRIS = 5,
+  CERES = 6,
 }
 
 // First abi/vm by default
 export const PROTOCOL_VM_ABI = {
-  [PROTOCOL_VERSIONS.IRIS]: {
+  [PROTOCOL_VERSIONS.CERES]: {
     [Tag.ContractCreateTx]: {
       vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE],
     },
