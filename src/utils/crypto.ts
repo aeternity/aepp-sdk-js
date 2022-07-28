@@ -17,7 +17,7 @@
 import nacl, { SignKeyPair } from 'tweetnacl';
 // js extension is required for mjs build, not importing the whole package to reduce bundle size
 // eslint-disable-next-line import/extensions
-import { blake2b, Data } from 'blakejs/blake2b.js';
+import { blake2b } from 'blakejs/blake2b.js';
 import { encode as varuintEncode } from 'varuint-bitcoin';
 
 import { str2buf } from './bytes';
@@ -80,7 +80,7 @@ export function encodeUnsigned(value: number): Buffer {
  * @param input - Data to hash
  * @returns Hash
  */
-export function hash(input: Data): Buffer {
+export function hash(input: string | Uint8Array): Buffer {
   return Buffer.from(blake2b(input, undefined, 32)); // 256 bits
 }
 

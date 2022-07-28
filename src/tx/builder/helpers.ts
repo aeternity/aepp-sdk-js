@@ -13,7 +13,7 @@ import {
   NAME_MAX_LENGTH_FEE,
 } from './constants';
 import { ceil } from '../../utils/bignumber';
-import { IllegalBidFeeError } from '../../utils/errors';
+import { ArgumentError, IllegalBidFeeError } from '../../utils/errors';
 import { NamePointer } from '../../apis/node';
 import { readId, writeId } from './address';
 
@@ -162,12 +162,12 @@ export function isNameValid(name: string): name is AensName {
   return name.endsWith(AENS_SUFFIX);
 }
 
-const encodingToPointerKey = {
-  [Encoding.AccountAddress]: 'account_pubkey',
-  [Encoding.OracleAddress]: 'oracle_pubkey',
-  [Encoding.ContractAddress]: 'contract_pubkey',
-  [Encoding.Channel]: 'channel',
-} as const;
+const encodingToPointerKey = [
+  [Encoding.AccountAddress, 'account_pubkey'],
+  [Encoding.OracleAddress, 'oracle_pubkey'],
+  [Encoding.ContractAddress, 'contract_pubkey'],
+  [Encoding.Channel, 'channel'],
+] as const;
 
 /**
  * @category AENS
@@ -175,11 +175,17 @@ const encodingToPointerKey = {
  * @returns default AENS pointer key
  */
 export function getDefaultPointerKey(
-  identifier: Encoded.Generic<keyof typeof encodingToPointerKey>,
-): typeof encodingToPointerKey[keyof typeof encodingToPointerKey] {
+  identifier: Encoded.Generic<typeof encodingToPointerKey[number][0]>,
+): typeof encodingToPointerKey[number][1] {
   decode(identifier);
-  const prefix = identifier.substring(0, 2) as keyof typeof encodingToPointerKey;
-  return encodingToPointerKey[prefix];
+  const encoding = identifier.substring(0, 2);
+  const result = encodingToPointerKey.find(([e]) => e === encoding)?.[1];
+  if (result != null) return result;
+  throw new ArgumentError(
+    'identifier',
+    `prefixed with one of ${encodingToPointerKey.map(([e]) => `${e}_`).join(', ')}`,
+    identifier,
+  );
 }
 
 /**
