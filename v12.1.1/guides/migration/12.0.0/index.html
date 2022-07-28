@@ -1,0 +1,2740 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.3">
+    
+    
+      
+        <title>Migration to 12.0.0 - æternity JavaScript SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.4a0965b7.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#migration-to-1200" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+          
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  You're not viewing the latest version.
+  <a href="../../../..">
+    <strong>Click here to go to latest.</strong>
+  </a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+          
+        </aside>
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            æternity JavaScript SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Migration to 12.0.0
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    æternity JavaScript SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../quick-start/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Usage Guides
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Usage Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Usage Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../aens/" class="md-nav__link">
+        AENS (æternity naming system)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contracts/" class="md-nav__link">
+        Contracts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contract-events/" class="md-nav__link">
+        Contract Events
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../oracles/" class="md-nav__link">
+        Oracles
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../paying-for-tx/" class="md-nav__link">
+        PayingForTx (Meta-Transactions)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../batch-requests/" class="md-nav__link">
+        Batch Transactions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../error-handling/" class="md-nav__link">
+        Error Handling
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../low-vs-high-usage/" class="md-nav__link">
+        Low vs High level API
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_9" type="checkbox" id="__nav_3_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_9">
+          Wallet interaction
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Wallet interaction" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_9">
+          <span class="md-nav__icon md-icon"></span>
+          Wallet interaction
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../connect-aepp-to-wallet/" class="md-nav__link">
+        Connect an æpp to a wallet
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../build-wallet/" class="md-nav__link">
+        How to build a wallet
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../transaction-options/" class="md-nav__link">
+        Transaction options
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Examples & Tutorials
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Examples & Tutorials" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Examples & Tutorials
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1" type="checkbox" id="__nav_5_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_1">
+          NodeJS
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="NodeJS" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_1">
+          <span class="md-nav__icon md-icon"></span>
+          NodeJS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/transfer-ae/" class="md-nav__link">
+        Transfer AE
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/contract-interaction/" class="md-nav__link">
+        Compile & Deploy a Sophia Smart Contract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1_3" type="checkbox" id="__nav_5_1_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_1_3">
+          PayingForTx
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="PayingForTx" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_1_3">
+          <span class="md-nav__icon md-icon"></span>
+          PayingForTx
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/paying-for-tx-contract-call-tx/" class="md-nav__link">
+        InnerTx: ContractCallTx
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/paying-for-tx-spend-tx/" class="md-nav__link">
+        InnerTx: SpendTx
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/vuejs/helloworld-blockheight/" class="md-nav__link">
+        Vue.js HelloWorld
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../api/" class="md-nav__link">
+        API Reference
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../compatibility/" class="md-nav__link">
+        Compatibility Table
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          Migration Guides
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Migration Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Migration Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Migration to 12.0.0
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Migration to 12.0.0
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#general" class="md-nav__link">
+    General
+  </a>
+  
+    <nav class="md-nav" aria-label="General">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#universal-rpcaepp-rpcwallet-ae-stamps-are-removed" class="md-nav__link">
+    Universal, RpcAepp, RpcWallet, Ae stamps are removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-rpcclient-browserwindowmessage-classes-are-using-private-fields" class="md-nav__link">
+    Node, RpcClient, BrowserWindowMessage classes are using private fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-combined-exports-are-inlined-requireaeternityaepp-sdkgeneratekeypair" class="md-nav__link">
+    all combined exports are inlined (require('@aeternity/aepp-sdk').generateKeyPair())
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accountbase-and-inheritors-are-classes-now" class="md-nav__link">
+    AccountBase and inheritors are classes now
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chainnode-contract-oracle-aens-generalizedaccount-stamps-not-exported" class="md-nav__link">
+    ChainNode, Contract, Oracle, Aens, GeneralizedAccount stamps not exported
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#node-and-compiler" class="md-nav__link">
+    Node and Compiler
+  </a>
+  
+    <nav class="md-nav" aria-label="Node and Compiler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-compiler-previously-contractcompilerhttp-are-classes-instead-of-a-stamps" class="md-nav__link">
+    Node, Compiler (previously ContractCompilerHttp) are classes instead of a stamps
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-compiler-doesnt-check-version-on-the-first-request-instead-of-init" class="md-nav__link">
+    Node, Compiler doesn't check version on the first request instead of init
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getnetworkid-returns-a-promise" class="md-nav__link">
+    getNetworkId returns a promise
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getnetworkid-ignores-force-option" class="md-nav__link">
+    getNetworkId ignores force option
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-is-removed-in-node" class="md-nav__link">
+    api is removed in Node
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-properties-are-removed-in-node" class="md-nav__link">
+    static properties are removed in Node
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-returns-bigints-for-coin-amount-fields-instead-of-string-or-number" class="md-nav__link">
+    Node returns BigInts for coin amount fields instead of string or number
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-not-accepts-internalurl" class="md-nav__link">
+    Node not accepts internalUrl
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-mempool-method-in-node" class="md-nav__link">
+    removed mempool method in Node
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compilerversion-is-removed-in-compiler" class="md-nav__link">
+    compilerVersion is removed in Compiler
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setcompilerurl-changes-compiler-url-in-sync" class="md-nav__link">
+    setCompilerUrl changes compiler URL in sync
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-of-compiler-requires-options-object-according-to-their-specification" class="md-nav__link">
+    methods of Compiler requires options object according to their specification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-of-compiler-returns-and-accepts-keys-named-in-camelcase-instead-of-snake_case" class="md-nav__link">
+    methods of Compiler returns and accepts keys named in camelCase instead of snake_case
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-builder" class="md-nav__link">
+    Transaction builder
+  </a>
+  
+    <nav class="md-nav" aria-label="Transaction builder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removed-methods-to-generate-a-transaction-of-specific-type" class="md-nav__link">
+    removed methods to generate a transaction of specific type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-ability-to-generate-transaction-on-the-node-side" class="md-nav__link">
+    removed ability to generate transaction on the node side
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nonce-ttl-gas-decoded-and-accepted-as-numbers-instead-of-strings" class="md-nav__link">
+    nonce, ttl, gas decoded and accepted as numbers instead of strings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gas-renamed-to-gaslimit" class="md-nav__link">
+    gas renamed to gasLimit
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unpacktx-not-accepting-transaction-as-buffer-only-as-tx-encoded-string" class="md-nav__link">
+    unpackTx not accepting transaction as Buffer, only as tx-encoded string
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unpacktx-doesnt-have-binary-field-in-result" class="md-nav__link">
+    unpackTx doesn't have binary field in result
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encode-since-the-prefix-is-evaluated-by-the-type-itself-the-required-prefix-parameter" class="md-nav__link">
+    encode: since the prefix is evaluated by the type itself the required prefix parameter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculateminfee-returns-bignumber-instead-of-string" class="md-nav__link">
+    calculateMinFee returns BigNumber instead of string
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fee-helpers-not-exported-anymore-base_gas-gas_per_byte-key_block_interval" class="md-nav__link">
+    Fee helpers not exported anymore (BASE_GAS, GAS_PER_BYTE, KEY_BLOCK_INTERVAL,
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buildrawtx-calculatettl-not-exported-anymore" class="md-nav__link">
+    buildRawTx, calculateTtl not exported anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tx_type-mapped-to-tag-number-instead-of-string" class="md-nav__link">
+    TX_TYPE mapped to tag (number) instead of string
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object_id_tx_type-not-exported-anymore" class="md-nav__link">
+    OBJECT_ID_TX_TYPE not exported anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tx_serialization_schema-combined-with-tx_deserialization_schema" class="md-nav__link">
+    TX_SERIALIZATION_SCHEMA combined with TX_DESERIALIZATION_SCHEMA
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transaction-schemas-doesnt-contain-tag-anymore" class="md-nav__link">
+    Transaction schemas doesn't contain tag anymore
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aens" class="md-nav__link">
+    AENS
+  </a>
+  
+    <nav class="md-nav" aria-label="AENS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#computebidfee-accepts-startfee-increment-as-options" class="md-nav__link">
+    computeBidFee accepts startFee, increment as options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#name_bid_timeouts-not-exposed-anymore" class="md-nav__link">
+    NAME_BID_TIMEOUTS not exposed anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#computeauctionendblock-accepts-and-returns-height-as-number" class="md-nav__link">
+    computeAuctionEndBlock accepts and returns height as number
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-ensurenamevalid" class="md-nav__link">
+    removed ensureNameValid
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nameupdate-namerevoke-doesnt-accept-address-in-onaccount" class="md-nav__link">
+    name.update, name.revoke doesn't accept address in onAccount
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oracle" class="md-nav__link">
+    Oracle
+  </a>
+  
+    <nav class="md-nav" aria-label="Oracle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#extendoraclettl-accepts-oracle-ttl-in-oraclettltype-and-oraclettlvalue-fields" class="md-nav__link">
+    extendOracleTtl accepts oracle ttl in oracleTtlType and oracleTtlValue fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-method-of-getqueryobject-removed" class="md-nav__link">
+    decode method of getQueryObject removed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract" class="md-nav__link">
+    Contract
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#createaensdelegationsignature-first-argument-not-an-object" class="md-nav__link">
+    createAensDelegationSignature first argument not an object
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#createoracledelegationsignature-first-argument-not-an-object" class="md-nav__link">
+    createOracleDelegationSignature first argument not an object
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments-in-creategeneralizedaccount-is-required" class="md-nav__link">
+    call arguments in createGeneralizedAccount is required
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesystem-option-renamed-to-filesystem" class="md-nav__link">
+    filesystem option renamed to fileSystem
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contract-instance-doesnt-accept-address-in-onaccount" class="md-nav__link">
+    Contract instance doesn't accept address in onAccount
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chain" class="md-nav__link">
+    Chain
+  </a>
+  
+    <nav class="md-nav" aria-label="Chain">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removed-balance-method" class="md-nav__link">
+    removed balance method
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-tx-method" class="md-nav__link">
+    removed tx method
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-gettxinfo-method" class="md-nav__link">
+    removed getTxInfo method
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other" class="md-nav__link">
+    Other
+  </a>
+  
+    <nav class="md-nav" aria-label="Other">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#getaccountnonce-removed" class="md-nav__link">
+    getAccountNonce removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aesdk-doesnt-accept-array-of-accounts" class="md-nav__link">
+    AeSdk doesn't accept array of accounts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#destroyinstance-method-removed" class="md-nav__link">
+    destroyInstance method removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodepool-is-removed" class="md-nav__link">
+    NodePool is removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accountmultiple-is-removed" class="md-nav__link">
+    AccountMultiple is removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#denomination_magnitude-not-exposed-anymore" class="md-nav__link">
+    DENOMINATION_MAGNITUDE not exposed anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-result-of-unpacktx-returned-instead-of-txobject" class="md-nav__link">
+    The result of unpackTx returned instead of TxObject
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validatekeyobj-removed" class="md-nav__link">
+    validateKeyObj removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#derivekeyusingargon2id-removed" class="md-nav__link">
+    deriveKeyUsingArgon2id removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-extra-implementation-of-getaddressfrompriv-in-keystore" class="md-nav__link">
+    removed extra implementation of getAddressFromPriv in keystore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#genswaggerclient-removed" class="md-nav__link">
+    genSwaggerClient removed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aepp-wallet-communication" class="md-nav__link">
+    Aepp Wallet communication
+  </a>
+  
+    <nav class="md-nav" aria-label="Aepp Wallet communication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#browserruntimeconnection-browserwindowmessageconnection-are-classes" class="md-nav__link">
+    BrowserRuntimeConnection, BrowserWindowMessageConnection are classes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contentscriptbridge-walletdetector-rewrited-to-plain-functions" class="md-nav__link">
+    ContentScriptBridge, WalletDetector rewrited to plain functions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-removed-origin-property" class="md-nav__link">
+    RpcClient: removed origin property
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-sendmessage-is-a-private-method" class="md-nav__link">
+    RpcClient: sendMessage is a private method
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-handlers-parameter-is-removed" class="md-nav__link">
+    RpcClient: handlers parameter is removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-doesnt-contain-aepp-info-anymore" class="md-nav__link">
+    RpcClient: doesn't contain aepp info anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-doesnt-contain-networkid-anymore" class="md-nav__link">
+    RpcClient: doesn't contain networkId anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpc-helpers-are-not-exposed-anymore-isiniframe-sendmessage-gethandler-message" class="md-nav__link">
+    RPC helpers are not exposed anymore (isInIframe, sendMessage, getHandler, message,
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aepp" class="md-nav__link">
+    Aepp
+  </a>
+  
+    <nav class="md-nav" aria-label="Aepp">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#connecttowallet-accepts-wallet-connection-as-the-first-argument" class="md-nav__link">
+    connectToWallet accepts wallet connection as the first argument
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disconnectwallet-runs-in-sync-and-senddisconnect-arg-removed" class="md-nav__link">
+    disconnectWallet runs in sync and sendDisconnect arg removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendconnectrequest-removed" class="md-nav__link">
+    sendConnectRequest removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#doesnt-accept-connection-anymore" class="md-nav__link">
+    doesn't accept connection anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-isconnected-issubscribedaccount-methods" class="md-nav__link">
+    removed isConnected, isSubscribedAccount methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#signmessage-returns-buffer-by-default" class="md-nav__link">
+    signMessage returns Buffer by default
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wallet" class="md-nav__link">
+    Wallet
+  </a>
+  
+    <nav class="md-nav" aria-label="Wallet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#browserruntimeconnection-requires-port-parameter" class="md-nav__link">
+    BrowserRuntimeConnection requires port parameter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requires-id-type-in-params" class="md-nav__link">
+    requires id, type in params
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getbrowserapi-helper-removed" class="md-nav__link">
+    getBrowserAPI helper removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sharewalletinfo-accepts-rpc-client-id-instead-of-callback" class="md-nav__link">
+    shareWalletInfo accepts rpc client id instead of callback
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sharenode-argument-in-accept-callback-of-onconnection-removed" class="md-nav__link">
+    shareNode argument in accept callback of onConnection removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cant-handle-specific-set-of-accounts-for-an-app" class="md-nav__link">
+    can't handle specific set of accounts for an app
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#txobject-parameter-of-onsign-callback-is-removed" class="md-nav__link">
+    txObject parameter of onSign callback is removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclients-in-wallet-is-not-exposed-anymore" class="md-nav__link">
+    rpcClients in wallet is not exposed anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ondisconnect-callback-on-wallet-side-accepts-client-id-instead-of-rpcclient" class="md-nav__link">
+    onDisconnect callback on wallet side accepts client id instead of RpcClient
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wallet-cant-selectively-notify-aepps-about-selectingadding-account" class="md-nav__link">
+    wallet can't selectively notify aepps about selecting/adding account
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wallet-cant-provide-metadata-for-accounts" class="md-nav__link">
+    wallet can't provide metadata for accounts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-actionaccept-in-permission-callbacks" class="md-nav__link">
+    removed action.accept in permission callbacks
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-actiondeny-in-permission-callbacks" class="md-nav__link">
+    removed action.deny in permission callbacks
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#callbacks-accept-client-id-params-and-origin" class="md-nav__link">
+    callbacks accept client id, params, and origin
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11.0.0/" class="md-nav__link">
+        Migration to 11.0.0
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10.0.0/" class="md-nav__link">
+        Migration to 10.0.0
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9.0.0/" class="md-nav__link">
+        Migration to 9.0.0
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.0.0/" class="md-nav__link">
+        Migration to 7.0.0
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10">
+          Contribute
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Contribute" data-md-level="1">
+        <label class="md-nav__title" for="__nav_10">
+          <span class="md-nav__icon md-icon"></span>
+          Contribute
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contrib/" class="md-nav__link">
+        Development
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contrib/releases/" class="md-nav__link">
+        Releases
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#general" class="md-nav__link">
+    General
+  </a>
+  
+    <nav class="md-nav" aria-label="General">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#universal-rpcaepp-rpcwallet-ae-stamps-are-removed" class="md-nav__link">
+    Universal, RpcAepp, RpcWallet, Ae stamps are removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-rpcclient-browserwindowmessage-classes-are-using-private-fields" class="md-nav__link">
+    Node, RpcClient, BrowserWindowMessage classes are using private fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-combined-exports-are-inlined-requireaeternityaepp-sdkgeneratekeypair" class="md-nav__link">
+    all combined exports are inlined (require('@aeternity/aepp-sdk').generateKeyPair())
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accountbase-and-inheritors-are-classes-now" class="md-nav__link">
+    AccountBase and inheritors are classes now
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chainnode-contract-oracle-aens-generalizedaccount-stamps-not-exported" class="md-nav__link">
+    ChainNode, Contract, Oracle, Aens, GeneralizedAccount stamps not exported
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#node-and-compiler" class="md-nav__link">
+    Node and Compiler
+  </a>
+  
+    <nav class="md-nav" aria-label="Node and Compiler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-compiler-previously-contractcompilerhttp-are-classes-instead-of-a-stamps" class="md-nav__link">
+    Node, Compiler (previously ContractCompilerHttp) are classes instead of a stamps
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-compiler-doesnt-check-version-on-the-first-request-instead-of-init" class="md-nav__link">
+    Node, Compiler doesn't check version on the first request instead of init
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getnetworkid-returns-a-promise" class="md-nav__link">
+    getNetworkId returns a promise
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getnetworkid-ignores-force-option" class="md-nav__link">
+    getNetworkId ignores force option
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-is-removed-in-node" class="md-nav__link">
+    api is removed in Node
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-properties-are-removed-in-node" class="md-nav__link">
+    static properties are removed in Node
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-returns-bigints-for-coin-amount-fields-instead-of-string-or-number" class="md-nav__link">
+    Node returns BigInts for coin amount fields instead of string or number
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-not-accepts-internalurl" class="md-nav__link">
+    Node not accepts internalUrl
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-mempool-method-in-node" class="md-nav__link">
+    removed mempool method in Node
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compilerversion-is-removed-in-compiler" class="md-nav__link">
+    compilerVersion is removed in Compiler
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setcompilerurl-changes-compiler-url-in-sync" class="md-nav__link">
+    setCompilerUrl changes compiler URL in sync
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-of-compiler-requires-options-object-according-to-their-specification" class="md-nav__link">
+    methods of Compiler requires options object according to their specification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-of-compiler-returns-and-accepts-keys-named-in-camelcase-instead-of-snake_case" class="md-nav__link">
+    methods of Compiler returns and accepts keys named in camelCase instead of snake_case
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-builder" class="md-nav__link">
+    Transaction builder
+  </a>
+  
+    <nav class="md-nav" aria-label="Transaction builder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removed-methods-to-generate-a-transaction-of-specific-type" class="md-nav__link">
+    removed methods to generate a transaction of specific type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-ability-to-generate-transaction-on-the-node-side" class="md-nav__link">
+    removed ability to generate transaction on the node side
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nonce-ttl-gas-decoded-and-accepted-as-numbers-instead-of-strings" class="md-nav__link">
+    nonce, ttl, gas decoded and accepted as numbers instead of strings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gas-renamed-to-gaslimit" class="md-nav__link">
+    gas renamed to gasLimit
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unpacktx-not-accepting-transaction-as-buffer-only-as-tx-encoded-string" class="md-nav__link">
+    unpackTx not accepting transaction as Buffer, only as tx-encoded string
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unpacktx-doesnt-have-binary-field-in-result" class="md-nav__link">
+    unpackTx doesn't have binary field in result
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encode-since-the-prefix-is-evaluated-by-the-type-itself-the-required-prefix-parameter" class="md-nav__link">
+    encode: since the prefix is evaluated by the type itself the required prefix parameter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculateminfee-returns-bignumber-instead-of-string" class="md-nav__link">
+    calculateMinFee returns BigNumber instead of string
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fee-helpers-not-exported-anymore-base_gas-gas_per_byte-key_block_interval" class="md-nav__link">
+    Fee helpers not exported anymore (BASE_GAS, GAS_PER_BYTE, KEY_BLOCK_INTERVAL,
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buildrawtx-calculatettl-not-exported-anymore" class="md-nav__link">
+    buildRawTx, calculateTtl not exported anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tx_type-mapped-to-tag-number-instead-of-string" class="md-nav__link">
+    TX_TYPE mapped to tag (number) instead of string
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object_id_tx_type-not-exported-anymore" class="md-nav__link">
+    OBJECT_ID_TX_TYPE not exported anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tx_serialization_schema-combined-with-tx_deserialization_schema" class="md-nav__link">
+    TX_SERIALIZATION_SCHEMA combined with TX_DESERIALIZATION_SCHEMA
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transaction-schemas-doesnt-contain-tag-anymore" class="md-nav__link">
+    Transaction schemas doesn't contain tag anymore
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aens" class="md-nav__link">
+    AENS
+  </a>
+  
+    <nav class="md-nav" aria-label="AENS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#computebidfee-accepts-startfee-increment-as-options" class="md-nav__link">
+    computeBidFee accepts startFee, increment as options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#name_bid_timeouts-not-exposed-anymore" class="md-nav__link">
+    NAME_BID_TIMEOUTS not exposed anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#computeauctionendblock-accepts-and-returns-height-as-number" class="md-nav__link">
+    computeAuctionEndBlock accepts and returns height as number
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-ensurenamevalid" class="md-nav__link">
+    removed ensureNameValid
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nameupdate-namerevoke-doesnt-accept-address-in-onaccount" class="md-nav__link">
+    name.update, name.revoke doesn't accept address in onAccount
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oracle" class="md-nav__link">
+    Oracle
+  </a>
+  
+    <nav class="md-nav" aria-label="Oracle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#extendoraclettl-accepts-oracle-ttl-in-oraclettltype-and-oraclettlvalue-fields" class="md-nav__link">
+    extendOracleTtl accepts oracle ttl in oracleTtlType and oracleTtlValue fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-method-of-getqueryobject-removed" class="md-nav__link">
+    decode method of getQueryObject removed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract" class="md-nav__link">
+    Contract
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#createaensdelegationsignature-first-argument-not-an-object" class="md-nav__link">
+    createAensDelegationSignature first argument not an object
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#createoracledelegationsignature-first-argument-not-an-object" class="md-nav__link">
+    createOracleDelegationSignature first argument not an object
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-arguments-in-creategeneralizedaccount-is-required" class="md-nav__link">
+    call arguments in createGeneralizedAccount is required
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesystem-option-renamed-to-filesystem" class="md-nav__link">
+    filesystem option renamed to fileSystem
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contract-instance-doesnt-accept-address-in-onaccount" class="md-nav__link">
+    Contract instance doesn't accept address in onAccount
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chain" class="md-nav__link">
+    Chain
+  </a>
+  
+    <nav class="md-nav" aria-label="Chain">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removed-balance-method" class="md-nav__link">
+    removed balance method
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-tx-method" class="md-nav__link">
+    removed tx method
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-gettxinfo-method" class="md-nav__link">
+    removed getTxInfo method
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other" class="md-nav__link">
+    Other
+  </a>
+  
+    <nav class="md-nav" aria-label="Other">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#getaccountnonce-removed" class="md-nav__link">
+    getAccountNonce removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aesdk-doesnt-accept-array-of-accounts" class="md-nav__link">
+    AeSdk doesn't accept array of accounts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#destroyinstance-method-removed" class="md-nav__link">
+    destroyInstance method removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodepool-is-removed" class="md-nav__link">
+    NodePool is removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accountmultiple-is-removed" class="md-nav__link">
+    AccountMultiple is removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#denomination_magnitude-not-exposed-anymore" class="md-nav__link">
+    DENOMINATION_MAGNITUDE not exposed anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-result-of-unpacktx-returned-instead-of-txobject" class="md-nav__link">
+    The result of unpackTx returned instead of TxObject
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validatekeyobj-removed" class="md-nav__link">
+    validateKeyObj removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#derivekeyusingargon2id-removed" class="md-nav__link">
+    deriveKeyUsingArgon2id removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-extra-implementation-of-getaddressfrompriv-in-keystore" class="md-nav__link">
+    removed extra implementation of getAddressFromPriv in keystore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#genswaggerclient-removed" class="md-nav__link">
+    genSwaggerClient removed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aepp-wallet-communication" class="md-nav__link">
+    Aepp Wallet communication
+  </a>
+  
+    <nav class="md-nav" aria-label="Aepp Wallet communication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#browserruntimeconnection-browserwindowmessageconnection-are-classes" class="md-nav__link">
+    BrowserRuntimeConnection, BrowserWindowMessageConnection are classes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contentscriptbridge-walletdetector-rewrited-to-plain-functions" class="md-nav__link">
+    ContentScriptBridge, WalletDetector rewrited to plain functions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-removed-origin-property" class="md-nav__link">
+    RpcClient: removed origin property
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-sendmessage-is-a-private-method" class="md-nav__link">
+    RpcClient: sendMessage is a private method
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-handlers-parameter-is-removed" class="md-nav__link">
+    RpcClient: handlers parameter is removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-doesnt-contain-aepp-info-anymore" class="md-nav__link">
+    RpcClient: doesn't contain aepp info anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclient-doesnt-contain-networkid-anymore" class="md-nav__link">
+    RpcClient: doesn't contain networkId anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpc-helpers-are-not-exposed-anymore-isiniframe-sendmessage-gethandler-message" class="md-nav__link">
+    RPC helpers are not exposed anymore (isInIframe, sendMessage, getHandler, message,
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aepp" class="md-nav__link">
+    Aepp
+  </a>
+  
+    <nav class="md-nav" aria-label="Aepp">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#connecttowallet-accepts-wallet-connection-as-the-first-argument" class="md-nav__link">
+    connectToWallet accepts wallet connection as the first argument
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disconnectwallet-runs-in-sync-and-senddisconnect-arg-removed" class="md-nav__link">
+    disconnectWallet runs in sync and sendDisconnect arg removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendconnectrequest-removed" class="md-nav__link">
+    sendConnectRequest removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#doesnt-accept-connection-anymore" class="md-nav__link">
+    doesn't accept connection anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-isconnected-issubscribedaccount-methods" class="md-nav__link">
+    removed isConnected, isSubscribedAccount methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#signmessage-returns-buffer-by-default" class="md-nav__link">
+    signMessage returns Buffer by default
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wallet" class="md-nav__link">
+    Wallet
+  </a>
+  
+    <nav class="md-nav" aria-label="Wallet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#browserruntimeconnection-requires-port-parameter" class="md-nav__link">
+    BrowserRuntimeConnection requires port parameter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requires-id-type-in-params" class="md-nav__link">
+    requires id, type in params
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getbrowserapi-helper-removed" class="md-nav__link">
+    getBrowserAPI helper removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sharewalletinfo-accepts-rpc-client-id-instead-of-callback" class="md-nav__link">
+    shareWalletInfo accepts rpc client id instead of callback
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sharenode-argument-in-accept-callback-of-onconnection-removed" class="md-nav__link">
+    shareNode argument in accept callback of onConnection removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cant-handle-specific-set-of-accounts-for-an-app" class="md-nav__link">
+    can't handle specific set of accounts for an app
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#txobject-parameter-of-onsign-callback-is-removed" class="md-nav__link">
+    txObject parameter of onSign callback is removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpcclients-in-wallet-is-not-exposed-anymore" class="md-nav__link">
+    rpcClients in wallet is not exposed anymore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ondisconnect-callback-on-wallet-side-accepts-client-id-instead-of-rpcclient" class="md-nav__link">
+    onDisconnect callback on wallet side accepts client id instead of RpcClient
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wallet-cant-selectively-notify-aepps-about-selectingadding-account" class="md-nav__link">
+    wallet can't selectively notify aepps about selecting/adding account
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wallet-cant-provide-metadata-for-accounts" class="md-nav__link">
+    wallet can't provide metadata for accounts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-actionaccept-in-permission-callbacks" class="md-nav__link">
+    removed action.accept in permission callbacks
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-actiondeny-in-permission-callbacks" class="md-nav__link">
+    removed action.deny in permission callbacks
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#callbacks-accept-client-id-params-and-origin" class="md-nav__link">
+    callbacks accept client id, params, and origin
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+<h1 id="migration-to-1200">Migration to 12.0.0</h1>
+<p>This guide describes all breaking changes introduced with <code>v12.0.0</code>.</p>
+<h2 id="general">General</h2>
+<h4 id="universal-rpcaepp-rpcwallet-ae-stamps-are-removed"><code>Universal</code>, <code>RpcAepp</code>, <code>RpcWallet</code>, <code>Ae</code> stamps are removed</h4>
+<p>Use <code>AeSdk</code>, <code>AeSdkAepp</code>, <code>AeSdkWallet</code>, <code>AeSdbBase</code> accordingly.
+For example:
+<div class="highlight"><pre><span></span><code><span class="gd">-import { Universal } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+<span class="gi">+import { AeSdk } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+
+<span class="gd">-const aeSdk = await Universal(options)</span><span class="w"></span>
+<span class="gi">+const aeSdk = new AeSdk(options)</span><span class="w"></span>
+</code></pre></div></p>
+<h4 id="node-rpcclient-browserwindowmessage-classes-are-using-private-fields"><code>Node</code>, <code>RpcClient</code>, <code>BrowserWindowMessage</code> classes are using private fields</h4>
+<p>Accessing private fields through <code>Proxy</code> will lead to "TypeError: attempted to set private
+field on non-instance" (<a href="https://github.com/tc39/proposal-class-fields/issues/106">tc39</a>).
+This may be an issue if you are using aepp-sdk with Vue@3, because Vue@3 introduced reactivity based
+on <code>Proxy</code> class (<a href="https://vuejs.org/guide/extras/reactivity-in-depth.html#how-reactivity-works-in-vue">Vue docs</a>).
+Avoid the above error by not making instances of these classes reactive.</p>
+<h4 id="all-combined-exports-are-inlined-requireaeternityaepp-sdkgeneratekeypair">all combined exports are inlined (<code>require('@aeternity/aepp-sdk').generateKeyPair()</code>)</h4>
+<p>Import the needed utils directly instead of importing a wrapper object firstly.
+For example:
+<div class="highlight"><pre><span></span><code><span class="gd">-import { Crypto } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+<span class="gi">+import { generateKeyPair } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+
+<span class="gd">-console.log(Crypto.generateKeyPair())</span><span class="w"></span>
+<span class="gi">+console.log(generateKeyPair())</span><span class="w"></span>
+</code></pre></div></p>
+<h4 id="accountbase-and-inheritors-are-classes-now"><code>AccountBase</code> and inheritors are classes now</h4>
+<p>Use <code>new</code> to create an instance.</p>
+<h4 id="chainnode-contract-oracle-aens-generalizedaccount-stamps-not-exported"><code>ChainNode</code>, <code>Contract</code>, <code>Oracle</code>, <code>Aens</code>, <code>GeneralizedAccount</code> stamps not exported</h4>
+<p>Their methods exported instead. Outside of <code>AeSdkBase</code> context, they may accept <code>onAccount</code>,
+<code>onNode</code>, <code>onCompiler</code> options.</p>
+<h2 id="node-and-compiler">Node and Compiler</h2>
+<h4 id="node-compiler-previously-contractcompilerhttp-are-classes-instead-of-a-stamps"><code>Node</code>, <code>Compiler</code> (previously <code>ContractCompilerHttp</code>) are classes instead of a stamps</h4>
+<p>For example:
+<div class="highlight"><pre><span></span><code><span class="w">import { Node } from &#39;@aeternity/aepp-sdk&#39;</span>
+
+<span class="gd">-const node = await Node({ url, ignoreVersion: false })</span><span class="w"></span>
+<span class="gi">+const node = new Node(url, { ignoreVersion: false })</span><span class="w"></span>
+</code></pre></div></p>
+<h4 id="node-compiler-doesnt-check-version-on-the-first-request-instead-of-init"><code>Node</code>, <code>Compiler</code> doesn't check version on the first request instead of init</h4>
+<p>Don't handle <code>new Node(...)</code> and <code>new Compiler(...)</code> as a <code>Promise</code>.</p>
+<h4 id="getnetworkid-returns-a-promise"><code>getNetworkId</code> returns a promise</h4>
+<h4 id="getnetworkid-ignores-force-option"><code>getNetworkId</code> ignores <code>force</code> option</h4>
+<p>So, it would throw exception in case networkId is not provided. Use <code>try/catch</code> instead.</p>
+<h4 id="api-is-removed-in-node"><code>api</code> is removed in <code>Node</code></h4>
+<p>Use <code>node.getBalance</code> instead of <code>node.api.getBalance.</code></p>
+<h4 id="static-properties-are-removed-in-node">static properties are removed in <code>Node</code></h4>
+<p>Use <code>node.getStatus()</code> or <code>node.getNodeInfo()</code> to get values of <code>version</code>, <code>revision</code>,
+<code>genesisHash</code>, <code>nodeNetworkId</code>, <code>consensusProtocolVersion</code>.</p>
+<h4 id="node-returns-bigints-for-coin-amount-fields-instead-of-string-or-number"><code>Node</code> returns BigInts for coin amount fields instead of string or number</h4>
+<h4 id="node-not-accepts-internalurl"><code>Node</code> not accepts <code>internalUrl</code></h4>
+<p><code>Node</code> doesn't accepts and stores <code>internalUrl</code>, also internal endpoints are not available anymore.
+If necessary, create a wrapper of internal API separately (<code>swagger-client</code> package).</p>
+<h4 id="removed-mempool-method-in-node">removed <code>mempool</code> method in <code>Node</code></h4>
+<p>Create a wrapper of internal API by <code>genSwaggerClient</code> and use <code>getPendingTransactions</code> method
+instead.</p>
+<h4 id="compilerversion-is-removed-in-compiler"><code>compilerVersion</code> is removed in <code>Compiler</code></h4>
+<p>Use <code>compilerApi.aPIVersion()</code> method instead.</p>
+<h4 id="setcompilerurl-changes-compiler-url-in-sync"><code>setCompilerUrl</code> changes compiler URL in sync</h4>
+<p>Don't handle <code>aeSdk.setCompilerUrl(...)</code> as a <code>Promise</code>.</p>
+<h4 id="methods-of-compiler-requires-options-object-according-to-their-specification">methods of <code>Compiler</code> requires <code>options</code> object according to their specification</h4>
+<h4 id="methods-of-compiler-returns-and-accepts-keys-named-in-camelcase-instead-of-snake_case">methods of <code>Compiler</code> returns and accepts keys named in camelCase instead of snake_case</h4>
+<h2 id="transaction-builder">Transaction builder</h2>
+<h4 id="removed-methods-to-generate-a-transaction-of-specific-type">removed methods to generate a transaction of specific type</h4>
+<p>Use <code>aeSdk.buildTx(txType, params)</code> instead.</p>
+<h4 id="removed-ability-to-generate-transaction-on-the-node-side">removed ability to generate transaction on the node side</h4>
+<p>Use <code>aeSdk.buildTx(txType, params)</code> instead.</p>
+<h4 id="nonce-ttl-gas-decoded-and-accepted-as-numbers-instead-of-strings"><code>nonce</code>, <code>ttl</code>, <code>gas</code> decoded and accepted as numbers instead of strings</h4>
+<h4 id="gas-renamed-to-gaslimit"><code>gas</code> renamed to <code>gasLimit</code></h4>
+<p>Use <code>gasLimit</code> instead of <code>gas</code> everywhere except for transaction details returned by node.</p>
+<h4 id="unpacktx-not-accepting-transaction-as-buffer-only-as-tx-encoded-string"><code>unpackTx</code> not accepting transaction as <code>Buffer</code>, only as tx-encoded string</h4>
+<p>Use <code>unpackTx(encode(tx, 'tx'))</code> instead.</p>
+<h4 id="unpacktx-doesnt-have-binary-field-in-result"><code>unpackTx</code> doesn't have <code>binary</code> field in result</h4>
+<p>Use <code>require('rlp').decode(unpackTx(tx).rlpEncoded)</code> instead.</p>
+<h4 id="encode-since-the-prefix-is-evaluated-by-the-type-itself-the-required-prefix-parameter"><strong>encode:</strong> since the prefix is evaluated by the type itself the required prefix parameter</h4>
+<p>is no more accepted
+For example:
+<div class="highlight"><pre><span></span><code><span class="gd">-decode(&#39;cb_DA6sWJo=&#39;, &#39;cb&#39;)</span><span class="w"></span>
+<span class="gi">+decode(&#39;cb_DA6sWJo=&#39;)</span><span class="w"></span>
+</code></pre></div></p>
+<h4 id="calculateminfee-returns-bignumber-instead-of-string"><code>calculateMinFee</code> returns BigNumber instead of string</h4>
+<h4 id="fee-helpers-not-exported-anymore-base_gas-gas_per_byte-key_block_interval">Fee helpers not exported anymore (<code>BASE_GAS</code>, <code>GAS_PER_BYTE</code>, <code>KEY_BLOCK_INTERVAL</code>,</h4>
+<p><code>TX_FEE_BASE_GAS</code>, <code>TX_FEE_OTHER_GAS</code>, <code>calculateFee</code>, <code>DEFAULT_FEE</code>)
+Use a general <code>calculateMinFee</code> instead.</p>
+<h4 id="buildrawtx-calculatettl-not-exported-anymore"><code>buildRawTx</code>, <code>calculateTtl</code> not exported anymore</h4>
+<p>Use a general <code>buildTx</code> method instead.</p>
+<h4 id="tx_type-mapped-to-tag-number-instead-of-string"><code>TX_TYPE</code> mapped to tag (number) instead of string</h4>
+<p>Always use <code>TX_TYPE</code>. To get type name by tag use <code>TX_TYPE[tag]</code>.</p>
+<h4 id="object_id_tx_type-not-exported-anymore"><code>OBJECT_ID_TX_TYPE</code> not exported anymore</h4>
+<p>Use <code>TX_TYPE[tag]</code> instead.</p>
+<h4 id="tx_serialization_schema-combined-with-tx_deserialization_schema"><code>TX_SERIALIZATION_SCHEMA</code> combined with <code>TX_DESERIALIZATION_SCHEMA</code></h4>
+<p>Use <code>TX_SCHEMA[TX_TYPE.*]</code> instead.</p>
+<h4 id="transaction-schemas-doesnt-contain-tag-anymore">Transaction schemas doesn't contain tag anymore</h4>
+<p>Use <code>OBJECT_ID_TX_TYPE</code> to find tag by transaction type.</p>
+<h2 id="aens">AENS</h2>
+<h4 id="computebidfee-accepts-startfee-increment-as-options"><code>computeBidFee</code> accepts <code>startFee</code>, <code>increment</code> as options</h4>
+<h4 id="name_bid_timeouts-not-exposed-anymore"><code>NAME_BID_TIMEOUTS</code> not exposed anymore</h4>
+<p>Use <code>computeAuctionEndBlock</code> function instead.</p>
+<h4 id="computeauctionendblock-accepts-and-returns-height-as-number"><code>computeAuctionEndBlock</code> accepts and returns height as number</h4>
+<h4 id="removed-ensurenamevalid">removed <code>ensureNameValid</code></h4>
+<p>Use a TypeScript check instead.</p>
+<h4 id="nameupdate-namerevoke-doesnt-accept-address-in-onaccount"><code>name.update</code>, <code>name.revoke</code> doesn't accept address in <code>onAccount</code></h4>
+<p>Pass an instance of <code>AccountBase</code> to <code>onAccount</code> option instead.</p>
+<h2 id="oracle">Oracle</h2>
+<h4 id="extendoraclettl-accepts-oracle-ttl-in-oraclettltype-and-oraclettlvalue-fields"><code>extendOracleTtl</code> accepts oracle ttl in <code>oracleTtlType</code> and <code>oracleTtlValue</code> fields</h4>
+<p>Use <code>oracleTtlType</code> field instead of <code>type</code>, and <code>oracleTtlValue</code> field instead of <code>value</code>.</p>
+<h4 id="decode-method-of-getqueryobject-removed"><code>decode</code> method of <code>getQueryObject</code> removed</h4>
+<p>Use <code>decode</code> function instead.</p>
+<h2 id="contract">Contract</h2>
+<h4 id="createaensdelegationsignature-first-argument-not-an-object"><code>createAensDelegationSignature</code> first argument not an object</h4>
+<p><code>contractId</code> accepted as the first argument, <code>name</code> should be passed as option to the second one.</p>
+<h4 id="createoracledelegationsignature-first-argument-not-an-object"><code>createOracleDelegationSignature</code> first argument not an object</h4>
+<p><code>contractId</code> accepted as the first argument, <code>queryId</code> should be passed as option to the second one.</p>
+<h4 id="call-arguments-in-creategeneralizedaccount-is-required">call arguments in <code>createGeneralizedAccount</code> is required</h4>
+<p>Pass an empty array if you need no arguments.</p>
+<h4 id="filesystem-option-renamed-to-filesystem"><code>filesystem</code> option renamed to <code>fileSystem</code></h4>
+<h4 id="contract-instance-doesnt-accept-address-in-onaccount">Contract instance doesn't accept address in <code>onAccount</code></h4>
+<p>It should be an instance of <code>AccountBase</code> instead.</p>
+<h2 id="chain">Chain</h2>
+<h4 id="removed-balance-method">removed <code>balance</code> method</h4>
+<p>Use <code>getBalance</code> instead.</p>
+<h4 id="removed-tx-method">removed <code>tx</code> method</h4>
+<p>Use <code>node.getTransactionByHash/getTransactionInfoByHash</code> instead.</p>
+<h4 id="removed-gettxinfo-method">removed <code>getTxInfo</code> method</h4>
+<p>Use <code>node.getTransactionInfoByHash</code> instead.</p>
+<h2 id="other">Other</h2>
+<h4 id="getaccountnonce-removed"><code>getAccountNonce</code> removed</h4>
+<p>Use <code>node.getAccountNextNonce</code> instead.</p>
+<h4 id="aesdk-doesnt-accept-array-of-accounts"><code>AeSdk</code> doesn't accept array of accounts</h4>
+<p>Use <code>aeSdk.addAccount</code> method instead.</p>
+<h4 id="destroyinstance-method-removed"><code>destroyInstance</code> method removed</h4>
+<p>It wasn't doing anything, just remove it's usages.</p>
+<h4 id="nodepool-is-removed"><code>NodePool</code> is removed</h4>
+<p>Use <code>AeSdkBase</code> or <code>AeSdk</code> instead.</p>
+<h4 id="accountmultiple-is-removed"><code>AccountMultiple</code> is removed</h4>
+<p>Use <code>AeSdk</code> instead.</p>
+<h4 id="denomination_magnitude-not-exposed-anymore"><code>DENOMINATION_MAGNITUDE</code> not exposed anymore</h4>
+<p>It is intended for internal use only.</p>
+<h4 id="the-result-of-unpacktx-returned-instead-of-txobject">The result of <code>unpackTx</code> returned instead of <code>TxObject</code></h4>
+<p>In <code>txObject</code> option of <code>onSign</code> handler on wallet side.
+In <code>tx</code> field of contract call result.</p>
+<h4 id="validatekeyobj-removed"><code>validateKeyObj</code> removed</h4>
+<p>Rely on TypeScript checks instead.</p>
+<h4 id="derivekeyusingargon2id-removed"><code>deriveKeyUsingArgon2id</code> removed</h4>
+<p>Use <code>argon2-browser</code> package instead.</p>
+<h4 id="removed-extra-implementation-of-getaddressfrompriv-in-keystore">removed extra implementation of <code>getAddressFromPriv</code> in keystore</h4>
+<p>Use <code>Crypto.getAddressFromPriv</code> instead.</p>
+<h4 id="genswaggerclient-removed"><code>genSwaggerClient</code> removed</h4>
+<p>Use <code>swagger-client</code> package instead.</p>
+<h2 id="aepp-wallet-communication">Aepp Wallet communication</h2>
+<h4 id="browserruntimeconnection-browserwindowmessageconnection-are-classes">BrowserRuntimeConnection, BrowserWindowMessageConnection are classes</h4>
+<p>Create instances using new.</p>
+<h4 id="contentscriptbridge-walletdetector-rewrited-to-plain-functions">ContentScriptBridge, WalletDetector rewrited to plain functions</h4>
+<p>Use <code>connectionProxy</code>, <code>walletDetector</code> accordingly.</p>
+<h4 id="rpcclient-removed-origin-property"><strong>RpcClient:</strong> removed <code>origin</code> property</h4>
+<p>Use <code>connection</code> property instead.</p>
+<h4 id="rpcclient-sendmessage-is-a-private-method"><strong>RpcClient:</strong> <code>sendMessage</code> is a private method</h4>
+<p>Use <code>request</code> or <code>notify</code> instead.</p>
+<h4 id="rpcclient-handlers-parameter-is-removed"><strong>RpcClient:</strong> <code>handlers</code> parameter is removed</h4>
+<p>Provide a <code>methods</code> parameter instead of <code>handlers[0]</code>.
+Provide an <code>onDisconnect</code> parameter instead of <code>handlers[1]</code>.</p>
+<h4 id="rpcclient-doesnt-contain-aepp-info-anymore"><strong>RpcClient:</strong> doesn't contain aepp info anymore</h4>
+<p>Get aepp info in <code>onConnection</code> callback, and store somehow to use later.</p>
+<h4 id="rpcclient-doesnt-contain-networkid-anymore"><strong>RpcClient:</strong> doesn't contain <code>networkId</code> anymore</h4>
+<p>On wallet side: assume that all aepps uses the same network as the wallet connected to.
+On aepp side: use <code>networkId</code> that wallet provided.
+In case <code>networkId</code> is not compatible ask user to switch wallet to a compatible network.</p>
+<h4 id="rpc-helpers-are-not-exposed-anymore-isiniframe-sendmessage-gethandler-message">RPC helpers are not exposed anymore (<code>isInIframe</code>, <code>sendMessage</code>, <code>getHandler</code>, <code>message</code>,</h4>
+<p><code>responseMessage</code>, <code>sendResponseMessage</code>, <code>isValidAccounts</code>)
+Use own implementation if needed.</p>
+<h2 id="aepp">Aepp</h2>
+<h4 id="connecttowallet-accepts-wallet-connection-as-the-first-argument"><code>connectToWallet</code> accepts wallet connection as the first argument</h4>
+<p>See <a href="../../connect-aepp-to-wallet/">connect-aepp-to-wallet.md</a> for details.</p>
+<h4 id="disconnectwallet-runs-in-sync-and-senddisconnect-arg-removed"><code>disconnectWallet</code> runs in sync and <code>sendDisconnect</code> arg removed</h4>
+<p>So, aepp would always send <code>closeConnection</code> notification.</p>
+<h4 id="sendconnectrequest-removed"><code>sendConnectRequest</code> removed</h4>
+<p>Use <code>connectToWallet</code> instead.</p>
+<h4 id="doesnt-accept-connection-anymore">doesn't accept <code>connection</code> anymore</h4>
+<p>Use <code>connectToWallet</code> method instead.</p>
+<h4 id="removed-isconnected-issubscribedaccount-methods">removed <code>isConnected</code>, <code>isSubscribedAccount</code> methods</h4>
+<p>Detect is aepp connected by persistence of <code>rpcClient</code> property.</p>
+<h4 id="signmessage-returns-buffer-by-default"><code>signMessage</code> returns Buffer by default</h4>
+<p>Use <code>returnHex</code> option to get the previous behaviour.</p>
+<h2 id="wallet">Wallet</h2>
+<h4 id="browserruntimeconnection-requires-port-parameter"><code>BrowserRuntimeConnection</code> requires <code>port</code> parameter</h4>
+<p>Pass <code>require('webextension-polyfill').runtime.connect()</code> to it.</p>
+<h4 id="requires-id-type-in-params">requires <code>id</code>, <code>type</code> in params</h4>
+<p><code>id</code> should be a unique string;
+<code>type</code> should be one of <code>WALLET_TYPE.window</code>, <code>WALLET_TYPE.extension</code>.</p>
+<h4 id="getbrowserapi-helper-removed"><code>getBrowserAPI</code> helper removed</h4>
+<p>Use <code>webextension-polyfill</code> package instead.</p>
+<h4 id="sharewalletinfo-accepts-rpc-client-id-instead-of-callback"><code>shareWalletInfo</code> accepts rpc client id instead of callback</h4>
+<p>For example:
+<div class="highlight"><pre><span></span><code><span class="w">const connection = new BrowserRuntimeConnection({ port })</span>
+<span class="gd">-aeSdk.addRpcClient(connection)</span><span class="w"></span>
+<span class="gd">-aeSdk.shareWalletInfo(port.postMessage.bind(port))</span><span class="w"></span>
+<span class="gi">+const rpcClientId = aeSdk.addRpcClient(connection)</span><span class="w"></span>
+<span class="gi">+aeSdk.shareWalletInfo(rpcClientId)</span><span class="w"></span>
+</code></pre></div></p>
+<h4 id="sharenode-argument-in-accept-callback-of-onconnection-removed"><code>shareNode</code> argument in accept callback of <code>onConnection</code> removed</h4>
+<p>Just deny the connection if you don't want to share the node url.</p>
+<h4 id="cant-handle-specific-set-of-accounts-for-an-app">can't handle specific set of accounts for an app</h4>
+<p>If you need this feature, create a custom wallet implementation or fill us an issue.</p>
+<h4 id="txobject-parameter-of-onsign-callback-is-removed"><code>txObject</code> parameter of <code>onSign</code> callback is removed</h4>
+<p>Use <code>unpackTx(tx)</code> on wallet side instead.</p>
+<h4 id="rpcclients-in-wallet-is-not-exposed-anymore"><code>rpcClients</code> in wallet is not exposed anymore</h4>
+<p>This expected to be used only internally.</p>
+<h4 id="ondisconnect-callback-on-wallet-side-accepts-client-id-instead-of-rpcclient"><code>onDisconnect</code> callback on wallet side accepts client id instead of <code>RpcClient</code></h4>
+<p>Use <code>sdk.rpcClient[clientId]</code> to get the corresponding instance of RpcClient.</p>
+<h4 id="wallet-cant-selectively-notify-aepps-about-selectingadding-account">wallet can't selectively notify aepps about selecting/adding account</h4>
+<p>If you need this feature, create a custom wallet implementation or fill us an issue.</p>
+<h4 id="wallet-cant-provide-metadata-for-accounts">wallet can't provide metadata for accounts</h4>
+<p>If you need this feature, create a custom wallet implementation or fill us an issue.</p>
+<h4 id="removed-actionaccept-in-permission-callbacks">removed <code>action.accept</code> in permission callbacks</h4>
+<p>Return the value you passed to <code>accept</code> instead.</p>
+<h4 id="removed-actiondeny-in-permission-callbacks">removed <code>action.deny</code> in permission callbacks</h4>
+<p>Throw instances of <code>RpcRejectedByUserError</code> instead.</p>
+<h4 id="callbacks-accept-client-id-params-and-origin">callbacks accept client id, params, and origin</h4>
+
+              
+            </article>
+            
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../../../CHANGELOG/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Changelog" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Changelog
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../11.0.0/" class="md-footer__link md-footer__link--next" aria-label="Next: Migration to 11.0.0" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Migration to 11.0.0
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "search": "../../../assets/javascripts/workers/search.b028fd86.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.f758a944.min.js"></script>
+      
+    
+  </body>
+</html>
