@@ -20,8 +20,8 @@
  * @param s - String to convert
  * @returns Converted string
  */
-export function snakeToPascal (s: string): string {
-  return s.replace(/_./g, match => match[1].toUpperCase())
+export function snakeToPascal(s: string): string {
+  return s.replace(/_./g, (match) => match[1].toUpperCase());
 }
 
 /**
@@ -29,8 +29,8 @@ export function snakeToPascal (s: string): string {
  * @param s - String to convert
  * @returns Converted string
  */
-export function pascalToSnake (s: string): string {
-  return s.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`)
+export function pascalToSnake(s: string): string {
+  return s.replace(/[A-Z]/g, (match) => `_${match.toLowerCase()}`);
 }
 
 /**
@@ -38,8 +38,8 @@ export function pascalToSnake (s: string): string {
  * @param str - String to validate.
  * @returns True if the string is valid hex, false otherwise.
  */
-export function isHex (str: string): boolean {
-  return str.length % 2 === 0 && /^[0-9a-f]+$/i.test(str)
+export function isHex(str: string): boolean {
+  return str.length % 2 === 0 && /^[0-9a-f]+$/i.test(str);
 }
 
 /**
@@ -47,8 +47,8 @@ export function isHex (str: string): boolean {
  * @param str - String to validate.
  * @returns True if the string is valid base-64, false otherwise.
  */
-export function isBase64 (str: string): boolean {
-  if (str.length % 4 > 0 || /[^0-9a-z+/=]/i.test(str)) return false
-  const index = str.indexOf('=')
-  return index === -1 || /={1,2}/.test(str.slice(index))
+export function isBase64(str: string): boolean {
+  if (str.length % 4 > 0 || /[^0-9a-z+/=]/i.test(str)) return false;
+  const index = str.indexOf('=');
+  return index === -1 || /={1,2}/.test(str.slice(index));
 }

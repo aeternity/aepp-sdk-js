@@ -15,16 +15,16 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '..'
-import { describe, it } from 'mocha'
-import { expect } from 'chai'
-import { dump, recover, Keystore } from '../../src/utils/keystore'
-import { getAddressFromPriv } from '../../src/utils/crypto'
-import { InvalidPasswordError } from '../../src/utils/errors'
+import '..';
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import {
+  dump, recover, Keystore, getAddressFromPriv, InvalidPasswordError,
+} from '../../src';
 
-const password = 'test'
-const secretKey = Buffer.from('35bdc4b31d75aebea2693760a2c96afe87d99dc571ddc4666db0ac8a2b59b30ef1e0c4e567f3d08eff8330c57d70ad457e9f31fa221e14fcc851273ec9af50ae', 'hex')
-const address = getAddressFromPriv(secretKey)
+const password = 'test';
+const secretKey = Buffer.from('35bdc4b31d75aebea2693760a2c96afe87d99dc571ddc4666db0ac8a2b59b30ef1e0c4e567f3d08eff8330c57d70ad457e9f31fa221e14fcc851273ec9af50ae', 'hex');
+const address = getAddressFromPriv(secretKey);
 const keystoreStatic = {
   name: 'test',
   version: 1,
@@ -40,30 +40,29 @@ const keystoreStatic = {
       memlimit_kib: 65536,
       opslimit: 3,
       parallelism: 1,
-      salt: 'ed7866c1f3bb16b077ad835b19eb510c'
-    }
-  }
-}
+      salt: 'ed7866c1f3bb16b077ad835b19eb510c',
+    },
+  },
+};
 
 describe('Keystore', () => {
-  let keystore: Keystore
+  let keystore: Keystore;
 
   it('dump account to keystore object', async () => {
-    keystore = await dump('test', password, secretKey)
-    expect(keystore.public_key).to.be.equal(address)
-  })
+    keystore = await dump('test', password, secretKey);
+    expect(keystore.public_key).to.be.equal(address);
+  });
 
   it('dump accepts hex', async () => {
-    const nonce = Buffer.from(keystoreStatic.crypto.cipher_params.nonce, 'hex')
-    const salt = Buffer.from(keystoreStatic.crypto.kdf_params.salt, 'hex')
-    const k = await dump('test', password, secretKey.toString('hex'), nonce, salt)
-    k.id = keystoreStatic.id
-    expect(k).to.be.eql(keystoreStatic)
-  })
+    const nonce = Buffer.from(keystoreStatic.crypto.cipher_params.nonce, 'hex');
+    const salt = Buffer.from(keystoreStatic.crypto.kdf_params.salt, 'hex');
+    const k = await dump('test', password, secretKey.toString('hex'), nonce, salt);
+    k.id = keystoreStatic.id;
+    expect(k).to.be.eql(keystoreStatic);
+  });
 
-  it('restore account from keystore object', async () =>
-    expect(await recover(password, keystore)).to.be.equal(secretKey.toString('hex')))
+  it('restore account from keystore object', async () => expect(await recover(password, keystore)).to.be.equal(secretKey.toString('hex')));
 
-  it('use invalid keystore password', () => expect(recover(password + '1', keystore))
-    .to.be.rejectedWith(InvalidPasswordError, 'Invalid password or nonce'))
-})
+  it('use invalid keystore password', () => expect(recover(`${password}1`, keystore))
+    .to.be.rejectedWith(InvalidPasswordError, 'Invalid password or nonce'));
+});

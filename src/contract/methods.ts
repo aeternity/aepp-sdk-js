@@ -22,40 +22,43 @@
  * https://github.com/aeternity/protocol/tree/master/contracts and
  */
 
-import { AensName } from '../tx/builder/schema'
-import { decode, produceNameId } from '../tx/builder/helpers'
-import { concatBuffers } from '../utils/other'
-import { EncodedData, EncodingType } from '../utils/encoder'
-import AccountBase from '../account/Base'
-import Node from '../Node'
-export { default as getContractInstance } from './aci'
+import { AensName } from '../tx/builder/constants';
+import { produceNameId } from '../tx/builder/helpers';
+import { concatBuffers } from '../utils/other';
+import { decode, Encoded } from '../utils/encoder';
+import AccountBase from '../account/Base';
+import Node from '../Node';
+
+export { default as getContractInstance } from './aci';
 
 /**
  * Utility method to create a delegate signature for a contract
+ * @category contract
  * @param ids - The list of id's to prepend
  * @param opt - Options
  * @param opt.onNode - Node to use
  * @param opt.onAccount - Account to use
  * @returns Signature in hex representation
  */
-async function delegateSignatureCommon (
-  ids: Array<EncodedData<EncodingType>> = [],
+async function delegateSignatureCommon(
+  ids: Encoded.Any[],
   { onAccount, onNode, ...opt }:
-  { onAccount: AccountBase, onNode: Node } & Parameters<AccountBase['sign']>[1]
+  { onAccount: AccountBase; onNode: Node } & Parameters<AccountBase['sign']>[1],
 ): Promise<string> {
   const signature = await onAccount.sign(
     concatBuffers([
       Buffer.from((await onNode.getStatus()).networkId),
-      ...ids.map(e => decode(e))
+      ...ids.map((e) => decode(e)),
     ]),
-    opt
-  )
-  return Buffer.from(signature).toString('hex')
+    opt,
+  );
+  return Buffer.from(signature).toString('hex');
 }
 
 /**
  * Helper to generate a signature to delegate pre-claim/claim/transfer/revoke of a name to
  * a contract.
+ * @category contract
  * @param contractId - Contract Id
  * @param opt - Options
  * @param opt.name - The name
@@ -74,23 +77,24 @@ async function delegateSignatureCommon (
  * )
  * ```
  */
-export async function createAensDelegationSignature (
-  contractId: EncodedData<'ct'>,
+export async function createAensDelegationSignature(
+  contractId: Encoded.ContractAddress,
   opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
-  { name?: AensName }
+  { name?: AensName },
 ): Promise<string> {
-  return await delegateSignatureCommon(
+  return delegateSignatureCommon(
     [
       await opt.onAccount.address(opt),
       ...opt.name != null ? [produceNameId(opt.name)] : [],
-      contractId
+      contractId,
     ],
-    opt
-  )
+    opt,
+  );
 }
 
 /**
  * Helper to generate a signature to delegate register/extend/respond of a Oracle to a contract.
+ * @category contract
  * @param contractId - Contract Id
  * @param opt - Options
  * @param opt.queryId - Oracle Query Id
@@ -107,12 +111,13 @@ export async function createAensDelegationSignature (
  * const respondSig = await aeSdk.createOracleDelegationSignature(contractId, { queryId })
  * ```
  */
-export async function createOracleDelegationSignature (
-  contractId: EncodedData<'ct'>,
+export async function createOracleDelegationSignature(
+  contractId: Encoded.ContractAddress,
   opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
-  { queryId?: EncodedData<'oq'> }
+  { queryId?: Encoded.OracleQueryId },
 ): Promise<string> {
-  return await delegateSignatureCommon(
-    [opt.queryId ?? await opt.onAccount.address(opt), contractId], opt
-  )
+  return delegateSignatureCommon(
+    [opt.queryId ?? await opt.onAccount.address(opt), contractId],
+    opt,
+  );
 }

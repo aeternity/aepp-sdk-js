@@ -34,7 +34,7 @@ Usage:
     const aeSdk = new Ae.AeSdk({
       nodes: [{ name: 'testnet', instance: node }]
     })
-    aeSdk.height().then(height => {
+    aeSdk.getHeight().then(height => {
       console.log("Current Block Height:" + height)
     })
   </script>
@@ -60,6 +60,23 @@ npm i @aeternity/aepp-sdk@next
 You can also install a version coming from a specific branch. In this case you would install the SDK version of the `develop` branch.
 ```bash
 npm i github:aeternity/aepp-sdk-js#develop
+```
+
+### TypeScript projects
+To work properly, sdk requires to enable `allowSyntheticDefaultImports` flag and register folder
+that contains type definitions for third-party packages sdk depends on.
+This may be done in `tsconfig.json`:
+```diff
+{
+  "compilerOptions": {
+    ...
++   "typeRoots": [
++     "node_modules/@types",
++     "node_modules/@aeternity/aepp-sdk/src/typings"
++   ],
++   "allowSyntheticDefaultImports": true
+  }
+}
 ```
 
 ------------------------------

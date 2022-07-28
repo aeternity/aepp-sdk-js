@@ -1,39 +1,41 @@
-import * as chainMethods from './chain'
-import * as txMethods from './tx'
-import * as aensMethods from './aens'
-import * as spendMethods from './spend'
-import * as oracleMethods from './oracle'
-import * as contractMethods from './contract/methods'
-import * as contractGaMethods from './contract/ga'
-import { _buildTx } from './tx'
-import { mapObject } from './utils/other'
-import Node, { getNetworkId } from './Node'
-import { AE_AMOUNT_FORMATS } from './utils/amount-formatter'
-import { AMOUNT, TX_TYPE } from './tx/builder/schema'
-import MemoryAccount, { Keypair } from './account/Memory'
-import AccountBase, { isAccountBase } from './account/Base'
+import * as chainMethods from './chain';
+import * as txMethods from './tx';
+import * as aensMethods from './aens';
+import * as spendMethods from './spend';
+import * as oracleMethods from './oracle';
+import * as contractMethods from './contract/methods';
+import * as contractGaMethods from './contract/ga';
+import * as deprecatedMethods from './deprecated/methods';
+import { _buildTx } from './tx';
+import { mapObject } from './utils/other';
+import Node, { getNetworkId } from './Node';
+import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
+import { AMOUNT } from './tx/builder/schema';
+import { Tag } from './tx/builder/constants';
+import MemoryAccount, { Keypair } from './account/Memory';
+import AccountBase, { isAccountBase } from './account/Base';
 import {
   CompilerError,
   DuplicateNodeError,
   NodeNotFoundError,
   NotImplementedError,
-  TypeError
-} from './utils/errors'
-import { EncodedData } from './utils/encoder'
-import Compiler from './contract/Compiler'
+  TypeError,
+} from './utils/errors';
+import { Encoded } from './utils/encoder';
+import Compiler from './contract/Compiler';
 
-export type Account = Keypair | AccountBase | any
+export type Account = Keypair | AccountBase | any;
 
-type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string }
+type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 
-function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Value {
+function getValueOrErrorProxy<Value extends object>(valueCb: () => Value): Value {
   try {
-    return valueCb()
+    return valueCb();
   } catch (error) {
     return new Proxy(
       {},
-      Object.fromEntries(['get', 'set', 'has'].map(name => [name, () => { throw error }]))
-    ) as Value
+      Object.fromEntries(['get', 'set', 'has'].map((name) => [name, () => { throw error; }])),
+    ) as Value;
   }
 }
 
@@ -54,14 +56,16 @@ function getValueOrErrorProxy<Value extends object> (valueCb: () => Value): Valu
  */
 class AeSdkBase {
   _options: {
-    denomination: AE_AMOUNT_FORMATS
-    amount: number
-    [key: string]: any
-  } = { denomination: AE_AMOUNT_FORMATS.AETTOS, amount: AMOUNT }
+    denomination: AE_AMOUNT_FORMATS;
+    amount: number;
+    [key: string]: any;
+  } = { denomination: AE_AMOUNT_FORMATS.AETTOS, amount: AMOUNT };
 
-  pool: Map<string, Node> = new Map()
-  selectedNodeName?: string
-  compilerApi: Compiler
+  pool: Map<string, Node> = new Map();
+
+  selectedNodeName?: string;
+
+  compilerApi: Compiler;
 
   /**
    * @param options - Options
@@ -69,35 +73,38 @@ class AeSdkBase {
    * @param options.compilerUrl - Url for compiler API
    * @param options.ignoreVersion - Don't check node or compiler version
    */
-  constructor (
-    { nodes = [], compilerUrl, ignoreVersion = false, ...options }:
+  constructor(
     {
-      nodes?: Array<{ name: string, instance: Node }>
-      compilerUrl?: string
-      ignoreVersion?: boolean
-      [key: string]: any // TODO: consider combining all possible options instead
-    } = {}
+      nodes = [], compilerUrl, ignoreVersion = false, ...options
+    }:
+    {
+      nodes?: Array<{ name: string; instance: Node }>;
+      compilerUrl?: string;
+      ignoreVersion?: boolean;
+      [key: string]: any; // TODO: consider combining all possible options instead
+    } = {},
   ) {
-    Object.assign(this._options, options)
+    Object.assign(this._options, options);
 
-    nodes.forEach(({ name, instance }, i) => this.addNode(name, instance, i === 0))
+    nodes.forEach(({ name, instance }, i) => this.addNode(name, instance, i === 0));
 
     if (compilerUrl == null) {
       this.compilerApi = getValueOrErrorProxy(() => {
-        throw new CompilerError('You can\'t use Compiler API. Compiler is not ready!')
-      })
-    } else this.setCompilerUrl(compilerUrl, { ignoreVersion })
+        throw new CompilerError('You can\'t use Compiler API. Compiler is not ready!');
+      });
+    } else this.setCompilerUrl(compilerUrl, { ignoreVersion });
   }
 
-  setCompilerUrl (
-    compilerUrl: string, { ignoreVersion = false }: { ignoreVersion?: boolean } = {}
+  setCompilerUrl(
+    compilerUrl: string,
+    { ignoreVersion = false }: { ignoreVersion?: boolean } = {},
   ): void {
-    this.compilerApi = new Compiler(compilerUrl, { ignoreVersion })
+    this.compilerApi = new Compiler(compilerUrl, { ignoreVersion });
   }
 
-  get api (): Node {
-    this.ensureNodeConnected()
-    return this.pool.get(this.selectedNodeName) as Node
+  get api(): Node {
+    this.ensureNodeConnected();
+    return this.pool.get(this.selectedNodeName) as Node;
   }
 
   /**
@@ -111,12 +118,12 @@ class AeSdkBase {
    * aeSdkBase.addNode('testNode', new Node({ url }), true)
    * ```
    */
-  addNode (name: string, node: Node, select = false): void {
-    if (this.pool.has(name)) throw new DuplicateNodeError(name)
+  addNode(name: string, node: Node, select = false): void {
+    if (this.pool.has(name)) throw new DuplicateNodeError(name);
 
-    this.pool.set(name, node)
+    this.pool.set(name, node);
     if (select || this.selectedNodeName == null) {
-      this.selectNode(name)
+      this.selectNode(name);
     }
   }
 
@@ -126,9 +133,9 @@ class AeSdkBase {
    * @example
    * nodePool.selectNode('testNode')
    */
-  selectNode (name: string): void {
-    if (!this.pool.has(name)) throw new NodeNotFoundError(`Node with name ${name} not in pool`)
-    this.selectedNodeName = name
+  selectNode(name: string): void {
+    if (!this.pool.has(name)) throw new NodeNotFoundError(`Node with name ${name} not in pool`);
+    this.selectedNodeName = name;
   }
 
   /**
@@ -136,20 +143,20 @@ class AeSdkBase {
    * @example
    * nodePool.getNetworkId()
    */
-  readonly getNetworkId = getNetworkId
+  readonly getNetworkId = getNetworkId;
 
   /**
    * Check if you have selected node
    * @example
    * nodePool.isNodeConnected()
    */
-  isNodeConnected (): this is AeSdkBase & { selectedNodeName: string } {
-    return this.selectedNodeName != null
+  isNodeConnected(): this is AeSdkBase & { selectedNodeName: string } {
+    return this.selectedNodeName != null;
   }
 
-  protected ensureNodeConnected (): asserts this is AeSdkBase & { selectedNodeName: string } {
+  protected ensureNodeConnected(): asserts this is AeSdkBase & { selectedNodeName: string } {
     if (!this.isNodeConnected()) {
-      throw new NodeNotFoundError('You can\'t use Node API. Node is not connected or not defined!')
+      throw new NodeNotFoundError('You can\'t use Node API. Node is not connected or not defined!');
     }
   }
 
@@ -160,12 +167,12 @@ class AeSdkBase {
    * nodePool.getNodeInfo() // { name, version, networkId, protocol, ... }
    * ```
    */
-  async getNodeInfo (): Promise<NodeInfo> {
-    this.ensureNodeConnected()
+  async getNodeInfo(): Promise<NodeInfo> {
+    this.ensureNodeConnected();
     return {
       name: this.selectedNodeName,
-      ...await this.api.getNodeInfo()
-    }
+      ...await this.api.getNodeInfo(),
+    };
   }
 
   /**
@@ -173,119 +180,130 @@ class AeSdkBase {
    * @example
    * nodePool.getNodesInPool()
    */
-  async getNodesInPool (): Promise<NodeInfo[]> {
-    return await Promise.all(
+  async getNodesInPool(): Promise<NodeInfo[]> {
+    return Promise.all(
       Array.from(this.pool.entries()).map(async ([name, node]) => ({
         name,
-        ...await node.getNodeInfo()
-      }))
-    )
+        ...await node.getNodeInfo(),
+      })),
+    );
   }
 
-  addresses (): Array<EncodedData<'ak'>> {
-    return []
+  // eslint-disable-next-line class-methods-use-this
+  addresses(): Encoded.AccountAddress[] {
+    return [];
   }
 
-  async address ({ onAccount }: { onAccount?: Account } = {}): Promise<EncodedData<'ak'>> {
-    return await this._resolveAccount(onAccount).address()
+  async address({ onAccount }: { onAccount?: Account } = {}): Promise<Encoded.AccountAddress> {
+    return this._resolveAccount(onAccount).address();
   }
 
-  async sign (
-    data: string | Uint8Array, { onAccount, ...options }: { onAccount?: Account } = {}
+  async sign(
+    data: string | Uint8Array,
+    { onAccount, ...options }: { onAccount?: Account } = {},
   ): Promise<Uint8Array> {
-    return await this._resolveAccount(onAccount).sign(data, options)
+    return this._resolveAccount(onAccount).sign(data, options);
   }
 
-  async signTransaction (
-    tx: EncodedData<'tx'>,
-    { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['signTransaction']>[1] = {}
-  ): Promise<EncodedData<'tx'>> {
-    return await this._resolveAccount(onAccount)
-      .signTransaction(tx, { ...options, networkId: await this.getNetworkId(options) })
+  async signTransaction(
+    tx: Encoded.Transaction,
+    { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['signTransaction']>[1] = {},
+  ): Promise<Encoded.Transaction> {
+    return this._resolveAccount(onAccount)
+      .signTransaction(tx, { ...options, networkId: await this.getNetworkId(options) });
   }
 
-  async signMessage (
+  async signMessage(
     message: string,
-    { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['signMessage']>[1] = {}
+    { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['signMessage']>[1] = {},
   ): Promise<string | Uint8Array> {
-    return await this._resolveAccount(onAccount).signMessage(message, options)
+    return this._resolveAccount(onAccount).signMessage(message, options);
   }
 
-  async verifyMessage (
+  async verifyMessage(
     message: string,
     signature: string | Uint8Array,
-    { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['verifyMessage']>[2] = {}
+    { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['verifyMessage']>[2] = {},
   ): Promise<boolean> {
-    return await this._resolveAccount(onAccount).verifyMessage(message, signature, options)
+    return this._resolveAccount(onAccount).verifyMessage(message, signature, options);
   }
 
   /**
    * Resolves an account
    * @param account - ak-address, instance of AccountBase, or keypair
    */
-  _resolveAccount (account?: Account): AccountBase {
+  // eslint-disable-next-line class-methods-use-this
+  _resolveAccount(account?: Account): AccountBase {
     switch (account !== null && typeof account) {
       case 'string':
-        throw new NotImplementedError('Address in AccountResolver')
+        throw new NotImplementedError('Address in AccountResolver');
       case 'object':
-        return isAccountBase(account) ? account : new MemoryAccount({ keypair: account })
+        return isAccountBase(account) ? account : new MemoryAccount({ keypair: account });
       default:
         throw new TypeError(
-          'Account should be an address (ak-prefixed string), ' +
-          `keypair, or instance of AccountBase, got ${String(account)} instead`)
+          'Account should be an address (ak-prefixed string), '
+          + `keypair, or instance of AccountBase, got ${String(account)} instead`,
+        );
     }
   }
 
-  async _getOptions (
-  ): Promise<{ onNode: Node, onAccount: AccountBase, onCompiler: Compiler, networkId: string }> {
+  _getOptions(): {
+    onNode: Node;
+    onAccount: AccountBase;
+    onCompiler: Compiler;
+  } {
     return {
       ...this._options,
       onNode: getValueOrErrorProxy(() => this.api),
       onAccount: getValueOrErrorProxy(() => this._resolveAccount()),
       onCompiler: getValueOrErrorProxy(() => this.compilerApi),
-      // TODO: remove networkId
-      networkId: (await this.api?.getStatus()).networkId
-    }
+    };
   }
 
-  async buildTx<TxType extends TX_TYPE> (
+  async buildTx<TxType extends Tag>(
     txType: TxType,
-    options: Omit<Parameters<typeof _buildTx<TxType>>[1], 'onNode'> & { onNode?: Node }
-  ): Promise<EncodedData<'tx'>> {
-    // @ts-expect-error
-    return await _buildTx<TxType>(txType, {
-      ...await this._getOptions(),
-      ...options
-    })
+    options: Omit<Parameters<typeof _buildTx<TxType>>[1], 'onNode'> & { onNode?: Node },
+  ): Promise<Encoded.Transaction> {
+    // @ts-expect-error TODO: need to figure out what's wrong here
+    return _buildTx<TxType>(txType, {
+      ...this._getOptions(),
+      ...options,
+    });
   }
 }
 
-const { _buildTx: _, ...txMethodsOther } = txMethods
+const { _buildTx: _, ...txMethodsOther } = txMethods;
+const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
 
 const methods = {
-  ...chainMethods,
+  ...chainMethodsOther,
   ...txMethodsOther,
   ...aensMethods,
   ...spendMethods,
   ...oracleMethods,
   ...contractMethods,
-  ...contractGaMethods
-} as const
+  ...contractGaMethods,
+  ...deprecatedMethods,
+} as const;
 
 type RequiredKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? never : K
-}[keyof T]
+}[keyof T];
 
-type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T
+type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T;
 
 type MakeOptional<Args extends any[]> = Args extends [infer Head, ...infer Tail]
   ? Tail extends []
     ? Head extends object
       ? OptionalIfNotRequired<[Omit<Head, 'onNode' | 'onCompiler' | 'onAccount'>
-      & { onNode?: Node, onCompiler?: Compiler, onAccount?: AccountBase | EncodedData<'ak'> | Keypair }]>
+      & {
+        onNode?: Node;
+        onCompiler?: Compiler;
+        onAccount?: AccountBase | Encoded.AccountAddress | Keypair;
+      }]>
       : [Head]
     : [Head, ...MakeOptional<Tail>]
-  : never
+  : never;
 
 type TransformMethods <Methods extends { [key: string]: Function }> =
   {
@@ -293,7 +311,7 @@ type TransformMethods <Methods extends { [key: string]: Function }> =
     Methods[Name] extends (...args: infer Args) => infer Ret
       ? (...args: MakeOptional<Args>) => Ret
       : never
-  }
+  };
 
 interface AeSdkBaseMethods extends TransformMethods<typeof methods> {}
 
@@ -301,20 +319,20 @@ Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
   methods,
   ([name, handler]) => [
     name,
-    async function (...args: any[]) {
-      const instanceOptions = await this._getOptions()
-      const lastArg = args[args.length - 1]
+    function methodWrapper(...args: any[]) {
+      const instanceOptions = this._getOptions();
+      const lastArg = args[args.length - 1];
       if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
-        Object.assign(lastArg, {
+        args[args.length - 1] = {
           ...instanceOptions,
           ...lastArg,
-          ...lastArg.onAccount != null && { onAccount: this._resolveAccount(lastArg.onAccount) }
-        })
-      } else args.push(instanceOptions)
-      return handler(...args)
-    }
-  ]
-))
+          ...lastArg.onAccount != null && { onAccount: this._resolveAccount(lastArg.onAccount) },
+        };
+      } else args.push(instanceOptions);
+      return handler(...args);
+    },
+  ],
+));
 
-export default AeSdkBase as new (options: ConstructorParameters<typeof AeSdkBase>[0]) =>
-AeSdkBase & AeSdkBaseMethods
+export default AeSdkBase as new (options?: ConstructorParameters<typeof AeSdkBase>[0]) =>
+AeSdkBase & AeSdkBaseMethods;

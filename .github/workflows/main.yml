@@ -30,12 +30,14 @@ jobs:
           fi
       - run: npm run build
       - run: npm run lint
-      - run: npm run test:unit
       - run: docker-compose up -d
       - name: Ensure that node is running
         run: |
           while [[ `curl -s -o /dev/null -w %{http_code} localhost:3013/api` != 200 ]]; do
             sleep 0.2;
           done
-      - run: npm run test:integration
+      - run: npm run test
+      - run: npm run report-coverage
+        if: always()
       - run: docker-compose logs
+        if: always()

@@ -15,44 +15,45 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { Runtime } from 'webextension-polyfill'
-import BrowserConnection from './Browser'
+import { Runtime } from 'webextension-polyfill';
+import BrowserConnection from './Browser';
 
 /**
  * BrowserRuntimeConnection
  * Handle browser runtime communication
+ * @category aepp wallet communication
  */
 export default class BrowserRuntimeConnection extends BrowserConnection {
-  port: Runtime.Port
+  port: Runtime.Port;
 
-  constructor ({ port, ...options }: { port: Runtime.Port, debug: boolean }) {
-    super(options)
-    this.port = port
+  constructor({ port, ...options }: { port: Runtime.Port; debug: boolean }) {
+    super(options);
+    this.port = port;
   }
 
-  disconnect (): void {
-    super.disconnect()
-    this.port.disconnect()
+  disconnect(): void {
+    super.disconnect();
+    this.port.disconnect();
   }
 
-  connect (
+  connect(
     onMessage: (message: any, origin: string, source: Runtime.Port) => void,
-    onDisconnect: () => void
+    onDisconnect: () => void,
   ): void {
-    super.connect(onMessage, onDisconnect)
+    super.connect(onMessage, onDisconnect);
     this.port.onMessage.addListener((message, port) => {
-      this.receiveMessage(message)
-      onMessage(message, port.name, port)
-    })
-    this.port.onDisconnect.addListener(onDisconnect)
+      this.receiveMessage(message);
+      onMessage(message, port.name, port);
+    });
+    this.port.onDisconnect.addListener(onDisconnect);
   }
 
-  sendMessage (message: any): void {
-    super.sendMessage(message)
-    this.port.postMessage(message)
+  sendMessage(message: any): void {
+    super.sendMessage(message);
+    this.port.postMessage(message);
   }
 
-  isConnected (): boolean {
-    return this.port.onMessage.hasListeners()
+  isConnected(): boolean {
+    return this.port.onMessage.hasListeners();
   }
 }

@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -15,39 +15,37 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import '../'
-import { describe, it } from 'mocha'
-import { expect } from 'chai'
-import BigNumber from 'bignumber.js'
-import { toBytes, bigNumberToByteArray } from '../../src/utils/bytes'
-import { isBase64, snakeToPascal, pascalToSnake } from '../../src/utils/string'
-import { TypeError } from '../../src/utils/errors'
+import '..';
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import BigNumber from 'bignumber.js';
+import { toBytes, bigNumberToByteArray, TypeError } from '../../src';
+import { isBase64, snakeToPascal, pascalToSnake } from '../../src/utils/string';
 
-describe('Bytes', function () {
-  const bytes = Buffer.from('hello')
+describe('Bytes', () => {
+  const bytes = Buffer.from('hello');
 
   it('toBytes: converts null to empty array', () => {
-    toBytes(null).should.be.eql(Buffer.from([]))
-  })
+    toBytes(null).should.be.eql(Buffer.from([]));
+  });
 
-  it('is base64 string', () => isBase64(bytes.toString('base64')).should.be.equal(true))
+  it('is base64 string', () => isBase64(bytes.toString('base64')).should.be.equal(true));
 
-  it('is not base64 string', () => isBase64('hello').should.be.equal(false))
+  it('is not base64 string', () => isBase64('hello').should.be.equal(false));
 
-  const testCase = 'test_test-testTest'
+  const testCase = 'test_test-testTest';
 
   it('converts snake to pascal case', () => snakeToPascal(testCase)
-    .should.be.equal('testTest-testTest'))
+    .should.be.equal('testTest-testTest'));
 
   it('converts pascal to snake case', () => pascalToSnake(testCase)
-    .should.be.equal('test_test-test_test'))
+    .should.be.equal('test_test-test_test'));
 
   describe('bigNumberToByteArray', () => {
     it('converts BigNumber to Buffer', () => bigNumberToByteArray(new BigNumber('1000'))
-      .readInt16BE().should.be.equal(1000))
+      .readInt16BE().should.be.equal(1000));
 
-    it('throws error if BigNumber is not integer', () =>
-      expect(() => bigNumberToByteArray(new BigNumber('1.5')))
-        .to.throw(TypeError, /Unexpected not integer value:/))
-  })
-})
+    it('throws error if BigNumber is not integer', () => expect(() => bigNumberToByteArray(new BigNumber('1.5')))
+      .to.throw(TypeError, /Unexpected not integer value:/));
+  });
+});

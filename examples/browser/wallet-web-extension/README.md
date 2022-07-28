@@ -10,6 +10,7 @@ This is a sample wallet as an WebExtension. It works with æpp opened in a brows
 4. This wallet should attempt to connect to the æpp
 
 ## Installation and running in Google Chrome
+Prerequisite: [refer SDK installation](../README.md#setup-info)
 1. Install required dependencies with `npm install`
 2. Start the build server in watch mode `npm run serve`
 3. Open [chrome://extensions](chrome://extensions/)

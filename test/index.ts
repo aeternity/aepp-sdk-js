@@ -15,16 +15,16 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-import { existsSync } from 'fs'
-import { execSync } from 'child_process'
-import { join } from 'path'
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import { existsSync } from 'fs';
+import { execSync } from 'child_process';
+import { join } from 'path';
 
-chai.use(chaiAsPromised)
-chai.should()
+chai.use(chaiAsPromised);
+chai.should();
 
 if (!existsSync(join(__dirname, '../src/apis'))) {
-  console.log('APIs are not generated, invoking generator')
-  execSync('npm run build:api', { stdio: 'inherit' })
+  console.log('APIs are not generated, invoking generator');
+  execSync('npm run build:api', { stdio: 'inherit' });
 }
