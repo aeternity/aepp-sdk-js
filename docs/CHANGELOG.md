@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.0...v12.1.1) (2022-07-28)
+
+
+### Bug Fixes
+
+* export and implementation of calculateMinFee ([cee0f7c](https://github.com/aeternity/aepp-sdk-js/commit/cee0f7c0cda890ac3639611abc5677161428dad9))
+
 ## [12.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v12.0.0...v12.1.0) (2022-07-28)
 
 
