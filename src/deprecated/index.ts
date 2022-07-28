@@ -45,14 +45,16 @@ export const createSalt = salt;
  * calculateMinFee('spendTx', { gasLimit, params })
  * ```
  */
-export default function calculateMinFee(
+export function calculateMinFee(
   txType: Tag,
   { params, vsn, denomination }: CalculateMinFeeOptions,
 ): BigNumber {
   return calculateMinFeeInternal(
     txType,
-    // @ts-expect-error anyway this planned to be removed
-    (fee: BigNumber) => buildTx({ ...params, fee }, txType, { vsn, denomination }),
+    (fee: BigNumber) => (
+      // @ts-expect-error anyway this planned to be removed
+      buildTx({ ...params, _computingMinFee: fee }, txType, { vsn, denomination })
+    ),
   );
 }
 
