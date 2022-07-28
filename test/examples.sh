@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+echo Run environment/node.js
+./test/environment/node.js
+echo Run environment/node.mjs
+./test/environment/node.mjs
+echo Run environment/node.ts
+./test/environment/node.ts
+
 run_node_example () {
   echo Run $1
   cat ./examples/node/$1 | sed -e "s|@aeternity/aepp-sdk|./dist/aepp-sdk.js|" | node
