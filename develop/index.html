@@ -347,6 +347,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#typescript-projects" class="md-nav__link">
+    TypeScript projects
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1074,6 +1081,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#typescript-projects" class="md-nav__link">
+    TypeScript projects
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1144,6 +1158,21 @@
 <h3 id="specific-github-branch">Specific Github Branch</h3>
 <p>You can also install a version coming from a specific branch. In this case you would install the SDK version of the <code>develop</code> branch.
 <div class="highlight"><pre><span></span><code>npm i github:aeternity/aepp-sdk-js#develop
+</code></pre></div></p>
+<h3 id="typescript-projects">TypeScript projects</h3>
+<p>To work properly, sdk requires to enable <code>allowSyntheticDefaultImports</code> flag and register folder
+that contains type definitions for third-party packages sdk depends on.
+This may be done in <code>tsconfig.json</code>:
+<div class="highlight"><pre><span></span><code><span class="w">{</span>
+<span class="w"> </span> &quot;compilerOptions&quot;: {<span class="w"></span>
+<span class="w"> </span>   ...<span class="w"></span>
+<span class="gi">+   &quot;typeRoots&quot;: [</span><span class="w"></span>
+<span class="gi">+     &quot;node_modules/@types&quot;,</span><span class="w"></span>
+<span class="gi">+     &quot;node_modules/@aeternity/aepp-sdk/src/typings&quot;</span><span class="w"></span>
+<span class="gi">+   ],</span><span class="w"></span>
+<span class="gi">+   &quot;allowSyntheticDefaultImports&quot;: true</span><span class="w"></span>
+<span class="w"> </span> }<span class="w"></span>
+<span class="w">}</span>
 </code></pre></div></p>
 <hr />
 <p><strong>Note</strong>: If you experience errors during the installation, you might need to install build tools for your OS.</p>
