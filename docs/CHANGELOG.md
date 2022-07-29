@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.0...v12.1.1) (2022-07-28)
+
+
+### Bug Fixes
+
+* export and implementation of calculateMinFee ([cee0f7c](https://github.com/aeternity/aepp-sdk-js/commit/cee0f7c0cda890ac3639611abc5677161428dad9))
+
+## [12.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v12.0.0...v12.1.0) (2022-07-28)
+
+
+### Features
+
+* export Encoding enum ([7ebc67f](https://github.com/aeternity/aepp-sdk-js/commit/7ebc67fdf32959960531cb96824fb3d181b99aed))
+
+
+### Bug Fixes
+
+* ability to use sdk without nodes ([8fa29e4](https://github.com/aeternity/aepp-sdk-js/commit/8fa29e4e81c6898573d259f15d8d9c0b1828ca94))
+* **aepp,wallet:** avoid invalid message errors using third-party tools ([4d4d117](https://github.com/aeternity/aepp-sdk-js/commit/4d4d1175b539cb50bac277cb76ad5eefb9742a0d))
+* **AeSdkBase:** don't mutate the options argument ([a574b7f](https://github.com/aeternity/aepp-sdk-js/commit/a574b7f00802b12334c3edc433fb0c53875c91cc))
+* **awaitHeight:** allow to wait for arbitrary number of blocks ([918a885](https://github.com/aeternity/aepp-sdk-js/commit/918a8855f17c1a8fb8d4b6d1ffd930cd172ab429))
+* **channel:** handle round as number ([97d7984](https://github.com/aeternity/aepp-sdk-js/commit/97d798438fb275974fa05bde5e52c21baf7e71b6))
+* getNetworkId throw proper error without node ([3d9e73c](https://github.com/aeternity/aepp-sdk-js/commit/3d9e73c0fab6ecb40e027c68bf28859fc0127896))
+* move type packages required by TS projects to dependencies ([90c5eb8](https://github.com/aeternity/aepp-sdk-js/commit/90c5eb8219d2a58c5760002ff947bcad8f578407))
+* **node:** avoid ts-expect-error missed in generated d.ts file ([60d9755](https://github.com/aeternity/aepp-sdk-js/commit/60d97554a47e30483702e1b96c303e03417bc193))
+* **node:** don't transform autorest properties ([7982327](https://github.com/aeternity/aepp-sdk-js/commit/7982327e1f33f915810ac94fd855baa8cfacb990))
+* **Node:** tread `nameTtl`, `clientTtl` as number ([b82c398](https://github.com/aeternity/aepp-sdk-js/commit/b82c398cdda55b13749e31cd032818dc27c59449))
+* **pollForQueryResponse:** poll until query is expired ([436f4a9](https://github.com/aeternity/aepp-sdk-js/commit/436f4a98b250e84fe47d7f2e0a5b578b690cf7c5))
+* **sendTransaction:** don't fall if `onAccount` missed in AeSdkBase ([eebbcb7](https://github.com/aeternity/aepp-sdk-js/commit/eebbcb776b733d003bb138f891e0a7766edacb30))
+* switch to aepp-calldata with fixed decoding of lists ([c1a3b24](https://github.com/aeternity/aepp-sdk-js/commit/c1a3b2458e30f2a16d6f1f33c0f5224471ba724d))
+
 ## [12.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v11.0.1...v12.0.0) (2022-06-17)
 
 

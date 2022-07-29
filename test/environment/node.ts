@@ -1,6 +1,5 @@
-#!/usr/bin/env node
-// eslint-disable-next-line import/extensions
-import { Node, AeSdk, MemoryAccount } from '../../es/index.mjs';
+#!/usr/bin/env npx ts-node
+import { Node, AeSdk, MemoryAccount } from '../..';
 
 const contractSource = `
 contract Test =

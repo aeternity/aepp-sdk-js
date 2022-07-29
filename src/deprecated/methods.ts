@@ -17,7 +17,7 @@ export async function signUsingGA(
 }
 
 /**
- * @deprecated Use createMetaTx instead
+ * @deprecated Use getHeight instead
  * @hidden
  */
 export async function height({ onNode }: { onNode: Node }): Promise<number> {

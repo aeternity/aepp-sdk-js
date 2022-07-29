@@ -30,7 +30,7 @@ import {
   NAME_BID_RANGES, Tag,
   SchemaNotFoundError,
 } from '../../src';
-import { Encoding } from '../../src/utils/encoder';
+import { Encoding, Encoded } from '../../src/utils/encoder';
 
 describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {
@@ -101,8 +101,13 @@ describe('Tx', () => {
   });
 
   describe('getDefaultPointerKey', () => {
-    it('returns default pointer key for contract', () => expect(getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'))
-      .to.be.equal('contract_pubkey'));
+    it('returns default pointer key for contract', () => expect(
+      getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'),
+    ).to.be.equal('contract_pubkey'));
+
+    it('throws error', () => expect(
+      () => getDefaultPointerKey('ba_AQIq9Y55kw==' as Encoded.Channel),
+    ).to.throw('identifier should be prefixed with one of ak_, ok_, ct_, ch_, got ba_AQIq9Y55kw== instead'));
   });
 
   it('Deserialize tx: invalid tx VSN', () => {

@@ -27,7 +27,9 @@ export * from './tx/builder/schema';
 export * from './tx/builder/address';
 export * from './utils/amount-formatter';
 export * from './utils/hd-wallet';
-export { sha256hash, encode, decode } from './utils/encoder';
+export {
+  sha256hash, encode, decode, Encoding,
+} from './utils/encoder';
 export * from './aens';
 export * from './contract/methods';
 export * from './oracle';

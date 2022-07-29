@@ -14,6 +14,7 @@ module.exports = {
         'deps',
         'node',
         'oracle',
+        'release',
         'tx-builder',
         'wallet',
       ],
