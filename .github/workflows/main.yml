@@ -36,8 +36,10 @@ jobs:
           while [[ `curl -s -o /dev/null -w %{http_code} localhost:3013/api` != 200 ]]; do
             sleep 0.2;
           done
-      - run: npm run test
-      - run: npm run report-coverage
-        if: always()
+      - run: npx nyc npm run test
+      - run: npx nyc report --reporter=text-lcov > coverage.lcov
+      - uses: codecov/codecov-action@v3
+        with:
+          files: coverage.lcov
       - run: docker-compose logs
         if: always()
