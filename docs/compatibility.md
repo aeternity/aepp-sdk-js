@@ -4,8 +4,8 @@ This package is expected to work in these environments:
 
 | Environment                           | Comment                                                              |
 |---------------------------------------|----------------------------------------------------------------------|
-| nodejs>=12, common js                 |                                                                      |
-| nodejs>=12, mjs                       |                                                                      |
+| nodejs>=14.19, common js              |                                                                      |
+| nodejs>=14.19, mjs                    |                                                                      |
 | Browser using script tag, umd         |                                                                      |
 | webpack@4                             | requires a fix to work with mjs build [webpack-4]                    |
 | webpack@5                             |                                                                      |

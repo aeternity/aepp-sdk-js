@@ -19,7 +19,7 @@
 // # InnerTx: ContractCallTx
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/paying-for-contract-call-tx.js)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/paying-for-contract-call-tx.mjs)
 // and this page explains in detail how to:
 //
 //  - Create and sign a `ContractCallTx` with the `innerTx` option for an account that has no
@@ -47,9 +47,9 @@
 // ## 1. Specify imports
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
-const {
+import {
   AeSdk, Node, MemoryAccount, generateKeyPair, Tag,
-} = require('@aeternity/aepp-sdk');
+} from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -92,75 +92,66 @@ const NEW_USER_KEYPAIR = generateKeyPair();
 //  - The `NEW_USER_KEYPAIR` is used to call the contract. The `PayingForTx` allows the new user to
 //    perform a contract call without having any funds.
 
-// ## 3. Open async codeblock
-// Most functions of the SDK return _Promises_, so the recommended way of
-// dealing with subsequent actions is running them one by one using `await`.
-// Therefore we are putting our logic into an `async` code block
-(async () => {
-  // ## 4. Create object instances
-  const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR });
-  const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR });
-  const node = new Node(NODE_URL);
-  const aeSdk = new AeSdk({
-    nodes: [{ name: 'testnet', instance: node }],
-    compilerUrl: COMPILER_URL,
-  });
-  await aeSdk.addAccount(payerAccount, { select: true });
-  await aeSdk.addAccount(newUserAccount);
+// ## 3. Create object instances
+const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR });
+const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR });
+const node = new Node(NODE_URL);
+const aeSdk = new AeSdk({
+  nodes: [{ name: 'testnet', instance: node }],
+  compilerUrl: COMPILER_URL,
+});
+await aeSdk.addAccount(payerAccount, { select: true });
+await aeSdk.addAccount(newUserAccount);
 
-  // ## 5. Create and sign `ContractCallTx` on behalf of new user
-  // Currently there is no high-level API available that allows you to create and sign the
-  // `ContractCallTx` by invoking the generated contract method on the contract instance that you
-  // typically use for contract calls.
-  //
-  // Following 4 steps need to be done:
-  //
-  //  1. Initialize a contract instance by the source code and the contract address.
-  //  1. Create calldata by calling the `encode` function providing the contract name, the name of
-  //     the `entrypoint` to call as well as the required params.
-  //      - The `entrypoint` with the name `set_latest_caller` doesn't require any params so you
-  //        can provide an empty array
-  //  1. Create the `ContractCreateTx` by providing all required params.
-  //      - You could omit `amount`, `gasLimit` and `gasPrice` if you choose to stick to the default
-  //        values (see
-  //        [transaction options](../../../transaction-options#contractcreatetx-contractcalltx))
-  //  1. Sign the transaction by providing `innerTx: true` as transaction option.
-  //      - The transaction will be signed in a special way that is required for inner transactions.
-  //
-  const contract = await aeSdk.getContractInstance(
-    { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS },
-  );
-  const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', []);
-  const contractCallTx = await aeSdk.buildTx(Tag.ContractCallTx, {
-    callerId: await newUserAccount.address(),
-    contractId: CONTRACT_ADDRESS,
-    amount: 0,
-    gasLimit: 1000000,
-    gasPrice: 1500000000,
-    callData: calldata,
-  });
-  const signedContractCallTx = await aeSdk.signTransaction(
-    contractCallTx,
-    { onAccount: newUserAccount, innerTx: true },
-  );
+// ## 4. Create and sign `ContractCallTx` on behalf of new user
+// Currently there is no high-level API available that allows you to create and sign the
+// `ContractCallTx` by invoking the generated contract method on the contract instance that you
+// typically use for contract calls.
+//
+// Following 4 steps need to be done:
+//
+//  1. Initialize a contract instance by the source code and the contract address.
+//  1. Create calldata by calling the `encode` function providing the contract name, the name of
+//     the `entrypoint` to call as well as the required params.
+//      - The `entrypoint` with the name `set_latest_caller` doesn't require any params so you
+//        can provide an empty array
+//  1. Create the `ContractCreateTx` by providing all required params.
+//      - You could omit `amount`, `gasLimit` and `gasPrice` if you choose to stick to the default
+//        values (see
+//        [transaction options](../../../transaction-options#contractcreatetx-contractcalltx))
+//  1. Sign the transaction by providing `innerTx: true` as transaction option.
+//      - The transaction will be signed in a special way that is required for inner transactions.
+//
+const contract = await aeSdk.getContractInstance(
+  { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS },
+);
+const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', []);
+const contractCallTx = await aeSdk.buildTx(Tag.ContractCallTx, {
+  callerId: await newUserAccount.address(),
+  contractId: CONTRACT_ADDRESS,
+  amount: 0,
+  gasLimit: 1000000,
+  gasPrice: 1500000000,
+  callData: calldata,
+});
+const signedContractCallTx = await aeSdk.signTransaction(
+  contractCallTx,
+  { onAccount: newUserAccount, innerTx: true },
+);
 
-  // ## 6. Create, sign & broadcast the `PayingForTx` as payer
-  const payForTx = await aeSdk.payForTransaction(signedContractCallTx, { onAccount: payerAccount });
-  console.log(payForTx);
+// ## 5. Create, sign & broadcast the `PayingForTx` as payer
+const payForTx = await aeSdk.payForTransaction(signedContractCallTx, { onAccount: payerAccount });
+console.log(payForTx);
 
-  // ## 7. Check that last caller is the new user
-  // Contract instance allows interacting with the contract in a convenient way.
-  const dryRunTx = await contract.methods.get_last_caller();
-  console.log(`New user: ${await newUserAccount.address()}`);
-  console.log('Last caller:', dryRunTx.decodedResult);
+// ## 6. Check that last caller is the new user
+// Contract instance allows interacting with the contract in a convenient way.
+const dryRunTx = await contract.methods.get_last_caller();
+console.log(`New user: ${await newUserAccount.address()}`);
+console.log('Last caller:', dryRunTx.decodedResult);
 
-  // Note:
-  //
-  //  - Last caller should now be the address of the new user.
-  //  - For regular (non-stateful) entrypoints the SDK automatically performs a dry-run which
-  //    allows to perform read-only calls for free, see
-  //    [Contract guide](../../guides/contracts.md#b-regular-entrypoints).
-
-// ## 8. Close and run async codeblock
-// Now you can close the async codeblock and execute it at the same time.
-})();
+// Note:
+//
+//  - Last caller should now be the address of the new user.
+//  - For regular (non-stateful) entrypoints the SDK automatically performs a dry-run which
+//    allows to perform read-only calls for free, see
+//    [Contract guide](../../guides/contracts.md#b-regular-entrypoints).
