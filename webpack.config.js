@@ -33,7 +33,7 @@ function configure(filename, opts = {}) {
           process: 'process',
           Buffer: ['buffer', 'Buffer'],
         })],
-      ...argv.report
+      ...env.REPORT
         ? [new BundleAnalyzerPlugin({
           analyzerMode: 'static',
           reportFilename: `${filename}.html`,

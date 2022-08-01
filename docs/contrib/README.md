@@ -2,7 +2,7 @@
 
 ## Principles
 
-The Javascript SDK wraps the æternity API explosed by
+The Javascript SDK wraps the æternity API exposed by
 [Node's Swagger file]. It aims to abstract the API, while still providing
 low-level access to it's endpoints, when necessary.
 
@@ -11,10 +11,8 @@ It uses the following Javascript technologies and principles:
 - [JavaScript the Good Parts] (because Crockford is always right)
 - [ES6 modules], using `export` and `import`
 - [Promises] using ES7 [async/await] syntax, where applicable
-- Functional Programming using [Ramda]
 - Statelessness wherever possible
-- [webpack 4] and the [Babel] [loader]
-- Strictly enforced [StandardJS]
+- [webpack] and the [Babel] [loader]
 - Loose coupling of modules to enable [tree-shaking]
 - Convention over configuration
 - "Easy things should be easy, and hard things should be possible." [source] -- [Larry Wall]
@@ -25,29 +23,26 @@ It uses the following Javascript technologies and principles:
     - bundling through webpack
 
 [Node's Swagger file]: https://github.com/aeternity/aeternity/blob/master/config/swagger.yaml
-[composition over inheritance]: https://medium.com/front-end-hacking/classless-javascript-composition-over-inheritance-6b27c35893b1
 [JavaScript the Good Parts]: https://github.com/dwyl/Javascript-the-Good-Parts-notes
 [ES6 modules]: https://hacks.mozilla.org/2015/08/es6-in-depth-modules/
 [Promises]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
 [async/await]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
-[Ramda]: https://ramdajs.com/
-[webpack 4]: https://webpack.js.org/
+[webpack]: https://webpack.js.org/
 [Babel]: https://babeljs.io/
 [loader]: https://github.com/babel/babel-loader
-[StandardJS]: https://standardjs.com/
 [tree-shaking]: https://webpack.js.org/guides/tree-shaking/
 [source]: https://www.amazon.com/gp/feature.html?ie=UTF8&docId=7137
 [Larry Wall]: https://en.wikipedia.org/wiki/Larry_Wall
 
 ## Requirements
 
-aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/), using [Babel](https://babeljs.io/) and is expected to work in any sufficiently new version of [Node.js](https://nodejs.org/en/) (`>= v12.17`) or modern web browser.
+aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/), using [Babel](https://babeljs.io/) and is expected to work in any sufficiently new version of [Node.js](https://nodejs.org/en/) or modern web browser.
 
 ## Contributing
 
 1. Clone the application
 2. Make sure your editor/IDE can read and use the `.editorconfig` file
-3. Start hacking (and dont forget to add [test](#testing) for whatever you'll be building).
+3. Start hacking (and don't forget to add [test](#testing) for whatever you'll be building).
 
 ## Documenting
 
@@ -67,6 +62,12 @@ npm install
 npm run build:dev
 ```
 
+## Generate bundle report
+
+```bash
+npx webpack --mode=production --env REPORT
+```
+
 ## Testing
 
 To test, launch the `test` command. This will run [mocha](https://mochajs.org/)'s tests locally.
@@ -77,19 +78,8 @@ npm test
 
 This repository also includes a docker-compose file, to allow you to **run your own æternity node locally**. If you want to do so, **from the root of the project**:
 
-1. Create a _**docker-compose.override.yml**_ file with this content:
-```yaml
-version: "3"
-services:
-  node:
-    ports:
-      - 3013:3013
-      - 3113:3113
-      - 3014:3014
-      - 3001:3001
-```
-2. Run `docker-compose up node`
-3. Congrats! you're now running your own æternity node locally.
+1. Run `docker-compose up node`
+2. Congrats! you're now running your own æternity node locally.
 
 The WebPack compilation provides two different build artifacts in `dist/`, one
 for Node.js and one for browsers. When referencing aepp-sdk through any modern
