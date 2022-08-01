@@ -15,14 +15,13 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { describe, it, before } from 'mocha';
+import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, Tag, genSalt, generateKeyPair, unpackTx,
+  AeSdk, generateKeyPair, genSalt, MemoryAccount, Tag, unpackTx,
 } from '../../src';
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
-import MemoryAccount from '../../src/account/Memory';
 import { ContractInstance } from '../../src/contract/aci';
 
 const authContractSource = `contract BlindAuth =
@@ -40,6 +39,7 @@ const authContractSource = `contract BlindAuth =
 `;
 describe('Generalized Account', () => {
   let aeSdk: AeSdk;
+  let accountBeforeGa: MemoryAccount;
   let gaAccountAddress: Encoded.AccountAddress;
   let authContract: ContractInstance;
 
@@ -49,6 +49,7 @@ describe('Generalized Account', () => {
   });
 
   it('Make account GA', async () => {
+    accountBeforeGa = Object.values(aeSdk.accounts)[0] as MemoryAccount;
     const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', authContractSource, []);
     const isGa = await aeSdk.isGA(gaAccountAddress);
     isGa.should.be.equal(true);
@@ -62,7 +63,7 @@ describe('Generalized Account', () => {
       .should.be.rejectedWith(`Account ${gaAccountAddress} is already GA`);
   });
 
-  const { publicKey } = generateKeyPair();
+  const { publicKey, secretKey } = generateKeyPair();
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
     aeSdk.removeAccount(gaAccountAddress);
@@ -85,5 +86,28 @@ describe('Generalized Account', () => {
     );
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.methods.getTxHash()).decodedResult);
+  });
+
+  it('fails trying to send SignedTx using generalized account', async () => {
+    await expect(aeSdk.spend(1, gaAccountAddress, { onAccount: accountBeforeGa })).to.be
+      .rejectedWith('Generalized account can\'t be used to generate SignedTx with signatures');
+  });
+
+  it('fails trying to send GaMeta using basic account', async () => {
+    const account = new MemoryAccount({ keypair: { publicKey, secretKey } });
+    account.isGa = true;
+    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
+      amount: 1,
+      senderId: await account.address(),
+      recipientId: gaAccountAddress,
+    });
+    const signedTx = await account.signTransaction(spendTx, {
+      authFun: 'authorize',
+      authData: { source: authContractSource, args: [genSalt()] },
+      onNode: aeSdk.api,
+      onCompiler: aeSdk.compilerApi,
+    });
+    await expect(aeSdk.sendTransaction(signedTx)).to.be
+      .rejectedWith('Basic account can\'t be used to generate GaMetaTx');
   });
 });
