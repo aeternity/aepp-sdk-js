@@ -6,10 +6,10 @@ const babelConfig = require('./babel.config');
 
 function configure(filename, opts = {}) {
   const isNode = opts.target.includes('node');
-  return (env, argv) => ({
+  return (env) => ({
     entry: './src/index.ts',
-    mode: 'development', // automatically overriden by production flag
-    devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
+    mode: 'production',
+    devtool: 'source-map',
     module: {
       rules: [
         {

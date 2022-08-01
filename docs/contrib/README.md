@@ -55,17 +55,17 @@ npm run docs:examples && npm run docs:api
 
 ## Building
 
-aepp-sdk is built using npm. In order to build a development version, launch the `build:dev` command.
+aepp-sdk is built using npm. In order to build a production version, launch the `build` command.
 
 ```bash
 npm install
-npm run build:dev
+npm run build
 ```
 
 ## Generate bundle report
 
 ```bash
-npx webpack --mode=production --env REPORT
+npx webpack --env REPORT
 ```
 
 ## Testing
