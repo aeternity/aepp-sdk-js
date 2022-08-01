@@ -14,8 +14,8 @@ run_node_example () {
 }
 
 run_node_example contract-interaction.js
-run_node_example paying-for-tx-contract-call-tx.js
-run_node_example paying-for-tx-spend-tx.js
+run_node_example paying-for-contract-call-tx.js
+run_node_example paying-for-spend-tx.js
 run_node_example transfer-ae.js
 
 echo Build example aepp
