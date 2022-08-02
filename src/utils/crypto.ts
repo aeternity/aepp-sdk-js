@@ -60,7 +60,8 @@ export function isAddressValid(
  * @returns random salt
  */
 export function genSalt(): number {
-  return Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER));
+  const [random] = new BigUint64Array(nacl.randomBytes(8).buffer);
+  return Number(random % BigInt(Number.MAX_SAFE_INTEGER));
 }
 
 /**
