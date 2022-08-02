@@ -9,15 +9,14 @@ import { concatBuffers } from './other';
 
 const Ecb = aesjs.ModeOfOperation.ecb;
 
-// TODO: at least don't export `encryptKey` and `decryptKey`
+// TODO: use mnemonic encryption instead of AES
 /**
  * Encrypt given data using `password`
  * @param password - Password to encrypt with
  * @param binaryData - Data to encrypt
  * @returns Encrypted data
- * @deprecated use 'sha.js' and 'aes-js' packages directly instead
  */
-export function encryptKey(password: string, binaryData: Uint8Array): Uint8Array {
+function encryptKey(password: string, binaryData: Uint8Array): Uint8Array {
   const hashedPasswordBytes = sha256hash(password);
   const aesEcb = new Ecb(hashedPasswordBytes);
   return aesEcb.encrypt(binaryData);
@@ -28,9 +27,8 @@ export function encryptKey(password: string, binaryData: Uint8Array): Uint8Array
  * @param password - Password to decrypt with
  * @param encrypted - Data to decrypt
  * @returns Decrypted data
- * @deprecated use 'sha.js' and 'aes-js' packages directly instead
  */
-export function decryptKey(password: string, encrypted: Uint8Array): Uint8Array {
+function decryptKey(password: string, encrypted: Uint8Array): Uint8Array {
   const encryptedBytes = Buffer.from(encrypted);
   const hashedPasswordBytes = sha256hash(password);
   const aesEcb = new Ecb(hashedPasswordBytes);
