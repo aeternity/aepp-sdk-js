@@ -1,8 +1,6 @@
 import nacl from 'tweetnacl';
 import { v4 as uuid } from '@aeternity/uuid';
-// js extension is required for mjs build
-// eslint-disable-next-line import/extensions
-import { ArgonType, hash } from '@aeternity/argon2-browser/dist/argon2-bundled.min.js';
+import { hash, argon2id } from '@aeternity/argon2';
 import { getAddressFromPriv } from './crypto';
 import { bytesToHex, hexToBytes } from './bytes';
 import { InvalidPasswordError } from './errors';
@@ -13,16 +11,15 @@ const DERIVED_KEY_FUNCTIONS = {
     salt: string | Uint8Array,
     params: Partial<Keystore['crypto']['kdf_params']>,
   ): Promise<Uint8Array> {
-    const { memlimit_kib: mem, opslimit: time } = params;
+    const { memlimit_kib: memoryCost, opslimit: timeCost } = params;
 
-    return (await hash({
-      hashLen: 32,
-      pass,
+    return hash(pass, {
+      hashLength: 32,
       salt,
-      time,
-      mem,
-      type: ArgonType.Argon2id,
-    })).hash;
+      timeCost,
+      memoryCost,
+      type: argon2id,
+    });
   },
 };
 

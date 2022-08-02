@@ -61,7 +61,8 @@ describe('Keystore', () => {
     expect(k).to.be.eql(keystoreStatic);
   });
 
-  it('restore account from keystore object', async () => expect(await recover(password, keystore)).to.be.equal(secretKey.toString('hex')));
+  it('restore account from keystore object', async () => expect(await recover(password, keystore))
+    .to.be.equal(secretKey.toString('hex')));
 
   it('use invalid keystore password', () => expect(recover(`${password}1`, keystore))
     .to.be.rejectedWith(InvalidPasswordError, 'Invalid password or nonce'));

@@ -52,10 +52,9 @@ function configure(filename, opts = {}) {
         type: 'umd',
       },
     },
-    externals: Object.fromEntries([
-      ...Object.keys(dependencies),
-      '@aeternity/argon2-browser/dist/argon2-bundled.min.js',
-    ].map((dependency) => [dependency, dependency])),
+    externals: Object.fromEntries(
+      Object.keys(dependencies).map((dependency) => [dependency, dependency]),
+    ),
     ...opts,
   });
 }
