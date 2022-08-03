@@ -16,7 +16,7 @@ jobs:
             ~/.npm
             ~/.autorest
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-      - run: npm ci --ignore-scripts
+      - run: npm ci
       - name: Run Commitlint
         env:
           EVENT_TYPE: ${{ github.event_name }}
@@ -28,7 +28,6 @@ jobs:
           else
             npx commitlint --from $BASE --to $HEAD --verbose
           fi
-      - run: npm run build
       - run: npm run lint
       - run: docker-compose up -d
       - name: Ensure that node is running
