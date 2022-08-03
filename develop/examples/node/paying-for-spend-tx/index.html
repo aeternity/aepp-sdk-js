@@ -13,7 +13,7 @@
     
     
       
-        <title>InnerTx: ContractCallTx - æternity JavaScript SDK</title>
+        <title>InnerTx: SpendTx - æternity JavaScript SDK</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#innertx-contractcalltx" class="md-skip">
+        <a href="#innertx-spendtx" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              InnerTx: ContractCallTx
+              InnerTx: SpendTx
             
           </span>
         </div>
@@ -613,6 +613,20 @@
               
   
   
+  
+    <li class="md-nav__item">
+      <a href="../paying-for-contract-call-tx/" class="md-nav__link">
+        InnerTx: ContractCallTx
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
     
   
   
@@ -625,12 +639,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          InnerTx: ContractCallTx
+          InnerTx: SpendTx
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        InnerTx: ContractCallTx
+        InnerTx: SpendTx
       </a>
       
         
@@ -653,19 +667,6 @@
     Introduction
   </a>
   
-    <nav class="md-nav" aria-label="Introduction">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#usecases" class="md-nav__link">
-    UseCases
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -683,43 +684,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-open-async-codeblock" class="md-nav__link">
-    3. Open async codeblock
+  <a href="#3-create-object-instances" class="md-nav__link">
+    3. Create object instances
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-create-object-instances" class="md-nav__link">
-    4. Create object instances
+  <a href="#4-send-1-aetto-from-payer-to-new-user" class="md-nav__link">
+    4. Send 1 aetto from payer to new user
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-create-and-sign-contractcalltx-on-behalf-of-new-user" class="md-nav__link">
-    5. Create and sign ContractCallTx on behalf of new user
+  <a href="#5-check-balance-of-new-user-before" class="md-nav__link">
+    5. Check balance of new user (before)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-create-sign-broadcast-the-payingfortx-as-payer" class="md-nav__link">
-    6. Create, sign &amp; broadcast the PayingForTx as payer
+  <a href="#6-create-and-sign-spendtx-on-behalf-of-new-user" class="md-nav__link">
+    6. Create and sign SpendTx on behalf of new user
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-check-that-last-caller-is-the-new-user" class="md-nav__link">
-    7. Check that last caller is the new user
+  <a href="#7-create-sign-broadcast-the-payingfortx-as-payer" class="md-nav__link">
+    7. Create, sign &amp; broadcast the PayingForTx as payer
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-close-and-run-async-codeblock" class="md-nav__link">
-    8. Close and run async codeblock
+  <a href="#8-check-balance-of-new-user-after" class="md-nav__link">
+    8. Check balance of new user (after)
   </a>
   
 </li>
@@ -728,20 +729,6 @@
   
 </nav>
       
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../paying-for-tx-spend-tx/" class="md-nav__link">
-        InnerTx: SpendTx
-      </a>
     </li>
   
 
@@ -1023,19 +1010,6 @@
     Introduction
   </a>
   
-    <nav class="md-nav" aria-label="Introduction">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#usecases" class="md-nav__link">
-    UseCases
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1053,43 +1027,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-open-async-codeblock" class="md-nav__link">
-    3. Open async codeblock
+  <a href="#3-create-object-instances" class="md-nav__link">
+    3. Create object instances
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-create-object-instances" class="md-nav__link">
-    4. Create object instances
+  <a href="#4-send-1-aetto-from-payer-to-new-user" class="md-nav__link">
+    4. Send 1 aetto from payer to new user
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-create-and-sign-contractcalltx-on-behalf-of-new-user" class="md-nav__link">
-    5. Create and sign ContractCallTx on behalf of new user
+  <a href="#5-check-balance-of-new-user-before" class="md-nav__link">
+    5. Check balance of new user (before)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-create-sign-broadcast-the-payingfortx-as-payer" class="md-nav__link">
-    6. Create, sign &amp; broadcast the PayingForTx as payer
+  <a href="#6-create-and-sign-spendtx-on-behalf-of-new-user" class="md-nav__link">
+    6. Create and sign SpendTx on behalf of new user
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-check-that-last-caller-is-the-new-user" class="md-nav__link">
-    7. Check that last caller is the new user
+  <a href="#7-create-sign-broadcast-the-payingfortx-as-payer" class="md-nav__link">
+    7. Create, sign &amp; broadcast the PayingForTx as payer
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-close-and-run-async-codeblock" class="md-nav__link">
-    8. Close and run async codeblock
+  <a href="#8-check-balance-of-new-user-after" class="md-nav__link">
+    8. Check balance of new user (after)
   </a>
   
 </li>
@@ -1108,38 +1082,25 @@
                 
 
 
-<h1 id="innertx-contractcalltx">InnerTx: ContractCallTx</h1>
+<h1 id="innertx-spendtx">InnerTx: SpendTx</h1>
 <h2 id="introduction">Introduction</h2>
-<p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/paying-for-tx-contract-call-tx.js">located in the repository</a>
+<p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/paying-for-spend-tx.mjs">located in the repository</a>
 and this page explains in detail how to:</p>
 <ul>
-<li>Create and sign a <code>ContractCallTx</code> with the <code>innerTx</code> option for an account that has no
-   balance.</li>
-<li>Wrap the signed <code>ContractCallTx</code> in a <code>PayingForTx</code> using an account with balance to pay the
-   fees of the inner transaction.</li>
+<li>Create and sign a <code>SpendTx</code> for an account with the <code>innerTx</code> option.</li>
+<li>Wrap the signed <code>SpendTx</code> in a <code>PayingForTx</code>, signing it using an account that pays the fees
+   of the inner <code>SpendTx</code> and broadcasts it to the network.</li>
 </ul>
 <p>Note:</p>
 <ul>
 <li>This can be done for <strong><em>any</em></strong> transaction type!</li>
 </ul>
-<h3 id="usecases">UseCases</h3>
-<p>This functionality allows <strong>every service</strong> to let their users interact with their
-decentralized aepp without having them to buy AE by covering their fees.</p>
-<p>Examples:</p>
-<ul>
-<li>Game developers that want to quickly onboard new users.</li>
-<li>Governance æpps that want people to vote on important proposals without having them to pay
-   anything.</li>
-<li>Custodians that want to offer an additional services to cover the transaction fees of their
-   clients.</li>
-<li>... many more!</li>
-</ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>You need to import <code>AeSdk</code>, <code>Node</code> and <code>MemoryAccount</code> classes from the SDK.
 Additionally you import the <code>generateKeyPair</code> utility function to generate a new keypair.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">generateKeyPair</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="p">,</span><span class="w"></span>
-<span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span><span class="w"></span>
 </code></pre></div>
 <strong>Note</strong>:</p>
 <ul>
@@ -1152,25 +1113,8 @@ Additionally you import the <code>generateKeyPair</code> utility function to gen
 <span class="w">  </span><span class="nx">secretKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b&#39;</span><span class="p">,</span><span class="w"></span>
 <span class="p">};</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">CONTRACT_ADDRESS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span>
-<span class="sb">@compiler &gt;= 6</span>
-
-<span class="sb">contract PayingForTxExample =</span>
-
-<span class="sb">    record state = { last_caller: option(address) }</span>
-
-<span class="sb">    entrypoint init() =</span>
-<span class="sb">        { last_caller = None }</span>
-
-<span class="sb">    stateful entrypoint set_last_caller() =</span>
-<span class="sb">        put(state{last_caller = Some(Call.caller)})</span>
-
-<span class="sb">    entrypoint get_last_caller() : option(address) =</span>
-<span class="sb">        state.last_caller</span>
-<span class="sb">`</span><span class="p">;</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">NEW_USER_KEYPAIR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">generateKeyPair</span><span class="p">();</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">AMOUNT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span><span class="w"></span>
 </code></pre></div>
 Note:</p>
 <ul>
@@ -1180,89 +1124,67 @@ Note:</p>
 <li>In case the account runs out of funds you can always request AE using the <a href="https://faucet.aepps.com/">Faucet</a></li>
 </ul>
 </li>
-<li>The contract is already deployed at the defined address.</li>
-<li>The <code>NEW_USER_KEYPAIR</code> is used to call the contract. The <code>PayingForTx</code> allows the new user to
-   perform a contract call without having any funds.</li>
+<li>The <code>AMOUNT</code> (in <code>aettos</code>) will be send to the new user and returned to the payer.</li>
 </ul>
-<h2 id="3-open-async-codeblock">3. Open async codeblock</h2>
-<p>Most functions of the SDK return <em>Promises</em>, so the recommended way of
-dealing with subsequent actions is running them one by one using <code>await</code>.
-Therefore we are putting our logic into an <code>async</code> code block
-<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-</code></pre></div></p>
-<h2 id="4-create-object-instances">4. Create object instances</h2>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">PAYER_ACCOUNT_KEYPAIR</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">NEW_USER_KEYPAIR</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">NODE_URL</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"></span>
-<span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
-<span class="w">    </span><span class="nx">compilerUrl</span><span class="o">:</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="p">});</span><span class="w"></span>
-<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">addAccount</span><span class="p">(</span><span class="nx">payerAccount</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
-<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">addAccount</span><span class="p">(</span><span class="nx">newUserAccount</span><span class="p">);</span><span class="w"></span>
+<h2 id="3-create-object-instances">3. Create object instances</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">PAYER_ACCOUNT_KEYPAIR</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">NEW_USER_KEYPAIR</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">NODE_URL</span><span class="p">);</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">addAccount</span><span class="p">(</span><span class="nx">payerAccount</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">addAccount</span><span class="p">(</span><span class="nx">newUserAccount</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
-<h2 id="5-create-and-sign-contractcalltx-on-behalf-of-new-user">5. Create and sign <code>ContractCallTx</code> on behalf of new user</h2>
-<p>Currently there is no high-level API available that allows you to create and sign the
-<code>ContractCallTx</code> by invoking the generated contract method on the contract instance that you
-typically use for contract calls.</p>
-<p>Following 4 steps need to be done:</p>
-<ol>
-<li>Initialize a contract instance by the source code and the contract address.</li>
-<li>Create calldata by calling the <code>encode</code> function providing the contract name, the name of
-    the <code>entrypoint</code> to call as well as the required params.<ul>
-<li>The <code>entrypoint</code> with the name <code>set_latest_caller</code> doesn't require any params so you
-   can provide an empty array</li>
-</ul>
-</li>
-<li>Create the <code>ContractCreateTx</code> by providing all required params.<ul>
-<li>You could omit <code>amount</code>, <code>gasLimit</code> and <code>gasPrice</code> if you choose to stick to the default
-   values (see
-   <a href="../../../transaction-options#contractcreatetx-contractcalltx">transaction options</a>)</li>
-</ul>
-</li>
-<li>Sign the transaction by providing <code>innerTx: true</code> as transaction option.<ul>
-<li>The transaction will be signed in a special way that is required for inner transactions.</li>
-</ul>
-</li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE</span><span class="p">,</span><span class="w"> </span><span class="nx">contractAddress</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_ADDRESS</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">  </span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">calldata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;PayingForTxExample&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;set_last_caller&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]);</span><span class="w"></span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">contractCallTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">buildTx</span><span class="p">(</span><span class="nx">Tag</span><span class="p">.</span><span class="nx">ContractCallTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nx">callerId</span><span class="o">:</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span><span class="w"></span>
-<span class="w">    </span><span class="nx">contractId</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_ADDRESS</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">gasLimit</span><span class="o">:</span><span class="w"> </span><span class="mf">1000000</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">gasPrice</span><span class="o">:</span><span class="w"> </span><span class="mf">1500000000</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nx">callData</span><span class="o">:</span><span class="w"> </span><span class="nx">calldata</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="p">});</span><span class="w"></span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">signedContractCallTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="w"></span>
-<span class="w">    </span><span class="nx">contractCallTx</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">innerTx</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">  </span><span class="p">);</span><span class="w"></span>
+<h2 id="4-send-1-aetto-from-payer-to-new-user">4. Send 1 <code>aetto</code> from payer to new user</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">spendTxResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="w"></span>
+<span class="w">  </span><span class="nx">AMOUNT</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">spendTxResult</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
-<h2 id="6-create-sign-broadcast-the-payingfortx-as-payer">6. Create, sign &amp; broadcast the <code>PayingForTx</code> as payer</h2>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">payForTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">payForTransaction</span><span class="p">(</span><span class="nx">signedContractCallTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">payForTx</span><span class="p">);</span><span class="w"></span>
-</code></pre></div>
-<h2 id="7-check-that-last-caller-is-the-new-user">7. Check that last caller is the new user</h2>
-<p>Contract instance allows interacting with the contract in a convenient way.
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">dryRunTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">get_last_caller</span><span class="p">();</span><span class="w"></span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`New user: </span><span class="si">${</span><span class="k">await</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Last caller:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">dryRunTx</span><span class="p">.</span><span class="nx">decodedResult</span><span class="p">);</span><span class="w"></span>
+<h2 id="5-check-balance-of-new-user-before">5. Check balance of new user (before)</h2>
+<p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">newUserBalanceBefore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">());</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`new user balance (before): </span><span class="si">${</span><span class="nx">newUserBalanceBefore</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 Note:</p>
 <ul>
-<li>Last caller should now be the address of the new user.</li>
-<li>For regular (non-stateful) entrypoints the SDK automatically performs a dry-run which
-   allows to perform read-only calls for free, see
-   <a href="../../../guides/contracts/#b-regular-entrypoints">Contract guide</a>.</li>
+<li>The balance should now be 1</li>
 </ul>
-<h2 id="8-close-and-run-async-codeblock">8. Close and run async codeblock</h2>
-<p>Now you can close the async codeblock and execute it at the same time.
-<div class="highlight"><pre><span></span><code><span class="p">})();</span><span class="w"></span>
-</code></pre></div></p>
+<h2 id="6-create-and-sign-spendtx-on-behalf-of-new-user">6. Create and sign <code>SpendTx</code> on behalf of new user</h2>
+<p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">spendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">buildTx</span><span class="p">(</span><span class="nx">Tag</span><span class="p">.</span><span class="nx">SpendTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">senderId</span><span class="o">:</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span><span class="w"></span>
+<span class="w">  </span><span class="nx">recipientId</span><span class="o">:</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">payerAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">(),</span><span class="w"></span>
+<span class="w">  </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="nx">AMOUNT</span><span class="p">,</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">signedSpendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="w"></span>
+<span class="w">  </span><span class="nx">spendTx</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">innerTx</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
+</code></pre></div>
+Note:</p>
+<ul>
+<li>The provided <a href="../../../transaction-options/">transaction option</a> <code>innerTx</code> indicates that
+   the transaction needs to be signed in a special way</li>
+</ul>
+<h2 id="7-create-sign-broadcast-the-payingfortx-as-payer">7. Create, sign &amp; broadcast the <code>PayingForTx</code> as payer</h2>
+<p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payForTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">payForTransaction</span><span class="p">(</span><span class="nx">signedSpendTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">payForTx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+Note:</p>
+<ul>
+<li>Normally sending the whole balance (1 <code>aetto</code>) would not be possible as the new user would
+   have to cover the transaction fee.</li>
+</ul>
+<h2 id="8-check-balance-of-new-user-after">8. Check balance of new user (after)</h2>
+<p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">newUserBalanceAfter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">());</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`new user balance (after): </span><span class="si">${</span><span class="nx">newUserBalanceAfter</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+Note:</p>
+<ul>
+<li>The balance should now be 0</li>
+</ul>
 
               
             </article>
@@ -1280,7 +1202,7 @@ Note:</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer" >
       
         
-        <a href="../contract-interaction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Compile &amp; Deploy a Sophia Smart Contract" rel="prev">
+        <a href="../paying-for-contract-call-tx/" class="md-footer__link md-footer__link--prev" aria-label="Previous: InnerTx: ContractCallTx" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
           </div>
@@ -1289,20 +1211,20 @@ Note:</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              Compile & Deploy a Sophia Smart Contract
+              InnerTx: ContractCallTx
             </div>
           </div>
         </a>
       
       
         
-        <a href="../paying-for-tx-spend-tx/" class="md-footer__link md-footer__link--next" aria-label="Next: InnerTx: SpendTx" rel="next">
+        <a href="../../../tutorials/vuejs/helloworld-blockheight/" class="md-footer__link md-footer__link--next" aria-label="Next: Vue.js HelloWorld" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              InnerTx: SpendTx
+              Vue.js HelloWorld
             </div>
           </div>
           <div class="md-footer__button md-icon">

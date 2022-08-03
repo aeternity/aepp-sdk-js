@@ -609,7 +609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/node/paying-for-tx-contract-call-tx/" class="md-nav__link">
+      <a href="../examples/node/paying-for-contract-call-tx/" class="md-nav__link">
         InnerTx: ContractCallTx
       </a>
     </li>
@@ -623,7 +623,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/node/paying-for-tx-spend-tx/" class="md-nav__link">
+      <a href="../examples/node/paying-for-spend-tx/" class="md-nav__link">
         InnerTx: SpendTx
       </a>
     </li>
@@ -919,6 +919,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#generate-bundle-report" class="md-nav__link">
+    Generate bundle report
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#testing" class="md-nav__link">
     Testing
   </a>
@@ -1030,6 +1037,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#generate-bundle-report" class="md-nav__link">
+    Generate bundle report
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#testing" class="md-nav__link">
     Testing
   </a>
@@ -1066,7 +1080,7 @@
 
 <h1 id="development">Development</h1>
 <h2 id="principles">Principles</h2>
-<p>The Javascript SDK wraps the æternity API explosed by
+<p>The Javascript SDK wraps the æternity API exposed by
 <a href="https://github.com/aeternity/aeternity/blob/master/config/swagger.yaml">Node's Swagger file</a>. It aims to abstract the API, while still providing
 low-level access to it's endpoints, when necessary.</p>
 <p>It uses the following Javascript technologies and principles:</p>
@@ -1074,10 +1088,8 @@ low-level access to it's endpoints, when necessary.</p>
 <li><a href="https://github.com/dwyl/Javascript-the-Good-Parts-notes">JavaScript the Good Parts</a> (because Crockford is always right)</li>
 <li><a href="https://hacks.mozilla.org/2015/08/es6-in-depth-modules/">ES6 modules</a>, using <code>export</code> and <code>import</code></li>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">Promises</a> using ES7 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function">async/await</a> syntax, where applicable</li>
-<li>Functional Programming using <a href="https://ramdajs.com/">Ramda</a></li>
 <li>Statelessness wherever possible</li>
-<li><a href="https://webpack.js.org/">webpack 4</a> and the <a href="https://github.com/babel/babel-loader">Babel</a></li>
-<li>Strictly enforced <a href="https://standardjs.com/">StandardJS</a></li>
+<li><a href="https://webpack.js.org/">webpack</a> and the <a href="https://github.com/babel/babel-loader">Babel</a></li>
 <li>Loose coupling of modules to enable <a href="https://webpack.js.org/guides/tree-shaking/">tree-shaking</a></li>
 <li>Convention over configuration</li>
 <li>"Easy things should be easy, and hard things should be possible." <a href="https://www.amazon.com/gp/feature.html?ie=UTF8&amp;docId=7137">source</a> -- <a href="https://en.wikipedia.org/wiki/Larry_Wall">Larry Wall</a></li>
@@ -1090,12 +1102,12 @@ low-level access to it's endpoints, when necessary.</p>
 </li>
 </ul>
 <h2 id="requirements">Requirements</h2>
-<p>aepp-sdk is transpiled to EcmaScript 5 through <a href="https://webpack.js.org/">WebPack</a>, using <a href="https://babeljs.io/">Babel</a> and is expected to work in any sufficiently new version of <a href="https://nodejs.org/en/">Node.js</a> (<code>&gt;= v12.17</code>) or modern web browser.</p>
+<p>aepp-sdk is transpiled to EcmaScript 5 through <a href="https://webpack.js.org/">WebPack</a>, using <a href="https://babeljs.io/">Babel</a> and is expected to work in any sufficiently new version of <a href="https://nodejs.org/en/">Node.js</a> or modern web browser.</p>
 <h2 id="contributing">Contributing</h2>
 <ol>
 <li>Clone the application</li>
 <li>Make sure your editor/IDE can read and use the <code>.editorconfig</code> file</li>
-<li>Start hacking (and dont forget to add <a href="#testing">test</a> for whatever you'll be building).</li>
+<li>Start hacking (and don't forget to add <a href="#testing">test</a> for whatever you'll be building).</li>
 </ol>
 <h2 id="documenting">Documenting</h2>
 <p>Apart from documenting features and code, there is also documentation automatically generated using <a href="https://typedoc.org/"><strong>TypeDoc</strong></a> for documenting TS files and <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/tooling/docs/examples-to-md.js">a script</a> for documenting examples and code partials.</p>
@@ -1103,9 +1115,12 @@ low-level access to it's endpoints, when necessary.</p>
 npm run docs:examples <span class="o">&amp;&amp;</span> npm run docs:api
 </code></pre></div>
 <h2 id="building">Building</h2>
-<p>aepp-sdk is built using npm. In order to build a development version, launch the <code>build:dev</code> command.</p>
+<p>aepp-sdk is built using npm. In order to build a production version, launch the <code>build</code> command.</p>
 <div class="highlight"><pre><span></span><code>npm install
-npm run build:dev
+npm run build
+</code></pre></div>
+<h2 id="generate-bundle-report">Generate bundle report</h2>
+<div class="highlight"><pre><span></span><code>npx webpack --env REPORT
 </code></pre></div>
 <h2 id="testing">Testing</h2>
 <p>To test, launch the <code>test</code> command. This will run <a href="https://mochajs.org/">mocha</a>'s tests locally.</p>
@@ -1113,16 +1128,6 @@ npm run build:dev
 </code></pre></div>
 <p>This repository also includes a docker-compose file, to allow you to <strong>run your own æternity node locally</strong>. If you want to do so, <strong>from the root of the project</strong>:</p>
 <ol>
-<li>Create a <em><strong>docker-compose.override.yml</strong></em> file with this content:
-<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3&quot;</span><span class="w"></span>
-<span class="nt">services</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">node</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3013:3013</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3113:3113</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3014:3014</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3001:3001</span><span class="w"></span>
-</code></pre></div></li>
 <li>Run <code>docker-compose up node</code></li>
 <li>Congrats! you're now running your own æternity node locally.</li>
 </ol>

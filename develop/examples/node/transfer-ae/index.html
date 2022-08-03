@@ -614,43 +614,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-open-async-codeblock" class="md-nav__link">
-    3. Open async codeblock
+  <a href="#3-create-object-instances" class="md-nav__link">
+    3. Create object instances
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-create-object-instances" class="md-nav__link">
-    4. Create object instances
+  <a href="#4-get-ae-balance-of-recipient-before-transfer" class="md-nav__link">
+    4. Get AE balance of recipient (before transfer)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-get-ae-balance-of-recipient-before-transfer" class="md-nav__link">
-    5. Get AE balance of recipient (before transfer)
+  <a href="#5-transfer-ae" class="md-nav__link">
+    5. Transfer AE
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-transfer-ae" class="md-nav__link">
-    6. Transfer AE
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-get-ae-balance-of-recipient-after-transfer" class="md-nav__link">
-    7. Get AE balance of recipient (after transfer)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-close-and-run-async-codeblock" class="md-nav__link">
-    8. Close and run async codeblock
+  <a href="#6-get-ae-balance-of-recipient-after-transfer" class="md-nav__link">
+    6. Get AE balance of recipient (after transfer)
   </a>
   
 </li>
@@ -710,7 +696,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../paying-for-tx-contract-call-tx/" class="md-nav__link">
+      <a href="../paying-for-contract-call-tx/" class="md-nav__link">
         InnerTx: ContractCallTx
       </a>
     </li>
@@ -724,7 +710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../paying-for-tx-spend-tx/" class="md-nav__link">
+      <a href="../paying-for-spend-tx/" class="md-nav__link">
         InnerTx: SpendTx
       </a>
     </li>
@@ -1025,43 +1011,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-open-async-codeblock" class="md-nav__link">
-    3. Open async codeblock
+  <a href="#3-create-object-instances" class="md-nav__link">
+    3. Create object instances
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-create-object-instances" class="md-nav__link">
-    4. Create object instances
+  <a href="#4-get-ae-balance-of-recipient-before-transfer" class="md-nav__link">
+    4. Get AE balance of recipient (before transfer)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-get-ae-balance-of-recipient-before-transfer" class="md-nav__link">
-    5. Get AE balance of recipient (before transfer)
+  <a href="#5-transfer-ae" class="md-nav__link">
+    5. Transfer AE
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-transfer-ae" class="md-nav__link">
-    6. Transfer AE
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-get-ae-balance-of-recipient-after-transfer" class="md-nav__link">
-    7. Get AE balance of recipient (after transfer)
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-close-and-run-async-codeblock" class="md-nav__link">
-    8. Close and run async codeblock
+  <a href="#6-get-ae-balance-of-recipient-after-transfer" class="md-nav__link">
+    6. Get AE balance of recipient (after transfer)
   </a>
   
 </li>
@@ -1082,7 +1054,7 @@
 
 <h1 id="transfer-ae">Transfer AE</h1>
 <h2 id="introduction">Introduction</h2>
-<p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.js">located in the repository</a>
+<p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.mjs">located in the repository</a>
 and this page explains in detail how to:</p>
 <ul>
 <li>initialize an instance of the SDK with a pre-funded account</li>
@@ -1090,7 +1062,7 @@ and this page explains in detail how to:</p>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>You need to import <code>AeSdk</code>, <code>Node</code> and <code>MemoryAccount</code> classes from the SDK.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span><span class="w"></span>
 </code></pre></div>
 <strong>Note</strong>:</p>
 <ul>
@@ -1120,33 +1092,27 @@ Note:</p>
 </ul>
 </li>
 </ul>
-<h2 id="3-open-async-codeblock">3. Open async codeblock</h2>
-<p>Most functions of the SDK return <em>Promises</em>, so the recommended way of
-dealing with subsequent actions is running them one by one using <code>await</code>.
-Therefore we are putting our logic into an <code>async</code> code block
-<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-</code></pre></div></p>
-<h2 id="4-create-object-instances">4. Create object instances</h2>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">ACCOUNT_KEYPAIR</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">NODE_URL</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"></span>
-<span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
-<span class="w">  </span><span class="p">});</span><span class="w"></span>
-<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">addAccount</span><span class="p">(</span><span class="nx">account</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<h2 id="3-create-object-instances">3. Create object instances</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">ACCOUNT_KEYPAIR</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">NODE_URL</span><span class="p">);</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">addAccount</span><span class="p">(</span><span class="nx">account</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
 </code></pre></div>
-<h2 id="5-get-ae-balance-of-recipient-before-transfer">5. Get AE balance of recipient (before transfer)</h2>
+<h2 id="4-get-ae-balance-of-recipient-before-transfer">4. Get AE balance of recipient (before transfer)</h2>
 <p>Before the transfer of AE you can check the AE balance of the recipient.
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">balanceBefore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (before): </span><span class="si">${</span><span class="nx">balanceBefore</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">balanceBefore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">);</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (before): </span><span class="si">${</span><span class="nx">balanceBefore</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">);</span><span class="w"></span>
 </code></pre></div></p>
-<h2 id="6-transfer-ae">6. Transfer AE</h2>
+<h2 id="5-transfer-ae">5. Transfer AE</h2>
 <p>Calling the <code>spend</code> function will create, sign and broadcast a <code>SpendTx</code> to the network.
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Transaction mined&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">tx</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">);</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Transaction mined&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">tx</span><span class="p">);</span><span class="w"></span>
 </code></pre></div></p>
-<h2 id="7-get-ae-balance-of-recipient-after-transfer">7. Get AE balance of recipient (after transfer)</h2>
-<p><div class="highlight"><pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">balanceAfter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (after): </span><span class="si">${</span><span class="nx">balanceAfter</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">);</span><span class="w"></span>
+<h2 id="6-get-ae-balance-of-recipient-after-transfer">6. Get AE balance of recipient (after transfer)</h2>
+<p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">balanceAfter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">);</span><span class="w"></span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (after): </span><span class="si">${</span><span class="nx">balanceAfter</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 Note:</p>
 <ul>
@@ -1154,10 +1120,6 @@ Note:</p>
    provided) the balance will be lower after transfer because a transaction <code>fee</code> has been
    paid to the miners.</li>
 </ul>
-<h2 id="8-close-and-run-async-codeblock">8. Close and run async codeblock</h2>
-<p>Now you can close the async codeblock and execute it at the same time.
-<div class="highlight"><pre><span></span><code><span class="p">})();</span><span class="w"></span>
-</code></pre></div></p>
 
               
             </article>
