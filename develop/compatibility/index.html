@@ -942,7 +942,7 @@
 </tr>
 <tr>
 <td>webpack@4</td>
-<td></td>
+<td>requires a fix to work with mjs build <a href="https://github.com/webpack/webpack/issues/7482#issuecomment-394884837">webpack-4</a></td>
 </tr>
 <tr>
 <td>webpack@5</td>
@@ -958,7 +958,7 @@
 </tr>
 <tr>
 <td>create-react-app@4 (webpack@4)</td>
-<td></td>
+<td>mjs build is not compatible with webpack@4 <a href="https://github.com/aeternity/aepp-sdk-js/issues/1529">cra-webpack-4</a></td>
 </tr>
 <tr>
 <td>create-react-app@5 (webpack@5)</td>
@@ -966,11 +966,19 @@
 </tr>
 <tr>
 <td>create-react-native-app@3 (webpack@4)</td>
-<td>Requires <code>URLSearchParams</code> polyfill https://github.com/swagger-api/swagger-js/issues/2457</td>
+<td>mjs build is not compatible with webpack@4 <a href="https://github.com/aeternity/aepp-sdk-js/issues/1529">cra-webpack-4</a></td>
 </tr>
 <tr>
 <td>meteor@2</td>
 <td></td>
+</tr>
+<tr>
+<td>jest@27.5.1</td>
+<td>requires an environment where Buffer is instanceof Uint8Array <a href="https://github.com/facebook/jest/issues/4422#issuecomment-770274099">jest</a></td>
+</tr>
+<tr>
+<td>typescript</td>
+<td>requires <code>tsconfig.json</code> adjustments <a href="..#typescript-projects">typescript</a></td>
 </tr>
 </tbody>
 </table>
