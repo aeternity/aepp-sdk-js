@@ -299,9 +299,8 @@ export default class AeSdkWallet extends AeSdk {
             const overrides = await this.onMessageSign(id, { message, onAccount }, origin);
             onAccount = overrides?.onAccount ?? onAccount;
             return {
-              // TODO: fix signMessage return type
-              signature: await this.signMessage(message, { onAccount, returnHex: true }) as
-                unknown as string,
+              signature: Buffer.from(await this.signMessage(message, { onAccount }))
+                .toString('hex'),
             };
           },
         },

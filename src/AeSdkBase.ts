@@ -216,7 +216,7 @@ class AeSdkBase {
   async signMessage(
     message: string,
     { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['signMessage']>[1] = {},
-  ): Promise<string | Uint8Array> {
+  ): Promise<Uint8Array> {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
 

@@ -61,7 +61,7 @@ describe('MemoryAccount', () => {
     const message = 'test';
     const acc = new MemoryAccount({ keypair: testAcc });
     const sig = await acc.signMessage(message);
-    const sigHex = await acc.signMessage(message, { returnHex: true });
+    const sigHex = Buffer.from(sig).toString('hex');
     const isValid = await acc.verifyMessage(message, sig);
     const isValidHex = await acc.verifyMessage(message, sigHex);
     isValid.should.be.equal(true);
