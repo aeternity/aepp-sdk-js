@@ -109,7 +109,7 @@ export function buildFee(txType: Tag, buildTx: any): BigNumber {
  * @param txType - Transaction type
  * @param rebuildTx - Callback to get built transaction with specific fee
  */
-export function calculateMinFee(
+function calculateMinFee(
   txType: Tag,
   rebuildTx: (value: BigNumber) => any,
 ): BigNumber {

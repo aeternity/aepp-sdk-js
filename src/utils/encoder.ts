@@ -18,7 +18,6 @@ export { Encoded, Encoding };
  * Calculate SHA256 hash of `input`
  * @param input - Data to hash
  * @returns Hash
- * @deprecated use `SubtleCrypto.digest` or `sha.js` package instead
  */
 export function sha256hash(input: Uint8Array | string): Buffer {
   return new Sha256().update(input).digest();

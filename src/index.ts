@@ -27,15 +27,12 @@ export * from './tx/builder/schema';
 export * from './tx/builder/address';
 export * from './utils/amount-formatter';
 export * from './utils/hd-wallet';
-export {
-  sha256hash, encode, decode, Encoding,
-} from './utils/encoder';
+export { encode, decode, Encoding } from './utils/encoder';
 export * from './aens';
 export * from './contract/methods';
 export * from './oracle';
 export * from './spend';
 export * from './contract/ga';
-export * from './deprecated';
 
 export { default as AeSdkBase } from './AeSdkBase';
 export { default as AeSdk } from './AeSdk';
