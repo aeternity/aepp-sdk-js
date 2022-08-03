@@ -390,9 +390,13 @@ export default async function getContractInstance({
 
     const callerId = await Promise.resolve()
       .then(() => opt.onAccount.address(opt))
-      .catch((error: any) => {
-        if (opt.callStatic === true) return DRY_RUN_ACCOUNT.pub;
-        throw error;
+      .catch((error) => {
+        const messageToSwallow = 'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got undefined instead';
+        if (
+          opt.callStatic !== true || !(error instanceof TypeError)
+          || error.message !== messageToSwallow
+        ) throw error;
+        return DRY_RUN_ACCOUNT.pub;
       }) as Encoded.AccountAddress;
     const callData = instance.calldata.encode(instance._name, fn, params);
 

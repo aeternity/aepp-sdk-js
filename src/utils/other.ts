@@ -1,3 +1,5 @@
+import { RestError } from '@azure/core-rest-pipeline';
+
 export const pause = async (duration: number): Promise<void> => new Promise((resolve) => {
   setTimeout(resolve, duration);
 });
@@ -41,4 +43,9 @@ export function isKeyOfObject<T>(key: string | number | symbol, object: T): key 
  */
 export function isItemOfArray<T>(item: any, array: readonly T[]): item is T {
   return array.includes(item);
+}
+
+export function isAccountNotFoundError(error: Error): boolean {
+  return error instanceof RestError && error.statusCode === 404
+    && error.message.includes('Account not found');
 }

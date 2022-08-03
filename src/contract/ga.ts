@@ -173,6 +173,7 @@ export async function createMetaTx(
     authData: authCallData,
     gasLimit,
     vsn: 2,
+    nonce: 0,
   };
   // @ts-expect-error createMetaTx needs to be integrated into tx builder
   const { fee } = await prepareTxParams(Tag.GaMetaTx, { ...params, onNode });
