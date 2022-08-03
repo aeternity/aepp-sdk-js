@@ -15,13 +15,8 @@ import { concatBuffers, isKeyOfObject } from '../utils/other';
 import {
   decode, encode, Encoded, Encoding,
 } from '../utils/encoder';
-import Node from '../Node';
-
-interface Account {
-  balance: bigint;
-  id: Encoded.AccountAddress;
-  nonce: number;
-}
+import Node, { TransformNodeType } from '../Node';
+import { Account } from '../apis/node';
 
 export interface ValidatorResult {
   message: string;
@@ -46,7 +41,8 @@ type Validator = (
     contractId?: Encoded.ContractAddress;
   },
   options: {
-    account?: Account;
+    // TODO: remove after fixing node types
+    account?: TransformNodeType<Account> & { id: Encoded.AccountAddress };
     nodeNetworkId: string;
     parentTxTypes: Tag[];
     node: Node;
@@ -162,6 +158,18 @@ validators.push(
       key: 'InsufficientBalance',
       checkedKeys: ['amount', 'fee', 'nameFee'],
     }];
+  },
+  ({ signatures }, { account, txType }) => {
+    if (account == null) return [];
+    let message;
+    if (txType === Tag.SignedTx && account.kind === 'generalized' && signatures.length !== 0) {
+      message = 'Generalized account can\'t be used to generate SignedTx with signatures';
+    }
+    if (txType === Tag.GaMetaTx && account.kind === 'basic') {
+      message = 'Basic account can\'t be used to generate GaMetaTx';
+    }
+    if (message == null) return [];
+    return [{ message, key: 'InvalidAccountType', checkedKeys: ['tag'] }];
   },
   ({ nonce }, { account, parentTxTypes }) => {
     if (nonce == null || account == null || parentTxTypes.includes(Tag.GaMetaTx)) return [];
