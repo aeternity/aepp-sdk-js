@@ -14,7 +14,7 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { messageToHash, verifyMessage as verifyMessageCrypto, hash } from '../utils/crypto';
+import { messageToHash, hash } from '../utils/crypto';
 import { buildTx } from '../tx/builder';
 import { decode, Encoded } from '../utils/encoder';
 import { Tag } from '../tx/builder/constants';
@@ -84,24 +84,6 @@ export default abstract class AccountBase {
    */
   async signMessage(message: string, options?: any): Promise<Uint8Array> {
     return this.sign(messageToHash(message), options);
-  }
-
-  /**
-   * Verify message
-   * @param message - Message to verify
-   * @param signature - Signature
-   * @param options - Options
-   */
-  async verifyMessage(
-    message: string,
-    signature: string | Uint8Array,
-    options?: object,
-  ): Promise<boolean> {
-    return verifyMessageCrypto(
-      message,
-      typeof signature === 'string' ? Buffer.from(signature, 'hex') : signature,
-      decode(await this.address(options)),
-    );
   }
 
   /**

@@ -44,6 +44,7 @@ import {
   UnknownRpcClientError,
   UnsubscribedAccountError,
   AccountBase,
+  verifyMessage,
 } from '../../src';
 import { concatBuffers } from '../../src/utils/other';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
@@ -289,8 +290,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
       const { tx: { signatures: [signature], encodedTx: { rlpEncoded } } } = unpackedTx;
       const txWithNetwork = concatBuffers([Buffer.from(networkId), hash(rlpEncoded)]);
-      const valid = verify(txWithNetwork, signature, decode(address));
-      valid.should.be.equal(true);
+      expect(verify(txWithNetwork, signature, address)).to.be.equal(true);
     });
 
     it('Try to sign using unpermited account', async () => {
@@ -335,10 +335,10 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Sign message', async () => {
       wallet.onMessageSign = async () => {};
-      const messageSig = await aepp.signMessage('test');
+      const messageSig = await aepp.signMessage('test') as Uint8Array;
       messageSig.should.be.instanceof(Buffer);
-      const isValid = await aepp.verifyMessage('test', messageSig);
-      isValid.should.be.equal(true);
+      expect(verifyMessage('test', messageSig, await aepp.address()))
+        .to.be.equal(true);
     });
 
     it('Sign message using custom account', async () => {
@@ -349,10 +349,10 @@ describe('Aepp<->Wallet', function aeppWallet() {
         throw new Error('Shouldn\'t be reachable');
       };
       const onAccount = accountAddress;
-      const messageSig = await aepp.signMessage('test', { onAccount });
+      const messageSig = await aepp.signMessage('test', { onAccount }) as Uint8Array;
       messageSig.should.be.instanceof(Buffer);
-      const isValid = await aepp.verifyMessage('test', messageSig, { onAccount });
-      isValid.should.be.equal(true);
+      expect(verifyMessage('test', messageSig, accountAddress))
+        .to.be.equal(true);
     });
 
     it('Sign and broadcast invalid transaction', async () => {

@@ -19,7 +19,9 @@ import '..';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import MemoryAccount from '../../src/account/Memory';
-import { generateKeyPair, InvalidKeypairError, DecodeError } from '../../src';
+import {
+  generateKeyPair, InvalidKeypairError, DecodeError, verifyMessage,
+} from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
 const testAcc = generateKeyPair();
@@ -59,12 +61,8 @@ describe('MemoryAccount', () => {
 
   it('Sign message', async () => {
     const message = 'test';
-    const acc = new MemoryAccount({ keypair: testAcc });
-    const sig = await acc.signMessage(message);
-    const sigHex = Buffer.from(sig).toString('hex');
-    const isValid = await acc.verifyMessage(message, sig);
-    const isValidHex = await acc.verifyMessage(message, sigHex);
-    isValid.should.be.equal(true);
-    isValidHex.should.be.equal(true);
+    const account = new MemoryAccount({ keypair: testAcc });
+    const signature = await account.signMessage(message);
+    expect(verifyMessage(message, signature, testAcc.publicKey)).to.equal(true);
   });
 });

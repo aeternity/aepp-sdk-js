@@ -219,14 +219,6 @@ class AeSdkBase {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
 
-  async verifyMessage(
-    message: string,
-    signature: string | Uint8Array,
-    { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['verifyMessage']>[2] = {},
-  ): Promise<boolean> {
-    return this._resolveAccount(onAccount).verifyMessage(message, signature, options);
-  }
-
   /**
    * Resolves an account
    * @param account - ak-address, instance of AccountBase, or keypair
