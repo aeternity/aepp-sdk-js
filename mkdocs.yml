@@ -66,8 +66,8 @@ nav:
       - examples/node/transfer-ae.md
       - examples/node/contract-interaction.md
       - PayingForTx:
-        - examples/node/paying-for-tx-contract-call-tx.md
-        - examples/node/paying-for-tx-spend-tx.md
+        - examples/node/paying-for-contract-call-tx.md
+        - examples/node/paying-for-spend-tx.md
     - tutorials/vuejs/helloworld-blockheight.md
   - 'API Reference': api/
   - compatibility.md

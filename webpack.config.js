@@ -2,23 +2,26 @@ const webpack = require('webpack');
 const path = require('path');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { dependencies } = require('./package.json');
+const babelConfig = require('./babel.config');
 
 function configure(filename, opts = {}) {
-  return (env, argv) => ({
+  const isNode = opts.target.includes('node');
+  return (env) => ({
     entry: './src/index.ts',
-    mode: 'development', // automatically overriden by production flag
-    devtool: argv.mode === 'production' ? 'source-map' : 'eval-source-map',
+    mode: 'production',
+    devtool: 'source-map',
     module: {
       rules: [
         {
           test: /\.(js|ts)$/,
           include: path.resolve(__dirname, 'src'),
           loader: 'babel-loader',
+          options: { ...babelConfig, browserslistEnv: opts.target.split(':')[1] },
         },
       ],
     },
     optimization: {
-      minimize: opts.target !== 'node',
+      minimize: !isNode,
     },
     resolve: {
       extensions: ['.ts', '.js'],
@@ -27,13 +30,13 @@ function configure(filename, opts = {}) {
       },
     },
     plugins: [
-      ...opts.target === 'node'
+      ...isNode
         ? []
         : [new webpack.ProvidePlugin({
           process: 'process',
           Buffer: ['buffer', 'Buffer'],
         })],
-      ...argv.report
+      ...env.REPORT
         ? [new BundleAnalyzerPlugin({
           analyzerMode: 'static',
           reportFilename: `${filename}.html`,
@@ -58,7 +61,7 @@ function configure(filename, opts = {}) {
 }
 
 module.exports = [
-  configure('aepp-sdk.js', { target: 'node' }),
-  configure('aepp-sdk.browser.js'),
-  configure('aepp-sdk.browser-script.js', { externals: undefined }),
+  configure('aepp-sdk.js', { target: 'browserslist:node' }),
+  configure('aepp-sdk.browser.js', { target: 'browserslist:browser' }),
+  configure('aepp-sdk.browser-script.js', { target: 'browserslist:browser', externals: undefined }),
 ];

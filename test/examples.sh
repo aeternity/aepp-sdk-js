@@ -10,13 +10,13 @@ echo Run environment/node.ts
 
 run_node_example () {
   echo Run $1
-  cat ./examples/node/$1 | sed -e "s|@aeternity/aepp-sdk|./dist/aepp-sdk.js|" | node
+  cat ./examples/node/$1 | sed -e "s|@aeternity/aepp-sdk|./es/index.mjs|" | node --input-type=module
 }
 
-run_node_example contract-interaction.js
-run_node_example paying-for-tx-contract-call-tx.js
-run_node_example paying-for-tx-spend-tx.js
-run_node_example transfer-ae.js
+run_node_example contract-interaction.mjs
+run_node_example paying-for-contract-call-tx.mjs
+run_node_example paying-for-spend-tx.mjs
+run_node_example transfer-ae.mjs
 
 echo Build example aepp
 cd ./examples/browser/aepp

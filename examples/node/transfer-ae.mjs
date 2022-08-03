@@ -19,7 +19,7 @@
 // # Transfer AE
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.js)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.mjs)
 // and this page explains in detail how to:
 //
 //  - initialize an instance of the SDK with a pre-funded account
@@ -27,7 +27,7 @@
 
 // ## 1. Specify imports
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-const { AeSdk, Node, MemoryAccount } = require('@aeternity/aepp-sdk');
+import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -53,39 +53,30 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 //        arguments when executing the script,
 //        e.g. `node transfer-ae.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb`
 
-// ## 3. Open async codeblock
-// Most functions of the SDK return _Promises_, so the recommended way of
-// dealing with subsequent actions is running them one by one using `await`.
-// Therefore we are putting our logic into an `async` code block
-(async () => {
-  // ## 4. Create object instances
-  const account = new MemoryAccount({ keypair: ACCOUNT_KEYPAIR });
-  const node = new Node(NODE_URL);
-  const aeSdk = new AeSdk({
-    nodes: [{ name: 'testnet', instance: node }],
-  });
-  await aeSdk.addAccount(account, { select: true });
+// ## 3. Create object instances
+const account = new MemoryAccount({ keypair: ACCOUNT_KEYPAIR });
+const node = new Node(NODE_URL);
+const aeSdk = new AeSdk({
+  nodes: [{ name: 'testnet', instance: node }],
+});
+await aeSdk.addAccount(account, { select: true });
 
-  // ## 5. Get AE balance of recipient (before transfer)
-  // Before the transfer of AE you can check the AE balance of the recipient.
-  const balanceBefore = await aeSdk.getBalance(recipient);
-  console.log(`Balance of ${recipient} (before): ${balanceBefore} aettos`);
+// ## 4. Get AE balance of recipient (before transfer)
+// Before the transfer of AE you can check the AE balance of the recipient.
+const balanceBefore = await aeSdk.getBalance(recipient);
+console.log(`Balance of ${recipient} (before): ${balanceBefore} aettos`);
 
-  // ## 6. Transfer AE
-  // Calling the `spend` function will create, sign and broadcast a `SpendTx` to the network.
-  const tx = await aeSdk.spend(amount, recipient);
-  console.log('Transaction mined', tx);
+// ## 5. Transfer AE
+// Calling the `spend` function will create, sign and broadcast a `SpendTx` to the network.
+const tx = await aeSdk.spend(amount, recipient);
+console.log('Transaction mined', tx);
 
-  // ## 7. Get AE balance of recipient (after transfer)
-  const balanceAfter = await aeSdk.getBalance(recipient);
-  console.log(`Balance of ${recipient} (after): ${balanceAfter} aettos`);
+// ## 6. Get AE balance of recipient (after transfer)
+const balanceAfter = await aeSdk.getBalance(recipient);
+console.log(`Balance of ${recipient} (after): ${balanceAfter} aettos`);
 
-  // Note:
-  //
-  //  - If the recipient is the same account as the sender (default of the script if no arguments
-  //    provided) the balance will be lower after transfer because a transaction `fee` has been
-  //    paid to the miners.
-
-// ## 8. Close and run async codeblock
-// Now you can close the async codeblock and execute it at the same time.
-})();
+// Note:
+//
+//  - If the recipient is the same account as the sender (default of the script if no arguments
+//    provided) the balance will be lower after transfer because a transaction `fee` has been
+//    paid to the miners.
