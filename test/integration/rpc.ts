@@ -120,8 +120,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
         onMessageSign: handlerRejectPromise,
         onDisconnect() {},
       });
-      await wallet.addAccount(account, { select: true });
-      await wallet.addAccount(MemoryAccount.generate(), { select: false });
+      wallet.addAccount(account, { select: true });
+      wallet.addAccount(MemoryAccount.generate());
       aepp = new AeSdkAepp({
         name: 'AEPP',
         nodes: [{ name: 'test', instance: node }],
@@ -375,7 +375,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       const accountsPromise = new Promise<Accounts>((resolve) => {
         aepp.onAddressChange = resolve;
       });
-      await wallet.addAccount(MemoryAccount.generate());
+      wallet.addAccount(MemoryAccount.generate());
       expect(Object.keys((await accountsPromise).connected).length).to.equal(connectedLength + 1);
     });
 
@@ -484,7 +484,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         onMessageSign: handlerRejectPromise,
         onDisconnect() {},
       });
-      await wallet.addAccount(account, { select: true });
+      wallet.addAccount(account, { select: true });
       aepp = new AeSdkAepp({
         name: 'AEPP',
         onNetworkChange() {},

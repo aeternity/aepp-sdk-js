@@ -35,7 +35,7 @@ export default class AeSdk extends AeSdkBase {
    * @param options.select - Select account
    * @example addAccount(account)
    */
-  async addAccount(account: AccountBase, { select }: { select?: boolean } = {}): Promise<void> {
+  addAccount(account: AccountBase, { select }: { select?: boolean } = {}): void {
     const { address } = account;
     this.accounts[address] = account;
     if (select === true) this.selectAccount(address);

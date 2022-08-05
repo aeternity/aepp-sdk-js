@@ -127,8 +127,8 @@ const node = new Node('https://testnet.aeternity.io')
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
 })
-await aeSdk.addAccount(payerAccount, { select: true })
-await aeSdk.addAccount(newUserAccount)
+aeSdk.addAccount(payerAccount, { select: true })
+aeSdk.addAccount(newUserAccount)
 
 // catch exceptions
 try {

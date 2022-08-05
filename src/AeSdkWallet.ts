@@ -140,11 +140,8 @@ export default class AeSdkWallet extends AeSdk {
     this._pushAccountsToApps();
   }
 
-  override async addAccount(
-    account: AccountBase,
-    options?: Parameters<AeSdk['addAccount']>[1],
-  ): Promise<void> {
-    await super.addAccount(account, options);
+  override addAccount(account: AccountBase, options?: Parameters<AeSdk['addAccount']>[1]): void {
+    super.addAccount(account, options);
     this._pushAccountsToApps();
   }
 

@@ -66,7 +66,7 @@ describe('Generalized Account', () => {
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
     aeSdk.removeAccount(gaAccountAddress);
-    await aeSdk.addAccount(new AccountGeneralized(gaAccountAddress), { select: true });
+    aeSdk.addAccount(new AccountGeneralized(gaAccountAddress), { select: true });
 
     const callData = authContract.calldata.encode('BlindAuth', 'authorize', [genSalt()]);
     await aeSdk.spend(10000, publicKey, { authData: { callData } });

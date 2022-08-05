@@ -62,8 +62,8 @@ const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
 });
-await aeSdk.addAccount(payerAccount, { select: true });
-await aeSdk.addAccount(newUserAccount);
+aeSdk.addAccount(payerAccount, { select: true });
+aeSdk.addAccount(newUserAccount);
 
 // ## 4. Send 1 `aetto` from payer to new user
 const spendTxResult = await aeSdk.spend(

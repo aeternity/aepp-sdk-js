@@ -96,8 +96,8 @@ const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
   compilerUrl: COMPILER_URL,
 });
-await aeSdk.addAccount(payerAccount, { select: true });
-await aeSdk.addAccount(newUserAccount);
+aeSdk.addAccount(payerAccount, { select: true });
+aeSdk.addAccount(newUserAccount);
 
 // ## 4. Create and sign `ContractCallTx` on behalf of new user
 // Currently there is no high-level API available that allows you to create and sign the

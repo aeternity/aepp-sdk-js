@@ -26,7 +26,7 @@ async function init () {
   const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }]
   })
-  await aeSdk.addAccount(new MemoryAccount('<SECRET_KEY_HERE>'), { select: true })
+  aeSdk.addAccount(new MemoryAccount('<SECRET_KEY_HERE>'), { select: true })
 
   // log transaction info
   console.log(await aeSdk.spend(100, 'ak_...'))
@@ -43,7 +43,7 @@ async function spend (amount, recipient) {
   const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }]
   })
-  await aeSdk.addAccount(new MemoryAccount('<SECRET_KEY_HERE>'), { select: true })
+  aeSdk.addAccount(new MemoryAccount('<SECRET_KEY_HERE>'), { select: true })
 
   // builds an unsigned SpendTx using integrated transaction builder
   const spendTx = await aeSdk.buildTx(Tag.SpendTx, {

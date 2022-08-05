@@ -69,8 +69,7 @@ describe('Paying for transaction of another account', () => {
 
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);
-    await aeSdkNotPayingFee
-      .addAccount(MemoryAccount.generate(), { select: true });
+    aeSdkNotPayingFee.addAccount(MemoryAccount.generate(), { select: true });
     aeSdkNotPayingFee._options = {
       waitMined: false,
       innerTx: true,

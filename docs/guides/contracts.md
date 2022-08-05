@@ -35,7 +35,7 @@ const aeSdk = new AeSdk({
   ],
   compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler
 })
-await aeSdk.addAccount(accoount, { select: true })
+aeSdk.addAccount(accoount, { select: true })
 ```
 
 Note:

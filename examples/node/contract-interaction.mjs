@@ -63,7 +63,7 @@ const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
   compilerUrl: COMPILER_URL,
 });
-await aeSdk.addAccount(account, { select: true });
+aeSdk.addAccount(account, { select: true });
 
 // ## 4. Get contract instance
 // Knowing the source code allows you to initialize a contract instance and interact with the

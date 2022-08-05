@@ -35,8 +35,7 @@ describe('Accounts', () => {
   before(async () => {
     aeSdk = await getSdk(2);
     aeSdkNoCoins = await getSdk(0);
-    await aeSdkNoCoins
-      .addAccount(MemoryAccount.generate(), { select: true });
+    aeSdkNoCoins.addAccount(MemoryAccount.generate(), { select: true });
   });
 
   it('removes account', async () => {
@@ -45,7 +44,7 @@ describe('Accounts', () => {
     aeSdk.removeAccount(address);
     expect(Object.keys(aeSdk.accounts)).to.have.length(1);
     expect(aeSdk.selectedAddress).to.be.equal(undefined);
-    await aeSdk.addAccount(account, { select: true });
+    aeSdk.addAccount(account, { select: true });
   });
 
   it('determining the balance with 0 balance', async () => {

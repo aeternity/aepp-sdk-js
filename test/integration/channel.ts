@@ -95,7 +95,7 @@ describe('Channel', () => {
   before(async () => {
     aeSdkInitiatior = await getSdk();
     aeSdkResponder = await getSdk(0);
-    await aeSdkResponder.addAccount(MemoryAccount.generate(), { select: true });
+    aeSdkResponder.addAccount(MemoryAccount.generate(), { select: true });
     sharedParams.initiatorId = await aeSdkInitiatior.address();
     sharedParams.responderId = await aeSdkResponder.address();
     await aeSdkInitiatior.spend(new BigNumber('500e18').toString(), await aeSdkResponder.address());
