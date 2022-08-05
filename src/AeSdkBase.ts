@@ -28,14 +28,20 @@ export type Account = Keypair | AccountBase | any;
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 
 function getValueOrErrorProxy<Value extends object>(valueCb: () => Value): Value {
-  try {
-    return valueCb();
-  } catch (error) {
-    return new Proxy(
-      {},
-      Object.fromEntries(['get', 'set', 'has'].map((name) => [name, () => { throw error; }])),
-    ) as Value;
-  }
+  return new Proxy({}, {
+    ...Object.fromEntries([
+      'apply', 'construct', 'defineProperty', 'deleteProperty', 'getOwnPropertyDescriptor',
+      'getPrototypeOf', 'isExtensible', 'ownKeys', 'preventExtensions', 'set', 'setPrototypeOf',
+    ].map((name) => [name, () => { throw new NotImplementedError(`${name} proxy request`); }])),
+    get(t: {}, property: string | symbol, receiver: any) {
+      const target = valueCb();
+      const value = Reflect.get(target, property, receiver);
+      return typeof value === 'function' ? value.bind(target) : value;
+    },
+    has(t: {}, property: string | symbol) {
+      return Reflect.has(valueCb(), property);
+    },
+  }) as Value;
 }
 
 /**
