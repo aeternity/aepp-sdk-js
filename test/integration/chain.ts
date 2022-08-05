@@ -128,7 +128,7 @@ describe('Node Chain', () => {
     )));
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
-    expect(httpSpy.args.length).to.be.equal(2 + txPostCount);
+    expect(httpSpy.args.length).to.be.equal(1 + txPostCount);
     httpSpy.restore();
   });
 
@@ -141,9 +141,8 @@ describe('Node Chain', () => {
       })),
     );
     transactions.push(...spends.map(({ hash }) => hash));
-    const accountGetCount = accounts.length;
     const txPostCount = accounts.length;
-    expect(httpSpy.args.length).to.be.equal(1 + accountGetCount + txPostCount);
+    expect(httpSpy.args.length).to.be.equal(1 + txPostCount);
     httpSpy.restore();
   });
 

@@ -18,9 +18,10 @@ import { messageToHash, hash } from '../utils/crypto';
 import { buildTx } from '../tx/builder';
 import { decode, Encoded } from '../utils/encoder';
 import { Tag } from '../tx/builder/constants';
-import { getNetworkId } from '../Node';
+import Node, { getNetworkId } from '../Node';
 import { concatBuffers } from '../utils/other';
 import type { createMetaTx } from '../contract/ga';
+import Compiler from '../contract/Compiler';
 
 /**
  * Check is provided object looks like an instance of AccountBase
@@ -58,8 +59,9 @@ export default abstract class AccountBase {
       innerTx?: boolean;
       networkId?: string;
       authData?: Parameters<typeof createMetaTx>[1];
-      authFun?: Parameters<typeof createMetaTx>[2];
-    } & Omit<Partial<Parameters<typeof createMetaTx>[3]>, 'onAccount'> = {},
+      onNode?: Node;
+      onCompiler?: Compiler;
+    } = {},
   ): Promise<Encoded.Transaction> {
     const prefixes = [await this.getNetworkId({ networkId })];
     if (innerTx === true) prefixes.push('inner_tx');

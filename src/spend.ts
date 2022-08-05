@@ -15,9 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import BigNumber from 'bignumber.js';
-import {
-  sendTransaction, getAccount, getBalance, resolveName,
-} from './chain';
+import { sendTransaction, getBalance, resolveName } from './chain';
 import { _buildTx, BuildTxOptions } from './tx';
 import { buildTxHash, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
@@ -38,14 +36,8 @@ export async function send(
   tx: Encoded.Transaction,
   options: SendOptions,
 ): Promise<SendReturnType> {
-  // TODO: detect authFun in AccountGa
-  const authFun = options.innerTx === true
-    ? undefined
-    : (await getAccount(await options.onAccount.address(options), options)).authFun;
-
   const signed = await options.onAccount.signTransaction(tx, {
     ...options,
-    authFun,
     networkId: (await options.onNode.getStatus()).networkId,
   });
 

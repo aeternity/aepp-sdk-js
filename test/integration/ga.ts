@@ -19,7 +19,7 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, generateKeyPair, genSalt, MemoryAccount, Tag, unpackTx,
+  AeSdk, generateKeyPair, genSalt, MemoryAccount, AccountGeneralized, Tag, unpackTx, createMetaTx,
 } from '../../src';
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
@@ -66,7 +66,7 @@ describe('Generalized Account', () => {
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
     aeSdk.removeAccount(gaAccountAddress);
-    await aeSdk.addAccount(new MemoryAccount({ gaId: gaAccountAddress }), { select: true });
+    await aeSdk.addAccount(new AccountGeneralized(gaAccountAddress), { select: true });
 
     const callData = authContract.calldata.encode('BlindAuth', 'authorize', [genSalt()]);
     await aeSdk.spend(10000, publicKey, { authData: { callData } });
@@ -93,19 +93,18 @@ describe('Generalized Account', () => {
   });
 
   it('fails trying to send GaMeta using basic account', async () => {
-    const account = new MemoryAccount({ keypair: { publicKey, secretKey } });
-    account.isGa = true;
+    const onAccount = new MemoryAccount({ keypair: { publicKey, secretKey } });
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
       amount: 1,
-      senderId: await account.address(),
+      senderId: await onAccount.address(),
       recipientId: gaAccountAddress,
     });
-    const signedTx = await account.signTransaction(spendTx, {
-      authFun: 'authorize',
-      authData: { source: authContractSource, args: [genSalt()] },
-      onNode: aeSdk.api,
-      onCompiler: aeSdk.compilerApi,
-    });
+    const signedTx = await createMetaTx(
+      spendTx,
+      { source: authContractSource, args: [genSalt()] },
+      'authorize',
+      { onNode: aeSdk.api, onCompiler: aeSdk.compilerApi, onAccount },
+    );
     await expect(aeSdk.sendTransaction(signedTx)).to.be
       .rejectedWith('Basic account can\'t be used to generate GaMetaTx');
   });

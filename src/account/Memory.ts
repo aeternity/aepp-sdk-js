@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -17,9 +17,8 @@
 import AccountBase from './Base';
 import { sign, isValidKeypair } from '../utils/crypto';
 import { isHex } from '../utils/string';
-import { ArgumentError, InvalidKeypairError, MissingParamError } from '../utils/errors';
+import { InvalidKeypairError } from '../utils/errors';
 import { decode, Encoded } from '../utils/encoder';
-import { createMetaTx } from '../contract/ga';
 
 const secrets = new WeakMap();
 
@@ -32,29 +31,17 @@ export interface Keypair {
  * In-memory account class
  */
 export default class AccountMemory extends AccountBase {
-  isGa: boolean;
-
   /**
    * @param options - Options
    * @param options.keypair - Key pair to use
    * @param options.keypair.publicKey - Public key
    * @param options.keypair.secretKey - Private key
-   * @param options.gaId - Address of generalized account
    */
   constructor(
-    { keypair, gaId, ...options }: { keypair?: Keypair; gaId?: Encoded.AccountAddress }
+    { keypair, ...options }: { keypair: Keypair }
     & ConstructorParameters<typeof AccountBase>[0],
   ) {
     super(options);
-
-    this.isGa = gaId != null;
-    if (this.isGa && gaId != null) {
-      decode(gaId);
-      secrets.set(this, { publicKey: gaId });
-      return;
-    }
-
-    if (keypair == null) throw new MissingParamError('Either gaId or keypair is required');
 
     if (
       !Buffer.isBuffer(keypair.secretKey)
@@ -74,22 +61,7 @@ export default class AccountMemory extends AccountBase {
   }
 
   async sign(data: string | Uint8Array): Promise<Uint8Array> {
-    if (this.isGa) throw new InvalidKeypairError('You are trying to sign data using generalized account without keypair');
     return sign(data, secrets.get(this).secretKey);
-  }
-
-  override async signTransaction(
-    tx: Encoded.Transaction,
-    options: Parameters<AccountBase['signTransaction']>[1] = {},
-  ): Promise<Encoded.Transaction> {
-    if (!this.isGa || options.innerTx === true) return super.signTransaction(tx, options);
-    const {
-      authData, authFun, onCompiler, onNode,
-    } = options;
-    if (authFun == null || authData == null || onCompiler == null || onNode == null) {
-      throw new ArgumentError('authData, authFun, onCompiler, onNode', 'provided', null);
-    }
-    return createMetaTx(tx, authData, authFun, { onCompiler, onNode, onAccount: this });
   }
 
   async address(): Promise<Encoded.AccountAddress> {
