@@ -24,8 +24,7 @@ async function init () {
   const node = new Node('https://testnet.aeternity.io') // ideally host your own node!
 
   const aeSdk = new AeSdk({
-    nodes: [{ name: 'testnet', instance: node }],
-    compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler!
+    nodes: [{ name: 'testnet', instance: node }]
   })
   await aeSdk.addAccount(
     new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}}),
@@ -40,29 +39,27 @@ async function init () {
 ## Low-level SDK usage (use [API](https://aeternity.com/protocol/node/api) endpoints directly)
 Example spend function, using the SDK, talking directly to the [**API**](https://aeternity.com/protocol/node/api):
 ```js
-import { MemoryAccount, Node, AeSdk } from '@aeternity/aepp-sdk'
+import { MemoryAccount, Node, AeSdk, Tag } from '@aeternity/aepp-sdk'
 
 async function spend (amount, recipient) {
   const node = new Node('https://testnet.aeternity.io') // ideally host your own node!
   const aeSdk = new AeSdk({
-    nodes: [{ name: 'testnet', instance: node }],
-    compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler!
+    nodes: [{ name: 'testnet', instance: node }]
   })
   await aeSdk.addAccount(
     new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}}),
     { select: true }
   )
 
-  // builds an unsigned SpendTx using the debug endpoint of the node's API
+  // builds an unsigned SpendTx using integrated transaction builder
   const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
     senderId: await aeSdk.address(),
     recipientId: recipient,
-    fee: 18000000000000, // you must provide enough fee
     amount, // aettos
     payload: 'using low-level api is funny'
   })
 
-  // sign the encoded transaction returned by the node
+  // sign the encoded transaction
   const signedTx = await aeSdk.signTransaction(spendTx)
 
   // broadcast the signed tx to the node
