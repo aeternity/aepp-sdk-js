@@ -47,10 +47,7 @@ export default class AeSdk extends AeSdkBase {
    * @example removeAccount(address)
    */
   removeAccount(address: Encoded.AccountAddress): void {
-    if (this.accounts[address] == null) {
-      console.warn(`removeAccount: Account for ${address} not available`);
-      return;
-    }
+    if (this.accounts[address] == null) throw new UnavailableAccountError(address);
     delete this.accounts[address]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
     if (this.selectedAddress === address) delete this.selectedAddress;
   }
