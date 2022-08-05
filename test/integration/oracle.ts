@@ -90,7 +90,7 @@ describe('Oracle', () => {
     before(async () => {
       const account = generateKeyPair();
       await aeSdk.spend(1e15, account.publicKey);
-      await aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true });
+      await aeSdk.addAccount(new MemoryAccount(account.secretKey), { select: true });
       oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString(), onAccount: account });
     });
 

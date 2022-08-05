@@ -44,7 +44,7 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 
 // Note:
 //
-//  - The keypair of the account is pre-funded and only used for demonstration purpose
+//  - The secret key of the account is pre-funded and only used for demonstration purpose
 //      - You should replace it with your own keypair
 //        (see [Create a Keypair](../../quick-start.md#2-create-a-keypair))
 //  - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
@@ -54,7 +54,7 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 //        e.g. `node transfer-ae.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb`
 
 // ## 3. Create object instances
-const account = new MemoryAccount({ keypair: ACCOUNT_KEYPAIR });
+const account = new MemoryAccount(ACCOUNT_KEYPAIR.secretKey);
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

@@ -33,8 +33,8 @@ describe('Paying for transaction of another account', () => {
   });
 
   it('pays for spend transaction', async () => {
-    const sender = new MemoryAccount({ keypair: generateKeyPair() });
-    const receiver = new MemoryAccount({ keypair: generateKeyPair() });
+    const sender = new MemoryAccount(generateKeyPair().secretKey);
+    const receiver = new MemoryAccount(generateKeyPair().secretKey);
     await aeSdk.spend(1e4, await sender.address());
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
       senderId: await sender.address(),
@@ -70,7 +70,7 @@ describe('Paying for transaction of another account', () => {
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);
     await aeSdkNotPayingFee
-      .addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: true });
+      .addAccount(new MemoryAccount(generateKeyPair().secretKey), { select: true });
     aeSdkNotPayingFee._options = {
       waitMined: false,
       innerTx: true,

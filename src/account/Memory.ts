@@ -15,56 +15,40 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import AccountBase from './Base';
-import { sign, isValidKeypair } from '../utils/crypto';
+import { generateKeyPairFromSecret, sign } from '../utils/crypto';
 import { isHex } from '../utils/string';
-import { InvalidKeypairError } from '../utils/errors';
-import { decode, Encoded } from '../utils/encoder';
+import { ArgumentError } from '../utils/errors';
+import { encode, Encoded, Encoding } from '../utils/encoder';
 
-const secrets = new WeakMap();
-
-export interface Keypair {
-  publicKey: Encoded.AccountAddress;
-  secretKey: string | Uint8Array;
-}
+const secretKeys = new WeakMap();
 
 /**
  * In-memory account class
  */
 export default class AccountMemory extends AccountBase {
   /**
-   * @param options - Options
-   * @param options.keypair - Key pair to use
-   * @param options.keypair.publicKey - Public key
-   * @param options.keypair.secretKey - Private key
+   * @param secretKey - Secret key
    */
-  constructor(
-    { keypair, ...options }: { keypair: Keypair }
-    & ConstructorParameters<typeof AccountBase>[0],
-  ) {
-    super(options);
-
-    if (
-      !Buffer.isBuffer(keypair.secretKey)
-      && typeof keypair.secretKey === 'string' && !isHex(keypair.secretKey)
-    ) throw new InvalidKeypairError('Secret key must be hex string or Buffer');
-    const secretKey = typeof keypair.secretKey === 'string'
-      ? Buffer.from(keypair.secretKey, 'hex')
-      : keypair.secretKey;
-    if (!isValidKeypair(secretKey, decode(keypair.publicKey))) {
-      throw new InvalidKeypairError('Invalid Key Pair');
+  constructor(secretKey: string | Uint8Array) {
+    super({});
+    if (typeof secretKey === 'string' && !isHex(secretKey)) {
+      throw new ArgumentError('secretKey', 'hex string', secretKey);
     }
-
-    secrets.set(this, {
-      secretKey,
-      publicKey: keypair.publicKey,
-    });
+    secretKey = typeof secretKey === 'string' ? Buffer.from(secretKey, 'hex') : secretKey;
+    if (secretKey.length !== 64) {
+      throw new ArgumentError('secretKey', '64 bytes', secretKey.length);
+    }
+    secretKeys.set(this, secretKey);
   }
 
   async sign(data: string | Uint8Array): Promise<Uint8Array> {
-    return sign(data, secrets.get(this).secretKey);
+    return sign(data, secretKeys.get(this));
   }
 
   async address(): Promise<Encoded.AccountAddress> {
-    return secrets.get(this).publicKey;
+    return encode(
+      generateKeyPairFromSecret(secretKeys.get(this)).publicKey,
+      Encoding.AccountAddress,
+    );
   }
 }

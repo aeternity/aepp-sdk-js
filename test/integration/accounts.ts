@@ -36,7 +36,7 @@ describe('Accounts', () => {
     aeSdk = await getSdk(2);
     aeSdkNoCoins = await getSdk(0);
     await aeSdkNoCoins
-      .addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: true });
+      .addAccount(new MemoryAccount(generateKeyPair().secretKey), { select: true });
   });
 
   it('removes account', async () => {
@@ -204,7 +204,7 @@ describe('Accounts', () => {
 
     it('Make operation on account using keyPair/MemoryAccount', async () => {
       const keypair = generateKeyPair();
-      const memoryAccount = new MemoryAccount({ keypair });
+      const memoryAccount = new MemoryAccount(keypair.secretKey);
       const data = 'Hello';
       const signature = await memoryAccount.sign(data);
       const sigUsingKeypair = await aeSdk.sign(data, { onAccount: keypair });

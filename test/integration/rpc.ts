@@ -123,7 +123,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         onDisconnect() {},
       });
       await wallet.addAccount(account, { select: true });
-      await wallet.addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: false });
+      await wallet.addAccount(new MemoryAccount(generateKeyPair().secretKey), { select: false });
       aepp = new AeSdkAepp({
         name: 'AEPP',
         nodes: [{ name: 'test', instance: node }],
@@ -377,7 +377,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       const accountsPromise = new Promise<Accounts>((resolve) => {
         aepp.onAddressChange = resolve;
       });
-      await wallet.addAccount(new MemoryAccount({ keypair: generateKeyPair() }));
+      await wallet.addAccount(new MemoryAccount(generateKeyPair().secretKey));
       expect(Object.keys((await accountsPromise).connected).length).to.equal(connectedLength + 1);
     });
 

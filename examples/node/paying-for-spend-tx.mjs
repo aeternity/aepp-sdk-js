@@ -43,25 +43,22 @@ import {
 
 // ## 2. Define constants
 // The following constants are used in the subsequent code snippets.
-const PAYER_ACCOUNT_KEYPAIR = {
-  publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
-  secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b',
-};
+const PAYER_ACCOUNT_SECRET_KEY = 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b';
 const NODE_URL = 'https://testnet.aeternity.io';
-const NEW_USER_KEYPAIR = generateKeyPair();
+const NEW_USER_SECRET_KEY = generateKeyPair().secretKey;
 const AMOUNT = 1;
 
 // Note:
 //
-//  - The keypair of the account is pre-funded and only used for demonstration purpose
+//  - The secret key of the account is pre-funded and only used for demonstration purpose
 //      - You can replace it with your own keypair (see
 //        [Create a Keypair](../../quick-start.md#2-create-a-keypair))
 //      - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 //  - The `AMOUNT` (in `aettos`) will be send to the new user and returned to the payer.
 
 // ## 3. Create object instances
-const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR });
-const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR });
+const payerAccount = new MemoryAccount(PAYER_ACCOUNT_SECRET_KEY);
+const newUserAccount = new MemoryAccount(NEW_USER_SECRET_KEY);
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

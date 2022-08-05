@@ -93,7 +93,7 @@ describe('Generalized Account', () => {
   });
 
   it('fails trying to send GaMeta using basic account', async () => {
-    const onAccount = new MemoryAccount({ keypair: { publicKey, secretKey } });
+    const onAccount = new MemoryAccount(secretKey);
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
       amount: 1,
       senderId: await onAccount.address(),

@@ -33,7 +33,7 @@ describe('Verify Transaction', () => {
     });
     const signedTx = await aeSdk.signTransaction(
       spendTx,
-      { onAccount: new MemoryAccount({ keypair: generateKeyPair() }) },
+      { onAccount: new MemoryAccount(generateKeyPair().secretKey) },
     );
     const errors = await verifyTransaction(signedTx, node);
     expect(errors.map(({ key }) => key)).to.be.eql([

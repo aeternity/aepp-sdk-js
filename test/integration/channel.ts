@@ -96,7 +96,7 @@ describe('Channel', () => {
     aeSdkInitiatior = await getSdk();
     aeSdkResponder = await getSdk(0);
     await aeSdkResponder.addAccount(
-      new MemoryAccount({ keypair: generateKeyPair() }),
+      new MemoryAccount(generateKeyPair().secretKey),
       { select: true },
     );
     sharedParams.initiatorId = await aeSdkInitiatior.address();

@@ -11,17 +11,24 @@ import Node, { getNetworkId } from './Node';
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
 import { AMOUNT } from './tx/builder/schema';
 import { Tag } from './tx/builder/constants';
-import MemoryAccount, { Keypair } from './account/Memory';
+import MemoryAccount from './account/Memory';
 import AccountBase, { isAccountBase } from './account/Base';
 import {
   CompilerError,
   DuplicateNodeError,
+  InvalidKeypairError,
   NodeNotFoundError,
   NotImplementedError,
   TypeError,
 } from './utils/errors';
-import { Encoded } from './utils/encoder';
+import { decode, Encoded } from './utils/encoder';
 import Compiler from './contract/Compiler';
+import { isValidKeypair } from './utils/crypto';
+
+interface Keypair {
+  publicKey: Encoded.AccountAddress;
+  secretKey: string | Uint8Array;
+}
 
 export type Account = Keypair | AccountBase | any;
 
@@ -234,8 +241,15 @@ class AeSdkBase {
     switch (account !== null && typeof account) {
       case 'string':
         throw new NotImplementedError('Address in AccountResolver');
-      case 'object':
-        return isAccountBase(account) ? account : new MemoryAccount({ keypair: account });
+      case 'object': {
+        if (isAccountBase(account)) return account;
+        const encoding = typeof account.secretKey === 'string' ? 'hex' : undefined;
+        const secretKey = Buffer.from(account.secretKey, encoding);
+        if (!isValidKeypair(secretKey, decode(account.publicKey))) {
+          throw new InvalidKeypairError('Invalid Key Pair');
+        }
+        return new MemoryAccount(account.secretKey);
+      }
       default:
         throw new TypeError(
           'Account should be an address (ak-prefixed string), '

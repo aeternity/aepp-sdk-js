@@ -112,23 +112,19 @@ BaseError
 
 ```js
 // import required error classes
-const {
+import {
   AeSdk,
   Node,
   MemoryAccount,
   generateKeyPair,
   InvalidTxParamsError,
   InvalidAensNameError
-} = require('@aeternity/aepp-sdk')
+} from '@aeternity/aepp-sdk'
 
 // setup
-const NODE_URL = 'https://testnet.aeternity.io'
-const PAYER_ACCOUNT_KEYPAIR = generateKeyPair()
-const NEW_USER_KEYPAIR = generateKeyPair()
-
-const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
-const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
-const node = new Node(NODE_URL)
+const payerAccount = new MemoryAccount(generateKeyPair().secretKey)
+const newUserAccount = new MemoryAccount(generateKeyPair().secretKey)
+const node = new Node('https://testnet.aeternity.io')
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
 })
