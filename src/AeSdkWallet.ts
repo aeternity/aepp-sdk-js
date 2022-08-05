@@ -33,7 +33,9 @@ type OnSubscription = (
 ) => void;
 
 type OnSign = (
-  clientId: string, params: Parameters<WalletApi[METHODS.sign]>[0], origin: string
+  clientId: string,
+  params: Omit<Parameters<WalletApi[METHODS.sign]>[0], 'networkId'>,
+  origin: string,
 ) => Promise<{ tx?: Encoded.Transaction; onAccount?: Account } | undefined> | Promise<void>;
 
 type OnDisconnect = (

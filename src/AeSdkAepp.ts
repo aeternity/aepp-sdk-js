@@ -66,7 +66,8 @@ export default class AeSdkAepp extends AeSdkBase {
       const address = account as Encoded.AccountAddress;
       decode(address);
       if (!this.addresses().includes(address)) throw new UnAuthorizedAccountError(address);
-      account = new AccountRpc({ rpcClient: this.rpcClient, address });
+      this._ensureConnected();
+      account = new AccountRpc(this.rpcClient, address);
     }
     if (account == null) this._ensureAccountAccess();
     return super._resolveAccount(account);

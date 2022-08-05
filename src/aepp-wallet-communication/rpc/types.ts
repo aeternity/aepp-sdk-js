@@ -43,7 +43,17 @@ export interface WalletApi {
   [METHODS.address]: () => Promise<Encoded.AccountAddress[]>;
 
   [METHODS.sign]: ((
-    p: { tx: Encoded.Transaction; onAccount: Encoded.AccountAddress; returnSigned: boolean }
+    p: {
+      tx: Encoded.Transaction;
+      onAccount: Encoded.AccountAddress;
+      returnSigned: boolean;
+      /**
+       * @deprecated Wallet provided networkId will be used (current network)
+       * required to maintain backward compatibility with wallets using SDK v11.0.1 and below
+       * @see {@link https://github.com/aeternity/aepp-sdk-js/commit/153fd89a52c4eab39fcd659b356b36d32129c1ba}
+       */
+      networkId: string;
+    }
   ) => Promise<{
     /**
      * @deprecated this is not a hash at all, will be removed later at the same time
