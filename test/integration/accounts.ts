@@ -36,7 +36,7 @@ describe('Accounts', () => {
     aeSdk = await getSdk(2);
     aeSdkNoCoins = await getSdk(0);
     await aeSdkNoCoins
-      .addAccount(new MemoryAccount(generateKeyPair().secretKey), { select: true });
+      .addAccount(MemoryAccount.generate(), { select: true });
   });
 
   it('removes account', async () => {

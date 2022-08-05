@@ -20,7 +20,7 @@ import { expect } from 'chai';
 import { getSdk } from '.';
 import {
   AeSdk, UnexpectedTsError,
-  generateKeyPair, decode, postQueryToOracle, registerOracle,
+  decode, postQueryToOracle, registerOracle,
   ORACLE_TTL_TYPES, QUERY_FEE,
 } from '../../src';
 import MemoryAccount from '../../src/account/Memory';
@@ -88,9 +88,9 @@ describe('Oracle', () => {
     const queryFee = 24000n;
 
     before(async () => {
-      const account = generateKeyPair();
-      await aeSdk.spend(1e15, account.publicKey);
-      await aeSdk.addAccount(new MemoryAccount(account.secretKey), { select: true });
+      const account = MemoryAccount.generate();
+      await aeSdk.spend(1e15, await account.address());
+      await aeSdk.addAccount(account, { select: true });
       oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString(), onAccount: account });
     });
 

@@ -22,7 +22,7 @@ import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
-  generateKeyPair, unpackTx, buildTx, buildTxHash, encode, decode, Tag,
+  unpackTx, buildTx, buildTxHash, encode, decode, Tag,
   IllegalArgumentError, InsufficientBalanceError, ChannelConnectionError, encodeContractAddress,
 } from '../../src';
 import { pause } from '../../src/utils/other';
@@ -95,10 +95,7 @@ describe('Channel', () => {
   before(async () => {
     aeSdkInitiatior = await getSdk();
     aeSdkResponder = await getSdk(0);
-    await aeSdkResponder.addAccount(
-      new MemoryAccount(generateKeyPair().secretKey),
-      { select: true },
-    );
+    await aeSdkResponder.addAccount(MemoryAccount.generate(), { select: true });
     sharedParams.initiatorId = await aeSdkInitiatior.address();
     sharedParams.responderId = await aeSdkResponder.address();
     await aeSdkInitiatior.spend(new BigNumber('500e18').toString(), await aeSdkResponder.address());

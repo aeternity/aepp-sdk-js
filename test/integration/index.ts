@@ -15,9 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {
-  AeSdk, generateKeyPair, MemoryAccount, Node,
-} from '../../src';
+import { AeSdk, MemoryAccount, Node } from '../../src';
 import '..';
 
 export const url = process.env.TEST_URL ?? 'http://localhost:3013';
@@ -36,9 +34,7 @@ export async function getSdk(accountCount = 1): Promise<AeSdk> {
     _microBlockCycle: 300,
   });
   await sdk.awaitHeight(2);
-  const accounts = new Array(accountCount)
-    .fill(null)
-    .map(() => new MemoryAccount(generateKeyPair().secretKey));
+  const accounts = new Array(accountCount).fill(null).map(() => MemoryAccount.generate());
   for (let i = 0; i < accounts.length; i += 1) {
     await sdk.spend(1e32, await accounts[i].address(), { onAccount: genesisAccount });
     await sdk.addAccount(accounts[i], { select: i === 0 });

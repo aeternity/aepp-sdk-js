@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 import {
-  AeSdkWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection, WALLET_TYPE,
+  AeSdkWallet, Node, MemoryAccount, BrowserRuntimeConnection, WALLET_TYPE,
   RpcConnectionDenyError, RpcRejectedByUserError,
 } from '@aeternity/aepp-sdk';
 
@@ -57,7 +57,7 @@ import {
     new MemoryAccount('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
     { select: true },
   );
-  await aeSdk.addAccount(new MemoryAccount(generateKeyPair().secretKey));
+  await aeSdk.addAccount(MemoryAccount.generate());
 
   browser.runtime.onConnect.addListener((port) => {
     // create connection

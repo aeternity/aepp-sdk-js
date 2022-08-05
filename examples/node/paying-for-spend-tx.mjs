@@ -34,7 +34,7 @@
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 import {
-  AeSdk, Node, MemoryAccount, generateKeyPair, Tag,
+  AeSdk, Node, MemoryAccount, Tag,
 } from '@aeternity/aepp-sdk';
 
 // **Note**:
@@ -45,7 +45,6 @@ import {
 // The following constants are used in the subsequent code snippets.
 const PAYER_ACCOUNT_SECRET_KEY = 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b';
 const NODE_URL = 'https://testnet.aeternity.io';
-const NEW_USER_SECRET_KEY = generateKeyPair().secretKey;
 const AMOUNT = 1;
 
 // Note:
@@ -58,7 +57,7 @@ const AMOUNT = 1;
 
 // ## 3. Create object instances
 const payerAccount = new MemoryAccount(PAYER_ACCOUNT_SECRET_KEY);
-const newUserAccount = new MemoryAccount(NEW_USER_SECRET_KEY);
+const newUserAccount = MemoryAccount.generate();
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

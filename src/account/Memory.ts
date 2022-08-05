@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import AccountBase from './Base';
-import { generateKeyPairFromSecret, sign } from '../utils/crypto';
+import { generateKeyPairFromSecret, sign, generateKeyPair } from '../utils/crypto';
 import { isHex } from '../utils/string';
 import { ArgumentError } from '../utils/errors';
 import { encode, Encoded, Encoding } from '../utils/encoder';
@@ -39,6 +39,13 @@ export default class AccountMemory extends AccountBase {
       throw new ArgumentError('secretKey', '64 bytes', secretKey.length);
     }
     secretKeys.set(this, secretKey);
+  }
+
+  /**
+   * Generates a new AccountMemory using a random secret key
+   */
+  static generate(): AccountMemory {
+    return new AccountMemory(generateKeyPair().secretKey);
   }
 
   async sign(data: string | Uint8Array): Promise<Uint8Array> {

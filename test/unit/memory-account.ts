@@ -39,6 +39,11 @@ describe('MemoryAccount', () => {
     await acc.address().should.eventually.be.equal(testAcc.publicKey);
   });
 
+  it('generates', async () => {
+    const acc = MemoryAccount.generate();
+    expect(await acc.address()).to.satisfy((a: string) => a.startsWith('ak_'));
+  });
+
   it('Sign message', async () => {
     const message = 'test';
     const account = new MemoryAccount(testAcc.secretKey);

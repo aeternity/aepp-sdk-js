@@ -116,14 +116,13 @@ import {
   AeSdk,
   Node,
   MemoryAccount,
-  generateKeyPair,
   InvalidTxParamsError,
   InvalidAensNameError
 } from '@aeternity/aepp-sdk'
 
 // setup
-const payerAccount = new MemoryAccount(generateKeyPair().secretKey)
-const newUserAccount = new MemoryAccount(generateKeyPair().secretKey)
+const payerAccount = MemoryAccount.generate()
+const newUserAccount = MemoryAccount.generate()
 const node = new Node('https://testnet.aeternity.io')
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

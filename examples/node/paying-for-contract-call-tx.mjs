@@ -48,7 +48,7 @@
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 import {
-  AeSdk, Node, MemoryAccount, generateKeyPair, Tag,
+  AeSdk, Node, MemoryAccount, Tag,
 } from '@aeternity/aepp-sdk';
 
 // **Note**:
@@ -77,7 +77,6 @@ contract PayingForTxExample =
     entrypoint get_last_caller() : option(address) =
         state.last_caller
 `;
-const NEW_USER_SECRET_KEY = generateKeyPair().secretKey;
 
 // Note:
 //
@@ -91,7 +90,7 @@ const NEW_USER_SECRET_KEY = generateKeyPair().secretKey;
 
 // ## 3. Create object instances
 const payerAccount = new MemoryAccount(PAYER_ACCOUNT_SECRET_KEY);
-const newUserAccount = new MemoryAccount(NEW_USER_SECRET_KEY);
+const newUserAccount = MemoryAccount.generate();
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

@@ -20,7 +20,7 @@ import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
-  AeSdk, generateKeyPair, MemoryAccount, Tag, UnexpectedTsError,
+  AeSdk, MemoryAccount, Tag, UnexpectedTsError,
 } from '../../src';
 import { ContractInstance } from '../../src/contract/aci';
 import { Encoded } from '../../src/utils/encoder';
@@ -33,8 +33,8 @@ describe('Paying for transaction of another account', () => {
   });
 
   it('pays for spend transaction', async () => {
-    const sender = new MemoryAccount(generateKeyPair().secretKey);
-    const receiver = new MemoryAccount(generateKeyPair().secretKey);
+    const sender = MemoryAccount.generate();
+    const receiver = MemoryAccount.generate();
     await aeSdk.spend(1e4, await sender.address());
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
       senderId: await sender.address(),
@@ -70,7 +70,7 @@ describe('Paying for transaction of another account', () => {
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);
     await aeSdkNotPayingFee
-      .addAccount(new MemoryAccount(generateKeyPair().secretKey), { select: true });
+      .addAccount(MemoryAccount.generate(), { select: true });
     aeSdkNotPayingFee._options = {
       waitMined: false,
       innerTx: true,
