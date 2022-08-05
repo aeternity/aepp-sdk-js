@@ -150,7 +150,7 @@ export default class AeSdkWallet extends AeSdk {
 
   _getNode(): { node: Network['node'] } {
     this.ensureNodeConnected();
-    return { node: { url: this.api.url, name: this.selectedNodeName } };
+    return { node: { url: this.api.$host, name: this.selectedNodeName } };
   }
 
   async selectNode(name: string): Promise<void> {
