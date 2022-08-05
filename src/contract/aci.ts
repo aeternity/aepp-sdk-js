@@ -322,7 +322,6 @@ export default async function getContractInstance({
     options?:
     Parameters<typeof instance.compile>[0] &
     Parameters<typeof instance.call>[2] &
-    Parameters<AccountBase['address']>[0] &
     Parameters<typeof sendAndProcess>[1],
   ): Promise<ContractInstance['deployInfo']> => {
     const opt = { ...instance.options, ...options };
@@ -331,7 +330,7 @@ export default async function getContractInstance({
     if (opt.callStatic === true) return instance.call('init', params, opt);
     if (instance.deployInfo.address != null) throw new DuplicateContractError();
 
-    const ownerId = await opt.onAccount.address(options);
+    const ownerId = opt.onAccount.address;
     const tx = await _buildTx(Tag.ContractCreateTx, {
       ...opt,
       gasLimit: opt.gasLimit ?? await instance._estimateGas('init', params, opt),
@@ -388,16 +387,17 @@ export default async function getContractInstance({
     if (contractId == null && fn !== 'init') throw new InvalidMethodInvocationError('You need to deploy contract before calling!');
     if (fn !== 'init' && opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(opt.amount, fn);
 
-    const callerId = await Promise.resolve()
-      .then(() => opt.onAccount.address(opt))
-      .catch((error) => {
-        const messageToSwallow = 'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got undefined instead';
-        if (
-          opt.callStatic !== true || !(error instanceof TypeError)
-          || error.message !== messageToSwallow
-        ) throw error;
-        return DRY_RUN_ACCOUNT.pub;
-      }) as Encoded.AccountAddress;
+    let callerId;
+    try {
+      callerId = opt.onAccount.address;
+    } catch (error) {
+      const messageToSwallow = 'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got undefined instead';
+      if (
+        opt.callStatic !== true || !(error instanceof TypeError)
+        || error.message !== messageToSwallow
+      ) throw error;
+      callerId = DRY_RUN_ACCOUNT.pub;
+    }
     const callData = instance.calldata.encode(instance._name, fn, params);
 
     let res: any;

@@ -35,10 +35,10 @@ describe('Paying for transaction of another account', () => {
   it('pays for spend transaction', async () => {
     const sender = MemoryAccount.generate();
     const receiver = MemoryAccount.generate();
-    await aeSdk.spend(1e4, await sender.address());
+    await aeSdk.spend(1e4, sender.address);
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      senderId: await sender.address(),
-      recipientId: await receiver.address(),
+      senderId: sender.address,
+      recipientId: receiver.address,
       amount: 1e4,
     });
     const signedSpendTx = await aeSdk
@@ -53,8 +53,8 @@ describe('Paying for transaction of another account', () => {
       new BigNumber(payerBalanceBefore)
         .minus(outerFee.toString()).minus(innerFee.toString()).toFixed(),
     );
-    expect(await aeSdk.getBalance(await sender.address())).to.equal('0');
-    expect(await aeSdk.getBalance(await receiver.address())).to.equal('10000');
+    expect(await aeSdk.getBalance(sender.address)).to.equal('0');
+    expect(await aeSdk.getBalance(receiver.address)).to.equal('10000');
   });
 
   const contractSource = `

@@ -36,7 +36,7 @@ export async function getSdk(accountCount = 1): Promise<AeSdk> {
   await sdk.awaitHeight(2);
   const accounts = new Array(accountCount).fill(null).map(() => MemoryAccount.generate());
   for (let i = 0; i < accounts.length; i += 1) {
-    await sdk.spend(1e32, await accounts[i].address(), { onAccount: genesisAccount });
+    await sdk.spend(1e32, accounts[i].address, { onAccount: genesisAccount });
     await sdk.addAccount(accounts[i], { select: i === 0 });
   }
   return sdk;

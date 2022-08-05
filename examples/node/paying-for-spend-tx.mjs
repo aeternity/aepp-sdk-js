@@ -68,13 +68,13 @@ await aeSdk.addAccount(newUserAccount);
 // ## 4. Send 1 `aetto` from payer to new user
 const spendTxResult = await aeSdk.spend(
   AMOUNT,
-  await newUserAccount.address(),
+  newUserAccount.address,
   { onAccount: payerAccount },
 );
 console.log(spendTxResult);
 
 // ## 5. Check balance of new user (before)
-const newUserBalanceBefore = await aeSdk.getBalance(await newUserAccount.address());
+const newUserBalanceBefore = await aeSdk.getBalance(newUserAccount.address);
 console.log(`new user balance (before): ${newUserBalanceBefore}`);
 
 // Note:
@@ -83,8 +83,8 @@ console.log(`new user balance (before): ${newUserBalanceBefore}`);
 
 // ## 6. Create and sign `SpendTx` on behalf of new user
 const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-  senderId: await newUserAccount.address(),
-  recipientId: await payerAccount.address(),
+  senderId: newUserAccount.address,
+  recipientId: payerAccount.address,
   amount: AMOUNT,
 });
 const signedSpendTx = await aeSdk.signTransaction(
@@ -107,7 +107,7 @@ console.log(payForTx);
 //    have to cover the transaction fee.
 
 // ## 8. Check balance of new user (after)
-const newUserBalanceAfter = await aeSdk.getBalance(await newUserAccount.address());
+const newUserBalanceAfter = await aeSdk.getBalance(newUserAccount.address);
 console.log(`new user balance (after): ${newUserBalanceAfter}`);
 
 // Note:

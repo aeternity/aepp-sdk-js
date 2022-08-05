@@ -132,7 +132,7 @@ await aeSdk.addAccount(newUserAccount)
 
 // catch exceptions
 try {
-  const spendTxResult = await aeSdk.spend(-1, await newUserAccount.address(), { onAccount: payerAccount})
+  const spendTxResult = await aeSdk.spend(-1, newUserAccount.address, { onAccount: payerAccount})
 } catch(err) {
   if(err instanceof InvalidTxParamsError){
     console.log(`Amount specified is not valid, ${err.message}`)

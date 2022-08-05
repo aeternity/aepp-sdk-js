@@ -89,7 +89,7 @@ describe('Oracle', () => {
 
     before(async () => {
       const account = MemoryAccount.generate();
-      await aeSdk.spend(1e15, await account.address());
+      await aeSdk.spend(1e15, account.address);
       await aeSdk.addAccount(account, { select: true });
       oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString(), onAccount: account });
     });

@@ -13,7 +13,7 @@ import { Encoded } from '../utils/encoder';
 export default class AccountRpc extends AccountBase {
   _rpcClient: any;
 
-  _address: Encoded.AccountAddress;
+  override readonly address: Encoded.AccountAddress;
 
   constructor(
     { rpcClient, address, ...options }: { rpcClient: any; address: Encoded.AccountAddress }
@@ -21,16 +21,12 @@ export default class AccountRpc extends AccountBase {
   ) {
     super(options);
     this._rpcClient = rpcClient;
-    this._address = address;
+    this.address = address;
   }
 
   // eslint-disable-next-line class-methods-use-this
   async sign(): Promise<Uint8Array> {
     throw new NotImplementedError('RAW signing using wallet');
-  }
-
-  async address(): Promise<Encoded.AccountAddress> {
-    return this._address;
   }
 
   /**
@@ -42,7 +38,7 @@ export default class AccountRpc extends AccountBase {
   ): Promise<Encoded.Transaction> {
     if (innerTx != null) throw new NotImplementedError('innerTx option in AccountRpc');
     const res = await this._rpcClient.request(METHODS.sign, {
-      onAccount: this._address,
+      onAccount: this.address,
       tx,
       returnSigned: true,
       /**
@@ -60,7 +56,7 @@ export default class AccountRpc extends AccountBase {
    */
   override async signMessage(message: string): Promise<Uint8Array> {
     const { signature } = await this._rpcClient
-      .request(METHODS.signMessage, { onAccount: this._address, message });
+      .request(METHODS.signMessage, { onAccount: this.address, message });
     return Buffer.from(signature, 'hex');
   }
 }

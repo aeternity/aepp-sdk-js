@@ -292,7 +292,7 @@ describe('Contract instance', () => {
   it('dry-runs init function on specific account', async () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
     const { result } = await testContract.methods.init.get('test', 1, 'hahahaha', { onAccount });
-    result.callerId.should.be.equal(await onAccount.address());
+    result.callerId.should.be.equal(onAccount.address);
   });
 
   it('fails on paying to not payable function', async () => {
@@ -312,7 +312,7 @@ describe('Contract instance', () => {
   it('calls on specific account', async () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
     const { result } = await testContract.methods.intFn(123, { onAccount });
-    result.callerId.should.be.equal(await onAccount.address());
+    result.callerId.should.be.equal(onAccount.address);
   });
 
   describe('Gas', () => {

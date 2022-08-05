@@ -70,7 +70,7 @@ export async function aensRevoke(
   const nameRevokeTx = await _buildTx(Tag.NameRevokeTx, {
     ...options,
     nameId: name,
-    accountId: await options.onAccount.address(options),
+    accountId: options.onAccount.address,
   });
   return send(nameRevokeTx, options);
 }
@@ -126,7 +126,7 @@ export async function aensUpdate(
     nameTtl: NAME_TTL,
     ...options,
     nameId: name,
-    accountId: await options.onAccount.address(options),
+    accountId: options.onAccount.address,
     pointers: Object.entries(allPointers).map(([key, id]) => ({ key, id: id.toString() })),
   });
 
@@ -172,7 +172,7 @@ export async function aensTransfer(
   const nameTransferTx = await _buildTx(Tag.NameTransferTx, {
     ...options,
     nameId: name,
-    accountId: await options.onAccount.address(options),
+    accountId: options.onAccount.address,
     recipientId: account,
   });
 
@@ -298,7 +298,7 @@ export async function aensClaim(
 ): Promise<AensClaimReturnType> {
   const claimTx = await _buildTx(Tag.NameClaimTx, {
     ...options,
-    accountId: await options.onAccount.address(options),
+    accountId: options.onAccount.address,
     nameSalt: salt,
     name,
   });
@@ -358,7 +358,7 @@ Awaited<ReturnType<typeof send>> & {
 
   const preclaimTx = await _buildTx(Tag.NamePreclaimTx, {
     ...options,
-    accountId: await options.onAccount.address(options),
+    accountId: options.onAccount.address,
     commitmentId,
   });
 

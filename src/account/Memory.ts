@@ -26,6 +26,8 @@ const secretKeys = new WeakMap();
  * In-memory account class
  */
 export default class AccountMemory extends AccountBase {
+  override readonly address: Encoded.AccountAddress;
+
   /**
    * @param secretKey - Secret key
    */
@@ -39,6 +41,10 @@ export default class AccountMemory extends AccountBase {
       throw new ArgumentError('secretKey', '64 bytes', secretKey.length);
     }
     secretKeys.set(this, secretKey);
+    this.address = encode(
+      generateKeyPairFromSecret(secretKeys.get(this)).publicKey,
+      Encoding.AccountAddress,
+    );
   }
 
   /**
@@ -50,12 +56,5 @@ export default class AccountMemory extends AccountBase {
 
   async sign(data: string | Uint8Array): Promise<Uint8Array> {
     return sign(data, secretKeys.get(this));
-  }
-
-  async address(): Promise<Encoded.AccountAddress> {
-    return encode(
-      generateKeyPairFromSecret(secretKeys.get(this)).publicKey,
-      Encoding.AccountAddress,
-    );
   }
 }

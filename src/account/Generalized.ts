@@ -26,7 +26,7 @@ import Compiler from '../contract/Compiler';
  * Generalized account class
  */
 export default class AccountGeneralized extends AccountBase {
-  #address: Encoded.AccountAddress;
+  override readonly address: Encoded.AccountAddress;
 
   #authFun?: string;
 
@@ -36,7 +36,7 @@ export default class AccountGeneralized extends AccountBase {
   constructor(address: Encoded.AccountAddress) {
     super({});
     decode(address);
-    this.#address = address;
+    this.address = address;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -57,7 +57,7 @@ export default class AccountGeneralized extends AccountBase {
     }
 
     if (this.#authFun == null) {
-      const account = await getAccount(await this.address(), { onNode });
+      const account = await getAccount(this.address, { onNode });
       if (account.kind !== 'generalized') {
         throw new ArgumentError('account kind', 'generalized', account.kind);
       }
@@ -68,9 +68,5 @@ export default class AccountGeneralized extends AccountBase {
     }
 
     return createMetaTx(tx, authData, this.#authFun, { onCompiler, onNode, onAccount: this });
-  }
-
-  async address(): Promise<Encoded.AccountAddress> {
-    return this.#address;
   }
 }

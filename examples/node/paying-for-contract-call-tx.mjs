@@ -123,7 +123,7 @@ const contract = await aeSdk.getContractInstance(
 );
 const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', []);
 const contractCallTx = await aeSdk.buildTx(Tag.ContractCallTx, {
-  callerId: await newUserAccount.address(),
+  callerId: newUserAccount.address,
   contractId: CONTRACT_ADDRESS,
   amount: 0,
   gasLimit: 1000000,
@@ -142,7 +142,7 @@ console.log(payForTx);
 // ## 6. Check that last caller is the new user
 // Contract instance allows interacting with the contract in a convenient way.
 const dryRunTx = await contract.methods.get_last_caller();
-console.log(`New user: ${await newUserAccount.address()}`);
+console.log(`New user: ${newUserAccount.address}`);
 console.log('Last caller:', dryRunTx.decodedResult);
 
 // Note:

@@ -31,17 +31,17 @@ describe('MemoryAccount', () => {
 
   it('Init with secretKey as hex string', async () => {
     const acc = new MemoryAccount(testAcc.secretKey);
-    await acc.address().should.eventually.be.equal(testAcc.publicKey);
+    expect(acc.address).to.be.equal(testAcc.publicKey);
   });
 
   it('Init with secretKey as Buffer', async () => {
     const acc = new MemoryAccount(Buffer.from(testAcc.secretKey, 'hex'));
-    await acc.address().should.eventually.be.equal(testAcc.publicKey);
+    expect(acc.address).to.be.equal(testAcc.publicKey);
   });
 
   it('generates', async () => {
     const acc = MemoryAccount.generate();
-    expect(await acc.address()).to.satisfy((a: string) => a.startsWith('ak_'));
+    expect(acc.address).to.satisfy((a: string) => a.startsWith('ak_'));
   });
 
   it('Sign message', async () => {

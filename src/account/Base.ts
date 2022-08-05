@@ -28,7 +28,8 @@ import Compiler from '../contract/Compiler';
  * @param acc - Object to check
  */
 export const isAccountBase = (acc: AccountBase | any): boolean => (
-  !['sign', 'address', 'signTransaction', 'signMessage'].some((f) => typeof acc[f] !== 'function')
+  !['sign', 'signTransaction', 'signMessage'].some((f) => typeof acc[f] !== 'function')
+  && acc.address.startsWith('ak_')
 );
 
 /**
@@ -97,8 +98,7 @@ export default abstract class AccountBase {
   abstract sign(data: string | Uint8Array, options?: any): Promise<Uint8Array>;
 
   /**
-   * Obtain account address
-   * @returns Public account address
+   * Account address
    */
-  abstract address(opt?: object): Promise<Encoded.AccountAddress>;
+  readonly address: Encoded.AccountAddress;
 }

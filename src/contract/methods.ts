@@ -79,12 +79,12 @@ async function delegateSignatureCommon(
  */
 export async function createAensDelegationSignature(
   contractId: Encoded.ContractAddress,
-  opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
+  opt: Parameters<typeof delegateSignatureCommon>[1] &
   { name?: AensName },
 ): Promise<string> {
   return delegateSignatureCommon(
     [
-      await opt.onAccount.address(opt),
+      opt.onAccount.address,
       ...opt.name != null ? [produceNameId(opt.name)] : [],
       contractId,
     ],
@@ -113,11 +113,8 @@ export async function createAensDelegationSignature(
  */
 export async function createOracleDelegationSignature(
   contractId: Encoded.ContractAddress,
-  opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
+  opt: Parameters<typeof delegateSignatureCommon>[1] &
   { queryId?: Encoded.OracleQueryId },
 ): Promise<string> {
-  return delegateSignatureCommon(
-    [opt.queryId ?? await opt.onAccount.address(opt), contractId],
-    opt,
-  );
+  return delegateSignatureCommon([opt.queryId ?? opt.onAccount.address, contractId], opt);
 }

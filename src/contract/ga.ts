@@ -60,7 +60,7 @@ export async function createGeneralizedAccount(
     rawTx: Encoded.Transaction;
     gaContractId: Encoded.ContractAddress;
   }>> {
-  const ownerId = await onAccount.address(options);
+  const ownerId = onAccount.address;
   if ((await getAccount(ownerId, { onNode })).kind === 'generalized') {
     throw new IllegalArgumentError(`Account ${ownerId} is already GA`);
   }
@@ -122,8 +122,7 @@ export async function createMetaTx(
   {
     onAccount, onCompiler, onNode, ...options
   }:
-  { onAccount: AccountBase; onCompiler: Compiler; onNode: Node }
-  & Parameters<AccountBase['address']>[0],
+  { onAccount: AccountBase; onCompiler: Compiler; onNode: Node },
 ): Promise<Encoded.Transaction> {
   const wrapInEmptySignedTx = (
     tx: Encoded.Transaction | Uint8Array | TxUnpacked<TxSchema>,
@@ -155,7 +154,7 @@ export async function createMetaTx(
       tx: wrappedTx.txObject,
     },
     // TODO: accept an address instead
-    gaId: await onAccount.address(options),
+    gaId: onAccount.address,
     abiVersion,
     authData: authCallData,
     gasLimit,

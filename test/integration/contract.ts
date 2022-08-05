@@ -167,13 +167,12 @@ describe('Contract', () => {
     const accountBefore = contract.options.onAccount;
     contract.options.onAccount = onAccount;
     deployed = await contract.deploy();
-    const address = await onAccount.address();
     if (deployed?.result?.callerId == null) throw new UnexpectedTsError();
-    expect(deployed.result.callerId).to.be.equal(address);
+    expect(deployed.result.callerId).to.be.equal(onAccount.address);
     expect((await contract.methods.getArg(42, { callStatic: true })).result.callerId)
-      .to.be.equal(address);
+      .to.be.equal(onAccount.address);
     expect((await contract.methods.getArg(42, { callStatic: false })).result.callerId)
-      .to.be.equal(address);
+      .to.be.equal(onAccount.address);
     contract.options.onAccount = accountBefore;
   });
 

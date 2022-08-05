@@ -184,7 +184,7 @@ export async function sendTransaction(
   try {
     let __queue;
     try {
-      __queue = onAccount != null ? `tx-${await onAccount.address(options)}` : null;
+      __queue = onAccount != null ? `tx-${onAccount.address}` : null;
     } catch (error) {
       __queue = null;
     }

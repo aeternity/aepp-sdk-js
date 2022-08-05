@@ -96,7 +96,7 @@ describe('Generalized Account', () => {
     const onAccount = new MemoryAccount(secretKey);
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
       amount: 1,
-      senderId: await onAccount.address(),
+      senderId: onAccount.address,
       recipientId: gaAccountAddress,
     });
     const signedTx = await createMetaTx(

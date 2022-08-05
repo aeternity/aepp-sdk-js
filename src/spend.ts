@@ -67,7 +67,7 @@ export async function spend(
   return send(
     await _buildTx(Tag.SpendTx, {
       ...options,
-      senderId: await options.onAccount.address(options),
+      senderId: options.onAccount.address,
       recipientId: await resolveName<Encoding.AccountAddress>(
         recipientIdOrName,
         'account_pubkey',
@@ -105,7 +105,7 @@ export async function transferFunds(
     'account_pubkey',
     options,
   );
-  const senderId = await options.onAccount.address(options);
+  const senderId = options.onAccount.address;
   const balance = new BigNumber(
     await getBalance.bind(options.onAccount)(senderId, options),
   );
@@ -144,7 +144,7 @@ export async function payForTransaction(
   return send(
     await _buildTx(
       Tag.PayingForTx,
-      { ...options, payerId: await options.onAccount.address(options), tx: transaction },
+      { ...options, payerId: options.onAccount.address, tx: transaction },
     ),
     options,
   );
