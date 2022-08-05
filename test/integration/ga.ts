@@ -51,8 +51,7 @@ describe('Generalized Account', () => {
   it('Make account GA', async () => {
     accountBeforeGa = Object.values(aeSdk.accounts)[0] as MemoryAccount;
     const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', authContractSource, []);
-    const isGa = await aeSdk.isGA(gaAccountAddress);
-    isGa.should.be.equal(true);
+    expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.be.equal('generalized');
     authContract = await aeSdk.getContractInstance({
       source: authContractSource, contractAddress: gaContractId,
     });

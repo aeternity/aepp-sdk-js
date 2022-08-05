@@ -39,21 +39,6 @@ import { getAccount } from '../chain';
 import Compiler from './Compiler';
 
 /**
- * Check if account is GA
- * @category contract
- * @param address - Account address
- * @param options - Options
- * @returns if account is GA
- */
-export async function isGA(
-  address: Encoded.AccountAddress,
-  options: Parameters<typeof getAccount>[1],
-): Promise<boolean> {
-  const { contractId } = await getAccount(address, options);
-  return contractId != null;
-}
-
-/**
  * Convert current account to GA
  * @category contract
  * @param authFnName - Authorization function name
@@ -76,7 +61,9 @@ export async function createGeneralizedAccount(
     gaContractId: Encoded.ContractAddress;
   }>> {
   const ownerId = await onAccount.address(options);
-  if (await isGA(ownerId, { onNode })) throw new IllegalArgumentError(`Account ${ownerId} is already GA`);
+  if ((await getAccount(ownerId, { onNode })).kind === 'generalized') {
+    throw new IllegalArgumentError(`Account ${ownerId} is already GA`);
+  }
 
   const contract = await getContractInstance({
     onAccount, onCompiler, onNode, source,
