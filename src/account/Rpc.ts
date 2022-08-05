@@ -16,10 +16,9 @@ export default class AccountRpc extends AccountBase {
   override readonly address: Encoded.AccountAddress;
 
   constructor(
-    { rpcClient, address, ...options }: { rpcClient: any; address: Encoded.AccountAddress }
-    & ConstructorParameters<typeof AccountBase>[0],
+    { rpcClient, address }: { rpcClient: any; address: Encoded.AccountAddress },
   ) {
-    super(options);
+    super();
     this._rpcClient = rpcClient;
     this.address = address;
   }

@@ -14,12 +14,8 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { messageToHash, hash } from '../utils/crypto';
-import { buildTx } from '../tx/builder';
-import { decode, Encoded } from '../utils/encoder';
-import { Tag } from '../tx/builder/constants';
-import Node, { getNetworkId } from '../Node';
-import { concatBuffers } from '../utils/other';
+import { Encoded } from '../utils/encoder';
+import Node from '../Node';
 import type { createMetaTx } from '../contract/ga';
 import Compiler from '../contract/Compiler';
 
@@ -37,47 +33,23 @@ export const isAccountBase = (acc: AccountBase | any): boolean => (
  * {@link AeSdk} and provides access to a signing key pair.
  */
 export default abstract class AccountBase {
-  networkId?: string;
-
-  /**
-   * @param options - Options
-   * @param options.networkId - Using for signing transactions
-   */
-  constructor({ networkId }: { networkId?: string } = {}) {
-    this.networkId ??= networkId;
-  }
-
   /**
    * Sign encoded transaction
    * @param tx - Transaction to sign
-   * @param opt - Options
-   * @param opt.innerTx - Sign as inner transaction for PayingFor
+   * @param options - Options
+   * @param options.innerTx - Sign as inner transaction for PayingFor
    * @returns Signed transaction
    */
-  async signTransaction(
+  abstract signTransaction(
     tx: Encoded.Transaction,
-    { innerTx, networkId, ...options }: {
+    options: {
       innerTx?: boolean;
       networkId?: string;
       authData?: Parameters<typeof createMetaTx>[1];
       onNode?: Node;
       onCompiler?: Compiler;
-    } = {},
-  ): Promise<Encoded.Transaction> {
-    const prefixes = [await this.getNetworkId({ networkId })];
-    if (innerTx === true) prefixes.push('inner_tx');
-    const rlpBinaryTx = decode(tx);
-    const txWithNetworkId = concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)]);
-
-    const signatures = [await this.sign(txWithNetworkId, options)];
-    return buildTx({ encodedTx: rlpBinaryTx, signatures }, Tag.SignedTx).tx;
-  }
-
-  /**
-   * Get network Id
-   * @returns Network Id
-   */
-  readonly getNetworkId = getNetworkId;
+    },
+  ): Promise<Encoded.Transaction>;
 
   /**
    * Sign message
@@ -85,9 +57,7 @@ export default abstract class AccountBase {
    * @param options - Options
    * @returns Signature as hex string of Uint8Array
    */
-  async signMessage(message: string, options?: any): Promise<Uint8Array> {
-    return this.sign(messageToHash(message), options);
-  }
+  abstract signMessage(message: string, options?: any): Promise<Uint8Array>;
 
   /**
    * Sign data blob

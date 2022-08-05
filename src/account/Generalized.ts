@@ -34,14 +34,19 @@ export default class AccountGeneralized extends AccountBase {
    * @param address - Address of generalized account
    */
   constructor(address: Encoded.AccountAddress) {
-    super({});
+    super();
     decode(address);
     this.address = address;
   }
 
   // eslint-disable-next-line class-methods-use-this
   override async sign(): Promise<Uint8Array> {
-    throw new InvalidKeypairError('You are trying to sign data using generalized account without keypair');
+    throw new InvalidKeypairError('Can\'t sign using generalized account');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  override async signMessage(): Promise<Uint8Array> {
+    throw new InvalidKeypairError('Can\'t sign using generalized account');
   }
 
   override async signTransaction(
