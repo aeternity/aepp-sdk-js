@@ -87,9 +87,9 @@ export abstract class RpcError extends BaseError {
  * @category exception
  */
 export class RpcInvalidTransactionError extends RpcError {
-  static code = 2;
+  static override code = 2;
 
-  code = 2;
+  override code = 2;
 
   constructor(data?: any) {
     super('Invalid transaction');
@@ -103,9 +103,9 @@ rpcErrors.push(RpcInvalidTransactionError);
  * @category exception
  */
 export class RpcBroadcastError extends RpcError {
-  static code = 3;
+  static override code = 3;
 
-  code = 3;
+  override code = 3;
 
   constructor(data?: any) {
     super('Broadcast failed');
@@ -119,9 +119,9 @@ rpcErrors.push(RpcBroadcastError);
  * @category exception
  */
 export class RpcRejectedByUserError extends RpcError {
-  static code = 4;
+  static override code = 4;
 
-  code = 4;
+  override code = 4;
 
   constructor(data?: any) {
     super('Operation rejected by user');
@@ -135,9 +135,9 @@ rpcErrors.push(RpcRejectedByUserError);
  * @category exception
  */
 export class RpcUnsupportedProtocolError extends RpcError {
-  static code = 5;
+  static override code = 5;
 
-  code = 5;
+  override code = 5;
 
   constructor() {
     super('Unsupported Protocol Version');
@@ -150,9 +150,9 @@ rpcErrors.push(RpcUnsupportedProtocolError);
  * @category exception
  */
 export class RpcConnectionDenyError extends RpcError {
-  static code = 9;
+  static override code = 9;
 
-  code = 9;
+  override code = 9;
 
   constructor(data?: any) {
     super('Wallet deny your connection request');
@@ -166,9 +166,9 @@ rpcErrors.push(RpcConnectionDenyError);
  * @category exception
  */
 export class RpcNotAuthorizeError extends RpcError {
-  static code = 10;
+  static override code = 10;
 
-  code = 10;
+  override code = 10;
 
   constructor() {
     super('You are not connected to the wallet');
@@ -181,9 +181,9 @@ rpcErrors.push(RpcNotAuthorizeError);
  * @category exception
  */
 export class RpcPermissionDenyError extends RpcError {
-  static code = 11;
+  static override code = 11;
 
-  code = 11;
+  override code = 11;
 
   constructor(address: Encoded.AccountAddress) {
     super(`You are not subscribed for account ${address}`);
@@ -197,9 +197,9 @@ rpcErrors.push(RpcPermissionDenyError);
  * @category exception
  */
 export class RpcInternalError extends RpcError {
-  static code = 12;
+  static override code = 12;
 
-  code = 12;
+  override code = 12;
 
   constructor() {
     super('The peer failed to execute your request due to unknown error');
@@ -212,9 +212,9 @@ rpcErrors.push(RpcInternalError);
  * @category exception
  */
 export class RpcMethodNotFoundError extends RpcError {
-  static code = -32601;
+  static override code = -32601;
 
-  code = -32601;
+  override code = -32601;
 
   constructor() {
     super('Method not found');

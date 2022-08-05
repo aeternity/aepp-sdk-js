@@ -36,7 +36,7 @@ export default class AccountRpc extends AccountBase {
   /**
    * @returns Signed transaction
    */
-  async signTransaction(
+  override async signTransaction(
     tx: Encoded.Transaction,
     { innerTx, networkId }: Parameters<AccountBase['signTransaction']>[1] = {},
   ): Promise<Encoded.Transaction> {
@@ -58,7 +58,7 @@ export default class AccountRpc extends AccountBase {
   /**
    * @returns Signed message
    */
-  async signMessage(message: string): Promise<Uint8Array> {
+  override async signMessage(message: string): Promise<Uint8Array> {
     const { signature } = await this._rpcClient
       .request(METHODS.signMessage, { onAccount: this._address, message });
     return Buffer.from(signature, 'hex');

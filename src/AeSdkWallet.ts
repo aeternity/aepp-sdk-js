@@ -135,12 +135,12 @@ export default class AeSdkWallet extends AeSdk {
       .forEach((client) => client.notify(METHODS.updateAddress, this.getAccounts()));
   }
 
-  selectAccount(address: Encoded.AccountAddress): void {
+  override selectAccount(address: Encoded.AccountAddress): void {
     super.selectAccount(address);
     this._pushAccountsToApps();
   }
 
-  async addAccount(
+  override async addAccount(
     account: AccountBase,
     options?: Parameters<AeSdk['addAccount']>[1],
   ): Promise<void> {
@@ -153,7 +153,7 @@ export default class AeSdkWallet extends AeSdk {
     return { node: { url: this.api.url, name: this.selectedNodeName } };
   }
 
-  async selectNode(name: string): Promise<void> {
+  override async selectNode(name: string): Promise<void> {
     super.selectNode(name);
     const networkId = await this.getNetworkId();
     Array.from(this._clients.keys())

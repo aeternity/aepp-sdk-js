@@ -11,6 +11,7 @@
     "isolatedModules": true,
     "outDir": "./es",
     "noImplicitAny": true,
+    "noImplicitOverride": true,
     "module": "es6",
     "target": "es2020",
     "lib": ["es2020", "dom"],
