@@ -11,7 +11,7 @@ import {
 import { Tag } from './builder/constants';
 import { TxUnpacked, unpackTx } from './builder';
 import { UnsupportedProtocolError } from '../utils/errors';
-import { concatBuffers, isKeyOfObject } from '../utils/other';
+import { concatBuffers, isAccountNotFoundError, isKeyOfObject } from '../utils/other';
 import {
   decode, encode, Encoded, Encoding,
 } from '../utils/encoder';
@@ -87,7 +87,10 @@ export default async function verifyTransaction(
     address == null
       ? undefined
       : node.getAccountByPubkey(address)
-        .catch(() => ({ id: address, balance: 0n, nonce: 0 }))
+        .catch((error) => {
+          if (!isAccountNotFoundError(error)) throw error;
+          return { id: address, balance: 0n, nonce: 0 };
+        })
         // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
         .then((acc) => ({ ...acc, id: acc.id as Encoded.AccountAddress })),
     node.getCurrentKeyBlockHeight(),

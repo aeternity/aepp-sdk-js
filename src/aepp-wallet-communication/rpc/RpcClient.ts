@@ -63,8 +63,8 @@ export default class RpcClient <
     }
 
     const request = msg as JsonRpcRequest;
-    let result; let
-      error;
+    let result;
+    let error;
     try {
       if (!(request.method in this.#methods)) throw new RpcMethodNotFoundError();
       const methodName = request.method as keyof LocalApi;

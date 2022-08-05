@@ -16,7 +16,7 @@
  */
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
 import verifyTransaction, { ValidatorResult } from './tx/validator';
-import { pause } from './utils/other';
+import { isAccountNotFoundError, pause } from './utils/other';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
 import { DRY_RUN_ACCOUNT } from './tx/builder/schema';
 import { AensName } from './tx/builder/constants';
@@ -267,7 +267,10 @@ export async function getBalance(
   { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
   { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1],
 ): Promise<string> {
-  const { balance } = await getAccount(address, options).catch(() => ({ balance: 0n }));
+  const { balance } = await getAccount(address, options).catch((error) => {
+    if (!isAccountNotFoundError(error)) throw error;
+    return { balance: 0n };
+  });
 
   return formatAmount(balance, { targetDenomination: format });
 }

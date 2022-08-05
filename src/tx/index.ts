@@ -33,7 +33,7 @@ import {
 import Node from '../Node';
 import { Encoded } from '../utils/encoder';
 import { buildTx as syncBuildTx, unpackTx } from './builder/index';
-import { isKeyOfObject } from '../utils/other';
+import { isAccountNotFoundError, isKeyOfObject } from '../utils/other';
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
 
 type Int = number | string | BigNumber;
@@ -91,7 +91,10 @@ export async function prepareTxParams(
   }: PrepareTxParamsOptions,
 ): Promise<{ ttl: number; nonce: number }> {
   nonce ??= (
-    await onNode.getAccountNextNonce(senderId, { strategy }).catch(() => ({ nextNonce: 1 }))
+    await onNode.getAccountNextNonce(senderId, { strategy }).catch((error) => {
+      if (!isAccountNotFoundError(error)) throw error;
+      return { nextNonce: 1 };
+    })
   ).nextNonce;
 
   if (ttl !== 0) {

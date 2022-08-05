@@ -189,8 +189,7 @@ describe('Aens', () => {
         .aensBid(nameShort, bidFee, { onAccount });
       bid.should.be.an('object');
 
-      const isAuctionFinished = await aeSdk.getName(nameShort).catch(() => false);
-      isAuctionFinished.should.be.equal(false);
+      await expect(aeSdk.getName(nameShort)).to.be.rejectedWith('error: Name not found');
 
       if (bid.blockHeight == null) throw new UnexpectedTsError();
       const auctionEndBlock = computeAuctionEndBlock(nameShort, bid.blockHeight);
