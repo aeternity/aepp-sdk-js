@@ -79,15 +79,11 @@ export default abstract class AccountBase {
   /**
    * Sign message
    * @param message - Message to sign
-   * @param opt - Options
+   * @param options - Options
    * @returns Signature as hex string of Uint8Array
    */
-  async signMessage(
-    message: string,
-    { returnHex = false, ...options }: { returnHex?: boolean } = {},
-  ): Promise<string | Uint8Array> {
-    const sig = await this.sign(messageToHash(message), options);
-    return returnHex ? Buffer.from(sig).toString('hex') : sig;
+  async signMessage(message: string, options?: any): Promise<Uint8Array> {
+    return this.sign(messageToHash(message), options);
   }
 
   /**
