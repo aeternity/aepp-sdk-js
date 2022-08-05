@@ -126,9 +126,8 @@ const newUserAccount = MemoryAccount.generate()
 const node = new Node('https://testnet.aeternity.io')
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
+  accounts: [payerAccount, newUserAccount],
 })
-aeSdk.addAccount(payerAccount, { select: true })
-aeSdk.addAccount(newUserAccount)
 
 // catch exceptions
 try {

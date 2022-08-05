@@ -110,6 +110,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       [account] = Object.values((await getSdk()).accounts);
       wallet = new AeSdkWallet({
         nodes: [{ name: 'local', instance: node }],
+        accounts: [account, MemoryAccount.generate()],
         id: 'test',
         type: WALLET_TYPE.window,
         name: 'Wallet',
@@ -120,8 +121,6 @@ describe('Aepp<->Wallet', function aeppWallet() {
         onMessageSign: handlerRejectPromise,
         onDisconnect() {},
       });
-      wallet.addAccount(account, { select: true });
-      wallet.addAccount(MemoryAccount.generate());
       aepp = new AeSdkAepp({
         name: 'AEPP',
         nodes: [{ name: 'test', instance: node }],
@@ -474,6 +473,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     before(async () => {
       wallet = new AeSdkWallet({
         nodes: [{ name: 'local', instance: node }],
+        accounts: [account],
         id: 'test',
         type: WALLET_TYPE.window,
         name: 'Wallet',
@@ -484,7 +484,6 @@ describe('Aepp<->Wallet', function aeppWallet() {
         onMessageSign: handlerRejectPromise,
         onDisconnect() {},
       });
-      wallet.addAccount(account, { select: true });
       aepp = new AeSdkAepp({
         name: 'AEPP',
         onNetworkChange() {},

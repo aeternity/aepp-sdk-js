@@ -30,12 +30,10 @@ const node = new Node('https://testnet.aeternity.io') // ideally host your own n
 const account = new MemoryAccount(SECRET_KEY)
 
 const aeSdk = new AeSdk({
-  nodes: [
-    { name: 'testnet', instance: node }
-  ],
+  nodes: [{ name: 'testnet', instance: node }],
+  accounts: [account],
   compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler
 })
-aeSdk.addAccount(accoount, { select: true })
 ```
 
 Note:

@@ -94,10 +94,9 @@ const newUserAccount = MemoryAccount.generate();
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
+  accounts: [payerAccount, newUserAccount],
   compilerUrl: COMPILER_URL,
 });
-aeSdk.addAccount(payerAccount, { select: true });
-aeSdk.addAccount(newUserAccount);
 
 // ## 4. Create and sign `ContractCallTx` on behalf of new user
 // Currently there is no high-level API available that allows you to create and sign the

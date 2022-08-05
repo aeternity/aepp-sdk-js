@@ -67,7 +67,7 @@ export default class AeSdkWallet extends AeSdk {
 
   name: string;
 
-  _clients: Map<string, RpcClientsInfo>;
+  _clients = new Map<string, RpcClientsInfo>();
 
   onConnection: OnConnection;
 
@@ -122,13 +122,13 @@ export default class AeSdkWallet extends AeSdk {
     this.onDisconnect = onDisconnect;
     this.onAskAccounts = onAskAccounts;
     this.onMessageSign = onMessageSign;
-    this._clients = new Map();
     this.name = name;
     this.id = id;
     this._type = type;
   }
 
   _pushAccountsToApps(): void {
+    if (this._clients == null) return;
     Array.from(this._clients.keys())
       .filter((clientId) => this._isRpcClientSubscribed(clientId))
       .map((clientId) => this._getClient(clientId).rpc)

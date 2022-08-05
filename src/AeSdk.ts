@@ -8,6 +8,14 @@ export default class AeSdk extends AeSdkBase {
 
   selectedAddress?: Encoded.AccountAddress;
 
+  constructor(
+    { accounts, ...options }: { accounts?: AccountBase[] }
+    & ConstructorParameters<typeof AeSdkBase>[0] = {},
+  ) {
+    super(options);
+    accounts?.forEach((account, idx) => this.addAccount(account, { select: idx === 0 }));
+  }
+
   override _resolveAccount(
     account: Account | Encoded.AccountAddress = this.selectedAddress,
   ): AccountBase {

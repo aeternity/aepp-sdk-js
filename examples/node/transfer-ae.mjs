@@ -58,8 +58,8 @@ const account = new MemoryAccount(ACCOUNT_KEYPAIR.secretKey);
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
+  accounts: [account],
 });
-aeSdk.addAccount(account, { select: true });
 
 // ## 4. Get AE balance of recipient (before transfer)
 // Before the transfer of AE you can check the AE balance of the recipient.

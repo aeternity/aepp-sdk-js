@@ -26,18 +26,18 @@ export const ignoreVersion = process.env.IGNORE_VERSION === 'true';
 const genesisAccount = new MemoryAccount(secretKey);
 
 export async function getSdk(accountCount = 1): Promise<AeSdk> {
+  const accounts = new Array(accountCount).fill(null).map(() => MemoryAccount.generate());
   const sdk = new AeSdk({
     compilerUrl,
     ignoreVersion,
     nodes: [{ name: 'test', instance: new Node(url, { ignoreVersion }) }],
+    accounts,
     _expectedMineRate: 1000,
     _microBlockCycle: 300,
   });
   await sdk.awaitHeight(2);
-  const accounts = new Array(accountCount).fill(null).map(() => MemoryAccount.generate());
   for (let i = 0; i < accounts.length; i += 1) {
     await sdk.spend(1e32, accounts[i].address, { onAccount: genesisAccount });
-    sdk.addAccount(accounts[i], { select: i === 0 });
   }
   return sdk;
 }

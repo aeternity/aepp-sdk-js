@@ -61,9 +61,9 @@ const account = new MemoryAccount(ACCOUNT_SECRET_KEY);
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
+  accounts: [account],
   compilerUrl: COMPILER_URL,
 });
-aeSdk.addAccount(account, { select: true });
 
 // ## 4. Get contract instance
 // Knowing the source code allows you to initialize a contract instance and interact with the

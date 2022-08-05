@@ -23,7 +23,6 @@ import {
   decode, postQueryToOracle, registerOracle,
   ORACLE_TTL_TYPES, QUERY_FEE,
 } from '../../src';
-import MemoryAccount from '../../src/account/Memory';
 import { Encoded } from '../../src/utils/encoder';
 
 describe('Oracle', () => {
@@ -33,7 +32,7 @@ describe('Oracle', () => {
   const queryResponse = "{'tmp': 30}";
 
   before(async () => {
-    aeSdk = await getSdk(1);
+    aeSdk = await getSdk(2);
   });
 
   it('Register Oracle with 5000 TTL', async () => {
@@ -88,10 +87,8 @@ describe('Oracle', () => {
     const queryFee = 24000n;
 
     before(async () => {
-      const account = MemoryAccount.generate();
-      await aeSdk.spend(1e15, account.address);
-      aeSdk.addAccount(account, { select: true });
-      oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString(), onAccount: account });
+      await aeSdk.selectAccount(aeSdk.addresses()[1]);
+      oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString() });
     });
 
     it('Post Oracle Query with default query fee', async () => {

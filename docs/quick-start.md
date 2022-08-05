@@ -42,9 +42,8 @@ const senderAccount = new MemoryAccount('<SENDER_SECRET_KEY>');
   const aeSdk = new AeSdk({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: node }],
+    accounts: [senderAccount],
   })
-  // Add sender account to the aeSdk state
-  aeSdk.addAccount(senderAccount, { select: true })
 
   // spend one AE
   await aeSdk.spend(1, '<RECIPIENT_PUBLIC_KEY>', {

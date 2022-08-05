@@ -85,6 +85,10 @@ export default {
         { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
         { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
       ],
+      accounts: [
+        new MemoryAccount('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
+        MemoryAccount.generate(),
+      ],
       compilerUrl: 'https://compiler.aepps.com',
       name: 'Wallet Iframe',
       onConnection: (aeppId, params) => {
@@ -101,11 +105,6 @@ export default {
         this.shareWalletInfo(clientId)
       }
     })
-    this.aeSdk.addAccount(
-      new MemoryAccount('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
-      { select: true },
-    )
-    this.aeSdk.addAccount(MemoryAccount.generate())
 
     this.nodeName = this.aeSdk.selectedNodeName
     this.address = this.aeSdk.addresses()[0]

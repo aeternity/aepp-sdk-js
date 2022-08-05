@@ -12,6 +12,10 @@ const aeSdk = new AeSdkWallet({
     name: 'testnet',
     instance: new Node('https://testnet.aeternity.io'),
   }],
+  accounts: [
+    new MemoryAccount('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
+    MemoryAccount.generate(),
+  ],
   id: browser.runtime.id,
   type: WALLET_TYPE.extension,
   name: 'Wallet WebExtension',
@@ -52,11 +56,6 @@ const aeSdk = new AeSdkWallet({
 });
 // The `ExtensionProvider` uses the first account by default.
 // You can change active account using `selectAccount(address)` function
-aeSdk.addAccount(
-  new MemoryAccount('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
-  { select: true },
-);
-aeSdk.addAccount(MemoryAccount.generate());
 
 browser.runtime.onConnect.addListener((port) => {
   // create connection
