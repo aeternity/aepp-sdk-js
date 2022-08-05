@@ -12,9 +12,7 @@ import { Tag } from './builder/constants';
 import { TxUnpacked, unpackTx } from './builder';
 import { UnsupportedProtocolError } from '../utils/errors';
 import { concatBuffers, isAccountNotFoundError, isKeyOfObject } from '../utils/other';
-import {
-  decode, encode, Encoded, Encoding,
-} from '../utils/encoder';
+import { encode, Encoded, Encoding } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
 
@@ -118,9 +116,8 @@ validators.push(
     ].join('-'));
     const txWithNetworkId = concatBuffers([prefix, encodedTx.rlpEncoded]);
     const txHashWithNetworkId = concatBuffers([prefix, hash(encodedTx.rlpEncoded)]);
-    const decodedPub = decode(account.id);
-    if (verify(txWithNetworkId, signatures[0], decodedPub)
-      || verify(txHashWithNetworkId, signatures[0], decodedPub)) return [];
+    if (verify(txWithNetworkId, signatures[0], account.id)
+      || verify(txHashWithNetworkId, signatures[0], account.id)) return [];
     return [{
       message: 'Signature cannot be verified, please ensure that you transaction have'
         + ' the correct prefix and the correct private key for the sender address',

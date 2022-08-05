@@ -156,18 +156,17 @@ export function sign(data: string | Uint8Array, privateKey: string | Uint8Array)
 
 /**
  * Verify that signature was signed by public key
- * @param data - Data to verify
- * @param signature - Signature to verify
- * @param publicKey - Key to verify against
- * @returns Valid?
+ * @param data - Data that was signed
+ * @param signature - Signature of data
+ * @param address - Address to verify against
+ * @returns is data was signed by address
  */
 export function verify(
   data: Uint8Array,
   signature: Uint8Array,
-  publicKey: string | Uint8Array,
+  address: Encoded.AccountAddress,
 ): boolean {
-  const publicKeyBuffer = typeof publicKey === 'string' ? str2buf(publicKey) : publicKey;
-  return nacl.sign.detached.verify(data, signature, publicKeyBuffer);
+  return nacl.sign.detached.verify(data, signature, decode(address));
 }
 
 export function messageToHash(message: string): Buffer {
@@ -180,12 +179,19 @@ export function signMessage(message: string, privateKey: string | Buffer): Uint8
   return sign(messageToHash(message), privateKey);
 }
 
+/**
+ * Verify that message was signed by address
+ * @param message - Message that was signed
+ * @param signature - Signature of message
+ * @param address - Address to verify against
+ * @returns is data was signed by address
+ */
 export function verifyMessage(
-  str: string,
+  message: string,
   signature: Uint8Array,
-  publicKey: string | Uint8Array,
+  address: Encoded.AccountAddress,
 ): boolean {
-  return verify(messageToHash(str), signature, publicKey);
+  return verify(messageToHash(message), signature, address);
 }
 
 /**
@@ -202,5 +208,6 @@ export function isValidKeypair(
 ): boolean {
   const message = Buffer.from('TheMessage');
   const signature = sign(message, privateKey);
-  return verify(message, signature, publicKey);
+  const publicKeyBuffer = typeof publicKey === 'string' ? str2buf(publicKey) : publicKey;
+  return verify(message, signature, encode(publicKeyBuffer, Encoding.AccountAddress));
 }
