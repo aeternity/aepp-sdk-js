@@ -118,8 +118,6 @@ export interface NodeInfo {
 }
 
 export default class Node extends (NodeTransformed as unknown as NodeTransformedApi) {
-  url: string;
-
   /**
    * @param url - Url for node API
    * @param options - Options
@@ -139,7 +137,6 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       ],
       ...options,
     });
-    this.url = url;
     if (!ignoreVersion) {
       const versionPromise = this.getStatus().then(({ nodeVersion }) => nodeVersion);
       this.pipeline.addPolicy(
@@ -164,7 +161,7 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       )
       .version;
     return {
-      url: this.url,
+      url: this.$host,
       nodeNetworkId,
       version,
       consensusProtocolVersion,
