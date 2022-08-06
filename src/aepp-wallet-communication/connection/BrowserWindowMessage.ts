@@ -77,7 +77,7 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
     return this.listener != null;
   }
 
-  connect(
+  override connect(
     onMessage: (message: any, origin: string, source: MessageEventSource | null) => void,
     onDisconnect: () => void,
   ): void {
@@ -102,7 +102,7 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
     this.#onDisconnect = onDisconnect;
   }
 
-  disconnect(): void {
+  override disconnect(): void {
     super.disconnect();
     if (this.listener == null || this.#onDisconnect == null) {
       throw new InternalError('Expected to not happen, required for TS');
@@ -113,7 +113,7 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
     this.#onDisconnect = undefined;
   }
 
-  sendMessage(msg: any): void {
+  override sendMessage(msg: any): void {
     if (this.#target == null) throw new RpcConnectionError('Can\'t send messages without target');
     const message = this.sendDirection != null ? { type: this.sendDirection, data: msg } : msg;
     super.sendMessage(message);

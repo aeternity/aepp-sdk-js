@@ -61,7 +61,7 @@ export default class AeSdkAepp extends AeSdkBase {
     this.name = name;
   }
 
-  _resolveAccount(account: Account = this.addresses()[0]): AccountBase {
+  override _resolveAccount(account: Account = this.addresses()[0]): AccountBase {
     if (typeof account === 'string') {
       const address = account as Encoded.AccountAddress;
       decode(address);
@@ -72,7 +72,7 @@ export default class AeSdkAepp extends AeSdkBase {
     return super._resolveAccount(account);
   }
 
-  addresses(): Encoded.AccountAddress[] {
+  override addresses(): Encoded.AccountAddress[] {
     if (this._accounts == null) return [];
     const current = Object.keys(this._accounts.current)[0];
     return [

@@ -8,7 +8,7 @@ export default class AeSdk extends AeSdkBase {
 
   selectedAddress?: Encoded.AccountAddress;
 
-  _resolveAccount(
+  override _resolveAccount(
     account: Account | Encoded.AccountAddress = this.selectedAddress,
   ): AccountBase {
     if (typeof account === 'string') {
@@ -24,7 +24,7 @@ export default class AeSdk extends AeSdkBase {
    * Get accounts addresses
    * @example addresses()
    */
-  addresses(): Encoded.AccountAddress[] {
+  override addresses(): Encoded.AccountAddress[] {
     return Object.keys(this.accounts) as Encoded.AccountAddress[];
   }
 

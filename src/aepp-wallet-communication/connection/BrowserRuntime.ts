@@ -31,12 +31,12 @@ export default class BrowserRuntimeConnection extends BrowserConnection {
     this.port = port;
   }
 
-  disconnect(): void {
+  override disconnect(): void {
     super.disconnect();
     this.port.disconnect();
   }
 
-  connect(
+  override connect(
     onMessage: (message: any, origin: string, source: Runtime.Port) => void,
     onDisconnect: () => void,
   ): void {
@@ -48,7 +48,7 @@ export default class BrowserRuntimeConnection extends BrowserConnection {
     this.port.onDisconnect.addListener(onDisconnect);
   }
 
-  sendMessage(message: any): void {
+  override sendMessage(message: any): void {
     super.sendMessage(message);
     this.port.postMessage(message);
   }

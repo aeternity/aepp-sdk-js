@@ -78,7 +78,7 @@ export default class AccountMemory extends AccountBase {
     return sign(data, secrets.get(this).secretKey);
   }
 
-  async signTransaction(
+  override async signTransaction(
     tx: Encoded.Transaction,
     options: Parameters<AccountBase['signTransaction']>[1] = {},
   ): Promise<Encoded.Transaction> {

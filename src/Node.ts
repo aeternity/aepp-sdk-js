@@ -34,7 +34,7 @@ const numberPropertyNames = [
 ] as const;
 
 class NodeTransformed extends NodeApi {
-  async sendOperationRequest(
+  override async sendOperationRequest(
     operationArguments: OperationArguments,
     operationSpec: OperationSpec,
   ): Promise<any> {
