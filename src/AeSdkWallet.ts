@@ -1,6 +1,6 @@
 import { v4 as uuid } from '@aeternity/uuid';
 import AeSdk from './AeSdk';
-import { Account } from './AeSdkBase';
+import { OnAccount } from './AeSdkBase';
 import verifyTransaction from './tx/validator';
 import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
 import {
@@ -36,7 +36,7 @@ type OnSign = (
   clientId: string,
   params: Omit<Parameters<WalletApi[METHODS.sign]>[0], 'networkId'>,
   origin: string,
-) => Promise<{ tx?: Encoded.Transaction; onAccount?: Account } | undefined> | Promise<void>;
+) => Promise<{ tx?: Encoded.Transaction; onAccount?: OnAccount } | undefined> | Promise<void>;
 
 type OnDisconnect = (
   clientId: string, params: Parameters<WalletApi[METHODS.closeConnection]>[0]
@@ -48,7 +48,7 @@ type OnAskAccounts = (
 
 type OnMessageSign = (
   clientId: string, params: Parameters<WalletApi[METHODS.signMessage]>[0], origin: string
-) => Promise<{ onAccount?: Account } | undefined> | Promise<void>;
+) => Promise<{ onAccount?: OnAccount } | undefined> | Promise<void>;
 
 interface RpcClientsInfo {
   id: string;
@@ -265,9 +265,9 @@ export default class AeSdkWallet extends AeSdk {
             await this.onAskAccounts(id, params, origin);
             return this.addresses();
           },
-          [METHODS.sign]: async ({ tx, onAccount, returnSigned }, origin) => {
+          [METHODS.sign]: async ({ tx, onAccount: address, returnSigned }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
-            onAccount ??= await this.address();
+            let onAccount: OnAccount = address ?? await this.address();
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }
@@ -288,9 +288,9 @@ export default class AeSdkWallet extends AeSdk {
               throw new RpcBroadcastError(error.message);
             }
           },
-          [METHODS.signMessage]: async ({ message, onAccount }, origin) => {
+          [METHODS.signMessage]: async ({ message, onAccount: address }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
-            onAccount ??= await this.address();
+            let onAccount: OnAccount = address ?? await this.address();
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }

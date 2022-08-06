@@ -262,7 +262,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign transaction: invalid account object in action', async () => {
-      wallet.onSign = async () => ({ onAccount: {} });
+      wallet.onSign = async () => ({ onAccount: {} as unknown as AccountBase });
       const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: keypair.publicKey,
         recipientId: keypair.publicKey,

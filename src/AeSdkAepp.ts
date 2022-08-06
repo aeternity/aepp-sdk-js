@@ -1,4 +1,4 @@
-import AeSdkBase, { Account } from './AeSdkBase';
+import AeSdkBase, { OnAccount } from './AeSdkBase';
 import AccountBase from './account/Base';
 import AccountRpc from './account/Rpc';
 import { decode, Encoded } from './utils/encoder';
@@ -61,7 +61,7 @@ export default class AeSdkAepp extends AeSdkBase {
     this.name = name;
   }
 
-  override _resolveAccount(account: Account = this.addresses()[0]): AccountBase {
+  override _resolveAccount(account: OnAccount = this.addresses()[0]): AccountBase {
     if (typeof account === 'string') {
       const address = account as Encoded.AccountAddress;
       decode(address);

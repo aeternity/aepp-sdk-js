@@ -20,7 +20,7 @@ import { spy } from 'sinon';
 import http from 'http';
 import { getSdk } from '.';
 import {
-  generateKeyPair, AeSdk, Tag, UnexpectedTsError,
+  generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
@@ -115,7 +115,7 @@ describe('Node Chain', () => {
     isConfirmed2.should.be.equal(true);
   });
 
-  const accounts = new Array(10).fill(undefined).map(() => generateKeyPair());
+  const accounts = new Array(10).fill(undefined).map(() => MemoryAccount.generate());
   const transactions: Encoded.TxHash[] = [];
 
   it('multiple spends from one account', async () => {
@@ -123,7 +123,7 @@ describe('Node Chain', () => {
     const httpSpy = spy(http, 'request');
     const spends = await Promise.all(accounts.map(async (account, idx) => aeSdk.spend(
       Math.floor(Math.random() * 1000 + 1e16),
-      account.publicKey,
+      account.address,
       { nonce: nextNonce + idx, verify: false, waitMined: false },
     )));
     transactions.push(...spends.map(({ hash }) => hash));

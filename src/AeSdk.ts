@@ -1,4 +1,4 @@
-import AeSdkBase, { Account } from './AeSdkBase';
+import AeSdkBase, { OnAccount } from './AeSdkBase';
 import AccountBase from './account/Base';
 import { decode, Encoded } from './utils/encoder';
 import { UnavailableAccountError } from './utils/errors';
@@ -16,9 +16,7 @@ export default class AeSdk extends AeSdkBase {
     accounts?.forEach((account, idx) => this.addAccount(account, { select: idx === 0 }));
   }
 
-  override _resolveAccount(
-    account: Account | Encoded.AccountAddress = this.selectedAddress,
-  ): AccountBase {
+  override _resolveAccount(account: OnAccount = this.selectedAddress): AccountBase {
     if (typeof account === 'string') {
       const address = account as Encoded.AccountAddress;
       decode(address);

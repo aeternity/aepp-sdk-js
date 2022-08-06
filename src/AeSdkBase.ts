@@ -11,26 +11,18 @@ import Node, { getNetworkId } from './Node';
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
 import { AMOUNT } from './tx/builder/schema';
 import { Tag } from './tx/builder/constants';
-import MemoryAccount from './account/Memory';
-import AccountBase, { isAccountBase } from './account/Base';
+import AccountBase from './account/Base';
 import {
   CompilerError,
   DuplicateNodeError,
-  InvalidKeypairError,
   NodeNotFoundError,
   NotImplementedError,
   TypeError,
 } from './utils/errors';
-import { decode, Encoded } from './utils/encoder';
+import { Encoded } from './utils/encoder';
 import Compiler from './contract/Compiler';
-import { isValidKeypair } from './utils/crypto';
 
-interface Keypair {
-  publicKey: Encoded.AccountAddress;
-  secretKey: string | Uint8Array;
-}
-
-export type Account = Keypair | AccountBase | any;
+export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 
@@ -206,20 +198,20 @@ class AeSdkBase {
     return [];
   }
 
-  async address({ onAccount }: { onAccount?: Account } = {}): Promise<Encoded.AccountAddress> {
+  async address({ onAccount }: { onAccount?: OnAccount } = {}): Promise<Encoded.AccountAddress> {
     return this._resolveAccount(onAccount).address;
   }
 
   async sign(
     data: string | Uint8Array,
-    { onAccount, ...options }: { onAccount?: Account } = {},
+    { onAccount, ...options }: { onAccount?: OnAccount } = {},
   ): Promise<Uint8Array> {
     return this._resolveAccount(onAccount).sign(data, options);
   }
 
   async signTransaction(
     tx: Encoded.Transaction,
-    { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['signTransaction']>[1] = {},
+    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTransaction']>[1] = {},
   ): Promise<Encoded.Transaction> {
     return this._resolveAccount(onAccount)
       .signTransaction(tx, { ...options, networkId: await this.getNetworkId(options) });
@@ -227,7 +219,7 @@ class AeSdkBase {
 
   async signMessage(
     message: string,
-    { onAccount, ...options }: { onAccount?: Account } & Parameters<AccountBase['signMessage']>[1] = {},
+    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signMessage']>[1] = {},
   ): Promise<Uint8Array> {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
@@ -237,25 +229,13 @@ class AeSdkBase {
    * @param account - ak-address, instance of AccountBase, or keypair
    */
   // eslint-disable-next-line class-methods-use-this
-  _resolveAccount(account?: Account): AccountBase {
-    switch (account !== null && typeof account) {
-      case 'string':
-        throw new NotImplementedError('Address in AccountResolver');
-      case 'object': {
-        if (isAccountBase(account)) return account;
-        const encoding = typeof account.secretKey === 'string' ? 'hex' : undefined;
-        const secretKey = Buffer.from(account.secretKey, encoding);
-        if (!isValidKeypair(secretKey, decode(account.publicKey))) {
-          throw new InvalidKeypairError('Invalid Key Pair');
-        }
-        return new MemoryAccount(account.secretKey);
-      }
-      default:
-        throw new TypeError(
-          'Account should be an address (ak-prefixed string), '
-          + `keypair, or instance of AccountBase, got ${String(account)} instead`,
-        );
-    }
+  _resolveAccount(account?: OnAccount): AccountBase {
+    if (typeof account === 'string') throw new NotImplementedError('Address in AccountResolver');
+    if (typeof account === 'object') return account;
+    throw new TypeError(
+      'Account should be an address (ak-prefixed string), '
+      + `or instance of AccountBase, got ${String(account)} instead`,
+    );
   }
 
   _getOptions(): {
@@ -306,11 +286,7 @@ type MakeOptional<Args extends any[]> = Args extends [infer Head, ...infer Tail]
   ? Tail extends []
     ? Head extends object
       ? OptionalIfNotRequired<[Omit<Head, 'onNode' | 'onCompiler' | 'onAccount'>
-      & {
-        onNode?: Node;
-        onCompiler?: Compiler;
-        onAccount?: AccountBase | Encoded.AccountAddress | Keypair;
-      }]>
+      & { onNode?: Node; onCompiler?: Compiler; onAccount?: OnAccount }]>
       : [Head]
     : [Head, ...MakeOptional<Tail>]
   : never;

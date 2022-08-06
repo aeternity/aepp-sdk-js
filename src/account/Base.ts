@@ -20,15 +20,6 @@ import type { createMetaTx } from '../contract/ga';
 import Compiler from '../contract/Compiler';
 
 /**
- * Check is provided object looks like an instance of AccountBase
- * @param acc - Object to check
- */
-export const isAccountBase = (acc: AccountBase | any): boolean => (
-  !['sign', 'signTransaction', 'signMessage'].some((f) => typeof acc[f] !== 'function')
-  && acc.address.startsWith('ak_')
-);
-
-/**
  * Account is one of the three basic building blocks of an
  * {@link AeSdk} and provides access to a signing key pair.
  */

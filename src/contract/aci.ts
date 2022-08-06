@@ -391,7 +391,7 @@ export default async function getContractInstance({
     try {
       callerId = opt.onAccount.address;
     } catch (error) {
-      const messageToSwallow = 'Account should be an address (ak-prefixed string), keypair, or instance of AccountBase, got undefined instead';
+      const messageToSwallow = 'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead';
       if (
         opt.callStatic !== true || !(error instanceof TypeError)
         || error.message !== messageToSwallow
