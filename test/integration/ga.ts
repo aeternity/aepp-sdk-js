@@ -45,7 +45,7 @@ describe('Generalized Account', () => {
 
   before(async () => {
     aeSdk = await getSdk();
-    gaAccountAddress = await aeSdk.address();
+    gaAccountAddress = aeSdk.address;
   });
 
   it('Make account GA', async () => {

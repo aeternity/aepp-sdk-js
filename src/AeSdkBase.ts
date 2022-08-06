@@ -198,8 +198,8 @@ class AeSdkBase {
     return [];
   }
 
-  async address({ onAccount }: { onAccount?: OnAccount } = {}): Promise<Encoded.AccountAddress> {
-    return this._resolveAccount(onAccount).address;
+  get address(): Encoded.AccountAddress {
+    return this._resolveAccount().address;
   }
 
   async sign(

@@ -47,7 +47,7 @@ async function spend (amount, recipient) {
 
   // builds an unsigned SpendTx using integrated transaction builder
   const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-    senderId: await aeSdk.address(),
+    senderId: aeSdk.address,
     recipientId: recipient,
     amount, // aettos
     payload: 'using low-level api is funny'

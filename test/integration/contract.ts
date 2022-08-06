@@ -156,8 +156,7 @@ describe('Contract', () => {
     const signature = await aeSdk.sign(msgHash);
     const signContract = await aeSdk.getContractInstance({ source: signSource });
     await signContract.deploy();
-    const { decodedResult } = await signContract.methods
-      .verify(msgHash, await aeSdk.address(), signature);
+    const { decodedResult } = await signContract.methods.verify(msgHash, aeSdk.address, signature);
     decodedResult.should.be.equal(true);
   });
 
@@ -197,7 +196,7 @@ describe('Contract', () => {
   it('throws errors on method call', async () => {
     const ct = await aeSdk.getContractInstance({ source: contractWithBrokenMethods });
     await ct.deploy();
-    await expect(ct.methods.failWithoutMessage(await aeSdk.address()))
+    await expect(ct.methods.failWithoutMessage(aeSdk.address))
       .to.be.rejectedWith('Invocation failed');
     await expect(ct.methods.failWithMessage())
       .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"');
@@ -391,7 +390,6 @@ describe('Contract', () => {
 
   describe('Oracle operation delegation', () => {
     let contractId: Encoded.ContractAddress;
-    let address: Encoded.AccountAddress;
     let oracle: Awaited<ReturnType<typeof aeSdk.getOracleObject>>;
     let oracleId: Encoded.OracleAddress;
     let queryObject: Awaited<ReturnType<typeof aeSdk.getQueryObject>>;
@@ -404,14 +402,13 @@ describe('Contract', () => {
       await contract.deploy();
       if (contract.deployInfo.address == null) throw new UnexpectedTsError();
       contractId = contract.deployInfo.address;
-      address = await aeSdk.address();
-      oracleId = encode(decode(address), Encoding.OracleAddress);
+      oracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     });
 
     it('registers', async () => {
       delegationSignature = await aeSdk.createOracleDelegationSignature(contractId);
       const oracleRegister = await contract.methods
-        .signedRegisterOracle(address, delegationSignature, queryFee, ttl);
+        .signedRegisterOracle(aeSdk.address, delegationSignature, queryFee, ttl);
       oracleRegister.result.returnType.should.be.equal('ok');
       oracle = await aeSdk.getOracleObject(oracleId);
       oracle.id.should.be.equal(oracleId);

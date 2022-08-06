@@ -24,8 +24,8 @@ describe('Verify Transaction', () => {
 
   it('returns errors', async () => {
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      senderId: await aeSdk.address(),
-      recipientId: await aeSdk.address(),
+      senderId: aeSdk.address,
+      recipientId: aeSdk.address,
       amount: 1e50,
       nonce: 1,
       ttl: 2,
@@ -40,8 +40,8 @@ describe('Verify Transaction', () => {
 
   it('returns NonceHigh error', async () => {
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      senderId: await aeSdk.address(),
-      recipientId: await aeSdk.address(),
+      senderId: aeSdk.address,
+      recipientId: aeSdk.address,
       amount: 100,
       nonce: 100,
     });
@@ -51,8 +51,8 @@ describe('Verify Transaction', () => {
 
   it('verifies transactions before broadcasting', async () => {
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      senderId: await aeSdk.address(),
-      recipientId: await aeSdk.address(),
+      senderId: aeSdk.address,
+      recipientId: aeSdk.address,
       amount: 1,
       ttl: 2,
       absoluteTtl: true,

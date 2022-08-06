@@ -68,7 +68,7 @@ async function delegateSignatureCommon(
  * const aeSdk = new AeSdk({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const name = 'example.chain' // AENS name
- * const onAccount = await aeSdk.address() // Sign with a specific account
+ * const onAccount = aeSdk.address // Sign with a specific account
  * // Preclaim signature
  * const preclaimSig = await aeSdk.createAensDelegationSignature(contractId, { onAccount: current })
  * // Claim, transfer and revoke signature
@@ -104,7 +104,7 @@ export async function createAensDelegationSignature(
  * const aeSdk = new AeSdk({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const queryId = 'oq_...' // Oracle Query Id
- * const onAccount = await aeSdk.address() // Sign with a specific account
+ * const onAccount = aeSdk.address // Sign with a specific account
  * // Oracle register and extend signature
  * const oracleDelegationSig = await aeSdk.createOracleDelegationSignature(contractId)
  * // Oracle respond signature

@@ -43,13 +43,13 @@ describe('Paying for transaction of another account', () => {
     });
     const signedSpendTx = await aeSdk
       .signTransaction(spendTx, { onAccount: sender, innerTx: true });
-    const payerBalanceBefore = await aeSdk.getBalance(await aeSdk.address());
+    const payerBalanceBefore = await aeSdk.getBalance(aeSdk.address);
 
     const { tx } = await aeSdk.payForTransaction(signedSpendTx);
     const outerFee = tx?.fee;
     const innerFee = tx?.tx?.tx.fee;
     if (outerFee == null || innerFee == null) throw new UnexpectedTsError();
-    expect(await aeSdk.getBalance(await aeSdk.address())).to.equal(
+    expect(await aeSdk.getBalance(aeSdk.address)).to.equal(
       new BigNumber(payerBalanceBefore)
         .minus(outerFee.toString()).minus(innerFee.toString()).toFixed(),
     );

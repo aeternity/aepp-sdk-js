@@ -47,7 +47,7 @@ describe('Accounts', () => {
   });
 
   it('determining the balance with 0 balance', async () => {
-    await aeSdkNoCoins.getBalance(await aeSdkNoCoins.address()).should.eventually.be.equal('0');
+    await aeSdkNoCoins.getBalance(aeSdkNoCoins.address).should.eventually.be.equal('0');
   });
 
   it('spending coins with 0 balance', async () => {
@@ -58,7 +58,7 @@ describe('Accounts', () => {
     .to.be.rejectedWith(ArgumentError, 'value should be greater or equal to 0, got -1 instead'));
 
   it('determines the balance using `balance`', async () => {
-    await aeSdk.getBalance(await aeSdk.address()).should.eventually.be.a('string');
+    await aeSdk.getBalance(aeSdk.address).should.eventually.be.a('string');
   });
 
   describe('transferFunds', () => {
@@ -68,9 +68,9 @@ describe('Accounts', () => {
       amount: BigNumber;
       fee: BigNumber;
     }> => {
-      const balanceBefore = new BigNumber(await aeSdk.getBalance(await aeSdk.address()));
+      const balanceBefore = new BigNumber(await aeSdk.getBalance(aeSdk.address));
       const { tx } = await aeSdk.transferFunds(fraction, receiver.address);
-      const balanceAfter = new BigNumber(await aeSdk.getBalance(await aeSdk.address()));
+      const balanceAfter = new BigNumber(await aeSdk.getBalance(aeSdk.address));
       if (tx == null || tx.amount == null) throw new UnexpectedTsError();
       return {
         balanceBefore,
@@ -107,7 +107,7 @@ describe('Accounts', () => {
     });
 
     it('accepts onAccount option', async () => {
-      await aeSdk.transferFunds(1, await aeSdk.address(), { onAccount: receiver });
+      await aeSdk.transferFunds(1, aeSdk.address, { onAccount: receiver });
       new BigNumber(await aeSdk.getBalance(receiver.address)).isZero().should.be.equal(true);
     });
   });
@@ -143,32 +143,26 @@ describe('Accounts', () => {
     const spend = await aeSdk.spend(123, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi');
     if (spend.blockHeight == null || spend.tx?.amount == null) throw new UnexpectedTsError();
     await aeSdk.awaitHeight(spend.blockHeight + 2);
-    const accountAfterSpend = await aeSdk.getAccount(await aeSdk.address());
+    const accountAfterSpend = await aeSdk.getAccount(aeSdk.address);
     const accountBeforeSpendByHash = await aeSdk
-      .getAccount(await aeSdk.address(), { height: spend.blockHeight - 1 });
+      .getAccount(aeSdk.address, { height: spend.blockHeight - 1 });
     expect(accountBeforeSpendByHash.balance - accountAfterSpend.balance).to.be
       .equal(spend.tx.fee + spend.tx.amount);
   });
 
   describe('Make operation on specific account without changing of current account', () => {
-    let address: Encoded.AccountAddress;
-
-    before(async () => {
-      address = await aeSdk.address();
-    });
-
     it('Can make spend on specific account', async () => {
       const accounts = aeSdk.addresses();
-      const onAccount = accounts.find((acc) => acc !== address);
+      const onAccount = accounts.find((acc) => acc !== aeSdk.address);
 
-      const { tx } = await aeSdk.spend(1, address, { onAccount });
+      const { tx } = await aeSdk.spend(1, aeSdk.address, { onAccount });
       if (tx?.senderId == null) throw new UnexpectedTsError();
       tx.senderId.should.be.equal(onAccount);
     });
 
     it('Fail on invalid account', () => {
       expect(() => {
-        aeSdk.spend(1, address, { onAccount: 1 as any });
+        aeSdk.spend(1, aeSdk.address, { onAccount: 1 as any });
       }).to.throw(
         TypeError,
         'Account should be an address (ak-prefixed string), or instance of AccountBase, got 1 instead',
@@ -177,7 +171,7 @@ describe('Accounts', () => {
 
     it('Fail on non exist account', () => {
       expect(() => {
-        aeSdk.spend(1, address, { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' });
+        aeSdk.spend(1, aeSdk.address, { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' });
       }).to.throw(
         UnavailableAccountError,
         'Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available',
@@ -186,7 +180,7 @@ describe('Accounts', () => {
 
     it('Fail on no accounts', async () => {
       const aeSdkWithoutAccount = await getSdk(0);
-      await expect(aeSdkWithoutAccount.spend(1, address))
+      await expect(aeSdkWithoutAccount.spend(1, aeSdk.address))
         .to.be.rejectedWith(
           TypeError,
           'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead',
@@ -207,10 +201,7 @@ describe('Accounts', () => {
       const data = 'Hello';
       const signature = await account.sign(data);
       const sigUsingMemoryAccount = await aeSdk.sign(data, { onAccount: account });
-      signature.toString().should.be.equal(sigUsingMemoryAccount.toString());
-      // address
-      const addressFromMemoryAccount = await aeSdk.address({ onAccount: account });
-      addressFromMemoryAccount.should.be.equal(account.address);
+      expect(signature).to.be.eql(sigUsingMemoryAccount);
     });
   });
 

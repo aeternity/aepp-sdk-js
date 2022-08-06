@@ -560,8 +560,8 @@ describe('Contract instance', () => {
       });
 
       it('Return address', async () => {
-        const { decodedResult } = await testContract.methods.accountAddress(await aeSdk.address());
-        decodedResult.should.be.equal(await aeSdk.address());
+        const { decodedResult } = await testContract.methods.accountAddress(aeSdk.address);
+        decodedResult.should.be.equal(aeSdk.address);
       });
 
       it('Valid', async () => {
@@ -742,15 +742,12 @@ describe('Contract instance', () => {
       });
 
       it('Invalid length', async () => {
-        const address = await aeSdk.address();
-        const decoded = Buffer.from(decode(address).slice(1));
-        await expect(testContract.methods.hashFn(decoded))
+        await expect(testContract.methods.hashFn(decode(aeSdk.address).slice(1)))
           .to.be.rejectedWith('Invalid length: got 31 bytes instead of 32 bytes');
       });
 
       it('Valid', async () => {
-        const address = await aeSdk.address();
-        const decoded = decode(address);
+        const decoded = decode(aeSdk.address);
         const hashAsBuffer = await testContract.methods.hashFn(decoded);
         const hashAsHex = await testContract.methods.hashFn(decoded.toString('hex'));
         hashAsBuffer.decodedResult.should.be.eql(decoded);
@@ -765,16 +762,12 @@ describe('Contract instance', () => {
       });
 
       it('Invalid length', async () => {
-        const address = await aeSdk.address();
-        const decoded = decode(address);
-        await expect(testContract.methods.signatureFn(decoded))
+        await expect(testContract.methods.signatureFn(decode(aeSdk.address)))
           .to.be.rejectedWith('Invalid length: got 32 bytes instead of 64 bytes');
       });
 
       it('Valid', async () => {
-        const address = await aeSdk.address();
-        const decoded = decode(address);
-        const fakeSignature = Buffer.from(await aeSdk.sign(decoded));
+        const fakeSignature = Buffer.from(await aeSdk.sign(decode(aeSdk.address)));
         const hashAsBuffer = await testContract.methods.signatureFn(fakeSignature);
         const hashAsHex = await testContract.methods.signatureFn(fakeSignature.toString('hex'));
         hashAsBuffer.decodedResult.should.be.eql(fakeSignature);
@@ -789,15 +782,13 @@ describe('Contract instance', () => {
       });
 
       it('Invalid length', async () => {
-        const address = await aeSdk.address();
-        const decoded = decode(address);
+        const decoded = decode(aeSdk.address);
         await expect(testContract.methods.bytesFn(Buffer.from([...decoded, 2])))
           .to.be.rejectedWith('is not of type [{bytes,32}]');
       });
 
       it('Valid', async () => {
-        const address = await aeSdk.address();
-        const decoded = decode(address);
+        const decoded = decode(aeSdk.address);
         const hashAsBuffer = await testContract.methods.bytesFn(decoded);
         const hashAsHex = await testContract.methods.bytesFn(decoded.toString('hex'));
         hashAsBuffer.decodedResult.should.be.eql(decoded);

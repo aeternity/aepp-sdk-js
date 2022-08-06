@@ -267,7 +267,7 @@ export default class AeSdkWallet extends AeSdk {
           },
           [METHODS.sign]: async ({ tx, onAccount: address, returnSigned }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
-            let onAccount: OnAccount = address ?? await this.address();
+            let onAccount: OnAccount = address ?? this.address;
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }
@@ -290,7 +290,7 @@ export default class AeSdkWallet extends AeSdk {
           },
           [METHODS.signMessage]: async ({ message, onAccount: address }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
-            let onAccount: OnAccount = address ?? await this.address();
+            let onAccount: OnAccount = address ?? this.address;
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }

@@ -20,8 +20,8 @@ import { expect } from 'chai';
 import { getSdk } from '.';
 import {
   AeSdk, UnexpectedTsError,
-  decode, postQueryToOracle, registerOracle,
-  ORACLE_TTL_TYPES, QUERY_FEE,
+  decode, encode, postQueryToOracle, registerOracle,
+  ORACLE_TTL_TYPES, QUERY_FEE, Encoding,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
@@ -36,7 +36,7 @@ describe('Oracle', () => {
   });
 
   it('Register Oracle with 5000 TTL', async () => {
-    const expectedOracleId = `ok_${(await aeSdk.address()).slice(3)}`;
+    const expectedOracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     oracle = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 5000 });
     oracle.id.should.be.equal(expectedOracleId);
   });

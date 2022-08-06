@@ -134,9 +134,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
       await Promise.all([
         aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'current'),
         aepp.askAddresses(),
-        aepp.address(),
       ].map((promise) => expect(promise).to.be.rejectedWith(NoWalletConnectedError, 'You are not connected to Wallet')));
       expect(() => aepp.disconnectWallet()).to.throw(NoWalletConnectedError, 'You are not connected to Wallet');
+      expect(() => aepp.address).to.throw(NoWalletConnectedError, 'You are not connected to Wallet');
     });
 
     it('Should receive `announcePresence` message from wallet', async () => {
@@ -172,7 +172,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Try to get address from wallet: not subscribed for account', async () => {
-      await expect(aepp.address()).to.be.rejectedWith(UnsubscribedAccountError, 'You are not subscribed for an account.');
+      expect(() => aepp.address).to.throw(UnsubscribedAccountError, 'You are not subscribed for an account.');
     });
 
     it('Try to ask for address', async () => {
@@ -215,11 +215,11 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('aepp accepts key pairs in onAccount', async () => {
-      await aepp.spend(100, await aepp.address(), { onAccount: account });
+      await aepp.spend(100, aepp.address, { onAccount: account });
     });
 
     it('Get address: subscribed for accounts', async () => {
-      (await aepp.address()).should.be.equal(account.address);
+      expect(aepp.address).to.be.equal(account.address);
     });
 
     it('Ask for address: subscribed for accounts -> wallet deny', async () => {
@@ -250,10 +250,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
       wallet.onSign = () => {
         throw new RpcRejectedByUserError();
       };
-      const address = await aepp.address();
       const tx = await aepp.buildTx(Tag.SpendTx, {
-        senderId: address,
-        recipientId: address,
+        senderId: aepp.address,
+        recipientId: aepp.address,
         amount: 0,
         payload: 'zerospend',
       });
@@ -275,10 +274,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Sign transaction: wallet allow', async () => {
       wallet.onSign = async () => {};
-      const address = await aepp.address();
       const tx = await aepp.buildTx(Tag.SpendTx, {
-        senderId: address,
-        recipientId: address,
+        senderId: aepp.address,
+        recipientId: aepp.address,
         amount: 0,
         payload: 'zerospend',
       });
@@ -287,7 +285,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
       const { tx: { signatures: [signature], encodedTx: { rlpEncoded } } } = unpackedTx;
       const txWithNetwork = concatBuffers([Buffer.from(networkId), hash(rlpEncoded)]);
-      expect(verify(txWithNetwork, signature, address)).to.be.equal(true);
+      expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
     });
 
     it('Try to sign using unpermited account', async () => {
@@ -303,17 +301,16 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
-      const address = await aepp.address();
       const tx2 = await aepp.buildTx(Tag.SpendTx, {
-        senderId: address,
-        recipientId: address,
+        senderId: aepp.address,
+        recipientId: aepp.address,
         amount: 0,
         payload: 'zerospend2',
       });
       wallet.onSign = async () => ({ tx: tx2 });
       const tx = await aepp.buildTx(Tag.SpendTx, {
-        senderId: address,
-        recipientId: address,
+        senderId: aepp.address,
+        recipientId: aepp.address,
         amount: 0,
         payload: 'zerospend',
       });
@@ -333,10 +330,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Sign message', async () => {
       wallet.onMessageSign = async () => {};
-      const messageSig = await aepp.signMessage('test') as Uint8Array;
+      const messageSig = await aepp.signMessage('test');
       messageSig.should.be.instanceof(Buffer);
-      expect(verifyMessage('test', messageSig, await aepp.address()))
-        .to.be.equal(true);
+      expect(verifyMessage('test', messageSig, aepp.address)).to.be.equal(true);
     });
 
     it('Sign message using custom account', async () => {
@@ -347,7 +343,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         throw new Error('Shouldn\'t be reachable');
       };
       const onAccount = account.address;
-      const messageSig = await aepp.signMessage('test', { onAccount }) as Uint8Array;
+      const messageSig = await aepp.signMessage('test', { onAccount });
       messageSig.should.be.instanceof(Buffer);
       expect(verifyMessage('test', messageSig, account.address))
         .to.be.equal(true);
@@ -355,10 +351,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Sign and broadcast invalid transaction', async () => {
       wallet.onSign = async () => {};
-      const address = await aepp.address();
       const tx = await aepp.buildTx(Tag.SpendTx, {
-        senderId: address,
-        recipientId: address,
+        senderId: aepp.address,
+        recipientId: aepp.address,
         amount: 0,
         ttl: 1,
         absoluteTtl: true,
@@ -517,17 +512,16 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
-      const address = await aepp.address();
       const tx2 = await aepp.buildTx(Tag.SpendTx, {
-        senderId: address,
-        recipientId: address,
+        senderId: aepp.address,
+        recipientId: aepp.address,
         amount: 0,
         payload: 'zerospend2',
       });
       wallet.onSign = async () => ({ tx: tx2 });
       const tx = await aepp.buildTx(Tag.SpendTx, {
-        senderId: address,
-        recipientId: address,
+        senderId: aepp.address,
+        recipientId: aepp.address,
         amount: 0,
         payload: 'zerospend',
       });

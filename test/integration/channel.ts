@@ -96,9 +96,9 @@ describe('Channel', () => {
     aeSdkInitiatior = await getSdk();
     aeSdkResponder = await getSdk(0);
     aeSdkResponder.addAccount(MemoryAccount.generate(), { select: true });
-    sharedParams.initiatorId = await aeSdkInitiatior.address();
-    sharedParams.responderId = await aeSdkResponder.address();
-    await aeSdkInitiatior.spend(new BigNumber('500e18').toString(), await aeSdkResponder.address());
+    sharedParams.initiatorId = aeSdkInitiatior.address;
+    sharedParams.responderId = aeSdkResponder.address;
+    await aeSdkInitiatior.spend(new BigNumber('500e18').toString(), aeSdkResponder.address);
   });
 
   after(() => {
@@ -135,8 +135,8 @@ describe('Channel', () => {
     sinon.assert.calledOnce(responderSign);
     sinon.assert.calledWithExactly(responderSign, sinon.match('responder_sign'), sinon.match.string);
     const expectedTxParams = {
-      initiator: await aeSdkInitiatior.address(),
-      responder: await aeSdkResponder.address(),
+      initiator: aeSdkInitiatior.address,
+      responder: aeSdkResponder.address,
       initiatorAmount: sharedParams.initiatorAmount.toString(),
       responderAmount: sharedParams.responderAmount.toString(),
       channelReserve: sharedParams?.channelReserve?.toString(),
@@ -176,8 +176,8 @@ describe('Channel', () => {
     const sign = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior));
     const amount = new BigNumber('10e18');
     const result = await initiatorCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
+      aeSdkInitiatior.address,
+      aeSdkResponder.address,
       amount,
       sign,
     );
@@ -193,8 +193,8 @@ describe('Channel', () => {
       sinon.match({
         updates: sinon.match([{
           amount: sinon.match(amount.toString()),
-          from: sinon.match(await aeSdkInitiatior.address()),
-          to: sinon.match(await aeSdkResponder.address()),
+          from: sinon.match(aeSdkInitiatior.address),
+          to: sinon.match(aeSdkResponder.address),
           op: sinon.match('OffChainTransfer'),
         }]),
       }),
@@ -206,8 +206,8 @@ describe('Channel', () => {
       sinon.match({
         updates: sinon.match([{
           amount: sinon.match(amount.toString()),
-          from: sinon.match(await aeSdkInitiatior.address()),
-          to: sinon.match(await aeSdkResponder.address()),
+          from: sinon.match(aeSdkInitiatior.address),
+          to: sinon.match(aeSdkResponder.address),
           op: sinon.match('OffChainTransfer'),
         }]),
       }),
@@ -219,8 +219,8 @@ describe('Channel', () => {
       updates: [
         {
           amount: amount.toString(),
-          from: await aeSdkInitiatior.address(),
-          to: await aeSdkResponder.address(),
+          from: aeSdkInitiatior.address,
+          to: aeSdkResponder.address,
           op: 'OffChainTransfer',
         },
       ],
@@ -233,8 +233,8 @@ describe('Channel', () => {
     const amount = 1;
     const roundBefore = initiatorCh.round();
     const result = await initiatorCh.update(
-      await aeSdkResponder.address(),
-      await aeSdkInitiatior.address(),
+      aeSdkResponder.address,
+      aeSdkInitiatior.address,
       amount,
       sign,
     );
@@ -249,8 +249,8 @@ describe('Channel', () => {
       sinon.match({
         updates: sinon.match([{
           amount: sinon.match(amount),
-          from: sinon.match(await aeSdkResponder.address()),
-          to: sinon.match(await aeSdkInitiatior.address()),
+          from: sinon.match(aeSdkResponder.address),
+          to: sinon.match(aeSdkInitiatior.address),
           op: sinon.match('OffChainTransfer'),
         }]),
       }),
@@ -262,8 +262,8 @@ describe('Channel', () => {
       sinon.match({
         updates: sinon.match([{
           amount: sinon.match(amount),
-          from: sinon.match(await aeSdkResponder.address()),
-          to: sinon.match(await aeSdkInitiatior.address()),
+          from: sinon.match(aeSdkResponder.address),
+          to: sinon.match(aeSdkInitiatior.address),
           op: sinon.match('OffChainTransfer'),
         }]),
       }),
@@ -274,8 +274,8 @@ describe('Channel', () => {
       updates: [
         {
           amount,
-          from: await aeSdkResponder.address(),
-          to: await aeSdkInitiatior.address(),
+          from: aeSdkResponder.address,
+          to: aeSdkInitiatior.address,
           op: 'OffChainTransfer',
         },
       ],
@@ -285,8 +285,8 @@ describe('Channel', () => {
   it('can abort update sign request', async () => {
     const errorCode = 12345;
     const result = await initiatorCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
+      aeSdkInitiatior.address,
+      aeSdkResponder.address,
       100,
       async () => Promise.resolve(errorCode),
     );
@@ -296,8 +296,8 @@ describe('Channel', () => {
   it('can abort update with custom error code', async () => {
     responderShouldRejectUpdate = 1234;
     const result = await initiatorCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
+      aeSdkInitiatior.address,
+      aeSdkResponder.address,
       100,
       (tx) => aeSdkInitiatior.signTransaction(tx),
     );
@@ -313,8 +313,8 @@ describe('Channel', () => {
     const meta = 'meta 1';
     const sign: any = sinon.spy(aeSdkInitiatior.signTransaction.bind(aeSdkInitiatior));
     await initiatorCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
+      aeSdkInitiatior.address,
+      aeSdkResponder.address,
       100,
       sign,
       [meta],
@@ -330,8 +330,8 @@ describe('Channel', () => {
   });
 
   it('can get proof of inclusion', async () => {
-    const initiatorAddr: Encoded.AccountAddress = await aeSdkInitiatior.address();
-    const responderAddr: Encoded.AccountAddress = await aeSdkResponder.address();
+    const initiatorAddr = aeSdkInitiatior.address;
+    const responderAddr = aeSdkResponder.address;
     const params = { accounts: [initiatorAddr, responderAddr] };
     const initiatorPoi: Encoded.Poi = await initiatorCh.poi(params);
     expect(initiatorPoi).to.be.equal(await responderCh.poi(params));
@@ -359,8 +359,8 @@ describe('Channel', () => {
   });
 
   it('can send a message', async () => {
-    const sender = await aeSdkInitiatior.address();
-    const recipient = await aeSdkResponder.address();
+    const sender = aeSdkInitiatior.address;
+    const recipient = aeSdkResponder.address;
     const info = 'hello world';
     initiatorCh.sendMessage(info, recipient);
     const message = await new Promise((resolve) => {
@@ -404,7 +404,7 @@ describe('Channel', () => {
         updates: [{
           amount: amount.toString(),
           op: 'OffChainWithdrawal',
-          to: await aeSdkInitiatior.address(),
+          to: aeSdkInitiatior.address,
         }],
       }),
     );
@@ -416,7 +416,7 @@ describe('Channel', () => {
         updates: [{
           amount: amount.toString(),
           op: 'OffChainWithdrawal',
-          to: await aeSdkInitiatior.address(),
+          to: aeSdkInitiatior.address,
         }],
       }),
     );
@@ -424,7 +424,7 @@ describe('Channel', () => {
     txType.should.equal(Tag.ChannelWithdrawTx);
     tx.should.eql({
       ...tx,
-      toId: await aeSdkInitiatior.address(),
+      toId: aeSdkInitiatior.address,
       amount: amount.toString(),
     });
   });
@@ -457,7 +457,7 @@ describe('Channel', () => {
         updates: [{
           amount: amount.toString(),
           op: 'OffChainWithdrawal',
-          to: await aeSdkInitiatior.address(),
+          to: aeSdkInitiatior.address,
         }],
       }),
     );
@@ -469,7 +469,7 @@ describe('Channel', () => {
         updates: [{
           amount: amount.toString(),
           op: 'OffChainWithdrawal',
-          to: await aeSdkInitiatior.address(),
+          to: aeSdkInitiatior.address,
         }],
       }),
     );
@@ -477,7 +477,7 @@ describe('Channel', () => {
     txType.should.equal(Tag.ChannelWithdrawTx);
     tx.should.eql({
       ...tx,
-      toId: await aeSdkInitiatior.address(),
+      toId: aeSdkInitiatior.address,
       amount: amount.toString(),
     });
   });
@@ -534,7 +534,7 @@ describe('Channel', () => {
         updates: sinon.match([{
           amount: amount.toString(),
           op: 'OffChainDeposit',
-          from: await aeSdkInitiatior.address(),
+          from: aeSdkInitiatior.address,
         }]),
       }),
     );
@@ -546,7 +546,7 @@ describe('Channel', () => {
         updates: sinon.match([{
           amount: amount.toString(),
           op: 'OffChainDeposit',
-          from: await aeSdkInitiatior.address(),
+          from: aeSdkInitiatior.address,
         }]),
       }),
     );
@@ -554,7 +554,7 @@ describe('Channel', () => {
     txType.should.equal(Tag.ChannelDepositTx);
     tx.should.eql({
       ...tx,
-      fromId: await aeSdkInitiatior.address(),
+      fromId: aeSdkInitiatior.address,
       amount: amount.toString(),
     });
   });
@@ -587,7 +587,7 @@ describe('Channel', () => {
         updates: [{
           amount: amount.toString(),
           op: 'OffChainDeposit',
-          from: await aeSdkInitiatior.address(),
+          from: aeSdkInitiatior.address,
         }],
       }),
     );
@@ -595,7 +595,7 @@ describe('Channel', () => {
     txType.should.equal(Tag.ChannelDepositTx);
     tx.should.eql({
       ...tx,
-      fromId: await aeSdkInitiatior.address(),
+      fromId: aeSdkInitiatior.address,
       amount: amount.toString(),
     });
   });
@@ -640,7 +640,7 @@ describe('Channel', () => {
     txType.should.equal(Tag.ChannelCloseMutualTx);
     tx.should.eql({
       ...tx,
-      fromId: await aeSdkInitiatior.address(),
+      fromId: aeSdkInitiatior.address,
       // TODO: check `initiatorAmountFinal` and `responderAmountFinal`
     });
   });
@@ -701,11 +701,11 @@ describe('Channel', () => {
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
 
-    const initiatorAddr = await aeSdkInitiatior.address();
-    const responderAddr = await aeSdkResponder.address();
+    const initiatorAddr = aeSdkInitiatior.address;
+    const responderAddr = aeSdkResponder.address;
     const { signedTx } = await initiatorCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
+      initiatorAddr,
+      responderAddr,
       new BigNumber('3e18'),
       (tx) => aeSdkInitiatior.signTransaction(tx),
     );
@@ -746,8 +746,8 @@ describe('Channel', () => {
   });
 
   it('can dispute via slash tx', async () => {
-    const initiatorAddr = await aeSdkInitiatior.address();
-    const responderAddr = await aeSdkResponder.address();
+    const initiatorAddr = aeSdkInitiatior.address;
+    const responderAddr = aeSdkResponder.address;
     initiatorCh.disconnect();
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
@@ -918,14 +918,12 @@ describe('Channel', () => {
   });
 
   it('can get balances', async () => {
-    const initiatorAddr = await aeSdkInitiatior.address();
-    const responderAddr = await aeSdkResponder.address();
     const contractAddr = encode(decode(contractAddress), Encoding.AccountAddress);
-    const addresses = [initiatorAddr, responderAddr, contractAddr];
+    const addresses = [aeSdkInitiatior.address, aeSdkResponder.address, contractAddr];
     const balances = await initiatorCh.balances(addresses);
     balances.should.be.an('object');
-    balances[initiatorAddr].should.be.a('string');
-    balances[responderAddr].should.be.a('string');
+    balances[aeSdkInitiatior.address].should.be.a('string');
+    balances[aeSdkResponder.address].should.be.a('string');
     balances[contractAddr].should.be.equal(1000);
     expect(balances).to.eql(await responderCh.balances(addresses));
   });
@@ -1002,12 +1000,12 @@ describe('Channel', () => {
 
   it('can get contract call', async () => {
     const result = await initiatorCh.getContractCall({
-      caller: await aeSdkInitiatior.address(),
+      caller: aeSdkInitiatior.address,
       contract: contractAddress,
       round: callerNonce,
     });
     result.should.eql({
-      callerId: await aeSdkInitiatior.address(),
+      callerId: aeSdkInitiatior.address,
       callerNonce,
       contractId: contractAddress,
       gasPrice: result.gasPrice,
@@ -1029,7 +1027,7 @@ describe('Channel', () => {
       abiVersion: 3,
     });
     result.should.eql({
-      callerId: await aeSdkInitiatior.address(),
+      callerId: aeSdkInitiatior.address,
       callerNonce: result.callerNonce,
       contractId: contractAddress,
       gasPrice: result.gasPrice,
@@ -1046,7 +1044,7 @@ describe('Channel', () => {
   it('can clean contract calls', async () => {
     await initiatorCh.cleanContractCalls();
     await initiatorCh.getContractCall({
-      caller: await aeSdkInitiatior.address(),
+      caller: aeSdkInitiatior.address,
       contract: contractAddress,
       round: callerNonce,
     }).should.eventually.be.rejected;
@@ -1060,7 +1058,7 @@ describe('Channel', () => {
         active: true,
         deposit: 1000,
         id: contractAddress,
-        ownerId: await aeSdkInitiatior.address(),
+        ownerId: aeSdkInitiatior.address,
         referrerIds: [],
         vmVersion: 5,
       },
@@ -1072,7 +1070,7 @@ describe('Channel', () => {
   it.skip('can post snapshot solo transaction', async () => {
     const snapshotSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelSnapshotSoloTx, {
       channelId: initiatorCh.id(),
-      fromId: await aeSdkInitiatior.address(),
+      fromId: aeSdkInitiatior.address,
       payload: (await initiatorCh.state()).signedTx,
     });
     await aeSdkInitiatior.sendTransaction(await aeSdkInitiatior.signTransaction(snapshotSoloTx));
@@ -1096,8 +1094,8 @@ describe('Channel', () => {
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     const result = await initiatorCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
+      aeSdkInitiatior.address,
+      aeSdkResponder.address,
       100,
       (tx) => aeSdkInitiatior.signTransaction(tx),
     );
@@ -1149,15 +1147,15 @@ describe('Channel', () => {
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     initiatorCh.disconnect();
     const { accepted } = await responderCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
+      aeSdkInitiatior.address,
+      aeSdkResponder.address,
       100,
       (tx) => aeSdkResponder.signTransaction(tx),
     );
     expect(accepted).to.equal(false);
     const result = await responderCh.update(
-      await aeSdkInitiatior.address(),
-      await aeSdkResponder.address(),
+      aeSdkInitiatior.address,
+      aeSdkResponder.address,
       100,
       async (transaction) => appendSignature(
         await aeSdkResponder.signTransaction(transaction),
@@ -1210,8 +1208,8 @@ describe('Channel', () => {
         errorMessage?: string;
       }> {
       return initiatorCh.update(
-        from ?? await aeSdkInitiatior.address(),
-        to ?? await aeSdkResponder.address(),
+        from ?? aeSdkInitiatior.address,
+        to ?? aeSdkResponder.address,
         amount ?? 1,
         sign ?? aeSdkInitiatior.signTransaction,
       );
