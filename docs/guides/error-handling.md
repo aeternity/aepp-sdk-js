@@ -23,7 +23,6 @@ BaseError
 │   │   UnexpectedTsError
 │
 └───AccountError
-│   │   InvalidKeypairError
 │   │   UnavailableAccountError
 │
 └───AensError

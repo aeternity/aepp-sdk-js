@@ -268,16 +268,6 @@ export class UnexpectedTsError extends InternalError {
 /**
  * @category exception
  */
-export class InvalidKeypairError extends AccountError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'InvalidKeypairError';
-  }
-}
-
-/**
- * @category exception
- */
 export class UnavailableAccountError extends AccountError {
   constructor(address: string) {
     super(`Account for ${address} not available`);

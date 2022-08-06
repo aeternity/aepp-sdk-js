@@ -15,7 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import AccountBase from './Base';
-import { ArgumentError, InternalError, InvalidKeypairError } from '../utils/errors';
+import { ArgumentError, InternalError, NotImplementedError } from '../utils/errors';
 import { decode, Encoded } from '../utils/encoder';
 import { createMetaTx } from '../contract/ga';
 import { getAccount } from '../chain';
@@ -41,12 +41,12 @@ export default class AccountGeneralized extends AccountBase {
 
   // eslint-disable-next-line class-methods-use-this
   override async sign(): Promise<Uint8Array> {
-    throw new InvalidKeypairError('Can\'t sign using generalized account');
+    throw new NotImplementedError('Can\'t sign using generalized account');
   }
 
   // eslint-disable-next-line class-methods-use-this
   override async signMessage(): Promise<Uint8Array> {
-    throw new InvalidKeypairError('Can\'t sign using generalized account');
+    throw new NotImplementedError('Can\'t sign using generalized account');
   }
 
   override async signTransaction(
