@@ -19,16 +19,11 @@
  * Generalized Account module - routines to use generalized account
  */
 
-import { TxSchema } from '../tx/builder/schema';
 import { Tag } from '../tx/builder/constants';
-import {
-  buildContractIdByContractTx, buildTx, BuiltTx, TxUnpacked, unpackTx,
-} from '../tx/builder';
-import {
-  _buildTx, BuildTxOptions, getVmVersion, prepareTxParams,
-} from '../tx';
+import { buildContractIdByContractTx, buildTx } from '../tx/builder';
+import { _buildTx, BuildTxOptions } from '../tx';
 import { hash } from '../utils/crypto';
-import { decode, Encoded, Encoding } from '../utils/encoder';
+import { decode, Encoded } from '../utils/encoder';
 import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
@@ -124,12 +119,6 @@ export async function createMetaTx(
   }:
   { onAccount: AccountBase; onCompiler: Compiler; onNode: Node },
 ): Promise<Encoded.Transaction> {
-  const wrapInEmptySignedTx = (
-    tx: Encoded.Transaction | Uint8Array | TxUnpacked<TxSchema>,
-  ): BuiltTx<TxSchema, Encoding.Transaction> => (
-    buildTx({ encodedTx: tx, signatures: [] }, Tag.SignedTx)
-  );
-
   if (Object.keys(authData).length <= 0) throw new MissingParamError('authData is required');
 
   const authCallData = authData.callData ?? await (async () => {
@@ -140,26 +129,17 @@ export async function createMetaTx(
     return contract.calldata.encode(contract._name, authFnName, authData.args);
   })();
 
-  const { abiVersion } = await getVmVersion(Tag.ContractCallTx, { onNode });
-  const wrappedTx = wrapInEmptySignedTx(unpackTx<Tag.SignedTx>(rawTransaction));
-  const params = {
+  const gaMetaTx = await _buildTx(Tag.GaMetaTx, {
     ...options,
-    tx: {
-      ...wrappedTx,
-      tx: wrappedTx.txObject,
-    },
+    tx: buildTx({ encodedTx: decode(rawTransaction), signatures: [] }, Tag.SignedTx).rlpEncoded,
     // TODO: accept an address instead
     gaId: onAccount.address,
-    abiVersion,
     authData: authCallData,
     gasLimit: authData.gasLimit,
-    vsn: 2,
     nonce: 0,
-  };
-  // @ts-expect-error createMetaTx needs to be integrated into tx builder
-  const { fee } = await prepareTxParams(Tag.GaMetaTx, { ...params, onNode });
-  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee }, Tag.GaMetaTx);
-  return wrapInEmptySignedTx(metaTxRlp).tx;
+    onNode,
+  });
+  return buildTx({ encodedTx: decode(gaMetaTx), signatures: [] }, Tag.SignedTx).tx;
 }
 
 /**
