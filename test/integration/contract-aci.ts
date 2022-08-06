@@ -212,6 +212,14 @@ describe('Contract instance', () => {
     expect((await testContract.methods.intFn(2)).decodedResult).to.be.equal(2n);
   });
 
+  it('gets actual options from AeSdkBase', async () => {
+    const [address1, address2] = aeSdk.addresses();
+    expect((await testContract.methods.intFn(2)).result.callerId).to.be.equal(address1);
+    aeSdk.selectAccount(address2);
+    expect((await testContract.methods.intFn(2)).result.callerId).to.be.equal(address2);
+    aeSdk.selectAccount(address1);
+  });
+
   it('generates by aci', async () => aeSdk.getContractInstance({ aci: testContractAci, contractAddress: testContractAddress }));
 
   it('fails on trying to generate with not existing contract address', () => expect(aeSdk.getContractInstance(
