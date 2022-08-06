@@ -38,7 +38,7 @@ export async function send(
 ): Promise<SendReturnType> {
   const signed = await options.onAccount.signTransaction(tx, {
     ...options,
-    networkId: (await options.onNode.getStatus()).networkId,
+    networkId: await options.onNode.getNetworkId(),
   });
 
   return options.innerTx === true

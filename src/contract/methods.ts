@@ -46,10 +46,7 @@ async function delegateSignatureCommon(
   { onAccount: AccountBase; onNode: Node } & Parameters<AccountBase['sign']>[1],
 ): Promise<string> {
   const signature = await onAccount.sign(
-    concatBuffers([
-      Buffer.from((await onNode.getStatus()).networkId),
-      ...ids.map((e) => decode(e)),
-    ]),
+    concatBuffers([Buffer.from(await onNode.getNetworkId()), ...ids.map((e) => decode(e))]),
     opt,
   );
   return Buffer.from(signature).toString('hex');

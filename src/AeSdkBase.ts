@@ -7,7 +7,7 @@ import * as contractMethods from './contract/methods';
 import * as contractGaMethods from './contract/ga';
 import { _buildTx } from './tx';
 import { mapObject } from './utils/other';
-import Node, { getNetworkId } from './Node';
+import Node from './Node';
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
 import { AMOUNT } from './tx/builder/schema';
 import { Tag } from './tx/builder/constants';
@@ -143,13 +143,6 @@ class AeSdkBase {
   }
 
   /**
-   * Get NetworkId of current Node
-   * @example
-   * nodePool.getNetworkId()
-   */
-  readonly getNetworkId = getNetworkId;
-
-  /**
    * Check if you have selected node
    * @example
    * nodePool.isNodeConnected()
@@ -213,8 +206,8 @@ class AeSdkBase {
     tx: Encoded.Transaction,
     { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTransaction']>[1] = {},
   ): Promise<Encoded.Transaction> {
-    return this._resolveAccount(onAccount)
-      .signTransaction(tx, { ...options, networkId: await this.getNetworkId(options) });
+    const networkId = this.selectedNodeName !== null ? await this.api.getNetworkId() : undefined;
+    return this._resolveAccount(onAccount).signTransaction(tx, { networkId, ...options });
   }
 
   async signMessage(

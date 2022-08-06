@@ -107,8 +107,7 @@ export async function buildAuthTxHash(
   transaction: Encoded.Transaction,
   { onNode }: { onNode: Node },
 ): Promise<Uint8Array> {
-  const { networkId } = await onNode.getStatus();
   return new Uint8Array(hash(
-    concatBuffers([Buffer.from(networkId), decode(transaction)]),
+    concatBuffers([Buffer.from(await onNode.getNetworkId()), decode(transaction)]),
   ));
 }

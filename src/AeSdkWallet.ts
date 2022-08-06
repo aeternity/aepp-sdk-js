@@ -154,7 +154,7 @@ export default class AeSdkWallet extends AeSdk {
 
   override async selectNode(name: string): Promise<void> {
     super.selectNode(name);
-    const networkId = await this.getNetworkId();
+    const networkId = await this.api.getNetworkId();
     Array.from(this._clients.keys())
       .filter((clientId) => this._isRpcClientConnected(clientId))
       .map((clientId) => this._getClient(clientId))
@@ -325,7 +325,7 @@ export default class AeSdkWallet extends AeSdk {
     return {
       id: this.id,
       name: this.name,
-      networkId: await this.getNetworkId(),
+      networkId: await this.api.getNetworkId(),
       origin: window.location.origin,
       type: this._type,
     };

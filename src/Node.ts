@@ -8,16 +8,6 @@ import {
 import { Node as NodeApi, NodeOptionalParams, ErrorModel } from './apis/node';
 import { mapObject } from './utils/other';
 import { Encoded } from './utils/encoder';
-import { MissingParamError } from './utils/errors';
-
-/**
- * Obtain networkId from account or node
- */
-export async function getNetworkId({ networkId }: { networkId?: string } = {}): Promise<string> {
-  const res = networkId ?? this.networkId ?? (await this.api?.getStatus())?.networkId;
-  if (res != null) return res;
-  throw new MissingParamError('networkId is not provided');
-}
 
 const bigIntPropertyNames = [
   'balance', 'queryFee', 'fee', 'amount', 'nameFee', 'channelAmount',
@@ -118,6 +108,8 @@ export interface NodeInfo {
 }
 
 export default class Node extends (NodeTransformed as unknown as NodeTransformedApi) {
+  #networkIdPromise?: Promise<string>;
+
   /**
    * @param url - Url for node API
    * @param options - Options
@@ -138,12 +130,19 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       ...options,
     });
     if (!ignoreVersion) {
-      const versionPromise = this.getStatus().then(({ nodeVersion }) => nodeVersion);
+      const statusPromise = this.getStatus();
+      const versionPromise = statusPromise.then(({ nodeVersion }) => nodeVersion);
+      this.#networkIdPromise = statusPromise.then(({ networkId }) => networkId);
       this.pipeline.addPolicy(
         genVersionCheckPolicy('node', '/v3/status', versionPromise, '6.2.0', '7.0.0'),
       );
     }
     this.intAsString = true;
+  }
+
+  async getNetworkId(): Promise<string> {
+    this.#networkIdPromise ??= this.getStatus().then(({ networkId }) => networkId);
+    return this.#networkIdPromise;
   }
 
   async getNodeInfo(): Promise<NodeInfo> {
