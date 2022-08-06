@@ -1,5 +1,5 @@
 import { IllegalArgumentError } from '../../../utils/errors';
-import { MIN_GAS_PRICE, Tag } from '../constants';
+import { MIN_GAS_PRICE, Tag, MAX_AUTH_FUN_GAS } from '../constants';
 import shortUInt from './short-u-int';
 import { buildFee } from './fee';
 
@@ -27,7 +27,7 @@ export default {
   ): Buffer {
     if (_computingGasLimit != null) return shortUInt.serialize(_computingGasLimit);
 
-    const gasLimitMax = calculateGasLimitMax(
+    const gasLimitMax = txType === Tag.GaMetaTx ? MAX_AUTH_FUN_GAS : calculateGasLimitMax(
       txType,
       gasMax,
       (gasLimit) => rebuildTx({ _computingGasLimit: gasLimit }),

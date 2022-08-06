@@ -19,7 +19,7 @@
  * Generalized Account module - routines to use generalized account
  */
 
-import { MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema';
+import { TxSchema } from '../tx/builder/schema';
 import { Tag } from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, buildTx, BuiltTx, TxUnpacked, unpackTx,
@@ -132,11 +132,6 @@ export async function createMetaTx(
 
   if (Object.keys(authData).length <= 0) throw new MissingParamError('authData is required');
 
-  const gasLimit = authData.gasLimit ?? MAX_AUTH_FUN_GAS;
-  if (gasLimit > MAX_AUTH_FUN_GAS) {
-    throw new InvalidAuthDataError(`the maximum gasLimit value for ga authFun is ${MAX_AUTH_FUN_GAS}, got ${gasLimit}`);
-  }
-
   const authCallData = authData.callData ?? await (async () => {
     if (authData.source == null || authData.args == null) throw new InvalidAuthDataError('Auth data must contain source code and arguments.');
     const contract = await getContractInstance({
@@ -157,7 +152,7 @@ export async function createMetaTx(
     gaId: onAccount.address,
     abiVersion,
     authData: authCallData,
-    gasLimit,
+    gasLimit: authData.gasLimit,
     vsn: 2,
     nonce: 0,
   };

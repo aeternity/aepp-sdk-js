@@ -76,6 +76,12 @@ describe('Generalized Account', () => {
     balanceAfter.should.be.equal('20000');
   });
 
+  it('throws error if gasLimit exceeds the maximum value', async () => {
+    const authData = { source: authContractSource, args: [genSalt()], gasLimit: 50001 };
+    await expect(aeSdk.spend(10000, publicKey, { authData }))
+      .to.be.rejectedWith('Gas limit 50001 must be less or equal to 50000');
+  });
+
   it('buildAuthTxHash generates a proper hash', async () => {
     const { rawTx } = await aeSdk
       .spend(10000, publicKey, { authData: { source: authContractSource, args: [genSalt()] } });

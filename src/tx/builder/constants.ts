@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { mapObject } from '../../utils/other';
 
+export const MAX_AUTH_FUN_GAS = 50000;
 // # AENS
 export type AensName = `${string}.chain`;
 export const NAME_TTL = 180000;
