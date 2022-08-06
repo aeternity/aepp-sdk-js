@@ -19,7 +19,7 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, generateKeyPair, genSalt, MemoryAccount, AccountGeneralized, Tag, unpackTx, createMetaTx,
+  AeSdk, generateKeyPair, genSalt, MemoryAccount, AccountGeneralized, Tag, unpackTx,
 } from '../../src';
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
@@ -62,7 +62,7 @@ describe('Generalized Account', () => {
       .should.be.rejectedWith(`Account ${gaAccountAddress} is already GA`);
   });
 
-  const { publicKey, secretKey } = generateKeyPair();
+  const { publicKey } = generateKeyPair();
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
     aeSdk.removeAccount(gaAccountAddress);
@@ -99,19 +99,11 @@ describe('Generalized Account', () => {
   });
 
   it('fails trying to send GaMeta using basic account', async () => {
-    const onAccount = new MemoryAccount(secretKey);
-    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      amount: 1,
-      senderId: onAccount.address,
-      recipientId: gaAccountAddress,
-    });
-    const signedTx = await createMetaTx(
-      spendTx,
-      { source: authContractSource, args: [genSalt()] },
-      'authorize',
-      { onNode: aeSdk.api, onCompiler: aeSdk.compilerApi, onAccount },
-    );
-    await expect(aeSdk.sendTransaction(signedTx)).to.be
-      .rejectedWith('Basic account can\'t be used to generate GaMetaTx');
+    const options = {
+      onAccount: new AccountGeneralized(publicKey),
+      authData: { callData: 'cb_KxFs8lcLG2+HEPb2FOjjZ2DqRd4=' },
+    } as const;
+    await expect(aeSdk.spend(1, gaAccountAddress, options))
+      .to.be.rejectedWith('Basic account can\'t be used to generate GaMetaTx');
   });
 });

@@ -15,12 +15,18 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import AccountBase from './Base';
-import { ArgumentError, InternalError, NotImplementedError } from '../utils/errors';
+import {
+  ArgumentError,
+  InternalError,
+  InvalidAuthDataError,
+  NotImplementedError,
+} from '../utils/errors';
 import { decode, Encoded } from '../utils/encoder';
-import { createMetaTx } from '../contract/ga';
 import { getAccount } from '../chain';
-import Node from '../Node';
-import Compiler from '../contract/Compiler';
+import { getContractInstance } from '../contract/methods';
+import { _buildTx } from '../tx';
+import { Tag } from '../tx/builder/constants';
+import { buildTx } from '../tx/builder';
 
 /**
  * Generalized account class
@@ -51,17 +57,13 @@ export default class AccountGeneralized extends AccountBase {
 
   override async signTransaction(
     tx: Encoded.Transaction,
-    { authData, onCompiler, onNode }: {
-      authData?: Parameters<typeof createMetaTx>[1];
-      onNode?: Node;
-      onCompiler?: Compiler;
-    },
+    { authData, onCompiler, onNode }: Parameters<AccountBase['signTransaction']>[1],
   ): Promise<Encoded.Transaction> {
     if (authData == null || onCompiler == null || onNode == null) {
       throw new ArgumentError('authData, onCompiler, onNode', 'provided', null);
     }
 
-    if (this.#authFun == null) {
+    if (this.#authFun == null && authData.callData == null) {
       const account = await getAccount(this.address, { onNode });
       if (account.kind !== 'generalized') {
         throw new ArgumentError('account kind', 'generalized', account.kind);
@@ -72,6 +74,22 @@ export default class AccountGeneralized extends AccountBase {
       }
     }
 
-    return createMetaTx(tx, authData, this.#authFun, { onCompiler, onNode, onAccount: this });
+    const authCallData = authData.callData ?? await (async () => {
+      if (authData.source == null || authData.args == null) {
+        throw new InvalidAuthDataError('Auth data must contain source code and arguments.');
+      }
+      const contract = await getContractInstance({ onCompiler, onNode, source: authData.source });
+      return contract.calldata.encode(contract._name, this.#authFun, authData.args);
+    })();
+
+    const gaMetaTx = await _buildTx(Tag.GaMetaTx, {
+      tx: buildTx({ encodedTx: decode(tx), signatures: [] }, Tag.SignedTx).rlpEncoded,
+      gaId: this.address,
+      authData: authCallData,
+      gasLimit: authData.gasLimit,
+      nonce: 0,
+      onNode,
+    });
+    return buildTx({ encodedTx: decode(gaMetaTx), signatures: [] }, Tag.SignedTx).tx;
   }
 }

@@ -16,7 +16,6 @@
  */
 import { Encoded } from '../utils/encoder';
 import Node from '../Node';
-import type { createMetaTx } from '../contract/ga';
 import Compiler from '../contract/Compiler';
 
 /**
@@ -29,6 +28,7 @@ export default abstract class AccountBase {
    * @param tx - Transaction to sign
    * @param options - Options
    * @param options.innerTx - Sign as inner transaction for PayingFor
+   * @param options.authData - Object with gaMeta params
    * @returns Signed transaction
    */
   abstract signTransaction(
@@ -36,7 +36,12 @@ export default abstract class AccountBase {
     options: {
       innerTx?: boolean;
       networkId?: string;
-      authData?: Parameters<typeof createMetaTx>[1];
+      authData?: {
+        gasLimit?: number;
+        callData?: Encoded.ContractBytearray;
+        source?: string;
+        args?: any[];
+      };
       onNode?: Node;
       onCompiler?: Compiler;
     },

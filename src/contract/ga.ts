@@ -20,11 +20,11 @@
  */
 
 import { Tag } from '../tx/builder/constants';
-import { buildContractIdByContractTx, buildTx } from '../tx/builder';
+import { buildContractIdByContractTx } from '../tx/builder';
 import { _buildTx, BuildTxOptions } from '../tx';
 import { hash } from '../utils/crypto';
 import { decode, Encoded } from '../utils/encoder';
-import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '../utils/errors';
+import { IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
 import { getContractInstance } from './methods';
@@ -93,53 +93,6 @@ interface CreateGeneralizedAccountOptions extends
   onCompiler: Compiler;
   onNode: Node;
   gasLimit?: number;
-}
-
-/**
- * Create a metaTx transaction
- * @category contract
- * @param rawTransaction - Inner transaction
- * @param authData - Object with gaMeta params
- * @param authFnName - Authorization function name
- * @param options - Options
- * @param options.onAccount - Account to use
- * @returns Transaction string
- */
-export async function createMetaTx(
-  rawTransaction: Encoded.Transaction,
-  authData: {
-    gasLimit?: number;
-    callData?: Encoded.ContractBytearray;
-    source?: string;
-    args?: any[];
-  },
-  authFnName: string,
-  {
-    onAccount, onCompiler, onNode, ...options
-  }:
-  { onAccount: AccountBase; onCompiler: Compiler; onNode: Node },
-): Promise<Encoded.Transaction> {
-  if (Object.keys(authData).length <= 0) throw new MissingParamError('authData is required');
-
-  const authCallData = authData.callData ?? await (async () => {
-    if (authData.source == null || authData.args == null) throw new InvalidAuthDataError('Auth data must contain source code and arguments.');
-    const contract = await getContractInstance({
-      onCompiler, onNode, source: authData.source,
-    });
-    return contract.calldata.encode(contract._name, authFnName, authData.args);
-  })();
-
-  const gaMetaTx = await _buildTx(Tag.GaMetaTx, {
-    ...options,
-    tx: buildTx({ encodedTx: decode(rawTransaction), signatures: [] }, Tag.SignedTx).rlpEncoded,
-    // TODO: accept an address instead
-    gaId: onAccount.address,
-    authData: authCallData,
-    gasLimit: authData.gasLimit,
-    nonce: 0,
-    onNode,
-  });
-  return buildTx({ encodedTx: decode(gaMetaTx), signatures: [] }, Tag.SignedTx).tx;
 }
 
 /**
