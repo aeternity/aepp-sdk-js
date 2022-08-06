@@ -114,6 +114,21 @@ describe('Node Chain', () => {
     isConfirmed2.should.be.equal(true);
   });
 
+  it('doesn\'t make extra requests', async () => {
+    const httpSpy = spy(http, 'request');
+    await aeSdk.spend(100, publicKey, { waitMined: false, verify: false });
+    expect(httpSpy.args.length).to.be.equal(2); // nonce, post tx
+    httpSpy.resetHistory();
+
+    await aeSdk.spend(100, publicKey, { waitMined: false, verify: false });
+    expect(httpSpy.args.length).to.be.equal(2); // nonce, post tx
+    httpSpy.resetHistory();
+
+    await aeSdk.spend(100, publicKey, { waitMined: false });
+    expect(httpSpy.args.length).to.be.equal(5); // nonce, validator(acc, height, status), post tx
+    httpSpy.restore();
+  });
+
   const accounts = new Array(10).fill(undefined).map(() => MemoryAccount.generate());
   const transactions: Encoded.TxHash[] = [];
 
