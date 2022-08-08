@@ -8,6 +8,11 @@
   "browser": {
     "dist/aepp-sdk.js": "./dist/aepp-sdk.browser.js"
   },
+  "exports": {
+    "import": "./es/index.mjs",
+    "node": "./dist/aepp-sdk.js",
+    "default": "./dist/aepp-sdk.browser.js"
+  },
   "sideEffects": false,
   "scripts": {
     "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
