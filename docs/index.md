@@ -16,7 +16,7 @@ In case you're not using any JS bundling/compilation technique, the SDK can also
 ...where `VERSION` is the version number of the SDK you want to use (eg. `8.1.0`).
 
 ### Browser `<script>` tag
-The bundle will assign the SDK to a global variable called `Ae` that makes all functionalities of the SDK accessible.
+The bundle will assign the SDK to a global variable called `Aeternity` that makes all functionalities of the SDK accessible.
 
 Usage:
 
@@ -30,8 +30,10 @@ Usage:
   <!-- include latest SDK version -->
   <script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
   <script type="text/javascript">
-    const node = new Ae.Node('https://testnet.aeternity.io')
-    const aeSdk = new Ae.AeSdk({
+    const { AeSdk, Node } = Aeternity
+
+    const node = new Node('https://testnet.aeternity.io')
+    const aeSdk = new AeSdk({
       nodes: [{ name: 'testnet', instance: node }]
     })
     aeSdk.getHeight().then(height => {
