@@ -79,14 +79,14 @@ describe('Paying for transaction of another account', () => {
     contractAddress = address;
     await aeSdk.payForTransaction(contractDeployTx);
     payingContract = await aeSdkNotPayingFee.getContractInstance(
-      { source: contractSource, contractAddress },
+      { source: contractSource, address },
     );
     expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(42n);
   });
 
   it('pays for contract call', async () => {
     const contract = await aeSdkNotPayingFee.getContractInstance(
-      { source: contractSource, contractAddress },
+      { source: contractSource, address: contractAddress },
     );
     const { rawTx: contractCallTx } = await contract.methods.setValue(43);
     await aeSdk.payForTransaction(contractCallTx);

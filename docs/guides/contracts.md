@@ -73,8 +73,8 @@ In many cases an application doesn't need to deploy a contract or verify its byt
 
 ```js
 const aci = ... // ACI of the contract
-const contractAddress = ... // the address of the contract
-const contractInstance = await aeSdk.getContractInstance({ aci, contractAddress })
+const address = ... // the address of the contract
+const contractInstance = await aeSdk.getContractInstance({ aci, address })
 ```
 
 ### Options
@@ -82,7 +82,7 @@ const contractInstance = await aeSdk.getContractInstance({ aci, contractAddress 
 - Following attributes can be provided via `options` to `getContractInstance`:
     - `aci` (default: obtained via http compiler)
         - The Contract ACI.
-    - `contractAddress`
+    - `address`
         - The address where the contract is located at.
         - To be used if a contract is already deployed.
     - `fileSystem` (default: {})

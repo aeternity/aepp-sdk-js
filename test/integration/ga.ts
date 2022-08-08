@@ -53,7 +53,7 @@ describe('Generalized Account', () => {
     const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', authContractSource, []);
     expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.be.equal('generalized');
     authContract = await aeSdk.getContractInstance({
-      source: authContractSource, contractAddress: gaContractId,
+      source: authContractSource, address: gaContractId,
     });
   });
 

@@ -70,7 +70,7 @@ describe('Aens', () => {
     if (contract.deployInfo.address == null) throw new UnexpectedTsError();
     await nameObject.update({ contract_pubkey: contract.deployInfo.address });
 
-    const contractByName = await aeSdk.getContractInstance({ source, contractAddress: name });
+    const contractByName = await aeSdk.getContractInstance({ source, address: name });
     expect((await contractByName.methods.getArg(42)).decodedResult).to.be.equal(42n);
   });
 

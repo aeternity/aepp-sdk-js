@@ -168,7 +168,7 @@ export default async function getContractInstance({
   source,
   bytecode,
   aci: _aci,
-  contractAddress,
+  address,
   fileSystem = {},
   validateBytecode,
   ...otherOptions
@@ -179,7 +179,7 @@ export default async function getContractInstance({
   source?: string;
   bytecode?: Encoded.ContractBytearray;
   aci?: Aci;
-  contractAddress?: Encoded.ContractAddress | AensName;
+  address?: Encoded.ContractAddress | AensName;
   fileSystem?: Record<string, string>;
   validateBytecode?: boolean;
   [key: string]: any;
@@ -190,21 +190,21 @@ export default async function getContractInstance({
   }
   if (_aci == null) throw new MissingContractDefError();
 
-  if (contractAddress != null) {
-    contractAddress = await resolveName(
-      contractAddress,
+  if (address != null) {
+    address = await resolveName(
+      address,
       'contract_pubkey',
       { resolveByNode: true, onNode },
     ) as Encoded.ContractAddress;
   }
 
-  if (contractAddress == null && source == null && bytecode == null) {
+  if (address == null && source == null && bytecode == null) {
     throw new MissingContractAddressError('Can\'t create instance by ACI without address');
   }
 
-  if (contractAddress != null) {
-    const contract = await getContract(contractAddress, { onNode });
-    if (contract.active == null) throw new InactiveContractError(contractAddress);
+  if (address != null) {
+    const contract = await getContract(address, { onNode });
+    if (contract.active == null) throw new InactiveContractError(address);
   }
 
   const instance: ContractInstance = {
@@ -213,7 +213,7 @@ export default async function getContractInstance({
     calldata: new Calldata([_aci.encodedAci, ..._aci.externalEncodedAci]),
     source,
     bytecode,
-    deployInfo: { address: contractAddress },
+    deployInfo: { address },
     options: {
       onAccount,
       onCompiler,
@@ -236,8 +236,8 @@ export default async function getContractInstance({
   };
 
   if (validateBytecode != null) {
-    if (contractAddress == null) throw new MissingContractAddressError('Can\'t validate bytecode without contract address');
-    const onChanBytecode = (await getContractByteCode(contractAddress, { onNode })).bytecode;
+    if (address == null) throw new MissingContractAddressError('Can\'t validate bytecode without contract address');
+    const onChanBytecode = (await getContractByteCode(address, { onNode })).bytecode;
     const isValid: boolean = source != null
       ? await onCompiler.validateByteCode(
         { bytecode: onChanBytecode, source, options: instance.options },
@@ -440,7 +440,7 @@ export default async function getContractInstance({
   };
 
   /**
-   * @param address - Contract address that emitted event
+   * @param ctAddress - Contract address that emitted event
    * @param nameHash - Hash of emitted event name
    * @param options - Options
    * @returns Contract name
@@ -448,14 +448,14 @@ export default async function getContractInstance({
    * @throws {@link AmbiguousEventDefinitionError}
    */
   function getContractNameByEvent(
-    address: Encoded.ContractAddress,
+    ctAddress: Encoded.ContractAddress,
     nameHash: BigInt,
     { contractAddressToName }: {
       contractAddressToName?: { [key: Encoded.ContractAddress]: string };
     },
   ): string {
     const addressToName = { ...instance.options.contractAddressToName, ...contractAddressToName };
-    if (addressToName[address] != null) return addressToName[address];
+    if (addressToName[ctAddress] != null) return addressToName[ctAddress];
 
     const matchedEvents = [
       instance._aci.encodedAci,
@@ -467,9 +467,9 @@ export default async function getContractInstance({
       .flat()
       .filter(([, eventName]) => BigInt(`0x${calcHash(eventName).toString('hex')}`) === nameHash);
     switch (matchedEvents.length) {
-      case 0: throw new MissingEventDefinitionError(nameHash.toString(), address);
+      case 0: throw new MissingEventDefinitionError(nameHash.toString(), ctAddress);
       case 1: return matchedEvents[0][0];
-      default: throw new AmbiguousEventDefinitionError(address, matchedEvents);
+      default: throw new AmbiguousEventDefinitionError(ctAddress, matchedEvents);
     }
   }
 

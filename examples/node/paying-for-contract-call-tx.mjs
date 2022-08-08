@@ -118,7 +118,7 @@ const aeSdk = new AeSdk({
 //      - The transaction will be signed in a special way that is required for inner transactions.
 //
 const contract = await aeSdk.getContractInstance(
-  { source: CONTRACT_SOURCE, contractAddress: CONTRACT_ADDRESS },
+  { source: CONTRACT_SOURCE, address: CONTRACT_ADDRESS },
 );
 const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', []);
 const contractCallTx = await aeSdk.buildTx(Tag.ContractCallTx, {

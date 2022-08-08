@@ -205,7 +205,7 @@ describe('Contract', () => {
   it('Dry-run without accounts', async () => {
     const sdk = await getSdk(0);
     const ct = await sdk.getContractInstance({
-      source: identityContract, contractAddress: deployed.address,
+      source: identityContract, address: deployed.address,
     });
     const { result } = await ct.methods.getArg(42);
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub);
