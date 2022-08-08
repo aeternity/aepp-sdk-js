@@ -133,7 +133,7 @@ describe('Contract', () => {
   });
 
   it('deploys precompiled bytecode', async () => {
-    contract = await aeSdk.getContractInstance({ bytecode, source: identityContract });
+    contract = await aeSdk.getContractInstance({ bytecode, sourceCode: identityContract });
     expect(await contract.deploy()).to.have.property('address');
   });
 
@@ -154,7 +154,7 @@ describe('Contract', () => {
   it('Verify message in Sophia', async () => {
     const msgHash = messageToHash('Hello');
     const signature = await aeSdk.sign(msgHash);
-    const signContract = await aeSdk.getContractInstance({ source: signSource });
+    const signContract = await aeSdk.getContractInstance({ sourceCode: signSource });
     await signContract.deploy();
     const { decodedResult } = await signContract.methods.verify(msgHash, aeSdk.address, signature);
     decodedResult.should.be.equal(true);
@@ -189,12 +189,12 @@ describe('Contract', () => {
   });
 
   it('throws error on deploy', async () => {
-    const ct = await aeSdk.getContractInstance({ source: contractWithBrokenDeploy });
+    const ct = await aeSdk.getContractInstance({ sourceCode: contractWithBrokenDeploy });
     await expect(ct.deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"');
   });
 
   it('throws errors on method call', async () => {
-    const ct = await aeSdk.getContractInstance({ source: contractWithBrokenMethods });
+    const ct = await aeSdk.getContractInstance({ sourceCode: contractWithBrokenMethods });
     await ct.deploy();
     await expect(ct.methods.failWithoutMessage(aeSdk.address))
       .to.be.rejectedWith('Invocation failed');
@@ -205,7 +205,7 @@ describe('Contract', () => {
   it('Dry-run without accounts', async () => {
     const sdk = await getSdk(0);
     const ct = await sdk.getContractInstance({
-      source: identityContract, address: deployed.address,
+      sourceCode: identityContract, address: deployed.address,
     });
     const { result } = await ct.methods.getArg(42);
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub);
@@ -229,7 +229,7 @@ describe('Contract', () => {
   });
 
   it('initializes contract state', async () => {
-    contract = await aeSdk.getContractInstance({ source: stateContract });
+    contract = await aeSdk.getContractInstance({ sourceCode: stateContract });
     const data = 'Hello World!';
     await contract.deploy([data]);
     expect((await contract.methods.retrieve()).decodedResult).to.be.equal(data);
@@ -238,13 +238,13 @@ describe('Contract', () => {
   describe('Namespaces', () => {
     it('Can compiler contract with external deps', async () => {
       contract = await aeSdk.getContractInstance({
-        source: contractWithLib, fileSystem: { testLib: libContract },
+        sourceCode: contractWithLib, fileSystem: { testLib: libContract },
       });
       expect(await contract.compile()).to.satisfy((b: string) => b.startsWith('cb_'));
     });
 
     it('Throw error when try to compile contract without providing external deps', async () => {
-      await expect(aeSdk.getContractInstance({ source: contractWithLib }))
+      await expect(aeSdk.getContractInstance({ sourceCode: contractWithLib }))
         .to.be.rejectedWith('Couldn\'t find include file');
     });
 
@@ -327,7 +327,7 @@ describe('Contract', () => {
     let delegationSignature: string;
 
     before(async () => {
-      contract = await aeSdk.getContractInstance({ source: aensDelegationContract });
+      contract = await aeSdk.getContractInstance({ sourceCode: aensDelegationContract });
       await contract.deploy();
       if (contract.deployInfo.address == null) throw new UnexpectedTsError();
       contractId = contract.deployInfo.address;
@@ -398,7 +398,7 @@ describe('Contract', () => {
     const ttl = { RelativeTTL: [50] };
 
     before(async () => {
-      contract = await aeSdk.getContractInstance({ source: oracleContract });
+      contract = await aeSdk.getContractInstance({ sourceCode: oracleContract });
       await contract.deploy();
       if (contract.deployInfo.address == null) throw new UnexpectedTsError();
       contractId = contract.deployInfo.address;

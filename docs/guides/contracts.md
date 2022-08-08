@@ -48,7 +48,7 @@ Note:
 
 ```js
 const sourceCode = ... // source code of the contract
-const contractInstance = await aeSdk.getContractInstance({ source: sourceCode })
+const contractInstance = await aeSdk.getContractInstance({ sourceCode })
 ```
 
 Note:
@@ -56,7 +56,7 @@ Note:
 - If your contract includes external dependencies which are not part of the [standard library](https://aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
   ```js
   const fileSystem = ... // key-value map with name of the include as key and source code of the include as value
-  const contractInstance = await aeSdk.getContractInstance({ source: sourceCode, fileSystem })
+  const contractInstance = await aeSdk.getContractInstance({ sourceCode, fileSystem })
   ```
 
 ### By ACI and bytecode

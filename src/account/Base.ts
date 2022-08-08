@@ -39,7 +39,7 @@ export default abstract class AccountBase {
       authData?: {
         gasLimit?: number;
         callData?: Encoded.ContractBytearray;
-        source?: string;
+        sourceCode?: string;
         args?: any[];
       };
       onNode?: Node;

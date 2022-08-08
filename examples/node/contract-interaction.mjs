@@ -36,7 +36,7 @@ import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk';
 // ## 2. Define constants
 // The following constants are used in the subsequent code snippets.
 // typically you read the source code from a separate .aes file
-const CONTRACT_SOURCE = `
+const CONTRACT_SOURCE_CODE = `
 contract Multiplier =
   record state = { factor: int }
   entrypoint init(f : int) : state = { factor = f }
@@ -68,8 +68,8 @@ const aeSdk = new AeSdk({
 // ## 4. Get contract instance
 // Knowing the source code allows you to initialize a contract instance and interact with the
 // contract in a convenient way.
-console.log(CONTRACT_SOURCE);
-const contract = await aeSdk.getContractInstance({ source: CONTRACT_SOURCE });
+console.log(CONTRACT_SOURCE_CODE);
+const contract = await aeSdk.getContractInstance({ sourceCode: CONTRACT_SOURCE_CODE });
 
 // ## 5. Compile the contract
 // The `compile` function sends a raw Sophia contract as string

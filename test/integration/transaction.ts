@@ -47,7 +47,7 @@ const query = '{\'city\': \'Berlin\'}';
 const queryResponse = '{\'tmp\': 101}';
 
 // Contract test data
-const contractSource = `
+const contractSourceCode = `
 contract Identity =
   entrypoint getArg(x : int) = x
 `;
@@ -65,7 +65,7 @@ describe('Transaction', () => {
 
   before(async () => {
     aeSdk = await getSdk(0);
-    contract = await aeSdk.getContractInstance({ source: contractSource });
+    contract = await aeSdk.getContractInstance({ sourceCode: contractSourceCode });
   });
 
   it('build spend tx using denomination amount', async () => {

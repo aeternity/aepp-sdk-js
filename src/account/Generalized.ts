@@ -62,8 +62,11 @@ export default class AccountGeneralized extends AccountBase {
     if (authData == null || onCompiler == null || onNode == null) {
       throw new ArgumentError('authData, onCompiler, onNode', 'provided', null);
     }
+    const {
+      callData, sourceCode, args, gasLimit,
+    } = authData;
 
-    if (this.#authFun == null && authData.callData == null) {
+    if (this.#authFun == null && callData == null) {
       const account = await getAccount(this.address, { onNode });
       if (account.kind !== 'generalized') {
         throw new ArgumentError('account kind', 'generalized', account.kind);
@@ -74,19 +77,19 @@ export default class AccountGeneralized extends AccountBase {
       }
     }
 
-    const authCallData = authData.callData ?? await (async () => {
-      if (authData.source == null || authData.args == null) {
+    const authCallData = callData ?? await (async () => {
+      if (sourceCode == null || args == null) {
         throw new InvalidAuthDataError('Auth data must contain source code and arguments.');
       }
-      const contract = await getContractInstance({ onCompiler, onNode, source: authData.source });
-      return contract.calldata.encode(contract._name, this.#authFun, authData.args);
+      const contract = await getContractInstance({ onCompiler, onNode, sourceCode });
+      return contract.calldata.encode(contract._name, this.#authFun, args);
     })();
 
     const gaMetaTx = await _buildTx(Tag.GaMetaTx, {
       tx: buildTx({ encodedTx: decode(tx), signatures: [] }, Tag.SignedTx).rlpEncoded,
       gaId: this.address,
       authData: authCallData,
-      gasLimit: authData.gasLimit,
+      gasLimit,
       nonce: 0,
       onNode,
     });

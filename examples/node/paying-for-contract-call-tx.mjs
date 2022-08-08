@@ -61,7 +61,7 @@ const PAYER_ACCOUNT_SECRET_KEY = 'bf66e1c256931870908a649572ed0257876bb84e3cdf71
 const NODE_URL = 'https://testnet.aeternity.io';
 const COMPILER_URL = 'https://compiler.aepps.com';
 const CONTRACT_ADDRESS = 'ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8';
-const CONTRACT_SOURCE = `
+const CONTRACT_SOURCE_CODE = `
 @compiler >= 6
 
 contract PayingForTxExample =
@@ -118,7 +118,7 @@ const aeSdk = new AeSdk({
 //      - The transaction will be signed in a special way that is required for inner transactions.
 //
 const contract = await aeSdk.getContractInstance(
-  { source: CONTRACT_SOURCE, address: CONTRACT_ADDRESS },
+  { sourceCode: CONTRACT_SOURCE_CODE, address: CONTRACT_ADDRESS },
 );
 const calldata = contract.calldata.encode('PayingForTxExample', 'set_last_caller', []);
 const contractCallTx = await aeSdk.buildTx(Tag.ContractCallTx, {
