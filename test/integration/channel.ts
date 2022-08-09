@@ -34,7 +34,7 @@ import { appendSignature } from '../../src/channel/handlers';
 
 const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
 
-const contractSource = `
+const contractSourceCode = `
 contract Identity =
   entrypoint getArg(x : int) : int = x
 `;
@@ -833,7 +833,7 @@ describe('Channel', () => {
       sign: responderSign,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
-    contract = await aeSdkInitiatior.getContractInstance({ source: contractSource });
+    contract = await aeSdkInitiatior.getContractInstance({ sourceCode: contractSourceCode });
     await contract.compile();
     const roundBefore = initiatorCh.round();
     assertNotNull(roundBefore);

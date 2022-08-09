@@ -93,7 +93,7 @@ export interface ContractInstance {
   _aci: Aci;
   _name: string;
   calldata: any;
-  source?: string;
+  sourceCode?: string;
   bytecode?: Encoded.ContractBytearray;
   deployInfo: {
     address?: Encoded.ContractAddress;
@@ -150,7 +150,7 @@ export interface ContractInstance {
  * @returns JS Contract API
  * @example
  * ```js
- * const contractIns = await aeSdk.getContractInstance({ source })
+ * const contractIns = await aeSdk.getContractInstance({ sourceCode })
  * await contractIns.deploy([321]) or await contractIns.methods.init(321)
  * const callResult = await contractIns.call('setState', [123]) or
  * await contractIns.methods.setState.send(123, options)
@@ -165,10 +165,10 @@ export default async function getContractInstance({
   onAccount,
   onCompiler,
   onNode,
-  source,
+  sourceCode,
   bytecode,
   aci: _aci,
-  contractAddress,
+  address,
   fileSystem = {},
   validateBytecode,
   ...otherOptions
@@ -176,44 +176,44 @@ export default async function getContractInstance({
   onAccount?: AccountBase;
   onCompiler: Compiler;
   onNode: Node;
-  source?: string;
+  sourceCode?: string;
   bytecode?: Encoded.ContractBytearray;
   aci?: Aci;
-  contractAddress?: Encoded.ContractAddress | AensName;
+  address?: Encoded.ContractAddress | AensName;
   fileSystem?: Record<string, string>;
   validateBytecode?: boolean;
   [key: string]: any;
 }): Promise<ContractInstance> {
-  if (_aci == null && source != null) {
+  if (_aci == null && sourceCode != null) {
     // TODO: should be fixed when the compiledAci interface gets updated
-    _aci = await onCompiler.generateACI({ code: source, options: { fileSystem } }) as Aci;
+    _aci = await onCompiler.generateACI({ code: sourceCode, options: { fileSystem } }) as Aci;
   }
   if (_aci == null) throw new MissingContractDefError();
 
-  if (contractAddress != null) {
-    contractAddress = await resolveName(
-      contractAddress,
+  if (address != null) {
+    address = await resolveName(
+      address,
       'contract_pubkey',
       { resolveByNode: true, onNode },
     ) as Encoded.ContractAddress;
   }
 
-  if (contractAddress == null && source == null && bytecode == null) {
+  if (address == null && sourceCode == null && bytecode == null) {
     throw new MissingContractAddressError('Can\'t create instance by ACI without address');
   }
 
-  if (contractAddress != null) {
-    const contract = await getContract(contractAddress, { onNode });
-    if (contract.active == null) throw new InactiveContractError(contractAddress);
+  if (address != null) {
+    const contract = await getContract(address, { onNode });
+    if (contract.active == null) throw new InactiveContractError(address);
   }
 
   const instance: ContractInstance = {
     _aci,
     _name: _aci.encodedAci.contract.name,
     calldata: new Calldata([_aci.encodedAci, ..._aci.externalEncodedAci]),
-    source,
+    sourceCode,
     bytecode,
-    deployInfo: { address: contractAddress },
+    deployInfo: { address },
     options: {
       onAccount,
       onCompiler,
@@ -236,14 +236,14 @@ export default async function getContractInstance({
   };
 
   if (validateBytecode != null) {
-    if (contractAddress == null) throw new MissingContractAddressError('Can\'t validate bytecode without contract address');
-    const onChanBytecode = (await getContractByteCode(contractAddress, { onNode })).bytecode;
-    const isValid: boolean = source != null
+    if (address == null) throw new MissingContractAddressError('Can\'t validate bytecode without contract address');
+    const onChanBytecode = (await getContractByteCode(address, { onNode })).bytecode;
+    const isValid: boolean = sourceCode != null
       ? await onCompiler.validateByteCode(
-        { bytecode: onChanBytecode, source, options: instance.options },
+        { bytecode: onChanBytecode, source: sourceCode, options: instance.options },
       ).then(() => true, () => false)
       : bytecode === onChanBytecode;
-    if (!isValid) throw new BytecodeMismatchError(source != null ? 'source' : 'bytecode');
+    if (!isValid) throw new BytecodeMismatchError(sourceCode != null ? 'source code' : 'bytecode');
   }
 
   /**
@@ -252,9 +252,9 @@ export default async function getContractInstance({
    */
   instance.compile = async (options = {}): Promise<Encoded.ContractBytearray> => {
     if (instance.bytecode != null) throw new IllegalArgumentError('Contract already compiled');
-    if (instance.source == null) throw new IllegalArgumentError('Can\'t compile without source code');
+    if (instance.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
     instance.bytecode = (await onCompiler.compileContract({
-      code: instance.source, options: { ...instance.options, ...options },
+      code: instance.sourceCode, options: { ...instance.options, ...options },
     })).bytecode as Encoded.ContractBytearray;
     return instance.bytecode;
   };
@@ -440,7 +440,7 @@ export default async function getContractInstance({
   };
 
   /**
-   * @param address - Contract address that emitted event
+   * @param ctAddress - Contract address that emitted event
    * @param nameHash - Hash of emitted event name
    * @param options - Options
    * @returns Contract name
@@ -448,14 +448,14 @@ export default async function getContractInstance({
    * @throws {@link AmbiguousEventDefinitionError}
    */
   function getContractNameByEvent(
-    address: Encoded.ContractAddress,
+    ctAddress: Encoded.ContractAddress,
     nameHash: BigInt,
     { contractAddressToName }: {
       contractAddressToName?: { [key: Encoded.ContractAddress]: string };
     },
   ): string {
     const addressToName = { ...instance.options.contractAddressToName, ...contractAddressToName };
-    if (addressToName[address] != null) return addressToName[address];
+    if (addressToName[ctAddress] != null) return addressToName[ctAddress];
 
     const matchedEvents = [
       instance._aci.encodedAci,
@@ -467,9 +467,9 @@ export default async function getContractInstance({
       .flat()
       .filter(([, eventName]) => BigInt(`0x${calcHash(eventName).toString('hex')}`) === nameHash);
     switch (matchedEvents.length) {
-      case 0: throw new MissingEventDefinitionError(nameHash.toString(), address);
+      case 0: throw new MissingEventDefinitionError(nameHash.toString(), ctAddress);
       case 1: return matchedEvents[0][0];
-      default: throw new AmbiguousEventDefinitionError(address, matchedEvents);
+      default: throw new AmbiguousEventDefinitionError(ctAddress, matchedEvents);
     }
   }
 

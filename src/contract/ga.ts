@@ -37,14 +37,14 @@ import Compiler from './Compiler';
  * Convert current account to GA
  * @category contract
  * @param authFnName - Authorization function name
- * @param source - Auth contract source code
+ * @param sourceCode - Auth contract source code
  * @param args - init arguments
  * @param options - Options
  * @returns General Account Object
  */
 export async function createGeneralizedAccount(
   authFnName: string,
-  source: string,
+  sourceCode: string,
   args: any[],
   {
     onAccount, onCompiler, onNode, ...options
@@ -61,7 +61,7 @@ export async function createGeneralizedAccount(
   }
 
   const contract = await getContractInstance({
-    onAccount, onCompiler, onNode, source,
+    onAccount, onCompiler, onNode, sourceCode,
   });
 
   const tx = await _buildTx(Tag.GaAttachTx, {

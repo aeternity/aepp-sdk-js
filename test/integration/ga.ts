@@ -24,7 +24,7 @@ import {
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
 
-const authContractSource = `contract BlindAuth =
+const sourceCode = `contract BlindAuth =
   record state = { txHash: option(hash) }
   entrypoint init() : state = { txHash = None }
 
@@ -37,6 +37,7 @@ const authContractSource = `contract BlindAuth =
       None          => abort("Not in Auth context")
       Some(tx_hash) => true
 `;
+
 describe('Generalized Account', () => {
   let aeSdk: AeSdk;
   let accountBeforeGa: MemoryAccount;
@@ -50,15 +51,13 @@ describe('Generalized Account', () => {
 
   it('Make account GA', async () => {
     accountBeforeGa = Object.values(aeSdk.accounts)[0] as MemoryAccount;
-    const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', authContractSource, []);
+    const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', sourceCode, []);
     expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.be.equal('generalized');
-    authContract = await aeSdk.getContractInstance({
-      source: authContractSource, contractAddress: gaContractId,
-    });
+    authContract = await aeSdk.getContractInstance({ sourceCode, address: gaContractId });
   });
 
   it('Fail on make GA on already GA', async () => {
-    await aeSdk.createGeneralizedAccount('authorize', authContractSource, [])
+    await aeSdk.createGeneralizedAccount('authorize', sourceCode, [])
       .should.be.rejectedWith(`Account ${gaAccountAddress} is already GA`);
   });
 
@@ -70,21 +69,20 @@ describe('Generalized Account', () => {
 
     const callData = authContract.calldata.encode('BlindAuth', 'authorize', [genSalt()]);
     await aeSdk.spend(10000, publicKey, { authData: { callData } });
-    await aeSdk
-      .spend(10000, publicKey, { authData: { source: authContractSource, args: [genSalt()] } });
+    await aeSdk.spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
     const balanceAfter = await aeSdk.getBalance(publicKey);
     balanceAfter.should.be.equal('20000');
   });
 
   it('throws error if gasLimit exceeds the maximum value', async () => {
-    const authData = { source: authContractSource, args: [genSalt()], gasLimit: 50001 };
+    const authData = { sourceCode, args: [genSalt()], gasLimit: 50001 };
     await expect(aeSdk.spend(10000, publicKey, { authData }))
       .to.be.rejectedWith('Gas limit 50001 must be less or equal to 50000');
   });
 
   it('buildAuthTxHash generates a proper hash', async () => {
     const { rawTx } = await aeSdk
-      .spend(10000, publicKey, { authData: { source: authContractSource, args: [genSalt()] } });
+      .spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
     const spendTx = encode(
       unpackTx(rawTx, Tag.SignedTx).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded,
       Encoding.Transaction,

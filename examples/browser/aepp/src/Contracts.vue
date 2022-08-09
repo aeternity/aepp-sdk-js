@@ -5,7 +5,7 @@
       <div>Contract Source Code</div>
       <div>
         <textarea
-          v-model="contractSource"
+          v-model="contractSourceCode"
           placeholder="Contact source code"
         />
       </div>
@@ -81,7 +81,7 @@
 import Value from './Value.vue'
 import { mapState, mapGetters } from 'vuex'
 
-const contractSource = `
+const contractSourceCode = `
 contract Multiplier =
   record state = { factor: int }
   entrypoint init(f : int) : state = { factor = f }
@@ -91,7 +91,7 @@ contract Multiplier =
 export default {
   components: { Value },
   data: () => ({
-    contractSource,
+    contractSourceCode,
     deployArg: 5,
     callArg: 7,
     createPromise: null,
@@ -105,7 +105,7 @@ export default {
   },
   methods: {
     create () {
-      return this.aeSdk.getContractInstance({ source: this.contractSource })
+      return this.aeSdk.getContractInstance({ sourceCode: this.contractSourceCode })
     },
     async compile () {
       return (await this.createPromise).compile()

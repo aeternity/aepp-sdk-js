@@ -163,7 +163,7 @@ describe('Node Chain', () => {
 
   it('multiple contract dry-runs calls at one request', async () => {
     const contract = await aeSdk.getContractInstance({
-      source:
+      sourceCode:
         'contract Test =\n'
         + '  entrypoint foo(x : int) = x * 100',
     });

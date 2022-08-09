@@ -1,7 +1,7 @@
 #!/usr/bin/env npx ts-node
 import { Node, AeSdk, MemoryAccount } from '../..';
 
-const contractSource = `
+const contractSourceCode = `
 contract Test =
  entrypoint getArg(x : map(string, int)) = x
 `;
@@ -18,7 +18,7 @@ const aeSdk = new AeSdk({
   console.log('Height:', await aeSdk.getHeight());
   console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map);
 
-  const contract = await aeSdk.getContractInstance({ source: contractSource });
+  const contract = await aeSdk.getContractInstance({ sourceCode: contractSourceCode });
   const deployInfo = await contract.deploy();
   console.log('Contract deployed at', deployInfo.address);
   const map = new Map([['foo', 42], ['bar', 43]]);

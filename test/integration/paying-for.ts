@@ -57,7 +57,7 @@ describe('Paying for transaction of another account', () => {
     expect(await aeSdk.getBalance(receiver.address)).to.equal('10000');
   });
 
-  const contractSource = `
+  const sourceCode = `
     contract Test =
       record state = { value: int }
       entrypoint init(x: int): state = { value = x }
@@ -74,19 +74,17 @@ describe('Paying for transaction of another account', () => {
       waitMined: false,
       innerTx: true,
     };
-    const contract = await aeSdkNotPayingFee.getContractInstance({ source: contractSource });
+    const contract = await aeSdkNotPayingFee.getContractInstance({ sourceCode });
     const { rawTx: contractDeployTx, address } = await contract.deploy([42]);
     contractAddress = address;
     await aeSdk.payForTransaction(contractDeployTx);
-    payingContract = await aeSdkNotPayingFee.getContractInstance(
-      { source: contractSource, contractAddress },
-    );
+    payingContract = await aeSdkNotPayingFee.getContractInstance({ sourceCode, address });
     expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(42n);
   });
 
   it('pays for contract call', async () => {
     const contract = await aeSdkNotPayingFee.getContractInstance(
-      { source: contractSource, contractAddress },
+      { sourceCode, address: contractAddress },
     );
     const { rawTx: contractCallTx } = await contract.methods.setValue(43);
     await aeSdk.payForTransaction(contractCallTx);

@@ -62,15 +62,15 @@ describe('Aens', () => {
   });
 
   it('Call contract using AENS name', async () => {
-    const source = 'contract Identity ='
+    const sourceCode = 'contract Identity ='
       + '  entrypoint getArg(x : int) = x';
-    const contract = await aeSdk.getContractInstance({ source });
+    const contract = await aeSdk.getContractInstance({ sourceCode });
     await contract.deploy([]);
     const nameObject = await aeSdk.aensQuery(name);
     if (contract.deployInfo.address == null) throw new UnexpectedTsError();
     await nameObject.update({ contract_pubkey: contract.deployInfo.address });
 
-    const contractByName = await aeSdk.getContractInstance({ source, contractAddress: name });
+    const contractByName = await aeSdk.getContractInstance({ sourceCode, address: name });
     expect((await contractByName.methods.getArg(42)).decodedResult).to.be.equal(42n);
   });
 

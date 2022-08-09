@@ -36,7 +36,7 @@ import { Encoded } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
 import { Aci } from '../../src/apis/compiler';
 
-const identityContractSource = `
+const identityContractSourceCode = `
 contract Identity =
  entrypoint getArg(x : int) = x
 `;
@@ -56,7 +56,7 @@ contract Remote =
       false => ()
 `;
 
-const testContractSource = `
+const testContractSourceCode = `
 namespace Test =
   function double(x: int): int = x*2
 
@@ -152,21 +152,21 @@ describe('Contract instance', () => {
   before(async () => {
     aeSdk = await getSdk(2);
     testContractAci = await aeSdk.compilerApi
-      .generateACI({ code: testContractSource, options: { fileSystem } });
+      .generateACI({ code: testContractSourceCode, options: { fileSystem } });
     // @ts-expect-error should be changed on api
     testContractBytecode = (await aeSdk.compilerApi.compileContract({
-      code: testContractSource, options: { fileSystem },
+      code: testContractSourceCode, options: { fileSystem },
     })).bytecode;
   });
 
   it('generates by source code', async () => {
     aeSdk._options.testProperty = 'test';
     testContract = await aeSdk.getContractInstance({
-      source: testContractSource, fileSystem, ttl: 0, gasLimit: 15000,
+      sourceCode: testContractSourceCode, fileSystem, ttl: 0, gasLimit: 15000,
     });
     delete aeSdk._options.testProperty;
     expect(testContract.options.testProperty).to.be.equal('test');
-    testContract.should.have.property('source');
+    testContract.should.have.property('sourceCode');
     testContract.should.have.property('bytecode');
     testContract.should.have.property('deployInfo');
     testContract.should.have.property('compile');
@@ -220,14 +220,14 @@ describe('Contract instance', () => {
     aeSdk.selectAccount(address1);
   });
 
-  it('generates by aci', async () => aeSdk.getContractInstance({ aci: testContractAci, contractAddress: testContractAddress }));
+  it('generates by aci', async () => aeSdk.getContractInstance({ aci: testContractAci, address: testContractAddress }));
 
   it('fails on trying to generate with not existing contract address', () => expect(aeSdk.getContractInstance(
-    { aci: identityContractSource, contractAddress: notExistingContractAddress },
+    { aci: identityContractSourceCode, address: notExistingContractAddress },
   )).to.be.rejectedWith(`v3/contracts/${notExistingContractAddress} error: Contract not found`));
 
   it('fails on trying to generate with invalid address', () => expect(aeSdk.getContractInstance(
-    { aci: identityContractSource, contractAddress: 'ct_asdasdasd' },
+    { aci: identityContractSourceCode, address: 'ct_asdasdasd' },
   )).to.be.rejectedWith(InvalidAensNameError, 'Invalid name or address: ct_asdasdasd'));
 
   it('fails on trying to generate by aci without address', () => expect(aeSdk.getContractInstance({ aci: testContractAci }))
@@ -239,7 +239,7 @@ describe('Contract instance', () => {
 
   it('calls by aci', async () => {
     const contract = await aeSdk.getContractInstance(
-      { aci: testContractAci, contractAddress: testContract.deployInfo.address },
+      { aci: testContractAci, address: testContract.deployInfo.address },
     );
     expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n);
   });
@@ -253,32 +253,32 @@ describe('Contract instance', () => {
   });
 
   it('accepts matching source code with enabled validation', async () => aeSdk.getContractInstance({
-    source: testContractSource,
+    sourceCode: testContractSourceCode,
     fileSystem,
-    contractAddress: testContractAddress,
+    address: testContractAddress,
     validateBytecode: true,
   }));
 
   it('rejects not matching source code with enabled validation', () => expect(aeSdk.getContractInstance({
-    source: identityContractSource,
-    contractAddress: testContractAddress,
+    sourceCode: identityContractSourceCode,
+    address: testContractAddress,
     validateBytecode: true,
-  })).to.be.rejectedWith(BytecodeMismatchError, 'Contract source do not correspond to the bytecode deployed on the chain'));
+  })).to.be.rejectedWith(BytecodeMismatchError, 'Contract source code do not correspond to the bytecode deployed on the chain'));
 
   it('accepts matching bytecode with enabled validation', async () => aeSdk.getContractInstance({
     bytecode: testContractBytecode,
     aci: testContractAci,
-    contractAddress: testContractAddress,
+    address: testContractAddress,
     validateBytecode: true,
   }));
 
   it('rejects not matching bytecode with enabled validation', async () => expect(aeSdk.getContractInstance({
     bytecode: (await aeSdk.compilerApi.compileContract({
-      code: identityContractSource, options: {},
+      code: identityContractSourceCode, options: {},
     })).bytecode,
     aci: await aeSdk.compilerApi
-      .generateACI({ code: identityContractSource, options: { fileSystem } }),
-    contractAddress: testContractAddress,
+      .generateACI({ code: identityContractSourceCode, options: { fileSystem } }),
+    address: testContractAddress,
     validateBytecode: true,
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'));
 
@@ -319,7 +319,9 @@ describe('Contract instance', () => {
     let contract: ContractInstance;
 
     before(async () => {
-      contract = await aeSdk.getContractInstance({ source: testContractSource, fileSystem });
+      contract = await aeSdk.getContractInstance(
+        { sourceCode: testContractSourceCode, fileSystem },
+      );
     });
 
     it('estimates gas by default for contract deployments', async () => {
@@ -330,7 +332,7 @@ describe('Contract instance', () => {
 
     it('overrides gas through getContractInstance options for contract deployments', async () => {
       const ct = await aeSdk.getContractInstance({
-        source: testContractSource, fileSystem, gasLimit: 300,
+        sourceCode: testContractSourceCode, fileSystem, gasLimit: 300,
       });
       const { tx: { gas }, gasUsed } = (await ct.deploy(['test', 42])).txData;
       expect(gasUsed).to.be.equal(160);
@@ -378,7 +380,7 @@ describe('Contract instance', () => {
     let eventResult: Awaited<ReturnType<ContractInstance['call']>>;
 
     before(async () => {
-      remoteContract = await aeSdk.getContractInstance({ source: remoteContractSource });
+      remoteContract = await aeSdk.getContractInstance({ sourceCode: remoteContractSource });
       await remoteContract.deploy();
       eventResult = await testContract.methods.emitEvents(remoteContract.deployInfo.address, false);
     });
@@ -483,10 +485,10 @@ describe('Contract instance', () => {
 
     it('calls a contract that emits events with no defined events', async () => {
       const contract = await aeSdk.getContractInstance({
-        source:
+        sourceCode:
           'contract FooContract =\n'
           + '  entrypoint emitEvents(f: bool) = ()',
-        contractAddress: remoteContract.deployInfo.address,
+        address: remoteContract.deployInfo.address,
       });
       const result = await contract.methods.emitEvents(false, { omitUnknown: true });
       expect(result.decodedEvents).to.be.eql([]);
