@@ -20,7 +20,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">Node</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/f1af345d/src/Node.ts#L120">Node.ts:120</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/8e392d52/src/Node.ts#L110">Node.ts:110</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -59,6 +59,7 @@
 <a href="Node.html#getMicroBlockTransactionsByHash" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Micro<wbr/>Block<wbr/>Transactions<wbr/>By<wbr/>Hash</span></a>
 <a href="Node.html#getMicroBlockTransactionsCountByHash" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Micro<wbr/>Block<wbr/>Transactions<wbr/>Count<wbr/>By<wbr/>Hash</span></a>
 <a href="Node.html#getNameEntryByName" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Name<wbr/>Entry<wbr/>By<wbr/>Name</span></a>
+<a href="Node.html#getNetworkId" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Network<wbr/>Id</span></a>
 <a href="Node.html#getNodeInfo" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Node<wbr/>Info</span></a>
 <a href="Node.html#getOracleByPubkey" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Oracle<wbr/>By<wbr/>Pubkey</span></a>
 <a href="Node.html#getOracleQueriesByPubkey" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Oracle<wbr/>Queries<wbr/>By<wbr/>Pubkey</span></a>
@@ -94,7 +95,7 @@
 <h4 class="tsd-returns-title">Returns <a href="Node.html" class="tsd-signature-type" data-tsd-kind="Class">Node</a></h4><aside class="tsd-sources">
 <p>Overrides (NodeTransformed as unknown as NodeTransformedApi).constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/f1af345d/src/Node.ts#L126">Node.ts:126</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/8e392d52/src/Node.ts#L118">Node.ts:118</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a id="_host" class="tsd-anchor"></a>
@@ -465,6 +466,14 @@ what transactions are currently present in the transaction pool</p>
 <p>Inherited from (NodeTransformed as unknown as NodeTransformedApi).getNameEntryByName</p>
 <ul>
 <li>Defined in apis/node/node.ts:580</li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getNetworkId" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Network<wbr/>Id</span><a href="#getNetworkId" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="getNetworkId.getNetworkId-1">get<wbr/>Network<wbr/>Id<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><a href="#getNetworkId.getNetworkId-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/8e392d52/src/Node.ts#L143">Node.ts:143</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getNodeInfo" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Node<wbr/>Info</span><a href="#getNodeInfo" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -472,7 +481,7 @@ what transactions are currently present in the transaction pool</p>
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_internal_.html" class="tsd-signature-type" data-tsd-kind="Namespace">&lt;internal&gt;</a><span class="tsd-signature-symbol">.</span><a href="../interfaces/_internal_.NodeInfo.html" class="tsd-signature-type" data-tsd-kind="Interface">NodeInfo</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/f1af345d/src/Node.ts#L149">Node.ts:149</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/8e392d52/src/Node.ts#L148">Node.ts:148</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a id="getOracleByPubkey" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Oracle<wbr/>By<wbr/>Pubkey</span><a href="#getOracleByPubkey" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
@@ -715,6 +724,7 @@ default value of 1000000 is being used instead.</p>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="Node.html#getMicroBlockTransactionsByHash" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Micro<wbr/>Block<wbr/>Transactions<wbr/>By<wbr/>Hash</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="Node.html#getMicroBlockTransactionsCountByHash" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Micro<wbr/>Block<wbr/>Transactions<wbr/>Count<wbr/>By<wbr/>Hash</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="Node.html#getNameEntryByName" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Name<wbr/>Entry<wbr/>By<wbr/>Name</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="Node.html#getNetworkId" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Network<wbr/>Id</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="Node.html#getNodeInfo" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Node<wbr/>Info</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="Node.html#getOracleByPubkey" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Oracle<wbr/>By<wbr/>Pubkey</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="Node.html#getOracleQueriesByPubkey" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Oracle<wbr/>Queries<wbr/>By<wbr/>Pubkey</a></li>

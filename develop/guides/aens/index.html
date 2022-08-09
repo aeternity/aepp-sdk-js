@@ -1501,7 +1501,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="c1">// AENS name</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;example.chain&#39;</span><span class="w"></span>
 <span class="c1">// Sign with a specific account</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">onAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">onAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="w"></span>
 
 <span class="c1">// this signature will allow the contract to perform a pre-claim on your behalf</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">preClaimSig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">createAensDelegationSignature</span><span class="p">(</span><span class="nx">contractId</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="w"> </span><span class="p">})</span><span class="w"></span>

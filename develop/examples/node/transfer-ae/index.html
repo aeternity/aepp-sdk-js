@@ -1079,7 +1079,7 @@ and this page explains in detail how to:</p>
 </code></pre></div>
 Note:</p>
 <ul>
-<li>The keypair of the account is pre-funded and only used for demonstration purpose<ul>
+<li>The secret key of the account is pre-funded and only used for demonstration purpose<ul>
 <li>You should replace it with your own keypair
    (see <a href="../../../quick-start/#2-create-a-keypair">Create a Keypair</a>)</li>
 </ul>
@@ -1093,12 +1093,12 @@ Note:</p>
 </li>
 </ul>
 <h2 id="3-create-object-instances">3. Create object instances</h2>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="o">:</span><span class="w"> </span><span class="nx">ACCOUNT_KEYPAIR</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="nx">ACCOUNT_KEYPAIR</span><span class="p">.</span><span class="nx">secretKey</span><span class="p">);</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">NODE_URL</span><span class="p">);</span><span class="w"></span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"></span>
 <span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
+<span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">account</span><span class="p">],</span><span class="w"></span>
 <span class="p">});</span><span class="w"></span>
-<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">addAccount</span><span class="p">(</span><span class="nx">account</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
 </code></pre></div>
 <h2 id="4-get-ae-balance-of-recipient-before-transfer">4. Get AE balance of recipient (before transfer)</h2>
 <p>Before the transfer of AE you can check the AE balance of the recipient.
