@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.1.2](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.1...v12.1.2) (2022-08-09)
+
+
+### Bug Fixes
+
+* **deps:** depend on specific version of @azure/core-client to fix [#1657](https://github.com/aeternity/aepp-sdk-js/issues/1657) ([95d5910](https://github.com/aeternity/aepp-sdk-js/commit/95d59105ef423acd55a2fb168d0cc6cb244effe1))
+
 ### [12.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.0...v12.1.1) (2022-07-28)
 
 
