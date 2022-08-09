@@ -62,7 +62,6 @@ namespace Test =
 
 contract interface RemoteI =
   type test_type = int
-  record state = { value: string, key: test_type, testOption: option(string) }
   record test_record = { value: string, key: list(test_type) }
   entrypoint test : () => int
   datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int)

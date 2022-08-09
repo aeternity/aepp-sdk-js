@@ -21,7 +21,7 @@ use-extension:
   '@autorest/modelerfour': ^4.23.1
 # replace with a link to https://github.com/aeternity/aesophia_http/blob/master/config/swagger.yaml
 # at specific version after fixing https://github.com/aeternity/aesophia_http/issues/87
-input-file: https://compiler.aeternity.io/api
+input-file: compiler-swagger.yaml
 output-folder: ../../src/apis/compiler
 source-code-folder-path: .
 client-side-validation: true

@@ -117,7 +117,7 @@ describe('Transaction', () => {
     }),
   ], [
     'contract create',
-    'tx_+LAqAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNi4xLjAAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfPxOlnVo=',
+    'tx_+LAqAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNy4wLjEAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfP6vKAEo=',
     async () => aeSdk.buildTx(Tag.ContractCreateTx, {
       nonce,
       ownerId: address,

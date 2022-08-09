@@ -58,9 +58,9 @@ export default class Compiler extends CompilerApi {
       ],
     });
     if (ignoreVersion !== true) {
-      const versionPromise = this.aPIVersion().then(({ apiVersion }) => apiVersion);
+      const versionPromise = this.apiVersion().then(({ apiVersion }) => apiVersion);
       this.pipeline.addPolicy(
-        genVersionCheckPolicy('compiler', '/api-version', versionPromise, '6.1.0', '7.0.0'),
+        genVersionCheckPolicy('compiler', '/api-version', versionPromise, '7.0.1', '8.0.0'),
       );
     }
   }

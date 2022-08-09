@@ -16,7 +16,7 @@
   "sideEffects": false,
   "scripts": {
     "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
-    "build:api": "npx autorest tooling/autorest/compiler.yaml --output-artifact:code-model-v4 && npx autorest tooling/autorest/node.yaml --output-artifact:code-model-v4",
+    "build:api": "node tooling/autorest/compiler-prepare.mjs && npx autorest tooling/autorest/compiler.yaml --output-artifact:code-model-v4 && npx autorest tooling/autorest/node.yaml --output-artifact:code-model-v4",
     "build": "npm run build:api && webpack && npm run build:es",
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.mjs",
     "docs:api": "typedoc",

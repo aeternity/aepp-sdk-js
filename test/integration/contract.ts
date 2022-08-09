@@ -283,11 +283,11 @@ describe('Contract', () => {
         options: {},
       })).to.be.rejectedWith(
         'compile error:\n'
-        + 'type_error:3:3: Duplicate definitions of getArg at\n'
+        + 'type_error:3:3: Duplicate definitions of `getArg` at\n'
         + '  - line 2, column 3\n'
         + '  - line 3, column 3\n'
-        + 'type_error:3:32: Unbound variable baz at line 3, column 32\n'
-        + 'type_error:4:33: Unbound variable baz at line 4, column 33',
+        + 'type_error:3:32: Unbound variable `baz`\n'
+        + 'type_error:4:33: Unbound variable `baz`',
       );
     });
 
