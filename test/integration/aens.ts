@@ -54,8 +54,7 @@ describe('Aens', () => {
     .aensQuery(randomName(13)).should.eventually.be.rejected);
 
   it('Spend using name with invalid pointers', async () => {
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     const { pointers } = await aeSdk.getName(name);
     pointers.length.should.be.equal(0);
     await expect(aeSdk.spend(100, name, { onAccount }))
@@ -93,8 +92,7 @@ describe('Aens', () => {
   it('throws error on updating names not owned by the account', async () => {
     const preclaim = await aeSdk.aensPreclaim(randomName(13));
     await preclaim.claim();
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     if (onAccount == null) throw new UnexpectedTsError();
     await aeSdk.aensUpdate(name, {}, { onAccount, blocks: 1 }).should.eventually.be.rejected;
   });
@@ -131,15 +129,13 @@ describe('Aens', () => {
   });
 
   it('Spend by name', async () => {
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     await aeSdk.spend(100, name, { onAccount });
   });
 
   it('transfers names', async () => {
     const claim = await aeSdk.aensQuery(name);
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     if (onAccount == null) throw new UnexpectedTsError();
     await claim.transfer(onAccount);
 
@@ -150,8 +146,7 @@ describe('Aens', () => {
   });
 
   it('revoke names', async () => {
-    const current = await aeSdk.address();
-    const onAccountIndex = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccountIndex = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     if (onAccountIndex == null) throw new UnexpectedTsError();
     const onAccount = aeSdk.accounts[onAccountIndex];
     const aensName = await aeSdk.aensQuery(name);
@@ -163,8 +158,7 @@ describe('Aens', () => {
   });
 
   it('PreClaim name using specific account', async () => {
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
 
     const preclaim = await aeSdk.aensPreclaim(name, { onAccount });
     preclaim.should.be.an('object');
@@ -174,8 +168,7 @@ describe('Aens', () => {
 
   describe('name auctions', () => {
     it('claims names', async () => {
-      const current = await aeSdk.address();
-      const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+      const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
       const nameShort = randomName(12);
 
       const preclaim = await aeSdk.aensPreclaim(nameShort);

@@ -29,7 +29,7 @@
 
 <script>
 import {
-  MemoryAccount, AeSdkWallet, Node, generateKeyPair,
+  MemoryAccount, AeSdkWallet, Node,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE,
   RpcConnectionDenyError, RpcRejectedByUserError
 } from '@aeternity/aepp-sdk'
@@ -71,7 +71,7 @@ export default {
       this.aeSdk.selectNode(this.nodeName)
     }
   },
-  async mounted () {
+  mounted () {
     const aeppInfo = {}
     const genConfirmCallback = (getActionName) => (aeppId, params) => {
       if (!confirm(`Client ${aeppInfo[aeppId].name} with id ${aeppId} want to ${getActionName(params)}`)) {
@@ -84,6 +84,10 @@ export default {
       nodes: [
         { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
         { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
+      ],
+      accounts: [
+        new MemoryAccount('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
+        MemoryAccount.generate(),
       ],
       compilerUrl: 'https://compiler.aepps.com',
       name: 'Wallet Iframe',
@@ -101,13 +105,6 @@ export default {
         this.shareWalletInfo(clientId)
       }
     })
-    await this.aeSdk.addAccount(new MemoryAccount({
-      keypair: {
-        publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
-        secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b',
-      }
-    }), { select: true })
-    await this.aeSdk.addAccount(new MemoryAccount({ keypair: generateKeyPair() }))
 
     this.nodeName = this.aeSdk.selectedNodeName
     this.address = this.aeSdk.addresses()[0]

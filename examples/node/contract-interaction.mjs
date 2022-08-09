@@ -45,28 +45,25 @@ contract Multiplier =
     f * 10
   entrypoint multiplyBy(x : int) = x * state.factor
 `;
-const ACCOUNT_KEYPAIR = {
-  publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
-  secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b',
-};
+const ACCOUNT_SECRET_KEY = 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b';
 const NODE_URL = 'https://testnet.aeternity.io';
 const COMPILER_URL = 'https://compiler.aepps.com';
 
 // Note:
 //
-//  - The keypair of the account is pre-funded and only used for demonstration purpose
+//  - The secret key of the account is pre-funded and only used for demonstration purpose
 //      - You should replace it with your own keypair (see
 //        [Create a Keypair](../../quick-start.md#2-create-a-keypair))
 //  - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 
 // ## 3. Create object instances
-const account = new MemoryAccount({ keypair: ACCOUNT_KEYPAIR });
+const account = new MemoryAccount(ACCOUNT_SECRET_KEY);
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
+  accounts: [account],
   compilerUrl: COMPILER_URL,
 });
-await aeSdk.addAccount(account, { select: true });
 
 // ## 4. Get contract instance
 // Knowing the source code allows you to initialize a contract instance and interact with the

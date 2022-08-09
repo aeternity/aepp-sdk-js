@@ -46,10 +46,7 @@ async function delegateSignatureCommon(
   { onAccount: AccountBase; onNode: Node } & Parameters<AccountBase['sign']>[1],
 ): Promise<string> {
   const signature = await onAccount.sign(
-    concatBuffers([
-      Buffer.from((await onNode.getStatus()).networkId),
-      ...ids.map((e) => decode(e)),
-    ]),
+    concatBuffers([Buffer.from(await onNode.getNetworkId()), ...ids.map((e) => decode(e))]),
     opt,
   );
   return Buffer.from(signature).toString('hex');
@@ -68,7 +65,7 @@ async function delegateSignatureCommon(
  * const aeSdk = new AeSdk({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const name = 'example.chain' // AENS name
- * const onAccount = await aeSdk.address() // Sign with a specific account
+ * const onAccount = aeSdk.address // Sign with a specific account
  * // Preclaim signature
  * const preclaimSig = await aeSdk.createAensDelegationSignature(contractId, { onAccount: current })
  * // Claim, transfer and revoke signature
@@ -79,12 +76,12 @@ async function delegateSignatureCommon(
  */
 export async function createAensDelegationSignature(
   contractId: Encoded.ContractAddress,
-  opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
+  opt: Parameters<typeof delegateSignatureCommon>[1] &
   { name?: AensName },
 ): Promise<string> {
   return delegateSignatureCommon(
     [
-      await opt.onAccount.address(opt),
+      opt.onAccount.address,
       ...opt.name != null ? [produceNameId(opt.name)] : [],
       contractId,
     ],
@@ -104,7 +101,7 @@ export async function createAensDelegationSignature(
  * const aeSdk = new AeSdk({ ... })
  * const contractId = 'ct_asd2ks...' // contract address
  * const queryId = 'oq_...' // Oracle Query Id
- * const onAccount = await aeSdk.address() // Sign with a specific account
+ * const onAccount = aeSdk.address // Sign with a specific account
  * // Oracle register and extend signature
  * const oracleDelegationSig = await aeSdk.createOracleDelegationSignature(contractId)
  * // Oracle respond signature
@@ -113,11 +110,8 @@ export async function createAensDelegationSignature(
  */
 export async function createOracleDelegationSignature(
   contractId: Encoded.ContractAddress,
-  opt: Parameters<AccountBase['address']>[0] & Parameters<typeof delegateSignatureCommon>[1] &
+  opt: Parameters<typeof delegateSignatureCommon>[1] &
   { queryId?: Encoded.OracleQueryId },
 ): Promise<string> {
-  return delegateSignatureCommon(
-    [opt.queryId ?? await opt.onAccount.address(opt), contractId],
-    opt,
-  );
+  return delegateSignatureCommon([opt.queryId ?? opt.onAccount.address, contractId], opt);
 }

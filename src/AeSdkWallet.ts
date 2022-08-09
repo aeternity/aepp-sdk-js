@@ -1,6 +1,6 @@
 import { v4 as uuid } from '@aeternity/uuid';
 import AeSdk from './AeSdk';
-import { Account } from './AeSdkBase';
+import { OnAccount } from './AeSdkBase';
 import verifyTransaction from './tx/validator';
 import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
 import {
@@ -33,8 +33,10 @@ type OnSubscription = (
 ) => void;
 
 type OnSign = (
-  clientId: string, params: Parameters<WalletApi[METHODS.sign]>[0], origin: string
-) => Promise<{ tx?: Encoded.Transaction; onAccount?: Account } | undefined> | Promise<void>;
+  clientId: string,
+  params: Omit<Parameters<WalletApi[METHODS.sign]>[0], 'networkId'>,
+  origin: string,
+) => Promise<{ tx?: Encoded.Transaction; onAccount?: OnAccount } | undefined> | Promise<void>;
 
 type OnDisconnect = (
   clientId: string, params: Parameters<WalletApi[METHODS.closeConnection]>[0]
@@ -46,7 +48,7 @@ type OnAskAccounts = (
 
 type OnMessageSign = (
   clientId: string, params: Parameters<WalletApi[METHODS.signMessage]>[0], origin: string
-) => Promise<{ onAccount?: Account } | undefined> | Promise<void>;
+) => Promise<{ onAccount?: OnAccount } | undefined> | Promise<void>;
 
 interface RpcClientsInfo {
   id: string;
@@ -67,7 +69,7 @@ export default class AeSdkWallet extends AeSdk {
 
   name: string;
 
-  _clients: Map<string, RpcClientsInfo>;
+  _clients = new Map<string, RpcClientsInfo>();
 
   onConnection: OnConnection;
 
@@ -122,13 +124,13 @@ export default class AeSdkWallet extends AeSdk {
     this.onDisconnect = onDisconnect;
     this.onAskAccounts = onAskAccounts;
     this.onMessageSign = onMessageSign;
-    this._clients = new Map();
     this.name = name;
     this.id = id;
     this._type = type;
   }
 
   _pushAccountsToApps(): void {
+    if (this._clients == null) return;
     Array.from(this._clients.keys())
       .filter((clientId) => this._isRpcClientSubscribed(clientId))
       .map((clientId) => this._getClient(clientId).rpc)
@@ -140,11 +142,8 @@ export default class AeSdkWallet extends AeSdk {
     this._pushAccountsToApps();
   }
 
-  override async addAccount(
-    account: AccountBase,
-    options?: Parameters<AeSdk['addAccount']>[1],
-  ): Promise<void> {
-    await super.addAccount(account, options);
+  override addAccount(account: AccountBase, options?: Parameters<AeSdk['addAccount']>[1]): void {
+    super.addAccount(account, options);
     this._pushAccountsToApps();
   }
 
@@ -155,7 +154,7 @@ export default class AeSdkWallet extends AeSdk {
 
   override async selectNode(name: string): Promise<void> {
     super.selectNode(name);
-    const networkId = await this.getNetworkId();
+    const networkId = await this.api.getNetworkId();
     Array.from(this._clients.keys())
       .filter((clientId) => this._isRpcClientConnected(clientId))
       .map((clientId) => this._getClient(clientId))
@@ -266,9 +265,9 @@ export default class AeSdkWallet extends AeSdk {
             await this.onAskAccounts(id, params, origin);
             return this.addresses();
           },
-          [METHODS.sign]: async ({ tx, onAccount, returnSigned }, origin) => {
+          [METHODS.sign]: async ({ tx, onAccount: address, returnSigned }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
-            onAccount ??= await this.address();
+            let onAccount: OnAccount = address ?? this.address;
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }
@@ -289,9 +288,9 @@ export default class AeSdkWallet extends AeSdk {
               throw new RpcBroadcastError(error.message);
             }
           },
-          [METHODS.signMessage]: async ({ message, onAccount }, origin) => {
+          [METHODS.signMessage]: async ({ message, onAccount: address }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
-            onAccount ??= await this.address();
+            let onAccount: OnAccount = address ?? this.address;
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }
@@ -326,7 +325,7 @@ export default class AeSdkWallet extends AeSdk {
     return {
       id: this.id,
       name: this.name,
-      networkId: await this.getNetworkId(),
+      networkId: await this.api.getNetworkId(),
       origin: window.location.origin,
       type: this._type,
     };

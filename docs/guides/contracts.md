@@ -27,18 +27,13 @@ When creating an instance of the SDK you need to provide an account which will b
 
 ```js
 const node = new Node('https://testnet.aeternity.io') // ideally host your own node
-const account = new MemoryAccount({
-  // provide a valid keypair with your secretKey and publicKey
-  keypair: { secretKey: SECRET_KEY, publicKey: PUBLIC_KEY }
-})
+const account = new MemoryAccount(SECRET_KEY)
 
 const aeSdk = new AeSdk({
-  nodes: [
-    { name: 'testnet', instance: node }
-  ],
+  nodes: [{ name: 'testnet', instance: node }],
+  accounts: [account],
   compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler
 })
-await aeSdk.addAccount(accoount, { select: true })
 ```
 
 Note:

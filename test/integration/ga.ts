@@ -19,7 +19,7 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, generateKeyPair, genSalt, MemoryAccount, Tag, unpackTx,
+  AeSdk, generateKeyPair, genSalt, MemoryAccount, AccountGeneralized, Tag, unpackTx,
 } from '../../src';
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/aci';
@@ -45,14 +45,13 @@ describe('Generalized Account', () => {
 
   before(async () => {
     aeSdk = await getSdk();
-    gaAccountAddress = await aeSdk.address();
+    gaAccountAddress = aeSdk.address;
   });
 
   it('Make account GA', async () => {
     accountBeforeGa = Object.values(aeSdk.accounts)[0] as MemoryAccount;
     const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', authContractSource, []);
-    const isGa = await aeSdk.isGA(gaAccountAddress);
-    isGa.should.be.equal(true);
+    expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.be.equal('generalized');
     authContract = await aeSdk.getContractInstance({
       source: authContractSource, contractAddress: gaContractId,
     });
@@ -63,11 +62,11 @@ describe('Generalized Account', () => {
       .should.be.rejectedWith(`Account ${gaAccountAddress} is already GA`);
   });
 
-  const { publicKey, secretKey } = generateKeyPair();
+  const { publicKey } = generateKeyPair();
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
     aeSdk.removeAccount(gaAccountAddress);
-    await aeSdk.addAccount(new MemoryAccount({ gaId: gaAccountAddress }), { select: true });
+    aeSdk.addAccount(new AccountGeneralized(gaAccountAddress), { select: true });
 
     const callData = authContract.calldata.encode('BlindAuth', 'authorize', [genSalt()]);
     await aeSdk.spend(10000, publicKey, { authData: { callData } });
@@ -75,6 +74,12 @@ describe('Generalized Account', () => {
       .spend(10000, publicKey, { authData: { source: authContractSource, args: [genSalt()] } });
     const balanceAfter = await aeSdk.getBalance(publicKey);
     balanceAfter.should.be.equal('20000');
+  });
+
+  it('throws error if gasLimit exceeds the maximum value', async () => {
+    const authData = { source: authContractSource, args: [genSalt()], gasLimit: 50001 };
+    await expect(aeSdk.spend(10000, publicKey, { authData }))
+      .to.be.rejectedWith('Gas limit 50001 must be less or equal to 50000');
   });
 
   it('buildAuthTxHash generates a proper hash', async () => {
@@ -94,20 +99,11 @@ describe('Generalized Account', () => {
   });
 
   it('fails trying to send GaMeta using basic account', async () => {
-    const account = new MemoryAccount({ keypair: { publicKey, secretKey } });
-    account.isGa = true;
-    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      amount: 1,
-      senderId: await account.address(),
-      recipientId: gaAccountAddress,
-    });
-    const signedTx = await account.signTransaction(spendTx, {
-      authFun: 'authorize',
-      authData: { source: authContractSource, args: [genSalt()] },
-      onNode: aeSdk.api,
-      onCompiler: aeSdk.compilerApi,
-    });
-    await expect(aeSdk.sendTransaction(signedTx)).to.be
-      .rejectedWith('Basic account can\'t be used to generate GaMetaTx');
+    const options = {
+      onAccount: new AccountGeneralized(publicKey),
+      authData: { callData: 'cb_KxFs8lcLG2+HEPb2FOjjZ2DqRd4=' },
+    } as const;
+    await expect(aeSdk.spend(1, gaAccountAddress, options))
+      .to.be.rejectedWith('Basic account can\'t be used to generate GaMetaTx');
   });
 });

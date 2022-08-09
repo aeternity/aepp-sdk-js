@@ -1,7 +1,9 @@
 import AccountBase from './Base';
 import { METHODS } from '../aepp-wallet-communication/schema';
-import { NotImplementedError } from '../utils/errors';
+import { ArgumentError, NotImplementedError, UnsupportedProtocolError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
+import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
+import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
 
 /**
  * Account provided by wallet
@@ -11,26 +13,19 @@ import { Encoded } from '../utils/encoder';
  * @returns AccountRpc instance
  */
 export default class AccountRpc extends AccountBase {
-  _rpcClient: any;
+  _rpcClient: RpcClient<WalletApi, AeppApi>;
 
-  _address: Encoded.AccountAddress;
+  override readonly address: Encoded.AccountAddress;
 
-  constructor(
-    { rpcClient, address, ...options }: { rpcClient: any; address: Encoded.AccountAddress }
-    & ConstructorParameters<typeof AccountBase>[0],
-  ) {
-    super(options);
+  constructor(rpcClient: RpcClient<WalletApi, AeppApi>, address: Encoded.AccountAddress) {
+    super();
     this._rpcClient = rpcClient;
-    this._address = address;
+    this.address = address;
   }
 
   // eslint-disable-next-line class-methods-use-this
   async sign(): Promise<Uint8Array> {
     throw new NotImplementedError('RAW signing using wallet');
-  }
-
-  async address(): Promise<Encoded.AccountAddress> {
-    return this._address;
   }
 
   /**
@@ -41,17 +36,16 @@ export default class AccountRpc extends AccountBase {
     { innerTx, networkId }: Parameters<AccountBase['signTransaction']>[1] = {},
   ): Promise<Encoded.Transaction> {
     if (innerTx != null) throw new NotImplementedError('innerTx option in AccountRpc');
+    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
     const res = await this._rpcClient.request(METHODS.sign, {
-      onAccount: this._address,
+      onAccount: this.address,
       tx,
       returnSigned: true,
-      /**
-       * @deprecated Wallet provided networkId will be used (current network)
-       * required to maintain backward compatibility with wallets using SDK v11.0.1 and below
-       * @see {@link https://github.com/aeternity/aepp-sdk-js/commit/153fd89a52c4eab39fcd659b356b36d32129c1ba}
-       */
       networkId,
     });
+    if (res.signedTransaction == null) {
+      throw new UnsupportedProtocolError('signedTransaction is missed in wallet response');
+    }
     return res.signedTransaction;
   }
 
@@ -60,7 +54,7 @@ export default class AccountRpc extends AccountBase {
    */
   override async signMessage(message: string): Promise<Uint8Array> {
     const { signature } = await this._rpcClient
-      .request(METHODS.signMessage, { onAccount: this._address, message });
+      .request(METHODS.signMessage, { onAccount: this.address, message });
     return Buffer.from(signature, 'hex');
   }
 }

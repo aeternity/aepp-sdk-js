@@ -15,9 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import BigNumber from 'bignumber.js';
-import {
-  sendTransaction, getAccount, getBalance, resolveName,
-} from './chain';
+import { sendTransaction, getBalance, resolveName } from './chain';
 import { _buildTx, BuildTxOptions } from './tx';
 import { buildTxHash, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
@@ -38,15 +36,9 @@ export async function send(
   tx: Encoded.Transaction,
   options: SendOptions,
 ): Promise<SendReturnType> {
-  // TODO: detect authFun in AccountGa
-  const authFun = options.innerTx === true
-    ? undefined
-    : (await getAccount(await options.onAccount.address(options), options)).authFun;
-
   const signed = await options.onAccount.signTransaction(tx, {
     ...options,
-    authFun,
-    networkId: (await options.onNode.getStatus()).networkId,
+    networkId: await options.onNode.getNetworkId(),
   });
 
   return options.innerTx === true
@@ -75,7 +67,7 @@ export async function spend(
   return send(
     await _buildTx(Tag.SpendTx, {
       ...options,
-      senderId: await options.onAccount.address(options),
+      senderId: options.onAccount.address,
       recipientId: await resolveName<Encoding.AccountAddress>(
         recipientIdOrName,
         'account_pubkey',
@@ -113,7 +105,7 @@ export async function transferFunds(
     'account_pubkey',
     options,
   );
-  const senderId = await options.onAccount.address(options);
+  const senderId = options.onAccount.address;
   const balance = new BigNumber(
     await getBalance.bind(options.onAccount)(senderId, options),
   );
@@ -152,7 +144,7 @@ export async function payForTransaction(
   return send(
     await _buildTx(
       Tag.PayingForTx,
-      { ...options, payerId: await options.onAccount.address(options), tx: transaction },
+      { ...options, payerId: options.onAccount.address, tx: transaction },
     ),
     options,
   );

@@ -15,6 +15,7 @@ import { concatBuffers, isAccountNotFoundError, isKeyOfObject } from '../utils/o
 import { encode, Encoded, Encoding } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
+import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
 
 export interface ValidatorResult {
   message: string;
@@ -68,16 +69,25 @@ const getSenderAddress = (
  * to make sure it can be posted it to the chain
  * @category transaction builder
  * @param transaction - Base64Check-encoded transaction
- * @param node - Node to validate transaction against
+ * @param nodeNotCached - Node to validate transaction against
  * @param parentTxTypes - Types of parent transactions
  * @returns Array with verification errors
  * @example const errors = await verifyTransaction(transaction, node)
  */
 export default async function verifyTransaction(
   transaction: Encoded.Transaction | Encoded.Poi,
-  node: Node,
+  nodeNotCached: Node,
   parentTxTypes: Tag[] = [],
 ): Promise<ValidatorResult[]> {
+  let node = nodeNotCached;
+  if (
+    !node.pipeline.getOrderedPolicies()
+      .some(({ name }) => name === 'aggressive-cache-get-responses')
+  ) {
+    node = new Node(nodeNotCached.$host, { ignoreVersion: true });
+    node.pipeline.addPolicy(genAggressiveCacheGetResponsesPolicy());
+  }
+
   const { tx, txType } = unpackTx<Tag.SignedTx>(transaction);
   const address = getSenderAddress(tx)
     ?? (txType === Tag.SignedTx ? getSenderAddress(tx.encodedTx.tx) : undefined);

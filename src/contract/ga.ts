@@ -19,17 +19,12 @@
  * Generalized Account module - routines to use generalized account
  */
 
-import { MAX_AUTH_FUN_GAS, TxSchema } from '../tx/builder/schema';
 import { Tag } from '../tx/builder/constants';
-import {
-  buildContractIdByContractTx, buildTx, BuiltTx, TxUnpacked, unpackTx,
-} from '../tx/builder';
-import {
-  _buildTx, BuildTxOptions, getVmVersion, prepareTxParams,
-} from '../tx';
+import { buildContractIdByContractTx } from '../tx/builder';
+import { _buildTx, BuildTxOptions } from '../tx';
 import { hash } from '../utils/crypto';
-import { decode, Encoded, Encoding } from '../utils/encoder';
-import { IllegalArgumentError, MissingParamError, InvalidAuthDataError } from '../utils/errors';
+import { decode, Encoded } from '../utils/encoder';
+import { IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
 import { getContractInstance } from './methods';
@@ -37,21 +32,6 @@ import { send, SendOptions } from '../spend';
 import Node from '../Node';
 import { getAccount } from '../chain';
 import Compiler from './Compiler';
-
-/**
- * Check if account is GA
- * @category contract
- * @param address - Account address
- * @param options - Options
- * @returns if account is GA
- */
-export async function isGA(
-  address: Encoded.AccountAddress,
-  options: Parameters<typeof getAccount>[1],
-): Promise<boolean> {
-  const { contractId } = await getAccount(address, options);
-  return contractId != null;
-}
 
 /**
  * Convert current account to GA
@@ -75,8 +55,10 @@ export async function createGeneralizedAccount(
     rawTx: Encoded.Transaction;
     gaContractId: Encoded.ContractAddress;
   }>> {
-  const ownerId = await onAccount.address(options);
-  if (await isGA(ownerId, { onNode })) throw new IllegalArgumentError(`Account ${ownerId} is already GA`);
+  const ownerId = onAccount.address;
+  if ((await getAccount(ownerId, { onNode })).kind === 'generalized') {
+    throw new IllegalArgumentError(`Account ${ownerId} is already GA`);
+  }
 
   const contract = await getContractInstance({
     onAccount, onCompiler, onNode, source,
@@ -114,74 +96,6 @@ interface CreateGeneralizedAccountOptions extends
 }
 
 /**
- * Create a metaTx transaction
- * @category contract
- * @param rawTransaction - Inner transaction
- * @param authData - Object with gaMeta params
- * @param authFnName - Authorization function name
- * @param options - Options
- * @param options.onAccount - Account to use
- * @returns Transaction string
- */
-export async function createMetaTx(
-  rawTransaction: Encoded.Transaction,
-  authData: {
-    gasLimit?: number;
-    callData?: Encoded.ContractBytearray;
-    source?: string;
-    args?: any[];
-  },
-  authFnName: string,
-  {
-    onAccount, onCompiler, onNode, ...options
-  }:
-  { onAccount: AccountBase; onCompiler: Compiler; onNode: Node }
-  & Parameters<AccountBase['address']>[0],
-): Promise<Encoded.Transaction> {
-  const wrapInEmptySignedTx = (
-    tx: Encoded.Transaction | Uint8Array | TxUnpacked<TxSchema>,
-  ): BuiltTx<TxSchema, Encoding.Transaction> => (
-    buildTx({ encodedTx: tx, signatures: [] }, Tag.SignedTx)
-  );
-
-  if (Object.keys(authData).length <= 0) throw new MissingParamError('authData is required');
-
-  const gasLimit = authData.gasLimit ?? MAX_AUTH_FUN_GAS;
-  if (gasLimit > MAX_AUTH_FUN_GAS) {
-    throw new InvalidAuthDataError(`the maximum gasLimit value for ga authFun is ${MAX_AUTH_FUN_GAS}, got ${gasLimit}`);
-  }
-
-  const authCallData = authData.callData ?? await (async () => {
-    if (authData.source == null || authData.args == null) throw new InvalidAuthDataError('Auth data must contain source code and arguments.');
-    const contract = await getContractInstance({
-      onCompiler, onNode, source: authData.source,
-    });
-    return contract.calldata.encode(contract._name, authFnName, authData.args);
-  })();
-
-  const { abiVersion } = await getVmVersion(Tag.ContractCallTx, { onNode });
-  const wrappedTx = wrapInEmptySignedTx(unpackTx<Tag.SignedTx>(rawTransaction));
-  const params = {
-    ...options,
-    tx: {
-      ...wrappedTx,
-      tx: wrappedTx.txObject,
-    },
-    // TODO: accept an address instead
-    gaId: await onAccount.address(options),
-    abiVersion,
-    authData: authCallData,
-    gasLimit,
-    vsn: 2,
-    nonce: 0,
-  };
-  // @ts-expect-error createMetaTx needs to be integrated into tx builder
-  const { fee } = await prepareTxParams(Tag.GaMetaTx, { ...params, onNode });
-  const { rlpEncoded: metaTxRlp } = buildTx({ ...params, fee }, Tag.GaMetaTx);
-  return wrapInEmptySignedTx(metaTxRlp).tx;
-}
-
-/**
  * Build a transaction hash the same as `Auth.tx_hash`
  * @category contract
  * @param transaction - tx-encoded transaction
@@ -193,8 +107,7 @@ export async function buildAuthTxHash(
   transaction: Encoded.Transaction,
   { onNode }: { onNode: Node },
 ): Promise<Uint8Array> {
-  const { networkId } = await onNode.getStatus();
   return new Uint8Array(hash(
-    concatBuffers([Buffer.from(networkId), decode(transaction)]),
+    concatBuffers([Buffer.from(await onNode.getNetworkId()), decode(transaction)]),
   ));
 }

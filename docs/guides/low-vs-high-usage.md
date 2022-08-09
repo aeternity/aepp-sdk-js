@@ -24,12 +24,9 @@ async function init () {
   const node = new Node('https://testnet.aeternity.io') // ideally host your own node!
 
   const aeSdk = new AeSdk({
-    nodes: [{ name: 'testnet', instance: node }]
+    nodes: [{ name: 'testnet', instance: node }],
+    accounts: [new MemoryAccount('<SECRET_KEY_HERE>')],
   })
-  await aeSdk.addAccount(
-    new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}}),
-    { select: true }
-  )
 
   // log transaction info
   console.log(await aeSdk.spend(100, 'ak_...'))
@@ -44,16 +41,13 @@ import { MemoryAccount, Node, AeSdk, Tag } from '@aeternity/aepp-sdk'
 async function spend (amount, recipient) {
   const node = new Node('https://testnet.aeternity.io') // ideally host your own node!
   const aeSdk = new AeSdk({
-    nodes: [{ name: 'testnet', instance: node }]
+    nodes: [{ name: 'testnet', instance: node }],
+    accounts: [new MemoryAccount('<SECRET_KEY_HERE>')],
   })
-  await aeSdk.addAccount(
-    new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}}),
-    { select: true }
-  )
 
   // builds an unsigned SpendTx using integrated transaction builder
   const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-    senderId: await aeSdk.address(),
+    senderId: aeSdk.address,
     recipientId: recipient,
     amount, // aettos
     payload: 'using low-level api is funny'

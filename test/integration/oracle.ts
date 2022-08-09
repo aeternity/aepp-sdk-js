@@ -20,10 +20,9 @@ import { expect } from 'chai';
 import { getSdk } from '.';
 import {
   AeSdk, UnexpectedTsError,
-  generateKeyPair, decode, postQueryToOracle, registerOracle,
-  ORACLE_TTL_TYPES, QUERY_FEE,
+  decode, encode, postQueryToOracle, registerOracle,
+  ORACLE_TTL_TYPES, QUERY_FEE, Encoding,
 } from '../../src';
-import MemoryAccount from '../../src/account/Memory';
 import { Encoded } from '../../src/utils/encoder';
 
 describe('Oracle', () => {
@@ -33,11 +32,11 @@ describe('Oracle', () => {
   const queryResponse = "{'tmp': 30}";
 
   before(async () => {
-    aeSdk = await getSdk(1);
+    aeSdk = await getSdk(2);
   });
 
   it('Register Oracle with 5000 TTL', async () => {
-    const expectedOracleId = `ok_${(await aeSdk.address()).slice(3)}`;
+    const expectedOracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     oracle = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 5000 });
     oracle.id.should.be.equal(expectedOracleId);
   });
@@ -88,10 +87,8 @@ describe('Oracle', () => {
     const queryFee = 24000n;
 
     before(async () => {
-      const account = generateKeyPair();
-      await aeSdk.spend(1e15, account.publicKey);
-      await aeSdk.addAccount(new MemoryAccount({ keypair: account }), { select: true });
-      oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString(), onAccount: account });
+      await aeSdk.selectAccount(aeSdk.addresses()[1]);
+      oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString() });
     });
 
     it('Post Oracle Query with default query fee', async () => {

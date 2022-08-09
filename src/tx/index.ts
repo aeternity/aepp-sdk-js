@@ -48,13 +48,13 @@ export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
  * @param ctVersion - Object with vm and abi version fields
  * @returns Object with vm/abi version
  */
-export async function getVmVersion(
+async function getVmVersion(
   txType: Tag.ContractCreateTx, ctVersion: Partial<CtVersion> & { onNode: Node }
 ): Promise<CtVersion>;
-export async function getVmVersion(
+async function getVmVersion(
   txType: Tag, ctVersion: Partial<Pick<CtVersion, 'abiVersion'>> & { onNode: Node }
 ): Promise<Pick<CtVersion, 'abiVersion'>>;
-export async function getVmVersion(
+async function getVmVersion(
   txType: Tag,
   { vmVersion, abiVersion, onNode }: Partial<CtVersion> & { onNode: Node },
 ): Promise<Partial<CtVersion>> {
@@ -79,7 +79,7 @@ export async function getVmVersion(
  * @param params - Object which contains all tx data
  * @returns Object with account nonce, absolute ttl and transaction fee
  */
-export async function prepareTxParams(
+async function prepareTxParams(
   txType: Tag,
   {
     senderId,
@@ -88,7 +88,12 @@ export async function prepareTxParams(
     absoluteTtl,
     strategy,
     onNode,
-  }: PrepareTxParamsOptions,
+  }: {
+    senderId: Encoded.AccountAddress;
+    absoluteTtl?: boolean;
+    strategy?: 'continuity' | 'max';
+    onNode: Node;
+  } & Pick<TxParamsCommon, 'nonce' | 'ttl'>,
 ): Promise<{ ttl: number; nonce: number }> {
   nonce ??= (
     await onNode.getAccountNextNonce(senderId, { strategy }).catch((error) => {
@@ -103,13 +108,6 @@ export async function prepareTxParams(
   }
 
   return { ttl, nonce };
-}
-
-interface PrepareTxParamsOptions extends Pick<TxParamsCommon, 'nonce' | 'ttl'> {
-  senderId: Encoded.AccountAddress;
-  absoluteTtl?: boolean;
-  strategy?: 'continuity' | 'max';
-  onNode: Node;
 }
 
 // TODO: find a better name or rearrange methods
@@ -154,6 +152,9 @@ export async function _buildTx<TxType extends Tag>(
     case Tag.GaAttachTx:
       senderKey = 'ownerId';
       break;
+    case Tag.GaMetaTx:
+      senderKey = 'gaId';
+      break;
     case Tag.ContractCallTx:
     case Tag.OracleExtendTx:
     case Tag.OracleResponseTx:
@@ -178,7 +179,7 @@ export async function _buildTx<TxType extends Tag>(
       { ...params, ...params.ctVersion },
     );
   }
-  if (txType === Tag.ContractCallTx) {
+  if ([Tag.ContractCallTx, Tag.GaMetaTx].includes(txType)) {
     params.abiVersion = (await getVmVersion(Tag.ContractCallTx, params)).abiVersion;
   }
   if (txType === Tag.OracleRegisterTx) {

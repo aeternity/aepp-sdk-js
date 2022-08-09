@@ -20,7 +20,7 @@ import { spy } from 'sinon';
 import http from 'http';
 import { getSdk } from '.';
 import {
-  generateKeyPair, AeSdk, Tag, UnexpectedTsError,
+  generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
@@ -87,10 +87,9 @@ describe('Node Chain', () => {
   });
 
   it('polls for transactions', async () => {
-    const senderId = await aeSdk.address();
     const tx = await aeSdk.buildTx(Tag.SpendTx, {
       amount: 1,
-      senderId,
+      senderId: aeSdk.address,
       recipientId: publicKey,
       payload: '',
       ttl: Number.MAX_SAFE_INTEGER,
@@ -103,47 +102,60 @@ describe('Node Chain', () => {
   });
 
   it('Wait for transaction confirmation', async () => {
-    const txData = await aeSdk.spend(1000, await aeSdk.address(), { confirm: true });
+    const txData = await aeSdk.spend(1000, aeSdk.address, { confirm: true });
     if (txData.blockHeight == null) throw new UnexpectedTsError();
     const isConfirmed = (await aeSdk.getHeight()) >= txData.blockHeight + 3;
 
     isConfirmed.should.be.equal(true);
 
-    const txData2 = await aeSdk.spend(1000, await aeSdk.address(), { confirm: 4 });
+    const txData2 = await aeSdk.spend(1000, aeSdk.address, { confirm: 4 });
     if (txData2.blockHeight == null) throw new UnexpectedTsError();
     const isConfirmed2 = (await aeSdk.getHeight()) >= txData2.blockHeight + 4;
     isConfirmed2.should.be.equal(true);
   });
 
-  const accounts = new Array(10).fill(undefined).map(() => generateKeyPair());
+  it('doesn\'t make extra requests', async () => {
+    const httpSpy = spy(http, 'request');
+    await aeSdk.spend(100, publicKey, { waitMined: false, verify: false });
+    expect(httpSpy.args.length).to.be.equal(2); // nonce, post tx
+    httpSpy.resetHistory();
+
+    await aeSdk.spend(100, publicKey, { waitMined: false, verify: false });
+    expect(httpSpy.args.length).to.be.equal(2); // nonce, post tx
+    httpSpy.resetHistory();
+
+    await aeSdk.spend(100, publicKey, { waitMined: false });
+    expect(httpSpy.args.length).to.be.equal(5); // nonce, validator(acc, height, status), post tx
+    httpSpy.restore();
+  });
+
+  const accounts = new Array(10).fill(undefined).map(() => MemoryAccount.generate());
   const transactions: Encoded.TxHash[] = [];
 
   it('multiple spends from one account', async () => {
-    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address());
+    const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     const httpSpy = spy(http, 'request');
     const spends = await Promise.all(accounts.map(async (account, idx) => aeSdk.spend(
       Math.floor(Math.random() * 1000 + 1e16),
-      account.publicKey,
+      account.address,
       { nonce: nextNonce + idx, verify: false, waitMined: false },
     )));
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
-    expect(httpSpy.args.length).to.be.equal(2 + txPostCount);
+    expect(httpSpy.args.length).to.be.equal(txPostCount);
     httpSpy.restore();
   });
 
   it('multiple spends from different accounts', async () => {
-    const receiver = await aeSdk.address();
     const httpSpy = spy(http, 'request');
     const spends = await Promise.all(
-      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e15, receiver, {
+      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e15, aeSdk.address, {
         nonce: 1, verify: false, onAccount, waitMined: false,
       })),
     );
     transactions.push(...spends.map(({ hash }) => hash));
-    const accountGetCount = accounts.length;
     const txPostCount = accounts.length;
-    expect(httpSpy.args.length).to.be.equal(1 + accountGetCount + txPostCount);
+    expect(httpSpy.args.length).to.be.equal(txPostCount);
     httpSpy.restore();
   });
 
@@ -157,7 +169,7 @@ describe('Node Chain', () => {
     });
     await contract.deploy();
     const { result: { gasUsed: gasLimit } } = await contract.methods.foo(5);
-    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address());
+    const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     const httpSpy = spy(http, 'request');
     const numbers = new Array(32).fill(undefined).map((v, idx) => idx * 2);
     const results = (await Promise.all(

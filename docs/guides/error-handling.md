@@ -23,7 +23,6 @@ BaseError
 │   │   UnexpectedTsError
 │
 └───AccountError
-│   │   InvalidKeypairError
 │   │   UnavailableAccountError
 │
 └───AensError
@@ -112,32 +111,26 @@ BaseError
 
 ```js
 // import required error classes
-const {
+import {
   AeSdk,
   Node,
   MemoryAccount,
-  generateKeyPair,
   InvalidTxParamsError,
   InvalidAensNameError
-} = require('@aeternity/aepp-sdk')
+} from '@aeternity/aepp-sdk'
 
 // setup
-const NODE_URL = 'https://testnet.aeternity.io'
-const PAYER_ACCOUNT_KEYPAIR = generateKeyPair()
-const NEW_USER_KEYPAIR = generateKeyPair()
-
-const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
-const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
-const node = new Node(NODE_URL)
+const payerAccount = MemoryAccount.generate()
+const newUserAccount = MemoryAccount.generate()
+const node = new Node('https://testnet.aeternity.io')
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
+  accounts: [payerAccount, newUserAccount],
 })
-await aeSdk.addAccount(payerAccount, { select: true })
-await aeSdk.addAccount(newUserAccount)
 
 // catch exceptions
 try {
-  const spendTxResult = await aeSdk.spend(-1, await newUserAccount.address(), { onAccount: payerAccount})
+  const spendTxResult = await aeSdk.spend(-1, newUserAccount.address, { onAccount: payerAccount})
 } catch(err) {
   if(err instanceof InvalidTxParamsError){
     console.log(`Amount specified is not valid, ${err.message}`)

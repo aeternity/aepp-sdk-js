@@ -20,7 +20,7 @@ import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
-  AeSdk, generateKeyPair, MemoryAccount, Tag, UnexpectedTsError,
+  AeSdk, MemoryAccount, Tag, UnexpectedTsError,
 } from '../../src';
 import { ContractInstance } from '../../src/contract/aci';
 import { Encoded } from '../../src/utils/encoder';
@@ -33,28 +33,28 @@ describe('Paying for transaction of another account', () => {
   });
 
   it('pays for spend transaction', async () => {
-    const sender = new MemoryAccount({ keypair: generateKeyPair() });
-    const receiver = new MemoryAccount({ keypair: generateKeyPair() });
-    await aeSdk.spend(1e4, await sender.address());
+    const sender = MemoryAccount.generate();
+    const receiver = MemoryAccount.generate();
+    await aeSdk.spend(1e4, sender.address);
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      senderId: await sender.address(),
-      recipientId: await receiver.address(),
+      senderId: sender.address,
+      recipientId: receiver.address,
       amount: 1e4,
     });
     const signedSpendTx = await aeSdk
       .signTransaction(spendTx, { onAccount: sender, innerTx: true });
-    const payerBalanceBefore = await aeSdk.getBalance(await aeSdk.address());
+    const payerBalanceBefore = await aeSdk.getBalance(aeSdk.address);
 
     const { tx } = await aeSdk.payForTransaction(signedSpendTx);
     const outerFee = tx?.fee;
     const innerFee = tx?.tx?.tx.fee;
     if (outerFee == null || innerFee == null) throw new UnexpectedTsError();
-    expect(await aeSdk.getBalance(await aeSdk.address())).to.equal(
+    expect(await aeSdk.getBalance(aeSdk.address)).to.equal(
       new BigNumber(payerBalanceBefore)
         .minus(outerFee.toString()).minus(innerFee.toString()).toFixed(),
     );
-    expect(await aeSdk.getBalance(await sender.address())).to.equal('0');
-    expect(await aeSdk.getBalance(await receiver.address())).to.equal('10000');
+    expect(await aeSdk.getBalance(sender.address)).to.equal('0');
+    expect(await aeSdk.getBalance(receiver.address)).to.equal('10000');
   });
 
   const contractSource = `
@@ -69,8 +69,7 @@ describe('Paying for transaction of another account', () => {
 
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);
-    await aeSdkNotPayingFee
-      .addAccount(new MemoryAccount({ keypair: generateKeyPair() }), { select: true });
+    aeSdkNotPayingFee.addAccount(MemoryAccount.generate(), { select: true });
     aeSdkNotPayingFee._options = {
       waitMined: false,
       innerTx: true,

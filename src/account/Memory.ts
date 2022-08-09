@@ -1,6 +1,6 @@
 /*
  * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
+ * Copyright (c) 2022 aeternity developers
  *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
@@ -15,84 +15,74 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import AccountBase from './Base';
-import { sign, isValidKeypair } from '../utils/crypto';
+import {
+  generateKeyPairFromSecret, sign, generateKeyPair, hash, messageToHash,
+} from '../utils/crypto';
 import { isHex } from '../utils/string';
-import { ArgumentError, InvalidKeypairError, MissingParamError } from '../utils/errors';
-import { decode, Encoded } from '../utils/encoder';
-import { createMetaTx } from '../contract/ga';
+import { ArgumentError } from '../utils/errors';
+import {
+  decode, encode, Encoded, Encoding,
+} from '../utils/encoder';
+import { concatBuffers } from '../utils/other';
+import { buildTx } from '../tx/builder';
+import { Tag } from '../tx/builder/constants';
 
-const secrets = new WeakMap();
-
-export interface Keypair {
-  publicKey: Encoded.AccountAddress;
-  secretKey: string | Uint8Array;
-}
+const secretKeys = new WeakMap();
 
 /**
  * In-memory account class
  */
 export default class AccountMemory extends AccountBase {
-  isGa: boolean;
+  override readonly address: Encoded.AccountAddress;
 
   /**
-   * @param options - Options
-   * @param options.keypair - Key pair to use
-   * @param options.keypair.publicKey - Public key
-   * @param options.keypair.secretKey - Private key
-   * @param options.gaId - Address of generalized account
+   * @param secretKey - Secret key
    */
-  constructor(
-    { keypair, gaId, ...options }: { keypair?: Keypair; gaId?: Encoded.AccountAddress }
-    & ConstructorParameters<typeof AccountBase>[0],
-  ) {
-    super(options);
-
-    this.isGa = gaId != null;
-    if (this.isGa && gaId != null) {
-      decode(gaId);
-      secrets.set(this, { publicKey: gaId });
-      return;
+  constructor(secretKey: string | Uint8Array) {
+    super();
+    if (typeof secretKey === 'string' && !isHex(secretKey)) {
+      throw new ArgumentError('secretKey', 'hex string', secretKey);
     }
-
-    if (keypair == null) throw new MissingParamError('Either gaId or keypair is required');
-
-    if (
-      !Buffer.isBuffer(keypair.secretKey)
-      && typeof keypair.secretKey === 'string' && !isHex(keypair.secretKey)
-    ) throw new InvalidKeypairError('Secret key must be hex string or Buffer');
-    const secretKey = typeof keypair.secretKey === 'string'
-      ? Buffer.from(keypair.secretKey, 'hex')
-      : keypair.secretKey;
-    if (!isValidKeypair(secretKey, decode(keypair.publicKey))) {
-      throw new InvalidKeypairError('Invalid Key Pair');
+    secretKey = typeof secretKey === 'string' ? Buffer.from(secretKey, 'hex') : secretKey;
+    if (secretKey.length !== 64) {
+      throw new ArgumentError('secretKey', '64 bytes', secretKey.length);
     }
-
-    secrets.set(this, {
-      secretKey,
-      publicKey: keypair.publicKey,
-    });
+    secretKeys.set(this, secretKey);
+    this.address = encode(
+      generateKeyPairFromSecret(secretKeys.get(this)).publicKey,
+      Encoding.AccountAddress,
+    );
   }
 
-  async sign(data: string | Uint8Array): Promise<Uint8Array> {
-    if (this.isGa) throw new InvalidKeypairError('You are trying to sign data using generalized account without keypair');
-    return sign(data, secrets.get(this).secretKey);
+  /**
+   * Generates a new AccountMemory using a random secret key
+   */
+  static generate(): AccountMemory {
+    return new AccountMemory(generateKeyPair().secretKey);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  override async sign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
+    return sign(data, secretKeys.get(this));
   }
 
   override async signTransaction(
     tx: Encoded.Transaction,
-    options: Parameters<AccountBase['signTransaction']>[1] = {},
+    { innerTx, networkId, ...options }: { innerTx?: boolean; networkId?: string } = {},
   ): Promise<Encoded.Transaction> {
-    if (!this.isGa || options.innerTx === true) return super.signTransaction(tx, options);
-    const {
-      authData, authFun, onCompiler, onNode,
-    } = options;
-    if (authFun == null || authData == null || onCompiler == null || onNode == null) {
-      throw new ArgumentError('authData, authFun, onCompiler, onNode', 'provided', null);
+    if (networkId == null) {
+      throw new ArgumentError('networkId', 'provided', networkId);
     }
-    return createMetaTx(tx, authData, authFun, { onCompiler, onNode, onAccount: this });
+    const prefixes = [networkId];
+    if (innerTx === true) prefixes.push('inner_tx');
+    const rlpBinaryTx = decode(tx);
+    const txWithNetworkId = concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)]);
+
+    const signatures = [await this.sign(txWithNetworkId, options)];
+    return buildTx({ encodedTx: rlpBinaryTx, signatures }, Tag.SignedTx).tx;
   }
 
-  async address(): Promise<Encoded.AccountAddress> {
-    return secrets.get(this).publicKey;
+  override async signMessage(message: string, options?: any): Promise<Uint8Array> {
+    return this.sign(messageToHash(message), options);
   }
 }

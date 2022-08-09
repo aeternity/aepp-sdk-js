@@ -1,4 +1,4 @@
-import AeSdkBase, { Account } from './AeSdkBase';
+import AeSdkBase, { OnAccount } from './AeSdkBase';
 import AccountBase from './account/Base';
 import { decode, Encoded } from './utils/encoder';
 import { UnavailableAccountError } from './utils/errors';
@@ -8,9 +8,15 @@ export default class AeSdk extends AeSdkBase {
 
   selectedAddress?: Encoded.AccountAddress;
 
-  override _resolveAccount(
-    account: Account | Encoded.AccountAddress = this.selectedAddress,
-  ): AccountBase {
+  constructor(
+    { accounts, ...options }: { accounts?: AccountBase[] }
+    & ConstructorParameters<typeof AeSdkBase>[0] = {},
+  ) {
+    super(options);
+    accounts?.forEach((account, idx) => this.addAccount(account, { select: idx === 0 }));
+  }
+
+  override _resolveAccount(account: OnAccount = this.selectedAddress): AccountBase {
     if (typeof account === 'string') {
       const address = account as Encoded.AccountAddress;
       decode(address);
@@ -35,8 +41,8 @@ export default class AeSdk extends AeSdkBase {
    * @param options.select - Select account
    * @example addAccount(account)
    */
-  async addAccount(account: AccountBase, { select }: { select?: boolean } = {}): Promise<void> {
-    const address = await account.address();
+  addAccount(account: AccountBase, { select }: { select?: boolean } = {}): void {
+    const { address } = account;
     this.accounts[address] = account;
     if (select === true) this.selectAccount(address);
   }

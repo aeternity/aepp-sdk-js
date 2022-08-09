@@ -2,7 +2,7 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, Node, InvalidTxError, InvalidTxParamsError, generateKeyPair, Tag,
+  AeSdk, Node, InvalidTxError, InvalidTxParamsError, Tag,
 } from '../../src';
 import MemoryAccount from '../../src/account/Memory';
 import verifyTransaction from '../../src/tx/validator';
@@ -24,17 +24,14 @@ describe('Verify Transaction', () => {
 
   it('returns errors', async () => {
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      senderId: await aeSdk.address(),
-      recipientId: await aeSdk.address(),
+      senderId: aeSdk.address,
+      recipientId: aeSdk.address,
       amount: 1e50,
       nonce: 1,
       ttl: 2,
       absoluteTtl: true,
     });
-    const signedTx = await aeSdk.signTransaction(
-      spendTx,
-      { onAccount: new MemoryAccount({ keypair: generateKeyPair() }) },
-    );
+    const signedTx = await aeSdk.signTransaction(spendTx, { onAccount: MemoryAccount.generate() });
     const errors = await verifyTransaction(signedTx, node);
     expect(errors.map(({ key }) => key)).to.be.eql([
       'InvalidSignature', 'ExpiredTTL', 'InsufficientBalance', 'NonceAlreadyUsed',
@@ -43,8 +40,8 @@ describe('Verify Transaction', () => {
 
   it('returns NonceHigh error', async () => {
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      senderId: await aeSdk.address(),
-      recipientId: await aeSdk.address(),
+      senderId: aeSdk.address,
+      recipientId: aeSdk.address,
       amount: 100,
       nonce: 100,
     });
@@ -54,8 +51,8 @@ describe('Verify Transaction', () => {
 
   it('verifies transactions before broadcasting', async () => {
     const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-      senderId: await aeSdk.address(),
-      recipientId: await aeSdk.address(),
+      senderId: aeSdk.address,
+      recipientId: aeSdk.address,
       amount: 1,
       ttl: 2,
       absoluteTtl: true,

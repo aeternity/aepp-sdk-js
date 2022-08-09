@@ -373,7 +373,7 @@ const contractId = 'ct_asd2ks...'
 // AENS name
 const name = 'example.chain'
 // Sign with a specific account
-const onAccount = await aeSdk.address()
+const onAccount = aeSdk.address
 
 // this signature will allow the contract to perform a pre-claim on your behalf
 const preClaimSig = await aeSdk.createAensDelegationSignature(contractId, { onAccount })

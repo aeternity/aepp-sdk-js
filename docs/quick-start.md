@@ -34,19 +34,16 @@ This example shows:
 ```js
 const NODE_URL = 'https://testnet.aeternity.io'
 const COMPILER_URL = 'https://compiler.aepps.com' // required for contract interactions
-const senderAccount = new MemoryAccount({
-  // replace <SENDER_SECRET> and <SENDER_PUBLIC_KEY> with the generated keypair from step 2
-  keypair: { secretKey: '<SENDER_SECRET>', publicKey: '<SENDER_PUBLIC_KEY>' }
-});
+// replace <SENDER_SECRET_KEY> with the generated secretKey from step 2
+const senderAccount = new MemoryAccount('<SENDER_SECRET_KEY>');
 
 (async function () {
   const node = new Node(NODE_URL)
   const aeSdk = new AeSdk({
     compilerUrl: COMPILER_URL,
     nodes: [{ name: 'testnet', instance: node }],
+    accounts: [senderAccount],
   })
-  // Add sender account to the aeSdk state
-  await aeSdk.addAccount(senderAccount, { select: true })
 
   // spend one AE
   await aeSdk.spend(1, '<RECIPIENT_PUBLIC_KEY>', {

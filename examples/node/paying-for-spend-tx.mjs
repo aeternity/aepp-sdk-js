@@ -34,7 +34,7 @@
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 import {
-  AeSdk, Node, MemoryAccount, generateKeyPair, Tag,
+  AeSdk, Node, MemoryAccount, Tag,
 } from '@aeternity/aepp-sdk';
 
 // **Note**:
@@ -43,42 +43,37 @@ import {
 
 // ## 2. Define constants
 // The following constants are used in the subsequent code snippets.
-const PAYER_ACCOUNT_KEYPAIR = {
-  publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
-  secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b',
-};
+const PAYER_ACCOUNT_SECRET_KEY = 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b';
 const NODE_URL = 'https://testnet.aeternity.io';
-const NEW_USER_KEYPAIR = generateKeyPair();
 const AMOUNT = 1;
 
 // Note:
 //
-//  - The keypair of the account is pre-funded and only used for demonstration purpose
+//  - The secret key of the account is pre-funded and only used for demonstration purpose
 //      - You can replace it with your own keypair (see
 //        [Create a Keypair](../../quick-start.md#2-create-a-keypair))
 //      - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 //  - The `AMOUNT` (in `aettos`) will be send to the new user and returned to the payer.
 
 // ## 3. Create object instances
-const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR });
-const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR });
+const payerAccount = new MemoryAccount(PAYER_ACCOUNT_SECRET_KEY);
+const newUserAccount = MemoryAccount.generate();
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
+  accounts: [payerAccount, newUserAccount],
 });
-await aeSdk.addAccount(payerAccount, { select: true });
-await aeSdk.addAccount(newUserAccount);
 
 // ## 4. Send 1 `aetto` from payer to new user
 const spendTxResult = await aeSdk.spend(
   AMOUNT,
-  await newUserAccount.address(),
+  newUserAccount.address,
   { onAccount: payerAccount },
 );
 console.log(spendTxResult);
 
 // ## 5. Check balance of new user (before)
-const newUserBalanceBefore = await aeSdk.getBalance(await newUserAccount.address());
+const newUserBalanceBefore = await aeSdk.getBalance(newUserAccount.address);
 console.log(`new user balance (before): ${newUserBalanceBefore}`);
 
 // Note:
@@ -87,8 +82,8 @@ console.log(`new user balance (before): ${newUserBalanceBefore}`);
 
 // ## 6. Create and sign `SpendTx` on behalf of new user
 const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-  senderId: await newUserAccount.address(),
-  recipientId: await payerAccount.address(),
+  senderId: newUserAccount.address,
+  recipientId: payerAccount.address,
   amount: AMOUNT,
 });
 const signedSpendTx = await aeSdk.signTransaction(
@@ -111,7 +106,7 @@ console.log(payForTx);
 //    have to cover the transaction fee.
 
 // ## 8. Check balance of new user (after)
-const newUserBalanceAfter = await aeSdk.getBalance(await newUserAccount.address());
+const newUserBalanceAfter = await aeSdk.getBalance(newUserAccount.address);
 console.log(`new user balance (after): ${newUserBalanceAfter}`);
 
 // Note:

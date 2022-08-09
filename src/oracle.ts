@@ -169,7 +169,7 @@ export async function postQueryToOracle(
   options: PostQueryToOracleOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getQueryObject>>> {
   options.queryFee ??= (await options.onNode.getOracleByPubkey(oracleId)).queryFee.toString();
-  const senderId = await options.onAccount.address(options);
+  const senderId = options.onAccount.address;
 
   const oracleQueryTx = await _buildTx(Tag.OracleQueryTx, {
     queryTtlType: QUERY_TTL.type,
@@ -219,7 +219,7 @@ export async function extendOracleTtl(
     oracleTtlType: ORACLE_TTL.type,
     oracleTtlValue: ORACLE_TTL.value,
     ...options,
-    callerId: await options.onAccount.address(options),
+    callerId: options.onAccount.address,
     oracleId,
   });
   return {
@@ -256,7 +256,7 @@ export async function respondToQuery(
     responseTtlType: RESPONSE_TTL.type,
     responseTtlValue: RESPONSE_TTL.value,
     ...options,
-    callerId: await options.onAccount.address(options),
+    callerId: options.onAccount.address,
     oracleId,
     queryId,
     response,
@@ -338,7 +338,7 @@ export async function registerOracle(
   responseFormat: string,
   options: RegisterOracleOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
-  const accountId = await options.onAccount.address(options);
+  const accountId = options.onAccount.address;
   const oracleRegisterTx = await _buildTx(Tag.OracleRegisterTx, {
     queryFee: QUERY_FEE,
     oracleTtlValue: ORACLE_TTL.value,

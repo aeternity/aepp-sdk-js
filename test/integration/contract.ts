@@ -156,8 +156,7 @@ describe('Contract', () => {
     const signature = await aeSdk.sign(msgHash);
     const signContract = await aeSdk.getContractInstance({ source: signSource });
     await signContract.deploy();
-    const { decodedResult } = await signContract.methods
-      .verify(msgHash, await aeSdk.address(), signature);
+    const { decodedResult } = await signContract.methods.verify(msgHash, aeSdk.address, signature);
     decodedResult.should.be.equal(true);
   });
 
@@ -167,13 +166,12 @@ describe('Contract', () => {
     const accountBefore = contract.options.onAccount;
     contract.options.onAccount = onAccount;
     deployed = await contract.deploy();
-    const address = await onAccount.address();
     if (deployed?.result?.callerId == null) throw new UnexpectedTsError();
-    expect(deployed.result.callerId).to.be.equal(address);
+    expect(deployed.result.callerId).to.be.equal(onAccount.address);
     expect((await contract.methods.getArg(42, { callStatic: true })).result.callerId)
-      .to.be.equal(address);
+      .to.be.equal(onAccount.address);
     expect((await contract.methods.getArg(42, { callStatic: false })).result.callerId)
-      .to.be.equal(address);
+      .to.be.equal(onAccount.address);
     contract.options.onAccount = accountBefore;
   });
 
@@ -198,7 +196,7 @@ describe('Contract', () => {
   it('throws errors on method call', async () => {
     const ct = await aeSdk.getContractInstance({ source: contractWithBrokenMethods });
     await ct.deploy();
-    await expect(ct.methods.failWithoutMessage(await aeSdk.address()))
+    await expect(ct.methods.failWithoutMessage(aeSdk.address))
       .to.be.rejectedWith('Invocation failed');
     await expect(ct.methods.failWithMessage())
       .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"');
@@ -392,7 +390,6 @@ describe('Contract', () => {
 
   describe('Oracle operation delegation', () => {
     let contractId: Encoded.ContractAddress;
-    let address: Encoded.AccountAddress;
     let oracle: Awaited<ReturnType<typeof aeSdk.getOracleObject>>;
     let oracleId: Encoded.OracleAddress;
     let queryObject: Awaited<ReturnType<typeof aeSdk.getQueryObject>>;
@@ -405,14 +402,13 @@ describe('Contract', () => {
       await contract.deploy();
       if (contract.deployInfo.address == null) throw new UnexpectedTsError();
       contractId = contract.deployInfo.address;
-      address = await aeSdk.address();
-      oracleId = encode(decode(address), Encoding.OracleAddress);
+      oracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     });
 
     it('registers', async () => {
       delegationSignature = await aeSdk.createOracleDelegationSignature(contractId);
       const oracleRegister = await contract.methods
-        .signedRegisterOracle(address, delegationSignature, queryFee, ttl);
+        .signedRegisterOracle(aeSdk.address, delegationSignature, queryFee, ttl);
       oracleRegister.result.returnType.should.be.equal('ok');
       oracle = await aeSdk.getOracleObject(oracleId);
       oracle.id.should.be.equal(oracleId);
