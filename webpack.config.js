@@ -48,7 +48,7 @@ function configure(filename, opts = {}) {
       path: path.resolve(__dirname, 'dist'),
       filename,
       library: {
-        name: 'Ae',
+        name: 'Aeternity',
         type: 'umd',
       },
     },
