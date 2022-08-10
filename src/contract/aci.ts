@@ -14,7 +14,6 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
-// @ts-expect-error TODO remove
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
 import { DRY_RUN_ACCOUNT, AMOUNT } from '../tx/builder/schema';
 import { Tag, AensName } from '../tx/builder/constants';
