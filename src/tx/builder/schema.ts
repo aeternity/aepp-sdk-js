@@ -255,7 +255,7 @@ export const TX_SCHEMA = {
       ['accountId', FIELD_TYPES.id, Encoding.AccountAddress],
       ['nonce', shortUInt],
       ['nameId', nameId],
-      ['nameTtl', uInt],
+      ['nameTtl', shortUInt],
       ['pointers', FIELD_TYPES.pointers],
       ['clientTtl', shortUInt],
       ['fee', fee],
