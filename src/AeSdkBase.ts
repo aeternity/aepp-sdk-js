@@ -293,15 +293,13 @@ Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
   ([name, handler]) => [
     name,
     function methodWrapper(...args: any[]) {
-      const instanceOptions = this._getOptions();
-      const lastArg = args[args.length - 1];
-      if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
-        args[args.length - 1] = {
-          ...instanceOptions,
-          ...lastArg,
-          ...lastArg.onAccount != null && { onAccount: this._resolveAccount(lastArg.onAccount) },
-        };
-      } else args.push(instanceOptions);
+      args.length = handler.length;
+      const options = args[args.length - 1];
+      args[args.length - 1] = {
+        ...this._getOptions(),
+        ...options,
+        ...options?.onAccount != null && { onAccount: this._resolveAccount(options.onAccount) },
+      };
       return handler(...args);
     },
   ],
