@@ -9,7 +9,6 @@ import { _buildTx } from './tx';
 import { mapObject } from './utils/other';
 import Node from './Node';
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
-import { AMOUNT } from './tx/builder/schema';
 import { Tag } from './tx/builder/constants';
 import AccountBase from './account/Base';
 import {
@@ -61,9 +60,8 @@ function getValueOrErrorProxy<Value extends object>(valueCb: () => Value): Value
 class AeSdkBase {
   _options: {
     denomination: AE_AMOUNT_FORMATS;
-    amount: number;
     [key: string]: any;
-  } = { denomination: AE_AMOUNT_FORMATS.AETTOS, amount: AMOUNT };
+  } = { denomination: AE_AMOUNT_FORMATS.AETTOS };
 
   pool: Map<string, Node> = new Map();
 

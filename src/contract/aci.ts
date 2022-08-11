@@ -15,7 +15,7 @@
 *  PERFORMANCE OF THIS SOFTWARE.
 */
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import { DRY_RUN_ACCOUNT, AMOUNT } from '../tx/builder/schema';
+import { DRY_RUN_ACCOUNT } from '../tx/builder/schema';
 import { Tag, AensName } from '../tx/builder/constants';
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder';
 import { _buildTx } from '../tx';
@@ -217,7 +217,6 @@ export default async function getContractInstance({
       onAccount,
       onCompiler,
       onNode,
-      amount: AMOUNT,
       callStatic: false,
       fileSystem,
       ...otherOptions,

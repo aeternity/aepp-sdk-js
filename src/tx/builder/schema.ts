@@ -26,7 +26,6 @@ export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
 export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 // # CONTRACT
-export const AMOUNT = 0;
 export const DRY_RUN_ACCOUNT = {
   pub: 'ak_11111111111111111111111111111111273Yts',
   amount: 100000000000000000000000000000000000n,
