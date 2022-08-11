@@ -1,5 +1,4 @@
 import * as chainMethods from './chain';
-import * as txMethods from './tx';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
@@ -254,12 +253,10 @@ class AeSdkBase {
   }
 }
 
-const { _buildTx: _, ...txMethodsOther } = txMethods;
 const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
 
 const methods = {
   ...chainMethodsOther,
-  ...txMethodsOther,
   ...aensMethods,
   ...spendMethods,
   ...oracleMethods,
