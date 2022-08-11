@@ -273,20 +273,16 @@ type RequiredKeys<T> = {
 
 type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T;
 
-type MakeOptional<Args extends any[]> = Args extends [infer Head, ...infer Tail]
-  ? Tail extends []
-    ? Head extends object
-      ? OptionalIfNotRequired<[Omit<Head, 'onNode' | 'onCompiler' | 'onAccount'>
-      & { onNode?: Node; onCompiler?: Compiler; onAccount?: OnAccount }]>
-      : [Head]
-    : [Head, ...MakeOptional<Tail>]
-  : never;
+type MakeOptional<Options> = OptionalIfNotRequired<[
+  Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'>
+  & { onNode?: Node; onCompiler?: Compiler; onAccount?: OnAccount },
+]>;
 
 type TransformMethods <Methods extends { [key: string]: Function }> =
   {
     [Name in keyof Methods]:
-    Methods[Name] extends (...args: infer Args) => infer Ret
-      ? (...args: MakeOptional<Args>) => Ret
+    Methods[Name] extends (...args: [...infer Args, infer Options]) => infer Ret
+      ? (...args: [...Args, ...MakeOptional<Options>]) => Ret
       : never
   };
 
