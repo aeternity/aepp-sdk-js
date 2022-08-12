@@ -5,7 +5,7 @@ import * as oracleMethods from './oracle';
 import getContractInstance from './contract/aci';
 import * as contractGaMethods from './contract/ga';
 import { _buildTx } from './tx';
-import { mapObject } from './utils/other';
+import { mapObject, UnionToIntersection } from './utils/other';
 import Node from './Node';
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
 import { Tag } from './tx/builder/constants';
@@ -39,6 +39,32 @@ function getValueOrErrorProxy<Value extends object>(valueCb: () => Value): Value
       return Reflect.has(valueCb(), property);
     },
   }) as Value;
+}
+
+const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
+
+const methods = {
+  ...chainMethodsOther,
+  ...aensMethods,
+  ...spendMethods,
+  ...oracleMethods,
+  getContractInstance,
+  ...contractGaMethods,
+} as const;
+
+type Decrement<Number extends number> = [-1, 0, 1, 2, 3, 4, 5][Number];
+type GetMethodsOptions <Methods extends { [key: string]: Function }> =
+  {
+    [Name in keyof Methods]:
+    Methods[Name] extends (...args: infer Args) => any
+      ? Args[Decrement<Args['length']>] : never
+  };
+type MethodsOptions = GetMethodsOptions<typeof methods>;
+interface AeSdkBaseOptions
+  extends Partial<UnionToIntersection<MethodsOptions[keyof MethodsOptions]>> {
+  nodes?: Array<{ name: string; instance: Node }>;
+  compilerUrl?: string;
+  ignoreVersion?: boolean;
 }
 
 /**
@@ -77,13 +103,7 @@ class AeSdkBase {
   constructor(
     {
       nodes = [], compilerUrl, ignoreVersion = false, ...options
-    }:
-    {
-      nodes?: Array<{ name: string; instance: Node }>;
-      compilerUrl?: string;
-      ignoreVersion?: boolean;
-      [key: string]: any; // TODO: consider combining all possible options instead
-    } = {},
+    }: AeSdkBaseOptions = {},
   ) {
     Object.assign(this._options, options);
 
@@ -252,17 +272,6 @@ class AeSdkBase {
     });
   }
 }
-
-const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
-
-const methods = {
-  ...chainMethodsOther,
-  ...aensMethods,
-  ...spendMethods,
-  ...oracleMethods,
-  getContractInstance,
-  ...contractGaMethods,
-} as const;
 
 type RequiredKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? never : K

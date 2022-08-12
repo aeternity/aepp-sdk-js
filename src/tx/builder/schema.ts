@@ -11,6 +11,7 @@ import {
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
 import MPTree from '../../utils/mptree';
+import { UnionToIntersection } from '../../utils/other';
 import { NamePointer } from '../../apis/node';
 
 export enum ORACLE_TTL_TYPES {
@@ -150,11 +151,6 @@ interface BuildFieldTypes<Prefix extends undefined | Encoding | readonly Encodin
   [FIELD_TYPES.payload]: string | undefined;
   [FIELD_TYPES.stateTree]: any;
 }
-
-// based on https://stackoverflow.com/a/50375286/6176994
-type UnionToIntersection<Union> =
-  (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
-    ? Intersection : never;
 
 type TxElem = readonly [string, FIELD_TYPES | Field]
 | readonly [string, FIELD_TYPES, Encoding | readonly Encoding[]];
