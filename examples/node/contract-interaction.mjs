@@ -80,11 +80,11 @@ const bytecode = await contract.compile();
 console.log(`Obtained bytecode ${bytecode}`);
 
 // ## 6. Deploy the contract
-// Invoking `deploy` on the contract instance will result in the `CreateContractTx`
+// Invoking `$deploy` on the contract instance will result in the `CreateContractTx`
 // being created, signed (using the _secretKey_ of the previously defined `MemoryAccount`) and
 // broadcasted to the network. It will be picked up by the miners and written to the chain.
 
-const deployInfo = await contract.deploy([5]);
+const deployInfo = await contract.$deploy([5]);
 console.log(`Contract deployed at ${deployInfo.address}`);
 
 // Note:

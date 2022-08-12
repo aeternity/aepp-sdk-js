@@ -167,7 +167,7 @@ describe('Node Chain', () => {
         'contract Test =\n'
         + '  entrypoint foo(x : int) = x * 100',
     });
-    await contract.deploy();
+    await contract.$deploy();
     const { result: { gasUsed: gasLimit } } = await contract.methods.foo(5);
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     const httpSpy = spy(http, 'request');

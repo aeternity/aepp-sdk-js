@@ -169,7 +169,7 @@ describe('Contract instance', () => {
     testContract.should.have.property('deployInfo');
     testContract.should.have.property('compile');
     testContract.should.have.property('call');
-    testContract.should.have.property('deploy');
+    testContract.should.have.property('$deploy');
     testContract.options.ttl.should.be.equal(0);
     testContract.options.should.have.property('fileSystem');
     testContract.options.fileSystem.should.have.property('testLib');
@@ -187,7 +187,7 @@ describe('Contract instance', () => {
     .to.be.rejectedWith(MissingContractAddressError, 'Can\'t call contract without address'));
 
   it('deploys', async () => {
-    const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'], {
+    const deployInfo = await testContract.$deploy(['test', 1, 'hahahaha'], {
       amount: 42,
       denomination: 'aettos',
       gasLimit: 16000,
@@ -246,7 +246,7 @@ describe('Contract instance', () => {
     const contract = await aeSdk.getContractInstance(
       { bytecode: testContractBytecode, aci: testContractAci },
     );
-    await contract.deploy(['test', 1]);
+    await contract.$deploy(['test', 1]);
     expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n);
   });
 
@@ -322,7 +322,7 @@ describe('Contract instance', () => {
     });
 
     it('estimates gas by default for contract deployments', async () => {
-      const { tx: { gas }, gasUsed } = (await contract.deploy(['test', 42])).txData;
+      const { tx: { gas }, gasUsed } = (await contract.$deploy(['test', 42])).txData;
       expect(gasUsed).to.be.equal(160);
       expect(gas).to.be.equal(200);
     });
@@ -331,7 +331,7 @@ describe('Contract instance', () => {
       const ct = await aeSdk.getContractInstance({
         sourceCode: testContractSourceCode, fileSystem, gasLimit: 300,
       });
-      const { tx: { gas }, gasUsed } = (await ct.deploy(['test', 42])).txData;
+      const { tx: { gas }, gasUsed } = (await ct.$deploy(['test', 42])).txData;
       expect(gasUsed).to.be.equal(160);
       expect(gas).to.be.equal(300);
     });
@@ -378,7 +378,7 @@ describe('Contract instance', () => {
 
     before(async () => {
       remoteContract = await aeSdk.getContractInstance({ sourceCode: remoteContractSource });
-      await remoteContract.deploy();
+      await remoteContract.$deploy();
       eventResult = await testContract.methods.emitEvents(remoteContract.deployInfo.address, false);
     });
 

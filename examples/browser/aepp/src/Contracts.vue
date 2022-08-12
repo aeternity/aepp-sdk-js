@@ -111,7 +111,7 @@ export default {
       return (await this.createPromise).compile()
     },
     async deploy () {
-      return (await this.createPromise).deploy([this.deployArg])
+      return (await this.createPromise).$deploy([this.deployArg])
     },
     async call () {
       return (await this.createPromise).methods.calc(this.callArg)

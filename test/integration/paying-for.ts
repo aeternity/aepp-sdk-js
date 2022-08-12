@@ -75,7 +75,7 @@ describe('Paying for transaction of another account', () => {
       innerTx: true,
     };
     const contract = await aeSdkNotPayingFee.getContractInstance({ sourceCode });
-    const { rawTx: contractDeployTx, address } = await contract.deploy([42]);
+    const { rawTx: contractDeployTx, address } = await contract.$deploy([42]);
     contractAddress = address;
     await aeSdk.payForTransaction(contractDeployTx);
     payingContract = await aeSdkNotPayingFee.getContractInstance({ sourceCode, address });

@@ -116,7 +116,7 @@ contract Increment =
 The contract can be deployed using the `contractInstance` in two different ways:
 
 ```js
-const tx = await contractInstance.deploy([1]) // recommended
+const tx = await contractInstance.$deploy([1])
 // or
 const tx = await contractInstance.methods.init(1)
 

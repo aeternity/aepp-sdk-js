@@ -133,19 +133,19 @@ describe('Contract', () => {
 
   it('deploys precompiled bytecode', async () => {
     contract = await aeSdk.getContractInstance({ bytecode, sourceCode: identityContract });
-    expect(await contract.deploy()).to.have.property('address');
+    expect(await contract.$deploy()).to.have.property('address');
   });
 
   it('throws exception if deploy deposit is not zero', async () => {
     contract.deployInfo = {};
-    await expect(contract.deploy([], { deposit: 10 })).to.be.rejectedWith(
+    await expect(contract.$deploy([], { deposit: 10 })).to.be.rejectedWith(
       IllegalArgumentError,
       'Contract deposit is not refundable, so it should be equal 0, got 10 instead',
     );
   });
 
   it('deploys static', async () => {
-    const res = await contract.deploy([], { callStatic: true });
+    const res = await contract.$deploy([], { callStatic: true });
     expect(res.result).to.have.property('gasUsed');
     expect(res.result).to.have.property('returnType');
   });
@@ -154,7 +154,7 @@ describe('Contract', () => {
     const msgHash = messageToHash('Hello');
     const signature = await aeSdk.sign(msgHash);
     const signContract = await aeSdk.getContractInstance({ sourceCode: signSource });
-    await signContract.deploy();
+    await signContract.$deploy();
     const { decodedResult } = await signContract.methods.verify(msgHash, aeSdk.address, signature);
     decodedResult.should.be.equal(true);
   });
@@ -164,7 +164,7 @@ describe('Contract', () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
     const accountBefore = contract.options.onAccount;
     contract.options.onAccount = onAccount;
-    deployed = await contract.deploy();
+    deployed = await contract.$deploy();
     if (deployed?.result?.callerId == null) throw new UnexpectedTsError();
     expect(deployed.result.callerId).to.be.equal(onAccount.address);
     expect((await contract.methods.getArg(42, { callStatic: true })).result.callerId)
@@ -175,26 +175,26 @@ describe('Contract', () => {
   });
 
   it('Call-Static deploy transaction', async () => {
-    const res = await contract.deploy([], { callStatic: true });
+    const res = await contract.$deploy([], { callStatic: true });
     res.result.should.have.property('gasUsed');
     res.result.should.have.property('returnType');
   });
 
   it('Call-Static deploy transaction on specific hash', async () => {
     const { hash } = await aeSdk.api.getTopHeader();
-    const res = await contract.deploy([], { callStatic: true, top: hash });
+    const res = await contract.$deploy([], { callStatic: true, top: hash });
     res.result.should.have.property('gasUsed');
     res.result.should.have.property('returnType');
   });
 
   it('throws error on deploy', async () => {
     const ct = await aeSdk.getContractInstance({ sourceCode: contractWithBrokenDeploy });
-    await expect(ct.deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"');
+    await expect(ct.$deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"');
   });
 
   it('throws errors on method call', async () => {
     const ct = await aeSdk.getContractInstance({ sourceCode: contractWithBrokenMethods });
-    await ct.deploy();
+    await ct.$deploy();
     await expect(ct.methods.failWithoutMessage(aeSdk.address))
       .to.be.rejectedWith('Invocation failed');
     await expect(ct.methods.failWithMessage())
@@ -212,7 +212,7 @@ describe('Contract', () => {
 
   it('call contract/deploy with waitMined: false', async () => {
     contract.deployInfo = {};
-    const deployInfo = await contract.deploy([], { waitMined: false });
+    const deployInfo = await contract.$deploy([], { waitMined: false });
     await aeSdk.poll(deployInfo.transaction);
     expect(deployInfo.result).to.be.equal(undefined);
     deployInfo.txData.should.not.be.equal(undefined);
@@ -230,7 +230,7 @@ describe('Contract', () => {
   it('initializes contract state', async () => {
     contract = await aeSdk.getContractInstance({ sourceCode: stateContract });
     const data = 'Hello World!';
-    await contract.deploy([data]);
+    await contract.$deploy([data]);
     expect((await contract.methods.retrieve()).decodedResult).to.be.equal(data);
   });
 
@@ -248,10 +248,10 @@ describe('Contract', () => {
     });
 
     it('Can deploy contract with external deps', async () => {
-      const deployInfo = await contract.deploy();
+      const deployInfo = await contract.$deploy();
       expect(deployInfo).to.have.property('address');
 
-      const deployedStatic = await contract.deploy([], { callStatic: true });
+      const deployedStatic = await contract.$deploy([], { callStatic: true });
       expect(deployedStatic.result).to.have.property('gasUsed');
       expect(deployedStatic.result).to.have.property('returnType');
     });
@@ -323,7 +323,7 @@ describe('Contract', () => {
 
     before(async () => {
       contract = await aeSdk.getContractInstance({ sourceCode: aensDelegationContract });
-      await contract.deploy();
+      await contract.$deploy();
       if (contract.deployInfo.address == null) throw new UnexpectedTsError();
       [owner, newOwner] = aeSdk.addresses();
     });
@@ -390,7 +390,7 @@ describe('Contract', () => {
 
     before(async () => {
       contract = await aeSdk.getContractInstance({ sourceCode: oracleContract });
-      await contract.deploy();
+      await contract.$deploy();
       if (contract.deployInfo.address == null) throw new UnexpectedTsError();
       oracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     });

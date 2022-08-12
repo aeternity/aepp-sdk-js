@@ -125,7 +125,7 @@ export interface ContractInstance {
   options: any;
   compile: (options?: {}) => Promise<Encoded.ContractBytearray>;
   _estimateGas: (name: string, params: any[], options: object) => Promise<number>;
-  deploy: (params?: any[], options?: object) => Promise<any>;
+  $deploy: (params?: any[], options?: object) => Promise<any>;
   call: (fn: string, params?: any[], options?: {}) => Promise<{
     hash: string;
     tx: any;
@@ -164,7 +164,7 @@ export interface ContractInstance {
  * @example
  * ```js
  * const contractIns = await aeSdk.getContractInstance({ sourceCode })
- * await contractIns.deploy([321]) or await contractIns.methods.init(321)
+ * await contractIns.$deploy([321]) or await contractIns.methods.init(321)
  * const callResult = await contractIns.call('setState', [123]) or
  * await contractIns.methods.setState.send(123, options)
  * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true }) or
@@ -239,7 +239,7 @@ export default async function getContractInstance({
     /* eslint-disable @typescript-eslint/no-empty-function */
     async compile(_options?: {}): Promise<any> {},
     async _estimateGas(_name: string, _params: any[], _options: object): Promise<any> {},
-    async deploy(_params?: any[], _options?: any): Promise<any> {},
+    async $deploy(_params?: any[], _options?: any): Promise<any> {},
     async call(_fn: string, _params?: any[], _options?: {}): Promise<any> {},
     decodeEvents(_events: Event[], options?: { omitUnknown?: boolean }): any {},
     /* eslint-enable @typescript-eslint/no-unused-vars */
@@ -381,7 +381,7 @@ export default async function getContractInstance({
    * @param options - Options
    * @returns deploy info
    */
-  instance.deploy = async (
+  instance.$deploy = async (
     params = [],
     options?:
     Parameters<typeof instance.compile>[0] &
@@ -390,7 +390,7 @@ export default async function getContractInstance({
   ): Promise<ContractInstance['deployInfo']> => {
     const opt = { ...instance.options, ...options };
     if (instance.bytecode == null) await instance.compile(opt);
-    // @ts-expect-error TODO: need to fix compatibility between return types of `deploy` and `call`
+    // @ts-expect-error TODO: need to fix compatibility between return types of `$deploy` and `call`
     if (opt.callStatic === true) return instance.call('init', params, opt);
     if (instance.deployInfo.address != null) throw new DuplicateContractError();
 
@@ -587,7 +587,7 @@ export default async function getContractInstance({
       const genHandler = (callStatic: boolean) => async (...args: any[]) => {
         const options = args.length === aciArgs.length + 1 ? args.pop() : {};
         if (typeof options !== 'object') throw new TypeError(`Options should be an object: ${options as string}`);
-        if (name === 'init') return instance.deploy(args, { callStatic, ...options });
+        if (name === 'init') return instance.$deploy(args, { callStatic, ...options });
         return instance.call(name, args, { callStatic, ...options });
       };
       return [

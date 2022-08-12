@@ -65,7 +65,7 @@ describe('Aens', () => {
     const sourceCode = 'contract Identity ='
       + '  entrypoint getArg(x : int) = x';
     const contract = await aeSdk.getContractInstance({ sourceCode });
-    await contract.deploy([]);
+    await contract.$deploy([]);
     const nameObject = await aeSdk.aensQuery(name);
     if (contract.deployInfo.address == null) throw new UnexpectedTsError();
     await nameObject.update({ contract_pubkey: contract.deployInfo.address });
