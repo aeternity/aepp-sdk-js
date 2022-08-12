@@ -22,7 +22,6 @@ import {
   decode,
   BytecodeMismatchError,
   InvalidAensNameError,
-  InvalidMethodInvocationError,
   MissingContractAddressError,
   MissingContractDefError,
   NotPayableFunctionError,
@@ -186,7 +185,7 @@ describe('Contract instance', () => {
   });
 
   it('fails on calling without deployment', () => expect(testContract.methods.intFn(2))
-    .to.be.rejectedWith(InvalidMethodInvocationError, 'You need to deploy contract before calling!'));
+    .to.be.rejectedWith(MissingContractAddressError, 'Can\'t call contract without address'));
 
   it('deploys', async () => {
     const deployInfo = await testContract.deploy(['test', 1, 'hahahaha'], {

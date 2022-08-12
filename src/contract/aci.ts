@@ -448,7 +448,7 @@ export default async function getContractInstance({
 
     if (fn == null) throw new MissingFunctionNameError();
     if (fn === 'init' && opt.callStatic === false) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
-    if (contractId == null && fn !== 'init') throw new InvalidMethodInvocationError('You need to deploy contract before calling!');
+    if (contractId == null && fn !== 'init') throw new MissingContractAddressError('Can\'t call contract without address');
     if (fn !== 'init' && opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(opt.amount, fn);
 
     let callerId;
