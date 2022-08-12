@@ -23,7 +23,7 @@ import {
 } from '../utils/errors';
 import { decode, Encoded } from '../utils/encoder';
 import { getAccount } from '../chain';
-import { getContractInstance } from '../contract/methods';
+import getContractInstance from '../contract/aci';
 import { _buildTx } from '../tx';
 import { Tag } from '../tx/builder/constants';
 import { buildTx } from '../tx/builder';
