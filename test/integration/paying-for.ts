@@ -22,7 +22,7 @@ import { getSdk } from '.';
 import {
   AeSdk, MemoryAccount, Tag, UnexpectedTsError,
 } from '../../src';
-import { ContractInstance } from '../../src/contract/aci';
+import { ContractInstance } from '../../src/contract/Contract';
 import { Encoded } from '../../src/utils/encoder';
 
 describe('Paying for transaction of another account', () => {

@@ -23,7 +23,7 @@ import {
   commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, genSalt, UnexpectedTsError, AeSdk,
 } from '../../src';
 import { Encoded, Encoding } from '../../src/utils/encoder';
-import { ContractInstance } from '../../src/contract/aci';
+import { ContractInstance } from '../../src/contract/Contract';
 
 const identityContract = `
 contract Identity =

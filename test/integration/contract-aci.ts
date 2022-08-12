@@ -32,7 +32,7 @@ import {
 } from '../../src';
 import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
-import { ContractInstance } from '../../src/contract/aci';
+import { ContractInstance } from '../../src/contract/Contract';
 import { Aci } from '../../src/apis/compiler';
 
 const identityContractSourceCode = `

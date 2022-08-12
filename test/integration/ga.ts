@@ -22,7 +22,7 @@ import {
   AeSdk, generateKeyPair, genSalt, MemoryAccount, AccountGeneralized, Tag, unpackTx,
 } from '../../src';
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
-import { ContractInstance } from '../../src/contract/aci';
+import { ContractInstance } from '../../src/contract/Contract';
 
 const sourceCode = `contract BlindAuth =
   record state = { txHash: option(hash) }

@@ -2,7 +2,7 @@ import * as chainMethods from './chain';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
-import getContractInstance from './contract/aci';
+import getContractInstance from './contract/Contract';
 import * as contractGaMethods from './contract/ga';
 import { _buildTx } from './tx';
 import { mapObject, UnionToIntersection } from './utils/other';
