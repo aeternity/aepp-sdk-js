@@ -254,7 +254,7 @@ class AeSdkBase {
       ...this._options,
       onNode: getValueOrErrorProxy(() => this.api),
       onAccount: getValueOrErrorProxy(() => this._resolveAccount()),
-      onCompiler: getValueOrErrorProxy(() => this.compilerApi),
+      onCompiler: this.compilerApi,
     };
   }
 
