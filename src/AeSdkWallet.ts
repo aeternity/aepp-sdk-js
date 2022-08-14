@@ -1,6 +1,6 @@
 import { v4 as uuid } from '@aeternity/uuid';
 import AeSdk from './AeSdk';
-import { OnAccount } from './AeSdkBase';
+import { OnAccount } from './AeSdkMethods';
 import verifyTransaction from './tx/validator';
 import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
 import {
