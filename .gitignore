@@ -28,3 +28,4 @@ coverage.*
 .site
 site
 /src/apis/
+/tooling/autorest/compiler-swagger.yaml

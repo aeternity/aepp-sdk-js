@@ -61,7 +61,6 @@ namespace Test =
 
 contract interface RemoteI =
   type test_type = int
-  record state = { value: string, key: test_type, testOption: option(string) }
   record test_record = { value: string, key: list(test_type) }
   entrypoint test : () => int
   datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int)
@@ -272,9 +271,8 @@ describe('Contract instance', () => {
   }));
 
   it('rejects not matching bytecode with enabled validation', async () => expect(aeSdk.getContractInstance({
-    bytecode: (await aeSdk.compilerApi.compileContract({
-      code: identityContractSourceCode, options: {},
-    })).bytecode,
+    bytecode: (await aeSdk.compilerApi.compileContract({ code: identityContractSourceCode }))
+      .bytecode,
     aci: await aeSdk.compilerApi
       .generateACI({ code: identityContractSourceCode, options: { fileSystem } }),
     address: testContractAddress,
