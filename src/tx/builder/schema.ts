@@ -11,6 +11,7 @@ import {
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
 import MPTree from '../../utils/mptree';
+import { UnionToIntersection } from '../../utils/other';
 import { NamePointer } from '../../apis/node';
 
 export enum ORACLE_TTL_TYPES {
@@ -26,7 +27,6 @@ export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
 export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 // # CONTRACT
-export const AMOUNT = 0;
 export const DRY_RUN_ACCOUNT = {
   pub: 'ak_11111111111111111111111111111111273Yts',
   amount: 100000000000000000000000000000000000n,
@@ -152,11 +152,6 @@ interface BuildFieldTypes<Prefix extends undefined | Encoding | readonly Encodin
   [FIELD_TYPES.stateTree]: any;
 }
 
-// based on https://stackoverflow.com/a/50375286/6176994
-type UnionToIntersection<Union> =
-  (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
-    ? Intersection : never;
-
 type TxElem = readonly [string, FIELD_TYPES | Field]
 | readonly [string, FIELD_TYPES, Encoding | readonly Encoding[]];
 
@@ -256,7 +251,7 @@ export const TX_SCHEMA = {
       ['accountId', FIELD_TYPES.id, Encoding.AccountAddress],
       ['nonce', shortUInt],
       ['nameId', nameId],
-      ['nameTtl', uInt],
+      ['nameTtl', shortUInt],
       ['pointers', FIELD_TYPES.pointers],
       ['clientTtl', shortUInt],
       ['fee', fee],

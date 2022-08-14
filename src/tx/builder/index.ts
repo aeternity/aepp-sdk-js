@@ -213,11 +213,11 @@ export function validateParams(
   schema: TxField[],
   { excludeKeys = [] }: { excludeKeys: string[] },
 ): object {
+  const optionalFields = ['payload', 'nameFee', 'deposit', 'gasPrice', 'fee', 'gasLimit', 'amount'];
   return Object.fromEntries(
     schema
       // TODO: allow optional keys in schema
-      .filter(([key]) => !excludeKeys.includes(key)
-        && !['payload', 'nameFee', 'deposit', 'gasPrice', 'fee', 'gasLimit'].includes(key))
+      .filter(([key]) => !excludeKeys.includes(key) && !optionalFields.includes(key))
       .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
       .filter(([, message]) => message),
   );

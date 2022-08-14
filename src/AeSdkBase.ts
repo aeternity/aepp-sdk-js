@@ -1,15 +1,13 @@
 import * as chainMethods from './chain';
-import * as txMethods from './tx';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
-import * as contractMethods from './contract/methods';
+import getContractInstance from './contract/Contract';
 import * as contractGaMethods from './contract/ga';
 import { _buildTx } from './tx';
-import { mapObject } from './utils/other';
+import { mapObject, UnionToIntersection } from './utils/other';
 import Node from './Node';
 import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
-import { AMOUNT } from './tx/builder/schema';
 import { Tag } from './tx/builder/constants';
 import AccountBase from './account/Base';
 import {
@@ -43,6 +41,32 @@ function getValueOrErrorProxy<Value extends object>(valueCb: () => Value): Value
   }) as Value;
 }
 
+const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
+
+const methods = {
+  ...chainMethodsOther,
+  ...aensMethods,
+  ...spendMethods,
+  ...oracleMethods,
+  getContractInstance,
+  ...contractGaMethods,
+} as const;
+
+type Decrement<Number extends number> = [-1, 0, 1, 2, 3, 4, 5][Number];
+type GetMethodsOptions <Methods extends { [key: string]: Function }> =
+  {
+    [Name in keyof Methods]:
+    Methods[Name] extends (...args: infer Args) => any
+      ? Args[Decrement<Args['length']>] : never
+  };
+type MethodsOptions = GetMethodsOptions<typeof methods>;
+interface AeSdkBaseOptions
+  extends Partial<UnionToIntersection<MethodsOptions[keyof MethodsOptions]>> {
+  nodes?: Array<{ name: string; instance: Node }>;
+  compilerUrl?: string;
+  ignoreVersion?: boolean;
+}
+
 /**
  * Basic AeSdk class
  *
@@ -61,9 +85,8 @@ function getValueOrErrorProxy<Value extends object>(valueCb: () => Value): Value
 class AeSdkBase {
   _options: {
     denomination: AE_AMOUNT_FORMATS;
-    amount: number;
     [key: string]: any;
-  } = { denomination: AE_AMOUNT_FORMATS.AETTOS, amount: AMOUNT };
+  } = { denomination: AE_AMOUNT_FORMATS.AETTOS };
 
   pool: Map<string, Node> = new Map();
 
@@ -80,13 +103,7 @@ class AeSdkBase {
   constructor(
     {
       nodes = [], compilerUrl, ignoreVersion = false, ...options
-    }:
-    {
-      nodes?: Array<{ name: string; instance: Node }>;
-      compilerUrl?: string;
-      ignoreVersion?: boolean;
-      [key: string]: any; // TODO: consider combining all possible options instead
-    } = {},
+    }: AeSdkBaseOptions = {},
   ) {
     Object.assign(this._options, options);
 
@@ -256,39 +273,22 @@ class AeSdkBase {
   }
 }
 
-const { _buildTx: _, ...txMethodsOther } = txMethods;
-const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
-
-const methods = {
-  ...chainMethodsOther,
-  ...txMethodsOther,
-  ...aensMethods,
-  ...spendMethods,
-  ...oracleMethods,
-  ...contractMethods,
-  ...contractGaMethods,
-} as const;
-
 type RequiredKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? never : K
 }[keyof T];
 
 type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T;
 
-type MakeOptional<Args extends any[]> = Args extends [infer Head, ...infer Tail]
-  ? Tail extends []
-    ? Head extends object
-      ? OptionalIfNotRequired<[Omit<Head, 'onNode' | 'onCompiler' | 'onAccount'>
-      & { onNode?: Node; onCompiler?: Compiler; onAccount?: OnAccount }]>
-      : [Head]
-    : [Head, ...MakeOptional<Tail>]
-  : never;
+type MakeOptional<Options> = OptionalIfNotRequired<[
+  Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'>
+  & { onNode?: Node; onCompiler?: Compiler; onAccount?: OnAccount },
+]>;
 
 type TransformMethods <Methods extends { [key: string]: Function }> =
   {
     [Name in keyof Methods]:
-    Methods[Name] extends (...args: infer Args) => infer Ret
-      ? (...args: MakeOptional<Args>) => Ret
+    Methods[Name] extends (...args: [...infer Args, infer Options]) => infer Ret
+      ? (...args: [...Args, ...MakeOptional<Options>]) => Ret
       : never
   };
 
@@ -299,15 +299,13 @@ Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
   ([name, handler]) => [
     name,
     function methodWrapper(...args: any[]) {
-      const instanceOptions = this._getOptions();
-      const lastArg = args[args.length - 1];
-      if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
-        args[args.length - 1] = {
-          ...instanceOptions,
-          ...lastArg,
-          ...lastArg.onAccount != null && { onAccount: this._resolveAccount(lastArg.onAccount) },
-        };
-      } else args.push(instanceOptions);
+      args.length = handler.length;
+      const options = args[args.length - 1];
+      args[args.length - 1] = {
+        ...this._getOptions(),
+        ...options,
+        ...options?.onAccount != null && { onAccount: this._resolveAccount(options.onAccount) },
+      };
       return handler(...args);
     },
   ],

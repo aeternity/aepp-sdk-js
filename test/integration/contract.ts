@@ -23,7 +23,7 @@ import {
   commitmentHash, decode, encode, DRY_RUN_ACCOUNT, messageToHash, genSalt, UnexpectedTsError, AeSdk,
 } from '../../src';
 import { Encoded, Encoding } from '../../src/utils/encoder';
-import { ContractInstance } from '../../src/contract/aci';
+import { ContractInstance } from '../../src/contract/Contract';
 
 const identityContract = `
 contract Identity =
@@ -319,18 +319,16 @@ describe('Contract', () => {
   });
 
   describe('AENS operation delegation', () => {
-    let contractId: Encoded.ContractAddress;
     const name = randomName(15);
     const salt = genSalt();
     let owner: Encoded.AccountAddress;
     let newOwner: Encoded.AccountAddress;
-    let delegationSignature: string;
+    let delegationSignature: Uint8Array;
 
     before(async () => {
       contract = await aeSdk.getContractInstance({ sourceCode: aensDelegationContract });
       await contract.deploy();
       if (contract.deployInfo.address == null) throw new UnexpectedTsError();
-      contractId = contract.deployInfo.address;
       [owner, newOwner] = aeSdk.addresses();
     });
 
@@ -338,13 +336,13 @@ describe('Contract', () => {
       const commitmentId = commitmentHash(name, salt);
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId);
-      const preclaimSig = await aeSdk.createAensDelegationSignature(contractId);
+      const preclaimSig = await contract.$createDelegationSignature();
       const preclaim = await contract.methods
         .signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
       preclaim.result.returnType.should.be.equal('ok');
       await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
       // signature for any other name related operations
-      delegationSignature = await aeSdk.createAensDelegationSignature(contractId, { name });
+      delegationSignature = await contract.$createDelegationSignature([name]);
     });
 
     it('claims', async () => {
@@ -378,10 +376,8 @@ describe('Contract', () => {
     });
 
     it('revokes', async () => {
-      const revokeSig = await aeSdk.createAensDelegationSignature(
-        contractId,
-        { name, onAccount: newOwner },
-      );
+      const revokeSig = await contract
+        .$createDelegationSignature([name], { onAccount: aeSdk.accounts[newOwner] });
       const revoke = await contract.methods.signedRevoke(newOwner, name, revokeSig);
       revoke.result.returnType.should.be.equal('ok');
       await expect(aeSdk.aensQuery(name)).to.be.rejectedWith(Error);
@@ -389,11 +385,10 @@ describe('Contract', () => {
   });
 
   describe('Oracle operation delegation', () => {
-    let contractId: Encoded.ContractAddress;
     let oracle: Awaited<ReturnType<typeof aeSdk.getOracleObject>>;
     let oracleId: Encoded.OracleAddress;
     let queryObject: Awaited<ReturnType<typeof aeSdk.getQueryObject>>;
-    let delegationSignature: string;
+    let delegationSignature: Uint8Array;
     const queryFee = 500000;
     const ttl = { RelativeTTL: [50] };
 
@@ -401,12 +396,11 @@ describe('Contract', () => {
       contract = await aeSdk.getContractInstance({ sourceCode: oracleContract });
       await contract.deploy();
       if (contract.deployInfo.address == null) throw new UnexpectedTsError();
-      contractId = contract.deployInfo.address;
       oracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     });
 
     it('registers', async () => {
-      delegationSignature = await aeSdk.createOracleDelegationSignature(contractId);
+      delegationSignature = await contract.$createDelegationSignature();
       const oracleRegister = await contract.methods
         .signedRegisterOracle(aeSdk.address, delegationSignature, queryFee, ttl);
       oracleRegister.result.returnType.should.be.equal('ok');
@@ -436,14 +430,14 @@ describe('Contract', () => {
 
     it('responds to query', async () => {
       const r = 'Hi!';
-      const queryId = queryObject.id;
+      // TODO type should be corrected in node api
+      const queryId = queryObject.id as Encoded.OracleQueryId;
       aeSdk.selectAccount(aeSdk.addresses()[1]);
-      const respondSig = await aeSdk.createOracleDelegationSignature(contractId, { queryId });
+      const respondSig = await contract
+        .$createDelegationSignature([queryId], { omitAddress: true });
       const response = await contract.methods.respond(oracle.id, queryObject.id, respondSig, r);
       response.result.returnType.should.be.equal('ok');
-      // TODO type should be corrected in node api
-      const queryObject2 = await aeSdk
-        .getQueryObject(oracle.id, queryObject.id as Encoded.OracleQueryId);
+      const queryObject2 = await aeSdk.getQueryObject(oracle.id, queryId);
       queryObject2.decodedResponse.should.be.equal(r);
     });
   });

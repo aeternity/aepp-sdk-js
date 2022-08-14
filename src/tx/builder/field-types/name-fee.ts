@@ -27,6 +27,6 @@ export default {
     value: Int | undefined,
     txFields: { name: AensName } & Parameters<typeof coinAmount['serialize']>[1],
   ): Buffer {
-    return coinAmount.serializeOptional.call(this, value, txFields);
+    return coinAmount.serialize.call(this, value, txFields);
   },
 };

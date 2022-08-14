@@ -14,9 +14,16 @@
 *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 *  PERFORMANCE OF THIS SOFTWARE.
 */
-// @ts-expect-error TODO remove
+
+/**
+ * Contract module - routines to interact with the æternity contract
+ *
+ * High level documentation of the contracts are available at
+ * https://github.com/aeternity/protocol/tree/master/contracts and
+ */
+
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import { DRY_RUN_ACCOUNT, AMOUNT } from '../tx/builder/schema';
+import { DRY_RUN_ACCOUNT } from '../tx/builder/schema';
 import { Tag, AensName } from '../tx/builder/constants';
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder';
 import { _buildTx } from '../tx';
@@ -49,6 +56,8 @@ import {
   getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun,
 } from '../chain';
 import AccountBase from '../account/Base';
+import { concatBuffers } from '../utils/other';
+import { isNameValid, produceNameId } from '../tx/builder/helpers';
 
 interface FunctionACI {
   arguments: any[];
@@ -139,6 +148,10 @@ export interface ContractInstance {
   decodeEvents: (
     events: Event[], options?: { omitUnknown?: boolean; contractAddressToName?: any }
   ) => DecodedEvent[];
+  $createDelegationSignature: (
+    ids?: Array<Encoded.Any | AensName>,
+    _options?: { omitAddress?: boolean; onAccount?: AccountBase },
+  ) => Promise<Uint8Array>;
   methods: any;
 }
 
@@ -218,7 +231,6 @@ export default async function getContractInstance({
       onAccount,
       onCompiler,
       onNode,
-      amount: AMOUNT,
       callStatic: false,
       fileSystem,
       ...otherOptions,
@@ -233,6 +245,58 @@ export default async function getContractInstance({
     /* eslint-enable @typescript-eslint/no-unused-vars */
     /* eslint-enable @typescript-eslint/no-empty-function */
     methods: undefined,
+    /**
+     * Helper to generate a signature to delegate
+     *  - pre-claim/claim/transfer/revoke of a name to a contract.
+     *  - register/extend/respond of an Oracle to a contract.
+     * @category contract
+     * @param ids - The list of id's to prepend
+     * @param _options - Options
+     * @param _options.omitAddress - Prepend delegation signature with an account address
+     * @param _options.onAccount - Account to use
+     * @returns Signature
+     * @example
+     * ```js
+     * const aeSdk = new AeSdk({ ... })
+     * const contract = await aeSdk.getContractInstance({ address: 'ct_asd2ks...' })
+     * const aensName = 'example.chain'
+     * const onAccount = new MemoryAccount(...) // Sign with a specific account
+     * // Preclaim signature
+     * const preclaimSig = await contract.$createDelegationSignature([], { onAccount })
+     * // Claim, transfer and revoke signature
+     * const aensDelegationSig = await contract
+     *   .$createDelegationSignature([aensName], { onAccount })
+     * ```
+     * @example
+     * ```js
+     * const aeSdk = new AeSdk({ ... })
+     * const contract = await aeSdk.getContractInstance({ address: 'ct_asd2ks...' })
+     * const oracleQueryId = 'oq_...'
+     * const onAccount = new MemoryAccount(...) // Sign with a specific account
+     * // Oracle register and extend signature
+     * const oracleDelegationSig = await contract.$createDelegationSignature([], { onAccount })
+     * // Oracle respond signature
+     * const respondSig = await contract
+     *   .$createDelegationSignature([oracleQueryId], { onAccount, omitAddress: true })
+     * ```
+     */
+    async $createDelegationSignature(
+      ids: Array<Encoded.Any | AensName> = [],
+      _options?: { omitAddress?: boolean; onAccount?: AccountBase },
+    ): Promise<Uint8Array> {
+      const options = { ...instance.options, ..._options };
+      const contractId = instance.deployInfo.address;
+      if (contractId == null) throw new MissingContractAddressError('Can\'t create delegation signature without address');
+      return options.onAccount.sign(
+        concatBuffers([
+          Buffer.from(await options.onNode.getNetworkId()),
+          ...options.omitAddress === true ? [] : [decode(options.onAccount.address)],
+          ...ids.map((e) => (isNameValid(e) ? produceNameId(e) : e)).map((e) => decode(e)),
+          decode(contractId),
+        ]),
+        options,
+      );
+    },
   };
 
   if (validateBytecode != null) {
@@ -384,7 +448,7 @@ export default async function getContractInstance({
 
     if (fn == null) throw new MissingFunctionNameError();
     if (fn === 'init' && opt.callStatic === false) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
-    if (contractId == null && fn !== 'init') throw new InvalidMethodInvocationError('You need to deploy contract before calling!');
+    if (contractId == null && fn !== 'init') throw new MissingContractAddressError('Can\'t call contract without address');
     if (fn !== 'init' && opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(opt.amount, fn);
 
     let callerId;

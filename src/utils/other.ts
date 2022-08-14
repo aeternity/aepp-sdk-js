@@ -49,3 +49,8 @@ export function isAccountNotFoundError(error: Error): boolean {
   return error instanceof RestError && error.statusCode === 404
     && error.message.includes('Account not found');
 }
+
+// based on https://stackoverflow.com/a/50375286/6176994
+export type UnionToIntersection<Union> =
+  (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
+    ? Intersection : never;

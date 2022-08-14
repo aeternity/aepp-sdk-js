@@ -11,6 +11,4 @@ export default {
     }
     return value;
   },
-
-  serialize: coinAmount.serializeOptional,
 };

@@ -138,6 +138,4 @@ export default {
     }
     return value.toFixed();
   },
-
-  serialize: coinAmount.serializeOptional,
 };

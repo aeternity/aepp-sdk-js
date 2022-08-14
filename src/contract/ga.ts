@@ -27,7 +27,7 @@ import { decode, Encoded } from '../utils/encoder';
 import { IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
-import { getContractInstance } from './methods';
+import getContractInstance from './Contract';
 import { send, SendOptions } from '../spend';
 import Node from '../Node';
 import { getAccount } from '../chain';
