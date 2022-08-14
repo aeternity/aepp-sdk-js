@@ -83,10 +83,7 @@ interface AeSdkBaseOptions
  * available.
  */
 class AeSdkBase {
-  _options: {
-    denomination: AE_AMOUNT_FORMATS;
-    [key: string]: any;
-  } = { denomination: AE_AMOUNT_FORMATS.AETTOS };
+  _options: AeSdkBaseOptions = { denomination: AE_AMOUNT_FORMATS.AETTOS };
 
   pool: Map<string, Node> = new Map();
 
