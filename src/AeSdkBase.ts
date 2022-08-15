@@ -1,93 +1,19 @@
-import * as chainMethods from './chain';
-import * as aensMethods from './aens';
-import * as spendMethods from './spend';
-import * as oracleMethods from './oracle';
-import getContractInstance from './contract/Contract';
-import * as contractGaMethods from './contract/ga';
-import { _buildTx } from './tx';
-import { mapObject, UnionToIntersection } from './utils/other';
 import Node from './Node';
-import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
-import { Tag } from './tx/builder/constants';
 import AccountBase from './account/Base';
-import {
-  CompilerError,
-  DuplicateNodeError,
-  NodeNotFoundError,
-  NotImplementedError,
-  TypeError,
-} from './utils/errors';
+import { CompilerError, DuplicateNodeError, NodeNotFoundError } from './utils/errors';
 import { Encoded } from './utils/encoder';
 import Compiler from './contract/Compiler';
-
-export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
+import AeSdkMethods, { OnAccount, getValueOrErrorProxy } from './AeSdkMethods';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 
-function getValueOrErrorProxy<Value extends object>(valueCb: () => Value): Value {
-  return new Proxy({}, {
-    ...Object.fromEntries([
-      'apply', 'construct', 'defineProperty', 'deleteProperty', 'getOwnPropertyDescriptor',
-      'getPrototypeOf', 'isExtensible', 'ownKeys', 'preventExtensions', 'set', 'setPrototypeOf',
-    ].map((name) => [name, () => { throw new NotImplementedError(`${name} proxy request`); }])),
-    get(t: {}, property: string | symbol, receiver: any) {
-      const target = valueCb();
-      const value = Reflect.get(target, property, receiver);
-      return typeof value === 'function' ? value.bind(target) : value;
-    },
-    has(t: {}, property: string | symbol) {
-      return Reflect.has(valueCb(), property);
-    },
-  }) as Value;
-}
-
-const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
-
-const methods = {
-  ...chainMethodsOther,
-  ...aensMethods,
-  ...spendMethods,
-  ...oracleMethods,
-  getContractInstance,
-  ...contractGaMethods,
-} as const;
-
-type Decrement<Number extends number> = [-1, 0, 1, 2, 3, 4, 5][Number];
-type GetMethodsOptions <Methods extends { [key: string]: Function }> =
-  {
-    [Name in keyof Methods]:
-    Methods[Name] extends (...args: infer Args) => any
-      ? Args[Decrement<Args['length']>] : never
-  };
-type MethodsOptions = GetMethodsOptions<typeof methods>;
-interface AeSdkBaseOptions
-  extends Partial<UnionToIntersection<MethodsOptions[keyof MethodsOptions]>> {
-  nodes?: Array<{ name: string; instance: Node }>;
-  compilerUrl?: string;
-  ignoreVersion?: boolean;
-}
-
 /**
- * Basic AeSdk class
- *
- * AeSdkBase objects are the composition of:
- * - chain methods
- * - tx methods
- * - aens methods
- * - spend methods
- * - oracle methods
- * - contract methods
- * - contract ga methods
- * Only by providing the joint functionality of them, most more advanced
- * operations, i.e. the ones with actual use value on the chain, become
- * available.
+ * Basic AeSdk class implements:
+ * - node selector,
+ * - integrated compiler support,
+ * - wrappers of account methods mapped to the current account.
  */
-class AeSdkBase {
-  _options: {
-    denomination: AE_AMOUNT_FORMATS;
-    [key: string]: any;
-  } = { denomination: AE_AMOUNT_FORMATS.AETTOS };
-
+export default class AeSdkBase extends AeSdkMethods {
   pool: Map<string, Node> = new Map();
 
   selectedNodeName?: string;
@@ -103,9 +29,13 @@ class AeSdkBase {
   constructor(
     {
       nodes = [], compilerUrl, ignoreVersion = false, ...options
-    }: AeSdkBaseOptions = {},
+    }: ConstructorParameters<typeof AeSdkMethods>[0] & {
+      nodes?: Array<{ name: string; instance: Node }>;
+      compilerUrl?: string;
+      ignoreVersion?: boolean;
+    } = {},
   ) {
-    Object.assign(this._options, options);
+    super(options);
 
     nodes.forEach(({ name, instance }, i) => this.addNode(name, instance, i === 0));
 
@@ -234,82 +164,15 @@ class AeSdkBase {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
 
-  /**
-   * Resolves an account
-   * @param account - ak-address, instance of AccountBase, or keypair
-   */
-  // eslint-disable-next-line class-methods-use-this
-  _resolveAccount(account?: OnAccount): AccountBase {
-    if (typeof account === 'string') throw new NotImplementedError('Address in AccountResolver');
-    if (typeof account === 'object') return account;
-    throw new TypeError(
-      'Account should be an address (ak-prefixed string), '
-      + `or instance of AccountBase, got ${String(account)} instead`,
-    );
-  }
-
-  _getOptions(): {
+  override _getOptions(): {
     onNode: Node;
     onAccount: AccountBase;
     onCompiler: Compiler;
   } {
     return {
-      ...this._options,
+      ...super._getOptions(),
       onNode: getValueOrErrorProxy(() => this.api),
-      onAccount: getValueOrErrorProxy(() => this._resolveAccount()),
-      onCompiler: getValueOrErrorProxy(() => this.compilerApi),
+      onCompiler: this.compilerApi,
     };
   }
-
-  async buildTx<TxType extends Tag>(
-    txType: TxType,
-    options: Omit<Parameters<typeof _buildTx<TxType>>[1], 'onNode'> & { onNode?: Node },
-  ): Promise<Encoded.Transaction> {
-    // @ts-expect-error TODO: need to figure out what's wrong here
-    return _buildTx<TxType>(txType, {
-      ...this._getOptions(),
-      ...options,
-    });
-  }
 }
-
-type RequiredKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
-}[keyof T];
-
-type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T;
-
-type MakeOptional<Options> = OptionalIfNotRequired<[
-  Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'>
-  & { onNode?: Node; onCompiler?: Compiler; onAccount?: OnAccount },
-]>;
-
-type TransformMethods <Methods extends { [key: string]: Function }> =
-  {
-    [Name in keyof Methods]:
-    Methods[Name] extends (...args: [...infer Args, infer Options]) => infer Ret
-      ? (...args: [...Args, ...MakeOptional<Options>]) => Ret
-      : never
-  };
-
-interface AeSdkBaseMethods extends TransformMethods<typeof methods> {}
-
-Object.assign(AeSdkBase.prototype, mapObject<Function, Function>(
-  methods,
-  ([name, handler]) => [
-    name,
-    function methodWrapper(...args: any[]) {
-      args.length = handler.length;
-      const options = args[args.length - 1];
-      args[args.length - 1] = {
-        ...this._getOptions(),
-        ...options,
-        ...options?.onAccount != null && { onAccount: this._resolveAccount(options.onAccount) },
-      };
-      return handler(...args);
-    },
-  ],
-));
-
-export default AeSdkBase as new (options?: ConstructorParameters<typeof AeSdkBase>[0]) =>
-AeSdkBase & AeSdkBaseMethods;

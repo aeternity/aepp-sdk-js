@@ -34,6 +34,7 @@ export * from './oracle';
 export * from './spend';
 export * from './contract/ga';
 
+export { default as AeSdkMethods } from './AeSdkMethods';
 export { default as AeSdkBase } from './AeSdkBase';
 export { default as AeSdk } from './AeSdk';
 export { default as AeSdkAepp } from './AeSdkAepp';

@@ -1,4 +1,5 @@
-import AeSdkBase, { OnAccount } from './AeSdkBase';
+import AeSdkBase from './AeSdkBase';
+import { OnAccount } from './AeSdkMethods';
 import AccountBase from './account/Base';
 import { decode, Encoded } from './utils/encoder';
 import { UnavailableAccountError } from './utils/errors';
