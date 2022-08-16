@@ -69,6 +69,7 @@ const CRYPTO_DEFAULTS = {
 
 /**
  * Symmetric private key encryption using secret (derived) key.
+ * @category keystore
  * @param plaintext - Data to be encrypted.
  * @param key - Secret key.
  * @param nonce - Randomly generated nonce.
@@ -86,6 +87,7 @@ function encrypt(
 
 /**
  * Symmetric private key decryption using secret (derived) key.
+ * @category keystore
  * @param ciphertext - Data to be decrypted.
  * @param key - Secret key.
  * @param nonce - Nonce from key-object.
@@ -103,6 +105,7 @@ function decrypt(
 
 /**
  * Derive secret key from password with key derivation function.
+ * @category keystore
  * @param password - User-supplied password.
  * @param nonce - Randomly generated nonce.
  * @param kdf - Key derivation function.
@@ -120,6 +123,7 @@ async function deriveKey(
 
 /**
  * Recover plaintext private key from secret-storage key object.
+ * @category keystore
  * @param password - Keystore object password.
  * @param keystore - Keystore object.
  * @returns Plaintext private key.
@@ -139,6 +143,7 @@ export async function recover(
 
 /**
  * Export private key to keystore secret-storage format.
+ * @category keystore
  * @param name - Key name.
  * @param password - User-supplied password.
  * @param privateKey - Private key as hex-string or a Buffer.
