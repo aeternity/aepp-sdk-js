@@ -5,6 +5,7 @@ import _coinAmount from './coin-amount';
 import _address from './address';
 import _addresses from './addresses';
 import _deposit from './deposit';
+import _enumeration from './enumeration';
 import _fee from './fee';
 import _gasLimit from './gas-limit';
 import _gasPrice from './gas-price';
@@ -21,6 +22,7 @@ const coinAmount = _coinAmount;
 const address = _address;
 const addresses = _addresses;
 const deposit = _deposit;
+const enumeration = _enumeration;
 const fee = _fee;
 const gasLimit = _gasLimit;
 const gasPrice = _gasPrice;
@@ -42,6 +44,7 @@ export {
   address,
   addresses,
   deposit,
+  enumeration,
   fee,
   gasLimit,
   gasPrice,

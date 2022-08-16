@@ -45,9 +45,6 @@ function deserializeField(
         abiVersion: readInt(Buffer.from([abi])),
       };
     }
-    case FIELD_TYPES.abiVersion:
-    case FIELD_TYPES.ttlType:
-      return readInt(value);
     case FIELD_TYPES.bool:
       return value[0] === 1;
     case FIELD_TYPES.binary:
@@ -108,9 +105,6 @@ function deserializeField(
 
 function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any {
   switch (type) {
-    case FIELD_TYPES.abiVersion:
-    case FIELD_TYPES.ttlType:
-      return writeInt(value);
     case FIELD_TYPES.bool:
       return Buffer.from([(value === true) ? 1 : 0]);
     case FIELD_TYPES.binary:

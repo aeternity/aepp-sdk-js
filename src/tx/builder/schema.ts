@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, addresses, pointers,
+  address, addresses, pointers, enumeration,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
 import MPTree from '../../utils/mptree';
@@ -118,8 +118,6 @@ export enum FIELD_TYPES {
   mptrees,
   callReturnType,
   ctVersion,
-  abiVersion,
-  ttlType,
   sophiaCodeTypeInfo,
   payload,
   stateTree,
@@ -140,8 +138,6 @@ interface BuildFieldTypes<Prefix extends undefined | Encoding | readonly Encodin
   [FIELD_TYPES.mptrees]: MPTree[];
   [FIELD_TYPES.callReturnType]: any;
   [FIELD_TYPES.ctVersion]: CtVersion;
-  [FIELD_TYPES.abiVersion]: ABI_VERSIONS;
-  [FIELD_TYPES.ttlType]: ORACLE_TTL_TYPES;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
   [FIELD_TYPES.payload]: string | undefined;
   [FIELD_TYPES.stateTree]: any;
@@ -308,7 +304,7 @@ export const TX_SCHEMA = {
       ['callerId', address<Encoding.AccountAddress>()],
       ['nonce', shortUInt],
       ['contractId', address<Encoding.ContractAddress | Encoding.Name>()],
-      ['abiVersion', FIELD_TYPES.abiVersion],
+      ['abiVersion', enumeration<ABI_VERSIONS>()],
       ['fee', fee],
       ['ttl', shortUInt],
       ['amount', coinAmount],
@@ -341,11 +337,11 @@ export const TX_SCHEMA = {
       ['queryFormat', FIELD_TYPES.string],
       ['responseFormat', FIELD_TYPES.string],
       ['queryFee', coinAmount],
-      ['oracleTtlType', FIELD_TYPES.ttlType],
+      ['oracleTtlType', enumeration<ORACLE_TTL_TYPES>()],
       ['oracleTtlValue', shortUInt],
       ['fee', fee],
       ['ttl', shortUInt],
-      ['abiVersion', FIELD_TYPES.abiVersion],
+      ['abiVersion', enumeration<ABI_VERSIONS>()],
     ],
   },
   [Tag.OracleExtendTx]: {
@@ -353,7 +349,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['oracleId', address<Encoding.OracleAddress | Encoding.Name>()],
       ['nonce', shortUInt],
-      ['oracleTtlType', FIELD_TYPES.ttlType],
+      ['oracleTtlType', enumeration<ORACLE_TTL_TYPES>()],
       ['oracleTtlValue', shortUInt],
       ['fee', fee],
       ['ttl', shortUInt],
@@ -367,9 +363,9 @@ export const TX_SCHEMA = {
       ['oracleId', address<Encoding.OracleAddress | Encoding.Name>()],
       ['query', FIELD_TYPES.string],
       ['queryFee', coinAmount],
-      ['queryTtlType', FIELD_TYPES.ttlType],
+      ['queryTtlType', enumeration<ORACLE_TTL_TYPES>()],
       ['queryTtlValue', shortUInt],
-      ['responseTtlType', FIELD_TYPES.ttlType],
+      ['responseTtlType', enumeration<ORACLE_TTL_TYPES>()],
       ['responseTtlValue', shortUInt],
       ['fee', fee],
       ['ttl', shortUInt],
@@ -382,7 +378,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
       ['queryId', FIELD_TYPES.binary, Encoding.OracleQueryId],
       ['response', FIELD_TYPES.string],
-      ['responseTtlType', FIELD_TYPES.ttlType],
+      ['responseTtlType', enumeration<ORACLE_TTL_TYPES>()],
       ['responseTtlValue', shortUInt],
       ['fee', fee],
       ['ttl', shortUInt],
@@ -570,7 +566,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['caller', address<Encoding.AccountAddress>()],
       ['contract', address<Encoding.ContractAddress>()],
-      ['abiVersion', FIELD_TYPES.abiVersion],
+      ['abiVersion', enumeration<ABI_VERSIONS>()],
       ['amount', uInt],
       ['callData', FIELD_TYPES.binary, Encoding.ContractBytearray],
       ['callStack', FIELD_TYPES.callStack],
@@ -678,7 +674,7 @@ export const TX_SCHEMA = {
       ...BASE_TX,
       ['gaId', address<Encoding.AccountAddress>()],
       ['authData', FIELD_TYPES.binary, Encoding.ContractBytearray],
-      ['abiVersion', FIELD_TYPES.abiVersion],
+      ['abiVersion', enumeration<ABI_VERSIONS>()],
       ['fee', fee],
       ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
