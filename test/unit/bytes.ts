@@ -20,18 +20,12 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { toBytes, bigNumberToByteArray, TypeError } from '../../src';
-import { isBase64, snakeToPascal, pascalToSnake } from '../../src/utils/string';
+import { snakeToPascal, pascalToSnake } from '../../src/utils/string';
 
 describe('Bytes', () => {
-  const bytes = Buffer.from('hello');
-
   it('toBytes: converts null to empty array', () => {
     toBytes(null).should.be.eql(Buffer.from([]));
   });
-
-  it('is base64 string', () => isBase64(bytes.toString('base64')).should.be.equal(true));
-
-  it('is not base64 string', () => isBase64('hello').should.be.equal(false));
 
   const testCase = 'test_test-testTest';
 
