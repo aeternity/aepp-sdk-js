@@ -69,6 +69,9 @@ type Bip32PathT<MaxLen extends number, H extends 'H' | 'h' | '\''> = MaxLen exte
 type Bip32Path<MaxLen extends number> =
   '' | Bip32PathT<MaxLen, 'H'> | Bip32PathT<MaxLen, 'h'> | Bip32PathT<MaxLen, '\''>;
 
+/**
+ * @category hd-wallet
+ */
 export function deriveChild({ secretKey, chainCode }: KeyTreeNode, index: number): KeyTreeNode {
   if (index < HARDENED_OFFSET) {
     throw new DerivationError(`Segment ${index} is not hardened`);
@@ -87,6 +90,9 @@ export function deriveChild({ secretKey, chainCode }: KeyTreeNode, index: number
   };
 }
 
+/**
+ * @category hd-wallet
+ */
 export function derivePathFromKey(path: Bip32Path<5>, key: KeyTreeNode): KeyTreeNode {
   const segments = path === '' ? [] : fromString(path).toPathArray();
   segments.forEach((segment, i) => {
@@ -98,6 +104,9 @@ export function derivePathFromKey(path: Bip32Path<5>, key: KeyTreeNode): KeyTree
   return segments.reduce((parentKey, segment) => deriveChild(parentKey, segment), key);
 }
 
+/**
+ * @category hd-wallet
+ */
 export function getMasterKeyFromSeed(seed: Uint8Array): KeyTreeNode {
   const I = hmac(seed, ED25519_CURVE);
   const IL = I.slice(0, 32);
@@ -108,6 +117,9 @@ export function getMasterKeyFromSeed(seed: Uint8Array): KeyTreeNode {
   };
 }
 
+/**
+ * @category hd-wallet
+ */
 export function derivePathFromSeed(path: 'm' | `m/${Bip32Path<5>}`, seed: Uint8Array): KeyTreeNode {
   if (!['m', 'm/'].includes(path.slice(0, 2))) {
     throw new DerivationError('Root element is required');
@@ -124,10 +136,16 @@ function formatAccount(keys: nacl.SignKeyPair): Account {
   };
 }
 
+/**
+ * @category hd-wallet
+ */
 export function getKeyPair(secretKey: Uint8Array): nacl.SignKeyPair {
   return nacl.sign.keyPair.fromSeed(secretKey);
 }
 
+/**
+ * @category hd-wallet
+ */
 export function generateSaveHDWalletFromSeed(seed: Uint8Array, password: string): HDWallet {
   const walletKey = derivePathFromSeed('m/44h/457h', seed);
   return {
@@ -136,6 +154,9 @@ export function generateSaveHDWalletFromSeed(seed: Uint8Array, password: string)
   };
 }
 
+/**
+ * @category hd-wallet
+ */
 export function getSaveHDWalletAccounts(
   saveHDWallet: HDWallet,
   password: string,
@@ -149,6 +170,9 @@ export function getSaveHDWalletAccounts(
     .map((_, idx) => formatAccount(getKeyPair(derivePathFromKey(`${idx}h/0h/0h`, walletKey).secretKey)));
 }
 
+/**
+ * @category hd-wallet
+ */
 export const getHdWalletAccountFromSeed = (
   seed: Uint8Array,
   accountIdx: number,
