@@ -162,8 +162,8 @@ describe('Contract', () => {
   it('Deploy and call contract on specific account', async () => {
     contract.deployInfo = {};
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
-    const accountBefore = contract.options.onAccount;
-    contract.options.onAccount = onAccount;
+    const accountBefore = contract.$options.onAccount;
+    contract.$options.onAccount = onAccount;
     deployed = await contract.$deploy();
     if (deployed?.result?.callerId == null) throw new UnexpectedTsError();
     expect(deployed.result.callerId).to.be.equal(onAccount.address);
@@ -171,7 +171,7 @@ describe('Contract', () => {
       .to.be.equal(onAccount.address);
     expect((await contract.methods.getArg(42, { callStatic: false })).result.callerId)
       .to.be.equal(onAccount.address);
-    contract.options.onAccount = accountBefore;
+    contract.$options.onAccount = accountBefore;
   });
 
   it('Call-Static deploy transaction', async () => {

@@ -122,7 +122,7 @@ export interface ContractInstance {
     rawTx?: string;
     txData?: TxData;
   };
-  options: any;
+  $options: any;
   $compile: (options?: {}) => Promise<Encoded.ContractBytearray>;
   _estimateGas: (name: string, params: any[], options: object) => Promise<number>;
   $deploy: (params?: any[], options?: object) => Promise<any>;
@@ -227,7 +227,7 @@ export default async function getContractInstance({
     sourceCode,
     bytecode,
     deployInfo: { address },
-    options: {
+    $options: {
       onAccount,
       onCompiler,
       onNode,
@@ -284,7 +284,7 @@ export default async function getContractInstance({
       ids: Array<Encoded.Any | AensName> = [],
       _options?: { omitAddress?: boolean; onAccount?: AccountBase },
     ): Promise<Uint8Array> {
-      const options = { ...instance.options, ..._options };
+      const options = { ...instance.$options, ..._options };
       const contractId = instance.deployInfo.address;
       if (contractId == null) throw new MissingContractAddressError('Can\'t create delegation signature without address');
       return options.onAccount.sign(
@@ -304,7 +304,7 @@ export default async function getContractInstance({
     const onChanBytecode = (await getContractByteCode(address, { onNode })).bytecode;
     const isValid: boolean = sourceCode != null
       ? await onCompiler.validateByteCode(
-        { bytecode: onChanBytecode, source: sourceCode, options: instance.options },
+        { bytecode: onChanBytecode, source: sourceCode, options: instance.$options },
       ).then(() => true, () => false)
       : bytecode === onChanBytecode;
     if (!isValid) throw new BytecodeMismatchError(sourceCode != null ? 'source code' : 'bytecode');
@@ -318,7 +318,7 @@ export default async function getContractInstance({
     if (instance.bytecode != null) throw new IllegalArgumentError('Contract already compiled');
     if (instance.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
     instance.bytecode = (await onCompiler.compileContract({
-      code: instance.sourceCode, options: { ...instance.options, ...options },
+      code: instance.sourceCode, options: { ...instance.$options, ...options },
     })).bytecode as Encoded.ContractBytearray;
     return instance.bytecode;
   };
@@ -352,7 +352,7 @@ export default async function getContractInstance({
     txData: TxData;
     rawTx: Encoded.Transaction;
   }> => {
-    options = { ...instance.options, ...options };
+    options = { ...instance.$options, ...options };
     const txData = await send(tx, options);
     const result = {
       hash: txData.hash,
@@ -388,7 +388,7 @@ export default async function getContractInstance({
     Parameters<typeof instance.$call>[2] &
     Parameters<typeof sendAndProcess>[1],
   ): Promise<ContractInstance['deployInfo']> => {
-    const opt = { ...instance.options, ...options };
+    const opt = { ...instance.$options, ...options };
     if (instance.bytecode == null) await instance.$compile(opt);
     // @ts-expect-error TODO: need to fix compatibility between return types of `$deploy`, `$call`
     if (opt.callStatic === true) return instance.$call('init', params, opt);
@@ -442,7 +442,7 @@ export default async function getContractInstance({
    * @returns CallResult
    */
   instance.$call = async (fn: string, params: any[] = [], options: object = {}) => {
-    const opt = { ...instance.options, ...options };
+    const opt = { ...instance.$options, ...options };
     const fnACI = getFunctionACI(fn);
     const contractId = instance.deployInfo.address;
 
@@ -518,7 +518,7 @@ export default async function getContractInstance({
       contractAddressToName?: { [key: Encoded.ContractAddress]: string };
     },
   ): string {
-    const addressToName = { ...instance.options.contractAddressToName, ...contractAddressToName };
+    const addressToName = { ...instance.$options.contractAddressToName, ...contractAddressToName };
     if (addressToName[ctAddress] != null) return addressToName[ctAddress];
 
     const matchedEvents = [

@@ -163,16 +163,16 @@ describe('Contract instance', () => {
       sourceCode: testContractSourceCode, fileSystem, ttl: 0, gasLimit: 15000,
     });
     delete aeSdk._options.testProperty;
-    expect(testContract.options.testProperty).to.be.equal('test');
+    expect(testContract.$options.testProperty).to.be.equal('test');
     testContract.should.have.property('sourceCode');
     testContract.should.have.property('bytecode');
     testContract.should.have.property('deployInfo');
     testContract.should.have.property('$compile');
     testContract.should.have.property('$call');
     testContract.should.have.property('$deploy');
-    testContract.options.ttl.should.be.equal(0);
-    testContract.options.should.have.property('fileSystem');
-    testContract.options.fileSystem.should.have.property('testLib');
+    testContract.$options.ttl.should.be.equal(0);
+    testContract.$options.should.have.property('fileSystem');
+    testContract.$options.fileSystem.should.have.property('testLib');
     expect(Object.keys(testContract.methods)).to.be.eql(
       testContract._aci.encodedAci.contract.functions.map(({ name }) => name),
     );
