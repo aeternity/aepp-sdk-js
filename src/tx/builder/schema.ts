@@ -63,6 +63,12 @@ export enum ABI_VERSIONS {
   FATE = 3,
 }
 
+export enum CallReturnType {
+  Ok = 0,
+  Error = 1,
+  Revert = 2,
+}
+
 /**
  * @category transaction builder
  */
@@ -116,7 +122,6 @@ export enum FIELD_TYPES {
   callStack,
   proofOfInclusion,
   mptrees,
-  callReturnType,
   ctVersion,
   sophiaCodeTypeInfo,
   payload,
@@ -136,7 +141,6 @@ interface BuildFieldTypes<Prefix extends undefined | Encoding | readonly Encodin
   [FIELD_TYPES.callStack]: any;
   [FIELD_TYPES.proofOfInclusion]: any;
   [FIELD_TYPES.mptrees]: MPTree[];
-  [FIELD_TYPES.callReturnType]: any;
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
   [FIELD_TYPES.payload]: string | undefined;
@@ -323,7 +327,7 @@ export const TX_SCHEMA = {
       ['gasPrice', gasPrice],
       ['gasUsed', shortUInt],
       ['returnValue', FIELD_TYPES.binary, Encoding.ContractBytearray],
-      ['returnType', FIELD_TYPES.callReturnType],
+      ['returnType', enumeration<CallReturnType>()],
       // TODO: add serialization for
       //  <log> :: [ { <address> :: id, [ <topics> :: binary() ], <data> :: binary() } ]
       ['log', FIELD_TYPES.rawBinary],

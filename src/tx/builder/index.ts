@@ -73,17 +73,6 @@ function deserializeField(
       return [readInt(value)];
     case FIELD_TYPES.mptrees:
       return value.map((t: MPTreeBinary) => new MPTree(t));
-    case FIELD_TYPES.callReturnType:
-      switch (readInt(value)) {
-        case '0':
-          return 'ok';
-        case '1':
-          return 'error';
-        case '2':
-          return 'revert';
-        default:
-          return value;
-      }
     case FIELD_TYPES.sophiaCodeTypeInfo:
       return value.reduce(
         (acc: object, [funHash, fnName, argType, outType]: [
@@ -127,13 +116,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       return value.map((t: MPTree) => t.serialize());
     case FIELD_TYPES.ctVersion:
       return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
-    case FIELD_TYPES.callReturnType:
-      switch (value) {
-        case 'ok': return writeInt(0);
-        case 'error': return writeInt(1);
-        case 'revert': return writeInt(2);
-        default: return value;
-      }
     default:
       if (typeof type === 'number') return value;
       return type.serialize(value, params);
