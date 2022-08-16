@@ -16,7 +16,6 @@
  */
 import BigNumber from 'bignumber.js';
 import { NoSerializerFoundError, TypeError } from './errors';
-import { isBase64, isHex } from './string';
 
 /**
  * Convert bignumber to byte array
@@ -50,19 +49,4 @@ export function toBytes(val?: null | string | number | BigNumber, big = false): 
     return Buffer.from(val);
   }
   throw new NoSerializerFoundError();
-}
-
-/**
- * Convert a string to a Buffer.  If encoding is not specified, hex-encoding
- * will be used if the input is valid hex.  If the input is valid base64 but
- * not valid hex, base64 will be used.  Otherwise, utf8 will be used.
- * @param str - String to be converted.
- * @param enc - Encoding of the input string.
- * @returns Buffer containing the input data.
- */
-export function str2buf(str: string, enc?: BufferEncoding): Buffer {
-  return Buffer.from(
-    str,
-    enc ?? (isHex(str) ? 'hex' : undefined) ?? (isBase64(str) ? 'base64' : undefined),
-  );
 }

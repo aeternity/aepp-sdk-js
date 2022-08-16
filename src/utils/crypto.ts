@@ -20,7 +20,6 @@ import nacl, { SignKeyPair } from 'tweetnacl';
 import { blake2b } from 'blakejs/blake2b.js';
 import { encode as varuintEncode } from 'varuint-bitcoin';
 
-import { str2buf } from './bytes';
 import { concatBuffers } from './other';
 import {
   decode, encode, Encoded, Encoding,
@@ -28,11 +27,11 @@ import {
 
 /**
  * Generate address from secret key
- * @param secret - Private key
+ * @param secret - Private key as hex string
  * @returns Public key encoded as address
  */
 export function getAddressFromPriv(secret: string | Uint8Array): Encoded.AccountAddress {
-  const secretBuffer = typeof secret === 'string' ? str2buf(secret) : secret;
+  const secretBuffer = typeof secret === 'string' ? Buffer.from(secret, 'hex') : secret;
   const keys = nacl.sign.keyPair.fromSecretKey(secretBuffer);
   return encode(keys.publicKey, Encoding.AccountAddress);
 }
@@ -199,7 +198,7 @@ export function verifyMessage(
  *
  * Sign a message, and then verifying that signature
  * @param privateKey - Private key to verify
- * @param publicKey - Public key to verify
+ * @param publicKey - Public key to verify as hex string
  * @returns Valid?
  */
 export function isValidKeypair(
@@ -208,6 +207,6 @@ export function isValidKeypair(
 ): boolean {
   const message = Buffer.from('TheMessage');
   const signature = sign(message, privateKey);
-  const publicKeyBuffer = typeof publicKey === 'string' ? str2buf(publicKey) : publicKey;
+  const publicKeyBuffer = typeof publicKey === 'string' ? Buffer.from(publicKey, 'hex') : publicKey;
   return verify(message, signature, encode(publicKeyBuffer, Encoding.AccountAddress));
 }
