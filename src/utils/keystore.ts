@@ -2,7 +2,7 @@ import nacl from 'tweetnacl';
 import { v4 as uuid } from '@aeternity/uuid';
 import { hash, argon2id } from '@aeternity/argon2';
 import { getAddressFromPriv } from './crypto';
-import { bytesToHex, hexToBytes } from './bytes';
+import { bytesToHex } from './bytes';
 import { InvalidPasswordError } from './errors';
 
 const DERIVED_KEY_FUNCTIONS = {
@@ -132,11 +132,11 @@ export async function recover(
   password: string | Uint8Array,
   { crypto }: Keystore,
 ): Promise<string> {
-  const salt = hexToBytes(crypto.kdf_params.salt);
+  const salt = Buffer.from(crypto.kdf_params.salt, 'hex');
   return bytesToHex(decrypt(
-    hexToBytes(crypto.ciphertext),
+    Buffer.from(crypto.ciphertext, 'hex'),
     await deriveKey(password, salt, crypto.kdf, crypto.kdf_params),
-    hexToBytes(crypto.cipher_params.nonce),
+    Buffer.from(crypto.cipher_params.nonce, 'hex'),
     crypto.symmetric_alg,
   ));
 }
@@ -163,7 +163,7 @@ export async function dump(
 ): Promise<Keystore> {
   const opt = { ...CRYPTO_DEFAULTS, ...options };
   const derivedKey = await deriveKey(password, salt, opt.kdf, opt.kdf_params);
-  const payload = typeof privateKey === 'string' ? hexToBytes(privateKey) : privateKey;
+  const payload = typeof privateKey === 'string' ? Buffer.from(privateKey, 'hex') : privateKey;
   return {
     name,
     version: 1,

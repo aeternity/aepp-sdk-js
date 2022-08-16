@@ -68,5 +68,3 @@ export function str2buf(str: string, enc?: BufferEncoding): Buffer {
 }
 
 export const bytesToHex = (b: Uint8Array): string => Buffer.from(b).toString('hex');
-
-export const hexToBytes = (s: string): Uint8Array => Buffer.from(s, 'hex');
