@@ -126,7 +126,7 @@ export interface ContractInstance {
   $compile: (options?: {}) => Promise<Encoded.ContractBytearray>;
   _estimateGas: (name: string, params: any[], options: object) => Promise<number>;
   $deploy: (params?: any[], options?: object) => Promise<any>;
-  call: (fn: string, params?: any[], options?: {}) => Promise<{
+  $call: (fn: string, params?: any[], options?: {}) => Promise<{
     hash: string;
     tx: any;
     txData: TxData;
@@ -165,9 +165,9 @@ export interface ContractInstance {
  * ```js
  * const contractIns = await aeSdk.getContractInstance({ sourceCode })
  * await contractIns.$deploy([321]) or await contractIns.methods.init(321)
- * const callResult = await contractIns.call('setState', [123]) or
+ * const callResult = await contractIns.$call('setState', [123]) or
  * await contractIns.methods.setState.send(123, options)
- * const staticCallResult = await contractIns.call('setState', [123], { callStatic: true }) or
+ * const staticCallResult = await contractIns.$call('setState', [123], { callStatic: true }) or
  * await contractIns.methods.setState.get(123, options)
  * ```
  * Also you can call contract like: `await contractIns.methods.setState(123, options)`
@@ -240,7 +240,7 @@ export default async function getContractInstance({
     async $compile(_options?: {}): Promise<any> {},
     async _estimateGas(_name: string, _params: any[], _options: object): Promise<any> {},
     async $deploy(_params?: any[], _options?: any): Promise<any> {},
-    async call(_fn: string, _params?: any[], _options?: {}): Promise<any> {},
+    async $call(_fn: string, _params?: any[], _options?: {}): Promise<any> {},
     decodeEvents(_events: Event[], options?: { omitUnknown?: boolean }): any {},
     /* eslint-enable @typescript-eslint/no-unused-vars */
     /* eslint-enable @typescript-eslint/no-empty-function */
@@ -370,7 +370,7 @@ export default async function getContractInstance({
 
   instance._estimateGas = async (name: string, params: any[], options: object): Promise<number> => {
     const { result: { gasUsed } } = await instance
-      .call(name, params, { ...options, callStatic: true });
+      .$call(name, params, { ...options, callStatic: true });
     // taken from https://github.com/aeternity/aepp-sdk-js/issues/1286#issuecomment-977814771
     return Math.floor(gasUsed * 1.25);
   };
@@ -385,13 +385,13 @@ export default async function getContractInstance({
     params = [],
     options?:
     Parameters<typeof instance.$compile>[0] &
-    Parameters<typeof instance.call>[2] &
+    Parameters<typeof instance.$call>[2] &
     Parameters<typeof sendAndProcess>[1],
   ): Promise<ContractInstance['deployInfo']> => {
     const opt = { ...instance.options, ...options };
     if (instance.bytecode == null) await instance.$compile(opt);
-    // @ts-expect-error TODO: need to fix compatibility between return types of `$deploy` and `call`
-    if (opt.callStatic === true) return instance.call('init', params, opt);
+    // @ts-expect-error TODO: need to fix compatibility between return types of `$deploy`, `$call`
+    if (opt.callStatic === true) return instance.$call('init', params, opt);
     if (instance.deployInfo.address != null) throw new DuplicateContractError();
 
     const ownerId = opt.onAccount.address;
@@ -441,7 +441,7 @@ export default async function getContractInstance({
    * @param options - Array of function arguments
    * @returns CallResult
    */
-  instance.call = async (fn: string, params: any[] = [], options: object = {}) => {
+  instance.$call = async (fn: string, params: any[] = [], options: object = {}) => {
     const opt = { ...instance.options, ...options };
     const fnACI = getFunctionACI(fn);
     const contractId = instance.deployInfo.address;
@@ -588,7 +588,7 @@ export default async function getContractInstance({
         const options = args.length === aciArgs.length + 1 ? args.pop() : {};
         if (typeof options !== 'object') throw new TypeError(`Options should be an object: ${options as string}`);
         if (name === 'init') return instance.$deploy(args, { callStatic, ...options });
-        return instance.call(name, args, { callStatic, ...options });
+        return instance.$call(name, args, { callStatic, ...options });
       };
       return [
         name,

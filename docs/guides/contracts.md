@@ -142,12 +142,12 @@ const tx = await contractInstance.methods.increment(3) // recommended
 // or
 const tx = await contractInstance.methods.increment.send(3)
 // or
-const tx = await contractInstance.call('increment', [3])
+const tx = await contractInstance.$call('increment', [3])
 ```
 
 Note:
 
-- The functions `send` and `call` provide an explicit way to tell the SDK to sign and broadcast the transaction.
+- The functions `send` and `$call` provide an explicit way to tell the SDK to sign and broadcast the transaction.
 - When using the `increment` function directly the SDK will automatically determine if it's a `stateful` entrypoint.
 
 ### b) Regular entrypoints
@@ -183,7 +183,7 @@ const tx = await contractInstance.methods.fund_project(1, { amount: 50 }) // rec
 // or
 const tx = await contractInstance.methods.fund_project.send(1, { amount: 50 })
 // or
-const tx = await contractInstance.call('fund_project', [1], { amount: 50 })
+const tx = await contractInstance.$call('fund_project', [1], { amount: 50 })
 ```
 
 ## Transaction options

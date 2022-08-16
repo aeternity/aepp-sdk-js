@@ -168,7 +168,7 @@ describe('Contract instance', () => {
     testContract.should.have.property('bytecode');
     testContract.should.have.property('deployInfo');
     testContract.should.have.property('$compile');
-    testContract.should.have.property('call');
+    testContract.should.have.property('$call');
     testContract.should.have.property('$deploy');
     testContract.options.ttl.should.be.equal(0);
     testContract.options.should.have.property('fileSystem');
@@ -374,7 +374,7 @@ describe('Contract instance', () => {
 
   describe('Events parsing', () => {
     let remoteContract: ContractInstance;
-    let eventResult: Awaited<ReturnType<ContractInstance['call']>>;
+    let eventResult: Awaited<ReturnType<ContractInstance['$call']>>;
 
     before(async () => {
       remoteContract = await aeSdk.getContractInstance({ sourceCode: remoteContractSource });
