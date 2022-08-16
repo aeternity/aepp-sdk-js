@@ -91,16 +91,6 @@ export function commitmentHash(
 }
 
 /**
- * Utility function to convert int to bytes
- * @category transaction builder
- * @param val - Value
- * @returns Buffer Buffer from number(BigEndian)
- */
-export function writeInt(val: number | string | BigNumber): Buffer {
-  return toBytes(val, true);
-}
-
-/**
  * Utility function to convert bytes to int
  * @category transaction builder
  * @param buf - Value

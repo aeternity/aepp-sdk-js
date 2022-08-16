@@ -15,7 +15,7 @@ import {
   TxTypeSchemas,
 } from './schema';
 import { Tag } from './constants';
-import { buildContractId, readInt, writeInt } from './helpers';
+import { buildContractId, readInt } from './helpers';
 import { toBytes } from '../../utils/bytes';
 import MPTree, { MPTreeBinary } from '../../utils/mptree';
 import {
