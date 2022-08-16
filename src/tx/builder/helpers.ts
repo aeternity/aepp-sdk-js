@@ -62,16 +62,6 @@ export function oracleQueryId(
 }
 
 /**
- * Format the salt into a 64-byte hex string
- * @category transaction builder
- * @param salt - Random number
- * @returns Zero-padded hex string of salt
- */
-export function formatSalt(salt: number): Buffer {
-  return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex');
-}
-
-/**
  * Encode an AENS name
  * @category AENS
  * @param name - Name to encode
@@ -82,11 +72,11 @@ export function produceNameId(name: AensName): Encoded.Name {
 }
 
 /**
- * Generate the commitment hash by hashing the formatted salt and
+ * Generate the commitment hash by hashing the salt and
  * name, base 58 encoding the result and prepending 'cm_'
  * @category transaction builder
  * @param name - Name to be registered
- * @param salt - Random salt
+ * @param salt - Random number
  * @returns Commitment hash
  */
 export function commitmentHash(
@@ -94,7 +84,10 @@ export function commitmentHash(
   salt: number = genSalt(),
 ): Encoded.Commitment {
   return encode(
-    hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])),
+    hash(concatBuffers([
+      Buffer.from(name.toLowerCase()),
+      Buffer.from(salt.toString(16).padStart(64, '0'), 'hex'),
+    ])),
     Encoding.Commitment,
   );
 }
