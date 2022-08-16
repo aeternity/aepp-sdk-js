@@ -52,8 +52,6 @@ function deserializeField(
     case FIELD_TYPES.abiVersion:
     case FIELD_TYPES.ttlType:
       return readInt(value);
-    case FIELD_TYPES.id:
-      return readId(value);
     case FIELD_TYPES.ids:
       return value.map(readId);
     case FIELD_TYPES.bool:
@@ -121,8 +119,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
     case FIELD_TYPES.abiVersion:
     case FIELD_TYPES.ttlType:
       return writeInt(value);
-    case FIELD_TYPES.id:
-      return writeId(value);
     case FIELD_TYPES.ids:
       return value.map(writeId);
     case FIELD_TYPES.bool:
@@ -165,21 +161,12 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
 function validateField(
   value: any,
   type: FIELD_TYPES | Field,
-  prefix?: Encoding | Encoding[],
 ): string | undefined {
   // All fields are required
   if (value == null) return 'Field is required';
 
   // Validate type of value
   switch (type) {
-    case FIELD_TYPES.id: {
-      const prefixes = Array.isArray(prefix) ? prefix : [prefix];
-      if (!prefixes.includes(value.split('_')[0])) {
-        if (prefix == null) { return `'${String(value)}' prefix doesn't exist'`; }
-        return `'${String(value)}' prefix doesn't match expected prefix '${prefix.toString()}'`;
-      }
-      return undefined;
-    }
     case FIELD_TYPES.ctVersion:
       if (!(Boolean(value.abiVersion) && Boolean(value.vmVersion))) {
         return 'Value must be an object with "vmVersion" and "abiVersion" fields';
@@ -217,7 +204,7 @@ function validateParams(
     schema
       // TODO: allow optional keys in schema
       .filter(([key]) => !excludeKeys.includes(key) && !optionalFields.includes(key))
-      .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
+      .map(([key, type]) => [key, validateField(params[key], type)])
       .filter(([, message]) => message),
   );
 }

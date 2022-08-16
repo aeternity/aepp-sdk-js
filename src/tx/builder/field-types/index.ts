@@ -2,7 +2,7 @@ import _field from './field';
 import _uInt from './u-int';
 import _shortUInt from './short-u-int';
 import _coinAmount from './coin-amount';
-
+import _address from './address';
 import _deposit from './deposit';
 import _fee from './fee';
 import _gasLimit from './gas-limit';
@@ -16,7 +16,7 @@ const field = _field;
 const uInt = _uInt;
 const shortUInt = _shortUInt;
 const coinAmount = _coinAmount;
-
+const address = _address;
 const deposit = _deposit;
 const fee = _fee;
 const gasLimit = _gasLimit;
@@ -35,7 +35,7 @@ export {
   uInt,
   shortUInt,
   coinAmount,
-
+  address,
   deposit,
   fee,
   gasLimit,

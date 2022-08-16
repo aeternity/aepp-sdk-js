@@ -20,7 +20,7 @@ const idTagToEncoding = [
   Encoding.Channel,
 ] as const;
 
-type AddressEncodings = typeof idTagToEncoding[number];
+export type AddressEncodings = typeof idTagToEncoding[number];
 
 /**
  * Utility function to create and _id type

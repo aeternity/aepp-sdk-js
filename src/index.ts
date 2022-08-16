@@ -24,7 +24,7 @@ export * from './tx/builder';
 export * from './tx/builder/helpers';
 export * from './tx/builder/constants';
 export * from './tx/builder/schema';
-export * from './tx/builder/address';
+export { writeId, readId } from './tx/builder/address';
 export * from './utils/amount-formatter';
 export * from './utils/hd-wallet';
 export { encode, decode, Encoding } from './utils/encoder';
