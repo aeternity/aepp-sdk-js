@@ -16,7 +16,7 @@ import {
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt, writeInt } from './helpers';
-import { readId, writeId } from './address';
+import genAddressField, { AddressEncodings } from './field-types/address';
 import { toBytes } from '../../utils/bytes';
 import MPTree, { MPTreeBinary } from '../../utils/mptree';
 import {
@@ -30,6 +30,8 @@ import { isKeyOfObject } from '../../utils/other';
 /**
  * JavaScript-based Transaction builder
  */
+
+const address = genAddressField<AddressEncodings>();
 
 // SERIALIZE AND DESERIALIZE PART
 function deserializeField(
@@ -50,7 +52,7 @@ function deserializeField(
     case FIELD_TYPES.ttlType:
       return readInt(value);
     case FIELD_TYPES.ids:
-      return value.map(readId);
+      return value.map(address.deserialize);
     case FIELD_TYPES.bool:
       return value[0] === 1;
     case FIELD_TYPES.binary:
@@ -115,7 +117,7 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
     case FIELD_TYPES.ttlType:
       return writeInt(value);
     case FIELD_TYPES.ids:
-      return value.map(writeId);
+      return value.map(address.serialize);
     case FIELD_TYPES.bool:
       return Buffer.from([(value === true) ? 1 : 0]);
     case FIELD_TYPES.binary:

@@ -1,8 +1,10 @@
 import { NamePointer as NamePointerString } from '../../../apis/node';
 import { toBytes } from '../../../utils/bytes';
-import { AddressEncodings, readId, writeId } from '../address';
 import { Encoded } from '../../../utils/encoder';
 import { IllegalArgumentError } from '../../../utils/errors';
+import address, { AddressEncodings } from './address';
+
+const addressAny = address<AddressEncodings>();
 
 // TODO: remove after fixing node types
 type NamePointer = NamePointerString & {
@@ -22,7 +24,7 @@ export default {
     }
 
     return pointers.map(
-      (pointer) => [toBytes(pointer.key), writeId(pointer.id)],
+      (pointer) => [toBytes(pointer.key), addressAny.serialize(pointer.id)],
     );
   },
 
@@ -33,7 +35,7 @@ export default {
    */
   deserialize(pointers: Array<[key: Buffer, id: Buffer]>): NamePointer[] {
     return pointers.map(
-      ([key, id]) => ({ key: key.toString(), id: readId(id) }),
+      ([key, id]) => ({ key: key.toString(), id: addressAny.deserialize(id) }),
     );
   },
 };

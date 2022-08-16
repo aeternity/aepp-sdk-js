@@ -37,7 +37,7 @@ import { _buildTx, BuildTxOptions } from './tx';
 import { TransformNodeType } from './Node';
 import { NameEntry, NamePointer } from './apis/node';
 import AccountBase from './account/Base';
-import { AddressEncodings } from './tx/builder/address';
+import { AddressEncodings } from './tx/builder/field-types/address';
 
 interface KeyPointers {
   [key: string]: Encoded.Generic<AddressEncodings>;
