@@ -123,7 +123,7 @@ export interface ContractInstance {
     txData?: TxData;
   };
   options: any;
-  compile: (options?: {}) => Promise<Encoded.ContractBytearray>;
+  $compile: (options?: {}) => Promise<Encoded.ContractBytearray>;
   _estimateGas: (name: string, params: any[], options: object) => Promise<number>;
   $deploy: (params?: any[], options?: object) => Promise<any>;
   call: (fn: string, params?: any[], options?: {}) => Promise<{
@@ -237,7 +237,7 @@ export default async function getContractInstance({
     },
     /* eslint-disable @typescript-eslint/no-unused-vars */
     /* eslint-disable @typescript-eslint/no-empty-function */
-    async compile(_options?: {}): Promise<any> {},
+    async $compile(_options?: {}): Promise<any> {},
     async _estimateGas(_name: string, _params: any[], _options: object): Promise<any> {},
     async $deploy(_params?: any[], _options?: any): Promise<any> {},
     async call(_fn: string, _params?: any[], _options?: {}): Promise<any> {},
@@ -314,7 +314,7 @@ export default async function getContractInstance({
    * Compile contract
    * @returns bytecode
    */
-  instance.compile = async (options = {}): Promise<Encoded.ContractBytearray> => {
+  instance.$compile = async (options = {}): Promise<Encoded.ContractBytearray> => {
     if (instance.bytecode != null) throw new IllegalArgumentError('Contract already compiled');
     if (instance.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
     instance.bytecode = (await onCompiler.compileContract({
@@ -384,12 +384,12 @@ export default async function getContractInstance({
   instance.$deploy = async (
     params = [],
     options?:
-    Parameters<typeof instance.compile>[0] &
+    Parameters<typeof instance.$compile>[0] &
     Parameters<typeof instance.call>[2] &
     Parameters<typeof sendAndProcess>[1],
   ): Promise<ContractInstance['deployInfo']> => {
     const opt = { ...instance.options, ...options };
-    if (instance.bytecode == null) await instance.compile(opt);
+    if (instance.bytecode == null) await instance.$compile(opt);
     // @ts-expect-error TODO: need to fix compatibility between return types of `$deploy` and `call`
     if (opt.callStatic === true) return instance.call('init', params, opt);
     if (instance.deployInfo.address != null) throw new DuplicateContractError();

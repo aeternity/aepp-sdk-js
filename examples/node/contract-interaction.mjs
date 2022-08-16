@@ -72,11 +72,11 @@ console.log(CONTRACT_SOURCE_CODE);
 const contract = await aeSdk.getContractInstance({ sourceCode: CONTRACT_SOURCE_CODE });
 
 // ## 5. Compile the contract
-// The `compile` function sends a raw Sophia contract as string
+// The `$compile` function sends a raw Sophia contract as string
 // to the HTTP compiler for bytecode compilation. In the future this will be done
 // without talking to the node, but requiring a bytecode compiler
 // implementation directly in the SDK.
-const bytecode = await contract.compile();
+const bytecode = await contract.$compile();
 console.log(`Obtained bytecode ${bytecode}`);
 
 // ## 6. Deploy the contract

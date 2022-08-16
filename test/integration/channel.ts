@@ -834,7 +834,7 @@ describe('Channel', () => {
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     contract = await aeSdkInitiatior.getContractInstance({ sourceCode: contractSourceCode });
-    await contract.compile();
+    await contract.$compile();
     const roundBefore = initiatorCh.round();
     assertNotNull(roundBefore);
     const callData = contract.calldata.encode('Identity', 'init', []);

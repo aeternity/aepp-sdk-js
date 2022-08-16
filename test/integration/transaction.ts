@@ -121,7 +121,7 @@ describe('Transaction', () => {
     async () => aeSdk.buildTx(Tag.ContractCreateTx, {
       nonce,
       ownerId: address,
-      code: await contract.compile(),
+      code: await contract.$compile(),
       amount,
       gasLimit,
       callData: contract.calldata.encode('Identity', 'init', []),

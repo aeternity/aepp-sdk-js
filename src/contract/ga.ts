@@ -67,7 +67,7 @@ export async function createGeneralizedAccount(
   const tx = await _buildTx(Tag.GaAttachTx, {
     ...options,
     onNode,
-    code: await contract.compile(),
+    code: await contract.$compile(),
     gasLimit: options.gasLimit ?? await contract._estimateGas('init', args, options),
     ownerId,
     callData: contract.calldata.encode(contract._name, 'init', args),

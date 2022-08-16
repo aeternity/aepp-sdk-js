@@ -167,7 +167,7 @@ describe('Contract instance', () => {
     testContract.should.have.property('sourceCode');
     testContract.should.have.property('bytecode');
     testContract.should.have.property('deployInfo');
-    testContract.should.have.property('compile');
+    testContract.should.have.property('$compile');
     testContract.should.have.property('call');
     testContract.should.have.property('$deploy');
     testContract.options.ttl.should.be.equal(0);
@@ -179,7 +179,7 @@ describe('Contract instance', () => {
   });
 
   it('compiles', async () => {
-    await testContract.compile();
+    await testContract.$compile();
     expect(testContract.bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
   });
 

@@ -108,7 +108,7 @@ export default {
       return this.aeSdk.getContractInstance({ sourceCode: this.contractSourceCode })
     },
     async compile () {
-      return (await this.createPromise).compile()
+      return (await this.createPromise).$compile()
     },
     async deploy () {
       return (await this.createPromise).$deploy([this.deployArg])

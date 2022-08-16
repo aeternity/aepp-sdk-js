@@ -239,7 +239,7 @@ describe('Contract', () => {
       contract = await aeSdk.getContractInstance({
         sourceCode: contractWithLib, fileSystem: { testLib: libContract },
       });
-      expect(await contract.compile()).to.satisfy((b: string) => b.startsWith('cb_'));
+      expect(await contract.$compile()).to.satisfy((b: string) => b.startsWith('cb_'));
     });
 
     it('Throw error when try to compile contract without providing external deps', async () => {
