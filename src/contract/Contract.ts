@@ -145,7 +145,7 @@ export interface ContractInstance {
     decodedResult: any;
     decodedEvents: DecodedEvent[];
   }>;
-  decodeEvents: (
+  $decodeEvents: (
     events: Event[], options?: { omitUnknown?: boolean; contractAddressToName?: any }
   ) => DecodedEvent[];
   $createDelegationSignature: (
@@ -241,7 +241,7 @@ export default async function getContractInstance({
     async _estimateGas(_name: string, _params: any[], _options: object): Promise<any> {},
     async $deploy(_params?: any[], _options?: any): Promise<any> {},
     async $call(_fn: string, _params?: any[], _options?: {}): Promise<any> {},
-    decodeEvents(_events: Event[], options?: { omitUnknown?: boolean }): any {},
+    $decodeEvents(_events: Event[], options?: { omitUnknown?: boolean }): any {},
     /* eslint-enable @typescript-eslint/no-unused-vars */
     /* eslint-enable @typescript-eslint/no-empty-function */
     methods: undefined,
@@ -498,7 +498,7 @@ export default async function getContractInstance({
     if (opt.callStatic === true || res.txData.blockHeight != null) {
       res.decodedResult = fnACI.returns != null && fnACI.returns !== 'unit' && fn !== 'init'
         && instance.calldata.decode(instance._name, fn, res.result.returnValue);
-      res.decodedEvents = instance.decodeEvents(res.result.log, opt);
+      res.decodedEvents = instance.$decodeEvents(res.result.log, opt);
     }
     return res;
   };
@@ -543,7 +543,7 @@ export default async function getContractInstance({
    * @param options - Options
    * @returns DecodedEvents
    */
-  instance.decodeEvents = (
+  instance.$decodeEvents = (
     events: Event[],
     { omitUnknown, ...opt }: { omitUnknown?: boolean } = {},
   ): DecodedEvent[] => events

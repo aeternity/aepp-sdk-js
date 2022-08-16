@@ -63,7 +63,7 @@ const txHash = 'th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET';
 const txInfo = await aeSdk.api.getTransactionInfoByHash(txHash)
 
 // decode events using contract instance
-const decodedUsingInstance = contractInstance.decodeEvents(txInfo.callInfo.log)
+const decodedUsingInstance = contractInstance.$decodeEvents(txInfo.callInfo.log)
 console.log(decodedUsingInstance)
 
 /*

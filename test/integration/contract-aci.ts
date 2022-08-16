@@ -421,14 +421,14 @@ describe('Contract instance', () => {
     });
 
     it('decodes events using decodeEvents', () => {
-      expect(testContract.decodeEvents(eventResult.result.log))
+      expect(testContract.$decodeEvents(eventResult.result.log))
         .to.be.eql(eventResult.decodedEvents);
     });
 
     it('throws error if can\'t find event definition', () => {
       const event = eventResult.result.log[0];
       event.topics[0] = event.topics[0].replace('0', '1');
-      expect(() => testContract.decodeEvents([event])).to.throw(
+      expect(() => testContract.$decodeEvents([event])).to.throw(
         MissingEventDefinitionError,
         'Can\'t find definition of 7165442193418278913262533136158148486147352807284929017531784742205476270109'
         + ` event emitted by ${testContract.deployInfo.address as string}`
@@ -439,7 +439,7 @@ describe('Contract instance', () => {
     it('omits events without definition using omitUnknown option', () => {
       const event = eventResult.result.log[0];
       event.topics[0] = event.topics[0].replace('0', '1');
-      expect(testContract.decodeEvents([event], { omitUnknown: true })).to.be.eql([]);
+      expect(testContract.$decodeEvents([event], { omitUnknown: true })).to.be.eql([]);
     });
 
     const getDuplicateLog = (): Array<{
@@ -456,7 +456,7 @@ describe('Contract instance', () => {
     }];
 
     it('throws error if found multiple event definitions', () => {
-      expect(() => testContract.decodeEvents(getDuplicateLog())).to.throw(
+      expect(() => testContract.$decodeEvents(getDuplicateLog())).to.throw(
         AmbiguousEventDefinitionError,
         'Found multiple definitions of "Duplicate" event emitted by'
         + ` ${remoteContract.deployInfo.address ?? ''} in "StateContract", "RemoteI" contracts`
@@ -466,7 +466,7 @@ describe('Contract instance', () => {
 
     it('multiple event definitions resolved using contractAddressToName', () => {
       expect(
-        testContract.decodeEvents(
+        testContract.$decodeEvents(
           getDuplicateLog(),
           { contractAddressToName: { [remoteContract.deployInfo.address ?? '']: 'RemoteI' } },
         ),
