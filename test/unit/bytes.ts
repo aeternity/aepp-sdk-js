@@ -19,7 +19,7 @@ import '..';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
-import { toBytes, bigNumberToByteArray, TypeError } from '../../src';
+import { toBytes, TypeError } from '../../src';
 import { snakeToPascal, pascalToSnake } from '../../src/utils/string';
 
 describe('Bytes', () => {
@@ -35,11 +35,9 @@ describe('Bytes', () => {
   it('converts pascal to snake case', () => pascalToSnake(testCase)
     .should.be.equal('test_test-test_test'));
 
-  describe('bigNumberToByteArray', () => {
-    it('converts BigNumber to Buffer', () => bigNumberToByteArray(new BigNumber('1000'))
-      .readInt16BE().should.be.equal(1000));
+  it('converts BigNumber to Buffer', () => toBytes(new BigNumber('1000'))
+    .readInt16BE().should.be.equal(1000));
 
-    it('throws error if BigNumber is not integer', () => expect(() => bigNumberToByteArray(new BigNumber('1.5')))
-      .to.throw(TypeError, /Unexpected not integer value:/));
-  });
+  it('throws error if BigNumber is not integer', () => expect(() => toBytes(new BigNumber('1.5')))
+    .to.throw(TypeError, /Unexpected not integer value:/));
 });
