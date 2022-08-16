@@ -208,7 +208,7 @@ function validateField(
  * @param excludeKeys - Array of keys to exclude for validation
  * @returns Object with validation errors
  */
-export function validateParams(
+function validateParams(
   params: any,
   schema: TxField[],
   { excludeKeys = [] }: { excludeKeys: string[] },
@@ -230,7 +230,7 @@ export function validateParams(
  * @param schema - Transaction schema
  * @returns Object with transaction field's
  */
-export function unpackRawTx<Tx extends TxSchema>(
+function unpackRawTx<Tx extends TxSchema>(
   binary: Uint8Array | NestedUint8Array,
   schema: TxField[],
 ): RawTxObject<Tx> {
