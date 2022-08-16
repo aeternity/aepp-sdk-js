@@ -4,7 +4,6 @@ import { fromString } from 'bip32-path';
 import aesjs from 'aes-js';
 import { sha256hash, encode, Encoding } from './encoder';
 import { CryptographyError } from './errors';
-import { bytesToHex } from './bytes';
 import { concatBuffers } from './other';
 
 const Ecb = aesjs.ModeOfOperation.ecb;
@@ -120,7 +119,7 @@ export function derivePathFromSeed(path: 'm' | `m/${Bip32Path<5>}`, seed: Uint8A
 function formatAccount(keys: nacl.SignKeyPair): Account {
   const { secretKey, publicKey } = keys;
   return {
-    secretKey: bytesToHex(secretKey),
+    secretKey: Buffer.from(secretKey).toString('hex'),
     publicKey: encode(publicKey, Encoding.AccountAddress),
   };
 }
@@ -132,8 +131,8 @@ export function getKeyPair(secretKey: Uint8Array): nacl.SignKeyPair {
 export function generateSaveHDWalletFromSeed(seed: Uint8Array, password: string): HDWallet {
   const walletKey = derivePathFromSeed('m/44h/457h', seed);
   return {
-    secretKey: bytesToHex(encryptKey(password, walletKey.secretKey)),
-    chainCode: bytesToHex(encryptKey(password, walletKey.chainCode)),
+    secretKey: Buffer.from(encryptKey(password, walletKey.secretKey)).toString('hex'),
+    chainCode: Buffer.from(encryptKey(password, walletKey.chainCode)).toString('hex'),
   };
 }
 

@@ -2,7 +2,6 @@ import nacl from 'tweetnacl';
 import { v4 as uuid } from '@aeternity/uuid';
 import { hash, argon2id } from '@aeternity/argon2';
 import { getAddressFromPriv } from './crypto';
-import { bytesToHex } from './bytes';
 import { InvalidPasswordError } from './errors';
 
 const DERIVED_KEY_FUNCTIONS = {
@@ -133,12 +132,12 @@ export async function recover(
   { crypto }: Keystore,
 ): Promise<string> {
   const salt = Buffer.from(crypto.kdf_params.salt, 'hex');
-  return bytesToHex(decrypt(
+  return Buffer.from(decrypt(
     Buffer.from(crypto.ciphertext, 'hex'),
     await deriveKey(password, salt, crypto.kdf, crypto.kdf_params),
     Buffer.from(crypto.cipher_params.nonce, 'hex'),
     crypto.symmetric_alg,
-  ));
+  )).toString('hex');
 }
 
 /**
@@ -172,12 +171,14 @@ export async function dump(
     crypto: {
       secret_type: opt.secret_type,
       symmetric_alg: opt.symmetric_alg,
-      ciphertext: bytesToHex(encrypt(payload, derivedKey, nonce, opt.symmetric_alg)),
-      cipher_params: { nonce: bytesToHex(nonce) },
+      ciphertext: Buffer.from(
+        encrypt(payload, derivedKey, nonce, opt.symmetric_alg),
+      ).toString('hex'),
+      cipher_params: { nonce: Buffer.from(nonce).toString('hex') },
       kdf: opt.kdf,
       kdf_params: {
         ...opt.kdf_params,
-        salt: bytesToHex(salt),
+        salt: Buffer.from(salt).toString('hex'),
       },
     },
   };
