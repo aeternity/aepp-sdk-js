@@ -158,7 +158,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       }
     default:
       if (typeof type === 'number') return value;
-      // @ts-expect-error will be solved after removing the whole serializeField function
       return type.serialize(value, params);
   }
 }

@@ -25,9 +25,10 @@ const name = _name;
 const nameFee = _nameFee;
 const nameId = _nameId;
 
-export type Field = typeof field | typeof uInt | typeof shortUInt | typeof coinAmount
-  | typeof deposit | typeof fee | typeof gasLimit | typeof gasPrice | typeof name | typeof nameFee
-  | typeof nameId;
+export interface Field {
+  serialize: (value: any, options: any) => Buffer;
+  deserialize: (value: Buffer) => any;
+}
 
 export {
   field,
