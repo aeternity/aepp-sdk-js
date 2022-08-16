@@ -21,7 +21,7 @@ import { getSdk } from '.';
 import { randomName } from '../utils';
 import {
   AeSdk, generateKeyPair, buildContractId, computeAuctionEndBlock, computeBidFee,
-  AensPointerContextError, UnexpectedTsError,
+  AensPointerContextError, UnexpectedTsError, encode, decode, Encoding,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
@@ -78,8 +78,8 @@ describe('Aens', () => {
   const pointers = {
     myKey: address,
     account_pubkey: address,
-    oracle_pubkey: address.replace('ak', 'ok'),
-    channel: address.replace('ak', 'ch'),
+    oracle_pubkey: encode(decode(address), Encoding.OracleAddress),
+    channel: encode(decode(address), Encoding.Channel),
     contract_pubkey: buildContractId(address, 13),
   };
   const pointersNode = Object.entries(pointers).map(([key, id]) => ({ key, id }));

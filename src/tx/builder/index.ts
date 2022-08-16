@@ -15,9 +15,7 @@ import {
   TxTypeSchemas,
 } from './schema';
 import { Tag } from './constants';
-import {
-  buildContractId, buildPointers, readInt, readPointers, writeInt,
-} from './helpers';
+import { buildContractId, readInt, writeInt } from './helpers';
 import { readId, writeId } from './address';
 import { toBytes } from '../../utils/bytes';
 import MPTree, { MPTreeBinary } from '../../utils/mptree';
@@ -28,7 +26,6 @@ import {
   SchemaNotFoundError,
 } from '../../utils/errors';
 import { isKeyOfObject } from '../../utils/other';
-import { NamePointer } from '../../apis/node';
 
 /**
  * JavaScript-based Transaction builder
@@ -64,8 +61,6 @@ function deserializeField(
       return value.toString();
     case FIELD_TYPES.payload:
       return encode(value, Encoding.Bytearray);
-    case FIELD_TYPES.pointers:
-      return readPointers(value);
     case FIELD_TYPES.rlpBinary:
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return unpackTx(encode(value, Encoding.Transaction));
@@ -137,8 +132,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
         : toBytes(value);
     case FIELD_TYPES.string:
       return toBytes(value);
-    case FIELD_TYPES.pointers:
-      return buildPointers(value);
     case FIELD_TYPES.rlpBinary:
       return value.rlpEncoded ?? value;
     case FIELD_TYPES.mptrees:
@@ -170,15 +163,6 @@ function validateField(
     case FIELD_TYPES.ctVersion:
       if (!(Boolean(value.abiVersion) && Boolean(value.vmVersion))) {
         return 'Value must be an object with "vmVersion" and "abiVersion" fields';
-      }
-      return undefined;
-    case FIELD_TYPES.pointers:
-      if (!Array.isArray(value)) return 'Value must be of type Array';
-      if (value.some((p: NamePointer) => !(Boolean(p.key) && Boolean(p.id)))) {
-        return 'Value must contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\'';
-      }
-      if (value.length > 32) {
-        return `Expected 32 pointers or less, got ${value.length} instead`;
       }
       return undefined;
     default:

@@ -10,6 +10,7 @@ import _gasPrice from './gas-price';
 import _name from './name';
 import _nameFee from './name-fee';
 import _nameId from './name-id';
+import _pointers from './pointers';
 
 // TODO: remove after fixing https://github.com/Gerrit0/typedoc-plugin-missing-exports/issues/15
 const field = _field;
@@ -24,10 +25,11 @@ const gasPrice = _gasPrice;
 const name = _name;
 const nameFee = _nameFee;
 const nameId = _nameId;
+const pointers = _pointers;
 
 export interface Field {
-  serialize: (value: any, options: any) => Buffer;
-  deserialize: (value: Buffer) => any;
+  serialize: (value: any, options: any) => Buffer | Buffer[][];
+  deserialize: (value: Buffer | Buffer[][]) => any;
 }
 
 export {
@@ -43,4 +45,5 @@ export {
   name,
   nameFee,
   nameId,
+  pointers,
 };

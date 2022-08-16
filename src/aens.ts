@@ -37,9 +37,10 @@ import { _buildTx, BuildTxOptions } from './tx';
 import { TransformNodeType } from './Node';
 import { NameEntry, NamePointer } from './apis/node';
 import AccountBase from './account/Base';
+import { AddressEncodings } from './tx/builder/address';
 
 interface KeyPointers {
-  [key: string]: string | Buffer;
+  [key: string]: Encoded.Generic<AddressEncodings>;
 }
 
 /**
@@ -115,8 +116,7 @@ export async function aensUpdate(
 ): ReturnType<typeof send> {
   const allPointers = {
     ...extendPointers === true && Object.fromEntries(
-      (await getName(name, options)).pointers
-        .map(({ key, id }: { key: string; id: string }) => [key, id]),
+      (await getName(name, options)).pointers.map(({ key, id }) => [key, id]),
     ),
     ...pointers,
   };
@@ -127,7 +127,8 @@ export async function aensUpdate(
     ...options,
     nameId: name,
     accountId: options.onAccount.address,
-    pointers: Object.entries(allPointers).map(([key, id]) => ({ key, id: id.toString() })),
+    pointers: Object.entries(allPointers)
+      .map(([key, id]: [string, Encoded.Generic<AddressEncodings>]) => ({ key, id })),
   });
 
   return send(nameUpdateTx, options);

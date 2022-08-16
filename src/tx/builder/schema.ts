@@ -8,12 +8,11 @@ import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address,
+  address, pointers,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
 import MPTree from '../../utils/mptree';
 import { UnionToIntersection } from '../../utils/other';
-import { NamePointer } from '../../apis/node';
 
 export enum ORACLE_TTL_TYPES {
   delta = 0,
@@ -113,7 +112,6 @@ export enum FIELD_TYPES {
   rlpBinaries,
   rawBinary,
   signatures,
-  pointers,
   offChainUpdates,
   callStack,
   proofOfInclusion,
@@ -137,7 +135,6 @@ interface BuildFieldTypes<Prefix extends undefined | Encoding | readonly Encodin
   [FIELD_TYPES.rlpBinaries]: any[];
   [FIELD_TYPES.rawBinary]: Uint8Array;
   [FIELD_TYPES.signatures]: Uint8Array[];
-  [FIELD_TYPES.pointers]: NamePointer[];
   [FIELD_TYPES.offChainUpdates]: any;
   [FIELD_TYPES.callStack]: any;
   [FIELD_TYPES.proofOfInclusion]: any;
@@ -251,7 +248,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
       ['nameId', nameId],
       ['nameTtl', shortUInt],
-      ['pointers', FIELD_TYPES.pointers],
+      ['pointers', pointers],
       ['clientTtl', shortUInt],
       ['fee', fee],
       ['ttl', shortUInt],

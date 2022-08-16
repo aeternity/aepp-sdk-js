@@ -14,8 +14,6 @@ import {
 } from './constants';
 import { ceil } from '../../utils/bignumber';
 import { ArgumentError, IllegalBidFeeError } from '../../utils/errors';
-import { NamePointer } from '../../apis/node';
-import { readId, writeId } from './address';
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -110,37 +108,6 @@ export function writeInt(val: number | string | BigNumber): Buffer {
  */
 export function readInt(buf: Buffer = Buffer.from([])): string {
   return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10);
-}
-
-/**
- * Helper function to build pointers for name update TX
- * @category transaction builder
- * @param pointers - Array of pointers
- * `([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])`
- * @returns Serialized pointers array
- */
-export function buildPointers(pointers: NamePointer[]): Buffer[][] {
-  return pointers.map(
-    (p) => [
-      toBytes(p.key),
-      writeId(p.id as Parameters<typeof writeId>[0]),
-    ],
-  );
-}
-
-/**
- * Helper function to read pointers from name update TX
- * @category transaction builder
- * @param pointers - Array of pointers
- * @returns Deserialize pointer array
- */
-export function readPointers(pointers: Array<[key: string, id: Buffer]>): NamePointer[] {
-  return pointers.map(
-    ([key, id]) => ({
-      key: key.toString(),
-      id: readId(id),
-    }),
-  );
 }
 
 const AENS_SUFFIX = '.chain';
