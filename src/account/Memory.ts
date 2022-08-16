@@ -18,7 +18,6 @@ import AccountBase from './Base';
 import {
   generateKeyPairFromSecret, sign, generateKeyPair, hash, messageToHash,
 } from '../utils/crypto';
-import { isHex } from '../utils/string';
 import { ArgumentError } from '../utils/errors';
 import {
   decode, encode, Encoded, Encoding,
@@ -40,9 +39,6 @@ export default class AccountMemory extends AccountBase {
    */
   constructor(secretKey: string | Uint8Array) {
     super();
-    if (typeof secretKey === 'string' && !isHex(secretKey)) {
-      throw new ArgumentError('secretKey', 'hex string', secretKey);
-    }
     secretKey = typeof secretKey === 'string' ? Buffer.from(secretKey, 'hex') : secretKey;
     if (secretKey.length !== 64) {
       throw new ArgumentError('secretKey', '64 bytes', secretKey.length);

@@ -26,7 +26,7 @@ const testAcc = generateKeyPair();
 describe('MemoryAccount', () => {
   it('fails on invalid secret key', async () => {
     expect(() => new MemoryAccount(' '))
-      .to.throw(ArgumentError, 'secretKey should be hex string, got   instead');
+      .to.throw(ArgumentError, 'should be 64 bytes, got 0 instead');
   });
 
   it('Init with secretKey as hex string', async () => {

@@ -34,15 +34,6 @@ export function pascalToSnake(s: string): string {
 }
 
 /**
- * Check whether a string is valid hex.
- * @param str - String to validate.
- * @returns True if the string is valid hex, false otherwise.
- */
-export function isHex(str: string): boolean {
-  return str.length % 2 === 0 && /^[0-9a-f]+$/i.test(str);
-}
-
-/**
  * Check whether a string is valid base-64.
  * @param str - String to validate.
  * @returns True if the string is valid base-64, false otherwise.
