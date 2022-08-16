@@ -8,11 +8,12 @@ import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, pointers,
+  address, addresses, pointers,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
 import MPTree from '../../utils/mptree';
 import { UnionToIntersection } from '../../utils/other';
+import { AddressEncodings } from './field-types/address';
 
 export enum ORACLE_TTL_TYPES {
   delta = 0,
@@ -103,7 +104,6 @@ export interface CtVersion {
  * @category transaction builder
  */
 export enum FIELD_TYPES {
-  ids,
   string,
   binary,
   bool,
@@ -126,7 +126,6 @@ export enum FIELD_TYPES {
 }
 
 interface BuildFieldTypes<Prefix extends undefined | Encoding | readonly Encoding[]> {
-  [FIELD_TYPES.ids]: Array<Encoded.Generic<Prefix extends Encoding[] ? Prefix : any>>;
   [FIELD_TYPES.string]: string;
   [FIELD_TYPES.binary]: PrefixType<Prefix>;
   [FIELD_TYPES.bool]: Boolean;
@@ -283,7 +282,7 @@ export const TX_SCHEMA = {
       ['code', FIELD_TYPES.binary, Encoding.ContractBytearray],
       ['log', FIELD_TYPES.binary, Encoding.ContractBytearray],
       ['active', FIELD_TYPES.bool],
-      ['referers', FIELD_TYPES.ids, Encoding.AccountAddress],
+      ['referers', addresses<Encoding.AccountAddress>()],
       ['deposit', deposit],
     ],
   },
@@ -512,8 +511,8 @@ export const TX_SCHEMA = {
       ['initiatorAmount', uInt],
       ['responderAmount', uInt],
       ['channelReserve', uInt],
-      ['initiatorDelegateIds', FIELD_TYPES.ids],
-      ['responderDelegateIds', FIELD_TYPES.ids],
+      ['initiatorDelegateIds', addresses<AddressEncodings>()],
+      ['responderDelegateIds', addresses<AddressEncodings>()],
       ['stateHash', FIELD_TYPES.hex],
       ['round', shortUInt],
       ['soloRound', uInt],

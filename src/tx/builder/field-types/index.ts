@@ -3,6 +3,7 @@ import _uInt from './u-int';
 import _shortUInt from './short-u-int';
 import _coinAmount from './coin-amount';
 import _address from './address';
+import _addresses from './addresses';
 import _deposit from './deposit';
 import _fee from './fee';
 import _gasLimit from './gas-limit';
@@ -18,6 +19,7 @@ const uInt = _uInt;
 const shortUInt = _shortUInt;
 const coinAmount = _coinAmount;
 const address = _address;
+const addresses = _addresses;
 const deposit = _deposit;
 const fee = _fee;
 const gasLimit = _gasLimit;
@@ -28,8 +30,8 @@ const nameId = _nameId;
 const pointers = _pointers;
 
 export interface Field {
-  serialize: (value: any, options: any) => Buffer | Buffer[][];
-  deserialize: (value: Buffer | Buffer[][]) => any;
+  serialize: (value: any, options: any) => Buffer | Buffer[] | Buffer[][];
+  deserialize: (value: Buffer | Buffer[] | Buffer[][]) => any;
 }
 
 export {
@@ -38,6 +40,7 @@ export {
   shortUInt,
   coinAmount,
   address,
+  addresses,
   deposit,
   fee,
   gasLimit,
