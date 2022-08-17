@@ -139,14 +139,14 @@ According to the example above you can call the `stateful` entrypoint `increment
 ```js
 const tx = await contractInstance.methods.increment(3) // recommended
 // or
-const tx = await contractInstance.methods.increment.send(3)
+const tx = await contractInstance.methods.increment(3, { callStatic: false })
 // or
 const tx = await contractInstance.$call('increment', [3])
 ```
 
 Note:
 
-- The functions `send` and `$call` provide an explicit way to tell the SDK to sign and broadcast the transaction.
+- The `callStatic: false` option provide an explicit way to tell the SDK to sign and broadcast the transaction.
 - When using the `increment` function directly the SDK will automatically determine if it's a `stateful` entrypoint.
 
 ### b) Regular entrypoints
@@ -155,7 +155,7 @@ The æternity node can expose an API endpoint that allows to execute a `dry-run`
 ```js
 const tx = await contractInstance.methods.get_count() // recommended
 // or
-const tx = await contractInstance.methods.get_count.get()
+const tx = await contractInstance.methods.get_count({ callStatic: true })
 
 // access the decoded result returned by the execution of the entrypoint
 console.log(tx.decodedResult);
@@ -163,7 +163,7 @@ console.log(tx.decodedResult);
 
 Note:
 
-- The functions `get` and `callStatic` provide an explicit way to tell the SDK to perform a `dry-run` and to **NOT** broadcast the transaction.
+- The `callStatic` option provide an explicit way to tell the SDK to perform a `dry-run` and to **NOT** broadcast the transaction.
 - When using the `get_count` function directly the SDK will automatically determine that the function is not declared `stateful` and thus perform a `dry-run`, too.
 
 ### c) Payable entrypoints
@@ -179,8 +179,6 @@ In order to successfully call the `fund_project` entrypoint you need to provide 
 
 ```js
 const tx = await contractInstance.methods.fund_project(1, { amount: 50 }) // recommended
-// or
-const tx = await contractInstance.methods.fund_project.send(1, { amount: 50 })
 // or
 const tx = await contractInstance.$call('fund_project', [1], { amount: 50 })
 ```

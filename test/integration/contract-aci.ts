@@ -279,7 +279,7 @@ describe('Contract instance', () => {
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'));
 
   it('dry-runs init function', async () => {
-    const res = await testContract.methods.init.get('test', 1, 'hahahaha');
+    const res = await testContract.methods.init('test', 1, 'hahahaha', { callStatic: true });
     res.result.should.have.property('gasUsed');
     res.result.should.have.property('returnType');
     // TODO: ensure that return value is always can't be decoded (empty?)
@@ -287,20 +287,21 @@ describe('Contract instance', () => {
 
   it('dry-runs init function on specific account', async () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
-    const { result } = await testContract.methods.init.get('test', 1, 'hahahaha', { onAccount });
+    const { result } = await testContract.methods
+      .init('test', 1, 'hahahaha', { onAccount, callStatic: true });
     result.callerId.should.be.equal(onAccount.address);
   });
 
   it('fails on paying to not payable function', async () => {
     const amount = 100;
-    await expect(testContract.methods.intFn.send(1, { amount }))
+    await expect(testContract.methods.intFn(1, { amount, callStatic: false }))
       .to.be.rejectedWith(NotPayableFunctionError, `You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept coins`);
   });
 
   it('pays to payable function', async () => {
     assertNotNull(testContract.$options.address);
     const contractBalance = await aeSdk.getBalance(testContract.$options.address);
-    await testContract.methods.stringFn.send('test', { amount: 100 });
+    await testContract.methods.stringFn('test', { amount: 100, callStatic: false });
     const balanceAfter = await aeSdk.getBalance(testContract.$options.address);
     balanceAfter.should.be.equal(`${+contractBalance + 100}`);
   });
@@ -502,19 +503,19 @@ describe('Contract instance', () => {
       });
 
       it('Valid', async () => {
-        const { decodedResult } = await testContract.methods.intFn.get(1);
+        const { decodedResult } = await testContract.methods.intFn(1);
         expect(decodedResult).to.be.equal(1n);
       });
 
       const unsafeInt = BigInt(`${Number.MAX_SAFE_INTEGER.toString()}0`);
       it('Supports unsafe integer', async () => {
-        const { decodedResult } = await testContract.methods.intFn.get(unsafeInt);
+        const { decodedResult } = await testContract.methods.intFn(unsafeInt);
         expect(decodedResult).to.be.equal(unsafeInt);
       });
 
       it('Supports BigNumber', async () => {
-        const { decodedResult } = await testContract.methods.intFn
-          .get(new BigNumber(unsafeInt.toString()));
+        const { decodedResult } = await testContract.methods
+          .intFn(new BigNumber(unsafeInt.toString()));
         expect(decodedResult).to.be.equal(unsafeInt);
       });
     });
@@ -526,7 +527,7 @@ describe('Contract instance', () => {
       });
 
       it('Valid', async () => {
-        const { decodedResult } = await testContract.methods.boolFn.get(true);
+        const { decodedResult } = await testContract.methods.boolFn(true);
         decodedResult.should.be.equal(true);
       });
     });
