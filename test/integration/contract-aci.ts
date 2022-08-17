@@ -27,11 +27,11 @@ import {
   NotPayableFunctionError,
   MissingEventDefinitionError,
   AmbiguousEventDefinitionError,
-  IllegalArgumentError, getContractInstance,
+  IllegalArgumentError,
+  Contract,
 } from '../../src';
 import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
-import { ContractInstance } from '../../src/contract/Contract';
 import { Aci } from '../../src/apis/compiler';
 import { assertNotNull, ChainTtl, InputNumber } from '../utils';
 
@@ -198,7 +198,7 @@ interface TestContractApi {
 
 describe('Contract instance', () => {
   let aeSdk: AeSdk;
-  let testContract: Awaited<ReturnType<typeof getContractInstance<TestContractApi>>>;
+  let testContract: Contract<TestContractApi>;
   let testContractAddress: Encoded.ContractAddress;
   let testContractAci: Aci;
   let testContractBytecode: Encoded.ContractBytearray;
@@ -253,12 +253,15 @@ describe('Contract instance', () => {
       strategy: 'max',
     });
     expect(deployInfo.address).to.satisfy((b: string) => b.startsWith('ct_'));
+    assertNotNull(deployInfo.txData.tx);
     expect(deployInfo.txData.tx.gas).to.be.equal(16000);
     expect(deployInfo.txData.tx.amount).to.be.equal(42n);
-    expect(deployInfo.txData.gasUsed).to.be.equal(209);
-    expect(deployInfo.txData.gasPrice).to.be.equal(1000000000n);
+    assertNotNull(deployInfo.result);
+    expect(deployInfo.result.gasUsed).to.be.equal(209);
+    expect(deployInfo.result.gasPrice).to.be.equal(1000000000n);
     expect(deployInfo.txData.tx.deposit).to.be.equal(0n);
     expect(testContract.$options.bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
+    assertNotNull(deployInfo.address);
     testContractAddress = deployInfo.address;
   });
 
@@ -268,9 +271,13 @@ describe('Contract instance', () => {
 
   it('gets actual options from AeSdkBase', async () => {
     const [address1, address2] = aeSdk.addresses();
-    expect((await testContract.intFn(2)).result.callerId).to.be.equal(address1);
+    let { result } = await testContract.intFn(2);
+    assertNotNull(result);
+    expect(result.callerId).to.be.equal(address1);
     aeSdk.selectAccount(address2);
-    expect((await testContract.intFn(2)).result.callerId).to.be.equal(address2);
+    result = (await testContract.intFn(2)).result;
+    assertNotNull(result);
+    expect(result.callerId).to.be.equal(address2);
     aeSdk.selectAccount(address1);
   });
 
@@ -336,9 +343,10 @@ describe('Contract instance', () => {
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'));
 
   it('dry-runs init function', async () => {
-    const res = await testContract.init('test', 1, 'hahahaha', { callStatic: true });
-    res.result.should.have.property('gasUsed');
-    res.result.should.have.property('returnType');
+    const { result } = await testContract.init('test', 1, 'hahahaha', { callStatic: true });
+    assertNotNull(result);
+    result.should.have.property('gasUsed');
+    result.should.have.property('returnType');
     // TODO: ensure that return value is always can't be decoded (empty?)
   });
 
@@ -346,6 +354,7 @@ describe('Contract instance', () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
     const { result } = await testContract
       .init('test', 1, 'hahahaha', { onAccount, callStatic: true });
+    assertNotNull(result);
     result.callerId.should.be.equal(onAccount.address);
   });
 
@@ -366,11 +375,12 @@ describe('Contract instance', () => {
   it('calls on specific account', async () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
     const { result } = await testContract.intFn(123, { onAccount });
+    assertNotNull(result);
     result.callerId.should.be.equal(onAccount.address);
   });
 
   describe('Gas', () => {
-    let contract: Awaited<ReturnType<typeof getContractInstance<TestContractApi>>>;
+    let contract: Contract<TestContractApi>;
 
     before(async () => {
       contract = await aeSdk.getContractInstance(
@@ -379,30 +389,38 @@ describe('Contract instance', () => {
     });
 
     it('estimates gas by default for contract deployments', async () => {
-      const { tx: { gas }, gasUsed } = (await contract.$deploy(['test', 42])).txData;
-      expect(gasUsed).to.be.equal(160);
-      expect(gas).to.be.equal(200);
+      const { txData: { tx }, result } = (await contract.$deploy(['test', 42]));
+      assertNotNull(tx);
+      assertNotNull(result);
+      expect(result.gasUsed).to.be.equal(160);
+      expect(tx.gas).to.be.equal(200);
     });
 
     it('overrides gas through getContractInstance options for contract deployments', async () => {
       const ct = await aeSdk.getContractInstance({
         sourceCode: testContractSourceCode, fileSystem, gasLimit: 300,
       });
-      const { tx: { gas }, gasUsed } = (await ct.$deploy(['test', 42])).txData;
-      expect(gasUsed).to.be.equal(160);
-      expect(gas).to.be.equal(300);
+      const { txData: { tx }, result } = await ct.$deploy(['test', 42]);
+      assertNotNull(tx);
+      assertNotNull(result);
+      expect(result.gasUsed).to.be.equal(160);
+      expect(tx.gas).to.be.equal(300);
     });
 
     it('estimates gas by default for contract calls', async () => {
-      const { tx: { gas }, gasUsed } = (await contract.setKey(2)).txData as any;
-      expect(gasUsed).to.be.equal(61);
-      expect(gas).to.be.equal(76);
+      const { txData: { tx }, result } = await contract.setKey(2);
+      assertNotNull(tx);
+      assertNotNull(result);
+      expect(result.gasUsed).to.be.equal(61);
+      expect(tx.gas).to.be.equal(76);
     });
 
     it('overrides gas through options for contract calls', async () => {
-      const { tx: { gas }, gasUsed } = (await contract.setKey(3, { gasLimit: 100 })).txData as any;
-      expect(gasUsed).to.be.equal(61);
-      expect(gas).to.be.equal(100);
+      const { txData: { tx }, result } = await contract.setKey(3, { gasLimit: 100 });
+      assertNotNull(tx);
+      assertNotNull(result);
+      expect(result.gasUsed).to.be.equal(61);
+      expect(tx.gas).to.be.equal(100);
     });
 
     it('runs out of gasLimit with correct message', async () => {
@@ -430,14 +448,18 @@ describe('Contract instance', () => {
   });
 
   describe('Events parsing', () => {
-    let remoteContract: ContractInstance;
-    let eventResult: Awaited<ReturnType<ContractInstance['$call']>>;
+    let remoteContract: Contract<{}>;
+    let eventResult: Awaited<ReturnType<Contract<{}>['$call']>>;
+    type Events = Parameters<Contract<{}>['$decodeEvents']>[0];
+    let eventResultLog: Events;
 
     before(async () => {
       remoteContract = await aeSdk.getContractInstance({ sourceCode: remoteContractSource });
       await remoteContract.$deploy();
       assertNotNull(remoteContract.$options.address);
       eventResult = await testContract.emitEvents(remoteContract.$options.address, false);
+      assertNotNull(eventResult.result);
+      eventResultLog = eventResult.result.log as Events;
     });
 
     it('decodes events', () => {
@@ -479,13 +501,12 @@ describe('Contract instance', () => {
     });
 
     it('decodes events using decodeEvents', () => {
-      expect(testContract.$decodeEvents(eventResult.result.log))
-        .to.be.eql(eventResult.decodedEvents);
+      expect(testContract.$decodeEvents(eventResultLog)).to.be.eql(eventResult.decodedEvents);
     });
 
     it('throws error if can\'t find event definition', () => {
-      const event = eventResult.result.log[0];
-      event.topics[0] = event.topics[0].replace('0', '1');
+      const event = eventResultLog[0];
+      event.topics[0] = event.topics[0].toString().replace('0', '1');
       expect(() => testContract.$decodeEvents([event])).to.throw(
         MissingEventDefinitionError,
         'Can\'t find definition of 7165442193418278913262533136158148486147352807284929017531784742205476270109'
@@ -495,8 +516,8 @@ describe('Contract instance', () => {
     });
 
     it('omits events without definition using omitUnknown option', () => {
-      const event = eventResult.result.log[0];
-      event.topics[0] = event.topics[0].replace('0', '1');
+      const event = eventResultLog[0];
+      event.topics[0] = event.topics[0].toString().replace('0', '1');
       expect(testContract.$decodeEvents([event], { omitUnknown: true })).to.be.eql([]);
     });
 

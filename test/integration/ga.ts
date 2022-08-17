@@ -26,7 +26,7 @@ import {
   AccountGeneralized,
   Tag,
   unpackTx,
-  getContractInstance,
+  Contract,
 } from '../../src';
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
 
@@ -54,7 +54,7 @@ describe('Generalized Account', () => {
   let aeSdk: AeSdk;
   let accountBeforeGa: MemoryAccount;
   let gaAccountAddress: Encoded.AccountAddress;
-  let authContract: Awaited<ReturnType<typeof getContractInstance<ContractApi>>>;
+  let authContract: Contract<ContractApi>;
 
   before(async () => {
     aeSdk = await getSdk();

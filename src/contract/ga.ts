@@ -27,7 +27,7 @@ import { decode, Encoded } from '../utils/encoder';
 import { IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
-import getContractInstance from './Contract';
+import Contract from './Contract';
 import { send, SendOptions } from '../spend';
 import Node from '../Node';
 import { getAccount } from '../chain';
@@ -60,7 +60,7 @@ export async function createGeneralizedAccount(
     throw new IllegalArgumentError(`Account ${ownerId} is already GA`);
   }
 
-  const contract = await getContractInstance({
+  const contract = await Contract.initialize({
     onAccount, onCompiler, onNode, sourceCode,
   });
 

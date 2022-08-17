@@ -31,10 +31,9 @@ import {
   genSalt,
   UnexpectedTsError,
   AeSdk,
-  getContractInstance,
+  Contract,
 } from '../../src';
 import { Encoded, Encoding } from '../../src/utils/encoder';
-import { ContractInstance } from '../../src/contract/Contract';
 
 const identitySourceCode = `
 contract Identity =
@@ -48,8 +47,8 @@ interface IdentityContractApi {
 describe('Contract', () => {
   let aeSdk: AeSdk;
   let bytecode: Encoded.ContractBytearray;
-  let identityContract: Awaited<ReturnType<typeof getContractInstance<IdentityContractApi>>>;
-  let deployed: Awaited<ReturnType<ContractInstance['$deploy']>>;
+  let identityContract: Contract<IdentityContractApi>;
+  let deployed: Awaited<ReturnType<Contract<{}>['$deploy']>>;
 
   before(async () => {
     aeSdk = await getSdk(2);
@@ -105,24 +104,28 @@ describe('Contract', () => {
     deployed = await identityContract.$deploy();
     if (deployed?.result?.callerId == null) throw new UnexpectedTsError();
     expect(deployed.result.callerId).to.be.equal(onAccount.address);
-    expect((await identityContract.getArg(42, { callStatic: true })).result.callerId)
-      .to.be.equal(onAccount.address);
-    expect((await identityContract.getArg(42, { callStatic: false })).result.callerId)
-      .to.be.equal(onAccount.address);
+    let { result } = await identityContract.getArg(42, { callStatic: true });
+    assertNotNull(result);
+    expect(result.callerId).to.be.equal(onAccount.address);
+    result = (await identityContract.getArg(42, { callStatic: false })).result;
+    assertNotNull(result);
+    expect(result.callerId).to.be.equal(onAccount.address);
     identityContract.$options.onAccount = accountBefore;
   });
 
   it('Call-Static deploy transaction', async () => {
-    const res = await identityContract.$deploy([], { callStatic: true });
-    res.result.should.have.property('gasUsed');
-    res.result.should.have.property('returnType');
+    const { result } = await identityContract.$deploy([], { callStatic: true });
+    assertNotNull(result);
+    result.should.have.property('gasUsed');
+    result.should.have.property('returnType');
   });
 
   it('Call-Static deploy transaction on specific hash', async () => {
     const { hash } = await aeSdk.api.getTopHeader();
-    const res = await identityContract.$deploy([], { callStatic: true, top: hash });
-    res.result.should.have.property('gasUsed');
-    res.result.should.have.property('returnType');
+    const { result } = await identityContract.$deploy([], { callStatic: true, top: hash });
+    assertNotNull(result);
+    result.should.have.property('gasUsed');
+    result.should.have.property('returnType');
   });
 
   it('throws error on deploy', async () => {
@@ -158,12 +161,14 @@ describe('Contract', () => {
       sourceCode: identitySourceCode, address: deployed.address,
     });
     const { result } = await contract.getArg(42);
+    assertNotNull(result);
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub);
   });
 
   it('call contract/deploy with waitMined: false', async () => {
     delete identityContract.$options.address;
     const deployInfo = await identityContract.$deploy([], { waitMined: false });
+    assertNotNull(deployInfo.transaction);
     await aeSdk.poll(deployInfo.transaction);
     expect(deployInfo.result).to.be.equal(undefined);
     deployInfo.txData.should.not.be.equal(undefined);
@@ -201,9 +206,7 @@ describe('Contract', () => {
       + '  entrypoint sumNumbers(x: int, y: int) : int = TestLib.sum(x, y)'
     );
 
-    let contract: Awaited<ReturnType<typeof getContractInstance<{
-      sumNumbers: (x: number, y: number) => bigint;
-    }>>>;
+    let contract: Contract<{ sumNumbers: (x: number, y: number) => bigint }>;
 
     it('Can compiler contract with external deps', async () => {
       contract = await aeSdk.getContractInstance({
@@ -295,7 +298,7 @@ describe('Contract', () => {
     let owner: Encoded.AccountAddress;
     let newOwner: Encoded.AccountAddress;
     let delegationSignature: Uint8Array;
-    let contract: Awaited<ReturnType<typeof getContractInstance<{
+    let contract: Contract<{
       getName: (name: string) => {
         'AENS.Name': [Encoded.AccountAddress, ChainTtl, Map<string, string>];
       };
@@ -321,7 +324,7 @@ describe('Contract', () => {
         pt: { 'AENS.OraclePt': readonly [Encoded.Any] },
         sign: Uint8Array
       ) => void;
-    }>>>;
+    }>;
 
     before(async () => {
       contract = await aeSdk.getContractInstance({
@@ -356,8 +359,9 @@ describe('Contract', () => {
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId);
       const preclaimSig = await contract.$createDelegationSignature();
-      const preclaim = await contract.signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
-      preclaim.result.returnType.should.be.equal('ok');
+      const { result } = await contract.signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
+      assertNotNull(result);
+      result.returnType.should.be.equal('ok');
       await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
       // signature for any other name related operations
       delegationSignature = await contract.$createDelegationSignature([name]);
@@ -365,8 +369,10 @@ describe('Contract', () => {
 
     it('claims', async () => {
       const nameFee = 20e18; // 20 AE
-      const claim = await contract.signedClaim(owner, name, salt, nameFee, delegationSignature);
-      claim.result.returnType.should.be.equal('ok');
+      const { result } = await contract
+        .signedClaim(owner, name, salt, nameFee, delegationSignature);
+      assertNotNull(result);
+      result.returnType.should.be.equal('ok');
     });
 
     it('gets', async () => {
@@ -378,9 +384,10 @@ describe('Contract', () => {
 
     it('updates', async () => {
       const pointee = { 'AENS.OraclePt': [newOwner] as const };
-      const update = await contract
+      const { result } = await contract
         .signedUpdate(owner, name, 'oracle', pointee, delegationSignature);
-      expect(update.result.returnType).to.be.equal('ok');
+      assertNotNull(result);
+      expect(result.returnType).to.be.equal('ok');
       expect((await aeSdk.aensQuery(name)).pointers).to.be.eql([{
         key: 'oracle',
         id: newOwner.replace('ak', 'ok'),
@@ -388,16 +395,18 @@ describe('Contract', () => {
     });
 
     it('transfers', async () => {
-      const transfer = await contract
+      const { result } = await contract
         .signedTransfer(owner, newOwner, name, delegationSignature);
-      transfer.result.returnType.should.be.equal('ok');
+      assertNotNull(result);
+      result.returnType.should.be.equal('ok');
     });
 
     it('revokes', async () => {
       const revokeSig = await contract
         .$createDelegationSignature([name], { onAccount: aeSdk.accounts[newOwner] });
-      const revoke = await contract.signedRevoke(newOwner, name, revokeSig);
-      revoke.result.returnType.should.be.equal('ok');
+      const { result } = await contract.signedRevoke(newOwner, name, revokeSig);
+      assertNotNull(result);
+      result.returnType.should.be.equal('ok');
       await expect(aeSdk.aensQuery(name)).to.be.rejectedWith(Error);
     });
   });
@@ -409,7 +418,7 @@ describe('Contract', () => {
     let delegationSignature: Uint8Array;
     const queryFee = 500000;
     const ttl: ChainTtl = { RelativeTTL: [50n] };
-    let contract: Awaited<ReturnType<typeof getContractInstance<{
+    let contract: Contract<{
       signedRegisterOracle: (
         addr: Encoded.AccountAddress, sign: Uint8Array, qfee: InputNumber, ttl: ChainTtl,
       ) => Encoded.OracleAddress;
@@ -421,7 +430,7 @@ describe('Contract', () => {
       respond: (
         o: Encoded.OracleAddress, q: Encoded.OracleQueryId, sign: Uint8Array, r: string,
       ) => void;
-    }>>>;
+    }>;
 
     before(async () => {
       contract = await aeSdk.getContractInstance({
@@ -451,17 +460,18 @@ describe('Contract', () => {
 
     it('registers', async () => {
       delegationSignature = await contract.$createDelegationSignature();
-      const oracleRegister = await contract
+      const { result } = await contract
         .signedRegisterOracle(aeSdk.address, delegationSignature, queryFee, ttl);
-      oracleRegister.result.returnType.should.be.equal('ok');
+      assertNotNull(result);
+      result.returnType.should.be.equal('ok');
       oracle = await aeSdk.getOracleObject(oracleId);
       oracle.id.should.be.equal(oracleId);
     });
 
     it('extends', async () => {
-      const queryExtend = await contract
-        .signedExtendOracle(oracleId, delegationSignature, ttl);
-      queryExtend.result.returnType.should.be.equal('ok');
+      const { result } = await contract.signedExtendOracle(oracleId, delegationSignature, ttl);
+      assertNotNull(result);
+      result.returnType.should.be.equal('ok');
       const oracleExtended = await aeSdk.getOracleObject(oracleId);
       oracleExtended.ttl.should.be.equal(oracle.ttl + 50);
     });
@@ -472,6 +482,7 @@ describe('Contract', () => {
       oracle = await aeSdk.registerOracle('string', 'int', { queryFee, onAccount: aeSdk.addresses()[1] });
       const query = await contract
         .createQuery(oracle.id, q, 1000 + queryFee, ttl, ttl, { amount: 5 * queryFee });
+      assertNotNull(query.result);
       query.result.returnType.should.be.equal('ok');
       queryObject = await aeSdk.getQueryObject(oracle.id, query.decodedResult);
       queryObject.should.be.an('object');
@@ -485,8 +496,9 @@ describe('Contract', () => {
       aeSdk.selectAccount(aeSdk.addresses()[1]);
       const respondSig = await contract
         .$createDelegationSignature([queryId], { omitAddress: true });
-      const response = await contract.respond(oracle.id, queryId, respondSig, r);
-      response.result.returnType.should.be.equal('ok');
+      const { result } = await contract.respond(oracle.id, queryId, respondSig, r);
+      assertNotNull(result);
+      result.returnType.should.be.equal('ok');
       const queryObject2 = await aeSdk.getQueryObject(oracle.id, queryId);
       queryObject2.decodedResponse.should.be.equal(r);
     });

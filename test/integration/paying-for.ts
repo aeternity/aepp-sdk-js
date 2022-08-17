@@ -20,7 +20,7 @@ import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
-  AeSdk, getContractInstance, MemoryAccount, Tag, UnexpectedTsError,
+  AeSdk, Contract, MemoryAccount, Tag, UnexpectedTsError,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 import { InputNumber } from '../utils';
@@ -72,7 +72,7 @@ describe('Paying for transaction of another account', () => {
 
   let contractAddress: Encoded.ContractAddress;
   let aeSdkNotPayingFee: any;
-  let payingContract: Awaited<ReturnType<typeof getContractInstance<ContractApi>>>;
+  let payingContract: Contract<ContractApi>;
 
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);

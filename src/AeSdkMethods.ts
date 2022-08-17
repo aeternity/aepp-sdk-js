@@ -2,7 +2,7 @@ import * as chainMethods from './chain';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
-import getContractInstance from './contract/Contract';
+import Contract from './contract/Contract';
 import * as contractGaMethods from './contract/ga';
 import { _buildTx } from './tx';
 import { mapObject, UnionToIntersection } from './utils/other';
@@ -114,14 +114,14 @@ class AeSdkMethods {
   }
 
   async getContractInstance<Methods extends object>(
-    options?: Omit<Parameters<typeof getContractInstance>[0], 'onNode' | 'onCompiler'> &
+    options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode' | 'onCompiler'> &
     { onNode?: Node; onCompiler?: Compiler },
-  ): ReturnType<typeof getContractInstance<Methods>> {
+  ): Promise<Contract<Methods>> {
     const { onNode, onCompiler, ...otherOptions } = this._getOptions();
     if (onCompiler == null || onNode == null) {
       throw new ArgumentError('onCompiler, onNode', 'provided', null);
     }
-    return getContractInstance<Methods>({
+    return Contract.initialize<Methods>({
       ...otherOptions,
       onNode,
       onCompiler,

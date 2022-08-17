@@ -23,6 +23,7 @@ import {
   generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
+import { assertNotNull } from '../utils';
 
 describe('Node Chain', () => {
   let aeSdk: AeSdk;
@@ -168,7 +169,9 @@ describe('Node Chain', () => {
         + '  entrypoint foo(x : int) = x * 100',
     });
     await contract.$deploy();
-    const { result: { gasUsed: gasLimit } } = await contract.foo(5);
+    const { result } = await contract.foo(5);
+    assertNotNull(result);
+    const { gasUsed: gasLimit } = result;
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     const httpSpy = spy(http, 'request');
     const numbers = new Array(32).fill(undefined).map((v, idx) => idx * 2);

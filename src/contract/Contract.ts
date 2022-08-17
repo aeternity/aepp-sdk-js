@@ -83,13 +83,13 @@ interface Aci extends BaseAci {
 
 interface Event {
   address: Encoded.ContractAddress;
-  data: string;
+  data: Encoded.ContractBytearray;
   topics: Array<string | number>;
 }
 
 interface DecodedEvent {
   name: string;
-  args: unknown;
+  args: unknown[];
   contract: {
     name: string;
     address: Encoded.ContractAddress;
@@ -98,54 +98,12 @@ interface DecodedEvent {
 
 type TxData = Awaited<ReturnType<typeof send>>;
 
-export interface ContractInstance {
-  _aci: Aci;
-  _name: string;
-  _calldata: any;
-  $options: {
-    sourceCode?: string;
-    bytecode?: Encoded.ContractBytearray;
-    address?: Encoded.ContractAddress;
-    onCompiler: Compiler;
-    onNode: Node;
-    fileSystem?: Record<string, string>;
-    omitUnknown?: boolean;
-    contractAddressToName?: { [key: Encoded.ContractAddress]: string };
-    [key: string]: any;
-  };
-  $compile: (options?: {}) => Promise<Encoded.ContractBytearray>;
-  _estimateGas: (name: string, params: any[], options: object) => Promise<number>;
-  $deploy: (params?: any[], options?: object) => Promise<any>;
-  $call: (fn: string, params?: any[], options?: {}) => Promise<{
-    hash: string;
-    tx: any;
-    txData: TxData;
-    rawTx: string;
-    result: {
-      callerId: Encoded.AccountAddress;
-      callerNonce: number;
-      contractId: Encoded.ContractAddress;
-      gasPrice: number;
-      gasUsed: number;
-      height: number;
-      log: any[];
-      returnType: ContractCallReturnType;
-      returnValue: string;
-    };
-    decodedResult: any;
-    decodedEvents: DecodedEvent[];
-  }>;
-  $decodeEvents: (
-    events: Event[],
-    options?: {
-      omitUnknown?: boolean;
-      contractAddressToName?: { [key: Encoded.ContractAddress]: string };
-    },
-  ) => DecodedEvent[];
-  $createDelegationSignature: (
-    ids?: Array<Encoded.Any | AensName>,
-    _options?: { omitAddress?: boolean; onAccount?: AccountBase },
-  ) => Promise<Uint8Array>;
+interface SendAndProcessReturnType {
+  result?: TransformNodeType<ContractCallObject>;
+  hash: TxData['hash'];
+  tx: Awaited<ReturnType<typeof unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>>>;
+  txData: TxData;
+  rawTx: Encoded.Transaction;
 }
 
 type MethodsToContractApi<Methods extends object> = {
@@ -153,13 +111,15 @@ type MethodsToContractApi<Methods extends object> = {
   Methods[Name] extends (...args: infer Args) => infer Ret
     ? (...args: [
       ...Args,
-      ...[] | [Name extends 'init' ? Parameters<ContractInstance['$deploy']>[1] : Parameters<ContractInstance['$call']>[2]],
+      ...[] | [Name extends 'init' ? Parameters<Contract['$deploy']>[1] : Parameters<Contract['$call']>[2]],
     ]) => Promise<
-    Awaited<ReturnType<ContractInstance['$call']>> &
-    { decodedResult: Ret }
+    Awaited<ReturnType<Contract['$call']>> &
+    { decodedResult?: Ret }
     >
     : never
 };
+
+type ContractGeneric<Methods extends {}> = Contract & MethodsToContractApi<Methods>;
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
@@ -178,167 +138,86 @@ type MethodsToContractApi<Methods extends object> = {
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is
  * stateful or not
  */
-export default async function getContractInstance<Methods extends object>({
-  onAccount,
-  onCompiler,
-  onNode,
-  sourceCode,
-  bytecode,
-  aci: _aci,
-  address,
-  fileSystem = {},
-  validateBytecode,
-  ...otherOptions
-}: {
-  onAccount?: AccountBase;
-  onCompiler: Compiler;
-  onNode: Node;
-  sourceCode?: string;
-  bytecode?: Encoded.ContractBytearray;
-  aci?: Aci;
-  address?: Encoded.ContractAddress | AensName;
-  fileSystem?: Record<string, string>;
-  validateBytecode?: boolean;
-  [key: string]: any;
-}): Promise<ContractInstance & MethodsToContractApi<Methods>> {
-  if (_aci == null && sourceCode != null) {
-    // TODO: should be fixed when the compiledAci interface gets updated
-    _aci = await onCompiler.generateACI({ code: sourceCode, options: { fileSystem } }) as Aci;
-  }
-  if (_aci == null) throw new MissingContractDefError();
-
-  if (address != null) {
-    address = await resolveName(
-      address,
-      'contract_pubkey',
-      { resolveByNode: true, onNode },
-    ) as Encoded.ContractAddress;
-  }
-
-  if (address == null && sourceCode == null && bytecode == null) {
-    throw new MissingContractAddressError('Can\'t create instance by ACI without address');
-  }
-
-  if (address != null) {
-    const contract = await getContract(address, { onNode });
-    if (contract.active == null) throw new InactiveContractError(address);
-  }
-
-  const instance: ContractInstance = {
-    _aci,
-    _name: _aci.encodedAci.contract.name,
-    _calldata: new Calldata([_aci.encodedAci, ..._aci.externalEncodedAci]),
-    $options: {
-      sourceCode,
-      bytecode,
-      address,
-      onAccount,
-      onCompiler,
-      onNode,
-      callStatic: false,
-      fileSystem,
-      ...otherOptions,
-    },
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    /* eslint-disable @typescript-eslint/no-empty-function */
-    async $compile(_options?: {}): Promise<any> {},
-    async _estimateGas(_name: string, _params: any[], _options: object): Promise<any> {},
-    async $deploy(_params?: any[], _options?: any): Promise<any> {},
-    async $call(_fn: string, _params?: any[], _options?: {}): Promise<any> {},
-    $decodeEvents(_events: Event[], options?: { omitUnknown?: boolean }): any {},
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-    /* eslint-enable @typescript-eslint/no-empty-function */
-    /**
-     * Helper to generate a signature to delegate
-     *  - pre-claim/claim/transfer/revoke of a name to a contract.
-     *  - register/extend/respond of an Oracle to a contract.
-     * @category contract
-     * @param ids - The list of id's to prepend
-     * @param _options - Options
-     * @param _options.omitAddress - Prepend delegation signature with an account address
-     * @param _options.onAccount - Account to use
-     * @returns Signature
-     * @example
-     * ```js
-     * const aeSdk = new AeSdk({ ... })
-     * const contract = await aeSdk.getContractInstance({ address: 'ct_asd2ks...' })
-     * const aensName = 'example.chain'
-     * const onAccount = new MemoryAccount(...) // Sign with a specific account
-     * // Preclaim signature
-     * const preclaimSig = await contract.$createDelegationSignature([], { onAccount })
-     * // Claim, transfer and revoke signature
-     * const aensDelegationSig = await contract
-     *   .$createDelegationSignature([aensName], { onAccount })
-     * ```
-     * @example
-     * ```js
-     * const aeSdk = new AeSdk({ ... })
-     * const contract = await aeSdk.getContractInstance({ address: 'ct_asd2ks...' })
-     * const oracleQueryId = 'oq_...'
-     * const onAccount = new MemoryAccount(...) // Sign with a specific account
-     * // Oracle register and extend signature
-     * const oracleDelegationSig = await contract.$createDelegationSignature([], { onAccount })
-     * // Oracle respond signature
-     * const respondSig = await contract
-     *   .$createDelegationSignature([oracleQueryId], { onAccount, omitAddress: true })
-     * ```
-     */
-    async $createDelegationSignature(
-      ids: Array<Encoded.Any | AensName> = [],
-      _options?: { omitAddress?: boolean; onAccount?: AccountBase },
-    ): Promise<Uint8Array> {
-      const options = { ...instance.$options, ..._options };
-      const contractId = instance.$options.address;
-      if (options.onAccount == null) throw new IllegalArgumentError('Can\'t create delegation signature without account');
-      if (contractId == null) throw new MissingContractAddressError('Can\'t create delegation signature without address');
-      return options.onAccount.sign(
-        concatBuffers([
-          Buffer.from(await options.onNode.getNetworkId()),
-          ...options.omitAddress === true ? [] : [decode(options.onAccount.address)],
-          ...ids.map((e) => (isNameValid(e) ? produceNameId(e) : e)).map((e) => decode(e)),
-          decode(contractId),
-        ]),
-        options,
-      );
-    },
-  };
-
-  if (validateBytecode != null) {
-    if (address == null) throw new MissingContractAddressError('Can\'t validate bytecode without contract address');
-    const onChanBytecode = (await getContractByteCode(address, { onNode })).bytecode;
-    const isValid: boolean = sourceCode != null
-      ? await onCompiler.validateByteCode(
-        { bytecode: onChanBytecode, source: sourceCode, options: instance.$options },
-      ).then(() => true, () => false)
-      : bytecode === onChanBytecode;
-    if (!isValid) throw new BytecodeMismatchError(sourceCode != null ? 'source code' : 'bytecode');
+class Contract {
+  /**
+   * Helper to generate a signature to delegate
+   *  - pre-claim/claim/transfer/revoke of a name to a contract.
+   *  - register/extend/respond of an Oracle to a contract.
+   * @category contract
+   * @param ids - The list of id's to prepend
+   * @param _options - Options
+   * @param _options.omitAddress - Prepend delegation signature with an account address
+   * @param _options.onAccount - Account to use
+   * @returns Signature
+   * @example
+   * ```js
+   * const aeSdk = new AeSdk({ ... })
+   * const contract = await aeSdk.getContractInstance({ address: 'ct_asd2ks...' })
+   * const aensName = 'example.chain'
+   * const onAccount = new MemoryAccount(...) // Sign with a specific account
+   * // Preclaim signature
+   * const preclaimSig = await contract.$createDelegationSignature([], { onAccount })
+   * // Claim, transfer and revoke signature
+   * const aensDelegationSig = await contract
+   *   .$createDelegationSignature([aensName], { onAccount })
+   * ```
+   * @example
+   * ```js
+   * const aeSdk = new AeSdk({ ... })
+   * const contract = await aeSdk.getContractInstance({ address: 'ct_asd2ks...' })
+   * const oracleQueryId = 'oq_...'
+   * const onAccount = new MemoryAccount(...) // Sign with a specific account
+   * // Oracle register and extend signature
+   * const oracleDelegationSig = await contract.$createDelegationSignature([], { onAccount })
+   * // Oracle respond signature
+   * const respondSig = await contract
+   *   .$createDelegationSignature([oracleQueryId], { onAccount, omitAddress: true })
+   * ```
+   */
+  async $createDelegationSignature(
+    ids: Array<Encoded.Any | AensName> = [],
+    _options?: { omitAddress?: boolean; onAccount?: AccountBase },
+  ): Promise<Uint8Array> {
+    const options = { ...this.$options, ..._options };
+    const contractId = this.$options.address;
+    if (options.onAccount == null) throw new IllegalArgumentError('Can\'t create delegation signature without account');
+    if (contractId == null) throw new MissingContractAddressError('Can\'t create delegation signature without address');
+    return options.onAccount.sign(
+      concatBuffers([
+        Buffer.from(await options.onNode.getNetworkId()),
+        ...options.omitAddress === true ? [] : [decode(options.onAccount.address)],
+        ...ids.map((e) => (isNameValid(e) ? produceNameId(e) : e)).map((e) => decode(e)),
+        decode(contractId),
+      ]),
+      options,
+    );
   }
 
   /**
    * Compile contract
    * @returns bytecode
    */
-  instance.$compile = async (options = {}): Promise<Encoded.ContractBytearray> => {
-    if (instance.$options.bytecode != null) throw new IllegalArgumentError('Contract already compiled');
-    if (instance.$options.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
-    instance.$options.bytecode = (await onCompiler.compileContract({
-      code: instance.$options.sourceCode, options: { ...instance.$options, ...options },
+  async $compile(): Promise<Encoded.ContractBytearray> {
+    if (this.$options.bytecode != null) throw new IllegalArgumentError('Contract already compiled');
+    if (this.$options.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
+    this.$options.bytecode = (await this.$options.onCompiler.compileContract({
+      code: this.$options.sourceCode, options: { fileSystem: this.$options.fileSystem },
     })).bytecode as Encoded.ContractBytearray;
-    return instance.$options.bytecode;
-  };
+    return this.$options.bytecode;
+  }
 
-  const handleCallError = (
+  protected _handleCallError(
     { returnType, returnValue }: {
       returnType: ContractCallReturnType;
       returnValue: Encoded.ContractBytearray;
     },
     transaction: string,
-  ): void => {
+  ): void {
     let message: string;
     switch (returnType) {
       case 'ok': return;
       case 'revert':
-        message = instance._calldata.decodeFateString(returnValue);
+        message = this._calldata.decodeFateString(returnValue);
         break;
       case 'error':
         message = decode(returnValue).toString();
@@ -347,13 +226,13 @@ export default async function getContractInstance<Methods extends object>({
         throw new InternalError(`Unknown return type: ${returnType}`);
     }
     throw new NodeInvocationError(message, transaction);
-  };
+  }
 
-  const sendAndProcess = async (
+  protected async _sendAndProcess(
     tx: Encoded.Transaction,
     options: any,
-  ): Promise<SendAndProcessReturnType> => {
-    options = { ...instance.$options, ...options };
+  ): Promise<SendAndProcessReturnType> {
+    options = { ...this.$options, ...options };
     const txData = await send(tx, options);
     const result = {
       hash: txData.hash,
@@ -362,27 +241,20 @@ export default async function getContractInstance<Methods extends object>({
       rawTx: txData.rawTx,
     };
     if (txData.blockHeight == null) return result;
-    const { callInfo } = await onNode.getTransactionInfoByHash(txData.hash);
+    const { callInfo } = await this.$options.onNode.getTransactionInfoByHash(txData.hash);
     Object.assign(result.txData, callInfo); // TODO: don't duplicate data in result
     // @ts-expect-error TODO api should be updated to match types
-    handleCallError(callInfo, tx);
+    this._handleCallError(callInfo, tx);
     return { ...result, result: callInfo };
-  };
-
-  interface SendAndProcessReturnType {
-    result?: TransformNodeType<ContractCallObject>;
-    hash: TxData['hash'];
-    tx: Awaited<ReturnType<typeof unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>>>;
-    txData: TxData;
-    rawTx: Encoded.Transaction;
   }
 
-  instance._estimateGas = async (name: string, params: any[], options: object): Promise<number> => {
-    const { result: { gasUsed } } = await instance
-      .$call(name, params, { ...options, callStatic: true });
+  async _estimateGas(name: string, params: any[], options: object): Promise<number> {
+    const { result } = await this.$call(name, params, { ...options, callStatic: true });
+    if (result == null) throw new UnexpectedTsError();
+    const { gasUsed } = result;
     // taken from https://github.com/aeternity/aepp-sdk-js/issues/1286#issuecomment-977814771
     return Math.floor(gasUsed * 1.25);
-  };
+  }
 
   /**
    * Deploy contract
@@ -390,49 +262,44 @@ export default async function getContractInstance<Methods extends object>({
    * @param options - Options
    * @returns deploy info
    */
-  instance.$deploy = async (
-    params = [],
-    options?:
-    Parameters<typeof instance.$compile>[0] &
-    Parameters<typeof instance.$call>[2] &
-    Parameters<typeof sendAndProcess>[1],
+  async $deploy(
+    params: any[] = [],
+    options?: Parameters<Contract['$call']>[2] & Parameters<Contract['_sendAndProcess']>[1],
   ): Promise<Omit<SendAndProcessReturnType, 'hash'> & {
-    transaction: SendAndProcessReturnType['hash'];
-    owner: Encoded.AccountAddress;
-    address: Encoded.ContractAddress;
-  }> => {
-    const opt = { ...instance.$options, ...options };
-    if (instance.$options.bytecode == null) await instance.$compile(opt);
-    // @ts-expect-error TODO: need to fix compatibility between return types of `$deploy`, `$call`
-    if (opt.callStatic === true) return instance.$call('init', params, opt);
-    if (instance.$options.address != null) throw new DuplicateContractError();
+      transaction?: Encoded.TxHash;
+      owner?: Encoded.AccountAddress;
+      address?: Encoded.ContractAddress;
+    }> {
+    const opt = { ...this.$options, ...options };
+    if (this.$options.bytecode == null) await this.$compile();
+    if (opt.callStatic === true) return this.$call('init', params, opt);
+    if (this.$options.address != null) throw new DuplicateContractError();
 
     const ownerId = opt.onAccount.address;
     const tx = await _buildTx(Tag.ContractCreateTx, {
       ...opt,
-      gasLimit: opt.gasLimit ?? await instance._estimateGas('init', params, opt),
-      callData: instance._calldata.encode(instance._name, 'init', params),
-      code: instance.$options.bytecode,
+      gasLimit: opt.gasLimit ?? await this._estimateGas('init', params, opt),
+      callData: this._calldata.encode(this._name, 'init', params),
+      code: this.$options.bytecode,
       ownerId,
-      onNode,
     });
-    instance.$options.address = buildContractIdByContractTx(tx);
-    const { hash, ...other } = await sendAndProcess(tx, opt);
+    this.$options.address = buildContractIdByContractTx(tx);
+    const { hash, ...other } = await this._sendAndProcess(tx, opt);
     return {
       ...other,
       owner: ownerId,
       transaction: hash,
-      address: instance.$options.address,
+      address: this.$options.address,
     };
-  };
+  }
 
   /**
    * Get function schema from contract ACI object
    * @param name - Function name
    * @returns function ACI
    */
-  function getFunctionACI(name: string): Partial<FunctionACI> {
-    const fn = instance._aci.encodedAci.contract.functions.find(
+  protected _getFunctionACI(name: string): Partial<FunctionACI> {
+    const fn = this._aci.encodedAci.contract.functions.find(
       (f: { name: string }) => f.name === name,
     );
     if (fn != null) {
@@ -449,10 +316,14 @@ export default async function getContractInstance<Methods extends object>({
    * @param options - Array of function arguments
    * @returns CallResult
    */
-  instance.$call = async (fn: string, params: any[] = [], options: object = {}) => {
-    const opt = { ...instance.$options, ...options };
-    const fnACI = getFunctionACI(fn);
-    const contractId = instance.$options.address;
+  async $call(fn: string, params: any[] = [], options: object = {}): Promise<{
+    decodedResult?: any;
+    decodedEvents?: ReturnType<Contract['$decodeEvents']>;
+  } & SendAndProcessReturnType> {
+    const opt = { ...this.$options, ...options };
+    const fnACI = this._getFunctionACI(fn);
+    const contractId = this.$options.address;
+    const { onNode } = opt;
 
     if (fn == null) throw new MissingFunctionNameError();
     if (fn === 'init' && opt.callStatic === false) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
@@ -469,7 +340,7 @@ export default async function getContractInstance<Methods extends object>({
       ) throw error;
       callerId = DRY_RUN_ACCOUNT.pub;
     }
-    const callData = instance._calldata.encode(instance._name, fn, params);
+    const callData = this._calldata.encode(this._name, fn, params);
 
     let res: any;
     if (opt.callStatic === true) {
@@ -482,10 +353,10 @@ export default async function getContractInstance<Methods extends object>({
       }
       let tx;
       if (fn === 'init') {
-        if (instance.$options.bytecode == null) throw new IllegalArgumentError('Can\'t dry-run "init" without bytecode');
+        if (this.$options.bytecode == null) throw new IllegalArgumentError('Can\'t dry-run "init" without bytecode');
         tx = await _buildTx(
           Tag.ContractCreateTx,
-          { ...txOpt, code: instance.$options.bytecode, ownerId: callerId },
+          { ...txOpt, code: this.$options.bytecode, ownerId: callerId },
         );
       } else {
         if (contractId == null) throw new MissingContractAddressError('Can\'t dry-run contract without address');
@@ -494,7 +365,7 @@ export default async function getContractInstance<Methods extends object>({
 
       const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, opt);
       if (callObj == null) throw new UnexpectedTsError();
-      handleCallError({
+      this._handleCallError({
         returnType: callObj.returnType as ContractCallReturnType,
         returnValue: callObj.returnValue as Encoded.ContractBytearray,
       }, tx);
@@ -503,20 +374,20 @@ export default async function getContractInstance<Methods extends object>({
       if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
       const tx = await _buildTx(Tag.ContractCallTx, {
         ...opt,
-        gasLimit: opt.gasLimit ?? await instance._estimateGas(fn, params, opt),
+        gasLimit: opt.gasLimit ?? await this._estimateGas(fn, params, opt),
         callerId,
         contractId,
         callData,
       });
-      res = await sendAndProcess(tx, opt);
+      res = await this._sendAndProcess(tx, opt);
     }
     if (opt.callStatic === true || res.txData.blockHeight != null) {
       res.decodedResult = fnACI.returns != null && fnACI.returns !== 'unit' && fn !== 'init'
-        && instance._calldata.decode(instance._name, fn, res.result.returnValue);
-      res.decodedEvents = instance.$decodeEvents(res.result.log, opt);
+        && this._calldata.decode(this._name, fn, res.result.returnValue);
+      res.decodedEvents = this.$decodeEvents(res.result.log, opt);
     }
     return res;
-  };
+  }
 
   /**
    * @param ctAddress - Contract address that emitted event
@@ -526,20 +397,17 @@ export default async function getContractInstance<Methods extends object>({
    * @throws {@link MissingEventDefinitionError}
    * @throws {@link AmbiguousEventDefinitionError}
    */
-  function getContractNameByEvent(
+  protected _getContractNameByEvent(
     ctAddress: Encoded.ContractAddress,
     nameHash: BigInt,
     { contractAddressToName }: {
       contractAddressToName?: { [key: Encoded.ContractAddress]: string };
     },
   ): string {
-    const addressToName = { ...instance.$options.contractAddressToName, ...contractAddressToName };
+    const addressToName = { ...this.$options.contractAddressToName, ...contractAddressToName };
     if (addressToName[ctAddress] != null) return addressToName[ctAddress];
 
-    const matchedEvents = [
-      instance._aci.encodedAci,
-      ...instance._aci.externalEncodedAci,
-    ]
+    const matchedEvents = [this._aci.encodedAci, ...this._aci.externalEncodedAci]
       .filter(({ contract }) => contract?.event)
       .map(({ contract }) => [contract.name, contract.event.variant])
       .map(([name, events]) => events.map((event: {}) => [name, Object.keys(event)[0]]))
@@ -558,61 +426,164 @@ export default async function getContractInstance<Methods extends object>({
    * @param options - Options
    * @returns DecodedEvents
    */
-  instance.$decodeEvents = (
+  $decodeEvents(
     events: Event[],
-    { omitUnknown, ...opt }: { omitUnknown?: boolean } = {},
-  ): DecodedEvent[] => events
-    .map((event) => {
-      const topics = event.topics.map((t: string | number) => BigInt(t));
-      let contractName;
-      try {
-        contractName = getContractNameByEvent(event.address, topics[0], opt);
-      } catch (error) {
-        if ((omitUnknown ?? false) && error instanceof MissingEventDefinitionError) return null;
-        throw error;
-      }
-      const decoded = instance._calldata.decodeEvent(contractName, event.data, topics);
-      const [name, args] = Object.entries(decoded)[0];
-      return {
-        name,
-        args,
-        contract: {
-          name: contractName,
-          address: event.address,
-        },
-      };
-    }).filter((e: DecodedEvent | null): e is DecodedEvent => e != null);
-
-  /**
-   * Generate proto function based on contract function using Contract ACI schema
-   * All function can be called like:
-   * ```js
-   * await contract.testFunction()
-   * ```
-   * then sdk will decide to use dry-run or send tx
-   * on-chain base on if function stateful or not.
-   * Also, you can manually do that:
-   * ```js
-   * await contract.testFunction({ callStatic: true }) // use call-static (dry-run)
-   * await contract.testFunction({ callStatic: false }) // send tx on-chain
-   * ```
-   */
-  Object.assign(
-    instance,
-    Object.fromEntries(instance._aci.encodedAci.contract.functions
-      .map(({ name, arguments: aciArgs, stateful }: FunctionACI) => {
-        const callStatic = name !== 'init' && !stateful;
-        return [
+    { omitUnknown, ...opt }: { omitUnknown?: boolean } &
+    Parameters<Contract['_getContractNameByEvent']>[2] = {},
+  ): DecodedEvent[] {
+    return events
+      .map((event) => {
+        const topics = event.topics.map((t: string | number) => BigInt(t));
+        let contractName;
+        try {
+          contractName = this._getContractNameByEvent(event.address, topics[0], opt);
+        } catch (error) {
+          if ((omitUnknown ?? false) && error instanceof MissingEventDefinitionError) return null;
+          throw error;
+        }
+        const decoded = this._calldata.decodeEvent(contractName, event.data, topics);
+        const [name, args] = Object.entries(decoded)[0];
+        return {
           name,
-          async (...args: any[]) => {
-            const options = args.length === aciArgs.length + 1 ? args.pop() : {};
-            if (typeof options !== 'object') throw new TypeError(`Options should be an object: ${options}`);
-            if (name === 'init') return instance.$deploy(args, { callStatic, ...options });
-            return instance.$call(name, args, { callStatic, ...options });
+          args,
+          contract: {
+            name: contractName,
+            address: event.address,
           },
-        ];
-      })),
-  );
+        };
+      }).filter((e: DecodedEvent | null): e is DecodedEvent => e != null);
+  }
 
-  return instance as ContractInstance & MethodsToContractApi<Methods>;
+  static async initialize<Methods extends {}>(
+    {
+      onCompiler,
+      onNode,
+      sourceCode,
+      bytecode,
+      aci,
+      address,
+      fileSystem,
+      validateBytecode,
+      ...otherOptions
+    }: Omit<ConstructorParameters<typeof Contract>[0], 'aci' | 'address'> & {
+      validateBytecode?: boolean;
+      aci?: Aci;
+      address?: Encoded.ContractAddress | AensName;
+    },
+  ): Promise<ContractGeneric<Methods>> {
+    if (aci == null && sourceCode != null) {
+      // TODO: should be fixed when the compiledAci interface gets updated
+      aci = await onCompiler.generateACI({ code: sourceCode, options: { fileSystem } }) as Aci;
+    }
+    if (aci == null) throw new MissingContractDefError();
+
+    if (address != null) {
+      address = await resolveName(
+        address,
+        'contract_pubkey',
+        { resolveByNode: true, onNode },
+      ) as Encoded.ContractAddress;
+    }
+
+    if (address == null && sourceCode == null && bytecode == null) {
+      throw new MissingContractAddressError('Can\'t create instance by ACI without address');
+    }
+
+    if (address != null) {
+      const contract = await getContract(address, { onNode });
+      if (contract.active == null) throw new InactiveContractError(address);
+    }
+
+    if (validateBytecode != null) {
+      if (address == null) throw new MissingContractAddressError('Can\'t validate bytecode without contract address');
+      const onChanBytecode = (await getContractByteCode(address, { onNode })).bytecode;
+      const isValid: boolean = sourceCode != null
+        ? await onCompiler.validateByteCode(
+          { bytecode: onChanBytecode, source: sourceCode, options: { fileSystem } },
+        ).then(() => true, () => false)
+        : bytecode === onChanBytecode;
+      if (!isValid) throw new BytecodeMismatchError(sourceCode != null ? 'source code' : 'bytecode');
+    }
+
+    return new ContractGeneric<Methods>({
+      onCompiler, onNode, sourceCode, bytecode, aci, address, fileSystem, ...otherOptions,
+    });
+  }
+
+  _aci: Aci;
+
+  _name: string;
+
+  _calldata: Calldata;
+
+  $options: {
+    sourceCode?: string;
+    bytecode?: Encoded.ContractBytearray;
+    address?: Encoded.ContractAddress;
+    onCompiler: Compiler;
+    onNode: Node;
+    omitUnknown?: boolean;
+    contractAddressToName?: { [key: Encoded.ContractAddress]: string };
+    [key: string]: any;
+  };
+
+  constructor({ aci, ...otherOptions }: {
+    onAccount?: AccountBase;
+    onCompiler: Compiler;
+    onNode: Node;
+    sourceCode?: string;
+    bytecode?: Encoded.ContractBytearray;
+    aci: Aci;
+    address?: Encoded.ContractAddress;
+    fileSystem?: Record<string, string>;
+    [key: string]: any;
+  }) {
+    this._aci = aci;
+    this._name = aci.encodedAci.contract.name;
+    this._calldata = new Calldata([aci.encodedAci, ...aci.externalEncodedAci]);
+    this.$options = { callStatic: false, ...otherOptions };
+
+    /**
+     * Generate proto function based on contract function using Contract ACI schema
+     * All function can be called like:
+     * ```js
+     * await contract.testFunction()
+     * ```
+     * then sdk will decide to use dry-run or send tx
+     * on-chain base on if function stateful or not.
+     * Also, you can manually do that:
+     * ```js
+     * await contract.testFunction({ callStatic: true }) // use call-static (dry-run)
+     * await contract.testFunction({ callStatic: false }) // send tx on-chain
+     * ```
+     */
+    Object.assign(
+      this,
+      Object.fromEntries(this._aci.encodedAci.contract.functions
+        .map(({ name, arguments: aciArgs, stateful }: FunctionACI) => {
+          const callStatic = name !== 'init' && !stateful;
+          return [
+            name,
+            async (...args: any[]) => {
+              const options = args.length === aciArgs.length + 1 ? args.pop() : {};
+              if (typeof options !== 'object') throw new TypeError(`Options should be an object: ${options}`);
+              if (name === 'init') return this.$deploy(args, { callStatic, ...options });
+              return this.$call(name, args, { callStatic, ...options });
+            },
+          ];
+        })),
+    );
+  }
 }
+
+interface ContractGenericClass {
+  new <Methods extends {}>(
+    options: ConstructorParameters<typeof Contract>[0],
+  ): ContractGeneric<Methods>;
+  initialize: typeof Contract['initialize'];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+const ContractGeneric: ContractGenericClass = Contract as any;
+
+export default ContractGeneric;
