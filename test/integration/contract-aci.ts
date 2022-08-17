@@ -164,12 +164,12 @@ describe('Contract instance', () => {
     });
     delete aeSdk._options.testProperty;
     expect(testContract.$options.testProperty).to.be.equal('test');
-    testContract.should.have.property('sourceCode');
-    testContract.should.have.property('bytecode');
     testContract.should.have.property('$compile');
     testContract.should.have.property('$call');
     testContract.should.have.property('$deploy');
     testContract.$options.ttl.should.be.equal(0);
+    testContract.$options.should.have.property('sourceCode');
+    testContract.$options.should.have.property('bytecode');
     assertNotNull(testContract.$options.fileSystem);
     testContract.$options.fileSystem.should.have.property('testLib');
     expect(Object.keys(testContract.methods)).to.be.eql(
@@ -179,7 +179,7 @@ describe('Contract instance', () => {
 
   it('compiles', async () => {
     await testContract.$compile();
-    expect(testContract.bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
+    expect(testContract.$options.bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
   });
 
   it('fails on calling without deployment', () => expect(testContract.methods.intFn(2))
@@ -201,7 +201,7 @@ describe('Contract instance', () => {
     expect(deployInfo.txData.gasUsed).to.be.equal(209);
     expect(deployInfo.txData.gasPrice).to.be.equal(1000000000n);
     expect(deployInfo.txData.tx.deposit).to.be.equal(0n);
-    expect(testContract.bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
+    expect(testContract.$options.bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
     testContractAddress = deployInfo.address;
   });
 

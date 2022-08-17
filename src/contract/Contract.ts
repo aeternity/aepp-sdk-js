@@ -102,9 +102,9 @@ export interface ContractInstance {
   _aci: Aci;
   _name: string;
   _calldata: any;
-  sourceCode?: string;
-  bytecode?: Encoded.ContractBytearray;
   $options: {
+    sourceCode?: string;
+    bytecode?: Encoded.ContractBytearray;
     address?: Encoded.ContractAddress;
     onCompiler: Compiler;
     onNode: Node;
@@ -218,9 +218,9 @@ export default async function getContractInstance({
     _aci,
     _name: _aci.encodedAci.contract.name,
     _calldata: new Calldata([_aci.encodedAci, ..._aci.externalEncodedAci]),
-    sourceCode,
-    bytecode,
     $options: {
+      sourceCode,
+      bytecode,
       address,
       onAccount,
       onCompiler,
@@ -310,12 +310,12 @@ export default async function getContractInstance({
    * @returns bytecode
    */
   instance.$compile = async (options = {}): Promise<Encoded.ContractBytearray> => {
-    if (instance.bytecode != null) throw new IllegalArgumentError('Contract already compiled');
-    if (instance.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
-    instance.bytecode = (await onCompiler.compileContract({
-      code: instance.sourceCode, options: { ...instance.$options, ...options },
+    if (instance.$options.bytecode != null) throw new IllegalArgumentError('Contract already compiled');
+    if (instance.$options.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
+    instance.$options.bytecode = (await onCompiler.compileContract({
+      code: instance.$options.sourceCode, options: { ...instance.$options, ...options },
     })).bytecode as Encoded.ContractBytearray;
-    return instance.bytecode;
+    return instance.$options.bytecode;
   };
 
   const handleCallError = (
@@ -393,7 +393,7 @@ export default async function getContractInstance({
     address: Encoded.ContractAddress;
   }> => {
     const opt = { ...instance.$options, ...options };
-    if (instance.bytecode == null) await instance.$compile(opt);
+    if (instance.$options.bytecode == null) await instance.$compile(opt);
     // @ts-expect-error TODO: need to fix compatibility between return types of `$deploy`, `$call`
     if (opt.callStatic === true) return instance.$call('init', params, opt);
     if (instance.$options.address != null) throw new DuplicateContractError();
@@ -403,7 +403,7 @@ export default async function getContractInstance({
       ...opt,
       gasLimit: opt.gasLimit ?? await instance._estimateGas('init', params, opt),
       callData: instance._calldata.encode(instance._name, 'init', params),
-      code: instance.bytecode,
+      code: instance.$options.bytecode,
       ownerId,
       onNode,
     });
@@ -473,10 +473,10 @@ export default async function getContractInstance({
       }
       let tx;
       if (fn === 'init') {
-        if (instance.bytecode == null) throw new IllegalArgumentError('Can\'t dry-run "init" without bytecode');
+        if (instance.$options.bytecode == null) throw new IllegalArgumentError('Can\'t dry-run "init" without bytecode');
         tx = await _buildTx(
           Tag.ContractCreateTx,
-          { ...txOpt, code: instance.bytecode, ownerId: callerId },
+          { ...txOpt, code: instance.$options.bytecode, ownerId: callerId },
         );
       } else {
         if (contractId == null) throw new MissingContractAddressError('Can\'t dry-run contract without address');
