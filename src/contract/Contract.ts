@@ -122,7 +122,14 @@ export interface ContractInstance {
     rawTx?: string;
     txData?: TxData;
   };
-  $options: any;
+  $options: {
+    onCompiler: Compiler;
+    onNode: Node;
+    fileSystem?: Record<string, string>;
+    omitUnknown?: boolean;
+    contractAddressToName?: { [key: Encoded.ContractAddress]: string };
+    [key: string]: any;
+  };
   $compile: (options?: {}) => Promise<Encoded.ContractBytearray>;
   _estimateGas: (name: string, params: any[], options: object) => Promise<number>;
   $deploy: (params?: any[], options?: object) => Promise<any>;
@@ -146,7 +153,11 @@ export interface ContractInstance {
     decodedEvents: DecodedEvent[];
   }>;
   $decodeEvents: (
-    events: Event[], options?: { omitUnknown?: boolean; contractAddressToName?: any }
+    events: Event[],
+    options?: {
+      omitUnknown?: boolean;
+      contractAddressToName?: { [key: Encoded.ContractAddress]: string };
+    },
   ) => DecodedEvent[];
   $createDelegationSignature: (
     ids?: Array<Encoded.Any | AensName>,
@@ -286,6 +297,7 @@ export default async function getContractInstance({
     ): Promise<Uint8Array> {
       const options = { ...instance.$options, ..._options };
       const contractId = instance.deployInfo.address;
+      if (options.onAccount == null) throw new IllegalArgumentError('Can\'t create delegation signature without account');
       if (contractId == null) throw new MissingContractAddressError('Can\'t create delegation signature without address');
       return options.onAccount.sign(
         concatBuffers([
@@ -448,7 +460,6 @@ export default async function getContractInstance({
 
     if (fn == null) throw new MissingFunctionNameError();
     if (fn === 'init' && opt.callStatic === false) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
-    if (contractId == null && fn !== 'init') throw new MissingContractAddressError('Can\'t call contract without address');
     if (fn !== 'init' && opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(opt.amount, fn);
 
     let callerId;
@@ -473,11 +484,19 @@ export default async function getContractInstance({
       if (opt.nonce == null && opt.top != null) {
         opt.nonce = (await getAccount(callerId, { hash: opt.top, onNode })).nonce + 1;
       }
-      const tx = await (fn === 'init'
-        ? _buildTx(Tag.ContractCreateTx, { ...txOpt, code: instance.bytecode, ownerId: callerId })
-        : _buildTx(Tag.ContractCallTx, { ...txOpt, callerId, contractId }));
+      let tx;
+      if (fn === 'init') {
+        if (instance.bytecode == null) throw new IllegalArgumentError('Can\'t dry-run "init" without bytecode');
+        tx = await _buildTx(
+          Tag.ContractCreateTx,
+          { ...txOpt, code: instance.bytecode, ownerId: callerId },
+        );
+      } else {
+        if (contractId == null) throw new MissingContractAddressError('Can\'t dry-run contract without address');
+        tx = await _buildTx(Tag.ContractCallTx, { ...txOpt, callerId, contractId });
+      }
 
-      const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, { onNode, ...opt });
+      const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, opt);
       if (callObj == null) throw new UnexpectedTsError();
       handleCallError({
         returnType: callObj.returnType as ContractCallReturnType,
@@ -485,9 +504,9 @@ export default async function getContractInstance({
       }, tx);
       res = { ...dryRunOther, tx: unpackTx(tx), result: callObj };
     } else {
+      if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
       const tx = await _buildTx(Tag.ContractCallTx, {
         ...opt,
-        onNode,
         gasLimit: opt.gasLimit ?? await instance._estimateGas(fn, params, opt),
         callerId,
         contractId,
