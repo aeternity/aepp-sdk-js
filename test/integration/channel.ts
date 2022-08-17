@@ -31,6 +31,7 @@ import { ChannelOptions, send } from '../../src/channel/internal';
 import MemoryAccount from '../../src/account/Memory';
 import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
+import { assertNotNull } from '../utils';
 
 const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
 
@@ -47,10 +48,6 @@ async function waitForChannel(channel: Channel): Promise<void> {
       }
     });
   });
-}
-
-function assertNotNull(value: any): asserts value {
-  if (value == null) throw new Error('Expected to be not null');
 }
 
 describe('Channel', () => {

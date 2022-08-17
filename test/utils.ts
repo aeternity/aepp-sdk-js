@@ -14,3 +14,7 @@ function randomString(len: number): string {
 export function randomName(length: number): AensName {
   return `${randomString(length)}.chain`;
 }
+
+export function assertNotNull(value: any): asserts value {
+  if (value == null) throw new Error('Expected to be not null');
+}

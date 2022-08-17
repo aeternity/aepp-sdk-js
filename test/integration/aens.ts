@@ -18,7 +18,7 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
-import { randomName } from '../utils';
+import { assertNotNull, randomName } from '../utils';
 import {
   AeSdk, generateKeyPair, buildContractId, computeAuctionEndBlock, computeBidFee,
   AensPointerContextError, UnexpectedTsError,
@@ -67,8 +67,8 @@ describe('Aens', () => {
     const contract = await aeSdk.getContractInstance({ sourceCode });
     await contract.$deploy([]);
     const nameObject = await aeSdk.aensQuery(name);
-    if (contract.deployInfo.address == null) throw new UnexpectedTsError();
-    await nameObject.update({ contract_pubkey: contract.deployInfo.address });
+    assertNotNull(contract.$options.address);
+    await nameObject.update({ contract_pubkey: contract.$options.address });
 
     const contractByName = await aeSdk.getContractInstance({ sourceCode, address: name });
     expect((await contractByName.methods.getArg(42)).decodedResult).to.be.equal(42n);

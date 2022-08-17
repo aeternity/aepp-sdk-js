@@ -16,7 +16,7 @@
  */
 import { expect } from 'chai';
 import { before, describe, it } from 'mocha';
-import { randomName } from '../utils';
+import { assertNotNull, randomName } from '../utils';
 import { getSdk } from '.';
 import {
   IllegalArgumentError, NodeInvocationError,
@@ -119,7 +119,7 @@ describe('Contract', () => {
   let aeSdk: AeSdk;
   let bytecode: Encoded.ContractBytearray;
   let contract: ContractInstance;
-  let deployed: ContractInstance['deployInfo'];
+  let deployed: Awaited<ReturnType<ContractInstance['$deploy']>>;
 
   before(async () => {
     aeSdk = await getSdk(2);
@@ -137,7 +137,7 @@ describe('Contract', () => {
   });
 
   it('throws exception if deploy deposit is not zero', async () => {
-    contract.deployInfo = {};
+    delete contract.$options.address;
     await expect(contract.$deploy([], { deposit: 10 })).to.be.rejectedWith(
       IllegalArgumentError,
       'Contract deposit is not refundable, so it should be equal 0, got 10 instead',
@@ -160,7 +160,7 @@ describe('Contract', () => {
   });
 
   it('Deploy and call contract on specific account', async () => {
-    contract.deployInfo = {};
+    delete contract.$options.address;
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
     const accountBefore = contract.$options.onAccount;
     contract.$options.onAccount = onAccount;
@@ -211,7 +211,7 @@ describe('Contract', () => {
   });
 
   it('call contract/deploy with waitMined: false', async () => {
-    contract.deployInfo = {};
+    delete contract.$options.address;
     const deployInfo = await contract.$deploy([], { waitMined: false });
     await aeSdk.poll(deployInfo.transaction);
     expect(deployInfo.result).to.be.equal(undefined);
@@ -324,7 +324,7 @@ describe('Contract', () => {
     before(async () => {
       contract = await aeSdk.getContractInstance({ sourceCode: aensDelegationContract });
       await contract.$deploy();
-      if (contract.deployInfo.address == null) throw new UnexpectedTsError();
+      assertNotNull(contract.$options.address);
       [owner, newOwner] = aeSdk.addresses();
     });
 
@@ -391,7 +391,7 @@ describe('Contract', () => {
     before(async () => {
       contract = await aeSdk.getContractInstance({ sourceCode: oracleContract });
       await contract.$deploy();
-      if (contract.deployInfo.address == null) throw new UnexpectedTsError();
+      assertNotNull(contract.$options.address);
       oracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     });
 

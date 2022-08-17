@@ -49,9 +49,9 @@ import {
 } from '../utils/errors';
 import { hash as calcHash } from '../utils/crypto';
 import { Aci as BaseAci } from '../apis/compiler';
-import { ContractCallReturnType } from '../apis/node';
+import { ContractCallObject, ContractCallReturnType } from '../apis/node';
 import Compiler from './Compiler';
-import Node from '../Node';
+import Node, { TransformNodeType } from '../Node';
 import {
   getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun,
 } from '../chain';
@@ -104,25 +104,8 @@ export interface ContractInstance {
   calldata: any;
   sourceCode?: string;
   bytecode?: Encoded.ContractBytearray;
-  deployInfo: {
-    address?: Encoded.ContractAddress;
-    result?: {
-      callerId: string;
-      callerNonce: string;
-      contractId: string;
-      gasPrice: bigint;
-      gasUsed: number;
-      height: number;
-      log: any[];
-      returnType: ContractCallReturnType;
-      returnValue: string;
-    };
-    owner?: Encoded.AccountAddress;
-    transaction?: string;
-    rawTx?: string;
-    txData?: TxData;
-  };
   $options: {
+    address?: Encoded.ContractAddress;
     onCompiler: Compiler;
     onNode: Node;
     fileSystem?: Record<string, string>;
@@ -237,8 +220,8 @@ export default async function getContractInstance({
     calldata: new Calldata([_aci.encodedAci, ..._aci.externalEncodedAci]),
     sourceCode,
     bytecode,
-    deployInfo: { address },
     $options: {
+      address,
       onAccount,
       onCompiler,
       onNode,
@@ -296,7 +279,7 @@ export default async function getContractInstance({
       _options?: { omitAddress?: boolean; onAccount?: AccountBase },
     ): Promise<Uint8Array> {
       const options = { ...instance.$options, ..._options };
-      const contractId = instance.deployInfo.address;
+      const contractId = instance.$options.address;
       if (options.onAccount == null) throw new IllegalArgumentError('Can\'t create delegation signature without account');
       if (contractId == null) throw new MissingContractAddressError('Can\'t create delegation signature without address');
       return options.onAccount.sign(
@@ -357,13 +340,10 @@ export default async function getContractInstance({
     throw new NodeInvocationError(message, transaction);
   };
 
-  const sendAndProcess = async (tx: Encoded.Transaction, options: any): Promise<{
-    result?: ContractInstance['deployInfo']['result'];
-    hash: TxData['hash'];
-    tx: Awaited<ReturnType<typeof unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>>>;
-    txData: TxData;
-    rawTx: Encoded.Transaction;
-  }> => {
+  const sendAndProcess = async (
+    tx: Encoded.Transaction,
+    options: any,
+  ): Promise<SendAndProcessReturnType> => {
     options = { ...instance.$options, ...options };
     const txData = await send(tx, options);
     const result = {
@@ -379,6 +359,14 @@ export default async function getContractInstance({
     handleCallError(callInfo, tx);
     return { ...result, result: callInfo };
   };
+
+  interface SendAndProcessReturnType {
+    result?: TransformNodeType<ContractCallObject>;
+    hash: TxData['hash'];
+    tx: Awaited<ReturnType<typeof unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>>>;
+    txData: TxData;
+    rawTx: Encoded.Transaction;
+  }
 
   instance._estimateGas = async (name: string, params: any[], options: object): Promise<number> => {
     const { result: { gasUsed } } = await instance
@@ -399,12 +387,16 @@ export default async function getContractInstance({
     Parameters<typeof instance.$compile>[0] &
     Parameters<typeof instance.$call>[2] &
     Parameters<typeof sendAndProcess>[1],
-  ): Promise<ContractInstance['deployInfo']> => {
+  ): Promise<Omit<SendAndProcessReturnType, 'hash'> & {
+    transaction: SendAndProcessReturnType['hash'];
+    owner: Encoded.AccountAddress;
+    address: Encoded.ContractAddress;
+  }> => {
     const opt = { ...instance.$options, ...options };
     if (instance.bytecode == null) await instance.$compile(opt);
     // @ts-expect-error TODO: need to fix compatibility between return types of `$deploy`, `$call`
     if (opt.callStatic === true) return instance.$call('init', params, opt);
-    if (instance.deployInfo.address != null) throw new DuplicateContractError();
+    if (instance.$options.address != null) throw new DuplicateContractError();
 
     const ownerId = opt.onAccount.address;
     const tx = await _buildTx(Tag.ContractCreateTx, {
@@ -415,19 +407,14 @@ export default async function getContractInstance({
       ownerId,
       onNode,
     });
-    const contractId = buildContractIdByContractTx(tx);
-    const {
-      hash, rawTx, result, txData,
-    } = await sendAndProcess(tx, opt);
-    instance.deployInfo = Object.freeze({
-      result,
+    instance.$options.address = buildContractIdByContractTx(tx);
+    const { hash, ...other } = await sendAndProcess(tx, opt);
+    return {
+      ...other,
       owner: ownerId,
       transaction: hash,
-      rawTx,
-      txData,
-      address: contractId,
-    });
-    return instance.deployInfo;
+      address: instance.$options.address,
+    };
   };
 
   /**
@@ -456,7 +443,7 @@ export default async function getContractInstance({
   instance.$call = async (fn: string, params: any[] = [], options: object = {}) => {
     const opt = { ...instance.$options, ...options };
     const fnACI = getFunctionACI(fn);
-    const contractId = instance.deployInfo.address;
+    const contractId = instance.$options.address;
 
     if (fn == null) throw new MissingFunctionNameError();
     if (fn === 'init' && opt.callStatic === false) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');

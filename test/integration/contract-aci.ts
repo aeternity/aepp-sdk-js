@@ -27,13 +27,13 @@ import {
   NotPayableFunctionError,
   MissingEventDefinitionError,
   AmbiguousEventDefinitionError,
-  UnexpectedTsError,
   IllegalArgumentError,
 } from '../../src';
 import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/Contract';
 import { Aci } from '../../src/apis/compiler';
+import { assertNotNull } from '../utils';
 
 const identityContractSourceCode = `
 contract Identity =
@@ -166,12 +166,11 @@ describe('Contract instance', () => {
     expect(testContract.$options.testProperty).to.be.equal('test');
     testContract.should.have.property('sourceCode');
     testContract.should.have.property('bytecode');
-    testContract.should.have.property('deployInfo');
     testContract.should.have.property('$compile');
     testContract.should.have.property('$call');
     testContract.should.have.property('$deploy');
     testContract.$options.ttl.should.be.equal(0);
-    testContract.$options.should.have.property('fileSystem');
+    assertNotNull(testContract.$options.fileSystem);
     testContract.$options.fileSystem.should.have.property('testLib');
     expect(Object.keys(testContract.methods)).to.be.eql(
       testContract._aci.encodedAci.contract.functions.map(({ name }) => name),
@@ -184,7 +183,7 @@ describe('Contract instance', () => {
   });
 
   it('fails on calling without deployment', () => expect(testContract.methods.intFn(2))
-    .to.be.rejectedWith(MissingContractAddressError, 'Can\'t call contract without address'));
+    .to.be.rejectedWith(MissingContractAddressError, 'Can\'t dry-run contract without address'));
 
   it('deploys', async () => {
     const deployInfo = await testContract.$deploy(['test', 1, 'hahahaha'], {
@@ -237,7 +236,7 @@ describe('Contract instance', () => {
 
   it('calls by aci', async () => {
     const contract = await aeSdk.getContractInstance(
-      { aci: testContractAci, address: testContract.deployInfo.address },
+      { aci: testContractAci, address: testContract.$options.address },
     );
     expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n);
   });
@@ -299,10 +298,10 @@ describe('Contract instance', () => {
   });
 
   it('pays to payable function', async () => {
-    if (testContract.deployInfo.address == null) throw new UnexpectedTsError('testContract.deployInfo.address is null');
-    const contractBalance = await aeSdk.getBalance(testContract.deployInfo.address);
+    assertNotNull(testContract.$options.address);
+    const contractBalance = await aeSdk.getBalance(testContract.$options.address);
     await testContract.methods.stringFn.send('test', { amount: 100 });
-    const balanceAfter = await aeSdk.getBalance(testContract.deployInfo.address);
+    const balanceAfter = await aeSdk.getBalance(testContract.$options.address);
     balanceAfter.should.be.equal(`${+contractBalance + 100}`);
   });
 
@@ -379,7 +378,7 @@ describe('Contract instance', () => {
     before(async () => {
       remoteContract = await aeSdk.getContractInstance({ sourceCode: remoteContractSource });
       await remoteContract.$deploy();
-      eventResult = await testContract.methods.emitEvents(remoteContract.deployInfo.address, false);
+      eventResult = await testContract.methods.emitEvents(remoteContract.$options.address, false);
     });
 
     it('decodes events', () => {
@@ -388,7 +387,7 @@ describe('Contract instance', () => {
         args: [true, 'This is not indexed', 1n],
         contract: {
           name: 'StateContract',
-          address: testContract.deployInfo.address,
+          address: testContract.$options.address,
         },
       }, {
         name: 'RemoteEvent2',
@@ -398,7 +397,7 @@ describe('Contract instance', () => {
         ],
         contract: {
           name: 'RemoteI',
-          address: remoteContract.deployInfo.address,
+          address: remoteContract.$options.address,
         },
       }, {
         name: 'AnotherEvent',
@@ -408,14 +407,14 @@ describe('Contract instance', () => {
         ],
         contract: {
           name: 'StateContract',
-          address: testContract.deployInfo.address,
+          address: testContract.$options.address,
         },
       }, {
         name: 'TheFirstEvent',
         args: [42n],
         contract: {
           name: 'StateContract',
-          address: testContract.deployInfo.address,
+          address: testContract.$options.address,
         },
       }]);
     });
@@ -431,7 +430,7 @@ describe('Contract instance', () => {
       expect(() => testContract.$decodeEvents([event])).to.throw(
         MissingEventDefinitionError,
         'Can\'t find definition of 7165442193418278913262533136158148486147352807284929017531784742205476270109'
-        + ` event emitted by ${testContract.deployInfo.address as string}`
+        + ` event emitted by ${testContract.$options.address}`
         + ' (use omitUnknown option to ignore events like this)',
       );
     });
@@ -446,20 +445,23 @@ describe('Contract instance', () => {
       address: Encoded.ContractAddress;
       data: Encoded.ContractBytearray;
       topics: Array<string | number>;
-    }> => [{
-      address: remoteContract.deployInfo.address as Encoded.ContractAddress,
-      data: 'cb_Xfbg4g==',
-      topics: [
-        '28631352549432199952459007654025571262660118571086898449909844428770770966435',
-        0,
-      ],
-    }];
+    }> => {
+      assertNotNull(remoteContract.$options.address);
+      return [{
+        address: remoteContract.$options.address,
+        data: 'cb_Xfbg4g==',
+        topics: [
+          '28631352549432199952459007654025571262660118571086898449909844428770770966435',
+          0,
+        ],
+      }];
+    };
 
     it('throws error if found multiple event definitions', () => {
       expect(() => testContract.$decodeEvents(getDuplicateLog())).to.throw(
         AmbiguousEventDefinitionError,
         'Found multiple definitions of "Duplicate" event emitted by'
-        + ` ${remoteContract.deployInfo.address ?? ''} in "StateContract", "RemoteI" contracts`
+        + ` ${remoteContract.$options.address ?? ''} in "StateContract", "RemoteI" contracts`
         + ' (use contractAddressToName option to specify contract name corresponding to address)',
       );
     });
@@ -468,13 +470,13 @@ describe('Contract instance', () => {
       expect(
         testContract.$decodeEvents(
           getDuplicateLog(),
-          { contractAddressToName: { [remoteContract.deployInfo.address ?? '']: 'RemoteI' } },
+          { contractAddressToName: { [remoteContract.$options.address ?? '']: 'RemoteI' } },
         ),
       ).to.be.eql([{
         name: 'Duplicate',
         args: [0n],
         contract: {
-          address: remoteContract.deployInfo.address,
+          address: remoteContract.$options.address,
           name: 'RemoteI',
         },
       }]);
@@ -485,7 +487,7 @@ describe('Contract instance', () => {
         sourceCode:
           'contract FooContract =\n'
           + '  entrypoint emitEvents(f: bool) = ()',
-        address: remoteContract.deployInfo.address,
+        address: remoteContract.$options.address,
       });
       const result = await contract.methods.emitEvents(false, { omitUnknown: true });
       expect(result.decodedEvents).to.be.eql([]);
