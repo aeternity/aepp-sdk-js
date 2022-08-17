@@ -124,7 +124,7 @@ describe('Transaction', () => {
       code: await contract.$compile(),
       amount,
       gasLimit,
-      callData: contract.calldata.encode('Identity', 'init', []),
+      callData: contract._calldata.encode('Identity', 'init', []),
     }),
   ], [
     'contract call',
@@ -135,7 +135,7 @@ describe('Transaction', () => {
       contractId,
       amount,
       gasLimit,
-      callData: contract.calldata.encode('Identity', 'getArg', [2]),
+      callData: contract._calldata.encode('Identity', 'getArg', [2]),
     }),
   ], [
     'oracle register',

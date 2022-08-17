@@ -67,7 +67,7 @@ describe('Generalized Account', () => {
     aeSdk.removeAccount(gaAccountAddress);
     aeSdk.addAccount(new AccountGeneralized(gaAccountAddress), { select: true });
 
-    const callData = authContract.calldata.encode('BlindAuth', 'authorize', [genSalt()]);
+    const callData = authContract._calldata.encode('BlindAuth', 'authorize', [genSalt()]);
     await aeSdk.spend(10000, publicKey, { authData: { callData } });
     await aeSdk.spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
     const balanceAfter = await aeSdk.getBalance(publicKey);

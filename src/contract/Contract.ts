@@ -101,7 +101,7 @@ type TxData = Awaited<ReturnType<typeof send>>;
 export interface ContractInstance {
   _aci: Aci;
   _name: string;
-  calldata: any;
+  _calldata: any;
   sourceCode?: string;
   bytecode?: Encoded.ContractBytearray;
   $options: {
@@ -217,7 +217,7 @@ export default async function getContractInstance({
   const instance: ContractInstance = {
     _aci,
     _name: _aci.encodedAci.contract.name,
-    calldata: new Calldata([_aci.encodedAci, ..._aci.externalEncodedAci]),
+    _calldata: new Calldata([_aci.encodedAci, ..._aci.externalEncodedAci]),
     sourceCode,
     bytecode,
     $options: {
@@ -329,7 +329,7 @@ export default async function getContractInstance({
     switch (returnType) {
       case 'ok': return;
       case 'revert':
-        message = instance.calldata.decodeFateString(returnValue);
+        message = instance._calldata.decodeFateString(returnValue);
         break;
       case 'error':
         message = decode(returnValue).toString();
@@ -402,7 +402,7 @@ export default async function getContractInstance({
     const tx = await _buildTx(Tag.ContractCreateTx, {
       ...opt,
       gasLimit: opt.gasLimit ?? await instance._estimateGas('init', params, opt),
-      callData: instance.calldata.encode(instance._name, 'init', params),
+      callData: instance._calldata.encode(instance._name, 'init', params),
       code: instance.bytecode,
       ownerId,
       onNode,
@@ -460,7 +460,7 @@ export default async function getContractInstance({
       ) throw error;
       callerId = DRY_RUN_ACCOUNT.pub;
     }
-    const callData = instance.calldata.encode(instance._name, fn, params);
+    const callData = instance._calldata.encode(instance._name, fn, params);
 
     let res: any;
     if (opt.callStatic === true) {
@@ -503,7 +503,7 @@ export default async function getContractInstance({
     }
     if (opt.callStatic === true || res.txData.blockHeight != null) {
       res.decodedResult = fnACI.returns != null && fnACI.returns !== 'unit' && fn !== 'init'
-        && instance.calldata.decode(instance._name, fn, res.result.returnValue);
+        && instance._calldata.decode(instance._name, fn, res.result.returnValue);
       res.decodedEvents = instance.$decodeEvents(res.result.log, opt);
     }
     return res;
@@ -562,7 +562,7 @@ export default async function getContractInstance({
         if ((omitUnknown ?? false) && error instanceof MissingEventDefinitionError) return null;
         throw error;
       }
-      const decoded = instance.calldata.decodeEvent(contractName, event.data, topics);
+      const decoded = instance._calldata.decodeEvent(contractName, event.data, topics);
       const [name, args] = Object.entries(decoded)[0];
       return {
         name,

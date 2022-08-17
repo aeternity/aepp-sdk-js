@@ -70,7 +70,7 @@ export async function createGeneralizedAccount(
     code: await contract.$compile(),
     gasLimit: options.gasLimit ?? await contract._estimateGas('init', args, options),
     ownerId,
-    callData: contract.calldata.encode(contract._name, 'init', args),
+    callData: contract._calldata.encode(contract._name, 'init', args),
     authFun: hash(authFnName),
   });
   const contractId = buildContractIdByContractTx(tx);

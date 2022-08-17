@@ -82,7 +82,7 @@ export default class AccountGeneralized extends AccountBase {
         throw new InvalidAuthDataError('Auth data must contain source code and arguments.');
       }
       const contract = await getContractInstance({ onCompiler, onNode, sourceCode });
-      return contract.calldata.encode(contract._name, this.#authFun, args);
+      return contract._calldata.encode(contract._name, this.#authFun, args);
     })();
 
     const gaMetaTx = await _buildTx(Tag.GaMetaTx, {
