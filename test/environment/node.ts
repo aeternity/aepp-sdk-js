@@ -22,7 +22,7 @@ const aeSdk = new AeSdk({
   const deployInfo = await contract.$deploy();
   console.log('Contract deployed at', deployInfo.address);
   const map = new Map([['foo', 42], ['bar', 43]]);
-  const { decodedResult } = await contract.methods.getArg(map);
+  const { decodedResult } = await contract.getArg(map);
   console.log('Call result', decodedResult);
   console.log('Instanceof works correctly for returned map', decodedResult instanceof Map);
 })();

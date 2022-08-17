@@ -19,10 +19,16 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, generateKeyPair, genSalt, MemoryAccount, AccountGeneralized, Tag, unpackTx,
+  AeSdk,
+  generateKeyPair,
+  genSalt,
+  MemoryAccount,
+  AccountGeneralized,
+  Tag,
+  unpackTx,
+  getContractInstance,
 } from '../../src';
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
-import { ContractInstance } from '../../src/contract/Contract';
 
 const sourceCode = `contract BlindAuth =
   record state = { txHash: option(hash) }
@@ -38,11 +44,17 @@ const sourceCode = `contract BlindAuth =
       Some(tx_hash) => true
 `;
 
+interface ContractApi {
+  init: () => void;
+  getTxHash: () => Uint8Array | undefined;
+  authorize: (r: number) => boolean;
+}
+
 describe('Generalized Account', () => {
   let aeSdk: AeSdk;
   let accountBeforeGa: MemoryAccount;
   let gaAccountAddress: Encoded.AccountAddress;
-  let authContract: ContractInstance;
+  let authContract: Awaited<ReturnType<typeof getContractInstance<ContractApi>>>;
 
   before(async () => {
     aeSdk = await getSdk();
@@ -88,7 +100,7 @@ describe('Generalized Account', () => {
       Encoding.Transaction,
     );
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
-      .eql((await authContract.methods.getTxHash()).decodedResult);
+      .eql((await authContract.getTxHash()).decodedResult);
   });
 
   it('fails trying to send SignedTx using generalized account', async () => {

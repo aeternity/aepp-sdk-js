@@ -114,7 +114,7 @@ export default {
       return (await this.createPromise).$deploy([this.deployArg])
     },
     async call () {
-      return (await this.createPromise).methods.calc(this.callArg)
+      return (await this.createPromise).calc(this.callArg)
     }
   }
 }

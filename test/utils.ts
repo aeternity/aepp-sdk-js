@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { AensName } from '../src';
 
 function randomString(len: number): string {
@@ -18,3 +19,8 @@ export function randomName(length: number): AensName {
 export function assertNotNull(value: any): asserts value {
   if (value == null) throw new Error('Expected to be not null');
 }
+
+export type ChainTtl = { FixedTTL: [bigint] }
+| { RelativeTTL: [bigint] } | { AbsoluteTTL: [bigint] };
+
+export type InputNumber = number | bigint | string | BigNumber;

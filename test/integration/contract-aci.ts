@@ -27,13 +27,13 @@ import {
   NotPayableFunctionError,
   MissingEventDefinitionError,
   AmbiguousEventDefinitionError,
-  IllegalArgumentError,
+  IllegalArgumentError, getContractInstance,
 } from '../../src';
 import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
 import { ContractInstance } from '../../src/contract/Contract';
 import { Aci } from '../../src/apis/compiler';
-import { assertNotNull } from '../utils';
+import { assertNotNull, ChainTtl, InputNumber } from '../utils';
 
 const identityContractSourceCode = `
 contract Identity =
@@ -86,8 +86,6 @@ contract StateContract =
   payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
   entrypoint addressFn(a: address) : address = a
-  entrypoint contractAddress (ct: address) : address = ct
-  entrypoint accountAddress (ak: address) : address = ak
 
   entrypoint tupleFn (a: string*int) : string*int = a
   entrypoint tupleInTupleFn (a: (string*int)*int) : (string*int)*int = a
@@ -140,9 +138,67 @@ const fileSystem = {
 };
 const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT';
 
+type DateUnit = { Year: [] } | { Month: [] } | { Day: [] };
+type OneOrBoth<First, Second> = { Left: [First] } | { Both: [First, Second] } | { Right: [Second] };
+
+interface TestContractApi {
+  init: (value: string, key: InputNumber, testOption?: string) => void;
+  retrieve: () => [string, bigint];
+  setKey: (key: InputNumber) => void;
+
+  remoteContract: (a: Encoded.ContractAddress) => bigint;
+  remoteArgs: (a: { value: string; key: InputNumber[] }) => bigint;
+  intFn: (a: InputNumber) => bigint;
+  stringFn: (a: string) => string;
+  boolFn: (a: boolean) => boolean;
+  addressFn: (a: Encoded.AccountAddress) => Encoded.AccountAddress;
+
+  tupleFn: (a: [string, InputNumber]) => [string, bigint];
+  tupleInTupleFn: (a: [[string, InputNumber], InputNumber]) => [[string, bigint], bigint];
+  tupleWithList: (a: [InputNumber[], InputNumber]) => [bigint[], bigint];
+
+  listFn: (a: InputNumber[]) => bigint[];
+  listInListFn: (a: InputNumber[][]) => bigint[][];
+
+  mapFn: (
+    a: Map<Encoded.AccountAddress, readonly [string, InputNumber]> |
+    ReadonlyArray<readonly [Encoded.AccountAddress, readonly [string, InputNumber]]>,
+  ) => Map<Encoded.AccountAddress, [string, bigint]>;
+  mapOptionFn: (
+    a: Map<Encoded.AccountAddress, readonly [string, InputNumber | undefined]> |
+    ReadonlyArray<[Encoded.AccountAddress, readonly [string, InputNumber | undefined]]>,
+  ) => Map<Encoded.AccountAddress, [string, bigint | undefined]>;
+
+  getRecord: () => { value: string; key: bigint; testOption?: string };
+  setRecord: (s: { value: string; key: InputNumber; testOption?: string }) => void;
+
+  intOption: (s?: InputNumber | null) => bigint | undefined;
+  listOption: (s?: Array<[InputNumber, string]>) => Array<[bigint, string]> | undefined;
+
+  testFn: (a: InputNumber[], b: boolean) => [bigint[], boolean];
+  approve: (tx_id: InputNumber, remote_contract: Encoded.ContractAddress) => bigint;
+
+  hashFn: (s: Uint8Array | string) => Uint8Array;
+  signatureFn: (s: Uint8Array | string) => Uint8Array;
+  bytesFn: (s: Uint8Array | string) => Uint8Array;
+
+  bitsFn: (s: InputNumber) => bigint;
+
+  usingExternalLib: (s: InputNumber) => bigint;
+
+  datTypeFn: (s: DateUnit) => DateUnit;
+  datTypeGFn: (s: OneOrBoth<InputNumber, string>) => bigint;
+
+  emitEvents: (remote: Encoded.ContractAddress, duplicate: boolean) => void;
+
+  chainTtlFn: (t: ChainTtl) => ChainTtl;
+
+  recursion: (t: string) => string;
+}
+
 describe('Contract instance', () => {
   let aeSdk: AeSdk;
-  let testContract: ContractInstance;
+  let testContract: Awaited<ReturnType<typeof getContractInstance<TestContractApi>>>;
   let testContractAddress: Encoded.ContractAddress;
   let testContractAci: Aci;
   let testContractBytecode: Encoded.ContractBytearray;
@@ -158,12 +214,13 @@ describe('Contract instance', () => {
   });
 
   it('generates by source code', async () => {
-    aeSdk._options.testProperty = 'test';
-    testContract = await aeSdk.getContractInstance({
+    aeSdk._options.gasPrice = 100;
+    testContract = await aeSdk.getContractInstance<TestContractApi>({
       sourceCode: testContractSourceCode, fileSystem, ttl: 0, gasLimit: 15000,
     });
-    delete aeSdk._options.testProperty;
-    expect(testContract.$options.testProperty).to.be.equal('test');
+    delete aeSdk._options.gasPrice;
+    expect(testContract.$options.gasPrice).to.be.equal(100);
+    delete testContract.$options.gasPrice;
     testContract.should.have.property('$compile');
     testContract.should.have.property('$call');
     testContract.should.have.property('$deploy');
@@ -172,9 +229,9 @@ describe('Contract instance', () => {
     testContract.$options.should.have.property('bytecode');
     assertNotNull(testContract.$options.fileSystem);
     testContract.$options.fileSystem.should.have.property('testLib');
-    expect(Object.keys(testContract.methods)).to.be.eql(
-      testContract._aci.encodedAci.contract.functions.map(({ name }) => name),
-    );
+    testContract._aci.encodedAci.contract.functions.forEach(({ name }) => {
+      expect(testContract).to.have.property(name);
+    });
   });
 
   it('compiles', async () => {
@@ -182,7 +239,7 @@ describe('Contract instance', () => {
     expect(testContract.$options.bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
   });
 
-  it('fails on calling without deployment', () => expect(testContract.methods.intFn(2))
+  it('fails on calling without deployment', () => expect(testContract.intFn(2))
     .to.be.rejectedWith(MissingContractAddressError, 'Can\'t dry-run contract without address'));
 
   it('deploys', async () => {
@@ -206,14 +263,14 @@ describe('Contract instance', () => {
   });
 
   it('calls', async () => {
-    expect((await testContract.methods.intFn(2)).decodedResult).to.be.equal(2n);
+    expect((await testContract.intFn(2)).decodedResult).to.be.equal(2n);
   });
 
   it('gets actual options from AeSdkBase', async () => {
     const [address1, address2] = aeSdk.addresses();
-    expect((await testContract.methods.intFn(2)).result.callerId).to.be.equal(address1);
+    expect((await testContract.intFn(2)).result.callerId).to.be.equal(address1);
     aeSdk.selectAccount(address2);
-    expect((await testContract.methods.intFn(2)).result.callerId).to.be.equal(address2);
+    expect((await testContract.intFn(2)).result.callerId).to.be.equal(address2);
     aeSdk.selectAccount(address1);
   });
 
@@ -235,18 +292,18 @@ describe('Contract instance', () => {
   it('fails on generation without arguments', () => expect(aeSdk.getContractInstance()).to.be.rejectedWith(MissingContractDefError, 'Either ACI or source code is required'));
 
   it('calls by aci', async () => {
-    const contract = await aeSdk.getContractInstance(
+    const contract = await aeSdk.getContractInstance<TestContractApi>(
       { aci: testContractAci, address: testContract.$options.address },
     );
-    expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n);
+    expect((await contract.intFn(3)).decodedResult).to.be.equal(3n);
   });
 
   it('deploys and calls by bytecode and aci', async () => {
-    const contract = await aeSdk.getContractInstance(
+    const contract = await aeSdk.getContractInstance<TestContractApi>(
       { bytecode: testContractBytecode, aci: testContractAci },
     );
     await contract.$deploy(['test', 1]);
-    expect((await contract.methods.intFn(3)).decodedResult).to.be.equal(3n);
+    expect((await contract.intFn(3)).decodedResult).to.be.equal(3n);
   });
 
   it('accepts matching source code with enabled validation', async () => aeSdk.getContractInstance({
@@ -279,7 +336,7 @@ describe('Contract instance', () => {
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'));
 
   it('dry-runs init function', async () => {
-    const res = await testContract.methods.init('test', 1, 'hahahaha', { callStatic: true });
+    const res = await testContract.init('test', 1, 'hahahaha', { callStatic: true });
     res.result.should.have.property('gasUsed');
     res.result.should.have.property('returnType');
     // TODO: ensure that return value is always can't be decoded (empty?)
@@ -287,33 +344,33 @@ describe('Contract instance', () => {
 
   it('dry-runs init function on specific account', async () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
-    const { result } = await testContract.methods
+    const { result } = await testContract
       .init('test', 1, 'hahahaha', { onAccount, callStatic: true });
     result.callerId.should.be.equal(onAccount.address);
   });
 
   it('fails on paying to not payable function', async () => {
     const amount = 100;
-    await expect(testContract.methods.intFn(1, { amount, callStatic: false }))
+    await expect(testContract.intFn(1, { amount, callStatic: false }))
       .to.be.rejectedWith(NotPayableFunctionError, `You try to pay "${amount}" to function "intFn" which is not payable. Only payable function can accept coins`);
   });
 
   it('pays to payable function', async () => {
     assertNotNull(testContract.$options.address);
     const contractBalance = await aeSdk.getBalance(testContract.$options.address);
-    await testContract.methods.stringFn('test', { amount: 100, callStatic: false });
+    await testContract.stringFn('test', { amount: 100, callStatic: false });
     const balanceAfter = await aeSdk.getBalance(testContract.$options.address);
     balanceAfter.should.be.equal(`${+contractBalance + 100}`);
   });
 
   it('calls on specific account', async () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
-    const { result } = await testContract.methods.intFn(123, { onAccount });
+    const { result } = await testContract.intFn(123, { onAccount });
     result.callerId.should.be.equal(onAccount.address);
   });
 
   describe('Gas', () => {
-    let contract: ContractInstance;
+    let contract: Awaited<ReturnType<typeof getContractInstance<TestContractApi>>>;
 
     before(async () => {
       contract = await aeSdk.getContractInstance(
@@ -337,37 +394,37 @@ describe('Contract instance', () => {
     });
 
     it('estimates gas by default for contract calls', async () => {
-      const { tx: { gas }, gasUsed } = (await contract.methods.setKey(2)).txData;
+      const { tx: { gas }, gasUsed } = (await contract.setKey(2)).txData as any;
       expect(gasUsed).to.be.equal(61);
       expect(gas).to.be.equal(76);
     });
 
     it('overrides gas through options for contract calls', async () => {
-      const { tx: { gas }, gasUsed } = (await contract.methods.setKey(3, { gasLimit: 100 })).txData;
+      const { tx: { gas }, gasUsed } = (await contract.setKey(3, { gasLimit: 100 })).txData as any;
       expect(gasUsed).to.be.equal(61);
       expect(gas).to.be.equal(100);
     });
 
     it('runs out of gasLimit with correct message', async () => {
-      await expect(contract.methods.setKey(42, { gasLimit: 10, callStatic: true }))
+      await expect(contract.setKey(42, { gasLimit: 10, callStatic: true }))
         .to.be.rejectedWith('Invocation failed: "Out of gas"');
-      await expect(contract.methods.setKey(42, { gasLimit: 10 }))
+      await expect(contract.setKey(42, { gasLimit: 10 }))
         .to.be.rejectedWith('Invocation failed');
-      await expect(contract.methods.recursion('infinite'))
+      await expect(contract.recursion('infinite'))
         .to.be.rejectedWith('Invocation failed: "Out of gas"');
     });
 
     it('validates gas limit for contract calls', async () => {
-      await expect(contract.methods.setKey(4, { gasLimit: 7e6 }))
+      await expect(contract.setKey(4, { gasLimit: 7e6 }))
         .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 7000000 must be less or equal to 5818100');
     });
 
     it('sets maximum possible gas limit for dry-run contract calls', async () => {
-      const { tx: { tx: { gasLimit } } } = await contract.methods.intFn(4);
+      const { tx: { tx: { gasLimit } } } = await contract.intFn(4);
       expect(gasLimit).to.be.equal(5817980);
-      await expect(contract.methods.intFn(4, { gasLimit: gasLimit + 1 }))
+      await expect(contract.intFn(4, { gasLimit: gasLimit + 1 }))
         .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 5817981 must be less or equal to 5817980');
-      await expect(contract.methods.intFn(4, { gasLimit: gasLimit + 1, gasMax: 6e6 + 1 }))
+      await expect(contract.intFn(4, { gasLimit: gasLimit + 1, gasMax: 6e6 + 1 }))
         .to.be.rejectedWith('v3/dry-run error: Over the gas limit');
     });
   });
@@ -379,7 +436,8 @@ describe('Contract instance', () => {
     before(async () => {
       remoteContract = await aeSdk.getContractInstance({ sourceCode: remoteContractSource });
       await remoteContract.$deploy();
-      eventResult = await testContract.methods.emitEvents(remoteContract.$options.address, false);
+      assertNotNull(remoteContract.$options.address);
+      eventResult = await testContract.emitEvents(remoteContract.$options.address, false);
     });
 
     it('decodes events', () => {
@@ -484,13 +542,13 @@ describe('Contract instance', () => {
     });
 
     it('calls a contract that emits events with no defined events', async () => {
-      const contract = await aeSdk.getContractInstance({
+      const contract = await aeSdk.getContractInstance<{ emitEvents: (f: boolean) => [] }>({
         sourceCode:
           'contract FooContract =\n'
           + '  entrypoint emitEvents(f: bool) = ()',
         address: remoteContract.$options.address,
       });
-      const result = await contract.methods.emitEvents(false, { omitUnknown: true });
+      const result = await contract.emitEvents(false, { omitUnknown: true });
       expect(result.decodedEvents).to.be.eql([]);
     });
   });
@@ -498,23 +556,23 @@ describe('Contract instance', () => {
   describe('Arguments Validation and Casting', () => {
     describe('INT', () => {
       it('Invalid', async () => {
-        await expect(testContract.methods.intFn('asd'))
+        await expect(testContract.intFn('asd'))
           .to.be.rejectedWith('Cannot convert asd to a BigInt');
       });
 
       it('Valid', async () => {
-        const { decodedResult } = await testContract.methods.intFn(1);
+        const { decodedResult } = await testContract.intFn(1);
         expect(decodedResult).to.be.equal(1n);
       });
 
       const unsafeInt = BigInt(`${Number.MAX_SAFE_INTEGER.toString()}0`);
       it('Supports unsafe integer', async () => {
-        const { decodedResult } = await testContract.methods.intFn(unsafeInt);
+        const { decodedResult } = await testContract.intFn(unsafeInt);
         expect(decodedResult).to.be.equal(unsafeInt);
       });
 
       it('Supports BigNumber', async () => {
-        const { decodedResult } = await testContract.methods
+        const { decodedResult } = await testContract
           .intFn(new BigNumber(unsafeInt.toString()));
         expect(decodedResult).to.be.equal(unsafeInt);
       });
@@ -522,12 +580,12 @@ describe('Contract instance', () => {
 
     describe('BOOL', () => {
       it('Accepts empty object as true', async () => {
-        const { decodedResult } = await testContract.methods.boolFn({});
+        const { decodedResult } = await testContract.boolFn({} as any);
         decodedResult.should.be.equal(true);
       });
 
       it('Valid', async () => {
-        const { decodedResult } = await testContract.methods.boolFn(true);
+        const { decodedResult } = await testContract.boolFn(true);
         decodedResult.should.be.equal(true);
       });
     });
@@ -535,223 +593,223 @@ describe('Contract instance', () => {
     describe('STRING', () => {
       it('Accepts array as joined string', async () => {
         const arr = [1, 2, 3];
-        const { decodedResult } = await testContract.methods.stringFn(arr);
+        const { decodedResult } = await testContract.stringFn(arr as any);
         decodedResult.should.be.equal(arr.join(','));
       });
 
       it('Accepts number as string', async () => {
-        const { decodedResult } = await testContract.methods.stringFn(123);
+        const { decodedResult } = await testContract.stringFn(123 as any);
         decodedResult.should.be.equal('123');
       });
 
       it('Valid', async () => {
-        const { decodedResult } = await testContract.methods.stringFn('test-string');
+        const { decodedResult } = await testContract.stringFn('test-string');
         decodedResult.should.be.equal('test-string');
       });
     });
 
     describe('ADDRESS', () => {
       it('Invalid address', async () => {
-        await expect(testContract.methods.addressFn('asdasasd'))
+        await expect(testContract.addressFn('asdasasd' as any))
           .to.be.rejectedWith('Address should start with ak_, got asdasasd instead');
       });
 
       it('Invalid address type', async () => {
-        await expect(testContract.methods.addressFn(333)).to.be
+        await expect(testContract.addressFn(333 as any)).to.be
           .rejectedWith('Address should start with ak_, got 333 instead');
       });
 
       it('Return address', async () => {
-        const { decodedResult } = await testContract.methods.accountAddress(aeSdk.address);
+        const { decodedResult } = await testContract.addressFn(aeSdk.address);
         decodedResult.should.be.equal(aeSdk.address);
       });
 
       it('Valid', async () => {
-        const { decodedResult } = await testContract.methods.addressFn('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif');
+        const { decodedResult } = await testContract.addressFn('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif');
         decodedResult.should.be.equal('ak_2ct6nMwmRnyGX6jPhraFPedZ5bYp1GXqpvnAq5LXeL5TTPfFif');
       });
     });
 
     describe('TUPLE', () => {
       it('Invalid type', async () => {
-        await expect(testContract.methods.tupleFn('asdasasd'))
+        await expect(testContract.tupleFn('asdasasd' as any))
           .to.be.rejectedWith('Fate tuple must be an Array, got asdasasd instead');
       });
 
       it('Invalid tuple prop type', async () => {
-        await expect(testContract.methods.tupleFn([1, 'test-string']))
+        await expect(testContract.tupleFn([1, 'test-string'] as any))
           .to.be.rejectedWith('Cannot convert test-string to a BigInt');
       });
 
       it('Required tuple prop', async () => {
-        await expect(testContract.methods.tupleFn([1]))
+        await expect(testContract.tupleFn([1] as any))
           .to.be.rejectedWith('Cannot convert undefined to a BigInt');
       });
 
       it('Wrong type in list inside tuple', async () => {
-        await expect(testContract.methods.tupleWithList([['test-string'], 1]))
+        await expect(testContract.tupleWithList([['test-string'], 1] as any))
           .to.be.rejectedWith('Cannot convert test-string to a BigInt');
       });
 
       it('Wrong type in tuple inside tuple', async () => {
-        await expect(testContract.methods.tupleInTupleFn([['str', 'test-string'], 1]))
+        await expect(testContract.tupleInTupleFn([['str', 'test-string'], 1] as any))
           .to.be.rejectedWith('Cannot convert test-string to a BigInt');
       });
 
       it('Valid', async () => {
-        const { decodedResult } = await testContract.methods.tupleFn(['test', 1]);
+        const { decodedResult } = await testContract.tupleFn(['test', 1]);
         decodedResult.should.be.eql(['test', 1n]);
       });
     });
 
     describe('LIST', () => {
       it('Invalid type', async () => {
-        await expect(testContract.methods.listFn('asdasasd'))
+        await expect(testContract.listFn('asdasasd' as any))
           .to.be.rejectedWith('Fate list must be an Array, got asdasasd instead');
       });
 
       it('Invalid list element type', async () => {
-        await expect(testContract.methods.listFn([1, 'test-string']))
+        await expect(testContract.listFn([1, 'test-string'] as any))
           .to.be.rejectedWith('Cannot convert test-string to a BigInt');
       });
 
       it('Invalid list element type nested', async () => {
-        await expect(testContract.methods.listInListFn([['childListWronmgElement'], 'parentListWrongElement']))
+        await expect(testContract.listInListFn([['childListWronmgElement'], 'parentListWrongElement'] as any))
           .to.be.rejectedWith('Cannot convert childListWronmgElement to a BigInt');
       });
 
       it('Valid', async () => {
-        const { decodedResult } = await testContract.methods.listInListFn([[1, 2], [3, 4]]);
+        const { decodedResult } = await testContract.listInListFn([[1, 2], [3, 4]]);
         decodedResult.should.be.eql([[1n, 2n], [3n, 4n]]);
       });
     });
 
     describe('MAP', () => {
-      const address = 'ak_gvxNbZf5CuxYVfcUFoKAP4geZatWaC2Yy4jpx5vZoCKank4Gc';
+      const address: Encoded.AccountAddress = 'ak_gvxNbZf5CuxYVfcUFoKAP4geZatWaC2Yy4jpx5vZoCKank4Gc';
 
       it('Valid', async () => {
-        const mapArg = new Map([[address, ['someStringV', 324n]]]);
-        const { decodedResult } = await testContract.methods.mapFn(mapArg);
+        const mapArg = new Map([[address, ['someStringV', 324n]]] as const);
+        const { decodedResult } = await testContract.mapFn(mapArg);
         decodedResult.should.be.eql(mapArg);
       });
 
       it('Map With Option Value', async () => {
-        const mapWithSomeValue = new Map([[address, ['someStringV', 123n]]]);
-        const mapWithNoneValue = new Map([[address, ['someStringV', undefined]]]);
-        let result = await testContract.methods.mapOptionFn(mapWithSomeValue);
+        const mapWithSomeValue = new Map([[address, ['someStringV', 123n]]] as const);
+        const mapWithNoneValue = new Map([[address, ['someStringV', undefined]]] as const);
+        let result = await testContract.mapOptionFn(mapWithSomeValue);
         result.decodedResult.should.be.eql(mapWithSomeValue);
-        result = await testContract.methods.mapOptionFn(mapWithNoneValue);
+        result = await testContract.mapOptionFn(mapWithNoneValue);
         result.decodedResult.should.be.eql(mapWithNoneValue);
       });
 
       it('Cast from string to int', async () => {
         const mapArg = new Map([[address, ['someStringV', '324']]] as const);
-        const result = await testContract.methods.mapFn(mapArg);
+        const result = await testContract.mapFn(mapArg);
         result.decodedResult.should.be.eql(new Map([[address, ['someStringV', 324n]]] as const));
       });
 
       it('Cast from array to map', async () => {
         const mapArg = [[address, ['someStringV', 324n]]] as const;
-        const { decodedResult } = await testContract.methods.mapFn(mapArg);
+        const { decodedResult } = await testContract.mapFn(mapArg);
         decodedResult.should.be.eql(new Map(mapArg));
       });
     });
 
     describe('RECORD/STATE', () => {
       it('Valid Set Record (Cast from JS object)', async () => {
-        await testContract.methods.setRecord({ value: 'qwe', key: 1234, testOption: 'test' });
-        const state = await testContract.methods.getRecord();
+        await testContract.setRecord({ value: 'qwe', key: 1234, testOption: 'test' });
+        const state = await testContract.getRecord();
         state.decodedResult.should.be.eql({ value: 'qwe', key: 1234n, testOption: 'test' });
       });
 
       it('Get Record(Convert to JS object)', async () => {
-        const result = await testContract.methods.getRecord();
+        const result = await testContract.getRecord();
         result.decodedResult.should.be.eql({ value: 'qwe', key: 1234n, testOption: 'test' });
       });
 
       it('Get Record With Option (Convert to JS object)', async () => {
-        await testContract.methods.setRecord({ key: 1234, value: 'qwe', testOption: 'resolved string' });
-        const result = await testContract.methods.getRecord();
+        await testContract.setRecord({ key: 1234, value: 'qwe', testOption: 'resolved string' });
+        const result = await testContract.getRecord();
         result.decodedResult.should.be.eql({ value: 'qwe', key: 1234n, testOption: 'resolved string' });
       });
 
       it('Invalid value type', async () => {
-        await expect(testContract.methods.setRecord({ value: 123, key: 'test' }))
+        await expect(testContract.setRecord({ value: 123, key: 'test' } as any))
           .to.be.rejectedWith('Cannot convert test to a BigInt');
       });
     });
 
     describe('OPTION', () => {
       it('Set Some Option Value(Cast from JS value/Convert result to JS)', async () => {
-        const optionRes = await testContract.methods.intOption(123);
+        const optionRes = await testContract.intOption(123);
         optionRes.decodedResult.should.be.equal(123n);
       });
 
       it('Set Some Option List Value(Cast from JS value/Convert result to JS)', async () => {
-        const optionRes = await testContract.methods.listOption([[1, 'testString']]);
+        const optionRes = await testContract.listOption([[1, 'testString']]);
         optionRes.decodedResult.should.be.eql([[1n, 'testString']]);
       });
 
       it('Set None Option Value(Cast from JS value/Convert to JS)', async () => {
-        const optionRes = await testContract.methods.intOption(null);
+        const optionRes = await testContract.intOption(null);
         expect(optionRes.decodedResult).to.be.equal(undefined);
       });
 
       it('Invalid option type', async () => {
-        await expect(testContract.methods.intOption('test-string'))
+        await expect(testContract.intOption('test-string' as any))
           .to.be.rejectedWith('Cannot convert test-string to a BigInt');
       });
     });
 
     describe('NAMESPACES', () => {
       it('Use namespace in function body', async () => {
-        const res = await testContract.methods.usingExternalLib(2);
+        const res = await testContract.usingExternalLib(2);
         res.decodedResult.should.be.equal(4n);
       });
     });
 
     describe('DATATYPE', () => {
       it('Invalid type', async () => {
-        await expect(testContract.methods.datTypeFn({}))
+        await expect(testContract.datTypeFn({} as any))
           .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got "[object Object]" instead');
       });
 
       it('Call generic datatype', async () => {
-        const res = await testContract.methods.datTypeGFn({ Left: [2] });
+        const res = await testContract.datTypeGFn({ Left: [2] });
         res.decodedResult.should.be.equal(2n);
       });
 
       it('Invalid arguments length', async () => {
-        await expect(testContract.methods.datTypeGFn())
+        await expect(testContract.datTypeGFn(...[] as any))
           .to.be.rejectedWith('Non matching number of arguments. datTypeGFn expects between 1 and 1 number of arguments but got 0');
       });
 
       it('Invalid variant', async () => {
-        await expect(testContract.methods.datTypeFn({ asdcxz: [] }))
+        await expect(testContract.datTypeFn({ asdcxz: [] } as any))
           .to.be.rejectedWith('Unknown variant constructor: asdcxz');
       });
 
       it('Valid', async () => {
-        const res = await testContract.methods.datTypeFn({ Year: [] });
+        const res = await testContract.datTypeFn({ Year: [] });
         res.decodedResult.should.be.eql({ Year: [] });
       });
     });
 
     describe('Hash', () => {
       it('Invalid type', async () => {
-        await expect(testContract.methods.hashFn({}))
+        await expect(testContract.hashFn({} as any))
           .to.be.rejectedWith('Should be one of: Array, ArrayBuffer, hex string, Number, BigInt; got [object Object] instead');
       });
 
       it('Invalid length', async () => {
-        await expect(testContract.methods.hashFn(decode(aeSdk.address).slice(1)))
+        await expect(testContract.hashFn(decode(aeSdk.address).slice(1)))
           .to.be.rejectedWith('Invalid length: got 31 bytes instead of 32 bytes');
       });
 
       it('Valid', async () => {
         const decoded = decode(aeSdk.address);
-        const hashAsBuffer = await testContract.methods.hashFn(decoded);
-        const hashAsHex = await testContract.methods.hashFn(decoded.toString('hex'));
+        const hashAsBuffer = await testContract.hashFn(decoded);
+        const hashAsHex = await testContract.hashFn(decoded.toString('hex'));
         hashAsBuffer.decodedResult.should.be.eql(decoded);
         hashAsHex.decodedResult.should.be.eql(decoded);
       });
@@ -759,19 +817,19 @@ describe('Contract instance', () => {
 
     describe('Signature', () => {
       it('Invalid type', async () => {
-        await expect(testContract.methods.signatureFn({}))
+        await expect(testContract.signatureFn({} as any))
           .to.be.rejectedWith('Should be one of: Array, ArrayBuffer, hex string, Number, BigInt; got [object Object] instead');
       });
 
       it('Invalid length', async () => {
-        await expect(testContract.methods.signatureFn(decode(aeSdk.address)))
+        await expect(testContract.signatureFn(decode(aeSdk.address)))
           .to.be.rejectedWith('Invalid length: got 32 bytes instead of 64 bytes');
       });
 
       it('Valid', async () => {
         const fakeSignature = Buffer.from(await aeSdk.sign(decode(aeSdk.address)));
-        const hashAsBuffer = await testContract.methods.signatureFn(fakeSignature);
-        const hashAsHex = await testContract.methods.signatureFn(fakeSignature.toString('hex'));
+        const hashAsBuffer = await testContract.signatureFn(fakeSignature);
+        const hashAsHex = await testContract.signatureFn(fakeSignature.toString('hex'));
         hashAsBuffer.decodedResult.should.be.eql(fakeSignature);
         hashAsHex.decodedResult.should.be.eql(fakeSignature);
       });
@@ -779,20 +837,20 @@ describe('Contract instance', () => {
 
     describe('Bytes', () => {
       it('Invalid type', async () => {
-        await expect(testContract.methods.bytesFn({}))
+        await expect(testContract.bytesFn({} as any))
           .to.be.rejectedWith('Should be one of: Array, ArrayBuffer, hex string, Number, BigInt; got [object Object] instead');
       });
 
       it('Invalid length', async () => {
         const decoded = decode(aeSdk.address);
-        await expect(testContract.methods.bytesFn(Buffer.from([...decoded, 2])))
+        await expect(testContract.bytesFn(Buffer.from([...decoded, 2])))
           .to.be.rejectedWith('is not of type [{bytes,32}]');
       });
 
       it('Valid', async () => {
         const decoded = decode(aeSdk.address);
-        const hashAsBuffer = await testContract.methods.bytesFn(decoded);
-        const hashAsHex = await testContract.methods.bytesFn(decoded.toString('hex'));
+        const hashAsBuffer = await testContract.bytesFn(decoded);
+        const hashAsHex = await testContract.bytesFn(decoded.toString('hex'));
         hashAsBuffer.decodedResult.should.be.eql(decoded);
         hashAsHex.decodedResult.should.be.eql(decoded);
       });
@@ -800,38 +858,38 @@ describe('Contract instance', () => {
 
     describe('Bits', () => {
       it('Invalid', async () => {
-        await expect(testContract.methods.bitsFn({}))
+        await expect(testContract.bitsFn({} as any))
           .to.be.rejectedWith('Cannot convert [object Object] to a BigInt');
       });
 
       it('Valid', async () => {
         (await Promise.all([0, -1n, 0b101n]
-          .map(async (value) => [value, (await testContract.methods.bitsFn(value)).decodedResult])))
+          .map(async (value) => [value, (await testContract.bitsFn(value)).decodedResult])))
           .forEach(([v1, v2]) => expect(v2).to.be.equal(BigInt(v1)));
       });
     });
 
     describe('Chain.ttl variant', () => {
       it('Invalid', async () => {
-        await expect(testContract.methods.chainTtlFn(50))
+        await expect(testContract.chainTtlFn(50 as any))
           .to.be.rejectedWith('Variant should be an object mapping constructor to array of values, got "50" instead');
       });
 
       it('Valid', async () => {
-        const value = { FixedTTL: [50n] };
-        expect((await testContract.methods.chainTtlFn(value)).decodedResult).to.be.eql(value);
+        const value: ChainTtl = { FixedTTL: [50n] };
+        expect((await testContract.chainTtlFn(value)).decodedResult).to.be.eql(value);
       });
     });
   });
 
   describe('Call contract', () => {
     it('Call contract using using js type arguments', async () => {
-      const res = await testContract.methods.listFn([1, 2]);
+      const res = await testContract.listFn([1, 2]);
       expect(res.decodedResult).to.be.eql([1n, 2n]);
     });
 
     it('Call contract with contract type argument', async () => {
-      const result = await testContract.methods.approve(0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh');
+      const result = await testContract.approve(0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh');
       expect(result.decodedResult).to.be.equal(0n);
     });
   });

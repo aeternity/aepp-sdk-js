@@ -20,10 +20,10 @@ import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
-  AeSdk, MemoryAccount, Tag, UnexpectedTsError,
+  AeSdk, getContractInstance, MemoryAccount, Tag, UnexpectedTsError,
 } from '../../src';
-import { ContractInstance } from '../../src/contract/Contract';
 import { Encoded } from '../../src/utils/encoder';
+import { InputNumber } from '../utils';
 
 describe('Paying for transaction of another account', () => {
   let aeSdk: AeSdk;
@@ -63,9 +63,16 @@ describe('Paying for transaction of another account', () => {
       entrypoint init(x: int): state = { value = x }
       entrypoint getValue(): int = state.value
       stateful entrypoint setValue(x: int) = put(state{ value = x })`;
+
+  interface ContractApi {
+    init: (x: InputNumber) => void;
+    getValue: () => bigint;
+    setValue: (x: InputNumber) => void;
+  }
+
   let contractAddress: Encoded.ContractAddress;
   let aeSdkNotPayingFee: any;
-  let payingContract: ContractInstance;
+  let payingContract: Awaited<ReturnType<typeof getContractInstance<ContractApi>>>;
 
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);
@@ -79,15 +86,15 @@ describe('Paying for transaction of another account', () => {
     contractAddress = address;
     await aeSdk.payForTransaction(contractDeployTx);
     payingContract = await aeSdkNotPayingFee.getContractInstance({ sourceCode, address });
-    expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(42n);
+    expect((await payingContract.getValue()).decodedResult).to.be.equal(42n);
   });
 
   it('pays for contract call', async () => {
     const contract = await aeSdkNotPayingFee.getContractInstance(
       { sourceCode, address: contractAddress },
     );
-    const { rawTx: contractCallTx } = await contract.methods.setValue(43);
+    const { rawTx: contractCallTx } = await contract.setValue(43);
     await aeSdk.payForTransaction(contractCallTx);
-    expect((await payingContract.methods.getValue()).decodedResult).to.be.equal(43n);
+    expect((await payingContract.getValue()).decodedResult).to.be.equal(43n);
   });
 });

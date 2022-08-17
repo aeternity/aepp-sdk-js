@@ -24,7 +24,7 @@ or obtaining it via http compiler (default) you will be able to access the `emit
 
 ```js
 // events emitted by contract calls are automatically decoded
-const tx = await contractInstance.methods.emitEvents(1337, "this message is not indexed")
+const tx = await contractInstance.emitEvents(1337, "this message is not indexed")
 console.log(tx.decodedEvents)
 
 /*

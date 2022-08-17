@@ -140,7 +140,7 @@ console.log(payForTx);
 
 // ## 6. Check that last caller is the new user
 // Contract instance allows interacting with the contract in a convenient way.
-const dryRunTx = await contract.methods.get_last_caller();
+const dryRunTx = await contract.get_last_caller();
 console.log(`New user: ${newUserAccount.address}`);
 console.log('Last caller:', dryRunTx.decodedResult);
 

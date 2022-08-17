@@ -97,7 +97,7 @@ console.log(`Contract deployed at ${deployInfo.address}`);
 // Once the `ContractCreateTx` has been successfully mined, you can attempt to invoke
 // any public function (aka `entrypoint` in Sophia) defined within it.
 
-await contract.methods.setFactor(6);
+await contract.setFactor(6);
 
 // **Note**:
 //
@@ -108,7 +108,7 @@ await contract.methods.setFactor(6);
 // You can use `callStatic` option which performs a `dry-run` of the
 // transaction which allows you to get the result without having to mine a transaction.
 
-let call = await contract.methods.setFactor(7, { callStatic: true });
+let call = await contract.setFactor(7, { callStatic: true });
 
 // ## 9. Decode the call result
 // The execution result, if successful, will be an FATE-encoded result value.
@@ -118,7 +118,7 @@ console.log(`setFactor execution result: ${call.decodedResult}`);
 
 // ## 10. Call a contract non-stateful entrypoint via dry-run
 
-call = await contract.methods.multiplyBy(8);
+call = await contract.multiplyBy(8);
 console.log(`multiplyBy execution result: ${call.decodedResult}`);
 
 // **Note**:

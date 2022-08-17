@@ -146,8 +146,20 @@ export interface ContractInstance {
     ids?: Array<Encoded.Any | AensName>,
     _options?: { omitAddress?: boolean; onAccount?: AccountBase },
   ) => Promise<Uint8Array>;
-  methods: any;
 }
+
+type MethodsToContractApi<Methods extends object> = {
+  [Name in keyof Methods]:
+  Methods[Name] extends (...args: infer Args) => infer Ret
+    ? (...args: [
+      ...Args,
+      ...[] | [Name extends 'init' ? Parameters<ContractInstance['$deploy']>[1] : Parameters<ContractInstance['$call']>[2]],
+    ]) => Promise<
+    Awaited<ReturnType<ContractInstance['$call']>> &
+    { decodedResult: Ret }
+    >
+    : never
+};
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
@@ -158,15 +170,15 @@ export interface ContractInstance {
  * @example
  * ```js
  * const contractIns = await aeSdk.getContractInstance({ sourceCode })
- * await contractIns.$deploy([321]) or await contractIns.methods.init(321)
+ * await contractIns.$deploy([321]) or await contractIns.init(321)
  * const callResult = await contractIns.$call('setState', [123])
  * const staticCallResult = await contractIns.$call('setState', [123], { callStatic: true })
  * ```
- * Also you can call contract like: `await contractIns.methods.setState(123, options)`
+ * Also you can call contract like: `await contractIns.setState(123, options)`
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is
  * stateful or not
  */
-export default async function getContractInstance({
+export default async function getContractInstance<Methods extends object>({
   onAccount,
   onCompiler,
   onNode,
@@ -188,7 +200,7 @@ export default async function getContractInstance({
   fileSystem?: Record<string, string>;
   validateBytecode?: boolean;
   [key: string]: any;
-}): Promise<ContractInstance> {
+}): Promise<ContractInstance & MethodsToContractApi<Methods>> {
   if (_aci == null && sourceCode != null) {
     // TODO: should be fixed when the compiledAci interface gets updated
     _aci = await onCompiler.generateACI({ code: sourceCode, options: { fileSystem } }) as Aci;
@@ -236,7 +248,6 @@ export default async function getContractInstance({
     $decodeEvents(_events: Event[], options?: { omitUnknown?: boolean }): any {},
     /* eslint-enable @typescript-eslint/no-unused-vars */
     /* eslint-enable @typescript-eslint/no-empty-function */
-    methods: undefined,
     /**
      * Helper to generate a signature to delegate
      *  - pre-claim/claim/transfer/revoke of a name to a contract.
@@ -576,29 +587,32 @@ export default async function getContractInstance({
    * Generate proto function based on contract function using Contract ACI schema
    * All function can be called like:
    * ```js
-   * await contract.methods.testFunction()
+   * await contract.testFunction()
    * ```
    * then sdk will decide to use dry-run or send tx
    * on-chain base on if function stateful or not.
    * Also, you can manually do that:
    * ```js
-   * await contract.methods.testFunction({ callStatic: true }) // use call-static (dry-run)
-   * await contract.methods.testFunction({ callStatic: false }) // send tx on-chain
+   * await contract.testFunction({ callStatic: true }) // use call-static (dry-run)
+   * await contract.testFunction({ callStatic: false }) // send tx on-chain
    * ```
    */
-  instance.methods = Object.fromEntries(instance._aci.encodedAci.contract.functions
-    .map(({ name, arguments: aciArgs, stateful }: FunctionACI) => {
-      const callStatic = name !== 'init' && !stateful;
-      return [
-        name,
-        async (...args: any[]) => {
-          const options = args.length === aciArgs.length + 1 ? args.pop() : {};
-          if (typeof options !== 'object') throw new TypeError(`Options should be an object: ${options}`);
-          if (name === 'init') return instance.$deploy(args, { callStatic, ...options });
-          return instance.$call(name, args, { callStatic, ...options });
-        },
-      ];
-    }));
+  Object.assign(
+    instance,
+    Object.fromEntries(instance._aci.encodedAci.contract.functions
+      .map(({ name, arguments: aciArgs, stateful }: FunctionACI) => {
+        const callStatic = name !== 'init' && !stateful;
+        return [
+          name,
+          async (...args: any[]) => {
+            const options = args.length === aciArgs.length + 1 ? args.pop() : {};
+            if (typeof options !== 'object') throw new TypeError(`Options should be an object: ${options}`);
+            if (name === 'init') return instance.$deploy(args, { callStatic, ...options });
+            return instance.$call(name, args, { callStatic, ...options });
+          },
+        ];
+      })),
+  );
 
-  return instance;
+  return instance as ContractInstance & MethodsToContractApi<Methods>;
 }

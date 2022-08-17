@@ -64,14 +64,17 @@ describe('Aens', () => {
   it('Call contract using AENS name', async () => {
     const sourceCode = 'contract Identity ='
       + '  entrypoint getArg(x : int) = x';
-    const contract = await aeSdk.getContractInstance({ sourceCode });
+    interface ContractApi {
+      getArg: (x: number) => bigint;
+    }
+    let contract = await aeSdk.getContractInstance<ContractApi>({ sourceCode });
     await contract.$deploy([]);
     const nameObject = await aeSdk.aensQuery(name);
     assertNotNull(contract.$options.address);
     await nameObject.update({ contract_pubkey: contract.$options.address });
 
-    const contractByName = await aeSdk.getContractInstance({ sourceCode, address: name });
-    expect((await contractByName.methods.getArg(42)).decodedResult).to.be.equal(42n);
+    contract = await aeSdk.getContractInstance<ContractApi>({ sourceCode, address: name });
+    expect((await contract.getArg(42)).decodedResult).to.be.equal(42n);
   });
 
   const address = generateKeyPair().publicKey;

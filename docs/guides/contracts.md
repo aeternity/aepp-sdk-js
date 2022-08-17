@@ -118,7 +118,7 @@ The contract can be deployed using the `contractInstance` in two different ways:
 ```js
 const tx = await contractInstance.$deploy([1])
 // or
-const tx = await contractInstance.methods.init(1)
+const tx = await contractInstance.init(1)
 
 // after successful deployment you can look up the transaction and the deploy information
 console.log(tx) // { owner, transaction, address, result, rawTx }
@@ -137,9 +137,9 @@ if they should produce changes to the state of the smart contract, see `incremen
 According to the example above you can call the `stateful` entrypoint `increment` by using one of the following lines:
 
 ```js
-const tx = await contractInstance.methods.increment(3) // recommended
+const tx = await contractInstance.increment(3) // recommended
 // or
-const tx = await contractInstance.methods.increment(3, { callStatic: false })
+const tx = await contractInstance.increment(3, { callStatic: false })
 // or
 const tx = await contractInstance.$call('increment', [3])
 ```
@@ -153,9 +153,9 @@ Note:
 The æternity node can expose an API endpoint that allows to execute a `dry-run` for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the `get_count` entrypoint of the example above:
 
 ```js
-const tx = await contractInstance.methods.get_count() // recommended
+const tx = await contractInstance.get_count() // recommended
 // or
-const tx = await contractInstance.methods.get_count({ callStatic: true })
+const tx = await contractInstance.get_count({ callStatic: true })
 
 // access the decoded result returned by the execution of the entrypoint
 console.log(tx.decodedResult);
@@ -178,7 +178,7 @@ payable stateful entrypoint fund_project(project_id: int) =
 In order to successfully call the `fund_project` entrypoint you need to provide at least 50 `aettos`. You can do this by providing the desired amount of `aettos` using one of the following lines:
 
 ```js
-const tx = await contractInstance.methods.fund_project(1, { amount: 50 }) // recommended
+const tx = await contractInstance.fund_project(1, { amount: 50 }) // recommended
 // or
 const tx = await contractInstance.$call('fund_project', [1], { amount: 50 })
 ```
