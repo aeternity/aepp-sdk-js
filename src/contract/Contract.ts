@@ -106,20 +106,30 @@ interface SendAndProcessReturnType {
   rawTx: Encoded.Transaction;
 }
 
-type MethodsToContractApi<Methods extends object> = {
-  [Name in keyof Methods]:
-  Methods[Name] extends (...args: infer Args) => infer Ret
+export interface ContractMethodsBase { [key: string]: (...args: any[]) => any }
+
+type MethodsToContractApi<M extends ContractMethodsBase> = {
+  [Name in keyof M]:
+  M[Name] extends (...args: infer Args) => infer Ret
     ? (...args: [
       ...Args,
-      ...[] | [Name extends 'init' ? Parameters<Contract['$deploy']>[1] : Parameters<Contract['$call']>[2]],
+      ...[] | [Name extends 'init'
+        ? Parameters<Contract<M>['$deploy']>[1] : Parameters<Contract<M>['$call']>[2]],
     ]) => Promise<
-    Awaited<ReturnType<Contract['$call']>> &
+    Awaited<ReturnType<Contract<M>['$call']>> &
     { decodedResult?: Ret }
     >
     : never
 };
 
-type ContractGeneric<Methods extends {}> = Contract & MethodsToContractApi<Methods>;
+type ContractWithMethods<M extends ContractMethodsBase> = Contract<M> & MethodsToContractApi<M>;
+
+type MethodNames<M extends ContractMethodsBase> = keyof M & string | 'init';
+
+type MethodParameters<M extends ContractMethodsBase, Fn extends MethodNames<M>> =
+  Fn extends 'init'
+    ? M extends { init: any } ? Parameters<M['init']> : []
+    : Parameters<M[Fn]>;
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
@@ -138,7 +148,7 @@ type ContractGeneric<Methods extends {}> = Contract & MethodsToContractApi<Metho
  * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is
  * stateful or not
  */
-class Contract {
+class Contract<M extends ContractMethodsBase> {
   /**
    * Helper to generate a signature to delegate
    *  - pre-claim/claim/transfer/revoke of a name to a contract.
@@ -248,7 +258,11 @@ class Contract {
     return { ...result, result: callInfo };
   }
 
-  async _estimateGas(name: string, params: any[], options: object): Promise<number> {
+  async _estimateGas<Fn extends MethodNames<M>>(
+    name: Fn,
+    params: MethodParameters<M, Fn>,
+    options: object = {},
+  ): Promise<number> {
     const { result } = await this.$call(name, params, { ...options, callStatic: true });
     if (result == null) throw new UnexpectedTsError();
     const { gasUsed } = result;
@@ -263,8 +277,8 @@ class Contract {
    * @returns deploy info
    */
   async $deploy(
-    params: any[] = [],
-    options?: Parameters<Contract['$call']>[2] & Parameters<Contract['_sendAndProcess']>[1],
+    params: MethodParameters<M, 'init'>,
+    options?: Parameters<Contract<M>['$call']>[2] & Parameters<Contract<M>['_sendAndProcess']>[1],
   ): Promise<Omit<SendAndProcessReturnType, 'hash'> & {
       transaction?: Encoded.TxHash;
       owner?: Encoded.AccountAddress;
@@ -316,10 +330,14 @@ class Contract {
    * @param options - Array of function arguments
    * @returns CallResult
    */
-  async $call(fn: string, params: any[] = [], options: object = {}): Promise<{
-    decodedResult?: any;
-    decodedEvents?: ReturnType<Contract['$decodeEvents']>;
-  } & SendAndProcessReturnType> {
+  async $call<Fn extends MethodNames<M>>(
+    fn: Fn,
+    params: MethodParameters<M, Fn>,
+    options: object = {},
+  ): Promise<{
+      decodedResult?: any;
+      decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
+    } & SendAndProcessReturnType> {
     const opt = { ...this.$options, ...options };
     const fnACI = this._getFunctionACI(fn);
     const contractId = this.$options.address;
@@ -429,7 +447,7 @@ class Contract {
   $decodeEvents(
     events: Event[],
     { omitUnknown, ...opt }: { omitUnknown?: boolean } &
-    Parameters<Contract['_getContractNameByEvent']>[2] = {},
+    Parameters<Contract<M>['_getContractNameByEvent']>[2] = {},
   ): DecodedEvent[] {
     return events
       .map((event) => {
@@ -454,7 +472,7 @@ class Contract {
       }).filter((e: DecodedEvent | null): e is DecodedEvent => e != null);
   }
 
-  static async initialize<Methods extends {}>(
+  static async initialize<M extends ContractMethodsBase>(
     {
       onCompiler,
       onNode,
@@ -470,7 +488,7 @@ class Contract {
       aci?: Aci;
       address?: Encoded.ContractAddress | AensName;
     },
-  ): Promise<ContractGeneric<Methods>> {
+  ): Promise<ContractWithMethods<M>> {
     if (aci == null && sourceCode != null) {
       // TODO: should be fixed when the compiledAci interface gets updated
       aci = await onCompiler.generateACI({ code: sourceCode, options: { fileSystem } }) as Aci;
@@ -505,7 +523,7 @@ class Contract {
       if (!isValid) throw new BytecodeMismatchError(sourceCode != null ? 'source code' : 'bytecode');
     }
 
-    return new ContractGeneric<Methods>({
+    return new ContractWithMethods<M>({
       onCompiler, onNode, sourceCode, bytecode, aci, address, fileSystem, ...otherOptions,
     });
   }
@@ -564,7 +582,7 @@ class Contract {
           const callStatic = name !== 'init' && !stateful;
           return [
             name,
-            async (...args: any[]) => {
+            async (...args: any) => {
               const options = args.length === aciArgs.length + 1 ? args.pop() : {};
               if (typeof options !== 'object') throw new TypeError(`Options should be an object: ${options}`);
               if (name === 'init') return this.$deploy(args, { callStatic, ...options });
@@ -576,14 +594,14 @@ class Contract {
   }
 }
 
-interface ContractGenericClass {
-  new <Methods extends {}>(
+interface ContractWithMethodsClass {
+  new <M extends ContractMethodsBase>(
     options: ConstructorParameters<typeof Contract>[0],
-  ): ContractGeneric<Methods>;
+  ): ContractWithMethods<M>;
   initialize: typeof Contract['initialize'];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-const ContractGeneric: ContractGenericClass = Contract as any;
+const ContractWithMethods: ContractWithMethodsClass = Contract as any;
 
-export default ContractGeneric;
+export default ContractWithMethods;

@@ -34,6 +34,7 @@ import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
 import { Aci } from '../../src/apis/compiler';
 import { assertNotNull, ChainTtl, InputNumber } from '../utils';
+import { ContractMethodsBase } from '../../src/contract/Contract';
 
 const identityContractSourceCode = `
 contract Identity =
@@ -141,7 +142,7 @@ const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUW
 type DateUnit = { Year: [] } | { Month: [] } | { Day: [] };
 type OneOrBoth<First, Second> = { Left: [First] } | { Both: [First, Second] } | { Right: [Second] };
 
-interface TestContractApi {
+interface TestContractApi extends ContractMethodsBase {
   init: (value: string, key: InputNumber, testOption?: string) => void;
   retrieve: () => [string, bigint];
   setKey: (key: InputNumber) => void;
@@ -397,7 +398,7 @@ describe('Contract instance', () => {
     });
 
     it('overrides gas through initializeContract options for contract deployments', async () => {
-      const ct = await aeSdk.initializeContract({
+      const ct = await aeSdk.initializeContract<TestContractApi>({
         sourceCode: testContractSourceCode, fileSystem, gasLimit: 300,
       });
       const { txData: { tx }, result } = await ct.$deploy(['test', 42]);
@@ -455,7 +456,7 @@ describe('Contract instance', () => {
 
     before(async () => {
       remoteContract = await aeSdk.initializeContract({ sourceCode: remoteContractSource });
-      await remoteContract.$deploy();
+      await remoteContract.$deploy([]);
       assertNotNull(remoteContract.$options.address);
       eventResult = await testContract.emitEvents(remoteContract.$options.address, false);
       assertNotNull(eventResult.result);

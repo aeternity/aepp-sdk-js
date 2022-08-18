@@ -34,13 +34,14 @@ import {
   Contract,
 } from '../../src';
 import { Encoded, Encoding } from '../../src/utils/encoder';
+import { ContractMethodsBase } from '../../src/contract/Contract';
 
 const identitySourceCode = `
 contract Identity =
  entrypoint getArg(x : int) = x
 `;
 
-interface IdentityContractApi {
+interface IdentityContractApi extends ContractMethodsBase {
   getArg: (x: InputNumber) => bigint;
 }
 
@@ -63,7 +64,7 @@ describe('Contract', () => {
   it('deploys precompiled bytecode', async () => {
     identityContract = await aeSdk
       .initializeContract({ bytecode, sourceCode: identitySourceCode });
-    expect(await identityContract.$deploy()).to.have.property('address');
+    expect(await identityContract.$deploy([])).to.have.property('address');
   });
 
   it('throws exception if deploy deposit is not zero', async () => {
@@ -91,7 +92,7 @@ describe('Contract', () => {
             + '\n  entrypoint verify (msg: hash, pub: address, sig: signature): bool ='
             + '\n    Crypto.verify_sig(msg, pub, sig)',
         });
-    await signContract.$deploy();
+    await signContract.$deploy([]);
     const { decodedResult } = await signContract.verify(msgHash, aeSdk.address, signature);
     decodedResult.should.be.equal(true);
   });
@@ -101,7 +102,7 @@ describe('Contract', () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
     const accountBefore = identityContract.$options.onAccount;
     identityContract.$options.onAccount = onAccount;
-    deployed = await identityContract.$deploy();
+    deployed = await identityContract.$deploy([]);
     if (deployed?.result?.callerId == null) throw new UnexpectedTsError();
     expect(deployed.result.callerId).to.be.equal(onAccount.address);
     let { result } = await identityContract.getArg(42, { callStatic: true });
@@ -134,7 +135,7 @@ describe('Contract', () => {
         'contract Foo =\n'
         + '  entrypoint init() = require(false, "CustomErrorMessage")',
     });
-    await expect(ct.$deploy()).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"');
+    await expect(ct.$deploy([])).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"');
   });
 
   it('throws errors on method call', async () => {
@@ -148,7 +149,7 @@ describe('Contract', () => {
             + '  payable stateful entrypoint failWithMessage() =\n'
             + '    require(false, "CustomErrorMessage")',
         });
-    await ct.$deploy();
+    await ct.$deploy([]);
     await expect(ct.failWithoutMessage(aeSdk.address))
       .to.be.rejectedWith('Invocation failed');
     await expect(ct.failWithMessage())
@@ -185,7 +186,7 @@ describe('Contract', () => {
 
   it('initializes contract state', async () => {
     const contract = await aeSdk.initializeContract<{
-      init: (a: { value: string }) => void;
+      init: (a: string) => void;
       retrieve: () => string;
     }>({
           sourceCode:
@@ -226,7 +227,7 @@ describe('Contract', () => {
     });
 
     it('Can deploy contract with external deps', async () => {
-      const deployInfo = await contract.$deploy();
+      const deployInfo = await contract.$deploy([]);
       expect(deployInfo).to.have.property('address');
 
       const deployedStatic = await contract.$deploy([], { callStatic: true });
@@ -349,7 +350,7 @@ describe('Contract', () => {
           + '      Some(AENS.Name(_, _, ptrs)) =>\n'
           + '        AENS.update(owner, name, None, None, Some(ptrs{[key] = pt}), signature = sig)',
       });
-      await contract.$deploy();
+      await contract.$deploy([]);
       assertNotNull(contract.$options.address);
       [owner, newOwner] = aeSdk.addresses();
     });
@@ -453,7 +454,7 @@ describe('Contract', () => {
           + '    o: oracle(string, string), q: oracle_query(string, string), sign : signature, r: string) =\n'
           + '    Oracle.respond(o, q, signature = sign, r)',
       });
-      await contract.$deploy();
+      await contract.$deploy([]);
       assertNotNull(contract.$options.address);
       oracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     });

@@ -2,7 +2,7 @@ import * as chainMethods from './chain';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
-import Contract from './contract/Contract';
+import Contract, { ContractMethodsBase } from './contract/Contract';
 import * as contractGaMethods from './contract/ga';
 import { _buildTx } from './tx';
 import { mapObject, UnionToIntersection } from './utils/other';
@@ -113,7 +113,7 @@ class AeSdkMethods {
     });
   }
 
-  async initializeContract<Methods extends object>(
+  async initializeContract<Methods extends ContractMethodsBase>(
     options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode' | 'onCompiler'> &
     { onNode?: Node; onCompiler?: Compiler },
   ): Promise<Contract<Methods>> {

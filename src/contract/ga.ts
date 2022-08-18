@@ -60,7 +60,7 @@ export async function createGeneralizedAccount(
     throw new IllegalArgumentError(`Account ${ownerId} is already GA`);
   }
 
-  const contract = await Contract.initialize({
+  const contract = await Contract.initialize<{ init: (...a: any[]) => void }>({
     onAccount, onCompiler, onNode, sourceCode,
   });
 

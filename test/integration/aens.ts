@@ -24,6 +24,7 @@ import {
   AensPointerContextError, UnexpectedTsError,
 } from '../../src';
 import { pause } from '../../src/utils/other';
+import { ContractMethodsBase } from '../../src/contract/Contract';
 
 describe('Aens', () => {
   let aeSdk: AeSdk;
@@ -64,7 +65,7 @@ describe('Aens', () => {
   it('Call contract using AENS name', async () => {
     const sourceCode = 'contract Identity ='
       + '  entrypoint getArg(x : int) = x';
-    interface ContractApi {
+    interface ContractApi extends ContractMethodsBase {
       getArg: (x: number) => bigint;
     }
     let contract = await aeSdk.initializeContract<ContractApi>({ sourceCode });

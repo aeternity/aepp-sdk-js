@@ -29,6 +29,7 @@ import {
   Contract,
 } from '../../src';
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
+import { ContractMethodsBase } from '../../src/contract/Contract';
 
 const sourceCode = `contract BlindAuth =
   record state = { txHash: option(hash) }
@@ -44,7 +45,7 @@ const sourceCode = `contract BlindAuth =
       Some(tx_hash) => true
 `;
 
-interface ContractApi {
+interface ContractApi extends ContractMethodsBase {
   init: () => void;
   getTxHash: () => Uint8Array | undefined;
   authorize: (r: number) => boolean;

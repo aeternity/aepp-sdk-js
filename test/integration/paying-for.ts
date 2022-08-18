@@ -64,15 +64,13 @@ describe('Paying for transaction of another account', () => {
       entrypoint getValue(): int = state.value
       stateful entrypoint setValue(x: int) = put(state{ value = x })`;
 
-  interface ContractApi {
+  let contractAddress: Encoded.ContractAddress;
+  let aeSdkNotPayingFee: any;
+  let payingContract: Contract<{
     init: (x: InputNumber) => void;
     getValue: () => bigint;
     setValue: (x: InputNumber) => void;
-  }
-
-  let contractAddress: Encoded.ContractAddress;
-  let aeSdkNotPayingFee: any;
-  let payingContract: Contract<ContractApi>;
+  }>;
 
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);

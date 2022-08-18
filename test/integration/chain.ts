@@ -168,7 +168,7 @@ describe('Node Chain', () => {
         'contract Test =\n'
         + '  entrypoint foo(x : int) = x * 100',
     });
-    await contract.$deploy();
+    await contract.$deploy([]);
     const { result } = await contract.foo(5);
     assertNotNull(result);
     const { gasUsed: gasLimit } = result;

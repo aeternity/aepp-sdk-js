@@ -30,6 +30,7 @@ export * from './utils/hd-wallet';
 export { encode, decode, Encoding } from './utils/encoder';
 export * from './aens';
 export { default as Contract } from './contract/Contract';
+export type { ContractMethodsBase } from './contract/Contract';
 export * from './oracle';
 export * from './spend';
 export * from './contract/ga';
