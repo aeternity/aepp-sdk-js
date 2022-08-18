@@ -113,7 +113,7 @@ class AeSdkMethods {
     });
   }
 
-  async getContractInstance<Methods extends object>(
+  async initializeContract<Methods extends object>(
     options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode' | 'onCompiler'> &
     { onNode?: Node; onCompiler?: Compiler },
   ): Promise<Contract<Methods>> {

@@ -129,7 +129,7 @@ type ContractGeneric<Methods extends {}> = Contract & MethodsToContractApi<Metho
  * @returns JS Contract API
  * @example
  * ```js
- * const contractIns = await aeSdk.getContractInstance({ sourceCode })
+ * const contractIns = await aeSdk.initializeContract({ sourceCode })
  * await contractIns.$deploy([321]) or await contractIns.init(321)
  * const callResult = await contractIns.$call('setState', [123])
  * const staticCallResult = await contractIns.$call('setState', [123], { callStatic: true })
@@ -152,7 +152,7 @@ class Contract {
    * @example
    * ```js
    * const aeSdk = new AeSdk({ ... })
-   * const contract = await aeSdk.getContractInstance({ address: 'ct_asd2ks...' })
+   * const contract = await aeSdk.initializeContract({ address: 'ct_asd2ks...' })
    * const aensName = 'example.chain'
    * const onAccount = new MemoryAccount(...) // Sign with a specific account
    * // Preclaim signature
@@ -164,7 +164,7 @@ class Contract {
    * @example
    * ```js
    * const aeSdk = new AeSdk({ ... })
-   * const contract = await aeSdk.getContractInstance({ address: 'ct_asd2ks...' })
+   * const contract = await aeSdk.initializeContract({ address: 'ct_asd2ks...' })
    * const oracleQueryId = 'oq_...'
    * const onAccount = new MemoryAccount(...) // Sign with a specific account
    * // Oracle register and extend signature

@@ -163,7 +163,7 @@ describe('Node Chain', () => {
   it('ensure transactions mined', async () => Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));
 
   it('multiple contract dry-runs calls at one request', async () => {
-    const contract = await aeSdk.getContractInstance<{ foo: (x: number) => bigint }>({
+    const contract = await aeSdk.initializeContract<{ foo: (x: number) => bigint }>({
       sourceCode:
         'contract Test =\n'
         + '  entrypoint foo(x : int) = x * 100',

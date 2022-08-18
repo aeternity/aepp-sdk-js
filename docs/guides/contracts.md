@@ -48,7 +48,7 @@ Note:
 
 ```js
 const sourceCode = ... // source code of the contract
-const contractInstance = await aeSdk.getContractInstance({ sourceCode })
+const contractInstance = await aeSdk.initializeContract({ sourceCode })
 ```
 
 Note:
@@ -56,7 +56,7 @@ Note:
 - If your contract includes external dependencies which are not part of the [standard library](https://aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
   ```js
   const fileSystem = ... // key-value map with name of the include as key and source code of the include as value
-  const contractInstance = await aeSdk.getContractInstance({ sourceCode, fileSystem })
+  const contractInstance = await aeSdk.initializeContract({ sourceCode, fileSystem })
   ```
 
 ### By ACI and bytecode
@@ -65,7 +65,7 @@ If you pre-compiled the contracts you can also initialize a contract instance by
 ```js
 const aci = ... // ACI of the contract
 const bytecode = ... // bytecode of the contract
-const contractInstance = await aeSdk.getContractInstance({ aci, bytecode })
+const contractInstance = await aeSdk.initializeContract({ aci, bytecode })
 ```
 
 ### By ACI and contract address
@@ -74,12 +74,12 @@ In many cases an application doesn't need to deploy a contract or verify its byt
 ```js
 const aci = ... // ACI of the contract
 const address = ... // the address of the contract
-const contractInstance = await aeSdk.getContractInstance({ aci, address })
+const contractInstance = await aeSdk.initializeContract({ aci, address })
 ```
 
 ### Options
 
-- Following attributes can be provided via `options` to `getContractInstance`:
+- Following attributes can be provided via `options` to `initializeContract`:
     - `aci` (default: obtained via http compiler)
         - The Contract ACI.
     - `address`

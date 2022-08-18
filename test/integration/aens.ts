@@ -67,13 +67,13 @@ describe('Aens', () => {
     interface ContractApi {
       getArg: (x: number) => bigint;
     }
-    let contract = await aeSdk.getContractInstance<ContractApi>({ sourceCode });
+    let contract = await aeSdk.initializeContract<ContractApi>({ sourceCode });
     await contract.$deploy([]);
     const nameObject = await aeSdk.aensQuery(name);
     assertNotNull(contract.$options.address);
     await nameObject.update({ contract_pubkey: contract.$options.address });
 
-    contract = await aeSdk.getContractInstance<ContractApi>({ sourceCode, address: name });
+    contract = await aeSdk.initializeContract<ContractApi>({ sourceCode, address: name });
     expect((await contract.getArg(42)).decodedResult).to.be.equal(42n);
   });
 

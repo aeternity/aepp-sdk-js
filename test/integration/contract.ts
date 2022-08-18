@@ -62,7 +62,7 @@ describe('Contract', () => {
 
   it('deploys precompiled bytecode', async () => {
     identityContract = await aeSdk
-      .getContractInstance({ bytecode, sourceCode: identitySourceCode });
+      .initializeContract({ bytecode, sourceCode: identitySourceCode });
     expect(await identityContract.$deploy()).to.have.property('address');
   });
 
@@ -83,7 +83,7 @@ describe('Contract', () => {
   it('Verify message in Sophia', async () => {
     const msgHash = messageToHash('Hello');
     const signature = await aeSdk.sign(msgHash);
-    const signContract = await aeSdk.getContractInstance<{
+    const signContract = await aeSdk.initializeContract<{
       verify: (msg: Uint8Array, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
           sourceCode:
@@ -129,7 +129,7 @@ describe('Contract', () => {
   });
 
   it('throws error on deploy', async () => {
-    const ct = await aeSdk.getContractInstance({
+    const ct = await aeSdk.initializeContract({
       sourceCode:
         'contract Foo =\n'
         + '  entrypoint init() = require(false, "CustomErrorMessage")',
@@ -138,7 +138,7 @@ describe('Contract', () => {
   });
 
   it('throws errors on method call', async () => {
-    const ct = await aeSdk.getContractInstance<{
+    const ct = await aeSdk.initializeContract<{
       failWithoutMessage: (x: Encoded.AccountAddress) => void;
       failWithMessage: () => void;
     }>({
@@ -157,7 +157,7 @@ describe('Contract', () => {
 
   it('Dry-run without accounts', async () => {
     const sdk = await getSdk(0);
-    const contract = await sdk.getContractInstance<IdentityContractApi>({
+    const contract = await sdk.initializeContract<IdentityContractApi>({
       sourceCode: identitySourceCode, address: deployed.address,
     });
     const { result } = await contract.getArg(42);
@@ -184,7 +184,7 @@ describe('Contract', () => {
   });
 
   it('initializes contract state', async () => {
-    const contract = await aeSdk.getContractInstance<{
+    const contract = await aeSdk.initializeContract<{
       init: (a: { value: string }) => void;
       retrieve: () => string;
     }>({
@@ -209,7 +209,7 @@ describe('Contract', () => {
     let contract: Contract<{ sumNumbers: (x: number, y: number) => bigint }>;
 
     it('Can compiler contract with external deps', async () => {
-      contract = await aeSdk.getContractInstance({
+      contract = await aeSdk.initializeContract({
         sourceCode: contractWithLibSourceCode,
         fileSystem: {
           testLib:
@@ -221,7 +221,7 @@ describe('Contract', () => {
     });
 
     it('Throw error when try to compile contract without providing external deps', async () => {
-      await expect(aeSdk.getContractInstance({ sourceCode: contractWithLibSourceCode }))
+      await expect(aeSdk.initializeContract({ sourceCode: contractWithLibSourceCode }))
         .to.be.rejectedWith('Couldn\'t find include file');
     });
 
@@ -327,7 +327,7 @@ describe('Contract', () => {
     }>;
 
     before(async () => {
-      contract = await aeSdk.getContractInstance({
+      contract = await aeSdk.initializeContract({
         sourceCode:
           'contract DelegateTest =\n'
           + '  entrypoint getName(name: string): option(AENS.name) =\n'
@@ -433,7 +433,7 @@ describe('Contract', () => {
     }>;
 
     before(async () => {
-      contract = await aeSdk.getContractInstance({
+      contract = await aeSdk.initializeContract({
         sourceCode:
           'contract DelegateTest =\n'
           + '  stateful payable entrypoint signedRegisterOracle(\n'

@@ -65,7 +65,7 @@ describe('Transaction', () => {
 
   before(async () => {
     aeSdk = await getSdk(0);
-    contract = await aeSdk.getContractInstance({ sourceCode: contractSourceCode });
+    contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
   });
 
   it('build spend tx using denomination amount', async () => {
