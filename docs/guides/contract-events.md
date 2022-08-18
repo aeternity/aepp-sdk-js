@@ -24,7 +24,7 @@ or obtaining it via http compiler (default) you will be able to access the `emit
 
 ```js
 // events emitted by contract calls are automatically decoded
-const tx = await contractInstance.emitEvents(1337, "this message is not indexed")
+const tx = await contract.emitEvents(1337, "this message is not indexed")
 console.log(tx.decodedEvents)
 
 /*
@@ -56,15 +56,15 @@ Note:
 
 - As you can see the event log will be automatically decoded in case you perform a `ContractCallTx` directly
 
-Of course it is also possible to decode the event log if you request the transaction details from the node for a transaction that has been mined already. You can request the transaction details by providing the tx-hash and then decode the event log using the `contractInstance` as follows:
+Of course it is also possible to decode the event log if you request the transaction details from the node for a transaction that has been mined already. You can request the transaction details by providing the tx-hash and then decode the event log using the `contract` as follows:
 ```js
 const txHash = 'th_2YV3AmAz2kXdTnQxXtR2uxQi3KuLS9wfvXyqKkQQ2Y6dE6RnET';
 // aeSdk is an instance of the AeSdk class
 const txInfo = await aeSdk.api.getTransactionInfoByHash(txHash)
 
 // decode events using contract instance
-const decodedUsingInstance = contractInstance.$decodeEvents(txInfo.callInfo.log)
-console.log(decodedUsingInstance)
+const decodedUsingContract = contract.$decodeEvents(txInfo.callInfo.log)
+console.log(decodedUsingContract)
 
 /*
 [

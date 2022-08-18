@@ -48,7 +48,7 @@ Note:
 
 ```js
 const sourceCode = ... // source code of the contract
-const contractInstance = await aeSdk.initializeContract({ sourceCode })
+const contract = await aeSdk.initializeContract({ sourceCode })
 ```
 
 Note:
@@ -56,7 +56,7 @@ Note:
 - If your contract includes external dependencies which are not part of the [standard library](https://aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
   ```js
   const fileSystem = ... // key-value map with name of the include as key and source code of the include as value
-  const contractInstance = await aeSdk.initializeContract({ sourceCode, fileSystem })
+  const contract = await aeSdk.initializeContract({ sourceCode, fileSystem })
   ```
 
 ### By ACI and bytecode
@@ -65,7 +65,7 @@ If you pre-compiled the contracts you can also initialize a contract instance by
 ```js
 const aci = ... // ACI of the contract
 const bytecode = ... // bytecode of the contract
-const contractInstance = await aeSdk.initializeContract({ aci, bytecode })
+const contract = await aeSdk.initializeContract({ aci, bytecode })
 ```
 
 ### By ACI and contract address
@@ -74,7 +74,7 @@ In many cases an application doesn't need to deploy a contract or verify its byt
 ```js
 const aci = ... // ACI of the contract
 const address = ... // the address of the contract
-const contractInstance = await aeSdk.initializeContract({ aci, address })
+const contract = await aeSdk.initializeContract({ aci, address })
 ```
 
 ### Options
@@ -113,12 +113,12 @@ contract Increment =
         state.count
 ```
 
-The contract can be deployed using the `contractInstance` in two different ways:
+The contract can be deployed using the `contract` in two different ways:
 
 ```js
-const tx = await contractInstance.$deploy([1])
+const tx = await contract.$deploy([1])
 // or
-const tx = await contractInstance.init(1)
+const tx = await contract.init(1)
 
 // after successful deployment you can look up the transaction and the deploy information
 console.log(tx) // { owner, transaction, address, result, rawTx }
@@ -137,11 +137,11 @@ if they should produce changes to the state of the smart contract, see `incremen
 According to the example above you can call the `stateful` entrypoint `increment` by using one of the following lines:
 
 ```js
-const tx = await contractInstance.increment(3) // recommended
+const tx = await contract.increment(3) // recommended
 // or
-const tx = await contractInstance.increment(3, { callStatic: false })
+const tx = await contract.increment(3, { callStatic: false })
 // or
-const tx = await contractInstance.$call('increment', [3])
+const tx = await contract.$call('increment', [3])
 ```
 
 Note:
@@ -153,9 +153,9 @@ Note:
 The æternity node can expose an API endpoint that allows to execute a `dry-run` for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the `get_count` entrypoint of the example above:
 
 ```js
-const tx = await contractInstance.get_count() // recommended
+const tx = await contract.get_count() // recommended
 // or
-const tx = await contractInstance.get_count({ callStatic: true })
+const tx = await contract.get_count({ callStatic: true })
 
 // access the decoded result returned by the execution of the entrypoint
 console.log(tx.decodedResult);
@@ -178,9 +178,9 @@ payable stateful entrypoint fund_project(project_id: int) =
 In order to successfully call the `fund_project` entrypoint you need to provide at least 50 `aettos`. You can do this by providing the desired amount of `aettos` using one of the following lines:
 
 ```js
-const tx = await contractInstance.fund_project(1, { amount: 50 }) // recommended
+const tx = await contract.fund_project(1, { amount: 50 }) // recommended
 // or
-const tx = await contractInstance.$call('fund_project', [1], { amount: 50 })
+const tx = await contract.$call('fund_project', [1], { amount: 50 })
 ```
 
 ## Transaction options

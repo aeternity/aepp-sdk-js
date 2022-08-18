@@ -30,14 +30,14 @@ Basically, the dry-run endpoint of the node is used to run them. Doing requests 
 ```js
 const results = []
 for (const d of data) {
-  results.push(await contractInstance.foo(d))
+  results.push(await contract.foo(d))
 }
 ```
 will make SDK create a new dry-run request for each static call. It may be not efficient because dry-run supports executing multiple transactions at a single request. It can be done by making all calls at once:
 ```js
 const base = (await aeSdk.api.getAccountNextNonce(aeSdk.address)).nextNonce
 const results = await Promise.all(
-  data.map((d, idx) => contractInstance.foo(d, { nonce: base + idx, combine: true }))
+  data.map((d, idx) => contract.foo(d, { nonce: base + idx, combine: true }))
 )
 ```
 With `combine` flag SDK would put all of them into a single dry-run request. Also, it is necessary to generate increasing nonces on the aepp side to avoid nonce-already-used errors.
