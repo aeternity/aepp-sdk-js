@@ -65,7 +65,7 @@ describe('Transaction', () => {
 
   before(async () => {
     aeSdk = await getSdk(0);
-    contract = await aeSdk.getContractInstance({ sourceCode: contractSourceCode });
+    contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
   });
 
   it('build spend tx using denomination amount', async () => {
@@ -121,10 +121,10 @@ describe('Transaction', () => {
     async () => aeSdk.buildTx(Tag.ContractCreateTx, {
       nonce,
       ownerId: address,
-      code: await contract.compile(),
+      code: await contract.$compile(),
       amount,
       gasLimit,
-      callData: contract.calldata.encode('Identity', 'init', []),
+      callData: contract._calldata.encode('Identity', 'init', []),
     }),
   ], [
     'contract call',
@@ -135,7 +135,7 @@ describe('Transaction', () => {
       contractId,
       amount,
       gasLimit,
-      callData: contract.calldata.encode('Identity', 'getArg', [2]),
+      callData: contract._calldata.encode('Identity', 'getArg', [2]),
     }),
   ], [
     'oracle register',

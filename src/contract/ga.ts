@@ -27,7 +27,7 @@ import { decode, Encoded } from '../utils/encoder';
 import { IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
-import getContractInstance from './Contract';
+import Contract from './Contract';
 import { send, SendOptions } from '../spend';
 import Node from '../Node';
 import { getAccount } from '../chain';
@@ -60,17 +60,17 @@ export async function createGeneralizedAccount(
     throw new IllegalArgumentError(`Account ${ownerId} is already GA`);
   }
 
-  const contract = await getContractInstance({
+  const contract = await Contract.initialize<{ init: (...a: any[]) => void }>({
     onAccount, onCompiler, onNode, sourceCode,
   });
 
   const tx = await _buildTx(Tag.GaAttachTx, {
     ...options,
     onNode,
-    code: await contract.compile(),
+    code: await contract.$compile(),
     gasLimit: options.gasLimit ?? await contract._estimateGas('init', args, options),
     ownerId,
-    callData: contract.calldata.encode(contract._name, 'init', args),
+    callData: contract._calldata.encode(contract._name, 'init', args),
     authFun: hash(authFnName),
   });
   const contractId = buildContractIdByContractTx(tx);

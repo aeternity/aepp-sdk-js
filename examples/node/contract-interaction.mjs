@@ -69,22 +69,22 @@ const aeSdk = new AeSdk({
 // Knowing the source code allows you to initialize a contract instance and interact with the
 // contract in a convenient way.
 console.log(CONTRACT_SOURCE_CODE);
-const contract = await aeSdk.getContractInstance({ sourceCode: CONTRACT_SOURCE_CODE });
+const contract = await aeSdk.initializeContract({ sourceCode: CONTRACT_SOURCE_CODE });
 
 // ## 5. Compile the contract
-// The `compile` function sends a raw Sophia contract as string
+// The `$compile` function sends a raw Sophia contract as string
 // to the HTTP compiler for bytecode compilation. In the future this will be done
 // without talking to the node, but requiring a bytecode compiler
 // implementation directly in the SDK.
-const bytecode = await contract.compile();
+const bytecode = await contract.$compile();
 console.log(`Obtained bytecode ${bytecode}`);
 
 // ## 6. Deploy the contract
-// Invoking `deploy` on the contract instance will result in the `CreateContractTx`
+// Invoking `$deploy` on the contract instance will result in the `CreateContractTx`
 // being created, signed (using the _secretKey_ of the previously defined `MemoryAccount`) and
 // broadcasted to the network. It will be picked up by the miners and written to the chain.
 
-const deployInfo = await contract.deploy([5]);
+const deployInfo = await contract.$deploy([5]);
 console.log(`Contract deployed at ${deployInfo.address}`);
 
 // Note:
@@ -97,7 +97,7 @@ console.log(`Contract deployed at ${deployInfo.address}`);
 // Once the `ContractCreateTx` has been successfully mined, you can attempt to invoke
 // any public function (aka `entrypoint` in Sophia) defined within it.
 
-await contract.methods.setFactor(6);
+await contract.setFactor(6);
 
 // **Note**:
 //
@@ -108,7 +108,7 @@ await contract.methods.setFactor(6);
 // You can use `callStatic` option which performs a `dry-run` of the
 // transaction which allows you to get the result without having to mine a transaction.
 
-let call = await contract.methods.setFactor(7, { callStatic: true });
+let call = await contract.setFactor(7, { callStatic: true });
 
 // ## 9. Decode the call result
 // The execution result, if successful, will be an FATE-encoded result value.
@@ -118,7 +118,7 @@ console.log(`setFactor execution result: ${call.decodedResult}`);
 
 // ## 10. Call a contract non-stateful entrypoint via dry-run
 
-call = await contract.methods.multiplyBy(8);
+call = await contract.multiplyBy(8);
 console.log(`multiplyBy execution result: ${call.decodedResult}`);
 
 // **Note**:

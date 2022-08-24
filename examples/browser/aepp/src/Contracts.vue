@@ -105,16 +105,16 @@ export default {
   },
   methods: {
     create () {
-      return this.aeSdk.getContractInstance({ sourceCode: this.contractSourceCode })
+      return this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode })
     },
     async compile () {
-      return (await this.createPromise).compile()
+      return (await this.createPromise).$compile()
     },
     async deploy () {
-      return (await this.createPromise).deploy([this.deployArg])
+      return (await this.createPromise).$deploy([this.deployArg])
     },
     async call () {
-      return (await this.createPromise).methods.calc(this.callArg)
+      return (await this.createPromise).calc(this.callArg)
     }
   }
 }

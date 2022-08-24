@@ -19,10 +19,17 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, generateKeyPair, genSalt, MemoryAccount, AccountGeneralized, Tag, unpackTx,
+  AeSdk,
+  generateKeyPair,
+  genSalt,
+  MemoryAccount,
+  AccountGeneralized,
+  Tag,
+  unpackTx,
+  Contract,
 } from '../../src';
 import { encode, Encoded, Encoding } from '../../src/utils/encoder';
-import { ContractInstance } from '../../src/contract/Contract';
+import { ContractMethodsBase } from '../../src/contract/Contract';
 
 const sourceCode = `contract BlindAuth =
   record state = { txHash: option(hash) }
@@ -38,11 +45,17 @@ const sourceCode = `contract BlindAuth =
       Some(tx_hash) => true
 `;
 
+interface ContractApi extends ContractMethodsBase {
+  init: () => void;
+  getTxHash: () => Uint8Array | undefined;
+  authorize: (r: number) => boolean;
+}
+
 describe('Generalized Account', () => {
   let aeSdk: AeSdk;
   let accountBeforeGa: MemoryAccount;
   let gaAccountAddress: Encoded.AccountAddress;
-  let authContract: ContractInstance;
+  let authContract: Contract<ContractApi>;
 
   before(async () => {
     aeSdk = await getSdk();
@@ -53,7 +66,7 @@ describe('Generalized Account', () => {
     accountBeforeGa = Object.values(aeSdk.accounts)[0] as MemoryAccount;
     const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', sourceCode, []);
     expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.be.equal('generalized');
-    authContract = await aeSdk.getContractInstance({ sourceCode, address: gaContractId });
+    authContract = await aeSdk.initializeContract({ sourceCode, address: gaContractId });
   });
 
   it('Fail on make GA on already GA', async () => {
@@ -67,7 +80,7 @@ describe('Generalized Account', () => {
     aeSdk.removeAccount(gaAccountAddress);
     aeSdk.addAccount(new AccountGeneralized(gaAccountAddress), { select: true });
 
-    const callData = authContract.calldata.encode('BlindAuth', 'authorize', [genSalt()]);
+    const callData = authContract._calldata.encode('BlindAuth', 'authorize', [genSalt()]);
     await aeSdk.spend(10000, publicKey, { authData: { callData } });
     await aeSdk.spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
     const balanceAfter = await aeSdk.getBalance(publicKey);
@@ -88,7 +101,7 @@ describe('Generalized Account', () => {
       Encoding.Transaction,
     );
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
-      .eql((await authContract.methods.getTxHash()).decodedResult);
+      .eql((await authContract.getTxHash()).decodedResult);
   });
 
   it('fails trying to send SignedTx using generalized account', async () => {

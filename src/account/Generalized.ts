@@ -23,7 +23,7 @@ import {
 } from '../utils/errors';
 import { decode, Encoded } from '../utils/encoder';
 import { getAccount } from '../chain';
-import getContractInstance from '../contract/Contract';
+import Contract from '../contract/Contract';
 import { _buildTx } from '../tx';
 import { Tag } from '../tx/builder/constants';
 import { buildTx } from '../tx/builder';
@@ -66,23 +66,23 @@ export default class AccountGeneralized extends AccountBase {
       callData, sourceCode, args, gasLimit,
     } = authData;
 
-    if (this.#authFun == null && callData == null) {
-      const account = await getAccount(this.address, { onNode });
-      if (account.kind !== 'generalized') {
-        throw new ArgumentError('account kind', 'generalized', account.kind);
+    const authCallData = callData ?? await (async () => {
+      if (this.#authFun == null) {
+        const account = await getAccount(this.address, { onNode });
+        if (account.kind !== 'generalized') {
+          throw new ArgumentError('account kind', 'generalized', account.kind);
+        }
+        this.#authFun = account.authFun;
       }
-      this.#authFun = account.authFun;
       if (this.#authFun == null) {
         throw new InternalError('Account in generalised, but authFun not provided');
       }
-    }
 
-    const authCallData = callData ?? await (async () => {
       if (sourceCode == null || args == null) {
         throw new InvalidAuthDataError('Auth data must contain source code and arguments.');
       }
-      const contract = await getContractInstance({ onCompiler, onNode, sourceCode });
-      return contract.calldata.encode(contract._name, this.#authFun, args);
+      const contract = await Contract.initialize({ onCompiler, onNode, sourceCode });
+      return contract._calldata.encode(contract._name, this.#authFun, args);
     })();
 
     const gaMetaTx = await _buildTx(Tag.GaMetaTx, {

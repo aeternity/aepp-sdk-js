@@ -2,7 +2,7 @@ import * as chainMethods from './chain';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
-import getContractInstance from './contract/Contract';
+import Contract, { ContractMethodsBase } from './contract/Contract';
 import * as contractGaMethods from './contract/ga';
 import { _buildTx } from './tx';
 import { mapObject, UnionToIntersection } from './utils/other';
@@ -12,7 +12,7 @@ import { Tag } from './tx/builder/constants';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
 import Compiler from './contract/Compiler';
-import { NotImplementedError, TypeError } from './utils/errors';
+import { ArgumentError, NotImplementedError, TypeError } from './utils/errors';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
 
@@ -40,7 +40,6 @@ const methods = {
   ...aensMethods,
   ...spendMethods,
   ...oracleMethods,
-  getContractInstance,
   ...contractGaMethods,
 } as const;
 
@@ -110,6 +109,22 @@ class AeSdkMethods {
     // @ts-expect-error TODO: need to figure out what's wrong here
     return _buildTx<TxType>(txType, {
       ...this._getOptions(),
+      ...options,
+    });
+  }
+
+  async initializeContract<Methods extends ContractMethodsBase>(
+    options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode' | 'onCompiler'> &
+    { onNode?: Node; onCompiler?: Compiler },
+  ): Promise<Contract<Methods>> {
+    const { onNode, onCompiler, ...otherOptions } = this._getOptions();
+    if (onCompiler == null || onNode == null) {
+      throw new ArgumentError('onCompiler, onNode', 'provided', null);
+    }
+    return Contract.initialize<Methods>({
+      ...otherOptions,
+      onNode,
+      onCompiler,
       ...options,
     });
   }

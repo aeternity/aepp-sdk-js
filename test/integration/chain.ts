@@ -23,6 +23,7 @@ import {
   generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
+import { assertNotNull } from '../utils';
 
 describe('Node Chain', () => {
   let aeSdk: AeSdk;
@@ -162,18 +163,20 @@ describe('Node Chain', () => {
   it('ensure transactions mined', async () => Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));
 
   it('multiple contract dry-runs calls at one request', async () => {
-    const contract = await aeSdk.getContractInstance({
+    const contract = await aeSdk.initializeContract<{ foo: (x: number) => bigint }>({
       sourceCode:
         'contract Test =\n'
         + '  entrypoint foo(x : int) = x * 100',
     });
-    await contract.deploy();
-    const { result: { gasUsed: gasLimit } } = await contract.methods.foo(5);
+    await contract.$deploy([]);
+    const { result } = await contract.foo(5);
+    assertNotNull(result);
+    const { gasUsed: gasLimit } = result;
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     const httpSpy = spy(http, 'request');
     const numbers = new Array(32).fill(undefined).map((v, idx) => idx * 2);
     const results = (await Promise.all(
-      numbers.map((v, idx) => contract.methods
+      numbers.map(async (v, idx) => contract
         .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true })),
     )).map((r) => r.decodedResult);
     expect(results).to.be.eql(numbers.map((v) => BigInt(v * 100)));
