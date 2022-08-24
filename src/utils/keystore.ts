@@ -2,7 +2,6 @@ import nacl from 'tweetnacl';
 import { v4 as uuid } from '@aeternity/uuid';
 import { hash, argon2id } from '@aeternity/argon2';
 import { getAddressFromPriv } from './crypto';
-import { bytesToHex, hexToBytes } from './bytes';
 import { InvalidPasswordError } from './errors';
 
 const DERIVED_KEY_FUNCTIONS = {
@@ -69,6 +68,7 @@ const CRYPTO_DEFAULTS = {
 
 /**
  * Symmetric private key encryption using secret (derived) key.
+ * @category keystore
  * @param plaintext - Data to be encrypted.
  * @param key - Secret key.
  * @param nonce - Randomly generated nonce.
@@ -86,6 +86,7 @@ function encrypt(
 
 /**
  * Symmetric private key decryption using secret (derived) key.
+ * @category keystore
  * @param ciphertext - Data to be decrypted.
  * @param key - Secret key.
  * @param nonce - Nonce from key-object.
@@ -103,6 +104,7 @@ function decrypt(
 
 /**
  * Derive secret key from password with key derivation function.
+ * @category keystore
  * @param password - User-supplied password.
  * @param nonce - Randomly generated nonce.
  * @param kdf - Key derivation function.
@@ -120,6 +122,7 @@ async function deriveKey(
 
 /**
  * Recover plaintext private key from secret-storage key object.
+ * @category keystore
  * @param password - Keystore object password.
  * @param keystore - Keystore object.
  * @returns Plaintext private key.
@@ -128,17 +131,18 @@ export async function recover(
   password: string | Uint8Array,
   { crypto }: Keystore,
 ): Promise<string> {
-  const salt = hexToBytes(crypto.kdf_params.salt);
-  return bytesToHex(decrypt(
-    hexToBytes(crypto.ciphertext),
+  const salt = Buffer.from(crypto.kdf_params.salt, 'hex');
+  return Buffer.from(decrypt(
+    Buffer.from(crypto.ciphertext, 'hex'),
     await deriveKey(password, salt, crypto.kdf, crypto.kdf_params),
-    hexToBytes(crypto.cipher_params.nonce),
+    Buffer.from(crypto.cipher_params.nonce, 'hex'),
     crypto.symmetric_alg,
-  ));
+  )).toString('hex');
 }
 
 /**
  * Export private key to keystore secret-storage format.
+ * @category keystore
  * @param name - Key name.
  * @param password - User-supplied password.
  * @param privateKey - Private key as hex-string or a Buffer.
@@ -158,7 +162,7 @@ export async function dump(
 ): Promise<Keystore> {
   const opt = { ...CRYPTO_DEFAULTS, ...options };
   const derivedKey = await deriveKey(password, salt, opt.kdf, opt.kdf_params);
-  const payload = typeof privateKey === 'string' ? hexToBytes(privateKey) : privateKey;
+  const payload = typeof privateKey === 'string' ? Buffer.from(privateKey, 'hex') : privateKey;
   return {
     name,
     version: 1,
@@ -167,12 +171,14 @@ export async function dump(
     crypto: {
       secret_type: opt.secret_type,
       symmetric_alg: opt.symmetric_alg,
-      ciphertext: bytesToHex(encrypt(payload, derivedKey, nonce, opt.symmetric_alg)),
-      cipher_params: { nonce: bytesToHex(nonce) },
+      ciphertext: Buffer.from(
+        encrypt(payload, derivedKey, nonce, opt.symmetric_alg),
+      ).toString('hex'),
+      cipher_params: { nonce: Buffer.from(nonce).toString('hex') },
       kdf: opt.kdf,
       kdf_params: {
         ...opt.kdf_params,
-        salt: bytesToHex(salt),
+        salt: Buffer.from(salt).toString('hex'),
       },
     },
   };

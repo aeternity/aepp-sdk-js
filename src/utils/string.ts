@@ -32,23 +32,3 @@ export function snakeToPascal(s: string): string {
 export function pascalToSnake(s: string): string {
   return s.replace(/[A-Z]/g, (match) => `_${match.toLowerCase()}`);
 }
-
-/**
- * Check whether a string is valid hex.
- * @param str - String to validate.
- * @returns True if the string is valid hex, false otherwise.
- */
-export function isHex(str: string): boolean {
-  return str.length % 2 === 0 && /^[0-9a-f]+$/i.test(str);
-}
-
-/**
- * Check whether a string is valid base-64.
- * @param str - String to validate.
- * @returns True if the string is valid base-64, false otherwise.
- */
-export function isBase64(str: string): boolean {
-  if (str.length % 4 > 0 || /[^0-9a-z+/=]/i.test(str)) return false;
-  const index = str.indexOf('=');
-  return index === -1 || /={1,2}/.test(str.slice(index));
-}

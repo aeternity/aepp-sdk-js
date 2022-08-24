@@ -15,10 +15,7 @@ import {
   TxTypeSchemas,
 } from './schema';
 import { Tag } from './constants';
-import {
-  buildContractId, buildPointers, readInt, readPointers, writeInt,
-} from './helpers';
-import { readId, writeId } from './address';
+import { buildContractId, readInt } from './helpers';
 import { toBytes } from '../../utils/bytes';
 import MPTree, { MPTreeBinary } from '../../utils/mptree';
 import {
@@ -28,7 +25,6 @@ import {
   SchemaNotFoundError,
 } from '../../utils/errors';
 import { isKeyOfObject } from '../../utils/other';
-import { NamePointer } from '../../apis/node';
 
 /**
  * JavaScript-based Transaction builder
@@ -49,13 +45,6 @@ function deserializeField(
         abiVersion: readInt(Buffer.from([abi])),
       };
     }
-    case FIELD_TYPES.abiVersion:
-    case FIELD_TYPES.ttlType:
-      return readInt(value);
-    case FIELD_TYPES.id:
-      return readId(value);
-    case FIELD_TYPES.ids:
-      return value.map(readId);
     case FIELD_TYPES.bool:
       return value[0] === 1;
     case FIELD_TYPES.binary:
@@ -66,8 +55,6 @@ function deserializeField(
       return value.toString();
     case FIELD_TYPES.payload:
       return encode(value, Encoding.Bytearray);
-    case FIELD_TYPES.pointers:
-      return readPointers(value);
     case FIELD_TYPES.rlpBinary:
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return unpackTx(encode(value, Encoding.Transaction));
@@ -86,17 +73,6 @@ function deserializeField(
       return [readInt(value)];
     case FIELD_TYPES.mptrees:
       return value.map((t: MPTreeBinary) => new MPTree(t));
-    case FIELD_TYPES.callReturnType:
-      switch (readInt(value)) {
-        case '0':
-          return 'ok';
-        case '1':
-          return 'error';
-        case '2':
-          return 'revert';
-        default:
-          return value;
-      }
     case FIELD_TYPES.sophiaCodeTypeInfo:
       return value.reduce(
         (acc: object, [funHash, fnName, argType, outType]: [
@@ -118,13 +94,6 @@ function deserializeField(
 
 function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any {
   switch (type) {
-    case FIELD_TYPES.abiVersion:
-    case FIELD_TYPES.ttlType:
-      return writeInt(value);
-    case FIELD_TYPES.id:
-      return writeId(value);
-    case FIELD_TYPES.ids:
-      return value.map(writeId);
     case FIELD_TYPES.bool:
       return Buffer.from([(value === true) ? 1 : 0]);
     case FIELD_TYPES.binary:
@@ -141,24 +110,14 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
         : toBytes(value);
     case FIELD_TYPES.string:
       return toBytes(value);
-    case FIELD_TYPES.pointers:
-      return buildPointers(value);
     case FIELD_TYPES.rlpBinary:
       return value.rlpEncoded ?? value;
     case FIELD_TYPES.mptrees:
       return value.map((t: MPTree) => t.serialize());
     case FIELD_TYPES.ctVersion:
       return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
-    case FIELD_TYPES.callReturnType:
-      switch (value) {
-        case 'ok': return writeInt(0);
-        case 'error': return writeInt(1);
-        case 'revert': return writeInt(2);
-        default: return value;
-      }
     default:
       if (typeof type === 'number') return value;
-      // @ts-expect-error will be solved after removing the whole serializeField function
       return type.serialize(value, params);
   }
 }
@@ -166,33 +125,15 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
 function validateField(
   value: any,
   type: FIELD_TYPES | Field,
-  prefix?: Encoding | Encoding[],
 ): string | undefined {
   // All fields are required
   if (value == null) return 'Field is required';
 
   // Validate type of value
   switch (type) {
-    case FIELD_TYPES.id: {
-      const prefixes = Array.isArray(prefix) ? prefix : [prefix];
-      if (!prefixes.includes(value.split('_')[0])) {
-        if (prefix == null) { return `'${String(value)}' prefix doesn't exist'`; }
-        return `'${String(value)}' prefix doesn't match expected prefix '${prefix.toString()}'`;
-      }
-      return undefined;
-    }
     case FIELD_TYPES.ctVersion:
       if (!(Boolean(value.abiVersion) && Boolean(value.vmVersion))) {
         return 'Value must be an object with "vmVersion" and "abiVersion" fields';
-      }
-      return undefined;
-    case FIELD_TYPES.pointers:
-      if (!Array.isArray(value)) return 'Value must be of type Array';
-      if (value.some((p: NamePointer) => !(Boolean(p.key) && Boolean(p.id)))) {
-        return 'Value must contains only object\'s like \'{key: "account_pubkey", id: "ak_lkamsflkalsdalksdlasdlasdlamd"}\'';
-      }
-      if (value.length > 32) {
-        return `Expected 32 pointers or less, got ${value.length} instead`;
       }
       return undefined;
     default:
@@ -208,7 +149,7 @@ function validateField(
  * @param excludeKeys - Array of keys to exclude for validation
  * @returns Object with validation errors
  */
-export function validateParams(
+function validateParams(
   params: any,
   schema: TxField[],
   { excludeKeys = [] }: { excludeKeys: string[] },
@@ -218,7 +159,7 @@ export function validateParams(
     schema
       // TODO: allow optional keys in schema
       .filter(([key]) => !excludeKeys.includes(key) && !optionalFields.includes(key))
-      .map(([key, type, prefix]) => [key, validateField(params[key], type, prefix)])
+      .map(([key, type]) => [key, validateField(params[key], type)])
       .filter(([, message]) => message),
   );
 }
@@ -230,7 +171,7 @@ export function validateParams(
  * @param schema - Transaction schema
  * @returns Object with transaction field's
  */
-export function unpackRawTx<Tx extends TxSchema>(
+function unpackRawTx<Tx extends TxSchema>(
   binary: Uint8Array | NestedUint8Array,
   schema: TxField[],
 ): RawTxObject<Tx> {
