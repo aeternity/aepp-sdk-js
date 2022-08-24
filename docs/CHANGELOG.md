@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.1.3](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.2...v12.1.3) (2022-08-24)
+
+
+### Bug Fixes
+
+* **deps:** update calldata to 1.3.0 ([3eacc29](https://github.com/aeternity/aepp-sdk-js/commit/3eacc29da4e2191dbf449ed4847fca508c342102))
+
 ### [12.1.2](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.1...v12.1.2) (2022-08-09)
 
 
