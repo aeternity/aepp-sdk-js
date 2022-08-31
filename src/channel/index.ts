@@ -99,6 +99,10 @@ export default class Channel {
 
   _pingTimeoutId: NodeJS.Timeout;
 
+  _nextRpcMessageId = 0;
+
+  _rpcCallbacks = new Map<number, (message: object) => void>();
+
   /**
    * @param options - Channel params
    * @param options.url - Channel url (for example: "ws://localhost:3001")

@@ -28,6 +28,7 @@ import {
   UnexpectedTsError,
   UnknownChannelStateError,
   ChannelIncomingMessageError,
+  ChannelError,
 } from '../utils/errors';
 
 interface ChannelAction {
@@ -139,9 +140,7 @@ const messageQueue = new WeakMap<Channel, object[]>();
 const messageQueueLocked = new WeakMap<Channel, boolean>();
 const actionQueue = new WeakMap<Channel, ChannelAction[]>();
 const actionQueueLocked = new WeakMap<Channel, boolean>();
-const sequence = new WeakMap<Channel, number>();
 export const channelId = new WeakMap<Channel, Encoded.Channel>();
-const rpcCallbacks = new WeakMap<Channel, Map<number, Function>>();
 export const fsmId = new WeakMap<Channel, string>();
 
 export function emit(channel: Channel, ...args: any[]): void {
@@ -272,11 +271,15 @@ function onMessage(channel: Channel, data: string): void {
   const debug: boolean = options.get(channel)?.debug ?? false;
   if (debug) console.log('Receive message: ', message);
   if (message.id != null) {
-    const callback = rpcCallbacks.get(channel)?.get(message.id);
+    const callback = channel._rpcCallbacks.get(message.id);
+    if (callback == null) {
+      emit(channel, 'error', new ChannelError(`Can't find callback by id: ${message.id}`));
+      return;
+    }
     try {
-      callback?.(message);
+      callback(message);
     } finally {
-      rpcCallbacks.get(channel)?.delete(message.id);
+      channel._rpcCallbacks.delete(message.id);
     }
     return;
   }
@@ -300,18 +303,16 @@ function onMessage(channel: Channel, data: string): void {
 
 export async function call(channel: Channel, method: string, params: any): Promise<any> {
   return new Promise((resolve, reject) => {
-    const currentSequence: number = sequence.get(channel) ?? 0;
-    const id = sequence.set(channel, currentSequence + 1).get(channel) ?? 1;
-    rpcCallbacks.get(channel)?.set(
-      id,
-      (message: { result: PromiseLike<any>; error?: ChannelMessageError }) => {
-        if (message.error != null) {
-          const details = message.error.data[0].message ?? '';
-          return reject(new ChannelCallError(message.error.message + details));
-        }
-        return resolve(message.result);
-      },
-    );
+    const id = channel._nextRpcMessageId;
+    channel._nextRpcMessageId += 1;
+    channel._rpcCallbacks.set(id, (
+      message: { result: PromiseLike<any>; error?: ChannelMessageError },
+    ) => {
+      if (message.error != null) {
+        const details = message.error.data[0].message ?? '';
+        reject(new ChannelCallError(message.error.message + details));
+      } else resolve(message.result);
+    });
     send(channel, { method, id, params });
   });
 }
@@ -324,8 +325,6 @@ export async function initialize(
 ): Promise<void> {
   options.set(channel, { url, ...channelOptions });
   fsm.set(channel, { handler: connectionHandler });
-  sequence.set(channel, 0);
-  rpcCallbacks.set(channel, new Map());
   messageQueue.set(channel, []);
 
   const wsUrl = new URL(url);
