@@ -37,7 +37,7 @@ import {
 } from '../../src';
 import { pause } from '../../src/utils/other';
 import Channel from '../../src/channel';
-import { ChannelOptions, send } from '../../src/channel/internal';
+import { ChannelOptions, notify } from '../../src/channel/internal';
 import MemoryAccount from '../../src/account/Memory';
 import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
@@ -165,11 +165,7 @@ describe('Channel', () => {
       }
       initiatorCh.on('error', handler);
     });
-    send(initiatorCh, {
-      jsonrpc: '2.0',
-      method: 'not-existing-method',
-      params: {},
-    });
+    notify(initiatorCh, 'not-existing-method');
     const error = await getError;
     expect(error.incomingMessage.error.message).to.be.equal('Method not found');
     expect(() => { throw error.handlerError; })

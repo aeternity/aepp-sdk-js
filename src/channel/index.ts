@@ -25,7 +25,7 @@ import {
   state as channelState,
   initialize,
   enqueueAction,
-  send,
+  notify,
   channelId,
   call,
   disconnect as channelDisconnect,
@@ -301,12 +301,8 @@ export default class Channel {
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, {
-            jsonrpc: '2.0',
-            method: 'channels.update.new',
-            params: {
-              from, to, amount, meta: metadata,
-            },
+          notify(channel, 'channels.update.new', {
+            from, to, amount, meta: metadata,
           });
           return {
             handler: handlers.awaitingOffChainTx,
@@ -409,7 +405,7 @@ export default class Channel {
         this,
         (channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, { jsonrpc: '2.0', method: 'channels.leave', params: {} });
+          notify(channel, 'channels.leave');
           return {
             handler: handlers.awaitingLeave,
             state: { resolve, reject },
@@ -439,7 +435,7 @@ export default class Channel {
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, { jsonrpc: '2.0', method: 'channels.shutdown', params: {} });
+          notify(channel, 'channels.shutdown');
           return {
             handler: handlers.awaitingShutdownTx,
             state: {
@@ -513,7 +509,7 @@ export default class Channel {
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, { jsonrpc: '2.0', method: 'channels.withdraw', params: { amount } });
+          notify(channel, 'channels.withdraw', { amount });
           return {
             handler: handlers.awaitingWithdrawTx,
             state: {
@@ -591,7 +587,7 @@ export default class Channel {
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, { jsonrpc: '2.0', method: 'channels.deposit', params: { amount } });
+          notify(channel, 'channels.deposit', { amount });
           return {
             handler: handlers.awaitingDepositTx,
             state: {
@@ -661,16 +657,12 @@ export default class Channel {
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, {
-            jsonrpc: '2.0',
-            method: 'channels.update.new_contract',
-            params: {
-              code,
-              call_data: callData,
-              deposit,
-              vm_version: vmVersion,
-              abi_version: abiVersion,
-            },
+          notify(channel, 'channels.update.new_contract', {
+            code,
+            call_data: callData,
+            deposit,
+            vm_version: vmVersion,
+            abi_version: abiVersion,
           });
           return {
             handler: handlers.awaitingNewContractTx,
@@ -734,15 +726,11 @@ export default class Channel {
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, {
-            jsonrpc: '2.0',
-            method: 'channels.update.call_contract',
-            params: {
-              amount,
-              call_data: callData,
-              contract_id: contract,
-              abi_version: abiVersion,
-            },
+          notify(channel, 'channels.update.call_contract', {
+            amount,
+            call_data: callData,
+            contract_id: contract,
+            abi_version: abiVersion,
           });
           return {
             handler: handlers.awaitingCallContractUpdateTx,
@@ -805,17 +793,13 @@ export default class Channel {
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, {
-            jsonrpc: '2.0',
-            method: 'channels.force_progress',
-            params: {
-              amount,
-              call_data: callData,
-              contract_id: contract,
-              abi_version: abiVersion,
-              gas_price: gasPrice,
-              gas: gasLimit,
-            },
+          notify(channel, 'channels.force_progress', {
+            amount,
+            call_data: callData,
+            contract_id: contract,
+            abi_version: abiVersion,
+            gas_price: gasPrice,
+            gas: gasLimit,
           });
           return {
             handler: handlers.awaitingCallContractForceProgressUpdate,
@@ -956,11 +940,7 @@ export default class Channel {
         this,
         (_channel, state) => state?.handler === handlers.channelOpen,
         (channel) => {
-          send(channel, {
-            jsonrpc: '2.0',
-            method: 'channels.clean_contract_calls',
-            params: {},
-          });
+          notify(channel, 'channels.clean_contract_calls');
           return {
             handler: handlers.awaitingCallsPruned,
             state: { resolve, reject },
@@ -1007,11 +987,7 @@ export default class Channel {
       // established. Thus we wait 500ms which seems to work.
       await pause(500);
     }
-    send(this, {
-      jsonrpc: '2.0',
-      method: 'channels.message',
-      params: { info, to: recipient },
-    });
+    notify(this, 'channels.message', { info, to: recipient });
   }
 
   static async reconnect(options: ChannelOptions, txParams: any): Promise<Channel> {

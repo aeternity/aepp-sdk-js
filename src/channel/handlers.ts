@@ -24,7 +24,7 @@ import {
   changeStatus,
   changeState,
   call,
-  send,
+  notify,
   emit,
   channelId,
   disconnect,
@@ -128,14 +128,14 @@ export async function awaitingChannelCreateTx(
     if (message.method === `channels.sign.${tag}`) {
       if (message.params.data.tx != null) {
         const signedTx = await channelOptions.sign(tag, message.params.data.tx);
-        send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { tx: signedTx } });
+        notify(channel, `channels.${tag}`, { tx: signedTx });
         return { handler: awaitingOnChainTx };
       }
       const signedTx = await appendSignature(
         message.params.data.signed_tx,
         async (tx) => channelOptions.sign(tag, tx),
       );
-      send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { signed_tx: signedTx } });
+      notify(channel, `channels.${tag}`, { signed_tx: signedTx });
       return { handler: awaitingOnChainTx };
     }
   }
@@ -292,7 +292,7 @@ export async function awaitingOffChainTx(
     const { sign } = state;
     if (message.params.data.tx != null) {
       const signedTx = await sign(message.params.data.tx, { updates: message.params.data.updates });
-      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } });
+      notify(channel, 'channels.update', { tx: signedTx });
       return { handler: awaitingOffChainUpdate, state };
     }
     const signedTx = await appendSignature(
@@ -300,11 +300,11 @@ export async function awaitingOffChainTx(
       async (tx) => sign(tx, { updates: message.params.data.updates }),
     );
     if (typeof signedTx === 'string') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } });
+      notify(channel, 'channels.update', { signed_tx: signedTx });
       return { handler: awaitingOffChainUpdate, state };
     }
     if (typeof signedTx === 'number') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { error: signedTx } });
+      notify(channel, 'channels.update', { error: signedTx });
       return { handler: awaitingOffChainTx, state };
     }
   }
@@ -384,7 +384,7 @@ export async function awaitingTxSignRequest(
         updates: message.params.data.updates,
       });
       if (signedTx != null) {
-        send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { tx: signedTx } });
+        notify(channel, `channels.${tag}`, { tx: signedTx });
         return { handler: channelOpen };
       }
     } else {
@@ -393,23 +393,19 @@ export async function awaitingTxSignRequest(
         async (tx) => channelOptions.sign(tag, tx, { updates: message.params.data.updates }),
       );
       if (typeof signedTx === 'string') {
-        send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { signed_tx: signedTx } });
+        notify(channel, `channels.${tag}`, { signed_tx: signedTx });
         return { handler: channelOpen };
       }
       if (typeof signedTx === 'number') {
-        send(channel, { jsonrpc: '2.0', method: `channels.${tag}`, params: { error: signedTx } });
+        notify(channel, `channels.${tag}`, { error: signedTx });
         return { handler: awaitingUpdateConflict, state };
       }
     }
     // soft-reject via competing update
-    send(channel, {
-      jsonrpc: '2.0',
-      method: 'channels.update.new',
-      params: {
-        from: generateKeyPair().publicKey,
-        to: generateKeyPair().publicKey,
-        amount: 1,
-      },
+    notify(channel, 'channels.update.new', {
+      from: generateKeyPair().publicKey,
+      to: generateKeyPair().publicKey,
+      amount: 1,
     });
     return { handler: awaitingUpdateConflict, state };
   }
@@ -438,14 +434,14 @@ export async function awaitingShutdownTx(
   if (message.method === 'channels.sign.shutdown_sign') {
     if (message.params.data.tx != null) {
       const signedTx = await state.sign(message.params.data.tx);
-      send(channel, { jsonrpc: '2.0', method: 'channels.shutdown_sign', params: { tx: signedTx } });
+      notify(channel, 'channels.shutdown_sign', { tx: signedTx });
       return { handler: awaitingShutdownOnChainTx, state };
     }
     const signedTx = await appendSignature(
       message.params.data.signed_tx,
       async (tx) => state.sign(tx),
     );
-    send(channel, { jsonrpc: '2.0', method: 'channels.shutdown_sign', params: { signed_tx: signedTx } });
+    notify(channel, 'channels.shutdown_sign', { signed_tx: signedTx });
     return { handler: awaitingShutdownOnChainTx, state };
   }
   return handleUnexpectedMessage(channel, message, state);
@@ -489,7 +485,7 @@ export async function awaitingWithdrawTx(
     const { sign } = state;
     if (message.params.data.tx != null) {
       const signedTx = await sign(message.params.data.tx, { updates: message.params.data.updates });
-      send(channel, { jsonrpc: '2.0', method: 'channels.withdraw_tx', params: { tx: signedTx } });
+      notify(channel, 'channels.withdraw_tx', { tx: signedTx });
       return { handler: awaitingWithdrawCompletion, state };
     }
     const signedTx = await appendSignature(
@@ -497,11 +493,11 @@ export async function awaitingWithdrawTx(
       async (tx) => sign(tx, { updates: message.params.data.updates }),
     );
     if (typeof signedTx === 'string') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.withdraw_tx', params: { signed_tx: signedTx } });
+      notify(channel, 'channels.withdraw_tx', { signed_tx: signedTx });
       return { handler: awaitingWithdrawCompletion, state };
     }
     if (typeof signedTx === 'number') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.withdraw_tx', params: { error: signedTx } });
+      notify(channel, 'channels.withdraw_tx', { error: signedTx });
       return { handler: awaitingWithdrawCompletion, state };
     }
   }
@@ -563,7 +559,7 @@ export async function awaitingDepositTx(
         message.params.data.tx,
         { updates: message.params.data.updates },
       );
-      send(channel, { jsonrpc: '2.0', method: 'channels.deposit_tx', params: { tx: signedTx } });
+      notify(channel, 'channels.deposit_tx', { tx: signedTx });
       return { handler: awaitingDepositCompletion, state };
     }
     const signedTx = await appendSignature(
@@ -571,11 +567,11 @@ export async function awaitingDepositTx(
       async (tx) => sign(tx, { updates: message.params.data.updates }),
     );
     if (typeof signedTx === 'string') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.deposit_tx', params: { signed_tx: signedTx } });
+      notify(channel, 'channels.deposit_tx', { signed_tx: signedTx });
       return { handler: awaitingDepositCompletion, state };
     }
     if (typeof signedTx === 'number') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.deposit_tx', params: { error: signedTx } });
+      notify(channel, 'channels.deposit_tx', { error: signedTx });
       return { handler: awaitingDepositCompletion, state };
     }
   }
@@ -633,7 +629,7 @@ export async function awaitingNewContractTx(
   if (message.method === 'channels.sign.update') {
     if (message.params.data.tx != null) {
       const signedTx = await state.sign(message.params.data.tx);
-      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } });
+      notify(channel, 'channels.update', { tx: signedTx });
       return { handler: awaitingNewContractCompletion, state };
     }
     const signedTx = await appendSignature(
@@ -641,11 +637,11 @@ export async function awaitingNewContractTx(
       async (tx) => state.sign(tx),
     );
     if (typeof signedTx === 'string') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } });
+      notify(channel, 'channels.update', { signed_tx: signedTx });
       return { handler: awaitingNewContractCompletion, state };
     }
     if (typeof signedTx === 'number') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { error: signedTx } });
+      notify(channel, 'channels.update', { error: signedTx });
       return { handler: awaitingNewContractCompletion, state };
     }
   }
@@ -704,7 +700,7 @@ export async function awaitingCallContractUpdateTx(
         message.params.data.tx,
         { updates: message.params.data.updates },
       );
-      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { tx: signedTx } });
+      notify(channel, 'channels.update', { tx: signedTx });
       return { handler: awaitingCallContractCompletion, state };
     }
     const signedTx = await appendSignature(
@@ -712,11 +708,11 @@ export async function awaitingCallContractUpdateTx(
       async (tx) => state.sign(tx, { updates: message.params.data.updates }),
     );
     if (typeof signedTx === 'string') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { signed_tx: signedTx } });
+      notify(channel, 'channels.update', { signed_tx: signedTx });
       return { handler: awaitingCallContractCompletion, state };
     }
     if (typeof signedTx === 'number') {
-      send(channel, { jsonrpc: '2.0', method: 'channels.update', params: { error: signedTx } });
+      notify(channel, 'channels.update', { error: signedTx });
       return { handler: awaitingCallContractCompletion, state };
     }
   }
@@ -733,10 +729,7 @@ export async function awaitingCallContractForceProgressUpdate(
       message.params.data.signed_tx,
       async (tx) => state.sign(tx, { updates: message.params.data.updates }),
     );
-    send(
-      channel,
-      { jsonrpc: '2.0', method: 'channels.force_progress_sign', params: { signed_tx: signedTx } },
-    );
+    notify(channel, 'channels.force_progress_sign', { signed_tx: signedTx });
     return { handler: awaitingForceProgressCompletion, state };
   }
   return handleUnexpectedMessage(channel, message, state);

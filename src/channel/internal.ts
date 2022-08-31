@@ -104,7 +104,6 @@ export interface ChannelFsm {
 
 export interface ChannelMessage {
   id?: number;
-  jsonrpc: string;
   method: string;
   params: any;
   payload?: any;
@@ -175,11 +174,17 @@ export function changeState(channel: Channel, newState: Encoded.Transaction): vo
   emit(channel, 'stateChanged', newState);
 }
 
-export function send(channel: Channel, message: ChannelMessage): void {
+function send(channel: Channel, message: ChannelMessage): void {
   const debug: boolean = options.get(channel)?.debug ?? false;
   if (debug) console.log('Send message: ', message);
 
-  websockets.get(channel)?.send(JsonBig.stringify(message));
+  const websocket = websockets.get(channel);
+  if (websocket == null) throw new UnexpectedTsError();
+  websocket.send(JsonBig.stringify({ jsonrpc: '2.0', ...message }));
+}
+
+export function notify(channel: Channel, method: string, params: object = {}): void {
+  send(channel, { method, params });
 }
 
 async function dequeueAction(channel: Channel): Promise<void> {
@@ -254,13 +259,7 @@ function ping(channel: Channel): void {
   if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
   if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
   pingTimeoutId.set(channel, setTimeout(() => {
-    send(channel, {
-      jsonrpc: '2.0',
-      method: 'channels.system',
-      params: {
-        action: 'ping',
-      },
-    });
+    notify(channel, 'channels.system', { action: 'ping' });
     pongTimeoutId.set(channel, setTimeout(() => {
       disconnect(channel);
       emit(channel, 'error', new ChannelPingTimedOutError());
@@ -307,15 +306,13 @@ export async function call(channel: Channel, method: string, params: any): Promi
       id,
       (message: { result: PromiseLike<any>; error?: ChannelMessageError }) => {
         if (message.error != null) {
-          const [{ message: details } = { message: '' }] = message.error.data ?? [];
+          const details = message.error.data[0].message ?? '';
           return reject(new ChannelCallError(message.error.message + details));
         }
         return resolve(message.result);
       },
     );
-    send(channel, {
-      jsonrpc: '2.0', method, id, params,
-    });
+    send(channel, { method, id, params });
   });
 }
 
