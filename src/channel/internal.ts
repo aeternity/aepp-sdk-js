@@ -210,17 +210,23 @@ async function dequeueAction(channel: Channel): Promise<void> {
   enterState(channel, nextState);
 }
 
-export function enqueueAction(
+export async function enqueueAction(
   channel: Channel,
   guard: ChannelAction['guard'],
-  action: ChannelAction['action'],
-): void {
+  action: () => { handler: ChannelHandler; state?: Partial<ChannelState> },
+): Promise<any> {
   const queue = actionQueue.get(channel) ?? [];
-  actionQueue.set(channel, [
-    ...queue,
-    { guard, action },
-  ]);
+  const promise = new Promise((resolve, reject) => {
+    actionQueue.set(channel, [...queue, {
+      guard,
+      action() {
+        const res = action();
+        return { ...res, state: { ...res.state, resolve, reject } };
+      },
+    }]);
+  });
   void dequeueAction(channel);
+  return promise;
 }
 
 async function handleMessage(channel: Channel, message: object): Promise<void> {

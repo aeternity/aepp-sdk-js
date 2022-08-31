@@ -33,6 +33,7 @@ import {
   SignTx,
   ChannelOptions,
   ChannelState,
+  ChannelHandler,
 } from './internal';
 import { UnknownChannelStateError, ChannelError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
@@ -255,6 +256,16 @@ export default class Channel {
     return id;
   }
 
+  async #enqueueAction(
+    action: () => { handler: ChannelHandler; state?: Partial<ChannelState> },
+  ): Promise<any> {
+    return enqueueAction(
+      this,
+      (channel, state) => state?.handler === handlers.channelOpen,
+      action,
+    );
+  }
+
   /**
    * Trigger a transfer update
    *
@@ -296,24 +307,14 @@ export default class Channel {
       errorCode?: number;
       errorMessage?: string;
     }> {
-    return new Promise((resolve, reject) => {
-      enqueueAction(
-        this,
-        (_channel, state) => state?.handler === handlers.channelOpen,
-        (channel) => {
-          notify(channel, 'channels.update.new', {
-            from, to, amount, meta: metadata,
-          });
-          return {
-            handler: handlers.awaitingOffChainTx,
-            state: {
-              resolve,
-              reject,
-              sign,
-            },
-          };
-        },
-      );
+    return this.#enqueueAction(() => {
+      notify(this, 'channels.update.new', {
+        from, to, amount, meta: metadata,
+      });
+      return {
+        handler: handlers.awaitingOffChainTx,
+        state: { sign },
+      };
     });
   }
 
@@ -400,18 +401,9 @@ export default class Channel {
    * ```
    */
   async leave(): Promise<{ channelId: string; signedTx: Encoded.Transaction }> {
-    return new Promise((resolve, reject) => {
-      enqueueAction(
-        this,
-        (channel, state) => state?.handler === handlers.channelOpen,
-        (channel) => {
-          notify(channel, 'channels.leave');
-          return {
-            handler: handlers.awaitingLeave,
-            state: { resolve, reject },
-          };
-        },
-      );
+    return this.#enqueueAction(() => {
+      notify(this, 'channels.leave');
+      return { handler: handlers.awaitingLeave };
     });
   }
 
@@ -429,23 +421,13 @@ export default class Channel {
    * ).then(tx => console.log('on_chain_tx', tx))
    * ```
    */
-  async shutdown(sign: Function): Promise<Encoded.Transaction> {
-    return new Promise((resolve, reject) => {
-      enqueueAction(
-        this,
-        (_channel, state) => state?.handler === handlers.channelOpen,
-        (channel) => {
-          notify(channel, 'channels.shutdown');
-          return {
-            handler: handlers.awaitingShutdownTx,
-            state: {
-              sign,
-              resolve,
-              reject,
-            },
-          };
-        },
-      );
+  async shutdown(sign: SignTx): Promise<Encoded.Transaction> {
+    return this.#enqueueAction(() => {
+      notify(this, 'channels.shutdown');
+      return {
+        handler: handlers.awaitingShutdownTx,
+        state: { sign },
+      };
     });
   }
 
@@ -504,25 +486,17 @@ export default class Channel {
     { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }:
     Pick<ChannelState, 'onOnChainTx' | 'onOwnWithdrawLocked' | 'onWithdrawLocked'> = {},
   ): Promise<{ accepted: boolean; signedTx: Encoded.Transaction }> {
-    return new Promise((resolve, reject) => {
-      enqueueAction(
-        this,
-        (_channel, state) => state?.handler === handlers.channelOpen,
-        (channel) => {
-          notify(channel, 'channels.withdraw', { amount });
-          return {
-            handler: handlers.awaitingWithdrawTx,
-            state: {
-              sign,
-              resolve,
-              reject,
-              onOnChainTx,
-              onOwnWithdrawLocked,
-              onWithdrawLocked,
-            },
-          };
+    return this.#enqueueAction(() => {
+      notify(this, 'channels.withdraw', { amount });
+      return {
+        handler: handlers.awaitingWithdrawTx,
+        state: {
+          sign,
+          onOnChainTx,
+          onOwnWithdrawLocked,
+          onWithdrawLocked,
         },
-      );
+      };
     });
   }
 
@@ -582,25 +556,17 @@ export default class Channel {
     { onOnChainTx, onOwnDepositLocked, onDepositLocked }:
     Pick<ChannelState, 'onOnChainTx' | 'onOwnDepositLocked' | 'onDepositLocked'> = {},
   ): Promise<{ accepted: boolean; state: ChannelState }> {
-    return new Promise((resolve, reject) => {
-      enqueueAction(
-        this,
-        (_channel, state) => state?.handler === handlers.channelOpen,
-        (channel) => {
-          notify(channel, 'channels.deposit', { amount });
-          return {
-            handler: handlers.awaitingDepositTx,
-            state: {
-              sign,
-              resolve,
-              reject,
-              onOnChainTx,
-              onOwnDepositLocked,
-              onDepositLocked,
-            },
-          };
+    return this.#enqueueAction(() => {
+      notify(this, 'channels.deposit', { amount });
+      return {
+        handler: handlers.awaitingDepositTx,
+        state: {
+          sign,
+          onOnChainTx,
+          onOwnDepositLocked,
+          onDepositLocked,
         },
-      );
+      };
     });
   }
 
@@ -652,28 +618,18 @@ export default class Channel {
   ): Promise<{
       accepted: boolean; signedTx: Encoded.Transaction; address: Encoded.ContractAddress;
     }> {
-    return new Promise((resolve, reject) => {
-      enqueueAction(
-        this,
-        (_channel, state) => state?.handler === handlers.channelOpen,
-        (channel) => {
-          notify(channel, 'channels.update.new_contract', {
-            code,
-            call_data: callData,
-            deposit,
-            vm_version: vmVersion,
-            abi_version: abiVersion,
-          });
-          return {
-            handler: handlers.awaitingNewContractTx,
-            state: {
-              sign,
-              resolve,
-              reject,
-            },
-          };
-        },
-      );
+    return this.#enqueueAction(() => {
+      notify(this, 'channels.update.new_contract', {
+        code,
+        call_data: callData,
+        deposit,
+        vm_version: vmVersion,
+        abi_version: abiVersion,
+      });
+      return {
+        handler: handlers.awaitingNewContractTx,
+        state: { sign },
+      };
     });
   }
 
@@ -721,23 +677,17 @@ export default class Channel {
     }: CallContractOptions,
     sign: SignTx,
   ): Promise<{ accepted: boolean; signedTx: Encoded.Transaction }> {
-    return new Promise((resolve, reject) => {
-      enqueueAction(
-        this,
-        (_channel, state) => state?.handler === handlers.channelOpen,
-        (channel) => {
-          notify(channel, 'channels.update.call_contract', {
-            amount,
-            call_data: callData,
-            contract_id: contract,
-            abi_version: abiVersion,
-          });
-          return {
-            handler: handlers.awaitingCallContractUpdateTx,
-            state: { resolve, reject, sign },
-          };
-        },
-      );
+    return this.#enqueueAction(() => {
+      notify(this, 'channels.update.call_contract', {
+        amount,
+        call_data: callData,
+        contract_id: contract,
+        abi_version: abiVersion,
+      });
+      return {
+        handler: handlers.awaitingCallContractUpdateTx,
+        state: { sign },
+      };
     });
   }
 
@@ -788,27 +738,19 @@ export default class Channel {
       signedTx: Encoded.Transaction;
       tx: Encoded.Transaction | Uint8Array;
     }> {
-    return new Promise((resolve, reject) => {
-      enqueueAction(
-        this,
-        (_channel, state) => state?.handler === handlers.channelOpen,
-        (channel) => {
-          notify(channel, 'channels.force_progress', {
-            amount,
-            call_data: callData,
-            contract_id: contract,
-            abi_version: abiVersion,
-            gas_price: gasPrice,
-            gas: gasLimit,
-          });
-          return {
-            handler: handlers.awaitingCallContractForceProgressUpdate,
-            state: {
-              resolve, reject, sign, onOnChainTx,
-            },
-          };
-        },
-      );
+    return this.#enqueueAction(() => {
+      notify(this, 'channels.force_progress', {
+        amount,
+        call_data: callData,
+        contract_id: contract,
+        abi_version: abiVersion,
+        gas_price: gasPrice,
+        gas: gasLimit,
+      });
+      return {
+        handler: handlers.awaitingCallContractForceProgressUpdate,
+        state: { sign, onOnChainTx },
+      };
     });
   }
 
@@ -935,18 +877,9 @@ export default class Channel {
    * fetching and inspection.
    */
   async cleanContractCalls(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      enqueueAction(
-        this,
-        (_channel, state) => state?.handler === handlers.channelOpen,
-        (channel) => {
-          notify(channel, 'channels.clean_contract_calls');
-          return {
-            handler: handlers.awaitingCallsPruned,
-            state: { resolve, reject },
-          };
-        },
-      );
+    return this.#enqueueAction(() => {
+      notify(this, 'channels.clean_contract_calls');
+      return { handler: handlers.awaitingCallsPruned };
     });
   }
 
