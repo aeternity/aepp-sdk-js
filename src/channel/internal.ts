@@ -142,8 +142,6 @@ const actionQueueLocked = new WeakMap<Channel, boolean>();
 const sequence = new WeakMap<Channel, number>();
 export const channelId = new WeakMap<Channel, Encoded.Channel>();
 const rpcCallbacks = new WeakMap<Channel, Map<number, Function>>();
-const pingTimeoutId = new WeakMap<Channel, NodeJS.Timeout>();
-const pongTimeoutId = new WeakMap<Channel, NodeJS.Timeout>();
 export const fsmId = new WeakMap<Channel, string>();
 
 export function emit(channel: Channel, ...args: any[]): void {
@@ -255,24 +253,18 @@ async function dequeueMessage(channel: Channel): Promise<void> {
 
 export function disconnect(channel: Channel): void {
   websockets.get(channel)?.close();
-  const pingTimeoutIdValue = pingTimeoutId.get(channel);
-  const pongTimeoutIdValue = pongTimeoutId.get(channel);
-  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
-  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
+  clearTimeout(channel._pingTimeoutId);
 }
 
 function ping(channel: Channel): void {
-  const pingTimeoutIdValue = pingTimeoutId.get(channel);
-  const pongTimeoutIdValue = pongTimeoutId.get(channel);
-  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
-  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
-  pingTimeoutId.set(channel, setTimeout(() => {
+  clearTimeout(channel._pingTimeoutId);
+  channel._pingTimeoutId = setTimeout(() => {
     notify(channel, 'channels.system', { action: 'ping' });
-    pongTimeoutId.set(channel, setTimeout(() => {
+    channel._pingTimeoutId = setTimeout(() => {
       disconnect(channel);
       emit(channel, 'error', new ChannelPingTimedOutError());
-    }, PONG_TIMEOUT_MS));
-  }, PING_TIMEOUT_MS));
+    }, PONG_TIMEOUT_MS);
+  }, PING_TIMEOUT_MS);
 }
 
 function onMessage(channel: Channel, data: string): void {
@@ -358,10 +350,7 @@ export async function initialize(
       },
       onclose: () => {
         changeStatus(channel, 'disconnected');
-        const pingTimeoutIdValue = pingTimeoutId.get(channel);
-        const pongTimeoutIdValue = pongTimeoutId.get(channel);
-        if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
-        if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
+        clearTimeout(channel._pingTimeoutId);
       },
       onmessage: ({ data }: { data: string }) => onMessage(channel, data),
     });

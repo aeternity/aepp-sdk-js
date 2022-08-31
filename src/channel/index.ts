@@ -97,6 +97,8 @@ interface Contract {
 export default class Channel {
   _eventEmitter = new EventEmitter();
 
+  _pingTimeoutId: NodeJS.Timeout;
+
   /**
    * @param options - Channel params
    * @param options.url - Channel url (for example: "ws://localhost:3001")
