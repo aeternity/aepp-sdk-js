@@ -15,12 +15,12 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import BigNumber from 'bignumber.js';
+import { EventEmitter } from 'events';
 import { snakeToPascal } from '../utils/string';
 import { buildTx, unpackTx } from '../tx/builder';
 import { MIN_GAS_PRICE, Tag } from '../tx/builder/constants';
 import * as handlers from './handlers';
 import {
-  eventEmitters,
   status as channelStatus,
   state as channelState,
   initialize,
@@ -95,6 +95,8 @@ interface Contract {
  * ```
  */
 export default class Channel {
+  _eventEmitter = new EventEmitter();
+
   /**
    * @param options - Channel params
    * @param options.url - Channel url (for example: "ws://localhost:3001")
@@ -171,9 +173,7 @@ export default class Channel {
    */
   // TODO define specific callback type depending on the event name
   on(eventName: string, callback: EventCallback): void {
-    const eventEmitter = eventEmitters.get(this);
-    if (eventEmitter == null) throw new UnknownChannelStateError();
-    eventEmitter.on(eventName, callback);
+    this._eventEmitter.on(eventName, callback);
   }
 
   /**
@@ -182,9 +182,7 @@ export default class Channel {
    * @param callback - Callback function
    */
   off(eventName: string, callback: EventCallback): void {
-    const eventEmitter = eventEmitters.get(this);
-    if (eventEmitter == null) throw new UnknownChannelStateError();
-    eventEmitter.removeListener(eventName, callback);
+    this._eventEmitter.removeListener(eventName, callback);
   }
 
   /**

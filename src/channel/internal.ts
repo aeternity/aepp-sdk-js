@@ -16,7 +16,6 @@
  */
 
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { EventEmitter } from 'events';
 import BigNumber from 'bignumber.js';
 import type Channel from '.';
 import JsonBig from '../utils/json-big';
@@ -136,7 +135,6 @@ export const status = new WeakMap<Channel, string>();
 export const state = new WeakMap<Channel, Encoded.Transaction>();
 const fsm = new WeakMap<Channel, ChannelFsm>();
 const websockets = new WeakMap<Channel, W3CWebSocket>();
-export const eventEmitters = new WeakMap<Channel, EventEmitter>();
 const messageQueue = new WeakMap<Channel, object[]>();
 const messageQueueLocked = new WeakMap<Channel, boolean>();
 const actionQueue = new WeakMap<Channel, ChannelAction[]>();
@@ -150,7 +148,7 @@ export const fsmId = new WeakMap<Channel, string>();
 
 export function emit(channel: Channel, ...args: any[]): void {
   const [eventName, ...rest] = args;
-  eventEmitters.get(channel)?.emit(eventName, ...rest);
+  channel._eventEmitter.emit(eventName, ...rest);
 }
 
 function enterState(channel: Channel, nextState: ChannelFsm): void {
@@ -334,7 +332,6 @@ export async function initialize(
 ): Promise<void> {
   options.set(channel, { url, ...channelOptions });
   fsm.set(channel, { handler: connectionHandler });
-  eventEmitters.set(channel, new EventEmitter());
   sequence.set(channel, 0);
   rpcCallbacks.set(channel, new Map());
   messageQueue.set(channel, []);
