@@ -28,7 +28,6 @@ import {
   emit,
   channelId,
   disconnect,
-  fsmId,
   ChannelMessage,
   ChannelFsm,
   SignTx,
@@ -101,7 +100,7 @@ export function awaitingConnection(
       return { handler: awaitingOpenConfirmation };
     }
     if (message.params.data.event === 'fsm_up') {
-      fsmId.set(channel, message.params.data.fsm_id);
+      channel._fsmId = message.params.data.fsm_id;
       return { handler: awaitingConnection };
     }
     return { handler: awaitingConnection };
@@ -119,7 +118,7 @@ export async function awaitingReconnection(
 ): Promise<ChannelFsm> {
   if (message.method === 'channels.info') {
     if (message.params.data.event === 'fsm_up') {
-      fsmId.set(channel, message.params.data.fsm_id);
+      channel._fsmId = message.params.data.fsm_id;
       changeState(channel, (await call(channel, 'channels.get.offchain_state', {})).signed_tx);
       return { handler: channelOpen };
     }
@@ -258,7 +257,7 @@ export async function channelOpen(
           emit(channel, message.params.data.event);
           return { handler: channelOpen };
         case 'fsm_up':
-          fsmId.set(channel, message.params.data.fsm_id);
+          channel._fsmId = message.params.data.fsm_id;
           return { handler: channelOpen };
         case 'timeout':
         case 'close_mutual':

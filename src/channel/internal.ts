@@ -49,7 +49,7 @@ export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
 );
 
 export interface ChannelOptions {
-  existingFsmId?: string;
+  existingFsmId?: Encoded.Bytearray;
   url: string;
   role: 'initiator' | 'responder';
   initiatorId: Encoded.AccountAddress;
@@ -141,7 +141,6 @@ const messageQueueLocked = new WeakMap<Channel, boolean>();
 const actionQueue = new WeakMap<Channel, ChannelAction[]>();
 const actionQueueLocked = new WeakMap<Channel, boolean>();
 export const channelId = new WeakMap<Channel, Encoded.Channel>();
-export const fsmId = new WeakMap<Channel, string>();
 
 export function emit(channel: Channel, ...args: any[]): void {
   const [eventName, ...rest] = args;

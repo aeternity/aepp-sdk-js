@@ -29,7 +29,6 @@ import {
   channelId,
   call,
   disconnect as channelDisconnect,
-  fsmId as channelFsmId,
   SignTx,
   ChannelOptions,
   ChannelState,
@@ -102,6 +101,8 @@ export default class Channel {
   _nextRpcMessageId = 0;
 
   _rpcCallbacks = new Map<number, (message: object) => void>();
+
+  _fsmId?: Encoded.Bytearray;
 
   /**
    * @param options - Channel params
@@ -254,10 +255,9 @@ export default class Channel {
    * Get channel's fsm id
    *
    */
-  fsmId(): string {
-    const id = channelFsmId.get(this);
-    if (id == null) throw new ChannelError('Channel is not initialized');
-    return id;
+  fsmId(): Encoded.Bytearray {
+    if (this._fsmId == null) throw new ChannelError('Channel is not initialized');
+    return this._fsmId;
   }
 
   async #enqueueAction(
@@ -404,7 +404,7 @@ export default class Channel {
    * })
    * ```
    */
-  async leave(): Promise<{ channelId: string; signedTx: Encoded.Transaction }> {
+  async leave(): Promise<{ channelId: Encoded.Bytearray; signedTx: Encoded.Transaction }> {
     return this.#enqueueAction(() => {
       notify(this, 'channels.leave');
       return { handler: handlers.awaitingLeave };

@@ -70,7 +70,7 @@ describe('Channel', () => {
   let initiatorCh: Channel;
   let responderCh: Channel;
   let responderShouldRejectUpdate: number | boolean;
-  let existingChannelId: string;
+  let existingChannelId: Encoded.Bytearray;
   let offchainTx: string;
   let contractAddress: Encoded.ContractAddress;
   let callerNonce: number;
