@@ -239,7 +239,7 @@ export default class Channel {
    * Get channel id
    *
    */
-  id(): string {
+  id(): Encoded.Channel {
     const id = channelId.get(this);
     if (id == null) throw new ChannelError('Channel is not initialized');
     return id;
@@ -888,7 +888,7 @@ export default class Channel {
     },
   ): Promise<{
       returnType: ContractCallReturnType;
-      returnValue: string;
+      returnValue: Encoded.ContractBytearray;
       gasPrice: number | BigNumber;
       gasUsed: number | BigNumber;
       height: number;

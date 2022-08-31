@@ -36,11 +36,15 @@ interface ChannelAction {
   action: (channel: Channel, state?: ChannelFsm) => ChannelFsm;
 }
 
-export type SignTxWithTag = (tag: string, tx: Encoded.Transaction, options?: object) => (
+interface SignOptions {
+  updates?: any[];
+  [k: string]: any;
+}
+export type SignTxWithTag = (tag: string, tx: Encoded.Transaction, options?: SignOptions) => (
   Promise<Encoded.Transaction>
 );
 // TODO: SignTx shouldn't return number or null
-export type SignTx = (tx: Encoded.Transaction, options?: object) => (
+export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
   Promise<Encoded.Transaction | number | null>
 );
 
@@ -81,7 +85,7 @@ export interface ChannelHandler extends Function {
 }
 
 export interface ChannelState {
-  signedTx: any;
+  signedTx: Encoded.Transaction;
   resolve: (r?: any) => void;
   reject: (e: BaseError) => void;
   sign: SignTx;
@@ -138,7 +142,7 @@ const messageQueueLocked = new WeakMap<Channel, boolean>();
 const actionQueue = new WeakMap<Channel, ChannelAction[]>();
 const actionQueueLocked = new WeakMap<Channel, boolean>();
 const sequence = new WeakMap<Channel, number>();
-export const channelId = new WeakMap<Channel, string>();
+export const channelId = new WeakMap<Channel, Encoded.Channel>();
 const rpcCallbacks = new WeakMap<Channel, Map<number, Function>>();
 const pingTimeoutId = new WeakMap<Channel, NodeJS.Timeout>();
 const pongTimeoutId = new WeakMap<Channel, NodeJS.Timeout>();
