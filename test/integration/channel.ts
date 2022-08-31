@@ -22,8 +22,18 @@ import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
-  unpackTx, buildTx, buildTxHash, encode, decode, Tag,
-  IllegalArgumentError, InsufficientBalanceError, ChannelConnectionError, encodeContractAddress,
+  unpackTx,
+  buildTx,
+  buildTxHash,
+  encode,
+  decode,
+  Tag,
+  IllegalArgumentError,
+  InsufficientBalanceError,
+  ChannelConnectionError,
+  encodeContractAddress,
+  ChannelIncomingMessageError,
+  UnknownChannelStateError,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 import Channel from '../../src/channel';
@@ -147,23 +157,23 @@ describe('Channel', () => {
     responderTx.should.eql({ ...responderTx, ...expectedTxParams });
   });
 
-  it('prints error on handling incoming messages', async () => {
-    const stub = sinon.stub(console, 'error');
-    const received = new Promise((resolve) => {
-      stub.callsFake(resolve);
+  it('emits error on handling incoming messages', async () => {
+    const getError = new Promise<ChannelIncomingMessageError>((resolve) => {
+      function handler(error: ChannelIncomingMessageError): void {
+        resolve(error);
+        initiatorCh.off('error', handler);
+      }
+      initiatorCh.on('error', handler);
     });
     send(initiatorCh, {
       jsonrpc: '2.0',
       method: 'not-existing-method',
       params: {},
     });
-    await received;
-    expect(stub.callCount).to.be.equal(3);
-    expect(stub.getCall(0).firstArg).to.be.equal('Error handling incoming message:');
-    expect(stub.getCall(1).firstArg.error.message).to.be.equal('Method not found');
-    expect(stub.getCall(2).firstArg.toString())
-      .to.be.equal('UnknownChannelStateError: State Channels FSM entered unknown state');
-    stub.restore();
+    const error = await getError;
+    expect(error.incomingMessage.error.message).to.be.equal('Method not found');
+    expect(() => { throw error.handlerError; })
+      .to.throw(UnknownChannelStateError, 'State Channels FSM entered unknown state');
   });
 
   it('can post update and accept', async () => {

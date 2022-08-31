@@ -28,6 +28,7 @@ import {
   ChannelPingTimedOutError,
   UnexpectedTsError,
   UnknownChannelStateError,
+  ChannelIncomingMessageError,
 } from '../utils/errors';
 
 interface ChannelAction {
@@ -233,9 +234,7 @@ async function dequeueMessage(channel: Channel): Promise<void> {
     try {
       await handleMessage(channel, message);
     } catch (error) {
-      console.error('Error handling incoming message:');
-      console.error(message);
-      console.error(error);
+      emit(channel, 'error', new ChannelIncomingMessageError(error, message));
     }
   }
   messageQueueLocked.set(channel, false);
