@@ -208,7 +208,7 @@ class Contract<M extends ContractMethodsBase> {
    * @returns bytecode
    */
   async $compile(): Promise<Encoded.ContractBytearray> {
-    if (this.$options.bytecode != null) throw new IllegalArgumentError('Contract already compiled');
+    if (this.$options.bytecode != null) return this.$options.bytecode;
     if (this.$options.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
     this.$options.bytecode = (await this.$options.onCompiler.compileContract({
       code: this.$options.sourceCode, options: { fileSystem: this.$options.fileSystem },

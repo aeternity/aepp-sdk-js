@@ -886,7 +886,7 @@ describe('Channel', () => {
         updates: sinon.match([{
           abi_version: 3,
           call_data: callData,
-          code: contract.$options.bytecode,
+          code: await contract.$compile(),
           deposit: 1000,
           op: 'OffChainNewContract',
           owner: sinon.match.string,
@@ -903,9 +903,8 @@ describe('Channel', () => {
   it('can create a contract and reject', async () => {
     responderShouldRejectUpdate = true;
     const roundBefore = initiatorCh.round();
-    assertNotNull(contract.$options.bytecode);
     const result = await initiatorCh.createContract({
-      code: contract.$options.bytecode,
+      code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
       deposit: new BigNumber('10e18'),
       vmVersion: 5,
@@ -917,10 +916,9 @@ describe('Channel', () => {
 
   it('can abort contract sign request', async () => {
     const errorCode = 12345;
-    assertNotNull(contract.$options.bytecode);
     const result = await initiatorCh.createContract(
       {
-        code: contract.$options.bytecode,
+        code: await contract.$compile(),
         callData: contract._calldata.encode('Identity', 'init', []),
         deposit: new BigNumber('10e18'),
         vmVersion: 5,
@@ -933,9 +931,8 @@ describe('Channel', () => {
 
   it('can abort contract with custom error code', async () => {
     responderShouldRejectUpdate = 12345;
-    assertNotNull(contract.$options.bytecode);
     const result = await initiatorCh.createContract({
-      code: contract.$options.bytecode,
+      code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
       deposit: new BigNumber('10e18'),
       vmVersion: 5,
