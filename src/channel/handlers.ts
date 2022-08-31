@@ -60,6 +60,18 @@ export async function appendSignature(
   return result;
 }
 
+async function appendSignatureAndNotify(
+  channel: Channel,
+  method: string,
+  tx: Encoded.Transaction,
+  signFn: SignTx,
+): Promise<boolean> {
+  const signedTx = await appendSignature(tx, signFn);
+  const isError = typeof signedTx !== 'string';
+  notify(channel, method, isError ? { error: signedTx ?? 1 } : { signed_tx: signedTx });
+  return isError;
+}
+
 function handleUnexpectedMessage(
   _channel: Channel,
   message: ChannelMessage,
@@ -131,11 +143,12 @@ export async function awaitingChannelCreateTx(
         notify(channel, `channels.${tag}`, { tx: signedTx });
         return { handler: awaitingOnChainTx };
       }
-      const signedTx = await appendSignature(
+      await appendSignatureAndNotify(
+        channel,
+        `channels.${tag}`,
         message.params.data.signed_tx,
         async (tx) => channelOptions.sign(tag, tx),
       );
-      notify(channel, `channels.${tag}`, { signed_tx: signedTx });
       return { handler: awaitingOnChainTx };
     }
   }
@@ -295,18 +308,13 @@ export async function awaitingOffChainTx(
       notify(channel, 'channels.update', { tx: signedTx });
       return { handler: awaitingOffChainUpdate, state };
     }
-    const signedTx = await appendSignature(
+    const isError = await appendSignatureAndNotify(
+      channel,
+      'channels.update',
       message.params.data.signed_tx,
       async (tx) => sign(tx, { updates: message.params.data.updates }),
     );
-    if (typeof signedTx === 'string') {
-      notify(channel, 'channels.update', { signed_tx: signedTx });
-      return { handler: awaitingOffChainUpdate, state };
-    }
-    if (typeof signedTx === 'number') {
-      notify(channel, 'channels.update', { error: signedTx });
-      return { handler: awaitingOffChainTx, state };
-    }
+    return { handler: isError ? awaitingOffChainTx : awaitingOffChainUpdate, state };
   }
   if (message.method === 'channels.error') {
     state.reject(new ChannelConnectionError(message.data.message));
@@ -388,18 +396,13 @@ export async function awaitingTxSignRequest(
         return { handler: channelOpen };
       }
     } else {
-      const signedTx = await appendSignature(
+      const isError = await appendSignatureAndNotify(
+        channel,
+        `channels.${tag}`,
         message.params.data.signed_tx,
         async (tx) => channelOptions.sign(tag, tx, { updates: message.params.data.updates }),
       );
-      if (typeof signedTx === 'string') {
-        notify(channel, `channels.${tag}`, { signed_tx: signedTx });
-        return { handler: channelOpen };
-      }
-      if (typeof signedTx === 'number') {
-        notify(channel, `channels.${tag}`, { error: signedTx });
-        return { handler: awaitingUpdateConflict, state };
-      }
+      return isError ? { handler: awaitingUpdateConflict, state } : { handler: channelOpen };
     }
     // soft-reject via competing update
     notify(channel, 'channels.update.new', {
@@ -437,11 +440,12 @@ export async function awaitingShutdownTx(
       notify(channel, 'channels.shutdown_sign', { tx: signedTx });
       return { handler: awaitingShutdownOnChainTx, state };
     }
-    const signedTx = await appendSignature(
+    await appendSignatureAndNotify(
+      channel,
+      'channels.shutdown_sign',
       message.params.data.signed_tx,
       async (tx) => state.sign(tx),
     );
-    notify(channel, 'channels.shutdown_sign', { signed_tx: signedTx });
     return { handler: awaitingShutdownOnChainTx, state };
   }
   return handleUnexpectedMessage(channel, message, state);
@@ -488,18 +492,13 @@ export async function awaitingWithdrawTx(
       notify(channel, 'channels.withdraw_tx', { tx: signedTx });
       return { handler: awaitingWithdrawCompletion, state };
     }
-    const signedTx = await appendSignature(
+    await appendSignatureAndNotify(
+      channel,
+      'channels.withdraw_tx',
       message.params.data.signed_tx,
       async (tx) => sign(tx, { updates: message.params.data.updates }),
     );
-    if (typeof signedTx === 'string') {
-      notify(channel, 'channels.withdraw_tx', { signed_tx: signedTx });
-      return { handler: awaitingWithdrawCompletion, state };
-    }
-    if (typeof signedTx === 'number') {
-      notify(channel, 'channels.withdraw_tx', { error: signedTx });
-      return { handler: awaitingWithdrawCompletion, state };
-    }
+    return { handler: awaitingWithdrawCompletion, state };
   }
   return handleUnexpectedMessage(channel, message, state);
 }
@@ -562,18 +561,13 @@ export async function awaitingDepositTx(
       notify(channel, 'channels.deposit_tx', { tx: signedTx });
       return { handler: awaitingDepositCompletion, state };
     }
-    const signedTx = await appendSignature(
+    await appendSignatureAndNotify(
+      channel,
+      'channels.deposit_tx',
       message.params.data.signed_tx,
       async (tx) => sign(tx, { updates: message.params.data.updates }),
     );
-    if (typeof signedTx === 'string') {
-      notify(channel, 'channels.deposit_tx', { signed_tx: signedTx });
-      return { handler: awaitingDepositCompletion, state };
-    }
-    if (typeof signedTx === 'number') {
-      notify(channel, 'channels.deposit_tx', { error: signedTx });
-      return { handler: awaitingDepositCompletion, state };
-    }
+    return { handler: awaitingDepositCompletion, state };
   }
   return handleUnexpectedMessage(channel, message, state);
 }
@@ -632,18 +626,13 @@ export async function awaitingNewContractTx(
       notify(channel, 'channels.update', { tx: signedTx });
       return { handler: awaitingNewContractCompletion, state };
     }
-    const signedTx = await appendSignature(
+    await appendSignatureAndNotify(
+      channel,
+      'channels.update',
       message.params.data.signed_tx,
       async (tx) => state.sign(tx),
     );
-    if (typeof signedTx === 'string') {
-      notify(channel, 'channels.update', { signed_tx: signedTx });
-      return { handler: awaitingNewContractCompletion, state };
-    }
-    if (typeof signedTx === 'number') {
-      notify(channel, 'channels.update', { error: signedTx });
-      return { handler: awaitingNewContractCompletion, state };
-    }
+    return { handler: awaitingNewContractCompletion, state };
   }
   return handleUnexpectedMessage(channel, message, state);
 }
@@ -703,18 +692,13 @@ export async function awaitingCallContractUpdateTx(
       notify(channel, 'channels.update', { tx: signedTx });
       return { handler: awaitingCallContractCompletion, state };
     }
-    const signedTx = await appendSignature(
+    await appendSignatureAndNotify(
+      channel,
+      'channels.update',
       message.params.data.signed_tx,
       async (tx) => state.sign(tx, { updates: message.params.data.updates }),
     );
-    if (typeof signedTx === 'string') {
-      notify(channel, 'channels.update', { signed_tx: signedTx });
-      return { handler: awaitingCallContractCompletion, state };
-    }
-    if (typeof signedTx === 'number') {
-      notify(channel, 'channels.update', { error: signedTx });
-      return { handler: awaitingCallContractCompletion, state };
-    }
+    return { handler: awaitingCallContractCompletion, state };
   }
   return handleUnexpectedMessage(channel, message, state);
 }
@@ -725,11 +709,12 @@ export async function awaitingCallContractForceProgressUpdate(
   state: ChannelState,
 ): Promise<ChannelFsm | undefined> {
   if (message.method === 'channels.sign.force_progress_tx') {
-    const signedTx = await appendSignature(
+    await appendSignatureAndNotify(
+      channel,
+      'channels.force_progress_sign',
       message.params.data.signed_tx,
       async (tx) => state.sign(tx, { updates: message.params.data.updates }),
     );
-    notify(channel, 'channels.force_progress_sign', { signed_tx: signedTx });
     return { handler: awaitingForceProgressCompletion, state };
   }
   return handleUnexpectedMessage(channel, message, state);
