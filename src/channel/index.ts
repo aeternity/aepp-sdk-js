@@ -34,6 +34,7 @@ import {
   ChannelHandler,
   ChannelAction,
   ChannelStatus,
+  ChannelFsm,
 } from './internal';
 import { ChannelError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
@@ -114,6 +115,8 @@ export default class Channel {
   _isActionQueueLocked = false;
 
   _status: ChannelStatus = 'disconnected';
+
+  _fsm: ChannelFsm;
 
   /**
    * @param options - Channel params

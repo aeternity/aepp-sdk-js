@@ -133,7 +133,6 @@ const PONG_TIMEOUT_MS = 5000;
 // TODO: move to Channel instance to avoid is-null checks and for easier debugging
 export const options = new WeakMap<Channel, ChannelOptions>();
 export const state = new WeakMap<Channel, Encoded.Transaction>();
-const fsm = new WeakMap<Channel, ChannelFsm>();
 const websockets = new WeakMap<Channel, W3CWebSocket>();
 export const channelId = new WeakMap<Channel, Encoded.Channel>();
 
@@ -146,7 +145,7 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
   if (nextState == null) {
     throw new UnknownChannelStateError();
   }
-  fsm.set(channel, nextState);
+  channel._fsm = nextState;
   if (nextState?.handler?.enter != null) {
     nextState.handler.enter(channel);
   }
@@ -186,13 +185,11 @@ async function dequeueAction(channel: Channel): Promise<void> {
   if (channel._isActionQueueLocked) return;
   const queue = channel._actionQueue;
   if (queue.length === 0) return;
-  const singleFsm = fsm.get(channel);
-  if (singleFsm == null) return;
-  const index = queue.findIndex((action) => action.guard(channel, singleFsm));
+  const index = queue.findIndex((action) => action.guard(channel, channel._fsm));
   if (index === -1) return;
   channel._actionQueue = queue.filter((_, i) => index !== i);
   channel._isActionQueueLocked = true;
-  const nextState: ChannelFsm = await queue[index].action(channel, singleFsm);
+  const nextState: ChannelFsm = await queue[index].action(channel, channel._fsm);
   channel._isActionQueueLocked = false;
   enterState(channel, nextState);
 }
@@ -216,9 +213,7 @@ export async function enqueueAction(
 }
 
 async function handleMessage(channel: Channel, message: object): Promise<void> {
-  const fsmState = fsm.get(channel);
-  if (fsmState == null) throw new UnknownChannelStateError();
-  const { handler, state: st } = fsmState;
+  const { handler, state: st } = channel._fsm;
   enterState(channel, await Promise.resolve(handler(channel, message, st)));
 }
 
@@ -311,7 +306,7 @@ export async function initialize(
   { url, ...channelOptions }: ChannelOptions,
 ): Promise<void> {
   options.set(channel, { url, ...channelOptions });
-  fsm.set(channel, { handler: connectionHandler });
+  channel._fsm = { handler: connectionHandler };
 
   const wsUrl = new URL(url);
   Object.entries(channelOptions)
