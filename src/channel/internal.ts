@@ -133,7 +133,6 @@ const PONG_TIMEOUT_MS = 5000;
 // TODO: move to Channel instance to avoid is-null checks and for easier debugging
 export const options = new WeakMap<Channel, ChannelOptions>();
 export const state = new WeakMap<Channel, Encoded.Transaction>();
-const websockets = new WeakMap<Channel, W3CWebSocket>();
 export const channelId = new WeakMap<Channel, Encoded.Channel>();
 
 export function emit(channel: Channel, ...args: any[]): void {
@@ -171,10 +170,7 @@ export function changeState(channel: Channel, newState: Encoded.Transaction): vo
 function send(channel: Channel, message: ChannelMessage): void {
   const debug: boolean = options.get(channel)?.debug ?? false;
   if (debug) console.log('Send message: ', message);
-
-  const websocket = websockets.get(channel);
-  if (websocket == null) throw new UnexpectedTsError();
-  websocket.send(JsonBig.stringify({ jsonrpc: '2.0', ...message }));
+  channel._websocket.send(JsonBig.stringify({ jsonrpc: '2.0', ...message }));
 }
 
 export function notify(channel: Channel, method: string, params: object = {}): void {
@@ -233,7 +229,7 @@ async function dequeueMessage(channel: Channel): Promise<void> {
 }
 
 export function disconnect(channel: Channel): void {
-  websockets.get(channel)?.close();
+  channel._websocket.close();
   clearTimeout(channel._pingTimeoutId);
 }
 
@@ -314,9 +310,9 @@ export async function initialize(
     .forEach(([key, value]) => wsUrl.searchParams.set(pascalToSnake(key), value));
   wsUrl.searchParams.set('protocol', 'json-rpc');
   changeStatus(channel, 'connecting');
-  const ws = new W3CWebSocket(wsUrl.toString());
+  channel._websocket = new W3CWebSocket(wsUrl.toString());
   await new Promise<void>((resolve, reject) => {
-    Object.assign(ws, {
+    Object.assign(channel._websocket, {
       onerror: reject,
       onopen: async () => {
         resolve();
@@ -335,5 +331,4 @@ export async function initialize(
       onmessage: ({ data }: { data: string }) => onMessage(channel, data),
     });
   });
-  websockets.set(channel, ws);
 }

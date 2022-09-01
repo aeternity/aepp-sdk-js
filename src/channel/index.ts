@@ -16,6 +16,7 @@
  */
 import BigNumber from 'bignumber.js';
 import { EventEmitter } from 'events';
+import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { snakeToPascal } from '../utils/string';
 import { buildTx, unpackTx } from '../tx/builder';
 import { MIN_GAS_PRICE, Tag } from '../tx/builder/constants';
@@ -117,6 +118,8 @@ export default class Channel {
   _status: ChannelStatus = 'disconnected';
 
   _fsm: ChannelFsm;
+
+  _websocket: W3CWebSocket;
 
   /**
    * @param options - Channel params
