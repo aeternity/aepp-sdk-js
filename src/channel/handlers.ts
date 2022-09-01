@@ -31,6 +31,7 @@ import {
   ChannelMessage,
   ChannelFsm,
   SignTx,
+  ChannelStatus,
 } from './internal';
 import { unpackTx, buildTx } from '../tx/builder';
 import { encode, Encoded, Encoding } from '../utils/encoder';
@@ -89,13 +90,15 @@ export function awaitingConnection(
 ): ChannelFsm | undefined {
   if (message.method === 'channels.info') {
     const channelInfoStatus: string = message.params.data.event;
-    if (['channel_accept', 'funding_created'].includes(channelInfoStatus)) {
-      changeStatus(channel, {
-        channel_accept: 'accepted',
-        funding_created: 'halfSigned',
-      }[channelInfoStatus as 'channel_accept' | 'funding_created']);
+
+    let nextStatus: ChannelStatus | null = null;
+    if (channelInfoStatus === 'channel_accept') nextStatus = 'accepted';
+    if (channelInfoStatus === 'funding_created') nextStatus = 'halfSigned';
+    if (nextStatus != null) {
+      changeStatus(channel, nextStatus);
       return { handler: awaitingChannelCreateTx };
     }
+
     if (message.params.data.event === 'channel_reestablished') {
       return { handler: awaitingOpenConfirmation };
     }

@@ -21,7 +21,6 @@ import { buildTx, unpackTx } from '../tx/builder';
 import { MIN_GAS_PRICE, Tag } from '../tx/builder/constants';
 import * as handlers from './handlers';
 import {
-  status as channelStatus,
   state as channelState,
   initialize,
   enqueueAction,
@@ -34,8 +33,9 @@ import {
   ChannelState,
   ChannelHandler,
   ChannelAction,
+  ChannelStatus,
 } from './internal';
-import { UnknownChannelStateError, ChannelError } from '../utils/errors';
+import { ChannelError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
 import { ContractCallReturnType } from '../apis/node';
 import { pause } from '../utils/other';
@@ -112,6 +112,8 @@ export default class Channel {
   _actionQueue: ChannelAction[] = [];
 
   _isActionQueueLocked = false;
+
+  _status: ChannelStatus = 'disconnected';
 
   /**
    * @param options - Channel params
@@ -210,12 +212,9 @@ export default class Channel {
 
   /**
    * Get current status
-   *
    */
-  status(): string {
-    const status = channelStatus.get(this);
-    if (status == null) throw new UnknownChannelStateError();
-    return status;
+  status(): ChannelStatus {
+    return this._status;
   }
 
   /**
@@ -230,7 +229,6 @@ export default class Channel {
    *
    * If round cannot be determined (for example when channel has not been opened)
    * it will return `null`.
-   *
    */
   round(): number | null {
     const state = channelState.get(this);

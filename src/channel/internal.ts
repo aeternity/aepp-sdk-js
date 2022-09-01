@@ -132,7 +132,6 @@ const PONG_TIMEOUT_MS = 5000;
 
 // TODO: move to Channel instance to avoid is-null checks and for easier debugging
 export const options = new WeakMap<Channel, ChannelOptions>();
-export const status = new WeakMap<Channel, string>();
 export const state = new WeakMap<Channel, Encoded.Transaction>();
 const fsm = new WeakMap<Channel, ChannelFsm>();
 const websockets = new WeakMap<Channel, W3CWebSocket>();
@@ -155,12 +154,14 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
   void dequeueAction(channel);
 }
 
-export function changeStatus(channel: Channel, newStatus: string): void {
-  const prevStatus = status.get(channel);
-  if (newStatus !== prevStatus) {
-    status.set(channel, newStatus);
-    emit(channel, 'statusChanged', newStatus);
-  }
+// TODO: rewrite to enum
+export type ChannelStatus = 'connecting' | 'connected' | 'accepted' | 'halfSigned' | 'signed'
+| 'open' | 'closing' | 'closed' | 'died' | 'disconnected';
+
+export function changeStatus(channel: Channel, newStatus: ChannelStatus): void {
+  if (newStatus === channel._status) return;
+  channel._status = newStatus;
+  emit(channel, 'statusChanged', newStatus);
 }
 
 export function changeState(channel: Channel, newState: Encoded.Transaction): void {
