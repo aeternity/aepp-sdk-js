@@ -25,7 +25,6 @@ import {
   call,
   notify,
   emit,
-  channelId,
   disconnect,
   ChannelMessage,
   ChannelFsm,
@@ -166,7 +165,7 @@ export function awaitingOnChainTx(
     && message.params.data.event === 'funding_signed'
     && channel._options.role === 'initiator'
   ) {
-    channelId.set(channel, message.params.channel_id);
+    channel._channelId = message.params.channel_id;
     changeStatus(channel, 'signed');
     return { handler: awaitingOnChainTx };
   }
@@ -203,7 +202,7 @@ export function awaitingOpenConfirmation(
   message: ChannelMessage,
 ): ChannelFsm | undefined {
   if (message.method === 'channels.info' && message.params.data.event === 'open') {
-    channelId.set(channel, message.params.channel_id);
+    channel._channelId = message.params.channel_id;
     return { handler: awaitingInitialState };
   }
 }

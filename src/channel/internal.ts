@@ -130,9 +130,6 @@ const PING_TIMEOUT_MS = 10000;
 // Close connection if pong message is not received within 5 seconds
 const PONG_TIMEOUT_MS = 5000;
 
-// TODO: move to Channel instance to avoid is-null checks and for easier debugging
-export const channelId = new WeakMap<Channel, Encoded.Channel>();
-
 export function emit(channel: Channel, ...args: any[]): void {
   const [eventName, ...rest] = args;
   channel._eventEmitter.emit(eventName, ...rest);
@@ -262,11 +259,7 @@ function onMessage(channel: Channel, data: string): void {
     return;
   }
   if (message.method === 'channels.system.pong') {
-    if (
-      (message.params.channel_id === channelId.get(channel))
-      // Skip channelId check if channelId is not known yet
-      || (channelId.get(channel) == null)
-    ) {
+    if (message.params.channel_id === channel._channelId || channel._channelId == null) {
       ping(channel);
     }
     return;

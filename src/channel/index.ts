@@ -25,7 +25,6 @@ import {
   initialize,
   enqueueAction,
   notify,
-  channelId,
   call,
   disconnect as channelDisconnect,
   SignTx,
@@ -123,6 +122,8 @@ export default class Channel {
   _state?: Encoded.Transaction;
 
   _options: ChannelOptions;
+
+  _channelId?: Encoded.Channel;
 
   /**
    * @param options - Channel params
@@ -261,9 +262,8 @@ export default class Channel {
    *
    */
   id(): Encoded.Channel {
-    const id = channelId.get(this);
-    if (id == null) throw new ChannelError('Channel is not initialized');
-    return id;
+    if (this._channelId == null) throw new ChannelError('Channel is not initialized');
+    return this._channelId;
   }
 
   /**
