@@ -36,9 +36,9 @@ import {
   UnknownChannelStateError,
   AeSdk,
   Contract,
+  Channel,
 } from '../../src';
 import { pause } from '../../src/utils/other';
-import Channel from '../../src/channel';
 import {
   ChannelOptions, notify, SignTx, SignTxWithTag,
 } from '../../src/channel/internal';

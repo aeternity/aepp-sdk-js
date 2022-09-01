@@ -45,7 +45,7 @@ export { default as AccountBase } from './account/Base';
 export { default as MemoryAccount } from './account/Memory';
 export { default as AccountGeneralized } from './account/Generalized';
 export { default as Compiler } from './contract/Compiler';
-export { default as Channel } from './channel';
+export { default as Channel } from './channel/Contract';
 
 export { default as connectionProxy } from './aepp-wallet-communication/connection-proxy';
 export * from './aepp-wallet-communication/schema';

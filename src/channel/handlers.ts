@@ -17,7 +17,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable default-case */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { generateKeyPair, encodeContractAddress } from '../utils/crypto';
+import { generateKeyPair } from '../utils/crypto';
 import {
   ChannelState,
   changeStatus,
@@ -39,7 +39,7 @@ import {
   ChannelConnectionError,
   UnexpectedChannelMessageError,
 } from '../utils/errors';
-import type Channel from '.';
+import type Channel from './Base';
 import { Tag } from '../tx/builder/constants';
 
 export async function appendSignature(
@@ -58,7 +58,7 @@ export async function appendSignature(
   return result;
 }
 
-async function appendSignatureAndNotify(
+export async function appendSignatureAndNotify(
   channel: Channel,
   method: string,
   tx: Encoded.Transaction,
@@ -70,7 +70,7 @@ async function appendSignatureAndNotify(
   return isError;
 }
 
-function handleUnexpectedMessage(
+export function handleUnexpectedMessage(
   _channel: Channel,
   message: ChannelMessage,
   state: ChannelState,
@@ -597,160 +597,6 @@ export function awaitingDepositCompletion(
     }
   }
   return handleUnexpectedMessage(channel, message, state);
-}
-
-export async function awaitingNewContractTx(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): Promise<ChannelFsm | undefined> {
-  if (message.method === 'channels.sign.update') {
-    if (message.params.data.tx != null) {
-      const signedTx = await state.sign(message.params.data.tx);
-      notify(channel, 'channels.update', { tx: signedTx });
-      return { handler: awaitingNewContractCompletion, state };
-    }
-    await appendSignatureAndNotify(
-      channel,
-      'channels.update',
-      message.params.data.signed_tx,
-      async (tx) => state.sign(tx),
-    );
-    return { handler: awaitingNewContractCompletion, state };
-  }
-  return handleUnexpectedMessage(channel, message, state);
-}
-
-export function awaitingNewContractCompletion(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): ChannelFsm {
-  if (message.method === 'channels.update') {
-    const { round } = unpackTx(message.params.data.state, Tag.SignedTx).tx.encodedTx.tx;
-    const addressKey = channel._options.role === 'initiator' ? 'initiatorId' : 'responderId';
-    const owner = channel._options[addressKey];
-    changeState(channel, message.params.data.state);
-    state.resolve({
-      accepted: true,
-      address: encodeContractAddress(owner, round),
-      signedTx: message.params.data.state,
-    });
-    return { handler: channelOpen };
-  }
-  if (message.method === 'channels.conflict') {
-    state.resolve({
-      accepted: false,
-      errorCode: message.params.data.error_code,
-      errorMessage: message.params.data.error_msg,
-    });
-    return { handler: channelOpen };
-  }
-  if (message.method === 'channels.info') {
-    if (message.params.data.event === 'aborted_update') {
-      state.resolve({ accepted: false });
-      return { handler: channelOpen };
-    }
-  }
-  return handleUnexpectedMessage(channel, message, state);
-}
-
-export async function awaitingCallContractUpdateTx(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): Promise<ChannelFsm | undefined> {
-  if (message.method === 'channels.sign.update') {
-    if (message.params.data.tx != null) {
-      const signedTx = await state.sign(
-        message.params.data.tx,
-        { updates: message.params.data.updates },
-      );
-      notify(channel, 'channels.update', { tx: signedTx });
-      return { handler: awaitingCallContractCompletion, state };
-    }
-    await appendSignatureAndNotify(
-      channel,
-      'channels.update',
-      message.params.data.signed_tx,
-      async (tx) => state.sign(tx, { updates: message.params.data.updates }),
-    );
-    return { handler: awaitingCallContractCompletion, state };
-  }
-  return handleUnexpectedMessage(channel, message, state);
-}
-
-export async function awaitingCallContractForceProgressUpdate(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): Promise<ChannelFsm | undefined> {
-  if (message.method === 'channels.sign.force_progress_tx') {
-    await appendSignatureAndNotify(
-      channel,
-      'channels.force_progress_sign',
-      message.params.data.signed_tx,
-      async (tx) => state.sign(tx, { updates: message.params.data.updates }),
-    );
-    return { handler: awaitingForceProgressCompletion, state };
-  }
-  return handleUnexpectedMessage(channel, message, state);
-}
-
-export function awaitingForceProgressCompletion(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): ChannelFsm {
-  if (message.method === 'channels.on_chain_tx') {
-    state.onOnChainTx?.(message.params.data.tx);
-    emit(channel, 'onChainTx', message.params.data.tx, {
-      info: message.params.data.info,
-      type: message.params.data.type,
-    });
-    state.resolve({ accepted: true, tx: message.params.data.tx });
-  }
-  return handleUnexpectedMessage(channel, message, state);
-}
-
-export function awaitingCallContractCompletion(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): ChannelFsm {
-  if (message.method === 'channels.update') {
-    changeState(channel, message.params.data.state);
-    state.resolve({ accepted: true, signedTx: message.params.data.state });
-    return { handler: channelOpen };
-  }
-  if (message.method === 'channels.conflict') {
-    state.resolve({
-      accepted: false,
-      errorCode: message.params.data.error_code,
-      errorMessage: message.params.data.error_msg,
-    });
-    return { handler: channelOpen };
-  }
-  if (message.method === 'channels.info') {
-    if (message.params.data.event === 'aborted_update') {
-      state.resolve({ accepted: false });
-      return { handler: channelOpen };
-    }
-  }
-  return handleUnexpectedMessage(channel, message, state);
-}
-
-export function awaitingCallsPruned(
-  _channels: Channel[],
-  message: ChannelMessage,
-  state: ChannelState,
-): ChannelFsm {
-  if (message.method === 'channels.calls_pruned.reply') {
-    state.resolve();
-    return { handler: channelOpen };
-  }
-  state.reject(new UnexpectedChannelMessageError('Unexpected message received'));
-  return { handler: channelClosed };
 }
 
 export function channelClosed(
