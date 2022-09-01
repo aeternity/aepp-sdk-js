@@ -22,7 +22,6 @@ import { buildTx, unpackTx } from '../tx/builder';
 import { MIN_GAS_PRICE, Tag } from '../tx/builder/constants';
 import * as handlers from './handlers';
 import {
-  state as channelState,
   initialize,
   enqueueAction,
   notify,
@@ -120,6 +119,8 @@ export default class Channel {
   _fsm: ChannelFsm;
 
   _websocket: W3CWebSocket;
+
+  _state?: Encoded.Transaction;
 
   /**
    * @param options - Channel params
@@ -237,11 +238,10 @@ export default class Channel {
    * it will return `null`.
    */
   round(): number | null {
-    const state = channelState.get(this);
-    if (state == null) {
+    if (this._state == null) {
       return null;
     }
-    const { txType, tx } = unpackTx(state, Tag.SignedTx).tx.encodedTx;
+    const { txType, tx } = unpackTx(this._state, Tag.SignedTx).tx.encodedTx;
     switch (txType) {
       case Tag.ChannelCreateTx:
         return 1;

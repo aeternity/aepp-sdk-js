@@ -132,7 +132,6 @@ const PONG_TIMEOUT_MS = 5000;
 
 // TODO: move to Channel instance to avoid is-null checks and for easier debugging
 export const options = new WeakMap<Channel, ChannelOptions>();
-export const state = new WeakMap<Channel, Encoded.Transaction>();
 export const channelId = new WeakMap<Channel, Encoded.Channel>();
 
 export function emit(channel: Channel, ...args: any[]): void {
@@ -163,7 +162,7 @@ export function changeStatus(channel: Channel, newStatus: ChannelStatus): void {
 }
 
 export function changeState(channel: Channel, newState: Encoded.Transaction): void {
-  state.set(channel, newState);
+  channel._state = newState;
   emit(channel, 'stateChanged', newState);
 }
 
