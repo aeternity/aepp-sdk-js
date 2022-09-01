@@ -33,6 +33,7 @@ import {
   ChannelOptions,
   ChannelState,
   ChannelHandler,
+  ChannelAction,
 } from './internal';
 import { UnknownChannelStateError, ChannelError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
@@ -103,6 +104,14 @@ export default class Channel {
   _rpcCallbacks = new Map<number, (message: object) => void>();
 
   _fsmId?: Encoded.Bytearray;
+
+  _messageQueue: object[] = [];
+
+  _isMessageQueueLocked = false;
+
+  _actionQueue: ChannelAction[] = [];
+
+  _isActionQueueLocked = false;
 
   /**
    * @param options - Channel params

@@ -31,7 +31,7 @@ import {
   ChannelError,
 } from '../utils/errors';
 
-interface ChannelAction {
+export interface ChannelAction {
   guard: (channel: Channel, state?: ChannelFsm) => boolean;
   action: (channel: Channel, state?: ChannelFsm) => ChannelFsm;
 }
@@ -136,10 +136,6 @@ export const status = new WeakMap<Channel, string>();
 export const state = new WeakMap<Channel, Encoded.Transaction>();
 const fsm = new WeakMap<Channel, ChannelFsm>();
 const websockets = new WeakMap<Channel, W3CWebSocket>();
-const messageQueue = new WeakMap<Channel, object[]>();
-const messageQueueLocked = new WeakMap<Channel, boolean>();
-const actionQueue = new WeakMap<Channel, ChannelAction[]>();
-const actionQueueLocked = new WeakMap<Channel, boolean>();
 export const channelId = new WeakMap<Channel, Encoded.Channel>();
 
 export function emit(channel: Channel, ...args: any[]): void {
@@ -186,21 +182,17 @@ export function notify(channel: Channel, method: string, params: object = {}): v
 }
 
 async function dequeueAction(channel: Channel): Promise<void> {
-  const locked = actionQueueLocked.get(channel);
-  const queue = actionQueue.get(channel) ?? [];
-  if (Boolean(locked) || queue.length === 0) {
-    return;
-  }
+  if (channel._isActionQueueLocked) return;
+  const queue = channel._actionQueue;
+  if (queue.length === 0) return;
   const singleFsm = fsm.get(channel);
   if (singleFsm == null) return;
-  const index = queue.findIndex((action: ChannelAction) => action.guard(channel, singleFsm));
-  if (index === -1) {
-    return;
-  }
-  actionQueue.set(channel, queue.filter((_: ChannelAction, i: number) => index !== i));
-  actionQueueLocked.set(channel, true);
-  const nextState: ChannelFsm = await Promise.resolve(queue[index].action(channel, singleFsm));
-  actionQueueLocked.set(channel, false);
+  const index = queue.findIndex((action) => action.guard(channel, singleFsm));
+  if (index === -1) return;
+  channel._actionQueue = queue.filter((_, i) => index !== i);
+  channel._isActionQueueLocked = true;
+  const nextState: ChannelFsm = await queue[index].action(channel, singleFsm);
+  channel._isActionQueueLocked = false;
   enterState(channel, nextState);
 }
 
@@ -209,15 +201,14 @@ export async function enqueueAction(
   guard: ChannelAction['guard'],
   action: () => { handler: ChannelHandler; state?: Partial<ChannelState> },
 ): Promise<any> {
-  const queue = actionQueue.get(channel) ?? [];
   const promise = new Promise((resolve, reject) => {
-    actionQueue.set(channel, [...queue, {
+    channel._actionQueue.push({
       guard,
       action() {
         const res = action();
         return { ...res, state: { ...res.state, resolve, reject } };
       },
-    }]);
+    });
   });
   void dequeueAction(channel);
   return promise;
@@ -231,14 +222,10 @@ async function handleMessage(channel: Channel, message: object): Promise<void> {
 }
 
 async function dequeueMessage(channel: Channel): Promise<void> {
-  const locked: boolean = messageQueueLocked.get(channel) ?? false;
-  if (locked) return;
-  const messages = messageQueue.get(channel);
-  if (messages == null) throw new UnexpectedTsError();
-  if (messages.length === 0) return;
-  messageQueueLocked.set(channel, true);
-  while (messages.length > 0) {
-    const message = messages.shift();
+  if (channel._isMessageQueueLocked) return;
+  channel._isMessageQueueLocked = true;
+  while (channel._messageQueue.length > 0) {
+    const message = channel._messageQueue.shift();
     if (message == null) throw new UnexpectedTsError();
     try {
       await handleMessage(channel, message);
@@ -246,7 +233,7 @@ async function dequeueMessage(channel: Channel): Promise<void> {
       emit(channel, 'error', new ChannelIncomingMessageError(error, message));
     }
   }
-  messageQueueLocked.set(channel, false);
+  channel._isMessageQueueLocked = false;
 }
 
 export function disconnect(channel: Channel): void {
@@ -296,7 +283,7 @@ function onMessage(channel: Channel, data: string): void {
     }
     return;
   }
-  messageQueue.get(channel)?.push(message);
+  channel._messageQueue.push(message);
   void dequeueMessage(channel);
 }
 
@@ -324,7 +311,6 @@ export async function initialize(
 ): Promise<void> {
   options.set(channel, { url, ...channelOptions });
   fsm.set(channel, { handler: connectionHandler });
-  messageQueue.set(channel, []);
 
   const wsUrl = new URL(url);
   Object.entries(channelOptions)
