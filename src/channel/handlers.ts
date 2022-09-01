@@ -82,6 +82,43 @@ export function handleUnexpectedMessage(
   return { handler: channelOpen };
 }
 
+export function awaitingCompletion(
+  channel: Channel,
+  message: ChannelMessage,
+  state: ChannelState,
+  onSuccess?: typeof handleUnexpectedMessage,
+): ChannelFsm {
+  if (onSuccess != null && message.method === 'channels.update') {
+    return onSuccess(channel, message, state);
+  }
+  if (message.method === 'channels.conflict') {
+    state.resolve({
+      accepted: false,
+      errorCode: message.params.data.error_code,
+      errorMessage: message.params.data.error_msg,
+    });
+    return { handler: channelOpen };
+  }
+  if (message.method === 'channels.info') {
+    if (message.params.data.event === 'aborted_update') {
+      state.resolve({ accepted: false });
+      return { handler: channelOpen };
+    }
+  }
+  if (message.error != null) {
+    const codes = message.error.data.map((d) => d.code);
+    if (codes.includes(1001)) {
+      state.reject(new InsufficientBalanceError('Insufficient balance'));
+    } else if (codes.includes(1002)) {
+      state.reject(new IllegalArgumentError('Amount cannot be negative'));
+    } else {
+      state.reject(new ChannelConnectionError(message.error.message));
+    }
+    return { handler: channelOpen };
+  }
+  return handleUnexpectedMessage(channel, message, state);
+}
+
 export function awaitingConnection(
   channel: Channel,
   message: ChannelMessage,
@@ -305,32 +342,7 @@ export async function awaitingOffChainTx(
     state.reject(new ChannelConnectionError(message.data.message));
     return { handler: channelOpen };
   }
-  if (message.error != null) {
-    const { data } = message.error ?? { data: [] };
-    if (data.find((i) => i.code === 1001) != null) {
-      state.reject(new InsufficientBalanceError('Insufficient balance'));
-    } else if (data.find((i) => i.code === 1002) != null) {
-      state.reject(new IllegalArgumentError('Amount cannot be negative'));
-    } else {
-      state.reject(new ChannelConnectionError(message.error.message));
-    }
-    return { handler: channelOpen };
-  }
-  if (message.method === 'channels.conflict') {
-    state.resolve({
-      accepted: false,
-      errorCode: message.params.data.error_code,
-      errorMessage: message.params.data.error_msg,
-    });
-    return { handler: channelOpen };
-  }
-  if (message.method === 'channels.info') {
-    if (message.params.data.event === 'aborted_update') {
-      state.resolve({ accepted: false });
-      return { handler: channelOpen };
-    }
-  }
-  return handleUnexpectedMessage(channel, message, state);
+  return awaitingCompletion(channel, message, state);
 }
 
 export function awaitingOffChainUpdate(
@@ -338,30 +350,11 @@ export function awaitingOffChainUpdate(
   message: ChannelMessage,
   state: ChannelState,
 ): ChannelFsm | undefined {
-  if (message.method === 'channels.update') {
+  return awaitingCompletion(channel, message, state, () => {
     changeState(channel, message.params.data.state);
     state.resolve({ accepted: true, signedTx: message.params.data.state });
     return { handler: channelOpen };
-  }
-  if (message.method === 'channels.conflict') {
-    state.resolve({
-      accepted: false,
-      errorCode: message.params.data.error_code,
-      errorMessage: message.params.data.error_msg,
-    });
-    return { handler: channelOpen };
-  }
-  if (message.method === 'channels.info') {
-    if (message.params.data.event === 'aborted_update') {
-      state.resolve({ accepted: false });
-      return { handler: channelOpen };
-    }
-  }
-  if (message.error != null) {
-    state.reject(new ChannelConnectionError(message.error.message));
-    return { handler: channelOpen };
-  }
-  return handleUnexpectedMessage(channel, message, state);
+  });
 }
 
 export async function awaitingTxSignRequest(
@@ -379,27 +372,26 @@ export async function awaitingTxSignRequest(
         notify(channel, `channels.${tag}`, { tx: signedTx });
         return { handler: channelOpen };
       }
-    } else {
-      const isError = await appendSignatureAndNotify(
-        channel,
-        `channels.${tag}`,
-        message.params.data.signed_tx,
-        async (tx) => channel._options.sign(tag, tx, { updates: message.params.data.updates }),
-      );
-      return isError ? { handler: awaitingUpdateConflict, state } : { handler: channelOpen };
+      // soft-reject via competing update
+      notify(channel, 'channels.update.new', {
+        from: generateKeyPair().publicKey,
+        to: generateKeyPair().publicKey,
+        amount: 1,
+      });
+      return { handler: awaitingUpdateConflict, state };
     }
-    // soft-reject via competing update
-    notify(channel, 'channels.update.new', {
-      from: generateKeyPair().publicKey,
-      to: generateKeyPair().publicKey,
-      amount: 1,
-    });
-    return { handler: awaitingUpdateConflict, state };
+    const isError = await appendSignatureAndNotify(
+      channel,
+      `channels.${tag}`,
+      message.params.data.signed_tx,
+      async (tx) => channel._options.sign(tag, tx, { updates: message.params.data.updates }),
+    );
+    return isError ? { handler: awaitingUpdateConflict, state } : { handler: channelOpen };
   }
   return handleUnexpectedMessage(channel, message, state);
 }
 
-export function awaitingUpdateConflict(
+function awaitingUpdateConflict(
   channel: Channel,
   message: ChannelMessage,
   state: ChannelState,
@@ -508,26 +500,11 @@ export function awaitingWithdrawCompletion(
       return { handler: awaitingWithdrawCompletion, state };
     }
   }
-  if (message.method === 'channels.update') {
+  return awaitingCompletion(channel, message, state, () => {
     changeState(channel, message.params.data.state);
     state.resolve({ accepted: true, signedTx: message.params.data.state });
     return { handler: channelOpen };
-  }
-  if (message.method === 'channels.conflict') {
-    state.resolve({
-      accepted: false,
-      errorCode: message.params.data.error_code,
-      errorMessage: message.params.data.error_msg,
-    });
-    return { handler: channelOpen };
-  }
-  if (message.method === 'channels.info') {
-    if (message.params.data.event === 'aborted_update') {
-      state.resolve({ accepted: false });
-      return { handler: channelOpen };
-    }
-  }
-  return handleUnexpectedMessage(channel, message, state);
+  });
 }
 
 export async function awaitingDepositTx(
@@ -577,26 +554,11 @@ export function awaitingDepositCompletion(
       return { handler: awaitingDepositCompletion, state };
     }
   }
-  if (message.method === 'channels.update') {
+  return awaitingCompletion(channel, message, state, () => {
     changeState(channel, message.params.data.state);
     state.resolve({ accepted: true, signedTx: message.params.data.state });
     return { handler: channelOpen };
-  }
-  if (message.method === 'channels.conflict') {
-    state.resolve({
-      accepted: false,
-      errorCode: message.params.data.error_code,
-      errorMessage: message.params.data.error_msg,
-    });
-    return { handler: channelOpen };
-  }
-  if (message.method === 'channels.info') {
-    if (message.params.data.event === 'aborted_update') {
-      state.resolve({ accepted: false });
-      return { handler: channelOpen };
-    }
-  }
-  return handleUnexpectedMessage(channel, message, state);
+  });
 }
 
 export function channelClosed(

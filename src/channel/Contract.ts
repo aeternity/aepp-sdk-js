@@ -19,6 +19,7 @@ import { snakeToPascal } from '../utils/string';
 import { MIN_GAS_PRICE, Tag } from '../tx/builder/constants';
 import {
   appendSignatureAndNotify,
+  awaitingCompletion,
   channelClosed,
   channelOpen,
   handleUnexpectedMessage,
@@ -150,8 +151,8 @@ export default class ChannelContract extends Channel {
               _2: Channel,
               message2: ChannelMessage,
               state2: ChannelState,
-            ): ChannelFsm => {
-              if (message2.method === 'channels.update') {
+            ): ChannelFsm => (
+              awaitingCompletion(this, message2, state2, () => {
                 const { round } = unpackTx(message2.params.data.state, Tag.SignedTx)
                   .tx.encodedTx.tx;
                 const addressKey = this._options.role === 'initiator'
@@ -164,23 +165,8 @@ export default class ChannelContract extends Channel {
                   signedTx: message2.params.data.state,
                 });
                 return { handler: channelOpen };
-              }
-              if (message2.method === 'channels.conflict') {
-                state2.resolve({
-                  accepted: false,
-                  errorCode: message2.params.data.error_code,
-                  errorMessage: message2.params.data.error_msg,
-                });
-                return { handler: channelOpen };
-              }
-              if (message2.method === 'channels.info') {
-                if (message2.params.data.event === 'aborted_update') {
-                  state2.resolve({ accepted: false });
-                  return { handler: channelOpen };
-                }
-              }
-              return handleUnexpectedMessage(this, message2, state2);
-            },
+              })
+            ),
             state,
           };
         },
@@ -268,28 +254,13 @@ export default class ChannelContract extends Channel {
               _2: Channel,
               message2: ChannelMessage,
               state2: ChannelState,
-            ): ChannelFsm => {
-              if (message2.method === 'channels.update') {
+            ): ChannelFsm => (
+              awaitingCompletion(this, message2, state2, () => {
                 changeState(this, message2.params.data.state);
                 state2.resolve({ accepted: true, signedTx: message2.params.data.state });
                 return { handler: channelOpen };
-              }
-              if (message2.method === 'channels.conflict') {
-                state2.resolve({
-                  accepted: false,
-                  errorCode: message2.params.data.error_code,
-                  errorMessage: message2.params.data.error_msg,
-                });
-                return { handler: channelOpen };
-              }
-              if (message2.method === 'channels.info') {
-                if (message2.params.data.event === 'aborted_update') {
-                  state2.resolve({ accepted: false });
-                  return { handler: channelOpen };
-                }
-              }
-              return handleUnexpectedMessage(this, message2, state2);
-            },
+              })
+            ),
             state,
           };
         },
