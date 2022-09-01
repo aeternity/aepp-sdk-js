@@ -122,6 +122,8 @@ export default class Channel {
 
   _state?: Encoded.Transaction;
 
+  _options: ChannelOptions;
+
   /**
    * @param options - Channel params
    * @param options.url - Channel url (for example: "ws://localhost:3001")

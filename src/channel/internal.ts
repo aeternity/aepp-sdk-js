@@ -131,7 +131,6 @@ const PING_TIMEOUT_MS = 10000;
 const PONG_TIMEOUT_MS = 5000;
 
 // TODO: move to Channel instance to avoid is-null checks and for easier debugging
-export const options = new WeakMap<Channel, ChannelOptions>();
 export const channelId = new WeakMap<Channel, Encoded.Channel>();
 
 export function emit(channel: Channel, ...args: any[]): void {
@@ -167,8 +166,7 @@ export function changeState(channel: Channel, newState: Encoded.Transaction): vo
 }
 
 function send(channel: Channel, message: ChannelMessage): void {
-  const debug: boolean = options.get(channel)?.debug ?? false;
-  if (debug) console.log('Send message: ', message);
+  if (channel._options.debug) console.log('Send message: ', message);
   channel._websocket.send(JsonBig.stringify({ jsonrpc: '2.0', ...message }));
 }
 
@@ -245,8 +243,7 @@ function ping(channel: Channel): void {
 
 function onMessage(channel: Channel, data: string): void {
   const message = JsonBig.parse(data);
-  const debug: boolean = options.get(channel)?.debug ?? false;
-  if (debug) console.log('Receive message: ', message);
+  if (channel._options.debug) console.log('Receive message: ', message);
   if (message.id != null) {
     const callback = channel._rpcCallbacks.get(message.id);
     if (callback == null) {
@@ -300,7 +297,7 @@ export async function initialize(
   openHandler: Function,
   { url, ...channelOptions }: ChannelOptions,
 ): Promise<void> {
-  options.set(channel, { url, ...channelOptions });
+  channel._options = { url, ...channelOptions };
   channel._fsm = { handler: connectionHandler };
 
   const wsUrl = new URL(url);

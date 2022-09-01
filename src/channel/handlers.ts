@@ -20,7 +20,6 @@
 import { generateKeyPair, encodeContractAddress } from '../utils/crypto';
 import {
   ChannelState,
-  options,
   changeStatus,
   changeState,
   call,
@@ -133,26 +132,20 @@ export async function awaitingChannelCreateTx(
   channel: Channel,
   message: ChannelMessage,
 ): Promise<ChannelFsm | undefined> {
-  const channelOptions = options.get(channel);
-  if (channelOptions != null) {
-    const tag = {
-      initiator: 'initiator_sign',
-      responder: 'responder_sign',
-    }[channelOptions.role];
-    if (message.method === `channels.sign.${tag}`) {
-      if (message.params.data.tx != null) {
-        const signedTx = await channelOptions.sign(tag, message.params.data.tx);
-        notify(channel, `channels.${tag}`, { tx: signedTx });
-        return { handler: awaitingOnChainTx };
-      }
-      await appendSignatureAndNotify(
-        channel,
-        `channels.${tag}`,
-        message.params.data.signed_tx,
-        async (tx) => channelOptions.sign(tag, tx),
-      );
+  const tag = channel._options.role === 'initiator' ? 'initiator_sign' : 'responder_sign';
+  if (message.method === `channels.sign.${tag}`) {
+    if (message.params.data.tx != null) {
+      const signedTx = await channel._options.sign(tag, message.params.data.tx);
+      notify(channel, `channels.${tag}`, { tx: signedTx });
       return { handler: awaitingOnChainTx };
     }
+    await appendSignatureAndNotify(
+      channel,
+      `channels.${tag}`,
+      message.params.data.signed_tx,
+      async (tx) => channel._options.sign(tag, tx),
+    );
+    return { handler: awaitingOnChainTx };
   }
 }
 
@@ -160,31 +153,22 @@ export function awaitingOnChainTx(
   channel: Channel,
   message: ChannelMessage,
 ): ChannelFsm | undefined {
-  const channelOptions = options.get(channel);
-  if (channelOptions != null) {
-    if (message.method === 'channels.on_chain_tx') {
-      if (
-        message.params.data.info === 'funding_signed'
-        && channelOptions.role === 'initiator'
-      ) {
-        return { handler: awaitingBlockInclusion };
-      }
-      if (
-        message.params.data.info === 'funding_created'
-        && channelOptions.role === 'responder'
-      ) {
-        return { handler: awaitingBlockInclusion };
-      }
+  if (message.method === 'channels.on_chain_tx') {
+    if (message.params.data.info === 'funding_signed' && channel._options.role === 'initiator') {
+      return { handler: awaitingBlockInclusion };
     }
-    if (
-      message.method === 'channels.info'
+    if (message.params.data.info === 'funding_created' && channel._options.role === 'responder') {
+      return { handler: awaitingBlockInclusion };
+    }
+  }
+  if (
+    message.method === 'channels.info'
     && message.params.data.event === 'funding_signed'
-    && channelOptions.role === 'initiator'
-    ) {
-      channelId.set(channel, message.params.channel_id);
-      changeStatus(channel, 'signed');
-      return { handler: awaitingOnChainTx };
-    }
+    && channel._options.role === 'initiator'
+  ) {
+    channelId.set(channel, message.params.channel_id);
+    changeStatus(channel, 'signed');
+    return { handler: awaitingOnChainTx };
   }
 }
 
@@ -387,10 +371,9 @@ export async function awaitingTxSignRequest(
   state: ChannelState,
 ): Promise<ChannelFsm | undefined> {
   const [, tag] = message.method.match(/^channels\.sign\.([^.]+)$/) ?? [];
-  const channelOptions = options.get(channel);
-  if (tag != null && (channelOptions != null)) {
+  if (tag != null) {
     if (message.params.data.tx != null) {
-      const signedTx = await channelOptions.sign(tag, message.params.data.tx, {
+      const signedTx = await channel._options.sign(tag, message.params.data.tx, {
         updates: message.params.data.updates,
       });
       if (signedTx != null) {
@@ -402,7 +385,7 @@ export async function awaitingTxSignRequest(
         channel,
         `channels.${tag}`,
         message.params.data.signed_tx,
-        async (tx) => channelOptions.sign(tag, tx, { updates: message.params.data.updates }),
+        async (tx) => channel._options.sign(tag, tx, { updates: message.params.data.updates }),
       );
       return isError ? { handler: awaitingUpdateConflict, state } : { handler: channelOpen };
     }
@@ -644,24 +627,17 @@ export function awaitingNewContractCompletion(
   message: ChannelMessage,
   state: ChannelState,
 ): ChannelFsm {
-  const channelOptions = options.get(channel);
   if (message.method === 'channels.update') {
     const { round } = unpackTx(message.params.data.state, Tag.SignedTx).tx.encodedTx.tx;
-    if (channelOptions?.role != null) {
-      let role: null | 'initiatorId' | 'responderId' = null;
-      if (channelOptions.role === 'initiator') role = 'initiatorId';
-      if (channelOptions.role === 'responder') role = 'responderId';
-      if (role != null) {
-        const owner = channelOptions?.[role];
-        changeState(channel, message.params.data.state);
-        state.resolve({
-          accepted: true,
-          address: encodeContractAddress(owner, round),
-          signedTx: message.params.data.state,
-        });
-        return { handler: channelOpen };
-      }
-    }
+    const addressKey = channel._options.role === 'initiator' ? 'initiatorId' : 'responderId';
+    const owner = channel._options[addressKey];
+    changeState(channel, message.params.data.state);
+    state.resolve({
+      accepted: true,
+      address: encodeContractAddress(owner, round),
+      signedTx: message.params.data.state,
+    });
+    return { handler: channelOpen };
   }
   if (message.method === 'channels.conflict') {
     state.resolve({
