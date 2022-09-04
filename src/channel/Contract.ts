@@ -30,6 +30,7 @@ import {
 import { Encoded } from '../utils/encoder';
 import { ContractCallReturnType } from '../apis/node';
 import Channel from './Base';
+import ChannelSpend from './Spend';
 import { UnexpectedChannelMessageError } from '../utils/errors';
 import { unpackTx } from '../tx/builder';
 import { encodeContractAddress } from '../utils/crypto';
@@ -65,7 +66,7 @@ interface Contract {
   vmVersion: number;
 }
 
-export default class ChannelContract extends Channel {
+export default class ChannelContract extends ChannelSpend {
   static override async initialize(options: ChannelOptions): Promise<ChannelContract> {
     return Channel._initialize(new ChannelContract(), options);
   }

@@ -320,39 +320,6 @@ channelOpen.enter = (channel: Channel) => {
   changeStatus(channel, 'open');
 };
 
-export async function awaitingOffChainTx(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): Promise<ChannelFsm> {
-  if (message.method === 'channels.sign.update') {
-    const isError = await signAndNotify(
-      channel,
-      'channels.update',
-      message.params.data,
-      async (tx) => state.sign(tx, { updates: message.params.data.updates }),
-    );
-    return { handler: isError ? awaitingOffChainTx : awaitingOffChainUpdate, state };
-  }
-  if (message.method === 'channels.error') {
-    state.reject(new ChannelConnectionError(message.data.message));
-    return { handler: channelOpen };
-  }
-  return awaitingCompletion(channel, message, state);
-}
-
-export function awaitingOffChainUpdate(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): ChannelFsm | undefined {
-  return awaitingCompletion(channel, message, state, () => {
-    changeState(channel, message.params.data.state);
-    state.resolve({ accepted: true, signedTx: message.params.data.state });
-    return { handler: channelOpen };
-  });
-}
-
 export async function awaitingTxSignRequest(
   channel: Channel,
   message: ChannelMessage,
@@ -429,63 +396,6 @@ export function awaitingLeave(
     return { handler: channelOpen };
   }
   return handleUnexpectedMessage(channel, message, state);
-}
-
-async function awaitingActionTx(
-  action: 'deposit' | 'withdraw',
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): Promise<ChannelFsm> {
-  if (message.method !== `channels.sign.${action}_tx`) {
-    return handleUnexpectedMessage(channel, message, state);
-  }
-
-  function awaitingActionCompletion(_: Channel, message2: ChannelMessage): ChannelFsm {
-    if (message2.method === 'channels.on_chain_tx') {
-      state.onOnChainTx?.(message2.params.data.tx);
-      return { handler: awaitingActionCompletion, state };
-    }
-    if (
-      message2.method === 'channels.info'
-      && [`own_${action}_locked`, `${action}_locked`].includes(message2.params.data.event)
-    ) {
-      const Action = action === 'deposit' ? 'Deposit' : 'Withdraw';
-      const isOwn: boolean = message2.params.data.event.startsWith('own_');
-      state[`on${isOwn ? 'Own' : ''}${Action}Locked`]?.();
-      return { handler: awaitingActionCompletion, state };
-    }
-    return awaitingCompletion(channel, message2, state, () => {
-      changeState(channel, message2.params.data.state);
-      state.resolve({ accepted: true, signedTx: message2.params.data.state });
-      return { handler: channelOpen };
-    });
-  }
-
-  const { sign } = state;
-  await signAndNotify(
-    channel,
-    `channels.${action}_tx`,
-    message.params.data,
-    async (tx) => sign(tx, { updates: message.params.data.updates }),
-  );
-  return { handler: awaitingActionCompletion, state };
-}
-
-export async function awaitingDepositTx(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): Promise<ChannelFsm> {
-  return awaitingActionTx('deposit', channel, message, state);
-}
-
-export async function awaitingWithdrawTx(
-  channel: Channel,
-  message: ChannelMessage,
-  state: ChannelState,
-): Promise<ChannelFsm> {
-  return awaitingActionTx('withdraw', channel, message, state);
 }
 
 export function channelClosed(
