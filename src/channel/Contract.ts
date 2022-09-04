@@ -132,7 +132,7 @@ export default class ChannelContract extends ChannelSpend {
           _: Channel,
           message: ChannelMessage,
           state: ChannelState,
-        ): Promise<ChannelFsm | undefined> => {
+        ): Promise<ChannelFsm> => {
           if (message.method !== 'channels.sign.update') {
             return handleUnexpectedMessage(this, message, state);
           }
@@ -227,7 +227,7 @@ export default class ChannelContract extends ChannelSpend {
           _: Channel,
           message: ChannelMessage,
           state: ChannelState,
-        ): Promise<ChannelFsm | undefined> => {
+        ): Promise<ChannelFsm> => {
           if (message.method !== 'channels.sign.update') {
             return handleUnexpectedMessage(this, message, state);
           }
