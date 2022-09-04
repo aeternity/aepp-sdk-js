@@ -18,7 +18,7 @@ import BigNumber from 'bignumber.js';
 import { snakeToPascal } from '../utils/string';
 import { MIN_GAS_PRICE, Tag } from '../tx/builder/constants';
 import {
-  appendSignatureAndNotify,
+  signAndNotify,
   awaitingCompletion,
   channelClosed,
   channelOpen,
@@ -135,17 +135,12 @@ export default class ChannelContract extends Channel {
           if (message.method !== 'channels.sign.update') {
             return handleUnexpectedMessage(this, message, state);
           }
-          if (message.params.data.tx != null) {
-            const signedTx = await state.sign(message.params.data.tx);
-            notify(this, 'channels.update', { tx: signedTx });
-          } else {
-            await appendSignatureAndNotify(
-              this,
-              'channels.update',
-              message.params.data.signed_tx,
-              async (tx) => state.sign(tx),
-            );
-          }
+          await signAndNotify(
+            this,
+            'channels.update',
+            message.params.data,
+            async (tx) => state.sign(tx),
+          );
           return {
             handler: (
               _2: Channel,
@@ -235,20 +230,12 @@ export default class ChannelContract extends Channel {
           if (message.method !== 'channels.sign.update') {
             return handleUnexpectedMessage(this, message, state);
           }
-          if (message.params.data.tx != null) {
-            const signedTx = await state.sign(
-              message.params.data.tx,
-              { updates: message.params.data.updates },
-            );
-            notify(this, 'channels.update', { tx: signedTx });
-          } else {
-            await appendSignatureAndNotify(
-              this,
-              'channels.update',
-              message.params.data.signed_tx,
-              async (tx) => state.sign(tx, { updates: message.params.data.updates }),
-            );
-          }
+          await signAndNotify(
+            this,
+            'channels.update',
+            message.params.data,
+            async (tx) => state.sign(tx, { updates: message.params.data.updates }),
+          );
           return {
             handler: (
               _2: Channel,
@@ -334,10 +321,10 @@ export default class ChannelContract extends Channel {
           if (message.method !== 'channels.sign.force_progress_tx') {
             return handleUnexpectedMessage(this, message, state);
           }
-          await appendSignatureAndNotify(
+          await signAndNotify(
             this,
             'channels.force_progress_sign',
-            message.params.data.signed_tx,
+            message.params.data,
             async (tx) => state.sign(tx, { updates: message.params.data.updates }),
           );
           return {

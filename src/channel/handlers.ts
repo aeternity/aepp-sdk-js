@@ -17,7 +17,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable default-case */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { generateKeyPair } from '../utils/crypto';
 import {
   ChannelState,
   changeStatus,
@@ -38,6 +37,7 @@ import {
   InsufficientBalanceError,
   ChannelConnectionError,
   UnexpectedChannelMessageError,
+  ChannelError,
 } from '../utils/errors';
 import type Channel from './Base';
 import { Tag } from '../tx/builder/constants';
@@ -58,15 +58,22 @@ export async function appendSignature(
   return result;
 }
 
-export async function appendSignatureAndNotify(
+export async function signAndNotify(
   channel: Channel,
   method: string,
-  tx: Encoded.Transaction,
+  data: {
+    tx?: Encoded.Transaction;
+    signed_tx?: Encoded.Transaction;
+  },
   signFn: SignTx,
 ): Promise<boolean> {
-  const signedTx = await appendSignature(tx, signFn);
+  let signedTx;
+  if (data.tx != null) signedTx = await signFn(data.tx);
+  else if (data.signed_tx != null) signedTx = await appendSignature(data.signed_tx, signFn);
+  else throw new ChannelError('Can\'t find transaction in message');
   const isError = typeof signedTx !== 'string';
-  notify(channel, method, isError ? { error: signedTx ?? 1 } : { signed_tx: signedTx });
+  const key = data.tx != null ? 'tx' : 'signed_tx';
+  notify(channel, method, isError ? { error: signedTx ?? 1 } : { [key]: signedTx });
   return isError;
 }
 
@@ -170,15 +177,10 @@ export async function awaitingChannelCreateTx(
 ): Promise<ChannelFsm | undefined> {
   const tag = channel._options.role === 'initiator' ? 'initiator_sign' : 'responder_sign';
   if (message.method === `channels.sign.${tag}`) {
-    if (message.params.data.tx != null) {
-      const signedTx = await channel._options.sign(tag, message.params.data.tx);
-      notify(channel, `channels.${tag}`, { tx: signedTx });
-      return { handler: awaitingOnChainTx };
-    }
-    await appendSignatureAndNotify(
+    await signAndNotify(
       channel,
       `channels.${tag}`,
-      message.params.data.signed_tx,
+      message.params.data,
       async (tx) => channel._options.sign(tag, tx),
     );
     return { handler: awaitingOnChainTx };
@@ -324,17 +326,11 @@ export async function awaitingOffChainTx(
   state: ChannelState,
 ): Promise<ChannelFsm> {
   if (message.method === 'channels.sign.update') {
-    const { sign } = state;
-    if (message.params.data.tx != null) {
-      const signedTx = await sign(message.params.data.tx, { updates: message.params.data.updates });
-      notify(channel, 'channels.update', { tx: signedTx });
-      return { handler: awaitingOffChainUpdate, state };
-    }
-    const isError = await appendSignatureAndNotify(
+    const isError = await signAndNotify(
       channel,
       'channels.update',
-      message.params.data.signed_tx,
-      async (tx) => sign(tx, { updates: message.params.data.updates }),
+      message.params.data,
+      async (tx) => state.sign(tx, { updates: message.params.data.updates }),
     );
     return { handler: isError ? awaitingOffChainTx : awaitingOffChainUpdate, state };
   }
@@ -364,26 +360,10 @@ export async function awaitingTxSignRequest(
 ): Promise<ChannelFsm | undefined> {
   const [, tag] = message.method.match(/^channels\.sign\.([^.]+)$/) ?? [];
   if (tag != null) {
-    if (message.params.data.tx != null) {
-      const signedTx = await channel._options.sign(tag, message.params.data.tx, {
-        updates: message.params.data.updates,
-      });
-      if (signedTx != null) {
-        notify(channel, `channels.${tag}`, { tx: signedTx });
-        return { handler: channelOpen };
-      }
-      // soft-reject via competing update
-      notify(channel, 'channels.update.new', {
-        from: generateKeyPair().publicKey,
-        to: generateKeyPair().publicKey,
-        amount: 1,
-      });
-      return { handler: awaitingUpdateConflict, state };
-    }
-    const isError = await appendSignatureAndNotify(
+    const isError = await signAndNotify(
       channel,
       `channels.${tag}`,
-      message.params.data.signed_tx,
+      message.params.data,
       async (tx) => channel._options.sign(tag, tx, { updates: message.params.data.updates }),
     );
     return isError ? { handler: awaitingUpdateConflict, state } : { handler: channelOpen };
@@ -411,15 +391,10 @@ export async function awaitingShutdownTx(
   state: ChannelState,
 ): Promise<ChannelFsm | undefined> {
   if (message.method === 'channels.sign.shutdown_sign') {
-    if (message.params.data.tx != null) {
-      const signedTx = await state.sign(message.params.data.tx);
-      notify(channel, 'channels.shutdown_sign', { tx: signedTx });
-      return { handler: awaitingShutdownOnChainTx, state };
-    }
-    await appendSignatureAndNotify(
+    await signAndNotify(
       channel,
       'channels.shutdown_sign',
-      message.params.data.signed_tx,
+      message.params.data,
       async (tx) => state.sign(tx),
     );
     return { handler: awaitingShutdownOnChainTx, state };
@@ -466,11 +441,7 @@ async function awaitingActionTx(
     return handleUnexpectedMessage(channel, message, state);
   }
 
-  function awaitingActionCompletion(
-    _: Channel,
-    message2: ChannelMessage,
-    _2: ChannelState,
-  ): ChannelFsm {
+  function awaitingActionCompletion(_: Channel, message2: ChannelMessage): ChannelFsm {
     if (message2.method === 'channels.on_chain_tx') {
       state.onOnChainTx?.(message2.params.data.tx);
       return { handler: awaitingActionCompletion, state };
@@ -492,15 +463,10 @@ async function awaitingActionTx(
   }
 
   const { sign } = state;
-  if (message.params.data.tx != null) {
-    const signedTx = await sign(message.params.data.tx, { updates: message.params.data.updates });
-    notify(channel, `channels.${action}_tx`, { tx: signedTx });
-    return { handler: awaitingActionCompletion, state };
-  }
-  await appendSignatureAndNotify(
+  await signAndNotify(
     channel,
     `channels.${action}_tx`,
-    message.params.data.signed_tx,
+    message.params.data,
     async (tx) => sign(tx, { updates: message.params.data.updates }),
   );
   return { handler: awaitingActionCompletion, state };
