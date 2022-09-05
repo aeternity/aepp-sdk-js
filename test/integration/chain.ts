@@ -116,17 +116,21 @@ describe('Node Chain', () => {
   });
 
   it('doesn\'t make extra requests', async () => {
+    let hash;
     const httpSpy = spy(http, 'request');
-    await aeSdk.spend(100, publicKey, { waitMined: false, verify: false });
+    hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
     expect(httpSpy.args.length).to.be.equal(2); // nonce, post tx
+    await aeSdk.poll(hash);
     httpSpy.resetHistory();
 
-    await aeSdk.spend(100, publicKey, { waitMined: false, verify: false });
+    hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
     expect(httpSpy.args.length).to.be.equal(2); // nonce, post tx
+    await aeSdk.poll(hash);
     httpSpy.resetHistory();
 
-    await aeSdk.spend(100, publicKey, { waitMined: false });
+    hash = (await aeSdk.spend(100, publicKey, { waitMined: false })).hash;
     expect(httpSpy.args.length).to.be.equal(5); // nonce, validator(acc, height, status), post tx
+    await aeSdk.poll(hash);
     httpSpy.restore();
   });
 
