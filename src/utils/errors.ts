@@ -398,6 +398,22 @@ export class UnexpectedChannelMessageError extends ChannelError {
 /**
  * @category exception
  */
+export class ChannelIncomingMessageError extends ChannelError {
+  handlerError: BaseError;
+
+  incomingMessage: { [key: string]: any };
+
+  constructor(handlerError: BaseError, incomingMessage: { [key: string]: any }) {
+    super(handlerError.message);
+    this.handlerError = handlerError;
+    this.incomingMessage = incomingMessage;
+    this.name = 'ChannelIncomingMessageError';
+  }
+}
+
+/**
+ * @category exception
+ */
 export class UnknownChannelStateError extends ChannelError {
   constructor() {
     super('State Channels FSM entered unknown state');

@@ -42,6 +42,7 @@ BaseError
 │   │   ChannelConnectionError
 │   │   ChannelPingTimedOutError
 │   │   UnexpectedChannelMessageError
+│   │   ChannelIncomingMessageError
 │   │   UnknownChannelStateError
 │
 └───CompilerError

@@ -23,7 +23,12 @@ import JsonBig from '../utils/json-big';
 import { pascalToSnake } from '../utils/string';
 import { Encoded } from '../utils/encoder';
 import {
-  BaseError, ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError,
+  BaseError,
+  ChannelCallError,
+  ChannelPingTimedOutError,
+  UnexpectedTsError,
+  UnknownChannelStateError,
+  ChannelIncomingMessageError,
 } from '../utils/errors';
 
 interface ChannelAction {
@@ -129,7 +134,7 @@ export const state = new WeakMap<Channel, Encoded.Transaction>();
 const fsm = new WeakMap<Channel, ChannelFsm>();
 const websockets = new WeakMap<Channel, W3CWebSocket>();
 export const eventEmitters = new WeakMap<Channel, EventEmitter>();
-const messageQueue = new WeakMap<Channel, string[]>();
+const messageQueue = new WeakMap<Channel, object[]>();
 const messageQueueLocked = new WeakMap<Channel, boolean>();
 const actionQueue = new WeakMap<Channel, ChannelAction[]>();
 const actionQueueLocked = new WeakMap<Channel, boolean>();
@@ -209,7 +214,7 @@ export function enqueueAction(
   void dequeueAction(channel);
 }
 
-async function handleMessage(channel: Channel, message: string): Promise<void> {
+async function handleMessage(channel: Channel, message: object): Promise<void> {
   const fsmState = fsm.get(channel);
   if (fsmState == null) throw new UnknownChannelStateError();
   const { handler, state: st } = fsmState;
@@ -219,17 +224,17 @@ async function handleMessage(channel: Channel, message: string): Promise<void> {
 async function dequeueMessage(channel: Channel): Promise<void> {
   const locked: boolean = messageQueueLocked.get(channel) ?? false;
   if (locked) return;
-  const messages: string[] = messageQueue.get(channel) ?? [];
+  const messages = messageQueue.get(channel);
+  if (messages == null) throw new UnexpectedTsError();
   if (messages.length === 0) return;
   messageQueueLocked.set(channel, true);
   while (messages.length > 0) {
-    const message: string = messages.shift() ?? '';
+    const message = messages.shift();
+    if (message == null) throw new UnexpectedTsError();
     try {
       await handleMessage(channel, message);
     } catch (error) {
-      console.error('Error handling incoming message:');
-      console.error(message);
-      console.error(error);
+      emit(channel, 'error', new ChannelIncomingMessageError(error, message));
     }
   }
   messageQueueLocked.set(channel, false);
