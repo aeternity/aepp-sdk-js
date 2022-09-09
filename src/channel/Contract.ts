@@ -29,6 +29,7 @@ import {
 } from './internal';
 import { Encoded } from '../utils/encoder';
 import { ContractCallReturnType } from '../apis/node';
+import { ContractCallObject } from '../contract/Contract';
 import Channel from './Base';
 import ChannelSpend from './Spend';
 import { UnexpectedChannelMessageError } from '../utils/errors';
@@ -427,14 +428,7 @@ export default class ChannelContract extends ChannelSpend {
       contract: Encoded.ContractAddress;
       round: number;
     },
-  ): Promise<{
-      returnType: ContractCallReturnType;
-      returnValue: Encoded.ContractBytearray;
-      gasPrice: number | BigNumber;
-      gasUsed: number | BigNumber;
-      height: number;
-      log: string;
-    }> {
+  ): Promise<ContractCallObject> {
     return snakeToPascalObjKeys(
       await call(this, 'channels.get.contract_call', {
         caller_id: caller,
