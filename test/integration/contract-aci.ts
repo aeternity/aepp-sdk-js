@@ -29,6 +29,7 @@ import {
   AmbiguousEventDefinitionError,
   IllegalArgumentError,
   Contract,
+  hash,
 } from '../../src';
 import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
@@ -48,7 +49,7 @@ namespace TestLib =
 
 const remoteContractSource = `
 contract Remote =
-  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int)
+  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int) | DuplicateSameType(int)
   stateful entrypoint emitEvents(duplicate: bool) : unit =
     Chain.event(RemoteEvent2("test-string", 43))
     switch(duplicate)
@@ -64,7 +65,7 @@ contract interface RemoteI =
   type test_type = int
   record test_record = { value: string, key: list(test_type) }
   entrypoint test : () => int
-  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int)
+  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int) | DuplicateSameType(int)
   entrypoint emitEvents : (bool) => unit
 
 include "testLib"
@@ -73,7 +74,7 @@ contract StateContract =
   record state = { value: string, key: number, testOption: option(string) }
   record yesEr = { t: number}
 
-  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int) | Duplicate(string)
+  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int) | Duplicate(string) | DuplicateSameType(int)
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
 
@@ -522,7 +523,7 @@ describe('Contract instance', () => {
       expect(testContract.$decodeEvents([event], { omitUnknown: true })).to.be.eql([]);
     });
 
-    const getDuplicateLog = (): Array<{
+    const getDuplicateLog = (eventName: string): Array<{
       address: Encoded.ContractAddress;
       data: Encoded.ContractBytearray;
       topics: Array<string | number>;
@@ -532,16 +533,16 @@ describe('Contract instance', () => {
         address: remoteContract.$options.address,
         data: 'cb_Xfbg4g==',
         topics: [
-          '28631352549432199952459007654025571262660118571086898449909844428770770966435',
+          BigInt(`0x${hash(eventName).toString('hex')}`).toString(),
           0,
         ],
       }];
     };
 
     it('throws error if found multiple event definitions', () => {
-      expect(() => testContract.$decodeEvents(getDuplicateLog())).to.throw(
+      expect(() => testContract.$decodeEvents(getDuplicateLog('Duplicate'))).to.throw(
         AmbiguousEventDefinitionError,
-        'Found multiple definitions of "Duplicate" event emitted by'
+        'Found multiple definitions of "Duplicate" event with different types emitted by'
         + ` ${remoteContract.$options.address ?? ''} in "StateContract", "RemoteI" contracts`
         + ' (use contractAddressToName option to specify contract name corresponding to address)',
       );
@@ -550,7 +551,7 @@ describe('Contract instance', () => {
     it('multiple event definitions resolved using contractAddressToName', () => {
       expect(
         testContract.$decodeEvents(
-          getDuplicateLog(),
+          getDuplicateLog('Duplicate'),
           { contractAddressToName: { [remoteContract.$options.address ?? '']: 'RemoteI' } },
         ),
       ).to.be.eql([{
@@ -559,6 +560,17 @@ describe('Contract instance', () => {
         contract: {
           address: remoteContract.$options.address,
           name: 'RemoteI',
+        },
+      }]);
+    });
+
+    it('don\'t throws error if found multiple event definitions with the same type', () => {
+      expect(testContract.$decodeEvents(getDuplicateLog('DuplicateSameType'))).to.be.eql([{
+        name: 'DuplicateSameType',
+        args: [0n],
+        contract: {
+          address: remoteContract.$options.address,
+          name: 'StateContract',
         },
       }]);
     });

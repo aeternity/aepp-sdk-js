@@ -425,12 +425,18 @@ class Contract<M extends ContractMethodsBase> {
     const addressToName = { ...this.$options.contractAddressToName, ...contractAddressToName };
     if (addressToName[ctAddress] != null) return addressToName[ctAddress];
 
+    // TODO: consider using a third-party library
+    const isEqual = (a: any, b: any): boolean => JSON.stringify(a) === JSON.stringify(b);
+
     const matchedEvents = [this._aci.encodedAci, ...this._aci.externalEncodedAci]
       .filter(({ contract }) => contract?.event)
       .map(({ contract }) => [contract.name, contract.event.variant])
-      .map(([name, events]) => events.map((event: {}) => [name, Object.keys(event)[0]]))
+      .map(([name, events]) => events.map((event: {}) => (
+        [name, Object.keys(event)[0], Object.values(event)[0]]
+      )))
       .flat()
-      .filter(([, eventName]) => BigInt(`0x${calcHash(eventName).toString('hex')}`) === nameHash);
+      .filter(([, eventName]) => BigInt(`0x${calcHash(eventName).toString('hex')}`) === nameHash)
+      .filter(([, , type], idx, arr) => !arr.slice(0, idx).some((el) => isEqual(el[2], type)));
     switch (matchedEvents.length) {
       case 0: throw new MissingEventDefinitionError(nameHash.toString(), ctAddress);
       case 1: return matchedEvents[0][0];
