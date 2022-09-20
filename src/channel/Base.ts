@@ -114,6 +114,10 @@ export default class Channel {
    * @param options.host - Host of the responder's node
    * @param options.port - The port of the responders node
    * @param options.lockPeriod - Amount of blocks for disputing a solo close
+   * @param options.minimumDepthStrategy - How to calculate minimum depth (default: txfee)
+   * @param options.minimumDepth - The minimum amount of blocks to be mined
+   * @param options.fee - The fee to be used for the channel open transaction
+   * @param options.gasPrice - Used for the fee computation of the channel open transaction
    * @param options.existingChannelId - Existing channel id (required if reestablishing a
    * channel)
    * @param options.offchainTx - Offchain transaction (required if reestablishing

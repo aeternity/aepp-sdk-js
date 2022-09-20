@@ -51,18 +51,27 @@ export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
 export interface ChannelOptions {
   existingFsmId?: Encoded.Bytearray;
   url: string;
-  role: 'initiator' | 'responder';
+
+  /**
+   * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
+   */
   initiatorId: Encoded.AccountAddress;
   responderId: Encoded.AccountAddress;
+  lockPeriod: number;
   pushAmount: number;
   initiatorAmount: BigNumber;
   responderAmount: BigNumber;
   channelReserve?: BigNumber | number;
-  signedTx?: string;
   ttl?: number;
   host: string;
   port: number;
-  lockPeriod: number;
+  role: 'initiator' | 'responder';
+  minimumDepthStrategy?: 'txfee' | 'plain';
+  minimumDepth?: number;
+  fee?: BigNumber | number;
+  gasPrice?: BigNumber | number;
+
+  signedTx?: string;
   existingChannelId?: string;
   offChainTx?: string;
   reconnectTx?: string;
