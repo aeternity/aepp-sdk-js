@@ -556,8 +556,8 @@ export class MissingEventDefinitionError extends ContractError {
 export class AmbiguousEventDefinitionError extends ContractError {
   constructor(eventAddress: string, matchedEvents: Array<[string, string]>) {
     super(
-      `Found multiple definitions of "${matchedEvents[0][1]}" event emitted by ${eventAddress}`
-      + ` in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts`
+      `Found multiple definitions of "${matchedEvents[0][1]}" event with different types emitted by`
+      + ` ${eventAddress} in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts`
       + ' (use contractAddressToName option to specify contract name corresponding to address)',
     );
     this.name = 'AmbiguousEventDefinitionError';
