@@ -35,7 +35,7 @@ import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
 import { Aci } from '../../src/apis/compiler';
 import { assertNotNull, ChainTtl, InputNumber } from '../utils';
-import { ContractMethodsBase } from '../../src/contract/Contract';
+import { ContractMethodsBase, ContractCallObject } from '../../src/contract/Contract';
 
 const identityContractSourceCode = `
 contract Identity =
@@ -523,18 +523,14 @@ describe('Contract instance', () => {
       expect(testContract.$decodeEvents([event], { omitUnknown: true })).to.be.eql([]);
     });
 
-    const getDuplicateLog = (eventName: string): Array<{
-      address: Encoded.ContractAddress;
-      data: Encoded.ContractBytearray;
-      topics: Array<string | number>;
-    }> => {
+    const getDuplicateLog = (eventName: string): ContractCallObject['log'] => {
       assertNotNull(remoteContract.$options.address);
       return [{
         address: remoteContract.$options.address,
         data: 'cb_Xfbg4g==',
         topics: [
           BigInt(`0x${hash(eventName).toString('hex')}`).toString(),
-          0,
+          '0',
         ],
       }];
     };

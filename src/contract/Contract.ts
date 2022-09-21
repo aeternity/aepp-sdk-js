@@ -49,7 +49,9 @@ import {
 } from '../utils/errors';
 import { hash as calcHash } from '../utils/crypto';
 import { Aci as BaseAci } from '../apis/compiler';
-import { ContractCallObject, ContractCallReturnType } from '../apis/node';
+import {
+  ContractCallObject as NodeContractCallObject, ContractCallReturnType, Event as NodeEvent,
+} from '../apis/node';
 import Compiler from './Compiler';
 import Node, { TransformNodeType } from '../Node';
 import {
@@ -81,10 +83,14 @@ interface Aci extends BaseAci {
   externalEncodedAci: any[];
 }
 
-interface Event {
+interface Event extends NodeEvent {
   address: Encoded.ContractAddress;
   data: Encoded.ContractBytearray;
-  topics: Array<string | number>;
+}
+
+export interface ContractCallObject extends NodeContractCallObject {
+  returnValue: Encoded.ContractBytearray;
+  log: Event[];
 }
 
 interface DecodedEvent {
@@ -255,7 +261,7 @@ class Contract<M extends ContractMethodsBase> {
     Object.assign(result.txData, callInfo); // TODO: don't duplicate data in result
     // @ts-expect-error TODO api should be updated to match types
     this._handleCallError(callInfo, tx);
-    return { ...result, result: callInfo };
+    return { ...result, result: callInfo as TransformNodeType<ContractCallObject> };
   }
 
   async _estimateGas<Fn extends MethodNames<M>>(
