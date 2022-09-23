@@ -44,6 +44,8 @@ export { default as verifyTransaction } from './tx/validator';
 export { default as AccountBase } from './account/Base';
 export { default as MemoryAccount } from './account/Memory';
 export { default as AccountGeneralized } from './account/Generalized';
+export { default as AccountLedger } from './account/Ledger';
+export { default as AccountLedgerFactory } from './account/LedgerFactory';
 export { default as Compiler } from './contract/Compiler';
 export { default as Channel } from './channel/Contract';
 

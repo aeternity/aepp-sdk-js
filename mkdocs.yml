@@ -60,6 +60,7 @@ nav:
     - Wallet interaction:
       - guides/connect-aepp-to-wallet.md
       - guides/build-wallet.md
+      - guides/ledger-wallet.md
   - transaction-options.md
   - Examples & Tutorials:
     - NodeJS:
