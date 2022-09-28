@@ -98,7 +98,6 @@ describe('Aepp<->Wallet', function aeppWallet() {
     target: connections.walletWindow,
   });
   const handlerReject = (): void => { throw new Error('test reject'); };
-  const handlerRejectPromise = async (): Promise<void> => { throw new Error('test reject'); };
   let account: AccountBase;
 
   describe('New RPC Wallet-AEPP: AEPP node', () => {
@@ -116,9 +115,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         name: 'Wallet',
         onConnection: handlerReject,
         onSubscription: handlerReject,
-        onSign: handlerRejectPromise,
         onAskAccounts: handlerReject,
-        onMessageSign: handlerRejectPromise,
         onDisconnect() {},
       });
       aepp = new AeSdkAepp({
@@ -247,7 +244,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign transaction: wallet deny', async () => {
-      wallet.onSign = () => {
+      wallet._resolveAccount().signTransaction = () => {
         throw new RpcRejectedByUserError();
       };
       const tx = await aepp.buildTx(Tag.SpendTx, {
@@ -260,8 +257,10 @@ describe('Aepp<->Wallet', function aeppWallet() {
         .rejectedWith('Operation rejected by user').with.property('code', 4);
     });
 
-    it('Sign transaction: invalid account object in action', async () => {
-      wallet.onSign = async () => ({ onAccount: {} as unknown as AccountBase });
+    it('Sign transaction: fails with unknown error', async () => {
+      wallet._resolveAccount().signTransaction = () => {
+        throw new Error('test');
+      };
       const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: keypair.publicKey,
         recipientId: keypair.publicKey,
@@ -273,7 +272,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign transaction: wallet allow', async () => {
-      wallet.onSign = async () => {};
+      // @ts-expect-error removes object property to restore the original behavior
+      delete wallet._resolveAccount().signTransaction;
       const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: aepp.address,
         recipientId: aepp.address,
@@ -301,13 +301,16 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
-      const tx2 = await aepp.buildTx(Tag.SpendTx, {
-        senderId: aepp.address,
-        recipientId: aepp.address,
-        amount: 0,
-        payload: 'zerospend2',
-      });
-      wallet.onSign = async () => ({ tx: tx2 });
+      const acc = wallet._resolveAccount();
+      acc.signTransaction = async (txIgnore, options) => {
+        const txReplace = await aepp.buildTx(Tag.SpendTx, {
+          senderId: aepp.address,
+          recipientId: aepp.address,
+          amount: 0,
+          payload: 'zerospend2',
+        });
+        return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
+      };
       const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: aepp.address,
         recipientId: aepp.address,
@@ -321,7 +324,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign message: rejected', async () => {
-      wallet.onMessageSign = () => {
+      wallet._resolveAccount().signMessage = () => {
         throw new RpcRejectedByUserError();
       };
       await expect(aepp.signMessage('test')).to.be.eventually
@@ -329,28 +332,31 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign message', async () => {
-      wallet.onMessageSign = async () => {};
+      // @ts-expect-error removes object property to restore the original behavior
+      delete wallet._resolveAccount().signMessage;
       const messageSig = await aepp.signMessage('test');
       messageSig.should.be.instanceof(Buffer);
       expect(verifyMessage('test', messageSig, aepp.address)).to.be.equal(true);
     });
 
-    it('Sign message using custom account', async () => {
-      wallet.onMessageSign = async (_aeppId, params) => {
-        if (params.onAccount === account.address) {
-          return { onAccount: account };
-        }
-        throw new Error('Shouldn\'t be reachable');
+    it('Sign message fails with unknown error', async () => {
+      wallet._resolveAccount().signMessage = () => {
+        throw new Error('test');
       };
-      const onAccount = account.address;
+      await expect(aepp.signMessage('test', { onAccount: account.address }))
+        .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
+    });
+
+    it('Sign message using specific account', async () => {
+      const onAccount = wallet.addresses()[1];
       const messageSig = await aepp.signMessage('test', { onAccount });
       messageSig.should.be.instanceof(Buffer);
-      expect(verifyMessage('test', messageSig, account.address))
-        .to.be.equal(true);
+      expect(verifyMessage('test', messageSig, onAccount)).to.be.equal(true);
     });
 
     it('Sign and broadcast invalid transaction', async () => {
-      wallet.onSign = async () => {};
+      // @ts-expect-error removes object property to restore the original behavior
+      delete wallet._resolveAccount().signTransaction;
       const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: aepp.address,
         recipientId: aepp.address,
@@ -475,9 +481,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         name: 'Wallet',
         onConnection() {},
         onSubscription: handlerReject,
-        onSign: handlerRejectPromise,
         onAskAccounts: handlerReject,
-        onMessageSign: handlerRejectPromise,
         onDisconnect() {},
       });
       aepp = new AeSdkAepp({
@@ -512,13 +516,16 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
-      const tx2 = await aepp.buildTx(Tag.SpendTx, {
-        senderId: aepp.address,
-        recipientId: aepp.address,
-        amount: 0,
-        payload: 'zerospend2',
-      });
-      wallet.onSign = async () => ({ tx: tx2 });
+      const acc = wallet._resolveAccount();
+      acc.signTransaction = async (txIgnore, options) => {
+        const txReplace = await aepp.buildTx(Tag.SpendTx, {
+          senderId: aepp.address,
+          recipientId: aepp.address,
+          amount: 0,
+          payload: 'zerospend2',
+        });
+        return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
+      };
       const tx = await aepp.buildTx(Tag.SpendTx, {
         senderId: aepp.address,
         recipientId: aepp.address,
