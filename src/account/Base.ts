@@ -44,6 +44,8 @@ export default abstract class AccountBase {
       };
       onNode?: Node;
       onCompiler?: Compiler;
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
     },
   ): Promise<Encoded.Transaction>;
 
@@ -53,7 +55,13 @@ export default abstract class AccountBase {
    * @param options - Options
    * @returns Signature as hex string of Uint8Array
    */
-  abstract signMessage(message: string, options?: any): Promise<Uint8Array>;
+  abstract signMessage(
+    message: string,
+    options?: {
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+  ): Promise<Uint8Array>;
 
   /**
    * Sign data blob

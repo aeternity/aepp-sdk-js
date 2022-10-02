@@ -1,10 +1,32 @@
 import browser from 'webextension-polyfill';
 import {
-  AeSdkWallet, Node, MemoryAccount, BrowserRuntimeConnection, WALLET_TYPE,
+  AeSdkWallet, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection, WALLET_TYPE,
   RpcConnectionDenyError, RpcRejectedByUserError,
 } from '@aeternity/aepp-sdk';
 
 const aeppInfo = {};
+const genConfirmCallback = (actionName) => (aeppId) => {
+  if (!confirm(`Client ${aeppInfo[aeppId].name} with id ${aeppId} want to ${actionName}`)) {
+    throw new RpcRejectedByUserError();
+  }
+};
+
+class AccountMemoryProtected extends MemoryAccount {
+  async signTransaction(tx, { aeppRpcClientId: id, ...options } = {}) {
+    if (id != null) genConfirmCallback(`sign transaction ${tx}`)(id);
+    return super.signTransaction(tx, options);
+  }
+
+  async signMessage(message, { aeppRpcClientId: id, ...options } = {}) {
+    if (id != null) genConfirmCallback(`sign message ${message}`)(id);
+    return super.signMessage(message, options);
+  }
+
+  static generate() {
+    // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
+    return new AccountMemoryProtected(generateKeyPair().secretKey);
+  }
+}
 
 const aeSdk = new AeSdkWallet({
   compilerUrl: 'https://compiler.aepps.com',
@@ -13,8 +35,8 @@ const aeSdk = new AeSdkWallet({
     instance: new Node('https://testnet.aeternity.io'),
   }],
   accounts: [
-    new MemoryAccount('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
-    MemoryAccount.generate(),
+    new AccountMemoryProtected('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
+    AccountMemoryProtected.generate(),
   ],
   id: browser.runtime.id,
   type: WALLET_TYPE.extension,
@@ -29,30 +51,8 @@ const aeSdk = new AeSdkWallet({
   onDisconnect(msg, client) {
     console.log('Client disconnected:', client);
   },
-  onSubscription(aeppId) {
-    const { name } = aeppInfo[aeppId];
-    if (!confirm(`Aepp ${name} with id ${aeppId} wants to subscribe for accounts`)) {
-      throw new RpcRejectedByUserError();
-    }
-  },
-  onSign(aeppId, params) {
-    const { name } = aeppInfo[aeppId];
-    if (!confirm(`Aepp ${name} with id ${aeppId} wants to sign tx ${params.tx}`)) {
-      throw new RpcRejectedByUserError();
-    }
-  },
-  onAskAccounts(aeppId) {
-    const { name } = aeppInfo[aeppId];
-    if (!confirm(`Aepp ${name} with id ${aeppId} wants to get accounts`)) {
-      throw new RpcRejectedByUserError();
-    }
-  },
-  onMessageSign(aeppId, params) {
-    const { name } = aeppInfo[aeppId];
-    if (!confirm(`Aepp ${name} with id ${aeppId} wants to sign msg ${params.message}`)) {
-      throw new RpcRejectedByUserError();
-    }
-  },
+  onSubscription: genConfirmCallback('subscription'),
+  onAskAccounts: genConfirmCallback('get accounts'),
 });
 // The `ExtensionProvider` uses the first account by default.
 // You can change active account using `selectAccount(address)` function

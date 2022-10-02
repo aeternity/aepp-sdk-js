@@ -1,6 +1,5 @@
 import { v4 as uuid } from '@aeternity/uuid';
 import AeSdk from './AeSdk';
-import { OnAccount } from './AeSdkMethods';
 import verifyTransaction from './tx/validator';
 import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
 import {
@@ -32,12 +31,6 @@ type OnSubscription = (
   clientId: string, params: Parameters<WalletApi[METHODS.subscribeAddress]>[0], origin: string
 ) => void;
 
-type OnSign = (
-  clientId: string,
-  params: Omit<Parameters<WalletApi[METHODS.sign]>[0], 'networkId'>,
-  origin: string,
-) => Promise<{ tx?: Encoded.Transaction; onAccount?: OnAccount } | undefined> | Promise<void>;
-
 type OnDisconnect = (
   clientId: string, params: Parameters<WalletApi[METHODS.closeConnection]>[0]
 ) => void;
@@ -45,10 +38,6 @@ type OnDisconnect = (
 type OnAskAccounts = (
   clientId: string, params: undefined, origin: string
 ) => void;
-
-type OnMessageSign = (
-  clientId: string, params: Parameters<WalletApi[METHODS.signMessage]>[0], origin: string
-) => Promise<{ onAccount?: OnAccount } | undefined> | Promise<void>;
 
 interface RpcClientsInfo {
   id: string;
@@ -75,13 +64,9 @@ export default class AeSdkWallet extends AeSdk {
 
   onSubscription: OnSubscription;
 
-  onSign: OnSign;
-
   onDisconnect: OnDisconnect;
 
   onAskAccounts: OnAskAccounts;
-
-  onMessageSign: OnMessageSign;
 
   /**
    * @param options - Options
@@ -90,9 +75,7 @@ export default class AeSdkWallet extends AeSdk {
    * @param options.type - Wallet type
    * @param options.onConnection - Call-back function for incoming AEPP connection
    * @param options.onSubscription - Call-back function for incoming AEPP account subscription
-   * @param options.onSign - Call-back function for incoming AEPP sign request
    * @param options.onAskAccounts - Call-back function for incoming AEPP get address request
-   * @param options.onMessageSign - Call-back function for incoming AEPP sign message request
    * @param options.onDisconnect - Call-back function for disconnect event
    */
   constructor({
@@ -101,10 +84,8 @@ export default class AeSdkWallet extends AeSdk {
     type,
     onConnection,
     onSubscription,
-    onSign,
     onDisconnect,
     onAskAccounts,
-    onMessageSign,
     ...options
   }: {
     id: string;
@@ -112,18 +93,14 @@ export default class AeSdkWallet extends AeSdk {
     name: string;
     onConnection: OnConnection;
     onSubscription: OnSubscription;
-    onSign: OnSign;
     onDisconnect: OnDisconnect;
     onAskAccounts: OnAskAccounts;
-    onMessageSign: OnMessageSign;
   } & ConstructorParameters<typeof AeSdk>[0]) {
     super(options);
     this.onConnection = onConnection;
     this.onSubscription = onSubscription;
-    this.onSign = onSign;
     this.onDisconnect = onDisconnect;
     this.onAskAccounts = onAskAccounts;
-    this.onMessageSign = onMessageSign;
     this.name = name;
     this.id = id;
     this._type = type;
@@ -265,22 +242,19 @@ export default class AeSdkWallet extends AeSdk {
             await this.onAskAccounts(id, params, origin);
             return this.addresses();
           },
-          [METHODS.sign]: async ({ tx, onAccount: address, returnSigned }, origin) => {
+          [METHODS.sign]: async ({ tx, onAccount = this.address, returnSigned }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
-            let onAccount: OnAccount = address ?? this.address;
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }
 
-            const overrides = await this.onSign(id, { tx, returnSigned, onAccount }, origin);
-            onAccount = overrides?.onAccount ?? onAccount;
-            tx = overrides?.tx ?? tx;
+            const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
             if (returnSigned) {
-              return { signedTransaction: await this.signTransaction(tx, { onAccount }) };
+              return { signedTransaction: await this.signTransaction(tx, parameters) };
             }
             try {
               return jsonBig.parse(jsonBig.stringify({
-                transactionHash: await this.send(tx, { onAccount, verify: false }),
+                transactionHash: await this.send(tx, { ...parameters, verify: false }),
               }));
             } catch (error) {
               const validation = await verifyTransaction(tx, this.api);
@@ -288,18 +262,15 @@ export default class AeSdkWallet extends AeSdk {
               throw new RpcBroadcastError(error.message);
             }
           },
-          [METHODS.signMessage]: async ({ message, onAccount: address }, origin) => {
+          [METHODS.signMessage]: async ({ message, onAccount = this.address }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
-            let onAccount: OnAccount = address ?? this.address;
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }
 
-            const overrides = await this.onMessageSign(id, { message, onAccount }, origin);
-            onAccount = overrides?.onAccount ?? onAccount;
+            const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
             return {
-              signature: Buffer.from(await this.signMessage(message, { onAccount }))
-                .toString('hex'),
+              signature: Buffer.from(await this.signMessage(message, parameters)).toString('hex'),
             };
           },
         },
