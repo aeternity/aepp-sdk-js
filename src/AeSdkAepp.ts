@@ -51,9 +51,9 @@ export default class AeSdkAepp extends AeSdkBase {
     ...other
   }: {
     name: string;
-    onAddressChange: (a: Accounts) => void;
-    onDisconnect: (p: any) => void;
-    onNetworkChange: (a: Network) => void;
+    onAddressChange?: (a: Accounts) => void;
+    onDisconnect?: (p: any) => void;
+    onNetworkChange?: (a: Network) => void;
   } & ConstructorParameters<typeof AeSdkBase>[0]) {
     super(other);
     this.onAddressChange = onAddressChange;
