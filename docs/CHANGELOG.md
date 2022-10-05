@@ -7,8 +7,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
+#### Wallet
 * **wallet:** `onSign`, `onMessageSign` callbacks removed on wallet side
 Check allowance to sign on the account side instead, using `aeppOrigin`, `aeppRpcClientId` options.
+
+#### Contract
 * **contract:** `params` argument in `$deploy` and `$call` is required
 * **contract:** `AeSdk.getContractInstance` renamed to `AeSdk.initializeContract`
 * **contract:** `getContractInstance` function replaced with Contract class
@@ -38,6 +41,28 @@ Use the return value of `contract.$deploy` instead.
 * **contract:** `contract.call` renamed to `contract.$call`
 * **contract:** `contract.compile` renamed to `contract.$compile`
 * **contract:** `contract.deploy` renamed to `contract.$deploy`
+* **contract:** `createAensDelegationSignature`, `createOracleDelegationSignature` removed
+Use `contract.$createDelegationSignature` instead.
+* **contract:** use `sourceCode` instead of `source`
+It is related to `getContractInstance` and signing using Generalized accounts. Apply a change:
+```diff
+-aeSdk.getContractInstance({ source: <contract source code>, ... })
++aeSdk.getContractInstance({ sourceCode: <contract source code>, ... })
+-aeSdk.spend(..., { authData: { source: <contract source code>, args: [...] } })
++aeSdk.spend(..., { authData: { sourceCode: <contract source code>, args: [...] } })
+```
+* **contract:** `getContractInstance` accepts `address` instead of `contractAddress`
+Apply a change:
+```diff
+-aeSdk.getContractInstance({ contractAddress: <contract address>, ... })
++aeSdk.getContractInstance({ address: <contract address>, ... })
+```
+* **contract:** `prepareTxParams`, `getVmVersion` not exported anymore
+Use `buildTx` instead.
+* **contract:** `isGA` method removed
+Use `(await aeSdk.getAccount(<address>)).kind === 'generalized'` instead.
+
+#### Transaction builder
 * **tx-builder:** `writeInt` function removed
 Use `toBytes` util instead.
 * **tx-builder:** `returnType` of contract call result structure is a value of CallReturnType enum
@@ -54,68 +79,21 @@ Use transaction builder instead.
 Use `Buffer.from(<salt>.toString(16).padStart(64, '0'), 'hex')` instead.
 * **tx-builder:** `validateParams`, `unpackRawTx` functions removed
 Use transaction builder instead.
-* `bigNumberToByteArray` removed
-Use `toBytes` instead.
-* `str2buf` function removed
-Use `Buffer.from(<data>, <encoding>)` instead.
-* `getAddressFromPriv` doesn't accept private key as base64-encoded or raw string
-* `isValidKeypair` doesn't accept public key as base64-encoded string
-* `bytesToHex` function removed
-Use `Buffer.from(<bytes>).toString('hex')` instead.
-* `hexToBytes` function removed
-Use `Buffer.from(<hex string>, 'hex')` instead.
-* **contract:** `createAensDelegationSignature`, `createOracleDelegationSignature` removed
-Use `contract.$createDelegationSignature` instead.
-* **compiler:** Dropped compatibility with compilers below 7.0.1
 * **tx-builder:** `AMOUNT` constant removed
 If necessary, use `0` instead.
-* **contract:** use `sourceCode` instead of `source`
-It is related to `getContractInstance` and signing using Generalized accounts. Apply a change:
-```diff
--aeSdk.getContractInstance({ source: <contract source code>, ... })
-+aeSdk.getContractInstance({ sourceCode: <contract source code>, ... })
--aeSdk.spend(..., { authData: { source: <contract source code>, args: [...] } })
-+aeSdk.spend(..., { authData: { sourceCode: <contract source code>, args: [...] } })
-```
-* **contract:** `getContractInstance` accepts `address` instead of `contractAddress`
-Apply a change:
-```diff
--aeSdk.getContractInstance({ contractAddress: <contract address>, ... })
-+aeSdk.getContractInstance({ address: <contract address>, ... })
-```
-* rename umd export to `Aeternity`
-* Subpaths imports of SDK are not allowed
-SDK does versioning only for the API provided in the root export.
-Replace subpaths imports with imports of the package root.
-```diff
--import MemoryAccount from '@aeternity/aepp-sdk/es/account/Memory.mjs';
-+import { MemoryAccount } from '@aeternity/aepp-sdk';
-```
-* Removed `getNetworkId` from `AeSdkBase`
-Use `Node.getNetworkId` instead.
-* `address` a getter in AeSdkBase
-Apply a change:
-```diff
--await aeSdk.address()
-+aeSdk.address
-```
+
+#### Compiler
+* **compiler:** Dropped compatibility with compilers below 7.0.1
+
+#### Account
 * **account:** `createMetaTx` removed
 Use `AccountGeneralized.signTransaction` instead.
-* **contract:** `prepareTxParams`, `getVmVersion` not exported anymore
-Use `buildTx` instead.
-* `onAccount` doesn't accepts keypair
-Apply a change:
-```diff
--aeSdk.<metnod name>(..., { onAccount: <keypair> })
-+aeSdk.<metnod name>(..., { onAccount: new MemoryAccount(<keypair>.secretKey) })
-```
 * **account:** `AccountRpc` constructor accepts arguments one by one
 Apply a change:
 ```diff
 -new AccountRpc({ rpcClient: <rpc client>, address: <address> })
 +new AccountRpc(<rpc client>, <address>)
 ```
-* `addAccount` is a sync function
 * **account:** `AccountMemory` requires `networkId` in `signTransaction`
 * **account:** `AccountBase` simplified
 - `networkId` removed
@@ -139,10 +117,45 @@ Apply a change:
 -new MemoryAccount({ gaId: <address> })
 +new AccountGeneralized(<address>)
 ```
-* **contract:** `isGA` method removed
-Use `(await aeSdk.getAccount(<address>)).kind === 'generalized'` instead.
+
+#### Node
 * **node:** `url` property of `Node` removed
 Use autorest's `$host` property instead.
+
+#### Other
+* `onAccount` doesn't accepts keypair
+Apply a change:
+```diff
+-aeSdk.<metnod name>(..., { onAccount: <keypair> })
++aeSdk.<metnod name>(..., { onAccount: new MemoryAccount(<keypair>.secretKey) })
+```
+* `bigNumberToByteArray` removed
+Use `toBytes` instead.
+* `str2buf` function removed
+Use `Buffer.from(<data>, <encoding>)` instead.
+* `getAddressFromPriv` doesn't accept private key as base64-encoded or raw string
+* `isValidKeypair` doesn't accept public key as base64-encoded string
+* `bytesToHex` function removed
+Use `Buffer.from(<bytes>).toString('hex')` instead.
+* `hexToBytes` function removed
+Use `Buffer.from(<hex string>, 'hex')` instead.
+* rename umd export to `Aeternity`
+* Subpaths imports of SDK are not allowed
+SDK does versioning only for the API provided in the root export.
+Replace subpaths imports with imports of the package root.
+```diff
+-import MemoryAccount from '@aeternity/aepp-sdk/es/account/Memory.mjs';
++import { MemoryAccount } from '@aeternity/aepp-sdk';
+```
+* Removed `getNetworkId` from `AeSdkBase`
+Use `Node.getNetworkId` instead.
+* `address` a getter in AeSdkBase
+Apply a change:
+```diff
+-await aeSdk.address()
++aeSdk.address
+```
+* `addAccount` is a sync function
 * `verifyMessage` removed from accounts and AeSdkBase
 Use `verifyMessage` exported in root instead.
 * `verify` and `verifyMessage` accepts address instead of hex string or Uint8Array
@@ -183,7 +196,7 @@ Use NamePointer from apis/node instead.
 * add Ledger HW support ([587e058](https://github.com/aeternity/aepp-sdk-js/commit/587e0583debc43f5667a6e1aa0dafd986bd6e3e4))
 * ensure that used correct account type while signing transaction ([46e8db3](https://github.com/aeternity/aepp-sdk-js/commit/46e8db337f65674c7d50b760a46ee9a4aad0c17d))
 * extract AeSdkMethods class with minimal interface ([fd0fe76](https://github.com/aeternity/aepp-sdk-js/commit/fd0fe76b08f7a670ca87e177dde6bd5233bcae05))
-* restore ability to specify array of accounts in AeSdk constructor ([aba9b9f](https://github.com/aeternity/aepp-sdk-js/commit/aba9b9f7a2452154b90d10faa65b76edcf7313a0)), closes [src/account/multiple.js#L58-L62](https://github.com/aeternity/src/account/multiple.js/issues/L58-L62)
+* restore ability to specify array of accounts in AeSdk constructor ([aba9b9f](https://github.com/aeternity/aepp-sdk-js/commit/aba9b9f7a2452154b90d10faa65b76edcf7313a0))
 
 
 ### Bug Fixes
@@ -202,8 +215,6 @@ Use NamePointer from apis/node instead.
 * **tx-builder:** mark `nameTtl` as `shortUInt` in `NameUpdateTx` ([3bfbb52](https://github.com/aeternity/aepp-sdk-js/commit/3bfbb52b23afe16fb47a75c34ee2a04ee93f9da2))
 * **tx-builder:** type of binary fields ([e979224](https://github.com/aeternity/aepp-sdk-js/commit/e97922476af56583a9aac33b0bd87f32b9e5b685))
 * use crypto random to generate salt ([88dcf38](https://github.com/aeternity/aepp-sdk-js/commit/88dcf3887206c34ea2cf97fe0a0d4691c5fc7c89))
-
-
 * **account:** accept AccountRpc arguments in array-style ([7d61b44](https://github.com/aeternity/aepp-sdk-js/commit/7d61b4400f26e9ee40539bbbdf24249fb522f3fa))
 * **account:** accept only secretKey in MemoryAccount constructor ([4fad8bf](https://github.com/aeternity/aepp-sdk-js/commit/4fad8bfc6906b442d08e8349a3e2aaf68e86ddd2))
 * **account:** extract AccountGeneralized ([108c7fb](https://github.com/aeternity/aepp-sdk-js/commit/108c7fb5f3f9dc534601097abb7f37917307ef6f))
