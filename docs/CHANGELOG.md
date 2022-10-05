@@ -10,51 +10,51 @@ All notable changes to this project will be documented in this file. See [standa
 Please check out [migration guide](./guides/migration/13.0.0.md).
 
 #### Wallet
-* **wallet:** `onSign`, `onMessageSign` callbacks removed on wallet side
+* `onSign`, `onMessageSign` callbacks removed on wallet side
 
 #### Contract
-* **contract:** `params` argument in `$deploy` and `$call` is required
-* **contract:** `AeSdk.getContractInstance` renamed to `AeSdk.initializeContract`
-* **contract:** `getContractInstance` function replaced with Contract class
-* **contract:** Contract methods accessible on the instance itself
-* **contract:** `contract.methods.<name>.get,send` removed
-* **contract:** `contract.bytecode,sourceCode` moved to `contract.$options`
-* **contract:** `contract.calldata` renamed to `contract._calldata`
-* **contract:** `contract.deployInfo` removed
-* **contract:** `contract.options` renamed to `contract.$options`
-* **contract:** `contract.decodeEvents` renamed to `contract.$decodeEvents`
-* **contract:** `contract.call` renamed to `contract.$call`
-* **contract:** `contract.compile` renamed to `contract.$compile`
-* **contract:** `contract.deploy` renamed to `contract.$deploy`
-* **contract:** `createAensDelegationSignature`, `createOracleDelegationSignature` removed
-* **contract:** use `sourceCode` instead of `source`
-* **contract:** `getContractInstance` accepts `address` instead of `contractAddress`
-* **contract:** `prepareTxParams`, `getVmVersion` not exported anymore
-* **contract:** `isGA` method removed
+* `params` argument in `$deploy` and `$call` is required
+* `AeSdk.getContractInstance` renamed to `AeSdk.initializeContract`
+* `getContractInstance` function replaced with Contract class
+* Contract methods accessible on the instance itself
+* `contract.methods.<name>.get,send` removed
+* `contract.bytecode,sourceCode` moved to `contract.$options`
+* `contract.calldata` renamed to `contract._calldata`
+* `contract.deployInfo` removed
+* `contract.options` renamed to `contract.$options`
+* `contract.decodeEvents` renamed to `contract.$decodeEvents`
+* `contract.call` renamed to `contract.$call`
+* `contract.compile` renamed to `contract.$compile`
+* `contract.deploy` renamed to `contract.$deploy`
+* `createAensDelegationSignature`, `createOracleDelegationSignature` removed
+* use `sourceCode` instead of `source`
+* `getContractInstance` accepts `address` instead of `contractAddress`
+* `prepareTxParams`, `getVmVersion` not exported anymore
+* `isGA` method removed
 
 #### Transaction builder
-* **tx-builder:** `writeInt` function removed
-* **tx-builder:** `returnType` of contract call result structure is a value of CallReturnType enum
-* **tx-builder:** `writeId`, `readId` function removed
-* **tx-builder:** `readPointers`, `buildPointers` functions removed
-* **tx-builder:** `formatSalt` function removed
-* **tx-builder:** `validateParams`, `unpackRawTx` functions removed
-* **tx-builder:** `AMOUNT` constant removed
+* `writeInt` function removed
+* `returnType` of contract call result structure is a value of CallReturnType enum
+* `writeId`, `readId` function removed
+* `readPointers`, `buildPointers` functions removed
+* `formatSalt` function removed
+* `validateParams`, `unpackRawTx` functions removed
+* `AMOUNT` constant removed
 
 #### Compiler
-* **compiler:** Dropped compatibility with compilers below 7.0.1
+* Dropped compatibility with compilers below 7.0.1
 
 #### Account
-* **account:** `createMetaTx` removed
-* **account:** `AccountRpc` constructor accepts arguments one by one
-* **account:** `AccountMemory` requires `networkId` in `signTransaction`
-* **account:** `AccountBase` simplified
-* **account:** `address` in `AccountBase` is a property
-* **account:** MemoryAccount accepts only secretKey
-* **account:** MemoryAccount not compatible with GA
+* `createMetaTx` removed
+* `AccountRpc` constructor accepts arguments one by one
+* `AccountMemory` requires `networkId` in `signTransaction`
+* `AccountBase` simplified
+* `address` in `AccountBase` is a property
+* MemoryAccount accepts only secretKey
+* MemoryAccount not compatible with GA
 
 #### Node
-* **node:** `url` property of `Node` removed
+* `url` property of `Node` removed
 
 #### Other
 * `onAccount` doesn't accepts keypair
