@@ -7,188 +7,84 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
+Please check out [migration guide](./guides/migration/13.0.0.md).
+
 #### Wallet
 * **wallet:** `onSign`, `onMessageSign` callbacks removed on wallet side
-Check allowance to sign on the account side instead, using `aeppOrigin`, `aeppRpcClientId` options.
 
 #### Contract
 * **contract:** `params` argument in `$deploy` and `$call` is required
 * **contract:** `AeSdk.getContractInstance` renamed to `AeSdk.initializeContract`
 * **contract:** `getContractInstance` function replaced with Contract class
-Apply a patch:
-```diff
--contract = await getContractInstance(<options>);
-+contract = await Contract.initialize(<options>);
-```
 * **contract:** Contract methods accessible on the instance itself
-Apply a patch:
-```diff
--const contract = aeSdk.getContractInstance(<contract args>);
-+const contract = aeSdk.getContractInstance<{ foo: (a: bigint) => bigint }>(<contract args>);
--await contract.methods.foo(<arguments>);
-+await contract.foo(<arguments>);
-```
 * **contract:** `contract.methods.<name>.get,send` removed
-Use `callStatic` option instead.
 * **contract:** `contract.bytecode,sourceCode` moved to `contract.$options`
 * **contract:** `contract.calldata` renamed to `contract._calldata`
-Use `contract._calldata` (considered to be a private field) or aepp-calldata package directly.
 * **contract:** `contract.deployInfo` removed
-Use the return value of `contract.$deploy` instead.
-`contract.deployInfo.address` moved to `contract.$options.address`.
 * **contract:** `contract.options` renamed to `contract.$options`
 * **contract:** `contract.decodeEvents` renamed to `contract.$decodeEvents`
 * **contract:** `contract.call` renamed to `contract.$call`
 * **contract:** `contract.compile` renamed to `contract.$compile`
 * **contract:** `contract.deploy` renamed to `contract.$deploy`
 * **contract:** `createAensDelegationSignature`, `createOracleDelegationSignature` removed
-Use `contract.$createDelegationSignature` instead.
 * **contract:** use `sourceCode` instead of `source`
-It is related to `getContractInstance` and signing using Generalized accounts. Apply a change:
-```diff
--aeSdk.getContractInstance({ source: <contract source code>, ... })
-+aeSdk.getContractInstance({ sourceCode: <contract source code>, ... })
--aeSdk.spend(..., { authData: { source: <contract source code>, args: [...] } })
-+aeSdk.spend(..., { authData: { sourceCode: <contract source code>, args: [...] } })
-```
 * **contract:** `getContractInstance` accepts `address` instead of `contractAddress`
-Apply a change:
-```diff
--aeSdk.getContractInstance({ contractAddress: <contract address>, ... })
-+aeSdk.getContractInstance({ address: <contract address>, ... })
-```
 * **contract:** `prepareTxParams`, `getVmVersion` not exported anymore
-Use `buildTx` instead.
 * **contract:** `isGA` method removed
-Use `(await aeSdk.getAccount(<address>)).kind === 'generalized'` instead.
 
 #### Transaction builder
 * **tx-builder:** `writeInt` function removed
-Use `toBytes` util instead.
 * **tx-builder:** `returnType` of contract call result structure is a value of CallReturnType enum
-Apply a patch:
-```diff
--contractCall.returnType === "error"
-+contractCall.returnType === CallReturnType.Error
-```
 * **tx-builder:** `writeId`, `readId` function removed
-Use transaction builder instead.
 * **tx-builder:** `readPointers`, `buildPointers` functions removed
-Use transaction builder instead.
 * **tx-builder:** `formatSalt` function removed
-Use `Buffer.from(<salt>.toString(16).padStart(64, '0'), 'hex')` instead.
 * **tx-builder:** `validateParams`, `unpackRawTx` functions removed
-Use transaction builder instead.
 * **tx-builder:** `AMOUNT` constant removed
-If necessary, use `0` instead.
 
 #### Compiler
 * **compiler:** Dropped compatibility with compilers below 7.0.1
 
 #### Account
 * **account:** `createMetaTx` removed
-Use `AccountGeneralized.signTransaction` instead.
 * **account:** `AccountRpc` constructor accepts arguments one by one
-Apply a change:
-```diff
--new AccountRpc({ rpcClient: <rpc client>, address: <address> })
-+new AccountRpc(<rpc client>, <address>)
-```
 * **account:** `AccountMemory` requires `networkId` in `signTransaction`
 * **account:** `AccountBase` simplified
-- `networkId` removed
-- `getNetworkId` method removed
-- `signTransaction`, `signMessage` made abstract
 * **account:** `address` in `AccountBase` is a property
-Apply a change:
-```diff
--await accountMemory.address(options)
-+accountMemory.address
-```
 * **account:** MemoryAccount accepts only secretKey
-Apply a change:
-```diff
--new MemoryAccount({ keypair: { publicKey: 'ak_..', secretKey: <secret key> } })
-+new MemoryAccount(<secret key>)
-```
 * **account:** MemoryAccount not compatible with GA
-Apply a change:
-```diff
--new MemoryAccount({ gaId: <address> })
-+new AccountGeneralized(<address>)
-```
 
 #### Node
 * **node:** `url` property of `Node` removed
-Use autorest's `$host` property instead.
 
 #### Other
 * `onAccount` doesn't accepts keypair
-Apply a change:
-```diff
--aeSdk.<metnod name>(..., { onAccount: <keypair> })
-+aeSdk.<metnod name>(..., { onAccount: new MemoryAccount(<keypair>.secretKey) })
-```
 * `bigNumberToByteArray` removed
-Use `toBytes` instead.
 * `str2buf` function removed
-Use `Buffer.from(<data>, <encoding>)` instead.
 * `getAddressFromPriv` doesn't accept private key as base64-encoded or raw string
 * `isValidKeypair` doesn't accept public key as base64-encoded string
 * `bytesToHex` function removed
-Use `Buffer.from(<bytes>).toString('hex')` instead.
 * `hexToBytes` function removed
-Use `Buffer.from(<hex string>, 'hex')` instead.
 * rename umd export to `Aeternity`
 * Subpaths imports of SDK are not allowed
-SDK does versioning only for the API provided in the root export.
-Replace subpaths imports with imports of the package root.
-```diff
--import MemoryAccount from '@aeternity/aepp-sdk/es/account/Memory.mjs';
-+import { MemoryAccount } from '@aeternity/aepp-sdk';
-```
 * Removed `getNetworkId` from `AeSdkBase`
-Use `Node.getNetworkId` instead.
 * `address` a getter in AeSdkBase
-Apply a change:
-```diff
--await aeSdk.address()
-+aeSdk.address
-```
 * `addAccount` is a sync function
 * `verifyMessage` removed from accounts and AeSdkBase
-Use `verifyMessage` exported in root instead.
 * `verify` and `verifyMessage` accepts address instead of hex string or Uint8Array
-Convert public key in Uint8Array to address using `encode(pk, 'ak')`.
-Convert public key in hex to address using `encode(Buffer.from(pk, 'hex'), 'ak')`.
 * node@12 not supported
-Use node@14.19 or newer.
 * `removeAccount` throws error if account not found
 * `signMessage` always return `Uint8Array`
-Use `Buffer.from(signature).toString('hex')` to convert it to hex.
 * `encryptKey`, `decryptKey` not exported anymore
-Use 'sha.js' and 'aes-js' packages directly instead.
 * `sha256hash` not exported anymore
-Use `SubtleCrypto.digest` or `sha.js` package instead.
 * `height` method removed
-Use `getHeight` instead.
 * `signUsingGA` method removed
-Use `createMetaTx` instead.
 * `POINTER_KEY_BY_PREFIX` removed
-Use `getDefaultPointerKey` instead.
 * `ID_TAG_PREFIX`, `PREFIX_ID_TAG`, `ID_TAG` removed
-Use `readId`, `writeId` instead.
 * `TX_TYPE` removed.
-Use `Tag` instead.
 * `GAS_MAX` removed
-Maximum gas limit depends on transaction size, this value is outdated,
-sdk check/provides gasLimit by itself while building a transaction.
 * `calculateMinFee` removed
-Use `buildTx` to generate transaction, unpack it and refer to `fee` field.
 * `salt`, `createSalt` removed
-Use `genSalt` instead.
 * `Pointer` removed
-Use NamePointer from apis/node instead.
 
 ### Features
 
