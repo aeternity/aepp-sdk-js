@@ -46,6 +46,7 @@ import {
   AmbiguousEventDefinitionError,
   UnexpectedTsError,
   InternalError,
+  NoWalletConnectedError,
 } from '../utils/errors';
 import { hash as calcHash } from '../utils/crypto';
 import { Aci as BaseAci } from '../apis/compiler';
@@ -357,11 +358,11 @@ class Contract<M extends ContractMethodsBase> {
     try {
       callerId = opt.onAccount.address;
     } catch (error) {
-      const messageToSwallow = 'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead';
-      if (
-        opt.callStatic !== true || !(error instanceof TypeError)
-        || error.message !== messageToSwallow
-      ) throw error;
+      const useFallbackAccount = opt.callStatic === true && (
+        (error instanceof TypeError && error.message === 'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead')
+        || (error instanceof NoWalletConnectedError)
+      );
+      if (!useFallbackAccount) throw error;
       callerId = DRY_RUN_ACCOUNT.pub;
     }
     const callData = this._calldata.encode(this._name, fn, params);

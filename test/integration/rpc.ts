@@ -20,6 +20,7 @@ import {
 } from 'mocha';
 import { expect } from 'chai';
 import {
+  AeSdk,
   AeSdkAepp,
   AeSdkWallet,
   BrowserWindowMessageConnection,
@@ -102,11 +103,13 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
   describe('New RPC Wallet-AEPP: AEPP node', () => {
     const keypair = generateKeyPair();
+    let aeSdk: AeSdk;
     let aepp: AeSdkAepp;
     let wallet: AeSdkWallet;
 
     before(async () => {
-      [account] = Object.values((await getSdk()).accounts);
+      aeSdk = await getSdk();
+      [account] = Object.values(aeSdk.accounts);
       wallet = new AeSdkWallet({
         nodes: [{ name: 'local', instance: node }],
         accounts: [account, MemoryAccount.generate()],
@@ -125,6 +128,24 @@ describe('Aepp<->Wallet', function aeppWallet() {
         onAddressChange() {},
         onDisconnect() {},
       });
+    });
+
+    it('aepp can do static calls without connection to wallet', async () => {
+      const contract = await aeSdk.initializeContract({
+        sourceCode: 'contract Test =\n'
+          + '  entrypoint getArg(x : int) = x',
+      });
+      await contract.$deploy([]);
+      const aeppSdk = new AeSdkAepp({
+        name: 'AEPP',
+        nodes: [{ name: 'test', instance: node }],
+        compilerUrl: aeSdk._options.compilerUrl,
+      });
+      const contractAepp = await aeppSdk.initializeContract<{ getArg: (a: number) => number }>({
+        aci: contract._aci,
+        address: contract.$options.address,
+      });
+      expect((await contractAepp.getArg(42)).decodedResult).to.be.equal(42n);
     });
 
     it('Fail on not connected', async () => {
