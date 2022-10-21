@@ -13,8 +13,8 @@ You can then collect the signed inner transaction, wrap it into a `PayingForTx` 
 ## Usage examples
 We provided following two NodeJS examples which you can take a look at:
 
-- [InnerTx: ContractCallTx](../examples/node/paying-for-contract-call-tx.md)
-- [InnerTx: SpendTx](../examples/node/paying-for-spend-tx.md)
+- [InnerTx: ContractCallTx](https://docs.aeternity.com/aepp-sdk-js/v12.1.3/examples/node/paying-for-tx-contract-call-tx/)
+- [InnerTx: SpendTx](https://docs.aeternity.com/aepp-sdk-js/v12.1.3/examples/node/paying-for-tx-spend-tx/)
 
 Note:
 
