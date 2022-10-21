@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This guide shows you how to perform all the operations that you need within the lifecycle of [oracles](https://aeternity.com/protocol/oracles) using the SDK.
+This guide shows you how to perform all the operations that you need within the lifecycle of [oracles](https://docs.aeternity.com/protocol/oracles) using the SDK.
 
 ## 1. Oracle: register
 You register an oracle that responds with the temperature of the city that is included in the query.
