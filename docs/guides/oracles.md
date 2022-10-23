@@ -68,10 +68,10 @@ const queryId = 'oq_...';
 
 // using the query instance
 const query = await aeSdk.getQueryObject(oracleId, queryId) // in case you need to get the query instance first
-const response = await query.pollForResponse({ attempts: 10, interval: 6000 })
+const response = await query.pollForResponse({ interval: 6000 })
 
 // OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
-const response = await aeSdk.pollForQueryResponse(oracleId, queryId, { attempts: 10, interval: 6000 })
+const response = await aeSdk.pollForQueryResponse(oracleId, queryId, { interval: 6000 })
 
 // decode the oracle response
 // the decode function returns a buffer that needs to be converted to a string
