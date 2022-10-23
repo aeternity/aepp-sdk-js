@@ -136,8 +136,8 @@ interface ChannelMessageError {
 
 // Send ping message every 10 seconds
 const PING_TIMEOUT_MS = 10000;
-// Close connection if pong message is not received within 5 seconds
-const PONG_TIMEOUT_MS = 5000;
+// Close connection if pong message is not received within 15 seconds
+const PONG_TIMEOUT_MS = 15000;
 
 export function emit(channel: Channel, ...args: any[]): void {
   const [eventName, ...rest] = args;
