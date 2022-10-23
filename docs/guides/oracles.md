@@ -7,20 +7,21 @@ This guide shows you how to perform all the operations that you need within the 
 ## 1. Oracle: register
 You register an oracle that responds with the temperature of the city that is included in the query.
 
-To register an oracle you need to provide a `queryFormat` and a `responseFormat` to the `registerOracle` function of the SDK. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtl`, see [transaction options](../transaction-options.md#oracleregistertx).
+To register an oracle you need to provide a `queryFormat` and a `responseFormat` to the `registerOracle` function of the SDK. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtlValue`, see [transaction options](../transaction-options.md#oracleregistertx).
 
 ```js
 // init an instance of the SDK using the AeSdk class
 const aeSdk = new AeSdk({ ... })
 
 // set TTL with a delta of 1000 blocks
-const oracleTtl = {type: 'delta', value: 1000}
+const oracleTtlOptions = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 1000 }
 // OR set a specific block height to expire
-const oracleTtl = { type: 'block', value: 555555 }
+const oracleTtlOptions = { oracleTtlType: ORACLE_TTL_TYPES.block, oracleTtlValue: 555555 }
 
 // queryFee is optional and defaults to 30000
-// oracleTtl is optional and defaults to { type: 'delta', value: 500 }
-const options = {queryFee: 1337, oracleTtl }
+// oracleTtlValue is optional and defaults to 500
+// oracleTtlType is optional and defaults to ORACLE_TTL_TYPES.delta
+const options = { queryFee: 1337, ...oracleTtlOptions }
 
 // the first argument is the queryFormat and the second is the responseFormat
 const oracle = await aeSdk.registerOracle("{'city': string}", "{'temperature': int}", options)
@@ -29,7 +30,7 @@ const oracle = await aeSdk.registerOracle("{'city': string}", "{'temperature': i
 Note:
 
 - By default the oracle will exist for the next 500 KeyBlocks.
-- If you intend to keep your oracle running longer you should increase the `oracleTtl` and/or set up a service that automatically extends the TTL before it expires.
+- If you intend to keep your oracle running longer you should increase the `oracleTtlValue` and/or set up a service that automatically extends the TTL before it expires.
 - The `oracleId` will be similar to the address of the account that registered the Oracle.
    - The only difference is the prefix that will be `ok_` instead of `ak_`
    - This means that each account can only host 1 oracle. It's not possible to manage multiple oracles using the same account.
@@ -42,14 +43,17 @@ After the oracle has been registered and as long as it isn't expired, everybody 
 ```js
 const oracleId = 'ok_...';
 
-// queryFee should cover the requested fee of the oracle and defaults to 30000
-// queryTtl is optional and defaults to {type: 'delta', value: 10}
-// responseTtl is optional and defaults to {type: 'delta', value: 10}
-const options = {queryFee: 1337, queryTtl: {type: 'delta', value: 20}, responseTtl: {type: 'delta', value: 50}}
+const options = {
+  queryFee: 1337, // should cover the requested fee of the oracle and defaults to 30000
+  queryTtlType: ORACLE_TTL_TYPES.delta, // optional and defaults to ORACLE_TTL_TYPES.delta
+  queryTtlValue: 20, // optional and defaults to 10
+  responseTtlType: ORACLE_TTL_TYPES.delta, // optional and defaults to ORACLE_TTL_TYPES.delta
+  responseTtlValue: 50, // optional and defaults to 10
+};
 
-// using the oracle object
-const oracle = await aeSdk.getOracleObject(oracleId) // in case you need to instantiate the oracle object first
-const query = await oracle.postQuery("{'city': 'Berlin'}", options) // using the oracle instance
+// using the oracle object in case you need to instantiate the oracle object first
+const oracle = await aeSdk.getOracleObject(oracleId)
+const query = await oracle.postQuery("{'city': 'Berlin'}", options)
 
 // OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
 const query = await aeSdk.postQueryToOracle(oracleId, "{'city': 'Berlin'}", options)
@@ -125,14 +129,14 @@ As mentioned above an Oracle has a certain TTL that can be specified when regist
 const oracleId = 'ok_...';
 
 // extend TTL by additional 500 blocks (based on current expiration height of the oracle)
-const oracleTtl = { type: 'delta', value: 500 }
+const options = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 500 }
 
 // using the oracle instance
 const oracle = await aeSdk.getOracleObject(oracleId)
-const extendedOracle = await oracle.extendOracle(oracleTtl)
+const extendedOracle = await oracle.extendOracle(options)
 
 // OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
-const extendedOracle = await aeSdk.extendOracleTtl(oracleId, oracleTtl)
+const extendedOracle = await aeSdk.extendOracleTtl(oracleId, options)
 ```
 
 ## Example applications

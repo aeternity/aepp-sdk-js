@@ -71,19 +71,25 @@ The following options are sepcific for each tx-type.
 ### OracleRegisterTx
 - `queryFee` (default: `30000`)
   - The fee in `aettos` that the oracle requests in order to provide a response.
-- `oracleTtl` (default: `{ type: 'delta', value: 500 }`)
+- `oracleTtlValue` (default: `500`)
   - The TTL of the oracle that defines its expiration.
-  - Format: `{type: 'delta|block', value: 'number'}`
+- `oracleTtlType` (default: `ORACLE_TTL_TYPES.delta`)
+  - `ORACLE_TTL_TYPES.delta`: TTL value treated relative to a current block height
+  - `ORACLE_TTL_TYPES.block`: TTL value treated as absolute block height
 
 ### OracleQueryTx
 - `queryFee` (default: `30000`)
   - The fee in `aettos` that will be payed to the oracle.
-- `queryTtl` (default: `{ type: 'delta', value: 10 }`)
+- `queryTtlValue` (default: `10`)
   - The TTL of the query that defines its expiration. The oracle needs to respond before the `queryTtl` expires.
-  - Format: `{type: 'delta|block', value: 'number'}`
-- `responseTtl` (default `{ type: 'delta', value: 10 }`)
+- `queryTtlType` (default: `ORACLE_TTL_TYPES.delta`)
+  - `ORACLE_TTL_TYPES.delta`: TTL value treated relative to a current block height
+  - `ORACLE_TTL_TYPES.block`: TTL value treated as absolute block height
+- `responseTtlValue` (default `10`)
   - The TTL of the response that defines its expiration. The response of the oracle will be garbage collected after its expiration.
-  - Format: `{type: 'delta|block', value: 'number'}`
+- `responseTtlType` (default `ORACLE_TTL_TYPES.delta`)
+  - `ORACLE_TTL_TYPES.delta`: TTL value treated relative to a current block height
+  - `ORACLE_TTL_TYPES.block`: TTL value treated as absolute block height
 
 ### SpendTx
 - `denomination` (default: `aettos`)
