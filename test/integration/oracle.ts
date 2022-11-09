@@ -43,7 +43,8 @@ describe('Oracle', () => {
       "{'tmp': num}",
       { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 5000 },
     );
-    expect(oracle.ttl).to.be.equal(height + 5000);
+    const ttl = height + 5000;
+    expect(oracle.ttl).to.be.within(ttl, ttl + 4);
     oracle.id.should.be.equal(expectedOracleId);
   });
 
