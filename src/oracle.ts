@@ -40,7 +40,7 @@ import { RequestTimedOutError } from './utils/errors';
 import {
   decode, encode, Encoded, Encoding,
 } from './utils/encoder';
-import { _getPollInterval } from './chain';
+import { _getPollInterval, getHeight } from './chain';
 import { _buildTx, BuildTxOptions } from './tx';
 import Node from './Node';
 import AccountBase from './account/Base';
@@ -110,7 +110,7 @@ export async function pollForQueryResponse(
     ({ response, ttl } = await onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId));
     const responseBuffer = decode(response as Encoded.OracleResponse);
     if (responseBuffer.length > 0) return responseBuffer.toString();
-    height = await this.getHeight();
+    height = await getHeight({ onNode });
   } while (ttl >= height);
   throw new RequestTimedOutError(height);
 }
