@@ -37,13 +37,21 @@ describe('Oracle', () => {
 
   it('Register Oracle with 5000 TTL', async () => {
     const expectedOracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
-    oracle = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 5000 });
+    const height = await aeSdk.getHeight();
+    oracle = await aeSdk.registerOracle(
+      "{'city': str}",
+      "{'tmp': num}",
+      { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 5000 },
+    );
+    expect(oracle.ttl).to.be.equal(height + 5000);
     oracle.id.should.be.equal(expectedOracleId);
   });
 
   it('Extend Oracle', async () => {
-    const extendedOracle = await oracle.extendOracle({ type: 'delta', value: 7450 });
-    expect(extendedOracle.ttl).to.be.greaterThan(oracle.ttl);
+    const extendedOracle = await oracle.extendOracle(
+      { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 7450 },
+    );
+    expect(extendedOracle.ttl).to.be.equal(oracle.ttl + 7450);
   });
 
   it('Post Oracle Query(Ask for weather in Berlin)', async () => {
