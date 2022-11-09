@@ -17,11 +17,12 @@
 
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { RestError } from '@azure/core-rest-pipeline';
 import { getSdk } from '.';
 import {
   AeSdk, UnexpectedTsError,
   decode, encode, registerOracle,
-  ORACLE_TTL_TYPES, QUERY_FEE, Encoding,
+  ORACLE_TTL_TYPES, QUERY_FEE, Encoding, RequestTimedOutError,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
@@ -74,8 +75,14 @@ describe('Oracle', () => {
   });
 
   it('Poll for response for query without response', async () => {
-    const query = await oracle.postQuery("{'city': 'Berlin'}");
-    await query.pollForResponse().should.be.rejectedWith(Error);
+    const query = await oracle.postQuery("{'city': 'Berlin'}", { queryTtlValue: 2 });
+    await query.pollForResponse().should.be.rejectedWith(RequestTimedOutError);
+  });
+
+  it('Poll for response for query that is already expired without response', async () => {
+    const query = await oracle.postQuery("{'city': 'Berlin'}", { queryTtlValue: 2 });
+    await aeSdk.awaitHeight(await aeSdk.getHeight() + 3);
+    await query.pollForResponse().should.be.rejectedWith(RestError, 'Query not found');
   });
 
   it('Respond to query', async () => {
