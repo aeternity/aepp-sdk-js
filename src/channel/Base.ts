@@ -33,6 +33,7 @@ import {
   ChannelAction,
   ChannelStatus,
   ChannelFsm,
+  ChannelMessage,
 } from './internal';
 import { ChannelError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
@@ -78,7 +79,7 @@ export default class Channel {
 
   _fsmId?: Encoded.Bytearray;
 
-  _messageQueue: object[] = [];
+  _messageQueue: ChannelMessage[] = [];
 
   _isMessageQueueLocked = false;
 

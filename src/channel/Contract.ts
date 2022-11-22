@@ -160,11 +160,9 @@ export default class ChannelContract extends ChannelSpend {
                   ? 'initiatorId' : 'responderId';
                 const owner = this._options[addressKey];
                 changeState(this, message2.params.data.state);
-                state2.resolve({
-                  accepted: true,
-                  address: encodeContractAddress(owner, params.round),
-                  signedTx: message2.params.data.state,
-                });
+                const address = encodeContractAddress(owner, params.round);
+                emit(this, 'newContract', address);
+                state2.resolve({ accepted: true, address, signedTx: message2.params.data.state });
                 return { handler: channelOpen };
               })
             ),
