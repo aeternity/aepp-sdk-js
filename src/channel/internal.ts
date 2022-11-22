@@ -32,6 +32,21 @@ import {
 } from '../utils/errors';
 import { encodeContractAddress } from '../utils/crypto';
 
+export interface ChannelEvents {
+  statusChanged: (status: ChannelStatus) => void;
+  stateChanged: (tx: Encoded.Transaction) => void;
+  depositLocked: () => void;
+  ownDepositLocked: () => void;
+  withdrawLocked: () => void;
+  ownWithdrawLocked: () => void;
+  peerDisconnected: () => void;
+  channelReestablished: () => void;
+  error: (error: Error) => void;
+  onChainTx: (tx: Encoded.Transaction, details: { info: string; type: string }) => void;
+  message: (message: string | Object) => void;
+  newContract: (contractAddress: Encoded.ContractAddress) => void;
+}
+
 export interface ChannelAction {
   guard: (channel: Channel, state?: ChannelFsm) => boolean;
   action: (channel: Channel, state?: ChannelFsm) => ChannelFsm;
@@ -140,7 +155,10 @@ const PING_TIMEOUT_MS = 10000;
 // Close connection if pong message is not received within 15 seconds
 const PONG_TIMEOUT_MS = 15000;
 
-export function emit(channel: Channel, ...args: any[]): void {
+export function emit<E extends keyof ChannelEvents>(
+  channel: Channel,
+  ...args: [E, ...Parameters<ChannelEvents[E]>]
+): void {
   const [eventName, ...rest] = args;
   channel._eventEmitter.emit(eventName, ...rest);
 }

@@ -28,6 +28,7 @@ import {
   ChannelFsm,
   SignTx,
   ChannelStatus,
+  ChannelEvents,
 } from './internal';
 import { unpackTx, buildTx } from '../tx/builder';
 import { decode, Encoded } from '../utils/encoder';
@@ -40,6 +41,7 @@ import {
 } from '../utils/errors';
 import type Channel from './Base';
 import { Tag } from '../tx/builder/constants';
+import { snakeToPascal } from '../utils/string';
 
 export async function appendSignature(
   tx: Encoded.Transaction,
@@ -270,7 +272,7 @@ export async function channelOpen(
           //
           //       We should enter intermediate state where offchain transactions
           //       are blocked until channel is reestablished.
-          emit(channel, message.params.data.event);
+          emit(channel, snakeToPascal(message.params.data.event) as keyof ChannelEvents);
           return { handler: channelOpen };
         case 'fsm_up':
           channel._fsmId = message.params.data.fsm_id;
