@@ -47,7 +47,7 @@ contract Multiplier =
 `;
 const ACCOUNT_SECRET_KEY = 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b';
 const NODE_URL = 'https://testnet.aeternity.io';
-const COMPILER_URL = 'https://compiler.aepps.com';
+const COMPILER_URL = 'https://v7.compiler.aepps.com';
 
 // Note:
 //

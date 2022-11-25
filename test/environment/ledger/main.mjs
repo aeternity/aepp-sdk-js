@@ -16,7 +16,7 @@ export default async function run(transport) {
   const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
     accounts: [account],
-    compilerUrl: 'https://compiler.aepps.com',
+    compilerUrl: 'https://v7.compiler.aepps.com',
   });
 
   const { hash } = await aeSdk.spend(1e17, 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR');

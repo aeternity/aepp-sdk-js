@@ -2,7 +2,7 @@ import { AeSdkAepp, Node } from '@aeternity/aepp-sdk';
 
 const TESTNET_NODE_URL = 'https://testnet.aeternity.io';
 const MAINNET_NODE_URL = 'https://mainnet.aeternity.io';
-const COMPILER_URL = 'https://compiler.aepps.com';
+const COMPILER_URL = 'https://v7.compiler.aepps.com';
 
 export default (store) => {
   let aeSdk;
