@@ -56,8 +56,8 @@
 </template>
 
 <script>
-import Value from './Value.vue'
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex';
+import Value from './Value.vue';
 
 export default {
   components: { Value },
@@ -69,30 +69,30 @@ export default {
     spendTo: '',
     spendAmount: '',
     spendPayload: '',
-    spendPromise: null
+    spendPromise: null,
   }),
   computed: {
     ...mapState('aeSdk', ['address', 'networkId']),
-    ...mapGetters('aeSdk', ['aeSdk'])
+    ...mapGetters('aeSdk', ['aeSdk']),
   },
-  mounted () {
+  mounted() {
     this.$watch(
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
       ([aeSdk, address]) => {
-        if (!aeSdk) return
+        if (!aeSdk) return;
         this.compilerVersionPromise = aeSdk.compilerApi.apiVersion()
-          .then(({ apiVersion }) => apiVersion)
-        this.balancePromise = aeSdk.getBalance(address)
-        this.heightPromise = aeSdk.getHeight()
-        this.nodeInfoPromise = aeSdk.getNodeInfo()
+          .then(({ apiVersion }) => apiVersion);
+        this.balancePromise = aeSdk.getBalance(address);
+        this.heightPromise = aeSdk.getHeight();
+        this.nodeInfoPromise = aeSdk.getNodeInfo();
       },
-      { immediate: true }
-    )
+      { immediate: true },
+    );
   },
   methods: {
-    spend () {
-      return this.aeSdk.spend(this.spendAmount, this.spendTo, { payload: this.spendPayload })
-    }
-  }
-}
+    spend() {
+      return this.aeSdk.spend(this.spendAmount, this.spendTo, { payload: this.spendPayload });
+    },
+  },
+};
 </script>

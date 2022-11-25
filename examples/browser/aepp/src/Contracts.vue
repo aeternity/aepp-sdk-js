@@ -78,15 +78,15 @@
 </template>
 
 <script>
-import Value from './Value.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import Value from './Value.vue';
 
 const contractSourceCode = `
 contract Multiplier =
   record state = { factor: int }
   entrypoint init(f : int) : state = { factor = f }
   entrypoint calc(x : int) = x * state.factor
-`.trim()
+`.trim();
 
 export default {
   components: { Value },
@@ -97,22 +97,22 @@ export default {
     createPromise: null,
     compilePromise: null,
     deployPromise: null,
-    callPromise: null
+    callPromise: null,
   }),
   computed: mapGetters('aeSdk', ['aeSdk']),
   methods: {
-    create () {
-      return this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode })
+    create() {
+      return this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode });
     },
-    async compile () {
-      return (await this.createPromise).$compile()
+    async compile() {
+      return (await this.createPromise).$compile();
     },
-    async deploy () {
-      return (await this.createPromise).$deploy([this.deployArg])
+    async deploy() {
+      return (await this.createPromise).$deploy([this.deployArg]);
     },
-    async call () {
-      return (await this.createPromise).calc(this.callArg)
-    }
-  }
-}
+    async call() {
+      return (await this.createPromise).calc(this.callArg);
+    },
+  },
+};
 </script>

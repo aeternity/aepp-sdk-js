@@ -30,16 +30,16 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Connect from '../../aepp/src/Connect'
-import Basic from '../../aepp/src/Basic'
-import Contracts from '../../aepp/src/Contracts'
+import { mapGetters } from 'vuex';
+import Connect from './Connect.vue';
+import Basic from './Basic.vue';
+import Contracts from './Contracts.vue';
 
 export default {
   components: { Connect, Basic, Contracts },
   data: () => ({ view: '' }),
-  computed: mapGetters('aeSdk', ['aeSdk'])
-}
+  computed: mapGetters('aeSdk', ['aeSdk']),
+};
 </script>
 
 <style lang="scss" src="./styles.scss" />
