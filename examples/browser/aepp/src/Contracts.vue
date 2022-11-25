@@ -79,7 +79,7 @@
 
 <script>
 import Value from './Value.vue'
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
 const contractSourceCode = `
 contract Multiplier =
@@ -99,10 +99,7 @@ export default {
     deployPromise: null,
     callPromise: null
   }),
-  computed: {
-    ...mapState('aeSdk', ['address', 'networkId']),
-    ...mapGetters('aeSdk', ['aeSdk'])
-  },
+  computed: mapGetters('aeSdk', ['aeSdk']),
   methods: {
     create () {
       return this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode })
