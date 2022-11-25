@@ -16,7 +16,7 @@
  */
 
 import {
-  AeSdk, Compiler, MemoryAccount, Node,
+  AeSdk, CompilerHttp, MemoryAccount, Node,
 } from '../../src';
 import '..';
 
@@ -30,7 +30,7 @@ const genesisAccount = new MemoryAccount(secretKey);
 export async function getSdk(accountCount = 1): Promise<AeSdk> {
   const accounts = new Array(accountCount).fill(null).map(() => MemoryAccount.generate());
   const sdk = new AeSdk({
-    onCompiler: new Compiler(compilerUrl, { ignoreVersion }),
+    onCompiler: new CompilerHttp(compilerUrl, { ignoreVersion }),
     nodes: [{ name: 'test', instance: new Node(url, { ignoreVersion }) }],
     accounts,
     _expectedMineRate: 1000,

@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 import {
-  AeSdkWallet, Compiler, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection,
+  AeSdkWallet, CompilerHttp, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection,
   WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError,
 } from '@aeternity/aepp-sdk';
 
@@ -29,7 +29,7 @@ class AccountMemoryProtected extends MemoryAccount {
 }
 
 const aeSdk = new AeSdkWallet({
-  onCompiler: new Compiler('https://v7.compiler.aepps.com'),
+  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
   nodes: [{
     name: 'testnet',
     instance: new Node('https://testnet.aeternity.io'),

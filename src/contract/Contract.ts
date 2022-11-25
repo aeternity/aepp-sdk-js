@@ -53,7 +53,7 @@ import { Aci as BaseAci } from '../apis/compiler';
 import {
   ContractCallObject as NodeContractCallObject, ContractCallReturnType, Event as NodeEvent,
 } from '../apis/node';
-import Compiler from './Compiler';
+import CompilerHttp from './CompilerHttp';
 import Node, { TransformNodeType } from '../Node';
 import {
   getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun,
@@ -551,7 +551,7 @@ class Contract<M extends ContractMethodsBase> {
     sourceCode?: string;
     bytecode?: Encoded.ContractBytearray;
     address?: Encoded.ContractAddress;
-    onCompiler: Compiler;
+    onCompiler: CompilerHttp;
     onNode: Node;
     omitUnknown?: boolean;
     contractAddressToName?: { [key: Encoded.ContractAddress]: string };
@@ -560,7 +560,7 @@ class Contract<M extends ContractMethodsBase> {
 
   constructor({ aci, ...otherOptions }: {
     onAccount?: AccountBase;
-    onCompiler: Compiler;
+    onCompiler: CompilerHttp;
     onNode: Node;
     sourceCode?: string;
     bytecode?: Encoded.ContractBytearray;

@@ -17,9 +17,9 @@ Note:
 ## 1. Specify imports
 ```js
 // node.js import
-const { AeSdk, MemoryAccount, Node, Compiler } = require('@aeternity/aepp-sdk')
+const { AeSdk, MemoryAccount, Node, CompilerHttp } = require('@aeternity/aepp-sdk')
 // ES import
-import { AeSdk, MemoryAccount, Node, Compiler } from '@aeternity/aepp-sdk'
+import { AeSdk, MemoryAccount, Node, CompilerHttp } from '@aeternity/aepp-sdk'
 ```
 
 ## 2. Create an instance of the SDK
@@ -32,7 +32,7 @@ const account = new MemoryAccount(SECRET_KEY)
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
   accounts: [account],
-  onCompiler: new Compiler('https://v7.compiler.aepps.com'), // ideally host your own compiler
+  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'), // ideally host your own compiler
 })
 ```
 

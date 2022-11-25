@@ -26,7 +26,7 @@ import {
   BrowserWindowMessageConnection,
   MemoryAccount,
   Node,
-  Compiler,
+  CompilerHttp,
   RpcConnectionDenyError,
   RpcRejectedByUserError,
   SUBSCRIPTION_TYPES,
@@ -140,7 +140,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       const aeppSdk = new AeSdkAepp({
         name: 'AEPP',
         nodes: [{ name: 'test', instance: node }],
-        onCompiler: new Compiler(aeSdk.compilerApi.$host),
+        onCompiler: new CompilerHttp(aeSdk.compilerApi.$host),
       });
       const contractAepp = await aeppSdk.initializeContract<{ getArg: (a: number) => number }>({
         aci: contract._aci,

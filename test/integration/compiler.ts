@@ -17,7 +17,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { compilerUrl, ignoreVersion } from '.';
-import { Compiler } from '../../src';
+import { CompilerHttp } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
 const identitySourceCode = `
@@ -26,7 +26,7 @@ contract Identity =
 `;
 
 describe('Sophia Compiler', () => {
-  const compiler = new Compiler(compilerUrl, { ignoreVersion });
+  const compiler = new CompilerHttp(compilerUrl, { ignoreVersion });
   let bytecode: Encoded.ContractBytearray;
 
   it('compiles', async () => {
@@ -70,7 +70,7 @@ describe('Sophia Compiler', () => {
   });
 
   it('throws exception if used invalid compiler url', async () => {
-    const c = new Compiler('https://compiler.aepps.comas');
+    const c = new CompilerHttp('https://compiler.aepps.comas');
     await expect(c.generateACI({ code: 'test' }))
       .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas');
   });

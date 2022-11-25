@@ -23,13 +23,13 @@ type GeneralCompilerError = ErrorModel & {
 };
 
 /**
- * Contract Compiler
+ * Contract Compiler over HTTP
  *
  * This class include api call's related to contract compiler functionality.
  * @category contract
- * @example Compiler('COMPILER_URL')
+ * @example CompilerHttp('COMPILER_URL')
  */
-export default class Compiler extends CompilerApi {
+export default class CompilerHttp extends CompilerApi {
   /**
    * @param compilerUrl - Url for compiler API
    * @param options - Options

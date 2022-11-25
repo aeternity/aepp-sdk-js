@@ -48,7 +48,7 @@
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 import {
-  AeSdk, Compiler, Node, MemoryAccount, Tag,
+  AeSdk, CompilerHttp, Node, MemoryAccount, Tag,
 } from '@aeternity/aepp-sdk';
 
 // **Note**:
@@ -95,7 +95,7 @@ const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
   accounts: [payerAccount, newUserAccount],
-  onCompiler: new Compiler(COMPILER_URL),
+  onCompiler: new CompilerHttp(COMPILER_URL),
 });
 
 // ## 4. Create and sign `ContractCallTx` on behalf of new user

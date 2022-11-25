@@ -29,7 +29,7 @@
 
 <script>
 import {
-  MemoryAccount, generateKeyPair, AeSdkWallet, Node, Compiler,
+  MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE,
   RpcConnectionDenyError, RpcRejectedByUserError,
 } from '@aeternity/aepp-sdk';
@@ -111,7 +111,7 @@ export default {
         new AccountMemoryProtected('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
         AccountMemoryProtected.generate(),
       ],
-      onCompiler: new Compiler('https://v7.compiler.aepps.com'),
+      onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
       name: 'Wallet Iframe',
       onConnection: (aeppId, params) => {
         if (!confirm(`Client ${params.name} with id ${aeppId} want to connect`)) {

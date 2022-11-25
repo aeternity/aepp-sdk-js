@@ -11,7 +11,7 @@ import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
 import { Tag } from './tx/builder/constants';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
-import Compiler from './contract/Compiler';
+import CompilerHttp from './contract/CompilerHttp';
 import { ArgumentError, NotImplementedError, TypeError } from './utils/errors';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
@@ -113,7 +113,7 @@ class AeSdkMethods {
 
   async initializeContract<Methods extends ContractMethodsBase>(
     options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode' | 'onCompiler'> &
-    { onNode?: Node; onCompiler?: Compiler },
+    { onNode?: Node; onCompiler?: CompilerHttp },
   ): Promise<Contract<Methods>> {
     const { onNode, onCompiler, ...otherOptions } = this._getOptions();
     if (onCompiler == null || onNode == null) {
@@ -136,7 +136,7 @@ type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ?
 
 type MakeOptional<Options> = OptionalIfNotRequired<[
   Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'>
-  & { onNode?: Node; onCompiler?: Compiler; onAccount?: OnAccount },
+  & { onNode?: Node; onCompiler?: CompilerHttp; onAccount?: OnAccount },
 ]>;
 
 type TransformMethods <Methods extends { [key: string]: Function }> =
