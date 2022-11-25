@@ -54,8 +54,6 @@ type MethodsOptions = GetMethodsOptions<typeof methods>;
 interface AeSdkMethodsOptions
   extends Partial<UnionToIntersection<MethodsOptions[keyof MethodsOptions]>> {
   nodes?: Array<{ name: string; instance: Node }>;
-  compilerUrl?: string;
-  ignoreVersion?: boolean;
 }
 
 /**

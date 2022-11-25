@@ -1,6 +1,8 @@
 #!/usr/bin/env node
+const {
+  Node, AeSdk, MemoryAccount, Compiler,
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { Node, AeSdk, MemoryAccount } = require('../../dist/aepp-sdk');
+} = require('../../dist/aepp-sdk');
 
 const contractSourceCode = `
 contract Test =
@@ -12,7 +14,7 @@ const aeSdk = new AeSdk({
   accounts: [
     new MemoryAccount('bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b'),
   ],
-  compilerUrl: 'https://v7.compiler.aepps.com',
+  onCompiler: new Compiler('https://v7.compiler.aepps.com'),
 });
 
 (async () => {

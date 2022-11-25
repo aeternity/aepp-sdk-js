@@ -1,6 +1,8 @@
 import fetch from 'cross-fetch';
+import {
+  Node, AeSdk, Compiler, AccountLedgerFactory,
 // eslint-disable-next-line import/extensions
-import { Node, AeSdk, AccountLedgerFactory } from '../../../es/index.mjs';
+} from '../../../es/index.mjs';
 
 export default async function run(transport) {
   const accountFactory = new AccountLedgerFactory(transport);
@@ -16,7 +18,7 @@ export default async function run(transport) {
   const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
     accounts: [account],
-    compilerUrl: 'https://v7.compiler.aepps.com',
+    onCompiler: new Compiler('https://v7.compiler.aepps.com'),
   });
 
   const { hash } = await aeSdk.spend(1e17, 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR');

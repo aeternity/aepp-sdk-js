@@ -1,4 +1,4 @@
-import { AeSdkAepp, Node } from '@aeternity/aepp-sdk';
+import { AeSdkAepp, Node, Compiler } from '@aeternity/aepp-sdk';
 
 const TESTNET_NODE_URL = 'https://testnet.aeternity.io';
 const MAINNET_NODE_URL = 'https://mainnet.aeternity.io';
@@ -37,7 +37,7 @@ export default (store) => {
             { name: 'testnet', instance: new Node(TESTNET_NODE_URL) },
             { name: 'mainnet', instance: new Node(MAINNET_NODE_URL) },
           ],
-          compilerUrl: COMPILER_URL,
+          onCompiler: new Compiler(COMPILER_URL),
           onNetworkChange: async ({ networkId }) => {
             const [{ name }] = (await aeSdk.getNodesInPool())
               .filter((node) => node.nodeNetworkId === networkId);

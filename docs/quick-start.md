@@ -9,6 +9,7 @@ const {
   AeSdk,
   MemoryAccount,
   Node,
+  Compiler,
   AE_AMOUNT_FORMATS,
   generateKeyPair
 } = require('@aeternity/aepp-sdk')
@@ -40,7 +41,7 @@ const senderAccount = new MemoryAccount('<SENDER_SECRET_KEY>');
 (async function () {
   const node = new Node(NODE_URL)
   const aeSdk = new AeSdk({
-    compilerUrl: COMPILER_URL,
+    onCompiler: new Compiler(COMPILER_URL),
     nodes: [{ name: 'testnet', instance: node }],
     accounts: [senderAccount],
   })

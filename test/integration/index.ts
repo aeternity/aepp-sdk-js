@@ -15,7 +15,9 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { AeSdk, MemoryAccount, Node } from '../../src';
+import {
+  AeSdk, Compiler, MemoryAccount, Node,
+} from '../../src';
 import '..';
 
 export const url = process.env.TEST_URL ?? 'http://localhost:3013';
@@ -28,8 +30,7 @@ const genesisAccount = new MemoryAccount(secretKey);
 export async function getSdk(accountCount = 1): Promise<AeSdk> {
   const accounts = new Array(accountCount).fill(null).map(() => MemoryAccount.generate());
   const sdk = new AeSdk({
-    compilerUrl,
-    ignoreVersion,
+    onCompiler: new Compiler(compilerUrl, { ignoreVersion }),
     nodes: [{ name: 'test', instance: new Node(url, { ignoreVersion }) }],
     accounts,
     _expectedMineRate: 1000,
