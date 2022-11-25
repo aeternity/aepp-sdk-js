@@ -81,27 +81,5 @@ This may be done in `tsconfig.json`:
 }
 ```
 
-------------------------------
-
-**Note**: If you experience errors during the installation, you might need to install build tools for your OS.
-
-**Windows: Windows Build Tools**
-```bash
-npm install -g windows-build-tools
-```
-
-**Ubuntu / Debian: Build Essential**
-```bash
-sudo apt-get update
-sudo apt-get install build-essential
-```
-
-**Mac**
-
-Download [Xcode](https://apps.apple.com/de/app/xcode/id497799835?mt=12) from AppStore, then run
-```
-xcode-select --install
-```
-
 ## Command Line Interface (CLI)
 If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the [💻 CLI](https://github.com/aeternity/aepp-cli-js) and follow the instructions mentioned there.
