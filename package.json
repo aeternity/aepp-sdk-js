@@ -4,6 +4,18 @@
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "types": "es/index.d.ts",
+  "typesVersions": {
+    "<4.5": {
+      "es/index.d.ts": [
+        "./types-legacy/ts4.2/index.d.ts"
+      ]
+    },
+    "<4.7": {
+      "es/index.d.ts": [
+        "./types-legacy/ts4.5/index.d.ts"
+      ]
+    }
+  },
   "module": "es/index.mjs",
   "browser": {
     "dist/aepp-sdk.js": "./dist/aepp-sdk.browser.js"
@@ -15,9 +27,10 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
+    "build:types": "tsc && node tooling/downlevel/run.mjs",
+    "build:es": "babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
     "build:api": "node tooling/autorest/compiler-prepare.mjs && npx autorest tooling/autorest/compiler.yaml --output-artifact:code-model-v4 && npx autorest tooling/autorest/node.yaml --output-artifact:code-model-v4",
-    "build": "npm run build:api && webpack && npm run build:es",
+    "build": "npm run build:api && webpack && npm run build:types && npm run build:es",
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.mjs",
     "docs:api": "typedoc",
     "commitlint": "commitlint --from develop",
@@ -97,6 +110,7 @@
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "cross-fetch": "^3.1.5",
+    "downlevel-dts": "github:aeternity/downlevel-dts",
     "eslint": "^8.28.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -118,6 +132,7 @@
   },
   "files": [
     "dist",
+    "types-legacy",
     "src",
     "es"
   ],

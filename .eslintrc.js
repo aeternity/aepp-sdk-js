@@ -21,7 +21,9 @@ module.exports = {
     '@typescript-eslint',
     'rulesdir',
   ],
-  ignorePatterns: ['dist', 'es', 'src/apis', 'docs/api', 'test/environment/ledger/browser'],
+  ignorePatterns: [
+    'dist', 'es', 'src/apis', 'docs/api', 'test/environment/ledger/browser', 'types-legacy',
+  ],
   rules: {
     'rulesdir/tsdoc-syntax': 'error',
     'no-spaced-func': 'off',

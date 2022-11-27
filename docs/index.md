@@ -80,6 +80,7 @@ This may be done in `tsconfig.json`:
   }
 }
 ```
+SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.
 
 ## Command Line Interface (CLI)
 If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the [💻 CLI](https://github.com/aeternity/aepp-cli-js) and follow the instructions mentioned there.
