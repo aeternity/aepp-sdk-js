@@ -24,10 +24,9 @@ module.exports = {
       },
     },
   },
-  // the workarounds that are only needed when sdk is not in the node_modules folder
+  // this workaround is only needed when sdk is not in the node_modules folder
   chainWebpack: (config) => {
     const sdkPath = path.join(__dirname, '..', '..', '..', 'es');
-    config.resolve.alias.set('@aeternity/aepp-sdk', sdkPath);
     config.module.rule('mjs').include.add(sdkPath);
   },
 };

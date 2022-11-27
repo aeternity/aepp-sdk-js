@@ -23,6 +23,9 @@ run_node_example paying-for-contract-call-tx.mjs
 run_node_example paying-for-spend-tx.mjs
 run_node_example transfer-ae.mjs
 
+# revisit --ignore-scripts after solving https://github.com/npm/cli/issues/4202
+sed -i '' 's/"prepare"/"rem-prepare"/g' package.json
+
 echo Build example aepp
 cd ./examples/browser/aepp
 npm i
@@ -37,3 +40,6 @@ echo Build example wallet-web-extension
 cd ../wallet-web-extension
 npm i
 npm run build
+
+cd ../../..
+sed -i '' 's/"rem-prepare"/"prepare"/g' package.json
