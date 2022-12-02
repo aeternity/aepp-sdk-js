@@ -1207,7 +1207,7 @@
 <p>The SDK needs to interact with following components in order to enable smart contract interactions on the æternity blockchain:</p>
 <ul>
 <li><a href="https://github.com/aeternity/aeternity">æternity</a> (host your own one or use the public testnet node at <code>https://testnet.aeternity.io</code>)</li>
-<li><a href="https://github.com/aeternity/aesophia_http">aesophia_http</a> (host your own one or use the public compiler at <code>https://compiler.aepps.com</code>)</li>
+<li><a href="https://github.com/aeternity/aesophia_http">aesophia_http</a> (host your own one or use the public compiler at <code>https://v7.compiler.aepps.com</code>)</li>
 </ul>
 <p>Note:</p>
 <ul>
@@ -1215,9 +1215,9 @@
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <div class="highlight"><pre><span></span><code><span class="c1">// node.js import</span><span class="w"></span>
-<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span><span class="w"></span>
 <span class="c1">// ES import</span><span class="w"></span>
-<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
 </code></pre></div>
 <h2 id="2-create-an-instance-of-the-sdk">2. Create an instance of the SDK</h2>
 <p>When creating an instance of the SDK you need to provide an account which will be used to sign transactions like <code>ContractCreateTx</code> and <code>ContractCallTx</code> that will be broadcasted to the network.</p>
@@ -1227,7 +1227,7 @@
 <span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"></span>
 <span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span><span class="w"></span>
 <span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">account</span><span class="p">],</span><span class="w"></span>
-<span class="w">  </span><span class="nx">compilerUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://compiler.aepps.com&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">// ideally host your own compiler</span><span class="w"></span>
+<span class="w">  </span><span class="nx">onCompiler</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="s1">&#39;https://v7.compiler.aepps.com&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1">// ideally host your own compiler</span><span class="w"></span>
 <span class="p">})</span><span class="w"></span>
 </code></pre></div>
 <p>Note:</p>
