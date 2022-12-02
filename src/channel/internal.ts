@@ -305,7 +305,7 @@ export async function initialize(
   const wsUrl = new URL(url);
   Object.entries(channelOptions)
     .filter(([key]) => !['sign', 'debug'].includes(key))
-    .forEach(([key, value]) => wsUrl.searchParams.set(pascalToSnake(key), value));
+    .forEach(([key, value]) => wsUrl.searchParams.set(pascalToSnake(key), value.toString()));
   wsUrl.searchParams.set('protocol', 'json-rpc');
   changeStatus(channel, 'connecting');
   channel._websocket = new W3CWebSocket(wsUrl.toString());

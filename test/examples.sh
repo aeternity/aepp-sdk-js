@@ -8,6 +8,11 @@ echo Run environment/node.mjs
 echo Run environment/node.ts
 ./test/environment/node.ts
 
+echo Check typescript
+cd ./test/environment/typescript/
+./run.sh
+cd ../../..
+
 run_node_example () {
   echo Run $1
   cat ./examples/node/$1 | sed -e "s|@aeternity/aepp-sdk|./es/index.mjs|" | node --input-type=module

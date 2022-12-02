@@ -182,10 +182,10 @@ export function computeBidFee(
  */
 export function computeAuctionEndBlock(name: AensName, claimHeight: number): number {
   const length = name.length - AENS_SUFFIX.length;
-  const h = (length <= 4 && 62 * NAME_BID_TIMEOUT_BLOCKS)
-    || (length <= 8 && 31 * NAME_BID_TIMEOUT_BLOCKS)
-    || (length <= 12 && NAME_BID_TIMEOUT_BLOCKS)
-    || 0;
+  const h = (length <= 4 ? 62 * NAME_BID_TIMEOUT_BLOCKS : null)
+    ?? (length <= 8 ? 31 * NAME_BID_TIMEOUT_BLOCKS : null)
+    ?? (length <= 12 ? NAME_BID_TIMEOUT_BLOCKS : null)
+    ?? 0;
   return h + claimHeight;
 }
 

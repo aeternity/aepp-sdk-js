@@ -21,7 +21,7 @@ debug/
 /coverage
 coverage.*
 .nyc_output/
-/examples/**/package-lock.json
+/**/package-lock.json
 /examples/**/dist
 /examples/**/artifacts
 .history
@@ -30,3 +30,4 @@ site
 /src/apis/
 /tooling/autorest/compiler-swagger.yaml
 /test/environment/ledger/browser
+/types-legacy

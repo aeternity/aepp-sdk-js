@@ -62,6 +62,26 @@ npm install
 npm run build
 ```
 
+**Note**: If you experience errors during the building, you might need to install build tools for your OS.
+
+**Windows: Windows Build Tools**
+```bash
+npm install -g windows-build-tools
+```
+
+**Ubuntu / Debian: Build Essential**
+```bash
+sudo apt-get update
+sudo apt-get install build-essential
+```
+
+**Mac**
+
+Download [Xcode](https://apps.apple.com/de/app/xcode/id497799835?mt=12) from AppStore, then run
+```
+xcode-select --install
+```
+
 ## Generate bundle report
 
 ```bash
