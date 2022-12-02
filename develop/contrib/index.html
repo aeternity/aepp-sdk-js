@@ -1133,6 +1133,18 @@ npm run docs:examples <span class="o">&amp;&amp;</span> npm run docs:api
 <div class="highlight"><pre><span></span><code>npm install
 npm run build
 </code></pre></div>
+<p><strong>Note</strong>: If you experience errors during the building, you might need to install build tools for your OS.</p>
+<p><strong>Windows: Windows Build Tools</strong>
+<div class="highlight"><pre><span></span><code>npm install -g windows-build-tools
+</code></pre></div></p>
+<p><strong>Ubuntu / Debian: Build Essential</strong>
+<div class="highlight"><pre><span></span><code>sudo apt-get update
+sudo apt-get install build-essential
+</code></pre></div></p>
+<p><strong>Mac</strong></p>
+<p>Download <a href="https://apps.apple.com/de/app/xcode/id497799835?mt=12">Xcode</a> from AppStore, then run
+<div class="highlight"><pre><span></span><code>xcode-select --install
+</code></pre></div></p>
 <h2 id="generate-bundle-report">Generate bundle report</h2>
 <div class="highlight"><pre><span></span><code>npx webpack --env REPORT
 </code></pre></div>

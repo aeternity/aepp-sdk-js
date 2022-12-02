@@ -1189,20 +1189,8 @@ This may be done in <code>tsconfig.json</code>:
 <span class="gi">+   &quot;allowSyntheticDefaultImports&quot;: true</span><span class="w"></span>
 <span class="w"> </span> }<span class="w"></span>
 <span class="w">}</span>
-</code></pre></div></p>
-<hr />
-<p><strong>Note</strong>: If you experience errors during the installation, you might need to install build tools for your OS.</p>
-<p><strong>Windows: Windows Build Tools</strong>
-<div class="highlight"><pre><span></span><code>npm install -g windows-build-tools
-</code></pre></div></p>
-<p><strong>Ubuntu / Debian: Build Essential</strong>
-<div class="highlight"><pre><span></span><code>sudo apt-get update
-sudo apt-get install build-essential
-</code></pre></div></p>
-<p><strong>Mac</strong></p>
-<p>Download <a href="https://apps.apple.com/de/app/xcode/id497799835?mt=12">Xcode</a> from AppStore, then run
-<div class="highlight"><pre><span></span><code>xcode-select --install
-</code></pre></div></p>
+</code></pre></div>
+SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.</p>
 <h2 id="command-line-interface-cli">Command Line Interface (CLI)</h2>
 <p>If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the <a href="https://github.com/aeternity/aepp-cli-js">💻 CLI</a> and follow the instructions mentioned there.</p>
 
