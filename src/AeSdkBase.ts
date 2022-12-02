@@ -2,7 +2,7 @@ import Node from './Node';
 import AccountBase from './account/Base';
 import { CompilerError, DuplicateNodeError, NodeNotFoundError } from './utils/errors';
 import { Encoded } from './utils/encoder';
-import Compiler from './contract/Compiler';
+import CompilerHttp from './contract/CompilerHttp';
 import AeSdkMethods, { OnAccount, getValueOrErrorProxy } from './AeSdkMethods';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
@@ -18,39 +18,25 @@ export default class AeSdkBase extends AeSdkMethods {
 
   selectedNodeName?: string;
 
-  compilerApi: Compiler;
-
   /**
    * @param options - Options
    * @param options.nodes - Array of nodes
-   * @param options.compilerUrl - Url for compiler API
-   * @param options.ignoreVersion - Don't check node or compiler version
    */
   constructor(
-    {
-      nodes = [], compilerUrl, ignoreVersion = false, ...options
-    }: ConstructorParameters<typeof AeSdkMethods>[0] & {
+    { nodes = [], ...options }: ConstructorParameters<typeof AeSdkMethods>[0] & {
       nodes?: Array<{ name: string; instance: Node }>;
-      compilerUrl?: string;
-      ignoreVersion?: boolean;
     } = {},
   ) {
     super(options);
 
     nodes.forEach(({ name, instance }, i) => this.addNode(name, instance, i === 0));
-
-    if (compilerUrl == null) {
-      this.compilerApi = getValueOrErrorProxy(() => {
-        throw new CompilerError('You can\'t use Compiler API. Compiler is not ready!');
-      });
-    } else this.setCompilerUrl(compilerUrl, { ignoreVersion });
   }
 
-  setCompilerUrl(
-    compilerUrl: string,
-    { ignoreVersion = false }: { ignoreVersion?: boolean } = {},
-  ): void {
-    this.compilerApi = new Compiler(compilerUrl, { ignoreVersion });
+  get compilerApi(): CompilerHttp {
+    if (this._options.onCompiler == null) {
+      throw new CompilerError('You can\'t use Compiler API. Compiler is not ready!');
+    }
+    return this._options.onCompiler;
   }
 
   get api(): Node {
@@ -167,12 +153,12 @@ export default class AeSdkBase extends AeSdkMethods {
   override _getOptions(): {
     onNode: Node;
     onAccount: AccountBase;
-    onCompiler: Compiler;
+    onCompiler: CompilerHttp;
   } {
     return {
       ...super._getOptions(),
       onNode: getValueOrErrorProxy(() => this.api),
-      onCompiler: this.compilerApi,
+      onCompiler: getValueOrErrorProxy(() => this.compilerApi),
     };
   }
 }

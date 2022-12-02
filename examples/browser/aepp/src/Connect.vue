@@ -40,9 +40,9 @@
 </template>
 
 <script>
-import { walletDetector, BrowserWindowMessageConnection } from '@aeternity/aepp-sdk'
-import Value from './Value'
-import { mapGetters } from 'vuex'
+import { walletDetector, BrowserWindowMessageConnection } from '@aeternity/aepp-sdk';
+import { mapGetters } from 'vuex';
+import Value from './Value.vue';
 
 export default {
   components: { Value },
@@ -52,53 +52,55 @@ export default {
     connectPromise: null,
     reverseIframe: null,
     reverseIframeWalletUrl: 'http://localhost:9000',
-    walletInfo: null
+    walletInfo: null,
   }),
   computed: {
     ...mapGetters('aeSdk', ['aeSdk']),
-    walletName () {
-      if (!this.aeSdk) return 'SDK is not ready'
-      if (!this.walletConnected) return 'Wallet is not connected'
-      return this.walletInfo.name
-    }
+    walletName() {
+      if (!this.aeSdk) return 'SDK is not ready';
+      if (!this.walletConnected) return 'Wallet is not connected';
+      return this.walletInfo.name;
+    },
   },
   methods: {
-    async scanForWallets () {
+    async scanForWallets() {
       return new Promise((resolve) => {
+        let stopScan;
+
         const handleWallets = async ({ wallets, newWallet }) => {
-          newWallet = newWallet || Object.values(wallets)[0]
+          newWallet = newWallet || Object.values(wallets)[0];
           if (confirm(`Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`)) {
-            console.log('newWallet', newWallet)
-            stopScan()
+            console.log('newWallet', newWallet);
+            stopScan();
 
-            this.walletInfo = await this.aeSdk.connectToWallet(newWallet.getConnection())
-            this.walletConnected = true
-            const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected')
-            this.$store.commit('aeSdk/setAddress', Object.keys(current)[0])
-            resolve()
+            this.walletInfo = await this.aeSdk.connectToWallet(newWallet.getConnection());
+            this.walletConnected = true;
+            const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected');
+            this.$store.commit('aeSdk/setAddress', Object.keys(current)[0]);
+            resolve();
           }
-        }
+        };
 
-        const scannerConnection = new BrowserWindowMessageConnection()
-        const stopScan = walletDetector(scannerConnection, handleWallets)
-      })
+        const scannerConnection = new BrowserWindowMessageConnection();
+        stopScan = walletDetector(scannerConnection, handleWallets);
+      });
     },
-    async connect () {
+    async connect() {
       if (this.connectMethod === 'reverse-iframe') {
-        this.reverseIframe = document.createElement('iframe')
-        this.reverseIframe.src = this.reverseIframeWalletUrl
-        this.reverseIframe.style.display = 'none'
-        document.body.appendChild(this.reverseIframe)
+        this.reverseIframe = document.createElement('iframe');
+        this.reverseIframe.src = this.reverseIframeWalletUrl;
+        this.reverseIframe.style.display = 'none';
+        document.body.appendChild(this.reverseIframe);
       }
-      await this.$store.dispatch('aeSdk/initialize')
-      await this.scanForWallets()
+      await this.$store.dispatch('aeSdk/initialize');
+      await this.scanForWallets();
     },
-    async disconnect () {
-      await this.aeSdk.disconnectWallet()
-      this.walletConnected = false
-      if (this.reverseIframe) this.reverseIframe.remove()
-      this.$emit('aeSdk', null)
-    }
-  }
-}
+    async disconnect() {
+      await this.aeSdk.disconnectWallet();
+      this.walletConnected = false;
+      if (this.reverseIframe) this.reverseIframe.remove();
+      this.$emit('aeSdk', null);
+    },
+  },
+};
 </script>

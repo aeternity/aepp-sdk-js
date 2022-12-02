@@ -55,12 +55,6 @@ describe('Contract', () => {
     aeSdk = await getSdk(2);
   });
 
-  it('compiles Sophia code', async () => {
-    bytecode = (await aeSdk.compilerApi.compileContract({ code: identitySourceCode }))
-      .bytecode as Encoded.ContractBytearray;
-    expect(bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
-  });
-
   it('deploys precompiled bytecode', async () => {
     identityContract = await aeSdk
       .initializeContract({ bytecode, sourceCode: identitySourceCode });
@@ -240,56 +234,6 @@ describe('Contract', () => {
         .to.be.equal(3n);
       expect((await contract.sumNumbers(1, 2, { callStatic: true })).decodedResult)
         .to.be.equal(3n);
-    });
-  });
-
-  describe('Sophia Compiler', () => {
-    it('compile', async () => {
-      bytecode = (await aeSdk.compilerApi.compileContract({ code: identitySourceCode }))
-        .bytecode as Encoded.ContractBytearray;
-      expect(bytecode.split('_')[0]).to.be.equal('cb');
-    });
-
-    it('throws clear exception if compile broken contract', async () => {
-      await expect(aeSdk.compilerApi.compileContract({
-        code:
-          'contract Foo =\n'
-          + '  entrypoint getArg(x : bar) = x\n'
-          + '  entrypoint getArg(x : int) = baz\n'
-          + '  entrypoint getArg1(x : int) = baz\n',
-      })).to.be.rejectedWith(
-        'compile error:\n'
-        + 'type_error:3:3: Duplicate definitions of `getArg` at\n'
-        + '  - line 2, column 3\n'
-        + '  - line 3, column 3\n'
-        + 'type_error:3:32: Unbound variable `baz`\n'
-        + 'type_error:4:33: Unbound variable `baz`',
-      );
-    });
-
-    it('generate contract ACI', async () => {
-      const aci = await aeSdk.compilerApi.generateACI({ code: identitySourceCode });
-      expect(aci).to.have.property('encodedAci');
-      expect(aci).to.have.property('externalEncodedAci');
-      expect(aci).to.have.property('interface');
-    });
-
-    it('throws clear exception if generating ACI with no arguments', async () => {
-      await expect(aeSdk.compilerApi.generateACI({} as any))
-        .to.be.rejectedWith('Error "body.code cannot be null or undefined." occurred in serializing the payload - undefined');
-    });
-
-    it('validate bytecode', async () => {
-      expect(await aeSdk.compilerApi.validateByteCode({ bytecode, source: identitySourceCode }))
-        .to.be.eql({ body: {} });
-    });
-
-    it('Use invalid compiler url', async () => {
-      const url = aeSdk.compilerApi.$host;
-      aeSdk.setCompilerUrl('https://compiler.aepps.comas');
-      await expect(aeSdk.compilerApi.generateACI({ code: 'test' }))
-        .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas');
-      aeSdk.setCompilerUrl(url);
     });
   });
 

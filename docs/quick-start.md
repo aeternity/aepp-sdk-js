@@ -9,6 +9,7 @@ const {
   AeSdk,
   MemoryAccount,
   Node,
+  CompilerHttp,
   AE_AMOUNT_FORMATS,
   generateKeyPair
 } = require('@aeternity/aepp-sdk')
@@ -33,14 +34,14 @@ This example shows:
 
 ```js
 const NODE_URL = 'https://testnet.aeternity.io'
-const COMPILER_URL = 'https://compiler.aepps.com' // required for contract interactions
+const COMPILER_URL = 'https://v7.compiler.aepps.com' // required for contract interactions
 // replace <SENDER_SECRET_KEY> with the generated secretKey from step 2
 const senderAccount = new MemoryAccount('<SENDER_SECRET_KEY>');
 
 (async function () {
   const node = new Node(NODE_URL)
   const aeSdk = new AeSdk({
-    compilerUrl: COMPILER_URL,
+    onCompiler: new CompilerHttp(COMPILER_URL),
     nodes: [{ name: 'testnet', instance: node }],
     accounts: [senderAccount],
   })

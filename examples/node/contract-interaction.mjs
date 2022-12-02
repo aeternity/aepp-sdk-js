@@ -27,7 +27,9 @@
 // ## 1. Specify imports
 //
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk';
+import {
+  AeSdk, CompilerHttp, Node, MemoryAccount,
+} from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -47,7 +49,7 @@ contract Multiplier =
 `;
 const ACCOUNT_SECRET_KEY = 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b';
 const NODE_URL = 'https://testnet.aeternity.io';
-const COMPILER_URL = 'https://compiler.aepps.com';
+const COMPILER_URL = 'https://v7.compiler.aepps.com';
 
 // Note:
 //
@@ -62,7 +64,7 @@ const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
   accounts: [account],
-  compilerUrl: COMPILER_URL,
+  onCompiler: new CompilerHttp(COMPILER_URL),
 });
 
 // ## 4. Get contract instance

@@ -75,10 +75,10 @@ describe('Paying for transaction of another account', () => {
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);
     aeSdkNotPayingFee.addAccount(MemoryAccount.generate(), { select: true });
-    aeSdkNotPayingFee._options = {
+    Object.assign(aeSdkNotPayingFee._options, {
       waitMined: false,
       innerTx: true,
-    };
+    });
     const contract = await aeSdkNotPayingFee.initializeContract({ sourceCode });
     const { rawTx: contractDeployTx, address } = await contract.$deploy([42]);
     contractAddress = address;

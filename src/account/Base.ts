@@ -16,7 +16,7 @@
  */
 import { Encoded } from '../utils/encoder';
 import Node from '../Node';
-import Compiler from '../contract/Compiler';
+import CompilerHttp from '../contract/CompilerHttp';
 
 /**
  * Account is one of the three basic building blocks of an
@@ -43,7 +43,7 @@ export default abstract class AccountBase {
         args?: any[];
       };
       onNode?: Node;
-      onCompiler?: Compiler;
+      onCompiler?: CompilerHttp;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },

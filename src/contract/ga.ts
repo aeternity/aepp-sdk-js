@@ -31,7 +31,7 @@ import Contract from './Contract';
 import { send, SendOptions } from '../spend';
 import Node from '../Node';
 import { getAccount } from '../chain';
-import Compiler from './Compiler';
+import CompilerHttp from './CompilerHttp';
 
 /**
  * Convert current account to GA
@@ -90,7 +90,7 @@ interface CreateGeneralizedAccountOptions extends
   BuildTxOptions<Tag.GaAttachTx, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
   SendOptions {
   onAccount: AccountBase;
-  onCompiler: Compiler;
+  onCompiler: CompilerHttp;
   onNode: Node;
   gasLimit?: number;
 }
