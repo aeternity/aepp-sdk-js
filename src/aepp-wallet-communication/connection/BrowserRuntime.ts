@@ -43,7 +43,8 @@ export default class BrowserRuntimeConnection extends BrowserConnection {
     super.connect(onMessage, onDisconnect);
     this.port.onMessage.addListener((message, port) => {
       this.receiveMessage(message);
-      onMessage(message, port.name, port);
+      // TODO: make `origin` optional because sender url is not available on aepp side
+      onMessage(message, port.sender?.url ?? '', port);
     });
     this.port.onDisconnect.addListener(onDisconnect);
   }

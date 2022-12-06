@@ -5,20 +5,27 @@ import {
 } from '@aeternity/aepp-sdk';
 
 const aeppInfo = {};
-const genConfirmCallback = (actionName) => (aeppId) => {
-  if (!confirm(`Client ${aeppInfo[aeppId].name} with id ${aeppId} want to ${actionName}`)) {
+const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
+  if (!confirm([
+    `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}`,
+    JSON.stringify(parameters, null, 2),
+  ].join('\n'))) {
     throw new RpcRejectedByUserError();
   }
 };
 
 class AccountMemoryProtected extends MemoryAccount {
-  async signTransaction(tx, { aeppRpcClientId: id, ...options } = {}) {
-    if (id != null) genConfirmCallback(`sign transaction ${tx}`)(id);
+  async signTransaction(tx, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+    if (id != null) {
+      genConfirmCallback(`sign transaction ${tx}`)(id, options, aeppOrigin);
+    }
     return super.signTransaction(tx, options);
   }
 
-  async signMessage(message, { aeppRpcClientId: id, ...options } = {}) {
-    if (id != null) genConfirmCallback(`sign message ${message}`)(id);
+  async signMessage(message, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+    if (id != null) {
+      genConfirmCallback(`sign message ${message}`)(id, options, aeppOrigin);
+    }
     return super.signMessage(message, options);
   }
 
@@ -41,9 +48,8 @@ const aeSdk = new AeSdkWallet({
   id: browser.runtime.id,
   type: WALLET_TYPE.extension,
   name: 'Wallet WebExtension',
-  // Hook for sdk registration
-  onConnection(aeppId, params) {
-    if (!confirm(`Aepp ${params.name} with id ${aeppId} wants to connect`)) {
+  onConnection: (aeppId, params, origin) => {
+    if (!confirm(`Client ${params.name} with id ${aeppId} at ${origin} want to connect`)) {
       throw new RpcConnectionDenyError();
     }
     aeppInfo[aeppId] = params;
