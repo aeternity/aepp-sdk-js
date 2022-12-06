@@ -71,7 +71,7 @@ const WindowPostMessageFake = (
     this.messages.push(msg);
     setTimeout(() => {
       if (typeof this.listener === 'function') {
-        this.listener({ data: msg, origin: 'testOrigin', source });
+        this.listener({ data: msg, origin: 'http://origin.test', source });
       }
     });
   },
@@ -213,11 +213,19 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Subscribe to address: wallet accept', async () => {
-      wallet.onSubscription = () => {};
+      let checkPromise;
+      wallet.onSubscription = (id, params, origin) => {
+        checkPromise = Promise.resolve().then(() => {
+          expect(id.split('-').length).to.be.equal(5);
+          expect(params).to.be.eql({ type: 'subscribe', value: 'connected' });
+          expect(origin).to.be.equal('http://origin.test');
+        });
+      };
       await aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected');
       await aepp.subscribeAddress(SUBSCRIPTION_TYPES.unsubscribe, 'connected');
       const subscriptionResponse = await aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected');
 
+      await checkPromise;
       subscriptionResponse.subscription.should.be.an('array');
       subscriptionResponse.subscription.filter((e) => e === 'connected').length.should.be.equal(1);
       subscriptionResponse.address.current.should.be.an('object');
@@ -250,10 +258,18 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Ask for address: subscribed for accounts -> wallet accept', async () => {
-      wallet.onAskAccounts = () => {};
+      let checkPromise;
+      wallet.onAskAccounts = (id, params, origin) => {
+        checkPromise = Promise.resolve().then(() => {
+          expect(id.split('-').length).to.be.equal(5);
+          expect(params).to.be.equal(undefined);
+          expect(origin).to.be.equal('http://origin.test');
+        });
+      };
       const addressees = await aepp.askAddresses();
       addressees.length.should.be.equal(2);
       addressees[0].should.be.equal(account.address);
+      await checkPromise;
     });
 
     it('Not authorize', async () => {
@@ -266,7 +282,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign transaction: wallet deny', async () => {
-      wallet._resolveAccount().signTransaction = () => {
+      let origin;
+      wallet._resolveAccount().signTransaction = (tx, { aeppOrigin }) => {
+        origin = aeppOrigin;
         throw new RpcRejectedByUserError();
       };
       const tx = await aepp.buildTx(Tag.SpendTx, {
@@ -277,6 +295,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       });
       await expect(aepp.signTransaction(tx)).to.be.eventually
         .rejectedWith('Operation rejected by user').with.property('code', 4);
+      expect(origin).to.be.equal('http://origin.test');
     });
 
     it('Sign transaction: fails with unknown error', async () => {
@@ -346,11 +365,14 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Sign message: rejected', async () => {
-      wallet._resolveAccount().signMessage = () => {
+      let origin;
+      wallet._resolveAccount().signMessage = (message, { aeppOrigin } = {}) => {
+        origin = aeppOrigin;
         throw new RpcRejectedByUserError();
       };
       await expect(aepp.signMessage('test')).to.be.eventually
         .rejectedWith('Operation rejected by user').with.property('code', 4);
+      expect(origin).to.be.equal('http://origin.test');
     });
 
     it('Sign message', async () => {
@@ -490,7 +512,6 @@ describe('Aepp<->Wallet', function aeppWallet() {
   });
 
   describe('New RPC Wallet-AEPP: Bind wallet node to AEPP', () => {
-    const keypair = generateKeyPair();
     let aepp: AeSdkAepp;
     let wallet: AeSdkWallet;
 
@@ -520,21 +541,11 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Subscribe to address: wallet accept', async () => {
-      const accounts = {
-        connected: { [keypair.publicKey]: {} },
-        current: wallet.addresses().reduce((acc, v) => ({ ...acc, [v]: {} }), {}),
-      };
-      wallet.onSubscription = () => accounts;
+      wallet.onSubscription = () => {};
       await aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected');
       await aepp.subscribeAddress(SUBSCRIPTION_TYPES.unsubscribe, 'connected');
       const subscriptionResponse = await aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected');
-
       subscriptionResponse.subscription.should.be.an('array');
-      subscriptionResponse.subscription.filter((e) => e === 'connected').length.should.be.equal(1);
-      subscriptionResponse.address.current.should.be.an('object');
-      Object.keys(subscriptionResponse.address.current)[0].should.be.equal(account.address);
-      subscriptionResponse.address.connected.should.be.an('object');
-      Object.keys(subscriptionResponse.address.connected).length.should.be.equal(0);
     });
 
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
