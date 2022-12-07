@@ -217,6 +217,7 @@ class Contract<M extends ContractMethodsBase> {
   async $compile(): Promise<Encoded.ContractBytearray> {
     if (this.$options.bytecode != null) return this.$options.bytecode;
     if (this.$options.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
+    if (this.$options.onCompiler == null) throw new IllegalArgumentError('Can\'t compile without compiler');
     this.$options.bytecode = (await this.$options.onCompiler.compileContract({
       code: this.$options.sourceCode, options: { fileSystem: this.$options.fileSystem },
     })).bytecode as Encoded.ContractBytearray;
@@ -502,7 +503,7 @@ class Contract<M extends ContractMethodsBase> {
       address?: Encoded.ContractAddress | AensName;
     },
   ): Promise<ContractWithMethods<M>> {
-    if (aci == null && sourceCode != null) {
+    if (aci == null && sourceCode != null && onCompiler != null) {
       // TODO: should be fixed when the compiledAci interface gets updated
       aci = await onCompiler.generateACI({ code: sourceCode, options: { fileSystem } }) as Aci;
     }
@@ -525,14 +526,17 @@ class Contract<M extends ContractMethodsBase> {
       if (contract.active == null) throw new InactiveContractError(address);
     }
 
-    if (validateBytecode != null) {
+    if (validateBytecode === true) {
       if (address == null) throw new MissingContractAddressError('Can\'t validate bytecode without contract address');
       const onChanBytecode = (await getContractByteCode(address, { onNode })).bytecode;
-      const isValid: boolean = sourceCode != null
-        ? await onCompiler.validateByteCode(
+      let isValid = false;
+      if (bytecode != null) isValid = bytecode === onChanBytecode;
+      else if (sourceCode != null) {
+        if (onCompiler == null) throw new IllegalArgumentError('Can\'t validate bytecode without compiler');
+        isValid = await onCompiler.validateByteCode(
           { bytecode: onChanBytecode, source: sourceCode, options: { fileSystem } },
-        ).then(() => true, () => false)
-        : bytecode === onChanBytecode;
+        ).then(() => true, () => false);
+      }
       if (!isValid) throw new BytecodeMismatchError(sourceCode != null ? 'source code' : 'bytecode');
     }
 
@@ -551,7 +555,7 @@ class Contract<M extends ContractMethodsBase> {
     sourceCode?: string;
     bytecode?: Encoded.ContractBytearray;
     address?: Encoded.ContractAddress;
-    onCompiler: CompilerHttp;
+    onCompiler?: CompilerHttp;
     onNode: Node;
     omitUnknown?: boolean;
     contractAddressToName?: { [key: Encoded.ContractAddress]: string };
@@ -560,7 +564,7 @@ class Contract<M extends ContractMethodsBase> {
 
   constructor({ aci, ...otherOptions }: {
     onAccount?: AccountBase;
-    onCompiler: CompilerHttp;
+    onCompiler?: CompilerHttp;
     onNode: Node;
     sourceCode?: string;
     bytecode?: Encoded.ContractBytearray;
