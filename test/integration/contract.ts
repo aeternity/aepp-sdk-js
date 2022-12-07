@@ -116,7 +116,7 @@ describe('Contract', () => {
   });
 
   it('Call-Static deploy transaction on specific hash', async () => {
-    const { hash } = await aeSdk.api.getTopHeader();
+    const hash = (await aeSdk.api.getTopHeader()).hash as Encoded.MicroBlockHash;
     const { result } = await identityContract.$deploy([], { callStatic: true, top: hash });
     assertNotNull(result);
     result.should.have.property('gasUsed');

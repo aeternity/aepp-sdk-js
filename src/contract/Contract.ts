@@ -26,8 +26,8 @@ import { Encoder as Calldata } from '@aeternity/aepp-calldata';
 import { DRY_RUN_ACCOUNT } from '../tx/builder/schema';
 import { Tag, AensName } from '../tx/builder/constants';
 import { buildContractIdByContractTx, unpackTx } from '../tx/builder';
-import { _buildTx } from '../tx';
-import { send } from '../spend';
+import { _buildTx, BuildTxOptions } from '../tx';
+import { send, SendOptions } from '../spend';
 import { decode, Encoded } from '../utils/encoder';
 import {
   MissingContractDefError,
@@ -70,7 +70,7 @@ interface FunctionACI {
   stateful: boolean;
 }
 
-interface Aci extends BaseAci {
+export interface Aci extends BaseAci {
   encodedAci: {
     contract: {
       name: string;
@@ -248,10 +248,9 @@ class Contract<M extends ContractMethodsBase> {
 
   protected async _sendAndProcess(
     tx: Encoded.Transaction,
-    options: any,
+    options: SendOptions,
   ): Promise<SendAndProcessReturnType> {
-    options = { ...this.$options, ...options };
-    const txData = await send(tx, options);
+    const txData = await send(tx, { ...this.$options, ...options });
     const result = {
       hash: txData.hash,
       tx: unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>(txData.rawTx),
@@ -286,18 +285,21 @@ class Contract<M extends ContractMethodsBase> {
    */
   async $deploy(
     params: MethodParameters<M, 'init'>,
-    options?: Parameters<Contract<M>['$call']>[2] & Parameters<Contract<M>['_sendAndProcess']>[1],
+    options?: Parameters<Contract<M>['$call']>[2]
+    & Partial<BuildTxOptions<Tag.ContractCreateTx, 'ownerId' | 'code' | 'callData'>>,
   ): Promise<Omit<SendAndProcessReturnType, 'hash'> & {
       transaction?: Encoded.TxHash;
       owner?: Encoded.AccountAddress;
       address?: Encoded.ContractAddress;
     }> {
-    const opt = { ...this.$options, ...options };
+    const { callStatic, ...opt } = { ...this.$options, ...options };
     if (this.$options.bytecode == null) await this.$compile();
-    if (opt.callStatic === true) return this.$call('init', params, opt);
+    if (callStatic === true) return this.$call('init', params, { ...opt, callStatic });
     if (this.$options.address != null) throw new DuplicateContractError();
 
+    if (opt.onAccount == null) throw new IllegalArgumentError('Can\'t deploy without account');
     const ownerId = opt.onAccount.address;
+    if (this.$options.bytecode == null) throw new IllegalArgumentError('Can\'t deploy without bytecode');
     const tx = await _buildTx(Tag.ContractCreateTx, {
       ...opt,
       gasLimit: opt.gasLimit ?? await this._estimateGas('init', params, opt),
@@ -306,7 +308,7 @@ class Contract<M extends ContractMethodsBase> {
       ownerId,
     });
     this.$options.address = buildContractIdByContractTx(tx);
-    const { hash, ...other } = await this._sendAndProcess(tx, opt);
+    const { hash, ...other } = await this._sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
     return {
       ...other,
       owner: ownerId,
@@ -341,25 +343,32 @@ class Contract<M extends ContractMethodsBase> {
   async $call<Fn extends MethodNames<M>>(
     fn: Fn,
     params: MethodParameters<M, Fn>,
-    options: object = {},
+    options: Partial<BuildTxOptions<Tag.ContractCallTx, 'callerId' | 'contractId' | 'callData'>>
+    & Parameters<Contract<M>['$decodeEvents']>[1]
+    & Omit<Parameters<Contract<M>['_sendAndProcess']>[1], 'onAccount' | 'onNode'>
+    & Omit<Parameters<typeof txDryRun>[2], 'onNode'>
+    & { onAccount?: AccountBase; onNode?: Node; callStatic?: boolean } = {},
   ): Promise<{
       decodedResult?: any;
       decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
     } & SendAndProcessReturnType> {
-    const opt = { ...this.$options, ...options };
+    const { callStatic, top, ...opt } = { ...this.$options, ...options };
     const fnACI = this._getFunctionACI(fn);
     const contractId = this.$options.address;
     const { onNode } = opt;
 
     if (fn == null) throw new MissingFunctionNameError();
-    if (fn === 'init' && opt.callStatic === false) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
-    if (fn !== 'init' && opt.amount > 0 && fnACI.payable === false) throw new NotPayableFunctionError(opt.amount, fn);
+    if (fn === 'init' && callStatic !== true) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
+    if (fn !== 'init' && opt.amount != null && opt.amount > 0 && fnACI.payable === false) {
+      throw new NotPayableFunctionError(opt.amount, fn);
+    }
 
     let callerId;
     try {
+      if (opt.onAccount == null) throw new InternalError('Use fallback account');
       callerId = opt.onAccount.address;
     } catch (error) {
-      const useFallbackAccount = opt.callStatic === true && (
+      const useFallbackAccount = callStatic === true && (
         (error instanceof TypeError && error.message === 'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead')
         || (error instanceof NoWalletConnectedError)
       );
@@ -369,10 +378,10 @@ class Contract<M extends ContractMethodsBase> {
     const callData = this._calldata.encode(this._name, fn, params);
 
     let res: any;
-    if (opt.callStatic === true) {
-      if (opt.nonce == null && opt.top != null) {
-        const topKey = typeof opt.top === 'number' ? 'height' : 'hash';
-        opt.nonce = (await getAccount(callerId, { [topKey]: opt.top, onNode })).nonce + 1;
+    if (callStatic === true) {
+      if (opt.nonce == null && top != null) {
+        const topKey = typeof top === 'number' ? 'height' : 'hash';
+        opt.nonce = (await getAccount(callerId, { [topKey]: top, onNode })).nonce + 1;
       }
       const txOpt = { ...opt, onNode, callData };
       let tx;
@@ -387,7 +396,7 @@ class Contract<M extends ContractMethodsBase> {
         tx = await _buildTx(Tag.ContractCallTx, { ...txOpt, callerId, contractId });
       }
 
-      const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, opt);
+      const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, { ...opt, top });
       if (callObj == null) throw new UnexpectedTsError();
       this._handleCallError({
         returnType: callObj.returnType as ContractCallReturnType,
@@ -395,7 +404,7 @@ class Contract<M extends ContractMethodsBase> {
       }, tx);
       res = { ...dryRunOther, tx: unpackTx(tx), result: callObj };
     } else {
-      if (opt.top != null) throw new IllegalArgumentError('Can\'t handle `top` option in on-chain contract call');
+      if (top != null) throw new IllegalArgumentError('Can\'t handle `top` option in on-chain contract call');
       if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
       const tx = await _buildTx(Tag.ContractCallTx, {
         ...opt,
@@ -404,9 +413,10 @@ class Contract<M extends ContractMethodsBase> {
         contractId,
         callData,
       });
-      res = await this._sendAndProcess(tx, opt);
+      if (opt.onAccount == null) throw new IllegalArgumentError('Can\'t call contract on chain without account');
+      res = await this._sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
     }
-    if (opt.callStatic === true || res.txData.blockHeight != null) {
+    if (callStatic === true || res.txData.blockHeight != null) {
       res.decodedResult = fnACI.returns != null && fnACI.returns !== 'unit' && fn !== 'init'
         && this._calldata.decode(this._name, fn, res.result.returnValue);
       res.decodedEvents = this.$decodeEvents(res.result.log, opt);
@@ -550,19 +560,9 @@ class Contract<M extends ContractMethodsBase> {
 
   _calldata: Calldata;
 
-  $options: {
-    sourceCode?: string;
-    bytecode?: Encoded.ContractBytearray;
-    address?: Encoded.ContractAddress;
-    onCompiler?: CompilerHttp;
-    onNode: Node;
-    omitUnknown?: boolean;
-    contractAddressToName?: { [key: Encoded.ContractAddress]: string };
-    [key: string]: any;
-  };
+  $options: Omit<ConstructorParameters<typeof Contract>[0], 'aci'>;
 
   constructor({ aci, ...otherOptions }: {
-    onAccount?: AccountBase;
     onCompiler?: CompilerHttp;
     onNode: Node;
     sourceCode?: string;
@@ -570,12 +570,11 @@ class Contract<M extends ContractMethodsBase> {
     aci: Aci;
     address?: Encoded.ContractAddress;
     fileSystem?: Record<string, string>;
-    [key: string]: any;
-  }) {
+  } & Parameters<Contract<M>['$deploy']>[1]) {
     this._aci = aci;
     this._name = aci.encodedAci.contract.name;
     this._calldata = new Calldata([aci.encodedAci, ...aci.externalEncodedAci]);
-    this.$options = { callStatic: false, ...otherOptions };
+    this.$options = otherOptions;
 
     /**
      * Generate proto function based on contract function using Contract ACI schema

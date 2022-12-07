@@ -30,12 +30,12 @@ import {
   IllegalArgumentError,
   Contract,
   hash,
+  AE_AMOUNT_FORMATS,
 } from '../../src';
 import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
-import { Aci } from '../../src/apis/compiler';
 import { assertNotNull, ChainTtl, InputNumber } from '../utils';
-import { ContractMethodsBase, ContractCallObject } from '../../src/contract/Contract';
+import { Aci, ContractMethodsBase, ContractCallObject } from '../../src/contract/Contract';
 
 const identityContractSourceCode = `
 contract Identity =
@@ -208,7 +208,7 @@ describe('Contract instance', () => {
   before(async () => {
     aeSdk = await getSdk(2);
     testContractAci = await aeSdk.compilerApi
-      .generateACI({ code: testContractSourceCode, options: { fileSystem } });
+      .generateACI({ code: testContractSourceCode, options: { fileSystem } }) as Aci;
     // @ts-expect-error should be changed on api
     testContractBytecode = (await aeSdk.compilerApi.compileContract({
       code: testContractSourceCode, options: { fileSystem },
@@ -226,7 +226,7 @@ describe('Contract instance', () => {
     testContract.should.have.property('$compile');
     testContract.should.have.property('$call');
     testContract.should.have.property('$deploy');
-    testContract.$options.ttl.should.be.equal(0);
+    expect(testContract.$options.ttl).to.be.equal(0);
     testContract.$options.should.have.property('sourceCode');
     testContract.$options.should.have.property('bytecode');
     assertNotNull(testContract.$options.fileSystem);
@@ -247,7 +247,7 @@ describe('Contract instance', () => {
   it('deploys', async () => {
     const deployInfo = await testContract.$deploy(['test', 1, 'hahahaha'], {
       amount: 42,
-      denomination: 'aettos',
+      denomination: AE_AMOUNT_FORMATS.AETTOS,
       gasLimit: 16000,
       deposit: 0,
       ttl: 0,
@@ -286,11 +286,11 @@ describe('Contract instance', () => {
   it('generates by aci', async () => aeSdk.initializeContract({ aci: testContractAci, address: testContractAddress }));
 
   it('fails on trying to generate with not existing contract address', () => expect(aeSdk.initializeContract(
-    { aci: identityContractSourceCode, address: notExistingContractAddress },
+    { sourceCode: identityContractSourceCode, address: notExistingContractAddress },
   )).to.be.rejectedWith(`v3/contracts/${notExistingContractAddress} error: Contract not found`));
 
   it('fails on trying to generate with invalid address', () => expect(aeSdk.initializeContract(
-    { aci: identityContractSourceCode, address: 'ct_asdasdasd' },
+    { sourceCode: identityContractSourceCode, address: 'ct_asdasdasd' },
   )).to.be.rejectedWith(InvalidAensNameError, 'Invalid name or address: ct_asdasdasd'));
 
   it('fails on trying to generate by aci without address', () => expect(aeSdk.initializeContract({ aci: testContractAci }))
@@ -337,9 +337,9 @@ describe('Contract instance', () => {
 
   it('rejects not matching bytecode with enabled validation', async () => expect(aeSdk.initializeContract({
     bytecode: (await aeSdk.compilerApi.compileContract({ code: identityContractSourceCode }))
-      .bytecode,
+      .bytecode as Encoded.ContractBytearray,
     aci: await aeSdk.compilerApi
-      .generateACI({ code: identityContractSourceCode, options: { fileSystem } }),
+      .generateACI({ code: identityContractSourceCode, options: { fileSystem } }) as Aci,
     address: testContractAddress,
     validateBytecode: true,
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'));
