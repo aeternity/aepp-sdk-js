@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.0-alpha.0](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.3...v13.0.0-alpha.0) (2022-12-08)
+
 ### [12.1.3](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.2...v12.1.3) (2022-08-24)
 
 

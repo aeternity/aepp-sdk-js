@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "12.1.3",
+  "version": "13.0.0-alpha.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "types": "es/index.d.ts",
@@ -41,7 +41,8 @@
     "test:watch": "mocha './test/unit/' './test/integration/' --watch",
     "prepare": "npm run build",
     "prepublishOnly": "test/examples.sh && npm run docs:examples && npm run docs:api",
-    "release": "standard-version --skip.tag --infile docs/CHANGELOG.md"
+    "release": "standard-version --skip.tag --infile docs/CHANGELOG.md",
+    "release-alpha": "npm run release -- --prerelease alpha"
   },
   "license": "ISC",
   "keywords": [
