@@ -1,5 +1,5 @@
 import coinAmount from './coin-amount';
-import { Int } from './u-int';
+import { Int } from '../constants';
 import { IllegalArgumentError } from '../../../utils/errors';
 
 export default {

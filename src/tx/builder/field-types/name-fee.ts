@@ -1,9 +1,8 @@
 import BigNumber from 'bignumber.js';
 import { getMinimumNameFee } from '../helpers';
 import { InsufficientNameFeeError } from '../../../utils/errors';
-import { Int } from './u-int';
 import coinAmount from './coin-amount';
-import { AensName } from '../constants';
+import { AensName, Int } from '../constants';
 
 export default {
   ...coinAmount,

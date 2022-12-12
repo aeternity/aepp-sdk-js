@@ -1,9 +1,7 @@
-import BigNumber from 'bignumber.js';
 import { readInt } from '../helpers';
+import { Int } from '../constants';
 import { ArgumentError } from '../../../utils/errors';
 import { toBytes } from '../../../utils/bytes';
-
-export type Int = number | string | BigNumber;
 
 export default {
   serialize(value: Int): Buffer {
