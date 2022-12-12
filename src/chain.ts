@@ -353,7 +353,7 @@ export async function getMicroBlockHeader(
 interface TxDryRunArguments {
   tx: Encoded.Transaction;
   accountAddress: Encoded.AccountAddress;
-  top?: number;
+  top?: number | Encoded.KeyBlockHash | Encoded.MicroBlockHash;
   txEvents?: any;
   resolve: Function;
   reject: Function;
@@ -367,8 +367,10 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
 
   let dryRunRes;
   try {
+    const top = typeof rs[0].top === 'number'
+      ? (await getKeyBlock(rs[0].top, { onNode })).hash : rs[0].top;
     dryRunRes = await onNode.protectedDryRunTxs({
-      top: rs[0].top,
+      top,
       txEvents: rs[0].txEvents,
       txs: rs.map((req) => ({ tx: req.tx })),
       accounts: Array.from(new Set(rs.map((req) => req.accountAddress)))
@@ -406,7 +408,7 @@ export async function txDryRun(
   {
     top, txEvents, combine, onNode,
   }:
-  { top?: number; txEvents?: boolean; combine?: boolean; onNode: Node },
+  { top?: TxDryRunArguments['top']; txEvents?: boolean; combine?: boolean; onNode: Node },
 ): Promise<{
     txEvents?: TransformNodeType<DryRunResults['txEvents']>;
   } & TransformNodeType<DryRunResult>> {

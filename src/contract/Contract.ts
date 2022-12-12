@@ -56,7 +56,7 @@ import {
 import CompilerHttp from './CompilerHttp';
 import Node, { TransformNodeType } from '../Node';
 import {
-  getAccount, getContract, getContractByteCode, getKeyBlock, resolveName, txDryRun,
+  getAccount, getContract, getContractByteCode, resolveName, txDryRun,
 } from '../chain';
 import AccountBase from '../account/Base';
 import { concatBuffers } from '../utils/other';
@@ -370,11 +370,9 @@ class Contract<M extends ContractMethodsBase> {
 
     let res: any;
     if (opt.callStatic === true) {
-      if (typeof opt.top === 'number') {
-        opt.top = (await getKeyBlock(opt.top, { onNode })).hash;
-      }
       if (opt.nonce == null && opt.top != null) {
-        opt.nonce = (await getAccount(callerId, { hash: opt.top, onNode })).nonce + 1;
+        const topKey = typeof opt.top === 'number' ? 'height' : 'hash';
+        opt.nonce = (await getAccount(callerId, { [topKey]: opt.top, onNode })).nonce + 1;
       }
       const txOpt = { ...opt, onNode, callData };
       let tx;
