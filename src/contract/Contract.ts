@@ -291,6 +291,7 @@ class Contract<M extends ContractMethodsBase> {
       transaction?: Encoded.TxHash;
       owner?: Encoded.AccountAddress;
       address?: Encoded.ContractAddress;
+      decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
     }> {
     const { callStatic, ...opt } = { ...this.$options, ...options };
     if (this.$options.bytecode == null) await this.$compile();
@@ -311,6 +312,9 @@ class Contract<M extends ContractMethodsBase> {
     const { hash, ...other } = await this._sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
     return {
       ...other,
+      ...other.result?.log != null && {
+        decodedEvents: this.$decodeEvents(other.result.log, opt),
+      },
       owner: ownerId,
       transaction: hash,
       address: this.$options.address,
