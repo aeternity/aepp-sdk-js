@@ -373,10 +373,10 @@ class Contract<M extends ContractMethodsBase> {
       if (typeof opt.top === 'number') {
         opt.top = (await getKeyBlock(opt.top, { onNode })).hash;
       }
-      const txOpt = { ...opt, onNode, callData };
       if (opt.nonce == null && opt.top != null) {
         opt.nonce = (await getAccount(callerId, { hash: opt.top, onNode })).nonce + 1;
       }
+      const txOpt = { ...opt, onNode, callData };
       let tx;
       if (fn === 'init') {
         if (this.$options.bytecode == null) throw new IllegalArgumentError('Can\'t dry-run "init" without bytecode');
@@ -397,6 +397,7 @@ class Contract<M extends ContractMethodsBase> {
       }, tx);
       res = { ...dryRunOther, tx: unpackTx(tx), result: callObj };
     } else {
+      if (opt.top != null) throw new IllegalArgumentError('Can\'t handle `top` option in on-chain contract call');
       if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
       const tx = await _buildTx(Tag.ContractCallTx, {
         ...opt,
