@@ -116,7 +116,7 @@ describe('Contract', () => {
   });
 
   it('Call-Static deploy transaction on specific hash', async () => {
-    const { hash } = await aeSdk.api.getTopHeader();
+    const hash = (await aeSdk.api.getTopHeader()).hash as Encoded.MicroBlockHash;
     const { result } = await identityContract.$deploy([], { callStatic: true, top: hash });
     assertNotNull(result);
     result.should.have.property('gasUsed');
@@ -158,6 +158,34 @@ describe('Contract', () => {
     const { result } = await contract.getArg(42);
     assertNotNull(result);
     result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub);
+  });
+
+  it('Dry-run at specific height', async () => {
+    const contract = await aeSdk.initializeContract<{ call: () => void }>({
+      sourceCode: 'contract Callable =\n'
+        + '  record state = { wasCalled: bool }\n'
+        + '\n'
+        + '  entrypoint init() : state = { wasCalled = false }\n'
+        + '\n'
+        + '  stateful entrypoint call() =\n'
+        + '    require(!state.wasCalled, "Already called")\n'
+        + '    put(state{ wasCalled = true })\n',
+    });
+    await contract.$deploy([]);
+    await aeSdk.awaitHeight(await aeSdk.getHeight() + 1);
+    const beforeKeyBlockHeight = await aeSdk.getHeight();
+    await aeSdk.spend(1, aeSdk.address);
+    const topHeader = await aeSdk.api.getTopHeader();
+    const beforeKeyBlockHash = topHeader.prevKeyHash as Encoded.KeyBlockHash;
+    const beforeMicroBlockHash = topHeader.hash as Encoded.MicroBlockHash;
+    expect(beforeKeyBlockHash).to.satisfy((s: string) => s.startsWith('kh_'));
+    expect(beforeMicroBlockHash).to.satisfy((s: string) => s.startsWith('mh_'));
+
+    await contract.call();
+    await expect(contract.call()).to.be.rejectedWith('Already called');
+    await contract.call({ callStatic: true, top: beforeMicroBlockHash });
+    await contract.call({ callStatic: true, top: beforeKeyBlockHash });
+    await contract.call({ callStatic: true, top: beforeKeyBlockHeight });
   });
 
   it('call contract/deploy with waitMined: false', async () => {

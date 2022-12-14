@@ -1,5 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
+import { Int } from '../tx/builder/constants';
 
 /**
  * aepp-sdk originated error
@@ -528,7 +529,7 @@ export class NoSuchContractFunctionError extends ContractError {
  * @category exception
  */
 export class NotPayableFunctionError extends ContractError {
-  constructor(amount: string, fn: string) {
+  constructor(amount: Int, fn: string) {
     super(
       `You try to pay "${amount}" to function "${fn}" which is not payable. `
       + 'Only payable function can accept coins',

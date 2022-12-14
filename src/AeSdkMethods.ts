@@ -112,8 +112,7 @@ class AeSdkMethods {
   }
 
   async initializeContract<Methods extends ContractMethodsBase>(
-    options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode' | 'onCompiler'> &
-    { onNode?: Node; onCompiler?: CompilerHttp },
+    options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode'> & { onNode?: Node },
   ): Promise<Contract<Methods>> {
     const { onNode, onCompiler, ...otherOptions } = this._getOptions();
     if (onCompiler == null || onNode == null) {

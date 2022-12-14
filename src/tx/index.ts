@@ -22,7 +22,6 @@
  * the creation of transactions to {@link Node}.
  * These methods provide ability to create native transactions.
  */
-import BigNumber from 'bignumber.js';
 import {
   ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TTL, TxParamsCommon,
 } from './builder/schema';
@@ -35,8 +34,6 @@ import { Encoded } from '../utils/encoder';
 import { buildTx as syncBuildTx, unpackTx } from './builder/index';
 import { isAccountNotFoundError, isKeyOfObject } from '../utils/other';
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
-
-type Int = number | string | BigNumber;
 
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
   Omit<Parameters<typeof _buildTx<TxType>>[1], OmitFields>;
@@ -117,15 +114,9 @@ async function prepareTxParams(
 export async function _buildTx<TxType extends Tag>(
   txType: TxType,
   { denomination, absoluteTtl, ..._params }:
-  Omit<Parameters<typeof syncBuildTx<TxType, 'tx'>>[0], 'fee' | 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'>
-  & {
-    onNode: Node;
-    fee?: Int;
-    nonce?: number;
-    ttl?: number;
-    denomination?: AE_AMOUNT_FORMATS;
-    absoluteTtl?: boolean;
-  }
+  Omit<Parameters<typeof syncBuildTx<TxType, 'tx'>>[0], 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'>
+  & { denomination?: AE_AMOUNT_FORMATS }
+  & Omit<Parameters<typeof prepareTxParams>[1], 'senderId'>
   & (TxType extends Tag.OracleExtendTx | Tag.OracleResponseTx
     ? { callerId: Encoded.AccountAddress } : {})
   & (TxType extends Tag.ContractCreateTx | Tag.GaAttachTx ? { ctVersion?: CtVersion } : {})

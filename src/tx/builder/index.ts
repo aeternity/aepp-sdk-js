@@ -212,7 +212,11 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends Encoding> {
  * @returns object.binary binary transaction
  */
 export function buildTx<TxType extends Tag, Prefix>(
-  _params: Omit<TxTypeSchemas[TxType], 'tag' | 'VSN'> & { VSN?: number },
+  _params: Omit<TxTypeSchemas[TxType], 'tag' | 'VSN'> & { VSN?: number }
+  // TODO: get it from gas-limit.ts somehow
+  & (TxType extends Tag.ContractCreateTx | Tag.ContractCallTx
+  | Tag.ChannelOffChainUpdateCallContract | Tag.GaAttachTx | Tag.GaMetaTx
+    ? { gasMax?: number } : {}),
   type: TxType,
   {
     excludeKeys = [],
