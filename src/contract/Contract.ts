@@ -573,6 +573,16 @@ class Contract<M extends ContractMethodsBase> {
     bytecode?: Encoded.ContractBytearray;
     aci: Aci;
     address?: Encoded.ContractAddress;
+    /**
+     * A map of contract filename to the corresponding contract source code to include into
+     * the main contract
+     * @example
+     * ```js
+     * {
+     *   'library.aes': 'namespace TestLib =\n  function sum(x: int, y: int) : int = x + y'
+     * }
+     * ```
+     */
     fileSystem?: Record<string, string>;
   } & Parameters<Contract<M>['$deploy']>[1]) {
     this._aci = aci;
