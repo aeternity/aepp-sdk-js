@@ -64,13 +64,13 @@ describe('Generalized Account', () => {
 
   it('Make account GA', async () => {
     accountBeforeGa = Object.values(aeSdk.accounts)[0] as MemoryAccount;
-    const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', sourceCode, []);
+    const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', [], { sourceCode });
     expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.be.equal('generalized');
     authContract = await aeSdk.initializeContract({ sourceCode, address: gaContractId });
   });
 
   it('Fail on make GA on already GA', async () => {
-    await aeSdk.createGeneralizedAccount('authorize', sourceCode, [])
+    await aeSdk.createGeneralizedAccount('authorize', [], { sourceCode })
       .should.be.rejectedWith(`Account ${gaAccountAddress} is already GA`);
   });
 
