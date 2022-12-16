@@ -14,8 +14,16 @@
  *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  *  PERFORMANCE OF THIS SOFTWARE.
  */
-import { Compiler as CompilerApi, ErrorModel, CompilerError } from '../apis/compiler';
-import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../utils/autorest';
+import { RestError } from '@azure/core-rest-pipeline';
+import {
+  Compiler as CompilerApi,
+  ErrorModel,
+  CompilerError as CompilerErrorApi,
+} from '../../apis/compiler';
+import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../../utils/autorest';
+import CompilerBase, { Aci } from './Base';
+import { Encoded } from '../../utils/encoder';
+import { CompilerError } from '../../utils/errors';
 
 type GeneralCompilerError = ErrorModel & {
   info?: object;
@@ -29,17 +37,20 @@ type GeneralCompilerError = ErrorModel & {
  * @category contract
  * @example CompilerHttp('COMPILER_URL')
  */
-export default class CompilerHttp extends CompilerApi {
+export default class CompilerHttp extends CompilerBase {
+  readonly api: CompilerApi;
+
   /**
    * @param compilerUrl - Url for compiler API
    * @param options - Options
    * @param options.ignoreVersion - Don't check compiler version
    */
   constructor(compilerUrl: string, { ignoreVersion }: { ignoreVersion?: boolean } = {}) {
-    super(compilerUrl, {
+    super();
+    this.api = new CompilerApi(compilerUrl, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        genErrorFormatterPolicy((body: GeneralCompilerError | CompilerError[]) => {
+        genErrorFormatterPolicy((body: GeneralCompilerError | CompilerErrorApi[]) => {
           let message = '';
           if ('reason' in body) {
             message += ` ${body.reason
@@ -50,7 +61,6 @@ export default class CompilerHttp extends CompilerApi {
           if (Array.isArray(body)) {
             message += `\n${body
               .map((e) => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context != null ? `(${e.context})` : ''}`)
-              .map((e) => e.trim()) // TODO: remove after fixing https://github.com/aeternity/aesophia_http/issues/80
               .join('\n')}`;
           }
           return message;
@@ -58,10 +68,47 @@ export default class CompilerHttp extends CompilerApi {
       ],
     });
     if (ignoreVersion !== true) {
-      const versionPromise = this.apiVersion().then(({ apiVersion }) => apiVersion);
-      this.pipeline.addPolicy(
+      const versionPromise = this.api.apiVersion().then(({ apiVersion }) => apiVersion);
+      this.api.pipeline.addPolicy(
         genVersionCheckPolicy('compiler', '/api-version', versionPromise, '7.0.1', '8.0.0'),
       );
     }
+  }
+
+  async compileBySourceCode(
+    sourceCode: string,
+    fileSystem?: Record<string, string>,
+  ): Promise<{ bytecode: Encoded.ContractBytearray; aci: Aci }> {
+    try {
+      const [bytecode, aci] = await Promise.all([
+        this.api.compileContract({ code: sourceCode, options: { fileSystem } })
+          .then((res) => res.bytecode as Encoded.ContractBytearray),
+        this.api.generateACI({ code: sourceCode, options: { fileSystem } }),
+      ]);
+      // TODO: should be fixed when the compiledAci interface gets updated
+      return { bytecode, aci: aci as Aci };
+    } catch (error) {
+      if (error instanceof RestError && error.statusCode === 400) {
+        throw new CompilerError(error.message.replace(/^aci error:/, 'compile error:'));
+      }
+      throw error;
+    }
+  }
+
+  async validateBySourceCode(
+    bytecode: Encoded.ContractBytearray,
+    sourceCode: string,
+    fileSystem?: Record<string, string>,
+  ): Promise<boolean> {
+    try {
+      await this.api.validateByteCode({ bytecode, source: sourceCode, options: { fileSystem } });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async version(): Promise<string> {
+    return (await this.api.version()).version;
   }
 }

@@ -51,7 +51,7 @@ import {
 import { concatBuffers } from '../../src/utils/other';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
 import {
-  getSdk, ignoreVersion, networkId, url,
+  getSdk, ignoreVersion, networkId, url, compilerUrl,
 } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
 import { Encoded } from '../../src/utils/encoder';
@@ -140,7 +140,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       const aeppSdk = new AeSdkAepp({
         name: 'AEPP',
         nodes: [{ name: 'test', instance: node }],
-        onCompiler: new CompilerHttp(aeSdk.compilerApi.$host),
+        onCompiler: new CompilerHttp(compilerUrl),
       });
       const contractAepp = await aeppSdk.initializeContract<{ getArg: (a: number) => number }>({
         aci: contract._aci,

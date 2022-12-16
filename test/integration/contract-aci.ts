@@ -35,7 +35,8 @@ import {
 import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
 import { assertNotNull, ChainTtl, InputNumber } from '../utils';
-import { Aci, ContractMethodsBase, ContractCallObject } from '../../src/contract/Contract';
+import { Aci } from '../../src/contract/compiler/Base';
+import { ContractMethodsBase, ContractCallObject } from '../../src/contract/Contract';
 
 const identityContractSourceCode = `
 contract Identity =
@@ -185,12 +186,9 @@ describe('Contract instance', () => {
 
   before(async () => {
     aeSdk = await getSdk(2);
-    testContractAci = await aeSdk.compilerApi
-      .generateACI({ code: testContractSourceCode, options: { fileSystem } }) as Aci;
-    // @ts-expect-error should be changed on api
-    testContractBytecode = (await aeSdk.compilerApi.compileContract({
-      code: testContractSourceCode, options: { fileSystem },
-    })).bytecode;
+    const res = await aeSdk.compilerApi.compileBySourceCode(testContractSourceCode, fileSystem);
+    testContractAci = res.aci;
+    testContractBytecode = res.bytecode;
   });
 
   it('generates by source code', async () => {
@@ -314,10 +312,7 @@ describe('Contract instance', () => {
   }));
 
   it('rejects not matching bytecode with enabled validation', async () => expect(aeSdk.initializeContract({
-    bytecode: (await aeSdk.compilerApi.compileContract({ code: identityContractSourceCode }))
-      .bytecode as Encoded.ContractBytearray,
-    aci: await aeSdk.compilerApi
-      .generateACI({ code: identityContractSourceCode, options: { fileSystem } }) as Aci,
+    ...await aeSdk.compilerApi.compileBySourceCode(identityContractSourceCode),
     address: testContractAddress,
     validateBytecode: true,
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'));

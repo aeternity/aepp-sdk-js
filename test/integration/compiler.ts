@@ -17,7 +17,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { compilerUrl, ignoreVersion } from '.';
-import { CompilerHttp } from '../../src';
+import { CompilerError, CompilerHttp } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
 const identitySourceCode = `
@@ -27,22 +27,29 @@ contract Identity =
 
 describe('Sophia Compiler', () => {
   const compiler = new CompilerHttp(compilerUrl, { ignoreVersion });
-  let bytecode: Encoded.ContractBytearray;
+  let identityBytecode: Encoded.ContractBytearray;
 
-  it('compiles', async () => {
-    bytecode = (await compiler.compileContract({ code: identitySourceCode }))
-      .bytecode as Encoded.ContractBytearray;
+  it('returns version', async () => {
+    expect(await compiler.version()).to.be.equal('7.0.1');
+  });
+
+  it('compiles and generates aci', async () => {
+    const { bytecode, aci } = await compiler.compileBySourceCode(identitySourceCode);
     expect(bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
+    expect(aci).to.have.property('encodedAci');
+    expect(aci).to.have.property('externalEncodedAci');
+    expect(aci).to.have.property('interface');
+    identityBytecode = bytecode;
   });
 
   it('throws clear exception if compile broken contract', async () => {
-    await expect(compiler.compileContract({
-      code:
-        'contract Foo =\n'
-        + '  entrypoint getArg(x : bar) = x\n'
-        + '  entrypoint getArg(x : int) = baz\n'
-        + '  entrypoint getArg1(x : int) = baz\n',
-    })).to.be.rejectedWith(
+    await expect(compiler.compileBySourceCode(
+      'contract Foo =\n'
+      + '  entrypoint getArg(x : bar) = x\n'
+      + '  entrypoint getArg(x : int) = baz\n'
+      + '  entrypoint getArg1(x : int) = baz\n',
+    )).to.be.rejectedWith(
+      CompilerError,
       'compile error:\n'
       + 'type_error:3:3: Duplicate definitions of `getArg` at\n'
       + '  - line 2, column 3\n'
@@ -52,26 +59,22 @@ describe('Sophia Compiler', () => {
     );
   });
 
-  it('generates contract ACI', async () => {
-    const aci = await compiler.generateACI({ code: identitySourceCode });
-    expect(aci).to.have.property('encodedAci');
-    expect(aci).to.have.property('externalEncodedAci');
-    expect(aci).to.have.property('interface');
-  });
-
-  it('throws clear exception if generating ACI with no arguments', async () => {
-    await expect(compiler.generateACI({} as any))
-      .to.be.rejectedWith('Error "body.code cannot be null or undefined." occurred in serializing the payload - undefined');
-  });
-
   it('validates bytecode', async () => {
-    expect(await compiler.validateByteCode({ bytecode, source: identitySourceCode }))
-      .to.be.eql({ body: {} });
+    expect(await compiler.validateBySourceCode(identityBytecode, identitySourceCode))
+      .to.be.equal(true);
+    const { bytecode } = await compiler.compileBySourceCode(
+      'contract Identity =\n'
+      + '  entrypoint getArg(x : string) = x',
+    );
+    expect(await compiler.validateBySourceCode(bytecode, identitySourceCode)).to.be.equal(false);
+    const invalidBytecode = `${bytecode}test` as Encoded.ContractBytearray;
+    expect(await compiler.validateBySourceCode(invalidBytecode, identitySourceCode))
+      .to.be.equal(false);
   });
 
   it('throws exception if used invalid compiler url', async () => {
     const c = new CompilerHttp('https://compiler.aepps.comas');
-    await expect(c.generateACI({ code: 'test' }))
+    await expect(c.compileBySourceCode('test'))
       .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas');
   });
 });

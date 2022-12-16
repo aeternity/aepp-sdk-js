@@ -11,7 +11,7 @@ import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
 import { Tag } from './tx/builder/constants';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
-import CompilerHttp from './contract/CompilerHttp';
+import CompilerBase from './contract/compiler/Base';
 import { ArgumentError, NotImplementedError, TypeError } from './utils/errors';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
@@ -135,7 +135,7 @@ type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ?
 
 type MakeOptional<Options> = OptionalIfNotRequired<[
   Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'>
-  & { onNode?: Node; onCompiler?: CompilerHttp; onAccount?: OnAccount },
+  & { onNode?: Node; onCompiler?: CompilerBase; onAccount?: OnAccount },
 ]>;
 
 type TransformMethods <Methods extends { [key: string]: Function }> =
