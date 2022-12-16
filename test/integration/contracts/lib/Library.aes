@@ -1,0 +1,4 @@
+include"lib/Sublibrary.aes"
+
+namespace Library =
+  function sum(x: int, y: int): int = Sublibrary.sum(x, y)

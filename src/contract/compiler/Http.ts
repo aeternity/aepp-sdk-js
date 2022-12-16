@@ -15,6 +15,7 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { RestError } from '@azure/core-rest-pipeline';
+import { readFile } from 'fs/promises';
 import {
   Compiler as CompilerApi,
   ErrorModel,
@@ -24,6 +25,7 @@ import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../../utils/auto
 import CompilerBase, { Aci } from './Base';
 import { Encoded } from '../../utils/encoder';
 import { CompilerError } from '../../utils/errors';
+import getFileSystem from './getFileSystem';
 
 type GeneralCompilerError = ErrorModel & {
   info?: object;
@@ -95,6 +97,12 @@ export default class CompilerHttp extends CompilerBase {
     }
   }
 
+  async compile(path: string): Promise<{ bytecode: Encoded.ContractBytearray; aci: Aci }> {
+    const fileSystem = await getFileSystem(path);
+    const sourceCode = await readFile(path, 'utf8');
+    return this.compileBySourceCode(sourceCode, fileSystem);
+  }
+
   async validateBySourceCode(
     bytecode: Encoded.ContractBytearray,
     sourceCode: string,
@@ -106,6 +114,12 @@ export default class CompilerHttp extends CompilerBase {
     } catch {
       return false;
     }
+  }
+
+  async validate(bytecode: Encoded.ContractBytearray, path: string): Promise<boolean> {
+    const fileSystem = await getFileSystem(path);
+    const sourceCode = await readFile(path, 'utf8');
+    return this.validateBySourceCode(bytecode, sourceCode, fileSystem);
   }
 
   async version(): Promise<string> {

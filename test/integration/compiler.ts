@@ -16,30 +16,42 @@
  */
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
+import { readFile } from 'fs/promises';
 import { compilerUrl, ignoreVersion } from '.';
-import { CompilerError, CompilerHttp } from '../../src';
+import { CompilerError, CompilerHttp, getFileSystem } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
-
-const identitySourceCode = `
-contract Identity =
- entrypoint getArg(x : int) = x
-`;
 
 describe('Sophia Compiler', () => {
   const compiler = new CompilerHttp(compilerUrl, { ignoreVersion });
-  let identityBytecode: Encoded.ContractBytearray;
+  const testSourceCodePath = './test/integration/contracts/Includes.aes';
+  let testSourceCode: string;
+  let testFileSystem: Record<string, string>;
+  const testBytecode = 'cb_+QEGRgOg7BH1sCv+p2IrS0Pn3/i6AfE8lOGUuC71lLPn6mbUm9PAuNm4cv4AWolkAjcCBwcHFBQAAgD+RNZEHwA3ADcAGg6CPwEDP/5Nt4A5AjcCBwcHDAECDAEABAMRAFqJZP6SiyA2ADcBBwcMAwgMAQAEAxFNt4A5/pSgnxIANwF3BwwBAAQDEarAwob+qsDChgI3AXcHPgQAALhgLwYRAFqJZD0uU3VibGlicmFyeS5zdW0RRNZEHxFpbml0EU23gDkxLkxpYnJhcnkuc3VtEZKLIDYRdGVzdBGUoJ8SJWdldExlbmd0aBGqwMKGOS5TdHJpbmcubGVuZ3Rogi8AhTcuMC4xAGzn9fM=';
+  const testBytecode2 = 'cb_+GhGA6BgYgXqYB9ctBcQ8mJ0+we5OXhb9PpsSQWP2DhPx9obn8C4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBd3cBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTcuMC4xAMXqWXc=';
+
+  before(async () => {
+    testSourceCode = await readFile(testSourceCodePath, 'utf8');
+    testFileSystem = await getFileSystem(testSourceCodePath);
+  });
 
   it('returns version', async () => {
     expect(await compiler.version()).to.be.equal('7.0.1');
   });
 
-  it('compiles and generates aci', async () => {
-    const { bytecode, aci } = await compiler.compileBySourceCode(identitySourceCode);
-    expect(bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
+  it('compiles and generates aci by path', async () => {
+    const { bytecode, aci } = await compiler.compile(testSourceCodePath);
+    expect(bytecode).to.equal(testBytecode);
     expect(aci).to.have.property('encodedAci');
     expect(aci).to.have.property('externalEncodedAci');
     expect(aci).to.have.property('interface');
-    identityBytecode = bytecode;
+  });
+
+  it('compiles and generates aci by source code', async () => {
+    const { bytecode, aci } = await compiler.compileBySourceCode(testSourceCode, testFileSystem);
+    expect(bytecode).to.equal(testBytecode);
+    expect(aci).to.have.property('encodedAci');
+    expect(aci).to.have.property('externalEncodedAci');
+    expect(aci).to.have.property('interface');
   });
 
   it('throws clear exception if compile broken contract', async () => {
@@ -59,16 +71,21 @@ describe('Sophia Compiler', () => {
     );
   });
 
-  it('validates bytecode', async () => {
-    expect(await compiler.validateBySourceCode(identityBytecode, identitySourceCode))
+  it('validates bytecode by path', async () => {
+    expect(await compiler.validate(testBytecode, testSourceCodePath))
       .to.be.equal(true);
-    const { bytecode } = await compiler.compileBySourceCode(
-      'contract Identity =\n'
-      + '  entrypoint getArg(x : string) = x',
-    );
-    expect(await compiler.validateBySourceCode(bytecode, identitySourceCode)).to.be.equal(false);
-    const invalidBytecode = `${bytecode}test` as Encoded.ContractBytearray;
-    expect(await compiler.validateBySourceCode(invalidBytecode, identitySourceCode))
+    expect(await compiler.validate(testBytecode2, testSourceCodePath)).to.be.equal(false);
+    const invalidBytecode = `${testBytecode2}test` as Encoded.ContractBytearray;
+    expect(await compiler.validate(invalidBytecode, testSourceCodePath))
+      .to.be.equal(false);
+  });
+
+  it('validates bytecode by source code', async () => {
+    expect(await compiler.validateBySourceCode(testBytecode, testSourceCode, testFileSystem))
+      .to.be.equal(true);
+    expect(await compiler.validateBySourceCode(testBytecode2, testSourceCode)).to.be.equal(false);
+    const invalidBytecode = `${testBytecode2}test` as Encoded.ContractBytearray;
+    expect(await compiler.validateBySourceCode(invalidBytecode, testSourceCode))
       .to.be.equal(false);
   });
 
@@ -76,5 +93,19 @@ describe('Sophia Compiler', () => {
     const c = new CompilerHttp('https://compiler.aepps.comas');
     await expect(c.compileBySourceCode('test'))
       .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas');
+  });
+
+  describe('getFileSystem', () => {
+    it('reads file system', async () => {
+      expect(await getFileSystem('./test/integration/contracts/Includes.aes')).to.be.eql({
+        './lib/Library.aes':
+          'include"lib/Sublibrary.aes"\n\n'
+          + 'namespace Library =\n'
+          + '  function sum(x: int, y: int): int = Sublibrary.sum(x, y)\n',
+        'lib/Sublibrary.aes':
+          'namespace Sublibrary =\n'
+          + '  function sum(x: int, y: int): int = x + y\n',
+      });
+    });
   });
 });

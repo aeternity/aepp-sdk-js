@@ -243,6 +243,13 @@ describe('Contract instance', () => {
     testContractAddress = deployInfo.address;
   });
 
+  it('can be deployed by source code path', async () => {
+    const contract = await aeSdk.initializeContract<{}>({
+      sourceCodePath: './test/integration/contracts/Includes.aes',
+    });
+    await contract.$deploy([]);
+  });
+
   it('calls', async () => {
     expect((await testContract.intFn(2)).decodedResult).to.be.equal(2n);
   });

@@ -485,6 +485,7 @@ class Contract<M extends ContractMethodsBase> {
       bytecode,
       aci,
       address,
+      sourceCodePath,
       sourceCode,
       fileSystem,
       validateBytecode,
@@ -495,10 +496,14 @@ class Contract<M extends ContractMethodsBase> {
       address?: Encoded.ContractAddress | AensName;
     },
   ): Promise<ContractWithMethods<M>> {
-    if (aci == null && sourceCode != null && onCompiler != null) {
-      const res = await onCompiler.compileBySourceCode(sourceCode, fileSystem);
-      aci = res.aci;
-      bytecode ??= res.bytecode;
+    if (aci == null && onCompiler != null) {
+      let res;
+      if (sourceCodePath != null) res = await onCompiler.compile(sourceCodePath);
+      if (sourceCode != null) res = await onCompiler.compileBySourceCode(sourceCode, fileSystem);
+      if (res != null) {
+        aci = res.aci;
+        bytecode ??= res.bytecode;
+      }
     }
     if (aci == null) throw new MissingContractDefError();
 
@@ -550,6 +555,7 @@ class Contract<M extends ContractMethodsBase> {
     bytecode?: Encoded.ContractBytearray;
     aci: Aci;
     address?: Encoded.ContractAddress;
+    sourceCodePath?: Parameters<CompilerBase['compile']>[0];
     sourceCode?: Parameters<CompilerBase['compileBySourceCode']>[0];
     fileSystem?: Parameters<CompilerBase['compileBySourceCode']>[1];
   } & Parameters<Contract<M>['$deploy']>[1]) {

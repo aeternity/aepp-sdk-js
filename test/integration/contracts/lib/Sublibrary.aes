@@ -1,0 +1,2 @@
+namespace Sublibrary =
+  function sum(x: int, y: int): int = x + y
