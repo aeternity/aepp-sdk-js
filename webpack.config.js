@@ -25,8 +25,13 @@ function configure(filename, opts = {}) {
     },
     resolve: {
       extensions: ['.ts', '.js'],
-      fallback: {
+      fallback: opts.target.includes('browser') && {
         buffer: require.resolve('buffer/'),
+        child_process: false,
+        os: false,
+        path: false,
+        'fs/promises': false,
+        url: false,
       },
     },
     plugins: [

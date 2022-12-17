@@ -48,6 +48,7 @@ export { default as AccountLedger } from './account/Ledger';
 export { default as AccountLedgerFactory } from './account/LedgerFactory';
 export { default as CompilerBase } from './contract/compiler/Base';
 export { default as CompilerHttp } from './contract/compiler/Http';
+export { default as CompilerCli } from './contract/compiler/Cli';
 export { default as getFileSystem } from './contract/compiler/getFileSystem';
 export { default as Channel } from './channel/Contract';
 

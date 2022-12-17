@@ -4,6 +4,7 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
+      - run: sudo apt install -y erlang
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
