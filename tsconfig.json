@@ -1,10 +1,4 @@
 {
-  // custom options for ts-node to run mocha tests
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs"
-    }
-  },
   "compilerOptions": {
     "esModuleInterop": true,
     "emitDeclarationOnly": true,

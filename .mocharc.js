@@ -1,8 +1,5 @@
 module.exports = {
-  require: [
-    '@babel/register',
-    'ts-node/register'
-  ],
+  require: 'tooling/babel-register.js',
   recursive: true,
   extension: '.js,.ts',
   timeout: '40s',
