@@ -21,7 +21,6 @@ import {
   ChannelState,
   changeStatus,
   changeState,
-  call,
   notify,
   emit,
   disconnect,
@@ -164,7 +163,7 @@ export async function awaitingReconnection(
   if (message.method === 'channels.info') {
     if (message.params.data.event === 'fsm_up') {
       channel._fsmId = message.params.data.fsm_id;
-      changeState(channel, (await call(channel, 'channels.get.offchain_state', {})).signed_tx);
+      changeState(channel, (await channel.state()).signedTx);
       return { handler: channelOpen };
     }
   }
