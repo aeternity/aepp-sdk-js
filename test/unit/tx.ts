@@ -28,7 +28,7 @@ import {
   toBytes,
   buildTx, unpackTx,
   NAME_BID_RANGES, Tag,
-  SchemaNotFoundError,
+  SchemaNotFoundError, ArgumentError,
 } from '../../src';
 import { Encoding, Encoded } from '../../src/utils/encoder';
 
@@ -110,10 +110,17 @@ describe('Tx', () => {
     ).to.throw('identifier should be prefixed with one of ak_, ok_, ct_, ch_, got ba_AQIq9Y55kw== instead'));
   });
 
-  it('Deserialize tx: invalid tx VSN', () => {
-    const tx = encode(rlpEncode([10, 99]), Encoding.Transaction);
-    expect(() => unpackTx(tx))
-      .to.throw(SchemaNotFoundError, `Transaction deserialization not implemented for tag ${10} version ${99}`);
+  describe('unpackTx', () => {
+    it('throws error if invalid tx VSN', () => {
+      const tx = encode(rlpEncode([10, 99]), Encoding.Transaction);
+      expect(() => unpackTx(tx))
+        .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag 10 version 99');
+    });
+
+    it('fails to unpack tx with more RLP items than in schema', () => {
+      expect(() => unpackTx('tx_+GIMAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg92HvYQAAABhHRlc3SEdGVzdK2Ldck='))
+        .to.throw(ArgumentError, 'Transaction RLP length should be 9, got 10 instead');
+    });
   });
 
   it('Serialize tx: invalid tx VSN', () => {

@@ -175,6 +175,9 @@ function unpackRawTx<Tx extends TxSchema>(
   binary: Uint8Array | NestedUint8Array,
   schema: TxField[],
 ): RawTxObject<Tx> {
+  if (binary.length !== schema.length) {
+    throw new ArgumentError('Transaction RLP length', schema.length, binary.length);
+  }
   return schema
     .reduce<any>(
     (
