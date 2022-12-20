@@ -6,106 +6,107 @@ This guide shows you how to handle errors originating from the SDK. SDK by defau
 
 ```
 BaseError
-│   ArgumentError
-│   IllegalArgumentError
-│   ArgumentCountMismatchError
-│   InsufficientBalanceError
-│   MissingParamError
-│   NoSerializerFoundError
-│   RequestTimedOutError
-│   TxTimedOutError
-│   TypeError
-│   UnsupportedPlatformError
-│   UnsupportedProtocolError
-│   NotImplementedError
-│   UnsupportedVersionError
-└───InternalError
-│   │   UnexpectedTsError
+├── ArgumentError
+├── IllegalArgumentError
+├── ArgumentCountMismatchError
+├── InsufficientBalanceError
+├── MissingParamError
+├── NoSerializerFoundError
+├── RequestTimedOutError
+├── TxTimedOutError
+├── TypeError
+├── UnsupportedPlatformError
+├── UnsupportedProtocolError
+├── NotImplementedError
+├── UnsupportedVersionError
 │
-└───AccountError
-│   │   UnavailableAccountError
+├── InternalError
+│   └── UnexpectedTsError
 │
-└───AensError
-│   │   AensPointerContextError
-│   │   InsufficientNameFeeError
-│   │   InvalidAensNameError
+├── AccountError
+│   └── UnavailableAccountError
 │
-└───AeppError
-│   │   InvalidRpcMessageError
-│   │   MissingCallbackError
-│   │   UnAuthorizedAccountError
-│   │   UnknownRpcClientError
-│   │   UnsubscribedAccountError
+├── AensError
+│   ├── AensPointerContextError
+│   ├── InsufficientNameFeeError
+│   └── InvalidAensNameError
 │
-└───ChannelError
-│   │   ChannelCallError
-│   │   ChannelConnectionError
-│   │   ChannelPingTimedOutError
-│   │   UnexpectedChannelMessageError
-│   │   ChannelIncomingMessageError
-│   │   UnknownChannelStateError
+├── AeppError
+│   ├── InvalidRpcMessageError
+│   ├── MissingCallbackError
+│   ├── UnAuthorizedAccountError
+│   ├── UnknownRpcClientError
+│   └── UnsubscribedAccountError
 │
-└───CompilerError
-│   │   InvalidAuthDataError
+├── ChannelError
+│   ├── ChannelCallError
+│   ├── ChannelConnectionError
+│   ├── ChannelPingTimedOutError
+│   ├── UnexpectedChannelMessageError
+│   ├── ChannelIncomingMessageError
+│   └── UnknownChannelStateError
 │
-└───ContractError
-│   │   BytecodeMismatchError
-│   │   DuplicateContractError
-│   │   InactiveContractError
-│   │   InvalidMethodInvocationError
-│   │   MissingContractAddressError
-│   │   MissingContractDefError
-│   │   MissingFunctionNameError
-│   │   NodeInvocationError
-│   │   NoSuchContractFunctionError
-│   │   NotPayableFunctionError
-│   │   MissingEventDefinitionError
-│   │   AmbiguousEventDefinitionError
+├── CompilerError
+│   └── InvalidAuthDataError
 │
-└───CryptographyError
-│   │   InvalidChecksumError
-│   │   DerivationError
-│   │   InvalidPasswordError
-│   │   MerkleTreeHashMismatchError
-│   │   MissingNodeInTreeError
-│   │   UnknownNodeLengthError
-│   │   UnknownPathNibbleError
+├── ContractError
+│   ├── BytecodeMismatchError
+│   ├── DuplicateContractError
+│   ├── InactiveContractError
+│   ├── InvalidMethodInvocationError
+│   ├── MissingContractAddressError
+│   ├── MissingContractDefError
+│   ├── MissingFunctionNameError
+│   ├── NodeInvocationError
+│   ├── NoSuchContractFunctionError
+│   ├── NotPayableFunctionError
+│   ├── MissingEventDefinitionError
+│   └── AmbiguousEventDefinitionError
 │
-└───NodeError
-│   │   DuplicateNodeError
-│   │   NodeNotFoundError
+├── CryptographyError
+│   ├── InvalidChecksumError
+│   ├── DerivationError
+│   ├── InvalidPasswordError
+│   ├── MerkleTreeHashMismatchError
+│   ├── MissingNodeInTreeError
+│   ├── UnknownNodeLengthError
+│   └── UnknownPathNibbleError
 │
-└───TransactionError
-│   │   DecodeError
-│   │   EncodeError
-│   │   PayloadLengthError
-│   │   DryRunError
-│   │   IllegalBidFeeError
-│   │   InvalidSignatureError
-│   │   InvalidTxError
-│   │   InvalidTxParamsError
-│   │   PrefixNotFoundError
-│   │   SchemaNotFoundError
-│   │   TagNotFoundError
-│   │   TxNotInChainError
-│   │   UnknownTxError
-│   │   UnsupportedABIversionError
-│   │   UnsupportedVMversionError
+├── NodeError
+│   ├── DuplicateNodeError
+│   └── NodeNotFoundError
 │
-└̌───WalletError
-│   │   AlreadyConnectedError
-│   │   NoWalletConnectedError
-│   │   RpcConnectionError
+├── TransactionError
+│   ├── DecodeError
+│   ├── EncodeError
+│   ├── PayloadLengthError
+│   ├── DryRunError
+│   ├── IllegalBidFeeError
+│   ├── InvalidSignatureError
+│   ├── InvalidTxError
+│   ├── InvalidTxParamsError
+│   ├── PrefixNotFoundError
+│   ├── SchemaNotFoundError
+│   ├── TagNotFoundError
+│   ├── TxNotInChainError
+│   ├── UnknownTxError
+│   ├── UnsupportedABIversionError
+│   └── UnsupportedVMversionError
 │
-└̌───RpcError
-│   │   RpcInvalidTransactionError
-│   │   RpcBroadcastError
-│   │   RpcRejectedByUserError
-│   │   RpcUnsupportedProtocolError
-│   │   RpcConnectionDenyError
-│   │   RpcNotAuthorizeError
-│   │   RpcPermissionDenyError
-│   │   RpcInternalError
+├── WalletError
+│   ├── AlreadyConnectedError
+│   ├── NoWalletConnectedError
+│   └── RpcConnectionError
+│
+├── RpcError
+│   ├── RpcInvalidTransactionError
+│   ├── RpcBroadcastError
+│   ├── RpcRejectedByUserError
+│   ├── RpcUnsupportedProtocolError
+│   ├── RpcConnectionDenyError
+│   ├── RpcNotAuthorizeError
+│   ├── RpcPermissionDenyError
+│   └── RpcInternalError
 ```
 
 ## Usage
