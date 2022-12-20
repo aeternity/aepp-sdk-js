@@ -91,7 +91,9 @@ export type TransformNodeType<Type> =
                   ? PreserveOptional<number, Type[Property]>
                   : Property extends 'txHash'
                     ? PreserveOptional<Encoded.TxHash, Type[Property]>
-                    : TransformNodeType<Type[Property]>
+                    : Property extends 'bytecode'
+                      ? PreserveOptional<Encoded.ContractBytearray, Type[Property]>
+                      : TransformNodeType<Type[Property]>
             }
             : Type;
 type NodeTransformedApi = new (...args: ConstructorParameters<typeof NodeApi>) => {

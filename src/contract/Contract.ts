@@ -49,11 +49,10 @@ import {
   NoWalletConnectedError,
 } from '../utils/errors';
 import { hash as calcHash } from '../utils/crypto';
-import { Aci as BaseAci } from '../apis/compiler';
 import {
   ContractCallObject as NodeContractCallObject, ContractCallReturnType, Event as NodeEvent,
 } from '../apis/node';
-import CompilerHttp from './CompilerHttp';
+import CompilerBase, { Aci } from './compiler/Base';
 import Node, { TransformNodeType } from '../Node';
 import {
   getAccount, getContract, getContractByteCode, resolveName, txDryRun,
@@ -62,27 +61,7 @@ import AccountBase from '../account/Base';
 import { concatBuffers } from '../utils/other';
 import { isNameValid, produceNameId } from '../tx/builder/helpers';
 
-interface FunctionACI {
-  arguments: any[];
-  name: string;
-  payable: boolean;
-  returns: string;
-  stateful: boolean;
-}
-
-export interface Aci extends BaseAci {
-  encodedAci: {
-    contract: {
-      name: string;
-      event: any;
-      kind: string;
-      state: any;
-      type_defs: any[];
-      functions: FunctionACI[];
-    };
-  };
-  externalEncodedAci: any[];
-}
+type FunctionAci = Aci['encodedAci']['contract']['functions'][0];
 
 interface Event extends NodeEvent {
   address: Encoded.ContractAddress;
@@ -218,9 +197,9 @@ class Contract<M extends ContractMethodsBase> {
     if (this.$options.bytecode != null) return this.$options.bytecode;
     if (this.$options.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
     if (this.$options.onCompiler == null) throw new IllegalArgumentError('Can\'t compile without compiler');
-    this.$options.bytecode = (await this.$options.onCompiler.compileContract({
-      code: this.$options.sourceCode, options: { fileSystem: this.$options.fileSystem },
-    })).bytecode as Encoded.ContractBytearray;
+    this.$options.bytecode = (await this.$options.onCompiler
+      .compileBySourceCode(this.$options.sourceCode, this.$options.fileSystem)
+    ).bytecode;
     return this.$options.bytecode;
   }
 
@@ -326,7 +305,7 @@ class Contract<M extends ContractMethodsBase> {
    * @param name - Function name
    * @returns function ACI
    */
-  protected _getFunctionACI(name: string): Partial<FunctionACI> {
+  protected _getFunctionACI(name: string): Partial<FunctionAci> {
     const fn = this._aci.encodedAci.contract.functions.find(
       (f: { name: string }) => f.name === name,
     );
@@ -503,10 +482,11 @@ class Contract<M extends ContractMethodsBase> {
     {
       onCompiler,
       onNode,
-      sourceCode,
       bytecode,
       aci,
       address,
+      sourceCodePath,
+      sourceCode,
       fileSystem,
       validateBytecode,
       ...otherOptions
@@ -516,9 +496,14 @@ class Contract<M extends ContractMethodsBase> {
       address?: Encoded.ContractAddress | AensName;
     },
   ): Promise<ContractWithMethods<M>> {
-    if (aci == null && sourceCode != null && onCompiler != null) {
-      // TODO: should be fixed when the compiledAci interface gets updated
-      aci = await onCompiler.generateACI({ code: sourceCode, options: { fileSystem } }) as Aci;
+    if (aci == null && onCompiler != null) {
+      let res;
+      if (sourceCodePath != null) res = await onCompiler.compile(sourceCodePath);
+      if (sourceCode != null) res = await onCompiler.compileBySourceCode(sourceCode, fileSystem);
+      if (res != null) {
+        aci = res.aci;
+        bytecode ??= res.bytecode;
+      }
     }
     if (aci == null) throw new MissingContractDefError();
 
@@ -546,9 +531,7 @@ class Contract<M extends ContractMethodsBase> {
       if (bytecode != null) isValid = bytecode === onChanBytecode;
       else if (sourceCode != null) {
         if (onCompiler == null) throw new IllegalArgumentError('Can\'t validate bytecode without compiler');
-        isValid = await onCompiler.validateByteCode(
-          { bytecode: onChanBytecode, source: sourceCode, options: { fileSystem } },
-        ).then(() => true, () => false);
+        isValid = await onCompiler.validateBySourceCode(onChanBytecode, sourceCode, fileSystem);
       }
       if (!isValid) throw new BytecodeMismatchError(sourceCode != null ? 'source code' : 'bytecode');
     }
@@ -567,23 +550,14 @@ class Contract<M extends ContractMethodsBase> {
   $options: Omit<ConstructorParameters<typeof Contract>[0], 'aci'>;
 
   constructor({ aci, ...otherOptions }: {
-    onCompiler?: CompilerHttp;
+    onCompiler?: CompilerBase;
     onNode: Node;
-    sourceCode?: string;
     bytecode?: Encoded.ContractBytearray;
     aci: Aci;
     address?: Encoded.ContractAddress;
-    /**
-     * A map of contract filename to the corresponding contract source code to include into
-     * the main contract
-     * @example
-     * ```js
-     * {
-     *   'library.aes': 'namespace TestLib =\n  function sum(x: int, y: int) : int = x + y'
-     * }
-     * ```
-     */
-    fileSystem?: Record<string, string>;
+    sourceCodePath?: Parameters<CompilerBase['compile']>[0];
+    sourceCode?: Parameters<CompilerBase['compileBySourceCode']>[0];
+    fileSystem?: Parameters<CompilerBase['compileBySourceCode']>[1];
   } & Parameters<Contract<M>['$deploy']>[1]) {
     this._aci = aci;
     this._name = aci.encodedAci.contract.name;
@@ -607,7 +581,7 @@ class Contract<M extends ContractMethodsBase> {
     Object.assign(
       this,
       Object.fromEntries(this._aci.encodedAci.contract.functions
-        .map(({ name, arguments: aciArgs, stateful }: FunctionACI) => {
+        .map(({ name, arguments: aciArgs, stateful }: FunctionAci) => {
           const callStatic = name !== 'init' && !stateful;
           return [
             name,

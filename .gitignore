@@ -31,3 +31,4 @@ site
 /tooling/autorest/compiler-swagger.yaml
 /test/environment/ledger/browser
 /types-legacy
+/bin

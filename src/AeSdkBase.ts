@@ -2,7 +2,7 @@ import Node from './Node';
 import AccountBase from './account/Base';
 import { CompilerError, DuplicateNodeError, NodeNotFoundError } from './utils/errors';
 import { Encoded } from './utils/encoder';
-import CompilerHttp from './contract/CompilerHttp';
+import CompilerBase from './contract/compiler/Base';
 import AeSdkMethods, { OnAccount, getValueOrErrorProxy } from './AeSdkMethods';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
@@ -32,7 +32,10 @@ export default class AeSdkBase extends AeSdkMethods {
     nodes.forEach(({ name, instance }, i) => this.addNode(name, instance, i === 0));
   }
 
-  get compilerApi(): CompilerHttp {
+  // TODO: consider dropping this getter, because:
+  // compiler is not intended to be used separately any more (functionality limited to sdk needs)
+  // and user creates its instance by himself
+  get compilerApi(): CompilerBase {
     if (this._options.onCompiler == null) {
       throw new CompilerError('You can\'t use Compiler API. Compiler is not ready!');
     }
@@ -153,7 +156,7 @@ export default class AeSdkBase extends AeSdkMethods {
   override _getOptions(): {
     onNode: Node;
     onAccount: AccountBase;
-    onCompiler: CompilerHttp;
+    onCompiler: CompilerBase;
   } {
     return {
       ...super._getOptions(),

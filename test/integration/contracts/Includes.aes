@@ -1,0 +1,7 @@
+include "String.aes"
+include "./lib/Library.aes"
+
+contract Includes =
+    entrypoint test(x: int): int = Library.sum(x, 4)
+
+    entrypoint getLength(x: string): int = String.length(x)

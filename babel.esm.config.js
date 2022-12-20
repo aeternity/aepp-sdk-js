@@ -11,5 +11,6 @@ config.plugins.push(
   }],
   ['transform-default-named-imports'],
 );
+config.plugins = config.plugins.filter((p) => p !== 'babel-plugin-transform-import-meta');
 
 module.exports = config;

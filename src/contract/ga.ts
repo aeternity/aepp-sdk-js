@@ -31,7 +31,7 @@ import Contract from './Contract';
 import { send, SendOptions } from '../spend';
 import Node from '../Node';
 import { getAccount } from '../chain';
-import CompilerHttp from './CompilerHttp';
+import CompilerBase from './compiler/Base';
 
 /**
  * Convert current account to GA
@@ -44,10 +44,9 @@ import CompilerHttp from './CompilerHttp';
  */
 export async function createGeneralizedAccount(
   authFnName: string,
-  sourceCode: string,
   args: any[],
   {
-    onAccount, onCompiler, onNode, ...options
+    onAccount, onCompiler, onNode, bytecode, aci, sourceCodePath, sourceCode, fileSystem, ...options
   }: CreateGeneralizedAccountOptions,
 ): Promise<Readonly<{
     owner: Encoded.AccountAddress;
@@ -61,7 +60,7 @@ export async function createGeneralizedAccount(
   }
 
   const contract = await Contract.initialize<{ init: (...a: any[]) => void }>({
-    onAccount, onCompiler, onNode, sourceCode,
+    onAccount, onCompiler, onNode, bytecode, aci, sourceCodePath, sourceCode, fileSystem,
   });
 
   const tx = await _buildTx(Tag.GaAttachTx, {
@@ -88,9 +87,13 @@ export async function createGeneralizedAccount(
 
 interface CreateGeneralizedAccountOptions extends
   BuildTxOptions<Tag.GaAttachTx, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
-  SendOptions {
+  SendOptions,
+  Pick<
+  Parameters<typeof Contract.initialize>[0],
+  'bytecode' | 'aci' | 'sourceCodePath' | 'sourceCode' | 'fileSystem'
+  > {
   onAccount: AccountBase;
-  onCompiler: CompilerHttp;
+  onCompiler: CompilerBase;
   onNode: Node;
   gasLimit?: number;
 }
