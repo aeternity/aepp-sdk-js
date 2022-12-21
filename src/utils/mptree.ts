@@ -35,11 +35,11 @@ enum NodeType {
 export type MPTreeBinary = [Buffer, Array<[Buffer, Buffer[]]>];
 
 export default class MPTree {
-  private readonly rootHash: string;
+  readonly #rootHash: string;
 
-  private readonly nodes: { [key: string]: Buffer[] };
+  readonly #nodes: { [key: string]: Buffer[] };
 
-  private static nodeHash(node: Input): string {
+  static #nodeHash(node: Input): string {
     return Buffer.from(hash(rlpEncode(node))).toString('hex');
   }
 
@@ -49,28 +49,28 @@ export default class MPTree {
    * @returns Merkle Patricia Tree
    */
   constructor(binary: MPTreeBinary) {
-    this.rootHash = binary[0].toString('hex');
-    this.nodes = Object.fromEntries(
+    this.#rootHash = binary[0].toString('hex');
+    this.#nodes = Object.fromEntries(
       binary[1].map((node) => [node[0].toString('hex'), node[1]]),
     );
 
-    if (this.nodes[this.rootHash] === undefined) throw new MissingNodeInTreeError('Can\'t find a node by root hash');
-    Object.entries(this.nodes).forEach(([key, node]) => {
-      if (MPTree.nodeHash(node) !== key) throw new MerkleTreeHashMismatchError();
-      const { type, payload } = MPTree.parseNode(node);
+    if (this.#nodes[this.#rootHash] === undefined) throw new MissingNodeInTreeError('Can\'t find a node by root hash');
+    Object.entries(this.#nodes).forEach(([key, node]) => {
+      if (MPTree.#nodeHash(node) !== key) throw new MerkleTreeHashMismatchError();
+      const { type, payload } = MPTree.#parseNode(node);
       switch (type) {
         case NodeType.Branch:
           payload
             .slice(0, 16)
             .filter((n) => n.length)
             .forEach((n) => {
-              if (this.nodes[n.toString('hex')] === undefined) {
+              if (this.#nodes[n.toString('hex')] === undefined) {
                 throw new MissingNodeInTreeError('Can\'t find a node by hash in branch node');
               }
             });
           break;
         case NodeType.Extension:
-          if (this.nodes[payload[0].toString('hex')] === undefined) {
+          if (this.#nodes[payload[0].toString('hex')] === undefined) {
             throw new MissingNodeInTreeError('Can\'t find a node by hash in extension node');
           }
       }
@@ -78,10 +78,10 @@ export default class MPTree {
   }
 
   isEqual(tree: MPTree): boolean {
-    return this.rootHash === tree.rootHash;
+    return this.#rootHash === tree.#rootHash;
   }
 
-  private static parseNode(node: Buffer[]): {
+  static #parseNode(node: Buffer[]): {
     type: NodeType;
     payload: Buffer[];
     path: string | null;
@@ -107,8 +107,8 @@ export default class MPTree {
    */
   serialize(): MPTreeBinary {
     return [
-      Buffer.from(this.rootHash, 'hex'),
-      Object.entries(this.nodes).map(([mptHash, value]) => ([
+      Buffer.from(this.#rootHash, 'hex'),
+      Object.entries(this.#nodes).map(([mptHash, value]) => ([
         Buffer.from(mptHash, 'hex'),
         value,
       ])),
@@ -121,10 +121,10 @@ export default class MPTree {
    * @returns Value associated to the specified key
    */
   get(_key: string): Buffer | undefined {
-    let searchFrom = this.rootHash;
+    let searchFrom = this.#rootHash;
     let key = _key;
     while (true) { // eslint-disable-line no-constant-condition
-      const { type, payload, path } = MPTree.parseNode(this.nodes[searchFrom]);
+      const { type, payload, path } = MPTree.#parseNode(this.#nodes[searchFrom]);
       switch (type) {
         case NodeType.Branch:
           if (key.length === 0) return payload[16];
