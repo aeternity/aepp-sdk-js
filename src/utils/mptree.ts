@@ -24,6 +24,8 @@ import {
   MissingNodeInTreeError,
   UnknownPathNibbleError,
   UnknownNodeLengthError,
+  ArgumentError,
+  InternalError,
 } from './errors';
 
 enum NodeType {
@@ -36,6 +38,12 @@ export type MPTreeBinary = [Buffer, Array<[Buffer, Buffer[]]>];
 
 export default class MPTree {
   readonly #rootHash: string;
+
+  #isComplete = true;
+
+  get isComplete(): boolean {
+    return this.#isComplete;
+  }
 
   readonly #nodes: { [key: string]: Buffer[] };
 
@@ -54,7 +62,13 @@ export default class MPTree {
       binary[1].map((node) => [node[0].toString('hex'), node[1]]),
     );
 
-    if (this.#nodes[this.#rootHash] == null) throw new MissingNodeInTreeError('Can\'t find a node by root hash');
+    if (this.#nodes[this.#rootHash] == null) {
+      if (Object.keys(this.#nodes).length !== 0) {
+        throw new MissingNodeInTreeError('Can\'t find a node by root hash');
+      }
+      this.#isComplete = false;
+      return;
+    }
     Object.entries(this.#nodes).forEach(([key, node]) => {
       if (MPTree.#nodeHash(node) !== key) throw new MerkleTreeHashMismatchError();
       const { type, payload } = MPTree.#parseNode(node);
@@ -64,9 +78,10 @@ export default class MPTree {
             .slice(0, 16)
             .filter((n) => n.length)
             .forEach((n) => {
-              if (this.#nodes[n.toString('hex')] == null) {
-                throw new MissingNodeInTreeError('Can\'t find a node by hash in branch node');
+              if (n.length !== 32) {
+                throw new ArgumentError('MPTree branch item length', 32, n.length);
               }
+              if (this.#nodes[n.toString('hex')] == null) this.#isComplete = false;
             });
           break;
         case NodeType.Extension:
@@ -124,7 +139,12 @@ export default class MPTree {
     let searchFrom = this.#rootHash;
     let key = _key;
     while (true) { // eslint-disable-line no-constant-condition
-      const { type, payload, path } = MPTree.#parseNode(this.#nodes[searchFrom]);
+      const node = this.#nodes[searchFrom];
+      if (node == null) {
+        if (!this.isComplete) return undefined;
+        throw new InternalError('Can\'t find node in complete tree');
+      }
+      const { type, payload, path } = MPTree.#parseNode(node);
       switch (type) {
         case NodeType.Branch:
           if (key.length === 0) return payload[16];

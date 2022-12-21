@@ -35,7 +35,8 @@ describe('Merkle Patricia Tree', () => {
   };
 
   it('can deserialize', () => {
-    expect(() => new MPTree(binary)).to.not.throw();
+    const tree = new MPTree(binary);
+    expect(tree.isComplete).to.be.equal(true);
   });
 
   it('can serialize', () => {
@@ -64,6 +65,6 @@ describe('Merkle Patricia Tree', () => {
     const wrongBranchNodeLength = hexToTreeBinary('f9013fa0f6322076ba7e911690cf61563126879df81851ae11cd1c7423931ae77672c8dbf9011bf850a0056232c6f764553f472dacd7bba764e4d630adce971e4437dcf07421e20d6cf3eea03e2e29b62366a6b1e363ebf174fce8e4d9ad61abdc2dde65e3f74923dcd629c48ccb0a010087038d7ea4c67ffcf850a065657db43209ef7d57acb7aaf2e2c38f8828f9d425e4bec0d7de5bfa26496c61eea03269a8e17fffe495df7b47bf0ffb94897e1060baf3192e99978d91010325b62d8ccb0a010087038d7ea4c68004f875a0f6322076ba7e911690cf61563126879df81851ae11cd1c7423931ae77672c8dbf85280a065657db43209ef7d57acb7aaf2e2c38f8828f9d425e4bec0d7de5bfa26496c618080a0056232c6f764553f472dacd7bba764e4d630adce971e4437dcf07421e20d6cf380808080808080808080808080');
     expect(() => new MPTree(wrongBranchNodeLength)).to.throw(UnknownNodeLengthError, 'Unknown node length: 18');
     const wrongBranchNodeHash = hexToTreeBinary('f9013ea02275f012f78197935cca6322773642620a62f9a4af9cc8ff3245e3755245fcfcf9011af850a0056232c6f764553f472dacd7bba764e4d630adce971e4437dcf07421e20d6cf3eea03e2e29b62366a6b1e363ebf174fce8e4d9ad61abdc2dde65e3f74923dcd629c48ccb0a010087038d7ea4c67ffcf850a065657db43209ef7d57acb7aaf2e2c38f8828f9d425e4bec0d7de5bfa26496c61eea03269a8e17fffe495df7b47bf0ffb94897e1060baf3192e99978d91010325b62d8ccb0a010087038d7ea4c68004f874a02275f012f78197935cca6322773642620a62f9a4af9cc8ff3245e3755245fcfcf85180a065657db432ffef7d57acb7aaf2e2c38f8828f9d425e4bec0d7de5bfa26496c618080a0056232c6f764553f472dacd7bba764e4d630adce971e4437dcf07421e20d6cf3808080808080808080808080');
-    expect(() => new MPTree(wrongBranchNodeHash)).to.throw(MissingNodeInTreeError, 'Can\'t find a node by hash in branch node');
+    expect(new MPTree(wrongBranchNodeHash).isComplete).to.equal(false);
   });
 });
