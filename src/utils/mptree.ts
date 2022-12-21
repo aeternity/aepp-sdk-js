@@ -54,7 +54,7 @@ export default class MPTree {
       binary[1].map((node) => [node[0].toString('hex'), node[1]]),
     );
 
-    if (this.#nodes[this.#rootHash] === undefined) throw new MissingNodeInTreeError('Can\'t find a node by root hash');
+    if (this.#nodes[this.#rootHash] == null) throw new MissingNodeInTreeError('Can\'t find a node by root hash');
     Object.entries(this.#nodes).forEach(([key, node]) => {
       if (MPTree.#nodeHash(node) !== key) throw new MerkleTreeHashMismatchError();
       const { type, payload } = MPTree.#parseNode(node);
@@ -64,13 +64,13 @@ export default class MPTree {
             .slice(0, 16)
             .filter((n) => n.length)
             .forEach((n) => {
-              if (this.#nodes[n.toString('hex')] === undefined) {
+              if (this.#nodes[n.toString('hex')] == null) {
                 throw new MissingNodeInTreeError('Can\'t find a node by hash in branch node');
               }
             });
           break;
         case NodeType.Extension:
-          if (this.#nodes[payload[0].toString('hex')] === undefined) {
+          if (this.#nodes[payload[0].toString('hex')] == null) {
             throw new MissingNodeInTreeError('Can\'t find a node by hash in extension node');
           }
       }

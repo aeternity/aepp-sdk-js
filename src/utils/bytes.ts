@@ -29,7 +29,7 @@ export function toBytes(val?: null | string | number | BigNumber, big = false): 
   // If the value is an int it will be encoded as bytes big endian
   // Raises ValueError if the input is not an int or string
 
-  if (val === undefined || val === null) return Buffer.from([]);
+  if (val == null) return Buffer.from([]);
   if (Number.isInteger(val) || BigNumber.isBigNumber(val) || big) {
     if (!BigNumber.isBigNumber(val)) val = new BigNumber(val);
     if (!val.isInteger()) throw new TypeError(`Unexpected not integer value: ${val.toFixed()}`);

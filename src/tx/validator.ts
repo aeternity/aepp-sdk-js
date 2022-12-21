@@ -117,7 +117,7 @@ export default async function verifyTransaction(
 
 validators.push(
   ({ encodedTx, signatures }, { account, nodeNetworkId, parentTxTypes }) => {
-    if ((encodedTx ?? signatures) === undefined) return [];
+    if ((encodedTx ?? signatures) == null) return [];
     if (account == null) return [];
     if (signatures.length !== 1) return []; // TODO: Support multisignature?
     const prefix = Buffer.from([
@@ -136,7 +136,7 @@ validators.push(
     }];
   },
   async ({ encodedTx, tx }, { node, parentTxTypes, txType }) => {
-    if ((encodedTx ?? tx) === undefined) return [];
+    if ((encodedTx ?? tx) == null) return [];
     return verifyTransaction(
       encode((encodedTx ?? tx).rlpEncoded, Encoding.Transaction),
       node,
@@ -144,7 +144,7 @@ validators.push(
     );
   },
   ({ ttl }, { height }) => {
-    if (ttl === undefined) return [];
+    if (ttl == null) return [];
     ttl = +ttl;
     if (ttl === 0 || ttl >= height) return [];
     return [{
@@ -157,7 +157,7 @@ validators.push(
     amount, fee, nameFee, tx,
   }, { account, parentTxTypes, txType }) => {
     if (account == null) return [];
-    if ((amount ?? fee ?? nameFee) === undefined) return [];
+    if ((amount ?? fee ?? nameFee) == null) return [];
     fee ??= 0;
     const cost = new BigNumber(fee).plus(nameFee ?? 0).plus(amount ?? 0)
       .plus(txType === Tag.PayingForTx ? (tx.tx.encodedTx.tx).fee : 0)
