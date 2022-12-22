@@ -30,6 +30,7 @@ type Validator = (
     tx: TxUnpacked<TxSchema> & {
       tx: TxTypeSchemas[Tag.SignedTx];
     };
+    tag: Tag;
     nonce?: number;
     ttl?: number;
     amount?: number;
@@ -45,7 +46,6 @@ type Validator = (
     nodeNetworkId: string;
     parentTxTypes: Tag[];
     node: Node;
-    txType: Tag;
     height: number;
     consensusProtocolVersion: number;
   }
@@ -88,9 +88,9 @@ export default async function verifyTransaction(
     node.pipeline.addPolicy(genAggressiveCacheGetResponsesPolicy());
   }
 
-  const { tx, txType } = unpackTx<Tag.SignedTx>(transaction);
+  const { tx } = unpackTx<Tag.SignedTx>(transaction);
   const address = getSenderAddress(tx)
-    ?? (txType === Tag.SignedTx ? getSenderAddress(tx.encodedTx.tx) : undefined);
+    ?? (tx.tag === Tag.SignedTx ? getSenderAddress(tx.encodedTx.tx) : undefined);
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
     address == null
       ? undefined
@@ -109,7 +109,7 @@ export default async function verifyTransaction(
     validators.map((v) => v(
       tx as any,
       {
-        txType, node, account, height, consensusProtocolVersion, nodeNetworkId, parentTxTypes,
+        node, account, height, consensusProtocolVersion, nodeNetworkId, parentTxTypes,
       },
     )),
   )).flat();
@@ -135,12 +135,12 @@ validators.push(
       checkedKeys: ['encodedTx', 'signatures'],
     }];
   },
-  async ({ encodedTx, tx }, { node, parentTxTypes, txType }) => {
+  async ({ encodedTx, tx, tag }, { node, parentTxTypes }) => {
     if ((encodedTx ?? tx) == null) return [];
     return verifyTransaction(
       encode((encodedTx ?? tx).rlpEncoded, Encoding.Transaction),
       node,
-      [...parentTxTypes, txType],
+      [...parentTxTypes, tag],
     );
   },
   ({ ttl }, { height }) => {
@@ -154,13 +154,13 @@ validators.push(
     }];
   },
   ({
-    amount, fee, nameFee, tx,
-  }, { account, parentTxTypes, txType }) => {
+    amount, fee, nameFee, tx, tag,
+  }, { account, parentTxTypes }) => {
     if (account == null) return [];
     if ((amount ?? fee ?? nameFee) == null) return [];
     fee ??= 0;
     const cost = new BigNumber(fee).plus(nameFee ?? 0).plus(amount ?? 0)
-      .plus(txType === Tag.PayingForTx ? (tx.tx.encodedTx.tx).fee : 0)
+      .plus(tag === Tag.PayingForTx ? (tx.tx.encodedTx.tx).fee : 0)
       .minus(parentTxTypes.includes(Tag.PayingForTx) ? fee : 0);
     if (cost.lte(account.balance.toString())) return [];
     return [{
@@ -169,13 +169,13 @@ validators.push(
       checkedKeys: ['amount', 'fee', 'nameFee'],
     }];
   },
-  ({ signatures }, { account, txType }) => {
+  ({ signatures, tag }, { account }) => {
     if (account == null) return [];
     let message;
-    if (txType === Tag.SignedTx && account.kind === 'generalized' && signatures.length !== 0) {
+    if (tag === Tag.SignedTx && account.kind === 'generalized' && signatures.length !== 0) {
       message = 'Generalized account can\'t be used to generate SignedTx with signatures';
     }
-    if (txType === Tag.GaMetaTx && account.kind === 'basic') {
+    if (tag === Tag.GaMetaTx && account.kind === 'basic') {
       message = 'Basic account can\'t be used to generate GaMetaTx';
     }
     if (message == null) return [];
@@ -199,7 +199,7 @@ validators.push(
       checkedKeys: ['nonce'],
     }];
   },
-  ({ ctVersion, abiVersion }, { txType, consensusProtocolVersion }) => {
+  ({ ctVersion, abiVersion, tag }, { consensusProtocolVersion }) => {
     if (!isKeyOfObject(consensusProtocolVersion, PROTOCOL_VM_ABI)) {
       throw new UnsupportedProtocolError(`Unsupported protocol: ${consensusProtocolVersion}`);
     }
@@ -207,7 +207,7 @@ validators.push(
 
     // If not contract create tx
     if (ctVersion == null) ctVersion = { abiVersion };
-    const txProtocol = protocol[txType as keyof typeof protocol];
+    const txProtocol = protocol[tag as keyof typeof protocol];
     if (txProtocol == null) return [];
     if (Object.entries(ctVersion).some(
       ([
@@ -225,8 +225,8 @@ validators.push(
     }
     return [];
   },
-  async ({ contractId }, { txType, node }) => {
-    if (Tag.ContractCallTx !== txType) return [];
+  async ({ contractId, tag }, { node }) => {
+    if (Tag.ContractCallTx !== tag) return [];
     contractId = contractId as Encoded.ContractAddress;
     try {
       const { active } = await node.getContract(contractId);

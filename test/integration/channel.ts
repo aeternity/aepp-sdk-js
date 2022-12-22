@@ -175,15 +175,11 @@ describe('Channel', () => {
       channelReserve: sharedParams?.channelReserve?.toString(),
       lockPeriod: sharedParams.lockPeriod.toString(),
     };
-    const { txType: initiatorTxType, tx: initiatorTx } = unpackTx(
-      initiatorSignTag.firstCall.args[1],
-    );
-    const { txType: responderTxType, tx: responderTx } = unpackTx(
-      responderSignTag.firstCall.args[1],
-    );
-    initiatorTxType.should.equal(Tag.ChannelCreateTx);
+    const { tx: initiatorTx } = unpackTx(initiatorSignTag.firstCall.args[1]);
+    const { tx: responderTx } = unpackTx(responderSignTag.firstCall.args[1]);
+    expect(initiatorTx.tag).to.be.equal(Tag.ChannelCreateTx);
     initiatorTx.should.eql({ ...initiatorTx, ...expectedTxParams });
-    responderTxType.should.equal(Tag.ChannelCreateTx);
+    expect(responderTx.tag).to.be.equal(Tag.ChannelCreateTx);
     responderTx.should.eql({ ...responderTx, ...expectedTxParams });
   });
 
@@ -244,8 +240,8 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { txType } = unpackTx(initiatorSign.firstCall.args[0]);
-    txType.should.equal(Tag.ChannelOffChainTx);
+    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
+    expect(tx.tag).to.be.equal(Tag.ChannelOffChainTx);
 
     expect(initiatorSign.firstCall.args[1]).to.eql({
       updates: [
@@ -299,8 +295,8 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { txType } = unpackTx(initiatorSign.firstCall.args[0]);
-    txType.should.equal(Tag.ChannelOffChainTx);
+    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
+    expect(tx.tag).to.be.equal(Tag.ChannelOffChainTx);
     expect(initiatorSign.firstCall.args[1]).to.eql({
       updates: [
         {
@@ -431,8 +427,8 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { txType, tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    txType.should.equal(Tag.ChannelWithdrawTx);
+    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
+    expect(tx.tag).to.be.equal(Tag.ChannelWithdrawTx);
     tx.should.eql({
       ...tx,
       toId: aeSdkInitiatior.address,
@@ -483,8 +479,8 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { txType, tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    txType.should.equal(Tag.ChannelWithdrawTx);
+    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
+    expect(tx.tag).to.be.equal(Tag.ChannelWithdrawTx);
     tx.should.eql({
       ...tx,
       toId: aeSdkInitiatior.address,
@@ -559,8 +555,8 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { txType, tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    txType.should.equal(Tag.ChannelDepositTx);
+    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
+    expect(tx.tag).to.be.equal(Tag.ChannelDepositTx);
     tx.should.eql({
       ...tx,
       fromId: aeSdkInitiatior.address,
@@ -599,8 +595,8 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { txType, tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    txType.should.equal(Tag.ChannelDepositTx);
+    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
+    expect(tx.tag).to.be.equal(Tag.ChannelDepositTx);
     tx.should.eql({
       ...tx,
       fromId: aeSdkInitiatior.address,
@@ -643,8 +639,8 @@ describe('Channel', () => {
     );
     sinon.assert.calledOnce(initiatorSign);
     sinon.assert.calledWithExactly(initiatorSign, sinon.match.string);
-    const { txType, tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    txType.should.equal(Tag.ChannelCloseMutualTx);
+    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
+    expect(tx.tag).to.be.equal(Tag.ChannelCloseMutualTx);
     tx.should.eql({
       ...tx,
       fromId: aeSdkInitiatior.address,

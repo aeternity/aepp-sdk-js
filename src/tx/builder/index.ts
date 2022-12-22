@@ -282,7 +282,6 @@ export function buildTx<TxType extends Tag, Prefix>(
  * @category transaction builder
  */
 export interface TxUnpacked<Tx extends TxSchema> {
-  txType: Tag;
   tx: RawTxObject<Tx>;
   rlpEncoded: Uint8Array;
 }
@@ -308,7 +307,6 @@ export function unpackTx<TxType extends Tag>(
   if (!isKeyOfObject(vsn, TX_SCHEMA[objId])) throw new SchemaNotFoundError('deserialization', `tag ${objId}`, vsn);
   const schema = TX_SCHEMA[objId][vsn];
   return {
-    txType: objId,
     tx: unpackRawTx<TxTypeSchemas[TxType]>(binary, schema),
     rlpEncoded,
   };
@@ -336,9 +334,9 @@ export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.Tx
 export function buildContractIdByContractTx(
   contractTx: Encoded.Transaction,
 ): Encoded.ContractAddress {
-  const { txType, tx } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
-  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(txType)) {
-    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', txType);
+  const { tx } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
+  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(tx.tag)) {
+    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', tx.tag);
   }
   return buildContractId(tx.ownerId, +tx.nonce);
 }

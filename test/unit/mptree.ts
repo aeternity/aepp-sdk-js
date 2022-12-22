@@ -43,14 +43,12 @@ describe('Merkle Patricia Tree', () => {
   const binary2 = hexToTreeBinary('f9015ea0eb9824f62f5fc5f1f205394cf9edf94e8597fc6054081af05a9b7f5924061d32f9013af850a0056232c6f764553f472dacd7bba764e4d630adce971e4437dcf07421e20d6cf3eea03e2e29b62366a6b1e363ebf174fce8e4d9ad61abdc2dde65e3f74923dcd629c48ccb0a010087038d7ea4c67ffcf850a065657db43209ef7d57acb7aaf2e2c38f8828f9d425e4bec0d7de5bfa26496c61eea03269a8e17fffe495df7b47bf0ffb94897e1060baf3192e99978d91010325b62d8ccb0a010087038d7ea4c68004f894a0eb9824f62f5fc5f1f205394cf9edf94e8597fc6054081af05a9b7f5924061d32f87180a065657db43209ef7d57acb7aaf2e2c38f8828f9d425e4bec0d7de5bfa26496c618080a0056232c6f764553f472dacd7bba764e4d630adce971e4437dcf07421e20d6cf38080808080808080808080a02275f012f78197935cca6322773642620a62f9a4af9cc8ff3245e3755245fcfc');
   const map: Record<Encoded.AccountAddress, object> = {
     ak_97L4GGbqagBAUZ93g2Qb1QU5W53yDpSgfDj5e5WVJ75wNFmBm: {
-      txType: 10,
       tx: {
         tag: 10, VSN: 1, nonce: 0, balance: '1000000000000004',
       },
       rlpEncoded: Buffer.from('cb0a010087038d7ea4c68004', 'hex'),
     },
     ak_bS1fWNoYpChJhGS3UMGv6WvwXp55xQYmcUrPoZ9UhcBXEPMsK: {
-      txType: 10,
       tx: {
         tag: 10, VSN: 1, nonce: 0, balance: '999999999999996',
       },

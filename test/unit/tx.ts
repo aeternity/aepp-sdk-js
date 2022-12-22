@@ -140,19 +140,16 @@ describe('Tx', () => {
         .to.eql(accountContract);
       expect(unpackedPoi.tx.accounts[0].toObject()).to.eql({
         ak_BvMjyAXbpHkjzVfG53N6FxF1LwTX2EYwFLfNbk8mcXjp8CXBC: {
-          txType: 10,
           tx: {
             tag: 10, VSN: 1, nonce: 0, balance: '100000000000000000003',
           },
           rlpEncoded: Buffer.from('cd0a010089056bc75e2d63100003', 'hex'),
         },
         [addressContract.replace('ct_', 'ak_')]: {
-          txType: 10,
           tx: accountContract,
           rlpEncoded: Buffer.from('c60a01008203e8', 'hex'),
         },
         [address]: {
-          txType: 10,
           tx: account,
           rlpEncoded: Buffer.from('cd0a010089056bc75e2d630ffc15', 'hex'),
         },
@@ -172,13 +169,12 @@ describe('Tx', () => {
       expect(unpackedPoi.tx.contracts[0].get(addressContract)?.tx).to.eql(contract);
       expect(unpackedPoi.tx.contracts[0].toObject()).to.eql({
         [addressContract]: {
-          txType: 40,
           tx: contract,
           rlpEncoded: Buffer.from('f87e2801a1015d716d669f58a9b63829d5bc36895ff478e9d1565c3569d038a8e009bf01afd983050003b84ef84c4603a0e1dfbf7b9eab821c24a6d3cf1abe03a2aa08e36ab450be2118017abe6257a059c0a08dfe8078209200370107070101008e2f01118078209219676574417267822f0085372e302e31008001c08203e8', 'hex'),
         },
       });
 
-      expect(buildTx(unpackedPoi.tx, unpackedPoi.txType, { prefix: Encoding.Poi }).tx)
+      expect(buildTx(unpackedPoi.tx, unpackedPoi.tx.tag, { prefix: Encoding.Poi }).tx)
         .to.equal(poi);
     });
   });
