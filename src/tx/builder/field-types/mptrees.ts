@@ -1,32 +1,18 @@
-/*
- * ISC License (ISC)
- * Copyright (c) 2021 aeternity developers
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
- *  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
- *  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
- *  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
- *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- *  PERFORMANCE OF THIS SOFTWARE.
- */
-
-import { encode as rlpEncode } from 'rlp';
-import type { Input } from 'rlp';
-import { hash } from './crypto';
+import { encode as rlpEncode, Input } from 'rlp';
+import { Tag } from '../constants';
+import { hash } from '../../../utils/crypto';
 import {
   MerkleTreeHashMismatchError,
   MissingNodeInTreeError,
   UnknownPathNibbleError,
-  UnknownNodeLengthError,
-  ArgumentError,
-  InternalError,
   UnexpectedTsError,
-} from './errors';
+  UnknownNodeLengthError,
+  InternalError,
+} from '../../../utils/errors';
+import {
+  decode, encode, Encoded, Encoding,
+} from '../../../utils/encoder';
+import type { unpackTx } from '..';
 
 enum NodeType {
   Branch,
@@ -34,9 +20,9 @@ enum NodeType {
   Leaf,
 }
 
-export type MPTreeBinary = [Buffer, Array<[Buffer, Buffer[]]>];
+type MPTreeBinary = [Buffer, Array<[Buffer, Buffer[]]>];
 
-export default class MPTree {
+class MPTree<E extends Encoding, T extends Tag> {
   readonly #rootHash: string;
 
   #isComplete = true;
@@ -47,6 +33,12 @@ export default class MPTree {
 
   readonly #nodes: { [key: string]: Buffer[] };
 
+  readonly #encoding: E;
+
+  readonly #tag: T;
+
+  readonly #unpackTx: typeof unpackTx;
+
   static #nodeHash(node: Input): string {
     return Buffer.from(hash(rlpEncode(node))).toString('hex');
   }
@@ -54,9 +46,14 @@ export default class MPTree {
   /**
    * Deserialize Merkle Patricia Tree
    * @param binary - Binary
+   * @param tag - Tag to use to decode value
+   * @param unpTx - Implementation of unpackTx use to decode values
    * @returns Merkle Patricia Tree
    */
-  constructor(binary: MPTreeBinary) {
+  constructor(binary: MPTreeBinary, encoding: E, tag: T, unpTx: typeof unpackTx) {
+    this.#encoding = encoding;
+    this.#tag = tag;
+    this.#unpackTx = unpTx;
     this.#rootHash = binary[0].toString('hex');
     this.#nodes = Object.fromEntries(
       binary[1].map((node) => [node[0].toString('hex'), node[1]]),
@@ -78,9 +75,10 @@ export default class MPTree {
             .slice(0, 16)
             .filter((n) => n.length)
             .forEach((n) => {
-              if (n.length !== 32) {
-                throw new ArgumentError('MPTree branch item length', 32, n.length);
-              }
+              // TODO: enable after resolving https://github.com/aeternity/aeternity/issues/4066
+              // if (n.length !== 32) {
+              //   throw new ArgumentError('MPTree branch item length', 32, n.length);
+              // }
               if (this.#nodes[n.toString('hex')] == null) this.#isComplete = false;
             });
           break;
@@ -97,7 +95,7 @@ export default class MPTree {
     });
   }
 
-  isEqual(tree: MPTree): boolean {
+  isEqual(tree: MPTree<E, T>): boolean {
     return this.#rootHash === tree.#rootHash;
   }
 
@@ -143,7 +141,7 @@ export default class MPTree {
    * @param _key - The key of the element to retrieve
    * @returns Value associated to the specified key
    */
-  get(_key: string): Buffer | undefined {
+  #getRaw(_key: string): Buffer | undefined {
     let searchFrom = this.#rootHash;
     let key = _key;
     while (true) { // eslint-disable-line no-constant-condition
@@ -171,6 +169,17 @@ export default class MPTree {
           throw new InternalError(`Unknown MPTree node type: ${type}`);
       }
     }
+  }
+
+  /**
+   * Retrieve value from Merkle Patricia Tree
+   * @param key - The key of the element to retrieve
+   * @returns Value associated to the specified key
+   */
+  get(key: Encoded.Generic<E>): ReturnType<typeof unpackTx<T>> | undefined {
+    const d = this.#getRaw(decode(key).toString('hex'));
+    if (d == null) return d;
+    return this.#unpackTx(encode(d, Encoding.Transaction), this.#tag);
   }
 
   #entriesRaw(): Array<[string, Buffer]> {
@@ -205,4 +214,29 @@ export default class MPTree {
     rec(this.#rootHash, '');
     return entries;
   }
+
+  toObject(): Record<Encoded.Any, ReturnType<typeof unpackTx<T>>> {
+    return Object.fromEntries(this.#entriesRaw()
+      // TODO: remove after resolving https://github.com/aeternity/aeternity/issues/4066
+      .filter(([k]) => this.#encoding !== Encoding.ContractAddress || k.length !== 66)
+      .map(([k, v]) => [
+        encode(Buffer.from(k, 'hex'), this.#encoding),
+        this.#unpackTx(encode(v, Encoding.Transaction), this.#tag),
+      ]));
+  }
+}
+
+export default function genMPTreesField<E extends Encoding, T extends Tag>(encoding: E, tag: T): {
+  serialize: (value: Array<MPTree<E, T>>) => MPTreeBinary[];
+  deserialize: (value: MPTreeBinary[], o: { unpackTx: typeof unpackTx }) => Array<MPTree<E, T>>;
+} {
+  return {
+    serialize(value) {
+      return value.map((el) => el.serialize());
+    },
+
+    deserialize(value, { unpackTx }) {
+      return value.map((el) => new MPTree(el, encoding, tag, unpackTx));
+    },
+  };
 }

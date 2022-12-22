@@ -17,7 +17,6 @@ import {
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
 import { toBytes } from '../../utils/bytes';
-import MPTree, { MPTreeBinary } from '../../utils/mptree';
 import {
   ArgumentError,
   DecodeError,
@@ -71,8 +70,6 @@ function deserializeField(
     case FIELD_TYPES.callStack:
       // TODO: fix this
       return [readInt(value)];
-    case FIELD_TYPES.mptrees:
-      return value.map((t: MPTreeBinary) => new MPTree(t));
     case FIELD_TYPES.sophiaCodeTypeInfo:
       return value.reduce(
         (acc: object, [funHash, fnName, argType, outType]: [
@@ -88,7 +85,8 @@ function deserializeField(
       );
     default:
       if (typeof type === 'number') return value;
-      return type.deserialize(value);
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return type.deserialize(value, { unpackTx });
   }
 }
 
@@ -112,8 +110,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       return toBytes(value);
     case FIELD_TYPES.rlpBinary:
       return value.rlpEncoded ?? value;
-    case FIELD_TYPES.mptrees:
-      return value.map((t: MPTree) => t.serialize());
     case FIELD_TYPES.ctVersion:
       return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
     default:
