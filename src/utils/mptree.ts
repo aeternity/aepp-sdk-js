@@ -15,7 +15,6 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* eslint-disable default-case */
 import { encode as rlpEncode } from 'rlp';
 import type { Input } from 'rlp';
 import { hash } from './crypto';
@@ -88,6 +87,11 @@ export default class MPTree {
           if (this.#nodes[payload[0].toString('hex')] == null) {
             throw new MissingNodeInTreeError('Can\'t find a node by hash in extension node');
           }
+          break;
+        case NodeType.Leaf:
+          break;
+        default:
+          throw new InternalError(`Unknown MPTree node type: ${type}`);
       }
     });
   }
@@ -159,6 +163,8 @@ export default class MPTree {
         case NodeType.Leaf:
           if (path !== key) return undefined;
           return payload[0];
+        default:
+          throw new InternalError(`Unknown MPTree node type: ${type}`);
       }
     }
   }
