@@ -25,6 +25,7 @@ import {
   UnknownNodeLengthError,
   ArgumentError,
   InternalError,
+  UnexpectedTsError,
 } from './errors';
 
 enum NodeType {
@@ -70,10 +71,10 @@ export default class MPTree {
     }
     Object.entries(this.#nodes).forEach(([key, node]) => {
       if (MPTree.#nodeHash(node) !== key) throw new MerkleTreeHashMismatchError();
-      const { type, payload } = MPTree.#parseNode(node);
+      const { type } = MPTree.#parseNode(node);
       switch (type) {
         case NodeType.Branch:
-          payload
+          node
             .slice(0, 16)
             .filter((n) => n.length)
             .forEach((n) => {
@@ -84,7 +85,7 @@ export default class MPTree {
             });
           break;
         case NodeType.Extension:
-          if (this.#nodes[payload[0].toString('hex')] == null) {
+          if (this.#nodes[node[1].toString('hex')] == null) {
             throw new MissingNodeInTreeError('Can\'t find a node by hash in extension node');
           }
           break;
@@ -100,20 +101,23 @@ export default class MPTree {
     return this.#rootHash === tree.#rootHash;
   }
 
-  static #parseNode(node: Buffer[]): {
-    type: NodeType;
-    payload: Buffer[];
-    path: string | null;
-  } {
+  static #parseNode(node: Buffer[]): { type: NodeType; value?: Buffer; path?: string } {
     switch (node.length) {
       case 17:
-        return { type: NodeType.Branch, payload: node, path: null };
+        return {
+          type: NodeType.Branch,
+          ...node[16].length !== 0 && { value: node[16] },
+        };
       case 2: {
         const nibble = node[0][0] >> 4; // eslint-disable-line no-bitwise
         if (nibble > 3) throw new UnknownPathNibbleError(nibble);
         const type = nibble <= 1 ? NodeType.Extension : NodeType.Leaf;
         const slice = [0, 2].includes(nibble) ? 2 : 1;
-        return { type, payload: [node[1]], path: node[0].toString('hex').slice(slice) };
+        return {
+          type,
+          ...type === NodeType.Leaf && { value: node[1] },
+          path: node[0].toString('hex').slice(slice),
+        };
       }
       default:
         throw new UnknownNodeLengthError(node.length);
@@ -148,24 +152,57 @@ export default class MPTree {
         if (!this.isComplete) return undefined;
         throw new InternalError('Can\'t find node in complete tree');
       }
-      const { type, payload, path } = MPTree.#parseNode(node);
+      const { type, value, path } = MPTree.#parseNode(node);
       switch (type) {
         case NodeType.Branch:
-          if (key.length === 0) return payload[16];
-          searchFrom = payload[+`0x${key[0]}`].toString('hex');
+          if (key.length === 0) return value;
+          searchFrom = node[+`0x${key[0]}`].toString('hex');
           key = key.substring(1);
           break;
         case NodeType.Extension:
           if (key.substring(0, path?.length) !== path) return undefined;
-          searchFrom = payload[0].toString('hex');
+          searchFrom = node[1].toString('hex');
           key = key.substring(path.length);
           break;
         case NodeType.Leaf:
           if (path !== key) return undefined;
-          return payload[0];
+          return value;
         default:
           throw new InternalError(`Unknown MPTree node type: ${type}`);
       }
     }
+  }
+
+  #entriesRaw(): Array<[string, Buffer]> {
+    const entries: Array<[string, Buffer]> = [];
+    const rec = (searchFrom: string, key: string): void => {
+      const node = this.#nodes[searchFrom];
+      if (node == null) {
+        if (!this.isComplete) return;
+        throw new InternalError('Can\'t find node in complete tree');
+      }
+      const { type, value, path } = MPTree.#parseNode(node);
+      switch (type) {
+        case NodeType.Branch:
+          node
+            .slice(0, 16)
+            .map((t, idx): [typeof t, number] => [t, idx])
+            .filter(([t]) => t.length)
+            .forEach(([t, idx]) => rec(t.toString('hex'), key + idx.toString(16)));
+          if (value != null) entries.push([key, value]);
+          break;
+        case NodeType.Extension:
+          rec(node[1].toString('hex'), key + path);
+          break;
+        case NodeType.Leaf:
+          if (value == null) throw new UnexpectedTsError();
+          entries.push([key + path, value]);
+          break;
+        default:
+          throw new InternalError(`Unknown MPTree node type: ${type}`);
+      }
+    };
+    rec(this.#rootHash, '');
+    return entries;
   }
 }
