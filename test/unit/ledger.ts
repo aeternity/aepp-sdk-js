@@ -172,7 +172,7 @@ describe('Ledger HW', () => {
 
     const transaction = buildTx({
       senderId: address, recipientId: address, amount: 1.23e18, nonce: 10, ttl: 0,
-    }, Tag.SpendTx).tx;
+    }, Tag.SpendTx);
 
     it('signs transaction', async () => {
       await initTransport('=> e00400006a000000000000005b0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80\n'

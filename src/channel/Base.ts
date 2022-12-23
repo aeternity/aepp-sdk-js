@@ -326,7 +326,7 @@ export default class Channel {
 
     return Channel.initialize({
       ...options,
-      reconnectTx: await sign('reconnect', buildTx(txParams, Tag.ChannelClientReconnectTx).tx),
+      reconnectTx: await sign('reconnect', buildTx(txParams, Tag.ChannelClientReconnectTx)),
     });
   }
 }

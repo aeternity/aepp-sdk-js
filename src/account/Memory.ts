@@ -75,7 +75,7 @@ export default class AccountMemory extends AccountBase {
     const txWithNetworkId = concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)]);
 
     const signatures = [await this.sign(txWithNetworkId, options)];
-    return buildTx({ encodedTx: rlpBinaryTx, signatures }, Tag.SignedTx).tx;
+    return buildTx({ encodedTx: rlpBinaryTx, signatures }, Tag.SignedTx);
   }
 
   override async signMessage(message: string, options?: any): Promise<Uint8Array> {

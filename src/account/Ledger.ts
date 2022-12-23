@@ -91,7 +91,7 @@ export default class AccountLedger extends AccountBase {
     );
     const signatures = [response.subarray(0, 64)];
 
-    return buildTx({ encodedTx: rawTx, signatures }, Tag.SignedTx).tx;
+    return buildTx({ encodedTx: rawTx, signatures }, Tag.SignedTx);
   }
 
   override async signMessage(messageStr: string): Promise<Uint8Array> {

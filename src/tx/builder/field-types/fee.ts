@@ -3,7 +3,7 @@ import { IllegalArgumentError } from '../../../utils/errors';
 import { MIN_GAS_PRICE, Tag } from '../constants';
 import coinAmount from './coin-amount';
 import { isKeyOfObject } from '../../../utils/other';
-import { decode } from '../../../utils/encoder';
+import { decode, Encoded } from '../../../utils/encoder';
 import type { unpackTx as unpackTxType } from '../index';
 
 const BASE_GAS = 15000;
@@ -93,10 +93,9 @@ function getOracleRelativeTtl(params: any): number {
 /**
  * Calculate fee based on tx type and params
  */
-export function buildFee(buildTx: any, unpackTx: typeof unpackTxType): BigNumber {
-  const { tx } = buildTx;
-  const { length } = decode(tx);
-  const txObject = unpackTx(tx).tx;
+export function buildFee(buildTx: Encoded.Transaction, unpackTx: typeof unpackTxType): BigNumber {
+  const { length } = decode(buildTx);
+  const txObject = unpackTx(buildTx).tx;
 
   return TX_FEE_BASE_GAS(txObject.tag)
     .plus(TX_FEE_OTHER_GAS(txObject.tag, length, {
@@ -114,7 +113,7 @@ export function buildFee(buildTx: any, unpackTx: typeof unpackTxType): BigNumber
  * @param rebuildTx - Callback to get built transaction with specific fee
  */
 function calculateMinFee(
-  rebuildTx: (value: BigNumber) => any,
+  rebuildTx: (value: BigNumber) => Encoded.Transaction,
   unpackTx: typeof unpackTxType,
 ): BigNumber {
   let fee = new BigNumber(0);
@@ -131,8 +130,11 @@ export default {
 
   serializeAettos(
     _value: string | undefined,
-    { rebuildTx, unpackTx, _computingMinFee }:
-    { rebuildTx: (params: any) => any; unpackTx: typeof unpackTxType; _computingMinFee?: string },
+    { rebuildTx, unpackTx, _computingMinFee }: {
+      rebuildTx: (params: any) => Encoded.Transaction;
+      unpackTx: typeof unpackTxType;
+      _computingMinFee?: string;
+    },
   ): string {
     if (_computingMinFee != null) return _computingMinFee;
     const minFee = calculateMinFee((fee) => rebuildTx({ _computingMinFee: fee }), unpackTx);

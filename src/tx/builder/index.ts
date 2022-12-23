@@ -185,13 +185,6 @@ function unpackRawTx<Tx extends TxSchema>(
 }
 
 /**
- * @category transaction builder
- */
-export interface BuiltTx<Prefix extends Encoding> {
-  tx: Encoded.Generic<Prefix>;
-}
-
-/**
  * Build transaction hash
  * @category transaction builder
  * @param _params - Object with tx params
@@ -205,7 +198,7 @@ export interface BuiltTx<Prefix extends Encoding> {
  * @returns object.rlpEncoded rlp encoded transaction
  * @returns object.binary binary transaction
  */
-export function buildTx<TxType extends Tag, Prefix>(
+export function buildTx<TxType extends Tag, E extends Encoding = Encoding.Transaction>(
   _params: Omit<TxTypeSchemas[TxType], 'tag' | 'version'> & { version?: number }
   // TODO: get it from gas-limit.ts somehow
   & (TxType extends Tag.ContractCreateTx | Tag.ContractCallTx
@@ -213,15 +206,15 @@ export function buildTx<TxType extends Tag, Prefix>(
     ? { gasMax?: number } : {}),
   type: TxType,
   {
-    prefix = Encoding.Transaction,
+    prefix,
     version,
     denomination = AE_AMOUNT_FORMATS.AETTOS,
   }: {
-    prefix?: Encoding;
+    prefix?: E;
     version?: number;
     denomination?: AE_AMOUNT_FORMATS;
   } = {},
-): BuiltTx<Prefix extends Encoding ? Prefix : Encoding.Transaction> {
+): Encoded.Generic<E> {
   const schemas = TX_SCHEMA[type];
 
   version ??= Math.max(...Object.keys(schemas).map((a) => +a));
@@ -249,15 +242,14 @@ export function buildTx<TxType extends Tag, Prefix>(
         rebuildTx: (overrideParams: any) => buildTx(
           { ...params, ...overrideParams },
           type,
-          { prefix: Encoding.Transaction, version, denomination },
+          { version, denomination },
         ),
       },
     )
   ));
 
-  return {
-    tx: encode(rlpEncode(binary), prefix),
-  } as any;
+  // @ts-expect-error looks like a TypeScript edge case
+  return encode(rlpEncode(binary), prefix ?? Encoding.Transaction);
 }
 
 /**

@@ -52,7 +52,7 @@ export async function appendSignature(
     return buildTx({
       signatures: signatures.concat(signedTx.signatures),
       encodedTx: signedTx.encodedTx.rlpEncoded,
-    }, Tag.SignedTx).tx;
+    }, Tag.SignedTx);
   }
   return result;
 }

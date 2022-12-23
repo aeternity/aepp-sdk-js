@@ -174,13 +174,33 @@ describe('Tx', () => {
         },
       });
 
-      expect(buildTx(unpackedPoi.tx, unpackedPoi.tx.tag, { prefix: Encoding.Poi }).tx)
-        .to.equal(poi);
+      expect(buildTx(unpackedPoi.tx, unpackedPoi.tx.tag, { prefix: Encoding.Poi })).to.equal(poi);
     });
   });
 
-  it('Serialize tx: invalid transaction version', () => {
-    expect(() => buildTx({} as any, Tag.SpendTx, { version: 5 }))
-      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
+  describe('buildTx', () => {
+    it('returns value of a proper type', () => {
+      const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
+
+      const tx: Encoded.Transaction = buildTx({
+        nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+      }, Tag.SpendTx);
+      expect(tx).to.satisfy((s: string) => s.startsWith('tx_'));
+
+      const txExplicit: Encoded.Transaction = buildTx({
+        nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+      }, Tag.SpendTx, { prefix: Encoding.Transaction });
+      expect(txExplicit).to.satisfy((s: string) => s.startsWith('tx_'));
+
+      const pi: Encoded.Poi = buildTx({
+        nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+      }, Tag.SpendTx, { prefix: Encoding.Poi });
+      expect(pi).to.satisfy((s: string) => s.startsWith('pi_'));
+    });
+
+    it('rejects if invalid transaction version', () => {
+      expect(() => buildTx({} as any, Tag.SpendTx, { version: 5 }))
+        .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
+    });
   });
 });
