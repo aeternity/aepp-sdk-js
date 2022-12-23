@@ -733,5 +733,8 @@ export type TxTypeSchemas = {
   >
 };
 
+export type TxTypeSchemaBy<T extends Tag, V extends keyof typeof TX_SCHEMA[T] | undefined> =
+  BuildTxArgBySchema<typeof TX_SCHEMA[T][V extends undefined ? keyof typeof TX_SCHEMA[T] : V]>;
+
 export type TxSchema = TxTypeSchemas[Tag];
 export type TxParamsCommon = Partial<UnionToIntersection<TxSchema>>;

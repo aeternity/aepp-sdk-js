@@ -10,9 +10,9 @@ import {
   RawTxObject,
   TX_SCHEMA,
   TxField,
-  TxParamsCommon,
   TxSchema,
   TxTypeSchemas,
+  TxTypeSchemaBy,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
@@ -187,8 +187,7 @@ function unpackRawTx<Tx extends TxSchema>(
 /**
  * Build transaction hash
  * @category transaction builder
- * @param _params - Object with tx params
- * @param type - Transaction type
+ * @param params - Object with tx params
  * @param options - options
  * @param options.denomination - Denomination of amounts
  * @param options.prefix - Prefix of transaction
@@ -198,36 +197,31 @@ function unpackRawTx<Tx extends TxSchema>(
  * @returns object.rlpEncoded rlp encoded transaction
  * @returns object.binary binary transaction
  */
-export function buildTx<TxType extends Tag, E extends Encoding = Encoding.Transaction>(
-  _params: Omit<TxTypeSchemas[TxType], 'tag' | 'version'> & { version?: number }
+export function buildTx<
+  TxType extends Tag,
+  E extends Encoding = Encoding.Transaction,
+  Version extends Extract<keyof typeof TX_SCHEMA[TxType], number> | undefined = undefined,
+>(
+  params: { tag: TxType; version?: Version } & Omit<TxTypeSchemaBy<TxType, Version>, 'tag' | 'version'>
   // TODO: get it from gas-limit.ts somehow
   & (TxType extends Tag.ContractCreateTx | Tag.ContractCallTx
   | Tag.ChannelOffChainUpdateCallContract | Tag.GaAttachTx | Tag.GaMetaTx
     ? { gasMax?: number } : {}),
-  type: TxType,
   {
     prefix,
-    version,
     denomination = AE_AMOUNT_FORMATS.AETTOS,
   }: {
     prefix?: E;
-    version?: number;
     denomination?: AE_AMOUNT_FORMATS;
   } = {},
 ): Encoded.Generic<E> {
-  const schemas = TX_SCHEMA[type];
+  const schemas = TX_SCHEMA[params.tag];
+  params.version ??= Math.max(...Object.keys(schemas).map((a) => +a)) as NonNullable<Version>;
+  if (!isKeyOfObject(params.version, schemas)) {
+    throw new SchemaNotFoundError('serialization', Tag[params.tag], params.version);
+  }
+  const schema = schemas[params.version] as unknown as TxField[];
 
-  version ??= Math.max(...Object.keys(schemas).map((a) => +a));
-  if (!isKeyOfObject(version, schemas)) throw new SchemaNotFoundError('serialization', Tag[type], version);
-
-  const schema = schemas[version] as unknown as TxField[];
-
-  const params = _params as TxParamsCommon & { onNode: Node; denomination?: AE_AMOUNT_FORMATS };
-  params.version = version;
-  params.tag = type;
-  params.denomination = denomination;
-
-  // Validation
   const valid = validateParams(params, schema);
   if (Object.keys(valid).length > 0) {
     throw new InvalidTxParamsError(`Transaction build error. ${JSON.stringify(valid)}`);
@@ -239,10 +233,10 @@ export function buildTx<TxType extends Tag, E extends Encoding = Encoding.Transa
       fieldType,
       {
         ...params,
+        denomination,
         rebuildTx: (overrideParams: any) => buildTx(
           { ...params, ...overrideParams },
-          type,
-          { version, denomination },
+          { denomination },
         ),
       },
     )

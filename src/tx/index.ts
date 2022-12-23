@@ -114,7 +114,7 @@ async function prepareTxParams(
 export async function _buildTx<TxType extends Tag>(
   txType: TxType,
   { denomination, absoluteTtl, ..._params }:
-  Omit<Parameters<typeof syncBuildTx<TxType>>[0], 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'>
+  Omit<Parameters<typeof syncBuildTx<TxType>>[0], 'tag' | 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'>
   & { denomination?: AE_AMOUNT_FORMATS }
   & Omit<Parameters<typeof prepareTxParams>[1], 'senderId'>
   & (TxType extends Tag.OracleExtendTx | Tag.OracleResponseTx
@@ -183,5 +183,5 @@ export async function _buildTx<TxType extends Tag>(
   // TODO: do this check on TypeScript level
   if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`);
   const extraParams = await prepareTxParams(txType, { ...params, senderId, absoluteTtl });
-  return syncBuildTx({ ...params, ...extraParams } as any, txType, { denomination });
+  return syncBuildTx({ ...params, ...extraParams, tag: txType } as any, { denomination });
 }
