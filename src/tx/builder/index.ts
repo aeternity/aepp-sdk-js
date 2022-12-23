@@ -142,19 +142,17 @@ function validateField(
  * @category transaction builder
  * @param params - Object with tx params
  * @param schema - Transaction schema
- * @param excludeKeys - Array of keys to exclude for validation
  * @returns Object with validation errors
  */
 function validateParams(
   params: any,
   schema: TxField[],
-  { excludeKeys = [] }: { excludeKeys: string[] },
 ): object {
   const optionalFields = ['payload', 'nameFee', 'deposit', 'gasPrice', 'fee', 'gasLimit', 'amount'];
   return Object.fromEntries(
     schema
       // TODO: allow optional keys in schema
-      .filter(([key]) => !excludeKeys.includes(key) && !optionalFields.includes(key))
+      .filter(([key]) => !optionalFields.includes(key))
       .map(([key, type]) => [key, validateField(params[key], type)])
       .filter(([, message]) => message),
   );
@@ -201,7 +199,6 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends Encoding> {
  * @param _params - Object with tx params
  * @param type - Transaction type
  * @param options - options
- * @param options.excludeKeys - Array of keys to exclude for validation and build
  * @param options.denomination - Denomination of amounts
  * @param options.prefix - Prefix of transaction
  * @throws {@link InvalidTxParamsError}
@@ -218,12 +215,10 @@ export function buildTx<TxType extends Tag, Prefix>(
     ? { gasMax?: number } : {}),
   type: TxType,
   {
-    excludeKeys = [],
     prefix = Encoding.Transaction,
     version,
     denomination = AE_AMOUNT_FORMATS.AETTOS,
   }: {
-    excludeKeys?: string[];
     prefix?: Encoding;
     version?: number;
     denomination?: AE_AMOUNT_FORMATS;
@@ -240,33 +235,28 @@ export function buildTx<TxType extends Tag, Prefix>(
   params.version = version;
   params.tag = type;
   params.denomination = denomination;
-  const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key));
 
   // Validation
-  const valid = validateParams(params, schema, { excludeKeys });
+  const valid = validateParams(params, schema);
   if (Object.keys(valid).length > 0) {
     throw new InvalidTxParamsError(`Transaction build error. ${JSON.stringify(valid)}`);
   }
 
-  const binary = filteredSchema
-    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, Encoding]) => (
-      serializeField(
-        params[key],
-        fieldType,
-        {
-          ...params,
-          txType: type,
-          rebuildTx: (overrideParams: any) => buildTx(
-            { ...params, ...overrideParams },
-            type,
-            {
-              excludeKeys, prefix: Encoding.Transaction, version, denomination,
-            },
-          ),
-        },
-      )
-    ))
-    .filter((e) => e !== undefined);
+  const binary = schema.map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES | Field]) => (
+    serializeField(
+      params[key],
+      fieldType,
+      {
+        ...params,
+        txType: type,
+        rebuildTx: (overrideParams: any) => buildTx(
+          { ...params, ...overrideParams },
+          type,
+          { prefix: Encoding.Transaction, version, denomination },
+        ),
+      },
+    )
+  ));
 
   const rlpEncoded = rlpEncode(binary);
   const tx = encode(rlpEncoded, prefix);
