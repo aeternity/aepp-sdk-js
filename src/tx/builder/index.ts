@@ -211,7 +211,7 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends Encoding> {
  * @returns object.binary binary transaction
  */
 export function buildTx<TxType extends Tag, Prefix>(
-  _params: Omit<TxTypeSchemas[TxType], 'tag' | 'VSN'> & { VSN?: number }
+  _params: Omit<TxTypeSchemas[TxType], 'tag' | 'version'> & { version?: number }
   // TODO: get it from gas-limit.ts somehow
   & (TxType extends Tag.ContractCreateTx | Tag.ContractCallTx
   | Tag.ChannelOffChainUpdateCallContract | Tag.GaAttachTx | Tag.GaMetaTx
@@ -220,24 +220,24 @@ export function buildTx<TxType extends Tag, Prefix>(
   {
     excludeKeys = [],
     prefix = Encoding.Transaction,
-    vsn,
+    version,
     denomination = AE_AMOUNT_FORMATS.AETTOS,
   }: {
     excludeKeys?: string[];
     prefix?: Encoding;
-    vsn?: number;
+    version?: number;
     denomination?: AE_AMOUNT_FORMATS;
   } = {},
 ): BuiltTx<TxSchema, Prefix extends Encoding ? Prefix : Encoding.Transaction> {
   const schemas = TX_SCHEMA[type];
 
-  vsn ??= Math.max(...Object.keys(schemas).map((a) => +a));
-  if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', Tag[type], vsn);
+  version ??= Math.max(...Object.keys(schemas).map((a) => +a));
+  if (!isKeyOfObject(version, schemas)) throw new SchemaNotFoundError('serialization', Tag[type], version);
 
-  const schema = schemas[vsn] as unknown as TxField[];
+  const schema = schemas[version] as unknown as TxField[];
 
   const params = _params as TxParamsCommon & { onNode: Node; denomination?: AE_AMOUNT_FORMATS };
-  params.VSN = vsn;
+  params.version = version;
   params.tag = type;
   params.denomination = denomination;
   const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key));
@@ -260,7 +260,7 @@ export function buildTx<TxType extends Tag, Prefix>(
             { ...params, ...overrideParams },
             type,
             {
-              excludeKeys, prefix: Encoding.Transaction, vsn, denomination,
+              excludeKeys, prefix: Encoding.Transaction, version, denomination,
             },
           ),
         },
@@ -300,12 +300,12 @@ export function unpackTx<TxType extends Tag>(
 ): TxUnpacked<TxTypeSchemas[TxType]> {
   const rlpEncoded = decode(encodedTx);
   const binary = rlpDecode(rlpEncoded);
-  const objId = +readInt(binary[0] as Buffer);
-  if (!isKeyOfObject(objId, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${objId}`);
-  if (txType != null && txType !== objId) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[objId]} instead`);
-  const vsn = +readInt(binary[1] as Buffer);
-  if (!isKeyOfObject(vsn, TX_SCHEMA[objId])) throw new SchemaNotFoundError('deserialization', `tag ${objId}`, vsn);
-  const schema = TX_SCHEMA[objId][vsn];
+  const tag = +readInt(binary[0] as Buffer);
+  if (!isKeyOfObject(tag, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${tag}`);
+  if (txType != null && txType !== tag) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[tag]} instead`);
+  const version = +readInt(binary[1] as Buffer);
+  if (!isKeyOfObject(version, TX_SCHEMA[tag])) throw new SchemaNotFoundError('deserialization', `tag ${tag}`, version);
+  const schema = TX_SCHEMA[tag][version];
   return {
     tx: unpackRawTx<TxTypeSchemas[TxType]>(binary, schema),
     rlpEncoded,

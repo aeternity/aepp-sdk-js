@@ -44,13 +44,13 @@ describe('Merkle Patricia Tree', () => {
   const map: Record<Encoded.AccountAddress, object> = {
     ak_97L4GGbqagBAUZ93g2Qb1QU5W53yDpSgfDj5e5WVJ75wNFmBm: {
       tx: {
-        tag: 10, VSN: 1, nonce: 0, balance: '1000000000000004',
+        tag: 10, version: 1, nonce: 0, balance: '1000000000000004',
       },
       rlpEncoded: Buffer.from('cb0a010087038d7ea4c68004', 'hex'),
     },
     ak_bS1fWNoYpChJhGS3UMGv6WvwXp55xQYmcUrPoZ9UhcBXEPMsK: {
       tx: {
-        tag: 10, VSN: 1, nonce: 0, balance: '999999999999996',
+        tag: 10, version: 1, nonce: 0, balance: '999999999999996',
       },
       rlpEncoded: Buffer.from('cb0a010087038d7ea4c67ffc', 'hex'),
     },

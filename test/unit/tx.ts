@@ -111,7 +111,7 @@ describe('Tx', () => {
   });
 
   describe('unpackTx', () => {
-    it('throws error if invalid tx VSN', () => {
+    it('throws error if invalid transaction version', () => {
       const tx = encode(rlpEncode([10, 99]), Encoding.Transaction);
       expect(() => unpackTx(tx))
         .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag 10 version 99');
@@ -128,20 +128,20 @@ describe('Tx', () => {
 
       const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
       const account = {
-        tag: 10, VSN: 1, nonce: 0, balance: '99999999999999998997',
+        tag: 10, version: 1, nonce: 0, balance: '99999999999999998997',
       };
       expect(unpackedPoi.tx.accounts[0].get(address)?.tx).to.eql(account);
 
       const addressContract = 'ct_ECdrEy2NJKq3qK3xraPtcDP7vfdi56SQXYAH3bVVSTmpqpYyW';
       const accountContract = {
-        tag: 10, VSN: 1, nonce: 0, balance: '1000',
+        tag: 10, version: 1, nonce: 0, balance: '1000',
       };
       expect(unpackedPoi.tx.accounts[0].get(addressContract as Encoded.AccountAddress)?.tx)
         .to.eql(accountContract);
       expect(unpackedPoi.tx.accounts[0].toObject()).to.eql({
         ak_BvMjyAXbpHkjzVfG53N6FxF1LwTX2EYwFLfNbk8mcXjp8CXBC: {
           tx: {
-            tag: 10, VSN: 1, nonce: 0, balance: '100000000000000000003',
+            tag: 10, version: 1, nonce: 0, balance: '100000000000000000003',
           },
           rlpEncoded: Buffer.from('cd0a010089056bc75e2d63100003', 'hex'),
         },
@@ -157,7 +157,7 @@ describe('Tx', () => {
 
       const contract = {
         tag: 40,
-        VSN: 1,
+        version: 1,
         owner: 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D',
         ctVersion: { vmVersion: '5', abiVersion: '3' },
         code: 'cb_+ExGA6Dh3797nquCHCSm088avgOiqgjjarRQviEYAXq+YlegWcCgjf6AeCCSADcBBwcBAQCOLwERgHggkhlnZXRBcmeCLwCFNy4wLjEALb9eTg==',
@@ -179,8 +179,8 @@ describe('Tx', () => {
     });
   });
 
-  it('Serialize tx: invalid tx VSN', () => {
-    expect(() => buildTx({} as any, Tag.SpendTx, { vsn: 5 }))
+  it('Serialize tx: invalid transaction version', () => {
+    expect(() => buildTx({} as any, Tag.SpendTx, { version: 5 }))
       .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
   });
 });

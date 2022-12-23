@@ -177,7 +177,7 @@ export type RawTxObject<Tx extends TxSchema> = {
 
 const BASE_TX = [
   ['tag', shortUInt],
-  ['VSN', shortUInt],
+  ['version', shortUInt],
 ] as const;
 
 /**
