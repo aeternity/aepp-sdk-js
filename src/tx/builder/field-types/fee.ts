@@ -75,7 +75,7 @@ const TX_FEE_OTHER_GAS = (
   }
 };
 
-function getOracleRelativeTtl(params: any, txType: Tag): number {
+function getOracleRelativeTtl(params: any): number {
   const ttlKeys = {
     [Tag.OracleRegisterTx]: 'oracleTtlValue',
     [Tag.OracleExtendTx]: 'oracleTtlValue',
@@ -83,20 +83,21 @@ function getOracleRelativeTtl(params: any, txType: Tag): number {
     [Tag.OracleResponseTx]: 'responseTtlValue',
   } as const;
 
-  if (!isKeyOfObject(txType, ttlKeys)) return 1;
-  return params[ttlKeys[txType]];
+  const { tag } = params;
+  if (!isKeyOfObject(tag, ttlKeys)) return 1;
+  return params[ttlKeys[tag]];
 }
 
 /**
  * Calculate fee based on tx type and params
  */
-export function buildFee(txType: Tag, buildTx: any): BigNumber {
+export function buildFee(buildTx: any): BigNumber {
   const { rlpEncoded: { length }, txObject } = buildTx;
 
-  return TX_FEE_BASE_GAS(txType)
-    .plus(TX_FEE_OTHER_GAS(txType, length, {
-      relativeTtl: getOracleRelativeTtl(txObject, txType),
-      innerTxSize: [Tag.GaMetaTx, Tag.PayingForTx].includes(txType)
+  return TX_FEE_BASE_GAS(txObject.tag)
+    .plus(TX_FEE_OTHER_GAS(txObject.tag, length, {
+      relativeTtl: getOracleRelativeTtl(txObject),
+      innerTxSize: [Tag.GaMetaTx, Tag.PayingForTx].includes(txObject.tag)
         ? txObject.tx.tx.encodedTx.rlpEncoded.length
         : 0,
     }))
@@ -106,18 +107,14 @@ export function buildFee(txType: Tag, buildTx: any): BigNumber {
 /**
  * Calculate min fee
  * @category transaction builder
- * @param txType - Transaction type
  * @param rebuildTx - Callback to get built transaction with specific fee
  */
-function calculateMinFee(
-  txType: Tag,
-  rebuildTx: (value: BigNumber) => any,
-): BigNumber {
+function calculateMinFee(rebuildTx: (value: BigNumber) => any): BigNumber {
   let fee = new BigNumber(0);
   let previousFee;
   do {
     previousFee = fee;
-    fee = buildFee(txType, rebuildTx(fee));
+    fee = buildFee(rebuildTx(fee));
   } while (!fee.eq(previousFee));
   return fee;
 }
@@ -127,11 +124,11 @@ export default {
 
   serializeAettos(
     _value: string | undefined,
-    { txType, rebuildTx, _computingMinFee }:
-    { txType: Tag; rebuildTx: (params: any) => any; _computingMinFee?: string },
+    { rebuildTx, _computingMinFee }:
+    { rebuildTx: (params: any) => any; _computingMinFee?: string },
   ): string {
     if (_computingMinFee != null) return _computingMinFee;
-    const minFee = calculateMinFee(txType, (fee) => rebuildTx({ _computingMinFee: fee }));
+    const minFee = calculateMinFee((fee) => rebuildTx({ _computingMinFee: fee }));
     const value = new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
       throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger then ${minFee}`);

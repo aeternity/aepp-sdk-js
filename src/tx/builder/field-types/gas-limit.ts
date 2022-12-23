@@ -4,11 +4,10 @@ import shortUInt from './short-u-int';
 import { buildFee } from './fee';
 
 function calculateGasLimitMax(
-  txType: Tag,
   gasMax: number,
   rebuildTx: (value: number) => any,
 ): number {
-  return gasMax - +buildFee(txType, rebuildTx(gasMax)).dividedBy(MIN_GAS_PRICE);
+  return gasMax - +buildFee(rebuildTx(gasMax)).dividedBy(MIN_GAS_PRICE);
 }
 
 export default {
@@ -17,9 +16,9 @@ export default {
   serialize(
     _value: number | undefined,
     {
-      txType, rebuildTx, gasMax = 6e6, _computingGasLimit,
+      tag, rebuildTx, gasMax = 6e6, _computingGasLimit,
     }: {
-      txType: Tag;
+      tag: Tag;
       rebuildTx: (params: any) => any;
       gasMax: number;
       _computingGasLimit?: number;
@@ -27,8 +26,7 @@ export default {
   ): Buffer {
     if (_computingGasLimit != null) return shortUInt.serialize(_computingGasLimit);
 
-    const gasLimitMax = txType === Tag.GaMetaTx ? MAX_AUTH_FUN_GAS : calculateGasLimitMax(
-      txType,
+    const gasLimitMax = tag === Tag.GaMetaTx ? MAX_AUTH_FUN_GAS : calculateGasLimitMax(
       gasMax,
       (gasLimit) => rebuildTx({ _computingGasLimit: gasLimit }),
     );

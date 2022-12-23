@@ -248,7 +248,6 @@ export function buildTx<TxType extends Tag, Prefix>(
       fieldType,
       {
         ...params,
-        txType: type,
         rebuildTx: (overrideParams: any) => buildTx(
           { ...params, ...overrideParams },
           type,
