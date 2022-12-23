@@ -4,6 +4,7 @@ import { MIN_GAS_PRICE, Tag } from '../constants';
 import coinAmount from './coin-amount';
 import { isKeyOfObject } from '../../../utils/other';
 import { decode } from '../../../utils/encoder';
+import type { unpackTx as unpackTxType } from '../index';
 
 const BASE_GAS = 15000;
 const GAS_PER_BYTE = 20;
@@ -92,15 +93,16 @@ function getOracleRelativeTtl(params: any): number {
 /**
  * Calculate fee based on tx type and params
  */
-export function buildFee(buildTx: any): BigNumber {
-  const { tx, txObject } = buildTx;
+export function buildFee(buildTx: any, unpackTx: typeof unpackTxType): BigNumber {
+  const { tx } = buildTx;
   const { length } = decode(tx);
+  const txObject = unpackTx(tx).tx;
 
   return TX_FEE_BASE_GAS(txObject.tag)
     .plus(TX_FEE_OTHER_GAS(txObject.tag, length, {
       relativeTtl: getOracleRelativeTtl(txObject),
       innerTxSize: [Tag.GaMetaTx, Tag.PayingForTx].includes(txObject.tag)
-        ? txObject.tx.tx.encodedTx.rlpEncoded.length
+        ? (txObject as any).tx.tx.encodedTx.rlpEncoded.length
         : 0,
     }))
     .times(MIN_GAS_PRICE);
@@ -111,12 +113,15 @@ export function buildFee(buildTx: any): BigNumber {
  * @category transaction builder
  * @param rebuildTx - Callback to get built transaction with specific fee
  */
-function calculateMinFee(rebuildTx: (value: BigNumber) => any): BigNumber {
+function calculateMinFee(
+  rebuildTx: (value: BigNumber) => any,
+  unpackTx: typeof unpackTxType,
+): BigNumber {
   let fee = new BigNumber(0);
   let previousFee;
   do {
     previousFee = fee;
-    fee = buildFee(rebuildTx(fee));
+    fee = buildFee(rebuildTx(fee), unpackTx);
   } while (!fee.eq(previousFee));
   return fee;
 }
@@ -126,11 +131,11 @@ export default {
 
   serializeAettos(
     _value: string | undefined,
-    { rebuildTx, _computingMinFee }:
-    { rebuildTx: (params: any) => any; _computingMinFee?: string },
+    { rebuildTx, unpackTx, _computingMinFee }:
+    { rebuildTx: (params: any) => any; unpackTx: typeof unpackTxType; _computingMinFee?: string },
   ): string {
     if (_computingMinFee != null) return _computingMinFee;
-    const minFee = calculateMinFee((fee) => rebuildTx({ _computingMinFee: fee }));
+    const minFee = calculateMinFee((fee) => rebuildTx({ _computingMinFee: fee }), unpackTx);
     const value = new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
       throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger then ${minFee}`);

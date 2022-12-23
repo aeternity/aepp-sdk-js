@@ -114,7 +114,8 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
     default:
       if (typeof type === 'number') return value;
-      return type.serialize(value, params);
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return type.serialize(value, { ...params, unpackTx });
   }
 }
 
@@ -186,9 +187,8 @@ function unpackRawTx<Tx extends TxSchema>(
 /**
  * @category transaction builder
  */
-export interface BuiltTx<Tx extends TxSchema, Prefix extends Encoding> {
+export interface BuiltTx<Prefix extends Encoding> {
   tx: Encoded.Generic<Prefix>;
-  txObject: RawTxObject<Tx>;
 }
 
 /**
@@ -221,7 +221,7 @@ export function buildTx<TxType extends Tag, Prefix>(
     version?: number;
     denomination?: AE_AMOUNT_FORMATS;
   } = {},
-): BuiltTx<TxSchema, Prefix extends Encoding ? Prefix : Encoding.Transaction> {
+): BuiltTx<Prefix extends Encoding ? Prefix : Encoding.Transaction> {
   const schemas = TX_SCHEMA[type];
 
   version ??= Math.max(...Object.keys(schemas).map((a) => +a));
@@ -257,7 +257,6 @@ export function buildTx<TxType extends Tag, Prefix>(
 
   return {
     tx: encode(rlpEncode(binary), prefix),
-    txObject: unpackRawTx<TxTypeSchemas[Tag]>(binary, schema),
   } as any;
 }
 
