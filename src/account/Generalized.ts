@@ -86,7 +86,7 @@ export default class AccountGeneralized extends AccountBase {
     })();
 
     const gaMetaTx = await _buildTx(Tag.GaMetaTx, {
-      tx: buildTx({ encodedTx: decode(tx), signatures: [] }, Tag.SignedTx).rlpEncoded,
+      tx: decode(buildTx({ encodedTx: decode(tx), signatures: [] }, Tag.SignedTx).tx),
       gaId: this.address,
       authData: authCallData,
       gasLimit,

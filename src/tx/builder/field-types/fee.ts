@@ -3,6 +3,7 @@ import { IllegalArgumentError } from '../../../utils/errors';
 import { MIN_GAS_PRICE, Tag } from '../constants';
 import coinAmount from './coin-amount';
 import { isKeyOfObject } from '../../../utils/other';
+import { decode } from '../../../utils/encoder';
 
 const BASE_GAS = 15000;
 const GAS_PER_BYTE = 20;
@@ -92,7 +93,8 @@ function getOracleRelativeTtl(params: any): number {
  * Calculate fee based on tx type and params
  */
 export function buildFee(buildTx: any): BigNumber {
-  const { rlpEncoded: { length }, txObject } = buildTx;
+  const { tx, txObject } = buildTx;
+  const { length } = decode(tx);
 
   return TX_FEE_BASE_GAS(txObject.tag)
     .plus(TX_FEE_OTHER_GAS(txObject.tag, length, {

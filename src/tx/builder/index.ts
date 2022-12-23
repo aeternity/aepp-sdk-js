@@ -188,8 +188,6 @@ function unpackRawTx<Tx extends TxSchema>(
  */
 export interface BuiltTx<Tx extends TxSchema, Prefix extends Encoding> {
   tx: Encoded.Generic<Prefix>;
-  rlpEncoded: Uint8Array;
-  binary: Uint8Array;
   txObject: RawTxObject<Tx>;
 }
 
@@ -257,12 +255,8 @@ export function buildTx<TxType extends Tag, Prefix>(
     )
   ));
 
-  const rlpEncoded = rlpEncode(binary);
-  const tx = encode(rlpEncoded, prefix);
   return {
-    tx,
-    rlpEncoded,
-    binary,
+    tx: encode(rlpEncode(binary), prefix),
     txObject: unpackRawTx<TxTypeSchemas[Tag]>(binary, schema),
   } as any;
 }
