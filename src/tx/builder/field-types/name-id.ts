@@ -3,7 +3,7 @@ import { produceNameId, isNameValid } from '../helpers';
 import address from './address';
 import { Encoded, Encoding } from '../../../utils/encoder';
 
-const addressName = address<Encoding.Name>();
+const addressName = address(Encoding.Name);
 
 export default {
   ...addressName,

@@ -2,9 +2,9 @@ import { NamePointer as NamePointerString } from '../../../apis/node';
 import { toBytes } from '../../../utils/bytes';
 import { Encoded } from '../../../utils/encoder';
 import { IllegalArgumentError } from '../../../utils/errors';
-import address, { AddressEncodings } from './address';
+import address, { AddressEncodings, idTagToEncoding } from './address';
 
-const addressAny = address<AddressEncodings>();
+const addressAny = address(...idTagToEncoding);
 
 // TODO: remove after fixing node types
 type NamePointer = NamePointerString & {
