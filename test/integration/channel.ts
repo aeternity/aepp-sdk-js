@@ -362,8 +362,10 @@ describe('Channel', () => {
     const responderAddr = aeSdkResponder.address;
     const params = { accounts: [initiatorAddr, responderAddr] };
     const initiatorPoi = await initiatorCh.poi(params);
-    expect(initiatorPoi).to.be.equal(await responderCh.poi(params));
-    initiatorPoi.should.be.a('string');
+    const responderPoi = await responderCh.poi(params);
+    expect(initiatorPoi).to.be.eql(responderPoi);
+    expect(initiatorPoi.tx.accounts[0].isEqual(responderPoi.tx.accounts[0]))
+      .to.be.equal(true);
   });
 
   it('can send a message', async () => {
@@ -722,7 +724,8 @@ describe('Channel', () => {
     const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
-      poi,
+      // @ts-expect-error remove after fixing tx-builder types
+      poi: poi.tx,
       payload: signedTx,
     });
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).tx.fee;
@@ -784,7 +787,8 @@ describe('Channel', () => {
     const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
       channelId: initiatorCh.id(),
       fromId: initiatorAddr,
-      poi: oldPoi,
+      // @ts-expect-error remove after fixing tx-builder types
+      poi: oldPoi.tx,
       payload: oldUpdate.signedTx,
     });
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).tx.fee;
@@ -793,7 +797,8 @@ describe('Channel', () => {
     const slashTx = await aeSdkResponder.buildTx(Tag.ChannelSlashTx, {
       channelId: responderCh.id(),
       fromId: responderAddr,
-      poi: recentPoi,
+      // @ts-expect-error remove after fixing tx-builder types
+      poi: recentPoi.tx,
       payload: recentUpdate.signedTx,
     });
     const slashTxFee = unpackTx(slashTx, Tag.ChannelSlashTx).tx.fee;

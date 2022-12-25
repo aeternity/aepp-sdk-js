@@ -115,7 +115,7 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
     default:
       if (typeof type === 'number') return value;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return type.serialize(value, { ...params, unpackTx });
+      return type.serialize(value, { ...params, unpackTx, buildTx });
   }
 }
 

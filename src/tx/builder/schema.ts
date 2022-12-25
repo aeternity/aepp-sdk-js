@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, addresses, pointers, enumeration, mptrees,
+  address, addresses, pointers, entry, enumeration, mptrees,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
 import { UnionToIntersection } from '../../utils/other';
@@ -444,7 +444,7 @@ export const TX_SCHEMA = {
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', FIELD_TYPES.binary, Encoding.Transaction],
-      ['poi', FIELD_TYPES.binary, Encoding.Poi],
+      ['poi', entry(Tag.TreesPoi)],
       ['ttl', shortUInt],
       ['fee', fee],
       ['nonce', shortUInt],
@@ -456,7 +456,7 @@ export const TX_SCHEMA = {
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', FIELD_TYPES.binary, Encoding.Transaction],
-      ['poi', FIELD_TYPES.binary, Encoding.Poi],
+      ['poi', entry(Tag.TreesPoi)],
       ['ttl', shortUInt],
       ['fee', fee],
       ['nonce', shortUInt],
