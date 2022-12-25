@@ -13,6 +13,7 @@ import {
   TxSchema,
   TxTypeSchemas,
   TxTypeSchemaBy,
+  TxVersionsBy,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
@@ -40,8 +41,8 @@ function deserializeField(
     case FIELD_TYPES.ctVersion: {
       const [vm, , abi] = value;
       return {
-        vmVersion: readInt(Buffer.from([vm])),
-        abiVersion: readInt(Buffer.from([abi])),
+        vmVersion: +readInt(Buffer.from([vm])),
+        abiVersion: +readInt(Buffer.from([abi])),
       };
     }
     case FIELD_TYPES.bool:
@@ -200,7 +201,7 @@ function unpackRawTx<Tx extends TxSchema>(
 export function buildTx<
   TxType extends Tag,
   E extends Encoding = Encoding.Transaction,
-  Version extends Extract<keyof typeof TX_SCHEMA[TxType], number> | undefined = undefined,
+  Version extends TxVersionsBy<TxType> = TxVersionsBy<TxType>,
 >(
   params: { tag: TxType; version?: Version } & Omit<TxTypeSchemaBy<TxType, Version>, 'tag' | 'version'>
   // TODO: get it from gas-limit.ts somehow

@@ -724,7 +724,6 @@ describe('Channel', () => {
     const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
-      // @ts-expect-error remove after fixing tx-builder types
       poi: poi.tx,
       payload: signedTx,
     });
@@ -787,7 +786,6 @@ describe('Channel', () => {
     const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
       channelId: initiatorCh.id(),
       fromId: initiatorAddr,
-      // @ts-expect-error remove after fixing tx-builder types
       poi: oldPoi.tx,
       payload: oldUpdate.signedTx,
     });
@@ -797,7 +795,6 @@ describe('Channel', () => {
     const slashTx = await aeSdkResponder.buildTx(Tag.ChannelSlashTx, {
       channelId: responderCh.id(),
       fromId: responderAddr,
-      // @ts-expect-error remove after fixing tx-builder types
       poi: recentPoi.tx,
       payload: recentUpdate.signedTx,
     });

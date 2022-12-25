@@ -15,6 +15,7 @@ import _name from './name';
 import _nameFee from './name-fee';
 import _nameId from './name-id';
 import _pointers from './pointers';
+import _shortUIntConst from './short-u-int-const';
 
 // TODO: remove after fixing https://github.com/Gerrit0/typedoc-plugin-missing-exports/issues/15
 const field = _field;
@@ -34,6 +35,7 @@ const name = _name;
 const nameFee = _nameFee;
 const nameId = _nameId;
 const pointers = _pointers;
+const shortUIntConst = _shortUIntConst;
 
 type BinaryData = Buffer | Buffer[] | Buffer[][] | Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
 export interface Field {
@@ -59,4 +61,5 @@ export {
   nameFee,
   nameId,
   pointers,
+  shortUIntConst,
 };

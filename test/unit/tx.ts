@@ -122,6 +122,26 @@ describe('Tx', () => {
         .to.throw(ArgumentError, 'Transaction RLP length should be 9, got 10 instead');
     });
 
+    it('unpacks unknown transaction', () => {
+      const account = unpackTx('tx_zQoBAIkFa8deLWMQAAMJo1/N').tx;
+      if (account.tag === Tag.SpendTx) {
+        expect(account.recipientId);
+        // @ts-expect-error spend tx don't have balance
+        expect(account.balance);
+      }
+      if (account.tag === Tag.Account) {
+        expect(account.balance);
+        if (account.version === 1) {
+          // @ts-expect-error account v1 entry don't have flags
+          expect(account.flags);
+        } else if (account.version === 2) {
+          expect(account.flags);
+        }
+        // @ts-expect-error without checking version, account may not have flags
+        expect(account.flags);
+      }
+    });
+
     it('unpacks state channel poi', () => {
       const poi = 'pi_+QS9PAH5Agj5AgWgLTKha2G59WNpjU2qOeEP9n/k6VUZw6lrwd2jn0zjyZb5AeH4dKAtMqFrYbn1Y2mNTao54Q/2f+TpVRnDqWvB3aOfTOPJlvhRgKBy/g6a1aHG5CUcExd2PvF/VDFQoFXDYRynvBxhsviPWoCAgKDmsQ/HT1KkP6IZIZxPre8pPevMUitDJ/wdFSLdSx2GU4CAgICAgICAgICA+HSgcv4OmtWhxuQlHBMXdj7xf1QxUKBVw2Ecp7wcYbL4j1r4UYCAgICAgICAoIEfDDawnsjhRHiZ3cH3w1bwZCU/ComV5UZ35oNfBZQNgICAgKC1oTen+OePzzEwr98V96QpzGPnNdq33nRolIwWZ31TO4CAgPhSoIEfDDawnsjhRHiZ3cH3w1bwZCU/ComV5UZ35oNfBZQN8KAgy4vNCNXy3SL07CeWTpNXmqxcXKgpwiS5xqMVvJqPbI7NCgEAiQVrx14tYxAAA/hLoLWhN6f454/PMTCv3xX3pCnMY+c12rfedGiUjBZnfVM76aAg+T20wFXy2ZOEIKWCVNexp+1QmgXSfwzarLhs8ov8rofGCgEAggPo+FKg5rEPx09SpD+iGSGcT63vKT3rzFIrQyf8HRUi3UsdhlPwoD1xbWafWKm2OCnVvDaJX/R46dFWXDVp0Dio4Am/Aa/Zjs0KAQCJBWvHXi1jD/wV4+KgkuUqD84mdniErJPs5b5pR5faMyeuAuGSpTK0rUbGowvAwPkChvkCg6B2jPRZng8uvSIogeA13/PJ3kppJyDm8hrp5NaP39/v3/kCX/hEoBHlmqYc8k9c2eNzc9JAADb3fErCVaOf2zDNbvn+WTd14hCgcz/+U+Q3icmxZXQLRTSUTLW827c3lKJfOCBYgXAEomP4O6BYJ4U3UbSFRNdKow3ApDqnzTNUNG7kE2T287Q+JQSb4NmFxCCCLwCDwiA/gICAgICAgICAgICAgICA+NWgbusUs5OcObuVt7pByi05w+imTwelvFFKINZcKb9uzA34soCgEeWaphzyT1zZ43Nz0kAANvd8SsJVo5/bMM1u+f5ZN3WAgICAgICAgICAgICAgLiA+H4oAaEBXXFtZp9YqbY4KdW8Nolf9Hjp0VZcNWnQOKjgCb8Br9mDBQADuE74TEYDoOHfv3ueq4IcJKbTzxq+A6KqCONqtFC+IRgBer5iV6BZwKCN/oB4IJIANwEHBwEBAI4vARGAeCCSGWdldEFyZ4IvAIU3LjAuMQCAAcCCA+j4U6BzP/5T5DeJybFldAtFNJRMtbzbtzeUol84IFiBcASiY/Gg+834Gf8ycAnGZdS3wlaPv5tIpbWL68KqCphOqokQveuAgICAgICAgICAgICAgIAA+Gagdoz0WZ4PLr0iKIHgNd/zyd5KaScg5vIa6eTWj9/f79/4Q6EAHfk9tMBV8tmThCClglTXsaftUJoF0n8M2qy4bPKL/K6gbusUs5OcObuVt7pByi05w+imTwelvFFKINZcKb9uzA34RqD7zfgZ/zJwCcZl1LfCVo+/m0iltYvrwqoKmE6qiRC96+SCAACgWCeFN1G0hUTXSqMNwKQ6p80zVDRu5BNk9vO0PiUEm+DAwLP4mdE=';
       const unpackedPoi = unpackTx(poi, Tag.TreesPoi);
@@ -159,7 +179,7 @@ describe('Tx', () => {
         tag: 40,
         version: 1,
         owner: 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D',
-        ctVersion: { vmVersion: '5', abiVersion: '3' },
+        ctVersion: { vmVersion: 5, abiVersion: 3 },
         code: 'cb_+ExGA6Dh3797nquCHCSm088avgOiqgjjarRQviEYAXq+YlegWcCgjf6AeCCSADcBBwcBAQCOLwERgHggkhlnZXRBcmeCLwCFNy4wLjEALb9eTg==',
         log: 'cb_Xfbg4g==',
         active: true,

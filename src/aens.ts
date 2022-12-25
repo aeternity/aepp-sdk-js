@@ -369,7 +369,8 @@ Awaited<ReturnType<typeof send>> & {
     salt,
     commitmentId,
     async claim(opts?: Parameters<typeof aensClaim>[2]) {
-      return aensClaim(name, salt, { ...options, ...opts });
+      const { version, ...otherOptions } = options;
+      return aensClaim(name, salt, { ...otherOptions, ...opts });
     },
   });
 }
@@ -377,7 +378,7 @@ Awaited<ReturnType<typeof send>> & {
 interface AensPreclaimOptions extends
   BuildTxOptions<Tag.NamePreclaimTx, 'accountId' | 'commitmentId'>,
   SendOptions,
-  AensClaimOptions {}
+  Omit<AensClaimOptions, 'version'> {}
 
 /**
  * Bid to name auction

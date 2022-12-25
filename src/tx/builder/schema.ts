@@ -8,10 +8,10 @@ import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, addresses, pointers, entry, enumeration, mptrees,
+  address, addresses, pointers, entry, enumeration, mptrees, shortUIntConst,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
-import { UnionToIntersection } from '../../utils/other';
+import { KeysOfUnion, UnionToIntersection } from '../../utils/other';
 import { idTagToEncoding } from './field-types/address';
 
 export enum ORACLE_TTL_TYPES {
@@ -175,23 +175,20 @@ export type RawTxObject<Tx extends TxSchema> = {
   [k in keyof Tx]-?: Tx[k] extends BigNumber ? string : Tx[k]
 };
 
-const BASE_TX = [
-  ['tag', shortUInt],
-  ['version', shortUInt],
-] as const;
-
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts}
  */
 export const TX_SCHEMA = {
   [Tag.Account]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.Account)],
+      ['version', shortUIntConst(1)],
       ['nonce', shortUInt],
       ['balance', uInt],
     ],
     2: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.Account)],
+      ['version', shortUIntConst(2)],
       ['flags', uInt],
       ['nonce', shortUInt],
       ['balance', uInt],
@@ -201,14 +198,16 @@ export const TX_SCHEMA = {
   },
   [Tag.SignedTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.SignedTx)],
+      ['version', shortUIntConst(1)],
       ['signatures', FIELD_TYPES.signatures],
       ['encodedTx', FIELD_TYPES.rlpBinary],
     ],
   },
   [Tag.SpendTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.SpendTx)],
+      ['version', shortUIntConst(1)],
       ['senderId', address(Encoding.AccountAddress)],
       ['recipientId', address(Encoding.AccountAddress, Encoding.Name)],
       ['amount', coinAmount],
@@ -220,7 +219,8 @@ export const TX_SCHEMA = {
   },
   [Tag.Name]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.Name)],
+      ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nameTtl', shortUInt],
       ['status', FIELD_TYPES.binary],
@@ -230,7 +230,8 @@ export const TX_SCHEMA = {
   },
   [Tag.NamePreclaimTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.NamePreclaimTx)],
+      ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['commitmentId', address(Encoding.Commitment)],
@@ -240,7 +241,8 @@ export const TX_SCHEMA = {
   },
   [Tag.NameClaimTx]: {
     2: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.NameClaimTx)],
+      ['version', shortUIntConst(2)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['name', name],
@@ -252,7 +254,8 @@ export const TX_SCHEMA = {
   },
   [Tag.NameUpdateTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.NameUpdateTx)],
+      ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['nameId', nameId],
@@ -265,7 +268,8 @@ export const TX_SCHEMA = {
   },
   [Tag.NameTransferTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.NameTransferTx)],
+      ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['nameId', nameId],
@@ -276,7 +280,8 @@ export const TX_SCHEMA = {
   },
   [Tag.NameRevokeTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.NameRevokeTx)],
+      ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['nameId', nameId],
@@ -286,7 +291,8 @@ export const TX_SCHEMA = {
   },
   [Tag.Contract]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.Contract)],
+      ['version', shortUIntConst(1)],
       ['owner', address(Encoding.AccountAddress)],
       ['ctVersion', FIELD_TYPES.ctVersion],
       ['code', FIELD_TYPES.binary, Encoding.ContractBytearray],
@@ -298,7 +304,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ContractCreateTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ContractCreateTx)],
+      ['version', shortUIntConst(1)],
       ['ownerId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['code', FIELD_TYPES.binary, Encoding.ContractBytearray],
@@ -314,7 +321,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ContractCallTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ContractCallTx)],
+      ['version', shortUIntConst(1)],
       ['callerId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['contractId', address(Encoding.ContractAddress, Encoding.Name)],
@@ -329,7 +337,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ContractCall]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ContractCall)],
+      ['version', shortUIntConst(1)],
       ['callerId', address(Encoding.AccountAddress)],
       ['callerNonce', shortUInt],
       ['height', shortUInt],
@@ -345,7 +354,8 @@ export const TX_SCHEMA = {
   },
   [Tag.Oracle]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.Oracle)],
+      ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
       ['queryFormat', FIELD_TYPES.string],
       ['responseFormat', FIELD_TYPES.string],
@@ -356,7 +366,8 @@ export const TX_SCHEMA = {
   },
   [Tag.OracleRegisterTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.OracleRegisterTx)],
+      ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['queryFormat', FIELD_TYPES.string],
@@ -371,7 +382,8 @@ export const TX_SCHEMA = {
   },
   [Tag.OracleExtendTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.OracleExtendTx)],
+      ['version', shortUIntConst(1)],
       ['oracleId', address(Encoding.OracleAddress, Encoding.Name)],
       ['nonce', shortUInt],
       ['oracleTtlType', enumeration(ORACLE_TTL_TYPES)],
@@ -382,7 +394,8 @@ export const TX_SCHEMA = {
   },
   [Tag.OracleQueryTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.OracleQueryTx)],
+      ['version', shortUIntConst(1)],
       ['senderId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['oracleId', address(Encoding.OracleAddress, Encoding.Name)],
@@ -398,7 +411,8 @@ export const TX_SCHEMA = {
   },
   [Tag.OracleResponseTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.OracleResponseTx)],
+      ['version', shortUIntConst(1)],
       ['oracleId', address(Encoding.OracleAddress)],
       ['nonce', shortUInt],
       ['queryId', FIELD_TYPES.binary, Encoding.OracleQueryId],
@@ -411,7 +425,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelCreateTx]: {
     2: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelCreateTx)],
+      ['version', shortUIntConst(2)],
       ['initiator', address(Encoding.AccountAddress)],
       ['initiatorAmount', uInt],
       ['responder', address(Encoding.AccountAddress)],
@@ -428,7 +443,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelCloseMutualTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelCloseMutualTx)],
+      ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['initiatorAmountFinal', uInt],
@@ -440,7 +456,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelCloseSoloTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelCloseSoloTx)],
+      ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', FIELD_TYPES.binary, Encoding.Transaction],
@@ -452,7 +469,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelSlashTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelSlashTx)],
+      ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', FIELD_TYPES.binary, Encoding.Transaction],
@@ -464,7 +482,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelDepositTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelDepositTx)],
+      ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['amount', uInt],
@@ -477,7 +496,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelWithdrawTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelWithdrawTx)],
+      ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['toId', address(Encoding.AccountAddress)],
       ['amount', uInt],
@@ -490,7 +510,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelSettleTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelSettleTx)],
+      ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['initiatorAmountFinal', uInt],
@@ -502,7 +523,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelForceProgressTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelForceProgressTx)],
+      ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', FIELD_TYPES.binary, Encoding.Transaction],
@@ -517,7 +539,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelOffChainTx]: {
     2: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelOffChainTx)],
+      ['version', shortUIntConst(2)],
       ['channelId', address(Encoding.Channel)],
       ['round', shortUInt],
       ['stateHash', FIELD_TYPES.binary, Encoding.State],
@@ -525,7 +548,8 @@ export const TX_SCHEMA = {
   },
   [Tag.Channel]: {
     3: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.Channel)],
+      ['version', shortUIntConst(3)],
       ['initiator', address(Encoding.AccountAddress)],
       ['responder', address(Encoding.AccountAddress)],
       ['channelAmount', uInt],
@@ -545,7 +569,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelSnapshotSoloTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelSnapshotSoloTx)],
+      ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', FIELD_TYPES.binary, Encoding.Transaction],
@@ -556,7 +581,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelOffChainUpdateTransfer]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelOffChainUpdateTransfer)],
+      ['version', shortUIntConst(1)],
       ['from', address(Encoding.AccountAddress)],
       ['to', address(Encoding.AccountAddress)],
       ['amount', uInt],
@@ -564,21 +590,24 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelOffChainUpdateDeposit]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelOffChainUpdateDeposit)],
+      ['version', shortUIntConst(1)],
       ['from', address(Encoding.AccountAddress)],
       ['amount', uInt],
     ],
   },
   [Tag.ChannelOffChainUpdateWithdraw]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelOffChainUpdateWithdraw)],
+      ['version', shortUIntConst(1)],
       ['from', address(Encoding.AccountAddress)],
       ['amount', uInt],
     ],
   },
   [Tag.ChannelOffChainUpdateCreateContract]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelOffChainUpdateCreateContract)],
+      ['version', shortUIntConst(1)],
       ['owner', address(Encoding.AccountAddress)],
       ['ctVersion', FIELD_TYPES.ctVersion],
       ['code', FIELD_TYPES.binary, Encoding.ContractBytearray],
@@ -588,7 +617,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelOffChainUpdateCallContract]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelOffChainUpdateCallContract)],
+      ['version', shortUIntConst(1)],
       ['caller', address(Encoding.AccountAddress)],
       ['contract', address(Encoding.ContractAddress)],
       ['abiVersion', enumeration(ABI_VERSIONS)],
@@ -601,7 +631,8 @@ export const TX_SCHEMA = {
   },
   [Tag.ChannelClientReconnectTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelClientReconnectTx)],
+      ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['round', shortUInt],
       ['role', FIELD_TYPES.string],
@@ -610,7 +641,8 @@ export const TX_SCHEMA = {
   },
   [Tag.TreesPoi]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.TreesPoi)],
+      ['version', shortUIntConst(1)],
       ['accounts', mptrees(Encoding.AccountAddress, Tag.Account)],
       ['calls', mptrees(Encoding.Bytearray, Tag.ContractCall)],
       ['channels', mptrees(Encoding.Channel, Tag.Channel)],
@@ -621,7 +653,8 @@ export const TX_SCHEMA = {
   },
   [Tag.StateTrees]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.StateTrees)],
+      ['version', shortUIntConst(1)],
       ['contracts', FIELD_TYPES.rlpBinary],
       ['calls', FIELD_TYPES.rlpBinary],
       ['channels', FIELD_TYPES.rlpBinary],
@@ -632,56 +665,65 @@ export const TX_SCHEMA = {
   },
   [Tag.Mtree]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.Mtree)],
+      ['version', shortUIntConst(1)],
       ['values', FIELD_TYPES.rlpBinaries],
     ],
   },
   [Tag.MtreeValue]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.MtreeValue)],
+      ['version', shortUIntConst(1)],
       ['key', FIELD_TYPES.hex],
       ['value', FIELD_TYPES.rawBinary],
     ],
   },
   [Tag.ContractsMtree]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ContractsMtree)],
+      ['version', shortUIntConst(1)],
       ['contracts', FIELD_TYPES.rlpBinary],
     ],
   },
   [Tag.CallsMtree]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.CallsMtree)],
+      ['version', shortUIntConst(1)],
       ['calls', FIELD_TYPES.rlpBinary],
     ],
   },
   [Tag.ChannelsMtree]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.ChannelsMtree)],
+      ['version', shortUIntConst(1)],
       ['channels', FIELD_TYPES.rlpBinary],
     ],
   },
   [Tag.NameserviceMtree]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.NameserviceMtree)],
+      ['version', shortUIntConst(1)],
       ['mtree', FIELD_TYPES.rlpBinary],
     ],
   },
   [Tag.OraclesMtree]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.OraclesMtree)],
+      ['version', shortUIntConst(1)],
       ['otree', FIELD_TYPES.rlpBinary],
     ],
   },
   [Tag.AccountsMtree]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.AccountsMtree)],
+      ['version', shortUIntConst(1)],
       ['accounts', FIELD_TYPES.rlpBinary],
     ],
   },
   [Tag.GaAttachTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.GaAttachTx)],
+      ['version', shortUIntConst(1)],
       ['ownerId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['code', FIELD_TYPES.binary, Encoding.ContractBytearray],
@@ -696,7 +738,8 @@ export const TX_SCHEMA = {
   },
   [Tag.GaMetaTx]: {
     2: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.GaMetaTx)],
+      ['version', shortUIntConst(2)],
       ['gaId', address(Encoding.AccountAddress)],
       ['authData', FIELD_TYPES.binary, Encoding.ContractBytearray],
       ['abiVersion', enumeration(ABI_VERSIONS)],
@@ -708,7 +751,8 @@ export const TX_SCHEMA = {
   },
   [Tag.PayingForTx]: {
     1: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.PayingForTx)],
+      ['version', shortUIntConst(1)],
       ['payerId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['fee', fee],
@@ -717,7 +761,8 @@ export const TX_SCHEMA = {
   },
   [Tag.CompilerSophia]: {
     3: [
-      ...BASE_TX,
+      ['tag', shortUIntConst(Tag.CompilerSophia)],
+      ['version', shortUIntConst(3)],
       ['sourceCodeHash', FIELD_TYPES.rawBinary],
       ['typeInfo', FIELD_TYPES.sophiaCodeTypeInfo],
       ['byteCode', FIELD_TYPES.rawBinary],
@@ -727,14 +772,20 @@ export const TX_SCHEMA = {
   },
 } as const;
 
-export type TxTypeSchemas = {
-  [key in Tag]: BuildTxArgBySchema<
-    typeof TX_SCHEMA[key][keyof typeof TX_SCHEMA[key]]
-  >
+type TxTypeSchemasNotCombined = {
+  [tag in Tag]: {
+    [ver in keyof typeof TX_SCHEMA[tag]]: BuildTxArgBySchema<typeof TX_SCHEMA[tag][ver]>
+  }
 };
 
-export type TxTypeSchemaBy<T extends Tag, V extends keyof typeof TX_SCHEMA[T] | undefined> =
-  BuildTxArgBySchema<typeof TX_SCHEMA[T][V extends undefined ? keyof typeof TX_SCHEMA[T] : V]>;
+export type TxTypeSchemas = {
+  [key in Tag]: TxTypeSchemasNotCombined[key][keyof TxTypeSchemasNotCombined[key]]
+};
+
+export type TxVersionsBy<T extends Tag> = Extract<KeysOfUnion<typeof TX_SCHEMA[T]>, number>;
+
+export type TxTypeSchemaBy<T extends Tag, V extends TxVersionsBy<T>> =
+  TxTypeSchemasNotCombined[T][V];
 
 export type TxSchema = TxTypeSchemas[Tag];
 export type TxParamsCommon = Partial<UnionToIntersection<TxSchema>>;
