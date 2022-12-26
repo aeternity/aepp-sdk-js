@@ -112,52 +112,15 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
     case FIELD_TYPES.rlpBinary:
       return value.rlpEncoded ?? value;
     case FIELD_TYPES.ctVersion:
+      if (value.vmVersion == null || value.vmVersion == null) {
+        throw new InvalidTxParamsError('`ctVersion` must be an object with `vmVersion` and `abiVersion` fields');
+      }
       return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
     default:
       if (typeof type === 'number') return value;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return type.serialize(value, { ...params, unpackTx, buildTx });
   }
-}
-
-function validateField(
-  value: any,
-  type: FIELD_TYPES | Field,
-): string | undefined {
-  // All fields are required
-  if (value == null) return 'Field is required';
-
-  // Validate type of value
-  switch (type) {
-    case FIELD_TYPES.ctVersion:
-      if (!(Boolean(value.abiVersion) && Boolean(value.vmVersion))) {
-        return 'Value must be an object with "vmVersion" and "abiVersion" fields';
-      }
-      return undefined;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Validate transaction params
- * @category transaction builder
- * @param params - Object with tx params
- * @param schema - Transaction schema
- * @returns Object with validation errors
- */
-function validateParams(
-  params: any,
-  schema: TxField[],
-): object {
-  const optionalFields = ['payload', 'nameFee', 'deposit', 'gasPrice', 'fee', 'gasLimit', 'amount'];
-  return Object.fromEntries(
-    schema
-      // TODO: allow optional keys in schema
-      .filter(([key]) => !optionalFields.includes(key))
-      .map(([key, type]) => [key, validateField(params[key], type)])
-      .filter(([, message]) => message),
-  );
 }
 
 /**
@@ -222,11 +185,6 @@ export function buildTx<
     throw new SchemaNotFoundError('serialization', Tag[params.tag], params.version);
   }
   const schema = schemas[params.version] as unknown as TxField[];
-
-  const valid = validateParams(params, schema);
-  if (Object.keys(valid).length > 0) {
-    throw new InvalidTxParamsError(`Transaction build error. ${JSON.stringify(valid)}`);
-  }
 
   const binary = schema.map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES | Field]) => (
     serializeField(
