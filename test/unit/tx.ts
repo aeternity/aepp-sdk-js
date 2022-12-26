@@ -239,6 +239,11 @@ describe('Tx', () => {
       expect(unpackTx(tx, Tag.ContractCreateTx).tx.fee).to.be.equal('78500000000000');
     });
 
+    it('unpack and build ChannelCreateTx into the same value', () => {
+      const tx = 'tx_+IgyAqEBNMD0uYWndDrqF2Q8OIUWZ/gEi45vpwfg+cNOEVi9pL+JBWvHXi1jEAAAoQG5mrb34g29bneQLjNaFcH4OwVP0r9m9x6kYxpxiqN7EYkFa8deLWMQAAAAAQCGECcSfcAAwMCgOK3o2rLTFOY30p/4fMgaz3hG5WWTAcWknsu7ceLFmM0CERW42w==';
+      expect(buildTx(unpackTx(tx).tx)).to.be.equal(tx);
+    });
+
     it('rejects if invalid transaction version', () => {
       expect(() => buildTx({ tag: Tag.SpendTx, version: 5 } as any))
         .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
