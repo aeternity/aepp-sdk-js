@@ -130,16 +130,20 @@ export default {
 
   serializeAettos(
     _value: string | undefined,
-    { rebuildTx, unpackTx, _computingMinFee }: {
+    {
+      rebuildTx, unpackTx, _computingMinFee, _pickBiggerFee,
+    }: {
       rebuildTx: (params: any) => Encoded.Transaction;
       unpackTx: typeof unpackTxType;
-      _computingMinFee?: string;
+      _computingMinFee?: BigNumber;
+      _pickBiggerFee?: boolean;
     },
   ): string {
-    if (_computingMinFee != null) return _computingMinFee;
+    if (_computingMinFee != null) return _computingMinFee.toFixed();
     const minFee = calculateMinFee((fee) => rebuildTx({ _computingMinFee: fee }), unpackTx);
     const value = new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
+      if (_pickBiggerFee === true) return minFee.toFixed();
       throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger then ${minFee}`);
     }
     return value.toFixed();

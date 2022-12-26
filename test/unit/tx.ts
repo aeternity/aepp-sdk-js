@@ -219,6 +219,26 @@ describe('Tx', () => {
       expect(pi).to.satisfy((s: string) => s.startsWith('pi_'));
     });
 
+    it('build ContractCreateTx with specified fee', () => {
+      const txParams = {
+        tag: Tag.ContractCreateTx,
+        version: 1,
+        ownerId: 'ak_xw6vb7yJfajDdfcXzjg6Q5bH23bSUJrud6iBBfMdegZJFbQmc',
+        nonce: 3,
+        code: 'cb_+GhGA6Csc3MTA1lWna1q0L5k4TgjcQsmHIVhaJ7qU/0CBZqpO8C4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBBwcBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTcuMC4xAHO0rKc=',
+        ctVersion: { vmVersion: 7, abiVersion: 3 },
+        fee: '78500000000000',
+        ttl: 0,
+        deposit: '0',
+        amount: '0',
+        gasLimit: 76,
+        gasPrice: '1000000000',
+        callData: 'cb_KxFE1kQfP4oEp9E=',
+      } as const;
+      const tx = buildTx(txParams);
+      expect(unpackTx(tx, Tag.ContractCreateTx).tx.fee).to.be.equal('78500000000000');
+    });
+
     it('rejects if invalid transaction version', () => {
       expect(() => buildTx({ tag: Tag.SpendTx, version: 5 } as any))
         .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
