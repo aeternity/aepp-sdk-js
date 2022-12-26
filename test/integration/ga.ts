@@ -26,9 +26,10 @@ import {
   AccountGeneralized,
   Tag,
   unpackTx,
+  buildTx,
   Contract,
 } from '../../src';
-import { encode, Encoded, Encoding } from '../../src/utils/encoder';
+import { Encoded } from '../../src/utils/encoder';
 import { ContractMethodsBase } from '../../src/contract/Contract';
 
 const sourceCode = `contract BlindAuth =
@@ -96,9 +97,8 @@ describe('Generalized Account', () => {
   it('buildAuthTxHash generates a proper hash', async () => {
     const { rawTx } = await aeSdk
       .spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
-    const spendTx = encode(
-      unpackTx(rawTx, Tag.SignedTx).tx.encodedTx.tx.tx.tx.encodedTx.rlpEncoded,
-      Encoding.Transaction,
+    const spendTx = buildTx(
+      unpackTx(rawTx, Tag.SignedTx).tx.encodedTx.tx.tx.tx.encodedTx.tx,
     );
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.getTxHash()).decodedResult);

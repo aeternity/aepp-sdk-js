@@ -110,7 +110,9 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
     case FIELD_TYPES.string:
       return toBytes(value);
     case FIELD_TYPES.rlpBinary:
-      return value.rlpEncoded ?? value;
+      if (ArrayBuffer.isView(value)) return value;
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return decode(buildTx(value.tx));
     case FIELD_TYPES.ctVersion:
       if (value.vmVersion == null || value.vmVersion == null) {
         throw new InvalidTxParamsError('`ctVersion` must be an object with `vmVersion` and `abiVersion` fields');
@@ -210,7 +212,6 @@ export function buildTx<
  */
 export interface TxUnpacked<Tx extends TxSchema> {
   tx: RawTxObject<Tx>;
-  rlpEncoded: Uint8Array;
 }
 /**
  * Unpack transaction hash
@@ -225,8 +226,7 @@ export function unpackTx<TxType extends Tag>(
   encodedTx: Encoded.Transaction | Encoded.Poi,
   txType?: TxType,
 ): TxUnpacked<TxTypeSchemas[TxType]> {
-  const rlpEncoded = decode(encodedTx);
-  const binary = rlpDecode(rlpEncoded);
+  const binary = rlpDecode(decode(encodedTx));
   const tag = +readInt(binary[0] as Buffer);
   if (!isKeyOfObject(tag, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${tag}`);
   if (txType != null && txType !== tag) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[tag]} instead`);
@@ -235,7 +235,6 @@ export function unpackTx<TxType extends Tag>(
   const schema = TX_SCHEMA[tag][version];
   return {
     tx: unpackRawTx<TxTypeSchemas[TxType]>(binary, schema),
-    rlpEncoded,
   };
 }
 

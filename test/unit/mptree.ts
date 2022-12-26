@@ -46,13 +46,11 @@ describe('Merkle Patricia Tree', () => {
       tx: {
         tag: 10, version: 1, nonce: 0, balance: '1000000000000004',
       },
-      rlpEncoded: Buffer.from('cb0a010087038d7ea4c68004', 'hex'),
     },
     ak_bS1fWNoYpChJhGS3UMGv6WvwXp55xQYmcUrPoZ9UhcBXEPMsK: {
       tx: {
         tag: 10, version: 1, nonce: 0, balance: '999999999999996',
       },
-      rlpEncoded: Buffer.from('cb0a010087038d7ea4c67ffc', 'hex'),
     },
   };
 

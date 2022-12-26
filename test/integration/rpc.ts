@@ -47,6 +47,7 @@ import {
   UnsubscribedAccountError,
   AccountBase,
   verifyMessage,
+  buildTx,
 } from '../../src';
 import { concatBuffers } from '../../src/utils/other';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
@@ -324,8 +325,10 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
       const signedTx = await aepp.signTransaction(tx);
       const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
-      const { tx: { signatures: [signature], encodedTx: { rlpEncoded } } } = unpackedTx;
-      const txWithNetwork = concatBuffers([Buffer.from(networkId), hash(rlpEncoded)]);
+      const { tx: { signatures: [signature], encodedTx } } = unpackedTx;
+      const txWithNetwork = concatBuffers([
+        Buffer.from(networkId), hash(decode(buildTx(encodedTx.tx))),
+      ]);
       expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
     });
 

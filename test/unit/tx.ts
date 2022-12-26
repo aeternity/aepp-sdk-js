@@ -163,15 +163,12 @@ describe('Tx', () => {
           tx: {
             tag: 10, version: 1, nonce: 0, balance: '100000000000000000003',
           },
-          rlpEncoded: Buffer.from('cd0a010089056bc75e2d63100003', 'hex'),
         },
         [addressContract.replace('ct_', 'ak_')]: {
           tx: accountContract,
-          rlpEncoded: Buffer.from('c60a01008203e8', 'hex'),
         },
         [address]: {
           tx: account,
-          rlpEncoded: Buffer.from('cd0a010089056bc75e2d630ffc15', 'hex'),
         },
       });
 
@@ -188,14 +185,10 @@ describe('Tx', () => {
       };
       expect(unpackedPoi.tx.contracts[0].get(addressContract)?.tx).to.eql(contract);
       expect(unpackedPoi.tx.contracts[0].toObject()).to.eql({
-        [addressContract]: {
-          tx: contract,
-          rlpEncoded: Buffer.from('f87e2801a1015d716d669f58a9b63829d5bc36895ff478e9d1565c3569d038a8e009bf01afd983050003b84ef84c4603a0e1dfbf7b9eab821c24a6d3cf1abe03a2aa08e36ab450be2118017abe6257a059c0a08dfe8078209200370107070101008e2f01118078209219676574417267822f0085372e302e31008001c08203e8', 'hex'),
-        },
+        [addressContract]: { tx: contract },
       });
 
-      // TODO: remove any after fixing return type of unpackTx
-      expect(buildTx(unpackedPoi.tx as any, { prefix: Encoding.Poi })).to.equal(poi);
+      expect(buildTx(unpackedPoi.tx, { prefix: Encoding.Poi })).to.equal(poi);
     });
   });
 
