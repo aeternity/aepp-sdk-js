@@ -99,13 +99,13 @@ export function buildFee(
   buildTx: typeof buildTxType,
 ): BigNumber {
   const { length } = decode(builtTx);
-  const txObject = unpackTx(builtTx).tx;
+  const txObject = unpackTx(builtTx);
 
   return TX_FEE_BASE_GAS(txObject.tag)
     .plus(TX_FEE_OTHER_GAS(txObject.tag, length, {
       relativeTtl: getOracleRelativeTtl(txObject),
       innerTxSize: txObject.tag === Tag.GaMetaTx || txObject.tag === Tag.PayingForTx
-        ? decode(buildTx(txObject.tx.tx.encodedTx.tx)).length
+        ? decode(buildTx(txObject.tx.encodedTx)).length
         : 0,
     }))
     .times(MIN_GAS_PRICE);

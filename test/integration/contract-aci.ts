@@ -420,7 +420,7 @@ describe('Contract instance', () => {
     });
 
     it('sets maximum possible gas limit for dry-run contract calls', async () => {
-      const { tx: { tx: { gasLimit } } } = await contract.intFn(4);
+      const { tx: { gasLimit } } = await contract.intFn(4);
       expect(gasLimit).to.be.equal(5817980);
       await expect(contract.intFn(4, { gasLimit: gasLimit + 1 }))
         .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 5817981 must be less or equal to 5817980');

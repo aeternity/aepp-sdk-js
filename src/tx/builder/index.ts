@@ -112,7 +112,7 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
     case FIELD_TYPES.rlpBinary:
       if (ArrayBuffer.isView(value)) return value;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return decode(buildTx(value.tx));
+      return decode(buildTx(value));
     case FIELD_TYPES.ctVersion:
       if (value.vmVersion == null || value.vmVersion == null) {
         throw new InvalidTxParamsError('`ctVersion` must be an object with `vmVersion` and `abiVersion` fields');
@@ -208,12 +208,6 @@ export function buildTx<
 }
 
 /**
- * @category transaction builder
- */
-export interface TxUnpacked<Tx extends TxSchema> {
-  tx: RawTxObject<Tx>;
-}
-/**
  * Unpack transaction hash
  * @category transaction builder
  * @param encodedTx - Transaction to unpack
@@ -225,7 +219,7 @@ export interface TxUnpacked<Tx extends TxSchema> {
 export function unpackTx<TxType extends Tag>(
   encodedTx: Encoded.Transaction | Encoded.Poi,
   txType?: TxType,
-): TxUnpacked<TxTypeSchemas[TxType]> {
+): RawTxObject<TxTypeSchemas[TxType]> {
   const binary = rlpDecode(decode(encodedTx));
   const tag = +readInt(binary[0] as Buffer);
   if (!isKeyOfObject(tag, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${tag}`);
@@ -233,9 +227,7 @@ export function unpackTx<TxType extends Tag>(
   const version = +readInt(binary[1] as Buffer);
   if (!isKeyOfObject(version, TX_SCHEMA[tag])) throw new SchemaNotFoundError('deserialization', `tag ${tag}`, version);
   const schema = TX_SCHEMA[tag][version];
-  return {
-    tx: unpackRawTx<TxTypeSchemas[TxType]>(binary, schema),
-  };
+  return unpackRawTx<TxTypeSchemas[TxType]>(binary, schema);
 }
 
 /**
@@ -260,9 +252,9 @@ export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.Tx
 export function buildContractIdByContractTx(
   contractTx: Encoded.Transaction,
 ): Encoded.ContractAddress {
-  const { tx } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
-  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(tx.tag)) {
-    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', tx.tag);
+  const { tag, ownerId, nonce } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
+  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(tag)) {
+    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', tag);
   }
-  return buildContractId(tx.ownerId, +tx.nonce);
+  return buildContractId(ownerId, +nonce);
 }

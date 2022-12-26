@@ -325,9 +325,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
       const signedTx = await aepp.signTransaction(tx);
       const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
-      const { tx: { signatures: [signature], encodedTx } } = unpackedTx;
+      const { signatures: [signature], encodedTx } = unpackedTx;
       const txWithNetwork = concatBuffers([
-        Buffer.from(networkId), hash(decode(buildTx(encodedTx.tx))),
+        Buffer.from(networkId), hash(decode(buildTx(encodedTx))),
       ]);
       expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
     });

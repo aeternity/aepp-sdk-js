@@ -123,7 +123,7 @@ describe('Tx', () => {
     });
 
     it('unpacks unknown transaction', () => {
-      const account = unpackTx('tx_zQoBAIkFa8deLWMQAAMJo1/N').tx;
+      const account = unpackTx('tx_zQoBAIkFa8deLWMQAAMJo1/N');
       if (account.tag === Tag.SpendTx) {
         expect(account.recipientId);
         // @ts-expect-error spend tx don't have balance
@@ -150,26 +150,20 @@ describe('Tx', () => {
       const account = {
         tag: 10, version: 1, nonce: 0, balance: '99999999999999998997',
       };
-      expect(unpackedPoi.tx.accounts[0].get(address)?.tx).to.eql(account);
+      expect(unpackedPoi.accounts[0].get(address)).to.eql(account);
 
       const addressContract = 'ct_ECdrEy2NJKq3qK3xraPtcDP7vfdi56SQXYAH3bVVSTmpqpYyW';
       const accountContract = {
         tag: 10, version: 1, nonce: 0, balance: '1000',
       };
-      expect(unpackedPoi.tx.accounts[0].get(addressContract as Encoded.AccountAddress)?.tx)
+      expect(unpackedPoi.accounts[0].get(addressContract as Encoded.AccountAddress))
         .to.eql(accountContract);
-      expect(unpackedPoi.tx.accounts[0].toObject()).to.eql({
+      expect(unpackedPoi.accounts[0].toObject()).to.eql({
         ak_BvMjyAXbpHkjzVfG53N6FxF1LwTX2EYwFLfNbk8mcXjp8CXBC: {
-          tx: {
-            tag: 10, version: 1, nonce: 0, balance: '100000000000000000003',
-          },
+          tag: 10, version: 1, nonce: 0, balance: '100000000000000000003',
         },
-        [addressContract.replace('ct_', 'ak_')]: {
-          tx: accountContract,
-        },
-        [address]: {
-          tx: account,
-        },
+        [addressContract.replace('ct_', 'ak_')]: accountContract,
+        [address]: account,
       });
 
       const contract = {
@@ -183,12 +177,10 @@ describe('Tx', () => {
         referers: [],
         deposit: '1000',
       };
-      expect(unpackedPoi.tx.contracts[0].get(addressContract)?.tx).to.eql(contract);
-      expect(unpackedPoi.tx.contracts[0].toObject()).to.eql({
-        [addressContract]: { tx: contract },
-      });
+      expect(unpackedPoi.contracts[0].get(addressContract)).to.eql(contract);
+      expect(unpackedPoi.contracts[0].toObject()).to.eql({ [addressContract]: contract });
 
-      expect(buildTx(unpackedPoi.tx, { prefix: Encoding.Poi })).to.equal(poi);
+      expect(buildTx(unpackedPoi, { prefix: Encoding.Poi })).to.equal(poi);
     });
   });
 
@@ -229,12 +221,12 @@ describe('Tx', () => {
         callData: 'cb_KxFE1kQfP4oEp9E=',
       } as const;
       const tx = buildTx(txParams);
-      expect(unpackTx(tx, Tag.ContractCreateTx).tx.fee).to.be.equal('78500000000000');
+      expect(unpackTx(tx, Tag.ContractCreateTx).fee).to.be.equal('78500000000000');
     });
 
     it('unpack and build ChannelCreateTx into the same value', () => {
       const tx = 'tx_+IgyAqEBNMD0uYWndDrqF2Q8OIUWZ/gEi45vpwfg+cNOEVi9pL+JBWvHXi1jEAAAoQG5mrb34g29bneQLjNaFcH4OwVP0r9m9x6kYxpxiqN7EYkFa8deLWMQAAAAAQCGECcSfcAAwMCgOK3o2rLTFOY30p/4fMgaz3hG5WWTAcWknsu7ceLFmM0CERW42w==';
-      expect(buildTx(unpackTx(tx).tx)).to.be.equal(tx);
+      expect(buildTx(unpackTx(tx))).to.be.equal(tx);
     });
 
     it('rejects if invalid transaction version', () => {

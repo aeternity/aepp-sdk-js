@@ -45,11 +45,11 @@ export async function appendSignature(
   tx: Encoded.Transaction,
   signFn: SignTx,
 ): Promise<Encoded.Transaction | number | null> {
-  const { signatures, encodedTx } = unpackTx(tx, Tag.SignedTx).tx;
-  const payloadTx = buildTx(encodedTx.tx);
+  const { signatures, encodedTx } = unpackTx(tx, Tag.SignedTx);
+  const payloadTx = buildTx(encodedTx);
   const result = await signFn(payloadTx);
   if (typeof result === 'string') {
-    const { signatures: signatures2 } = unpackTx(result, Tag.SignedTx).tx;
+    const { signatures: signatures2 } = unpackTx(result, Tag.SignedTx);
     return buildTx({
       tag: Tag.SignedTx,
       signatures: signatures.concat(signatures2),

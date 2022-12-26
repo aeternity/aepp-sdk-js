@@ -150,8 +150,7 @@ export default class ChannelContract extends ChannelSpend {
               state2: ChannelState,
             ): ChannelFsm => (
               awaitingCompletion(this, message2, state2, () => {
-                const { round } = unpackTx(message2.params.data.state, Tag.SignedTx)
-                  .tx.encodedTx.tx;
+                const { round } = unpackTx(message2.params.data.state, Tag.SignedTx).encodedTx;
                 const addressKey = this._options.role === 'initiator'
                   ? 'initiatorId' : 'responderId';
                 const owner = this._options[addressKey];

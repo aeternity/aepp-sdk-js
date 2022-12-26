@@ -97,9 +97,7 @@ describe('Generalized Account', () => {
   it('buildAuthTxHash generates a proper hash', async () => {
     const { rawTx } = await aeSdk
       .spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
-    const spendTx = buildTx(
-      unpackTx(rawTx, Tag.SignedTx).tx.encodedTx.tx.tx.tx.encodedTx.tx,
-    );
+    const spendTx = buildTx(unpackTx(rawTx, Tag.SignedTx).encodedTx.tx.encodedTx);
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.getTxHash()).decodedResult);
   });

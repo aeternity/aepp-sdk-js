@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { expect } from 'chai';
 import { AensName } from '../src';
 
 function randomString(len: number): string {
@@ -17,7 +18,11 @@ export function randomName(length: number): AensName {
 }
 
 export function assertNotNull(value: any): asserts value {
-  if (value == null) throw new Error('Expected to be not null');
+  expect([undefined, null]).to.not.include(value);
+}
+
+export function ensureEqual<T>(value: any, equalTo: T): asserts value is T {
+  expect(value).to.be.equal(equalTo);
 }
 
 export type ChainTtl = { FixedTTL: [bigint] }

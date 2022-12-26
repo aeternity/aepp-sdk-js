@@ -44,7 +44,7 @@ import {
 import MemoryAccount from '../../src/account/Memory';
 import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
-import { assertNotNull } from '../utils';
+import { assertNotNull, ensureEqual } from '../utils';
 
 const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
 
@@ -175,8 +175,8 @@ describe('Channel', () => {
       channelReserve: sharedParams?.channelReserve?.toString(),
       lockPeriod: sharedParams.lockPeriod.toString(),
     };
-    const { tx: initiatorTx } = unpackTx(initiatorSignTag.firstCall.args[1]);
-    const { tx: responderTx } = unpackTx(responderSignTag.firstCall.args[1]);
+    const initiatorTx = unpackTx(initiatorSignTag.firstCall.args[1]);
+    const responderTx = unpackTx(responderSignTag.firstCall.args[1]);
     expect(initiatorTx.tag).to.be.equal(Tag.ChannelCreateTx);
     initiatorTx.should.eql({ ...initiatorTx, ...expectedTxParams });
     expect(responderTx.tag).to.be.equal(Tag.ChannelCreateTx);
@@ -240,8 +240,8 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    expect(tx.tag).to.be.equal(Tag.ChannelOffChainTx);
+    const tx = unpackTx(initiatorSign.firstCall.args[0]);
+    ensureEqual<Tag.ChannelOffChainTx>(tx.tag, Tag.ChannelOffChainTx);
 
     expect(initiatorSign.firstCall.args[1]).to.eql({
       updates: [
@@ -295,7 +295,7 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
+    const tx = unpackTx(initiatorSign.firstCall.args[0]);
     expect(tx.tag).to.be.equal(Tag.ChannelOffChainTx);
     expect(initiatorSign.firstCall.args[1]).to.eql({
       updates: [
@@ -364,7 +364,7 @@ describe('Channel', () => {
     const initiatorPoi = await initiatorCh.poi(params);
     const responderPoi = await responderCh.poi(params);
     expect(initiatorPoi).to.be.eql(responderPoi);
-    expect(initiatorPoi.tx.accounts[0].isEqual(responderPoi.tx.accounts[0]))
+    expect(initiatorPoi.accounts[0].isEqual(responderPoi.accounts[0]))
       .to.be.equal(true);
   });
 
@@ -429,13 +429,10 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    expect(tx.tag).to.be.equal(Tag.ChannelWithdrawTx);
-    tx.should.eql({
-      ...tx,
-      toId: aeSdkInitiatior.address,
-      amount: amount.toString(),
-    });
+    const tx = unpackTx(initiatorSign.firstCall.args[0]);
+    ensureEqual<Tag.ChannelWithdrawTx>(tx.tag, Tag.ChannelWithdrawTx);
+    expect(tx.toId).to.be.equal(aeSdkInitiatior.address);
+    expect(tx.amount).to.be.equal(amount.toString());
   });
 
   it('can request a withdraw and reject', async () => {
@@ -481,13 +478,10 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    expect(tx.tag).to.be.equal(Tag.ChannelWithdrawTx);
-    tx.should.eql({
-      ...tx,
-      toId: aeSdkInitiatior.address,
-      amount: amount.toString(),
-    });
+    const tx = unpackTx(initiatorSign.firstCall.args[0]);
+    ensureEqual<Tag.ChannelWithdrawTx>(tx.tag, Tag.ChannelWithdrawTx);
+    expect(tx.toId).to.be.equal(aeSdkInitiatior.address);
+    expect(tx.amount).to.be.equal(amount.toString());
   });
 
   it('can abort withdraw sign request', async () => {
@@ -557,13 +551,10 @@ describe('Channel', () => {
         }]),
       }),
     );
-    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    expect(tx.tag).to.be.equal(Tag.ChannelDepositTx);
-    tx.should.eql({
-      ...tx,
-      fromId: aeSdkInitiatior.address,
-      amount: amount.toString(),
-    });
+    const tx = unpackTx(initiatorSign.firstCall.args[0]);
+    ensureEqual<Tag.ChannelDepositTx>(tx.tag, Tag.ChannelDepositTx);
+    expect(tx.fromId).to.be.equal(aeSdkInitiatior.address);
+    expect(tx.amount).to.be.equal(amount.toString());
   });
 
   it('can request a deposit and reject', async () => {
@@ -597,13 +588,10 @@ describe('Channel', () => {
         }],
       }),
     );
-    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    expect(tx.tag).to.be.equal(Tag.ChannelDepositTx);
-    tx.should.eql({
-      ...tx,
-      fromId: aeSdkInitiatior.address,
-      amount: amount.toString(),
-    });
+    const tx = unpackTx(initiatorSign.firstCall.args[0]);
+    ensureEqual<Tag.ChannelDepositTx>(tx.tag, Tag.ChannelDepositTx);
+    expect(tx.fromId).to.be.equal(aeSdkInitiatior.address);
+    expect(tx.amount).to.be.equal(amount.toString());
   });
 
   it('can abort deposit sign request', async () => {
@@ -641,13 +629,10 @@ describe('Channel', () => {
     );
     sinon.assert.calledOnce(initiatorSign);
     sinon.assert.calledWithExactly(initiatorSign, sinon.match.string);
-    const { tx } = unpackTx(initiatorSign.firstCall.args[0]);
-    expect(tx.tag).to.be.equal(Tag.ChannelCloseMutualTx);
-    tx.should.eql({
-      ...tx,
-      fromId: aeSdkInitiatior.address,
-      // TODO: check `initiatorAmountFinal` and `responderAmountFinal`
-    });
+    const tx = unpackTx(initiatorSign.firstCall.args[0]);
+    ensureEqual<Tag.ChannelCloseMutualTx>(tx.tag, Tag.ChannelCloseMutualTx);
+    expect(tx.fromId).to.be.equal(aeSdkInitiatior.address);
+    // TODO: check `initiatorAmountFinal` and `responderAmountFinal`
   });
 
   it('can leave a channel', async () => {
@@ -724,10 +709,10 @@ describe('Channel', () => {
     const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
-      poi: poi.tx,
+      poi,
       payload: signedTx,
     });
-    const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).tx.fee;
+    const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
     await aeSdkInitiatior.sendTransaction(await initiatorSign(closeSoloTx));
     const settleTx = await aeSdkInitiatior.buildTx(Tag.ChannelSettleTx, {
       channelId: await initiatorCh.id(),
@@ -735,7 +720,7 @@ describe('Channel', () => {
       initiatorAmountFinal: balances[initiatorAddr],
       responderAmountFinal: balances[responderAddr],
     });
-    const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).tx.fee;
+    const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
     await aeSdkInitiatior.sendTransaction(await initiatorSign(settleTx));
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);
@@ -786,19 +771,19 @@ describe('Channel', () => {
     const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
       channelId: initiatorCh.id(),
       fromId: initiatorAddr,
-      poi: oldPoi.tx,
+      poi: oldPoi,
       payload: oldUpdate.signedTx,
     });
-    const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).tx.fee;
+    const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
     await aeSdkInitiatior.sendTransaction(await initiatorSign(closeSoloTx));
     assertNotNull(recentUpdate.signedTx);
     const slashTx = await aeSdkResponder.buildTx(Tag.ChannelSlashTx, {
       channelId: responderCh.id(),
       fromId: responderAddr,
-      poi: recentPoi.tx,
+      poi: recentPoi,
       payload: recentUpdate.signedTx,
     });
-    const slashTxFee = unpackTx(slashTx, Tag.ChannelSlashTx).tx.fee;
+    const slashTxFee = unpackTx(slashTx, Tag.ChannelSlashTx).fee;
     await aeSdkResponder.sendTransaction(await responderSign(slashTx));
     const settleTx = await aeSdkResponder.buildTx(Tag.ChannelSettleTx, {
       channelId: responderCh.id(),
@@ -806,7 +791,7 @@ describe('Channel', () => {
       initiatorAmountFinal: recentBalances[initiatorAddr],
       responderAmountFinal: recentBalances[responderAddr],
     });
-    const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).tx.fee;
+    const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
     await aeSdkResponder.sendTransaction(await responderSign(settleTx));
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);

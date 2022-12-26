@@ -229,14 +229,14 @@ export default class Channel {
     if (this._state == null) {
       return null;
     }
-    const { tx } = unpackTx(this._state, Tag.SignedTx).tx.encodedTx;
-    switch (tx.tag) {
+    const { tag, round } = unpackTx(this._state, Tag.SignedTx).encodedTx;
+    switch (tag) {
       case Tag.ChannelCreateTx:
         return 1;
       case Tag.ChannelOffChainTx:
       case Tag.ChannelWithdrawTx:
       case Tag.ChannelDepositTx:
-        return tx.round;
+        return round;
       default:
         return null;
     }

@@ -54,7 +54,7 @@ async function verifyTransactionInternal(
   parentTxTypes: Tag[],
 ): Promise<ValidatorResult[]> {
   const address = getSenderAddress(tx)
-    ?? (tx.tag === Tag.SignedTx ? getSenderAddress(tx.encodedTx.tx) : undefined);
+    ?? (tx.tag === Tag.SignedTx ? getSenderAddress(tx.encodedTx) : undefined);
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
     address == null
       ? undefined
@@ -95,7 +95,7 @@ export default async function verifyTransaction(
 ): Promise<ValidatorResult[]> {
   const node = new Node(nodeNotCached.$host, { ignoreVersion: true });
   node.pipeline.addPolicy(genAggressiveCacheGetResponsesPolicy());
-  return verifyTransactionInternal(unpackTx(transaction).tx, node, []);
+  return verifyTransactionInternal(unpackTx(transaction), node, []);
 }
 
 validators.push(
@@ -107,7 +107,7 @@ validators.push(
       nodeNetworkId,
       ...parentTxTypes.includes(Tag.PayingForTx) ? ['inner_tx'] : [],
     ].join('-'));
-    const txBinary = decode(buildTx(encodedTx.tx));
+    const txBinary = decode(buildTx(encodedTx));
     const txWithNetworkId = concatBuffers([prefix, txBinary]);
     const txHashWithNetworkId = concatBuffers([prefix, hash(txBinary)]);
     if (verify(txWithNetworkId, signatures[0], account.id)
@@ -121,7 +121,7 @@ validators.push(
   },
   async ({ encodedTx, tx, tag }, { node, parentTxTypes }) => {
     if ((encodedTx ?? tx) == null) return [];
-    return verifyTransactionInternal((encodedTx ?? tx).tx, node, [...parentTxTypes, tag]);
+    return verifyTransactionInternal(encodedTx ?? tx, node, [...parentTxTypes, tag]);
   },
   ({ ttl }, { height }) => {
     if (ttl == null) return [];
@@ -140,7 +140,7 @@ validators.push(
     if ((amount ?? fee ?? nameFee) == null) return [];
     fee ??= 0;
     const cost = new BigNumber(fee).plus(nameFee ?? 0).plus(amount ?? 0)
-      .plus(tag === Tag.PayingForTx ? (tx.tx.encodedTx.tx).fee : 0)
+      .plus(tag === Tag.PayingForTx ? tx.encodedTx.fee : 0)
       .minus(parentTxTypes.includes(Tag.PayingForTx) ? fee : 0);
     if (cost.lte(account.balance.toString())) return [];
     return [{
