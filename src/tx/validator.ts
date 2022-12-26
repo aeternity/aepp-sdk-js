@@ -1,18 +1,16 @@
 import BigNumber from 'bignumber.js';
 import { hash, verify } from '../utils/crypto';
 import {
-  CtVersion,
   PROTOCOL_VM_ABI,
   RawTxObject,
   TxParamsCommon,
   TxSchema,
-  TxTypeSchemas,
 } from './builder/schema';
 import { Tag } from './builder/constants';
-import { TxUnpacked, unpackTx } from './builder';
+import { buildTx, unpackTx } from './builder';
 import { UnsupportedProtocolError } from '../utils/errors';
 import { concatBuffers, isAccountNotFoundError, isKeyOfObject } from '../utils/other';
-import { encode, Encoded, Encoding } from '../utils/encoder';
+import { Encoded, decode } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
@@ -23,23 +21,10 @@ export interface ValidatorResult {
   checkedKeys: string[];
 }
 
+type UnpackedTx = ReturnType<typeof unpackTx>['tx'];
+
 type Validator = (
-  tx: {
-    encodedTx: TxUnpacked<TxSchema>;
-    signatures: Buffer[];
-    tx: TxUnpacked<TxSchema> & {
-      tx: TxTypeSchemas[Tag.SignedTx];
-    };
-    tag: Tag;
-    nonce?: number;
-    ttl?: number;
-    amount?: number;
-    fee?: number;
-    nameFee?: number;
-    ctVersion?: Partial<CtVersion>;
-    abiVersion?: number;
-    contractId?: Encoded.ContractAddress;
-  },
+  tx: UnpackedTx,
   options: {
     // TODO: remove after fixing node types
     account?: TransformNodeType<Account> & { id: Encoded.AccountAddress };
@@ -63,32 +48,11 @@ const getSenderAddress = (
   .filter((a) => a)
   .map((a) => a?.toString().replace(/^ok_/, 'ak_'))[0] as Encoded.AccountAddress | undefined;
 
-/**
- * Transaction Validator
- * This function validates some of transaction properties,
- * to make sure it can be posted it to the chain
- * @category transaction builder
- * @param transaction - Base64Check-encoded transaction
- * @param nodeNotCached - Node to validate transaction against
- * @param parentTxTypes - Types of parent transactions
- * @returns Array with verification errors
- * @example const errors = await verifyTransaction(transaction, node)
- */
-export default async function verifyTransaction(
-  transaction: Encoded.Transaction | Encoded.Poi,
-  nodeNotCached: Node,
-  parentTxTypes: Tag[] = [],
+async function verifyTransactionInternal(
+  tx: UnpackedTx,
+  node: Node,
+  parentTxTypes: Tag[],
 ): Promise<ValidatorResult[]> {
-  let node = nodeNotCached;
-  if (
-    !node.pipeline.getOrderedPolicies()
-      .some(({ name }) => name === 'aggressive-cache-get-responses')
-  ) {
-    node = new Node(nodeNotCached.$host, { ignoreVersion: true });
-    node.pipeline.addPolicy(genAggressiveCacheGetResponsesPolicy());
-  }
-
-  const { tx } = unpackTx<Tag.SignedTx>(transaction);
   const address = getSenderAddress(tx)
     ?? (tx.tag === Tag.SignedTx ? getSenderAddress(tx.encodedTx.tx) : undefined);
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
@@ -107,7 +71,7 @@ export default async function verifyTransaction(
 
   return (await Promise.all(
     validators.map((v) => v(
-      tx as any,
+      tx,
       {
         node, account, height, consensusProtocolVersion, nodeNetworkId, parentTxTypes,
       },
@@ -115,17 +79,37 @@ export default async function verifyTransaction(
   )).flat();
 }
 
+/**
+ * Transaction Validator
+ * This function validates some transaction properties,
+ * to make sure it can be posted it to the chain
+ * @category transaction builder
+ * @param transaction - Base64Check-encoded transaction
+ * @param nodeNotCached - Node to validate transaction against
+ * @returns Array with verification errors
+ * @example const errors = await verifyTransaction(transaction, node)
+ */
+export default async function verifyTransaction(
+  transaction: Parameters<typeof unpackTx>[0],
+  nodeNotCached: Node,
+): Promise<ValidatorResult[]> {
+  const node = new Node(nodeNotCached.$host, { ignoreVersion: true });
+  node.pipeline.addPolicy(genAggressiveCacheGetResponsesPolicy());
+  return verifyTransactionInternal(unpackTx(transaction).tx, node, []);
+}
+
 validators.push(
   ({ encodedTx, signatures }, { account, nodeNetworkId, parentTxTypes }) => {
     if ((encodedTx ?? signatures) == null) return [];
     if (account == null) return [];
-    if (signatures.length !== 1) return []; // TODO: Support multisignature?
+    if (signatures.length !== 1) return []; // TODO: Support multisignature like in state channels
     const prefix = Buffer.from([
       nodeNetworkId,
       ...parentTxTypes.includes(Tag.PayingForTx) ? ['inner_tx'] : [],
     ].join('-'));
-    const txWithNetworkId = concatBuffers([prefix, encodedTx.rlpEncoded]);
-    const txHashWithNetworkId = concatBuffers([prefix, hash(encodedTx.rlpEncoded)]);
+    const txBinary = decode(buildTx(encodedTx.tx));
+    const txWithNetworkId = concatBuffers([prefix, txBinary]);
+    const txHashWithNetworkId = concatBuffers([prefix, hash(txBinary)]);
     if (verify(txWithNetworkId, signatures[0], account.id)
       || verify(txHashWithNetworkId, signatures[0], account.id)) return [];
     return [{
@@ -137,11 +121,7 @@ validators.push(
   },
   async ({ encodedTx, tx, tag }, { node, parentTxTypes }) => {
     if ((encodedTx ?? tx) == null) return [];
-    return verifyTransaction(
-      encode((encodedTx ?? tx).rlpEncoded, Encoding.Transaction),
-      node,
-      [...parentTxTypes, tag],
-    );
+    return verifyTransactionInternal((encodedTx ?? tx).tx, node, [...parentTxTypes, tag]);
   },
   ({ ttl }, { height }) => {
     if (ttl == null) return [];
