@@ -210,7 +210,12 @@ export default class Channel {
   /**
    * Get current state
    */
-  async state(): Promise<ChannelState> {
+  async state(): Promise<{
+    calls: Encoded.CallStateTree;
+    halfSignedTx: Encoded.Transaction | '';
+    signedTx: Encoded.Transaction;
+    trees: Encoded.StateTrees;
+  }> {
     return snakeToPascalObjKeys(await call(this, 'channels.get.offchain_state', {}));
   }
 

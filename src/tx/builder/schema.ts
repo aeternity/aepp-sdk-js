@@ -8,10 +8,9 @@ import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, addresses, pointers, enumeration,
+  address, addresses, pointers, enumeration, mptrees,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
-import MPTree from '../../utils/mptree';
 import { UnionToIntersection } from '../../utils/other';
 import { AddressEncodings } from './field-types/address';
 
@@ -121,7 +120,6 @@ export enum FIELD_TYPES {
   offChainUpdates,
   callStack,
   proofOfInclusion,
-  mptrees,
   ctVersion,
   sophiaCodeTypeInfo,
   payload,
@@ -140,7 +138,6 @@ interface BuildFieldTypes<Prefix extends undefined | Encoding | readonly Encodin
   [FIELD_TYPES.offChainUpdates]: any;
   [FIELD_TYPES.callStack]: any;
   [FIELD_TYPES.proofOfInclusion]: any;
-  [FIELD_TYPES.mptrees]: MPTree[];
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
   [FIELD_TYPES.payload]: string | undefined;
@@ -183,6 +180,9 @@ const BASE_TX = [
   ['VSN', shortUInt],
 ] as const;
 
+/**
+ * @see {@link https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts}
+ */
 export const TX_SCHEMA = {
   [Tag.Account]: {
     1: [
@@ -216,6 +216,16 @@ export const TX_SCHEMA = {
       ['ttl', shortUInt],
       ['nonce', shortUInt],
       ['payload', FIELD_TYPES.payload],
+    ],
+  },
+  [Tag.Name]: {
+    1: [
+      ...BASE_TX,
+      ['accountId', address<Encoding.AccountAddress>()],
+      ['nameTtl', shortUInt],
+      ['status', FIELD_TYPES.binary],
+      ['clientTtl', shortUInt],
+      ['pointers', pointers],
     ],
   },
   [Tag.NamePreclaimTx]: {
@@ -331,6 +341,17 @@ export const TX_SCHEMA = {
       // TODO: add serialization for
       //  <log> :: [ { <address> :: id, [ <topics> :: binary() ], <data> :: binary() } ]
       ['log', FIELD_TYPES.rawBinary],
+    ],
+  },
+  [Tag.Oracle]: {
+    1: [
+      ...BASE_TX,
+      ['accountId', address<Encoding.AccountAddress>()],
+      ['queryFormat', FIELD_TYPES.string],
+      ['responseFormat', FIELD_TYPES.string],
+      ['queryFee', coinAmount],
+      ['oracleTtlValue', shortUInt],
+      ['abiVersion', enumeration<ABI_VERSIONS>()],
     ],
   },
   [Tag.OracleRegisterTx]: {
@@ -590,12 +611,12 @@ export const TX_SCHEMA = {
   [Tag.TreesPoi]: {
     1: [
       ...BASE_TX,
-      ['accounts', FIELD_TYPES.mptrees],
-      ['calls', FIELD_TYPES.mptrees],
-      ['channels', FIELD_TYPES.mptrees],
-      ['contracts', FIELD_TYPES.mptrees],
-      ['ns', FIELD_TYPES.mptrees],
-      ['oracles', FIELD_TYPES.mptrees],
+      ['accounts', mptrees(Encoding.AccountAddress, Tag.Account)],
+      ['calls', mptrees(Encoding.Bytearray, Tag.ContractCall)],
+      ['channels', mptrees(Encoding.Channel, Tag.Channel)],
+      ['contracts', mptrees(Encoding.ContractAddress, Tag.Contract)],
+      ['ns', mptrees(Encoding.Name, Tag.Name)],
+      ['oracles', mptrees(Encoding.OracleAddress, Tag.Oracle)],
     ],
   },
   [Tag.StateTrees]: {

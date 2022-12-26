@@ -317,7 +317,7 @@ export async function initialize(
         changeStatus(channel, 'connected');
         if (channelOptions.reconnectTx != null) {
           enterState(channel, { handler: openHandler });
-          const signedTx = (await call(channel, 'channels.get.offchain_state', {})).signed_tx;
+          const { signedTx } = await channel.state();
           changeState(channel, signedTx);
         }
         ping(channel);

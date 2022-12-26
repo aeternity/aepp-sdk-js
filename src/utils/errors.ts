@@ -117,8 +117,8 @@ export class WalletError extends BaseError {
  * @category exception
  */
 export class ArgumentError extends BaseError {
-  constructor(argumentName: string, requirement: string, argumentValue: any) {
-    super(`${argumentName} should be ${requirement}, got ${String(argumentValue)} instead`);
+  constructor(argumentName: string, requirement: unknown, argumentValue: unknown) {
+    super(`${argumentName} should be ${requirement}, got ${argumentValue} instead`);
     this.name = 'ArgumentError';
   }
 }

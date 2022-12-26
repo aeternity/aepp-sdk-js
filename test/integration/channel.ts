@@ -23,7 +23,6 @@ import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
   unpackTx,
-  buildTx,
   buildTxHash,
   encode,
   decode,
@@ -366,29 +365,9 @@ describe('Channel', () => {
     const initiatorAddr = aeSdkInitiatior.address;
     const responderAddr = aeSdkResponder.address;
     const params = { accounts: [initiatorAddr, responderAddr] };
-    const initiatorPoi: Encoded.Poi = await initiatorCh.poi(params);
+    const initiatorPoi = await initiatorCh.poi(params);
     expect(initiatorPoi).to.be.equal(await responderCh.poi(params));
     initiatorPoi.should.be.a('string');
-    const unpackedInitiatorPoi = unpackTx(initiatorPoi, Tag.TreesPoi);
-
-    // TODO: move to `unpackTx`/`MPTree`
-    function getAccountBalance(address: Encoded.AccountAddress): string {
-      const addressHex = decode(address).toString('hex');
-      const treeNode = unpackedInitiatorPoi.tx.accounts[0].get(addressHex);
-      assertNotNull(treeNode);
-      const { balance, ...account } = unpackTx(
-        encode(treeNode, Encoding.Transaction),
-        Tag.Account,
-      ).tx;
-      expect(account).to.eql({ tag: 10, VSN: 1, nonce: 0 });
-      return balance.toString();
-    }
-
-    expect(getAccountBalance(initiatorAddr)).to.eql('89999999999999999997');
-    expect(getAccountBalance(responderAddr)).to.eql('110000000000000000003');
-    expect(
-      buildTx(unpackedInitiatorPoi.tx, unpackedInitiatorPoi.txType, { prefix: Encoding.Poi }).tx,
-    ).to.equal(initiatorPoi);
   });
 
   it('can send a message', async () => {

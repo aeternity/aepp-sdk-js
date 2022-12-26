@@ -9,6 +9,7 @@ import _enumeration from './enumeration';
 import _fee from './fee';
 import _gasLimit from './gas-limit';
 import _gasPrice from './gas-price';
+import _mptrees from './mptrees';
 import _name from './name';
 import _nameFee from './name-fee';
 import _nameId from './name-id';
@@ -26,14 +27,16 @@ const enumeration = _enumeration;
 const fee = _fee;
 const gasLimit = _gasLimit;
 const gasPrice = _gasPrice;
+const mptrees = _mptrees;
 const name = _name;
 const nameFee = _nameFee;
 const nameId = _nameId;
 const pointers = _pointers;
 
+type BinaryData = Buffer | Buffer[] | Buffer[][] | Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
 export interface Field {
-  serialize: (value: any, options: any) => Buffer | Buffer[] | Buffer[][];
-  deserialize: (value: Buffer | Buffer[] | Buffer[][]) => any;
+  serialize: (value: any, options: any) => BinaryData;
+  deserialize: (value: BinaryData, options: any) => any;
 }
 
 export {
@@ -48,6 +51,7 @@ export {
   fee,
   gasLimit,
   gasPrice,
+  mptrees,
   name,
   nameFee,
   nameId,
