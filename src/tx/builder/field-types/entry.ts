@@ -4,7 +4,8 @@ import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index'
 
 export default function genEntryField<T extends Tag>(tag: T): {
   serialize: (
-    value: Parameters<typeof buildTxType<T>>[0], options: { buildTx: typeof buildTxType },
+    value: { tx: Parameters<typeof buildTxType<T>>[0] } | Parameters<typeof buildTxType<T>>[0],
+    options: { buildTx: typeof buildTxType },
   ) => Buffer;
   deserialize: (
     value: Buffer, options: { unpackTx: typeof unpackTxType },
@@ -12,7 +13,7 @@ export default function genEntryField<T extends Tag>(tag: T): {
 } {
   return {
     serialize(txParams, { buildTx }) {
-      return decode(buildTx({ ...txParams, tag }));
+      return decode(buildTx({ ...'tx' in txParams ? txParams.tx : txParams, tag }));
     },
 
     deserialize(buf, { unpackTx }) {
