@@ -47,12 +47,6 @@ function deserializeField(
     }
     case FIELD_TYPES.bool:
       return value[0] === 1;
-    case FIELD_TYPES.rlpBinary:
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return unpackTx(encode(value, Encoding.Transaction));
-    case FIELD_TYPES.rlpBinaries:
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return value.map((v: Buffer) => unpackTx(encode(v, Encoding.Transaction)));
     case FIELD_TYPES.hex:
       return value.toString('hex');
     case FIELD_TYPES.sophiaCodeTypeInfo:
@@ -83,10 +77,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       return Buffer.from([(value === true) ? 1 : 0]);
     case FIELD_TYPES.hex:
       return Buffer.from(value, 'hex');
-    case FIELD_TYPES.rlpBinary:
-      if (ArrayBuffer.isView(value)) return value;
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return decode(buildTx(value));
     case FIELD_TYPES.ctVersion:
       if (value.vmVersion == null || value.vmVersion == null) {
         throw new InvalidTxParamsError('`ctVersion` must be an object with `vmVersion` and `abiVersion` fields');

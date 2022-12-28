@@ -105,8 +105,6 @@ export interface CtVersion {
 export enum FIELD_TYPES {
   bool,
   hex,
-  rlpBinary,
-  rlpBinaries,
   ctVersion,
   sophiaCodeTypeInfo,
 }
@@ -114,8 +112,6 @@ export enum FIELD_TYPES {
 interface BuildFieldTypes {
   [FIELD_TYPES.bool]: Boolean;
   [FIELD_TYPES.hex]: string;
-  [FIELD_TYPES.rlpBinary]: any;
-  [FIELD_TYPES.rlpBinaries]: any[];
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
 }
@@ -173,7 +169,7 @@ export const TX_SCHEMA = {
       ['tag', shortUIntConst(Tag.SignedTx)],
       ['version', shortUIntConst(1)],
       ['signatures', array(raw)],
-      ['encodedTx', FIELD_TYPES.rlpBinary],
+      ['encodedTx', entry()],
     ],
   },
   [Tag.SpendTx]: {
@@ -627,19 +623,19 @@ export const TX_SCHEMA = {
     1: [
       ['tag', shortUIntConst(Tag.StateTrees)],
       ['version', shortUIntConst(1)],
-      ['contracts', FIELD_TYPES.rlpBinary],
-      ['calls', FIELD_TYPES.rlpBinary],
-      ['channels', FIELD_TYPES.rlpBinary],
-      ['ns', FIELD_TYPES.rlpBinary],
-      ['oracles', FIELD_TYPES.rlpBinary],
-      ['accounts', FIELD_TYPES.rlpBinary],
+      ['contracts', entry()],
+      ['calls', entry()],
+      ['channels', entry()],
+      ['ns', entry()],
+      ['oracles', entry()],
+      ['accounts', entry()],
     ],
   },
   [Tag.Mtree]: {
     1: [
       ['tag', shortUIntConst(Tag.Mtree)],
       ['version', shortUIntConst(1)],
-      ['values', FIELD_TYPES.rlpBinaries],
+      ['values', array(entry())],
     ],
   },
   [Tag.MtreeValue]: {
@@ -654,42 +650,42 @@ export const TX_SCHEMA = {
     1: [
       ['tag', shortUIntConst(Tag.ContractsMtree)],
       ['version', shortUIntConst(1)],
-      ['contracts', FIELD_TYPES.rlpBinary],
+      ['contracts', entry()],
     ],
   },
   [Tag.CallsMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.CallsMtree)],
       ['version', shortUIntConst(1)],
-      ['calls', FIELD_TYPES.rlpBinary],
+      ['calls', entry()],
     ],
   },
   [Tag.ChannelsMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelsMtree)],
       ['version', shortUIntConst(1)],
-      ['channels', FIELD_TYPES.rlpBinary],
+      ['channels', entry()],
     ],
   },
   [Tag.NameserviceMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.NameserviceMtree)],
       ['version', shortUIntConst(1)],
-      ['mtree', FIELD_TYPES.rlpBinary],
+      ['mtree', entry()],
     ],
   },
   [Tag.OraclesMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.OraclesMtree)],
       ['version', shortUIntConst(1)],
-      ['otree', FIELD_TYPES.rlpBinary],
+      ['otree', entry()],
     ],
   },
   [Tag.AccountsMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.AccountsMtree)],
       ['version', shortUIntConst(1)],
-      ['accounts', FIELD_TYPES.rlpBinary],
+      ['accounts', entry()],
     ],
   },
   [Tag.GaAttachTx]: {
@@ -718,7 +714,7 @@ export const TX_SCHEMA = {
       ['fee', fee],
       ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
-      ['tx', FIELD_TYPES.rlpBinary],
+      ['tx', entry()],
     ],
   },
   [Tag.PayingForTx]: {
@@ -728,7 +724,7 @@ export const TX_SCHEMA = {
       ['payerId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['fee', fee],
-      ['tx', FIELD_TYPES.rlpBinary],
+      ['tx', entry()],
     ],
   },
   [Tag.CompilerSophia]: {
