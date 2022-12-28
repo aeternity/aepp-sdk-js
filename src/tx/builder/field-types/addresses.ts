@@ -1,10 +1,11 @@
 import genAddressField, { AddressEncodings } from './address';
+import { Encoded } from '../../../utils/encoder';
 
 export default function genAddressesField<Encoding extends AddressEncodings>(
   ...encodings: Encoding[]
 ): {
-    serialize: (value: Array<`${Encoding}_${string}`>) => Buffer[];
-    deserialize: (value: Buffer[]) => Array<`${Encoding}_${string}`>;
+    serialize: (value: Array<Encoded.Generic<Encoding>>) => Buffer[];
+    deserialize: (value: Buffer[]) => Array<Encoded.Generic<Encoding>>;
   } {
   const address = genAddressField(...encodings);
 

@@ -5,6 +5,7 @@ import _coinAmount from './coin-amount';
 import _address from './address';
 import _addresses from './addresses';
 import _deposit from './deposit';
+import _encoded from './encoded';
 import _entry from './entry';
 import _enumeration from './enumeration';
 import _fee from './fee';
@@ -26,6 +27,7 @@ const coinAmount = _coinAmount;
 const address = _address;
 const addresses = _addresses;
 const deposit = _deposit;
+const encoded = _encoded;
 const entry = _entry;
 const enumeration = _enumeration;
 const fee = _fee;
@@ -53,6 +55,7 @@ export {
   address,
   addresses,
   deposit,
+  encoded,
   entry,
   enumeration,
   fee,

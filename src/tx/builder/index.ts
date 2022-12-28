@@ -34,7 +34,6 @@ import { isKeyOfObject } from '../../utils/other';
 function deserializeField(
   value: any,
   type: FIELD_TYPES | Field,
-  prefix?: Encoding | Encoding[],
 ): any {
   if (value == null) return '';
   switch (type) {
@@ -47,8 +46,6 @@ function deserializeField(
     }
     case FIELD_TYPES.bool:
       return value[0] === 1;
-    case FIELD_TYPES.binary:
-      return encode(value, prefix as Encoding);
     case FIELD_TYPES.stateTree:
       return encode(value, Encoding.StateTrees);
     case FIELD_TYPES.payload:
@@ -90,8 +87,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
   switch (type) {
     case FIELD_TYPES.bool:
       return Buffer.from([(value === true) ? 1 : 0]);
-    case FIELD_TYPES.binary:
-      return decode(value);
     case FIELD_TYPES.stateTree:
       return decode(value);
     case FIELD_TYPES.hex:
@@ -136,9 +131,9 @@ function unpackRawTx<Tx extends TxSchema>(
     .reduce<any>(
     (
       acc,
-      [key, fieldType, prefix],
+      [key, fieldType],
       index,
-    ) => Object.assign(acc, { [key]: deserializeField(binary[index], fieldType, prefix) }),
+    ) => Object.assign(acc, { [key]: deserializeField(binary[index], fieldType) }),
     {},
   );
 }
