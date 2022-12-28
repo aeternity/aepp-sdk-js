@@ -9,7 +9,7 @@ import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
   address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array,
+  array, boolean,
 } from './field-types';
 import { Encoding } from '../../utils/encoder';
 import { KeysOfUnion, UnionToIntersection } from '../../utils/other';
@@ -103,14 +103,12 @@ export interface CtVersion {
  * @category transaction builder
  */
 export enum FIELD_TYPES {
-  bool,
   hex,
   ctVersion,
   sophiaCodeTypeInfo,
 }
 
 interface BuildFieldTypes {
-  [FIELD_TYPES.bool]: Boolean;
   [FIELD_TYPES.hex]: string;
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
@@ -265,7 +263,7 @@ export const TX_SCHEMA = {
       ['ctVersion', FIELD_TYPES.ctVersion],
       ['code', encoded(Encoding.ContractBytearray)],
       ['log', encoded(Encoding.ContractBytearray)],
-      ['active', FIELD_TYPES.bool],
+      ['active', boolean],
       ['referers', array(address(Encoding.AccountAddress))],
       ['deposit', deposit],
     ],
@@ -735,7 +733,7 @@ export const TX_SCHEMA = {
       ['typeInfo', FIELD_TYPES.sophiaCodeTypeInfo],
       ['byteCode', raw],
       ['compilerVersion', string],
-      ['payable', FIELD_TYPES.bool],
+      ['payable', boolean],
     ],
   },
 } as const;

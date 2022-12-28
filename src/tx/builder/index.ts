@@ -45,8 +45,6 @@ function deserializeField(
         abiVersion: +readInt(Buffer.from([abi])),
       };
     }
-    case FIELD_TYPES.bool:
-      return value[0] === 1;
     case FIELD_TYPES.hex:
       return value.toString('hex');
     case FIELD_TYPES.sophiaCodeTypeInfo:
@@ -73,8 +71,6 @@ function deserializeField(
 
 function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any {
   switch (type) {
-    case FIELD_TYPES.bool:
-      return Buffer.from([(value === true) ? 1 : 0]);
     case FIELD_TYPES.hex:
       return Buffer.from(value, 'hex');
     case FIELD_TYPES.ctVersion:

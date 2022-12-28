@@ -1,5 +1,6 @@
 import _address from './address';
 import _array from './array';
+import _boolean from './boolean';
 import _coinAmount from './coin-amount';
 import _deposit from './deposit';
 import _encoded from './encoded';
@@ -23,6 +24,7 @@ import _uInt from './u-int';
 // TODO: remove after fixing https://github.com/Gerrit0/typedoc-plugin-missing-exports/issues/15
 const address = _address;
 const array = _array;
+const boolean = _boolean;
 const coinAmount = _coinAmount;
 const deposit = _deposit;
 const encoded = _encoded;
@@ -52,6 +54,7 @@ export interface Field {
 export {
   address,
   array,
+  boolean,
   coinAmount,
   deposit,
   encoded,
