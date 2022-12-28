@@ -20,7 +20,7 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { decode as rlpDecode } from 'rlp';
 import type { Input } from 'rlp';
-import genMPTreesField from '../../src/tx/builder/field-types/mptrees';
+import genMPTreeField from '../../src/tx/builder/field-types/mptree';
 import {
   Encoding,
   Tag,
@@ -31,10 +31,10 @@ import {
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
-const field = genMPTreesField(Encoding.AccountAddress, Tag.Account);
-type MPTreeBinary = Parameters<typeof field.deserialize>[0][0];
-const deserialize = (d: MPTreeBinary): ReturnType<typeof field.deserialize>[0] => (
-  field.deserialize([d], { unpackTx })[0]
+const field = genMPTreeField(Encoding.AccountAddress, Tag.Account);
+type MPTreeBinary = Parameters<typeof field.deserialize>[0];
+const deserialize = (d: MPTreeBinary): ReturnType<typeof field.deserialize> => (
+  field.deserialize(d, { unpackTx })
 );
 const hexToTreeBinary = (hex: string): MPTreeBinary => rlpDecode(Buffer.from(hex, 'hex') as Input) as MPTreeBinary;
 
@@ -62,7 +62,7 @@ describe('Merkle Patricia Tree', () => {
 
   it('can serialize', () => {
     const tree = deserialize(binary);
-    expect(field.serialize([tree])).to.be.eql([binary]);
+    expect(field.serialize(tree)).to.be.eql(binary);
   });
 
   it('can retrieve values', () => {

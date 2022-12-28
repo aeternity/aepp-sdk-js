@@ -226,17 +226,17 @@ class MPTree<E extends Encoding, T extends Tag> {
   }
 }
 
-export default function genMPTreesField<E extends Encoding, T extends Tag>(encoding: E, tag: T): {
-  serialize: (value: Array<MPTree<E, T>>) => MPTreeBinary[];
-  deserialize: (value: MPTreeBinary[], o: { unpackTx: typeof unpackTx }) => Array<MPTree<E, T>>;
+export default function genMPTreeField<E extends Encoding, T extends Tag>(encoding: E, tag: T): {
+  serialize: (value: MPTree<E, T>) => MPTreeBinary;
+  deserialize: (value: MPTreeBinary, o: { unpackTx: typeof unpackTx }) => MPTree<E, T>;
 } {
   return {
     serialize(value) {
-      return value.map((el) => el.serialize());
+      return value.serialize();
     },
 
     deserialize(value, { unpackTx }) {
-      return value.map((el) => new MPTree(el, encoding, tag, unpackTx));
+      return new MPTree(value, encoding, tag, unpackTx);
     },
   };
 }

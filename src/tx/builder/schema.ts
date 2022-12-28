@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, addresses, pointers, entry, enumeration, mptrees, shortUIntConst, string, encoded, raw,
+  address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
   array,
 } from './field-types';
 import { Encoding } from '../../utils/encoder';
@@ -270,7 +270,7 @@ export const TX_SCHEMA = {
       ['code', encoded(Encoding.ContractBytearray)],
       ['log', encoded(Encoding.ContractBytearray)],
       ['active', FIELD_TYPES.bool],
-      ['referers', addresses(Encoding.AccountAddress)],
+      ['referers', array(address(Encoding.AccountAddress))],
       ['deposit', deposit],
     ],
   },
@@ -407,8 +407,8 @@ export const TX_SCHEMA = {
       ['lockPeriod', uInt],
       ['ttl', shortUInt],
       ['fee', fee],
-      ['initiatorDelegateIds', addresses(...idTagToEncoding)],
-      ['responderDelegateIds', addresses(...idTagToEncoding)],
+      ['initiatorDelegateIds', array(address(...idTagToEncoding))],
+      ['responderDelegateIds', array(address(...idTagToEncoding))],
       ['stateHash', encoded(Encoding.State)],
       ['nonce', shortUInt],
     ],
@@ -528,8 +528,8 @@ export const TX_SCHEMA = {
       ['initiatorAmount', uInt],
       ['responderAmount', uInt],
       ['channelReserve', uInt],
-      ['initiatorDelegateIds', addresses(...idTagToEncoding)],
-      ['responderDelegateIds', addresses(...idTagToEncoding)],
+      ['initiatorDelegateIds', array(address(...idTagToEncoding))],
+      ['responderDelegateIds', array(address(...idTagToEncoding))],
       ['stateHash', FIELD_TYPES.hex],
       ['round', shortUInt],
       ['soloRound', uInt],
@@ -615,12 +615,12 @@ export const TX_SCHEMA = {
     1: [
       ['tag', shortUIntConst(Tag.TreesPoi)],
       ['version', shortUIntConst(1)],
-      ['accounts', mptrees(Encoding.AccountAddress, Tag.Account)],
-      ['calls', mptrees(Encoding.Bytearray, Tag.ContractCall)],
-      ['channels', mptrees(Encoding.Channel, Tag.Channel)],
-      ['contracts', mptrees(Encoding.ContractAddress, Tag.Contract)],
-      ['ns', mptrees(Encoding.Name, Tag.Name)],
-      ['oracles', mptrees(Encoding.OracleAddress, Tag.Oracle)],
+      ['accounts', array(mptree(Encoding.AccountAddress, Tag.Account))],
+      ['calls', array(mptree(Encoding.Bytearray, Tag.ContractCall))],
+      ['channels', array(mptree(Encoding.Channel, Tag.Channel))],
+      ['contracts', array(mptree(Encoding.ContractAddress, Tag.Contract))],
+      ['ns', array(mptree(Encoding.Name, Tag.Name))],
+      ['oracles', array(mptree(Encoding.OracleAddress, Tag.Oracle))],
     ],
   },
   [Tag.StateTrees]: {

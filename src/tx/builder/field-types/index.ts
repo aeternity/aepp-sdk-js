@@ -1,5 +1,4 @@
 import _address from './address';
-import _addresses from './addresses';
 import _array from './array';
 import _coinAmount from './coin-amount';
 import _deposit from './deposit';
@@ -10,7 +9,7 @@ import _fee from './fee';
 import _field from './field';
 import _gasLimit from './gas-limit';
 import _gasPrice from './gas-price';
-import _mptrees from './mptrees';
+import _mptree from './mptree';
 import _name from './name';
 import _nameFee from './name-fee';
 import _nameId from './name-id';
@@ -23,7 +22,6 @@ import _uInt from './u-int';
 
 // TODO: remove after fixing https://github.com/Gerrit0/typedoc-plugin-missing-exports/issues/15
 const address = _address;
-const addresses = _addresses;
 const array = _array;
 const coinAmount = _coinAmount;
 const deposit = _deposit;
@@ -34,7 +32,7 @@ const fee = _fee;
 const field = _field;
 const gasLimit = _gasLimit;
 const gasPrice = _gasPrice;
-const mptrees = _mptrees;
+const mptree = _mptree;
 const name = _name;
 const nameFee = _nameFee;
 const nameId = _nameId;
@@ -53,7 +51,6 @@ export interface Field {
 
 export {
   address,
-  addresses,
   array,
   coinAmount,
   deposit,
@@ -64,7 +61,7 @@ export {
   field,
   gasLimit,
   gasPrice,
-  mptrees,
+  mptree,
   name,
   nameFee,
   nameId,
