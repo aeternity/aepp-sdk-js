@@ -23,7 +23,7 @@
  * These methods provide ability to create native transactions.
  */
 import {
-  ABI_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TTL, TxParamsCommon,
+  ABI_VERSIONS, VM_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TTL, TxParamsCommon,
 } from './builder/schema';
 import { Tag } from './builder/constants';
 import {
@@ -38,85 +38,26 @@ import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
   Omit<Parameters<typeof _buildTx<TxType>>[1], OmitFields>;
 
-/**
- * Validated vm/abi version or get default based on transaction type and NODE version
- * @category transaction builder
- * @param txType - Type of transaction
- * @param ctVersion - Object with vm and abi version fields
- * @returns Object with vm/abi version
- */
-async function getVmVersion(
-  txType: Tag.ContractCreateTx, ctVersion: Partial<CtVersion> & { onNode: Node }
-): Promise<CtVersion>;
-async function getVmVersion(
-  txType: Tag, ctVersion: Partial<Pick<CtVersion, 'abiVersion'>> & { onNode: Node }
-): Promise<Pick<CtVersion, 'abiVersion'>>;
-async function getVmVersion(
-  txType: Tag,
-  { vmVersion, abiVersion, onNode }: Partial<CtVersion> & { onNode: Node },
-): Promise<Partial<CtVersion>> {
-  const { consensusProtocolVersion } = await onNode.getNodeInfo();
-  if (!isKeyOfObject(consensusProtocolVersion, PROTOCOL_VM_ABI)) {
-    throw new UnsupportedProtocolError('Not supported consensus protocol version');
-  }
-  const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion];
-  if (!isKeyOfObject(txType, supportedProtocol)) {
-    throw new UnknownTxError('Not supported tx type');
-  }
-  const protocolForTX = supportedProtocol[txType];
-  abiVersion ??= protocolForTX.abiVersion[0];
-  vmVersion ??= protocolForTX.vmVersion[0];
-  return { vmVersion, abiVersion };
-}
-
-/**
- * Calculate fee, get absolute ttl (ttl + height), get account nonce
- * @category transaction builder
- * @param txType - Type of transaction
- * @param params - Object which contains all tx data
- * @returns Object with account nonce, absolute ttl and transaction fee
- */
-async function prepareTxParams(
-  txType: Tag,
-  {
-    senderId,
-    nonce,
-    ttl = TX_TTL,
-    absoluteTtl,
-    strategy,
-    onNode,
-  }: {
-    senderId: Encoded.AccountAddress;
-    absoluteTtl?: boolean;
-    strategy?: 'continuity' | 'max';
-    onNode: Node;
-  } & Pick<TxParamsCommon, 'nonce' | 'ttl'>,
-): Promise<{ ttl: number; nonce: number }> {
-  nonce ??= (
-    await onNode.getAccountNextNonce(senderId, { strategy }).catch((error) => {
-      if (!isAccountNotFoundError(error)) throw error;
-      return { nextNonce: 1 };
-    })
-  ).nextNonce;
-
-  if (ttl !== 0) {
-    if (ttl < 0) throw new ArgumentError('ttl', 'greater or equal to 0', ttl);
-    ttl += absoluteTtl === true ? 0 : (await onNode.getCurrentKeyBlock()).height;
-  }
-
-  return { ttl, nonce };
-}
-
 // TODO: find a better name or rearrange methods
 /**
  * @category transaction builder
  */
 export async function _buildTx<TxType extends Tag>(
   txType: TxType,
-  { denomination, absoluteTtl, ..._params }:
-  Omit<Parameters<typeof syncBuildTx<TxType>>[0], 'tag' | 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'>
-  & { denomination?: AE_AMOUNT_FORMATS }
-  & Omit<Parameters<typeof prepareTxParams>[1], 'senderId'>
+  {
+    denomination, absoluteTtl, strategy, onNode, ..._params
+  }: Omit<
+  Parameters<typeof syncBuildTx<TxType>>[0],
+  'tag' | 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'
+  >
+  & {
+    denomination?: AE_AMOUNT_FORMATS;
+    absoluteTtl?: boolean;
+    strategy?: 'continuity' | 'max';
+    onNode: Node;
+    ttl?: number;
+    nonce?: number;
+  }
   & (TxType extends Tag.OracleExtendTx | Tag.OracleResponseTx
     ? { callerId: Encoded.AccountAddress } : {})
   & (TxType extends Tag.ContractCreateTx | Tag.GaAttachTx ? { ctVersion?: CtVersion } : {})
@@ -163,16 +104,32 @@ export async function _buildTx<TxType extends Tag>(
     default:
       throw new ArgumentError('txType', 'valid transaction type', txType);
   }
+
   // TODO: move specific cases to field-types
-  if ([Tag.ContractCreateTx, Tag.GaAttachTx].includes(txType)) {
-    params.ctVersion = await getVmVersion(
-      Tag.ContractCreateTx,
-      { ...params, ...params.ctVersion },
-    );
+  const isContractCreate = (Tag.ContractCreateTx === txType || Tag.GaAttachTx === txType)
+    && params.ctVersion == null;
+  const isContractCall = (Tag.ContractCallTx === txType || Tag.GaMetaTx === txType)
+    && params.abiVersion == null;
+  if (isContractCreate || isContractCall) {
+    const { consensusProtocolVersion } = await onNode.getNodeInfo();
+    if (!isKeyOfObject(consensusProtocolVersion, PROTOCOL_VM_ABI)) {
+      throw new UnsupportedProtocolError('Not supported consensus protocol version');
+    }
+    const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion];
+    const tag = isContractCreate ? Tag.ContractCreateTx : Tag.ContractCallTx;
+    if (!isKeyOfObject(tag, supportedProtocol)) {
+      throw new UnknownTxError('Not supported tx type');
+    }
+    const protocolForTX = supportedProtocol[tag];
+
+    if (isContractCreate) {
+      params.ctVersion = {
+        vmVersion: protocolForTX.vmVersion[0] as VM_VERSIONS,
+        abiVersion: protocolForTX.abiVersion[0],
+      };
+    } else [params.abiVersion] = protocolForTX.abiVersion;
   }
-  if ([Tag.ContractCallTx, Tag.GaMetaTx].includes(txType)) {
-    params.abiVersion = (await getVmVersion(Tag.ContractCallTx, params)).abiVersion;
-  }
+
   if (txType === Tag.OracleRegisterTx) {
     params.abiVersion ??= ABI_VERSIONS.NO_ABI;
   }
@@ -182,6 +139,19 @@ export async function _buildTx<TxType extends Tag>(
   const senderId = params[senderKey];
   // TODO: do this check on TypeScript level
   if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`);
-  const extraParams = await prepareTxParams(txType, { ...params, senderId, absoluteTtl });
-  return syncBuildTx({ ...params, ...extraParams, tag: txType } as any, { denomination });
+
+  params.nonce ??= (
+    await onNode.getAccountNextNonce(senderId, { strategy }).catch((error) => {
+      if (!isAccountNotFoundError(error)) throw error;
+      return { nextNonce: 1 };
+    })
+  ).nextNonce;
+
+  params.ttl ??= TX_TTL;
+  if (params.ttl !== 0) {
+    if (params.ttl < 0) throw new ArgumentError('ttl', 'greater or equal to 0', params.ttl);
+    params.ttl += absoluteTtl === true ? 0 : (await onNode.getCurrentKeyBlock()).height;
+  }
+
+  return syncBuildTx({ ...params, tag: txType } as any, { denomination });
 }
