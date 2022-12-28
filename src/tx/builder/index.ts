@@ -45,8 +45,6 @@ function deserializeField(
         abiVersion: +readInt(Buffer.from([abi])),
       };
     }
-    case FIELD_TYPES.hex:
-      return value.toString('hex');
     case FIELD_TYPES.sophiaCodeTypeInfo:
       return value.reduce(
         (acc: object, [funHash, fnName, argType, outType]: [
@@ -71,8 +69,6 @@ function deserializeField(
 
 function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any {
   switch (type) {
-    case FIELD_TYPES.hex:
-      return Buffer.from(value, 'hex');
     case FIELD_TYPES.ctVersion:
       if (value.vmVersion == null || value.vmVersion == null) {
         throw new InvalidTxParamsError('`ctVersion` must be an object with `vmVersion` and `abiVersion` fields');

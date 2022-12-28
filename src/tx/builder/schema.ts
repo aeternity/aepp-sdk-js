@@ -103,13 +103,11 @@ export interface CtVersion {
  * @category transaction builder
  */
 export enum FIELD_TYPES {
-  hex,
   ctVersion,
   sophiaCodeTypeInfo,
 }
 
 interface BuildFieldTypes {
-  [FIELD_TYPES.hex]: string;
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
 }
@@ -524,7 +522,7 @@ export const TX_SCHEMA = {
       ['channelReserve', uInt],
       ['initiatorDelegateIds', array(address(...idTagToEncoding))],
       ['responderDelegateIds', array(address(...idTagToEncoding))],
-      ['stateHash', FIELD_TYPES.hex],
+      ['stateHash', encoded(Encoding.State)],
       ['round', shortUInt],
       ['soloRound', uInt],
       ['lockPeriod', uInt],
@@ -640,7 +638,7 @@ export const TX_SCHEMA = {
     1: [
       ['tag', shortUIntConst(Tag.MtreeValue)],
       ['version', shortUIntConst(1)],
-      ['key', FIELD_TYPES.hex],
+      ['key', raw],
       ['value', raw],
     ],
   },
