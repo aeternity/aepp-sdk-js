@@ -145,7 +145,7 @@ export enum Tag {
   NameserviceMtree = 624,
   OraclesMtree = 625,
   AccountsMtree = 626,
-  CompilerSophia = 70,
+  // CompilerSophia = 70,
   GaAttachTx = 80,
   GaMetaTx = 81,
   PayingForTx = 82,

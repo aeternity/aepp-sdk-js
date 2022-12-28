@@ -4,9 +4,8 @@ import {
 } from '../../utils/encoder';
 import { AE_AMOUNT_FORMATS } from '../../utils/amount-formatter';
 import { hash } from '../../utils/crypto';
-import { Field } from './field-types';
+import { BinaryData, Field } from './field-types';
 import {
-  FIELD_TYPES,
   RawTxObject,
   TX_SCHEMA,
   TxField,
@@ -17,57 +16,12 @@ import {
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
-import {
-  ArgumentError,
-  DecodeError,
-  InternalError,
-  SchemaNotFoundError,
-} from '../../utils/errors';
+import { ArgumentError, DecodeError, SchemaNotFoundError } from '../../utils/errors';
 import { isKeyOfObject } from '../../utils/other';
 
 /**
  * JavaScript-based Transaction builder
  */
-
-// SERIALIZE AND DESERIALIZE PART
-function deserializeField(
-  value: any,
-  type: FIELD_TYPES | Field,
-): any {
-  if (value == null) return '';
-  switch (type) {
-    case FIELD_TYPES.sophiaCodeTypeInfo:
-      return value.reduce(
-        (acc: object, [funHash, fnName, argType, outType]: [
-          funHash: Buffer,
-          fnName: string,
-          argType: string,
-          outType: string,
-        ]) => ({
-          ...acc,
-          [fnName.toString()]: { funHash, argType, outType },
-        }),
-        {},
-      );
-    default:
-      if (typeof type === 'number') {
-        throw new InternalError(`No matching handler for ${FIELD_TYPES[type]} transaction field`);
-      }
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return type.deserialize(value, { unpackTx });
-  }
-}
-
-function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any {
-  switch (type) {
-    default:
-      if (typeof type === 'number') {
-        throw new InternalError(`No matching handler for ${FIELD_TYPES[type]} transaction field`);
-      }
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return type.serialize(value, { ...params, unpackTx, buildTx });
-  }
-}
 
 /**
  * Unpack binary transaction
@@ -87,9 +41,13 @@ function unpackRawTx<Tx extends TxSchema>(
     .reduce<any>(
     (
       acc,
-      [key, fieldType],
+      [name, field],
       index,
-    ) => Object.assign(acc, { [key]: deserializeField(binary[index], fieldType) }),
+    ) => {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      const deserialized = field.deserialize(binary[index] as BinaryData, { unpackTx });
+      return { ...acc, [name]: deserialized };
+    },
     {},
   );
 }
@@ -132,12 +90,14 @@ export function buildTx<
   }
   const schema = schemas[params.version] as unknown as TxField[];
 
-  const binary = schema.map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES | Field]) => (
-    serializeField(
+  const binary = schema.map(([key, field]: [keyof TxSchema, Field]) => (
+    field.serialize(
       params[key],
-      fieldType,
       {
         ...params,
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        unpackTx,
+        buildTx,
         denomination,
         rebuildTx: (overrideParams: any) => buildTx(
           { ...params, ...overrideParams },

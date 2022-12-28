@@ -49,7 +49,8 @@ const shortUIntConst = _shortUIntConst;
 const string = _string;
 const uInt = _uInt;
 
-type BinaryData = Buffer | Buffer[] | Buffer[][] | Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
+export type BinaryData = Buffer | Buffer[] | Buffer[][]
+| Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
 export interface Field {
   serialize: (value: any, options: any) => BinaryData;
   deserialize: (value: BinaryData, options: any) => any;

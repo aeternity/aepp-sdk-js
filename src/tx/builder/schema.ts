@@ -35,7 +35,7 @@ export const DRY_RUN_ACCOUNT = {
 
 export type TxField = [
   name: string,
-  type: FIELD_TYPES | Field,
+  type: Field,
 ];
 
 export enum CallReturnType {
@@ -44,25 +44,9 @@ export enum CallReturnType {
   Revert = 2,
 }
 
-/**
- * @category transaction builder
- */
-export enum FIELD_TYPES {
-  sophiaCodeTypeInfo,
-}
+type TxElem = readonly [string, Field];
 
-interface BuildFieldTypes {
-  [FIELD_TYPES.sophiaCodeTypeInfo]: any;
-}
-
-type TxElem = readonly [string, FIELD_TYPES | Field];
-
-type BuildTxArgBySchemaType<Type extends FIELD_TYPES | Field> =
-  Type extends Field
-    ? Parameters<Type['serialize']>[0]
-    : Type extends FIELD_TYPES
-      ? BuildFieldTypes[Type]
-      : never;
+type BuildTxArgBySchemaType<Type extends Field> = Parameters<Type['serialize']>[0];
 
 type NullablePartial<
   T,
@@ -664,17 +648,6 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
       ['fee', fee],
       ['tx', entry()],
-    ],
-  },
-  [Tag.CompilerSophia]: {
-    3: [
-      ['tag', shortUIntConst(Tag.CompilerSophia)],
-      ['version', shortUIntConst(3)],
-      ['sourceCodeHash', raw],
-      ['typeInfo', FIELD_TYPES.sophiaCodeTypeInfo],
-      ['byteCode', raw],
-      ['compilerVersion', string],
-      ['payable', boolean],
     ],
   },
 } as const;
