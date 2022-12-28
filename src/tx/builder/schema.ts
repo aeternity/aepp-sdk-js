@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, addresses, pointers, entry, enumeration, mptrees, shortUIntConst,
+  address, addresses, pointers, entry, enumeration, mptrees, shortUIntConst, string,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
 import { KeysOfUnion, UnionToIntersection } from '../../utils/other';
@@ -109,7 +109,6 @@ export interface CtVersion {
  * @category transaction builder
  */
 export enum FIELD_TYPES {
-  string,
   binary,
   bool,
   hex,
@@ -125,7 +124,6 @@ export enum FIELD_TYPES {
 }
 
 interface BuildFieldTypes<Prefix extends undefined | Encoding | readonly Encoding[]> {
-  [FIELD_TYPES.string]: string;
   [FIELD_TYPES.binary]: PrefixType<Prefix>;
   [FIELD_TYPES.bool]: Boolean;
   [FIELD_TYPES.hex]: string;
@@ -353,8 +351,8 @@ export const TX_SCHEMA = {
       ['tag', shortUIntConst(Tag.Oracle)],
       ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
-      ['queryFormat', FIELD_TYPES.string],
-      ['responseFormat', FIELD_TYPES.string],
+      ['queryFormat', string],
+      ['responseFormat', string],
       ['queryFee', coinAmount],
       ['oracleTtlValue', shortUInt],
       ['abiVersion', enumeration(ABI_VERSIONS)],
@@ -366,8 +364,8 @@ export const TX_SCHEMA = {
       ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
-      ['queryFormat', FIELD_TYPES.string],
-      ['responseFormat', FIELD_TYPES.string],
+      ['queryFormat', string],
+      ['responseFormat', string],
       ['queryFee', coinAmount],
       ['oracleTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['oracleTtlValue', shortUInt],
@@ -395,7 +393,7 @@ export const TX_SCHEMA = {
       ['senderId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['oracleId', address(Encoding.OracleAddress, Encoding.Name)],
-      ['query', FIELD_TYPES.string],
+      ['query', string],
       ['queryFee', coinAmount],
       ['queryTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['queryTtlValue', shortUInt],
@@ -412,7 +410,7 @@ export const TX_SCHEMA = {
       ['oracleId', address(Encoding.OracleAddress)],
       ['nonce', shortUInt],
       ['queryId', FIELD_TYPES.binary, Encoding.OracleQueryId],
-      ['response', FIELD_TYPES.string],
+      ['response', string],
       ['responseTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['responseTtlValue', shortUInt],
       ['fee', fee],
@@ -631,7 +629,7 @@ export const TX_SCHEMA = {
       ['version', shortUIntConst(1)],
       ['channelId', address(Encoding.Channel)],
       ['round', shortUInt],
-      ['role', FIELD_TYPES.string],
+      ['role', string],
       ['pubkey', address(Encoding.AccountAddress)],
     ],
   },
@@ -762,7 +760,7 @@ export const TX_SCHEMA = {
       ['sourceCodeHash', FIELD_TYPES.rawBinary],
       ['typeInfo', FIELD_TYPES.sophiaCodeTypeInfo],
       ['byteCode', FIELD_TYPES.rawBinary],
-      ['compilerVersion', FIELD_TYPES.string],
+      ['compilerVersion', string],
       ['payable', FIELD_TYPES.bool],
     ],
   },

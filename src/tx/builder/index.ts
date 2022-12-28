@@ -51,8 +51,6 @@ function deserializeField(
       return encode(value, prefix as Encoding);
     case FIELD_TYPES.stateTree:
       return encode(value, Encoding.StateTrees);
-    case FIELD_TYPES.string:
-      return value.toString();
     case FIELD_TYPES.payload:
       return encode(value, Encoding.Bytearray);
     case FIELD_TYPES.rlpBinary:
@@ -104,8 +102,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       return typeof value === 'string' && value.split('_')[0] === 'ba'
         ? decode(value as Encoded.Bytearray)
         : toBytes(value);
-    case FIELD_TYPES.string:
-      return toBytes(value);
     case FIELD_TYPES.rlpBinary:
       if (ArrayBuffer.isView(value)) return value;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
