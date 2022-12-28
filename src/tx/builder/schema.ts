@@ -111,7 +111,6 @@ export enum FIELD_TYPES {
   callStack,
   ctVersion,
   sophiaCodeTypeInfo,
-  stateTree,
 }
 
 interface BuildFieldTypes {
@@ -124,7 +123,6 @@ interface BuildFieldTypes {
   [FIELD_TYPES.callStack]: any;
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
-  [FIELD_TYPES.stateTree]: any;
 }
 
 type TxElem = readonly [string, FIELD_TYPES | Field];
@@ -510,7 +508,7 @@ export const TX_SCHEMA = {
       ['round', shortUInt],
       ['update', encoded(Encoding.ContractBytearray)],
       ['stateHash', encoded(Encoding.State)],
-      ['offChainTrees', FIELD_TYPES.stateTree],
+      ['offChainTrees', encoded(Encoding.StateTrees)],
       ['ttl', shortUInt],
       ['fee', fee],
       ['nonce', shortUInt],

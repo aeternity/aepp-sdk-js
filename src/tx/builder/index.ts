@@ -46,8 +46,6 @@ function deserializeField(
     }
     case FIELD_TYPES.bool:
       return value[0] === 1;
-    case FIELD_TYPES.stateTree:
-      return encode(value, Encoding.StateTrees);
     case FIELD_TYPES.rlpBinary:
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return unpackTx(encode(value, Encoding.Transaction));
@@ -85,8 +83,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
   switch (type) {
     case FIELD_TYPES.bool:
       return Buffer.from([(value === true) ? 1 : 0]);
-    case FIELD_TYPES.stateTree:
-      return decode(value);
     case FIELD_TYPES.hex:
       return Buffer.from(value, 'hex');
     case FIELD_TYPES.signatures:
