@@ -1,7 +1,9 @@
+import _abiVersion from './abi-version';
 import _address from './address';
 import _array from './array';
 import _boolean from './boolean';
 import _coinAmount from './coin-amount';
+import _ctVersion from './ct-version';
 import _deposit from './deposit';
 import _encoded from './encoded';
 import _entry from './entry';
@@ -22,10 +24,12 @@ import _string from './string';
 import _uInt from './u-int';
 
 // TODO: remove after fixing https://github.com/Gerrit0/typedoc-plugin-missing-exports/issues/15
+const abiVersion = _abiVersion;
 const address = _address;
 const array = _array;
 const boolean = _boolean;
 const coinAmount = _coinAmount;
+const ctVersion = _ctVersion;
 const deposit = _deposit;
 const encoded = _encoded;
 const entry = _entry;
@@ -52,10 +56,12 @@ export interface Field {
 }
 
 export {
+  abiVersion,
   address,
   array,
   boolean,
   coinAmount,
+  ctVersion,
   deposit,
   encoded,
   entry,

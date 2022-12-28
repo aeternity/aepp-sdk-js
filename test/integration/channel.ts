@@ -27,6 +27,8 @@ import {
   encode,
   decode,
   Tag,
+  AbiVersion,
+  VmVersion,
   IllegalArgumentError,
   InsufficientBalanceError,
   ChannelConnectionError,
@@ -832,8 +834,8 @@ describe('Channel', () => {
       code: await contract.$compile(),
       callData,
       deposit: 1000,
-      vmVersion: 5,
-      abiVersion: 3,
+      vmVersion: VmVersion.Fate,
+      abiVersion: AbiVersion.Fate,
     }, initiatorSign);
     result.should.eql({
       accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx,
@@ -869,8 +871,8 @@ describe('Channel', () => {
       code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
       deposit: new BigNumber('10e18'),
-      vmVersion: 5,
-      abiVersion: 3,
+      vmVersion: VmVersion.Fate,
+      abiVersion: AbiVersion.Fate,
     }, initiatorSign);
     expect(initiatorCh.round()).to.equal(roundBefore);
     result.should.eql({ ...result, accepted: false });
@@ -883,8 +885,8 @@ describe('Channel', () => {
         code: await contract.$compile(),
         callData: contract._calldata.encode('Identity', 'init', []),
         deposit: new BigNumber('10e18'),
-        vmVersion: 5,
-        abiVersion: 3,
+        vmVersion: VmVersion.Fate,
+        abiVersion: AbiVersion.Fate,
       },
       async () => Promise.resolve(errorCode),
     );
@@ -897,8 +899,8 @@ describe('Channel', () => {
       code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
       deposit: new BigNumber('10e18'),
-      vmVersion: 5,
-      abiVersion: 3,
+      vmVersion: VmVersion.Fate,
+      abiVersion: AbiVersion.Fate,
     }, initiatorSign);
     result.should.eql({
       accepted: false,
@@ -925,7 +927,7 @@ describe('Channel', () => {
       amount: 0,
       callData: contract._calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
-      abiVersion: 3,
+      abiVersion: AbiVersion.Fate,
     }, initiatorSign);
     result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
     const round = initiatorCh.round();
@@ -939,7 +941,7 @@ describe('Channel', () => {
       amount: 0,
       callData: contract._calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
-      abiVersion: 3,
+      abiVersion: AbiVersion.Fate,
     }, initiatorSign);
     const hash = buildTxHash(forceTx.tx);
     const { callInfo } = await aeSdkInitiatior.api.getTransactionInfoByHash(hash);
@@ -954,7 +956,7 @@ describe('Channel', () => {
       amount: 0,
       callData: contract._calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
-      abiVersion: 3,
+      abiVersion: AbiVersion.Fate,
     }, initiatorSign);
     expect(initiatorCh.round()).to.equal(roundBefore);
     result.should.eql({ ...result, accepted: false });
@@ -967,7 +969,7 @@ describe('Channel', () => {
         amount: 0,
         callData: contract._calldata.encode('Identity', 'getArg', [42]),
         contract: contractAddress,
-        abiVersion: 3,
+        abiVersion: AbiVersion.Fate,
       },
       async () => Promise.resolve(errorCode),
     );
@@ -980,7 +982,7 @@ describe('Channel', () => {
       amount: 0,
       callData: contract._calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
-      abiVersion: 3,
+      abiVersion: AbiVersion.Fate,
     }, initiatorSign);
     result.should.eql({
       accepted: false,
@@ -1015,7 +1017,7 @@ describe('Channel', () => {
       amount: 0,
       callData: contract._calldata.encode('Identity', 'getArg', [42]),
       contract: contractAddress,
-      abiVersion: 3,
+      abiVersion: AbiVersion.Fate,
     });
     result.should.eql({
       callerId: aeSdkInitiatior.address,
@@ -1045,13 +1047,13 @@ describe('Channel', () => {
     const result = await initiatorCh.getContractState(contractAddress);
     result.should.eql({
       contract: {
-        abiVersion: 3,
+        abiVersion: AbiVersion.Fate,
         active: true,
         deposit: 1000,
         id: contractAddress,
         ownerId: aeSdkInitiatior.address,
         referrerIds: [],
-        vmVersion: 5,
+        vmVersion: VmVersion.Fate,
       },
       contractState: result.contractState,
     });

@@ -16,7 +16,9 @@
  */
 import BigNumber from 'bignumber.js';
 import { snakeToPascal } from '../utils/string';
-import { MIN_GAS_PRICE, Tag } from '../tx/builder/constants';
+import {
+  MIN_GAS_PRICE, Tag, AbiVersion, VmVersion,
+} from '../tx/builder/constants';
 import {
   signAndNotify,
   awaitingCompletion,
@@ -46,7 +48,7 @@ function snakeToPascalObjKeys<Type>(obj: object): Type {
 interface CallContractOptions {
   amount?: number | BigNumber;
   callData?: Encoded.ContractBytearray;
-  abiVersion?: number;
+  abiVersion?: AbiVersion;
   contract?: Encoded.ContractAddress;
   returnValue?: any;
   gasUsed?: number | BigNumber;
@@ -58,13 +60,13 @@ interface CallContractOptions {
 }
 
 interface Contract {
-  abiVersion: number;
+  abiVersion: AbiVersion;
   active: boolean;
   deposit: number | BigNumber;
   id: string;
   ownerId: string;
   referrerIds: string[];
-  vmVersion: number;
+  vmVersion: VmVersion;
 }
 
 export default class ChannelContract extends ChannelSpend {
@@ -113,8 +115,8 @@ export default class ChannelContract extends ChannelSpend {
       code: Encoded.ContractBytearray;
       callData: Encoded.ContractBytearray;
       deposit: number | BigNumber;
-      vmVersion: number;
-      abiVersion: number;
+      vmVersion: VmVersion;
+      abiVersion: AbiVersion;
     },
     sign: SignTx,
   ): Promise<{
@@ -293,7 +295,7 @@ export default class ChannelContract extends ChannelSpend {
       amount: number;
       callData: Encoded.ContractBytearray;
       contract: Encoded.ContractAddress;
-      abiVersion: number;
+      abiVersion: AbiVersion;
       gasLimit?: number;
       gasPrice?: number;
     },
@@ -389,7 +391,7 @@ export default class ChannelContract extends ChannelSpend {
       amount: number;
       callData: Encoded.ContractBytearray;
       contract: Encoded.ContractAddress;
-      abiVersion: number;
+      abiVersion: AbiVersion;
     },
   ): Promise<CallContractOptions> {
     return snakeToPascalObjKeys(await call(this, 'channels.dry_run.call_contract', {

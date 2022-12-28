@@ -58,6 +58,34 @@ export const NAME_BID_RANGES = mapObject({
   1: 5702887,
 }, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]);
 
+export enum ConsensusProtocolVersion {
+  Iris = 5,
+}
+
+/**
+ * @category transaction builder
+ * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
+ */
+export enum VmVersion {
+  NoVm = 0,
+  Sophia = 1,
+  SophiaImprovementsMinerva = 3,
+  SophiaImprovementsFortuna = 4,
+  Fate = 5,
+  SophiaImprovementsLima = 6,
+  Fate2 = 7,
+}
+
+/**
+ * @category transaction builder
+ * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
+ */
+export enum AbiVersion {
+  NoAbi = 0,
+  Sophia = 1,
+  Fate = 3,
+}
+
 /**
  * Enum with tag types
  * @category transaction builder

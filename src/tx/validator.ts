@@ -1,15 +1,10 @@
 import BigNumber from 'bignumber.js';
 import { hash, verify } from '../utils/crypto';
-import {
-  PROTOCOL_VM_ABI,
-  RawTxObject,
-  TxParamsCommon,
-  TxSchema,
-} from './builder/schema';
-import { Tag } from './builder/constants';
+import { RawTxObject, TxParamsCommon, TxSchema } from './builder/schema';
+import { ProtocolToVmAbi } from './builder/field-types/ct-version';
+import { Tag, ConsensusProtocolVersion } from './builder/constants';
 import { buildTx, unpackTx } from './builder';
-import { UnsupportedProtocolError } from '../utils/errors';
-import { concatBuffers, isAccountNotFoundError, isKeyOfObject } from '../utils/other';
+import { concatBuffers, isAccountNotFoundError } from '../utils/other';
 import { Encoded, decode } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
@@ -32,7 +27,7 @@ type Validator = (
     parentTxTypes: Tag[];
     node: Node;
     height: number;
-    consensusProtocolVersion: number;
+    consensusProtocolVersion: ConsensusProtocolVersion;
   }
 ) => ValidatorResult[] | Promise<ValidatorResult[]>;
 
@@ -180,25 +175,27 @@ validators.push(
     }];
   },
   ({ ctVersion, abiVersion, tag }, { consensusProtocolVersion }) => {
-    if (!isKeyOfObject(consensusProtocolVersion, PROTOCOL_VM_ABI)) {
-      throw new UnsupportedProtocolError(`Unsupported protocol: ${consensusProtocolVersion}`);
-    }
-    const protocol = PROTOCOL_VM_ABI[consensusProtocolVersion];
+    const oracleCall = Tag.Oracle === tag || Tag.OracleRegisterTx === tag;
+    const contractCreate = Tag.ContractCreateTx === tag || Tag.GaAttachTx === tag;
+    const contractCall = Tag.ContractCallTx === tag || Tag.GaMetaTx === tag;
+    const type = (oracleCall ? 'oracle-call' : null)
+      ?? (contractCreate ? 'contract-create' : null)
+      ?? (contractCall ? 'contract-call' : null);
+    if (type == null) return [];
+    // TODO: remove assertion after fixing buildTx types
+    const protocol = ProtocolToVmAbi[consensusProtocolVersion][type] as unknown as {
+      abiVersion: any[];
+      vmVersion: any[];
+    };
 
     // If not contract create tx
     if (ctVersion == null) ctVersion = { abiVersion };
-    const txProtocol = protocol[tag as keyof typeof protocol];
-    if (txProtocol == null) return [];
-    if (Object.entries(ctVersion).some(
-      ([
-        key,
-        value,
-      ]: [
-        key:keyof typeof txProtocol,
-        value:any]) => !(txProtocol[key].includes(+value as never)),
-    )) {
+    if (
+      !protocol.abiVersion.includes(ctVersion.abiVersion)
+      || (contractCreate && !protocol.vmVersion.includes(ctVersion.vmVersion))
+    ) {
       return [{
-        message: `ABI/VM version ${JSON.stringify(ctVersion)} is wrong, supported is: ${JSON.stringify(txProtocol)}`,
+        message: `ABI/VM version ${JSON.stringify(ctVersion)} is wrong, supported is: ${JSON.stringify(protocol)}`,
         key: 'VmAndAbiVersionMismatch',
         checkedKeys: ['ctVersion', 'abiVersion'],
       }];

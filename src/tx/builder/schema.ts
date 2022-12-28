@@ -9,7 +9,7 @@ import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
   address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array, boolean,
+  array, boolean, ctVersion, abiVersion,
 } from './field-types';
 import { Encoding } from '../../utils/encoder';
 import { KeysOfUnion, UnionToIntersection } from '../../utils/other';
@@ -38,30 +38,6 @@ export type TxField = [
   type: FIELD_TYPES | Field,
 ];
 
-/**
- * @category transaction builder
- * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
- */
-export enum VM_VERSIONS {
-  NO_VM = 0,
-  SOPHIA = 1,
-  SOPHIA_IMPROVEMENTS_MINERVA = 3,
-  SOPHIA_IMPROVEMENTS_FORTUNA = 4,
-  FATE = 5,
-  SOPHIA_IMPROVEMENTS_LIMA = 6,
-  FATE_2 = 7,
-}
-
-/**
- * @category transaction builder
- * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
- */
-export enum ABI_VERSIONS {
-  NO_ABI = 0,
-  SOPHIA = 1,
-  FATE = 3,
-}
-
 export enum CallReturnType {
   Ok = 0,
   Error = 1,
@@ -71,44 +47,11 @@ export enum CallReturnType {
 /**
  * @category transaction builder
  */
-export enum PROTOCOL_VERSIONS {
-  IRIS = 5,
-}
-
-// First abi/vm by default
-export const PROTOCOL_VM_ABI = {
-  [PROTOCOL_VERSIONS.IRIS]: {
-    [Tag.ContractCreateTx]: {
-      vmVersion: [VM_VERSIONS.FATE_2], abiVersion: [ABI_VERSIONS.FATE],
-    },
-    // TODO: Ensure that AEVM (SOPHIA?) is still available here
-    [Tag.ContractCallTx]: {
-      vmVersion: [], abiVersion: [ABI_VERSIONS.FATE, ABI_VERSIONS.SOPHIA],
-    },
-    [Tag.OracleRegisterTx]: {
-      vmVersion: [], abiVersion: [ABI_VERSIONS.NO_ABI, ABI_VERSIONS.SOPHIA],
-    },
-  },
-} as const;
-
-/**
- * @category transaction builder
- */
-export interface CtVersion {
-  vmVersion: VM_VERSIONS;
-  abiVersion: ABI_VERSIONS;
-}
-
-/**
- * @category transaction builder
- */
 export enum FIELD_TYPES {
-  ctVersion,
   sophiaCodeTypeInfo,
 }
 
 interface BuildFieldTypes {
-  [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
 }
 
@@ -258,7 +201,7 @@ export const TX_SCHEMA = {
       ['tag', shortUIntConst(Tag.Contract)],
       ['version', shortUIntConst(1)],
       ['owner', address(Encoding.AccountAddress)],
-      ['ctVersion', FIELD_TYPES.ctVersion],
+      ['ctVersion', ctVersion],
       ['code', encoded(Encoding.ContractBytearray)],
       ['log', encoded(Encoding.ContractBytearray)],
       ['active', boolean],
@@ -273,7 +216,7 @@ export const TX_SCHEMA = {
       ['ownerId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['code', encoded(Encoding.ContractBytearray)],
-      ['ctVersion', FIELD_TYPES.ctVersion],
+      ['ctVersion', ctVersion],
       ['fee', fee],
       ['ttl', shortUInt],
       ['deposit', deposit],
@@ -290,7 +233,7 @@ export const TX_SCHEMA = {
       ['callerId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['contractId', address(Encoding.ContractAddress, Encoding.Name)],
-      ['abiVersion', enumeration(ABI_VERSIONS)],
+      ['abiVersion', abiVersion],
       ['fee', fee],
       ['ttl', shortUInt],
       ['amount', coinAmount],
@@ -325,7 +268,7 @@ export const TX_SCHEMA = {
       ['responseFormat', string],
       ['queryFee', coinAmount],
       ['oracleTtlValue', shortUInt],
-      ['abiVersion', enumeration(ABI_VERSIONS)],
+      ['abiVersion', abiVersion],
     ],
   },
   [Tag.OracleRegisterTx]: {
@@ -341,7 +284,7 @@ export const TX_SCHEMA = {
       ['oracleTtlValue', shortUInt],
       ['fee', fee],
       ['ttl', shortUInt],
-      ['abiVersion', enumeration(ABI_VERSIONS)],
+      ['abiVersion', abiVersion],
     ],
   },
   [Tag.OracleExtendTx]: {
@@ -573,7 +516,7 @@ export const TX_SCHEMA = {
       ['tag', shortUIntConst(Tag.ChannelOffChainUpdateCreateContract)],
       ['version', shortUIntConst(1)],
       ['owner', address(Encoding.AccountAddress)],
-      ['ctVersion', FIELD_TYPES.ctVersion],
+      ['ctVersion', ctVersion],
       ['code', encoded(Encoding.ContractBytearray)],
       ['deposit', uInt],
       ['callData', encoded(Encoding.ContractBytearray)],
@@ -585,7 +528,7 @@ export const TX_SCHEMA = {
       ['version', shortUIntConst(1)],
       ['caller', address(Encoding.AccountAddress)],
       ['contract', address(Encoding.ContractAddress)],
-      ['abiVersion', enumeration(ABI_VERSIONS)],
+      ['abiVersion', abiVersion],
       ['amount', uInt],
       ['callData', encoded(Encoding.ContractBytearray)],
       ['callStack', raw],
@@ -692,7 +635,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
       ['code', encoded(Encoding.ContractBytearray)],
       ['authFun', raw],
-      ['ctVersion', FIELD_TYPES.ctVersion],
+      ['ctVersion', ctVersion],
       ['fee', fee],
       ['ttl', shortUInt],
       ['gasLimit', gasLimit],
@@ -706,7 +649,7 @@ export const TX_SCHEMA = {
       ['version', shortUIntConst(2)],
       ['gaId', address(Encoding.AccountAddress)],
       ['authData', encoded(Encoding.ContractBytearray)],
-      ['abiVersion', enumeration(ABI_VERSIONS)],
+      ['abiVersion', abiVersion],
       ['fee', fee],
       ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],

@@ -17,12 +17,10 @@ import {
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
-import { toBytes } from '../../utils/bytes';
 import {
   ArgumentError,
   DecodeError,
   InternalError,
-  InvalidTxParamsError,
   SchemaNotFoundError,
 } from '../../utils/errors';
 import { isKeyOfObject } from '../../utils/other';
@@ -38,13 +36,6 @@ function deserializeField(
 ): any {
   if (value == null) return '';
   switch (type) {
-    case FIELD_TYPES.ctVersion: {
-      const [vm, , abi] = value;
-      return {
-        vmVersion: +readInt(Buffer.from([vm])),
-        abiVersion: +readInt(Buffer.from([abi])),
-      };
-    }
     case FIELD_TYPES.sophiaCodeTypeInfo:
       return value.reduce(
         (acc: object, [funHash, fnName, argType, outType]: [
@@ -69,11 +60,6 @@ function deserializeField(
 
 function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any {
   switch (type) {
-    case FIELD_TYPES.ctVersion:
-      if (value.vmVersion == null || value.vmVersion == null) {
-        throw new InvalidTxParamsError('`ctVersion` must be an object with `vmVersion` and `abiVersion` fields');
-      }
-      return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
     default:
       if (typeof type === 'number') {
         throw new InternalError(`No matching handler for ${FIELD_TYPES[type]} transaction field`);

@@ -22,17 +22,13 @@
  * the creation of transactions to {@link Node}.
  * These methods provide ability to create native transactions.
  */
-import {
-  ABI_VERSIONS, VM_VERSIONS, CtVersion, PROTOCOL_VM_ABI, TX_TTL, TxParamsCommon,
-} from './builder/schema';
+import { TX_TTL, TxParamsCommon } from './builder/schema';
 import { Tag } from './builder/constants';
-import {
-  ArgumentError, UnsupportedProtocolError, UnknownTxError, InvalidTxParamsError,
-} from '../utils/errors';
+import { ArgumentError, InvalidTxParamsError } from '../utils/errors';
 import Node from '../Node';
 import { Encoded } from '../utils/encoder';
 import { buildTx as syncBuildTx, unpackTx } from './builder/index';
-import { isAccountNotFoundError, isKeyOfObject } from '../utils/other';
+import { isAccountNotFoundError } from '../utils/other';
 import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
 
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
@@ -46,10 +42,7 @@ export async function _buildTx<TxType extends Tag>(
   txType: TxType,
   {
     denomination, absoluteTtl, strategy, onNode, ..._params
-  }: Omit<
-  Parameters<typeof syncBuildTx<TxType>>[0],
-  'tag' | 'nonce' | 'ttl' | 'ctVersion' | 'abiVersion'
-  >
+  }: Omit<Parameters<typeof syncBuildTx<TxType>>[0], 'tag' | 'nonce' | 'ttl'>
   & {
     denomination?: AE_AMOUNT_FORMATS;
     absoluteTtl?: boolean;
@@ -59,10 +52,7 @@ export async function _buildTx<TxType extends Tag>(
     nonce?: number;
   }
   & (TxType extends Tag.OracleExtendTx | Tag.OracleResponseTx
-    ? { callerId: Encoded.AccountAddress } : {})
-  & (TxType extends Tag.ContractCreateTx | Tag.GaAttachTx ? { ctVersion?: CtVersion } : {})
-  & (TxType extends Tag.ContractCallTx | Tag.OracleRegisterTx
-    ? { abiVersion?: ABI_VERSIONS } : {}),
+    ? { callerId: Encoded.AccountAddress } : {}),
 ): Promise<Encoded.Transaction> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node };
@@ -105,34 +95,15 @@ export async function _buildTx<TxType extends Tag>(
       throw new ArgumentError('txType', 'valid transaction type', txType);
   }
 
-  // TODO: move specific cases to field-types
-  const isContractCreate = (Tag.ContractCreateTx === txType || Tag.GaAttachTx === txType)
-    && params.ctVersion == null;
-  const isContractCall = (Tag.ContractCallTx === txType || Tag.GaMetaTx === txType)
-    && params.abiVersion == null;
-  if (isContractCreate || isContractCall) {
+  if (
+    ((Tag.ContractCreateTx === txType || Tag.GaAttachTx === txType) && params.ctVersion == null)
+    || ((Tag.ContractCallTx === txType || Tag.GaMetaTx === txType) && params.abiVersion == null)
+  ) {
     const { consensusProtocolVersion } = await onNode.getNodeInfo();
-    if (!isKeyOfObject(consensusProtocolVersion, PROTOCOL_VM_ABI)) {
-      throw new UnsupportedProtocolError('Not supported consensus protocol version');
-    }
-    const supportedProtocol = PROTOCOL_VM_ABI[consensusProtocolVersion];
-    const tag = isContractCreate ? Tag.ContractCreateTx : Tag.ContractCallTx;
-    if (!isKeyOfObject(tag, supportedProtocol)) {
-      throw new UnknownTxError('Not supported tx type');
-    }
-    const protocolForTX = supportedProtocol[tag];
-
-    if (isContractCreate) {
-      params.ctVersion = {
-        vmVersion: protocolForTX.vmVersion[0] as VM_VERSIONS,
-        abiVersion: protocolForTX.abiVersion[0],
-      };
-    } else [params.abiVersion] = protocolForTX.abiVersion;
+    // @ts-expect-error remove after fixing buildTx types
+    params.consensusProtocolVersion = consensusProtocolVersion;
   }
 
-  if (txType === Tag.OracleRegisterTx) {
-    params.abiVersion ??= ABI_VERSIONS.NO_ABI;
-  }
   if (txType === Tag.PayingForTx) {
     params.tx = unpackTx(params.tx);
   }

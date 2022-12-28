@@ -27,7 +27,7 @@ import {
   getDefaultPointerKey, commitmentHash, getMinimumNameFee, isNameValid, produceNameId,
   toBytes,
   buildTx, unpackTx,
-  NAME_BID_RANGES, Tag,
+  NAME_BID_RANGES, Tag, AbiVersion, VmVersion,
   SchemaNotFoundError, ArgumentError,
 } from '../../src';
 import { Encoding, Encoded } from '../../src/utils/encoder';
@@ -170,7 +170,7 @@ describe('Tx', () => {
         tag: 40,
         version: 1,
         owner: 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D',
-        ctVersion: { vmVersion: 5, abiVersion: 3 },
+        ctVersion: { vmVersion: VmVersion.Fate, abiVersion: AbiVersion.Fate },
         code: 'cb_+ExGA6Dh3797nquCHCSm088avgOiqgjjarRQviEYAXq+YlegWcCgjf6AeCCSADcBBwcBAQCOLwERgHggkhlnZXRBcmeCLwCFNy4wLjEALb9eTg==',
         log: 'cb_Xfbg4g==',
         active: true,
@@ -211,7 +211,7 @@ describe('Tx', () => {
         ownerId: 'ak_xw6vb7yJfajDdfcXzjg6Q5bH23bSUJrud6iBBfMdegZJFbQmc',
         nonce: 3,
         code: 'cb_+GhGA6Csc3MTA1lWna1q0L5k4TgjcQsmHIVhaJ7qU/0CBZqpO8C4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBBwcBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTcuMC4xAHO0rKc=',
-        ctVersion: { vmVersion: 7, abiVersion: 3 },
+        ctVersion: { vmVersion: VmVersion.Fate2, abiVersion: AbiVersion.Fate },
         fee: '78500000000000',
         ttl: 0,
         deposit: '0',

@@ -748,16 +748,6 @@ export class TxNotInChainError extends TransactionError {
 /**
  * @category exception
  */
-export class UnknownTxError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'UnknownTxError';
-  }
-}
-
-/**
- * @category exception
- */
 export class UnsupportedABIversionError extends TransactionError {
   constructor(message: string) {
     super(message);

@@ -89,7 +89,6 @@ BaseError
 │   ├── SchemaNotFoundError
 │   ├── TagNotFoundError
 │   ├── TxNotInChainError
-│   ├── UnknownTxError
 │   ├── UnsupportedABIversionError
 │   └── UnsupportedVMversionError
 │
