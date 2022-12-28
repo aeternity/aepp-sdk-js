@@ -9,6 +9,7 @@ import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
   address, addresses, pointers, entry, enumeration, mptrees, shortUIntConst, string, encoded, raw,
+  array,
 } from './field-types';
 import { Encoding } from '../../utils/encoder';
 import { KeysOfUnion, UnionToIntersection } from '../../utils/other';
@@ -106,7 +107,6 @@ export enum FIELD_TYPES {
   hex,
   rlpBinary,
   rlpBinaries,
-  signatures,
   ctVersion,
   sophiaCodeTypeInfo,
 }
@@ -116,7 +116,6 @@ interface BuildFieldTypes {
   [FIELD_TYPES.hex]: string;
   [FIELD_TYPES.rlpBinary]: any;
   [FIELD_TYPES.rlpBinaries]: any[];
-  [FIELD_TYPES.signatures]: Uint8Array[];
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
 }
@@ -173,7 +172,7 @@ export const TX_SCHEMA = {
     1: [
       ['tag', shortUIntConst(Tag.SignedTx)],
       ['version', shortUIntConst(1)],
-      ['signatures', FIELD_TYPES.signatures],
+      ['signatures', array(raw)],
       ['encodedTx', FIELD_TYPES.rlpBinary],
     ],
   },

@@ -83,8 +83,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       return Buffer.from([(value === true) ? 1 : 0]);
     case FIELD_TYPES.hex:
       return Buffer.from(value, 'hex');
-    case FIELD_TYPES.signatures:
-      return value.map(Buffer.from);
     case FIELD_TYPES.rlpBinary:
       if (ArrayBuffer.isView(value)) return value;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
