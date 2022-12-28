@@ -65,9 +65,6 @@ function deserializeField(
       return value;
     case FIELD_TYPES.hex:
       return value.toString('hex');
-    case FIELD_TYPES.offChainUpdates:
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return value.map((v: Buffer) => unpackTx(encode(v, Encoding.Transaction)));
     case FIELD_TYPES.callStack:
       // TODO: fix this
       return [readInt(value)];

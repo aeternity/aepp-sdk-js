@@ -117,9 +117,7 @@ export enum FIELD_TYPES {
   rlpBinaries,
   rawBinary,
   signatures,
-  offChainUpdates,
   callStack,
-  proofOfInclusion,
   ctVersion,
   sophiaCodeTypeInfo,
   payload,
@@ -135,9 +133,7 @@ interface BuildFieldTypes<Prefix extends undefined | Encoding | readonly Encodin
   [FIELD_TYPES.rlpBinaries]: any[];
   [FIELD_TYPES.rawBinary]: Uint8Array;
   [FIELD_TYPES.signatures]: Uint8Array[];
-  [FIELD_TYPES.offChainUpdates]: any;
   [FIELD_TYPES.callStack]: any;
-  [FIELD_TYPES.proofOfInclusion]: any;
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
   [FIELD_TYPES.payload]: string | undefined;
