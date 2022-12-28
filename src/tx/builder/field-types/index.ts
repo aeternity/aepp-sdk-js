@@ -16,6 +16,7 @@ import _name from './name';
 import _nameFee from './name-fee';
 import _nameId from './name-id';
 import _pointers from './pointers';
+import _raw from './raw';
 import _shortUIntConst from './short-u-int-const';
 import _string from './string';
 
@@ -38,6 +39,7 @@ const name = _name;
 const nameFee = _nameFee;
 const nameId = _nameId;
 const pointers = _pointers;
+const raw = _raw;
 const shortUIntConst = _shortUIntConst;
 const string = _string;
 
@@ -66,6 +68,7 @@ export {
   nameFee,
   nameId,
   pointers,
+  raw,
   shortUIntConst,
   string,
 };

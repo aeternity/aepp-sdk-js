@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, addresses, pointers, entry, enumeration, mptrees, shortUIntConst, string, encoded,
+  address, addresses, pointers, entry, enumeration, mptrees, shortUIntConst, string, encoded, raw,
 } from './field-types';
 import { Encoding } from '../../utils/encoder';
 import { KeysOfUnion, UnionToIntersection } from '../../utils/other';
@@ -106,9 +106,7 @@ export enum FIELD_TYPES {
   hex,
   rlpBinary,
   rlpBinaries,
-  rawBinary,
   signatures,
-  callStack,
   ctVersion,
   sophiaCodeTypeInfo,
 }
@@ -118,9 +116,7 @@ interface BuildFieldTypes {
   [FIELD_TYPES.hex]: string;
   [FIELD_TYPES.rlpBinary]: any;
   [FIELD_TYPES.rlpBinaries]: any[];
-  [FIELD_TYPES.rawBinary]: Uint8Array;
   [FIELD_TYPES.signatures]: Uint8Array[];
-  [FIELD_TYPES.callStack]: any;
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
 }
@@ -200,7 +196,7 @@ export const TX_SCHEMA = {
       ['version', shortUIntConst(1)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nameTtl', shortUInt],
-      ['status', FIELD_TYPES.rawBinary],
+      ['status', raw],
       ['clientTtl', shortUInt],
       ['pointers', pointers],
     ],
@@ -326,7 +322,7 @@ export const TX_SCHEMA = {
       ['returnType', enumeration(CallReturnType)],
       // TODO: add serialization for
       //  <log> :: [ { <address> :: id, [ <topics> :: binary() ], <data> :: binary() } ]
-      ['log', FIELD_TYPES.rawBinary],
+      ['log', raw],
     ],
   },
   [Tag.Oracle]: {
@@ -601,7 +597,7 @@ export const TX_SCHEMA = {
       ['abiVersion', enumeration(ABI_VERSIONS)],
       ['amount', uInt],
       ['callData', encoded(Encoding.ContractBytearray)],
-      ['callStack', FIELD_TYPES.callStack],
+      ['callStack', raw],
       ['gasPrice', gasPrice],
       ['gasLimit', gasLimit],
     ],
@@ -652,7 +648,7 @@ export const TX_SCHEMA = {
       ['tag', shortUIntConst(Tag.MtreeValue)],
       ['version', shortUIntConst(1)],
       ['key', FIELD_TYPES.hex],
-      ['value', FIELD_TYPES.rawBinary],
+      ['value', raw],
     ],
   },
   [Tag.ContractsMtree]: {
@@ -704,7 +700,7 @@ export const TX_SCHEMA = {
       ['ownerId', address(Encoding.AccountAddress)],
       ['nonce', shortUInt],
       ['code', encoded(Encoding.ContractBytearray)],
-      ['authFun', FIELD_TYPES.rawBinary],
+      ['authFun', raw],
       ['ctVersion', FIELD_TYPES.ctVersion],
       ['fee', fee],
       ['ttl', shortUInt],
@@ -740,9 +736,9 @@ export const TX_SCHEMA = {
     3: [
       ['tag', shortUIntConst(Tag.CompilerSophia)],
       ['version', shortUIntConst(3)],
-      ['sourceCodeHash', FIELD_TYPES.rawBinary],
+      ['sourceCodeHash', raw],
       ['typeInfo', FIELD_TYPES.sophiaCodeTypeInfo],
-      ['byteCode', FIELD_TYPES.rawBinary],
+      ['byteCode', raw],
       ['compilerVersion', string],
       ['payable', FIELD_TYPES.bool],
     ],
