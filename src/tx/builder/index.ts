@@ -48,8 +48,6 @@ function deserializeField(
       return value[0] === 1;
     case FIELD_TYPES.stateTree:
       return encode(value, Encoding.StateTrees);
-    case FIELD_TYPES.payload:
-      return encode(value, Encoding.Bytearray);
     case FIELD_TYPES.rlpBinary:
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return unpackTx(encode(value, Encoding.Transaction));
@@ -93,10 +91,6 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       return Buffer.from(value, 'hex');
     case FIELD_TYPES.signatures:
       return value.map(Buffer.from);
-    case FIELD_TYPES.payload:
-      return typeof value === 'string' && value.split('_')[0] === 'ba'
-        ? decode(value as Encoded.Bytearray)
-        : toBytes(value);
     case FIELD_TYPES.rlpBinary:
       if (ArrayBuffer.isView(value)) return value;
       // eslint-disable-next-line @typescript-eslint/no-use-before-define

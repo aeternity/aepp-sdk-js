@@ -111,7 +111,6 @@ export enum FIELD_TYPES {
   callStack,
   ctVersion,
   sophiaCodeTypeInfo,
-  payload,
   stateTree,
 }
 
@@ -125,7 +124,6 @@ interface BuildFieldTypes {
   [FIELD_TYPES.callStack]: any;
   [FIELD_TYPES.ctVersion]: CtVersion;
   [FIELD_TYPES.sophiaCodeTypeInfo]: any;
-  [FIELD_TYPES.payload]: string | undefined;
   [FIELD_TYPES.stateTree]: any;
 }
 
@@ -195,7 +193,7 @@ export const TX_SCHEMA = {
       ['fee', fee],
       ['ttl', shortUInt],
       ['nonce', shortUInt],
-      ['payload', FIELD_TYPES.payload],
+      ['payload', encoded(Encoding.Bytearray, true)],
     ],
   },
   [Tag.Name]: {
