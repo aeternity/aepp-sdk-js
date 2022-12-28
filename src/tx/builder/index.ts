@@ -21,6 +21,7 @@ import { toBytes } from '../../utils/bytes';
 import {
   ArgumentError,
   DecodeError,
+  InternalError,
   InvalidTxParamsError,
   SchemaNotFoundError,
 } from '../../utils/errors';
@@ -68,7 +69,9 @@ function deserializeField(
         {},
       );
     default:
-      if (typeof type === 'number') return value;
+      if (typeof type === 'number') {
+        throw new InternalError(`No matching handler for ${FIELD_TYPES[type]} transaction field`);
+      }
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return type.deserialize(value, { unpackTx });
   }
@@ -92,7 +95,9 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       }
       return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
     default:
-      if (typeof type === 'number') return value;
+      if (typeof type === 'number') {
+        throw new InternalError(`No matching handler for ${FIELD_TYPES[type]} transaction field`);
+      }
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return type.serialize(value, { ...params, unpackTx, buildTx });
   }
