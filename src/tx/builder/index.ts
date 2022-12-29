@@ -1,4 +1,4 @@
-import { decode as rlpDecode, encode as rlpEncode, NestedUint8Array } from 'rlp';
+import { decode as rlpDecode, encode as rlpEncode } from 'rlp';
 import {
   decode, encode, Encoded, Encoding,
 } from '../../utils/encoder';
@@ -18,35 +18,6 @@ import { isKeyOfObject } from '../../utils/other';
  */
 
 /**
- * Unpack binary transaction
- * @category transaction builder
- * @param binary - Array with binary transaction field's
- * @param schema - Transaction schema
- * @returns Object with transaction field's
- */
-function unpackRawTx<Tx extends TxSchema>(
-  binary: Uint8Array | NestedUint8Array,
-  schema: TxField[],
-): RawTxObject<Tx> {
-  if (binary.length !== schema.length) {
-    throw new ArgumentError('Transaction RLP length', schema.length, binary.length);
-  }
-  return schema
-    .reduce<any>(
-    (
-      acc,
-      [name, field],
-      index,
-    ) => {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      const deserialized = field.deserialize(binary[index] as BinaryData, { unpackTx });
-      return { ...acc, [name]: deserialized };
-    },
-    {},
-  );
-}
-
-/**
  * Build transaction hash
  * @category transaction builder
  * @param params - Object with tx params
@@ -54,10 +25,7 @@ function unpackRawTx<Tx extends TxSchema>(
  * @param options.denomination - Denomination of amounts
  * @param options.prefix - Prefix of transaction
  * @throws {@link InvalidTxParamsError}
- * @returns object
- * @returns object.tx Base64Check transaction hash with 'tx_' prefix
- * @returns object.rlpEncoded rlp encoded transaction
- * @returns object.binary binary transaction
+ * @returns object Base64Check transaction hash with 'tx_' prefix
  */
 export function buildTx<
   TxType extends Tag,
@@ -105,13 +73,11 @@ export function buildTx<
 }
 
 /**
- * Unpack transaction hash
+ * Unpack transaction encoded as string
  * @category transaction builder
  * @param encodedTx - Transaction to unpack
  * @param txType - Expected transaction type
- * @returns object
- * @returns object.tx Object with transaction param's
- * @returns object.txType Transaction type
+ * @returns Object with transaction param's
  */
 export function unpackTx<TxType extends Tag>(
   encodedTx: Encoded.Transaction | Encoded.Poi,
@@ -122,9 +88,20 @@ export function unpackTx<TxType extends Tag>(
   if (!isKeyOfObject(tag, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${tag}`);
   if (txType != null && txType !== tag) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[tag]} instead`);
   const version = +readInt(binary[1] as Buffer);
-  if (!isKeyOfObject(version, TX_SCHEMA[tag])) throw new SchemaNotFoundError('deserialization', `tag ${tag}`, version);
-  const schema = TX_SCHEMA[tag][version];
-  return unpackRawTx<TxTypeSchemas[TxType]>(binary, schema);
+  const schemas = TX_SCHEMA[tag];
+  if (!isKeyOfObject(version, schemas)) throw new SchemaNotFoundError('deserialization', `tag ${tag}`, version);
+  const schema = schemas[version] as TxField[];
+  if (binary.length !== schema.length) {
+    throw new ArgumentError('Transaction RLP length', schema.length, binary.length);
+  }
+  return schema.reduce<any>(
+    (acc, [name, field], index) => {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      const deserialized = field.deserialize(binary[index] as BinaryData, { unpackTx });
+      return { ...acc, [name]: deserialized };
+    },
+    {},
+  ) as any;
 }
 
 /**
@@ -149,9 +126,9 @@ export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.Tx
 export function buildContractIdByContractTx(
   contractTx: Encoded.Transaction,
 ): Encoded.ContractAddress {
-  const { tag, ownerId, nonce } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
-  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(tag)) {
-    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', tag);
+  const params = unpackTx(contractTx);
+  if (Tag.ContractCreateTx !== params.tag && Tag.GaAttachTx !== params.tag) {
+    throw new ArgumentError('contractTx', 'a contractCreateTx or gaAttach', params.tag);
   }
-  return buildContractId(ownerId, +nonce);
+  return buildContractId(params.ownerId, params.nonce);
 }
