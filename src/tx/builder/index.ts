@@ -10,9 +10,10 @@ import {
   RawTxObject,
   TX_SCHEMA,
   TxField,
-  TxParamsCommon,
   TxSchema,
   TxTypeSchemas,
+  TxTypeSchemaBy,
+  TxVersionsBy,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
@@ -40,8 +41,8 @@ function deserializeField(
     case FIELD_TYPES.ctVersion: {
       const [vm, , abi] = value;
       return {
-        vmVersion: readInt(Buffer.from([vm])),
-        abiVersion: readInt(Buffer.from([abi])),
+        vmVersion: +readInt(Buffer.from([vm])),
+        abiVersion: +readInt(Buffer.from([abi])),
       };
     }
     case FIELD_TYPES.bool:
@@ -114,7 +115,8 @@ function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any
       return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
     default:
       if (typeof type === 'number') return value;
-      return type.serialize(value, params);
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return type.serialize(value, { ...params, unpackTx, buildTx });
   }
 }
 
@@ -142,19 +144,17 @@ function validateField(
  * @category transaction builder
  * @param params - Object with tx params
  * @param schema - Transaction schema
- * @param excludeKeys - Array of keys to exclude for validation
  * @returns Object with validation errors
  */
 function validateParams(
   params: any,
   schema: TxField[],
-  { excludeKeys = [] }: { excludeKeys: string[] },
 ): object {
   const optionalFields = ['payload', 'nameFee', 'deposit', 'gasPrice', 'fee', 'gasLimit', 'amount'];
   return Object.fromEntries(
     schema
       // TODO: allow optional keys in schema
-      .filter(([key]) => !excludeKeys.includes(key) && !optionalFields.includes(key))
+      .filter(([key]) => !optionalFields.includes(key))
       .map(([key, type]) => [key, validateField(params[key], type)])
       .filter(([, message]) => message),
   );
@@ -186,22 +186,10 @@ function unpackRawTx<Tx extends TxSchema>(
 }
 
 /**
- * @category transaction builder
- */
-export interface BuiltTx<Tx extends TxSchema, Prefix extends Encoding> {
-  tx: Encoded.Generic<Prefix>;
-  rlpEncoded: Uint8Array;
-  binary: Uint8Array;
-  txObject: RawTxObject<Tx>;
-}
-
-/**
  * Build transaction hash
  * @category transaction builder
- * @param _params - Object with tx params
- * @param type - Transaction type
+ * @param params - Object with tx params
  * @param options - options
- * @param options.excludeKeys - Array of keys to exclude for validation and build
  * @param options.denomination - Denomination of amounts
  * @param options.prefix - Prefix of transaction
  * @throws {@link InvalidTxParamsError}
@@ -210,79 +198,59 @@ export interface BuiltTx<Tx extends TxSchema, Prefix extends Encoding> {
  * @returns object.rlpEncoded rlp encoded transaction
  * @returns object.binary binary transaction
  */
-export function buildTx<TxType extends Tag, Prefix>(
-  _params: Omit<TxTypeSchemas[TxType], 'tag' | 'VSN'> & { VSN?: number }
+export function buildTx<
+  TxType extends Tag,
+  E extends Encoding = Encoding.Transaction,
+  Version extends TxVersionsBy<TxType> = TxVersionsBy<TxType>,
+>(
+  params: { tag: TxType; version?: Version } & Omit<TxTypeSchemaBy<TxType, Version>, 'tag' | 'version'>
   // TODO: get it from gas-limit.ts somehow
   & (TxType extends Tag.ContractCreateTx | Tag.ContractCallTx
   | Tag.ChannelOffChainUpdateCallContract | Tag.GaAttachTx | Tag.GaMetaTx
     ? { gasMax?: number } : {}),
-  type: TxType,
   {
-    excludeKeys = [],
-    prefix = Encoding.Transaction,
-    vsn,
+    prefix,
     denomination = AE_AMOUNT_FORMATS.AETTOS,
   }: {
-    excludeKeys?: string[];
-    prefix?: Encoding;
-    vsn?: number;
+    prefix?: E;
     denomination?: AE_AMOUNT_FORMATS;
   } = {},
-): BuiltTx<TxSchema, Prefix extends Encoding ? Prefix : Encoding.Transaction> {
-  const schemas = TX_SCHEMA[type];
+): Encoded.Generic<E> {
+  const schemas = TX_SCHEMA[params.tag];
+  params.version ??= Math.max(...Object.keys(schemas).map((a) => +a)) as NonNullable<Version>;
+  if (!isKeyOfObject(params.version, schemas)) {
+    throw new SchemaNotFoundError('serialization', Tag[params.tag], params.version);
+  }
+  const schema = schemas[params.version] as unknown as TxField[];
 
-  vsn ??= Math.max(...Object.keys(schemas).map((a) => +a));
-  if (!isKeyOfObject(vsn, schemas)) throw new SchemaNotFoundError('serialization', Tag[type], vsn);
-
-  const schema = schemas[vsn] as unknown as TxField[];
-
-  const params = _params as TxParamsCommon & { onNode: Node; denomination?: AE_AMOUNT_FORMATS };
-  params.VSN = vsn;
-  params.tag = type;
-  params.denomination = denomination;
-  const filteredSchema = schema.filter(([key]) => !excludeKeys.includes(key));
-
-  // Validation
-  const valid = validateParams(params, schema, { excludeKeys });
+  const valid = validateParams(params, schema);
   if (Object.keys(valid).length > 0) {
     throw new InvalidTxParamsError(`Transaction build error. ${JSON.stringify(valid)}`);
   }
 
-  const binary = filteredSchema
-    .map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES, Encoding]) => (
-      serializeField(
-        params[key],
-        fieldType,
-        {
-          ...params,
-          txType: type,
-          rebuildTx: (overrideParams: any) => buildTx(
-            { ...params, ...overrideParams },
-            type,
-            {
-              excludeKeys, prefix: Encoding.Transaction, vsn, denomination,
-            },
-          ),
-        },
-      )
-    ))
-    .filter((e) => e !== undefined);
+  const binary = schema.map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES | Field]) => (
+    serializeField(
+      params[key],
+      fieldType,
+      {
+        ...params,
+        denomination,
+        rebuildTx: (overrideParams: any) => buildTx(
+          { ...params, ...overrideParams },
+          { denomination },
+        ),
+      },
+    )
+  ));
 
-  const rlpEncoded = rlpEncode(binary);
-  const tx = encode(rlpEncoded, prefix);
-  return {
-    tx,
-    rlpEncoded,
-    binary,
-    txObject: unpackRawTx<TxTypeSchemas[Tag]>(binary, schema),
-  } as any;
+  // @ts-expect-error looks like a TypeScript edge case
+  return encode(rlpEncode(binary), prefix ?? Encoding.Transaction);
 }
 
 /**
  * @category transaction builder
  */
 export interface TxUnpacked<Tx extends TxSchema> {
-  txType: Tag;
   tx: RawTxObject<Tx>;
   rlpEncoded: Uint8Array;
 }
@@ -301,14 +269,13 @@ export function unpackTx<TxType extends Tag>(
 ): TxUnpacked<TxTypeSchemas[TxType]> {
   const rlpEncoded = decode(encodedTx);
   const binary = rlpDecode(rlpEncoded);
-  const objId = +readInt(binary[0] as Buffer);
-  if (!isKeyOfObject(objId, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${objId}`);
-  if (txType != null && txType !== objId) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[objId]} instead`);
-  const vsn = +readInt(binary[1] as Buffer);
-  if (!isKeyOfObject(vsn, TX_SCHEMA[objId])) throw new SchemaNotFoundError('deserialization', `tag ${objId}`, vsn);
-  const schema = TX_SCHEMA[objId][vsn];
+  const tag = +readInt(binary[0] as Buffer);
+  if (!isKeyOfObject(tag, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${tag}`);
+  if (txType != null && txType !== tag) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[tag]} instead`);
+  const version = +readInt(binary[1] as Buffer);
+  if (!isKeyOfObject(version, TX_SCHEMA[tag])) throw new SchemaNotFoundError('deserialization', `tag ${tag}`, version);
+  const schema = TX_SCHEMA[tag][version];
   return {
-    txType: objId,
     tx: unpackRawTx<TxTypeSchemas[TxType]>(binary, schema),
     rlpEncoded,
   };
@@ -336,9 +303,9 @@ export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.Tx
 export function buildContractIdByContractTx(
   contractTx: Encoded.Transaction,
 ): Encoded.ContractAddress {
-  const { txType, tx } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
-  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(txType)) {
-    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', txType);
+  const { tx } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
+  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(tx.tag)) {
+    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', tx.tag);
   }
   return buildContractId(tx.ownerId, +tx.nonce);
 }

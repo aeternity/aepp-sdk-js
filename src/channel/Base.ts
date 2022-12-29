@@ -229,8 +229,8 @@ export default class Channel {
     if (this._state == null) {
       return null;
     }
-    const { txType, tx } = unpackTx(this._state, Tag.SignedTx).tx.encodedTx;
-    switch (txType) {
+    const { tx } = unpackTx(this._state, Tag.SignedTx).tx.encodedTx;
+    switch (tx.tag) {
       case Tag.ChannelCreateTx:
         return 1;
       case Tag.ChannelOffChainTx:
@@ -326,7 +326,10 @@ export default class Channel {
 
     return Channel.initialize({
       ...options,
-      reconnectTx: await sign('reconnect', buildTx(txParams, Tag.ChannelClientReconnectTx).tx),
+      reconnectTx: await sign(
+        'reconnect',
+        buildTx({ ...txParams, tag: Tag.ChannelClientReconnectTx }),
+      ),
     });
   }
 }

@@ -111,7 +111,7 @@ describe('Tx', () => {
   });
 
   describe('unpackTx', () => {
-    it('throws error if invalid tx VSN', () => {
+    it('throws error if invalid transaction version', () => {
       const tx = encode(rlpEncode([10, 99]), Encoding.Transaction);
       expect(() => unpackTx(tx))
         .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag 10 version 99');
@@ -122,37 +122,54 @@ describe('Tx', () => {
         .to.throw(ArgumentError, 'Transaction RLP length should be 9, got 10 instead');
     });
 
+    it('unpacks unknown transaction', () => {
+      const account = unpackTx('tx_zQoBAIkFa8deLWMQAAMJo1/N').tx;
+      if (account.tag === Tag.SpendTx) {
+        expect(account.recipientId);
+        // @ts-expect-error spend tx don't have balance
+        expect(account.balance);
+      }
+      if (account.tag === Tag.Account) {
+        expect(account.balance);
+        if (account.version === 1) {
+          // @ts-expect-error account v1 entry don't have flags
+          expect(account.flags);
+        } else if (account.version === 2) {
+          expect(account.flags);
+        }
+        // @ts-expect-error without checking version, account may not have flags
+        expect(account.flags);
+      }
+    });
+
     it('unpacks state channel poi', () => {
       const poi = 'pi_+QS9PAH5Agj5AgWgLTKha2G59WNpjU2qOeEP9n/k6VUZw6lrwd2jn0zjyZb5AeH4dKAtMqFrYbn1Y2mNTao54Q/2f+TpVRnDqWvB3aOfTOPJlvhRgKBy/g6a1aHG5CUcExd2PvF/VDFQoFXDYRynvBxhsviPWoCAgKDmsQ/HT1KkP6IZIZxPre8pPevMUitDJ/wdFSLdSx2GU4CAgICAgICAgICA+HSgcv4OmtWhxuQlHBMXdj7xf1QxUKBVw2Ecp7wcYbL4j1r4UYCAgICAgICAoIEfDDawnsjhRHiZ3cH3w1bwZCU/ComV5UZ35oNfBZQNgICAgKC1oTen+OePzzEwr98V96QpzGPnNdq33nRolIwWZ31TO4CAgPhSoIEfDDawnsjhRHiZ3cH3w1bwZCU/ComV5UZ35oNfBZQN8KAgy4vNCNXy3SL07CeWTpNXmqxcXKgpwiS5xqMVvJqPbI7NCgEAiQVrx14tYxAAA/hLoLWhN6f454/PMTCv3xX3pCnMY+c12rfedGiUjBZnfVM76aAg+T20wFXy2ZOEIKWCVNexp+1QmgXSfwzarLhs8ov8rofGCgEAggPo+FKg5rEPx09SpD+iGSGcT63vKT3rzFIrQyf8HRUi3UsdhlPwoD1xbWafWKm2OCnVvDaJX/R46dFWXDVp0Dio4Am/Aa/Zjs0KAQCJBWvHXi1jD/wV4+KgkuUqD84mdniErJPs5b5pR5faMyeuAuGSpTK0rUbGowvAwPkChvkCg6B2jPRZng8uvSIogeA13/PJ3kppJyDm8hrp5NaP39/v3/kCX/hEoBHlmqYc8k9c2eNzc9JAADb3fErCVaOf2zDNbvn+WTd14hCgcz/+U+Q3icmxZXQLRTSUTLW827c3lKJfOCBYgXAEomP4O6BYJ4U3UbSFRNdKow3ApDqnzTNUNG7kE2T287Q+JQSb4NmFxCCCLwCDwiA/gICAgICAgICAgICAgICA+NWgbusUs5OcObuVt7pByi05w+imTwelvFFKINZcKb9uzA34soCgEeWaphzyT1zZ43Nz0kAANvd8SsJVo5/bMM1u+f5ZN3WAgICAgICAgICAgICAgLiA+H4oAaEBXXFtZp9YqbY4KdW8Nolf9Hjp0VZcNWnQOKjgCb8Br9mDBQADuE74TEYDoOHfv3ueq4IcJKbTzxq+A6KqCONqtFC+IRgBer5iV6BZwKCN/oB4IJIANwEHBwEBAI4vARGAeCCSGWdldEFyZ4IvAIU3LjAuMQCAAcCCA+j4U6BzP/5T5DeJybFldAtFNJRMtbzbtzeUol84IFiBcASiY/Gg+834Gf8ycAnGZdS3wlaPv5tIpbWL68KqCphOqokQveuAgICAgICAgICAgICAgIAA+Gagdoz0WZ4PLr0iKIHgNd/zyd5KaScg5vIa6eTWj9/f79/4Q6EAHfk9tMBV8tmThCClglTXsaftUJoF0n8M2qy4bPKL/K6gbusUs5OcObuVt7pByi05w+imTwelvFFKINZcKb9uzA34RqD7zfgZ/zJwCcZl1LfCVo+/m0iltYvrwqoKmE6qiRC96+SCAACgWCeFN1G0hUTXSqMNwKQ6p80zVDRu5BNk9vO0PiUEm+DAwLP4mdE=';
       const unpackedPoi = unpackTx(poi, Tag.TreesPoi);
 
       const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
       const account = {
-        tag: 10, VSN: 1, nonce: 0, balance: '99999999999999998997',
+        tag: 10, version: 1, nonce: 0, balance: '99999999999999998997',
       };
       expect(unpackedPoi.tx.accounts[0].get(address)?.tx).to.eql(account);
 
       const addressContract = 'ct_ECdrEy2NJKq3qK3xraPtcDP7vfdi56SQXYAH3bVVSTmpqpYyW';
       const accountContract = {
-        tag: 10, VSN: 1, nonce: 0, balance: '1000',
+        tag: 10, version: 1, nonce: 0, balance: '1000',
       };
       expect(unpackedPoi.tx.accounts[0].get(addressContract as Encoded.AccountAddress)?.tx)
         .to.eql(accountContract);
       expect(unpackedPoi.tx.accounts[0].toObject()).to.eql({
         ak_BvMjyAXbpHkjzVfG53N6FxF1LwTX2EYwFLfNbk8mcXjp8CXBC: {
-          txType: 10,
           tx: {
-            tag: 10, VSN: 1, nonce: 0, balance: '100000000000000000003',
+            tag: 10, version: 1, nonce: 0, balance: '100000000000000000003',
           },
           rlpEncoded: Buffer.from('cd0a010089056bc75e2d63100003', 'hex'),
         },
         [addressContract.replace('ct_', 'ak_')]: {
-          txType: 10,
           tx: accountContract,
           rlpEncoded: Buffer.from('c60a01008203e8', 'hex'),
         },
         [address]: {
-          txType: 10,
           tx: account,
           rlpEncoded: Buffer.from('cd0a010089056bc75e2d630ffc15', 'hex'),
         },
@@ -160,9 +177,9 @@ describe('Tx', () => {
 
       const contract = {
         tag: 40,
-        VSN: 1,
+        version: 1,
         owner: 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D',
-        ctVersion: { vmVersion: '5', abiVersion: '3' },
+        ctVersion: { vmVersion: 5, abiVersion: 3 },
         code: 'cb_+ExGA6Dh3797nquCHCSm088avgOiqgjjarRQviEYAXq+YlegWcCgjf6AeCCSADcBBwcBAQCOLwERgHggkhlnZXRBcmeCLwCFNy4wLjEALb9eTg==',
         log: 'cb_Xfbg4g==',
         active: true,
@@ -172,19 +189,59 @@ describe('Tx', () => {
       expect(unpackedPoi.tx.contracts[0].get(addressContract)?.tx).to.eql(contract);
       expect(unpackedPoi.tx.contracts[0].toObject()).to.eql({
         [addressContract]: {
-          txType: 40,
           tx: contract,
           rlpEncoded: Buffer.from('f87e2801a1015d716d669f58a9b63829d5bc36895ff478e9d1565c3569d038a8e009bf01afd983050003b84ef84c4603a0e1dfbf7b9eab821c24a6d3cf1abe03a2aa08e36ab450be2118017abe6257a059c0a08dfe8078209200370107070101008e2f01118078209219676574417267822f0085372e302e31008001c08203e8', 'hex'),
         },
       });
 
-      expect(buildTx(unpackedPoi.tx, unpackedPoi.txType, { prefix: Encoding.Poi }).tx)
-        .to.equal(poi);
+      // TODO: remove any after fixing return type of unpackTx
+      expect(buildTx(unpackedPoi.tx as any, { prefix: Encoding.Poi })).to.equal(poi);
     });
   });
 
-  it('Serialize tx: invalid tx VSN', () => {
-    expect(() => buildTx({} as any, Tag.SpendTx, { vsn: 5 }))
-      .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
+  describe('buildTx', () => {
+    it('returns value of a proper type', () => {
+      const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
+
+      const tx: Encoded.Transaction = buildTx({
+        tag: Tag.SpendTx, nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+      });
+      expect(tx).to.satisfy((s: string) => s.startsWith('tx_'));
+
+      const txExplicit: Encoded.Transaction = buildTx({
+        tag: Tag.SpendTx, nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+      }, { prefix: Encoding.Transaction });
+      expect(txExplicit).to.satisfy((s: string) => s.startsWith('tx_'));
+
+      const pi: Encoded.Poi = buildTx({
+        tag: Tag.SpendTx, nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+      }, { prefix: Encoding.Poi });
+      expect(pi).to.satisfy((s: string) => s.startsWith('pi_'));
+    });
+
+    it('build ContractCreateTx with specified fee', () => {
+      const txParams = {
+        tag: Tag.ContractCreateTx,
+        version: 1,
+        ownerId: 'ak_xw6vb7yJfajDdfcXzjg6Q5bH23bSUJrud6iBBfMdegZJFbQmc',
+        nonce: 3,
+        code: 'cb_+GhGA6Csc3MTA1lWna1q0L5k4TgjcQsmHIVhaJ7qU/0CBZqpO8C4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBBwcBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTcuMC4xAHO0rKc=',
+        ctVersion: { vmVersion: 7, abiVersion: 3 },
+        fee: '78500000000000',
+        ttl: 0,
+        deposit: '0',
+        amount: '0',
+        gasLimit: 76,
+        gasPrice: '1000000000',
+        callData: 'cb_KxFE1kQfP4oEp9E=',
+      } as const;
+      const tx = buildTx(txParams);
+      expect(unpackTx(tx, Tag.ContractCreateTx).tx.fee).to.be.equal('78500000000000');
+    });
+
+    it('rejects if invalid transaction version', () => {
+      expect(() => buildTx({ tag: Tag.SpendTx, version: 5 } as any))
+        .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
+    });
   });
 });

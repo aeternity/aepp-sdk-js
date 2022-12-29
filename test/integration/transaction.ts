@@ -21,7 +21,7 @@ import { getSdk } from './index';
 import {
   AeSdk,
   commitmentHash, oracleQueryId, decode, encode,
-  ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS,
+  ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS, buildTx, unpackTx,
 } from '../../src';
 import { Encoded, Encoding } from '../../src/utils/encoder';
 
@@ -81,7 +81,7 @@ describe('Transaction', () => {
   });
 
   const contractId = 'ct_TCQVoset7Y4qEyV5tgEAJAqa2Foz8J1EXqoGpq3fB6dWH5roe';
-  const transactions: Array<[string, string, () => Promise<string>]> = [[
+  const transactions: Array<[string, Encoded.Transaction, () => Promise<Encoded.Transaction>]> = [[
     'spend',
     'tx_+F0MAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg9e1n8oAAABhHRlc3QLK3OW',
     async () => aeSdk.buildTx(Tag.SpendTx, {
@@ -170,5 +170,6 @@ describe('Transaction', () => {
 
   transactions.forEach(([txName, expected, getter]) => it(`build of ${txName} transaction`, async () => {
     expect(await getter()).to.be.equal(expected);
+    expect(buildTx(unpackTx(expected).tx)).to.be.equal(expected);
   }));
 });

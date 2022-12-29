@@ -25,6 +25,8 @@ import { ChannelConnectionError } from '../utils/errors';
 import {
   awaitingCompletion, channelOpen, handleUnexpectedMessage, signAndNotify,
 } from './handlers';
+import { unpackTx } from '../tx/builder';
+import { Tag } from '../tx/builder/constants';
 
 export default class ChannelSpend extends Channel {
   /**
@@ -133,8 +135,11 @@ export default class ChannelSpend extends Channel {
       accounts: Encoded.AccountAddress[];
       contracts?: Encoded.ContractAddress[];
     },
-  ): Promise<Encoded.Poi> {
-    return (await call(this, 'channels.get.poi', { accounts, contracts })).poi;
+  ): Promise<ReturnType<typeof unpackTx<Tag.TreesPoi>>> {
+    return unpackTx(
+      (await call(this, 'channels.get.poi', { accounts, contracts })).poi,
+      Tag.TreesPoi,
+    );
   }
 
   /**

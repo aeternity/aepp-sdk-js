@@ -5,6 +5,7 @@ import _coinAmount from './coin-amount';
 import _address from './address';
 import _addresses from './addresses';
 import _deposit from './deposit';
+import _entry from './entry';
 import _enumeration from './enumeration';
 import _fee from './fee';
 import _gasLimit from './gas-limit';
@@ -14,6 +15,7 @@ import _name from './name';
 import _nameFee from './name-fee';
 import _nameId from './name-id';
 import _pointers from './pointers';
+import _shortUIntConst from './short-u-int-const';
 
 // TODO: remove after fixing https://github.com/Gerrit0/typedoc-plugin-missing-exports/issues/15
 const field = _field;
@@ -23,6 +25,7 @@ const coinAmount = _coinAmount;
 const address = _address;
 const addresses = _addresses;
 const deposit = _deposit;
+const entry = _entry;
 const enumeration = _enumeration;
 const fee = _fee;
 const gasLimit = _gasLimit;
@@ -32,6 +35,7 @@ const name = _name;
 const nameFee = _nameFee;
 const nameId = _nameId;
 const pointers = _pointers;
+const shortUIntConst = _shortUIntConst;
 
 type BinaryData = Buffer | Buffer[] | Buffer[][] | Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
 export interface Field {
@@ -47,6 +51,7 @@ export {
   address,
   addresses,
   deposit,
+  entry,
   enumeration,
   fee,
   gasLimit,
@@ -56,4 +61,5 @@ export {
   nameFee,
   nameId,
   pointers,
+  shortUIntConst,
 };

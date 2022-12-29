@@ -50,9 +50,10 @@ export async function appendSignature(
   if (typeof result === 'string') {
     const { tx: signedTx } = unpackTx(result, Tag.SignedTx);
     return buildTx({
+      tag: Tag.SignedTx,
       signatures: signatures.concat(signedTx.signatures),
       encodedTx: signedTx.encodedTx.rlpEncoded,
-    }, Tag.SignedTx).tx;
+    });
   }
   return result;
 }
