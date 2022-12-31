@@ -52,7 +52,7 @@ const uInt = _uInt;
 export type BinaryData = Buffer | Buffer[] | Buffer[][]
 | Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
 export interface Field {
-  serialize: (value: any, options: any) => BinaryData;
+  serialize: (value: any, options: any, parameters: any) => BinaryData;
   deserialize: (value: BinaryData, options: any) => any;
 }
 

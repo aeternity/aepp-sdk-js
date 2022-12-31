@@ -46,8 +46,6 @@ export enum CallReturnType {
 
 type TxElem = readonly [string, Field];
 
-type BuildTxArgBySchemaType<Type extends Field> = Parameters<Type['serialize']>[0];
-
 type NullablePartial<
   T,
   NK extends keyof T = { [K in keyof T]: undefined extends T[K] ? K : never }[keyof T],
@@ -57,7 +55,8 @@ type BuildTxArgBySchema<SchemaLine> =
   UnionToIntersection<
   SchemaLine extends ReadonlyArray<infer Elem>
     ? Elem extends TxElem
-      ? NullablePartial<{ [k in Elem[0]]: BuildTxArgBySchemaType<Elem[1]> }>
+      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
+      & (Parameters<Elem[1]['serialize']>[2] extends object ? Parameters<Elem[1]['serialize']>[2] : {})
       : never
     : never
   >;

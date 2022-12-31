@@ -31,11 +31,7 @@ export function buildTx<
   TxType extends Tag,
   E extends Encoding = Encoding.Transaction,
 >(
-  params: { tag: TxType; version?: number } & Omit<TxTypeSchemas[TxType], 'tag' | 'version'>
-  // TODO: get it from gas-limit.ts somehow
-  & (TxType extends Tag.ContractCreateTx | Tag.ContractCallTx
-  | Tag.ChannelOffChainUpdateCallContract | Tag.GaAttachTx | Tag.GaMetaTx
-    ? { gasMax?: number } : {}),
+  params: { tag: TxType; version?: number } & Omit<TxTypeSchemas[TxType], 'tag' | 'version'>,
   {
     prefix,
     denomination = AE_AMOUNT_FORMATS.AETTOS,
@@ -65,6 +61,7 @@ export function buildTx<
           { denomination },
         ),
       },
+      params,
     )
   ));
 
