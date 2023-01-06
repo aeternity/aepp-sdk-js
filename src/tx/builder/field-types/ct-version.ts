@@ -48,8 +48,9 @@ export function getProtocolDetails(
 export default {
   serialize(
     value: CtVersion | undefined,
+    params: {},
     { consensusProtocolVersion = ConsensusProtocolVersion.Iris }:
-    { consensusProtocolVersion: ConsensusProtocolVersion },
+    { consensusProtocolVersion?: ConsensusProtocolVersion },
   ): Buffer {
     value ??= getProtocolDetails(consensusProtocolVersion, 'contract-create');
 

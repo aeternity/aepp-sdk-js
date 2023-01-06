@@ -29,7 +29,6 @@ import Node from '../Node';
 import { Encoded } from '../utils/encoder';
 import { buildTx as syncBuildTx, unpackTx } from './builder/index';
 import { isAccountNotFoundError } from '../utils/other';
-import { AE_AMOUNT_FORMATS } from '../utils/amount-formatter';
 
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
   Omit<Parameters<typeof _buildTx<TxType>>[1], OmitFields>;
@@ -41,10 +40,9 @@ export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
 export async function _buildTx<TxType extends Tag>(
   txType: TxType,
   {
-    denomination, absoluteTtl, strategy, onNode, ..._params
+    absoluteTtl, strategy, onNode, ..._params
   }: Omit<Parameters<typeof syncBuildTx<TxType>>[0], 'tag' | 'nonce' | 'ttl'>
   & {
-    denomination?: AE_AMOUNT_FORMATS;
     absoluteTtl?: boolean;
     strategy?: 'continuity' | 'max';
     onNode: Node;
@@ -101,7 +99,6 @@ export async function _buildTx<TxType extends Tag>(
     || ((Tag.ContractCallTx === txType || Tag.GaMetaTx === txType) && params.abiVersion == null))
   ) {
     const { consensusProtocolVersion } = await onNode.getNodeInfo();
-    // @ts-expect-error remove after fixing buildTx types
     params.consensusProtocolVersion = consensusProtocolVersion;
   }
 
@@ -125,5 +122,5 @@ export async function _buildTx<TxType extends Tag>(
     params.ttl += absoluteTtl === true ? 0 : (await onNode.getCurrentKeyBlock()).height;
   }
 
-  return syncBuildTx({ ...params, tag: txType } as any, { denomination });
+  return syncBuildTx({ ...params, tag: txType } as any);
 }

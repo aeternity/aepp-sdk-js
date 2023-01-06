@@ -4,8 +4,9 @@ import { getProtocolDetails } from './ct-version';
 export default {
   serialize(
     value: AbiVersion | undefined,
-    { tag, consensusProtocolVersion = ConsensusProtocolVersion.Iris }:
-    { tag: Tag; consensusProtocolVersion: ConsensusProtocolVersion },
+    { tag }: { tag: Tag },
+    { consensusProtocolVersion = ConsensusProtocolVersion.Iris }:
+    { consensusProtocolVersion?: ConsensusProtocolVersion },
   ): Buffer {
     const result = value ?? getProtocolDetails(
       consensusProtocolVersion,

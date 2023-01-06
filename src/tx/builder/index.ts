@@ -2,7 +2,6 @@ import { decode as rlpDecode, encode as rlpEncode } from 'rlp';
 import {
   decode, encode, Encoded, Encoding,
 } from '../../utils/encoder';
-import { AE_AMOUNT_FORMATS } from '../../utils/amount-formatter';
 import { hash } from '../../utils/crypto';
 import { BinaryData, Field } from './field-types';
 import {
@@ -22,7 +21,6 @@ import { isKeyOfObject } from '../../utils/other';
  * @category transaction builder
  * @param params - Object with tx params
  * @param options - options
- * @param options.denomination - Denomination of amounts
  * @param options.prefix - Prefix of transaction
  * @throws {@link InvalidTxParamsError}
  * @returns object Base64Check transaction hash with 'tx_' prefix
@@ -34,10 +32,8 @@ export function buildTx<
   params: { tag: TxType; version?: number } & Omit<TxTypeSchemas[TxType], 'tag' | 'version'>,
   {
     prefix,
-    denomination = AE_AMOUNT_FORMATS.AETTOS,
   }: {
     prefix?: E;
-    denomination?: AE_AMOUNT_FORMATS;
   } = {},
 ): Encoded.Generic<E> {
   const schemas = TX_SCHEMA[params.tag];
@@ -55,10 +51,8 @@ export function buildTx<
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         unpackTx,
         buildTx,
-        denomination,
         rebuildTx: (overrideParams: any) => buildTx(
           { ...params, ...overrideParams },
-          { denomination },
         ),
       },
       params,
