@@ -189,17 +189,17 @@ describe('Tx', () => {
       const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
 
       const tx: Encoded.Transaction = buildTx({
-        tag: Tag.SpendTx, nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+        tag: Tag.SpendTx, nonce: 0, amount: 123, senderId: address, recipientId: address,
       });
       expect(tx).to.satisfy((s: string) => s.startsWith('tx_'));
 
       const txExplicit: Encoded.Transaction = buildTx({
-        tag: Tag.SpendTx, nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+        tag: Tag.SpendTx, nonce: 0, amount: 123, senderId: address, recipientId: address,
       }, { prefix: Encoding.Transaction });
       expect(txExplicit).to.satisfy((s: string) => s.startsWith('tx_'));
 
       const pi: Encoded.Poi = buildTx({
-        tag: Tag.SpendTx, nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+        tag: Tag.SpendTx, nonce: 0, amount: 123, senderId: address, recipientId: address,
       }, { prefix: Encoding.Poi });
       expect(pi).to.satisfy((s: string) => s.startsWith('pi_'));
     });

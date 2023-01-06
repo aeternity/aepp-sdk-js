@@ -9,7 +9,7 @@ import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
   address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array, boolean, ctVersion, abiVersion,
+  array, boolean, ctVersion, abiVersion, ttl,
 } from './field-types';
 import { Encoding } from '../../utils/encoder';
 import { UnionToIntersection } from '../../utils/other';
@@ -20,8 +20,6 @@ export enum ORACLE_TTL_TYPES {
   block = 1,
 }
 
-// # TRANSACTION DEFAULT TTL
-export const TX_TTL = 0;
 // # ORACLE
 export const QUERY_FEE = 30000;
 export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
@@ -102,7 +100,7 @@ export const TX_SCHEMA = {
       ['recipientId', address(Encoding.AccountAddress, Encoding.Name)],
       ['amount', coinAmount],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['nonce', shortUInt],
       ['payload', encoded(Encoding.Bytearray, true)],
     ],
@@ -126,7 +124,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
       ['commitmentId', address(Encoding.Commitment)],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.NameClaimTx]: {
@@ -139,7 +137,7 @@ export const TX_SCHEMA = {
       ['nameSalt', uInt],
       ['nameFee', nameFee],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.NameUpdateTx]: {
@@ -153,7 +151,7 @@ export const TX_SCHEMA = {
       ['pointers', pointers],
       ['clientTtl', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.NameTransferTx]: {
@@ -165,7 +163,7 @@ export const TX_SCHEMA = {
       ['nameId', nameId],
       ['recipientId', address(Encoding.AccountAddress, Encoding.Name)],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.NameRevokeTx]: {
@@ -176,7 +174,7 @@ export const TX_SCHEMA = {
       ['nonce', shortUInt],
       ['nameId', nameId],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.Contract]: {
@@ -201,7 +199,7 @@ export const TX_SCHEMA = {
       ['code', encoded(Encoding.ContractBytearray)],
       ['ctVersion', ctVersion],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['deposit', deposit],
       ['amount', coinAmount],
       ['gasLimit', gasLimit],
@@ -218,7 +216,7 @@ export const TX_SCHEMA = {
       ['contractId', address(Encoding.ContractAddress, Encoding.Name)],
       ['abiVersion', abiVersion],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['amount', coinAmount],
       ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
@@ -266,7 +264,7 @@ export const TX_SCHEMA = {
       ['oracleTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['oracleTtlValue', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['abiVersion', abiVersion],
     ],
   },
@@ -279,7 +277,7 @@ export const TX_SCHEMA = {
       ['oracleTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['oracleTtlValue', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.OracleQueryTx]: {
@@ -296,7 +294,7 @@ export const TX_SCHEMA = {
       ['responseTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['responseTtlValue', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.OracleResponseTx]: {
@@ -310,7 +308,7 @@ export const TX_SCHEMA = {
       ['responseTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['responseTtlValue', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.ChannelCreateTx]: {
@@ -323,7 +321,7 @@ export const TX_SCHEMA = {
       ['responderAmount', uInt],
       ['channelReserve', uInt],
       ['lockPeriod', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['initiatorDelegateIds', array(address(...idTagToEncoding))],
       ['responderDelegateIds', array(address(...idTagToEncoding))],
@@ -339,7 +337,7 @@ export const TX_SCHEMA = {
       ['fromId', address(Encoding.AccountAddress)],
       ['initiatorAmountFinal', uInt],
       ['responderAmountFinal', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['nonce', shortUInt],
     ],
@@ -352,7 +350,7 @@ export const TX_SCHEMA = {
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', encoded(Encoding.Transaction)],
       ['poi', entry(Tag.TreesPoi)],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['nonce', shortUInt],
     ],
@@ -365,7 +363,7 @@ export const TX_SCHEMA = {
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', encoded(Encoding.Transaction)],
       ['poi', entry(Tag.TreesPoi)],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['nonce', shortUInt],
     ],
@@ -377,7 +375,7 @@ export const TX_SCHEMA = {
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['amount', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['stateHash', encoded(Encoding.State)],
       ['round', shortUInt],
@@ -391,7 +389,7 @@ export const TX_SCHEMA = {
       ['channelId', address(Encoding.Channel)],
       ['toId', address(Encoding.AccountAddress)],
       ['amount', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['stateHash', encoded(Encoding.State)],
       ['round', shortUInt],
@@ -406,7 +404,7 @@ export const TX_SCHEMA = {
       ['fromId', address(Encoding.AccountAddress)],
       ['initiatorAmountFinal', uInt],
       ['responderAmountFinal', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['nonce', shortUInt],
     ],
@@ -422,7 +420,7 @@ export const TX_SCHEMA = {
       ['update', encoded(Encoding.ContractBytearray)],
       ['stateHash', encoded(Encoding.State)],
       ['offChainTrees', encoded(Encoding.StateTrees)],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['nonce', shortUInt],
     ],
@@ -464,7 +462,7 @@ export const TX_SCHEMA = {
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', encoded(Encoding.Transaction)],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['nonce', shortUInt],
     ],
@@ -620,7 +618,7 @@ export const TX_SCHEMA = {
       ['authFun', raw],
       ['ctVersion', ctVersion],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
       ['callData', encoded(Encoding.ContractBytearray)],

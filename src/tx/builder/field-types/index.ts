@@ -21,6 +21,7 @@ import _raw from './raw';
 import _shortUInt from './short-u-int';
 import _shortUIntConst from './short-u-int-const';
 import _string from './string';
+import _ttl from './ttl';
 import _uInt from './u-int';
 
 // TODO: remove after fixing https://github.com/Gerrit0/typedoc-plugin-missing-exports/issues/15
@@ -47,6 +48,7 @@ const raw = _raw;
 const shortUInt = _shortUInt;
 const shortUIntConst = _shortUIntConst;
 const string = _string;
+const ttl = _ttl;
 const uInt = _uInt;
 
 export type BinaryData = Buffer | Buffer[] | Buffer[][]
@@ -80,5 +82,6 @@ export {
   shortUInt,
   shortUIntConst,
   string,
+  ttl,
   uInt,
 };

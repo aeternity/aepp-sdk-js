@@ -22,7 +22,7 @@
  * the creation of transactions to {@link Node}.
  * These methods provide ability to create native transactions.
  */
-import { TX_TTL, TxParamsCommon } from './builder/schema';
+import { TxParamsCommon } from './builder/schema';
 import { ConsensusProtocolVersion, Tag } from './builder/constants';
 import { ArgumentError, InvalidTxParamsError } from '../utils/errors';
 import Node from '../Node';
@@ -39,14 +39,10 @@ export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
  */
 export async function _buildTx<TxType extends Tag>(
   txType: TxType,
-  {
-    absoluteTtl, strategy, onNode, ..._params
-  }: Omit<Parameters<typeof syncBuildTx<TxType>>[0], 'tag' | 'nonce' | 'ttl'>
+  { strategy, onNode, ..._params }: Omit<Parameters<typeof syncBuildTx<TxType>>[0], 'tag' | 'nonce'>
   & {
-    absoluteTtl?: boolean;
     strategy?: 'continuity' | 'max';
     onNode: Node;
-    ttl?: number;
     nonce?: number;
   }
   & (TxType extends Tag.OracleExtendTx | Tag.OracleResponseTx
@@ -116,10 +112,9 @@ export async function _buildTx<TxType extends Tag>(
     })
   ).nextNonce;
 
-  params.ttl ??= TX_TTL;
-  if (params.ttl !== 0) {
-    if (params.ttl < 0) throw new ArgumentError('ttl', 'greater or equal to 0', params.ttl);
-    params.ttl += absoluteTtl === true ? 0 : (await onNode.getCurrentKeyBlock()).height;
+  if (params.absoluteTtl !== true && params.ttl !== 0 && params.ttl !== undefined) {
+    params.ttl += (await onNode.getCurrentKeyBlock()).height;
+    params.absoluteTtl = true;
   }
 
   return syncBuildTx({ ...params, tag: txType } as any);

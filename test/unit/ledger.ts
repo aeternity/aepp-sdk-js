@@ -171,7 +171,7 @@ describe('Ledger HW', () => {
     });
 
     const transaction = buildTx({
-      tag: Tag.SpendTx, senderId: address, recipientId: address, amount: 1.23e18, nonce: 10, ttl: 0,
+      tag: Tag.SpendTx, senderId: address, recipientId: address, amount: 1.23e18, nonce: 10,
     });
 
     it('signs transaction', async () => {
