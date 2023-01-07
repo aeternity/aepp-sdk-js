@@ -49,12 +49,14 @@ type NullablePartial<
   NK extends keyof T = { [K in keyof T]: undefined extends T[K] ? K : never }[keyof T],
 > = Partial<Pick<T, NK>> & Omit<T, NK>;
 
+type Or<A, B> = A extends undefined ? B : A;
+
 type BuildTxArgBySchema<SchemaLine> =
   UnionToIntersection<
   SchemaLine extends ReadonlyArray<infer Elem>
     ? Elem extends TxElem
       ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
-      & (Parameters<Elem[1]['serialize']>[2] extends object ? Parameters<Elem[1]['serialize']>[2] : {})
+      & Or<Parameters<Elem[1]['serialize']>[2], {}>
       : never
     : never
   >;
