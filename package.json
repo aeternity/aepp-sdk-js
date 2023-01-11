@@ -18,11 +18,15 @@
   },
   "module": "es/index.mjs",
   "browser": {
+    "es/index.mjs": "./es/index-browser.mjs",
     "dist/aepp-sdk.js": "./dist/aepp-sdk.browser.js"
   },
   "exports": {
-    "import": "./es/index.mjs",
-    "node": "./dist/aepp-sdk.js",
+    "node": {
+      "import": "./es/index.mjs",
+      "default": "./dist/aepp-sdk.js"
+    },
+    "import": "./es/index-browser.mjs",
     "default": "./dist/aepp-sdk.browser.js"
   },
   "sideEffects": false,

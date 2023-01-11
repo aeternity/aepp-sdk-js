@@ -7,7 +7,7 @@ const babelConfig = require('./babel.config');
 function configure(filename, opts = {}) {
   const isNode = opts.target.includes('node');
   return (env) => ({
-    entry: './src/index.ts',
+    entry: `./src/index${isNode ? '' : '-browser'}.ts`,
     mode: 'production',
     devtool: 'source-map',
     module: {
@@ -25,7 +25,7 @@ function configure(filename, opts = {}) {
     },
     resolve: {
       extensions: ['.ts', '.js'],
-      fallback: opts.target.includes('browser') && {
+      fallback: isNode ? {} : {
         buffer: require.resolve('buffer/'),
         child_process: false,
         os: false,

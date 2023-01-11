@@ -19,7 +19,7 @@ import { describe, it } from 'mocha';
 import { readFile } from 'fs/promises';
 import { compilerUrl, ignoreVersion } from '.';
 import {
-  CompilerBase, CompilerHttp, CompilerCli, CompilerError, getFileSystem,
+  CompilerBase, CompilerHttpNode, CompilerCli, CompilerError, getFileSystem,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
@@ -97,11 +97,11 @@ function testCompiler(compiler: CompilerBase): void {
 }
 
 describe('CompilerHttp', () => {
-  const compiler = new CompilerHttp(compilerUrl, { ignoreVersion });
+  const compiler = new CompilerHttpNode(compilerUrl, { ignoreVersion });
   testCompiler(compiler);
 
   it('throws exception if used invalid compiler url', async () => {
-    const c = new CompilerHttp('https://compiler.aepps.comas');
+    const c = new CompilerHttpNode('https://compiler.aepps.comas');
     await expect(c.compileBySourceCode('test'))
       .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas');
   });
