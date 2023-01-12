@@ -21,7 +21,7 @@ export default async function run(transport) {
     onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
   });
 
-  const { hash } = await aeSdk.spend(1e17, 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR');
+  const { hash } = await aeSdk.spend(1e17, 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E');
   console.log('Spend tx hash', hash);
 
   const contractSourceCode = `

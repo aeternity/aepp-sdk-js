@@ -60,7 +60,7 @@ const commitmentId = commitmentHash(name, nameSalt);
 
 describe('Transaction', () => {
   let aeSdk: AeSdk;
-  const address = 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR';
+  const address = 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E';
   const oracleId = encode(decode(address), Encoding.OracleAddress);
   let contract: any;
 
@@ -118,7 +118,7 @@ describe('Transaction', () => {
     }),
   ], [
     'contract create',
-    'tx_+LAqAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNy4wLjEAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfP6vKAEo=',
+    'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNy4wLjEAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfP4mhOyM=',
     async () => aeSdk.buildTx(Tag.ContractCreateTx, {
       nonce,
       ownerId: address,
@@ -129,7 +129,7 @@ describe('Transaction', () => {
     }),
   ], [
     'contract call',
-    'tx_+GMrAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQU7e5ChtHAGM1Nh0MVEV74SbrYb1b5FQ3WBd7OBpwALyQOGpYvVcSgAAACDTEtAhDuaygCIKxGAeCCSGwT8YkzY',
+    'tx_+GMrAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoQU7e5ChtHAGM1Nh0MVEV74SbrYb1b5FQ3WBd7OBpwALyQOGpYvVcSgAAACDTEtAhDuaygCIKxGAeCCSGwRJ4Is+',
     async () => aeSdk.buildTx(Tag.ContractCallTx, {
       nonce,
       callerId: address,
@@ -140,25 +140,25 @@ describe('Transaction', () => {
     }),
   ], [
     'oracle register',
-    'tx_+FAWAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19gnUwAIIB9IYPN7jqmAAAAGsRIcw=',
+    'tx_+FAWAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19gnUwAIIB9IYPN7jqmAAAAFrPoGY=',
     async () => aeSdk.buildTx(Tag.OracleRegisterTx, {
       nonce, accountId: address, queryFormat, responseFormat, queryFee, ...oracleTtl,
     }),
   ], [
     'oracle extend',
-    'tx_8RkBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajOwEAggH0hg6itfGYAADwE/X7',
+    'tx_8RkBoQSEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAAEAggH0hg6itfGYAAC5Cppj',
     async () => aeSdk.buildTx(Tag.OracleExtendTx, {
       nonce, oracleId, callerId: address, ...oracleTtl,
     }),
   ], [
     'oracle post query',
-    'tx_+GkXAaEB1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoQTVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajO5J7J2NpdHknOiAnQmVybGluJ32CdTAAZABkhg+bJBmGAAAtn7nr',
+    'tx_+GkXAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoQSEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAJJ7J2NpdHknOiAnQmVybGluJ32CdTAAZABkhg+bJBmGAABcZrGe',
     async () => aeSdk.buildTx(Tag.OracleQueryTx, {
       nonce, oracleId, ...responseTtl, query, ...queryTtl, queryFee, senderId: address,
     }),
   ], [
     'oracle respond query',
-    'tx_+F0YAaEE1c8IQA6YgiLybrSwLI+JB3RXRnIRpubZVe23B0nGozsBoClgM30zCmbxGvUfzRbIZXGzOT8KCzYAUMRdnxbBX2Q9jHsndG1wJzogMTAxfQBkhg9jQvwmAADfRUs7',
+    'tx_+F0YAaEEhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoLpilW+m1a50IepD5pClPlSP54fnFbPvEU5kIgFZExwhjHsndG1wJzogMTAxfQBkhg9jQvwmAADiJk0r',
     async () => aeSdk.buildTx(Tag.OracleResponseTx, {
       nonce,
       oracleId,

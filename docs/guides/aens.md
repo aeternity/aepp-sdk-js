@@ -311,7 +311,7 @@ console.log(nameTransferTx)
     fee: 17300000000000,
     nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',
     nonce: 33,
-    recipientId: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
+    recipientId: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
     type: 'NameTransferTx',
     version: 1
   },
