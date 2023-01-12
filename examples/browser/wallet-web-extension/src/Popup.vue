@@ -1,20 +1,23 @@
 <template>
-  <div>
-    <h3>Wallet WebExtension</h3>
-    <img src="../public/icons/128.png" alt="Logo">
-
+  <div class="popup">
     <template v-if="popupParameters">
       <h2>Aepp at {{ aeppOrigin }} want to {{ action }}</h2>
-      <div>Request details</div>
-      <div>{{ JSON.stringify(popupParameters, null, 2) }}</div>
+      <div class="group">
+        <div>
+          <div>Request details</div>
+          <div>{{ JSON.stringify(popupParameters, null, 2) }}</div>
+        </div>
 
-      <button @click="() => respond(true)">
-        Confirm
-      </button>
-      <button @click="() => respond(false)">
-        Reject
-      </button>
+        <button @click="() => respond(true)">
+          Confirm
+        </button>
+        <button @click="() => respond(false)">
+          Reject
+        </button>
+      </div>
     </template>
+
+    <h2 v-else>Wallet WebExtension</h2>
   </div>
 </template>
 
@@ -52,3 +55,5 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" src="./styles.scss" />

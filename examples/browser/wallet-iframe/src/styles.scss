@@ -22,16 +22,8 @@ button {
   }
 }
 
-h1, h2 {
-  @extend .mt-2, .font-bold;
-}
-
-h1 {
-  @extend .text-3xl;
-}
-
 h2 {
-  @extend .text-2xl;
+  @extend .mt-2, .font-bold, .text-2xl;
 }
 
 .group {
