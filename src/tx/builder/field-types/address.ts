@@ -1,6 +1,8 @@
 import { ArgumentError, PrefixNotFoundError, TagNotFoundError } from '../../../utils/errors';
 import { toBytes } from '../../../utils/bytes';
-import { decode, encode, Encoding } from '../../../utils/encoder';
+import {
+  decode, encode, Encoded, Encoding,
+} from '../../../utils/encoder';
 import { isItemOfArray } from '../../../utils/other';
 
 /**
@@ -23,8 +25,8 @@ export type AddressEncodings = typeof idTagToEncoding[number];
 export default function genAddressField<Encoding extends AddressEncodings>(
   ...encodings: Encoding[]
 ): {
-    serialize: (value: `${Encoding}_${string}`) => Buffer;
-    deserialize: (value: Buffer) => `${Encoding}_${string}`;
+    serialize: (value: Encoded.Generic<Encoding>) => Buffer;
+    deserialize: (value: Buffer) => Encoded.Generic<Encoding>;
   } {
   return {
     /**
@@ -54,7 +56,7 @@ export default function genAddressField<Encoding extends AddressEncodings>(
       if (!isItemOfArray(enc, encodings)) {
         throw new ArgumentError('Address encoding', encodings.join(', '), enc);
       }
-      return encode(buf.subarray(1), enc) as `${Encoding}_${string}`;
+      return encode(buf.subarray(1), enc) as Encoded.Generic<Encoding>;
     },
   };
 }

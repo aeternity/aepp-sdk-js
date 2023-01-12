@@ -181,8 +181,7 @@ describe('Ledger HW', () => {
       const networkId = 'ae_uat';
       const signedTransaction = await account.signTransaction(transaction, { networkId });
       expect(signedTransaction).to.satisfy((t: string) => t.startsWith('tx_'));
-      const data = unpackTx(signedTransaction, Tag.SignedTx);
-      const signature = data.tx.signatures[0];
+      const { signatures: [signature] } = unpackTx(signedTransaction, Tag.SignedTx);
       const hashedTx = Buffer.concat([Buffer.from(networkId), hash(decode(transaction))]);
       expect(verify(hashedTx, signature, address)).to.be.equal(true);
     });

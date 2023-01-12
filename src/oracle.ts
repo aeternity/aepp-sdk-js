@@ -181,7 +181,7 @@ export async function postQueryToOracle(
     senderId,
     query,
   });
-  const { nonce } = unpackTx(oracleQueryTx, Tag.OracleQueryTx).tx;
+  const { nonce } = unpackTx(oracleQueryTx, Tag.OracleQueryTx);
   const queryId = oracleQueryId(senderId, nonce, oracleId);
   return {
     ...await send(oracleQueryTx, options),

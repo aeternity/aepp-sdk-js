@@ -19,7 +19,7 @@ import '..';
 import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
 import {
-  buildTxHash, unpackTx,
+  buildTxHash, decode,
   generateKeyPair, getAddressFromPriv, verifyMessage, isValidKeypair, isAddressValid, hash, genSalt,
   sign, verify, messageToHash, signMessage,
 } from '../../src';
@@ -145,8 +145,6 @@ describe('crypto', () => {
   });
 
   it('Can produce tx hash', () => {
-    const rlpEncodedTx = unpackTx(txRaw).rlpEncoded;
-    buildTxHash(txRaw).should.be.equal(expectedHash);
-    buildTxHash(rlpEncodedTx).should.be.equal(expectedHash);
+    buildTxHash(decode(txRaw)).should.be.equal(expectedHash);
   });
 });

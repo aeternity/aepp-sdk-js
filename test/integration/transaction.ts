@@ -35,6 +35,7 @@ const name = 'test123test.chain';
 const nameId = 'nm_2sFnPHi5ziAqhdApSpRBsYdomCahtmk3YGNZKYUTtUNpVSMccC';
 const nameFee = '1000000000000000000000';
 const pointers = [{ key: 'account_pubkey', id: senderId }];
+const payload = encode(Buffer.from('test'), Encoding.Bytearray);
 
 // Oracle
 const queryFormat = '{\'city\': str}';
@@ -70,7 +71,7 @@ describe('Transaction', () => {
 
   it('build spend tx using denomination amount', async () => {
     const params = {
-      senderId, recipientId, nonce, payload: 'test',
+      senderId, recipientId, nonce, payload,
     };
     const spendAe = await aeSdk.buildTx(
       Tag.SpendTx,
@@ -85,7 +86,7 @@ describe('Transaction', () => {
     'spend',
     'tx_+F0MAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg9e1n8oAAABhHRlc3QLK3OW',
     async () => aeSdk.buildTx(Tag.SpendTx, {
-      senderId, recipientId, nonce, payload: 'test', amount: 2, denomination: AE_AMOUNT_FORMATS.AE,
+      senderId, recipientId, nonce, payload, amount: 2, denomination: AE_AMOUNT_FORMATS.AE,
     }),
   ], [
     'name pre-claim',
@@ -170,6 +171,6 @@ describe('Transaction', () => {
 
   transactions.forEach(([txName, expected, getter]) => it(`build of ${txName} transaction`, async () => {
     expect(await getter()).to.be.equal(expected);
-    expect(buildTx(unpackTx(expected).tx)).to.be.equal(expected);
+    expect(buildTx(unpackTx(expected))).to.be.equal(expected);
   }));
 });

@@ -110,7 +110,7 @@ export async function transferFunds(
     await getBalance.bind(options.onAccount)(senderId, options),
   );
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP);
-  const { tx: { fee } } = unpackTx(
+  const { fee } = unpackTx(
     await _buildTx(Tag.SpendTx, {
       ...options, senderId, recipientId, amount: desiredAmount,
     }),

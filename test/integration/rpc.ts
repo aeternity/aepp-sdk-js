@@ -47,6 +47,7 @@ import {
   UnsubscribedAccountError,
   AccountBase,
   verifyMessage,
+  buildTx,
 } from '../../src';
 import { concatBuffers } from '../../src/utils/other';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
@@ -54,7 +55,7 @@ import {
   getSdk, ignoreVersion, networkId, url, compilerUrl,
 } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
-import { Encoded } from '../../src/utils/encoder';
+import { encode, Encoded, Encoding } from '../../src/utils/encoder';
 
 const WindowPostMessageFake = (
   name: string,
@@ -291,7 +292,6 @@ describe('Aepp<->Wallet', function aeppWallet() {
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,
-        payload: 'zerospend',
       });
       await expect(aepp.signTransaction(tx)).to.be.eventually
         .rejectedWith('Operation rejected by user').with.property('code', 4);
@@ -306,7 +306,6 @@ describe('Aepp<->Wallet', function aeppWallet() {
         senderId: keypair.publicKey,
         recipientId: keypair.publicKey,
         amount: 0,
-        payload: 'zerospend',
       });
       await expect(aepp.signTransaction(tx, { onAccount: account.address }))
         .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
@@ -319,13 +318,14 @@ describe('Aepp<->Wallet', function aeppWallet() {
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,
-        payload: 'zerospend',
       });
 
       const signedTx = await aepp.signTransaction(tx);
       const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
-      const { tx: { signatures: [signature], encodedTx: { rlpEncoded } } } = unpackedTx;
-      const txWithNetwork = concatBuffers([Buffer.from(networkId), hash(rlpEncoded)]);
+      const { signatures: [signature], encodedTx } = unpackedTx;
+      const txWithNetwork = concatBuffers([
+        Buffer.from(networkId), hash(decode(buildTx(encodedTx))),
+      ]);
       expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
     });
 
@@ -348,7 +348,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
           senderId: aepp.address,
           recipientId: aepp.address,
           amount: 0,
-          payload: 'zerospend2',
+          payload: encode(Buffer.from('zerospend2'), Encoding.Bytearray),
         });
         return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
       };
@@ -356,7 +356,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,
-        payload: 'zerospend',
+        payload: encode(Buffer.from('zerospend'), Encoding.Bytearray),
       });
       const res = await aepp.send(tx);
       if (res.tx?.payload == null || res.blockHeight == null) throw new UnexpectedTsError();
@@ -407,7 +407,6 @@ describe('Aepp<->Wallet', function aeppWallet() {
         amount: 0,
         ttl: 1,
         absoluteTtl: true,
-        payload: 'zerospend',
       });
 
       await expect(aepp.send(tx)).to.be
@@ -555,7 +554,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
           senderId: aepp.address,
           recipientId: aepp.address,
           amount: 0,
-          payload: 'zerospend2',
+          payload: encode(Buffer.from('zerospend2'), Encoding.Bytearray),
         });
         return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
       };
@@ -563,7 +562,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,
-        payload: 'zerospend',
+        payload: encode(Buffer.from('zerospend'), Encoding.Bytearray),
       });
       const res = await aepp.send(tx);
       if (res.tx?.payload == null || res.blockHeight == null) throw new UnexpectedTsError();

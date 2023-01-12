@@ -1,18 +1,11 @@
 import BigNumber from 'bignumber.js';
 import { hash, verify } from '../utils/crypto';
-import {
-  CtVersion,
-  PROTOCOL_VM_ABI,
-  RawTxObject,
-  TxParamsCommon,
-  TxSchema,
-  TxTypeSchemas,
-} from './builder/schema';
-import { Tag } from './builder/constants';
-import { TxUnpacked, unpackTx } from './builder';
-import { UnsupportedProtocolError } from '../utils/errors';
-import { concatBuffers, isAccountNotFoundError, isKeyOfObject } from '../utils/other';
-import { encode, Encoded, Encoding } from '../utils/encoder';
+import { RawTxObject, TxParamsCommon, TxSchema } from './builder/schema';
+import { ProtocolToVmAbi } from './builder/field-types/ct-version';
+import { Tag, ConsensusProtocolVersion } from './builder/constants';
+import { buildTx, unpackTx } from './builder';
+import { concatBuffers, isAccountNotFoundError } from '../utils/other';
+import { Encoded, decode } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
@@ -23,23 +16,10 @@ export interface ValidatorResult {
   checkedKeys: string[];
 }
 
+type UnpackedTx = ReturnType<typeof unpackTx>['tx'];
+
 type Validator = (
-  tx: {
-    encodedTx: TxUnpacked<TxSchema>;
-    signatures: Buffer[];
-    tx: TxUnpacked<TxSchema> & {
-      tx: TxTypeSchemas[Tag.SignedTx];
-    };
-    tag: Tag;
-    nonce?: number;
-    ttl?: number;
-    amount?: number;
-    fee?: number;
-    nameFee?: number;
-    ctVersion?: Partial<CtVersion>;
-    abiVersion?: number;
-    contractId?: Encoded.ContractAddress;
-  },
+  tx: UnpackedTx,
   options: {
     // TODO: remove after fixing node types
     account?: TransformNodeType<Account> & { id: Encoded.AccountAddress };
@@ -47,7 +27,7 @@ type Validator = (
     parentTxTypes: Tag[];
     node: Node;
     height: number;
-    consensusProtocolVersion: number;
+    consensusProtocolVersion: ConsensusProtocolVersion;
   }
 ) => ValidatorResult[] | Promise<ValidatorResult[]>;
 
@@ -63,34 +43,13 @@ const getSenderAddress = (
   .filter((a) => a)
   .map((a) => a?.toString().replace(/^ok_/, 'ak_'))[0] as Encoded.AccountAddress | undefined;
 
-/**
- * Transaction Validator
- * This function validates some of transaction properties,
- * to make sure it can be posted it to the chain
- * @category transaction builder
- * @param transaction - Base64Check-encoded transaction
- * @param nodeNotCached - Node to validate transaction against
- * @param parentTxTypes - Types of parent transactions
- * @returns Array with verification errors
- * @example const errors = await verifyTransaction(transaction, node)
- */
-export default async function verifyTransaction(
-  transaction: Encoded.Transaction | Encoded.Poi,
-  nodeNotCached: Node,
-  parentTxTypes: Tag[] = [],
+async function verifyTransactionInternal(
+  tx: UnpackedTx,
+  node: Node,
+  parentTxTypes: Tag[],
 ): Promise<ValidatorResult[]> {
-  let node = nodeNotCached;
-  if (
-    !node.pipeline.getOrderedPolicies()
-      .some(({ name }) => name === 'aggressive-cache-get-responses')
-  ) {
-    node = new Node(nodeNotCached.$host, { ignoreVersion: true });
-    node.pipeline.addPolicy(genAggressiveCacheGetResponsesPolicy());
-  }
-
-  const { tx } = unpackTx<Tag.SignedTx>(transaction);
   const address = getSenderAddress(tx)
-    ?? (tx.tag === Tag.SignedTx ? getSenderAddress(tx.encodedTx.tx) : undefined);
+    ?? (tx.tag === Tag.SignedTx ? getSenderAddress(tx.encodedTx) : undefined);
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
     address == null
       ? undefined
@@ -107,7 +66,7 @@ export default async function verifyTransaction(
 
   return (await Promise.all(
     validators.map((v) => v(
-      tx as any,
+      tx,
       {
         node, account, height, consensusProtocolVersion, nodeNetworkId, parentTxTypes,
       },
@@ -115,17 +74,37 @@ export default async function verifyTransaction(
   )).flat();
 }
 
+/**
+ * Transaction Validator
+ * This function validates some transaction properties,
+ * to make sure it can be posted it to the chain
+ * @category transaction builder
+ * @param transaction - Base64Check-encoded transaction
+ * @param nodeNotCached - Node to validate transaction against
+ * @returns Array with verification errors
+ * @example const errors = await verifyTransaction(transaction, node)
+ */
+export default async function verifyTransaction(
+  transaction: Parameters<typeof unpackTx>[0],
+  nodeNotCached: Node,
+): Promise<ValidatorResult[]> {
+  const node = new Node(nodeNotCached.$host, { ignoreVersion: true });
+  node.pipeline.addPolicy(genAggressiveCacheGetResponsesPolicy());
+  return verifyTransactionInternal(unpackTx(transaction), node, []);
+}
+
 validators.push(
   ({ encodedTx, signatures }, { account, nodeNetworkId, parentTxTypes }) => {
     if ((encodedTx ?? signatures) == null) return [];
     if (account == null) return [];
-    if (signatures.length !== 1) return []; // TODO: Support multisignature?
+    if (signatures.length !== 1) return []; // TODO: Support multisignature like in state channels
     const prefix = Buffer.from([
       nodeNetworkId,
       ...parentTxTypes.includes(Tag.PayingForTx) ? ['inner_tx'] : [],
     ].join('-'));
-    const txWithNetworkId = concatBuffers([prefix, encodedTx.rlpEncoded]);
-    const txHashWithNetworkId = concatBuffers([prefix, hash(encodedTx.rlpEncoded)]);
+    const txBinary = decode(buildTx(encodedTx));
+    const txWithNetworkId = concatBuffers([prefix, txBinary]);
+    const txHashWithNetworkId = concatBuffers([prefix, hash(txBinary)]);
     if (verify(txWithNetworkId, signatures[0], account.id)
       || verify(txHashWithNetworkId, signatures[0], account.id)) return [];
     return [{
@@ -137,11 +116,7 @@ validators.push(
   },
   async ({ encodedTx, tx, tag }, { node, parentTxTypes }) => {
     if ((encodedTx ?? tx) == null) return [];
-    return verifyTransaction(
-      encode((encodedTx ?? tx).rlpEncoded, Encoding.Transaction),
-      node,
-      [...parentTxTypes, tag],
-    );
+    return verifyTransactionInternal(encodedTx ?? tx, node, [...parentTxTypes, tag]);
   },
   ({ ttl }, { height }) => {
     if (ttl == null) return [];
@@ -160,7 +135,7 @@ validators.push(
     if ((amount ?? fee ?? nameFee) == null) return [];
     fee ??= 0;
     const cost = new BigNumber(fee).plus(nameFee ?? 0).plus(amount ?? 0)
-      .plus(tag === Tag.PayingForTx ? (tx.tx.encodedTx.tx).fee : 0)
+      .plus(tag === Tag.PayingForTx ? tx.encodedTx.fee : 0)
       .minus(parentTxTypes.includes(Tag.PayingForTx) ? fee : 0);
     if (cost.lte(account.balance.toString())) return [];
     return [{
@@ -200,25 +175,27 @@ validators.push(
     }];
   },
   ({ ctVersion, abiVersion, tag }, { consensusProtocolVersion }) => {
-    if (!isKeyOfObject(consensusProtocolVersion, PROTOCOL_VM_ABI)) {
-      throw new UnsupportedProtocolError(`Unsupported protocol: ${consensusProtocolVersion}`);
-    }
-    const protocol = PROTOCOL_VM_ABI[consensusProtocolVersion];
+    const oracleCall = Tag.Oracle === tag || Tag.OracleRegisterTx === tag;
+    const contractCreate = Tag.ContractCreateTx === tag || Tag.GaAttachTx === tag;
+    const contractCall = Tag.ContractCallTx === tag || Tag.GaMetaTx === tag;
+    const type = (oracleCall ? 'oracle-call' : null)
+      ?? (contractCreate ? 'contract-create' : null)
+      ?? (contractCall ? 'contract-call' : null);
+    if (type == null) return [];
+    // TODO: remove assertion after fixing buildTx types
+    const protocol = ProtocolToVmAbi[consensusProtocolVersion][type] as unknown as {
+      abiVersion: any[];
+      vmVersion: any[];
+    };
 
     // If not contract create tx
     if (ctVersion == null) ctVersion = { abiVersion };
-    const txProtocol = protocol[tag as keyof typeof protocol];
-    if (txProtocol == null) return [];
-    if (Object.entries(ctVersion).some(
-      ([
-        key,
-        value,
-      ]: [
-        key:keyof typeof txProtocol,
-        value:any]) => !(txProtocol[key].includes(+value as never)),
-    )) {
+    if (
+      !protocol.abiVersion.includes(ctVersion.abiVersion)
+      || (contractCreate && !protocol.vmVersion.includes(ctVersion.vmVersion))
+    ) {
       return [{
-        message: `ABI/VM version ${JSON.stringify(ctVersion)} is wrong, supported is: ${JSON.stringify(txProtocol)}`,
+        message: `ABI/VM version ${JSON.stringify(ctVersion)} is wrong, supported is: ${JSON.stringify(protocol)}`,
         key: 'VmAndAbiVersionMismatch',
         checkedKeys: ['ctVersion', 'abiVersion'],
       }];

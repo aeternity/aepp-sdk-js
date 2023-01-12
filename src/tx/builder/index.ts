@@ -4,9 +4,8 @@ import {
 } from '../../utils/encoder';
 import { AE_AMOUNT_FORMATS } from '../../utils/amount-formatter';
 import { hash } from '../../utils/crypto';
-import { Field } from './field-types';
+import { BinaryData, Field } from './field-types';
 import {
-  FIELD_TYPES,
   RawTxObject,
   TX_SCHEMA,
   TxField,
@@ -17,148 +16,12 @@ import {
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
-import { toBytes } from '../../utils/bytes';
-import {
-  ArgumentError,
-  DecodeError,
-  InvalidTxParamsError,
-  SchemaNotFoundError,
-} from '../../utils/errors';
+import { ArgumentError, DecodeError, SchemaNotFoundError } from '../../utils/errors';
 import { isKeyOfObject } from '../../utils/other';
 
 /**
  * JavaScript-based Transaction builder
  */
-
-// SERIALIZE AND DESERIALIZE PART
-function deserializeField(
-  value: any,
-  type: FIELD_TYPES | Field,
-  prefix?: Encoding | Encoding[],
-): any {
-  if (value == null) return '';
-  switch (type) {
-    case FIELD_TYPES.ctVersion: {
-      const [vm, , abi] = value;
-      return {
-        vmVersion: +readInt(Buffer.from([vm])),
-        abiVersion: +readInt(Buffer.from([abi])),
-      };
-    }
-    case FIELD_TYPES.bool:
-      return value[0] === 1;
-    case FIELD_TYPES.binary:
-      return encode(value, prefix as Encoding);
-    case FIELD_TYPES.stateTree:
-      return encode(value, Encoding.StateTrees);
-    case FIELD_TYPES.string:
-      return value.toString();
-    case FIELD_TYPES.payload:
-      return encode(value, Encoding.Bytearray);
-    case FIELD_TYPES.rlpBinary:
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return unpackTx(encode(value, Encoding.Transaction));
-    case FIELD_TYPES.rlpBinaries:
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return value.map((v: Buffer) => unpackTx(encode(v, Encoding.Transaction)));
-    case FIELD_TYPES.rawBinary:
-      return value;
-    case FIELD_TYPES.hex:
-      return value.toString('hex');
-    case FIELD_TYPES.offChainUpdates:
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return value.map((v: Buffer) => unpackTx(encode(v, Encoding.Transaction)));
-    case FIELD_TYPES.callStack:
-      // TODO: fix this
-      return [readInt(value)];
-    case FIELD_TYPES.sophiaCodeTypeInfo:
-      return value.reduce(
-        (acc: object, [funHash, fnName, argType, outType]: [
-          funHash: Buffer,
-          fnName: string,
-          argType: string,
-          outType: string,
-        ]) => ({
-          ...acc,
-          [fnName.toString()]: { funHash, argType, outType },
-        }),
-        {},
-      );
-    default:
-      if (typeof type === 'number') return value;
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return type.deserialize(value, { unpackTx });
-  }
-}
-
-function serializeField(value: any, type: FIELD_TYPES | Field, params: any): any {
-  switch (type) {
-    case FIELD_TYPES.bool:
-      return Buffer.from([(value === true) ? 1 : 0]);
-    case FIELD_TYPES.binary:
-      return decode(value);
-    case FIELD_TYPES.stateTree:
-      return decode(value);
-    case FIELD_TYPES.hex:
-      return Buffer.from(value, 'hex');
-    case FIELD_TYPES.signatures:
-      return value.map(Buffer.from);
-    case FIELD_TYPES.payload:
-      return typeof value === 'string' && value.split('_')[0] === 'ba'
-        ? decode(value as Encoded.Bytearray)
-        : toBytes(value);
-    case FIELD_TYPES.string:
-      return toBytes(value);
-    case FIELD_TYPES.rlpBinary:
-      return value.rlpEncoded ?? value;
-    case FIELD_TYPES.ctVersion:
-      return Buffer.from([...toBytes(value.vmVersion), 0, ...toBytes(value.abiVersion)]);
-    default:
-      if (typeof type === 'number') return value;
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return type.serialize(value, { ...params, unpackTx, buildTx });
-  }
-}
-
-function validateField(
-  value: any,
-  type: FIELD_TYPES | Field,
-): string | undefined {
-  // All fields are required
-  if (value == null) return 'Field is required';
-
-  // Validate type of value
-  switch (type) {
-    case FIELD_TYPES.ctVersion:
-      if (!(Boolean(value.abiVersion) && Boolean(value.vmVersion))) {
-        return 'Value must be an object with "vmVersion" and "abiVersion" fields';
-      }
-      return undefined;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Validate transaction params
- * @category transaction builder
- * @param params - Object with tx params
- * @param schema - Transaction schema
- * @returns Object with validation errors
- */
-function validateParams(
-  params: any,
-  schema: TxField[],
-): object {
-  const optionalFields = ['payload', 'nameFee', 'deposit', 'gasPrice', 'fee', 'gasLimit', 'amount'];
-  return Object.fromEntries(
-    schema
-      // TODO: allow optional keys in schema
-      .filter(([key]) => !optionalFields.includes(key))
-      .map(([key, type]) => [key, validateField(params[key], type)])
-      .filter(([, message]) => message),
-  );
-}
 
 /**
  * Unpack binary transaction
@@ -178,9 +41,13 @@ function unpackRawTx<Tx extends TxSchema>(
     .reduce<any>(
     (
       acc,
-      [key, fieldType, prefix],
+      [name, field],
       index,
-    ) => Object.assign(acc, { [key]: deserializeField(binary[index], fieldType, prefix) }),
+    ) => {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      const deserialized = field.deserialize(binary[index] as BinaryData, { unpackTx });
+      return { ...acc, [name]: deserialized };
+    },
     {},
   );
 }
@@ -223,17 +90,14 @@ export function buildTx<
   }
   const schema = schemas[params.version] as unknown as TxField[];
 
-  const valid = validateParams(params, schema);
-  if (Object.keys(valid).length > 0) {
-    throw new InvalidTxParamsError(`Transaction build error. ${JSON.stringify(valid)}`);
-  }
-
-  const binary = schema.map(([key, fieldType]: [keyof TxSchema, FIELD_TYPES | Field]) => (
-    serializeField(
+  const binary = schema.map(([key, field]: [keyof TxSchema, Field]) => (
+    field.serialize(
       params[key],
-      fieldType,
       {
         ...params,
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        unpackTx,
+        buildTx,
         denomination,
         rebuildTx: (overrideParams: any) => buildTx(
           { ...params, ...overrideParams },
@@ -248,13 +112,6 @@ export function buildTx<
 }
 
 /**
- * @category transaction builder
- */
-export interface TxUnpacked<Tx extends TxSchema> {
-  tx: RawTxObject<Tx>;
-  rlpEncoded: Uint8Array;
-}
-/**
  * Unpack transaction hash
  * @category transaction builder
  * @param encodedTx - Transaction to unpack
@@ -266,19 +123,15 @@ export interface TxUnpacked<Tx extends TxSchema> {
 export function unpackTx<TxType extends Tag>(
   encodedTx: Encoded.Transaction | Encoded.Poi,
   txType?: TxType,
-): TxUnpacked<TxTypeSchemas[TxType]> {
-  const rlpEncoded = decode(encodedTx);
-  const binary = rlpDecode(rlpEncoded);
+): RawTxObject<TxTypeSchemas[TxType]> {
+  const binary = rlpDecode(decode(encodedTx));
   const tag = +readInt(binary[0] as Buffer);
   if (!isKeyOfObject(tag, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${tag}`);
   if (txType != null && txType !== tag) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[tag]} instead`);
   const version = +readInt(binary[1] as Buffer);
   if (!isKeyOfObject(version, TX_SCHEMA[tag])) throw new SchemaNotFoundError('deserialization', `tag ${tag}`, version);
   const schema = TX_SCHEMA[tag][version];
-  return {
-    tx: unpackRawTx<TxTypeSchemas[TxType]>(binary, schema),
-    rlpEncoded,
-  };
+  return unpackRawTx<TxTypeSchemas[TxType]>(binary, schema);
 }
 
 /**
@@ -303,9 +156,9 @@ export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.Tx
 export function buildContractIdByContractTx(
   contractTx: Encoded.Transaction,
 ): Encoded.ContractAddress {
-  const { tx } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
-  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(tx.tag)) {
-    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', tx.tag);
+  const { tag, ownerId, nonce } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
+  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(tag)) {
+    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', tag);
   }
-  return buildContractId(tx.ownerId, +tx.nonce);
+  return buildContractId(ownerId, +nonce);
 }

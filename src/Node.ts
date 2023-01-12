@@ -8,6 +8,7 @@ import {
 import { Node as NodeApi, NodeOptionalParams, ErrorModel } from './apis/node';
 import { mapObject } from './utils/other';
 import { Encoded } from './utils/encoder';
+import { ConsensusProtocolVersion } from './tx/builder/constants';
 
 const bigIntPropertyNames = [
   'balance', 'queryFee', 'fee', 'amount', 'nameFee', 'channelAmount',
@@ -106,7 +107,7 @@ export interface NodeInfo {
   url: string;
   nodeNetworkId: string;
   version: string;
-  consensusProtocolVersion: number;
+  consensusProtocolVersion: ConsensusProtocolVersion;
 }
 
 export default class Node extends (NodeTransformed as unknown as NodeTransformedApi) {

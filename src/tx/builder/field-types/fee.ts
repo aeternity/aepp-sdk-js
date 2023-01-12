@@ -4,7 +4,7 @@ import { MIN_GAS_PRICE, Tag } from '../constants';
 import coinAmount from './coin-amount';
 import { isKeyOfObject } from '../../../utils/other';
 import { decode, Encoded } from '../../../utils/encoder';
-import type { unpackTx as unpackTxType } from '../index';
+import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
 
 const BASE_GAS = 15000;
 const GAS_PER_BYTE = 20;
@@ -93,15 +93,19 @@ function getOracleRelativeTtl(params: any): number {
 /**
  * Calculate fee based on tx type and params
  */
-export function buildFee(buildTx: Encoded.Transaction, unpackTx: typeof unpackTxType): BigNumber {
-  const { length } = decode(buildTx);
-  const txObject = unpackTx(buildTx).tx;
+export function buildFee(
+  builtTx: Encoded.Transaction,
+  unpackTx: typeof unpackTxType,
+  buildTx: typeof buildTxType,
+): BigNumber {
+  const { length } = decode(builtTx);
+  const txObject = unpackTx(builtTx);
 
   return TX_FEE_BASE_GAS(txObject.tag)
     .plus(TX_FEE_OTHER_GAS(txObject.tag, length, {
       relativeTtl: getOracleRelativeTtl(txObject),
-      innerTxSize: [Tag.GaMetaTx, Tag.PayingForTx].includes(txObject.tag)
-        ? (txObject as any).tx.tx.encodedTx.rlpEncoded.length
+      innerTxSize: txObject.tag === Tag.GaMetaTx || txObject.tag === Tag.PayingForTx
+        ? decode(buildTx(txObject.tx.encodedTx)).length
         : 0,
     }))
     .times(MIN_GAS_PRICE);
@@ -115,12 +119,13 @@ export function buildFee(buildTx: Encoded.Transaction, unpackTx: typeof unpackTx
 function calculateMinFee(
   rebuildTx: (value: BigNumber) => Encoded.Transaction,
   unpackTx: typeof unpackTxType,
+  buildTx: typeof buildTxType,
 ): BigNumber {
   let fee = new BigNumber(0);
   let previousFee;
   do {
     previousFee = fee;
-    fee = buildFee(rebuildTx(fee), unpackTx);
+    fee = buildFee(rebuildTx(fee), unpackTx, buildTx);
   } while (!fee.eq(previousFee));
   return fee;
 }
@@ -131,16 +136,21 @@ export default {
   serializeAettos(
     _value: string | undefined,
     {
-      rebuildTx, unpackTx, _computingMinFee, _pickBiggerFee,
+      rebuildTx, unpackTx, buildTx, _computingMinFee, _pickBiggerFee,
     }: {
       rebuildTx: (params: any) => Encoded.Transaction;
       unpackTx: typeof unpackTxType;
+      buildTx: typeof buildTxType;
       _computingMinFee?: BigNumber;
       _pickBiggerFee?: boolean;
     },
   ): string {
     if (_computingMinFee != null) return _computingMinFee.toFixed();
-    const minFee = calculateMinFee((fee) => rebuildTx({ _computingMinFee: fee }), unpackTx);
+    const minFee = calculateMinFee(
+      (fee) => rebuildTx({ _computingMinFee: fee }),
+      unpackTx,
+      buildTx,
+    );
     const value = new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
       if (_pickBiggerFee === true) return minFee.toFixed();

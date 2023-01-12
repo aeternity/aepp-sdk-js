@@ -27,7 +27,7 @@ import {
   getDefaultPointerKey, commitmentHash, getMinimumNameFee, isNameValid, produceNameId,
   toBytes,
   buildTx, unpackTx,
-  NAME_BID_RANGES, Tag,
+  NAME_BID_RANGES, Tag, AbiVersion, VmVersion,
   SchemaNotFoundError, ArgumentError,
 } from '../../src';
 import { Encoding, Encoded } from '../../src/utils/encoder';
@@ -123,7 +123,7 @@ describe('Tx', () => {
     });
 
     it('unpacks unknown transaction', () => {
-      const account = unpackTx('tx_zQoBAIkFa8deLWMQAAMJo1/N').tx;
+      const account = unpackTx('tx_zQoBAIkFa8deLWMQAAMJo1/N');
       if (account.tag === Tag.SpendTx) {
         expect(account.recipientId);
         // @ts-expect-error spend tx don't have balance
@@ -150,52 +150,37 @@ describe('Tx', () => {
       const account = {
         tag: 10, version: 1, nonce: 0, balance: '99999999999999998997',
       };
-      expect(unpackedPoi.tx.accounts[0].get(address)?.tx).to.eql(account);
+      expect(unpackedPoi.accounts[0].get(address)).to.eql(account);
 
       const addressContract = 'ct_ECdrEy2NJKq3qK3xraPtcDP7vfdi56SQXYAH3bVVSTmpqpYyW';
       const accountContract = {
         tag: 10, version: 1, nonce: 0, balance: '1000',
       };
-      expect(unpackedPoi.tx.accounts[0].get(addressContract as Encoded.AccountAddress)?.tx)
+      expect(unpackedPoi.accounts[0].get(addressContract as Encoded.AccountAddress))
         .to.eql(accountContract);
-      expect(unpackedPoi.tx.accounts[0].toObject()).to.eql({
+      expect(unpackedPoi.accounts[0].toObject()).to.eql({
         ak_BvMjyAXbpHkjzVfG53N6FxF1LwTX2EYwFLfNbk8mcXjp8CXBC: {
-          tx: {
-            tag: 10, version: 1, nonce: 0, balance: '100000000000000000003',
-          },
-          rlpEncoded: Buffer.from('cd0a010089056bc75e2d63100003', 'hex'),
+          tag: 10, version: 1, nonce: 0, balance: '100000000000000000003',
         },
-        [addressContract.replace('ct_', 'ak_')]: {
-          tx: accountContract,
-          rlpEncoded: Buffer.from('c60a01008203e8', 'hex'),
-        },
-        [address]: {
-          tx: account,
-          rlpEncoded: Buffer.from('cd0a010089056bc75e2d630ffc15', 'hex'),
-        },
+        [addressContract.replace('ct_', 'ak_')]: accountContract,
+        [address]: account,
       });
 
       const contract = {
         tag: 40,
         version: 1,
         owner: 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D',
-        ctVersion: { vmVersion: 5, abiVersion: 3 },
+        ctVersion: { vmVersion: VmVersion.Fate, abiVersion: AbiVersion.Fate },
         code: 'cb_+ExGA6Dh3797nquCHCSm088avgOiqgjjarRQviEYAXq+YlegWcCgjf6AeCCSADcBBwcBAQCOLwERgHggkhlnZXRBcmeCLwCFNy4wLjEALb9eTg==',
         log: 'cb_Xfbg4g==',
         active: true,
         referers: [],
         deposit: '1000',
       };
-      expect(unpackedPoi.tx.contracts[0].get(addressContract)?.tx).to.eql(contract);
-      expect(unpackedPoi.tx.contracts[0].toObject()).to.eql({
-        [addressContract]: {
-          tx: contract,
-          rlpEncoded: Buffer.from('f87e2801a1015d716d669f58a9b63829d5bc36895ff478e9d1565c3569d038a8e009bf01afd983050003b84ef84c4603a0e1dfbf7b9eab821c24a6d3cf1abe03a2aa08e36ab450be2118017abe6257a059c0a08dfe8078209200370107070101008e2f01118078209219676574417267822f0085372e302e31008001c08203e8', 'hex'),
-        },
-      });
+      expect(unpackedPoi.contracts[0].get(addressContract)).to.eql(contract);
+      expect(unpackedPoi.contracts[0].toObject()).to.eql({ [addressContract]: contract });
 
-      // TODO: remove any after fixing return type of unpackTx
-      expect(buildTx(unpackedPoi.tx as any, { prefix: Encoding.Poi })).to.equal(poi);
+      expect(buildTx(unpackedPoi, { prefix: Encoding.Poi })).to.equal(poi);
     });
   });
 
@@ -226,7 +211,7 @@ describe('Tx', () => {
         ownerId: 'ak_xw6vb7yJfajDdfcXzjg6Q5bH23bSUJrud6iBBfMdegZJFbQmc',
         nonce: 3,
         code: 'cb_+GhGA6Csc3MTA1lWna1q0L5k4TgjcQsmHIVhaJ7qU/0CBZqpO8C4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBBwcBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTcuMC4xAHO0rKc=',
-        ctVersion: { vmVersion: 7, abiVersion: 3 },
+        ctVersion: { vmVersion: VmVersion.Fate2, abiVersion: AbiVersion.Fate },
         fee: '78500000000000',
         ttl: 0,
         deposit: '0',
@@ -236,7 +221,12 @@ describe('Tx', () => {
         callData: 'cb_KxFE1kQfP4oEp9E=',
       } as const;
       const tx = buildTx(txParams);
-      expect(unpackTx(tx, Tag.ContractCreateTx).tx.fee).to.be.equal('78500000000000');
+      expect(unpackTx(tx, Tag.ContractCreateTx).fee).to.be.equal('78500000000000');
+    });
+
+    it('unpack and build ChannelCreateTx into the same value', () => {
+      const tx = 'tx_+IgyAqEBNMD0uYWndDrqF2Q8OIUWZ/gEi45vpwfg+cNOEVi9pL+JBWvHXi1jEAAAoQG5mrb34g29bneQLjNaFcH4OwVP0r9m9x6kYxpxiqN7EYkFa8deLWMQAAAAAQCGECcSfcAAwMCgOK3o2rLTFOY30p/4fMgaz3hG5WWTAcWknsu7ceLFmM0CERW42w==';
+      expect(buildTx(unpackTx(tx))).to.be.equal(tx);
     });
 
     it('rejects if invalid transaction version', () => {
