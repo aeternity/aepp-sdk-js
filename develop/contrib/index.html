@@ -1126,31 +1126,31 @@ low-level access to it's endpoints, when necessary.</p>
 <h2 id="documenting">Documenting</h2>
 <p>Apart from documenting features and code, there is also documentation automatically generated using <a href="https://typedoc.org/"><strong>TypeDoc</strong></a> for documenting TS files and <a href="https://github.com/aeternity/aepp-sdk-js/blob/master/tooling/docs/examples-to-md.js">a script</a> for documenting examples and code partials.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">#generate examples and api documentation</span>
-npm run docs:examples <span class="o">&amp;&amp;</span> npm run docs:api
+npm<span class="w"> </span>run<span class="w"> </span>docs:examples<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>docs:api
 </code></pre></div>
 <h2 id="building">Building</h2>
 <p>aepp-sdk is built using npm. In order to build a production version, launch the <code>build</code> command.</p>
-<div class="highlight"><pre><span></span><code>npm install
-npm run build
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install
+npm<span class="w"> </span>run<span class="w"> </span>build
 </code></pre></div>
 <p><strong>Note</strong>: If you experience errors during the building, you might need to install build tools for your OS.</p>
 <p><strong>Windows: Windows Build Tools</strong>
-<div class="highlight"><pre><span></span><code>npm install -g windows-build-tools
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>windows-build-tools
 </code></pre></div></p>
 <p><strong>Ubuntu / Debian: Build Essential</strong>
-<div class="highlight"><pre><span></span><code>sudo apt-get update
-sudo apt-get install build-essential
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>build-essential
 </code></pre></div></p>
 <p><strong>Mac</strong></p>
 <p>Download <a href="https://apps.apple.com/de/app/xcode/id497799835?mt=12">Xcode</a> from AppStore, then run
 <div class="highlight"><pre><span></span><code>xcode-select --install
 </code></pre></div></p>
 <h2 id="generate-bundle-report">Generate bundle report</h2>
-<div class="highlight"><pre><span></span><code>npx webpack --env REPORT
+<div class="highlight"><pre><span></span><code>npx<span class="w"> </span>webpack<span class="w"> </span>--env<span class="w"> </span>REPORT
 </code></pre></div>
 <h2 id="testing">Testing</h2>
 <p>To test, launch the <code>test</code> command. This will run <a href="https://mochajs.org/">mocha</a>'s tests locally.</p>
-<div class="highlight"><pre><span></span><code>npm <span class="nb">test</span>
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span><span class="nb">test</span>
 </code></pre></div>
 <p>This repository also includes a docker-compose file, to allow you to <strong>run your own æternity node locally</strong>. If you want to do so, <strong>from the root of the project</strong>:</p>
 <ol>

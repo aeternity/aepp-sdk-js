@@ -1149,45 +1149,45 @@
 <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
   <span class="cm">&lt;!-- include latest SDK version --&gt;</span>
   <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span><span class="w"></span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Aeternity</span><span class="w"></span>
+  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Aeternity</span>
 
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"></span>
-<span class="w">      </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}]</span><span class="w"></span>
-<span class="w">    </span><span class="p">})</span><span class="w"></span>
-<span class="w">    </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getHeight</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">height</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Current Block Height:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">height</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">})</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
+<span class="w">      </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}]</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getHeight</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">height</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Current Block Height:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">height</span><span class="p">)</span>
+<span class="w">    </span><span class="p">})</span>
 <span class="w">  </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>
 <h2 id="npm">NPM</h2>
 <h3 id="latest-release">Latest Release</h3>
-<div class="highlight"><pre><span></span><code>npm i @aeternity/aepp-sdk
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>i<span class="w"> </span>@aeternity/aepp-sdk
 </code></pre></div>
 <h3 id="pre-release">Pre Release</h3>
 <p>To install a <em>Pre-Release</em> (latest <code>beta</code> or <code>alpha</code> version) you have to install the package appending the <code>@next</code> tag reference.
-<div class="highlight"><pre><span></span><code>npm i @aeternity/aepp-sdk@next
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>i<span class="w"> </span>@aeternity/aepp-sdk@next
 </code></pre></div></p>
 <h3 id="specific-github-branch">Specific Github Branch</h3>
 <p>You can also install a version coming from a specific branch. In this case you would install the SDK version of the <code>develop</code> branch.
-<div class="highlight"><pre><span></span><code>npm i github:aeternity/aepp-sdk-js#develop
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>i<span class="w"> </span>github:aeternity/aepp-sdk-js#develop
 </code></pre></div></p>
 <h3 id="typescript-projects">TypeScript projects</h3>
 <p>To work properly, sdk requires to enable <code>allowSyntheticDefaultImports</code> flag and register folder
 that contains type definitions for third-party packages sdk depends on.
 This may be done in <code>tsconfig.json</code>:
 <div class="highlight"><pre><span></span><code><span class="w">{</span>
-<span class="w"> </span> &quot;compilerOptions&quot;: {<span class="w"></span>
-<span class="w"> </span>   ...<span class="w"></span>
-<span class="gi">+   &quot;typeRoots&quot;: [</span><span class="w"></span>
-<span class="gi">+     &quot;node_modules/@types&quot;,</span><span class="w"></span>
-<span class="gi">+     &quot;node_modules/@aeternity/aepp-sdk/src/typings&quot;</span><span class="w"></span>
-<span class="gi">+   ],</span><span class="w"></span>
-<span class="gi">+   &quot;allowSyntheticDefaultImports&quot;: true</span><span class="w"></span>
-<span class="w"> </span> }<span class="w"></span>
+<span class="w"> </span> &quot;compilerOptions&quot;: {
+<span class="w"> </span>   ...
+<span class="gi">+   &quot;typeRoots&quot;: [</span>
+<span class="gi">+     &quot;node_modules/@types&quot;,</span>
+<span class="gi">+     &quot;node_modules/@aeternity/aepp-sdk/src/typings&quot;</span>
+<span class="gi">+   ],</span>
+<span class="gi">+   &quot;allowSyntheticDefaultImports&quot;: true</span>
+<span class="w"> </span> }
 <span class="w">}</span>
 </code></pre></div>
 SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.</p>

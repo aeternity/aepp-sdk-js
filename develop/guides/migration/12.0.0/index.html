@@ -2462,11 +2462,11 @@
 <h4 id="universal-rpcaepp-rpcwallet-ae-stamps-are-removed"><code>Universal</code>, <code>RpcAepp</code>, <code>RpcWallet</code>, <code>Ae</code> stamps are removed</h4>
 <p>Use <code>AeSdk</code>, <code>AeSdkAepp</code>, <code>AeSdkWallet</code>, <code>AeSdbBase</code> accordingly.
 For example:
-<div class="highlight"><pre><span></span><code><span class="gd">-import { Universal } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
-<span class="gi">+import { AeSdk } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="gd">-import { Universal } from &#39;@aeternity/aepp-sdk&#39;</span>
+<span class="gi">+import { AeSdk } from &#39;@aeternity/aepp-sdk&#39;</span>
 
-<span class="gd">-const aeSdk = await Universal(options)</span><span class="w"></span>
-<span class="gi">+const aeSdk = new AeSdk(options)</span><span class="w"></span>
+<span class="gd">-const aeSdk = await Universal(options)</span>
+<span class="gi">+const aeSdk = new AeSdk(options)</span>
 </code></pre></div></p>
 <h4 id="node-rpcclient-browserwindowmessage-classes-are-using-private-fields"><code>Node</code>, <code>RpcClient</code>, <code>BrowserWindowMessage</code> classes are using private fields</h4>
 <p>Accessing private fields through <code>Proxy</code> will lead to "TypeError: attempted to set private
@@ -2477,11 +2477,11 @@ Avoid the above error by not making instances of these classes reactive.</p>
 <h4 id="all-combined-exports-are-inlined-requireaeternityaepp-sdkgeneratekeypair">all combined exports are inlined (<code>require('@aeternity/aepp-sdk').generateKeyPair()</code>)</h4>
 <p>Import the needed utils directly instead of importing a wrapper object firstly.
 For example:
-<div class="highlight"><pre><span></span><code><span class="gd">-import { Crypto } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
-<span class="gi">+import { generateKeyPair } from &#39;@aeternity/aepp-sdk&#39;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="gd">-import { Crypto } from &#39;@aeternity/aepp-sdk&#39;</span>
+<span class="gi">+import { generateKeyPair } from &#39;@aeternity/aepp-sdk&#39;</span>
 
-<span class="gd">-console.log(Crypto.generateKeyPair())</span><span class="w"></span>
-<span class="gi">+console.log(generateKeyPair())</span><span class="w"></span>
+<span class="gd">-console.log(Crypto.generateKeyPair())</span>
+<span class="gi">+console.log(generateKeyPair())</span>
 </code></pre></div></p>
 <h4 id="accountbase-and-inheritors-are-classes-now"><code>AccountBase</code> and inheritors are classes now</h4>
 <p>Use <code>new</code> to create an instance.</p>
@@ -2493,8 +2493,8 @@ For example:
 <p>For example:
 <div class="highlight"><pre><span></span><code><span class="w">import { Node } from &#39;@aeternity/aepp-sdk&#39;</span>
 
-<span class="gd">-const node = await Node({ url, ignoreVersion: false })</span><span class="w"></span>
-<span class="gi">+const node = new Node(url, { ignoreVersion: false })</span><span class="w"></span>
+<span class="gd">-const node = await Node({ url, ignoreVersion: false })</span>
+<span class="gi">+const node = new Node(url, { ignoreVersion: false })</span>
 </code></pre></div></p>
 <h4 id="node-compiler-doesnt-check-version-on-the-first-request-instead-of-init"><code>Node</code>, <code>Compiler</code> doesn't check version on the first request instead of init</h4>
 <p>Don't handle <code>new Node(...)</code> and <code>new Compiler(...)</code> as a <code>Promise</code>.</p>
@@ -2534,8 +2534,8 @@ instead.</p>
 <h4 id="encode-since-the-prefix-is-evaluated-by-the-type-itself-the-required-prefix-parameter"><strong>encode:</strong> since the prefix is evaluated by the type itself the required prefix parameter</h4>
 <p>is no more accepted
 For example:
-<div class="highlight"><pre><span></span><code><span class="gd">-decode(&#39;cb_DA6sWJo=&#39;, &#39;cb&#39;)</span><span class="w"></span>
-<span class="gi">+decode(&#39;cb_DA6sWJo=&#39;)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="gd">-decode(&#39;cb_DA6sWJo=&#39;, &#39;cb&#39;)</span>
+<span class="gi">+decode(&#39;cb_DA6sWJo=&#39;)</span>
 </code></pre></div></p>
 <h4 id="calculateminfee-returns-bignumber-instead-of-string"><code>calculateMinFee</code> returns BigNumber instead of string</h4>
 <h4 id="fee-helpers-not-exported-anymore-base_gas-gas_per_byte-key_block_interval">Fee helpers not exported anymore (<code>BASE_GAS</code>, <code>GAS_PER_BYTE</code>, <code>KEY_BLOCK_INTERVAL</code>,</h4>
@@ -2651,10 +2651,10 @@ Use own implementation if needed.</p>
 <h4 id="sharewalletinfo-accepts-rpc-client-id-instead-of-callback"><code>shareWalletInfo</code> accepts rpc client id instead of callback</h4>
 <p>For example:
 <div class="highlight"><pre><span></span><code><span class="w">const connection = new BrowserRuntimeConnection({ port })</span>
-<span class="gd">-aeSdk.addRpcClient(connection)</span><span class="w"></span>
-<span class="gd">-aeSdk.shareWalletInfo(port.postMessage.bind(port))</span><span class="w"></span>
-<span class="gi">+const rpcClientId = aeSdk.addRpcClient(connection)</span><span class="w"></span>
-<span class="gi">+aeSdk.shareWalletInfo(rpcClientId)</span><span class="w"></span>
+<span class="gd">-aeSdk.addRpcClient(connection)</span>
+<span class="gd">-aeSdk.shareWalletInfo(port.postMessage.bind(port))</span>
+<span class="gi">+const rpcClientId = aeSdk.addRpcClient(connection)</span>
+<span class="gi">+aeSdk.shareWalletInfo(rpcClientId)</span>
 </code></pre></div></p>
 <h4 id="sharenode-argument-in-accept-callback-of-onconnection-removed"><code>shareNode</code> argument in accept callback of <code>onConnection</code> removed</h4>
 <p>Just deny the connection if you don't want to share the node url.</p>
