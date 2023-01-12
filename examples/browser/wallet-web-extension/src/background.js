@@ -54,8 +54,8 @@ const aeSdk = new AeSdkWallet({
     }
     aeppInfo[aeppId] = params;
   },
-  onDisconnect(msg, client) {
-    console.log('Client disconnected:', client);
+  onDisconnect(aeppId, payload) {
+    console.log('Client disconnected:', aeppId, payload);
   },
   onSubscription: genConfirmCallback('subscription'),
   onAskAccounts: genConfirmCallback('get accounts'),
@@ -70,7 +70,8 @@ browser.runtime.onConnect.addListener((port) => {
   const clientId = aeSdk.addRpcClient(connection);
   // share wallet details
   aeSdk.shareWalletInfo(clientId);
-  setInterval(() => aeSdk.shareWalletInfo(clientId), 3000);
+  const interval = setInterval(() => aeSdk.shareWalletInfo(clientId), 3000);
+  port.onDisconnect.addListener(() => clearInterval(interval));
 });
 
 console.log('Wallet initialized!');
