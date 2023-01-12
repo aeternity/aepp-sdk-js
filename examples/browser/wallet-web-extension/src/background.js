@@ -4,27 +4,52 @@ import {
   WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError,
 } from '@aeternity/aepp-sdk';
 
+let popupCounter = 0;
+async function confirmInPopup(parameters) {
+  const popupUrl = new URL(browser.runtime.getURL('./popup.html'));
+  const popupId = popupCounter;
+  popupCounter += 1;
+  popupUrl.searchParams.set('data', JSON.stringify({ ...parameters, popupId }));
+  await browser.windows.create({
+    url: popupUrl.toString(),
+    type: 'popup',
+    height: 600,
+    width: 600,
+  });
+  return new Promise((resolve) => {
+    const handler = (message, sender, sendResponse) => {
+      if (message.popupId !== popupId) return;
+      resolve(message.response);
+      sendResponse();
+      browser.runtime.onMessage.removeListener(handler);
+    };
+    browser.runtime.onMessage.addListener(handler);
+  });
+}
+
 const aeppInfo = {};
-const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
-  if (!confirm([
-    `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}`,
-    JSON.stringify(parameters, null, 2),
-  ].join('\n'))) {
-    throw new RpcRejectedByUserError();
-  }
+const genConfirmCallback = (action) => async (aeppId, parameters, aeppOrigin) => {
+  const isConfirmed = await confirmInPopup({
+    ...parameters,
+    action,
+    aeppId,
+    aeppInfo: aeppInfo[aeppId],
+    aeppOrigin,
+  });
+  if (!isConfirmed) throw new RpcRejectedByUserError();
 };
 
 class AccountMemoryProtected extends MemoryAccount {
-  async signTransaction(tx, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+  async signTransaction(transaction, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
-      genConfirmCallback(`sign transaction ${tx}`)(id, options, aeppOrigin);
+      await genConfirmCallback('sign transaction')(id, { ...options, transaction }, aeppOrigin);
     }
-    return super.signTransaction(tx, options);
+    return super.signTransaction(transaction, options);
   }
 
   async signMessage(message, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
-      genConfirmCallback(`sign message ${message}`)(id, options, aeppOrigin);
+      await genConfirmCallback('sign message')(id, { ...options, message }, aeppOrigin);
     }
     return super.signMessage(message, options);
   }
@@ -48,10 +73,14 @@ const aeSdk = new AeSdkWallet({
   id: browser.runtime.id,
   type: WALLET_TYPE.extension,
   name: 'Wallet WebExtension',
-  onConnection: (aeppId, params, origin) => {
-    if (!confirm(`Client ${params.name} with id ${aeppId} at ${origin} want to connect`)) {
-      throw new RpcConnectionDenyError();
-    }
+  async onConnection(aeppId, params, aeppOrigin) {
+    const isConfirmed = await confirmInPopup({
+      action: 'connect',
+      aeppId,
+      aeppInfo: params,
+      aeppOrigin,
+    });
+    if (!isConfirmed) throw new RpcConnectionDenyError();
     aeppInfo[aeppId] = params;
   },
   onDisconnect(aeppId, payload) {
