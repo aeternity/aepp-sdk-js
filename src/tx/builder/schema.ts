@@ -12,7 +12,7 @@ import {
   array, boolean, ctVersion, abiVersion,
 } from './field-types';
 import { Encoding } from '../../utils/encoder';
-import { KeysOfUnion, UnionToIntersection } from '../../utils/other';
+import { UnionToIntersection } from '../../utils/other';
 import { idTagToEncoding } from './field-types/address';
 
 export enum ORACLE_TTL_TYPES {
@@ -661,11 +661,6 @@ type TxTypeSchemasNotCombined = {
 export type TxTypeSchemas = {
   [key in Tag]: TxTypeSchemasNotCombined[key][keyof TxTypeSchemasNotCombined[key]]
 };
-
-export type TxVersionsBy<T extends Tag> = Extract<KeysOfUnion<typeof TX_SCHEMA[T]>, number>;
-
-export type TxTypeSchemaBy<T extends Tag, V extends TxVersionsBy<T>> =
-  TxTypeSchemasNotCombined[T][V];
 
 export type TxSchema = TxTypeSchemas[Tag];
 export type TxParamsCommon = Partial<UnionToIntersection<TxSchema>>;
