@@ -57,6 +57,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { encode, Encoding } from '@aeternity/aepp-sdk';
 import Value from './Value.vue';
 
 export default {
@@ -80,8 +81,7 @@ export default {
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
       ([aeSdk, address]) => {
         if (!aeSdk) return;
-        this.compilerVersionPromise = aeSdk.compilerApi.apiVersion()
-          .then(({ apiVersion }) => apiVersion);
+        this.compilerVersionPromise = aeSdk.compilerApi.version();
         this.balancePromise = aeSdk.getBalance(address);
         this.heightPromise = aeSdk.getHeight();
         this.nodeInfoPromise = aeSdk.getNodeInfo();
@@ -91,7 +91,9 @@ export default {
   },
   methods: {
     spend() {
-      return this.aeSdk.spend(this.spendAmount, this.spendTo, { payload: this.spendPayload });
+      return this.aeSdk.spend(this.spendAmount, this.spendTo, {
+        payload: encode(new TextEncoder().encode(this.spendPayload), Encoding.Bytearray),
+      });
     },
   },
 };

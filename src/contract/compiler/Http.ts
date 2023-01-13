@@ -15,7 +15,6 @@
  *  PERFORMANCE OF THIS SOFTWARE.
  */
 import { RestError } from '@azure/core-rest-pipeline';
-import { readFile } from 'fs/promises';
 import {
   Compiler as CompilerApi,
   ErrorModel,
@@ -24,8 +23,7 @@ import {
 import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../../utils/autorest';
 import CompilerBase, { Aci } from './Base';
 import { Encoded } from '../../utils/encoder';
-import { CompilerError } from '../../utils/errors';
-import getFileSystem from './getFileSystem';
+import { CompilerError, NotImplementedError } from '../../utils/errors';
 
 type GeneralCompilerError = ErrorModel & {
   info?: object;
@@ -97,10 +95,9 @@ export default class CompilerHttp extends CompilerBase {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
   async compile(path: string): Promise<{ bytecode: Encoded.ContractBytearray; aci: Aci }> {
-    const fileSystem = await getFileSystem(path);
-    const sourceCode = await readFile(path, 'utf8');
-    return this.compileBySourceCode(sourceCode, fileSystem);
+    throw new NotImplementedError('File system access, use CompilerHttpNode instead');
   }
 
   async validateBySourceCode(
@@ -116,10 +113,9 @@ export default class CompilerHttp extends CompilerBase {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
   async validate(bytecode: Encoded.ContractBytearray, path: string): Promise<boolean> {
-    const fileSystem = await getFileSystem(path);
-    const sourceCode = await readFile(path, 'utf8');
-    return this.validateBySourceCode(bytecode, sourceCode, fileSystem);
+    throw new NotImplementedError('File system access, use CompilerHttpNode instead');
   }
 
   async version(): Promise<string> {

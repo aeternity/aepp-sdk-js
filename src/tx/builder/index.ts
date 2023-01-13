@@ -6,13 +6,7 @@ import { AE_AMOUNT_FORMATS } from '../../utils/amount-formatter';
 import { hash } from '../../utils/crypto';
 import { BinaryData, Field } from './field-types';
 import {
-  RawTxObject,
-  TX_SCHEMA,
-  TxField,
-  TxSchema,
-  TxTypeSchemas,
-  TxTypeSchemaBy,
-  TxVersionsBy,
+  RawTxObject, TX_SCHEMA, TxField, TxSchema, TxTypeSchemas,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
@@ -68,9 +62,8 @@ function unpackRawTx<Tx extends TxSchema>(
 export function buildTx<
   TxType extends Tag,
   E extends Encoding = Encoding.Transaction,
-  Version extends TxVersionsBy<TxType> = TxVersionsBy<TxType>,
 >(
-  params: { tag: TxType; version?: Version } & Omit<TxTypeSchemaBy<TxType, Version>, 'tag' | 'version'>
+  params: { tag: TxType; version?: number } & Omit<TxTypeSchemas[TxType], 'tag' | 'version'>
   // TODO: get it from gas-limit.ts somehow
   & (TxType extends Tag.ContractCreateTx | Tag.ContractCallTx
   | Tag.ChannelOffChainUpdateCallContract | Tag.GaAttachTx | Tag.GaMetaTx
@@ -84,7 +77,7 @@ export function buildTx<
   } = {},
 ): Encoded.Generic<E> {
   const schemas = TX_SCHEMA[params.tag];
-  params.version ??= Math.max(...Object.keys(schemas).map((a) => +a)) as NonNullable<Version>;
+  params.version ??= Math.max(...Object.keys(schemas).map((a) => +a));
   if (!isKeyOfObject(params.version, schemas)) {
     throw new SchemaNotFoundError('serialization', Tag[params.tag], params.version);
   }
