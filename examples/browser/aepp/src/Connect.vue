@@ -47,7 +47,9 @@
 </template>
 
 <script>
-import { walletDetector, BrowserWindowMessageConnection } from '@aeternity/aepp-sdk';
+import {
+  walletDetector, BrowserWindowMessageConnection, RpcConnectionDenyError,
+} from '@aeternity/aepp-sdk';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -95,7 +97,12 @@ export default {
         }
         await this.$store.dispatch('aeSdk/initialize');
         const connection = await this.scanForWallets();
-        this.walletInfo = await this.aeSdk.connectToWallet(connection);
+        try {
+          this.walletInfo = await this.aeSdk.connectToWallet(connection);
+        } catch (error) {
+          if (error instanceof RpcConnectionDenyError) connection.disconnect();
+          throw error;
+        }
         this.walletConnected = true;
         const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected');
         this.$store.commit('aeSdk/setAddress', Object.keys(current)[0]);
