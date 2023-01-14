@@ -16,6 +16,16 @@ import { isKeyOfObject } from '../../utils/other';
  * JavaScript-based Transaction builder
  */
 
+function getSchema(tag: Tag, version?: number): TxField[] {
+  const schemas = TX_SCHEMA[tag];
+  if (schemas == null) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
+  version ??= Math.max(...Object.keys(schemas).map((a) => +a));
+  if (!isKeyOfObject(version, schemas)) {
+    throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, version);
+  }
+  return schemas[version];
+}
+
 /**
  * Build transaction hash
  * @category transaction builder
@@ -36,12 +46,7 @@ export function buildTx<
     prefix?: E;
   } = {},
 ): Encoded.Generic<E> {
-  const schemas = TX_SCHEMA[params.tag];
-  params.version ??= Math.max(...Object.keys(schemas).map((a) => +a));
-  if (!isKeyOfObject(params.version, schemas)) {
-    throw new SchemaNotFoundError('serialization', Tag[params.tag], params.version);
-  }
-  const schema = schemas[params.version] as unknown as TxField[];
+  const schema = getSchema(params.tag, params.version);
 
   const binary = schema.map(([key, field]: [keyof TxSchema, Field]) => (
     field.serialize(
@@ -76,12 +81,9 @@ export function unpackTx<TxType extends Tag>(
 ): RawTxObject<TxTypeSchemas[TxType]> {
   const binary = rlpDecode(decode(encodedTx));
   const tag = +readInt(binary[0] as Buffer);
-  if (!isKeyOfObject(tag, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${tag}`);
-  if (txType != null && txType !== tag) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[tag]} instead`);
   const version = +readInt(binary[1] as Buffer);
-  const schemas = TX_SCHEMA[tag];
-  if (!isKeyOfObject(version, schemas)) throw new SchemaNotFoundError('deserialization', `tag ${tag}`, version);
-  const schema = schemas[version] as TxField[];
+  const schema = getSchema(tag, version);
+  if (txType != null && txType !== tag) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[tag]} instead`);
   if (binary.length !== schema.length) {
     throw new ArgumentError('Transaction RLP length', schema.length, binary.length);
   }

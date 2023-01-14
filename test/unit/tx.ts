@@ -114,7 +114,7 @@ describe('Tx', () => {
     it('throws error if invalid transaction version', () => {
       const tx = encode(rlpEncode([10, 99]), Encoding.Transaction);
       expect(() => unpackTx(tx))
-        .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag 10 version 99');
+        .to.throw(SchemaNotFoundError, 'Transaction schema not implemented for tag Account (10) version 99');
     });
 
     it('fails to unpack tx with more RLP items than in schema', () => {
@@ -231,7 +231,7 @@ describe('Tx', () => {
 
     it('rejects if invalid transaction version', () => {
       expect(() => buildTx({ tag: Tag.SpendTx, version: 5 } as any))
-        .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
+        .to.throw(SchemaNotFoundError, 'Transaction schema not implemented for tag SpendTx (12) version 5');
     });
   });
 });
