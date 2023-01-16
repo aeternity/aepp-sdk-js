@@ -11,6 +11,7 @@ export default {
   async prepare(
     value: number | undefined,
     params: {},
+    // TODO: { absoluteTtl: true } | { absoluteTtl: false, onNode: Node }
     { onNode, absoluteTtl }: { onNode: Node; absoluteTtl?: boolean },
   ) {
     if (absoluteTtl !== true && value !== 0 && value != null) {

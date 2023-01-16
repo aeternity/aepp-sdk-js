@@ -698,16 +698,6 @@ export class InvalidSignatureError extends TransactionError {
 /**
  * @category exception
  */
-export class InvalidTxParamsError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'InvalidTxParamsError';
-  }
-}
-
-/**
- * @category exception
- */
 export class PrefixNotFoundError extends TransactionError {
   constructor(tag: number) {
     super(`Prefix for id-tag ${tag} not found.`);

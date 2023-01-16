@@ -32,7 +32,6 @@ export function getSchema(tag: Tag, version?: number): TxField[] {
  * @param params - Object with tx params
  * @param options - options
  * @param options.prefix - Prefix of transaction
- * @throws {@link InvalidTxParamsError}
  * @returns object Base64Check transaction hash with 'tx_' prefix
  */
 export function buildTx<

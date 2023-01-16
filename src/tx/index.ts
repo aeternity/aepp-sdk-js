@@ -24,11 +24,9 @@
  */
 import { TxParamsCommon, TxSchema, TxTypeSchemasAsync } from './builder/schema';
 import { Tag } from './builder/constants';
-import { ArgumentError, InvalidTxParamsError } from '../utils/errors';
 import Node from '../Node';
 import { Encoded } from '../utils/encoder';
 import { buildTx as syncBuildTx, getSchema, unpackTx } from './builder/index';
-import { isAccountNotFoundError } from '../utils/other';
 import { Field } from './builder/field-types';
 
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
@@ -40,69 +38,13 @@ export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
  */
 export async function _buildTx<TxType extends Tag>(
   txType: TxType,
-  { strategy, ..._params }: Omit<TxTypeSchemasAsync[TxType], 'tag' | 'nonce'>
-  & {
-    strategy?: 'continuity' | 'max';
-    onNode: Node;
-    nonce?: number;
-  }
-  & (TxType extends Tag.OracleExtendTx | Tag.OracleResponseTx
-    ? { callerId: Encoded.AccountAddress } : {}),
+  _params: Omit<TxTypeSchemasAsync[TxType], 'tag'>,
 ): Promise<Encoded.Transaction> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node };
-  let senderKey: keyof TxParamsCommon | '<absent>';
-  switch (txType) {
-    case Tag.SpendTx:
-    case Tag.OracleQueryTx:
-      senderKey = 'senderId';
-      break;
-    case Tag.NameClaimTx:
-    case Tag.NameUpdateTx:
-    case Tag.NameRevokeTx:
-    case Tag.NameTransferTx:
-    case Tag.NamePreclaimTx:
-    case Tag.OracleRegisterTx:
-      senderKey = 'accountId';
-      break;
-    case Tag.ContractCreateTx:
-    case Tag.GaAttachTx:
-      senderKey = 'ownerId';
-      break;
-    case Tag.GaMetaTx:
-      senderKey = 'gaId';
-      break;
-    case Tag.ContractCallTx:
-    case Tag.OracleExtendTx:
-    case Tag.OracleResponseTx:
-      senderKey = 'callerId';
-      break;
-    case Tag.ChannelCloseSoloTx:
-    case Tag.ChannelSlashTx:
-    case Tag.ChannelSettleTx:
-    case Tag.ChannelSnapshotSoloTx:
-      senderKey = 'fromId';
-      break;
-    case Tag.PayingForTx:
-      senderKey = 'payerId';
-      break;
-    default:
-      throw new ArgumentError('txType', 'valid transaction type', txType);
-  }
-
   if (txType === Tag.PayingForTx) {
     params.tx = unpackTx(params.tx);
   }
-  const senderId = params[senderKey];
-  // TODO: do this check on TypeScript level
-  if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`);
-
-  params.nonce ??= (
-    await params.onNode.getAccountNextNonce(senderId, { strategy }).catch((error) => {
-      if (!isAccountNotFoundError(error)) throw error;
-      return { nextNonce: 1 };
-    })
-  ).nextNonce;
 
   await Promise.all(
     getSchema(txType, params.version)

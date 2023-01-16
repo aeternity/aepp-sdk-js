@@ -90,7 +90,6 @@ export default class AccountGeneralized extends AccountBase {
       gaId: this.address,
       authData: authCallData,
       gasLimit,
-      nonce: 0,
       onNode,
     });
     return buildTx({ tag: Tag.SignedTx, encodedTx: decode(gaMetaTx), signatures: [] });
