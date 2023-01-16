@@ -26,7 +26,7 @@ import { TxParamsCommon, TxSchema, TxTypeSchemasAsync } from './builder/schema';
 import { Tag } from './builder/constants';
 import Node from '../Node';
 import { Encoded } from '../utils/encoder';
-import { buildTx as syncBuildTx, getSchema, unpackTx } from './builder/index';
+import { buildTx as syncBuildTx, getSchema } from './builder/index';
 import { Field } from './builder/field-types';
 
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
@@ -42,9 +42,6 @@ export async function _buildTx<TxType extends Tag>(
 ): Promise<Encoded.Transaction> {
   // TODO: avoid this assertion
   const params = _params as unknown as TxParamsCommon & { onNode: Node };
-  if (txType === Tag.PayingForTx) {
-    params.tx = unpackTx(params.tx);
-  }
 
   await Promise.all(
     getSchema(txType, params.version)

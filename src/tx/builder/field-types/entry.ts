@@ -1,4 +1,6 @@
-import { decode, encode, Encoding } from '../../../utils/encoder';
+import {
+  decode, encode, Encoded, Encoding,
+} from '../../../utils/encoder';
 import { Tag } from '../constants';
 import { ArgumentError } from '../../../utils/errors';
 import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
@@ -19,6 +21,9 @@ export default function genEntryField<T extends Tag = Tag>(tag?: T): {
   return {
     serialize(txParams, { buildTx }) {
       if (ArrayBuffer.isView(txParams)) return Buffer.from(txParams as any);
+      if (typeof txParams === 'string' && txParams.startsWith('tx_')) {
+        return decode(txParams as Encoded.Transaction);
+      }
       return decode(buildTx({ ...txParams, ...tag != null && { tag } }));
     },
 
