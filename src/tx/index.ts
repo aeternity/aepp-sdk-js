@@ -22,13 +22,14 @@
  * the creation of transactions to {@link Node}.
  * These methods provide ability to create native transactions.
  */
-import { TxParamsCommon } from './builder/schema';
+import { TxParamsCommon, TxSchema, TxTypeSchemasAsync } from './builder/schema';
 import { ConsensusProtocolVersion, Tag } from './builder/constants';
 import { ArgumentError, InvalidTxParamsError } from '../utils/errors';
 import Node from '../Node';
 import { Encoded } from '../utils/encoder';
-import { buildTx as syncBuildTx, unpackTx } from './builder/index';
+import { buildTx as syncBuildTx, getSchema, unpackTx } from './builder/index';
 import { isAccountNotFoundError } from '../utils/other';
+import { Field } from './builder/field-types';
 
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
   Omit<Parameters<typeof _buildTx<TxType>>[1], OmitFields>;
@@ -39,7 +40,7 @@ export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
  */
 export async function _buildTx<TxType extends Tag>(
   txType: TxType,
-  { strategy, onNode, ..._params }: Omit<Parameters<typeof syncBuildTx<TxType>>[0], 'tag' | 'nonce'>
+  { strategy, ..._params }: Omit<TxTypeSchemasAsync[TxType], 'tag' | 'nonce'>
   & {
     strategy?: 'continuity' | 'max';
     onNode: Node;
@@ -94,7 +95,7 @@ export async function _buildTx<TxType extends Tag>(
     && (((Tag.ContractCreateTx === txType || Tag.GaAttachTx === txType) && params.ctVersion == null)
     || ((Tag.ContractCallTx === txType || Tag.GaMetaTx === txType) && params.abiVersion == null))
   ) {
-    const { consensusProtocolVersion } = await onNode.getNodeInfo();
+    const { consensusProtocolVersion } = await params.onNode.getNodeInfo();
     params.consensusProtocolVersion = consensusProtocolVersion;
   }
 
@@ -106,16 +107,19 @@ export async function _buildTx<TxType extends Tag>(
   if (senderId == null) throw new InvalidTxParamsError(`Transaction field ${senderKey} is missed`);
 
   params.nonce ??= (
-    await onNode.getAccountNextNonce(senderId, { strategy }).catch((error) => {
+    await params.onNode.getAccountNextNonce(senderId, { strategy }).catch((error) => {
       if (!isAccountNotFoundError(error)) throw error;
       return { nextNonce: 1 };
     })
   ).nextNonce;
 
-  if (params.absoluteTtl !== true && params.ttl !== 0 && params.ttl !== undefined) {
-    params.ttl += (await onNode.getCurrentKeyBlock()).height;
-    params.absoluteTtl = true;
-  }
+  await Promise.all(
+    getSchema(txType, params.version)
+      .map(async ([key, field]: [keyof TxSchema, Field]) => {
+        if (field.prepare == null) return;
+        params[key] = await field.prepare(params[key], params, params);
+      }),
+  );
 
   return syncBuildTx({ ...params, tag: txType } as any);
 }

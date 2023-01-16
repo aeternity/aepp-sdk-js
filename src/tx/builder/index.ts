@@ -16,7 +16,7 @@ import { isKeyOfObject } from '../../utils/other';
  * JavaScript-based Transaction builder
  */
 
-function getSchema(tag: Tag, version?: number): TxField[] {
+export function getSchema(tag: Tag, version?: number): TxField[] {
   const schemas = TX_SCHEMA[tag];
   if (schemas == null) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
   version ??= Math.max(...Object.keys(schemas).map((a) => +a));

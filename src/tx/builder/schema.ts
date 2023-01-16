@@ -42,8 +42,6 @@ export enum CallReturnType {
   Revert = 2,
 }
 
-type TxElem = readonly [string, Field];
-
 type NullablePartial<
   T,
   NK extends keyof T = { [K in keyof T]: undefined extends T[K] ? K : never }[keyof T],
@@ -54,10 +52,24 @@ type Or<A, B> = A extends undefined ? B : A;
 type BuildTxArgBySchema<SchemaLine> =
   UnionToIntersection<
   SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends TxElem
+    ? Elem extends readonly [string, Field]
       ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
       & Or<Parameters<Elem[1]['serialize']>[2], {}>
       : never
+    : never
+  >;
+
+type BuildTxArgBySchemaAsync<SchemaLine> =
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field & { prepare: Function }]
+      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['prepare']>[0] }>
+      & Or<Parameters<Elem[1]['serialize']>[2], {}>
+      & Or<Parameters<Elem[1]['prepare']>[2], {}>
+      : Elem extends readonly [string, Field]
+        ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
+        & Or<Parameters<Elem[1]['serialize']>[2], {}>
+        : never
     : never
   >;
 
@@ -657,8 +669,18 @@ type TxTypeSchemasNotCombined = {
   }
 };
 
+type TxTypeSchemasNotCombinedAsync = {
+  [tag in Tag]: {
+    [ver in keyof typeof TX_SCHEMA[tag]]: BuildTxArgBySchemaAsync<typeof TX_SCHEMA[tag][ver]>
+  }
+};
+
 export type TxTypeSchemas = {
   [key in Tag]: TxTypeSchemasNotCombined[key][keyof TxTypeSchemasNotCombined[key]]
+};
+
+export type TxTypeSchemasAsync = {
+  [key in Tag]: TxTypeSchemasNotCombinedAsync[key][keyof TxTypeSchemasNotCombinedAsync[key]]
 };
 
 export type TxSchema = TxTypeSchemas[Tag];
