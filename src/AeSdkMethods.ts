@@ -7,7 +7,6 @@ import * as contractGaMethods from './contract/ga';
 import { _buildTx } from './tx';
 import { mapObject, UnionToIntersection } from './utils/other';
 import Node from './Node';
-import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
 import { Tag } from './tx/builder/constants';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
@@ -70,7 +69,7 @@ interface AeSdkMethodsOptions
  * their context (current account, network, and compiler to use).
  */
 class AeSdkMethods {
-  _options: AeSdkMethodsOptions = { denomination: AE_AMOUNT_FORMATS.AETTOS };
+  _options: AeSdkMethodsOptions = {};
 
   /**
    * @param options - Options

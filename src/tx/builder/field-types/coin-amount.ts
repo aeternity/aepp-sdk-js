@@ -12,7 +12,7 @@ export default {
   serialize(
     value: Int | undefined,
     params: {},
-    { denomination }: { denomination?: AE_AMOUNT_FORMATS },
+    { denomination = AE_AMOUNT_FORMATS.AETTOS }: { denomination?: AE_AMOUNT_FORMATS },
   ): Buffer {
     return uInt.serialize(
       this.serializeAettos(
