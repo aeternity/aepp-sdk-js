@@ -23,7 +23,7 @@
  * These methods provide ability to create native transactions.
  */
 import { TxParamsCommon, TxSchema, TxTypeSchemasAsync } from './builder/schema';
-import { ConsensusProtocolVersion, Tag } from './builder/constants';
+import { Tag } from './builder/constants';
 import { ArgumentError, InvalidTxParamsError } from '../utils/errors';
 import Node from '../Node';
 import { Encoded } from '../utils/encoder';
@@ -88,15 +88,6 @@ export async function _buildTx<TxType extends Tag>(
       break;
     default:
       throw new ArgumentError('txType', 'valid transaction type', txType);
-  }
-
-  if (
-    Object.keys(ConsensusProtocolVersion).length !== 2
-    && (((Tag.ContractCreateTx === txType || Tag.GaAttachTx === txType) && params.ctVersion == null)
-    || ((Tag.ContractCallTx === txType || Tag.GaMetaTx === txType) && params.abiVersion == null))
-  ) {
-    const { consensusProtocolVersion } = await params.onNode.getNodeInfo();
-    params.consensusProtocolVersion = consensusProtocolVersion;
   }
 
   if (txType === Tag.PayingForTx) {
