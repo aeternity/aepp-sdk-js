@@ -22,9 +22,8 @@
  * the creation of transactions to {@link Node}.
  * These methods provide ability to create native transactions.
  */
-import { TxParamsCommon, TxSchema, TxTypeSchemasAsync } from './builder/schema';
+import { TxSchema, TxTypeSchemasAsyncUnion } from './builder/schema';
 import { Tag } from './builder/constants';
-import Node from '../Node';
 import { Encoded } from '../utils/encoder';
 import { buildTx as syncBuildTx, getSchema } from './builder/index';
 import { Field } from './builder/field-types';
@@ -38,18 +37,18 @@ export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
  */
 export async function _buildTx<TxType extends Tag>(
   txType: TxType,
-  _params: Omit<TxTypeSchemasAsync[TxType], 'tag'>,
+  params: Omit<TxTypeSchemasAsyncUnion & { tag: TxType }, 'tag'>,
 ): Promise<Encoded.Transaction> {
-  // TODO: avoid this assertion
-  const params = _params as unknown as TxParamsCommon & { onNode: Node };
-
   await Promise.all(
+    // @ts-expect-error TODO
     getSchema(txType, params.version)
       .map(async ([key, field]: [keyof TxSchema, Field]) => {
         if (field.prepare == null) return;
+        // @ts-expect-error TODO
         params[key] = await field.prepare(params[key], params, params);
       }),
   );
 
-  return syncBuildTx({ ...params, tag: txType } as any);
+  // @ts-expect-error TODO
+  return syncBuildTx({ ...params, tag: txType });
 }

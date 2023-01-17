@@ -185,9 +185,9 @@ describe('Tx', () => {
   });
 
   describe('buildTx', () => {
-    it('returns value of a proper type', () => {
-      const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
+    const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
 
+    it('returns value of a proper type', () => {
       const tx: Encoded.Transaction = buildTx({
         tag: Tag.SpendTx, nonce: 0, amount: 123, senderId: address, recipientId: address,
       });
@@ -227,6 +227,32 @@ describe('Tx', () => {
     it('unpack and build ChannelCreateTx into the same value', () => {
       const tx = 'tx_+IgyAqEBNMD0uYWndDrqF2Q8OIUWZ/gEi45vpwfg+cNOEVi9pL+JBWvHXi1jEAAAoQG5mrb34g29bneQLjNaFcH4OwVP0r9m9x6kYxpxiqN7EYkFa8deLWMQAAAAAQCGECcSfcAAwMCgOK3o2rLTFOY30p/4fMgaz3hG5WWTAcWknsu7ceLFmM0CERW42w==';
       expect(buildTx(unpackTx(tx))).to.be.equal(tx);
+    });
+
+    it('checks argument types', () => {
+      const spendTxParams = {
+        tag: Tag.SpendTx, nonce: 0, senderId: address, recipientId: address,
+      } as const;
+      const spendTx = 'tx_+FEMAaEBXXFtZp9YqbY4KdW8Nolf9Hjp0VZcNWnQOKjgCb8Br9mhAV1xbWafWKm2OCnVvDaJX/R46dFWXDVp0Dio4Am/Aa/ZAIYPJvVhyAAAAIBeys6T';
+      expect(buildTx(spendTxParams)).to.equal(spendTx);
+      // @ts-expect-error spend tx don't have balance
+      expect(buildTx({ ...spendTxParams, balance: 123 })).to.equal(spendTx);
+
+      const accountParams = { tag: Tag.Account, nonce: 0, balance: 123 } as const;
+      const account = 'tx_xAoBAHt6KY13';
+      const accountV2Params = {
+        flags: 12,
+        gaContract: 'ct_ECdrEy2NJKq3qK3xraPtcDP7vfdi56SQXYAH3bVVSTmpqpYyW',
+        gaAuthFun: 'cb_Xfbg4g==',
+      } as const;
+      const accountV2 = 'tx_6AoCDAB7oQUd+T20wFXy2ZOEIKWCVNexp+1QmgXSfwzarLhs8ov8roBmV7GN';
+      // @ts-expect-error version should be specified if used not the last schema
+      expect(() => buildTx(accountParams)).to.throw();
+      expect(buildTx({ ...accountParams, version: 1 })).to.equal(account);
+      expect(buildTx({ ...accountParams, version: 2, ...accountV2Params })).to.equal(accountV2);
+      // @ts-expect-error account v1 entry don't have flags
+      expect(buildTx({ ...accountParams, version: 1, flags: 12 })).to.equal(account);
+      expect(buildTx({ ...accountParams, ...accountV2Params })).to.equal(accountV2);
     });
 
     it('rejects if invalid transaction version', () => {

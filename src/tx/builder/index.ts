@@ -5,7 +5,7 @@ import {
 import { hash } from '../../utils/crypto';
 import { BinaryData, Field } from './field-types';
 import {
-  RawTxObject, TX_SCHEMA, TxField, TxSchema, TxTypeSchemas,
+  RawTxObject, TX_SCHEMA, TxField, TxSchema, TxTypeSchemas, TxTypeSchemasUnion,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
@@ -35,10 +35,9 @@ export function getSchema(tag: Tag, version?: number): TxField[] {
  * @returns object Base64Check transaction hash with 'tx_' prefix
  */
 export function buildTx<
-  TxType extends Tag,
   E extends Encoding = Encoding.Transaction,
 >(
-  params: { tag: TxType; version?: number } & Omit<TxTypeSchemas[TxType], 'tag' | 'version'>,
+  params: TxTypeSchemasUnion,
   {
     prefix,
   }: {
