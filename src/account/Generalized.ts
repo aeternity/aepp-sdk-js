@@ -85,7 +85,8 @@ export default class AccountGeneralized extends AccountBase {
       return contract._calldata.encode(contract._name, this.#authFun, args);
     })();
 
-    const gaMetaTx = await _buildTx(Tag.GaMetaTx, {
+    const gaMetaTx = await _buildTx({
+      tag: Tag.GaMetaTx,
       tx: decode(buildTx({ tag: Tag.SignedTx, encodedTx: decode(tx), signatures: [] })),
       gaId: this.address,
       authData: authCallData,

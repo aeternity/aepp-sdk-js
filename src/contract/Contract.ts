@@ -280,8 +280,9 @@ class Contract<M extends ContractMethodsBase> {
     if (opt.onAccount == null) throw new IllegalArgumentError('Can\'t deploy without account');
     const ownerId = opt.onAccount.address;
     if (this.$options.bytecode == null) throw new IllegalArgumentError('Can\'t deploy without bytecode');
-    const tx = await _buildTx(Tag.ContractCreateTx, {
+    const tx = await _buildTx({
       ...opt,
+      tag: Tag.ContractCreateTx,
       gasLimit: opt.gasLimit ?? await this._estimateGas('init', params, opt),
       callData: this._calldata.encode(this._name, 'init', params),
       code: this.$options.bytecode,
@@ -370,13 +371,14 @@ class Contract<M extends ContractMethodsBase> {
       let tx;
       if (fn === 'init') {
         if (this.$options.bytecode == null) throw new IllegalArgumentError('Can\'t dry-run "init" without bytecode');
-        tx = await _buildTx(
-          Tag.ContractCreateTx,
-          { ...txOpt, code: this.$options.bytecode, ownerId: callerId },
-        );
+        tx = await _buildTx({
+          ...txOpt, tag: Tag.ContractCreateTx, code: this.$options.bytecode, ownerId: callerId,
+        });
       } else {
         if (contractId == null) throw new MissingContractAddressError('Can\'t dry-run contract without address');
-        tx = await _buildTx(Tag.ContractCallTx, { ...txOpt, callerId, contractId });
+        tx = await _buildTx({
+          ...txOpt, tag: Tag.ContractCallTx, callerId, contractId,
+        });
       }
 
       const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, { ...opt, top });
@@ -389,8 +391,9 @@ class Contract<M extends ContractMethodsBase> {
     } else {
       if (top != null) throw new IllegalArgumentError('Can\'t handle `top` option in on-chain contract call');
       if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
-      const tx = await _buildTx(Tag.ContractCallTx, {
+      const tx = await _buildTx({
         ...opt,
+        tag: Tag.ContractCallTx,
         gasLimit: opt.gasLimit ?? await this._estimateGas(fn, params, opt),
         callerId,
         contractId,

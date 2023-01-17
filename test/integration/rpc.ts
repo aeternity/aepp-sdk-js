@@ -288,7 +288,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
         origin = aeppOrigin;
         throw new RpcRejectedByUserError();
       };
-      const tx = await aepp.buildTx(Tag.SpendTx, {
+      const tx = await aepp.buildTx({
+        tag: Tag.SpendTx,
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,
@@ -302,7 +303,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
       wallet._resolveAccount().signTransaction = () => {
         throw new Error('test');
       };
-      const tx = await aepp.buildTx(Tag.SpendTx, {
+      const tx = await aepp.buildTx({
+        tag: Tag.SpendTx,
         senderId: keypair.publicKey,
         recipientId: keypair.publicKey,
         amount: 0,
@@ -314,7 +316,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
     it('Sign transaction: wallet allow', async () => {
       // @ts-expect-error removes object property to restore the original behavior
       delete wallet._resolveAccount().signTransaction;
-      const tx = await aepp.buildTx(Tag.SpendTx, {
+      const tx = await aepp.buildTx({
+        tag: Tag.SpendTx,
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,
@@ -344,7 +347,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const acc = wallet._resolveAccount();
       acc.signTransaction = async (txIgnore, options) => {
-        const txReplace = await aepp.buildTx(Tag.SpendTx, {
+        const txReplace = await aepp.buildTx({
+          tag: Tag.SpendTx,
           senderId: aepp.address,
           recipientId: aepp.address,
           amount: 0,
@@ -352,7 +356,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
         });
         return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
       };
-      const tx = await aepp.buildTx(Tag.SpendTx, {
+      const tx = await aepp.buildTx({
+        tag: Tag.SpendTx,
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,
@@ -401,7 +406,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
     it('Sign and broadcast invalid transaction', async () => {
       // @ts-expect-error removes object property to restore the original behavior
       delete wallet._resolveAccount().signTransaction;
-      const tx = await aepp.buildTx(Tag.SpendTx, {
+      const tx = await aepp.buildTx({
+        tag: Tag.SpendTx,
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,
@@ -550,7 +556,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
     it('Sign by wallet and broadcast transaction by aepp ', async () => {
       const acc = wallet._resolveAccount();
       acc.signTransaction = async (txIgnore, options) => {
-        const txReplace = await aepp.buildTx(Tag.SpendTx, {
+        const txReplace = await aepp.buildTx({
+          tag: Tag.SpendTx,
           senderId: aepp.address,
           recipientId: aepp.address,
           amount: 0,
@@ -558,7 +565,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
         });
         return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
       };
-      const tx = await aepp.buildTx(Tag.SpendTx, {
+      const tx = await aepp.buildTx({
+        tag: Tag.SpendTx,
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,

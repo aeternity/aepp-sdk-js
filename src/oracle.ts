@@ -171,12 +171,13 @@ export async function postQueryToOracle(
   options.queryFee ??= (await options.onNode.getOracleByPubkey(oracleId)).queryFee.toString();
   const senderId = options.onAccount.address;
 
-  const oracleQueryTx = await _buildTx(Tag.OracleQueryTx, {
+  const oracleQueryTx = await _buildTx({
     queryTtlType: QUERY_TTL.type,
     queryTtlValue: QUERY_TTL.value,
     responseTtlType: RESPONSE_TTL.type,
     responseTtlValue: RESPONSE_TTL.value,
     ...options,
+    tag: Tag.OracleQueryTx,
     oracleId,
     senderId,
     query,
@@ -215,10 +216,11 @@ export async function extendOracleTtl(
   oracleId: Encoded.OracleAddress,
   options: ExtendOracleTtlOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
-  const oracleExtendTx = await _buildTx(Tag.OracleExtendTx, {
+  const oracleExtendTx = await _buildTx({
     oracleTtlType: ORACLE_TTL.type,
     oracleTtlValue: ORACLE_TTL.value,
     ...options,
+    tag: Tag.OracleExtendTx,
     callerId: options.onAccount.address,
     oracleId,
   });
@@ -252,10 +254,11 @@ export async function respondToQuery(
   response: string,
   options: RespondToQueryOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
-  const oracleRespondTx = await _buildTx(Tag.OracleResponseTx, {
+  const oracleRespondTx = await _buildTx({
     responseTtlType: RESPONSE_TTL.type,
     responseTtlValue: RESPONSE_TTL.value,
     ...options,
+    tag: Tag.OracleResponseTx,
     callerId: options.onAccount.address,
     oracleId,
     queryId,
@@ -339,11 +342,12 @@ export async function registerOracle(
   options: RegisterOracleOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const accountId = options.onAccount.address;
-  const oracleRegisterTx = await _buildTx(Tag.OracleRegisterTx, {
+  const oracleRegisterTx = await _buildTx({
     queryFee: QUERY_FEE,
     oracleTtlValue: ORACLE_TTL.value,
     oracleTtlType: ORACLE_TTL.type,
     ...options,
+    tag: Tag.OracleRegisterTx,
     accountId,
     queryFormat,
     responseFormat,

@@ -7,7 +7,7 @@ import * as contractGaMethods from './contract/ga';
 import { _buildTx } from './tx';
 import { mapObject, UnionToIntersection } from './utils/other';
 import Node from './Node';
-import { Tag } from './tx/builder/constants';
+import { TxTypeSchemasAsyncUnion } from './tx/builder/schema';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
 import CompilerBase from './contract/compiler/Base';
@@ -99,15 +99,8 @@ class AeSdkMethods {
     };
   }
 
-  async buildTx<TxType extends Tag>(
-    txType: TxType,
-    options: Omit<Parameters<typeof _buildTx<TxType>>[1], 'onNode'> & { onNode?: Node },
-  ): Promise<Encoded.Transaction> {
-    // @ts-expect-error TODO: need to figure out what's wrong here
-    return _buildTx<TxType>(txType, {
-      ...this._getOptions(),
-      ...options,
-    });
+  async buildTx(options: TxTypeSchemasAsyncUnion): Promise<Encoded.Transaction> {
+    return _buildTx({ ...this._getOptions(), ...options });
   }
 
   async initializeContract<Methods extends ContractMethodsBase>(

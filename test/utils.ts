@@ -29,3 +29,6 @@ export type ChainTtl = { FixedTTL: [bigint] }
 | { RelativeTTL: [bigint] } | { AbsoluteTTL: [bigint] };
 
 export type InputNumber = number | bigint | string | BigNumber;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function checkOnlyTypes(cb: Function): void {}

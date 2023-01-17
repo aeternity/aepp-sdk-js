@@ -20,7 +20,7 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { encode as rlpEncode } from 'rlp';
 import BigNumber from 'bignumber.js';
-import { randomName } from '../utils';
+import { checkOnlyTypes, randomName } from '../utils';
 import {
   genSalt,
   decode, encode,
@@ -28,7 +28,7 @@ import {
   toBytes,
   buildTx, unpackTx,
   NAME_BID_RANGES, Tag, AbiVersion, VmVersion,
-  SchemaNotFoundError, ArgumentError,
+  SchemaNotFoundError, ArgumentError, AeSdk,
 } from '../../src';
 import { Encoding, Encoded } from '../../src/utils/encoder';
 
@@ -184,9 +184,9 @@ describe('Tx', () => {
     });
   });
 
-  describe('buildTx', () => {
-    const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
+  const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
 
+  describe('buildTx', () => {
     it('returns value of a proper type', () => {
       const tx: Encoded.Transaction = buildTx({
         tag: Tag.SpendTx, nonce: 0, amount: 123, senderId: address, recipientId: address,
@@ -237,6 +237,8 @@ describe('Tx', () => {
       expect(buildTx(spendTxParams)).to.equal(spendTx);
       // @ts-expect-error spend tx don't have balance
       expect(buildTx({ ...spendTxParams, balance: 123 })).to.equal(spendTx);
+      // @ts-expect-error spend tx should have senderId
+      expect(() => buildTx({ ...spendTxParams, senderId: undefined })).to.throw(TypeError);
 
       const accountParams = { tag: Tag.Account, nonce: 0, balance: 123 } as const;
       const account = 'tx_xAoBAHt6KY13';
@@ -258,6 +260,16 @@ describe('Tx', () => {
     it('rejects if invalid transaction version', () => {
       expect(() => buildTx({ tag: Tag.SpendTx, version: 5 } as any))
         .to.throw(SchemaNotFoundError, 'Transaction schema not implemented for tag SpendTx (12) version 5');
+    });
+  });
+
+  describe('buildTxAsync', () => {
+    it('should fail if key is missed', () => {
+      checkOnlyTypes(async () => {
+        const sdk = new AeSdk();
+        // @ts-expect-error recipientId field is missed
+        await sdk.buildTx({ tag: Tag.SpendTx, senderId: address, amount: 0 });
+      });
     });
   });
 });

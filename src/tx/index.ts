@@ -22,33 +22,28 @@
  * the creation of transactions to {@link Node}.
  * These methods provide ability to create native transactions.
  */
-import { TxSchema, TxTypeSchemasAsyncUnion } from './builder/schema';
+import { TxTypeSchemasAsyncUnion } from './builder/schema';
 import { Tag } from './builder/constants';
 import { Encoded } from '../utils/encoder';
 import { buildTx as syncBuildTx, getSchema } from './builder/index';
-import { Field } from './builder/field-types';
 
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
-  Omit<Parameters<typeof _buildTx<TxType>>[1], OmitFields>;
+  Omit<TxTypeSchemasAsyncUnion & { tag: TxType }, 'tag' | OmitFields>;
 
 // TODO: find a better name or rearrange methods
 /**
  * @category transaction builder
  */
-export async function _buildTx<TxType extends Tag>(
-  txType: TxType,
-  params: Omit<TxTypeSchemasAsyncUnion & { tag: TxType }, 'tag'>,
-): Promise<Encoded.Transaction> {
+export async function _buildTx(params: TxTypeSchemasAsyncUnion): Promise<Encoded.Transaction> {
   await Promise.all(
-    // @ts-expect-error TODO
-    getSchema(txType, params.version)
-      .map(async ([key, field]: [keyof TxSchema, Field]) => {
+    getSchema(params.tag, params.version)
+      .map(async ([key, field]) => {
         if (field.prepare == null) return;
-        // @ts-expect-error TODO
+        // @ts-expect-error the type of `params[key]` can't be determined accurately
         params[key] = await field.prepare(params[key], params, params);
       }),
   );
 
-  // @ts-expect-error TODO
-  return syncBuildTx({ ...params, tag: txType });
+  // @ts-expect-error after preparation properties should be compatible with sync tx builder
+  return syncBuildTx(params);
 }

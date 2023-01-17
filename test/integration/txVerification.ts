@@ -18,12 +18,13 @@ describe('Verify Transaction', () => {
   });
 
   it('validates params in buildRawTx', async () => {
-    await expect(aeSdk.buildTx(Tag.SpendTx, {} as any)).to.eventually.be
+    await expect(aeSdk.buildTx({ tag: Tag.SpendTx } as any)).to.eventually.be
       .rejectedWith(ArgumentError, 'senderId should be provided (or provide `nonce` instead), got undefined instead');
   });
 
   it('returns errors', async () => {
-    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
+    const spendTx = await aeSdk.buildTx({
+      tag: Tag.SpendTx,
       senderId: aeSdk.address,
       recipientId: aeSdk.address,
       amount: 1e50,
@@ -39,7 +40,8 @@ describe('Verify Transaction', () => {
   });
 
   it('returns NonceHigh error', async () => {
-    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
+    const spendTx = await aeSdk.buildTx({
+      tag: Tag.SpendTx,
       senderId: aeSdk.address,
       recipientId: aeSdk.address,
       amount: 100,
@@ -50,7 +52,8 @@ describe('Verify Transaction', () => {
   });
 
   it('verifies transactions before broadcasting', async () => {
-    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
+    const spendTx = await aeSdk.buildTx({
+      tag: Tag.SpendTx,
       senderId: aeSdk.address,
       recipientId: aeSdk.address,
       amount: 1,
