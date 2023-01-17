@@ -4,7 +4,6 @@
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
-import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
@@ -42,45 +41,10 @@ export enum CallReturnType {
   Revert = 2,
 }
 
-type NullablePartial<
-  T,
-  NK extends keyof T = { [K in keyof T]: undefined extends T[K] ? K : never }[keyof T],
-> = Partial<Pick<T, NK>> & Omit<T, NK>;
-
-type Or<A, B> = A extends undefined ? B : A;
-
-type BuildTxArgBySchema<SchemaLine> =
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field]
-      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
-      & Or<Parameters<Elem[1]['serialize']>[2], {}>
-      : never
-    : never
-  >;
-
-type BuildTxArgBySchemaAsync<SchemaLine> =
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field & { prepare: Function }]
-      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['prepare']>[0] }>
-      & Or<Parameters<Elem[1]['serialize']>[2], {}>
-      & Or<Parameters<Elem[1]['prepare']>[2], {}>
-      : Elem extends readonly [string, Field]
-        ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
-        & Or<Parameters<Elem[1]['serialize']>[2], {}>
-        : never
-    : never
-  >;
-
-export type RawTxObject<Tx extends TxSchema> = {
-  [k in keyof Tx]-?: Tx[k] extends BigNumber ? string : Tx[k]
-};
-
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts}
  */
-export const TX_SCHEMA = {
+export const txSchema = {
   [Tag.Account]: {
     1: [
       ['tag', shortUIntConst(Tag.Account)],
@@ -663,29 +627,90 @@ export const TX_SCHEMA = {
   },
 } as const;
 
-type TxTypeSchemasNotCombined = {
+type NullablePartial<
+  T,
+  NK extends keyof T = { [K in keyof T]: undefined extends T[K] ? K : never }[keyof T],
+> = Partial<Pick<T, NK>> & Omit<T, NK>;
+
+type Or<A, B> = A extends undefined ? B : A;
+
+type TxParamsBySchemaInternal<SchemaLine> =
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field]
+      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
+      : never
+    : never
+  >;
+
+type GetFieldOrEmpty<Object, Key extends string> =
+  Object extends { [key in Key]: any } ? Object[Key] : {};
+
+type TxParamsBySchemaInternalParams<SchemaLine> =
+  GetFieldOrEmpty<
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field]
+      ? { options: Or<Parameters<Elem[1]['serialize']>[2], {}> }
+      : never
+    : never
+  >,
+  'options'
+  >;
+
+type TxParamsBySchema<SchemaLine> =
+  TxParamsBySchemaInternal<SchemaLine> & TxParamsBySchemaInternalParams<SchemaLine>;
+
+type TxParamsAsyncBySchemaInternal<SchemaLine> =
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field & { prepare: Function }]
+      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['prepare']>[0] }>
+      : TxParamsBySchemaInternal<[Elem]>
+    : never
+  >;
+
+type TxParamsAsyncBySchemaInternalParams<SchemaLine> =
+  GetFieldOrEmpty<
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field & { prepare: Function }]
+      ? { options: Or<Parameters<Elem[1]['prepare']>[2], {}> } : {}
+    : never
+  >,
+  'options'
+  >;
+
+type TxParamsAsyncBySchema<SchemaLine> =
+  TxParamsAsyncBySchemaInternal<SchemaLine>
+  & TxParamsAsyncBySchemaInternalParams<SchemaLine>
+  & TxParamsBySchemaInternalParams<SchemaLine>;
+
+type TxUnpackedBySchema<SchemaLine> =
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field]
+      ? { [k in Elem[0]]: ReturnType<Elem[1]['deserialize']> }
+      : never
+    : never
+  >;
+
+type TxNotCombined<Mode extends 'params' | 'params-async' | 'unpacked'> = {
   [tag in Tag]: {
-    [ver in keyof typeof TX_SCHEMA[tag]]: BuildTxArgBySchema<typeof TX_SCHEMA[tag][ver]>
+    [ver in keyof typeof txSchema[tag]]: Mode extends 'params'
+      ? TxParamsBySchema<typeof txSchema[tag][ver]>
+      : Mode extends 'params-async'
+        ? TxParamsAsyncBySchema<typeof txSchema[tag][ver]>
+        : Mode extends 'unpacked'
+          ? TxUnpackedBySchema<typeof txSchema[tag][ver]>
+          : never
   }
 };
 
-type TxTypeSchemasNotCombinedAsync = {
-  [tag in Tag]: {
-    [ver in keyof typeof TX_SCHEMA[tag]]: BuildTxArgBySchemaAsync<typeof TX_SCHEMA[tag][ver]>
-  }
-};
+type ConvertToUnion<Schema extends { [key in Tag]: any }> = {
+  [key in Tag]: Schema[key][keyof Schema[key]]
+}[Tag];
 
-export type TxTypeSchemas = {
-  [key in Tag]: TxTypeSchemasNotCombined[key][keyof TxTypeSchemasNotCombined[key]]
-};
-
-export type TxTypeSchemasUnion = TxTypeSchemas[keyof TxTypeSchemas];
-
-export type TxTypeSchemasAsync = {
-  [key in Tag]: TxTypeSchemasNotCombinedAsync[key][keyof TxTypeSchemasNotCombinedAsync[key]]
-};
-
-export type TxTypeSchemasAsyncUnion = TxTypeSchemasAsync[keyof TxTypeSchemasAsync];
-
-export type TxSchema = TxTypeSchemas[Tag];
-export type TxParamsCommon = Partial<UnionToIntersection<TxSchema>>;
+export type TxParams = ConvertToUnion<TxNotCombined<'params'>>;
+export type TxParamsAsync = ConvertToUnion<TxNotCombined<'params-async'>>;
+export type TxUnpacked = ConvertToUnion<TxNotCombined<'unpacked'>>;

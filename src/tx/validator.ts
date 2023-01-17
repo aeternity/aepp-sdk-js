@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { hash, verify } from '../utils/crypto';
-import { RawTxObject, TxParamsCommon, TxSchema } from './builder/schema';
-import { ProtocolToVmAbi } from './builder/field-types/ct-version';
+import { TxUnpacked } from './builder/schema';
+import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version';
 import { Tag, ConsensusProtocolVersion } from './builder/constants';
 import { buildTx, unpackTx } from './builder';
 import { concatBuffers, isAccountNotFoundError } from '../utils/other';
@@ -9,6 +9,7 @@ import { Encoded, decode } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
+import { UnexpectedTsError } from '../utils/errors';
 
 export interface ValidatorResult {
   message: string;
@@ -16,10 +17,8 @@ export interface ValidatorResult {
   checkedKeys: string[];
 }
 
-type UnpackedTx = ReturnType<typeof unpackTx>['tx'];
-
 type Validator = (
-  tx: UnpackedTx,
+  tx: TxUnpacked,
   options: {
     // TODO: remove after fixing node types
     account?: TransformNodeType<Account> & { id: Encoded.AccountAddress };
@@ -33,18 +32,16 @@ type Validator = (
 
 const validators: Validator[] = [];
 
-const getSenderAddress = (
-  tx: TxParamsCommon | RawTxObject<TxSchema>,
-): Encoded.AccountAddress | undefined => [
+const getSenderAddress = (tx: TxUnpacked): Encoded.AccountAddress | undefined => [
   'senderId', 'accountId', 'ownerId', 'callerId',
   'oracleId', 'fromId', 'initiator', 'gaId', 'payerId',
 ]
-  .map((key: keyof TxSchema) => tx[key])
+  .map((key: keyof TxUnpacked) => tx[key])
   .filter((a) => a)
   .map((a) => a?.toString().replace(/^ok_/, 'ak_'))[0] as Encoded.AccountAddress | undefined;
 
 async function verifyTransactionInternal(
-  tx: UnpackedTx,
+  tx: TxUnpacked,
   node: Node,
   parentTxTypes: Tag[],
 ): Promise<ValidatorResult[]> {
@@ -94,7 +91,9 @@ export default async function verifyTransaction(
 }
 
 validators.push(
-  ({ encodedTx, signatures }, { account, nodeNetworkId, parentTxTypes }) => {
+  (tx, { account, nodeNetworkId, parentTxTypes }) => {
+    if (tx.tag !== Tag.SignedTx) return [];
+    const { encodedTx, signatures } = tx;
     if ((encodedTx ?? signatures) == null) return [];
     if (account == null) return [];
     if (signatures.length !== 1) return []; // TODO: Support multisignature like in state channels
@@ -114,29 +113,30 @@ validators.push(
       checkedKeys: ['encodedTx', 'signatures'],
     }];
   },
-  async ({ encodedTx, tx, tag }, { node, parentTxTypes }) => {
-    if ((encodedTx ?? tx) == null) return [];
-    return verifyTransactionInternal(encodedTx ?? tx, node, [...parentTxTypes, tag]);
+  async (tx, { node, parentTxTypes }) => {
+    let nestedTx;
+    if ('encodedTx' in tx) nestedTx = tx.encodedTx;
+    if ('tx' in tx) nestedTx = tx.tx;
+    if (nestedTx == null) return [];
+    return verifyTransactionInternal(nestedTx, node, [...parentTxTypes, tx.tag]);
   },
-  ({ ttl }, { height }) => {
-    if (ttl == null) return [];
-    ttl = +ttl;
-    if (ttl === 0 || ttl >= height) return [];
+  (tx, { height }) => {
+    if (!('ttl' in tx)) return [];
+    if (tx.ttl === 0 || tx.ttl >= height) return [];
     return [{
-      message: `TTL ${ttl} is already expired, current height is ${height}`,
+      message: `TTL ${tx.ttl} is already expired, current height is ${height}`,
       key: 'ExpiredTTL',
       checkedKeys: ['ttl'],
     }];
   },
-  ({
-    amount, fee, nameFee, tx, tag,
-  }, { account, parentTxTypes }) => {
+  (tx, { account, parentTxTypes }) => {
     if (account == null) return [];
-    if ((amount ?? fee ?? nameFee) == null) return [];
-    fee ??= 0;
-    const cost = new BigNumber(fee).plus(nameFee ?? 0).plus(amount ?? 0)
-      .plus(tag === Tag.PayingForTx ? tx.encodedTx.fee : 0)
-      .minus(parentTxTypes.includes(Tag.PayingForTx) ? fee : 0);
+    const cost = new BigNumber('fee' in tx ? tx.fee : 0)
+      .plus('nameFee' in tx ? tx.nameFee : 0)
+      .plus('amount' in tx ? tx.amount : 0)
+      // TODO: calculate nested tx fee more accurate
+      .plus(tx.tag === Tag.PayingForTx ? tx.tx.encodedTx.fee : 0)
+      .minus(parentTxTypes.includes(Tag.PayingForTx) && 'fee' in tx ? tx.fee : 0);
     if (cost.lte(account.balance.toString())) return [];
     return [{
       message: `Account balance ${account.balance.toString()} is not enough to execute the transaction that costs ${cost.toFixed()}`,
@@ -144,52 +144,52 @@ validators.push(
       checkedKeys: ['amount', 'fee', 'nameFee'],
     }];
   },
-  ({ signatures, tag }, { account }) => {
+  (tx, { account }) => {
     if (account == null) return [];
     let message;
-    if (tag === Tag.SignedTx && account.kind === 'generalized' && signatures.length !== 0) {
+    if (tx.tag === Tag.SignedTx && account.kind === 'generalized' && tx.signatures.length !== 0) {
       message = 'Generalized account can\'t be used to generate SignedTx with signatures';
     }
-    if (tag === Tag.GaMetaTx && account.kind === 'basic') {
+    if (tx.tag === Tag.GaMetaTx && account.kind === 'basic') {
       message = 'Basic account can\'t be used to generate GaMetaTx';
     }
     if (message == null) return [];
     return [{ message, key: 'InvalidAccountType', checkedKeys: ['tag'] }];
   },
-  ({ nonce }, { account, parentTxTypes }) => {
-    if (nonce == null || account == null || parentTxTypes.includes(Tag.GaMetaTx)) return [];
-    nonce = +nonce;
+  (tx, { account, parentTxTypes }) => {
+    if (!('nonce' in tx) || account == null || parentTxTypes.includes(Tag.GaMetaTx)) return [];
     const validNonce = account.nonce + 1;
-    if (nonce === validNonce) return [];
+    if (tx.nonce === validNonce) return [];
     return [{
-      ...nonce < validNonce
+      ...tx.nonce < validNonce
         ? {
-          message: `Nonce ${nonce} is already used, valid nonce is ${validNonce}`,
+          message: `Nonce ${tx.nonce} is already used, valid nonce is ${validNonce}`,
           key: 'NonceAlreadyUsed',
         }
         : {
-          message: `Nonce ${nonce} is too high, valid nonce is ${validNonce}`,
+          message: `Nonce ${tx.nonce} is too high, valid nonce is ${validNonce}`,
           key: 'NonceHigh',
         },
       checkedKeys: ['nonce'],
     }];
   },
-  ({ ctVersion, abiVersion, tag }, { consensusProtocolVersion }) => {
-    const oracleCall = Tag.Oracle === tag || Tag.OracleRegisterTx === tag;
-    const contractCreate = Tag.ContractCreateTx === tag || Tag.GaAttachTx === tag;
-    const contractCall = Tag.ContractCallTx === tag || Tag.GaMetaTx === tag;
+  (tx, { consensusProtocolVersion }) => {
+    const oracleCall = Tag.Oracle === tx.tag || Tag.OracleRegisterTx === tx.tag;
+    const contractCreate = Tag.ContractCreateTx === tx.tag || Tag.GaAttachTx === tx.tag;
+    const contractCall = Tag.ContractCallTx === tx.tag || Tag.GaMetaTx === tx.tag;
     const type = (oracleCall ? 'oracle-call' : null)
       ?? (contractCreate ? 'contract-create' : null)
       ?? (contractCall ? 'contract-call' : null);
     if (type == null) return [];
-    // TODO: remove assertion after fixing buildTx types
-    const protocol = ProtocolToVmAbi[consensusProtocolVersion][type] as unknown as {
-      abiVersion: any[];
-      vmVersion: any[];
+    const protocol = ProtocolToVmAbi[consensusProtocolVersion][type] as {
+      abiVersion: readonly any[];
+      vmVersion: readonly any[];
     };
 
-    // If not contract create tx
-    if (ctVersion == null) ctVersion = { abiVersion };
+    let ctVersion: Partial<CtVersion> | undefined;
+    if ('abiVersion' in tx) ctVersion = { abiVersion: tx.abiVersion };
+    if ('ctVersion' in tx) ctVersion = tx.ctVersion;
+    if (ctVersion == null) throw new UnexpectedTsError();
     if (
       !protocol.abiVersion.includes(ctVersion.abiVersion)
       || (contractCreate && !protocol.vmVersion.includes(ctVersion.vmVersion))
@@ -202,14 +202,13 @@ validators.push(
     }
     return [];
   },
-  async ({ contractId, tag }, { node }) => {
-    if (Tag.ContractCallTx !== tag) return [];
-    contractId = contractId as Encoded.ContractAddress;
+  async (tx, { node }) => {
+    if (Tag.ContractCallTx !== tx.tag) return [];
     try {
-      const { active } = await node.getContract(contractId);
+      const { active } = await node.getContract(tx.contractId);
       if (active) return [];
       return [{
-        message: `Contract ${contractId} is not active`,
+        message: `Contract ${tx.contractId} is not active`,
         key: 'ContractNotActive',
         checkedKeys: ['contractId'],
       }];

@@ -3,10 +3,9 @@ import {
   decode, encode, Encoded, Encoding,
 } from '../../utils/encoder';
 import { hash } from '../../utils/crypto';
-import { BinaryData, Field } from './field-types';
+import { BinaryData } from './field-types';
 import {
-  RawTxObject, TX_SCHEMA, TxField, TxSchema, TxTypeSchemas, TxTypeSchemasUnion,
-  TxTypeSchemasAsyncUnion,
+  txSchema, TxField, TxUnpacked, TxParams, TxParamsAsync,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
@@ -18,7 +17,7 @@ import { isKeyOfObject } from '../../utils/other';
  */
 
 function getSchema(tag: Tag, version?: number): TxField[] {
-  const schemas = TX_SCHEMA[tag];
+  const schemas = txSchema[tag];
   if (schemas == null) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
   version ??= Math.max(...Object.keys(schemas).map((a) => +a));
   if (!isKeyOfObject(version, schemas)) {
@@ -38,7 +37,7 @@ function getSchema(tag: Tag, version?: number): TxField[] {
 export function buildTx<
   E extends Encoding = Encoding.Transaction,
 >(
-  params: TxTypeSchemasUnion,
+  params: TxParams,
   {
     prefix,
   }: {
@@ -47,8 +46,9 @@ export function buildTx<
 ): Encoded.Generic<E> {
   const schema = getSchema(params.tag, params.version);
 
-  const binary = schema.map(([key, field]: [keyof TxSchema, Field]) => (
+  const binary = schema.map(([key, field]) => (
     field.serialize(
+      // @ts-expect-error the type of `params[key]` can't be determined accurately
       params[key],
       {
         ...params,
@@ -68,12 +68,12 @@ export function buildTx<
 }
 
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
-  Omit<TxTypeSchemasAsyncUnion & { tag: TxType }, 'tag' | OmitFields>;
+  Omit<TxParamsAsync & { tag: TxType }, 'tag' | OmitFields>;
 
 /**
  * @category transaction builder
  */
-export async function buildTxAsync(params: TxTypeSchemasAsyncUnion): Promise<Encoded.Transaction> {
+export async function buildTxAsync(params: TxParamsAsync): Promise<Encoded.Transaction> {
   await Promise.all(
     getSchema(params.tag, params.version)
       .map(async ([key, field]) => {
@@ -97,7 +97,7 @@ export async function buildTxAsync(params: TxTypeSchemasAsyncUnion): Promise<Enc
 export function unpackTx<TxType extends Tag>(
   encodedTx: Encoded.Transaction | Encoded.Poi,
   txType?: TxType,
-): RawTxObject<TxTypeSchemas[TxType]> {
+): TxUnpacked & { tag: TxType } {
   const binary = rlpDecode(decode(encodedTx));
   const tag = +readInt(binary[0] as Buffer);
   const version = +readInt(binary[1] as Buffer);

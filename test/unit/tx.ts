@@ -128,6 +128,8 @@ describe('Tx', () => {
         expect(account.recipientId);
         // @ts-expect-error spend tx don't have balance
         expect(account.balance);
+        const str: string = account.fee;
+        expect(str);
       }
       if (account.tag === Tag.Account) {
         expect(account.balance);
@@ -139,6 +141,10 @@ describe('Tx', () => {
         }
         // @ts-expect-error without checking version, account may not have flags
         expect(account.flags);
+      }
+      if (account.tag === Tag.ContractCallTx) {
+        // @ts-expect-error contract call shouldn't store protocol version
+        expect(account.consensusProtocolVersion);
       }
     });
 

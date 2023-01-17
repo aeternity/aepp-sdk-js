@@ -7,7 +7,7 @@ import * as contractGaMethods from './contract/ga';
 import { buildTxAsync } from './tx/builder';
 import { mapObject, UnionToIntersection } from './utils/other';
 import Node from './Node';
-import { TxTypeSchemasAsyncUnion } from './tx/builder/schema';
+import { TxParamsAsync } from './tx/builder/schema';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
 import { ArgumentError, NotImplementedError, TypeError } from './utils/errors';
@@ -98,7 +98,7 @@ class AeSdkMethods {
     };
   }
 
-  async buildTx(options: TxTypeSchemasAsyncUnion): Promise<Encoded.Transaction> {
+  async buildTx(options: TxParamsAsync): Promise<Encoded.Transaction> {
     return buildTxAsync({ ...this._getOptions(), ...options });
   }
 

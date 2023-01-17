@@ -9,7 +9,7 @@ export default function genEncodedField<E extends Encoding, Optional extends boo
 ): {
     serialize: Optional extends true
       ? (value?: Encoded.Generic<E>) => Buffer : (value: Encoded.Generic<E>) => Buffer;
-    deserialize: (value: Buffer) => Encoded.Generic<Encoding>;
+    deserialize: (value: Buffer) => Encoded.Generic<E>;
   } {
   return {
     serialize(encodedData?: Encoded.Generic<E>) {
