@@ -10,7 +10,6 @@ import Node from './Node';
 import { TxTypeSchemasAsyncUnion } from './tx/builder/schema';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
-import CompilerBase from './contract/compiler/Base';
 import { ArgumentError, NotImplementedError, TypeError } from './utils/errors';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
@@ -125,9 +124,11 @@ type RequiredKeys<T> = {
 
 type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T;
 
+type ReplaceOnAccount<Options> = Options extends { onAccount: any }
+  ? Omit<Options, 'onAccount'> & { onAccount: OnAccount } : Options;
+
 type MakeOptional<Options> = OptionalIfNotRequired<[
-  Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'>
-  & { onNode?: Node; onCompiler?: CompilerBase; onAccount?: OnAccount },
+  Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'> & Partial<ReplaceOnAccount<Options>>,
 ]>;
 
 type TransformMethods <Methods extends { [key: string]: Function }> =
