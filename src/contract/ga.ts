@@ -20,8 +20,7 @@
  */
 
 import { Tag } from '../tx/builder/constants';
-import { buildContractIdByContractTx } from '../tx/builder';
-import { _buildTx, BuildTxOptions } from '../tx';
+import { buildContractIdByContractTx, buildTxAsync, BuildTxOptions } from '../tx/builder';
 import { hash } from '../utils/crypto';
 import { decode, Encoded } from '../utils/encoder';
 import { IllegalArgumentError } from '../utils/errors';
@@ -63,7 +62,7 @@ export async function createGeneralizedAccount(
     onAccount, onCompiler, onNode, bytecode, aci, sourceCodePath, sourceCode, fileSystem,
   });
 
-  const tx = await _buildTx({
+  const tx = await buildTxAsync({
     ...options,
     tag: Tag.GaAttachTx,
     onNode,

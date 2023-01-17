@@ -19,7 +19,6 @@ export * from './chain';
 export * from './utils/crypto';
 export * from './utils/keystore';
 export * from './utils/bytes';
-export * from './tx';
 export * from './tx/builder';
 export * from './tx/builder/helpers';
 export * from './tx/builder/constants';

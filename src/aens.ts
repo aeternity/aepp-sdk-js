@@ -33,7 +33,7 @@ import { ArgumentError } from './utils/errors';
 import { Encoded } from './utils/encoder';
 import { send, SendOptions } from './spend';
 import { getName, getHeight } from './chain';
-import { _buildTx, BuildTxOptions } from './tx';
+import { buildTxAsync, BuildTxOptions } from './tx/builder';
 import { TransformNodeType } from './Node';
 import { NameEntry, NamePointer } from './apis/node';
 import AccountBase from './account/Base';
@@ -68,7 +68,7 @@ export async function aensRevoke(
   name: AensName,
   options: AensRevokeOptions,
 ): ReturnType<typeof send> {
-  const nameRevokeTx = await _buildTx({
+  const nameRevokeTx = await buildTxAsync({
     ...options,
     tag: Tag.NameRevokeTx,
     nameId: name,
@@ -122,7 +122,7 @@ export async function aensUpdate(
     ...pointers,
   };
 
-  const nameUpdateTx = await _buildTx({
+  const nameUpdateTx = await buildTxAsync({
     clientTtl: CLIENT_TTL,
     nameTtl: NAME_TTL,
     ...options,
@@ -172,7 +172,7 @@ export async function aensTransfer(
   account: Encoded.AccountAddress,
   options: AensTransferOptions,
 ): ReturnType<typeof send> {
-  const nameTransferTx = await _buildTx({
+  const nameTransferTx = await buildTxAsync({
     ...options,
     tag: Tag.NameTransferTx,
     nameId: name,
@@ -300,7 +300,7 @@ export async function aensClaim(
   salt: number,
   options: AensClaimOptions,
 ): Promise<AensClaimReturnType> {
-  const claimTx = await _buildTx({
+  const claimTx = await buildTxAsync({
     ...options,
     tag: Tag.NameClaimTx,
     accountId: options.onAccount.address,
@@ -361,7 +361,7 @@ Awaited<ReturnType<typeof send>> & {
   const height = await getHeight(options);
   const commitmentId = commitmentHash(name, salt);
 
-  const preclaimTx = await _buildTx({
+  const preclaimTx = await buildTxAsync({
     ...options,
     tag: Tag.NamePreclaimTx,
     accountId: options.onAccount.address,

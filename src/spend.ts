@@ -16,8 +16,9 @@
  */
 import BigNumber from 'bignumber.js';
 import { sendTransaction, getBalance, resolveName } from './chain';
-import { _buildTx, BuildTxOptions } from './tx';
-import { buildTxHash, unpackTx } from './tx/builder';
+import {
+  buildTxAsync, BuildTxOptions, buildTxHash, unpackTx,
+} from './tx/builder';
 import { ArgumentError } from './utils/errors';
 import { Encoded, Encoding } from './utils/encoder';
 import { Tag, AensName } from './tx/builder/constants';
@@ -65,7 +66,7 @@ export async function spend(
   options: SpendOptions,
 ): ReturnType<typeof send> {
   return send(
-    await _buildTx({
+    await buildTxAsync({
       ...options,
       tag: Tag.SpendTx,
       senderId: options.onAccount.address,
@@ -112,7 +113,7 @@ export async function transferFunds(
   );
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP);
   const { fee } = unpackTx(
-    await _buildTx({
+    await buildTxAsync({
       ...options, tag: Tag.SpendTx, senderId, recipientId, amount: desiredAmount,
     }),
     Tag.SpendTx,
@@ -120,7 +121,7 @@ export async function transferFunds(
   // Reducing of the amount may reduce transaction fee, so this is not completely accurate
   const amount = desiredAmount.plus(fee).gt(balance) ? balance.minus(fee) : desiredAmount;
   return send(
-    await _buildTx({
+    await buildTxAsync({
       ...options, tag: Tag.SpendTx, senderId, recipientId, amount,
     }),
     options,
@@ -143,7 +144,7 @@ export async function payForTransaction(
   options: PayForTransactionOptions,
 ): ReturnType<typeof send> {
   return send(
-    await _buildTx({
+    await buildTxAsync({
       ...options, tag: Tag.PayingForTx, payerId: options.onAccount.address, tx: transaction,
     }),
     options,

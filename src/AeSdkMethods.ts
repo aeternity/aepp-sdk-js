@@ -4,7 +4,7 @@ import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
 import Contract, { ContractMethodsBase } from './contract/Contract';
 import * as contractGaMethods from './contract/ga';
-import { _buildTx } from './tx';
+import { buildTxAsync } from './tx/builder';
 import { mapObject, UnionToIntersection } from './utils/other';
 import Node from './Node';
 import { TxTypeSchemasAsyncUnion } from './tx/builder/schema';
@@ -99,7 +99,7 @@ class AeSdkMethods {
   }
 
   async buildTx(options: TxTypeSchemasAsyncUnion): Promise<Encoded.Transaction> {
-    return _buildTx({ ...this._getOptions(), ...options });
+    return buildTxAsync({ ...this._getOptions(), ...options });
   }
 
   async initializeContract<Methods extends ContractMethodsBase>(

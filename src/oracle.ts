@@ -27,7 +27,7 @@ import BigNumber from 'bignumber.js';
 import { send, SendOptions } from './spend';
 import { mapObject, pause } from './utils/other';
 import { oracleQueryId } from './tx/builder/helpers';
-import { unpackTx } from './tx/builder';
+import { unpackTx, buildTxAsync, BuildTxOptions } from './tx/builder';
 import {
   ORACLE_TTL,
   ORACLE_TTL_TYPES,
@@ -41,7 +41,6 @@ import {
   decode, encode, Encoded, Encoding,
 } from './utils/encoder';
 import { _getPollInterval, getHeight } from './chain';
-import { _buildTx, BuildTxOptions } from './tx';
 import Node from './Node';
 import AccountBase from './account/Base';
 
@@ -171,7 +170,7 @@ export async function postQueryToOracle(
   options.queryFee ??= (await options.onNode.getOracleByPubkey(oracleId)).queryFee.toString();
   const senderId = options.onAccount.address;
 
-  const oracleQueryTx = await _buildTx({
+  const oracleQueryTx = await buildTxAsync({
     queryTtlType: QUERY_TTL.type,
     queryTtlValue: QUERY_TTL.value,
     responseTtlType: RESPONSE_TTL.type,
@@ -216,7 +215,7 @@ export async function extendOracleTtl(
   oracleId: Encoded.OracleAddress,
   options: ExtendOracleTtlOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
-  const oracleExtendTx = await _buildTx({
+  const oracleExtendTx = await buildTxAsync({
     oracleTtlType: ORACLE_TTL.type,
     oracleTtlValue: ORACLE_TTL.value,
     ...options,
@@ -254,7 +253,7 @@ export async function respondToQuery(
   response: string,
   options: RespondToQueryOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
-  const oracleRespondTx = await _buildTx({
+  const oracleRespondTx = await buildTxAsync({
     responseTtlType: RESPONSE_TTL.type,
     responseTtlValue: RESPONSE_TTL.value,
     ...options,
@@ -342,7 +341,7 @@ export async function registerOracle(
   options: RegisterOracleOptions,
 ): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
   const accountId = options.onAccount.address;
-  const oracleRegisterTx = await _buildTx({
+  const oracleRegisterTx = await buildTxAsync({
     queryFee: QUERY_FEE,
     oracleTtlValue: ORACLE_TTL.value,
     oracleTtlType: ORACLE_TTL.type,

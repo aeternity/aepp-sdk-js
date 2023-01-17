@@ -6,6 +6,7 @@ import { hash } from '../../utils/crypto';
 import { BinaryData, Field } from './field-types';
 import {
   RawTxObject, TX_SCHEMA, TxField, TxSchema, TxTypeSchemas, TxTypeSchemasUnion,
+  TxTypeSchemasAsyncUnion,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
@@ -16,7 +17,7 @@ import { isKeyOfObject } from '../../utils/other';
  * JavaScript-based Transaction builder
  */
 
-export function getSchema(tag: Tag, version?: number): TxField[] {
+function getSchema(tag: Tag, version?: number): TxField[] {
   const schemas = TX_SCHEMA[tag];
   if (schemas == null) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
   version ??= Math.max(...Object.keys(schemas).map((a) => +a));
@@ -64,6 +65,26 @@ export function buildTx<
 
   // @ts-expect-error looks like a TypeScript edge case
   return encode(rlpEncode(binary), prefix ?? Encoding.Transaction);
+}
+
+export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
+  Omit<TxTypeSchemasAsyncUnion & { tag: TxType }, 'tag' | OmitFields>;
+
+/**
+ * @category transaction builder
+ */
+export async function buildTxAsync(params: TxTypeSchemasAsyncUnion): Promise<Encoded.Transaction> {
+  await Promise.all(
+    getSchema(params.tag, params.version)
+      .map(async ([key, field]) => {
+        if (field.prepare == null) return;
+        // @ts-expect-error the type of `params[key]` can't be determined accurately
+        params[key] = await field.prepare(params[key], params, params);
+      }),
+  );
+
+  // @ts-expect-error after preparation properties should be compatible with sync tx builder
+  return buildTx(params);
 }
 
 /**

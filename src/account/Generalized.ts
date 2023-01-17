@@ -24,9 +24,8 @@ import {
 import { decode, Encoded } from '../utils/encoder';
 import { getAccount } from '../chain';
 import Contract from '../contract/Contract';
-import { _buildTx } from '../tx';
+import { buildTxAsync, buildTx } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
-import { buildTx } from '../tx/builder';
 
 /**
  * Generalized account class
@@ -85,7 +84,7 @@ export default class AccountGeneralized extends AccountBase {
       return contract._calldata.encode(contract._name, this.#authFun, args);
     })();
 
-    const gaMetaTx = await _buildTx({
+    const gaMetaTx = await buildTxAsync({
       tag: Tag.GaMetaTx,
       tx: decode(buildTx({ tag: Tag.SignedTx, encodedTx: decode(tx), signatures: [] })),
       gaId: this.address,
