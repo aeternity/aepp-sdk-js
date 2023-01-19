@@ -5,13 +5,13 @@
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
 import { Tag } from './constants';
+import SchemaTypes from './SchemaTypes';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
   address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
   array, boolean, ctVersion, abiVersion, ttl, nonce,
 } from './field-types';
 import { Encoding } from '../../utils/encoder';
-import { UnionToIntersection } from '../../utils/other';
 import { idTagToEncoding } from './field-types/address';
 
 export enum ORACLE_TTL_TYPES {
@@ -627,90 +627,7 @@ export const txSchema = {
   },
 } as const;
 
-type NullablePartial<
-  T,
-  NK extends keyof T = { [K in keyof T]: undefined extends T[K] ? K : never }[keyof T],
-> = Partial<Pick<T, NK>> & Omit<T, NK>;
-
-type Or<A, B> = A extends undefined ? B : A;
-
-type TxParamsBySchemaInternal<SchemaLine> =
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field]
-      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
-      : never
-    : never
-  >;
-
-type GetFieldOrEmpty<Object, Key extends string> =
-  Object extends { [key in Key]: any } ? Object[Key] : {};
-
-type TxParamsBySchemaInternalParams<SchemaLine> =
-  GetFieldOrEmpty<
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field]
-      ? { options: Or<Parameters<Elem[1]['serialize']>[2], {}> }
-      : never
-    : never
-  >,
-  'options'
-  >;
-
-type TxParamsBySchema<SchemaLine> =
-  TxParamsBySchemaInternal<SchemaLine> & TxParamsBySchemaInternalParams<SchemaLine>;
-
-type TxParamsAsyncBySchemaInternal<SchemaLine> =
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field & { prepare: Function }]
-      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['prepare']>[0] }>
-      : TxParamsBySchemaInternal<[Elem]>
-    : never
-  >;
-
-type TxParamsAsyncBySchemaInternalParams<SchemaLine> =
-  GetFieldOrEmpty<
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field & { prepare: Function }]
-      ? { options: Or<Parameters<Elem[1]['prepare']>[2], {}> } : {}
-    : never
-  >,
-  'options'
-  >;
-
-type TxParamsAsyncBySchema<SchemaLine> =
-  TxParamsAsyncBySchemaInternal<SchemaLine>
-  & TxParamsAsyncBySchemaInternalParams<SchemaLine>
-  & TxParamsBySchemaInternalParams<SchemaLine>;
-
-type TxUnpackedBySchema<SchemaLine> =
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field]
-      ? { [k in Elem[0]]: ReturnType<Elem[1]['deserialize']> }
-      : never
-    : never
-  >;
-
-type TxNotCombined<Mode extends 'params' | 'params-async' | 'unpacked'> = {
-  [tag in Tag]: {
-    [ver in keyof typeof txSchema[tag]]: Mode extends 'params'
-      ? TxParamsBySchema<typeof txSchema[tag][ver]>
-      : Mode extends 'params-async'
-        ? TxParamsAsyncBySchema<typeof txSchema[tag][ver]>
-        : Mode extends 'unpacked'
-          ? TxUnpackedBySchema<typeof txSchema[tag][ver]>
-          : never
-  }
-};
-
-type ConvertToUnion<Schema extends { [key in Tag]: any }> = {
-  [key in Tag]: Schema[key][keyof Schema[key]]
-}[Tag];
-
-export type TxParams = ConvertToUnion<TxNotCombined<'params'>>;
-export type TxParamsAsync = ConvertToUnion<TxNotCombined<'params-async'>>;
-export type TxUnpacked = ConvertToUnion<TxNotCombined<'unpacked'>>;
+type TxSchema = typeof txSchema;
+export type TxParams = SchemaTypes<TxSchema>['TxParams'];
+export type TxParamsAsync = SchemaTypes<TxSchema>['TxParamsAsync'];
+export type TxUnpacked = SchemaTypes<TxSchema>['TxUnpacked'];
