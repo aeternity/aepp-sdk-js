@@ -1,17 +1,19 @@
 import { ConsensusProtocolVersion, VmVersion, AbiVersion } from '../constants';
 
-// First abi/vm by default
+/*
+ * First abi/vm by default
+ * @see {@link https://github.com/aeternity/protocol/blob/71cf111/contracts/contract_vms.md#virtual-machines-on-the-æternity-blockchain}
+ */
 export const ProtocolToVmAbi = {
   [ConsensusProtocolVersion.Iris]: {
     'contract-create': {
       vmVersion: [VmVersion.Fate2], abiVersion: [AbiVersion.Fate],
     },
-    // TODO: Ensure that AEVM (Sophia?) is still available here
     'contract-call': {
       vmVersion: [], abiVersion: [AbiVersion.Fate, AbiVersion.Sophia],
     },
     'oracle-call': {
-      vmVersion: [], abiVersion: [AbiVersion.NoAbi, AbiVersion.Sophia],
+      vmVersion: [], abiVersion: [AbiVersion.NoAbi, AbiVersion.Fate],
     },
   },
 } as const;
