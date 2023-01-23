@@ -183,7 +183,7 @@ describe('Node Chain', () => {
         .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true })),
     )).map((r) => r.decodedResult);
     expect(results).to.be.eql(numbers.map((v) => BigInt(v * 100)));
-    expect(httpSpy.args.length).to.be.equal(1);
+    expect(httpSpy.args.length).to.be.equal(2);
     httpSpy.restore();
   });
 });

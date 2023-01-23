@@ -111,7 +111,7 @@
     "@types/sinon": "^10.0.13",
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "@typescript-eslint/parser": "^5.47.1",
-    "autorest": "^3.6.2",
+    "autorest": "^3.6.3",
     "babel-loader": "^9.1.0",
     "babel-plugin-add-import-extension": "^1.6.0",
     "babel-plugin-import-globals": "^2.0.0",
