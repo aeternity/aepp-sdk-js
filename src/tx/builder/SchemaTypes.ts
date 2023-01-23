@@ -22,8 +22,8 @@ SchemaItemValues extends Field
   ? Or<Parameters<SchemaItemValues['serialize']>[2], {}> : never
 >;
 
-type TxParamsBySchema<SchemaItem> =
-  TxParamsBySchemaInternal<SchemaItem> & TxParamsBySchemaInternalParams<SchemaItem>;
+type TxParamsBySchema<SchemaItem> = SchemaItem extends Object
+  ? TxParamsBySchemaInternal<SchemaItem> & TxParamsBySchemaInternalParams<SchemaItem> : never;
 
 type TxParamsAsyncBySchemaInternal<SchemaItem> = NullablePartial<{
   -readonly [key in keyof SchemaItem]: SchemaItem[key] extends Field & { prepare: Function }
@@ -38,13 +38,14 @@ type TxParamsAsyncBySchemaInternalParams<
   SchemaItemValues = SchemaItem[keyof SchemaItem],
 > = UnionToIntersection<
 SchemaItemValues extends Field & { prepare: Function }
-  ? Or<Parameters<SchemaItemValues['prepare']>[2], {}> : never
+  ? Or<Parameters<SchemaItemValues['prepare']>[2], {}> : {}
 >;
 
-type TxParamsAsyncBySchema<SchemaItem> =
-  TxParamsAsyncBySchemaInternal<SchemaItem>
+type TxParamsAsyncBySchema<SchemaItem> = SchemaItem extends Object
+  ? TxParamsAsyncBySchemaInternal<SchemaItem>
   & TxParamsAsyncBySchemaInternalParams<SchemaItem>
-  & TxParamsBySchemaInternalParams<SchemaItem>;
+  & TxParamsBySchemaInternalParams<SchemaItem>
+  : never;
 
 type TxUnpackedBySchema<SchemaItem> = {
   -readonly [key in keyof SchemaItem]: SchemaItem[key] extends Field
@@ -52,24 +53,11 @@ type TxUnpackedBySchema<SchemaItem> = {
     : never;
 };
 
-type TxNotCombined<Schema, Mode extends 'params' | 'params-async' | 'unpacked'> = {
-  [tag in keyof Schema]: {
-    [ver in keyof Schema[tag]]: Mode extends 'params'
-      ? TxParamsBySchema<Schema[tag][ver]>
-      : Mode extends 'params-async'
-        ? TxParamsAsyncBySchema<Schema[tag][ver]>
-        : Mode extends 'unpacked'
-          ? TxUnpackedBySchema<Schema[tag][ver]>
-          : never
-  }
-};
-
-type ConvertToUnion<Schema> = {
-  [key in keyof Schema]: Schema[key][keyof Schema[key]]
-}[keyof Schema];
-
-export default interface SchemaTypes<Schema> {
-  TxParams: ConvertToUnion<TxNotCombined<Schema, 'params'>>;
-  TxParamsAsync: ConvertToUnion<TxNotCombined<Schema, 'params-async'>>;
-  TxUnpacked: ConvertToUnion<TxNotCombined<Schema, 'unpacked'>>;
+export default interface SchemaTypes<
+  Schema extends readonly any[],
+  SchemaItems = Schema[number],
+> {
+  TxParams: TxParamsBySchema<SchemaItems>;
+  TxParamsAsync: TxParamsAsyncBySchema<SchemaItems>;
+  TxUnpacked: TxUnpackedBySchema<SchemaItems>;
 }

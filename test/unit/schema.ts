@@ -8,53 +8,43 @@ describe('Schema', () => {
       serialize: (a: number): Buffer => Buffer.from([a]),
       deserialize: (a: Buffer): number => a[0],
     };
-    const schema = {
-      12: {
-        4: {
-          required,
-          optional: {
-            ...required,
-            serialize: (a?: number): Buffer => Buffer.from([a ?? 0]),
-          },
-        },
-        6: {
-          required,
-          required2: required,
-        },
-        8: {
-          options: {
-            ...required,
-            serialize: (a: number, _: {}, { incBy }: { incBy: number }): Buffer => (
-              Buffer.from([a + incBy])
-            ),
-          },
-        },
-        10: {
-          prepare: {
-            ...required,
-            serialize: (a: number, _: {}, { incBy }: { incBy: number }): Buffer => (
-              Buffer.from([a + incBy])
-            ),
-            prepare: async (a: number, _: {}, { mulBy }: { mulBy: number }): Promise<number> => (
-              a * mulBy
-            ),
-          },
+    const schema = [{
+      required,
+      optional: {
+        ...required,
+        serialize: (a?: number): Buffer => Buffer.from([a ?? 0]),
+      },
+    }, {
+      required,
+      required2: required,
+    }, {
+      options: {
+        ...required,
+        serialize: (a: number, _: {}, { incBy }: { incBy: number }): Buffer => (
+          Buffer.from([a + incBy])
+        ),
+      },
+    }, {
+      prepare: {
+        ...required,
+        serialize: (a: number, _: {}, { incBy }: { incBy: number }): Buffer => (
+          Buffer.from([a + incBy])
+        ),
+        prepare: async (a: number, _: {}, { mulBy }: { mulBy: number }): Promise<number> => (
+          a * mulBy
+        ),
+      },
+    }, {
+      required,
+      prepareOther: {
+        ...required,
+        prepare: async (a: number, _: {}, opts: { otherBool?: boolean }): Promise<number> => {
+          expect(a);
+          expect(opts);
+          return 4;
         },
       },
-      9: {
-        1: {
-          required,
-          prepareOther: {
-            ...required,
-            prepare: async (a: number, _: {}, opts: { otherBool?: boolean }): Promise<number> => {
-              expect(a);
-              expect(opts);
-              return 4;
-            },
-          },
-        },
-      },
-    } as const;
+    }] as const;
     type Schema = SchemaTypes<typeof schema>;
     type TxParams = Schema['TxParams'];
     type TxParamsAsync = Schema['TxParamsAsync'];
