@@ -93,7 +93,7 @@ export async function buildTxAsync(params: TxParamsAsync): Promise<Encoded.Trans
  * @returns Object with transaction param's
  */
 export function unpackTx<TxType extends Tag>(
-  encodedTx: Encoded.Transaction | Encoded.Poi,
+  encodedTx: Encoded.Transaction | Encoded.Poi | Encoded.StateTrees | Encoded.CallStateTree,
   txType?: TxType,
 ): TxUnpacked & { tag: TxType } {
   const binary = rlpDecode(decode(encodedTx));

@@ -154,26 +154,26 @@ describe('Tx', () => {
 
       const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
       const account = {
-        tag: 10, version: 1, nonce: 0, balance: '99999999999999998997',
+        tag: Tag.Account, version: 1, nonce: 0, balance: '99999999999999998997',
       };
       expect(unpackedPoi.accounts[0].get(address)).to.eql(account);
 
       const addressContract = 'ct_ECdrEy2NJKq3qK3xraPtcDP7vfdi56SQXYAH3bVVSTmpqpYyW';
       const accountContract = {
-        tag: 10, version: 1, nonce: 0, balance: '1000',
+        tag: Tag.Account, version: 1, nonce: 0, balance: '1000',
       };
       expect(unpackedPoi.accounts[0].get(addressContract as Encoded.AccountAddress))
         .to.eql(accountContract);
       expect(unpackedPoi.accounts[0].toObject()).to.eql({
         ak_BvMjyAXbpHkjzVfG53N6FxF1LwTX2EYwFLfNbk8mcXjp8CXBC: {
-          tag: 10, version: 1, nonce: 0, balance: '100000000000000000003',
+          tag: Tag.Account, version: 1, nonce: 0, balance: '100000000000000000003',
         },
         [addressContract.replace('ct_', 'ak_')]: accountContract,
         [address]: account,
       });
 
       const contract = {
-        tag: 40,
+        tag: Tag.Contract,
         version: 1,
         owner: 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D',
         ctVersion: { vmVersion: VmVersion.Fate, abiVersion: AbiVersion.Fate },
@@ -187,6 +187,119 @@ describe('Tx', () => {
       expect(unpackedPoi.contracts[0].toObject()).to.eql({ [addressContract]: contract });
 
       expect(buildTx(unpackedPoi, { prefix: Encoding.Poi })).to.equal(poi);
+    });
+
+    it('unpacks state channel calls record', () => {
+      const tx = 'cs_+QFBggJuAbkBOvkBNz8B+QEyuJf4lUABuEBRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhED9reWbZWfYmFIwTrKG6Khrbb7SvfC4T4ll2BtXsX/luE/4TSkCoQFZYYdOS6IFcvCPFPCBUOkebcCW0ZehLaMRA+K9RcniKwICoQVRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhAA9PwDAuJf4lUABuEBRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhADlKPCJlyMdCDQrNsajcRCzQk6M8LSJvbdnJ7Lc4aFjuE/4TSkCoQFZYYdOS6IFcvCPFPCBUOkebcCW0ZehLaMRA+K9RcniKwMDoQVRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhAEOVADAenqUfg==';
+      const params = {
+        tag: Tag.CallsMtree,
+        version: 1,
+        payload: {
+          'ba_Ubf68VEz8EqfAQTEFke9AIOpE4jV0w5jti1krbGxF4RA/a3lm2Vn2JhSME6yhuioa22+0r3wuE+JZdgbV7F/5c9Ms1g=': {
+            callerId: 'ak_gN7nP72rm7D1kuSYWRtL9Sf4pFRoTPKM8wa9JHyneazW8zHm4',
+            callerNonce: 2,
+            contractId: 'ct_czPqotjcUujiXu5DaTeJMbv2WJpqwuhsQFn6edrGVRaoHLifk',
+            gasPrice: '0',
+            gasUsed: 61,
+            height: 2,
+            log: [],
+            returnType: 0,
+            returnValue: 'cb_P4fvHVw=',
+            tag: Tag.ContractCall,
+            version: 2,
+          },
+          'ba_Ubf68VEz8EqfAQTEFke9AIOpE4jV0w5jti1krbGxF4QA5SjwiZcjHQg0KzbGo3EQs0JOjPC0ib23Zyey3OGhY+BjbKc=': {
+            callerId: 'ak_gN7nP72rm7D1kuSYWRtL9Sf4pFRoTPKM8wa9JHyneazW8zHm4',
+            callerNonce: 3,
+            contractId: 'ct_czPqotjcUujiXu5DaTeJMbv2WJpqwuhsQFn6edrGVRaoHLifk',
+            gasPrice: '1',
+            gasUsed: 14,
+            height: 3,
+            log: [],
+            returnType: 0,
+            returnValue: 'cb_VNLOFXc=',
+            tag: Tag.ContractCall,
+            version: 2,
+          },
+        },
+      } as const;
+      expect(unpackTx(tx, Tag.CallsMtree)).to.be.eql(params);
+      expect(buildTx(params, { prefix: Encoding.CallStateTree })).to.be.equal(tx);
+    });
+
+    it('unpacks state channel signed tx', () => {
+      const { signatures, encodedTx } = unpackTx(
+        'tx_+NILAfiEuEBCv6dwkalvFkuHyYNcRpgZVYlSMmyOO9ukCrBBYYy2zLdgaSs/ug3e01ep2jiy6z9ABOkC83QNpCjdi0eAahUBuEC1RFFr7z4401oJRENrqGRlRsOwTp/GU70W5zeiTP0TZ8rtfzhGH1ZjIsq7u+o6duevI+eyrBtXr3yeqbViEB4KuEj4RjkCoQYzv70uksCUiH6SlOGVAYhx0LkLFmtDUXsRejThITz2MwOgGK/uHihyT8uUtXTAcncw9QFkW0QghCzEWDfwXWbHR14jXFqu',
+        Tag.SignedTx,
+      );
+      expect(signatures).to.have.lengthOf(2);
+      if (encodedTx.tag !== Tag.ChannelOffChainTx) throw new Error('Unexpected nested transaction');
+      expect(encodedTx.channelId).to.be.satisfy((s: string) => s.startsWith('ch_'));
+      expect(encodedTx.round).to.be.equal(3);
+      expect(encodedTx.stateHash).to.be.satisfy((s: string) => s.startsWith('st_'));
+    });
+
+    it('unpacks state trees tx', () => {
+      const tx = 'ss_+QKqPgC5ATb5ATOCAm0BuQEs+QEpPwH5ASSo50ABo/v6skWp8mq1jwV/+iKDkHayfTtp7ytW6d/nZ2QVQ4zhEAABP6rpQAGj+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEQAACCLwCm5UABofv6skWp8mq1jwV/+iKDkHayfTtp7ytW6d/nZ2QVQ4zhEAC4p/ilQAGg+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOG4gPh+KAGhAaJtvnDfkCeML/RLVY1N/6eQNHADrvu4hZoCmMAbCi5SgwUAA7hO+ExGA6Dh3797nquCHCSm088avgOiqgjjarRQviEYAXq+YlegWcCgjf6AeCCSADcBBwcBAQCOLwERgHggkhlnZXRBcmeCLwCFNy4wLjEAgAHAggPouKf4pYICbgG4n/idPwH4mbiX+JVAAbhA+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEHycljzso7F0NwAzM/Oj84MV1Lo7ia3VslsuGHHCI+wrhP+E0pAqEBom2+cN+QJ4wv9EtVjU3/p5A0cAOu+7iFmgKYwBsKLlICAqEF+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEAPT8AwIrJggJvAYTDPwHAismCAnABhMM/AcCKyYICcQGEwz8BwLij+KGCAnIBuJv4mT8B+JWs60ABoPv6skWp8mq1jwV/+iKDkHayfTtp7ytW6d/nZ2QVQ4zhh8YKAQCCA+iz8kABoKJtvnDfkCeML/RLVY1N/6eQNHADrvu4hZoCmMAbCi5Sjs0KAQCJBWvHXi1jD/wVs/JAAaBuFXSR/8BDssKtH01lCLrV/Jd1ImY9KNci1mQqB0RIJY7NCgEAiQVrx14tYxAAA0X2l9c=';
+      const params = {
+        accounts: {
+          ak_2uyUQn1dyzrMxjzhSQgZ2rV1dk2D5BCYpquzzBn6hxoSAo7y1d: {
+            balance: '1000',
+            nonce: 0,
+            tag: Tag.Account,
+            version: 1,
+          },
+          ak_2EY2KjfhXkpLq2u13YuvDBahi8Yxq5ErNocCeCUAvwHmJjS2aF: {
+            balance: '99999999999999998997',
+            nonce: 0,
+            tag: Tag.Account,
+            version: 1,
+          },
+          ak_qUwhrGsBqhxh2Ace9KBsrDtJpmFeWhuhLZg61L4cQ4Lknhvud: {
+            balance: '100000000000000000003',
+            nonce: 0,
+            tag: Tag.Account,
+            version: 1,
+          },
+        },
+        calls: {
+          'ba_+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEHycljzso7F0NwAzM/Oj84MV1Lo7ia3VslsuGHHCI+wsMqg1w=': {
+            callerId: 'ak_2EY2KjfhXkpLq2u13YuvDBahi8Yxq5ErNocCeCUAvwHmJjS2aF',
+            callerNonce: 2,
+            contractId: 'ct_2uyUQn1dyzrMxjzhSQgZ2rV1dk2D5BCYpquzzBn6hxoSAo7y1d',
+            gasPrice: '0',
+            gasUsed: 61,
+            height: 2,
+            log: [],
+            returnType: 0,
+            returnValue: 'cb_P4fvHVw=',
+            tag: Tag.ContractCall,
+            version: 2,
+          },
+        },
+        channels: {},
+        contracts: {
+          ct_2uyUQn1dyzrMxjzhSQgZ2rV1dk2D5BCYpquzzBn6hxoSAo7y1d: {
+            active: true,
+            code: 'cb_+ExGA6Dh3797nquCHCSm088avgOiqgjjarRQviEYAXq+YlegWcCgjf6AeCCSADcBBwcBAQCOLwERgHggkhlnZXRBcmeCLwCFNy4wLjEALb9eTg==',
+            ctVersion: {
+              abiVersion: 3,
+              vmVersion: 5,
+            },
+            deposit: '1000',
+            log: 'cb_Xfbg4g==',
+            owner: 'ak_2EY2KjfhXkpLq2u13YuvDBahi8Yxq5ErNocCeCUAvwHmJjS2aF',
+            referers: [],
+            tag: Tag.Contract,
+            version: 1,
+          },
+        },
+        ns: {},
+        oracles: {},
+        tag: Tag.StateTrees,
+        version: 0,
+      } as const;
+      expect(unpackTx(tx, Tag.StateTrees)).to.be.eql(params);
     });
   });
 

@@ -12,6 +12,7 @@ import _fee from './fee';
 import _field from './field';
 import _gasLimit from './gas-limit';
 import _gasPrice from './gas-price';
+import _map from './map';
 import _mptree from './mptree';
 import _name from './name';
 import _nameFee from './name-fee';
@@ -24,6 +25,7 @@ import _shortUIntConst from './short-u-int-const';
 import _string from './string';
 import _ttl from './ttl';
 import _uInt from './u-int';
+import _wrapped from './wrapped';
 
 // TODO: remove after fixing https://github.com/Gerrit0/typedoc-plugin-missing-exports/issues/15
 const abiVersion = _abiVersion;
@@ -40,6 +42,7 @@ const fee = _fee;
 const field = _field;
 const gasLimit = _gasLimit;
 const gasPrice = _gasPrice;
+const map = _map;
 const mptree = _mptree;
 const name = _name;
 const nameFee = _nameFee;
@@ -52,6 +55,7 @@ const shortUIntConst = _shortUIntConst;
 const string = _string;
 const ttl = _ttl;
 const uInt = _uInt;
+const wrapped = _wrapped;
 
 export type BinaryData = Buffer | Buffer[] | Buffer[][]
 | Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
@@ -77,6 +81,7 @@ export {
   field,
   gasLimit,
   gasPrice,
+  map,
   mptree,
   name,
   nameFee,
@@ -89,4 +94,5 @@ export {
   string,
   ttl,
   uInt,
+  wrapped,
 };

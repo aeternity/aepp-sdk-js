@@ -4,7 +4,7 @@ export default function genArrayField<Input, Output, Binary>(
     deserialize: (value: Binary, params: unknown) => Output;
   },
 ): {
-    serialize: (value: Input[], params: unknown) => Binary[];
+    serialize: (value: readonly Input[], params: unknown) => Binary[];
     deserialize: (value: Binary[], params: unknown) => Output[];
   } {
   return {

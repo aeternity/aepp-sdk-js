@@ -9,7 +9,7 @@ import SchemaTypes from './SchemaTypes';
 import {
   uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
   address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array, boolean, ctVersion, abiVersion, ttl, nonce,
+  array, boolean, ctVersion, abiVersion, ttl, nonce, map, wrapped,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
 import { idTagToEncoding } from './field-types/address';
@@ -43,11 +43,17 @@ interface EntryAny {
   recursiveType: true;
 }
 
-interface EntryAnyArray {
-  serialize: (value: Array<TxParams | Uint8Array | Encoded.Transaction>) => Buffer[];
-  deserialize: (value: Buffer[]) => TxUnpacked[];
+const entryAny = entry() as unknown as EntryAny;
+
+interface EntryMtreeValueArray {
+  serialize: (
+    value: Array<TxParams & { tag: Tag.MtreeValue } | Uint8Array | Encoded.Transaction>,
+  ) => Buffer[];
+  deserialize: (value: Buffer[]) => Array<TxUnpacked & { tag: Tag.MtreeValue }>;
   recursiveType: true;
 }
+
+const entryMtreeValueArray = array(entry(Tag.MtreeValue)) as unknown as EntryMtreeValueArray;
 
 interface EntryTreesPoi {
   serialize: (value: TxParams & { tag: Tag.TreesPoi } | Uint8Array | Encoded.Transaction) => Buffer;
@@ -55,8 +61,69 @@ interface EntryTreesPoi {
   recursiveType: true;
 }
 
-const entryAny = entry() as unknown as EntryAny;
 const entryTreesPoi = entry(Tag.TreesPoi) as unknown as EntryTreesPoi;
+
+interface MapContracts {
+  serialize: (
+    value: Record<Encoded.ContractAddress, TxParams & { tag: Tag.Contract }>,
+  ) => Buffer;
+  deserialize: (
+    value: Buffer,
+  ) => Record<Encoded.ContractAddress, TxUnpacked & { tag: Tag.Contract }>;
+  recursiveType: true;
+}
+
+const mapContracts = map(Encoding.ContractAddress, Tag.Contract) as unknown as MapContracts;
+
+interface MapAccounts {
+  serialize: (
+    value: Record<Encoded.AccountAddress, TxParams & { tag: Tag.Account }>,
+  ) => Buffer;
+  deserialize: (value: Buffer) => Record<Encoded.AccountAddress, TxUnpacked & { tag: Tag.Account }>;
+  recursiveType: true;
+}
+
+const mapAccounts = map(Encoding.AccountAddress, Tag.Account) as unknown as MapAccounts;
+
+interface MapCalls {
+  serialize: (
+    value: Record<Encoded.Bytearray, TxParams & { tag: Tag.ContractCall }>,
+  ) => Buffer;
+  deserialize: (value: Buffer) => Record<Encoded.Bytearray, TxUnpacked & { tag: Tag.ContractCall }>;
+  recursiveType: true;
+}
+
+const mapCalls = map(Encoding.Bytearray, Tag.ContractCall) as unknown as MapCalls;
+
+interface MapChannels {
+  serialize: (
+    value: Record<Encoded.Channel, TxParams & { tag: Tag.Channel }>,
+  ) => Buffer;
+  deserialize: (value: Buffer) => Record<Encoded.Channel, TxUnpacked & { tag: Tag.Channel }>;
+  recursiveType: true;
+}
+
+const mapChannels = map(Encoding.Channel, Tag.Channel) as unknown as MapChannels;
+
+interface MapNames {
+  serialize: (
+    value: Record<Encoded.Name, TxParams & { tag: Tag.Name }>,
+  ) => Buffer;
+  deserialize: (value: Buffer) => Record<Encoded.Name, TxUnpacked & { tag: Tag.Name }>;
+  recursiveType: true;
+}
+
+const mapNames = map(Encoding.Name, Tag.Name) as unknown as MapNames;
+
+interface MapOracles {
+  serialize: (
+    value: Record<Encoded.OracleAddress, TxParams & { tag: Tag.Oracle }>,
+  ) => Buffer;
+  deserialize: (value: Buffer) => Record<Encoded.OracleAddress, TxUnpacked & { tag: Tag.Oracle }>;
+  recursiveType: true;
+}
+
+const mapOracles = map(Encoding.OracleAddress, Tag.Oracle) as unknown as MapOracles;
 
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts}
@@ -182,18 +249,19 @@ export const txSchema = [{
   callData: encoded(Encoding.ContractBytearray),
 }, {
   tag: shortUIntConst(Tag.ContractCall),
-  version: shortUIntConst(1, true),
+  version: shortUIntConst(2, true),
   callerId: address(Encoding.AccountAddress),
   callerNonce: shortUInt,
   height: shortUInt,
   contractId: address(Encoding.ContractAddress),
-  gasPrice,
+  // TODO: rename after resolving https://github.com/aeternity/protocol/issues/506
+  gasPrice: uInt,
   gasUsed: shortUInt,
   returnValue: encoded(Encoding.ContractBytearray),
   returnType: enumeration(CallReturnType),
   // TODO: add serialization for
   //  <log> :: [ { <address> :: id, [ <topics> :: binary() }, <data> :: binary() } ]
-  log: raw,
+  log: array(raw),
 }, {
   tag: shortUIntConst(Tag.Oracle),
   version: shortUIntConst(1, true),
@@ -418,6 +486,7 @@ export const txSchema = [{
 }, {
   tag: shortUIntConst(Tag.TreesPoi),
   version: shortUIntConst(1, true),
+  // TODO: inline an extra wrapping array after resolving https://github.com/aeternity/protocol/issues/505
   accounts: array(mptree(Encoding.AccountAddress, Tag.Account)),
   calls: array(mptree(Encoding.Bytearray, Tag.ContractCall)),
   channels: array(mptree(Encoding.Channel, Tag.Channel)),
@@ -426,17 +495,17 @@ export const txSchema = [{
   oracles: array(mptree(Encoding.OracleAddress, Tag.Oracle)),
 }, {
   tag: shortUIntConst(Tag.StateTrees),
-  version: shortUIntConst(1, true),
-  contracts: entryAny,
-  calls: entryAny,
-  channels: entryAny,
-  ns: entryAny,
-  oracles: entryAny,
-  accounts: entryAny,
+  version: shortUIntConst(0, true),
+  contracts: wrapped(Tag.ContractsMtree) as unknown as MapContracts,
+  calls: wrapped(Tag.CallsMtree) as unknown as MapCalls,
+  channels: wrapped(Tag.ChannelsMtree) as unknown as MapChannels,
+  ns: wrapped(Tag.NameserviceMtree) as unknown as MapNames,
+  oracles: wrapped(Tag.OraclesMtree) as unknown as MapOracles,
+  accounts: wrapped(Tag.AccountsMtree) as unknown as MapAccounts,
 }, {
   tag: shortUIntConst(Tag.Mtree),
   version: shortUIntConst(1, true),
-  values: array(entry()) as unknown as EntryAnyArray,
+  values: entryMtreeValueArray,
 }, {
   tag: shortUIntConst(Tag.MtreeValue),
   version: shortUIntConst(1, true),
@@ -445,27 +514,27 @@ export const txSchema = [{
 }, {
   tag: shortUIntConst(Tag.ContractsMtree),
   version: shortUIntConst(1, true),
-  contracts: entryAny,
+  payload: mapContracts,
 }, {
   tag: shortUIntConst(Tag.CallsMtree),
   version: shortUIntConst(1, true),
-  calls: entryAny,
+  payload: mapCalls,
 }, {
   tag: shortUIntConst(Tag.ChannelsMtree),
   version: shortUIntConst(1, true),
-  channels: entryAny,
+  payload: mapChannels,
 }, {
   tag: shortUIntConst(Tag.NameserviceMtree),
   version: shortUIntConst(1, true),
-  mtree: entryAny,
+  payload: mapNames,
 }, {
   tag: shortUIntConst(Tag.OraclesMtree),
   version: shortUIntConst(1, true),
-  otree: entryAny,
+  payload: mapOracles,
 }, {
   tag: shortUIntConst(Tag.AccountsMtree),
   version: shortUIntConst(1, true),
-  accounts: entryAny,
+  payload: mapAccounts,
 }, {
   tag: shortUIntConst(Tag.GaAttachTx),
   version: shortUIntConst(1, true),
