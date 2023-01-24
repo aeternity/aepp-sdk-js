@@ -11,7 +11,7 @@ import {
   address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
   array, boolean, ctVersion, abiVersion, ttl, nonce,
 } from './field-types';
-import { Encoding } from '../../utils/encoder';
+import { Encoded, Encoding } from '../../utils/encoder';
 import { idTagToEncoding } from './field-types/address';
 
 export enum ORACLE_TTL_TYPES {
@@ -36,6 +36,28 @@ export enum CallReturnType {
   Revert = 2,
 }
 
+// TODO: figure out how to omit overriding types of recursive fields
+interface EntryAny {
+  serialize: (value: TxParams | Uint8Array | Encoded.Transaction) => Buffer;
+  deserialize: (value: Buffer) => TxUnpacked;
+  recursiveType: true;
+}
+
+interface EntryAnyArray {
+  serialize: (value: Array<TxParams | Uint8Array | Encoded.Transaction>) => Buffer[];
+  deserialize: (value: Buffer[]) => TxUnpacked[];
+  recursiveType: true;
+}
+
+interface EntryTreesPoi {
+  serialize: (value: TxParams & { tag: Tag.TreesPoi } | Uint8Array | Encoded.Transaction) => Buffer;
+  deserialize: (value: Buffer) => TxUnpacked & { tag: Tag.TreesPoi };
+  recursiveType: true;
+}
+
+const entryAny = entry() as unknown as EntryAny;
+const entryTreesPoi = entry(Tag.TreesPoi) as unknown as EntryTreesPoi;
+
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts}
  */
@@ -56,7 +78,7 @@ export const txSchema = [{
   tag: shortUIntConst(Tag.SignedTx),
   version: shortUIntConst(1, true),
   signatures: array(raw),
-  encodedTx: entry(),
+  encodedTx: entryAny,
 }, {
   tag: shortUIntConst(Tag.SpendTx),
   version: shortUIntConst(1, true),
@@ -259,7 +281,7 @@ export const txSchema = [{
   channelId: address(Encoding.Channel),
   fromId: address(Encoding.AccountAddress),
   payload: encoded(Encoding.Transaction),
-  poi: entry(Tag.TreesPoi),
+  poi: entryTreesPoi,
   ttl,
   fee,
   nonce: nonce('fromId'),
@@ -269,7 +291,7 @@ export const txSchema = [{
   channelId: address(Encoding.Channel),
   fromId: address(Encoding.AccountAddress),
   payload: encoded(Encoding.Transaction),
-  poi: entry(Tag.TreesPoi),
+  poi: entryTreesPoi,
   ttl,
   fee,
   nonce: nonce('fromId'),
@@ -405,16 +427,16 @@ export const txSchema = [{
 }, {
   tag: shortUIntConst(Tag.StateTrees),
   version: shortUIntConst(1, true),
-  contracts: entry(),
-  calls: entry(),
-  channels: entry(),
-  ns: entry(),
-  oracles: entry(),
-  accounts: entry(),
+  contracts: entryAny,
+  calls: entryAny,
+  channels: entryAny,
+  ns: entryAny,
+  oracles: entryAny,
+  accounts: entryAny,
 }, {
   tag: shortUIntConst(Tag.Mtree),
   version: shortUIntConst(1, true),
-  values: array(entry()),
+  values: array(entry()) as unknown as EntryAnyArray,
 }, {
   tag: shortUIntConst(Tag.MtreeValue),
   version: shortUIntConst(1, true),
@@ -423,27 +445,27 @@ export const txSchema = [{
 }, {
   tag: shortUIntConst(Tag.ContractsMtree),
   version: shortUIntConst(1, true),
-  contracts: entry(),
+  contracts: entryAny,
 }, {
   tag: shortUIntConst(Tag.CallsMtree),
   version: shortUIntConst(1, true),
-  calls: entry(),
+  calls: entryAny,
 }, {
   tag: shortUIntConst(Tag.ChannelsMtree),
   version: shortUIntConst(1, true),
-  channels: entry(),
+  channels: entryAny,
 }, {
   tag: shortUIntConst(Tag.NameserviceMtree),
   version: shortUIntConst(1, true),
-  mtree: entry(),
+  mtree: entryAny,
 }, {
   tag: shortUIntConst(Tag.OraclesMtree),
   version: shortUIntConst(1, true),
-  otree: entry(),
+  otree: entryAny,
 }, {
   tag: shortUIntConst(Tag.AccountsMtree),
   version: shortUIntConst(1, true),
-  accounts: entry(),
+  accounts: entryAny,
 }, {
   tag: shortUIntConst(Tag.GaAttachTx),
   version: shortUIntConst(1, true),
@@ -466,14 +488,14 @@ export const txSchema = [{
   fee,
   gasLimit,
   gasPrice,
-  tx: entry(),
+  tx: entryAny,
 }, {
   tag: shortUIntConst(Tag.PayingForTx),
   version: shortUIntConst(1, true),
   payerId: address(Encoding.AccountAddress),
   nonce: nonce('payerId'),
   fee,
-  tx: entry(),
+  tx: entryAny,
 }] as const;
 
 type TxSchema = SchemaTypes<typeof txSchema>;

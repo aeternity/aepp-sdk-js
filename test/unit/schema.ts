@@ -8,6 +8,15 @@ describe('Schema', () => {
       serialize: (a: number): Buffer => Buffer.from([a]),
       deserialize: (a: Buffer): number => a[0],
     };
+
+    // TODO: figure out why these methods should be defined separately
+    function recursiveSerialize(a: TxParams): Buffer {
+      return a as any;
+    }
+    function recursiveDeserialize(a: Buffer): TxUnpacked {
+      return a as any;
+    }
+
     const schema = [{
       required,
       optional: {
@@ -44,6 +53,13 @@ describe('Schema', () => {
           return 4;
         },
       },
+    }, {
+      requiredRec: required,
+      recursive: {
+        serialize: recursiveSerialize,
+        deserialize: recursiveDeserialize,
+        recursiveType: true,
+      },
     }] as const;
     type Schema = SchemaTypes<typeof schema>;
     type TxParams = Schema['TxParams'];
@@ -61,6 +77,9 @@ describe('Schema', () => {
     txParams.options = 42; expect(txParams);
     // @ts-expect-error prepare options missed in sync params
     txParams = { prepare: 41, incBy: 10, mulBy: 2 }; expect(txParams);
+    txParams = { requiredRec: 41, recursive: { required: 42, optional: 43 } }; expect(txParams);
+    // @ts-expect-error invalid type in recursive
+    txParams = { requiredRec: 41, recursive: { required: 'test' } }; expect(txParams);
 
     let txParamsAsync: TxParamsAsync;
     // @ts-expect-error passing an undefined property
@@ -73,6 +92,10 @@ describe('Schema', () => {
     txParamsAsync = { prepare: 41, incBy: 10, mulBy: 2 }; expect(txParamsAsync);
     txParamsAsync = { required: 42, prepareOther: 41, otherBool: true }; expect(txParamsAsync);
     txParamsAsync.required = 43; expect(txParamsAsync);
+    txParamsAsync = { requiredRec: 41, recursive: { required: 42, optional: 43 } };
+    expect(txParamsAsync);
+    // @ts-expect-error invalid type in recursive
+    txParamsAsync = { requiredRec: 41, recursive: { required: 'test' } }; expect(txParamsAsync);
 
     let txUnpacked: TxUnpacked;
     // @ts-expect-error passing an undefined property
@@ -87,5 +110,8 @@ describe('Schema', () => {
     txUnpacked = { options: 41, incBy: 10 }; expect(txUnpacked);
     // @ts-expect-error prepare options missed in unpacked
     txUnpacked = { prepare: 41, incBy: 10, mulBy: 2 }; expect(txUnpacked);
+    txUnpacked = { requiredRec: 41, recursive: { required: 42, optional: 43 } }; expect(txUnpacked);
+    // @ts-expect-error invalid type in recursive
+    txUnpacked = { requiredRec: 41, recursive: { required: 'test' } }; expect(txUnpacked);
   });
 });

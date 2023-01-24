@@ -9,7 +9,7 @@ import { Encoded, decode } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
-import { UnexpectedTsError } from '../utils/errors';
+import { ArgumentError, UnexpectedTsError } from '../utils/errors';
 
 export interface ValidatorResult {
   message: string;
@@ -131,11 +131,20 @@ validators.push(
   },
   (tx, { account, parentTxTypes }) => {
     if (account == null) return [];
+    let extraFee = '0';
+    if (tx.tag === Tag.PayingForTx) {
+      if (tx.tx.tag !== Tag.SignedTx) {
+        throw new ArgumentError('Payload of PayingForTx', Tag[Tag.SignedTx], Tag[tx.tx.tag]);
+      }
+      // TODO: calculate nested tx fee more accurate
+      if ('fee' in tx.tx.encodedTx) {
+        extraFee = tx.tx.encodedTx.fee;
+      }
+    }
     const cost = new BigNumber('fee' in tx ? tx.fee : 0)
       .plus('nameFee' in tx ? tx.nameFee : 0)
       .plus('amount' in tx ? tx.amount : 0)
-      // TODO: calculate nested tx fee more accurate
-      .plus(tx.tag === Tag.PayingForTx ? tx.tx.encodedTx.fee : 0)
+      .plus(extraFee)
       .minus(parentTxTypes.includes(Tag.PayingForTx) && 'fee' in tx ? tx.fee : 0);
     if (cost.lte(account.balance.toString())) return [];
     return [{

@@ -34,7 +34,7 @@ import { ContractCallReturnType } from '../apis/node';
 import { ContractCallObject } from '../contract/Contract';
 import Channel from './Base';
 import ChannelSpend from './Spend';
-import { UnexpectedChannelMessageError } from '../utils/errors';
+import { ChannelError, UnexpectedChannelMessageError } from '../utils/errors';
 import { unpackTx } from '../tx/builder';
 import { encodeContractAddress } from '../utils/crypto';
 
@@ -152,14 +152,17 @@ export default class ChannelContract extends ChannelSpend {
               state2: ChannelState,
             ): ChannelFsm => (
               awaitingCompletion(this, message2, state2, () => {
-                const { round } = unpackTx(message2.params.data.state, Tag.SignedTx).encodedTx;
+                const params = unpackTx(message2.params.data.state, Tag.SignedTx).encodedTx;
+                if (params.tag !== Tag.ChannelOffChainTx) {
+                  throw new ChannelError(`Tag should be ${Tag[Tag.ChannelOffChainTx]}, got ${Tag[params.tag]} instead`);
+                }
                 const addressKey = this._options.role === 'initiator'
                   ? 'initiatorId' : 'responderId';
                 const owner = this._options[addressKey];
                 changeState(this, message2.params.data.state);
                 state2.resolve({
                   accepted: true,
-                  address: encodeContractAddress(owner, round),
+                  address: encodeContractAddress(owner, params.round),
                   signedTx: message2.params.data.state,
                 });
                 return { handler: channelOpen };
