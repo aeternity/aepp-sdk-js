@@ -8,66 +8,49 @@ type NullablePartial<
 
 type Or<A, B> = A extends undefined ? B : A;
 
-type TxParamsBySchemaInternal<SchemaLine> =
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field]
-      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
-      : never
-    : never
-  >;
+type TxParamsBySchemaInternal<SchemaItem> = NullablePartial<{
+  -readonly [key in keyof SchemaItem]: SchemaItem[key] extends Field
+    ? Parameters<SchemaItem[key]['serialize']>[0]
+    : never;
+}>;
 
-type GetFieldOrEmpty<Object, Key extends string> =
-  Object extends { [key in Key]: any } ? Object[Key] : {};
+type TxParamsBySchemaInternalParams<
+  SchemaItem,
+  SchemaItemValues = SchemaItem[keyof SchemaItem],
+> = UnionToIntersection<
+SchemaItemValues extends Field
+  ? Or<Parameters<SchemaItemValues['serialize']>[2], {}> : never
+>;
 
-type TxParamsBySchemaInternalParams<SchemaLine> =
-  GetFieldOrEmpty<
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field]
-      ? { options: Or<Parameters<Elem[1]['serialize']>[2], {}> }
-      : never
-    : never
-  >,
-  'options'
-  >;
+type TxParamsBySchema<SchemaItem> =
+  TxParamsBySchemaInternal<SchemaItem> & TxParamsBySchemaInternalParams<SchemaItem>;
 
-type TxParamsBySchema<SchemaLine> =
-  TxParamsBySchemaInternal<SchemaLine> & TxParamsBySchemaInternalParams<SchemaLine>;
+type TxParamsAsyncBySchemaInternal<SchemaItem> = NullablePartial<{
+  -readonly [key in keyof SchemaItem]: SchemaItem[key] extends Field & { prepare: Function }
+    ? Parameters<SchemaItem[key]['prepare']>[0]
+    : SchemaItem[key] extends Field
+      ? Parameters<SchemaItem[key]['serialize']>[0]
+      : never;
+}>;
 
-type TxParamsAsyncBySchemaInternal<SchemaLine> =
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field & { prepare: Function }]
-      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['prepare']>[0] }>
-      : TxParamsBySchemaInternal<[Elem]>
-    : never
-  >;
+type TxParamsAsyncBySchemaInternalParams<
+  SchemaItem,
+  SchemaItemValues = SchemaItem[keyof SchemaItem],
+> = UnionToIntersection<
+SchemaItemValues extends Field & { prepare: Function }
+  ? Or<Parameters<SchemaItemValues['prepare']>[2], {}> : never
+>;
 
-type TxParamsAsyncBySchemaInternalParams<SchemaLine> =
-  GetFieldOrEmpty<
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field & { prepare: Function }]
-      ? { options: Or<Parameters<Elem[1]['prepare']>[2], {}> } : {}
-    : never
-  >,
-  'options'
-  >;
+type TxParamsAsyncBySchema<SchemaItem> =
+  TxParamsAsyncBySchemaInternal<SchemaItem>
+  & TxParamsAsyncBySchemaInternalParams<SchemaItem>
+  & TxParamsBySchemaInternalParams<SchemaItem>;
 
-type TxParamsAsyncBySchema<SchemaLine> =
-  TxParamsAsyncBySchemaInternal<SchemaLine>
-  & TxParamsAsyncBySchemaInternalParams<SchemaLine>
-  & TxParamsBySchemaInternalParams<SchemaLine>;
-
-type TxUnpackedBySchema<SchemaLine> =
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends readonly [string, Field]
-      ? { [k in Elem[0]]: ReturnType<Elem[1]['deserialize']> }
-      : never
-    : never
-  >;
+type TxUnpackedBySchema<SchemaItem> = {
+  -readonly [key in keyof SchemaItem]: SchemaItem[key] extends Field
+    ? ReturnType<SchemaItem[key]['deserialize']>
+    : never;
+};
 
 type TxNotCombined<Schema, Mode extends 'params' | 'params-async' | 'unpacked'> = {
   [tag in keyof Schema]: {

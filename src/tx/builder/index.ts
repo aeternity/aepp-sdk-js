@@ -3,9 +3,9 @@ import {
   decode, encode, Encoded, Encoding,
 } from '../../utils/encoder';
 import { hash } from '../../utils/crypto';
-import { BinaryData } from './field-types';
+import { BinaryData, Field } from './field-types';
 import {
-  txSchema, TxField, TxUnpacked, TxParams, TxParamsAsync,
+  txSchema, TxUnpacked, TxParams, TxParamsAsync,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
@@ -16,14 +16,14 @@ import { isKeyOfObject } from '../../utils/other';
  * JavaScript-based Transaction builder
  */
 
-function getSchema(tag: Tag, version?: number): TxField[] {
+function getSchema(tag: Tag, version?: number): Array<[string, Field]> {
   const schemas = txSchema[tag];
   if (schemas == null) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
   version ??= Math.max(...Object.keys(schemas).map((a) => +a));
   if (!isKeyOfObject(version, schemas)) {
     throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, version);
   }
-  return schemas[version];
+  return Object.entries(schemas[version]);
 }
 
 /**

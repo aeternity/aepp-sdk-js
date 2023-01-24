@@ -10,27 +10,27 @@ describe('Schema', () => {
     };
     const schema = {
       12: {
-        4: [
-          ['required', required],
-          ['optional', {
+        4: {
+          required,
+          optional: {
             ...required,
             serialize: (a?: number): Buffer => Buffer.from([a ?? 0]),
-          }],
-        ],
-        6: [
-          ['required', required],
-          ['required2', required],
-        ],
-        8: [
-          ['options', {
+          },
+        },
+        6: {
+          required,
+          required2: required,
+        },
+        8: {
+          options: {
             ...required,
             serialize: (a: number, _: {}, { incBy }: { incBy: number }): Buffer => (
               Buffer.from([a + incBy])
             ),
-          }],
-        ],
-        10: [
-          ['prepare', {
+          },
+        },
+        10: {
+          prepare: {
             ...required,
             serialize: (a: number, _: {}, { incBy }: { incBy: number }): Buffer => (
               Buffer.from([a + incBy])
@@ -38,8 +38,21 @@ describe('Schema', () => {
             prepare: async (a: number, _: {}, { mulBy }: { mulBy: number }): Promise<number> => (
               a * mulBy
             ),
-          }],
-        ],
+          },
+        },
+      },
+      9: {
+        1: {
+          required,
+          prepareOther: {
+            ...required,
+            prepare: async (a: number, _: {}, opts: { otherBool?: boolean }): Promise<number> => {
+              expect(a);
+              expect(opts);
+              return 4;
+            },
+          },
+        },
       },
     } as const;
     type Schema = SchemaTypes<typeof schema>;
@@ -55,6 +68,7 @@ describe('Schema', () => {
     txParams = { required2: 42 }; expect(txParams);
     txParams = { required: 42, optional: 43 }; expect(txParams);
     txParams = { options: 41, incBy: 10 }; expect(txParams);
+    txParams.options = 42; expect(txParams);
     // @ts-expect-error prepare options missed in sync params
     txParams = { prepare: 41, incBy: 10, mulBy: 2 }; expect(txParams);
 
@@ -67,6 +81,8 @@ describe('Schema', () => {
     txParamsAsync = { required: 42, optional: 43 }; expect(txParamsAsync);
     txParamsAsync = { options: 41, incBy: 10 }; expect(txParamsAsync);
     txParamsAsync = { prepare: 41, incBy: 10, mulBy: 2 }; expect(txParamsAsync);
+    txParamsAsync = { required: 42, prepareOther: 41, otherBool: true }; expect(txParamsAsync);
+    txParamsAsync.required = 43; expect(txParamsAsync);
 
     let txUnpacked: TxUnpacked;
     // @ts-expect-error passing an undefined property
@@ -76,6 +92,7 @@ describe('Schema', () => {
     // @ts-expect-error missing required property
     txUnpacked = { required2: 42 }; expect(txUnpacked);
     txUnpacked = { required: 42, optional: 43 }; expect(txUnpacked);
+    txUnpacked.required = 43; expect(txUnpacked);
     // @ts-expect-error options missed in unpacked
     txUnpacked = { options: 41, incBy: 10 }; expect(txUnpacked);
     // @ts-expect-error prepare options missed in unpacked
