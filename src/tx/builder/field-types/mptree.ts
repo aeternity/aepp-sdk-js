@@ -215,14 +215,14 @@ class MPTree<E extends Encoding, T extends Tag> {
     return entries;
   }
 
-  toObject(): Record<Encoded.Any, ReturnType<typeof unpackTx<T>>> {
+  toObject(): Record<Encoded.Generic<E>, ReturnType<typeof unpackTx<T>>> {
     return Object.fromEntries(this.#entriesRaw()
       // TODO: remove after resolving https://github.com/aeternity/aeternity/issues/4066
       .filter(([k]) => this.#encoding !== Encoding.ContractAddress || k.length !== 66)
       .map(([k, v]) => [
         encode(Buffer.from(k, 'hex'), this.#encoding),
         this.#unpackTx(encode(v, Encoding.Transaction), this.#tag),
-      ]));
+      ])) as Record<Encoded.Generic<E>, ReturnType<typeof unpackTx<T>>>;
   }
 }
 
