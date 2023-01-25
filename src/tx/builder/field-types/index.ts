@@ -16,11 +16,13 @@ import _mptree from './mptree';
 import _name from './name';
 import _nameFee from './name-fee';
 import _nameId from './name-id';
+import _nonce from './nonce';
 import _pointers from './pointers';
 import _raw from './raw';
 import _shortUInt from './short-u-int';
 import _shortUIntConst from './short-u-int-const';
 import _string from './string';
+import _ttl from './ttl';
 import _uInt from './u-int';
 
 // TODO: remove after fixing https://github.com/Gerrit0/typedoc-plugin-missing-exports/issues/15
@@ -42,17 +44,20 @@ const mptree = _mptree;
 const name = _name;
 const nameFee = _nameFee;
 const nameId = _nameId;
+const nonce = _nonce;
 const pointers = _pointers;
 const raw = _raw;
 const shortUInt = _shortUInt;
 const shortUIntConst = _shortUIntConst;
 const string = _string;
+const ttl = _ttl;
 const uInt = _uInt;
 
 export type BinaryData = Buffer | Buffer[] | Buffer[][]
 | Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
 export interface Field {
-  serialize: (value: any, options: any) => BinaryData;
+  serialize: (value: any, options: any, parameters: any) => BinaryData;
+  prepare?: (value: any, options: any, parameters: any) => Promise<any>;
   deserialize: (value: BinaryData, options: any) => any;
 }
 
@@ -75,10 +80,12 @@ export {
   name,
   nameFee,
   nameId,
+  nonce,
   pointers,
   raw,
   shortUInt,
   shortUIntConst,
   string,
+  ttl,
   uInt,
 };

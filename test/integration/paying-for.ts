@@ -36,7 +36,8 @@ describe('Paying for transaction of another account', () => {
     const sender = MemoryAccount.generate();
     const receiver = MemoryAccount.generate();
     await aeSdk.spend(1e4, sender.address);
-    const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
+    const spendTx = await aeSdk.buildTx({
+      tag: Tag.SpendTx,
       senderId: sender.address,
       recipientId: receiver.address,
       amount: 1e4,

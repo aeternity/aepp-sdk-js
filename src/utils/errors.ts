@@ -698,16 +698,6 @@ export class InvalidSignatureError extends TransactionError {
 /**
  * @category exception
  */
-export class InvalidTxParamsError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'InvalidTxParamsError';
-  }
-}
-
-/**
- * @category exception
- */
 export class PrefixNotFoundError extends TransactionError {
   constructor(tag: number) {
     super(`Prefix for id-tag ${tag} not found.`);
@@ -719,8 +709,8 @@ export class PrefixNotFoundError extends TransactionError {
  * @category exception
  */
 export class SchemaNotFoundError extends TransactionError {
-  constructor(schemaName: string, key: string, version: number) {
-    super(`Transaction ${schemaName} not implemented for ${key} version ${version}`);
+  constructor(key: string, version: number) {
+    super(`Transaction schema not implemented for tag ${key} version ${version}`);
     this.name = 'SchemaNotFoundError';
   }
 }

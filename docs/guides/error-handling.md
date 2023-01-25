@@ -84,7 +84,6 @@ BaseError
 │   ├── IllegalBidFeeError
 │   ├── InvalidSignatureError
 │   ├── InvalidTxError
-│   ├── InvalidTxParamsError
 │   ├── PrefixNotFoundError
 │   ├── SchemaNotFoundError
 │   ├── TagNotFoundError
@@ -116,7 +115,7 @@ import {
   AeSdk,
   Node,
   MemoryAccount,
-  InvalidTxParamsError,
+  ArgumentError,
   InvalidAensNameError
 } from '@aeternity/aepp-sdk'
 
@@ -132,10 +131,10 @@ const aeSdk = new AeSdk({
 // catch exceptions
 try {
   const spendTxResult = await aeSdk.spend(-1, newUserAccount.address, { onAccount: payerAccount})
-} catch(err) {
-  if(err instanceof InvalidTxParamsError){
+} catch (err) {
+  if (err instanceof ArgumentError) {
     console.log(`Amount specified is not valid, ${err.message}`)
-  } else if(err instanceof InvalidAensNameError) {
+  } else if (err instanceof InvalidAensNameError) {
     console.log(`Address specified is not valid, ${err.message}`)
   }
 }

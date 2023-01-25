@@ -1,12 +1,11 @@
-import { decode as rlpDecode, encode as rlpEncode, NestedUint8Array } from 'rlp';
+import { decode as rlpDecode, encode as rlpEncode } from 'rlp';
 import {
   decode, encode, Encoded, Encoding,
 } from '../../utils/encoder';
-import { AE_AMOUNT_FORMATS } from '../../utils/amount-formatter';
 import { hash } from '../../utils/crypto';
-import { BinaryData, Field } from './field-types';
+import { BinaryData } from './field-types';
 import {
-  RawTxObject, TX_SCHEMA, TxField, TxSchema, TxTypeSchemas,
+  txSchema, TxField, TxUnpacked, TxParams, TxParamsAsync,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
@@ -17,33 +16,14 @@ import { isKeyOfObject } from '../../utils/other';
  * JavaScript-based Transaction builder
  */
 
-/**
- * Unpack binary transaction
- * @category transaction builder
- * @param binary - Array with binary transaction field's
- * @param schema - Transaction schema
- * @returns Object with transaction field's
- */
-function unpackRawTx<Tx extends TxSchema>(
-  binary: Uint8Array | NestedUint8Array,
-  schema: TxField[],
-): RawTxObject<Tx> {
-  if (binary.length !== schema.length) {
-    throw new ArgumentError('Transaction RLP length', schema.length, binary.length);
+function getSchema(tag: Tag, version?: number): TxField[] {
+  const schemas = txSchema[tag];
+  if (schemas == null) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
+  version ??= Math.max(...Object.keys(schemas).map((a) => +a));
+  if (!isKeyOfObject(version, schemas)) {
+    throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, version);
   }
-  return schema
-    .reduce<any>(
-    (
-      acc,
-      [name, field],
-      index,
-    ) => {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      const deserialized = field.deserialize(binary[index] as BinaryData, { unpackTx });
-      return { ...acc, [name]: deserialized };
-    },
-    {},
-  );
+  return schemas[version];
 }
 
 /**
@@ -51,52 +31,35 @@ function unpackRawTx<Tx extends TxSchema>(
  * @category transaction builder
  * @param params - Object with tx params
  * @param options - options
- * @param options.denomination - Denomination of amounts
  * @param options.prefix - Prefix of transaction
- * @throws {@link InvalidTxParamsError}
- * @returns object
- * @returns object.tx Base64Check transaction hash with 'tx_' prefix
- * @returns object.rlpEncoded rlp encoded transaction
- * @returns object.binary binary transaction
+ * @returns object Base64Check transaction hash with 'tx_' prefix
  */
 export function buildTx<
-  TxType extends Tag,
   E extends Encoding = Encoding.Transaction,
 >(
-  params: { tag: TxType; version?: number } & Omit<TxTypeSchemas[TxType], 'tag' | 'version'>
-  // TODO: get it from gas-limit.ts somehow
-  & (TxType extends Tag.ContractCreateTx | Tag.ContractCallTx
-  | Tag.ChannelOffChainUpdateCallContract | Tag.GaAttachTx | Tag.GaMetaTx
-    ? { gasMax?: number } : {}),
+  params: TxParams,
   {
     prefix,
-    denomination = AE_AMOUNT_FORMATS.AETTOS,
   }: {
     prefix?: E;
-    denomination?: AE_AMOUNT_FORMATS;
   } = {},
 ): Encoded.Generic<E> {
-  const schemas = TX_SCHEMA[params.tag];
-  params.version ??= Math.max(...Object.keys(schemas).map((a) => +a));
-  if (!isKeyOfObject(params.version, schemas)) {
-    throw new SchemaNotFoundError('serialization', Tag[params.tag], params.version);
-  }
-  const schema = schemas[params.version] as unknown as TxField[];
+  const schema = getSchema(params.tag, params.version);
 
-  const binary = schema.map(([key, field]: [keyof TxSchema, Field]) => (
+  const binary = schema.map(([key, field]) => (
     field.serialize(
+      // @ts-expect-error the type of `params[key]` can't be determined accurately
       params[key],
       {
         ...params,
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         unpackTx,
         buildTx,
-        denomination,
         rebuildTx: (overrideParams: any) => buildTx(
           { ...params, ...overrideParams },
-          { denomination },
         ),
       },
+      params,
     )
   ));
 
@@ -104,27 +67,53 @@ export function buildTx<
   return encode(rlpEncode(binary), prefix ?? Encoding.Transaction);
 }
 
+export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
+  Omit<TxParamsAsync & { tag: TxType }, 'tag' | OmitFields>;
+
 /**
- * Unpack transaction hash
+ * @category transaction builder
+ */
+export async function buildTxAsync(params: TxParamsAsync): Promise<Encoded.Transaction> {
+  await Promise.all(
+    getSchema(params.tag, params.version)
+      .map(async ([key, field]) => {
+        if (field.prepare == null) return;
+        // @ts-expect-error the type of `params[key]` can't be determined accurately
+        params[key] = await field.prepare(params[key], params, params);
+      }),
+  );
+
+  // @ts-expect-error after preparation properties should be compatible with sync tx builder
+  return buildTx(params);
+}
+
+/**
+ * Unpack transaction encoded as string
  * @category transaction builder
  * @param encodedTx - Transaction to unpack
  * @param txType - Expected transaction type
- * @returns object
- * @returns object.tx Object with transaction param's
- * @returns object.txType Transaction type
+ * @returns Object with transaction param's
  */
 export function unpackTx<TxType extends Tag>(
   encodedTx: Encoded.Transaction | Encoded.Poi,
   txType?: TxType,
-): RawTxObject<TxTypeSchemas[TxType]> {
+): TxUnpacked & { tag: TxType } {
   const binary = rlpDecode(decode(encodedTx));
   const tag = +readInt(binary[0] as Buffer);
-  if (!isKeyOfObject(tag, TX_SCHEMA)) throw new DecodeError(`Unknown transaction tag: ${tag}`);
-  if (txType != null && txType !== tag) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[tag]} instead`);
   const version = +readInt(binary[1] as Buffer);
-  if (!isKeyOfObject(version, TX_SCHEMA[tag])) throw new SchemaNotFoundError('deserialization', `tag ${tag}`, version);
-  const schema = TX_SCHEMA[tag][version];
-  return unpackRawTx<TxTypeSchemas[TxType]>(binary, schema);
+  const schema = getSchema(tag, version);
+  if (txType != null && txType !== tag) throw new DecodeError(`Expected transaction to have ${Tag[txType]} tag, got ${Tag[tag]} instead`);
+  if (binary.length !== schema.length) {
+    throw new ArgumentError('Transaction RLP length', schema.length, binary.length);
+  }
+  return schema.reduce<any>(
+    (acc, [name, field], index) => {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      const deserialized = field.deserialize(binary[index] as BinaryData, { unpackTx });
+      return { ...acc, [name]: deserialized };
+    },
+    {},
+  ) as any;
 }
 
 /**
@@ -149,9 +138,9 @@ export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.Tx
 export function buildContractIdByContractTx(
   contractTx: Encoded.Transaction,
 ): Encoded.ContractAddress {
-  const { tag, ownerId, nonce } = unpackTx<Tag.ContractCreateTx | Tag.GaAttachTx>(contractTx);
-  if (![Tag.ContractCreateTx, Tag.GaAttachTx].includes(tag)) {
-    throw new ArgumentError('contractCreateTx', 'a contractCreateTx or gaAttach', tag);
+  const params = unpackTx(contractTx);
+  if (Tag.ContractCreateTx !== params.tag && Tag.GaAttachTx !== params.tag) {
+    throw new ArgumentError('contractTx', 'a contractCreateTx or gaAttach', params.tag);
   }
-  return buildContractId(ownerId, +nonce);
+  return buildContractId(params.ownerId, params.nonce);
 }

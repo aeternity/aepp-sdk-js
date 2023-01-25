@@ -20,7 +20,7 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { encode as rlpEncode } from 'rlp';
 import BigNumber from 'bignumber.js';
-import { randomName } from '../utils';
+import { checkOnlyTypes, randomName } from '../utils';
 import {
   genSalt,
   decode, encode,
@@ -28,7 +28,7 @@ import {
   toBytes,
   buildTx, unpackTx,
   NAME_BID_RANGES, Tag, AbiVersion, VmVersion,
-  SchemaNotFoundError, ArgumentError,
+  SchemaNotFoundError, ArgumentError, AeSdk,
 } from '../../src';
 import { Encoding, Encoded } from '../../src/utils/encoder';
 
@@ -114,7 +114,7 @@ describe('Tx', () => {
     it('throws error if invalid transaction version', () => {
       const tx = encode(rlpEncode([10, 99]), Encoding.Transaction);
       expect(() => unpackTx(tx))
-        .to.throw(SchemaNotFoundError, 'Transaction deserialization not implemented for tag 10 version 99');
+        .to.throw(SchemaNotFoundError, 'Transaction schema not implemented for tag Account (10) version 99');
     });
 
     it('fails to unpack tx with more RLP items than in schema', () => {
@@ -128,6 +128,8 @@ describe('Tx', () => {
         expect(account.recipientId);
         // @ts-expect-error spend tx don't have balance
         expect(account.balance);
+        const str: string = account.fee;
+        expect(str);
       }
       if (account.tag === Tag.Account) {
         expect(account.balance);
@@ -139,6 +141,10 @@ describe('Tx', () => {
         }
         // @ts-expect-error without checking version, account may not have flags
         expect(account.flags);
+      }
+      if (account.tag === Tag.ContractCallTx) {
+        // @ts-expect-error contract call shouldn't store protocol version
+        expect(account.consensusProtocolVersion);
       }
     });
 
@@ -184,22 +190,22 @@ describe('Tx', () => {
     });
   });
 
+  const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
+
   describe('buildTx', () => {
     it('returns value of a proper type', () => {
-      const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
-
       const tx: Encoded.Transaction = buildTx({
-        tag: Tag.SpendTx, nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+        tag: Tag.SpendTx, nonce: 0, amount: 123, senderId: address, recipientId: address,
       });
       expect(tx).to.satisfy((s: string) => s.startsWith('tx_'));
 
       const txExplicit: Encoded.Transaction = buildTx({
-        tag: Tag.SpendTx, nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+        tag: Tag.SpendTx, nonce: 0, amount: 123, senderId: address, recipientId: address,
       }, { prefix: Encoding.Transaction });
       expect(txExplicit).to.satisfy((s: string) => s.startsWith('tx_'));
 
       const pi: Encoded.Poi = buildTx({
-        tag: Tag.SpendTx, nonce: 0, ttl: 0, amount: 123, senderId: address, recipientId: address,
+        tag: Tag.SpendTx, nonce: 0, amount: 123, senderId: address, recipientId: address,
       }, { prefix: Encoding.Poi });
       expect(pi).to.satisfy((s: string) => s.startsWith('pi_'));
     });
@@ -229,9 +235,47 @@ describe('Tx', () => {
       expect(buildTx(unpackTx(tx))).to.be.equal(tx);
     });
 
+    it('checks argument types', () => {
+      const spendTxParams = {
+        tag: Tag.SpendTx, nonce: 0, senderId: address, recipientId: address,
+      } as const;
+      const spendTx = 'tx_+FEMAaEBXXFtZp9YqbY4KdW8Nolf9Hjp0VZcNWnQOKjgCb8Br9mhAV1xbWafWKm2OCnVvDaJX/R46dFWXDVp0Dio4Am/Aa/ZAIYPJvVhyAAAAIBeys6T';
+      expect(buildTx(spendTxParams)).to.equal(spendTx);
+      // @ts-expect-error spend tx don't have balance
+      expect(buildTx({ ...spendTxParams, balance: 123 })).to.equal(spendTx);
+      // @ts-expect-error spend tx should have senderId
+      expect(() => buildTx({ ...spendTxParams, senderId: undefined })).to.throw(TypeError);
+
+      const accountParams = { tag: Tag.Account, nonce: 0, balance: 123 } as const;
+      const account = 'tx_xAoBAHt6KY13';
+      const accountV2Params = {
+        flags: 12,
+        gaContract: 'ct_ECdrEy2NJKq3qK3xraPtcDP7vfdi56SQXYAH3bVVSTmpqpYyW',
+        gaAuthFun: 'cb_Xfbg4g==',
+      } as const;
+      const accountV2 = 'tx_6AoCDAB7oQUd+T20wFXy2ZOEIKWCVNexp+1QmgXSfwzarLhs8ov8roBmV7GN';
+      // @ts-expect-error version should be specified if used not the last schema
+      expect(() => buildTx(accountParams)).to.throw();
+      expect(buildTx({ ...accountParams, version: 1 })).to.equal(account);
+      expect(buildTx({ ...accountParams, version: 2, ...accountV2Params })).to.equal(accountV2);
+      // @ts-expect-error account v1 entry don't have flags
+      expect(buildTx({ ...accountParams, version: 1, flags: 12 })).to.equal(account);
+      expect(buildTx({ ...accountParams, ...accountV2Params })).to.equal(accountV2);
+    });
+
     it('rejects if invalid transaction version', () => {
       expect(() => buildTx({ tag: Tag.SpendTx, version: 5 } as any))
-        .to.throw(SchemaNotFoundError, 'Transaction serialization not implemented for SpendTx version 5');
+        .to.throw(SchemaNotFoundError, 'Transaction schema not implemented for tag SpendTx (12) version 5');
+    });
+  });
+
+  describe('buildTxAsync', () => {
+    it('should fail if key is missed', () => {
+      checkOnlyTypes(async () => {
+        const sdk = new AeSdk();
+        // @ts-expect-error recipientId field is missed
+        await sdk.buildTx({ tag: Tag.SpendTx, senderId: address, amount: 0 });
+      });
     });
   });
 });

@@ -19,15 +19,15 @@ export default {
   serialize(
     _value: number | undefined,
     {
-      tag, rebuildTx, unpackTx, buildTx, gasMax = 6e6, _computingGasLimit,
+      tag, rebuildTx, unpackTx, buildTx, _computingGasLimit,
     }: {
       tag: Tag;
       rebuildTx: (params: any) => any;
       unpackTx: typeof unpackTxType;
       buildTx: typeof buildTxType;
-      gasMax: number;
       _computingGasLimit?: number;
     },
+    { gasMax = 6e6 }: { gasMax?: number },
   ): Buffer {
     if (_computingGasLimit != null) return shortUInt.serialize(_computingGasLimit);
 

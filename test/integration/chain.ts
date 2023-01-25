@@ -88,7 +88,8 @@ describe('Node Chain', () => {
   });
 
   it('polls for transactions', async () => {
-    const tx = await aeSdk.buildTx(Tag.SpendTx, {
+    const tx = await aeSdk.buildTx({
+      tag: Tag.SpendTx,
       amount: 1,
       senderId: aeSdk.address,
       recipientId: publicKey,

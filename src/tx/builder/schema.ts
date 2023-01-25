@@ -4,12 +4,11 @@
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
-import BigNumber from 'bignumber.js';
 import { Tag } from './constants';
 import {
   Field, uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
   address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array, boolean, ctVersion, abiVersion,
+  array, boolean, ctVersion, abiVersion, ttl, nonce,
 } from './field-types';
 import { Encoding } from '../../utils/encoder';
 import { UnionToIntersection } from '../../utils/other';
@@ -20,8 +19,6 @@ export enum ORACLE_TTL_TYPES {
   block = 1,
 }
 
-// # TRANSACTION DEFAULT TTL
-export const TX_TTL = 0;
 // # ORACLE
 export const QUERY_FEE = 30000;
 export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
@@ -44,32 +41,10 @@ export enum CallReturnType {
   Revert = 2,
 }
 
-type TxElem = readonly [string, Field];
-
-type BuildTxArgBySchemaType<Type extends Field> = Parameters<Type['serialize']>[0];
-
-type NullablePartial<
-  T,
-  NK extends keyof T = { [K in keyof T]: undefined extends T[K] ? K : never }[keyof T],
-> = Partial<Pick<T, NK>> & Omit<T, NK>;
-
-type BuildTxArgBySchema<SchemaLine> =
-  UnionToIntersection<
-  SchemaLine extends ReadonlyArray<infer Elem>
-    ? Elem extends TxElem
-      ? NullablePartial<{ [k in Elem[0]]: BuildTxArgBySchemaType<Elem[1]> }>
-      : never
-    : never
-  >;
-
-export type RawTxObject<Tx extends TxSchema> = {
-  [k in keyof Tx]-?: Tx[k] extends BigNumber ? string : Tx[k]
-};
-
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts}
  */
-export const TX_SCHEMA = {
+export const txSchema = {
   [Tag.Account]: {
     1: [
       ['tag', shortUIntConst(Tag.Account)],
@@ -79,7 +54,7 @@ export const TX_SCHEMA = {
     ],
     2: [
       ['tag', shortUIntConst(Tag.Account)],
-      ['version', shortUIntConst(2)],
+      ['version', shortUIntConst(2, true)],
       ['flags', uInt],
       ['nonce', shortUInt],
       ['balance', uInt],
@@ -90,7 +65,7 @@ export const TX_SCHEMA = {
   [Tag.SignedTx]: {
     1: [
       ['tag', shortUIntConst(Tag.SignedTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['signatures', array(raw)],
       ['encodedTx', entry()],
     ],
@@ -98,20 +73,20 @@ export const TX_SCHEMA = {
   [Tag.SpendTx]: {
     1: [
       ['tag', shortUIntConst(Tag.SpendTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['senderId', address(Encoding.AccountAddress)],
       ['recipientId', address(Encoding.AccountAddress, Encoding.Name)],
       ['amount', coinAmount],
       ['fee', fee],
-      ['ttl', shortUInt],
-      ['nonce', shortUInt],
+      ['ttl', ttl],
+      ['nonce', nonce('senderId')],
       ['payload', encoded(Encoding.Bytearray, true)],
     ],
   },
   [Tag.Name]: {
     1: [
       ['tag', shortUIntConst(Tag.Name)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['accountId', address(Encoding.AccountAddress)],
       ['nameTtl', shortUInt],
       ['status', raw],
@@ -122,68 +97,68 @@ export const TX_SCHEMA = {
   [Tag.NamePreclaimTx]: {
     1: [
       ['tag', shortUIntConst(Tag.NamePreclaimTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['accountId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('accountId')],
       ['commitmentId', address(Encoding.Commitment)],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.NameClaimTx]: {
     2: [
       ['tag', shortUIntConst(Tag.NameClaimTx)],
-      ['version', shortUIntConst(2)],
+      ['version', shortUIntConst(2, true)],
       ['accountId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('accountId')],
       ['name', name],
       ['nameSalt', uInt],
       ['nameFee', nameFee],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.NameUpdateTx]: {
     1: [
       ['tag', shortUIntConst(Tag.NameUpdateTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['accountId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('accountId')],
       ['nameId', nameId],
       ['nameTtl', shortUInt],
       ['pointers', pointers],
       ['clientTtl', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.NameTransferTx]: {
     1: [
       ['tag', shortUIntConst(Tag.NameTransferTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['accountId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('accountId')],
       ['nameId', nameId],
       ['recipientId', address(Encoding.AccountAddress, Encoding.Name)],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.NameRevokeTx]: {
     1: [
       ['tag', shortUIntConst(Tag.NameRevokeTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['accountId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('accountId')],
       ['nameId', nameId],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.Contract]: {
     1: [
       ['tag', shortUIntConst(Tag.Contract)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['owner', address(Encoding.AccountAddress)],
       ['ctVersion', ctVersion],
       ['code', encoded(Encoding.ContractBytearray)],
@@ -196,13 +171,13 @@ export const TX_SCHEMA = {
   [Tag.ContractCreateTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ContractCreateTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['ownerId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('ownerId')],
       ['code', encoded(Encoding.ContractBytearray)],
       ['ctVersion', ctVersion],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['deposit', deposit],
       ['amount', coinAmount],
       ['gasLimit', gasLimit],
@@ -213,13 +188,13 @@ export const TX_SCHEMA = {
   [Tag.ContractCallTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ContractCallTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['callerId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('callerId')],
       ['contractId', address(Encoding.ContractAddress, Encoding.Name)],
       ['abiVersion', abiVersion],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['amount', coinAmount],
       ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
@@ -229,7 +204,7 @@ export const TX_SCHEMA = {
   [Tag.ContractCall]: {
     1: [
       ['tag', shortUIntConst(Tag.ContractCall)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['callerId', address(Encoding.AccountAddress)],
       ['callerNonce', shortUInt],
       ['height', shortUInt],
@@ -246,7 +221,7 @@ export const TX_SCHEMA = {
   [Tag.Oracle]: {
     1: [
       ['tag', shortUIntConst(Tag.Oracle)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['accountId', address(Encoding.AccountAddress)],
       ['queryFormat', string],
       ['responseFormat', string],
@@ -258,37 +233,37 @@ export const TX_SCHEMA = {
   [Tag.OracleRegisterTx]: {
     1: [
       ['tag', shortUIntConst(Tag.OracleRegisterTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['accountId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('accountId')],
       ['queryFormat', string],
       ['responseFormat', string],
       ['queryFee', coinAmount],
       ['oracleTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['oracleTtlValue', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['abiVersion', abiVersion],
     ],
   },
   [Tag.OracleExtendTx]: {
     1: [
       ['tag', shortUIntConst(Tag.OracleExtendTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['oracleId', address(Encoding.OracleAddress, Encoding.Name)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('callerId')],
       ['oracleTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['oracleTtlValue', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.OracleQueryTx]: {
     1: [
       ['tag', shortUIntConst(Tag.OracleQueryTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['senderId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('senderId')],
       ['oracleId', address(Encoding.OracleAddress, Encoding.Name)],
       ['query', string],
       ['queryFee', coinAmount],
@@ -297,125 +272,125 @@ export const TX_SCHEMA = {
       ['responseTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['responseTtlValue', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.OracleResponseTx]: {
     1: [
       ['tag', shortUIntConst(Tag.OracleResponseTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['oracleId', address(Encoding.OracleAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('callerId')],
       ['queryId', encoded(Encoding.OracleQueryId)],
       ['response', string],
       ['responseTtlType', enumeration(ORACLE_TTL_TYPES)],
       ['responseTtlValue', shortUInt],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
     ],
   },
   [Tag.ChannelCreateTx]: {
     2: [
       ['tag', shortUIntConst(Tag.ChannelCreateTx)],
-      ['version', shortUIntConst(2)],
+      ['version', shortUIntConst(2, true)],
       ['initiator', address(Encoding.AccountAddress)],
       ['initiatorAmount', uInt],
       ['responder', address(Encoding.AccountAddress)],
       ['responderAmount', uInt],
       ['channelReserve', uInt],
       ['lockPeriod', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['initiatorDelegateIds', array(address(...idTagToEncoding))],
       ['responderDelegateIds', array(address(...idTagToEncoding))],
       ['stateHash', encoded(Encoding.State)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('initiator')],
     ],
   },
   [Tag.ChannelCloseMutualTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelCloseMutualTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['initiatorAmountFinal', uInt],
       ['responderAmountFinal', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
-      ['nonce', shortUInt],
+      ['nonce', nonce('fromId')],
     ],
   },
   [Tag.ChannelCloseSoloTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelCloseSoloTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', encoded(Encoding.Transaction)],
       ['poi', entry(Tag.TreesPoi)],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
-      ['nonce', shortUInt],
+      ['nonce', nonce('fromId')],
     ],
   },
   [Tag.ChannelSlashTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelSlashTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', encoded(Encoding.Transaction)],
       ['poi', entry(Tag.TreesPoi)],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
-      ['nonce', shortUInt],
+      ['nonce', nonce('fromId')],
     ],
   },
   [Tag.ChannelDepositTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelDepositTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['amount', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['stateHash', encoded(Encoding.State)],
       ['round', shortUInt],
-      ['nonce', shortUInt],
+      ['nonce', nonce('fromId')],
     ],
   },
   [Tag.ChannelWithdrawTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelWithdrawTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channelId', address(Encoding.Channel)],
       ['toId', address(Encoding.AccountAddress)],
       ['amount', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
       ['stateHash', encoded(Encoding.State)],
       ['round', shortUInt],
-      ['nonce', shortUInt],
+      ['nonce', nonce('fromId')],
     ],
   },
   [Tag.ChannelSettleTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelSettleTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['initiatorAmountFinal', uInt],
       ['responderAmountFinal', uInt],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
-      ['nonce', shortUInt],
+      ['nonce', nonce('fromId')],
     ],
   },
   [Tag.ChannelForceProgressTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelForceProgressTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', encoded(Encoding.Transaction)],
@@ -423,15 +398,15 @@ export const TX_SCHEMA = {
       ['update', encoded(Encoding.ContractBytearray)],
       ['stateHash', encoded(Encoding.State)],
       ['offChainTrees', encoded(Encoding.StateTrees)],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
-      ['nonce', shortUInt],
+      ['nonce', nonce('fromId')],
     ],
   },
   [Tag.ChannelOffChainTx]: {
     2: [
       ['tag', shortUIntConst(Tag.ChannelOffChainTx)],
-      ['version', shortUIntConst(2)],
+      ['version', shortUIntConst(2, true)],
       ['channelId', address(Encoding.Channel)],
       ['round', shortUInt],
       ['stateHash', encoded(Encoding.State)],
@@ -440,7 +415,7 @@ export const TX_SCHEMA = {
   [Tag.Channel]: {
     3: [
       ['tag', shortUIntConst(Tag.Channel)],
-      ['version', shortUIntConst(3)],
+      ['version', shortUIntConst(3, true)],
       ['initiator', address(Encoding.AccountAddress)],
       ['responder', address(Encoding.AccountAddress)],
       ['channelAmount', uInt],
@@ -461,19 +436,19 @@ export const TX_SCHEMA = {
   [Tag.ChannelSnapshotSoloTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelSnapshotSoloTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channelId', address(Encoding.Channel)],
       ['fromId', address(Encoding.AccountAddress)],
       ['payload', encoded(Encoding.Transaction)],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['fee', fee],
-      ['nonce', shortUInt],
+      ['nonce', nonce('fromId')],
     ],
   },
   [Tag.ChannelOffChainUpdateTransfer]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelOffChainUpdateTransfer)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['from', address(Encoding.AccountAddress)],
       ['to', address(Encoding.AccountAddress)],
       ['amount', uInt],
@@ -482,7 +457,7 @@ export const TX_SCHEMA = {
   [Tag.ChannelOffChainUpdateDeposit]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelOffChainUpdateDeposit)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['from', address(Encoding.AccountAddress)],
       ['amount', uInt],
     ],
@@ -490,7 +465,7 @@ export const TX_SCHEMA = {
   [Tag.ChannelOffChainUpdateWithdraw]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelOffChainUpdateWithdraw)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['from', address(Encoding.AccountAddress)],
       ['amount', uInt],
     ],
@@ -498,7 +473,7 @@ export const TX_SCHEMA = {
   [Tag.ChannelOffChainUpdateCreateContract]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelOffChainUpdateCreateContract)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['owner', address(Encoding.AccountAddress)],
       ['ctVersion', ctVersion],
       ['code', encoded(Encoding.ContractBytearray)],
@@ -509,7 +484,7 @@ export const TX_SCHEMA = {
   [Tag.ChannelOffChainUpdateCallContract]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelOffChainUpdateCallContract)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['caller', address(Encoding.AccountAddress)],
       ['contract', address(Encoding.ContractAddress)],
       ['abiVersion', abiVersion],
@@ -523,7 +498,7 @@ export const TX_SCHEMA = {
   [Tag.ChannelClientReconnectTx]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelClientReconnectTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channelId', address(Encoding.Channel)],
       ['round', shortUInt],
       ['role', string],
@@ -533,7 +508,7 @@ export const TX_SCHEMA = {
   [Tag.TreesPoi]: {
     1: [
       ['tag', shortUIntConst(Tag.TreesPoi)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['accounts', array(mptree(Encoding.AccountAddress, Tag.Account))],
       ['calls', array(mptree(Encoding.Bytearray, Tag.ContractCall))],
       ['channels', array(mptree(Encoding.Channel, Tag.Channel))],
@@ -545,7 +520,7 @@ export const TX_SCHEMA = {
   [Tag.StateTrees]: {
     1: [
       ['tag', shortUIntConst(Tag.StateTrees)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['contracts', entry()],
       ['calls', entry()],
       ['channels', entry()],
@@ -557,14 +532,14 @@ export const TX_SCHEMA = {
   [Tag.Mtree]: {
     1: [
       ['tag', shortUIntConst(Tag.Mtree)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['values', array(entry())],
     ],
   },
   [Tag.MtreeValue]: {
     1: [
       ['tag', shortUIntConst(Tag.MtreeValue)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['key', raw],
       ['value', raw],
     ],
@@ -572,56 +547,56 @@ export const TX_SCHEMA = {
   [Tag.ContractsMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.ContractsMtree)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['contracts', entry()],
     ],
   },
   [Tag.CallsMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.CallsMtree)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['calls', entry()],
     ],
   },
   [Tag.ChannelsMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.ChannelsMtree)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['channels', entry()],
     ],
   },
   [Tag.NameserviceMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.NameserviceMtree)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['mtree', entry()],
     ],
   },
   [Tag.OraclesMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.OraclesMtree)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['otree', entry()],
     ],
   },
   [Tag.AccountsMtree]: {
     1: [
       ['tag', shortUIntConst(Tag.AccountsMtree)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['accounts', entry()],
     ],
   },
   [Tag.GaAttachTx]: {
     1: [
       ['tag', shortUIntConst(Tag.GaAttachTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['ownerId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('ownerId')],
       ['code', encoded(Encoding.ContractBytearray)],
       ['authFun', raw],
       ['ctVersion', ctVersion],
       ['fee', fee],
-      ['ttl', shortUInt],
+      ['ttl', ttl],
       ['gasLimit', gasLimit],
       ['gasPrice', gasPrice],
       ['callData', encoded(Encoding.ContractBytearray)],
@@ -630,7 +605,7 @@ export const TX_SCHEMA = {
   [Tag.GaMetaTx]: {
     2: [
       ['tag', shortUIntConst(Tag.GaMetaTx)],
-      ['version', shortUIntConst(2)],
+      ['version', shortUIntConst(2, true)],
       ['gaId', address(Encoding.AccountAddress)],
       ['authData', encoded(Encoding.ContractBytearray)],
       ['abiVersion', abiVersion],
@@ -643,24 +618,99 @@ export const TX_SCHEMA = {
   [Tag.PayingForTx]: {
     1: [
       ['tag', shortUIntConst(Tag.PayingForTx)],
-      ['version', shortUIntConst(1)],
+      ['version', shortUIntConst(1, true)],
       ['payerId', address(Encoding.AccountAddress)],
-      ['nonce', shortUInt],
+      ['nonce', nonce('payerId')],
       ['fee', fee],
       ['tx', entry()],
     ],
   },
 } as const;
 
-type TxTypeSchemasNotCombined = {
+type NullablePartial<
+  T,
+  NK extends keyof T = { [K in keyof T]: undefined extends T[K] ? K : never }[keyof T],
+> = Partial<Pick<T, NK>> & Omit<T, NK>;
+
+type Or<A, B> = A extends undefined ? B : A;
+
+type TxParamsBySchemaInternal<SchemaLine> =
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field]
+      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['serialize']>[0] }>
+      : never
+    : never
+  >;
+
+type GetFieldOrEmpty<Object, Key extends string> =
+  Object extends { [key in Key]: any } ? Object[Key] : {};
+
+type TxParamsBySchemaInternalParams<SchemaLine> =
+  GetFieldOrEmpty<
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field]
+      ? { options: Or<Parameters<Elem[1]['serialize']>[2], {}> }
+      : never
+    : never
+  >,
+  'options'
+  >;
+
+type TxParamsBySchema<SchemaLine> =
+  TxParamsBySchemaInternal<SchemaLine> & TxParamsBySchemaInternalParams<SchemaLine>;
+
+type TxParamsAsyncBySchemaInternal<SchemaLine> =
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field & { prepare: Function }]
+      ? NullablePartial<{ [k in Elem[0]]: Parameters<Elem[1]['prepare']>[0] }>
+      : TxParamsBySchemaInternal<[Elem]>
+    : never
+  >;
+
+type TxParamsAsyncBySchemaInternalParams<SchemaLine> =
+  GetFieldOrEmpty<
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field & { prepare: Function }]
+      ? { options: Or<Parameters<Elem[1]['prepare']>[2], {}> } : {}
+    : never
+  >,
+  'options'
+  >;
+
+type TxParamsAsyncBySchema<SchemaLine> =
+  TxParamsAsyncBySchemaInternal<SchemaLine>
+  & TxParamsAsyncBySchemaInternalParams<SchemaLine>
+  & TxParamsBySchemaInternalParams<SchemaLine>;
+
+type TxUnpackedBySchema<SchemaLine> =
+  UnionToIntersection<
+  SchemaLine extends ReadonlyArray<infer Elem>
+    ? Elem extends readonly [string, Field]
+      ? { [k in Elem[0]]: ReturnType<Elem[1]['deserialize']> }
+      : never
+    : never
+  >;
+
+type TxNotCombined<Mode extends 'params' | 'params-async' | 'unpacked'> = {
   [tag in Tag]: {
-    [ver in keyof typeof TX_SCHEMA[tag]]: BuildTxArgBySchema<typeof TX_SCHEMA[tag][ver]>
+    [ver in keyof typeof txSchema[tag]]: Mode extends 'params'
+      ? TxParamsBySchema<typeof txSchema[tag][ver]>
+      : Mode extends 'params-async'
+        ? TxParamsAsyncBySchema<typeof txSchema[tag][ver]>
+        : Mode extends 'unpacked'
+          ? TxUnpackedBySchema<typeof txSchema[tag][ver]>
+          : never
   }
 };
 
-export type TxTypeSchemas = {
-  [key in Tag]: TxTypeSchemasNotCombined[key][keyof TxTypeSchemasNotCombined[key]]
-};
+type ConvertToUnion<Schema extends { [key in Tag]: any }> = {
+  [key in Tag]: Schema[key][keyof Schema[key]]
+}[Tag];
 
-export type TxSchema = TxTypeSchemas[Tag];
-export type TxParamsCommon = Partial<UnionToIntersection<TxSchema>>;
+export type TxParams = ConvertToUnion<TxNotCombined<'params'>>;
+export type TxParamsAsync = ConvertToUnion<TxNotCombined<'params-async'>>;
+export type TxUnpacked = ConvertToUnion<TxNotCombined<'unpacked'>>;

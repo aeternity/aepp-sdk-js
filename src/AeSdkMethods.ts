@@ -4,14 +4,12 @@ import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
 import Contract, { ContractMethodsBase } from './contract/Contract';
 import * as contractGaMethods from './contract/ga';
-import { _buildTx } from './tx';
+import { buildTxAsync } from './tx/builder';
 import { mapObject, UnionToIntersection } from './utils/other';
 import Node from './Node';
-import { AE_AMOUNT_FORMATS } from './utils/amount-formatter';
-import { Tag } from './tx/builder/constants';
+import { TxParamsAsync } from './tx/builder/schema';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
-import CompilerBase from './contract/compiler/Base';
 import { ArgumentError, NotImplementedError, TypeError } from './utils/errors';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
@@ -70,7 +68,7 @@ interface AeSdkMethodsOptions
  * their context (current account, network, and compiler to use).
  */
 class AeSdkMethods {
-  _options: AeSdkMethodsOptions = { denomination: AE_AMOUNT_FORMATS.AETTOS };
+  _options: AeSdkMethodsOptions = {};
 
   /**
    * @param options - Options
@@ -100,15 +98,8 @@ class AeSdkMethods {
     };
   }
 
-  async buildTx<TxType extends Tag>(
-    txType: TxType,
-    options: Omit<Parameters<typeof _buildTx<TxType>>[1], 'onNode'> & { onNode?: Node },
-  ): Promise<Encoded.Transaction> {
-    // @ts-expect-error TODO: need to figure out what's wrong here
-    return _buildTx<TxType>(txType, {
-      ...this._getOptions(),
-      ...options,
-    });
+  async buildTx(options: TxParamsAsync): Promise<Encoded.Transaction> {
+    return buildTxAsync({ ...this._getOptions(), ...options });
   }
 
   async initializeContract<Methods extends ContractMethodsBase>(
@@ -133,9 +124,11 @@ type RequiredKeys<T> = {
 
 type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T;
 
+type ReplaceOnAccount<Options> = Options extends { onAccount: any }
+  ? Omit<Options, 'onAccount'> & { onAccount: OnAccount } : Options;
+
 type MakeOptional<Options> = OptionalIfNotRequired<[
-  Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'>
-  & { onNode?: Node; onCompiler?: CompilerBase; onAccount?: OnAccount },
+  Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'> & Partial<ReplaceOnAccount<Options>>,
 ]>;
 
 type TransformMethods <Methods extends { [key: string]: Function }> =

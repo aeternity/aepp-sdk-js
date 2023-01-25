@@ -708,7 +708,8 @@ describe('Channel', () => {
     const balances = await initiatorCh.balances([initiatorAddr, responderAddr]);
     const initiatorBalanceBeforeClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceBeforeClose = await aeSdkResponder.getBalance(responderAddr);
-    const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
+    const closeSoloTx = await aeSdkInitiatior.buildTx({
+      tag: Tag.ChannelCloseSoloTx,
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
       poi,
@@ -716,7 +717,8 @@ describe('Channel', () => {
     });
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
     await aeSdkInitiatior.sendTransaction(await initiatorSign(closeSoloTx));
-    const settleTx = await aeSdkInitiatior.buildTx(Tag.ChannelSettleTx, {
+    const settleTx = await aeSdkInitiatior.buildTx({
+      tag: Tag.ChannelSettleTx,
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
       initiatorAmountFinal: balances[initiatorAddr],
@@ -770,7 +772,8 @@ describe('Channel', () => {
     });
     const recentBalances = await responderCh.balances([initiatorAddr, responderAddr]);
     assertNotNull(oldUpdate.signedTx);
-    const closeSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelCloseSoloTx, {
+    const closeSoloTx = await aeSdkInitiatior.buildTx({
+      tag: Tag.ChannelCloseSoloTx,
       channelId: initiatorCh.id(),
       fromId: initiatorAddr,
       poi: oldPoi,
@@ -779,7 +782,8 @@ describe('Channel', () => {
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
     await aeSdkInitiatior.sendTransaction(await initiatorSign(closeSoloTx));
     assertNotNull(recentUpdate.signedTx);
-    const slashTx = await aeSdkResponder.buildTx(Tag.ChannelSlashTx, {
+    const slashTx = await aeSdkResponder.buildTx({
+      tag: Tag.ChannelSlashTx,
       channelId: responderCh.id(),
       fromId: responderAddr,
       poi: recentPoi,
@@ -787,7 +791,8 @@ describe('Channel', () => {
     });
     const slashTxFee = unpackTx(slashTx, Tag.ChannelSlashTx).fee;
     await aeSdkResponder.sendTransaction(await responderSign(slashTx));
-    const settleTx = await aeSdkResponder.buildTx(Tag.ChannelSettleTx, {
+    const settleTx = await aeSdkResponder.buildTx({
+      tag: Tag.ChannelSettleTx,
       channelId: responderCh.id(),
       fromId: responderAddr,
       initiatorAmountFinal: recentBalances[initiatorAddr],
@@ -1062,7 +1067,8 @@ describe('Channel', () => {
   // TODO fix this
   it.skip('can post snapshot solo transaction', async () => {
     const { signedTx } = await initiatorCh.state();
-    const snapshotSoloTx = await aeSdkInitiatior.buildTx(Tag.ChannelSnapshotSoloTx, {
+    const snapshotSoloTx = await aeSdkInitiatior.buildTx({
+      tag: Tag.ChannelSnapshotSoloTx,
       channelId: initiatorCh.id(),
       fromId: aeSdkInitiatior.address,
       payload: signedTx,

@@ -1,4 +1,5 @@
 import { ConsensusProtocolVersion, VmVersion, AbiVersion } from '../constants';
+import Node from '../../../Node';
 
 /*
  * First abi/vm by default
@@ -48,12 +49,31 @@ export function getProtocolDetails(
 export default {
   serialize(
     value: CtVersion | undefined,
+    params: {},
     { consensusProtocolVersion = ConsensusProtocolVersion.Iris }:
-    { consensusProtocolVersion: ConsensusProtocolVersion },
+    { consensusProtocolVersion?: ConsensusProtocolVersion },
   ): Buffer {
     value ??= getProtocolDetails(consensusProtocolVersion, 'contract-create');
 
     return Buffer.from([value.vmVersion, 0, value.abiVersion]);
+  },
+
+  async prepare(
+    value: CtVersion | undefined,
+    params: {},
+    // TODO: { consensusProtocolVersion: ConsensusProtocolVersion } | { onNode: Node } | {}
+    options: { consensusProtocolVersion?: ConsensusProtocolVersion; onNode?: Node },
+  ): Promise<CtVersion | undefined> {
+    if (value != null) return value;
+    if (options.consensusProtocolVersion != null) return undefined;
+    if (Object.keys(ConsensusProtocolVersion).length === 2) return undefined;
+    if (options.onNode != null) {
+      return getProtocolDetails(
+        (await options.onNode.getNodeInfo()).consensusProtocolVersion,
+        'contract-create',
+      );
+    }
+    return undefined;
   },
 
   deserialize(buffer: Buffer): CtVersion {
