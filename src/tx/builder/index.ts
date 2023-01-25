@@ -3,27 +3,25 @@ import {
   decode, encode, Encoded, Encoding,
 } from '../../utils/encoder';
 import { hash } from '../../utils/crypto';
-import { BinaryData } from './field-types';
+import { BinaryData, Field } from './field-types';
 import {
-  txSchema, TxField, TxUnpacked, TxParams, TxParamsAsync,
+  txSchema, TxUnpacked, TxParams, TxParamsAsync,
 } from './schema';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
 import { ArgumentError, DecodeError, SchemaNotFoundError } from '../../utils/errors';
-import { isKeyOfObject } from '../../utils/other';
 
 /**
  * JavaScript-based Transaction builder
  */
 
-function getSchema(tag: Tag, version?: number): TxField[] {
-  const schemas = txSchema[tag];
-  if (schemas == null) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
-  version ??= Math.max(...Object.keys(schemas).map((a) => +a));
-  if (!isKeyOfObject(version, schemas)) {
-    throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, version);
-  }
-  return schemas[version];
+function getSchema(tag: Tag, version?: number): Array<[string, Field]> {
+  const schemas = txSchema.filter((s) => s.tag.constValue === tag);
+  if (schemas.length === 0) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
+  version ??= Math.max(...schemas.map((schema) => schema.version.constValue));
+  const schema = schemas.find((s) => s.version.constValue === version);
+  if (schema == null) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, version);
+  return Object.entries(schema);
 }
 
 /**
@@ -95,7 +93,7 @@ export async function buildTxAsync(params: TxParamsAsync): Promise<Encoded.Trans
  * @returns Object with transaction param's
  */
 export function unpackTx<TxType extends Tag>(
-  encodedTx: Encoded.Transaction | Encoded.Poi,
+  encodedTx: Encoded.Transaction | Encoded.Poi | Encoded.StateTrees | Encoded.CallStateTree,
   txType?: TxType,
 ): TxUnpacked & { tag: TxType } {
   const binary = rlpDecode(decode(encodedTx));

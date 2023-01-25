@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { IllegalArgumentError } from '../../../utils/errors';
+import { ArgumentError, IllegalArgumentError } from '../../../utils/errors';
 import { MIN_GAS_PRICE, Tag } from '../constants';
 import coinAmount from './coin-amount';
 import { isKeyOfObject } from '../../../utils/other';
@@ -101,12 +101,21 @@ export function buildFee(
   const { length } = decode(builtTx);
   const txObject = unpackTx(builtTx);
 
+  let innerTxSize = 0;
+  if (txObject.tag === Tag.GaMetaTx || txObject.tag === Tag.PayingForTx) {
+    if (txObject.tx.tag !== Tag.SignedTx) {
+      throw new ArgumentError(
+        `Payload of ${Tag[txObject.tag]}`,
+        Tag[Tag.SignedTx],
+        Tag[txObject.tx.tag],
+      );
+    }
+    innerTxSize = decode(buildTx(txObject.tx.encodedTx)).length;
+  }
+
   return TX_FEE_BASE_GAS(txObject.tag)
     .plus(TX_FEE_OTHER_GAS(txObject.tag, length, {
-      relativeTtl: getOracleRelativeTtl(txObject),
-      innerTxSize: txObject.tag === Tag.GaMetaTx || txObject.tag === Tag.PayingForTx
-        ? decode(buildTx(txObject.tx.encodedTx)).length
-        : 0,
+      relativeTtl: getOracleRelativeTtl(txObject), innerTxSize,
     }))
     .times(MIN_GAS_PRICE);
 }
