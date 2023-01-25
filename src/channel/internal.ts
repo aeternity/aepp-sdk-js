@@ -30,6 +30,7 @@ import {
   ChannelIncomingMessageError,
   ChannelError,
 } from '../utils/errors';
+import { encodeContractAddress } from '../utils/crypto';
 
 export interface ChannelAction {
   guard: (channel: Channel, state?: ChannelFsm) => boolean;
@@ -211,9 +212,21 @@ export async function enqueueAction(
   return promise;
 }
 
-async function handleMessage(channel: Channel, message: object): Promise<void> {
+async function handleMessage(channel: Channel, message: ChannelMessage): Promise<void> {
   const { handler, state: st } = channel._fsm;
-  enterState(channel, await Promise.resolve(handler(channel, message, st)));
+  const nextState = await Promise.resolve(handler(channel, message, st));
+  enterState(channel, nextState);
+  // TODO: emit message and handler name (?) to move this code to Contract constructor
+  if (
+    message?.params?.data?.updates?.[0]?.op === 'OffChainNewContract'
+    // if name is channelOpen, the contract was created by other participant
+    && nextState?.handler.name === 'channelOpen'
+  ) {
+    const round = channel.round();
+    if (round == null) throw new UnexpectedTsError('Round is null');
+    const owner = message?.params?.data?.updates?.[0]?.owner;
+    emit(channel, 'newContract', encodeContractAddress(owner, round + 1));
+  }
 }
 
 async function dequeueMessage(channel: Channel): Promise<void> {

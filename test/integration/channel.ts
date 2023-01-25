@@ -32,7 +32,6 @@ import {
   IllegalArgumentError,
   InsufficientBalanceError,
   ChannelConnectionError,
-  encodeContractAddress,
   ChannelIncomingMessageError,
   UnknownChannelStateError,
   AeSdk,
@@ -47,6 +46,7 @@ import MemoryAccount from '../../src/account/Memory';
 import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual } from '../utils';
+import { TxUnpacked } from '../../src/tx/builder/schema';
 
 const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
 
@@ -815,6 +815,11 @@ describe('Channel', () => {
       .should.be.equal(true);
   });
 
+  // TODO: return unpacked entries in Channel.state
+  async function getChannelState(channel: Channel): Promise<TxUnpacked & { tag: Tag.StateTrees }> {
+    return unpackTx((await channel.state()).trees);
+  }
+
   it('can create a contract and accept', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
@@ -832,6 +837,10 @@ describe('Channel', () => {
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     contract = await aeSdkInitiatior.initializeContract({ sourceCode: contractSourceCode });
+    const initiatorNewContract = sinon.spy();
+    initiatorCh.on('newContract', initiatorNewContract);
+    const responderNewContract = sinon.spy();
+    responderCh.on('newContract', responderNewContract);
     const roundBefore = initiatorCh.round();
     assertNotNull(roundBefore);
     const callData = contract._calldata.encode('Identity', 'init', []);
@@ -853,20 +862,42 @@ describe('Channel', () => {
       sinon.match.string,
       sinon.match({
         updates: sinon.match([{
-          abi_version: 3,
+          abi_version: AbiVersion.Fate,
           call_data: callData,
           code: await contract.$compile(),
           deposit: 1000,
           op: 'OffChainNewContract',
           owner: sinon.match.string,
-          vm_version: 5,
+          vm_version: VmVersion.Fate,
         }]),
       }),
     );
-    const { updates: [{ owner }] } = responderSignTag.lastCall.lastArg;
-    // TODO: extract this calculation https://github.com/aeternity/aepp-sdk-js/issues/1619
-    expect(encodeContractAddress(owner, roundBefore + 1)).to.equal(result.address);
+    async function getContractAddresses(channel: Channel): Promise<Encoded.ContractAddress[]> {
+      return Object.keys((await getChannelState(channel)).contracts) as Encoded.ContractAddress[];
+    }
+    expect(initiatorNewContract.callCount).to.equal(1);
+    expect(initiatorNewContract.firstCall.args).to.eql([result.address]);
+    expect(responderNewContract.callCount).to.equal(1);
+    expect(responderNewContract.firstCall.args).to.eql([result.address]);
+    expect(await getContractAddresses(initiatorCh)).to.eql([result.address]);
+    expect(await getContractAddresses(responderCh)).to.eql([result.address]);
     contractAddress = result.address;
+
+    await responderCh.createContract({
+      code: await contract.$compile(),
+      callData: contract._calldata.encode('Identity', 'init', []),
+      deposit: new BigNumber('10e18'),
+      vmVersion: VmVersion.Fate,
+      abiVersion: AbiVersion.Fate,
+    }, responderSign);
+    const contracts = await getContractAddresses(initiatorCh);
+    expect(contracts.length).to.equal(2);
+    expect(await getContractAddresses(responderCh)).to.eql(contracts);
+    const secondContract = contracts.filter((c) => c !== result.address);
+    expect(initiatorNewContract.callCount).to.equal(2);
+    expect(initiatorNewContract.secondCall.args).to.eql(secondContract);
+    expect(responderNewContract.callCount).to.equal(2);
+    expect(responderNewContract.secondCall.args).to.eql(secondContract);
   });
 
   it('can create a contract and reject', async () => {
