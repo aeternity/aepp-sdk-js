@@ -34,6 +34,7 @@ import {
   ChannelStatus,
   ChannelFsm,
   ChannelMessage,
+  ChannelEvents,
 } from './internal';
 import { ChannelError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
@@ -44,8 +45,6 @@ function snakeToPascalObjKeys<Type>(obj: object): Type {
     [snakeToPascal(key)]: val,
   }), {}) as Type;
 }
-
-type EventCallback = (...args: any[]) => void;
 
 /**
  * Channel
@@ -169,19 +168,23 @@ export default class Channel {
    * Possible events:
    *
    *   - "error"
+   *   - "stateChanged"
+   *   - "statusChanged"
+   *   - "message"
+   *   - "peerDisconnected"
    *   - "onChainTx"
    *   - "ownWithdrawLocked"
    *   - "withdrawLocked"
    *   - "ownDepositLocked"
    *   - "depositLocked"
+   *   - "channelReestablished"
+   *   - "newContract"
    *
-   * TODO: the event list looks outdated
    *
    * @param eventName - Event name
    * @param callback - Callback function
    */
-  // TODO define specific callback type depending on the event name
-  on(eventName: string, callback: EventCallback): void {
+  on<E extends keyof ChannelEvents>(eventName: E, callback: ChannelEvents[E]): void {
     this._eventEmitter.on(eventName, callback);
   }
 
@@ -190,7 +193,7 @@ export default class Channel {
    * @param eventName - Event name
    * @param callback - Callback function
    */
-  off(eventName: string, callback: EventCallback): void {
+  off<E extends keyof ChannelEvents>(eventName: E, callback: ChannelEvents[E]): void {
     this._eventEmitter.removeListener(eventName, callback);
   }
 
