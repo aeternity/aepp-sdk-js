@@ -28,6 +28,7 @@ coverage.*
 .site
 site
 /src/apis/
+/src/tx/builder/schema.generated.ts
 /tooling/autorest/compiler-swagger.yaml
 /test/environment/ledger/browser
 /types-legacy

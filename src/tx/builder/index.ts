@@ -4,9 +4,8 @@ import {
 } from '../../utils/encoder';
 import { hash } from '../../utils/crypto';
 import { BinaryData, Field } from './field-types';
-import {
-  txSchema, TxUnpacked, TxParams, TxParamsAsync,
-} from './schema';
+import { txSchema } from './schema';
+import { TxUnpacked, TxParams, TxParamsAsync } from './schema.generated';
 import { Tag } from './constants';
 import { buildContractId, readInt } from './helpers';
 import { ArgumentError, DecodeError, SchemaNotFoundError } from '../../utils/errors';
