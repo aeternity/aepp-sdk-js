@@ -1123,7 +1123,9 @@ Note:</p>
 <p>Calling the <code>spend</code> function will create, sign and broadcast a <code>SpendTx</code> to the network.
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Transaction mined&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">tx</span><span class="p">);</span>
-</code></pre></div></p>
+</code></pre></div>
+Alternatively, you can use <a href="https://docs.aeternity.com/aepp-sdk-js/latest/api/functions/transferFunds.html">transferFunds</a>
+method to transfer a fraction of your AE to another account.</p>
 <h2 id="6-get-ae-balance-of-recipient-after-transfer">6. Get AE balance of recipient (after transfer)</h2>
 <p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">balanceAfter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Balance of </span><span class="si">${</span><span class="nx">recipient</span><span class="si">}</span><span class="sb"> (after): </span><span class="si">${</span><span class="nx">balanceAfter</span><span class="si">}</span><span class="sb"> aettos`</span><span class="p">);</span>
