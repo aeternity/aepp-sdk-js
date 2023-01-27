@@ -87,12 +87,21 @@ interface SpendOptions extends SpendOptionsType {}
 
 // TODO: Rename to spendFraction
 /**
- * Send a fraction of coin balance to another account
+ * Spend a fraction of coin balance to another account. Useful if needed to drain account balance
+ * completely, sending funds to another account (with fraction set to 1).
  * @category chain
  * @param fraction - Fraction of balance to spend (between 0 and 1)
  * @param recipientIdOrName - Address or name of recipient account
  * @param options - Options
- * @returns Transaction
+ * @example
+ * ```js
+ * // `fraction` * 100 = % of AE to be transferred (e.g. `0.42` for 42% or `1` for 100%)
+ * const { blockHeight } = await aeSdk.transferFunds(
+ *   0.42,
+ *   'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
+ * );
+ * console.log('Transaction mined at', blockHeight);
+ * ```
  */
 export async function transferFunds(
   fraction: number | string,
