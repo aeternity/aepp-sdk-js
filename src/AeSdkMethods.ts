@@ -7,7 +7,7 @@ import * as contractGaMethods from './contract/ga';
 import { buildTxAsync } from './tx/builder';
 import { mapObject, UnionToIntersection } from './utils/other';
 import Node from './Node';
-import { TxParamsAsync } from './tx/builder/schema';
+import { TxParamsAsync } from './tx/builder/schema.generated';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
 import { ArgumentError, NotImplementedError, TypeError } from './utils/errors';

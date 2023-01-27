@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { hash, verify } from '../utils/crypto';
-import { TxUnpacked } from './builder/schema';
+import { TxUnpacked } from './builder/schema.generated';
 import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version';
 import { Tag, ConsensusProtocolVersion } from './builder/constants';
 import { buildTx, unpackTx } from './builder';

@@ -46,7 +46,7 @@ import MemoryAccount from '../../src/account/Memory';
 import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual } from '../utils';
-import { TxUnpacked } from '../../src/tx/builder/schema';
+import { TxUnpacked } from '../../src/tx/builder/schema.generated';
 
 const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
 

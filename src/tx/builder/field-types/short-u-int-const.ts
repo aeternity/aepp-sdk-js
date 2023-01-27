@@ -7,6 +7,7 @@ export default function genShortUIntConstField<
   serialize: Optional extends true ? (value?: Value) => Buffer : (value: Value) => Buffer;
   deserialize: (value: Buffer) => Value;
   constValue: Value;
+  constValueOptional: boolean;
 } {
   return {
     serialize(value?: Value) {
@@ -23,5 +24,7 @@ export default function genShortUIntConstField<
     },
 
     constValue,
+
+    constValueOptional: optional === true,
   };
 }
