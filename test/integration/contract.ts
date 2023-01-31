@@ -298,6 +298,7 @@ describe('Contract', () => {
         sign: Uint8Array
       ) => void;
     }>;
+    let contractAddress: Encoded.ContractAddress;
 
     before(async () => {
       contract = await aeSdk.initializeContract({
@@ -324,6 +325,7 @@ describe('Contract', () => {
       });
       await contract.$deploy([]);
       assertNotNull(contract.$options.address);
+      contractAddress = contract.$options.address;
       [owner, newOwner] = aeSdk.addresses();
     });
 
@@ -331,13 +333,13 @@ describe('Contract', () => {
       const commitmentId = commitmentHash(name, salt);
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId);
-      const preclaimSig = await contract.$createDelegationSignature();
+      const preclaimSig = await aeSdk.createDelegationSignature(contractAddress, []);
       const { result } = await contract.signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
       await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
       // signature for any other name related operations
-      delegationSignature = await contract.$createDelegationSignature([name]);
+      delegationSignature = await aeSdk.createDelegationSignature(contractAddress, [name]);
     });
 
     it('claims', async () => {
@@ -375,8 +377,11 @@ describe('Contract', () => {
     });
 
     it('revokes', async () => {
-      const revokeSig = await contract
-        .$createDelegationSignature([name], { onAccount: aeSdk.accounts[newOwner] });
+      const revokeSig = await aeSdk.createDelegationSignature(
+        contractAddress,
+        [name],
+        { onAccount: aeSdk.accounts[newOwner] },
+      );
       const { result } = await contract.signedRevoke(newOwner, name, revokeSig);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
@@ -404,6 +409,7 @@ describe('Contract', () => {
         o: Encoded.OracleAddress, q: Encoded.OracleQueryId, sign: Uint8Array, r: string,
       ) => void;
     }>;
+    let contractAddress: Encoded.ContractAddress;
 
     before(async () => {
       contract = await aeSdk.initializeContract({
@@ -428,11 +434,12 @@ describe('Contract', () => {
       });
       await contract.$deploy([]);
       assertNotNull(contract.$options.address);
+      contractAddress = contract.$options.address;
       oracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     });
 
     it('registers', async () => {
-      delegationSignature = await contract.$createDelegationSignature();
+      delegationSignature = await aeSdk.createDelegationSignature(contractAddress, []);
       const { result } = await contract
         .signedRegisterOracle(aeSdk.address, delegationSignature, queryFee, ttl);
       assertNotNull(result);
@@ -467,8 +474,8 @@ describe('Contract', () => {
       // TODO type should be corrected in node api
       const queryId = queryObject.id as Encoded.OracleQueryId;
       aeSdk.selectAccount(aeSdk.addresses()[1]);
-      const respondSig = await contract
-        .$createDelegationSignature([queryId], { omitAddress: true });
+      const respondSig = await aeSdk
+        .createDelegationSignature(contractAddress, [queryId], { omitAddress: true });
       const { result } = await contract.respond(oracle.id, queryId, respondSig, r);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');

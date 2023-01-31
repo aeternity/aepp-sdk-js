@@ -59,8 +59,6 @@ import {
   getAccount, getContract, getContractByteCode, resolveName, txDryRun,
 } from '../chain';
 import AccountBase from '../account/Base';
-import { concatBuffers } from '../utils/other';
-import { isNameValid, produceNameId } from '../tx/builder/helpers';
 
 type FunctionAci = Aci['encodedAci']['contract']['functions'][0];
 
@@ -136,60 +134,6 @@ type MethodParameters<M extends ContractMethodsBase, Fn extends MethodNames<M>> 
  * stateful or not
  */
 class Contract<M extends ContractMethodsBase> {
-  /**
-   * Helper to generate a signature to delegate
-   *  - pre-claim/claim/transfer/revoke of a name to a contract.
-   *  - register/extend/respond of an Oracle to a contract.
-   * @category contract
-   * @param ids - The list of id's to prepend
-   * @param _options - Options
-   * @param _options.omitAddress - Prepend delegation signature with an account address
-   * @param _options.onAccount - Account to use
-   * @returns Signature
-   * @example
-   * ```js
-   * const aeSdk = new AeSdk({ ... })
-   * const contract = await aeSdk.initializeContract({ address: 'ct_asd2ks...' })
-   * const aensName = 'example.chain'
-   * const onAccount = new MemoryAccount(...) // Sign with a specific account
-   * // Preclaim signature
-   * const preclaimSig = await contract.$createDelegationSignature([], { onAccount })
-   * // Claim, transfer and revoke signature
-   * const aensDelegationSig = await contract
-   *   .$createDelegationSignature([aensName], { onAccount })
-   * ```
-   * @example
-   * ```js
-   * const aeSdk = new AeSdk({ ... })
-   * const contract = await aeSdk.initializeContract({ address: 'ct_asd2ks...' })
-   * const oracleQueryId = 'oq_...'
-   * const onAccount = new MemoryAccount(...) // Sign with a specific account
-   * // Oracle register and extend signature
-   * const oracleDelegationSig = await contract.$createDelegationSignature([], { onAccount })
-   * // Oracle respond signature
-   * const respondSig = await contract
-   *   .$createDelegationSignature([oracleQueryId], { onAccount, omitAddress: true })
-   * ```
-   */
-  async $createDelegationSignature(
-    ids: Array<Encoded.Any | AensName> = [],
-    _options?: { omitAddress?: boolean; onAccount?: AccountBase },
-  ): Promise<Uint8Array> {
-    const options = { ...this.$options, ..._options };
-    const contractId = this.$options.address;
-    if (options.onAccount == null) throw new IllegalArgumentError('Can\'t create delegation signature without account');
-    if (contractId == null) throw new MissingContractAddressError('Can\'t create delegation signature without address');
-    return options.onAccount.sign(
-      concatBuffers([
-        Buffer.from(await options.onNode.getNetworkId()),
-        ...options.omitAddress === true ? [] : [decode(options.onAccount.address)],
-        ...ids.map((e) => (isNameValid(e) ? produceNameId(e) : e)).map((e) => decode(e)),
-        decode(contractId),
-      ]),
-      options,
-    );
-  }
-
   /**
    * Compile contract
    * @returns bytecode

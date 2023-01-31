@@ -368,17 +368,16 @@ This functionality could for example be used to build an AENS marketplace.
 
 const aeSdk = new AeSdk({ ... }) // init the SDK instance with AeSdk class
 
-// initialize contract
-const contract = await aeSdk.initializeContract({ address: 'ct_asd2ks...', aci })
+const contractAddress = 'ct_asd2ks...'
 // AENS name
 const name = 'example.chain'
 // Sign with a specific account
 const onAccount = aeSdk.address
 
 // this signature will allow the contract to perform a pre-claim on your behalf
-const preClaimSig = await contract.$createDelegationSignature()
+const preClaimSig = await aeSdk.createDelegationSignature(contractAddress, [])
 
 // this signature will allow the contract to perform
 // any name related transaction for a specific name that you own
-const aensDelegationSig = await contract.$createDelegationSignature([name], { onAccount })
+const aensDelegationSig = await aeSdk.createDelegationSignature(contractAddress, [name], { onAccount })
 ```
