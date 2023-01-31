@@ -3,6 +3,7 @@ import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
 import Contract, { ContractMethodsBase } from './contract/Contract';
+import createDelegationSignature from './contract/delegation-signature';
 import * as contractGaMethods from './contract/ga';
 import { buildTxAsync } from './tx/builder';
 import { mapObject, UnionToIntersection } from './utils/other';
@@ -38,6 +39,7 @@ const methods = {
   ...aensMethods,
   ...spendMethods,
   ...oracleMethods,
+  createDelegationSignature,
   ...contractGaMethods,
 } as const;
 
