@@ -1510,19 +1510,18 @@ the same <code>salt</code> and it should be signed with the same private key as 
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// init the SDK instance with AeSdk class</span>
 
-<span class="c1">// contract address</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contractId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ct_asd2ks...&#39;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contractAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ct_asd2ks...&#39;</span>
 <span class="c1">// AENS name</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;example.chain&#39;</span>
 <span class="c1">// Sign with a specific account</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">onAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span>
 
 <span class="c1">// this signature will allow the contract to perform a pre-claim on your behalf</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">preClaimSig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">createAensDelegationSignature</span><span class="p">(</span><span class="nx">contractId</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">preClaimSig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">createDelegationSignature</span><span class="p">(</span><span class="nx">contractAddress</span><span class="p">,</span><span class="w"> </span><span class="p">[])</span>
 
 <span class="c1">// this signature will allow the contract to perform</span>
 <span class="c1">// any name related transaction for a specific name that you own</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">aensDelegationSig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">createAensDelegationSignature</span><span class="p">(</span><span class="nx">contractId</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">onAccount</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aensDelegationSig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">createDelegationSignature</span><span class="p">(</span><span class="nx">contractAddress</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nx">name</span><span class="p">],</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="w"> </span><span class="p">})</span>
 </code></pre></div>
 
               
