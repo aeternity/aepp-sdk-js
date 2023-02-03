@@ -376,9 +376,11 @@ class Contract<M extends ContractMethodsBase> {
     // TODO: consider using a third-party library
     const isEqual = (a: any, b: any): boolean => JSON.stringify(a) === JSON.stringify(b);
 
-    const matchedEvents = [this._aci.encodedAci, ...this._aci.externalEncodedAci]
-      .filter(({ contract }) => contract?.event)
-      .map(({ contract }) => [contract.name, contract.event.variant])
+    const contracts = [this._aci.encodedAci, ...this._aci.externalEncodedAci ?? []]
+      .map(({ contract }) => contract)
+      .filter((contract) => contract?.event) as Array<Aci['encodedAci']['contract']>;
+    const matchedEvents = contracts
+      .map((contract) => [contract.name, contract.event.variant])
       .map(([name, events]) => events.map((event: {}) => (
         [name, Object.keys(event)[0], Object.values(event)[0]]
       )))
@@ -509,7 +511,7 @@ class Contract<M extends ContractMethodsBase> {
   } & Parameters<Contract<M>['$deploy']>[1]) {
     this._aci = aci;
     this._name = aci.encodedAci.contract.name;
-    this._calldata = new Calldata([aci.encodedAci, ...aci.externalEncodedAci]);
+    this._calldata = new Calldata([aci.encodedAci, ...aci.externalEncodedAci ?? []]);
     this.$options = otherOptions;
 
     /**

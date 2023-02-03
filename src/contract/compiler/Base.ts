@@ -9,18 +9,15 @@ interface FunctionAci {
   stateful: boolean;
 }
 
+interface AciContract {
+  name: string;
+  event?: any;
+  functions: FunctionAci[];
+}
+
 export interface Aci extends BaseAci {
-  encodedAci: {
-    contract: {
-      name: string;
-      event: any;
-      kind: string;
-      state: any;
-      type_defs: any[];
-      functions: FunctionAci[];
-    };
-  };
-  externalEncodedAci: any[];
+  encodedAci: { contract: AciContract };
+  externalEncodedAci?: Array<{ contract?: AciContract }>;
 }
 
 /**
