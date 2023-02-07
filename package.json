@@ -168,5 +168,6 @@
   },
   "engines": {
     "node": ">=14.19.0"
-  }
+  },
+  "packageManager": "npm@8.19.3"
 }
