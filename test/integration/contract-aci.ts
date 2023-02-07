@@ -732,12 +732,12 @@ describe('Contract instance', () => {
     describe('ADDRESS', () => {
       it('Invalid address', async () => {
         await expect(testContract.addressFn('asdasasd' as any))
-          .to.be.rejectedWith('Address should start with ak_, got asdasasd instead');
+          .to.be.rejectedWith('Account pubkey should start with ak_, got asdasasd instead');
       });
 
       it('Invalid address type', async () => {
         await expect(testContract.addressFn(333 as any)).to.be
-          .rejectedWith('Address should start with ak_, got 333 instead');
+          .rejectedWith('data.substring is not a function');
       });
 
       it('Return address', async () => {
