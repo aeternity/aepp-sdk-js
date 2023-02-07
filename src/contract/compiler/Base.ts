@@ -5,7 +5,7 @@ interface FunctionAci {
   arguments: any[];
   name: string;
   payable: boolean;
-  returns: string;
+  returns: any;
   stateful: boolean;
 }
 
