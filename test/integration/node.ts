@@ -17,6 +17,8 @@
 
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { spy } from 'sinon';
+import http from 'http';
 import { url, ignoreVersion } from '.';
 import { AeSdkBase, Node, NodeNotFoundError } from '../../src';
 
@@ -42,6 +44,17 @@ describe('Node client', () => {
     await expect(node.getTransactionByHash('th_test'))
       .to.be.rejectedWith('v3/transactions/th_test error: Invalid hash');
   });
+
+  it('retries requests if failed', async () => ([
+    ['ak_test', 1],
+    ['ak_2CxRaRcMUGn9s5UwN36UhdrtZVFUbgG1BSX5tUAyQbCNneUwti', 4],
+  ] as const).reduce(async (prev, [address, requestCount]) => {
+    await prev;
+    const httpSpy = spy(http, 'request');
+    await node.getAccountByPubkey(address).catch(() => {});
+    expect(httpSpy.callCount).to.be.equal(requestCount);
+    httpSpy.restore();
+  }, Promise.resolve()));
 
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {

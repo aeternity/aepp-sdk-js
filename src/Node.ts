@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 import { OperationArguments, OperationSpec } from '@azure/core-client';
 import {
   genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
-  genVersionCheckPolicy,
+  genVersionCheckPolicy, genRetryOnFailurePolicy,
 } from './utils/autorest';
 import { Node as NodeApi, NodeOptionalParams, ErrorModel } from './apis/node';
 import { mapObject } from './utils/other';
@@ -128,6 +128,7 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       additionalPolicies: [
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
+        genRetryOnFailurePolicy(),
         genErrorFormatterPolicy((body: ErrorModel) => ` ${body.reason}`),
       ],
       ...options,

@@ -2,7 +2,7 @@ import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pi
 import { AdditionalPolicyConfig } from '@azure/core-client';
 import { pause } from './other';
 import semverSatisfies from './semver-satisfies';
-import { UnsupportedVersionError } from './errors';
+import { UnexpectedTsError, UnsupportedVersionError } from './errors';
 
 export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
   const requestQueues = new Map<string, Promise<unknown>>();
@@ -105,4 +105,31 @@ export const genVersionCheckPolicy = (
     if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args);
     return next(request);
   },
+});
+
+export const genRetryOnFailurePolicy = (): AdditionalPolicyConfig => ({
+  policy: {
+    name: 'retry-on-failure',
+    async sendRequest(request, next) {
+      const statusesToNotRetry = [200, 400, 403];
+      let error: Error | undefined;
+      for (let attempt = 0; attempt <= 3; attempt += 1) {
+        if (error != null) {
+          if (
+            !(error instanceof RestError)
+            || statusesToNotRetry.includes(error.response?.status ?? 0)
+          ) throw error;
+          await pause((attempt / 3) ** 2 * 500);
+        }
+        try {
+          return await next(request);
+        } catch (e) {
+          error = e;
+        }
+      }
+      if (error == null) throw new UnexpectedTsError();
+      throw error;
+    },
+  },
+  position: 'perCall',
 });
