@@ -18,6 +18,13 @@ import { Encoded } from '../utils/encoder';
 import Node from '../Node';
 import CompilerBase from '../contract/compiler/Base';
 
+interface AuthData {
+  gasLimit?: number;
+  callData?: Encoded.ContractBytearray;
+  sourceCode?: string;
+  args?: any[];
+}
+
 /**
  * Account is one of the three basic building blocks of an
  * {@link AeSdk} and provides access to a signing key pair.
@@ -36,12 +43,7 @@ export default abstract class AccountBase {
     options: {
       innerTx?: boolean;
       networkId?: string;
-      authData?: {
-        gasLimit?: number;
-        callData?: Encoded.ContractBytearray;
-        sourceCode?: string;
-        args?: any[];
-      };
+      authData?: AuthData | ((tx: Encoded.Transaction) => Promise<AuthData>);
       onNode?: Node;
       onCompiler?: CompilerBase;
       aeppOrigin?: string;
