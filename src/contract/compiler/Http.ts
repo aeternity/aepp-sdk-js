@@ -68,7 +68,8 @@ export default class CompilerHttp extends CompilerBase {
       ],
     });
     if (ignoreVersion !== true) {
-      const versionPromise = this.api.apiVersion().then(({ apiVersion }) => apiVersion);
+      const versionPromise = this.api.apiVersion()
+        .then(({ apiVersion }) => apiVersion, (error) => error);
       this.api.pipeline.addPolicy(
         genVersionCheckPolicy('compiler', '/api-version', versionPromise, '7.0.1', '8.0.0'),
       );

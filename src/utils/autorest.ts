@@ -94,14 +94,16 @@ export const genErrorFormatterPolicy = (
 export const genVersionCheckPolicy = (
   name: string,
   ignorePath: string,
-  versionPromise: Promise<string>,
+  versionPromise: Promise<string | Error>,
   geVersion: string,
   ltVersion: string,
 ): PipelinePolicy => ({
   name: 'version-check',
   async sendRequest(request, next) {
     if (new URL(request.url).pathname === ignorePath) return next(request);
-    const args = [await versionPromise, geVersion, ltVersion] as const;
+    const version = await versionPromise;
+    if (version instanceof Error) throw version;
+    const args = [version, geVersion, ltVersion] as const;
     if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args);
     return next(request);
   },

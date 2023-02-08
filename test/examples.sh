@@ -7,6 +7,8 @@ echo Run environment/node.mjs
 ./test/environment/node.mjs
 echo Run environment/node.ts
 ./test/environment/node.ts
+echo Run environment/node-unhandled-exception.mjs
+./test/environment/node-unhandled-exception.mjs
 
 echo Check typescript
 cd ./test/environment/typescript/

@@ -111,7 +111,7 @@ export interface NodeInfo {
 }
 
 export default class Node extends (NodeTransformed as unknown as NodeTransformedApi) {
-  #networkIdPromise?: Promise<string>;
+  #networkIdPromise?: Promise<string | Error>;
 
   /**
    * @param url - Url for node API
@@ -134,8 +134,8 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
     });
     if (!ignoreVersion) {
       const statusPromise = this.getStatus();
-      const versionPromise = statusPromise.then(({ nodeVersion }) => nodeVersion);
-      this.#networkIdPromise = statusPromise.then(({ networkId }) => networkId);
+      const versionPromise = statusPromise.then(({ nodeVersion }) => nodeVersion, (error) => error);
+      this.#networkIdPromise = statusPromise.then(({ networkId }) => networkId, (error) => error);
       this.pipeline.addPolicy(
         genVersionCheckPolicy('node', '/v3/status', versionPromise, '6.2.0', '7.0.0'),
       );
@@ -145,7 +145,9 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
 
   async getNetworkId(): Promise<string> {
     this.#networkIdPromise ??= this.getStatus().then(({ networkId }) => networkId);
-    return this.#networkIdPromise;
+    const networkId = await this.#networkIdPromise;
+    if (networkId instanceof Error) throw networkId;
+    return networkId;
   }
 
   async getNodeInfo(): Promise<NodeInfo> {
