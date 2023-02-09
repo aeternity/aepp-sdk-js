@@ -114,6 +114,10 @@ type MethodParameters<M extends ContractMethodsBase, Fn extends MethodNames<M>> 
     ? M extends { init: any } ? Parameters<M['init']> : []
     : Parameters<M[Fn]>;
 
+interface GetContractNameByEventOptions {
+  contractAddressToName?: { [key: Encoded.ContractAddress]: string };
+}
+
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
  * creating a reference to already deployed contracts
@@ -146,7 +150,7 @@ class Contract<M extends ContractMethodsBase> {
     return this.$options.bytecode;
   }
 
-  protected _handleCallError(
+  #handleCallError(
     { returnType, returnValue }: {
       returnType: ContractCallReturnType;
       returnValue: Encoded.ContractBytearray;
@@ -168,7 +172,7 @@ class Contract<M extends ContractMethodsBase> {
     throw new NodeInvocationError(message, transaction);
   }
 
-  protected async _sendAndProcess(
+  async #sendAndProcess(
     tx: Encoded.Transaction,
     options: SendOptions,
   ): Promise<SendAndProcessReturnType> {
@@ -186,7 +190,7 @@ class Contract<M extends ContractMethodsBase> {
       throw new ContractError(`callInfo is not available for transaction ${txData.hash}`);
     }
     const callInfoTyped = callInfo as ContractCallObject;
-    this._handleCallError(callInfoTyped, tx);
+    this.#handleCallError(callInfoTyped, tx);
     return { ...result, result: callInfoTyped };
   }
 
@@ -235,7 +239,7 @@ class Contract<M extends ContractMethodsBase> {
       ownerId,
     });
     this.$options.address = buildContractIdByContractTx(tx);
-    const { hash, ...other } = await this._sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
+    const { hash, ...other } = await this.#sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
     return {
       ...other,
       ...other.result?.log != null && {
@@ -252,7 +256,7 @@ class Contract<M extends ContractMethodsBase> {
    * @param name - Function name
    * @returns function ACI
    */
-  protected _getFunctionAci(name: string): FunctionAci {
+  #getFunctionAci(name: string): FunctionAci {
     const fn = this._aci.encodedAci.contract.functions.find(
       (f: { name: string }) => f.name === name,
     );
@@ -279,7 +283,7 @@ class Contract<M extends ContractMethodsBase> {
     params: MethodParameters<M, Fn>,
     options: Partial<BuildTxOptions<Tag.ContractCallTx, 'callerId' | 'contractId' | 'callData'>>
     & Parameters<Contract<M>['$decodeEvents']>[1]
-    & Omit<Parameters<Contract<M>['_sendAndProcess']>[1], 'onAccount' | 'onNode'>
+    & Omit<SendOptions, 'onAccount' | 'onNode'>
     & Omit<Parameters<typeof txDryRun>[2], 'onNode'>
     & { onAccount?: AccountBase; onNode?: Node; callStatic?: boolean } = {},
   ): Promise<{
@@ -287,7 +291,7 @@ class Contract<M extends ContractMethodsBase> {
       decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
     } & SendAndProcessReturnType> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
-    const fnAci = this._getFunctionAci(fn);
+    const fnAci = this.#getFunctionAci(fn);
     const contractId = this.$options.address;
     const { onNode } = opt;
 
@@ -333,7 +337,7 @@ class Contract<M extends ContractMethodsBase> {
 
       const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, { ...opt, top });
       if (callObj == null) throw new UnexpectedTsError();
-      this._handleCallError({
+      this.#handleCallError({
         returnType: callObj.returnType as ContractCallReturnType,
         returnValue: callObj.returnValue as Encoded.ContractBytearray,
       }, tx);
@@ -350,7 +354,7 @@ class Contract<M extends ContractMethodsBase> {
         callData,
       });
       if (opt.onAccount == null) throw new IllegalArgumentError('Can\'t call contract on chain without account');
-      res = await this._sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
+      res = await this.#sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
     }
     if (callStatic === true || res.txData.blockHeight != null) {
       res.decodedResult = fnAci.returns !== 'unit' && fn !== 'init'
@@ -368,12 +372,10 @@ class Contract<M extends ContractMethodsBase> {
    * @throws {@link MissingEventDefinitionError}
    * @throws {@link AmbiguousEventDefinitionError}
    */
-  protected _getContractNameByEvent(
+  #getContractNameByEvent(
     ctAddress: Encoded.ContractAddress,
     nameHash: BigInt,
-    { contractAddressToName }: {
-      contractAddressToName?: { [key: Encoded.ContractAddress]: string };
-    },
+    { contractAddressToName }: GetContractNameByEventOptions,
   ): string {
     const addressToName = { ...this.$options.contractAddressToName, ...contractAddressToName };
     if (addressToName[ctAddress] != null) return addressToName[ctAddress];
@@ -407,15 +409,14 @@ class Contract<M extends ContractMethodsBase> {
    */
   $decodeEvents(
     events: Event[],
-    { omitUnknown, ...opt }: { omitUnknown?: boolean } &
-    Parameters<Contract<M>['_getContractNameByEvent']>[2] = {},
+    { omitUnknown, ...opt }: { omitUnknown?: boolean } & GetContractNameByEventOptions = {},
   ): DecodedEvent[] {
     return events
       .map((event) => {
         const topics = event.topics.map((t: string | number) => BigInt(t));
         let contractName;
         try {
-          contractName = this._getContractNameByEvent(event.address, topics[0], opt);
+          contractName = this.#getContractNameByEvent(event.address, topics[0], opt);
         } catch (error) {
           if ((omitUnknown ?? false) && error instanceof MissingEventDefinitionError) return null;
           throw error;
