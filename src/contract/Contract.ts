@@ -60,6 +60,7 @@ import {
   getAccount, getContract, getContractByteCode, resolveName, txDryRun,
 } from '../chain';
 import AccountBase from '../account/Base';
+import { TxUnpacked } from '../tx/builder/schema.generated';
 
 type FunctionAci = Aci['encodedAci']['contract']['functions'][0];
 
@@ -87,7 +88,7 @@ type TxData = Awaited<ReturnType<typeof send>>;
 interface SendAndProcessReturnType {
   result?: ContractCallObject;
   hash: TxData['hash'];
-  tx: Awaited<ReturnType<typeof unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>>>;
+  tx: TxUnpacked & { tag: Tag.ContractCallTx | Tag.ContractCreateTx };
   txData: TxData;
   rawTx: Encoded.Transaction;
 }
