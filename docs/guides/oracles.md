@@ -86,11 +86,11 @@ console.log(decodedResponse)
 ## 3. Oracle: poll for queries and respond
 
 ### Poll for queries
-Typically the oracle itself polls for its own queries and responds as soon as possible:
+Typically, the oracle itself polls for its own queries and responds as soon as possible:
 
 ```js
-const stopPolling = await oracle.pollQueries((queries) => {
-   console.log(queries) // log all new queries
+const stopPolling = await oracle.pollQueries((query) => {
+  console.log(query) // log a new query
 }, { interval: 1000 }) // polling interval in milliseconds
 
 stopPolling() // stop polling

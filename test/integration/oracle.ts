@@ -45,8 +45,8 @@ describe('Oracle', () => {
 
   it('Pool for queries', (done) => {
     let count = 0;
-    const stopPolling = oracle.pollQueries((queries) => {
-      count += queries.length;
+    const stopPolling = oracle.pollQueries(() => {
+      count += 1;
       expect(count).to.be.lessThanOrEqual(4);
       if (count !== 4) return;
       stopPolling();
