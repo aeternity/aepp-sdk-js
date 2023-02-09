@@ -95,15 +95,12 @@ export interface ContractMethodsBase { [key: string]: (...args: any[]) => any }
 
 type MethodsToContractApi<M extends ContractMethodsBase> = {
   [Name in keyof M]:
-  M[Name] extends (...args: infer Args) => infer Ret
+  M[Name] extends (...args: infer Args) => any
     ? (...args: [
       ...Args,
       ...[] | [Name extends 'init'
         ? Parameters<Contract<M>['$deploy']>[1] : Parameters<Contract<M>['$call']>[2]],
-    ]) => Promise<
-    Awaited<ReturnType<Contract<M>['$call']>> &
-    { decodedResult?: Ret }
-    >
+    ]) => ReturnType<Contract<M>['$call']>
     : never
 };
 
@@ -278,7 +275,7 @@ class Contract<M extends ContractMethodsBase> {
     & Omit<Parameters<typeof txDryRun>[2], 'onNode'>
     & { onAccount?: AccountBase; onNode?: Node; callStatic?: boolean } = {},
   ): Promise<{
-      decodedResult?: any;
+      decodedResult?: ReturnType<M[Fn]>;
       decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
     } & SendAndProcessReturnType> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
