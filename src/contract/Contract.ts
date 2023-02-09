@@ -48,6 +48,7 @@ import {
   UnexpectedTsError,
   InternalError,
   NoWalletConnectedError,
+  ContractError,
 } from '../utils/errors';
 import { hash as calcHash } from '../utils/crypto';
 import {
@@ -67,7 +68,7 @@ interface Event extends NodeEvent {
   data: Encoded.ContractBytearray;
 }
 
-export interface ContractCallObject extends NodeContractCallObject {
+export interface ContractCallObject extends TransformNodeType<NodeContractCallObject> {
   returnValue: Encoded.ContractBytearray;
   log: Event[];
 }
@@ -84,7 +85,7 @@ interface DecodedEvent {
 type TxData = Awaited<ReturnType<typeof send>>;
 
 interface SendAndProcessReturnType {
-  result?: TransformNodeType<ContractCallObject>;
+  result?: ContractCallObject;
   hash: TxData['hash'];
   tx: Awaited<ReturnType<typeof unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>>>;
   txData: TxData;
@@ -181,9 +182,12 @@ class Contract<M extends ContractMethodsBase> {
     if (txData.blockHeight == null) return result;
     const { callInfo } = await this.$options.onNode.getTransactionInfoByHash(txData.hash);
     Object.assign(result.txData, callInfo); // TODO: don't duplicate data in result
-    // @ts-expect-error TODO api should be updated to match types
-    this._handleCallError(callInfo, tx);
-    return { ...result, result: callInfo as TransformNodeType<ContractCallObject> };
+    if (callInfo == null) {
+      throw new ContractError(`callInfo is not available for transaction ${txData.hash}`);
+    }
+    const callInfoTyped = callInfo as ContractCallObject;
+    this._handleCallError(callInfoTyped, tx);
+    return { ...result, result: callInfoTyped };
   }
 
   async _estimateGas<Fn extends MethodNames<M>>(
