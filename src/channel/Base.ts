@@ -38,6 +38,7 @@ import {
 } from './internal';
 import { ChannelError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
+import { TxUnpacked } from '../tx/builder/schema.generated';
 
 function snakeToPascalObjKeys<Type>(obj: object): Type {
   return Object.entries(obj).reduce((result, [key, val]) => ({
@@ -92,7 +93,7 @@ export default class Channel {
 
   _websocket: W3CWebSocket;
 
-  _state?: Encoded.Transaction;
+  _state: Encoded.Transaction | '' = '';
 
   _options: ChannelOptions;
 
@@ -215,12 +216,23 @@ export default class Channel {
    * Get current state
    */
   async state(): Promise<{
-    calls: Encoded.CallStateTree;
-    halfSignedTx: Encoded.Transaction | '';
-    signedTx: Encoded.Transaction;
-    trees: Encoded.StateTrees;
+    calls: TxUnpacked & { tag: Tag.CallsMtree };
+    halfSignedTx?: TxUnpacked & { tag: Tag.SignedTx };
+    signedTx?: TxUnpacked & { tag: Tag.SignedTx };
+    trees: TxUnpacked & { tag: Tag.StateTrees };
   }> {
-    return snakeToPascalObjKeys(await call(this, 'channels.get.offchain_state', {}));
+    const res = snakeToPascalObjKeys<{
+      calls: Encoded.CallStateTree;
+      halfSignedTx: Encoded.Transaction | '';
+      signedTx: Encoded.Transaction | '';
+      trees: Encoded.StateTrees;
+    }>(await call(this, 'channels.get.offchain_state', {}));
+    return {
+      calls: unpackTx(res.calls, Tag.CallsMtree),
+      ...res.halfSignedTx !== '' && { halfSignedTx: unpackTx(res.halfSignedTx, Tag.SignedTx) },
+      ...res.signedTx !== '' && { signedTx: unpackTx(res.signedTx, Tag.SignedTx) },
+      trees: unpackTx(res.trees, Tag.StateTrees),
+    };
   }
 
   /**
@@ -230,7 +242,7 @@ export default class Channel {
    * it will return `null`.
    */
   round(): number | null {
-    if (this._state == null) {
+    if (this._state === '') {
       return null;
     }
     const params = unpackTx(this._state, Tag.SignedTx).encodedTx;
