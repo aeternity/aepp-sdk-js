@@ -252,7 +252,7 @@ class Contract<M extends ContractMethodsBase> {
    * @param name - Function name
    * @returns function ACI
    */
-  protected _getFunctionACI(name: string): Partial<FunctionAci> {
+  protected _getFunctionAci(name: string): Partial<FunctionAci> {
     const fn = this._aci.encodedAci.contract.functions.find(
       (f: { name: string }) => f.name === name,
     );
@@ -283,13 +283,13 @@ class Contract<M extends ContractMethodsBase> {
       decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
     } & SendAndProcessReturnType> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
-    const fnACI = this._getFunctionACI(fn);
+    const fnAci = this._getFunctionAci(fn);
     const contractId = this.$options.address;
     const { onNode } = opt;
 
     if (fn == null) throw new MissingFunctionNameError();
     if (fn === 'init' && callStatic !== true) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
-    if (fn !== 'init' && opt.amount != null && opt.amount > 0 && fnACI.payable === false) {
+    if (fn !== 'init' && opt.amount != null && opt.amount > 0 && fnAci.payable === false) {
       throw new NotPayableFunctionError(opt.amount, fn);
     }
 
@@ -349,7 +349,7 @@ class Contract<M extends ContractMethodsBase> {
       res = await this._sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
     }
     if (callStatic === true || res.txData.blockHeight != null) {
-      res.decodedResult = fnACI.returns != null && fnACI.returns !== 'unit' && fn !== 'init'
+      res.decodedResult = fnAci.returns != null && fnAci.returns !== 'unit' && fn !== 'init'
         && this._calldata.decode(this._name, fn, res.result.returnValue);
       res.decodedEvents = this.$decodeEvents(res.result.log, opt);
     }
