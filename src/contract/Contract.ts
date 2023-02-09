@@ -193,7 +193,7 @@ class Contract<M extends ContractMethodsBase> {
   async _estimateGas<Fn extends MethodNames<M>>(
     name: Fn,
     params: MethodParameters<M, Fn>,
-    options: object = {},
+    options: Omit<Parameters<Contract<M>['$call']>[2], 'callStatic'> = {},
   ): Promise<number> {
     const { result } = await this.$call(name, params, { ...options, callStatic: true });
     if (result == null) throw new UnexpectedTsError();
