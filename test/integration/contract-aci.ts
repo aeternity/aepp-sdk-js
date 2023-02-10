@@ -71,6 +71,7 @@ contract StateContract =
 
   entrypoint remoteContract(a: RemoteI) : int = 1
   entrypoint remoteArgs(a: RemoteI.test_record) : RemoteI.test_type = 1
+  entrypoint unitFn(a: unit) = a
   entrypoint intFn(a: int) : int = a
   payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
@@ -131,6 +132,7 @@ interface TestContractApi extends ContractMethodsBase {
 
   remoteContract: (a: Encoded.ContractAddress) => bigint;
   remoteArgs: (a: { value: string; key: InputNumber[] }) => bigint;
+  unitFn: (a: []) => [];
   intFn: (a: InputNumber) => bigint;
   stringFn: (a: string) => string;
   boolFn: (a: boolean) => boolean;
@@ -603,6 +605,18 @@ describe('Contract instance', () => {
   });
 
   describe('Arguments Validation and Casting', () => {
+    describe('UNIT', () => {
+      it('Invalid', async () => {
+        await expect(testContract.unitFn('asd' as any))
+          .to.be.rejectedWith('Fate tuple must be an Array, got asd instead');
+      });
+
+      it('Valid', async () => {
+        const { decodedResult } = await testContract.unitFn([]);
+        expect(decodedResult).to.be.eql([]);
+      });
+    });
+
     describe('INT', () => {
       it('Invalid', async () => {
         await expect(testContract.intFn('asd'))
