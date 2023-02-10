@@ -327,11 +327,12 @@ describe('Contract instance', () => {
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'));
 
   it('dry-runs init function', async () => {
-    const { result } = await testContract.init('test', 1, 'hahahaha', { callStatic: true });
+    const { result, decodedResult } = await testContract
+      .init('test', 1, 'hahahaha', { callStatic: true });
     assertNotNull(result);
     result.should.have.property('gasUsed');
     result.should.have.property('returnType');
-    // TODO: ensure that return value is always can't be decoded (empty?)
+    expect(decodedResult).to.be.equal(undefined);
   });
 
   it('dry-runs init function on specific account', async () => {

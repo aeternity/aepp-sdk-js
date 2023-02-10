@@ -358,8 +358,7 @@ class Contract<M extends ContractMethodsBase> {
       res = await this.#sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
     }
     if (callStatic === true || res.txData.blockHeight != null) {
-      res.decodedResult = fn !== 'init'
-        && this._calldata.decode(this._name, fn, res.result.returnValue);
+      res.decodedResult = this._calldata.decode(this._name, fn, res.result.returnValue);
       res.decodedEvents = this.$decodeEvents(res.result.log, opt);
     }
     return res;
