@@ -24,7 +24,6 @@ use-extension:
 input-file: compiler-swagger.yaml
 output-folder: ../../src/apis/compiler
 source-code-folder-path: .
-client-side-validation: true
 generator: typescript
 generate-metadata: false
 add-credentials: false

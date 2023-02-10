@@ -164,7 +164,6 @@ use-extension:
 input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.5.2/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
-client-side-validation: true
 generator: typescript
 generate-metadata: false
 add-credentials: false
