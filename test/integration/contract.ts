@@ -59,20 +59,61 @@ describe('Contract', () => {
     expect(res.result).to.have.property('returnType');
   });
 
-  it('Verify message in Sophia', async () => {
-    const msgHash = messageToHash('Hello');
-    const signature = await aeSdk.sign(msgHash);
+  it('Verify signature of 32 bytes in Sophia', async () => {
     const signContract = await aeSdk.initializeContract<{
-      verify: (msg: Uint8Array, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
+      verify: (data: Uint8Array, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
           sourceCode:
             'contract Sign ='
-            + '\n  entrypoint verify (msg: hash, pub: address, sig: signature): bool ='
-            + '\n    Crypto.verify_sig(msg, pub, sig)',
+            + '\n  entrypoint verify (data: bytes(32), pub: address, sig: signature): bool ='
+            + '\n    Crypto.verify_sig(data, pub, sig)',
         });
     await signContract.$deploy([]);
-    const { decodedResult } = await signContract.verify(msgHash, aeSdk.address, signature);
-    decodedResult.should.be.equal(true);
+    const data = Buffer.from(new Array(32).fill(0).map((_, idx) => idx ** 2));
+    const signature = await aeSdk.sign(data);
+    expect((await signContract.verify(data, aeSdk.address, signature)).decodedResult)
+      .to.be.equal(true);
+  });
+
+  it('Verify message in Sophia', async () => {
+    const signContract = await aeSdk.initializeContract<{
+      message_to_hash: (message: string) => Uint8Array;
+      verify: (message: string, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
+    }>({
+          sourceCode:
+            'include "String.aes"'
+            + '\ninclude "Option.aes"'
+            + '\n'
+            + '\ncontract Sign ='
+            + '\n  entrypoint int_to_binary (i: int): string ='
+            + '\n    switch(Char.from_int(i))'
+            + '\n      None => abort("Int is too big")'
+            + '\n      Some(c) => String.from_list([c])'
+            + '\n'
+            + '\n  entrypoint includes (str: string, pat: string): bool ='
+            + '\n    switch(String.contains(str, pat))'
+            + '\n      None => false'
+            + '\n      Some(c) => true'
+            + '\n'
+            + '\n  entrypoint message_to_hash (message: string): hash ='
+            + '\n    let prefix = "aeternity Signed Message:\\n"'
+            + '\n    let prefixBinary = String.concat(int_to_binary(String.length(prefix)), prefix)'
+            + '\n    let messageBinary = String.concat(int_to_binary(String.length(message)), message)'
+            + '\n    Crypto.blake2b(String.concat(prefixBinary, messageBinary))'
+            + '\n'
+            + '\n  entrypoint verify (message: string, pub: address, sig: signature): bool ='
+            + '\n    require(includes(message, "H"), "Invalid message")'
+            + '\n    Crypto.verify_sig(message_to_hash(message), pub, sig)',
+        });
+    await signContract.$deploy([]);
+
+    await Promise.all(['Hello', 'H'.repeat(127)].map(async (message) => {
+      expect((await signContract.message_to_hash(message)).decodedResult)
+        .to.be.eql(messageToHash(message));
+      const signature = await aeSdk.signMessage(message);
+      expect((await signContract.verify(message, aeSdk.address, signature)).decodedResult)
+        .to.be.equal(true);
+    }));
   });
 
   it('Deploy and call contract on specific account', async () => {
@@ -111,7 +152,7 @@ describe('Contract', () => {
     const ct = await aeSdk.initializeContract({
       sourceCode:
         'contract Foo =\n'
-        + '  entrypoint init() = require(false, "CustomErrorMessage")',
+        + '  entrypoint init() = abort("CustomErrorMessage")',
     });
     await expect(ct.$deploy([])).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"');
   });
@@ -125,7 +166,7 @@ describe('Contract', () => {
             'contract Foo =\n'
             + '  payable stateful entrypoint failWithoutMessage(x : address) = Chain.spend(x, 1000000000)\n'
             + '  payable stateful entrypoint failWithMessage() =\n'
-            + '    require(false, "CustomErrorMessage")',
+            + '    abort("CustomErrorMessage")',
         });
     await ct.$deploy([]);
     await expect(ct.failWithoutMessage(aeSdk.address))
