@@ -256,6 +256,14 @@ describe('Contract instance', () => {
     expect((await testContract.intFn(2)).decodedResult).to.be.equal(2n);
   });
 
+  it('calls without waitMined and get result later', async () => {
+    const { hash: txHash } = await testContract
+      .stringFn('test', { callStatic: false, waitMined: false });
+    await aeSdk.poll(txHash);
+    const { decodedResult } = await testContract.$getCallResultByTxHash(txHash, 'stringFn');
+    expect(decodedResult).to.be.equal('test');
+  });
+
   it('gets actual options from AeSdkBase', async () => {
     const [address1, address2] = aeSdk.addresses();
     let { result } = await testContract.intFn(2);

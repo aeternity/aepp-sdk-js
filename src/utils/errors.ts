@@ -507,9 +507,9 @@ export class MissingFunctionNameError extends ContractError {
  * @category exception
  */
 export class NodeInvocationError extends ContractError {
-  transaction: Encoded.Transaction;
+  transaction?: Encoded.Transaction;
 
-  constructor(message: string, transaction: Encoded.Transaction) {
+  constructor(message: string, transaction?: Encoded.Transaction) {
     super(`Invocation failed${message == null ? '' : `: "${message}"`}`);
     this.name = 'NodeInvocationError';
     this.transaction = transaction;

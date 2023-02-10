@@ -26,7 +26,7 @@ import { Encoder as Calldata } from '@aeternity/aepp-calldata';
 import { DRY_RUN_ACCOUNT } from '../tx/builder/schema';
 import { Tag, AensName } from '../tx/builder/constants';
 import {
-  buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions,
+  buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
 } from '../tx/builder';
 import { send, SendOptions } from '../spend';
 import { decode, Encoded } from '../utils/encoder';
@@ -52,7 +52,7 @@ import {
 } from '../utils/errors';
 import { hash as calcHash } from '../utils/crypto';
 import {
-  ContractCallObject as NodeContractCallObject, ContractCallReturnType, Event as NodeEvent,
+  ContractCallObject as NodeContractCallObject, Event as NodeEvent,
 } from '../apis/node';
 import CompilerBase, { Aci } from './compiler/Base';
 import Node, { TransformNodeType } from '../Node';
@@ -119,6 +119,11 @@ interface GetContractNameByEventOptions {
   contractAddressToName?: { [key: Encoded.ContractAddress]: string };
 }
 
+interface GetCallResultByHashReturnType<M extends ContractMethodsBase, Fn extends MethodNames<M>> {
+  decodedResult: ReturnType<M[Fn]>;
+  decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
+}
+
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
  * creating a reference to already deployed contracts
@@ -151,16 +156,21 @@ class Contract<M extends ContractMethodsBase> {
     return this.$options.bytecode;
   }
 
-  #handleCallError(
-    { returnType, returnValue }: {
-      returnType: ContractCallReturnType;
-      returnValue: Encoded.ContractBytearray;
-    },
-    transaction: Encoded.Transaction,
-  ): void {
+  #getCallResult<Fn extends MethodNames<M>>(
+    { returnType, returnValue, log }: ContractCallObject,
+    fnName: Fn,
+    transaction: Encoded.Transaction | undefined,
+    options: Parameters<Contract<M>['$decodeEvents']>[1],
+  ): GetCallResultByHashReturnType<M, Fn> {
     let message: string;
     switch (returnType) {
-      case 'ok': return;
+      case 'ok': {
+        const fnAci = this.#getFunctionAci(fnName);
+        return {
+          decodedResult: this._calldata.decode(this._name, fnAci.name, returnValue),
+          decodedEvents: this.$decodeEvents(log, options),
+        };
+      }
       case 'revert':
         message = this._calldata.decodeFateString(returnValue);
         break;
@@ -173,26 +183,37 @@ class Contract<M extends ContractMethodsBase> {
     throw new NodeInvocationError(message, transaction);
   }
 
-  async #sendAndProcess(
+  async #sendAndProcess<Fn extends MethodNames<M>>(
     tx: Encoded.Transaction,
-    options: SendOptions,
-  ): Promise<SendAndProcessReturnType> {
+    fnName: Fn,
+    options: SendOptions & Parameters<Contract<M>['$getCallResultByTxHash']>[2],
+  ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
     const txData = await send(tx, { ...this.$options, ...options });
-    const result = {
+    return {
       hash: txData.hash,
       tx: unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>(txData.rawTx),
       txData,
       rawTx: txData.rawTx,
+      ...txData.blockHeight != null && (
+        await this.$getCallResultByTxHash(txData.hash, fnName, options)
+      ),
     };
-    if (txData.blockHeight == null) return result;
-    const { callInfo } = await this.$options.onNode.getTransactionInfoByHash(txData.hash);
-    Object.assign(result.txData, callInfo); // TODO: don't duplicate data in result
+  }
+
+  async $getCallResultByTxHash<Fn extends MethodNames<M>>(
+    hash: Encoded.TxHash,
+    fnName: Fn,
+    options?: Parameters<Contract<M>['$decodeEvents']>[1],
+  ): Promise<GetCallResultByHashReturnType<M, Fn> & { result: ContractCallObject }> {
+    const { callInfo } = await this.$options.onNode.getTransactionInfoByHash(hash);
     if (callInfo == null) {
-      throw new ContractError(`callInfo is not available for transaction ${txData.hash}`);
+      throw new ContractError(`callInfo is not available for transaction ${hash}`);
     }
     const callInfoTyped = callInfo as ContractCallObject;
-    this.#handleCallError(callInfoTyped, tx);
-    return { ...result, result: callInfoTyped };
+    return {
+      ...this.#getCallResult(callInfoTyped, fnName, undefined, options),
+      result: callInfoTyped,
+    };
   }
 
   async _estimateGas<Fn extends MethodNames<M>>(
@@ -240,7 +261,11 @@ class Contract<M extends ContractMethodsBase> {
       ownerId,
     });
     this.$options.address = buildContractIdByContractTx(tx);
-    const { hash, ...other } = await this.#sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
+    const { hash, ...other } = await this.#sendAndProcess(
+      tx,
+      'init',
+      { ...opt, onAccount: opt.onAccount },
+    );
     return {
       ...other,
       ...other.result?.log != null && {
@@ -287,10 +312,7 @@ class Contract<M extends ContractMethodsBase> {
     & Omit<SendOptions, 'onAccount' | 'onNode'>
     & Omit<Parameters<typeof txDryRun>[2], 'onNode'>
     & { onAccount?: AccountBase; onNode?: Node; callStatic?: boolean } = {},
-  ): Promise<{
-      decodedResult?: ReturnType<M[Fn]>;
-      decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
-    } & SendAndProcessReturnType> {
+  ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
     const fnAci = this.#getFunctionAci(fn);
     const contractId = this.$options.address;
@@ -316,7 +338,6 @@ class Contract<M extends ContractMethodsBase> {
     }
     const callData = this._calldata.encode(this._name, fn, params);
 
-    let res: any;
     if (callStatic === true) {
       if (opt.nonce == null && top != null) {
         const topKey = typeof top === 'number' ? 'height' : 'hash';
@@ -337,31 +358,33 @@ class Contract<M extends ContractMethodsBase> {
       }
 
       const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, { ...opt, top });
-      if (callObj == null) throw new UnexpectedTsError();
-      this.#handleCallError({
-        returnType: callObj.returnType as ContractCallReturnType,
-        returnValue: callObj.returnValue as Encoded.ContractBytearray,
-      }, tx);
-      res = { ...dryRunOther, tx: unpackTx(tx), result: callObj };
-    } else {
-      if (top != null) throw new IllegalArgumentError('Can\'t handle `top` option in on-chain contract call');
-      if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
-      const tx = await buildTxAsync({
-        ...opt,
-        tag: Tag.ContractCallTx,
-        gasLimit: opt.gasLimit ?? await this._estimateGas(fn, params, opt),
-        callerId,
-        contractId,
-        callData,
-      });
-      if (opt.onAccount == null) throw new IllegalArgumentError('Can\'t call contract on chain without account');
-      res = await this.#sendAndProcess(tx, { ...opt, onAccount: opt.onAccount });
+      if (callObj == null) {
+        throw new InternalError(`callObj is not available for transaction ${tx}`);
+      }
+      const callInfoTyped = callObj as ContractCallObject;
+      return {
+        ...dryRunOther,
+        ...this.#getCallResult(callInfoTyped, fn, tx, opt),
+        tx: unpackTx(tx),
+        result: callInfoTyped,
+        rawTx: tx,
+        hash: buildTxHash(tx),
+        txData: undefined as any,
+      };
     }
-    if (callStatic === true || res.txData.blockHeight != null) {
-      res.decodedResult = this._calldata.decode(this._name, fn, res.result.returnValue);
-      res.decodedEvents = this.$decodeEvents(res.result.log, opt);
-    }
-    return res;
+
+    if (top != null) throw new IllegalArgumentError('Can\'t handle `top` option in on-chain contract call');
+    if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
+    const tx = await buildTxAsync({
+      ...opt,
+      tag: Tag.ContractCallTx,
+      gasLimit: opt.gasLimit ?? await this._estimateGas(fn, params, opt),
+      callerId,
+      contractId,
+      callData,
+    });
+    if (opt.onAccount == null) throw new IllegalArgumentError('Can\'t call contract on chain without account');
+    return this.#sendAndProcess(tx, fn, { ...opt, onAccount: opt.onAccount });
   }
 
   /**
