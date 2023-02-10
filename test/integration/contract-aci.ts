@@ -361,6 +361,40 @@ describe('Contract instance', () => {
     result.callerId.should.be.equal(onAccount.address);
   });
 
+  it('can be inherited', async () => {
+    const contractOptions = await aeSdk.compilerApi.compileBySourceCode(identityContractSourceCode);
+    interface TestApi extends ContractMethodsBase {
+      getArg: (x: bigint | number) => bigint;
+    }
+    type OmitCompiler<Options> = Omit<Options, 'aci' | 'bytecode' | 'sourceCode' | 'onCompiler'>;
+
+    class TestContract extends Contract<TestApi> {
+      constructor(options: OmitCompiler<ConstructorParameters<typeof Contract<TestApi>>[0]>) {
+        super({ ...options, ...contractOptions });
+      }
+
+      static override async initialize<M extends ContractMethodsBase = TestApi>(
+        options: OmitCompiler<Parameters<typeof Contract<TestApi>['initialize']>[0]>,
+      ): Promise<Contract<M>> {
+        return Contract.initialize<M>({ ...options, ...contractOptions });
+      }
+    }
+
+    const contract1 = new TestContract(aeSdk._getOptions());
+    expect(contract1._aci).to.be.an('object');
+    expect(contract1.$options).to.be.an('object');
+    await contract1.$deploy([]);
+    expect((await contract1.getArg(42)).decodedResult).to.be.equal(42n);
+
+    const contract2 = await TestContract.initialize({
+      ...aeSdk._getOptions(),
+      address: contract1.$options.address,
+    });
+    expect(contract2._aci).to.be.an('object');
+    expect(contract2.$options).to.be.an('object');
+    expect((await contract2.getArg(42)).decodedResult).to.be.equal(42n);
+  });
+
   describe('Gas', () => {
     let contract: Contract<TestContractApi>;
 
