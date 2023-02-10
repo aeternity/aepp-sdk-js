@@ -44,7 +44,7 @@ export default class CompilerHttp extends CompilerBase {
           }
           if (Array.isArray(body)) {
             message += `\n${body
-              .map((e) => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context != null ? `(${e.context})` : ''}`)
+              .map((e) => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context != null ? ` (${e.context})` : ''}`)
               .join('\n')}`;
           }
           return message;
