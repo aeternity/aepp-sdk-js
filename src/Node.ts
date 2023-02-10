@@ -117,10 +117,18 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
    * @param url - Url for node API
    * @param options - Options
    * @param options.ignoreVersion - Don't check node version
+   * @param options.retryCount - Amount of extra requests to do in case of failure
+   * @param options.retryOverallDelay - Time in ms to wait between all retries
    */
   constructor(
     url: string,
-    { ignoreVersion = false, ...options }: NodeOptionalParams & { ignoreVersion?: boolean } = {},
+    {
+      ignoreVersion = false, retryCount = 3, retryOverallDelay = 800, ...options
+    }: NodeOptionalParams & {
+      ignoreVersion?: boolean;
+      retryCount?: number;
+      retryOverallDelay?: number;
+    } = {},
   ) {
     // eslint-disable-next-line constructor-super
     super(url, {
@@ -128,7 +136,7 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       additionalPolicies: [
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
-        genRetryOnFailurePolicy(),
+        genRetryOnFailurePolicy(retryCount, retryOverallDelay),
         genErrorFormatterPolicy((body: ErrorModel) => ` ${body.reason}`),
       ],
       ...options,

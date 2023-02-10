@@ -107,19 +107,28 @@ export const genVersionCheckPolicy = (
   },
 });
 
-export const genRetryOnFailurePolicy = (): AdditionalPolicyConfig => ({
+export const genRetryOnFailurePolicy = (
+  retryCount: number,
+  retryOverallDelay: number,
+): AdditionalPolicyConfig => ({
   policy: {
     name: 'retry-on-failure',
     async sendRequest(request, next) {
       const statusesToNotRetry = [200, 400, 403];
+
+      const intervals = new Array(retryCount).fill(0)
+        .map((_, idx) => ((idx + 1) / retryCount) ** 2);
+      const intervalSum = intervals.reduce((a, b) => a + b);
+      const intervalsInMs = intervals.map((el) => (el / intervalSum) * retryOverallDelay);
+
       let error: Error | undefined;
-      for (let attempt = 0; attempt <= 3; attempt += 1) {
+      for (let attempt = 0; attempt <= retryCount; attempt += 1) {
         if (error != null) {
           if (
             !(error instanceof RestError)
             || statusesToNotRetry.includes(error.response?.status ?? 0)
           ) throw error;
-          await pause((attempt / 3) ** 2 * 500);
+          await pause(intervalsInMs[attempt - 1]);
         }
         try {
           return await next(request);
