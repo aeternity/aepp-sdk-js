@@ -47,7 +47,7 @@ export default class AccountGeneralized extends AccountBase {
     }
     const {
       callData, sourceCode, args, gasLimit,
-    } = authData;
+    } = typeof authData === 'function' ? await authData(tx) : authData;
 
     const authCallData = callData ?? await (async () => {
       if (this.#authFun == null) {

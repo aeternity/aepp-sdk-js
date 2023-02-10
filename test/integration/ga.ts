@@ -14,6 +14,7 @@ import {
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 import { ContractMethodsBase } from '../../src/contract/Contract';
+import { ensureEqual } from '../utils';
 
 const sourceCode = `contract BlindAuth =
   record state = { txHash: option(hash) }
@@ -87,6 +88,20 @@ describe('Generalized Account', () => {
     const spendTx = buildTx(gaMetaTxParams.tx.encodedTx);
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.getTxHash()).decodedResult);
+  });
+
+  it('accepts a function in authData', async () => {
+    let spendTx;
+    const { rawTx } = await aeSdk.spend(10000, publicKey, {
+      authData: async (tx) => {
+        spendTx = tx;
+        return { sourceCode, args: [genSalt()] };
+      },
+    });
+    const txParams = unpackTx(rawTx, Tag.SignedTx);
+    ensureEqual<Tag.GaMetaTx>(txParams.encodedTx.tag, Tag.GaMetaTx);
+    ensureEqual<Tag.SignedTx>(txParams.encodedTx.tx.tag, Tag.SignedTx);
+    expect(buildTx(txParams.encodedTx.tx.encodedTx)).to.be.equal(spendTx);
   });
 
   it('fails trying to send SignedTx using generalized account', async () => {
