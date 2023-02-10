@@ -156,7 +156,7 @@ class Contract<M extends ContractMethodsBase> {
       returnType: ContractCallReturnType;
       returnValue: Encoded.ContractBytearray;
     },
-    transaction: string,
+    transaction: Encoded.Transaction,
   ): void {
     let message: string;
     switch (returnType) {
