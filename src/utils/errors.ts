@@ -739,26 +739,6 @@ export class TxNotInChainError extends TransactionError {
 /**
  * @category exception
  */
-export class UnsupportedABIversionError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'UnsupportedABIversionError';
-  }
-}
-
-/**
- * @category exception
- */
-export class UnsupportedVMversionError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'UnsupportedVMversionError';
-  }
-}
-
-/**
- * @category exception
- */
 export class AlreadyConnectedError extends WalletError {
   constructor(message: string) {
     super(message);
