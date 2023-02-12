@@ -38,7 +38,7 @@ describe('Oracle', () => {
     expect(extendedOracle.ttl).to.be.equal(oracle.ttl + 7450);
   });
 
-  it('Post Oracle Query(Ask for weather in Berlin)', async () => {
+  it('Post Oracle Query', async () => {
     const query = await oracle.postQuery("{'city': 'Berlin'}");
     query.decodedQuery.should.be.equal("{'city': 'Berlin'}");
   });

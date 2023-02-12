@@ -77,7 +77,6 @@ describe('Node Chain', () => {
       amount: 1,
       senderId: aeSdk.address,
       recipientId: publicKey,
-      ttl: Number.MAX_SAFE_INTEGER,
     });
     const signed = await aeSdk.signTransaction(tx);
     const { txHash } = await aeSdk.api.postTransaction({ tx: signed });

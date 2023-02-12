@@ -334,14 +334,12 @@ interface AensClaimReturnType extends
  */
 export async function aensPreclaim(name: AensName, options: AensPreclaimOptions): Promise<Readonly<
 Awaited<ReturnType<typeof send>> & {
-  height: number;
   salt: number;
   commitmentId: string;
   claim: (opts?: Parameters<typeof aensClaim>[2]) => ReturnType<typeof aensClaim>;
 }
 >> {
   const salt = genSalt();
-  const height = await getHeight(options);
   const commitmentId = commitmentHash(name, salt);
 
   const preclaimTx = await buildTxAsync({
@@ -353,7 +351,6 @@ Awaited<ReturnType<typeof send>> & {
 
   return Object.freeze({
     ...await send(preclaimTx, options),
-    height,
     salt,
     commitmentId,
     async claim(opts?: Parameters<typeof aensClaim>[2]) {
