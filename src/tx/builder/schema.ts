@@ -20,7 +20,6 @@ export enum ORACLE_TTL_TYPES {
 }
 
 // # ORACLE
-export const QUERY_FEE = 30000;
 export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
 export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };

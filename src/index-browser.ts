@@ -7,7 +7,7 @@ export * from './tx/builder/helpers';
 export * from './tx/builder/constants';
 // TODO: move to constants
 export {
-  ORACLE_TTL_TYPES, QUERY_FEE, ORACLE_TTL, QUERY_TTL, RESPONSE_TTL, DRY_RUN_ACCOUNT, CallReturnType,
+  ORACLE_TTL_TYPES, ORACLE_TTL, QUERY_TTL, RESPONSE_TTL, DRY_RUN_ACCOUNT, CallReturnType,
 } from './tx/builder/schema';
 export * from './utils/amount-formatter';
 export * from './utils/hd-wallet';

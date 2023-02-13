@@ -6,14 +6,12 @@
  * repository.
  */
 
-import BigNumber from 'bignumber.js';
 import { mapObject, pause } from './utils/other';
 import { oracleQueryId } from './tx/builder/helpers';
 import { unpackTx, buildTxAsync, BuildTxOptions } from './tx/builder';
 import {
   ORACLE_TTL,
   ORACLE_TTL_TYPES,
-  QUERY_FEE,
   QUERY_TTL,
   RESPONSE_TTL,
 } from './tx/builder/schema';
@@ -333,7 +331,6 @@ export async function registerOracle(
   > {
   const accountId = options.onAccount.address;
   const oracleRegisterTx = await buildTxAsync({
-    queryFee: QUERY_FEE,
     oracleTtlValue: ORACLE_TTL.value,
     oracleTtlType: ORACLE_TTL.type,
     ...options,
@@ -349,9 +346,8 @@ export async function registerOracle(
 }
 
 type RegisterOracleOptionsType = SendTransactionOptions & Parameters<typeof getOracleObject>[1]
-& BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat' | 'queryFee' | 'oracleTtlType' | 'oracleTtlValue'>
+& BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat' | 'oracleTtlType' | 'oracleTtlValue'>
 & {
-  queryFee?: number | string | BigNumber;
   oracleTtlType?: ORACLE_TTL_TYPES;
   oracleTtlValue?: number;
 };

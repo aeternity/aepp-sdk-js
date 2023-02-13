@@ -5,7 +5,7 @@ import { getSdk } from '.';
 import {
   AeSdk, UnexpectedTsError,
   decode, encode, registerOracle,
-  ORACLE_TTL_TYPES, QUERY_FEE, Encoding, RequestTimedOutError,
+  ORACLE_TTL_TYPES, Encoding, RequestTimedOutError,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
@@ -89,10 +89,10 @@ describe('Oracle', () => {
       oracleWithFee = await aeSdk.registerOracle("{'city': str}", "{'tmp': num}", { queryFee: queryFee.toString() });
     });
 
-    it('Post Oracle Query with default query fee', async () => {
+    it('Post Oracle Query without query fee', async () => {
       const query = await oracle.postQuery("{'city': 'Berlin'}");
       if (query.tx?.queryFee == null) throw new UnexpectedTsError();
-      query.tx.queryFee.should.be.equal(BigInt(QUERY_FEE));
+      query.tx.queryFee.should.be.equal(0n);
     });
 
     it('Post Oracle Query with registered query fee', async () => {
