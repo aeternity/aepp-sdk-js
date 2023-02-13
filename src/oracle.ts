@@ -7,7 +7,6 @@
  */
 
 import BigNumber from 'bignumber.js';
-import { send, SendOptions } from './spend';
 import { mapObject, pause } from './utils/other';
 import { oracleQueryId } from './tx/builder/helpers';
 import { unpackTx, buildTxAsync, BuildTxOptions } from './tx/builder';
@@ -23,7 +22,9 @@ import { RequestTimedOutError } from './utils/errors';
 import {
   decode, encode, Encoded, Encoding,
 } from './utils/encoder';
-import { _getPollInterval, getHeight } from './chain';
+import {
+  _getPollInterval, getHeight, sendTransaction, SendTransactionOptions,
+} from './chain';
 import Node from './Node';
 import AccountBase from './account/Base';
 
@@ -151,7 +152,9 @@ export async function postQueryToOracle(
   oracleId: Encoded.OracleAddress,
   query: string,
   options: PostQueryToOracleOptions,
-): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getQueryObject>>> {
+): Promise<
+  Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getQueryObject>>
+  > {
   options.queryFee ??= (await options.onNode.getOracleByPubkey(oracleId)).queryFee.toString();
   const senderId = options.onAccount.address;
 
@@ -169,12 +172,12 @@ export async function postQueryToOracle(
   const { nonce } = unpackTx(oracleQueryTx, Tag.OracleQueryTx);
   const queryId = oracleQueryId(senderId, nonce, oracleId);
   return {
-    ...await send(oracleQueryTx, options),
+    ...await sendTransaction(oracleQueryTx, options),
     ...await getQueryObject(oracleId, queryId, options),
   };
 }
 
-type PostQueryToOracleOptionsType = Parameters<typeof send>[1]
+type PostQueryToOracleOptionsType = Parameters<typeof sendTransaction>[1]
 & Parameters<typeof getQueryObject>[2]
 & BuildTxOptions<Tag.OracleQueryTx, 'oracleId' | 'senderId' | 'query' | 'queryTtlType' | 'queryTtlValue' | 'responseTtlType' | 'responseTtlValue'>
 & {
@@ -199,7 +202,9 @@ interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
 export async function extendOracleTtl(
   oracleId: Encoded.OracleAddress,
   options: ExtendOracleTtlOptions,
-): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
+): Promise<
+  Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getOracleObject>>
+  > {
   const oracleExtendTx = await buildTxAsync({
     oracleTtlType: ORACLE_TTL.type,
     oracleTtlValue: ORACLE_TTL.value,
@@ -209,13 +214,13 @@ export async function extendOracleTtl(
     oracleId,
   });
   return {
-    ...await send(oracleExtendTx, options),
+    ...await sendTransaction(oracleExtendTx, options),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     ...await getOracleObject(oracleId, options),
   };
 }
 
-type ExtendOracleTtlOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
+type ExtendOracleTtlOptionsType = SendTransactionOptions & Parameters<typeof getOracleObject>[1]
 & BuildTxOptions<Tag.OracleExtendTx, 'oracleTtlType' | 'oracleTtlValue' | 'callerId' | 'oracleId'>
 & { oracleTtlType?: ORACLE_TTL_TYPES; oracleTtlValue?: number };
 interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
@@ -237,7 +242,9 @@ export async function respondToQuery(
   queryId: Encoded.OracleQueryId,
   response: string,
   options: RespondToQueryOptions,
-): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
+): Promise<
+  Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getOracleObject>>
+  > {
   const oracleRespondTx = await buildTxAsync({
     responseTtlType: RESPONSE_TTL.type,
     responseTtlValue: RESPONSE_TTL.value,
@@ -249,13 +256,13 @@ export async function respondToQuery(
     response,
   });
   return {
-    ...await send(oracleRespondTx, options),
+    ...await sendTransaction(oracleRespondTx, options),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     ...await getOracleObject(oracleId, options),
   };
 }
 
-type RespondToQueryOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
+type RespondToQueryOptionsType = SendTransactionOptions & Parameters<typeof getOracleObject>[1]
 & BuildTxOptions<Tag.OracleResponseTx, 'callerId' | 'oracleId' | 'queryId' | 'response' | 'responseTtlType' | 'responseTtlValue'>
 & { responseTtlType?: ORACLE_TTL_TYPES; responseTtlValue?: number };
 interface RespondToQueryOptions extends RespondToQueryOptionsType {}
@@ -324,7 +331,9 @@ export async function registerOracle(
   queryFormat: string,
   responseFormat: string,
   options: RegisterOracleOptions,
-): Promise<Awaited<ReturnType<typeof send>> & Awaited<ReturnType<typeof getOracleObject>>> {
+): Promise<
+  Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getOracleObject>>
+  > {
   const accountId = options.onAccount.address;
   const oracleRegisterTx = await buildTxAsync({
     queryFee: QUERY_FEE,
@@ -337,12 +346,12 @@ export async function registerOracle(
     responseFormat,
   });
   return {
-    ...await send(oracleRegisterTx, options),
+    ...await sendTransaction(oracleRegisterTx, options),
     ...await getOracleObject(encode(decode(accountId), Encoding.OracleAddress), options),
   };
 }
 
-type RegisterOracleOptionsType = SendOptions & Parameters<typeof getOracleObject>[1]
+type RegisterOracleOptionsType = SendTransactionOptions & Parameters<typeof getOracleObject>[1]
 & BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat' | 'queryFee' | 'oracleTtlType' | 'oracleTtlValue'>
 & {
   queryFee?: number | string | BigNumber;

@@ -1,4 +1,4 @@
-import { send } from '../../spend';
+import { sendTransaction } from '../../chain';
 import { Encoded } from '../../utils/encoder';
 import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema';
 
@@ -59,7 +59,7 @@ export interface WalletApi {
      * @deprecated this is not a hash at all, will be removed later at the same time
      * as dropping ability to broadcast transaction by wallet
      */
-    transactionHash?: Awaited<ReturnType<typeof send>>;
+    transactionHash?: Awaited<ReturnType<typeof sendTransaction>>;
     signedTransaction?: Encoded.Transaction;
   }>);
 

@@ -60,7 +60,8 @@ describe('Verify Transaction', () => {
       ttl: 2,
       absoluteTtl: true,
     });
-    const error = await aeSdk.send(spendTx).catch((e: InvalidTxError) => e) as InvalidTxError;
+    const error = await aeSdk.sendTransaction(spendTx)
+      .catch((e: InvalidTxError) => e) as InvalidTxError;
     expect(error.validation).to.have.lengthOf(1);
   });
 

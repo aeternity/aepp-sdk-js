@@ -184,7 +184,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Try to sign and send transaction to wallet without subscription', async () => {
       wallet.getAccounts().should.be.an('object');
-      await Promise.all([aepp.signTransaction('tx_asdasd'), aepp.send('tx_asdasd')]
+      await Promise.all([aepp.signTransaction('tx_asdasd'), aepp.sendTransaction('tx_asdasd')]
         .map((promise) => expect(promise).to.be.rejectedWith(UnsubscribedAccountError, 'You are not subscribed for an account.')));
     });
 
@@ -346,7 +346,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         amount: 0,
         payload: encode(Buffer.from('zerospend'), Encoding.Bytearray),
       });
-      const res = await aepp.send(tx);
+      const res = await aepp.sendTransaction(tx);
       if (res.tx?.payload == null || res.blockHeight == null) throw new UnexpectedTsError();
       decode(res.tx.payload as Encoded.Any).toString().should.be.equal('zerospend2');
       res.blockHeight.should.be.a('number');
@@ -398,7 +398,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         absoluteTtl: true,
       });
 
-      await expect(aepp.send(tx)).to.be
+      await expect(aepp.sendTransaction(tx)).to.be
         .rejectedWith('Transaction verification errors: TTL 1 is already expired, current height is');
     });
 
@@ -555,7 +555,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         amount: 0,
         payload: encode(Buffer.from('zerospend'), Encoding.Bytearray),
       });
-      const res = await aepp.send(tx);
+      const res = await aepp.sendTransaction(tx);
       if (res.tx?.payload == null || res.blockHeight == null) throw new UnexpectedTsError();
       decode(res.tx.payload as Encoded.Any).toString().should.be.equal('zerospend2');
       res.blockHeight.should.be.a('number');

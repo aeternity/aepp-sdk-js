@@ -1,40 +1,12 @@
 import BigNumber from 'bignumber.js';
-import { sendTransaction, getBalance, resolveName } from './chain';
 import {
-  buildTxAsync, BuildTxOptions, buildTxHash, unpackTx,
-} from './tx/builder';
+  sendTransaction, getBalance, resolveName, SendTransactionOptions,
+} from './chain';
+import { buildTxAsync, BuildTxOptions, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
 import { Encoded, Encoding } from './utils/encoder';
 import { Tag, AensName } from './tx/builder/constants';
 import AccountBase from './account/Base';
-
-/**
- * Sign and post a transaction to the chain
- * @category chain
- * @param tx - Transaction
- * @param options - Options
- * @param options.verify - Verify transaction before broadcast, throw error if not
- * valid
- * @returns Transaction
- */
-export async function send(
-  tx: Encoded.Transaction,
-  options: SendOptions,
-): Promise<SendReturnType> {
-  const signed = await options.onAccount.signTransaction(tx, {
-    ...options,
-    networkId: await options.onNode.getNetworkId(),
-  });
-
-  return options.innerTx === true
-    ? { hash: buildTxHash(signed), rawTx: signed }
-    : sendTransaction(signed, options);
-}
-
-type SendOptionsType = Parameters<AccountBase['signTransaction']>[1]
-& Parameters<typeof sendTransaction>[1] & { onAccount: AccountBase };
-export interface SendOptions extends SendOptionsType {}
-interface SendReturnType extends Awaited<ReturnType<typeof sendTransaction>> {}
 
 /**
  * Send coins to another account
@@ -48,8 +20,8 @@ export async function spend(
   amount: number | string,
   recipientIdOrName: Encoded.AccountAddress | AensName,
   options: SpendOptions,
-): ReturnType<typeof send> {
-  return send(
+): ReturnType<typeof sendTransaction> {
+  return sendTransaction(
     await buildTxAsync({
       ...options,
       tag: Tag.SpendTx,
@@ -66,7 +38,7 @@ export async function spend(
 }
 
 type SpendOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount'>
-& Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendOptions;
+& Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendTransactionOptions;
 interface SpendOptions extends SpendOptionsType {}
 
 // TODO: Rename to spendFraction
@@ -91,7 +63,7 @@ export async function transferFunds(
   fraction: number | string,
   recipientIdOrName: AensName | Encoded.AccountAddress,
   options: TransferFundsOptions,
-): ReturnType<typeof send> {
+): ReturnType<typeof sendTransaction> {
   if (fraction < 0 || fraction > 1) {
     throw new ArgumentError('fraction', 'a number between 0 and 1', fraction);
   }
@@ -113,7 +85,7 @@ export async function transferFunds(
   );
   // Reducing of the amount may reduce transaction fee, so this is not completely accurate
   const amount = desiredAmount.plus(fee).gt(balance) ? balance.minus(fee) : desiredAmount;
-  return send(
+  return sendTransaction(
     await buildTxAsync({
       ...options, tag: Tag.SpendTx, senderId, recipientId, amount,
     }),
@@ -122,7 +94,7 @@ export async function transferFunds(
 }
 
 type TransferFundsOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount'>
-& Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendOptions;
+& Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendTransactionOptions;
 interface TransferFundsOptions extends TransferFundsOptionsType {}
 
 /**
@@ -135,8 +107,8 @@ interface TransferFundsOptions extends TransferFundsOptionsType {}
 export async function payForTransaction(
   transaction: Encoded.Transaction,
   options: PayForTransactionOptions,
-): ReturnType<typeof send> {
-  return send(
+): ReturnType<typeof sendTransaction> {
+  return sendTransaction(
     await buildTxAsync({
       ...options, tag: Tag.PayingForTx, payerId: options.onAccount.address, tx: transaction,
     }),
@@ -145,6 +117,6 @@ export async function payForTransaction(
 }
 
 interface PayForTransactionOptions extends
-  BuildTxOptions<Tag.PayingForTx, 'payerId' | 'tx' | 'onNode'>, SendOptions {
+  BuildTxOptions<Tag.PayingForTx, 'payerId' | 'tx' | 'onNode'>, SendTransactionOptions {
   onAccount: AccountBase;
 }

@@ -11,7 +11,6 @@ import { Tag, AensName } from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
 } from '../tx/builder';
-import { send, SendOptions } from '../spend';
 import { decode, Encoded } from '../utils/encoder';
 import {
   MissingContractDefError,
@@ -40,7 +39,8 @@ import {
 import CompilerBase, { Aci } from './compiler/Base';
 import Node, { TransformNodeType } from '../Node';
 import {
-  getAccount, getContract, getContractByteCode, resolveName, txDryRun,
+  getAccount, getContract, getContractByteCode, resolveName, txDryRun, sendTransaction,
+  SendTransactionOptions,
 } from '../chain';
 import AccountBase from '../account/Base';
 import { TxUnpacked } from '../tx/builder/schema.generated';
@@ -66,7 +66,7 @@ interface DecodedEvent {
   };
 }
 
-type TxData = Awaited<ReturnType<typeof send>>;
+type TxData = Awaited<ReturnType<typeof sendTransaction>>;
 
 interface SendAndProcessReturnType {
   result?: ContractCallObject;
@@ -169,9 +169,9 @@ class Contract<M extends ContractMethodsBase> {
   async #sendAndProcess<Fn extends MethodNames<M>>(
     tx: Encoded.Transaction,
     fnName: Fn,
-    options: SendOptions & Parameters<Contract<M>['$getCallResultByTxHash']>[2],
+    options: SendTransactionOptions & Parameters<Contract<M>['$getCallResultByTxHash']>[2],
   ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
-    const txData = await send(tx, { ...this.$options, ...options });
+    const txData = await sendTransaction(tx, { ...this.$options, ...options });
     return {
       hash: txData.hash,
       tx: unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>(txData.rawTx),
@@ -292,7 +292,7 @@ class Contract<M extends ContractMethodsBase> {
     params: MethodParameters<M, Fn>,
     options: Partial<BuildTxOptions<Tag.ContractCallTx, 'callerId' | 'contractId' | 'callData'>>
     & Parameters<Contract<M>['$decodeEvents']>[1]
-    & Omit<SendOptions, 'onAccount' | 'onNode'>
+    & Omit<SendTransactionOptions, 'onAccount' | 'onNode'>
     & Omit<Parameters<typeof txDryRun>[2], 'onNode'>
     & { onAccount?: AccountBase; onNode?: Node; callStatic?: boolean } = {},
   ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
