@@ -10,7 +10,7 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
     value: number | undefined,
     params: {},
     // TODO: replace `string` with AddressEncodings
-    options: { [key in SenderKey]?: string } & { strategy?: 'continuity' | 'max'; onNode?: Node },
+    options: { [key in SenderKey]: string } & { strategy?: 'continuity' | 'max'; onNode?: Node },
   ) => Promise<number>;
   deserialize: (value: Buffer) => number;
 } {
@@ -25,10 +25,11 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
       if (onNode == null) throw new ArgumentError('onNode', requirement, onNode);
       if (senderId == null) throw new ArgumentError('senderId', requirement, senderId);
       return (
-        await onNode.getAccountNextNonce(senderId, { strategy }).catch((error) => {
-          if (!isAccountNotFoundError(error)) throw error;
-          return { nextNonce: 1 };
-        })
+        await onNode.getAccountNextNonce(senderId.replace(/^ok_/, 'ak_'), { strategy })
+          .catch((error) => {
+            if (!isAccountNotFoundError(error)) throw error;
+            return { nextNonce: 1 };
+          })
       ).nextNonce;
     },
   };

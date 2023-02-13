@@ -113,8 +113,8 @@ const options = { onAccount: 'ak_...' } // only the account of the oracle can re
 const query = await aeSdk.getQueryObject(oracleId, queryId)
 await query.respond('{ "temperature": 27.5 }', options)
 
-// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId and the queryId
-await aeSdk.respondToQuery(oracleId, queryId, '{ "temperature": 27.5 }', options)
+// OR using the aeSdk (instance of AeSdk class) directly by providing the queryId
+await aeSdk.respondToQuery(queryId, '{ "temperature": 27.5 }', options)
 ```
 
 Note:
@@ -135,8 +135,8 @@ const options = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 500 }
 const oracle = await aeSdk.getOracleObject(oracleId)
 const extendedOracle = await oracle.extendOracle(options)
 
-// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
-const extendedOracle = await aeSdk.extendOracleTtl(oracleId, options)
+// OR using the aeSdk (instance of AeSdk class) directly
+const extendedOracle = await aeSdk.extendOracleTtl(options)
 ```
 
 ## Example applications

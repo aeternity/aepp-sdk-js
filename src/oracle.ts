@@ -120,7 +120,7 @@ export async function getQueryObject(
     decodedResponse: decode(record.response as Encoded.OracleResponse).toString(),
     respond: async (response, opt) => (
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      respondToQuery(oracleId, queryId, response, { ...options, ...opt })
+      respondToQuery(queryId, response, { ...options, ...opt })
     ),
     pollForResponse: async (opt) => pollForQueryResponse(oracleId, queryId, { ...options, ...opt }),
   };
@@ -129,7 +129,7 @@ export async function getQueryObject(
 interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQueryByPubkeyAndQueryId']>> {
   decodedQuery: string;
   decodedResponse: string;
-  respond: (response: string, options?: Parameters<typeof respondToQuery>[3]) =>
+  respond: (response: string, options?: Parameters<typeof respondToQuery>[2]) =>
   ReturnType<typeof respondToQuery>;
   pollForResponse: (options?: Parameters<typeof pollForQueryResponse>[2]) =>
   ReturnType<typeof pollForQueryResponse>;
@@ -191,7 +191,6 @@ interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
 /**
  * Extend oracle ttl
  * @category oracle
- * @param oracleId - Oracle public key
  * @param options - Options object
  * @param options.fee - fee Transaction fee
  * @param options.ttl - Transaction time to leave
@@ -199,18 +198,15 @@ interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
  * @param options.oracleTtlValue - Oracle time to leave for extend
  * @returns Oracle object
  */
-export async function extendOracleTtl(
-  oracleId: Encoded.OracleAddress,
-  options: ExtendOracleTtlOptions,
-): Promise<
-  Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getOracleObject>>
-  > {
+export async function extendOracleTtl(options: ExtendOracleTtlOptions): Promise<
+Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getOracleObject>>
+> {
+  const oracleId = encode(decode(options.onAccount.address), Encoding.OracleAddress);
   const oracleExtendTx = await buildTxAsync({
     oracleTtlType: ORACLE_TTL.type,
     oracleTtlValue: ORACLE_TTL.value,
     ...options,
     tag: Tag.OracleExtendTx,
-    callerId: options.onAccount.address,
     oracleId,
   });
   return {
@@ -228,7 +224,6 @@ interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
 /**
  * Extend oracle ttl
  * @category oracle
- * @param oracleId - Oracle public key
  * @param queryId - Oracle query id
  * @param response - Oracle query response
  * @param options - Options object
@@ -238,19 +233,18 @@ interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
  * @returns Oracle object
  */
 export async function respondToQuery(
-  oracleId: Encoded.OracleAddress,
   queryId: Encoded.OracleQueryId,
   response: string,
   options: RespondToQueryOptions,
 ): Promise<
   Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getOracleObject>>
   > {
+  const oracleId = encode(decode(options.onAccount.address), Encoding.OracleAddress);
   const oracleRespondTx = await buildTxAsync({
     responseTtlType: RESPONSE_TTL.type,
     responseTtlValue: RESPONSE_TTL.value,
     ...options,
     tag: Tag.OracleResponseTx,
-    callerId: options.onAccount.address,
     oracleId,
     queryId,
     response,
@@ -296,7 +290,10 @@ export async function getOracleObject(
           if (lastArg != null && typeof lastArg === 'object' && lastArg.constructor === Object) {
             Object.assign(lastArg, { ...options, ...lastArg });
           } else args.push(options);
-          return handler(oracleId, ...args);
+          return handler(
+            ...['extendOracle', 'respondToQuery'].includes(name) ? [] : [oracleId],
+            ...args,
+          );
         },
       ],
     ),
