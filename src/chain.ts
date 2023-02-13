@@ -13,7 +13,9 @@ import {
   Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx,
 } from './apis/node';
-import { decode, Encoded, Encoding } from './utils/encoder';
+import {
+  decode, encode, Encoded, Encoding,
+} from './utils/encoder';
 import AccountBase from './account/Base';
 import { buildTxHash } from './tx/builder';
 
@@ -258,11 +260,15 @@ export async function getAccount(
  * @param options.hash - The block hash on which to obtain the balance for (default: top of chain)
  */
 export async function getBalance(
-  address: Encoded.AccountAddress | Encoded.ContractAddress,
+  address: Encoded.AccountAddress | Encoded.ContractAddress | Encoded.OracleAddress,
   { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
   { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1],
 ): Promise<string> {
-  const { balance } = await getAccount(address, options).catch((error) => {
+  const addr = address.startsWith('ok_')
+    ? encode(decode(address), Encoding.AccountAddress)
+    : address as Encoded.AccountAddress | Encoded.ContractAddress;
+
+  const { balance } = await getAccount(addr, options).catch((error) => {
     if (!isAccountNotFoundError(error)) throw error;
     return { balance: 0n };
   });
