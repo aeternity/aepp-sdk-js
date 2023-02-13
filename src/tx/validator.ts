@@ -9,7 +9,7 @@ import { Encoded, decode } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
-import { ArgumentError, UnexpectedTsError } from '../utils/errors';
+import { UnexpectedTsError } from '../utils/errors';
 
 export interface ValidatorResult {
   message: string;
@@ -133,9 +133,6 @@ validators.push(
     if (account == null) return [];
     let extraFee = '0';
     if (tx.tag === Tag.PayingForTx) {
-      if (tx.tx.tag !== Tag.SignedTx) {
-        throw new ArgumentError('Payload of PayingForTx', Tag[Tag.SignedTx], Tag[tx.tx.tag]);
-      }
       // TODO: calculate nested tx fee more accurate
       if ('fee' in tx.tx.encodedTx) {
         extraFee = tx.tx.encodedTx.fee;

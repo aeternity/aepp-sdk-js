@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { ArgumentError, IllegalArgumentError } from '../../../utils/errors';
+import { IllegalArgumentError } from '../../../utils/errors';
 import { MIN_GAS_PRICE, Tag } from '../constants';
 import coinAmount from './coin-amount';
 import { isKeyOfObject } from '../../../utils/other';
@@ -103,13 +103,6 @@ export function buildFee(
 
   let innerTxSize = 0;
   if (txObject.tag === Tag.GaMetaTx || txObject.tag === Tag.PayingForTx) {
-    if (txObject.tx.tag !== Tag.SignedTx) {
-      throw new ArgumentError(
-        `Payload of ${Tag[txObject.tag]}`,
-        Tag[Tag.SignedTx],
-        Tag[txObject.tx.tag],
-      );
-    }
     innerTxSize = decode(buildTx(txObject.tx.encodedTx)).length;
   }
 

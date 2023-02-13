@@ -44,6 +44,14 @@ interface EntryAny {
 
 const entryAny = entry() as unknown as EntryAny;
 
+interface EntrySignedTx {
+  serialize: (value: TxParams & { tag: Tag.SignedTx } | Uint8Array | Encoded.Transaction) => Buffer;
+  deserialize: (value: Buffer) => TxUnpacked & { tag: Tag.SignedTx };
+  recursiveType: true;
+}
+
+const entrySignedTx = entry(Tag.SignedTx) as unknown as EntrySignedTx;
+
 interface EntryMtreeValueArray {
   serialize: (
     value: Array<TxParams & { tag: Tag.MtreeValue } | Uint8Array | Encoded.Transaction>,
@@ -556,14 +564,14 @@ export const txSchema = [{
   fee,
   gasLimit,
   gasPrice,
-  tx: entryAny,
+  tx: entrySignedTx,
 }, {
   tag: shortUIntConst(Tag.PayingForTx),
   version: shortUIntConst(1, true),
   payerId: address(Encoding.AccountAddress),
   nonce: nonce('payerId'),
   fee,
-  tx: entryAny,
+  tx: entrySignedTx,
 }] as const;
 
 type TxSchema = SchemaTypes<typeof txSchema>;

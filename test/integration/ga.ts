@@ -82,9 +82,7 @@ describe('Generalized Account', () => {
     const { rawTx } = await aeSdk
       .spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
     const gaMetaTxParams = unpackTx(rawTx, Tag.SignedTx).encodedTx;
-    if (gaMetaTxParams.tag !== Tag.GaMetaTx || gaMetaTxParams.tx.tag !== Tag.SignedTx) {
-      throw new Error('Unexpected nested transaction');
-    }
+    if (gaMetaTxParams.tag !== Tag.GaMetaTx) throw new Error('Unexpected nested transaction');
     const spendTx = buildTx(gaMetaTxParams.tx.encodedTx);
     expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
       .eql((await authContract.getTxHash()).decodedResult);
@@ -100,7 +98,6 @@ describe('Generalized Account', () => {
     });
     const txParams = unpackTx(rawTx, Tag.SignedTx);
     ensureEqual<Tag.GaMetaTx>(txParams.encodedTx.tag, Tag.GaMetaTx);
-    ensureEqual<Tag.SignedTx>(txParams.encodedTx.tx.tag, Tag.SignedTx);
     expect(buildTx(txParams.encodedTx.tx.encodedTx)).to.be.equal(spendTx);
   });
 
