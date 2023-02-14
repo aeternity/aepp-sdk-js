@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import { hash, verify } from '../utils/crypto';
 import { TxUnpacked } from './builder/schema.generated';
 import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version';
@@ -11,6 +10,7 @@ import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
 import { UnexpectedTsError } from '../utils/errors';
 import getTransactionSignerAddress from './transaction-signer';
+import { getExecutionCostUsingNode } from './execution-cost';
 
 export interface ValidatorResult {
   message: string;
@@ -121,24 +121,14 @@ validators.push(
       checkedKeys: ['ttl'],
     }];
   },
-  (tx, { account, parentTxTypes }) => {
-    let extraFee = '0';
-    if (tx.tag === Tag.PayingForTx) {
-      // TODO: calculate nested tx fee more accurate
-      if ('fee' in tx.tx.encodedTx) {
-        extraFee = tx.tx.encodedTx.fee;
-      }
-    }
-    const cost = new BigNumber('fee' in tx ? tx.fee : 0)
-      .plus('nameFee' in tx ? tx.nameFee : 0)
-      .plus('amount' in tx ? tx.amount : 0)
-      .plus(extraFee)
-      .minus(parentTxTypes.includes(Tag.PayingForTx) && 'fee' in tx ? tx.fee : 0);
-    if (cost.lte(account.balance.toString())) return [];
+  async (tx, { account, parentTxTypes, node }) => {
+    if (parentTxTypes.length !== 0) return [];
+    const cost = await getExecutionCostUsingNode(buildTx(tx), node).catch(() => 0n);
+    if (cost <= account.balance) return [];
     return [{
-      message: `Account balance ${account.balance.toString()} is not enough to execute the transaction that costs ${cost.toFixed()}`,
+      message: `Account balance ${account.balance} is not enough to execute the transaction that costs ${cost}`,
       key: 'InsufficientBalance',
-      checkedKeys: ['amount', 'fee', 'nameFee'],
+      checkedKeys: ['amount', 'fee', 'nameFee', 'gasLimit', 'gasPrice'],
     }];
   },
   (tx, { account }) => {

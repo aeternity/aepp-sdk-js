@@ -12,6 +12,17 @@ import { Tag } from '../tx/builder/constants';
 
 const secretKeys = new WeakMap();
 
+export function getBufferToSign(
+  transaction: Encoded.Transaction,
+  networkId: string,
+  innerTx: boolean,
+): Uint8Array {
+  const prefixes = [networkId];
+  if (innerTx) prefixes.push('inner_tx');
+  const rlpBinaryTx = decode(transaction);
+  return concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)]);
+}
+
 /**
  * In-memory account class
  */
@@ -47,16 +58,14 @@ export default class AccountMemory extends AccountBase {
   }
 
   override async signTransaction(
-    tx: Encoded.Transaction,
+    transaction: Encoded.Transaction,
     { innerTx, networkId, ...options }: { innerTx?: boolean; networkId?: string } = {},
   ): Promise<Encoded.Transaction> {
     if (networkId == null) {
       throw new ArgumentError('networkId', 'provided', networkId);
     }
-    const prefixes = [networkId];
-    if (innerTx === true) prefixes.push('inner_tx');
-    const rlpBinaryTx = decode(tx);
-    const txWithNetworkId = concatBuffers([Buffer.from(prefixes.join('-')), hash(rlpBinaryTx)]);
+    const rlpBinaryTx = decode(transaction);
+    const txWithNetworkId = getBufferToSign(transaction, networkId, innerTx === true);
 
     const signatures = [await this.sign(txWithNetworkId, options)];
     return buildTx({ tag: Tag.SignedTx, encodedTx: rlpBinaryTx, signatures });

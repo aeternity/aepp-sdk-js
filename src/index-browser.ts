@@ -1,3 +1,4 @@
+// TODO: avoid `export * from`
 export * from './chain';
 export * from './utils/crypto';
 export * from './utils/keystore';
@@ -11,6 +12,9 @@ export * from './tx/builder/constants';
 export {
   ORACLE_TTL_TYPES, ORACLE_TTL, QUERY_TTL, RESPONSE_TTL, DRY_RUN_ACCOUNT, CallReturnType,
 } from './tx/builder/schema';
+export {
+  getExecutionCost, getExecutionCostBySignedTx, getExecutionCostUsingNode,
+} from './tx/execution-cost';
 export { default as getTransactionSignerAddress } from './tx/transaction-signer';
 export * from './utils/amount-formatter';
 export * from './utils/hd-wallet';
