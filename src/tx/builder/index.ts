@@ -14,7 +14,7 @@ import { ArgumentError, DecodeError, SchemaNotFoundError } from '../../utils/err
  * JavaScript-based Transaction builder
  */
 
-function getSchema(tag: Tag, version?: number): Array<[string, Field]> {
+export function getSchema(tag: Tag, version?: number): Array<[string, Field]> {
   const schemas = txSchema.filter((s) => s.tag.constValue === tag);
   if (schemas.length === 0) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
   version ??= Math.max(...schemas.map((schema) => schema.version.constValue));

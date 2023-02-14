@@ -10,6 +10,7 @@ import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
 import { UnexpectedTsError } from '../utils/errors';
+import getTransactionSignerAddress from './transaction-signer';
 
 export interface ValidatorResult {
   message: string;
@@ -21,7 +22,7 @@ type Validator = (
   tx: TxUnpacked,
   options: {
     // TODO: remove after fixing node types
-    account?: TransformNodeType<Account> & { id: Encoded.AccountAddress };
+    account: TransformNodeType<Account> & { id: Encoded.AccountAddress };
     nodeNetworkId: string;
     parentTxTypes: Tag[];
     node: Node;
@@ -32,31 +33,20 @@ type Validator = (
 
 const validators: Validator[] = [];
 
-const getSenderAddress = (tx: TxUnpacked): Encoded.AccountAddress | undefined => [
-  'senderId', 'accountId', 'ownerId', 'callerId',
-  'oracleId', 'fromId', 'initiator', 'gaId', 'payerId',
-]
-  .map((key: keyof TxUnpacked) => tx[key])
-  .filter((a) => a)
-  .map((a) => a?.toString().replace(/^ok_/, 'ak_'))[0] as Encoded.AccountAddress | undefined;
-
 async function verifyTransactionInternal(
   tx: TxUnpacked,
   node: Node,
   parentTxTypes: Tag[],
 ): Promise<ValidatorResult[]> {
-  const address = getSenderAddress(tx)
-    ?? (tx.tag === Tag.SignedTx ? getSenderAddress(tx.encodedTx) : undefined);
+  const address = getTransactionSignerAddress(buildTx(tx));
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
-    address == null
-      ? undefined
-      : node.getAccountByPubkey(address)
-        .catch((error) => {
-          if (!isAccountNotFoundError(error)) throw error;
-          return { id: address, balance: 0n, nonce: 0 };
-        })
-        // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
-        .then((acc) => ({ ...acc, id: acc.id as Encoded.AccountAddress })),
+    node.getAccountByPubkey(address)
+      .catch((error) => {
+        if (!isAccountNotFoundError(error)) throw error;
+        return { id: address, balance: 0n, nonce: 0 };
+      })
+      // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
+      .then((acc) => ({ ...acc, id: acc.id as Encoded.AccountAddress })),
     node.getCurrentKeyBlockHeight(),
     node.getNodeInfo(),
   ]);
@@ -98,7 +88,6 @@ validators.push(
     if (tx.tag !== Tag.SignedTx) return [];
     const { encodedTx, signatures } = tx;
     if ((encodedTx ?? signatures) == null) return [];
-    if (account == null) return [];
     if (signatures.length !== 1) return []; // TODO: Support multisignature like in state channels
     const prefix = Buffer.from([
       nodeNetworkId,
@@ -133,7 +122,6 @@ validators.push(
     }];
   },
   (tx, { account, parentTxTypes }) => {
-    if (account == null) return [];
     let extraFee = '0';
     if (tx.tag === Tag.PayingForTx) {
       // TODO: calculate nested tx fee more accurate
@@ -154,7 +142,6 @@ validators.push(
     }];
   },
   (tx, { account }) => {
-    if (account == null) return [];
     let message;
     if (tx.tag === Tag.SignedTx && account.kind === 'generalized' && tx.signatures.length !== 0) {
       message = 'Generalized account can\'t be used to generate SignedTx with signatures';
@@ -166,7 +153,7 @@ validators.push(
     return [{ message, key: 'InvalidAccountType', checkedKeys: ['tag'] }];
   },
   (tx, { account, parentTxTypes }) => {
-    if (!('nonce' in tx) || account == null || parentTxTypes.includes(Tag.GaMetaTx)) return [];
+    if (!('nonce' in tx) || parentTxTypes.includes(Tag.GaMetaTx)) return [];
     const validNonce = account.nonce + 1;
     if (tx.nonce === validNonce) return [];
     return [{

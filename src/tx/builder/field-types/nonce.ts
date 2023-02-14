@@ -13,6 +13,7 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
     options: { [key in SenderKey]: string } & { strategy?: 'continuity' | 'max'; onNode?: Node },
   ) => Promise<number>;
   deserialize: (value: Buffer) => number;
+  senderKey: string;
 } {
   return {
     ...shortUInt,
@@ -32,5 +33,7 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
           })
       ).nextNonce;
     },
+
+    senderKey,
   };
 }
