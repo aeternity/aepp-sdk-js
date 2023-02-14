@@ -85,8 +85,11 @@ export default async function verifyTransaction(
   transaction: Parameters<typeof unpackTx>[0],
   nodeNotCached: Node,
 ): Promise<ValidatorResult[]> {
-  const node = new Node(nodeNotCached.$host, { ignoreVersion: true });
-  node.pipeline.addPolicy(genAggressiveCacheGetResponsesPolicy());
+  const node = new Node(nodeNotCached.$host, {
+    ignoreVersion: true,
+    pipeline: nodeNotCached.pipeline.clone(),
+    additionalPolicies: [genAggressiveCacheGetResponsesPolicy()],
+  });
   return verifyTransactionInternal(unpackTx(transaction), node, []);
 }
 

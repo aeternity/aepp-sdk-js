@@ -1,7 +1,6 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { spy } from 'sinon';
-import http from 'http';
+import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
 import { url, ignoreVersion } from '.';
 import { AeSdkBase, Node, NodeNotFoundError } from '../../src';
 
@@ -33,10 +32,20 @@ describe('Node client', () => {
     ['ak_2CxRaRcMUGn9s5UwN36UhdrtZVFUbgG1BSX5tUAyQbCNneUwti', 4],
   ] as const).reduce(async (prev, [address, requestCount]) => {
     await prev;
-    const httpSpy = spy(http, 'request');
+
+    let counter = 0;
+    node.pipeline.addPolicy({
+      name: 'counter',
+      async sendRequest(request: PipelineRequest, next: SendRequest): Promise<PipelineResponse> {
+        counter += 1;
+        return next(request);
+      },
+    }, { phase: 'Deserialize' });
+
     await node.getAccountByPubkey(address).catch(() => {});
-    expect(httpSpy.callCount).to.be.equal(requestCount);
-    httpSpy.restore();
+
+    node.pipeline.removePolicy({ name: 'counter' });
+    expect(counter).to.be.equal(requestCount);
   }, Promise.resolve()));
 
   describe('Node Pool', () => {
