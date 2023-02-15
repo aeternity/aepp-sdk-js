@@ -11,6 +11,7 @@ import {
 } from './handlers';
 import { unpackTx } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
+import { TxUnpacked } from '../tx/builder/schema.generated';
 
 export default class ChannelSpend extends Channel {
   /**
@@ -119,7 +120,7 @@ export default class ChannelSpend extends Channel {
       accounts: Encoded.AccountAddress[];
       contracts?: Encoded.ContractAddress[];
     },
-  ): Promise<ReturnType<typeof unpackTx<Tag.TreesPoi>>> {
+  ): Promise<TxUnpacked & { tag: Tag.TreesPoi }> {
     return unpackTx(
       (await call(this, 'channels.get.poi', { accounts, contracts })).poi,
       Tag.TreesPoi,

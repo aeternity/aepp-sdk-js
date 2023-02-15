@@ -1,6 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
-import { Int } from '../tx/builder/constants';
+import { AensName, Int } from '../tx/builder/constants';
+import * as Encoded from './encoder-types';
 
 /**
  * aepp-sdk originated error
@@ -187,7 +188,7 @@ export class RequestTimedOutError extends BaseError {
  * @category exception
  */
 export class TxTimedOutError extends BaseError {
-  constructor(blocks: number, th: string) {
+  constructor(blocks: number, th: Encoded.TxHash) {
     super([
       `Giving up after ${blocks} blocks mined`,
       `transaction hash: ${th}`,
@@ -270,7 +271,7 @@ export class UnexpectedTsError extends InternalError {
  * @category exception
  */
 export class UnavailableAccountError extends AccountError {
-  constructor(address: string) {
+  constructor(address: Encoded.AccountAddress) {
     super(`Account for ${address} not available`);
     this.name = 'UnavailableAccountError';
   }
@@ -280,7 +281,7 @@ export class UnavailableAccountError extends AccountError {
  * @category exception
  */
 export class AensPointerContextError extends AensError {
-  constructor(nameOrId: string, prefix: string) {
+  constructor(nameOrId: AensName | Encoded.Name, prefix: string) {
     super(`Name ${nameOrId} don't have pointers for ${prefix}`);
     this.name = 'AensPointerContextError';
   }
@@ -330,7 +331,7 @@ export class MissingCallbackError extends AeppError {
  * @category exception
  */
 export class UnAuthorizedAccountError extends AeppError {
-  constructor(onAccount: string) {
+  constructor(onAccount: Encoded.AccountAddress) {
     super(`You do not have access to account ${onAccount}`);
     this.name = 'UnAuthorizedAccountError';
   }
@@ -436,7 +437,7 @@ export class InvalidAuthDataError extends CompilerError {
  * @category exception
  */
 export class BytecodeMismatchError extends ContractError {
-  constructor(source: string) {
+  constructor(source: 'source code' | 'bytecode') {
     super(`Contract ${source} do not correspond to the bytecode deployed on the chain`);
     this.name = 'BytecodeMismatchError';
   }
@@ -456,7 +457,7 @@ export class DuplicateContractError extends ContractError {
  * @category exception
  */
 export class InactiveContractError extends ContractError {
-  constructor(contractAddress: string) {
+  constructor(contractAddress: Encoded.ContractAddress) {
     super(`Contract with address ${contractAddress} not active`);
     this.name = 'InactiveContractError';
   }
@@ -506,9 +507,9 @@ export class MissingFunctionNameError extends ContractError {
  * @category exception
  */
 export class NodeInvocationError extends ContractError {
-  transaction: string;
+  transaction?: Encoded.Transaction;
 
-  constructor(message: string, transaction: string) {
+  constructor(message: string, transaction?: Encoded.Transaction) {
     super(`Invocation failed${message == null ? '' : `: "${message}"`}`);
     this.name = 'NodeInvocationError';
     this.transaction = transaction;
@@ -542,7 +543,7 @@ export class NotPayableFunctionError extends ContractError {
  * @category exception
  */
 export class MissingEventDefinitionError extends ContractError {
-  constructor(eventNameHash: string, eventAddress: string) {
+  constructor(eventNameHash: string, eventAddress: Encoded.ContractAddress) {
     super(
       `Can't find definition of ${eventNameHash} event emitted by ${eventAddress}`
       + ' (use omitUnknown option to ignore events like this)',
@@ -555,7 +556,7 @@ export class MissingEventDefinitionError extends ContractError {
  * @category exception
  */
 export class AmbiguousEventDefinitionError extends ContractError {
-  constructor(eventAddress: string, matchedEvents: Array<[string, string]>) {
+  constructor(eventAddress: Encoded.ContractAddress, matchedEvents: Array<[string, string]>) {
     super(
       `Found multiple definitions of "${matchedEvents[0][1]}" event with different types emitted by`
       + ` ${eventAddress} in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts`
@@ -729,7 +730,7 @@ export class TagNotFoundError extends TransactionError {
  * @category exception
  */
 export class TxNotInChainError extends TransactionError {
-  constructor(txHash: string) {
+  constructor(txHash: Encoded.TxHash) {
     super(`Transaction ${txHash} is removed from chain`);
     this.name = 'TxNotInChainError';
   }

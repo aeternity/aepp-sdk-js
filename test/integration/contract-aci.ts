@@ -55,6 +55,7 @@ contract StateContract =
 
   entrypoint remoteContract(a: RemoteI) : int = 1
   entrypoint remoteArgs(a: RemoteI.test_record) : RemoteI.test_type = 1
+  entrypoint unitFn(a: unit) = a
   entrypoint intFn(a: int) : int = a
   payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
@@ -115,6 +116,7 @@ interface TestContractApi extends ContractMethodsBase {
 
   remoteContract: (a: Encoded.ContractAddress) => bigint;
   remoteArgs: (a: { value: string; key: InputNumber[] }) => bigint;
+  unitFn: (a: []) => [];
   intFn: (a: InputNumber) => bigint;
   stringFn: (a: string) => string;
   boolFn: (a: boolean) => boolean;
@@ -238,6 +240,14 @@ describe('Contract instance', () => {
     expect((await testContract.intFn(2)).decodedResult).to.be.equal(2n);
   });
 
+  it('calls without waitMined and get result later', async () => {
+    const { hash: txHash } = await testContract
+      .stringFn('test', { callStatic: false, waitMined: false });
+    await aeSdk.poll(txHash);
+    const { decodedResult } = await testContract.$getCallResultByTxHash(txHash, 'stringFn');
+    expect(decodedResult).to.be.equal('test');
+  });
+
   it('gets actual options from AeSdkBase', async () => {
     const [address1, address2] = aeSdk.addresses();
     let { result } = await testContract.intFn(2);
@@ -340,11 +350,12 @@ describe('Contract instance', () => {
   })).to.be.rejectedWith(BytecodeMismatchError, 'Contract bytecode do not correspond to the bytecode deployed on the chain'));
 
   it('dry-runs init function', async () => {
-    const { result } = await testContract.init('test', 1, 'hahahaha', { callStatic: true });
+    const { result, decodedResult } = await testContract
+      .init('test', 1, 'hahahaha', { callStatic: true });
     assertNotNull(result);
     result.should.have.property('gasUsed');
     result.should.have.property('returnType');
-    // TODO: ensure that return value is always can't be decoded (empty?)
+    expect(decodedResult).to.be.equal(undefined);
   });
 
   it('dry-runs init function on specific account', async () => {
@@ -652,6 +663,18 @@ describe('Contract instance', () => {
   });
 
   describe('Arguments Validation and Casting', () => {
+    describe('UNIT', () => {
+      it('Invalid', async () => {
+        await expect(testContract.unitFn('asd' as any))
+          .to.be.rejectedWith('Fate tuple must be an Array, got asd instead');
+      });
+
+      it('Valid', async () => {
+        const { decodedResult } = await testContract.unitFn([]);
+        expect(decodedResult).to.be.eql([]);
+      });
+    });
+
     describe('INT', () => {
       it('Invalid', async () => {
         await expect(testContract.intFn('asd'))
