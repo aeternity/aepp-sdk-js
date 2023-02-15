@@ -41,7 +41,7 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
  */
 export function pollForQueries(
   oracleId: Encoded.OracleAddress,
-  onQuery: (queries: OracleQueries) => void,
+  onQuery: (query: OracleQueries[number]) => void,
   { interval, onNode, ...options }: { interval?: number; onNode: Node }
   & Parameters<typeof _getPollInterval>[1],
 ): () => void {
@@ -50,8 +50,10 @@ export function pollForQueries(
   const checkNewQueries = async (): Promise<void> => {
     const queries = ((await onNode.getOracleQueriesByPubkey(oracleId)).oracleQueries ?? [])
       .filter(({ id }) => !knownQueryIds.has(id));
-    queries.forEach(({ id }) => knownQueryIds.add(id));
-    if (queries.length > 0) onQuery(queries);
+    queries.forEach((query) => {
+      knownQueryIds.add(query.id);
+      onQuery(query);
+    });
   };
 
   let stopped = false;
