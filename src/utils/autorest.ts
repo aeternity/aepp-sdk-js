@@ -2,7 +2,7 @@ import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pi
 import { AdditionalPolicyConfig } from '@azure/core-client';
 import { pause } from './other';
 import semverSatisfies from './semver-satisfies';
-import { UnsupportedVersionError } from './errors';
+import { UnexpectedTsError, UnsupportedVersionError } from './errors';
 
 export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
   const requestQueues = new Map<string, Promise<unknown>>();
@@ -107,4 +107,40 @@ export const genVersionCheckPolicy = (
     if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args);
     return next(request);
   },
+});
+
+export const genRetryOnFailurePolicy = (
+  retryCount: number,
+  retryOverallDelay: number,
+): AdditionalPolicyConfig => ({
+  policy: {
+    name: 'retry-on-failure',
+    async sendRequest(request, next) {
+      const statusesToNotRetry = [200, 400, 403];
+
+      const intervals = new Array(retryCount).fill(0)
+        .map((_, idx) => ((idx + 1) / retryCount) ** 2);
+      const intervalSum = intervals.reduce((a, b) => a + b);
+      const intervalsInMs = intervals.map((el) => (el / intervalSum) * retryOverallDelay);
+
+      let error: Error | undefined;
+      for (let attempt = 0; attempt <= retryCount; attempt += 1) {
+        if (error != null) {
+          if (
+            !(error instanceof RestError)
+            || statusesToNotRetry.includes(error.response?.status ?? 0)
+          ) throw error;
+          await pause(intervalsInMs[attempt - 1]);
+        }
+        try {
+          return await next(request);
+        } catch (e) {
+          error = e;
+        }
+      }
+      if (error == null) throw new UnexpectedTsError();
+      throw error;
+    },
+  },
+  position: 'perCall',
 });
