@@ -21,6 +21,7 @@ import {
   AeSdk,
   Contract,
   Channel,
+  buildTx,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 import {
@@ -30,7 +31,6 @@ import MemoryAccount from '../../src/account/Memory';
 import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual } from '../utils';
-import { TxUnpacked } from '../../src/tx/builder/schema.generated';
 
 const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
 
@@ -84,6 +84,11 @@ describe('Channel', () => {
     }
     return responderSign(tx);
   });
+  const initiatorSignedTx = async (): Promise<Encoded.Transaction> => {
+    const { signedTx } = await initiatorCh.state();
+    assertNotNull(signedTx);
+    return buildTx(signedTx);
+  };
   const sharedParams: Omit<ChannelOptions, 'sign'> = {
     url: wsUrl,
     pushAmount: 3,
@@ -383,7 +388,7 @@ describe('Channel', () => {
       initiatorSign,
       { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked },
     );
-    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
+    result.should.eql({ accepted: true, signedTx: await initiatorSignedTx() });
     expect(initiatorCh.round()).to.equal(roundBefore + 1);
     sinon.assert.called(onOnChainTx);
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string);
@@ -505,7 +510,7 @@ describe('Channel', () => {
       initiatorSign,
       { onOnChainTx, onOwnDepositLocked, onDepositLocked },
     );
-    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
+    result.should.eql({ accepted: true, signedTx: await initiatorSignedTx() });
     expect(initiatorCh.round()).to.equal(roundBefore + 1);
     sinon.assert.called(onOnChainTx);
     sinon.assert.calledWithExactly(onOnChainTx, sinon.match.string);
@@ -799,11 +804,6 @@ describe('Channel', () => {
       .should.be.equal(true);
   });
 
-  // TODO: return unpacked entries in Channel.state
-  async function getChannelState(channel: Channel): Promise<TxUnpacked & { tag: Tag.StateTrees }> {
-    return unpackTx((await channel.state()).trees);
-  }
-
   it('can create a contract and accept', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
@@ -836,7 +836,7 @@ describe('Channel', () => {
       abiVersion: AbiVersion.Fate,
     }, initiatorSign);
     result.should.eql({
-      accepted: true, address: result.address, signedTx: (await initiatorCh.state()).signedTx,
+      accepted: true, address: result.address, signedTx: await initiatorSignedTx(),
     });
     expect(initiatorCh.round()).to.equal(roundBefore + 1);
     sinon.assert.calledTwice(responderSignTag);
@@ -857,7 +857,7 @@ describe('Channel', () => {
       }),
     );
     async function getContractAddresses(channel: Channel): Promise<Encoded.ContractAddress[]> {
-      return Object.keys((await getChannelState(channel)).contracts) as Encoded.ContractAddress[];
+      return Object.keys((await channel.state()).trees.contracts) as Encoded.ContractAddress[];
     }
     expect(initiatorNewContract.callCount).to.equal(1);
     expect(initiatorNewContract.firstCall.args).to.eql([result.address]);
@@ -949,7 +949,7 @@ describe('Channel', () => {
       contract: contractAddress,
       abiVersion: AbiVersion.Fate,
     }, initiatorSign);
-    result.should.eql({ accepted: true, signedTx: (await initiatorCh.state()).signedTx });
+    result.should.eql({ accepted: true, signedTx: await initiatorSignedTx() });
     const round = initiatorCh.round();
     assertNotNull(round);
     expect(round).to.equal(roundBefore + 1);
@@ -1081,12 +1081,11 @@ describe('Channel', () => {
   });
   // TODO fix this
   it.skip('can post snapshot solo transaction', async () => {
-    const { signedTx } = await initiatorCh.state();
     const snapshotSoloTx = await aeSdkInitiatior.buildTx({
       tag: Tag.ChannelSnapshotSoloTx,
       channelId: initiatorCh.id(),
       fromId: aeSdkInitiatior.address,
-      payload: signedTx,
+      payload: await initiatorSignedTx(),
     });
     await aeSdkInitiatior.sendTransaction(await initiatorSign(snapshotSoloTx));
   });

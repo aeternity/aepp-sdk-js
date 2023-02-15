@@ -151,7 +151,8 @@ export async function awaitingReconnection(
   if (message.method === 'channels.info') {
     if (message.params.data.event === 'fsm_up') {
       channel._fsmId = message.params.data.fsm_id;
-      changeState(channel, (await channel.state()).signedTx);
+      const { signedTx } = await channel.state();
+      changeState(channel, signedTx == null ? '' : buildTx(signedTx));
       return { handler: channelOpen };
     }
   }

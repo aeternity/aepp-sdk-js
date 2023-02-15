@@ -14,10 +14,11 @@ import {
   ChannelError,
 } from '../utils/errors';
 import { encodeContractAddress } from '../utils/crypto';
+import { buildTx } from '../tx/builder';
 
 export interface ChannelEvents {
   statusChanged: (status: ChannelStatus) => void;
-  stateChanged: (tx: Encoded.Transaction) => void;
+  stateChanged: (tx: Encoded.Transaction | '') => void;
   depositLocked: () => void;
   ownDepositLocked: () => void;
   withdrawLocked: () => void;
@@ -168,7 +169,7 @@ export function changeStatus(channel: Channel, newStatus: ChannelStatus): void {
   emit(channel, 'statusChanged', newStatus);
 }
 
-export function changeState(channel: Channel, newState: Encoded.Transaction): void {
+export function changeState(channel: Channel, newState: Encoded.Transaction | ''): void {
   channel._state = newState;
   emit(channel, 'stateChanged', newState);
 }
@@ -332,7 +333,10 @@ export async function initialize(
         if (channelOptions.reconnectTx != null) {
           enterState(channel, { handler: openHandler });
           const { signedTx } = await channel.state();
-          changeState(channel, signedTx);
+          if (signedTx == null) {
+            throw new ChannelError('`signedTx` missed in state while reconnection');
+          }
+          changeState(channel, buildTx(signedTx));
         }
         ping(channel);
       },
