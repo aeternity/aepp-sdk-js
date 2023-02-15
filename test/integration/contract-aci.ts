@@ -282,6 +282,37 @@ describe('Contract instance', () => {
     expect((await contract.intFn(3)).decodedResult).to.be.equal(3n);
   });
 
+  it('supports contract interfaces polymorphism', async () => {
+    const contract = await aeSdk.initializeContract<{
+      soundByDog: () => string;
+      soundByCat: () => string;
+    }>({
+          sourceCode: ''
+            + 'include "String.aes"\n'
+            + '\n'
+            + 'contract interface Animal =\n'
+            + '  entrypoint sound : () => string\n'
+            + ''
+            + 'contract Cat: Animal =\n'
+            + '  entrypoint sound() = "meow"\n'
+            + ''
+            + 'contract Dog: Animal =\n'
+            + '  entrypoint sound() = "bark"\n'
+            + ''
+            + 'main contract Main =\n'
+            + '  entrypoint soundByAnimal(a: Animal): string =\n'
+            + '    String.concat("animal sound: ", a.sound())\n'
+            + '\n'
+            + '  stateful entrypoint soundByDog(): string = soundByAnimal(Chain.create(): Dog)\n'
+            + '\n'
+            + '  stateful entrypoint soundByCat(): string = soundByAnimal(Chain.create(): Cat)\n',
+        });
+
+    await contract.$deploy([]);
+    expect((await contract.soundByDog()).decodedResult).to.be.equal('animal sound: bark');
+    expect((await contract.soundByCat()).decodedResult).to.be.equal('animal sound: meow');
+  });
+
   it('accepts matching source code with enabled validation', async () => aeSdk.initializeContract({
     sourceCode: testContractSourceCode,
     fileSystem,
