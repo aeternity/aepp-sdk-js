@@ -1217,9 +1217,9 @@
 </code></pre></div>
 <h2 id="3-oracle-poll-for-queries-and-respond">3. Oracle: poll for queries and respond</h2>
 <h3 id="poll-for-queries">Poll for queries</h3>
-<p>Typically the oracle itself polls for its own queries and responds as soon as possible:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">stopPolling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">pollQueries</span><span class="p">((</span><span class="nx">queries</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">queries</span><span class="p">)</span><span class="w"> </span><span class="c1">// log all new queries</span>
+<p>Typically, the oracle itself polls for its own queries and responds as soon as possible:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">stopPolling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">pollQueries</span><span class="p">((</span><span class="nx">query</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">query</span><span class="p">)</span><span class="w"> </span><span class="c1">// log a new query</span>
 <span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// polling interval in milliseconds</span>
 
 <span class="nx">stopPolling</span><span class="p">()</span><span class="w"> </span><span class="c1">// stop polling</span>
