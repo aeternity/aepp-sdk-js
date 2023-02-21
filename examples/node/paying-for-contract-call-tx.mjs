@@ -104,7 +104,8 @@ const contract = await aeSdk.initializeContract(
   { sourceCode: CONTRACT_SOURCE_CODE, address: CONTRACT_ADDRESS },
 );
 const calldata = contract._calldata.encode('PayingForTxExample', 'set_last_caller', []);
-const contractCallTx = await aeSdk.buildTx(Tag.ContractCallTx, {
+const contractCallTx = await aeSdk.buildTx({
+  tag: Tag.ContractCallTx,
   callerId: newUserAccount.address,
   contractId: CONTRACT_ADDRESS,
   amount: 0,

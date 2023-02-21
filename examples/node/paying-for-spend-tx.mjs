@@ -64,7 +64,8 @@ console.log(`new user balance (before): ${newUserBalanceBefore}`);
 //  - The balance should now be 1
 
 // ## 6. Create and sign `SpendTx` on behalf of new user
-const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
+const spendTx = await aeSdk.buildTx({
+  tag: Tag.SpendTx,
   senderId: newUserAccount.address,
   recipientId: payerAccount.address,
   amount: AMOUNT,
