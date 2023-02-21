@@ -146,7 +146,7 @@ describe('Transaction', () => {
     'oracle extend',
     'tx_8RkBoQSEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAAEAggH0hg6itfGYAAC5Cppj',
     async () => aeSdk.buildTx({
-      tag: Tag.OracleExtendTx, nonce, oracleId, callerId: address, ...oracleTtl,
+      tag: Tag.OracleExtendTx, nonce, oracleId, ...oracleTtl,
     }),
   ], [
     'oracle post query',
@@ -168,7 +168,6 @@ describe('Transaction', () => {
       tag: Tag.OracleResponseTx,
       nonce,
       oracleId,
-      callerId: address,
       ...responseTtl,
       queryId: oracleQueryId(address, nonce, oracleId),
       response: queryResponse,

@@ -13,8 +13,11 @@ import {
   Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx,
 } from './apis/node';
-import { decode, Encoded, Encoding } from './utils/encoder';
+import {
+  decode, encode, Encoded, Encoding,
+} from './utils/encoder';
 import AccountBase from './account/Base';
+import { buildTxHash } from './tx/builder';
 
 /**
  * @category chain
@@ -138,24 +141,33 @@ export async function waitForTxConfirm(
 }
 
 /**
- * Submit a signed transaction for mining
+ * Signs and submits transaction for mining
  * @category chain
- * @param tx - Transaction to submit
+ * @param txUnsigned - Transaction to sign and submit
  * @param options - Options
  * @param options.onNode - Node to use
  * @param options.onAccount - Account to use
- * @param options.verify - Verify transaction before sending
+ * @param options.verify - Verify transaction before broadcast, throw error if not
  * @param options.waitMined - Ensure that transaction get into block
  * @param options.confirm - Number of micro blocks that should be mined after tx get included
  * @returns Transaction details
  */
 export async function sendTransaction(
-  tx: Encoded.Transaction,
+  txUnsigned: Encoded.Transaction,
   {
-    onNode, onAccount, verify = true, waitMined = true, confirm, ...options
+    onNode, onAccount, verify = true, waitMined = true, confirm, innerTx, ...options
   }:
   SendTransactionOptions,
 ): Promise<SendTransactionReturnType> {
+  const tx = await onAccount.signTransaction(txUnsigned, {
+    ...options,
+    onNode,
+    innerTx,
+    networkId: await onNode.getNetworkId(),
+  });
+
+  if (innerTx === true) return { hash: buildTxHash(tx), rawTx: tx };
+
   if (verify) {
     const validation = await verifyTransaction(tx, onNode);
     if (validation.length > 0) {
@@ -205,12 +217,13 @@ export async function sendTransaction(
 
 type SendTransactionOptionsType = {
   onNode: Node;
-  onAccount?: AccountBase;
+  onAccount: AccountBase;
   verify?: boolean;
   waitMined?: boolean;
   confirm?: boolean | number;
-} & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>;
-interface SendTransactionOptions extends SendTransactionOptionsType {}
+} & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
+& Parameters<AccountBase['signTransaction']>[1];
+export interface SendTransactionOptions extends SendTransactionOptionsType {}
 interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
   hash: Encoded.TxHash;
   rawTx: Encoded.Transaction;
@@ -247,11 +260,15 @@ export async function getAccount(
  * @param options.hash - The block hash on which to obtain the balance for (default: top of chain)
  */
 export async function getBalance(
-  address: Encoded.AccountAddress | Encoded.ContractAddress,
+  address: Encoded.AccountAddress | Encoded.ContractAddress | Encoded.OracleAddress,
   { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
   { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1],
 ): Promise<string> {
-  const { balance } = await getAccount(address, options).catch((error) => {
+  const addr = address.startsWith('ok_')
+    ? encode(decode(address), Encoding.AccountAddress)
+    : address as Encoded.AccountAddress | Encoded.ContractAddress;
+
+  const { balance } = await getAccount(addr, options).catch((error) => {
     if (!isAccountNotFoundError(error)) throw error;
     return { balance: 0n };
   });

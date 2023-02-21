@@ -87,9 +87,7 @@ BaseError
 │   ├── PrefixNotFoundError
 │   ├── SchemaNotFoundError
 │   ├── TagNotFoundError
-│   ├── TxNotInChainError
-│   ├── UnsupportedABIversionError
-│   └── UnsupportedVMversionError
+│   └── TxNotInChainError
 │
 ├── WalletError
 │   ├── AlreadyConnectedError

@@ -1,14 +1,21 @@
+// TODO: avoid `export * from`
 export * from './chain';
 export * from './utils/crypto';
 export * from './utils/keystore';
 export * from './utils/bytes';
-export * from './tx/builder';
+export {
+  buildTx, buildTxAsync, buildTxHash, unpackTx, buildContractIdByContractTx,
+} from './tx/builder';
 export * from './tx/builder/helpers';
 export * from './tx/builder/constants';
 // TODO: move to constants
 export {
-  ORACLE_TTL_TYPES, QUERY_FEE, ORACLE_TTL, QUERY_TTL, RESPONSE_TTL, DRY_RUN_ACCOUNT, CallReturnType,
+  ORACLE_TTL_TYPES, ORACLE_TTL, QUERY_TTL, RESPONSE_TTL, DRY_RUN_ACCOUNT, CallReturnType,
 } from './tx/builder/schema';
+export {
+  getExecutionCost, getExecutionCostBySignedTx, getExecutionCostUsingNode,
+} from './tx/execution-cost';
+export { default as getTransactionSignerAddress } from './tx/transaction-signer';
 export * from './utils/amount-formatter';
 export * from './utils/hd-wallet';
 export { encode, decode, Encoding } from './utils/encoder';

@@ -20,7 +20,6 @@ export enum ORACLE_TTL_TYPES {
 }
 
 // # ORACLE
-export const QUERY_FEE = 30000;
 export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
 export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
@@ -44,6 +43,14 @@ interface EntryAny {
 }
 
 const entryAny = entry() as unknown as EntryAny;
+
+interface EntrySignedTx {
+  serialize: (value: TxParams & { tag: Tag.SignedTx } | Uint8Array | Encoded.Transaction) => Buffer;
+  deserialize: (value: Buffer) => TxUnpacked & { tag: Tag.SignedTx };
+  recursiveType: true;
+}
+
+const entrySignedTx = entry(Tag.SignedTx) as unknown as EntrySignedTx;
 
 interface EntryMtreeValueArray {
   serialize: (
@@ -288,7 +295,7 @@ export const txSchema = [{
   tag: shortUIntConst(Tag.OracleExtendTx),
   version: shortUIntConst(1, true),
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
-  nonce: nonce('callerId'),
+  nonce: nonce('oracleId'),
   oracleTtlType: enumeration(ORACLE_TTL_TYPES),
   oracleTtlValue: shortUInt,
   fee,
@@ -311,7 +318,7 @@ export const txSchema = [{
   tag: shortUIntConst(Tag.OracleResponseTx),
   version: shortUIntConst(1, true),
   oracleId: address(Encoding.OracleAddress),
-  nonce: nonce('callerId'),
+  nonce: nonce('oracleId'),
   queryId: encoded(Encoding.OracleQueryId),
   response: string,
   responseTtlType: enumeration(ORACLE_TTL_TYPES),
@@ -557,14 +564,14 @@ export const txSchema = [{
   fee,
   gasLimit,
   gasPrice,
-  tx: entryAny,
+  tx: entrySignedTx,
 }, {
   tag: shortUIntConst(Tag.PayingForTx),
   version: shortUIntConst(1, true),
   payerId: address(Encoding.AccountAddress),
   nonce: nonce('payerId'),
   fee,
-  tx: entryAny,
+  tx: entrySignedTx,
 }] as const;
 
 type TxSchema = SchemaTypes<typeof txSchema>;

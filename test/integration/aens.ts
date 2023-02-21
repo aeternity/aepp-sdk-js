@@ -19,12 +19,11 @@ describe('Aens', () => {
 
   it('claims names', async () => {
     const preclaim = await aeSdk.aensPreclaim(name);
-    preclaim.should.be.an('object');
+    expect(preclaim.commitmentId).to.satisfy((s: string) => s.startsWith('cm_'));
+
     const claimed = await preclaim.claim();
-    claimed.should.be.an('object');
-    if (claimed.id == null || claimed.ttl == null) throw new UnexpectedTsError();
-    claimed.id.should.be.a('string');
-    claimed.ttl.should.be.an('number');
+    expect(claimed.id).to.be.a('string');
+    expect(claimed.ttl).to.be.an('number');
   });
 
   it('queries names', async () => {

@@ -35,7 +35,7 @@ describe('Verify Transaction', () => {
     const signedTx = await aeSdk.signTransaction(spendTx, { onAccount: MemoryAccount.generate() });
     const errors = await verifyTransaction(signedTx, node);
     expect(errors.map(({ key }) => key)).to.be.eql([
-      'InvalidSignature', 'ExpiredTTL', 'InsufficientBalance', 'NonceAlreadyUsed',
+      'InvalidSignature', 'ExpiredTTL', 'NonceAlreadyUsed',
     ]);
   });
 
@@ -60,7 +60,8 @@ describe('Verify Transaction', () => {
       ttl: 2,
       absoluteTtl: true,
     });
-    const error = await aeSdk.send(spendTx).catch((e: InvalidTxError) => e) as InvalidTxError;
+    const error = await aeSdk.sendTransaction(spendTx)
+      .catch((e: InvalidTxError) => e) as InvalidTxError;
     expect(error.validation).to.have.lengthOf(1);
   });
 
@@ -78,7 +79,7 @@ describe('Verify Transaction', () => {
   });
 
   it('verifies nameFee for nameClaim transaction', async () => {
-    const tx = 'tx_+KILAfhCuEAtbc38n/FH8jZHO0DkEkiLZZm8ypEzZEhbjyHtaoEYkENOE9tD+Xp6smFMou9X521oI4gkFBQGwSQaQk6Z7XMNuFr4WCACoQHkWpoidhJW2EZEega88I1P9Ktw1DFBUWwrzkr5jC5zUAORc29tZUF1Y3Rpb24uY2hhaW6HDwTrMteR15AJQ0VVyE5TcqKSstgfbGV6hg9HjghAAAAGpIPS';
+    const tx = 'tx_+KILAfhCuEDpKJambBPcIhemdxhFNwweD8QlInCqNQY2EHyCuP/gQZOyute/X1PxlWpbsOqvEwIqOFRIlr3kgXNhSAaIC9wEuFr4WCACoQE0ePUJYiVSDsuUDUOsQUw2XGWtPSLDefg5djhul3bfqgORc29tZUF1Y3Rpb24uY2hhaW6HDwTrMteR15AJQ0VVyE5TcqKSstgfbGV6hg9HjghAAABn0LtV';
     const errors = await verifyTransaction(tx, node);
     expect(errors.map(({ key }) => key)).to.include('InsufficientBalance');
   });

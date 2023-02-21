@@ -254,7 +254,7 @@ export default class AeSdkWallet extends AeSdk {
             }
             try {
               return jsonBig.parse(jsonBig.stringify({
-                transactionHash: await this.send(tx, { ...parameters, verify: false }),
+                transactionHash: await this.sendTransaction(tx, { ...parameters, verify: false }),
               }));
             } catch (error) {
               const validation = await verifyTransaction(tx, this.api);

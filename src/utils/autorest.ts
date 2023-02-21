@@ -48,18 +48,21 @@ export const genCombineGetRequestsPolicy = (): AdditionalPolicyConfig => {
   };
 };
 
-export const genAggressiveCacheGetResponsesPolicy = (): PipelinePolicy => {
+export const genAggressiveCacheGetResponsesPolicy = (): AdditionalPolicyConfig => {
   const getRequests = new Map<string, Promise<PipelineResponse>>();
 
   return {
-    name: 'aggressive-cache-get-responses',
-    async sendRequest(request, next) {
-      if (request.method !== 'GET') return next(request);
-      const key = JSON.stringify([request.url, request.body]);
-      const response = getRequests.get(key) ?? next(request);
-      getRequests.set(key, response);
-      return response;
+    policy: {
+      name: 'aggressive-cache-get-responses',
+      async sendRequest(request, next) {
+        if (request.method !== 'GET') return next(request);
+        const key = JSON.stringify([request.url, request.body]);
+        const response = getRequests.get(key) ?? next(request);
+        getRequests.set(key, response);
+        return response;
+      },
     },
+    position: 'perCall',
   };
 };
 

@@ -10,9 +10,8 @@ import { IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
 import Contract from './Contract';
-import { send, SendOptions } from '../spend';
 import Node from '../Node';
-import { getAccount } from '../chain';
+import { sendTransaction, SendTransactionOptions, getAccount } from '../chain';
 import CompilerBase from './compiler/Base';
 
 /**
@@ -56,7 +55,7 @@ export async function createGeneralizedAccount(
     authFun: hash(authFnName),
   });
   const contractId = buildContractIdByContractTx(tx);
-  const { hash: transaction, rawTx } = await send(tx, {
+  const { hash: transaction, rawTx } = await sendTransaction(tx, {
     onNode, onAccount, onCompiler, ...options,
   });
 
@@ -70,7 +69,7 @@ export async function createGeneralizedAccount(
 
 interface CreateGeneralizedAccountOptions extends
   BuildTxOptions<Tag.GaAttachTx, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
-  SendOptions,
+  SendTransactionOptions,
   Pick<
   Parameters<typeof Contract.initialize>[0],
   'bytecode' | 'aci' | 'sourceCodePath' | 'sourceCode' | 'fileSystem'

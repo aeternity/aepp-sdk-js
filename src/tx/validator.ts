@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import { hash, verify } from '../utils/crypto';
 import { TxUnpacked } from './builder/schema.generated';
 import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version';
@@ -9,7 +8,9 @@ import { Encoded, decode } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
-import { ArgumentError, UnexpectedTsError } from '../utils/errors';
+import { UnexpectedTsError } from '../utils/errors';
+import getTransactionSignerAddress from './transaction-signer';
+import { getExecutionCostUsingNode } from './execution-cost';
 
 export interface ValidatorResult {
   message: string;
@@ -21,7 +22,7 @@ type Validator = (
   tx: TxUnpacked,
   options: {
     // TODO: remove after fixing node types
-    account?: TransformNodeType<Account> & { id: Encoded.AccountAddress };
+    account: TransformNodeType<Account> & { id: Encoded.AccountAddress };
     nodeNetworkId: string;
     parentTxTypes: Tag[];
     node: Node;
@@ -32,31 +33,20 @@ type Validator = (
 
 const validators: Validator[] = [];
 
-const getSenderAddress = (tx: TxUnpacked): Encoded.AccountAddress | undefined => [
-  'senderId', 'accountId', 'ownerId', 'callerId',
-  'oracleId', 'fromId', 'initiator', 'gaId', 'payerId',
-]
-  .map((key: keyof TxUnpacked) => tx[key])
-  .filter((a) => a)
-  .map((a) => a?.toString().replace(/^ok_/, 'ak_'))[0] as Encoded.AccountAddress | undefined;
-
 async function verifyTransactionInternal(
   tx: TxUnpacked,
   node: Node,
   parentTxTypes: Tag[],
 ): Promise<ValidatorResult[]> {
-  const address = getSenderAddress(tx)
-    ?? (tx.tag === Tag.SignedTx ? getSenderAddress(tx.encodedTx) : undefined);
+  const address = getTransactionSignerAddress(buildTx(tx));
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
-    address == null
-      ? undefined
-      : node.getAccountByPubkey(address)
-        .catch((error) => {
-          if (!isAccountNotFoundError(error)) throw error;
-          return { id: address, balance: 0n, nonce: 0 };
-        })
-        // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
-        .then((acc) => ({ ...acc, id: acc.id as Encoded.AccountAddress })),
+    node.getAccountByPubkey(address)
+      .catch((error) => {
+        if (!isAccountNotFoundError(error)) throw error;
+        return { id: address, balance: 0n, nonce: 0 };
+      })
+      // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
+      .then((acc) => ({ ...acc, id: acc.id as Encoded.AccountAddress })),
     node.getCurrentKeyBlockHeight(),
     node.getNodeInfo(),
   ]);
@@ -85,8 +75,11 @@ export default async function verifyTransaction(
   transaction: Parameters<typeof unpackTx>[0],
   nodeNotCached: Node,
 ): Promise<ValidatorResult[]> {
-  const node = new Node(nodeNotCached.$host, { ignoreVersion: true });
-  node.pipeline.addPolicy(genAggressiveCacheGetResponsesPolicy());
+  const node = new Node(nodeNotCached.$host, {
+    ignoreVersion: true,
+    pipeline: nodeNotCached.pipeline.clone(),
+    additionalPolicies: [genAggressiveCacheGetResponsesPolicy()],
+  });
   return verifyTransactionInternal(unpackTx(transaction), node, []);
 }
 
@@ -95,7 +88,6 @@ validators.push(
     if (tx.tag !== Tag.SignedTx) return [];
     const { encodedTx, signatures } = tx;
     if ((encodedTx ?? signatures) == null) return [];
-    if (account == null) return [];
     if (signatures.length !== 1) return []; // TODO: Support multisignature like in state channels
     const prefix = Buffer.from([
       nodeNetworkId,
@@ -129,32 +121,17 @@ validators.push(
       checkedKeys: ['ttl'],
     }];
   },
-  (tx, { account, parentTxTypes }) => {
-    if (account == null) return [];
-    let extraFee = '0';
-    if (tx.tag === Tag.PayingForTx) {
-      if (tx.tx.tag !== Tag.SignedTx) {
-        throw new ArgumentError('Payload of PayingForTx', Tag[Tag.SignedTx], Tag[tx.tx.tag]);
-      }
-      // TODO: calculate nested tx fee more accurate
-      if ('fee' in tx.tx.encodedTx) {
-        extraFee = tx.tx.encodedTx.fee;
-      }
-    }
-    const cost = new BigNumber('fee' in tx ? tx.fee : 0)
-      .plus('nameFee' in tx ? tx.nameFee : 0)
-      .plus('amount' in tx ? tx.amount : 0)
-      .plus(extraFee)
-      .minus(parentTxTypes.includes(Tag.PayingForTx) && 'fee' in tx ? tx.fee : 0);
-    if (cost.lte(account.balance.toString())) return [];
+  async (tx, { account, parentTxTypes, node }) => {
+    if (parentTxTypes.length !== 0) return [];
+    const cost = await getExecutionCostUsingNode(buildTx(tx), node).catch(() => 0n);
+    if (cost <= account.balance) return [];
     return [{
-      message: `Account balance ${account.balance.toString()} is not enough to execute the transaction that costs ${cost.toFixed()}`,
+      message: `Account balance ${account.balance} is not enough to execute the transaction that costs ${cost}`,
       key: 'InsufficientBalance',
-      checkedKeys: ['amount', 'fee', 'nameFee'],
+      checkedKeys: ['amount', 'fee', 'nameFee', 'gasLimit', 'gasPrice'],
     }];
   },
   (tx, { account }) => {
-    if (account == null) return [];
     let message;
     if (tx.tag === Tag.SignedTx && account.kind === 'generalized' && tx.signatures.length !== 0) {
       message = 'Generalized account can\'t be used to generate SignedTx with signatures';
@@ -166,7 +143,7 @@ validators.push(
     return [{ message, key: 'InvalidAccountType', checkedKeys: ['tag'] }];
   },
   (tx, { account, parentTxTypes }) => {
-    if (!('nonce' in tx) || account == null || parentTxTypes.includes(Tag.GaMetaTx)) return [];
+    if (!('nonce' in tx) || parentTxTypes.includes(Tag.GaMetaTx)) return [];
     const validNonce = account.nonce + 1;
     if (tx.nonce === validNonce) return [];
     return [{

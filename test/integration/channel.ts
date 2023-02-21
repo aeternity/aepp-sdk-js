@@ -705,7 +705,7 @@ describe('Channel', () => {
       payload: signedTx,
     });
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
-    await aeSdkInitiatior.sendTransaction(await initiatorSign(closeSoloTx));
+    await aeSdkInitiatior.sendTransaction(closeSoloTx);
     const settleTx = await aeSdkInitiatior.buildTx({
       tag: Tag.ChannelSettleTx,
       channelId: await initiatorCh.id(),
@@ -714,7 +714,7 @@ describe('Channel', () => {
       responderAmountFinal: balances[responderAddr],
     });
     const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
-    await aeSdkInitiatior.sendTransaction(await initiatorSign(settleTx));
+    await aeSdkInitiatior.sendTransaction(settleTx);
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);
     new BigNumber(initiatorBalanceAfterClose)
@@ -769,7 +769,7 @@ describe('Channel', () => {
       payload: oldUpdate.signedTx,
     });
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
-    await aeSdkInitiatior.sendTransaction(await initiatorSign(closeSoloTx));
+    await aeSdkInitiatior.sendTransaction(closeSoloTx);
     assertNotNull(recentUpdate.signedTx);
     const slashTx = await aeSdkResponder.buildTx({
       tag: Tag.ChannelSlashTx,
@@ -779,7 +779,7 @@ describe('Channel', () => {
       payload: recentUpdate.signedTx,
     });
     const slashTxFee = unpackTx(slashTx, Tag.ChannelSlashTx).fee;
-    await aeSdkResponder.sendTransaction(await responderSign(slashTx));
+    await aeSdkResponder.sendTransaction(slashTx);
     const settleTx = await aeSdkResponder.buildTx({
       tag: Tag.ChannelSettleTx,
       channelId: responderCh.id(),
@@ -788,7 +788,7 @@ describe('Channel', () => {
       responderAmountFinal: recentBalances[responderAddr],
     });
     const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
-    await aeSdkResponder.sendTransaction(await responderSign(settleTx));
+    await aeSdkResponder.sendTransaction(settleTx);
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);
     new BigNumber(initiatorBalanceAfterClose)
@@ -1087,7 +1087,7 @@ describe('Channel', () => {
       fromId: aeSdkInitiatior.address,
       payload: await initiatorSignedTx(),
     });
-    await aeSdkInitiatior.sendTransaction(await initiatorSign(snapshotSoloTx));
+    await aeSdkInitiatior.sendTransaction(snapshotSoloTx);
   });
 
   it('can reconnect', async () => {
