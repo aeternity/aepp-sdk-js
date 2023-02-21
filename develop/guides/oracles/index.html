@@ -1239,8 +1239,8 @@ has not been expired.</p>
 <span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">)</span>
 <span class="k">await</span><span class="w"> </span><span class="nx">query</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span><span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
 
-<span class="c1">// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId and the queryId</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">respondToQuery</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
+<span class="c1">// OR using the aeSdk (instance of AeSdk class) directly by providing the queryId</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">respondToQuery</span><span class="p">(</span><span class="nx">queryId</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{ &quot;temperature&quot;: 27.5 }&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -1258,8 +1258,8 @@ has not been expired.</p>
 <span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">extendedOracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">extendOracle</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span>
 
-<span class="c1">// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">extendedOracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">extendOracleTtl</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
+<span class="c1">// OR using the aeSdk (instance of AeSdk class) directly</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">extendedOracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">extendOracleTtl</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="example-applications">Example applications</h2>
 <ul>
