@@ -118,7 +118,7 @@ export async function awaitHeight(
  * @category chain
  * @param txHash - Transaction hash
  * @param options - Options
- * @param options.confirm - Number of micro blocks to wait for transaction confirmation
+ * @param options.confirm - Number of key blocks to wait for transaction confirmation
  * @param options.onNode - Node to use
  * @returns Current Height
  */
@@ -149,7 +149,7 @@ export async function waitForTxConfirm(
  * @param options.onAccount - Account to use
  * @param options.verify - Verify transaction before broadcast, throw error if not
  * @param options.waitMined - Ensure that transaction get into block
- * @param options.confirm - Number of micro blocks that should be mined after tx get included
+ * @param options.confirm - Number of key blocks that should be mined after tx get included
  * @returns Transaction details
  */
 export async function sendTransaction(
@@ -199,10 +199,7 @@ export async function sendTransaction(
       // wait for transaction confirmation
       if (confirm != null && (confirm === true || confirm > 0)) {
         const c = typeof confirm === 'boolean' ? undefined : confirm;
-        return {
-          ...txData,
-          confirmationHeight: await waitForTxConfirm(txHash, { onNode, confirm: c, ...options }),
-        };
+        await waitForTxConfirm(txHash, { onNode, confirm: c, ...options });
       }
       return txData;
     }
@@ -227,7 +224,6 @@ export interface SendTransactionOptions extends SendTransactionOptionsType {}
 interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
   hash: Encoded.TxHash;
   rawTx: Encoded.Transaction;
-  confirmationHeight?: number;
 }
 
 /**
