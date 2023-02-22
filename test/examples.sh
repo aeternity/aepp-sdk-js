@@ -20,6 +20,7 @@ run_node_example () {
   cat ./examples/node/$1 | sed -e "s|@aeternity/aepp-sdk|./es/index.mjs|" | node --input-type=module
 }
 
+run_node_example account-generalized.mjs
 run_node_example contract-interaction.mjs
 run_node_example paying-for-contract-call-tx.mjs
 run_node_example paying-for-spend-tx.mjs

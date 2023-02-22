@@ -23,7 +23,7 @@ const sourceCode = `contract BlindAuth =
   entrypoint getTxHash() : option(hash) = state.txHash
 
   stateful entrypoint authorize(r: int) : bool =
-    // r is a random number only used to make tx hashes unique
+    // r is a random number only used to make call arguments unique
     put(state{ txHash = Auth.tx_hash })
     switch(Auth.tx_hash)
       None          => abort("Not in Auth context")
@@ -113,5 +113,27 @@ describe('Generalized Account', () => {
     } as const;
     await expect(aeSdk.spend(1, gaAccountAddress, options))
       .to.be.rejectedWith('Basic account can\'t be used to generate GaMetaTx');
+  });
+
+  // TODO: enable after resolving https://github.com/aeternity/aeternity/issues/4087
+  // TODO: copy to examples/node/account-generalized.mjs
+  it.skip('deploys and calls contract', async () => {
+    const contract = await aeSdk.initializeContract<{
+      init: (value: number) => void;
+      getState: () => number;
+      setState: (value: number) => void;
+    }>({
+          sourceCode: ''
+            + 'contract Stateful =\n'
+            + '  record state = { value: int }\n'
+            + '  entrypoint init(_value: int) : state = { value = _value }\n'
+            + '  entrypoint getState(): int = state.value\n'
+            + '  stateful entrypoint setState(_value: int): unit =\n'
+            + '    put(state{ value = _value })',
+        });
+    await contract.$deploy([42], { authData: { sourceCode, args: [genSalt()] } });
+    expect((await contract.getState()).decodedResult).to.be.equal(42);
+    await contract.setState(43, { authData: { sourceCode, args: [genSalt()] } });
+    expect((await contract.getState()).decodedResult).to.be.equal(43);
   });
 });

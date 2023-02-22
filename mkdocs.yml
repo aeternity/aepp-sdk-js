@@ -69,6 +69,7 @@ nav:
       - PayingForTx:
         - examples/node/paying-for-contract-call-tx.md
         - examples/node/paying-for-spend-tx.md
+      - examples/node/account-generalized.md
     - tutorials/vuejs/helloworld-blockheight.md
   - 'API Reference': api/
   - compatibility.md
