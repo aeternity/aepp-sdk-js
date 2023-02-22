@@ -1,7 +1,6 @@
 import { createHash } from 'crypto';
 import { dirname } from 'path';
 import { writeFileSync, readFileSync, mkdirSync } from 'fs';
-import fetch from 'cross-fetch';
 
 const path = './bin/aesophia_cli';
 const hash = 'uzco6Jfvm/FAoU/QmGrT400RURzardrAJ8sW8CKRhPdGYsFK0DK64BfGRPBmvmJByztmWsn0xCktQ1g38zKQ6w==';

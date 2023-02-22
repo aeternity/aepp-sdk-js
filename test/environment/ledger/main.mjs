@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch';
 import {
   Node, AeSdk, CompilerHttp, AccountLedgerFactory,
 // eslint-disable-next-line import/extensions
