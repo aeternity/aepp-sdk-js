@@ -1,5 +1,5 @@
 #!/usr/bin/env -S ts-node --transpile-only
-import ts, { factory } from 'typescript';
+import ts, { factory, IntersectionTypeNode, TypeNode } from 'typescript';
 import { writeFileSync } from 'fs';
 import { basename } from 'path';
 import { txSchema } from '../src/tx/builder/schema';
@@ -16,6 +16,27 @@ function addTsDocCategory<T extends ts.Node>(node: T): T {
     '*\n * @category transaction builder\n ',
     true,
   );
+}
+
+// workaround to fix "An interface can only extend an object type or intersection of object types
+// with statically known members." while building test/environment/typescript (uses ts decl files)
+// TODO: figure out why union is not converted to a single item it case of Tag.Account v2 and v1
+function reAddVersion(node: TypeNode, version: number): IntersectionTypeNode {
+  return factory.createIntersectionTypeNode([
+    factory.createTypeReferenceNode(
+      factory.createIdentifier('Omit'),
+      [
+        node,
+        factory.createLiteralTypeNode(factory.createStringLiteral('version')),
+      ],
+    ),
+    factory.createTypeLiteralNode([factory.createPropertySignature(
+      undefined,
+      factory.createIdentifier('version'),
+      factory.createToken(ts.SyntaxKind.QuestionToken),
+      factory.createLiteralTypeNode(factory.createNumericLiteral(version)),
+    )]),
+  ]);
 }
 
 const list = factory.createNodeArray([
@@ -63,54 +84,56 @@ const list = factory.createNodeArray([
     const tag = Tag[schema.tag.constValue];
     const version = schema.version.constValue;
     const name = `${tag}${version}`;
-    return ['TxParams', 'TxParamsAsync', 'TxUnpacked'].map((kind) => [
-      factory.createTypeAliasDeclaration(
-        undefined,
-        factory.createIdentifier(`${kind}${name}Type`),
-        undefined,
-        factory.createIntersectionTypeNode([
-          factory.createTypeReferenceNode(
-            factory.createIdentifier(`${kind}Complex`),
+    return ['TxParams', 'TxParamsAsync', 'TxUnpacked'].map((kind) => {
+      const isVersionOptional = schema.version.constValueOptional && kind !== 'TxUnpacked';
+      const innerType = factory.createIntersectionTypeNode([
+        factory.createTypeReferenceNode(
+          factory.createIdentifier(`${kind}Complex`),
+          undefined,
+        ),
+        factory.createTypeLiteralNode([
+          factory.createPropertySignature(
             undefined,
-          ),
-          factory.createTypeLiteralNode([
-            factory.createPropertySignature(
-              undefined,
-              factory.createIdentifier('tag'),
-              undefined,
-              factory.createTypeReferenceNode(
-                factory.createQualifiedName(
-                  factory.createIdentifier('Tag'),
-                  factory.createIdentifier(tag),
-                ),
-                undefined,
+            factory.createIdentifier('tag'),
+            undefined,
+            factory.createTypeReferenceNode(
+              factory.createQualifiedName(
+                factory.createIdentifier('Tag'),
+                factory.createIdentifier(tag),
               ),
-            ),
-            factory.createPropertySignature(
               undefined,
-              factory.createIdentifier('version'),
-              schema.version.constValueOptional
-                ? factory.createToken(ts.SyntaxKind.QuestionToken)
-                : undefined,
-              factory.createLiteralTypeNode(factory.createNumericLiteral(version)),
             ),
-          ]),
-        ]),
-      ),
-      factory.createInterfaceDeclaration(
-        [factory.createToken(ts.SyntaxKind.ExportKeyword)],
-        factory.createIdentifier(`${kind}${name}`),
-        undefined,
-        [factory.createHeritageClause(
-          ts.SyntaxKind.ExtendsKeyword,
-          [factory.createExpressionWithTypeArguments(
-            factory.createIdentifier(`${kind}${name}Type`),
+          ),
+          factory.createPropertySignature(
             undefined,
+            factory.createIdentifier('version'),
+            undefined,
+            factory.createLiteralTypeNode(factory.createNumericLiteral(version)),
+          ),
+        ]),
+      ]);
+      return [
+        factory.createTypeAliasDeclaration(
+          undefined,
+          factory.createIdentifier(`${kind}${name}Type`),
+          undefined,
+          isVersionOptional ? reAddVersion(innerType, version) : innerType,
+        ),
+        factory.createInterfaceDeclaration(
+          [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+          factory.createIdentifier(`${kind}${name}`),
+          undefined,
+          [factory.createHeritageClause(
+            ts.SyntaxKind.ExtendsKeyword,
+            [factory.createExpressionWithTypeArguments(
+              factory.createIdentifier(`${kind}${name}Type`),
+              undefined,
+            )],
           )],
-        )],
-        [],
-      ),
-    ])
+          [],
+        ),
+      ];
+    })
       .flat()
       .map((node) => addTsDocCategory(node));
   }).flat(),
