@@ -144,7 +144,7 @@ export function getDefaultPointerKey(
  * @param name - the AENS name to get the fee for
  * @returns the minimum fee for the AENS name auction
  */
-export function getMinimumNameFee(name: AensName): BigNumber {
+export function getMinimumNameFee(name: AensName): bigint {
   const nameLength = name.length - AENS_SUFFIX.length;
   return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)];
 }
@@ -161,12 +161,12 @@ export function getMinimumNameFee(name: AensName): BigNumber {
 export function computeBidFee(
   name: AensName,
   { startFee = getMinimumNameFee(name), increment = NAME_FEE_BID_INCREMENT }:
-  { startFee?: Int; increment?: number } = {},
-): BigNumber {
+  { startFee?: Int | bigint; increment?: number } = {},
+): bigint {
   if (increment < NAME_FEE_BID_INCREMENT) {
     throw new ArgumentError('increment', `not less than ${NAME_FEE_BID_INCREMENT}`, increment);
   }
-  return new BigNumber(startFee).times(increment + 1).integerValue(BigNumber.ROUND_CEIL);
+  return BigInt(Math.ceil(Number(startFee) * (increment + 1)));
 }
 
 /**

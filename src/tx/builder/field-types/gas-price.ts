@@ -5,7 +5,7 @@ import { Int, MIN_GAS_PRICE } from '../constants';
 export default {
   ...coinAmount,
 
-  serialize(value: Int = MIN_GAS_PRICE): Buffer {
+  serialize(value: Int = MIN_GAS_PRICE.toString()): Buffer {
     if (+value < MIN_GAS_PRICE) {
       throw new IllegalArgumentError(`Gas price ${value.toString()} must be bigger then ${MIN_GAS_PRICE}`);
     }

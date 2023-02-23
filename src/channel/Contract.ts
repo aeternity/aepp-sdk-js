@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { snakeToPascal } from '../utils/string';
 import {
-  MIN_GAS_PRICE, Tag, AbiVersion, VmVersion,
+  MIN_GAS_PRICE, Tag, AbiVersion, VmVersion, Int,
 } from '../tx/builder/constants';
 import {
   signAndNotify,
@@ -275,14 +275,15 @@ export default class ChannelContract extends ChannelSpend {
    */
   async forceProgress(
     {
-      amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = MIN_GAS_PRICE,
+      amount, callData, contract, abiVersion, gasLimit = 1000000,
+      gasPrice = MIN_GAS_PRICE.toString(),
     }: {
-      amount: number;
+      amount: Int;
       callData: Encoded.ContractBytearray;
       contract: Encoded.ContractAddress;
       abiVersion: AbiVersion;
       gasLimit?: number;
-      gasPrice?: number;
+      gasPrice?: Int;
     },
     sign: SignTx,
     { onOnChainTx }: Pick<ChannelState, 'onOnChainTx'> = {},
