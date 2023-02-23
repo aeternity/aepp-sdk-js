@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { IllegalArgumentError } from '../../../utils/errors';
-import { MIN_GAS_PRICE, Tag } from '../constants';
+import { Int, MIN_GAS_PRICE, Tag } from '../constants';
 import coinAmount from './coin-amount';
 import { isKeyOfObject } from '../../../utils/other';
 import { decode, Encoded } from '../../../utils/encoder';
@@ -135,8 +135,8 @@ function calculateMinFee(
 export default {
   ...coinAmount,
 
-  serializeAettos(
-    _value: string | undefined,
+  serialize(
+    _value: Int | undefined,
     {
       rebuildTx, unpackTx, buildTx, _computingMinFee, _pickBiggerFee,
     }: {
@@ -146,8 +146,8 @@ export default {
       _computingMinFee?: BigNumber;
       _pickBiggerFee?: boolean;
     },
-  ): string {
-    if (_computingMinFee != null) return _computingMinFee.toFixed();
+  ): Buffer {
+    if (_computingMinFee != null) return coinAmount.serialize(_computingMinFee);
     const minFee = calculateMinFee(
       (fee) => rebuildTx({ _computingMinFee: fee }),
       unpackTx,
@@ -155,9 +155,9 @@ export default {
     );
     const value = new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
-      if (_pickBiggerFee === true) return minFee.toFixed();
+      if (_pickBiggerFee === true) return coinAmount.serialize(minFee);
       throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger then ${minFee}`);
     }
-    return value.toFixed();
+    return coinAmount.serialize(value);
   },
 };
