@@ -1,4 +1,3 @@
-import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
 import verifyTransaction, { ValidatorResult } from './tx/validator';
 import { isAccountNotFoundError, pause } from './utils/other';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
@@ -257,9 +256,8 @@ export async function getAccount(
  */
 export async function getBalance(
   address: Encoded.AccountAddress | Encoded.ContractAddress | Encoded.OracleAddress,
-  { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
-  { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1],
-): Promise<string> {
+  options: Parameters<typeof getAccount>[1],
+): Promise<bigint> {
   const addr = address.startsWith('ok_')
     ? encode(decode(address), Encoding.AccountAddress)
     : address as Encoded.AccountAddress | Encoded.ContractAddress;
@@ -269,7 +267,7 @@ export async function getBalance(
     return { balance: 0n };
   });
 
-  return formatAmount(balance, { targetDenomination: format });
+  return balance;
 }
 
 /**

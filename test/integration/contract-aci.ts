@@ -375,7 +375,7 @@ describe('Contract instance', () => {
     const contractBalance = await aeSdk.getBalance(testContract.$options.address);
     await testContract.stringFn('test', { amount: 100, callStatic: false });
     const balanceAfter = await aeSdk.getBalance(testContract.$options.address);
-    balanceAfter.should.be.equal(`${+contractBalance + 100}`);
+    balanceAfter.should.be.equal(contractBalance + 100n);
   });
 
   it('calls on specific account', async () => {

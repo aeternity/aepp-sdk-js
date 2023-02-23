@@ -717,14 +717,14 @@ describe('Channel', () => {
     await aeSdkInitiatior.sendTransaction(settleTx);
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);
-    new BigNumber(initiatorBalanceAfterClose)
-      .minus(initiatorBalanceBeforeClose)
+    new BigNumber(initiatorBalanceAfterClose.toString())
+      .minus(initiatorBalanceBeforeClose.toString())
       .plus(closeSoloTxFee)
       .plus(settleTxFee)
       .isEqualTo(balances[initiatorAddr])
       .should.be.equal(true);
-    new BigNumber(responderBalanceAfterClose)
-      .minus(responderBalanceBeforeClose)
+    new BigNumber(responderBalanceAfterClose.toString())
+      .minus(responderBalanceBeforeClose.toString())
       .isEqualTo(balances[responderAddr])
       .should.be.equal(true);
   });
@@ -791,13 +791,13 @@ describe('Channel', () => {
     await aeSdkResponder.sendTransaction(settleTx);
     const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
     const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);
-    new BigNumber(initiatorBalanceAfterClose)
-      .minus(initiatorBalanceBeforeClose)
+    new BigNumber(initiatorBalanceAfterClose.toString())
+      .minus(initiatorBalanceBeforeClose.toString())
       .plus(closeSoloTxFee)
       .isEqualTo(recentBalances[initiatorAddr])
       .should.be.equal(true);
-    new BigNumber(responderBalanceAfterClose)
-      .minus(responderBalanceBeforeClose)
+    new BigNumber(responderBalanceAfterClose.toString())
+      .minus(responderBalanceBeforeClose.toString())
       .plus(slashTxFee)
       .plus(settleTxFee)
       .isEqualTo(recentBalances[responderAddr])

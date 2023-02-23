@@ -68,8 +68,7 @@ describe('Generalized Account', () => {
     const callData = authContract._calldata.encode('BlindAuth', 'authorize', [genSalt()]);
     await aeSdk.spend(10000, publicKey, { authData: { callData } });
     await aeSdk.spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
-    const balanceAfter = await aeSdk.getBalance(publicKey);
-    balanceAfter.should.be.equal('20000');
+    expect(await aeSdk.getBalance(publicKey)).to.be.equal(20000n);
   });
 
   it('throws error if gasLimit exceeds the maximum value', async () => {
