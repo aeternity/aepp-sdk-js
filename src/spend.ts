@@ -60,7 +60,7 @@ interface SpendOptions extends SpendOptionsType {}
  * ```
  */
 export async function transferFunds(
-  fraction: number | string,
+  fraction: number,
   recipientIdOrName: AensName | Encoded.AccountAddress,
   options: TransferFundsOptions,
 ): ReturnType<typeof sendTransaction> {
