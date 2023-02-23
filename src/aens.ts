@@ -6,11 +6,10 @@
  * repository.
  */
 
-import BigNumber from 'bignumber.js';
 import { genSalt } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
 import {
-  CLIENT_TTL, NAME_TTL, Tag, AensName,
+  CLIENT_TTL, NAME_TTL, Tag, AensName, Int,
 } from './tx/builder/constants';
 import { ArgumentError } from './utils/errors';
 import { Encoded } from './utils/encoder';
@@ -386,7 +385,7 @@ interface AensPreclaimOptions extends
  */
 export async function aensBid(
   name: AensName,
-  nameFee: number | string | BigNumber,
+  nameFee: Int,
   options: Omit<Parameters<typeof aensClaim>[2], 'nameFee'>,
 ): ReturnType<typeof aensClaim> {
   return aensClaim(name, 0, { ...options, nameFee });

@@ -5,7 +5,7 @@ import {
 import { buildTxAsync, BuildTxOptions, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
 import { Encoded, Encoding } from './utils/encoder';
-import { Tag, AensName } from './tx/builder/constants';
+import { Tag, AensName, Int } from './tx/builder/constants';
 import AccountBase from './account/Base';
 
 /**
@@ -17,7 +17,7 @@ import AccountBase from './account/Base';
  * @returns Transaction
  */
 export async function spend(
-  amount: number | string,
+  amount: Int,
   recipientIdOrName: Encoded.AccountAddress | AensName,
   options: SpendOptions,
 ): ReturnType<typeof sendTransaction> {

@@ -7,6 +7,7 @@ import { toBytes } from '../../utils/bytes';
 import { concatBuffers } from '../../utils/other';
 import {
   AensName,
+  Int,
   NAME_BID_RANGES,
   NAME_BID_TIMEOUT_BLOCKS,
   NAME_FEE_BID_INCREMENT,
@@ -161,7 +162,7 @@ export function getMinimumNameFee(name: AensName): BigNumber {
 export function computeBidFee(
   name: AensName,
   { startFee, increment = NAME_FEE_BID_INCREMENT }:
-  { startFee?: number | string | BigNumber; increment?: number } = {},
+  { startFee?: Int; increment?: number } = {},
 ): BigNumber {
   if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`);
   if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`);
