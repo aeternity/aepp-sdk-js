@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
   AeSdk, MemoryAccount,
-  generateKeyPair, AE_AMOUNT_FORMATS,
+  generateKeyPair,
   UnavailableAccountError, TypeError, ArgumentError, UnexpectedTsError,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
@@ -103,7 +103,7 @@ describe('Accounts', () => {
   });
 
   it('spends coins in AE format', async () => {
-    const ret = await aeSdk.spend(1, receiver.address, { denomination: AE_AMOUNT_FORMATS.AE });
+    const ret = await aeSdk.spend(1e18, receiver.address);
     ret.should.have.property('tx');
     if (ret.tx == null) throw new UnexpectedTsError();
     ret.tx.should.include({ amount: 10n ** 18n, recipientId: receiver.address });

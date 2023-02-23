@@ -1,6 +1,5 @@
 import uInt from './u-int';
 import { Int } from '../constants';
-import { AE_AMOUNT_FORMATS, formatAmount } from '../../../utils/amount-formatter';
 
 export default {
   ...uInt,
@@ -12,13 +11,9 @@ export default {
   serialize(
     value: Int | undefined,
     params: {},
-    { denomination = AE_AMOUNT_FORMATS.AETTOS }: { denomination?: AE_AMOUNT_FORMATS },
   ): Buffer {
     return uInt.serialize(
-      this.serializeAettos(
-        value != null ? formatAmount(value, { denomination }) : value,
-        params,
-      ),
+      this.serializeAettos(value, params),
     );
   },
 };
