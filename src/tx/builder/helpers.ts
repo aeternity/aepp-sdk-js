@@ -28,7 +28,7 @@ import { ArgumentError, IllegalBidFeeError } from '../../utils/errors';
  */
 export function buildContractId(
   ownerId: Encoded.AccountAddress,
-  nonce: number | BigNumber,
+  nonce: number,
 ): Encoded.ContractAddress {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId), ...toBytes(nonce)]);
   const b2bHash = hash(ownerIdAndNonce);
@@ -45,10 +45,10 @@ export function buildContractId(
  */
 export function oracleQueryId(
   senderId: Encoded.AccountAddress,
-  nonce: number | BigNumber | string,
+  nonce: number,
   oracleId: Encoded.OracleAddress,
 ): Encoded.OracleQueryId {
-  function _int32(val: number | string | BigNumber): Buffer {
+  function _int32(val: number): Buffer {
     const nonceBE = toBytes(val, true);
     return concatBuffers([Buffer.alloc(32 - nonceBE.length), nonceBE]);
   }
