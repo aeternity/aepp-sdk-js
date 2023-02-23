@@ -710,8 +710,8 @@ describe('Channel', () => {
       tag: Tag.ChannelSettleTx,
       channelId: await initiatorCh.id(),
       fromId: initiatorAddr,
-      initiatorAmountFinal: balances[initiatorAddr],
-      responderAmountFinal: balances[responderAddr],
+      initiatorAmountFinal: balances[initiatorAddr].toString(),
+      responderAmountFinal: balances[responderAddr].toString(),
     });
     const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
     await aeSdkInitiatior.sendTransaction(settleTx);
@@ -721,11 +721,11 @@ describe('Channel', () => {
       .minus(initiatorBalanceBeforeClose.toString())
       .plus(closeSoloTxFee)
       .plus(settleTxFee)
-      .isEqualTo(balances[initiatorAddr])
+      .isEqualTo(balances[initiatorAddr].toString())
       .should.be.equal(true);
     new BigNumber(responderBalanceAfterClose.toString())
       .minus(responderBalanceBeforeClose.toString())
-      .isEqualTo(balances[responderAddr])
+      .isEqualTo(balances[responderAddr].toString())
       .should.be.equal(true);
   });
 
@@ -784,8 +784,8 @@ describe('Channel', () => {
       tag: Tag.ChannelSettleTx,
       channelId: responderCh.id(),
       fromId: responderAddr,
-      initiatorAmountFinal: recentBalances[initiatorAddr],
-      responderAmountFinal: recentBalances[responderAddr],
+      initiatorAmountFinal: recentBalances[initiatorAddr].toString(),
+      responderAmountFinal: recentBalances[responderAddr].toString(),
     });
     const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
     await aeSdkResponder.sendTransaction(settleTx);
@@ -794,13 +794,13 @@ describe('Channel', () => {
     new BigNumber(initiatorBalanceAfterClose.toString())
       .minus(initiatorBalanceBeforeClose.toString())
       .plus(closeSoloTxFee)
-      .isEqualTo(recentBalances[initiatorAddr])
+      .isEqualTo(recentBalances[initiatorAddr].toString())
       .should.be.equal(true);
     new BigNumber(responderBalanceAfterClose.toString())
       .minus(responderBalanceBeforeClose.toString())
       .plus(slashTxFee)
       .plus(settleTxFee)
-      .isEqualTo(recentBalances[responderAddr])
+      .isEqualTo(recentBalances[responderAddr].toString())
       .should.be.equal(true);
   });
 
@@ -933,10 +933,9 @@ describe('Channel', () => {
     const contractAddr = encode(decode(contractAddress), Encoding.AccountAddress);
     const addresses = [aeSdkInitiatior.address, aeSdkResponder.address, contractAddr];
     const balances = await initiatorCh.balances(addresses);
-    balances.should.be.an('object');
-    balances[aeSdkInitiatior.address].should.be.a('string');
-    balances[aeSdkResponder.address].should.be.a('string');
-    balances[contractAddr].should.be.equal(1000);
+    expect(balances[aeSdkInitiatior.address]).to.be.a('bigint');
+    expect(balances[aeSdkResponder.address]).to.be.a('bigint');
+    expect(balances[contractAddr]).to.be.equal(1000n);
     expect(balances).to.eql(await responderCh.balances(addresses));
   });
 
