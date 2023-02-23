@@ -81,7 +81,6 @@ BaseError
 │   ├── EncodeError
 │   ├── PayloadLengthError
 │   ├── DryRunError
-│   ├── IllegalBidFeeError
 │   ├── InvalidSignatureError
 │   ├── InvalidTxError
 │   ├── PrefixNotFoundError

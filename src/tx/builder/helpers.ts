@@ -13,8 +13,7 @@ import {
   NAME_FEE_BID_INCREMENT,
   NAME_MAX_LENGTH_FEE,
 } from './constants';
-import { ceil } from '../../utils/bignumber';
-import { ArgumentError, IllegalBidFeeError } from '../../utils/errors';
+import { ArgumentError } from '../../utils/errors';
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -161,16 +160,13 @@ export function getMinimumNameFee(name: AensName): BigNumber {
  */
 export function computeBidFee(
   name: AensName,
-  { startFee, increment = NAME_FEE_BID_INCREMENT }:
+  { startFee = getMinimumNameFee(name), increment = NAME_FEE_BID_INCREMENT }:
   { startFee?: Int; increment?: number } = {},
 ): BigNumber {
-  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`);
-  if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`);
-  // FIXME: increment should be used somehow here
-  return ceil(
-    new BigNumber(startFee ?? getMinimumNameFee(name))
-      .times(new BigNumber(NAME_FEE_BID_INCREMENT).plus(1)),
-  );
+  if (increment < NAME_FEE_BID_INCREMENT) {
+    throw new ArgumentError('increment', `not less than ${NAME_FEE_BID_INCREMENT}`, increment);
+  }
+  return new BigNumber(startFee).times(increment + 1).integerValue(BigNumber.ROUND_CEIL);
 }
 
 /**
