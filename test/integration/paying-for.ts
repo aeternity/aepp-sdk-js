@@ -1,6 +1,5 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
   AeSdk, Contract, MemoryAccount, Tag, UnexpectedTsError,
@@ -33,12 +32,10 @@ describe('Paying for transaction of another account', () => {
     const outerFee = tx?.fee;
     const innerFee = tx?.tx?.tx.fee;
     if (outerFee == null || innerFee == null) throw new UnexpectedTsError();
-    expect(await aeSdk.getBalance(aeSdk.address)).to.equal(
-      new BigNumber(payerBalanceBefore)
-        .minus(outerFee.toString()).minus(innerFee.toString()).toFixed(),
-    );
-    expect(await aeSdk.getBalance(sender.address)).to.equal('0');
-    expect(await aeSdk.getBalance(receiver.address)).to.equal('10000');
+    expect(await aeSdk.getBalance(aeSdk.address)).to
+      .equal(payerBalanceBefore - outerFee - innerFee);
+    expect(await aeSdk.getBalance(sender.address)).to.equal(0n);
+    expect(await aeSdk.getBalance(receiver.address)).to.equal(10000n);
   });
 
   const sourceCode = `

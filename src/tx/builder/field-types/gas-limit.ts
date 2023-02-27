@@ -10,7 +10,7 @@ function calculateGasLimitMax(
   unpackTx: typeof unpackTxType,
   buildTx: typeof buildTxType,
 ): number {
-  return gasMax - +buildFee(rebuildTx(gasMax), unpackTx, buildTx).dividedBy(MIN_GAS_PRICE);
+  return gasMax - Number(buildFee(rebuildTx(gasMax), unpackTx, buildTx) / MIN_GAS_PRICE);
 }
 
 export default {

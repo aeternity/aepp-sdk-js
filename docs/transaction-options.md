@@ -6,9 +6,9 @@ The `options` object can be optionally passed to the respective function behind 
 ```js
 const sender = 'ak_...'
 const recipient = 'ak_...'
-const options = { onAccount: sender, denomination: 'ae' } // optional options object
+const options = { onAccount: sender } // optional options object
 // aeSdk is an instance of the AeSdk class
-await aeSdk.spend(1, recipient, options) // amount, recipient and (optional) options
+await aeSdk.spend(1e18, recipient, options) // amount, recipient and (optional) options
 ```
 
 Note:
@@ -48,9 +48,7 @@ The following options are sepcific for each tx-type.
 
 ### ContractCreateTx & ContractCallTx
 - `amount` (default: `0`)
-  - To be used for providing `aettos` (or `AE` with respective denomination) to a contract related transaction.
-- `denomination` (default: `aettos`)
-  - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
+  - To be used for providing `aettos` to a contract related transaction.
 - `gasLimit`
   - Maximum amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
 - `gasPrice` (default: `1e9`)
@@ -90,10 +88,6 @@ The following options are sepcific for each tx-type.
 - `responseTtlType` (default `ORACLE_TTL_TYPES.delta`)
   - `ORACLE_TTL_TYPES.delta`: TTL value treated relative to a current block height
   - `ORACLE_TTL_TYPES.block`: TTL value treated as absolute block height
-
-### SpendTx
-- `denomination` (default: `aettos`)
-  - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
 
 ## How to estimate gas?
 - As æpp developer, it is reasonable to estimate the gas consumption for a contract call using the dry-run feature of the node **once** and provide a specific offset (e.g. multiplied by 1.5 or 2) as default in the æpp to ensure that contract calls are mined. Depending on the logic of the contract the gas consumption of a specific contract call can vary and therefore you should monitor the gas consumption and increase the default for the respective contract call accordingly over time.

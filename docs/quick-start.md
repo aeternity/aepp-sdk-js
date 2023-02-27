@@ -47,16 +47,13 @@ const senderAccount = new MemoryAccount('<SENDER_SECRET_KEY>');
   })
 
   // spend one AE
-  await aeSdk.spend(1, '<RECIPIENT_PUBLIC_KEY>', {
-    // replace <RECIPIENT_PUBLIC_KEY>, Ideally you use public key from Superhero Wallet you have created before
-    denomination: AE_AMOUNT_FORMATS.AE
-  })
+  // replace <RECIPIENT_PUBLIC_KEY>, Ideally you use public key from Superhero Wallet you have created before
+  await aeSdk.spend(1e18, '<RECIPIENT_PUBLIC_KEY>')
 })()
 ```
 
 Note:
 
 - You may remove code from Step 2 as this serves only for one-time creation
-- By default the `spend` function expects the amount to be spent in `aettos` (the smallest possible unit)
-- Following the example snippet you would specify `AE` as denomination
+- The `spend` function expects the amount to be spent in `aettos` (the smallest possible unit)
 - See [Testnet Explorer](https://explorer.testnet.aeternity.io/) and track your transactions

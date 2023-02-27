@@ -12,9 +12,9 @@ export const NAME_TTL = 180000;
 export const NAME_MAX_TTL = 36000;
 export const NAME_MAX_CLIENT_TTL = 84600;
 export const CLIENT_TTL = NAME_MAX_CLIENT_TTL;
-export const MIN_GAS_PRICE = 1e9;
+export const MIN_GAS_PRICE = BigInt(1e9);
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
-export const NAME_FEE_MULTIPLIER = 1e14; // 100000000000000
+export const NAME_FEE_MULTIPLIER = BigInt(1e14); // 100000000000000
 export const NAME_FEE_BID_INCREMENT = 0.05; // # the increment is in percentage
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272
 export const NAME_BID_TIMEOUT_BLOCKS = 480; // # ~1 day
@@ -56,7 +56,7 @@ export const NAME_BID_RANGES = mapObject({
   3: 2178309,
   2: 3524578,
   1: 5702887,
-}, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]);
+}, ([key, value]) => [key, BigInt(value) * NAME_FEE_MULTIPLIER]);
 
 export enum ConsensusProtocolVersion {
   Iris = 5,

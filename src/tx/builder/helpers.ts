@@ -7,13 +7,13 @@ import { toBytes } from '../../utils/bytes';
 import { concatBuffers } from '../../utils/other';
 import {
   AensName,
+  Int,
   NAME_BID_RANGES,
   NAME_BID_TIMEOUT_BLOCKS,
   NAME_FEE_BID_INCREMENT,
   NAME_MAX_LENGTH_FEE,
 } from './constants';
-import { ceil } from '../../utils/bignumber';
-import { ArgumentError, IllegalBidFeeError } from '../../utils/errors';
+import { ArgumentError } from '../../utils/errors';
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -28,7 +28,7 @@ import { ArgumentError, IllegalBidFeeError } from '../../utils/errors';
  */
 export function buildContractId(
   ownerId: Encoded.AccountAddress,
-  nonce: number | BigNumber,
+  nonce: number,
 ): Encoded.ContractAddress {
   const ownerIdAndNonce = Buffer.from([...decode(ownerId), ...toBytes(nonce)]);
   const b2bHash = hash(ownerIdAndNonce);
@@ -45,10 +45,10 @@ export function buildContractId(
  */
 export function oracleQueryId(
   senderId: Encoded.AccountAddress,
-  nonce: number | BigNumber | string,
+  nonce: number,
   oracleId: Encoded.OracleAddress,
 ): Encoded.OracleQueryId {
-  function _int32(val: number | string | BigNumber): Buffer {
+  function _int32(val: number): Buffer {
     const nonceBE = toBytes(val, true);
     return concatBuffers([Buffer.alloc(32 - nonceBE.length), nonceBE]);
   }
@@ -144,7 +144,7 @@ export function getDefaultPointerKey(
  * @param name - the AENS name to get the fee for
  * @returns the minimum fee for the AENS name auction
  */
-export function getMinimumNameFee(name: AensName): BigNumber {
+export function getMinimumNameFee(name: AensName): bigint {
   const nameLength = name.length - AENS_SUFFIX.length;
   return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)];
 }
@@ -160,16 +160,13 @@ export function getMinimumNameFee(name: AensName): BigNumber {
  */
 export function computeBidFee(
   name: AensName,
-  { startFee, increment = NAME_FEE_BID_INCREMENT }:
-  { startFee?: number | string | BigNumber; increment?: number } = {},
-): BigNumber {
-  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`);
-  if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`);
-  // FIXME: increment should be used somehow here
-  return ceil(
-    new BigNumber(startFee ?? getMinimumNameFee(name))
-      .times(new BigNumber(NAME_FEE_BID_INCREMENT).plus(1)),
-  );
+  { startFee = getMinimumNameFee(name), increment = NAME_FEE_BID_INCREMENT }:
+  { startFee?: Int | bigint; increment?: number } = {},
+): bigint {
+  if (increment < NAME_FEE_BID_INCREMENT) {
+    throw new ArgumentError('increment', `not less than ${NAME_FEE_BID_INCREMENT}`, increment);
+  }
+  return BigInt(Math.ceil(Number(startFee) * (increment + 1)));
 }
 
 /**

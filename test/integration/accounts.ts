@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
   AeSdk, MemoryAccount,
-  generateKeyPair, AE_AMOUNT_FORMATS,
+  generateKeyPair,
   UnavailableAccountError, TypeError, ArgumentError, UnexpectedTsError,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
@@ -30,7 +30,7 @@ describe('Accounts', () => {
   });
 
   it('determining the balance with 0 balance', async () => {
-    await aeSdkNoCoins.getBalance(aeSdkNoCoins.address).should.eventually.be.equal('0');
+    expect(await aeSdkNoCoins.getBalance(aeSdkNoCoins.address)).to.be.equal(0n);
   });
 
   it('spending coins with 0 balance', async () => {
@@ -41,7 +41,7 @@ describe('Accounts', () => {
     .to.be.rejectedWith(ArgumentError, 'value should be greater or equal to 0, got -1 instead'));
 
   it('determines the balance using `balance`', async () => {
-    await aeSdk.getBalance(aeSdk.address).should.eventually.be.a('string');
+    expect(await aeSdk.getBalance(aeSdk.address)).to.be.a('bigint');
   });
 
   describe('transferFunds', () => {
@@ -51,9 +51,9 @@ describe('Accounts', () => {
       amount: BigNumber;
       fee: BigNumber;
     }> => {
-      const balanceBefore = new BigNumber(await aeSdk.getBalance(aeSdk.address));
+      const balanceBefore = new BigNumber((await aeSdk.getBalance(aeSdk.address)).toString());
       const { tx } = await aeSdk.transferFunds(fraction, receiver.address);
-      const balanceAfter = new BigNumber(await aeSdk.getBalance(aeSdk.address));
+      const balanceAfter = new BigNumber((await aeSdk.getBalance(aeSdk.address)).toString());
       if (tx == null || tx.amount == null) throw new UnexpectedTsError();
       return {
         balanceBefore,
@@ -91,7 +91,7 @@ describe('Accounts', () => {
 
     it('accepts onAccount option', async () => {
       await aeSdk.transferFunds(1, aeSdk.address, { onAccount: receiver });
-      new BigNumber(await aeSdk.getBalance(receiver.address)).isZero().should.be.equal(true);
+      expect(await aeSdk.getBalance(receiver.address)).to.be.equal(0n);
     });
   });
 
@@ -103,7 +103,7 @@ describe('Accounts', () => {
   });
 
   it('spends coins in AE format', async () => {
-    const ret = await aeSdk.spend(1, receiver.address, { denomination: AE_AMOUNT_FORMATS.AE });
+    const ret = await aeSdk.spend(1e18, receiver.address);
     ret.should.have.property('tx');
     if (ret.tx == null) throw new UnexpectedTsError();
     ret.tx.should.include({ amount: 10n ** 18n, recipientId: receiver.address });
@@ -115,7 +115,7 @@ describe('Accounts', () => {
     const ret = await aeSdk.spend(bigAmount.toString(), publicKey);
 
     const balanceAfter = await aeSdk.getBalance(publicKey);
-    balanceAfter.should.be.equal(bigAmount.toString());
+    balanceAfter.should.be.equal(bigAmount);
     ret.should.have.property('tx');
     if (ret.tx == null) throw new UnexpectedTsError();
     ret.tx.should.include({ amount: bigAmount, recipientId: publicKey });

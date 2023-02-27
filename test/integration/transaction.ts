@@ -4,7 +4,7 @@ import { getSdk } from './index';
 import {
   AeSdk,
   commitmentHash, oracleQueryId, decode, encode,
-  ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS, buildTx, unpackTx,
+  ORACLE_TTL_TYPES, Tag, buildTx, unpackTx,
 } from '../../src';
 import { Encoded, Encoding } from '../../src/utils/encoder';
 
@@ -52,17 +52,6 @@ describe('Transaction', () => {
     contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
   });
 
-  it('build spend tx using denomination amount', async () => {
-    const params = {
-      senderId, recipientId, nonce, payload,
-    };
-    const spendAe = await aeSdk.buildTx({
-      ...params, tag: Tag.SpendTx, amount: 1, denomination: AE_AMOUNT_FORMATS.AE,
-    });
-    const spendAettos = await aeSdk.buildTx({ ...params, tag: Tag.SpendTx, amount: 1e18 });
-    spendAe.should.be.equal(spendAettos);
-  });
-
   const contractId = 'ct_TCQVoset7Y4qEyV5tgEAJAqa2Foz8J1EXqoGpq3fB6dWH5roe';
   const transactions: Array<[string, Encoded.Transaction, () => Promise<Encoded.Transaction>]> = [[
     'spend',
@@ -73,8 +62,7 @@ describe('Transaction', () => {
       recipientId,
       nonce,
       payload,
-      amount: 2,
-      denomination: AE_AMOUNT_FORMATS.AE,
+      amount: 2e18,
     }),
   ], [
     'name pre-claim',

@@ -163,7 +163,7 @@ describe('Aens', () => {
       const claim = await preclaim.claim();
       claim.should.be.an('object');
 
-      const bidFee = computeBidFee(nameShort);
+      const bidFee = computeBidFee(nameShort).toString();
       const bid: Awaited<ReturnType<typeof aeSdk.aensClaim>> = await aeSdk
         .aensBid(nameShort, bidFee, { onAccount });
       bid.should.be.an('object');

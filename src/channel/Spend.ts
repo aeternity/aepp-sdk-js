@@ -150,13 +150,13 @@ export default class ChannelSpend extends Channel {
    */
   async balances(
     accounts: Encoded.AccountAddress[],
-  ): Promise<{ [key: Encoded.AccountAddress]: string }> {
+  ): Promise<{ [key: Encoded.AccountAddress]: bigint }> {
     return Object.fromEntries(
       (await call(this, 'channels.get.balances', { accounts }))
         .map((item: {
           account: Encoded.AccountAddress;
           balance: string;
-        }) => [item.account, item.balance]),
+        }) => [item.account, BigInt(item.balance)]),
     );
   }
 

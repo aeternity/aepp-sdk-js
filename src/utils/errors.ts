@@ -679,16 +679,6 @@ export class DryRunError extends TransactionError {
 /**
  * @category exception
  */
-export class IllegalBidFeeError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'IllegalBidFeeError';
-  }
-}
-
-/**
- * @category exception
- */
 export class InvalidSignatureError extends TransactionError {
   constructor(message: string) {
     super(message);

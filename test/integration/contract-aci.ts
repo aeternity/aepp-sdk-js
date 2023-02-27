@@ -14,7 +14,6 @@ import {
   IllegalArgumentError,
   Contract,
   hash,
-  AE_AMOUNT_FORMATS,
 } from '../../src';
 import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
@@ -209,7 +208,6 @@ describe('Contract instance', () => {
   it('deploys', async () => {
     const deployInfo = await testContract.$deploy(['test', 1, 'hahahaha'], {
       amount: 42,
-      denomination: AE_AMOUNT_FORMATS.AETTOS,
       gasLimit: 16000,
       deposit: 0,
       ttl: 0,
@@ -377,7 +375,7 @@ describe('Contract instance', () => {
     const contractBalance = await aeSdk.getBalance(testContract.$options.address);
     await testContract.stringFn('test', { amount: 100, callStatic: false });
     const balanceAfter = await aeSdk.getBalance(testContract.$options.address);
-    balanceAfter.should.be.equal(`${+contractBalance + 100}`);
+    balanceAfter.should.be.equal(contractBalance + 100n);
   });
 
   it('calls on specific account', async () => {
