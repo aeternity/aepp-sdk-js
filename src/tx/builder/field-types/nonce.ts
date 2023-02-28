@@ -2,6 +2,7 @@ import { isAccountNotFoundError } from '../../../utils/other';
 import shortUInt from './short-u-int';
 import Node from '../../../Node';
 import { ArgumentError } from '../../../utils/errors';
+import { NextNonceStrategy } from '../../../apis/node';
 
 export default function genNonceField<SenderKey extends string>(senderKey: SenderKey): {
   serialize: (value: number) => Buffer;
@@ -10,7 +11,7 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
     value: number | undefined,
     params: {},
     // TODO: replace `string` with AddressEncodings
-    options: { [key in SenderKey]: string } & { strategy?: 'continuity' | 'max'; onNode?: Node },
+    options: { [key in SenderKey]: string } & { strategy?: NextNonceStrategy; onNode?: Node },
   ) => Promise<number>;
   deserialize: (value: Buffer) => number;
   senderKey: string;

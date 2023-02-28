@@ -142,23 +142,7 @@ validators.push(
     if (message == null) return [];
     return [{ message, key: 'InvalidAccountType', checkedKeys: ['tag'] }];
   },
-  (tx, { account, parentTxTypes }) => {
-    if (!('nonce' in tx) || parentTxTypes.includes(Tag.GaMetaTx)) return [];
-    const validNonce = account.nonce + 1;
-    if (tx.nonce === validNonce) return [];
-    return [{
-      ...tx.nonce < validNonce
-        ? {
-          message: `Nonce ${tx.nonce} is already used, valid nonce is ${validNonce}`,
-          key: 'NonceAlreadyUsed',
-        }
-        : {
-          message: `Nonce ${tx.nonce} is too high, valid nonce is ${validNonce}`,
-          key: 'NonceHigh',
-        },
-      checkedKeys: ['nonce'],
-    }];
-  },
+  // TODO: revert nonce check
   (tx, { consensusProtocolVersion }) => {
     const oracleCall = Tag.Oracle === tx.tag || Tag.OracleRegisterTx === tx.tag;
     const contractCreate = Tag.ContractCreateTx === tx.tag || Tag.GaAttachTx === tx.tag;
