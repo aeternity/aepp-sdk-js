@@ -9,6 +9,8 @@ echo Run environment/node.ts
 ./test/environment/node.ts
 echo Run environment/node-unhandled-exception.mjs
 ./test/environment/node-unhandled-exception.mjs
+echo Run environment/name-claim-unmined.mjs
+./test/environment/name-claim-unmined.mjs
 
 echo Check typescript
 cd ./test/environment/typescript/
