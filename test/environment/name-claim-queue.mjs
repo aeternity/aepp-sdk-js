@@ -12,7 +12,7 @@ const { status } = await fetch(`https://faucet.aepps.com/account/${address}`, { 
 console.assert(status === 200, 'Invalid faucet response code', status);
 
 const pauseUntilLoadBalancerGetSynced = () => new Promise((resolve) => {
-  setTimeout(resolve, 500);
+  setTimeout(resolve, 1000);
 });
 const name = `test-${Math.random().toString(16).slice(2)}.chain`;
 const options = { waitMined: false };
