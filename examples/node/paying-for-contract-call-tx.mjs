@@ -42,7 +42,7 @@ import {
 // The following constants are used in the subsequent code snippets.
 const PAYER_ACCOUNT_SECRET_KEY = '9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200';
 const NODE_URL = 'https://testnet.aeternity.io';
-const COMPILER_URL = 'https://v7.compiler.aepps.com';
+const COMPILER_URL = 'https://v7.compiler.stg.aepps.com';
 const CONTRACT_ADDRESS = 'ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8';
 const CONTRACT_SOURCE_CODE = `
 @compiler >= 6
@@ -104,7 +104,8 @@ const contract = await aeSdk.initializeContract(
   { sourceCode: CONTRACT_SOURCE_CODE, address: CONTRACT_ADDRESS },
 );
 const calldata = contract._calldata.encode('PayingForTxExample', 'set_last_caller', []);
-const contractCallTx = await aeSdk.buildTx(Tag.ContractCallTx, {
+const contractCallTx = await aeSdk.buildTx({
+  tag: Tag.ContractCallTx,
   callerId: newUserAccount.address,
   contractId: CONTRACT_ADDRESS,
   amount: 0,

@@ -9,8 +9,8 @@ echo Run environment/node.ts
 ./test/environment/node.ts
 echo Run environment/node-unhandled-exception.mjs
 ./test/environment/node-unhandled-exception.mjs
-echo Run environment/name-claim-unmined.mjs
-./test/environment/name-claim-unmined.mjs
+echo Run environment/name-claim-queue.mjs
+./test/environment/name-claim-queue.mjs
 
 echo Check typescript
 cd ./test/environment/typescript/
@@ -28,8 +28,8 @@ run_node_example paying-for-contract-call-tx.mjs
 run_node_example paying-for-spend-tx.mjs
 run_node_example transfer-ae.mjs
 
-# revisit --ignore-scripts after solving https://github.com/npm/cli/issues/4202
-sed -i '' 's/"prepare"/"rem-prepare"/g' package.json
+# TODO: revisit --ignore-scripts after solving https://github.com/npm/cli/issues/4202
+perl -i -pe 's/"prepare"/"rem-prepare"/g' package.json
 
 echo Build example aepp
 cd ./examples/browser/aepp
@@ -47,4 +47,4 @@ npm i
 npm run build
 
 cd ../../..
-sed -i '' 's/"rem-prepare"/"prepare"/g' package.json
+perl -i -pe 's/"rem-prepare"/"prepare"/g' package.json

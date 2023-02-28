@@ -8,7 +8,7 @@ Before interacting with contracts using the SDK you should get familiar with Sop
 The SDK needs to interact with following components in order to enable smart contract interactions on the æternity blockchain:
 
 - [æternity](https://github.com/aeternity/aeternity) (host your own one or use the public testnet node at `https://testnet.aeternity.io`)
-- [aesophia_http](https://github.com/aeternity/aesophia_http) (host your own one or use the public compiler at `https://v7.compiler.aepps.com`)
+- [aesophia_http](https://github.com/aeternity/aesophia_http) (host your own one or use the public compiler at `https://v7.compiler.stg.aepps.com`)
 
 Note:
 
@@ -32,7 +32,7 @@ const account = new MemoryAccount(SECRET_KEY)
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
   accounts: [account],
-  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'), // ideally host your own compiler
+  onCompiler: new CompilerHttp('https://v7.compiler.stg.aepps.com'), // ideally host your own compiler
 })
 ```
 

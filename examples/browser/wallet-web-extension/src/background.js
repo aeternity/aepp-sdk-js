@@ -61,7 +61,7 @@ class AccountMemoryProtected extends MemoryAccount {
 }
 
 const aeSdk = new AeSdkWallet({
-  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+  onCompiler: new CompilerHttp('https://v7.compiler.stg.aepps.com'),
   nodes: [{
     name: 'testnet',
     instance: new Node('https://testnet.aeternity.io'),
