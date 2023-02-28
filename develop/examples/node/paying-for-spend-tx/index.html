@@ -1190,7 +1190,8 @@ Note:</p>
 <li>The balance should now be 1</li>
 </ul>
 <h2 id="6-create-and-sign-spendtx-on-behalf-of-new-user">6. Create and sign <code>SpendTx</code> on behalf of new user</h2>
-<p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">spendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">buildTx</span><span class="p">(</span><span class="nx">Tag</span><span class="p">.</span><span class="nx">SpendTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">spendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">buildTx</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="nx">Tag</span><span class="p">.</span><span class="nx">SpendTx</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">senderId</span><span class="o">:</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">recipientId</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="nx">AMOUNT</span><span class="p">,</span>
