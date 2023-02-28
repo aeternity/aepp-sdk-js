@@ -11,7 +11,7 @@ function testCompiler(compiler: CompilerBase): void {
   const inclSourceCodePath = './test/integration/contracts/Includes.aes';
   let inclSourceCode: string;
   let inclFileSystem: Record<string, string>;
-  const inclBytecode = 'cb_+QEGRgOg7BH1sCv+p2IrS0Pn3/i6AfE8lOGUuC71lLPn6mbUm9PAuNm4cv4AWolkAjcCBwcHFBQAAgD+RNZEHwA3ADcAGg6CPwEDP/5Nt4A5AjcCBwcHDAECDAEABAMRAFqJZP6SiyA2ADcBBwcMAwgMAQAEAxFNt4A5/pSgnxIANwF3BwwBAAQDEarAwob+qsDChgI3AXcHPgQAALhgLwYRAFqJZD0uU3VibGlicmFyeS5zdW0RRNZEHxFpbml0EU23gDkxLkxpYnJhcnkuc3VtEZKLIDYRdGVzdBGUoJ8SJWdldExlbmd0aBGqwMKGOS5TdHJpbmcubGVuZ3Rogi8AhTcuMC4xAGzn9fM=';
+  const inclBytecode = 'cb_+QEGRgOg7BH1sCv+p2IrS0Pn3/i6AfE8lOGUuC71lLPn6mbUm9PAuNm4cv4AWolkAjcCBwcHFBQAAgD+RNZEHwA3ADcAGg6CPwEDP/5Nt4A5AjcCBwcHDAECDAEABAMRAFqJZP6SiyA2ADcBBwcMAwgMAQAEAxFNt4A5/pSgnxIANwF3BwwBAAQDEarAwob+qsDChgI3AXcHPgQAALhgLwYRAFqJZD0uU3VibGlicmFyeS5zdW0RRNZEHxFpbml0EU23gDkxLkxpYnJhcnkuc3VtEZKLIDYRdGVzdBGUoJ8SJWdldExlbmd0aBGqwMKGOS5TdHJpbmcubGVuZ3Rogi8AhTcuMS4wAGHgFTw=';
   // TODO: use Includes.aes after fixing https://github.com/aeternity/aesophia_cli/issues/74
   const incSourceCodePath = './test/integration/contracts/Increment.aes';
   let incSourceCode: string;
@@ -25,21 +25,21 @@ function testCompiler(compiler: CompilerBase): void {
   });
 
   it('returns version', async () => {
-    expect(await compiler.version()).to.be.equal('7.0.1');
+    expect(await compiler.version()).to.be.equal('7.1.0');
   });
 
   it('compiles and generates aci by path', async () => {
     const { bytecode, aci } = await compiler.compile(inclSourceCodePath);
     expect(bytecode).to.equal(inclBytecode);
-    expect(aci).to.have.property('encodedAci');
-    expect(aci).to.have.property('externalEncodedAci');
+    expect(aci).to.have.length(6);
+    expect(aci[aci.length - 1]).to.have.property('contract');
   });
 
   it('compiles and generates aci by source code', async () => {
     const { bytecode, aci } = await compiler.compileBySourceCode(inclSourceCode, inclFileSystem);
     expect(bytecode).to.equal(inclBytecode);
-    expect(aci).to.have.property('encodedAci');
-    expect(aci).to.have.property('externalEncodedAci');
+    expect(aci).to.have.length(6);
+    expect(aci[aci.length - 1]).to.have.property('contract');
   });
 
   it('throws clear exception if compile broken contract', async () => {

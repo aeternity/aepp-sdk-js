@@ -193,9 +193,9 @@ describe('Contract instance', () => {
     testContract.$options.should.have.property('bytecode');
     assertNotNull(testContract.$options.fileSystem);
     testContract.$options.fileSystem.should.have.property('testLib');
-    testContract._aci.encodedAci.contract.functions.forEach(({ name }) => {
-      expect(testContract).to.have.property(name);
-    });
+    const contractAci = testContract._aci[testContract._aci.length - 1]?.contract;
+    assertNotNull(contractAci);
+    contractAci.functions.forEach(({ name }) => expect(testContract).to.have.property(name));
   });
 
   it('compiles', async () => {
@@ -407,7 +407,7 @@ describe('Contract instance', () => {
     }
 
     const contract1 = new TestContract(aeSdk._getOptions());
-    expect(contract1._aci).to.be.an('object');
+    expect(contract1._aci).to.be.an('array');
     expect(contract1.$options).to.be.an('object');
     await contract1.$deploy([]);
     expect((await contract1.getArg(42)).decodedResult).to.be.equal(42n);
@@ -416,7 +416,7 @@ describe('Contract instance', () => {
       ...aeSdk._getOptions(),
       address: contract1.$options.address,
     });
-    expect(contract2._aci).to.be.an('object');
+    expect(contract2._aci).to.be.an('array');
     expect(contract2.$options).to.be.an('object');
     expect((await contract2.getArg(42)).decodedResult).to.be.equal(42n);
   });
@@ -618,7 +618,7 @@ describe('Contract instance', () => {
       expect(() => contract.$decodeEvents(getDuplicateLog('Duplicate'))).to.throw(
         AmbiguousEventDefinitionError,
         'Found multiple definitions of "Duplicate" event with different types emitted by'
-        + ` ${remoteContract.$options.address ?? ''} in "StateContract", "RemoteI" contracts`
+        + ` ${remoteContract.$options.address ?? ''} in "RemoteI", "StateContract" contracts`
         + ' (use contractAddressToName option to specify contract name corresponding to address)',
       );
     });
@@ -645,7 +645,7 @@ describe('Contract instance', () => {
         args: [0n],
         contract: {
           address: remoteContract.$options.address,
-          name: 'StateContract',
+          name: 'RemoteI',
         },
       }]);
     });
@@ -732,12 +732,12 @@ describe('Contract instance', () => {
     describe('ADDRESS', () => {
       it('Invalid address', async () => {
         await expect(testContract.addressFn('asdasasd' as any))
-          .to.be.rejectedWith('Address should start with ak_, got asdasasd instead');
+          .to.be.rejectedWith('Account pubkey should start with ak_, got asdasasd instead');
       });
 
       it('Invalid address type', async () => {
         await expect(testContract.addressFn(333 as any)).to.be
-          .rejectedWith('Address should start with ak_, got 333 instead');
+          .rejectedWith('data.substring is not a function');
       });
 
       it('Return address', async () => {

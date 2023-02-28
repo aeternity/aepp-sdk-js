@@ -55,7 +55,7 @@ export default class CompilerHttp extends CompilerBase {
       const versionPromise = this.api.apiVersion()
         .then(({ apiVersion }) => apiVersion, (error) => error);
       this.api.pipeline.addPolicy(
-        genVersionCheckPolicy('compiler', '/api-version', versionPromise, '7.0.1', '8.0.0'),
+        genVersionCheckPolicy('compiler', '/api-version', versionPromise, '7.1.1', '8.0.0'),
       );
     }
   }
@@ -65,13 +65,9 @@ export default class CompilerHttp extends CompilerBase {
     fileSystem?: Record<string, string>,
   ): Promise<{ bytecode: Encoded.ContractBytearray; aci: Aci }> {
     try {
-      const [bytecode, aci] = await Promise.all([
-        this.api.compileContract({ code: sourceCode, options: { fileSystem } })
-          .then((res) => res.bytecode as Encoded.ContractBytearray),
-        this.api.generateACI({ code: sourceCode, options: { fileSystem } }),
-      ]);
+      const res = await this.api.compileContract({ code: sourceCode, options: { fileSystem } });
       // TODO: should be fixed when the compiledAci interface gets updated
-      return { bytecode, aci: aci as Aci };
+      return res as { bytecode: Encoded.ContractBytearray; aci: Aci };
     } catch (error) {
       if (error instanceof RestError && error.statusCode === 400) {
         throw new CompilerError(error.message.replace(/^aci error:/, 'compile error:'));

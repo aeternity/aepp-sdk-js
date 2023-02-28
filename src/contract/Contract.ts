@@ -45,7 +45,8 @@ import {
 import AccountBase from '../account/Base';
 import { TxUnpacked } from '../tx/builder/schema.generated';
 
-type FunctionAci = Aci['encodedAci']['contract']['functions'][0];
+type ContractAci = NonNullable<Aci[0]['contract']>;
+type FunctionAci = ContractAci['functions'][0];
 
 interface Event extends NodeEvent {
   address: Encoded.ContractAddress;
@@ -266,7 +267,7 @@ class Contract<M extends ContractMethodsBase> {
    * @returns function ACI
    */
   #getFunctionAci(name: string): FunctionAci {
-    const fn = this._aci.encodedAci.contract.functions.find(
+    const fn = this.#aciContract.functions.find(
       (f: { name: string }) => f.name === name,
     );
     if (fn != null) {
@@ -389,9 +390,9 @@ class Contract<M extends ContractMethodsBase> {
     // TODO: consider using a third-party library
     const isEqual = (a: any, b: any): boolean => JSON.stringify(a) === JSON.stringify(b);
 
-    const contracts = [this._aci.encodedAci, ...this._aci.externalEncodedAci ?? []]
+    const contracts = this._aci
       .map(({ contract }) => contract)
-      .filter((contract) => contract?.event) as Array<Aci['encodedAci']['contract']>;
+      .filter((contract) => contract?.event) as ContractAci[];
     const matchedEvents = contracts
       .map((contract) => [contract.name, contract.event.variant])
       .map(([name, events]) => events.map((event: {}) => (
@@ -505,6 +506,8 @@ class Contract<M extends ContractMethodsBase> {
 
   _aci: Aci;
 
+  #aciContract: ContractAci;
+
   _name: string;
 
   _calldata: Calldata;
@@ -522,8 +525,13 @@ class Contract<M extends ContractMethodsBase> {
     fileSystem?: Parameters<CompilerBase['compileBySourceCode']>[1];
   } & Parameters<Contract<M>['$deploy']>[1]) {
     this._aci = aci;
-    this._name = aci.encodedAci.contract.name;
-    this._calldata = new Calldata([aci.encodedAci, ...aci.externalEncodedAci ?? []]);
+    const aciLast = aci[aci.length - 1];
+    if (aciLast.contract == null) {
+      throw new IllegalArgumentError(`The last 'aci' item should have 'contract' key, got ${Object.keys(aciLast)} keys instead`);
+    }
+    this.#aciContract = aciLast.contract;
+    this._name = this.#aciContract.name;
+    this._calldata = new Calldata(aci);
     this.$options = otherOptions;
 
     /**
@@ -542,7 +550,7 @@ class Contract<M extends ContractMethodsBase> {
      */
     Object.assign(
       this,
-      Object.fromEntries(this._aci.encodedAci.contract.functions
+      Object.fromEntries(this.#aciContract.functions
         .map(({ name, arguments: aciArgs, stateful }: FunctionAci) => {
           const callStatic = name !== 'init' && !stateful;
           return [

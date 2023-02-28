@@ -71,24 +71,18 @@ export default class CompilerCli extends CompilerBase {
     aci: Aci;
   }> {
     await this.#ensureCompatibleVersion;
-    let bytecode;
-    let aciCli;
     try {
-      [bytecode, aciCli] = await Promise.all([
+      const [bytecode, aci] = await Promise.all([
         this.#run(path),
         this.#run('--create_json_aci', path).then((res) => JSON.parse(res)),
       ]);
+      return {
+        bytecode: bytecode.trimEnd() as Encoded.ContractBytearray,
+        aci: aci as Aci,
+      };
     } catch (error) {
       throw new CompilerError(error.message);
     }
-    const aci = {
-      encodedAci: aciCli[0],
-      externalEncodedAci: aciCli.slice(1),
-    };
-    return {
-      bytecode: bytecode.trimEnd() as Encoded.ContractBytearray,
-      aci: aci as Aci,
-    };
   }
 
   async compileBySourceCode(sourceCode: string, fileSystem?: Record<string, string>): Promise<{

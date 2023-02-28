@@ -1,7 +1,7 @@
 import https from 'https';
 import fs from 'fs';
 
-const swaggerUrl = 'https://raw.githubusercontent.com/aeternity/aesophia_http/v7.0.1/config/swagger.yaml';
+const swaggerUrl = 'https://raw.githubusercontent.com/aeternity/aesophia_http/v7.1.1/config/swagger.yaml';
 
 let swagger = await new Promise((resolve) => {
   https.get(swaggerUrl, (res) => {
