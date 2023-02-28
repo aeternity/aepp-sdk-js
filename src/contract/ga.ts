@@ -91,8 +91,8 @@ interface CreateGeneralizedAccountOptions extends
 export async function buildAuthTxHash(
   transaction: Encoded.Transaction,
   { onNode }: { onNode: Node },
-): Promise<Uint8Array> {
-  return new Uint8Array(hash(
+): Promise<Buffer> {
+  return hash(
     concatBuffers([Buffer.from(await onNode.getNetworkId()), decode(transaction)]),
-  ));
+  );
 }
