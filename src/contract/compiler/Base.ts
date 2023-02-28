@@ -1,5 +1,4 @@
 import { Encoded } from '../../utils/encoder';
-import { Aci as BaseAci } from '../../apis/compiler';
 
 interface FunctionAci {
   arguments: any[];
@@ -9,16 +8,13 @@ interface FunctionAci {
   stateful: boolean;
 }
 
-interface AciContract {
-  name: string;
-  event?: any;
-  functions: FunctionAci[];
-}
-
-export interface Aci extends BaseAci {
-  encodedAci: { contract: AciContract };
-  externalEncodedAci?: Array<{ contract?: AciContract }>;
-}
+export type Aci = Array<{
+  contract?: {
+    name: string;
+    event?: any;
+    functions: FunctionAci[];
+  };
+}>;
 
 /**
  * A base class for all compiler implementations

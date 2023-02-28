@@ -31,15 +31,15 @@ function testCompiler(compiler: CompilerBase): void {
   it('compiles and generates aci by path', async () => {
     const { bytecode, aci } = await compiler.compile(inclSourceCodePath);
     expect(bytecode).to.equal(inclBytecode);
-    expect(aci).to.have.property('encodedAci');
-    expect(aci).to.have.property('externalEncodedAci');
+    expect(aci).to.have.length(6);
+    expect(aci[aci.length - 1]).to.have.property('contract');
   });
 
   it('compiles and generates aci by source code', async () => {
     const { bytecode, aci } = await compiler.compileBySourceCode(inclSourceCode, inclFileSystem);
     expect(bytecode).to.equal(inclBytecode);
-    expect(aci).to.have.property('encodedAci');
-    expect(aci).to.have.property('externalEncodedAci');
+    expect(aci).to.have.length(6);
+    expect(aci[aci.length - 1]).to.have.property('contract');
   });
 
   it('throws clear exception if compile broken contract', async () => {
