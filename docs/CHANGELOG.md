@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file. See [standa
 Please check out [migration guide](./guides/migration/13.0.0.md).
 
 #### Wallet
-* `onSign`, `onMessageSign` callbacks removed on wallet side
+* `onSign`, `onMessageSign` callbacks were removed on the wallet side
 
 #### Contract
 * ACI format used the same as returned by aesophia_cli
@@ -30,28 +30,28 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `contract.deploy` renamed to `contract.$deploy`
 * use `sourceCode` instead of `source`
 * `getContractInstance` accepts `address` instead of `contractAddress`
-* `prepareTxParams`, `getVmVersion` not exported anymore
+* `prepareTxParams`, `getVmVersion` are not exported anymore
 * `isGA` method removed
 
 #### Transaction builder
-* StateTrees fields decoded as objects mapping key to decoded entry instead internals
+* StateTrees fields decoded as objects mapping key to decoded entry instead of internals
 * The content of Tag.*Mtree entries decoded and moved to `payload` field
 * TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas not exported anymore
 * AeSdk.buildTx accepts `tag` in options
 * `TX_TTL` not exported anymore
 * sync `buildTx` accepts `denomination` in the first argument
-* Enum `FIELD_TYPES` not exported anymore
+* Enum `FIELD_TYPES` is not exported anymore
 * Not able to build/unpack CompilerSophia entry (tag 70)
 * Enums `PROTOCOL_VM_ABI`, interface `CtVersion` not exported anymore
 * Enums `VM_VERSIONS`, `ABI_VERSIONS`, `PROTOCOL_VERSIONS` renamed
 * `stateHash` of Channel entry decoded as `st_`-prefixed string instead of hex
-* `key` of MtreeValue entry temporary decoded as buffer instead of hex
-* SpendTx `payload` doesn't accept arbitrary string anymore
-* `unpackTx` return object of transaction parameters
+* `key` of MtreeValue entry decoded as a buffer instead of a hex
+* SpendTx `payload` doesn't accept arbitrary strings anymore
+* `unpackTx` return an object of transaction parameters
 * `unpackTx` doesn't return `rlpEncoded` anymore
 * `verifyTransaction` doesn't accept parent tx types anymore
 * TxBuilder accepts and returns `poi` field unpacked as TreesPoi
-* `buildTx` accepts transaction type and version in first argument
+* `buildTx` accepts transaction type and version in the first argument
 * `buildTx` return string instead of object
 * `buildTx` doesn't return `txObject` anymore
 * `buildTx` doesn't return `binary` anymore
@@ -62,7 +62,7 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `get` method of MPTree accepts and returns typed values
 * `writeInt` function removed
 * `returnType` of contract call result structure is a value of CallReturnType enum
-* `writeId`, `readId` function removed
+* `writeId`, `readId` functions removed
 * `readPointers`, `buildPointers` functions removed
 * `formatSalt` function removed
 * `validateParams`, `unpackRawTx` functions removed
@@ -82,7 +82,7 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `AccountBase` simplified
 * `address` in `AccountBase` is a property
 * MemoryAccount accepts only secretKey
-* MemoryAccount not compatible with GA
+* MemoryAccount is not compatible with GA
 
 #### Node
 * `url` property of `Node` removed
@@ -97,7 +97,7 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `send` inlined into `sendTransaction`
 
 #### AENS
-* `height` removed from output of `aensPreclaim`
+* `height` removed from the output of `aensPreclaim`
 
 #### Channel
 * Channel:state returns unpacked entries
@@ -105,7 +105,7 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * Channel:poi returns unpacked TreesPoi
 
 #### Other
-* `onAccount` doesn't accepts keypair
+* `onAccount` doesn't accept keypair
 * `bigNumberToByteArray` removed
 * `str2buf` function removed
 * `getAddressFromPriv` doesn't accept private key as base64-encoded or raw string
@@ -120,9 +120,9 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `verifyMessage` removed from accounts and AeSdkBase
 * `verify` and `verifyMessage` accepts address instead of hex string or Uint8Array
 * node@12 not supported
-* `removeAccount` throws error if account not found
-* `signMessage` always return `Uint8Array`
-* `encryptKey`, `decryptKey` not exported anymore
+* `removeAccount` throws an error if the account is not found
+* `signMessage` always returns `Uint8Array`
+* `encryptKey`, `decryptKey` are not exported anymore
 * `sha256hash` not exported anymore
 * `height` method removed
 * `signUsingGA` method removed
@@ -163,7 +163,7 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * add Ledger HW support ([587e058](https://github.com/aeternity/aepp-sdk-js/commit/587e0583debc43f5667a6e1aa0dafd986bd6e3e4))
 * ensure that used correct account type while signing transaction ([46e8db3](https://github.com/aeternity/aepp-sdk-js/commit/46e8db337f65674c7d50b760a46ee9a4aad0c17d))
 * extract AeSdkMethods class with minimal interface ([fd0fe76](https://github.com/aeternity/aepp-sdk-js/commit/fd0fe76b08f7a670ca87e177dde6bd5233bcae05))
-* restore ability to specify array of accounts in AeSdk constructor ([aba9b9f](https://github.com/aeternity/aepp-sdk-js/commit/aba9b9f7a2452154b90d10faa65b76edcf7313a0))
+* restore the ability to specify an array of accounts in AeSdk constructor ([aba9b9f](https://github.com/aeternity/aepp-sdk-js/commit/aba9b9f7a2452154b90d10faa65b76edcf7313a0))
 
 
 ### Bug Fixes
@@ -196,7 +196,7 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * **contract:** don't throw ambiguous error if event types the same ([669c326](https://github.com/aeternity/aepp-sdk-js/commit/669c32677fbf11d2fc61c7817a7e24a2775aa423))
 * **contract:** don't throw error if already compiled ([dcedb61](https://github.com/aeternity/aepp-sdk-js/commit/dcedb611bf9dc305925fa44e95424d0a37e4d060))
 * **contract:** more specific error on calling without address ([5c5a241](https://github.com/aeternity/aepp-sdk-js/commit/5c5a241f4e86b2df322fcfc0dfc31c95d3b9f575))
-* don't swallow errors without checking its type and message ([7456b0f](https://github.com/aeternity/aepp-sdk-js/commit/7456b0f29d67c3a83fff929c8582990f91c6e103))
+* don't swallow errors without checking their type and message ([7456b0f](https://github.com/aeternity/aepp-sdk-js/commit/7456b0f29d67c3a83fff929c8582990f91c6e103))
 * don't use any in AeSdkBase constructor options ([51fd3ae](https://github.com/aeternity/aepp-sdk-js/commit/51fd3ae4061576c8f741c05b617d05eb135090fb))
 * sync options between Contract and AeSdkBase ([6acebaf](https://github.com/aeternity/aepp-sdk-js/commit/6acebaf8e25f28b74f4a896d07f91b93bbde8a83))
 * **tx-builder:** avoid extra requests in tx validator ([03c77e5](https://github.com/aeternity/aepp-sdk-js/commit/03c77e5d320ca5a2cfd1ce6581d190d915d74ed1))
