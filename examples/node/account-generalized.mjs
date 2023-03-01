@@ -77,7 +77,7 @@ await aeSdk.spend(2e18, recipient, {
     const fee = 10n ** 14n;
     const gasPrice = MIN_GAS_PRICE;
     const authTxHash = await aeSdk.buildAuthTxHash(transaction, { fee, gasPrice });
-    console.log('Auth.tx_hash', authTxHash.toString());
+    console.log('Auth.tx_hash', authTxHash.toString('hex'));
     authData.args[1] += 1;
     Object.assign(authData, { fee, gasPrice });
     return authData;
