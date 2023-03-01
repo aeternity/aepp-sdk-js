@@ -6549,7 +6549,7 @@
 <p>Please check out <a href="../guides/migration/13.0.0/">migration guide</a>.</p>
 <h4 id="wallet">Wallet</h4>
 <ul>
-<li><code>onSign</code>, <code>onMessageSign</code> callbacks removed on wallet side</li>
+<li><code>onSign</code>, <code>onMessageSign</code> callbacks were removed on the wallet side</li>
 </ul>
 <h4 id="contract">Contract</h4>
 <ul>
@@ -6570,29 +6570,29 @@
 <li><code>contract.deploy</code> renamed to <code>contract.$deploy</code></li>
 <li>use <code>sourceCode</code> instead of <code>source</code></li>
 <li><code>getContractInstance</code> accepts <code>address</code> instead of <code>contractAddress</code></li>
-<li><code>prepareTxParams</code>, <code>getVmVersion</code> not exported anymore</li>
+<li><code>prepareTxParams</code>, <code>getVmVersion</code> are not exported anymore</li>
 <li><code>isGA</code> method removed</li>
 </ul>
 <h4 id="transaction-builder">Transaction builder</h4>
 <ul>
-<li>StateTrees fields decoded as objects mapping key to decoded entry instead internals</li>
+<li>StateTrees fields decoded as objects mapping key to decoded entry instead of internals</li>
 <li>The content of Tag.*Mtree entries decoded and moved to <code>payload</code> field</li>
 <li>TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas not exported anymore</li>
 <li>AeSdk.buildTx accepts <code>tag</code> in options</li>
 <li><code>TX_TTL</code> not exported anymore</li>
 <li>sync <code>buildTx</code> accepts <code>denomination</code> in the first argument</li>
-<li>Enum <code>FIELD_TYPES</code> not exported anymore</li>
+<li>Enum <code>FIELD_TYPES</code> is not exported anymore</li>
 <li>Not able to build/unpack CompilerSophia entry (tag 70)</li>
 <li>Enums <code>PROTOCOL_VM_ABI</code>, interface <code>CtVersion</code> not exported anymore</li>
 <li>Enums <code>VM_VERSIONS</code>, <code>ABI_VERSIONS</code>, <code>PROTOCOL_VERSIONS</code> renamed</li>
 <li><code>stateHash</code> of Channel entry decoded as <code>st_</code>-prefixed string instead of hex</li>
-<li><code>key</code> of MtreeValue entry temporary decoded as buffer instead of hex</li>
-<li>SpendTx <code>payload</code> doesn't accept arbitrary string anymore</li>
-<li><code>unpackTx</code> return object of transaction parameters</li>
+<li><code>key</code> of MtreeValue entry decoded as a buffer instead of a hex</li>
+<li>SpendTx <code>payload</code> doesn't accept arbitrary strings anymore</li>
+<li><code>unpackTx</code> return an object of transaction parameters</li>
 <li><code>unpackTx</code> doesn't return <code>rlpEncoded</code> anymore</li>
 <li><code>verifyTransaction</code> doesn't accept parent tx types anymore</li>
 <li>TxBuilder accepts and returns <code>poi</code> field unpacked as TreesPoi</li>
-<li><code>buildTx</code> accepts transaction type and version in first argument</li>
+<li><code>buildTx</code> accepts transaction type and version in the first argument</li>
 <li><code>buildTx</code> return string instead of object</li>
 <li><code>buildTx</code> doesn't return <code>txObject</code> anymore</li>
 <li><code>buildTx</code> doesn't return <code>binary</code> anymore</li>
@@ -6603,7 +6603,7 @@
 <li><code>get</code> method of MPTree accepts and returns typed values</li>
 <li><code>writeInt</code> function removed</li>
 <li><code>returnType</code> of contract call result structure is a value of CallReturnType enum</li>
-<li><code>writeId</code>, <code>readId</code> function removed</li>
+<li><code>writeId</code>, <code>readId</code> functions removed</li>
 <li><code>readPointers</code>, <code>buildPointers</code> functions removed</li>
 <li><code>formatSalt</code> function removed</li>
 <li><code>validateParams</code>, <code>unpackRawTx</code> functions removed</li>
@@ -6625,7 +6625,7 @@
 <li><code>AccountBase</code> simplified</li>
 <li><code>address</code> in <code>AccountBase</code> is a property</li>
 <li>MemoryAccount accepts only secretKey</li>
-<li>MemoryAccount not compatible with GA</li>
+<li>MemoryAccount is not compatible with GA</li>
 </ul>
 <h4 id="node">Node</h4>
 <ul>
@@ -6644,7 +6644,7 @@
 </ul>
 <h4 id="aens">AENS</h4>
 <ul>
-<li><code>height</code> removed from output of <code>aensPreclaim</code></li>
+<li><code>height</code> removed from the output of <code>aensPreclaim</code></li>
 </ul>
 <h4 id="channel">Channel</h4>
 <ul>
@@ -6654,7 +6654,7 @@
 </ul>
 <h4 id="other">Other</h4>
 <ul>
-<li><code>onAccount</code> doesn't accepts keypair</li>
+<li><code>onAccount</code> doesn't accept keypair</li>
 <li><code>bigNumberToByteArray</code> removed</li>
 <li><code>str2buf</code> function removed</li>
 <li><code>getAddressFromPriv</code> doesn't accept private key as base64-encoded or raw string</li>
@@ -6669,9 +6669,9 @@
 <li><code>verifyMessage</code> removed from accounts and AeSdkBase</li>
 <li><code>verify</code> and <code>verifyMessage</code> accepts address instead of hex string or Uint8Array</li>
 <li>node@12 not supported</li>
-<li><code>removeAccount</code> throws error if account not found</li>
-<li><code>signMessage</code> always return <code>Uint8Array</code></li>
-<li><code>encryptKey</code>, <code>decryptKey</code> not exported anymore</li>
+<li><code>removeAccount</code> throws an error if the account is not found</li>
+<li><code>signMessage</code> always returns <code>Uint8Array</code></li>
+<li><code>encryptKey</code>, <code>decryptKey</code> are not exported anymore</li>
 <li><code>sha256hash</code> not exported anymore</li>
 <li><code>height</code> method removed</li>
 <li><code>signUsingGA</code> method removed</li>
@@ -6712,7 +6712,7 @@
 <li>add Ledger HW support (<a href="https://github.com/aeternity/aepp-sdk-js/commit/587e0583debc43f5667a6e1aa0dafd986bd6e3e4">587e058</a>)</li>
 <li>ensure that used correct account type while signing transaction (<a href="https://github.com/aeternity/aepp-sdk-js/commit/46e8db337f65674c7d50b760a46ee9a4aad0c17d">46e8db3</a>)</li>
 <li>extract AeSdkMethods class with minimal interface (<a href="https://github.com/aeternity/aepp-sdk-js/commit/fd0fe76b08f7a670ca87e177dde6bd5233bcae05">fd0fe76</a>)</li>
-<li>restore ability to specify array of accounts in AeSdk constructor (<a href="https://github.com/aeternity/aepp-sdk-js/commit/aba9b9f7a2452154b90d10faa65b76edcf7313a0">aba9b9f</a>)</li>
+<li>restore the ability to specify an array of accounts in AeSdk constructor (<a href="https://github.com/aeternity/aepp-sdk-js/commit/aba9b9f7a2452154b90d10faa65b76edcf7313a0">aba9b9f</a>)</li>
 </ul>
 <h3 id="bug-fixes">Bug Fixes</h3>
 <ul>
@@ -6744,7 +6744,7 @@
 <li><strong>contract:</strong> don't throw ambiguous error if event types the same (<a href="https://github.com/aeternity/aepp-sdk-js/commit/669c32677fbf11d2fc61c7817a7e24a2775aa423">669c326</a>)</li>
 <li><strong>contract:</strong> don't throw error if already compiled (<a href="https://github.com/aeternity/aepp-sdk-js/commit/dcedb611bf9dc305925fa44e95424d0a37e4d060">dcedb61</a>)</li>
 <li><strong>contract:</strong> more specific error on calling without address (<a href="https://github.com/aeternity/aepp-sdk-js/commit/5c5a241f4e86b2df322fcfc0dfc31c95d3b9f575">5c5a241</a>)</li>
-<li>don't swallow errors without checking its type and message (<a href="https://github.com/aeternity/aepp-sdk-js/commit/7456b0f29d67c3a83fff929c8582990f91c6e103">7456b0f</a>)</li>
+<li>don't swallow errors without checking their type and message (<a href="https://github.com/aeternity/aepp-sdk-js/commit/7456b0f29d67c3a83fff929c8582990f91c6e103">7456b0f</a>)</li>
 <li>don't use any in AeSdkBase constructor options (<a href="https://github.com/aeternity/aepp-sdk-js/commit/51fd3ae4061576c8f741c05b617d05eb135090fb">51fd3ae</a>)</li>
 <li>sync options between Contract and AeSdkBase (<a href="https://github.com/aeternity/aepp-sdk-js/commit/6acebaf8e25f28b74f4a896d07f91b93bbde8a83">6acebaf</a>)</li>
 <li><strong>tx-builder:</strong> avoid extra requests in tx validator (<a href="https://github.com/aeternity/aepp-sdk-js/commit/03c77e5d320ca5a2cfd1ce6581d190d915d74ed1">03c77e5</a>)</li>
