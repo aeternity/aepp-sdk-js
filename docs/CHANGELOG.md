@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
+Please check out [migration guide](./guides/migration/13.0.0.md).
+
+#### Wallet
+* `onSign`, `onMessageSign` callbacks removed on wallet side
+
+#### Contract
 * **contract:** ACI format used the same as returned by aesophia_cli
 aesophia_http old format
 ```json
@@ -20,35 +26,40 @@ aesophia_cli format
 [<2>, { contract: <1> }]
 ```
 * **contract:** Dropped compatibility with aesophia_http below 7.1.0
-* **oracle:** `QUERY_FEE` is not exported anymore
-Use 30000 instead if necessary.
-* **oracle:** Oracles created without queryFee by default
-Specify `queryFee` in `registerOracle` if needed.
-* **oracle:** AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId
-Remove the first argument.
-* **chain:** `send` inlined into `sendTransaction`
-Pass not signed transaction to `sendTransaction`.
-If you need to post signed transaction use Node:postTransaction.
-* **aens:** `height` removed from output of `aensPreclaim`
-Use `blockHeight` instead:
-```
-const res = aeSdk.aensPreclaim('name.chain');
--res.height
-+res.blockHeight - 1
-```
-* **oracle:** `onQuery` callback of `pollForQueries`, `oracle.pollQueries` accepts a single query
-It was accepting an array before. Apply a patch:
-```diff
--aeSdk.pollForQueries(oracleId, (queries) => queries.forEach(handleQuery));
-+aeSdk.pollForQueries(oracleId, handleQuery);
-```
-* **channel:** Channel:state returns unpacked entries
-Use `buildTx` to pack them back if needed.
 * **contract:** Contract.$createDelegationSignature extracted to a separate AeSdk method
 TODO: Combine with a previous breaking change
-* **channel:** All channel events emitted in snakeCase
-Affected events: 'own_withdraw_locked', 'withdraw_locked', 'own_deposit_locked', 'deposit_locked',
-'peer_disconnected', 'channel_reestablished'.
+* **contract:** `createGeneralizedAccount` accepts `sourceCode` in options
+Apply a patch:
+```diff
+-aeSdk.createGeneralizedAccount('authorize', sourceCode, ['arg-1']);
++aeSdk.createGeneralizedAccount('authorize', ['arg-1'], { sourceCode });
+```
+* **contract:** Methods of `CompilerHttp` moved to `api` property
+Apply a patch:
+```diff
+-compilerHttp.generateACI({ code: sourceCode });
++compilerHttp.api.generateACI({ code: sourceCode });
+```
+* `params` argument in `$deploy` and `$call` is required
+* `AeSdk.getContractInstance` renamed to `AeSdk.initializeContract`
+* `getContractInstance` function replaced with Contract class
+* Contract methods accessible on the instance itself
+* `contract.methods.<name>.get,send` removed
+* `contract.bytecode,sourceCode` moved to `contract.$options`
+* `contract.calldata` renamed to `contract._calldata`
+* `contract.deployInfo` removed
+* `contract.options` renamed to `contract.$options`
+* `contract.decodeEvents` renamed to `contract.$decodeEvents`
+* `contract.call` renamed to `contract.$call`
+* `contract.compile` renamed to `contract.$compile`
+* `contract.deploy` renamed to `contract.$deploy`
+* `createAensDelegationSignature`, `createOracleDelegationSignature` removed
+* use `sourceCode` instead of `source`
+* `getContractInstance` accepts `address` instead of `contractAddress`
+* `prepareTxParams`, `getVmVersion` not exported anymore
+* `isGA` method removed
+
+#### Transaction builder
 * **tx-builder:** StateTrees fields decoded as objects mapping key to decoded entry instead internals
 * **tx-builder:** The content of Tag.*Mtree entries decoded and moved to `payload` field
 * **tx-builder:** TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas not exported anymore
@@ -107,18 +118,15 @@ Apply a change:
 -unpackTx(tree.get(decode('ak_97...')))
 +tree.get('ak_97...')
 ```
-* **contract:** `createGeneralizedAccount` accepts `sourceCode` in options
-Apply a patch:
-```diff
--aeSdk.createGeneralizedAccount('authorize', sourceCode, ['arg-1']);
-+aeSdk.createGeneralizedAccount('authorize', ['arg-1'], { sourceCode });
-```
-* **contract:** Methods of `CompilerHttp` moved to `api` property
-Apply a patch:
-```diff
--compilerHttp.generateACI({ code: sourceCode });
-+compilerHttp.api.generateACI({ code: sourceCode });
-```
+* `writeInt` function removed
+* `returnType` of contract call result structure is a value of CallReturnType enum
+* `writeId`, `readId` function removed
+* `readPointers`, `buildPointers` functions removed
+* `formatSalt` function removed
+* `validateParams`, `unpackRawTx` functions removed
+* `AMOUNT` constant removed
+
+#### Compiler
 * **compiler:** `Compiler` export renamed to `CompilerHttp`
 * **compiler:** removed `compilerUrl`, `setCompilerUrl`
 Compiler instance need to be passed explicitly in `onCompiler` option:
@@ -131,44 +139,6 @@ const aeSdk = new AeSdk({
 +  compilerUrl: new Compiler(<compiler url>),
 });
 ```
-
-### ⚠ BREAKING CHANGES
-
-Please check out [migration guide](./guides/migration/13.0.0.md).
-
-#### Wallet
-* `onSign`, `onMessageSign` callbacks removed on wallet side
-
-#### Contract
-* `params` argument in `$deploy` and `$call` is required
-* `AeSdk.getContractInstance` renamed to `AeSdk.initializeContract`
-* `getContractInstance` function replaced with Contract class
-* Contract methods accessible on the instance itself
-* `contract.methods.<name>.get,send` removed
-* `contract.bytecode,sourceCode` moved to `contract.$options`
-* `contract.calldata` renamed to `contract._calldata`
-* `contract.deployInfo` removed
-* `contract.options` renamed to `contract.$options`
-* `contract.decodeEvents` renamed to `contract.$decodeEvents`
-* `contract.call` renamed to `contract.$call`
-* `contract.compile` renamed to `contract.$compile`
-* `contract.deploy` renamed to `contract.$deploy`
-* `createAensDelegationSignature`, `createOracleDelegationSignature` removed
-* use `sourceCode` instead of `source`
-* `getContractInstance` accepts `address` instead of `contractAddress`
-* `prepareTxParams`, `getVmVersion` not exported anymore
-* `isGA` method removed
-
-#### Transaction builder
-* `writeInt` function removed
-* `returnType` of contract call result structure is a value of CallReturnType enum
-* `writeId`, `readId` function removed
-* `readPointers`, `buildPointers` functions removed
-* `formatSalt` function removed
-* `validateParams`, `unpackRawTx` functions removed
-* `AMOUNT` constant removed
-
-#### Compiler
 * Dropped compatibility with compilers below 7.0.1
 
 #### Account
@@ -182,6 +152,41 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 
 #### Node
 * `url` property of `Node` removed
+
+#### Oracle
+* **oracle:** `QUERY_FEE` is not exported anymore
+Use 30000 instead if necessary.
+* **oracle:** Oracles created without queryFee by default
+Specify `queryFee` in `registerOracle` if needed.
+* **oracle:** AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId
+Remove the first argument.
+* **oracle:** `onQuery` callback of `pollForQueries`, `oracle.pollQueries` accepts a single query
+It was accepting an array before. Apply a patch:
+```diff
+-aeSdk.pollForQueries(oracleId, (queries) => queries.forEach(handleQuery));
++aeSdk.pollForQueries(oracleId, handleQuery);
+```
+
+#### Chain
+* **chain:** `send` inlined into `sendTransaction`
+Pass not signed transaction to `sendTransaction`.
+If you need to post signed transaction use Node:postTransaction.
+
+#### AENS
+* **aens:** `height` removed from output of `aensPreclaim`
+Use `blockHeight` instead:
+```
+const res = aeSdk.aensPreclaim('name.chain');
+-res.height
++res.blockHeight - 1
+```
+
+#### Channel
+* **channel:** Channel:state returns unpacked entries
+Use `buildTx` to pack them back if needed.
+* **channel:** All channel events emitted in snakeCase
+Affected events: 'own_withdraw_locked', 'withdraw_locked', 'own_deposit_locked', 'deposit_locked',
+'peer_disconnected', 'channel_reestablished'.
 
 #### Other
 * `onAccount` doesn't accepts keypair
