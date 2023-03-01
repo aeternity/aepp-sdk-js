@@ -4,7 +4,7 @@
 
 import { ConsensusProtocolVersion, Int, Tag } from '../tx/builder/constants';
 import {
-  buildContractIdByContractTx, buildTx, buildTxAsync, BuildTxOptions,
+  buildContractIdByContractTx, buildTx, buildTxAsync, BuildTxOptions, unpackTx,
 } from '../tx/builder';
 import { hash } from '../utils/crypto';
 import {
@@ -111,4 +111,27 @@ export async function buildAuthTxHash(
     })));
   }
   return payload;
+}
+
+/**
+ * Build a transaction hash the same as `Auth.tx_hash` by GaMetaTx
+ * @category contract
+ * @param transaction - tx-encoded signed GaMeta transaction
+ * @param options - Options
+ * @param options.onNode - Node to use
+ * @returns Transaction hash
+ */
+export async function buildAuthTxHashByGaMetaTx(
+  transaction: Encoded.Transaction,
+  { onNode }: { onNode: Node },
+): Promise<Buffer> {
+  const txParams = unpackTx(transaction, Tag.SignedTx);
+  if (txParams.encodedTx.tag !== Tag.GaMetaTx) {
+    throw new ArgumentError('transaction', 'to include GaMetaTx', Tag[txParams.encodedTx.tag]);
+  }
+  return buildAuthTxHash(buildTx(txParams.encodedTx.tx.encodedTx), {
+    fee: txParams.encodedTx.fee,
+    gasPrice: txParams.encodedTx.gasPrice,
+    onNode,
+  });
 }
