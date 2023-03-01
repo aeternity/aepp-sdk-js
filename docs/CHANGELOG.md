@@ -14,32 +14,7 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 
 #### Contract
 * **contract:** ACI format used the same as returned by aesophia_cli
-aesophia_http old format
-```json
-{
-  "encoded_aci": { contract: <1> },
-  "external_encoded_aci": [<2>]
-}
-```
-aesophia_cli format
-```json
-[<2>, { contract: <1> }]
-```
-* **contract:** Dropped compatibility with aesophia_http below 7.1.0
-* **contract:** Contract.$createDelegationSignature extracted to a separate AeSdk method
-TODO: Combine with a previous breaking change
-* **contract:** `createGeneralizedAccount` accepts `sourceCode` in options
-Apply a patch:
-```diff
--aeSdk.createGeneralizedAccount('authorize', sourceCode, ['arg-1']);
-+aeSdk.createGeneralizedAccount('authorize', ['arg-1'], { sourceCode });
-```
-* **contract:** Methods of `CompilerHttp` moved to `api` property
-Apply a patch:
-```diff
--compilerHttp.generateACI({ code: sourceCode });
-+compilerHttp.api.generateACI({ code: sourceCode });
-```
+* **contract:** `createAensDelegationSignature`, `createOracleDelegationSignature` replaced with `createDelegationSignature`
 * `params` argument in `$deploy` and `$call` is required
 * `AeSdk.getContractInstance` renamed to `AeSdk.initializeContract`
 * `getContractInstance` function replaced with Contract class
@@ -64,60 +39,29 @@ Apply a patch:
 * **tx-builder:** The content of Tag.*Mtree entries decoded and moved to `payload` field
 * **tx-builder:** TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas not exported anymore
 * **tx-builder:** AeSdk.buildTx accepts `tag` in options
-Replace `aeSdk.buildTx(Tag.SpendTx, { ... })` with `aeSdk.buildTx({ ..., tag: Tag.SpendTx })`.
 * **tx-builder:** `TX_TTL` not exported anymore
-Use `0` instead.
 * **tx-builder:** sync `buildTx` accepts `denomination` in the first argument
-```diff
--buildTx({ ... }, { denomination: AE_AMOUNT_FORMATS.AETTOS })
-+buildTx({ ..., denomination: AE_AMOUNT_FORMATS.AETTOS })
-```
 * **tx-builder:** Enum `FIELD_TYPES` not exported anymore
 * **tx-builder:** Not able to build/unpack CompilerSophia entry (tag 70)
 * **tx-builder:** Enums `PROTOCOL_VM_ABI`, interface `CtVersion` not exported anymore
 * **tx-builder:** Enums `VM_VERSIONS`, `ABI_VERSIONS`, `PROTOCOL_VERSIONS` renamed
-They are exported as `VmVersion`, `AbiVersion`, `ConsensusProtocolVersion`.
 * **tx-builder:** `stateHash` of Channel entry decoded as `st_`-prefixed string instead of hex
 * **tx-builder:** `key` of MtreeValue entry temporary decoded as buffer instead of hex
 * **tx-builder:** SpendTx `payload` doesn't accept arbitrary string anymore
-Provide `ba_`-encoded string instead.
-```diff
--payload: 'test',
-+payload: encode(Buffer.from('test'), Encoding.Bytearray),
-```
 * **tx-builder:** `unpackTx` return object of transaction parameters
-Use `unpackTx(...)` instead of `unpackTx(...).tx`.
 * **tx-builder:** `unpackTx` doesn't return `rlpEncoded` anymore
-Use `decode(buildTx(unpackTx(...).tx))` instead.
 * **tx-builder:** `verifyTransaction` doesn't accept parent tx types anymore
 * **tx-builder:** TxBuilder accepts and returns `poi` field unpacked as TreesPoi
 * **tx-builder:** `Channel.poi` returns unpacked TreesPoi
-Use just `await channel.poi(...)` instead of `unpackTx(await channel.poi(...))`.
 * **tx-builder:** `buildTx` accepts transaction type and version in first argument
-Apply a change:
-```diff
--buildTx({ ... }, Tag.SpendTx, { version: 2 })
-+buildTx({ ..., tag: Tag.SpendTx, version: 2 })
-```
 * **tx-builder:** `buildTx` return string instead of object
-Use just `buildTx(...)` instead of `buildTx(...).tx`.
 * **tx-builder:** `buildTx` doesn't return `txObject` anymore
-Use `unpackTx(buildTx(...).tx)` instead.
 * **tx-builder:** `buildTx` doesn't return `binary` anymore
-Use `require('rlp').decode(decode(buildTx(...).tx))` instead.
 * **tx-builder:** `buildTx` doesn't return `rlpEncoded` anymore
-Use `decode(buildTx(...).tx)` instead.
 * **tx-builder:** `buildTx` doesn't accept `excludeKeys` option anymore
-Consider opening an issue, if you need this functionality.
 * **tx-builder:** Use `version` instead of `VSN`, `vsn` in `unpackTx`, `buildTx`
 * **tx-builder:** `txType` property of `unpackTx` removed
-Use `tx.tag` instead.
 * **tx-builder:** `get` method of MPTree accepts and returns typed values
-Apply a change:
-```diff
--unpackTx(tree.get(decode('ak_97...')))
-+tree.get('ak_97...')
-```
 * `writeInt` function removed
 * `returnType` of contract call result structure is a value of CallReturnType enum
 * `writeId`, `readId` function removed
@@ -127,21 +71,13 @@ Apply a change:
 * `AMOUNT` constant removed
 
 #### Compiler
+* **contract:** Methods of `CompilerHttp` moved to `api` property
 * **compiler:** `Compiler` export renamed to `CompilerHttp`
 * **compiler:** removed `compilerUrl`, `setCompilerUrl`
-Compiler instance need to be passed explicitly in `onCompiler` option:
-```diff
--import { AeSdk } from '@aeternity/aepp-sdk';
-+import { AeSdk, Compiler } from '@aeternity/aepp-sdk';
-
-const aeSdk = new AeSdk({
--  compilerUrl: <compiler url>,
-+  compilerUrl: new Compiler(<compiler url>),
-});
-```
-* Dropped compatibility with compilers below 7.0.1
+* Dropped compatibility with aesophia_http below 7.1.1, aesophia_cli below 7.0.1
 
 #### Account
+* **contract:** `createGeneralizedAccount` accepts `sourceCode` in options
 * `createMetaTx` removed
 * `AccountRpc` constructor accepts arguments one by one
 * `AccountMemory` requires `networkId` in `signTransaction`
@@ -155,38 +91,20 @@ const aeSdk = new AeSdk({
 
 #### Oracle
 * **oracle:** `QUERY_FEE` is not exported anymore
-Use 30000 instead if necessary.
 * **oracle:** Oracles created without queryFee by default
-Specify `queryFee` in `registerOracle` if needed.
 * **oracle:** AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId
-Remove the first argument.
 * **oracle:** `onQuery` callback of `pollForQueries`, `oracle.pollQueries` accepts a single query
-It was accepting an array before. Apply a patch:
-```diff
--aeSdk.pollForQueries(oracleId, (queries) => queries.forEach(handleQuery));
-+aeSdk.pollForQueries(oracleId, handleQuery);
-```
 
 #### Chain
 * **chain:** `send` inlined into `sendTransaction`
-Pass not signed transaction to `sendTransaction`.
-If you need to post signed transaction use Node:postTransaction.
 
 #### AENS
 * **aens:** `height` removed from output of `aensPreclaim`
-Use `blockHeight` instead:
-```
-const res = aeSdk.aensPreclaim('name.chain');
--res.height
-+res.blockHeight - 1
-```
 
 #### Channel
 * **channel:** Channel:state returns unpacked entries
-Use `buildTx` to pack them back if needed.
 * **channel:** All channel events emitted in snakeCase
-Affected events: 'own_withdraw_locked', 'withdraw_locked', 'own_deposit_locked', 'deposit_locked',
-'peer_disconnected', 'channel_reestablished'.
+* **tx-builder:** `Channel.poi` returns unpacked TreesPoi
 
 #### Other
 * `onAccount` doesn't accepts keypair
@@ -325,7 +243,6 @@ Affected events: 'own_withdraw_locked', 'withdraw_locked', 'own_deposit_locked',
 * **account:** move methods from AccountBase to AccountMemory ([857af21](https://github.com/aeternity/aepp-sdk-js/commit/857af21b907873abf36ca666df0602326f16a860))
 * add `exports` field to package.json ([79b16cd](https://github.com/aeternity/aepp-sdk-js/commit/79b16cd0b227329861f2c1e90eed6c31bebb2afa))
 * **compiler:** update to 7.0.1 ([994911f](https://github.com/aeternity/aepp-sdk-js/commit/994911f1716a52857d68b79a56f2d18908ae38bb))
-* **contract:** add `$createDelegationSignature` to contract instance ([24699f1](https://github.com/aeternity/aepp-sdk-js/commit/24699f15896be0984fc8396979148fa97288dab4))
 * **contract:** make `calldata` instance property private ([bc12833](https://github.com/aeternity/aepp-sdk-js/commit/bc128337383815371e7616f9a467e4f055783a5f))
 * **contract:** move `contract.bytecode,sourceCode` to `$options` ([a8eaf3c](https://github.com/aeternity/aepp-sdk-js/commit/a8eaf3c82c6d8c00a64ce6959d3d065d0e07e8ff))
 * **contract:** prefix `call` method with dollar sign ([16574d6](https://github.com/aeternity/aepp-sdk-js/commit/16574d6d093b0aa3a6b81bab497bc66643aee7f3))
