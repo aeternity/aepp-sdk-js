@@ -12,7 +12,7 @@
 
 // ## 1. Create SDK instance and generate an account
 import {
-  AeSdk, Node, MemoryAccount, AccountGeneralized, CompilerHttp,
+  AeSdk, Node, MemoryAccount, AccountGeneralized, CompilerHttp, MIN_GAS_PRICE,
 } from '@aeternity/aepp-sdk';
 
 const aeSdk = new AeSdk({
@@ -74,9 +74,12 @@ console.log('balance after', await aeSdk.getBalance(address));
 
 await aeSdk.spend(2e18, recipient, {
   async authData(transaction) {
-    const authTxHash = await aeSdk.buildAuthTxHash(transaction);
+    const fee = 10n ** 14n;
+    const gasPrice = MIN_GAS_PRICE;
+    const authTxHash = await aeSdk.buildAuthTxHash(transaction, { fee, gasPrice });
     console.log('Auth.tx_hash', authTxHash.toString());
     authData.args[1] += 1;
+    Object.assign(authData, { fee, gasPrice });
     return authData;
   },
 });
