@@ -28,7 +28,6 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `contract.call` renamed to `contract.$call`
 * `contract.compile` renamed to `contract.$compile`
 * `contract.deploy` renamed to `contract.$deploy`
-* `createAensDelegationSignature`, `createOracleDelegationSignature` removed
 * use `sourceCode` instead of `source`
 * `getContractInstance` accepts `address` instead of `contractAddress`
 * `prepareTxParams`, `getVmVersion` not exported anymore
@@ -52,7 +51,6 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `unpackTx` doesn't return `rlpEncoded` anymore
 * `verifyTransaction` doesn't accept parent tx types anymore
 * TxBuilder accepts and returns `poi` field unpacked as TreesPoi
-* `Channel.poi` returns unpacked TreesPoi
 * `buildTx` accepts transaction type and version in first argument
 * `buildTx` return string instead of object
 * `buildTx` doesn't return `txObject` anymore
@@ -104,7 +102,7 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 #### Channel
 * Channel:state returns unpacked entries
 * All channel events emitted in snakeCase
-* `Channel.poi` returns unpacked TreesPoi
+* Channel:poi returns unpacked TreesPoi
 
 #### Other
 * `onAccount` doesn't accepts keypair
@@ -191,36 +189,6 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * **wallet:** don't use Event.hasListeners that is not available in FF ([05c0424](https://github.com/aeternity/aepp-sdk-js/commit/05c0424b21cecf3c19ce4c5162a82034decee911))
 * **wallet:** explicitly convert error to JSON to don't pass stack trace ([3948153](https://github.com/aeternity/aepp-sdk-js/commit/3948153255ed848e8ef0a3891992d7a622e4acf4))
 * **wallet:** provide origin on webext side instead of empty string ([662d8d0](https://github.com/aeternity/aepp-sdk-js/commit/662d8d00482688fd6eb6d0b10ed9628632b7a587))
-* **aens:** remove `height` in output of `aensPreclaim` ([f28c01d](https://github.com/aeternity/aepp-sdk-js/commit/f28c01dd7c5e3d417d2279ec4a49e1c22d24ec3b))
-* **chain:** inline `send` into `sendTransaction` ([1f36a2a](https://github.com/aeternity/aepp-sdk-js/commit/1f36a2a82932900806f71632e307f19756a4281c))
-* **channel:** add strict types to events ([dfb86b0](https://github.com/aeternity/aepp-sdk-js/commit/dfb86b0e54bce6f7cfceead3e9e54a821c67e624))
-* **channel:** return unpacked entries in `state` method ([256cc74](https://github.com/aeternity/aepp-sdk-js/commit/256cc741c441be099248ea206ce3855975242e56))
-* **compiler:** remove `compilerUrl`, `setCompilerUrl` ([c2edc5e](https://github.com/aeternity/aepp-sdk-js/commit/c2edc5e5b0091bd152515d2ad68e8d5e166d1b1e))
-* **compiler:** rename `Compiler` to `CompilerHttp` ([e4c6f36](https://github.com/aeternity/aepp-sdk-js/commit/e4c6f36e95010e4c18227566562e3b1d0106c9d0))
-* **contract:** extract ContractBase abstract class ([25c63e0](https://github.com/aeternity/aepp-sdk-js/commit/25c63e0edf1c2c098774f368cb2930385de1c27e))
-* **contract:** separate create delegation signature from Contract ([3f8bf5d](https://github.com/aeternity/aepp-sdk-js/commit/3f8bf5d9f06ef53150322c02f008b584b80650d5))
-* **contract:** use ACI format returned by aesophia_cli compiler ([3d4ab2c](https://github.com/aeternity/aepp-sdk-js/commit/3d4ab2cad4e060e5cd9cb40dd0b7df582192cfa9))
-* **oracle:** determine oracleId based on provided account address ([c35aecd](https://github.com/aeternity/aepp-sdk-js/commit/c35aecdef8ce040dd646e3c319287700e0e2304f))
-* **oracle:** pass queries one by one in pollForQueries ([b9df46f](https://github.com/aeternity/aepp-sdk-js/commit/b9df46f3e2ae5ed68e1dd226808ecbe7f04a7d3b))
-* **oracle:** remove QUERY_FEE constant ([0e9c552](https://github.com/aeternity/aepp-sdk-js/commit/0e9c55269e3e982a4ae3e8d7c6de4dabc3641b9a))
-* **tx-builder:** accept tag and version in first arg of `buildTx` ([31a13c6](https://github.com/aeternity/aepp-sdk-js/commit/31a13c60a140320d837720d1b46353b3eb714882))
-* **tx-builder:** accept through additional field parameters ([607d456](https://github.com/aeternity/aepp-sdk-js/commit/607d456e9f299b18f2512139c9e7ab3db1908445))
-* **tx-builder:** don't shortcut `version` to `VSN` or `vsn` ([d65c637](https://github.com/aeternity/aepp-sdk-js/commit/d65c6375808035308be9ae58acff2ebc5854fca1))
-* **tx-builder:** don't use `rlpEncoded` in validator ([46658bb](https://github.com/aeternity/aepp-sdk-js/commit/46658bbdf919d44a168b13d3db33c99ac104890d))
-* **tx-builder:** don't use generic in async buildTx ([5982cf9](https://github.com/aeternity/aepp-sdk-js/commit/5982cf90e80bd85ce6848d2fc2d07d624732a1f6))
-* **tx-builder:** make `ttl` optional ([a1edc76](https://github.com/aeternity/aepp-sdk-js/commit/a1edc76f91956a0a10f40f82f0d32ccd6d7ece9a))
-* **tx-builder:** rearrange schema types ([d66c3ae](https://github.com/aeternity/aepp-sdk-js/commit/d66c3aecc9e7b48f97a9ab0bd338c055219ad4e8))
-* **tx-builder:** remove `ctVersion` from field types enum ([34029e3](https://github.com/aeternity/aepp-sdk-js/commit/34029e3cc72033258a7d171c07b1764c570a08fb))
-* **tx-builder:** remove `excludeKeys` option of `buildTx` ([b077912](https://github.com/aeternity/aepp-sdk-js/commit/b077912ba7273dd60a1e380fb6c7ead80487f98d))
-* **tx-builder:** remove `hex` from field types enum ([6e63de0](https://github.com/aeternity/aepp-sdk-js/commit/6e63de0126ad2f2bc8416168ea0efe9169c0e7e7))
-* **tx-builder:** remove `payload` from field types enum ([d12b1e5](https://github.com/aeternity/aepp-sdk-js/commit/d12b1e547acf2cd7591d50bb1bf772b4129680c7))
-* **tx-builder:** remove `rlpEncoded` in result of `unpackTx` ([c7ce916](https://github.com/aeternity/aepp-sdk-js/commit/c7ce91630c2c3ef667dfc2993970bda1176769ff))
-* **tx-builder:** remove `rlpEncoded`, `binary` props of `buildTx` ([3be74e5](https://github.com/aeternity/aepp-sdk-js/commit/3be74e5302ef371452088126cb44260295243c4e))
-* **tx-builder:** remove `sophiaCodeTypeInfo` from field types enum ([746fc2b](https://github.com/aeternity/aepp-sdk-js/commit/746fc2be10606a4238f10c5d440a38c0979bb13e))
-* **tx-builder:** remove `txObject` prop of `buildTx` ([95b1ed6](https://github.com/aeternity/aepp-sdk-js/commit/95b1ed61103d7137dadc0a424d032d59677778ce))
-* **tx-builder:** remove `txType` property of `unpackTx` ([ad4efc8](https://github.com/aeternity/aepp-sdk-js/commit/ad4efc84b7a909038b7ce5dfcdb3fd8d3e5cc89c))
-* **tx-builder:** remove extra object wrapping `buildTx` result ([b3312f0](https://github.com/aeternity/aepp-sdk-js/commit/b3312f0b5537a95003aaa179ff9b8f74463d1fab))
-* **tx-builder:** remove extra object wrapping `unpackTx` result ([ad5ea62](https://github.com/aeternity/aepp-sdk-js/commit/ad5ea62cc4c2f90f91d9eb38b18e78c1dbc16e84))
 * **channel:** `log` field type in result of `getContractCall` ([600d9e7](https://github.com/aeternity/aepp-sdk-js/commit/600d9e77bd6bfc90544b301f99b3c16ea6224f56))
 * **channel:** add missed types for `minimumDepth`, `fee`, `gasPrice` ([a14ddfc](https://github.com/aeternity/aepp-sdk-js/commit/a14ddfc90e396b2b38eec9ed20af42df83892bec))
 * **channel:** emit incoming message handler error instead of printing ([d71efad](https://github.com/aeternity/aepp-sdk-js/commit/d71efad4fb767fd167a55c0f49de6f0cf904552d))
@@ -235,54 +203,6 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * **tx-builder:** mark `nameTtl` as `shortUInt` in `NameUpdateTx` ([3bfbb52](https://github.com/aeternity/aepp-sdk-js/commit/3bfbb52b23afe16fb47a75c34ee2a04ee93f9da2))
 * **tx-builder:** type of binary fields ([e979224](https://github.com/aeternity/aepp-sdk-js/commit/e97922476af56583a9aac33b0bd87f32b9e5b685))
 * use crypto random to generate salt ([88dcf38](https://github.com/aeternity/aepp-sdk-js/commit/88dcf3887206c34ea2cf97fe0a0d4691c5fc7c89))
-* **account:** accept AccountRpc arguments in array-style ([7d61b44](https://github.com/aeternity/aepp-sdk-js/commit/7d61b4400f26e9ee40539bbbdf24249fb522f3fa))
-* **account:** accept only secretKey in MemoryAccount constructor ([4fad8bf](https://github.com/aeternity/aepp-sdk-js/commit/4fad8bfc6906b442d08e8349a3e2aaf68e86ddd2))
-* **account:** extract AccountGeneralized ([108c7fb](https://github.com/aeternity/aepp-sdk-js/commit/108c7fb5f3f9dc534601097abb7f37917307ef6f))
-* **account:** inline `createMetaTx` ([995a26e](https://github.com/aeternity/aepp-sdk-js/commit/995a26e9f44316de50d8e93f3ac9df13c96e4245))
-* **account:** make `address` a property ([5823867](https://github.com/aeternity/aepp-sdk-js/commit/5823867ed805640733a52439d692b3d456cac71d))
-* **account:** move methods from AccountBase to AccountMemory ([857af21](https://github.com/aeternity/aepp-sdk-js/commit/857af21b907873abf36ca666df0602326f16a860))
-* add `exports` field to package.json ([79b16cd](https://github.com/aeternity/aepp-sdk-js/commit/79b16cd0b227329861f2c1e90eed6c31bebb2afa))
-* **compiler:** update to 7.0.1 ([994911f](https://github.com/aeternity/aepp-sdk-js/commit/994911f1716a52857d68b79a56f2d18908ae38bb))
-* **contract:** make `calldata` instance property private ([bc12833](https://github.com/aeternity/aepp-sdk-js/commit/bc128337383815371e7616f9a467e4f055783a5f))
-* **contract:** move `contract.bytecode,sourceCode` to `$options` ([a8eaf3c](https://github.com/aeternity/aepp-sdk-js/commit/a8eaf3c82c6d8c00a64ce6959d3d065d0e07e8ff))
-* **contract:** prefix `call` method with dollar sign ([16574d6](https://github.com/aeternity/aepp-sdk-js/commit/16574d6d093b0aa3a6b81bab497bc66643aee7f3))
-* **contract:** prefix `compile` method with dollar sign ([0e12716](https://github.com/aeternity/aepp-sdk-js/commit/0e12716385d3592e7481538d0bc1b250b691fa49))
-* **contract:** prefix `decodeEvents` method with dollar sign ([6807b9c](https://github.com/aeternity/aepp-sdk-js/commit/6807b9c31c3d53078100d32500651be850672851))
-* **contract:** prefix `deploy` method with dollar sign ([920828e](https://github.com/aeternity/aepp-sdk-js/commit/920828e6c52c0591229820068b0f78a6ea5b6070))
-* **contract:** prefix `options` method with dollar sign ([ff1e9a6](https://github.com/aeternity/aepp-sdk-js/commit/ff1e9a668b60bd035f5a5f390f432039775721a4))
-* **contract:** remove `deployInfo` instance property ([c9a32c9](https://github.com/aeternity/aepp-sdk-js/commit/c9a32c990b70b91a20ae151db2b9b017b306aa52))
-* **contract:** remove `isGA` method ([c158aaf](https://github.com/aeternity/aepp-sdk-js/commit/c158aafd573a0cb02586c9916050712df3bd785b))
-* **contract:** remove `send`, `get` submethods of contract methods ([ab3756b](https://github.com/aeternity/aepp-sdk-js/commit/ab3756b673418636b556b2a78091f197b6523d59))
-* **contract:** remove extra `methods` object ([13145a2](https://github.com/aeternity/aepp-sdk-js/commit/13145a2e40fd8147c6f8e8ad2862adf7468b870c))
-* **contract:** rename `AeSdk.getContractInstance` to `initializeContract` ([2d05173](https://github.com/aeternity/aepp-sdk-js/commit/2d05173febf28a32f22f806be861b5eba3d284e9))
-* **contract:** rename `contractAddress` to `address` ([e7f2691](https://github.com/aeternity/aepp-sdk-js/commit/e7f26912ed6d0d4462fd2c35f3e230e4dc5ff6b8))
-* **contract:** rename `source` to `sourceCode` ([d0fc419](https://github.com/aeternity/aepp-sdk-js/commit/d0fc419683dc78764f03044817542152a0650110))
-* **contract:** replace `getContractInstance` with Contract class ([cf8208d](https://github.com/aeternity/aepp-sdk-js/commit/cf8208d252188f9590494b50044747c7de898356))
-* **contract:** type check `$deploy` and `$call` params ([6debdd3](https://github.com/aeternity/aepp-sdk-js/commit/6debdd3e41031f51ca1dc48d1778651e6daa7a47))
-* **contract:** use high-level tx builder in createMetaTx ([a3b7238](https://github.com/aeternity/aepp-sdk-js/commit/a3b7238ad824af3ea410c2e5c6ba3f3c9071e205))
-* don't accept keypair in `onAccount` ([d354ffb](https://github.com/aeternity/aepp-sdk-js/commit/d354ffb59753675048898b8ed10c0ae967829000))
-* drop node@12 support ([a40aeca](https://github.com/aeternity/aepp-sdk-js/commit/a40aeca4d02da400283b58655feb3356456aaf60))
-* inline `bigNumberToByteArray` function ([9dd4609](https://github.com/aeternity/aepp-sdk-js/commit/9dd4609b98b7cf1a2c997817149e23328ce51291))
-* make `addAccount` a sync function ([f142ef9](https://github.com/aeternity/aepp-sdk-js/commit/f142ef9ecdda036fbfef66d6e5debeb369d5f9f6))
-* make `address` a getter in AeSdkBase ([52c23be](https://github.com/aeternity/aepp-sdk-js/commit/52c23bee9b3bab56bbeeb4003bbb3a4c57e17aaa))
-* move `getNetworkId` to `Node` ([29e20ea](https://github.com/aeternity/aepp-sdk-js/commit/29e20ea77e3e972321848cc55ce1be67d33c4363))
-* **node:** drop duplicate `url` property ([3a89814](https://github.com/aeternity/aepp-sdk-js/commit/3a8981420887c8fb914955774e5d9452c3d1b914))
-* remove `bytesToHex` function ([9a761e4](https://github.com/aeternity/aepp-sdk-js/commit/9a761e45ed2083427941f795c2591dcb29ada42f))
-* remove `hexToBytes` function ([e3f2e60](https://github.com/aeternity/aepp-sdk-js/commit/e3f2e60a5b810cb0740a3c26c5425165f4b85570))
-* remove `str2buf` function ([b6a655f](https://github.com/aeternity/aepp-sdk-js/commit/b6a655f6b1195630d1dd650ea2c98c6fe8a9d53f))
-* remove `verifyMessage` from accounts and AeSdkBase ([10cd2b0](https://github.com/aeternity/aepp-sdk-js/commit/10cd2b0e78b5b4d9f794cd589344968768bbaa2f))
-* remove deprecated exports ([829fe80](https://github.com/aeternity/aepp-sdk-js/commit/829fe8038ba9af8a37b536159c22a838cf2b1d17))
-* remove returnHex option in signMessage ([764b78f](https://github.com/aeternity/aepp-sdk-js/commit/764b78f694306bcff39fb9df9c6cfa34c32a7c81))
-* rename umd export to `Aeternity` ([0f5d40d](https://github.com/aeternity/aepp-sdk-js/commit/0f5d40d1d343960f3fde09ca103791f3d8394fca))
-* throw error if account not found in `removeAccount` ([82b2def](https://github.com/aeternity/aepp-sdk-js/commit/82b2defa5740b40c49375daf132de28499b52c3d))
-* **tx-builder:** create `pointers` instead of FIELD_TYPES.pointers ([9e8c7a1](https://github.com/aeternity/aepp-sdk-js/commit/9e8c7a11d9c988c3bdb7bc9663d5e0ce74a6b3ac))
-* **tx-builder:** don't export `validateParams`, `unpackRawTx` ([0ab8b86](https://github.com/aeternity/aepp-sdk-js/commit/0ab8b86310decb482557b46cbbc337e3909d7fe0))
-* **tx-builder:** inline `formatSalt` function ([61370f0](https://github.com/aeternity/aepp-sdk-js/commit/61370f0d5a698e468f962e9ae3f353ed1bdb953a))
-* **tx-builder:** inline `writeId`, `readId` into `address` field type ([317c0cc](https://github.com/aeternity/aepp-sdk-js/commit/317c0cce97115e454c72f4710b96443e06d8a172))
-* **tx-builder:** make `returnType` a CallReturnType enum ([32b1369](https://github.com/aeternity/aepp-sdk-js/commit/32b1369d40a7f9d9089a2fb5a7a4931d77c59f4f))
-* **tx-builder:** remove `writeInt` function ([1edae1e](https://github.com/aeternity/aepp-sdk-js/commit/1edae1eba5043ad72c1e7e738529229fdfbe5b80))
-* **tx-builder:** remove AMOUNT constant ([4623946](https://github.com/aeternity/aepp-sdk-js/commit/46239461129e623f08da5af1bd267f0336aa9bbc))
-* **wallet:** remove `onSign`, `onMessageSign` callbacks ([0d6abb4](https://github.com/aeternity/aepp-sdk-js/commit/0d6abb45b82cfdaef3084289e1d68a4534076579))
 
 ### [13.0.0-alpha.1](https://github.com/aeternity/aepp-sdk-js/compare/v13.0.0-alpha.0...v13.0.0-alpha.1) (2023-01-13)
 
