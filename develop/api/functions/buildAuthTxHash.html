@@ -17,9 +17,9 @@
 <h1>Function buildAuthTxHash</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures tsd-kind-function">
-<li class="tsd-signature tsd-anchor-link" id="buildAuthTxHash">build<wbr/>Auth<wbr/>Tx<wbr/>Hash<span class="tsd-signature-symbol">(</span>transaction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">`</span><span class="tsd-signature-type">tx_</span><span class="tsd-signature-symbol">${</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">`</span>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>onNode<span class="tsd-signature-symbol">: </span><a href="../classes/Node.html" class="tsd-signature-type" data-tsd-kind="Class">Node</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span><a href="#buildAuthTxHash" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="buildAuthTxHash">build<wbr/>Auth<wbr/>Tx<wbr/>Hash<span class="tsd-signature-symbol">(</span>transaction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">`</span><span class="tsd-signature-type">tx_</span><span class="tsd-signature-symbol">${</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">`</span>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>fee<span class="tsd-signature-symbol">?: </span><a href="../types/Int.html" class="tsd-signature-type" data-tsd-kind="Type alias">Int</a><span class="tsd-signature-symbol">; </span><br/><span>    </span>gasPrice<span class="tsd-signature-symbol">?: </span><a href="../types/Int.html" class="tsd-signature-type" data-tsd-kind="Type alias">Int</a><span class="tsd-signature-symbol">; </span><br/><span>    </span>onNode<span class="tsd-signature-symbol">: </span><a href="../classes/Node.html" class="tsd-signature-type" data-tsd-kind="Class">Node</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span><a href="#buildAuthTxHash" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Build a transaction hash the same as <code>Auth.tx_hash</code></p>
+<div class="tsd-comment tsd-typography"><p>Build a transaction hash the same as <code>Auth.tx_hash</code> by GaMetaTx payload</p>
 
 <h3>Returns</h3><p>Transaction hash</p>
 </div>
@@ -31,17 +31,25 @@
 <div class="tsd-comment tsd-typography"><p>tx-encoded transaction</p>
 </div></li>
 <li>
-<h5>options: <span class="tsd-signature-symbol">{ </span><br/><span>    </span>onNode<span class="tsd-signature-symbol">: </span><a href="../classes/Node.html" class="tsd-signature-type" data-tsd-kind="Class">Node</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
+<h5>options: <span class="tsd-signature-symbol">{ </span><br/><span>    </span>fee<span class="tsd-signature-symbol">?: </span><a href="../types/Int.html" class="tsd-signature-type" data-tsd-kind="Type alias">Int</a><span class="tsd-signature-symbol">; </span><br/><span>    </span>gasPrice<span class="tsd-signature-symbol">?: </span><a href="../types/Int.html" class="tsd-signature-type" data-tsd-kind="Type alias">Int</a><span class="tsd-signature-symbol">; </span><br/><span>    </span>onNode<span class="tsd-signature-symbol">: </span><a href="../classes/Node.html" class="tsd-signature-type" data-tsd-kind="Class">Node</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
 <div class="tsd-comment tsd-typography"><p>Options</p>
 </div>
 <ul class="tsd-parameters">
 <li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> fee<span class="tsd-signature-symbol">?: </span><a href="../types/Int.html" class="tsd-signature-type" data-tsd-kind="Type alias">Int</a></h5>
+<div class="tsd-comment tsd-typography"><p>GaMetaTx fee, required in Ceres</p>
+</div></li>
+<li class="tsd-parameter">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> gas<wbr/>Price<span class="tsd-signature-symbol">?: </span><a href="../types/Int.html" class="tsd-signature-type" data-tsd-kind="Type alias">Int</a></h5>
+<div class="tsd-comment tsd-typography"><p>GaMetaTx gasPrice, required in Ceres</p>
+</div></li>
+<li class="tsd-parameter">
 <h5>on<wbr/>Node<span class="tsd-signature-symbol">: </span><a href="../classes/Node.html" class="tsd-signature-type" data-tsd-kind="Class">Node</a></h5>
 <div class="tsd-comment tsd-typography"><p>Node to use</p>
 </div></li></ul></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/ff7c1abb2/src/contract/ga.ts#L91">contract/ga.ts:91</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/ecb9d6d5a/src/contract/ga.ts#L97">contract/ga.ts:97</a></li></ul></aside></li></ul></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -214,6 +222,7 @@
 <li class="tsd-kind-function"><a href="aensUpdate.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>aens<wbr/>Update</a></li>
 <li class="tsd-kind-function"><a href="awaitHeight.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>await<wbr/>Height</a></li>
 <li class="current tsd-kind-function"><a href="buildAuthTxHash.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>build<wbr/>Auth<wbr/>Tx<wbr/>Hash</a></li>
+<li class="tsd-kind-function"><a href="buildAuthTxHashByGaMetaTx.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>build<wbr/>Auth<wbr/>Tx<wbr/>Hash<wbr/>By<wbr/>Ga<wbr/>Meta<wbr/>Tx</a></li>
 <li class="tsd-kind-function"><a href="buildContractId.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>build<wbr/>Contract<wbr/>Id</a></li>
 <li class="tsd-kind-function"><a href="buildContractIdByContractTx.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>build<wbr/>Contract<wbr/>Id<wbr/>By<wbr/>Contract<wbr/>Tx</a></li>
 <li class="tsd-kind-function"><a href="buildTx.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>build<wbr/>Tx</a></li>
