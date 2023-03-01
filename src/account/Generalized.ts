@@ -46,7 +46,7 @@ export default class AccountGeneralized extends AccountBase {
       throw new ArgumentError('authData, onCompiler, onNode', 'provided', null);
     }
     const {
-      callData, sourceCode, args, gasLimit,
+      callData, sourceCode, args, fee, gasLimit, gasPrice,
     } = typeof authData === 'function' ? await authData(tx) : authData;
 
     const authCallData = callData ?? await (async () => {
@@ -73,7 +73,9 @@ export default class AccountGeneralized extends AccountBase {
       tx: { tag: Tag.SignedTx, encodedTx: decode(tx), signatures: [] },
       gaId: this.address,
       authData: authCallData,
+      fee,
       gasLimit,
+      gasPrice,
       onNode,
     });
     return buildTx({ tag: Tag.SignedTx, encodedTx: decode(gaMetaTx), signatures: [] });

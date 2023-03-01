@@ -150,6 +150,7 @@ export enum Tag {
   GaAttachTx = 80,
   GaMetaTx = 81,
   PayingForTx = 82,
+  GaMetaTxAuthData = 810,
   // KeyBlock = 100,
   // MicroBlock = 101,
   // LightMicroBlock = 102,

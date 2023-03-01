@@ -11,6 +11,7 @@ import {
   unpackTx,
   buildTx,
   Contract,
+  MIN_GAS_PRICE,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 import { ContractMethodsBase } from '../../src/contract/Contract';
@@ -81,24 +82,35 @@ describe('Generalized Account', () => {
   it('buildAuthTxHash generates a proper hash', async () => {
     const { rawTx } = await aeSdk
       .spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
+
+    expect(new Uint8Array(await aeSdk.buildAuthTxHashByGaMetaTx(rawTx))).to.be
+      .eql((await authContract.getTxHash()).decodedResult);
+
     const gaMetaTxParams = unpackTx(rawTx, Tag.SignedTx).encodedTx;
     if (gaMetaTxParams.tag !== Tag.GaMetaTx) throw new Error('Unexpected nested transaction');
     const spendTx = buildTx(gaMetaTxParams.tx.encodedTx);
-    expect(await aeSdk.buildAuthTxHash(spendTx)).to.be
+    const { fee, gasPrice } = gaMetaTxParams;
+    expect(new Uint8Array(await aeSdk.buildAuthTxHash(spendTx, { fee, gasPrice }))).to.be
       .eql((await authContract.getTxHash()).decodedResult);
   });
 
   it('accepts a function in authData', async () => {
     let spendTx;
+    const fee = 1e16;
+    const gasPrice = MIN_GAS_PRICE + 1;
     const { rawTx } = await aeSdk.spend(10000, publicKey, {
       authData: async (tx) => {
         spendTx = tx;
-        return { sourceCode, args: [genSalt()] };
+        return {
+          sourceCode, args: [genSalt()], fee, gasPrice,
+        };
       },
     });
     const txParams = unpackTx(rawTx, Tag.SignedTx);
     ensureEqual<Tag.GaMetaTx>(txParams.encodedTx.tag, Tag.GaMetaTx);
     expect(buildTx(txParams.encodedTx.tx.encodedTx)).to.be.equal(spendTx);
+    expect(txParams.encodedTx.fee).to.be.equal(fee.toString());
+    expect(txParams.encodedTx.gasPrice).to.be.equal(gasPrice.toString());
   });
 
   it('fails trying to send SignedTx using generalized account', async () => {

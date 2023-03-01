@@ -572,6 +572,12 @@ export const txSchema = [{
   nonce: nonce('payerId'),
   fee,
   tx: entrySignedTx,
+}, {
+  tag: shortUIntConst(Tag.GaMetaTxAuthData),
+  version: shortUIntConst(1, true),
+  fee: coinAmount,
+  gasPrice,
+  txHash: encoded(Encoding.TxHash),
 }] as const;
 
 type TxSchema = SchemaTypes<typeof txSchema>;

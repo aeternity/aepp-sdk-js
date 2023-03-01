@@ -1,9 +1,12 @@
 import { Encoded } from '../utils/encoder';
 import Node from '../Node';
 import CompilerBase from '../contract/compiler/Base';
+import { Int } from '../tx/builder/constants';
 
 interface AuthData {
+  fee?: Int;
   gasLimit?: number;
+  gasPrice?: Int;
   callData?: Encoded.ContractBytearray;
   sourceCode?: string;
   args?: any[];

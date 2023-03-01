@@ -2,11 +2,15 @@
  * Generalized Account module - routines to use generalized account
  */
 
-import { Tag } from '../tx/builder/constants';
-import { buildContractIdByContractTx, buildTxAsync, BuildTxOptions } from '../tx/builder';
+import { ConsensusProtocolVersion, Int, Tag } from '../tx/builder/constants';
+import {
+  buildContractIdByContractTx, buildTx, buildTxAsync, BuildTxOptions, unpackTx,
+} from '../tx/builder';
 import { hash } from '../utils/crypto';
-import { decode, Encoded } from '../utils/encoder';
-import { IllegalArgumentError } from '../utils/errors';
+import {
+  decode, encode, Encoded, Encoding,
+} from '../utils/encoder';
+import { ArgumentError, IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
 import Contract from './Contract';
@@ -81,18 +85,53 @@ interface CreateGeneralizedAccountOptions extends
 }
 
 /**
- * Build a transaction hash the same as `Auth.tx_hash`
+ * Build a transaction hash the same as `Auth.tx_hash` by GaMetaTx payload
  * @category contract
  * @param transaction - tx-encoded transaction
  * @param options - Options
+ * @param options.fee - GaMetaTx fee, required in Ceres
+ * @param options.gasPrice - GaMetaTx gasPrice, required in Ceres
  * @param options.onNode - Node to use
  * @returns Transaction hash
  */
 export async function buildAuthTxHash(
   transaction: Encoded.Transaction,
+  { fee, gasPrice, onNode }: { fee?: Int; gasPrice?: Int; onNode: Node },
+): Promise<Buffer> {
+  const { nodeNetworkId, consensusProtocolVersion } = await onNode.getNodeInfo();
+  let payload = hash(concatBuffers([Buffer.from(nodeNetworkId), decode(transaction)]));
+  if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
+    if (fee == null) throw new ArgumentError('fee', 'provided (in Ceres)', fee);
+    if (gasPrice == null) throw new ArgumentError('gasPrice', 'provided (in Ceres)', gasPrice);
+    payload = hash(decode(buildTx({
+      tag: Tag.GaMetaTxAuthData,
+      fee,
+      gasPrice,
+      txHash: encode(payload, Encoding.TxHash),
+    })));
+  }
+  return payload;
+}
+
+/**
+ * Build a transaction hash the same as `Auth.tx_hash` by GaMetaTx
+ * @category contract
+ * @param transaction - tx-encoded signed GaMeta transaction
+ * @param options - Options
+ * @param options.onNode - Node to use
+ * @returns Transaction hash
+ */
+export async function buildAuthTxHashByGaMetaTx(
+  transaction: Encoded.Transaction,
   { onNode }: { onNode: Node },
-): Promise<Uint8Array> {
-  return new Uint8Array(hash(
-    concatBuffers([Buffer.from(await onNode.getNetworkId()), decode(transaction)]),
-  ));
+): Promise<Buffer> {
+  const txParams = unpackTx(transaction, Tag.SignedTx);
+  if (txParams.encodedTx.tag !== Tag.GaMetaTx) {
+    throw new ArgumentError('transaction', 'to include GaMetaTx', Tag[txParams.encodedTx.tag]);
+  }
+  return buildAuthTxHash(buildTx(txParams.encodedTx.tx.encodedTx), {
+    fee: txParams.encodedTx.fee,
+    gasPrice: txParams.encodedTx.gasPrice,
+    onNode,
+  });
 }
