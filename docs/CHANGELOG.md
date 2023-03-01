@@ -13,8 +13,8 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `onSign`, `onMessageSign` callbacks removed on wallet side
 
 #### Contract
-* **contract:** ACI format used the same as returned by aesophia_cli
-* **contract:** `createAensDelegationSignature`, `createOracleDelegationSignature` replaced with `createDelegationSignature`
+* ACI format used the same as returned by aesophia_cli
+* `createAensDelegationSignature`, `createOracleDelegationSignature` replaced with `createDelegationSignature`
 * `params` argument in `$deploy` and `$call` is required
 * `AeSdk.getContractInstance` renamed to `AeSdk.initializeContract`
 * `getContractInstance` function replaced with Contract class
@@ -35,33 +35,33 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `isGA` method removed
 
 #### Transaction builder
-* **tx-builder:** StateTrees fields decoded as objects mapping key to decoded entry instead internals
-* **tx-builder:** The content of Tag.*Mtree entries decoded and moved to `payload` field
-* **tx-builder:** TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas not exported anymore
-* **tx-builder:** AeSdk.buildTx accepts `tag` in options
-* **tx-builder:** `TX_TTL` not exported anymore
-* **tx-builder:** sync `buildTx` accepts `denomination` in the first argument
-* **tx-builder:** Enum `FIELD_TYPES` not exported anymore
-* **tx-builder:** Not able to build/unpack CompilerSophia entry (tag 70)
-* **tx-builder:** Enums `PROTOCOL_VM_ABI`, interface `CtVersion` not exported anymore
-* **tx-builder:** Enums `VM_VERSIONS`, `ABI_VERSIONS`, `PROTOCOL_VERSIONS` renamed
-* **tx-builder:** `stateHash` of Channel entry decoded as `st_`-prefixed string instead of hex
-* **tx-builder:** `key` of MtreeValue entry temporary decoded as buffer instead of hex
-* **tx-builder:** SpendTx `payload` doesn't accept arbitrary string anymore
-* **tx-builder:** `unpackTx` return object of transaction parameters
-* **tx-builder:** `unpackTx` doesn't return `rlpEncoded` anymore
-* **tx-builder:** `verifyTransaction` doesn't accept parent tx types anymore
-* **tx-builder:** TxBuilder accepts and returns `poi` field unpacked as TreesPoi
-* **tx-builder:** `Channel.poi` returns unpacked TreesPoi
-* **tx-builder:** `buildTx` accepts transaction type and version in first argument
-* **tx-builder:** `buildTx` return string instead of object
-* **tx-builder:** `buildTx` doesn't return `txObject` anymore
-* **tx-builder:** `buildTx` doesn't return `binary` anymore
-* **tx-builder:** `buildTx` doesn't return `rlpEncoded` anymore
-* **tx-builder:** `buildTx` doesn't accept `excludeKeys` option anymore
-* **tx-builder:** Use `version` instead of `VSN`, `vsn` in `unpackTx`, `buildTx`
-* **tx-builder:** `txType` property of `unpackTx` removed
-* **tx-builder:** `get` method of MPTree accepts and returns typed values
+* StateTrees fields decoded as objects mapping key to decoded entry instead internals
+* The content of Tag.*Mtree entries decoded and moved to `payload` field
+* TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas not exported anymore
+* AeSdk.buildTx accepts `tag` in options
+* `TX_TTL` not exported anymore
+* sync `buildTx` accepts `denomination` in the first argument
+* Enum `FIELD_TYPES` not exported anymore
+* Not able to build/unpack CompilerSophia entry (tag 70)
+* Enums `PROTOCOL_VM_ABI`, interface `CtVersion` not exported anymore
+* Enums `VM_VERSIONS`, `ABI_VERSIONS`, `PROTOCOL_VERSIONS` renamed
+* `stateHash` of Channel entry decoded as `st_`-prefixed string instead of hex
+* `key` of MtreeValue entry temporary decoded as buffer instead of hex
+* SpendTx `payload` doesn't accept arbitrary string anymore
+* `unpackTx` return object of transaction parameters
+* `unpackTx` doesn't return `rlpEncoded` anymore
+* `verifyTransaction` doesn't accept parent tx types anymore
+* TxBuilder accepts and returns `poi` field unpacked as TreesPoi
+* `Channel.poi` returns unpacked TreesPoi
+* `buildTx` accepts transaction type and version in first argument
+* `buildTx` return string instead of object
+* `buildTx` doesn't return `txObject` anymore
+* `buildTx` doesn't return `binary` anymore
+* `buildTx` doesn't return `rlpEncoded` anymore
+* `buildTx` doesn't accept `excludeKeys` option anymore
+* Use `version` instead of `VSN`, `vsn` in `unpackTx`, `buildTx`
+* `txType` property of `unpackTx` removed
+* `get` method of MPTree accepts and returns typed values
 * `writeInt` function removed
 * `returnType` of contract call result structure is a value of CallReturnType enum
 * `writeId`, `readId` function removed
@@ -71,13 +71,13 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `AMOUNT` constant removed
 
 #### Compiler
-* **contract:** Methods of `CompilerHttp` moved to `api` property
-* **compiler:** `Compiler` export renamed to `CompilerHttp`
-* **compiler:** removed `compilerUrl`, `setCompilerUrl`
+* Methods of `CompilerHttp` moved to `api` property
+* `Compiler` export renamed to `CompilerHttp`
+* removed `compilerUrl`, `setCompilerUrl`
 * Dropped compatibility with aesophia_http below 7.1.1, aesophia_cli below 7.0.1
 
 #### Account
-* **contract:** `createGeneralizedAccount` accepts `sourceCode` in options
+* `createGeneralizedAccount` accepts `sourceCode` in options
 * `createMetaTx` removed
 * `AccountRpc` constructor accepts arguments one by one
 * `AccountMemory` requires `networkId` in `signTransaction`
@@ -90,21 +90,21 @@ Please check out [migration guide](./guides/migration/13.0.0.md).
 * `url` property of `Node` removed
 
 #### Oracle
-* **oracle:** `QUERY_FEE` is not exported anymore
-* **oracle:** Oracles created without queryFee by default
-* **oracle:** AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId
-* **oracle:** `onQuery` callback of `pollForQueries`, `oracle.pollQueries` accepts a single query
+* `QUERY_FEE` is not exported anymore
+* Oracles created without queryFee by default
+* AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId
+* `onQuery` callback of `pollForQueries`, `oracle.pollQueries` accepts a single query
 
 #### Chain
-* **chain:** `send` inlined into `sendTransaction`
+* `send` inlined into `sendTransaction`
 
 #### AENS
-* **aens:** `height` removed from output of `aensPreclaim`
+* `height` removed from output of `aensPreclaim`
 
 #### Channel
-* **channel:** Channel:state returns unpacked entries
-* **channel:** All channel events emitted in snakeCase
-* **tx-builder:** `Channel.poi` returns unpacked TreesPoi
+* Channel:state returns unpacked entries
+* All channel events emitted in snakeCase
+* `Channel.poi` returns unpacked TreesPoi
 
 #### Other
 * `onAccount` doesn't accepts keypair
