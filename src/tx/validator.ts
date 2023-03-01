@@ -52,7 +52,7 @@ async function verifyTransactionInternal(
   ]);
 
   return (await Promise.all(
-    validators.map((v) => v(
+    validators.map(async (v) => v(
       tx,
       {
         node, account, height, consensusProtocolVersion, nodeNetworkId, parentTxTypes,
