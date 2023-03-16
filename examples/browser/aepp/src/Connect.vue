@@ -95,7 +95,6 @@ export default {
           this.reverseIframe.style.display = 'none';
           document.body.appendChild(this.reverseIframe);
         }
-        await this.$store.dispatch('aeSdk/initialize');
         const connection = await this.scanForWallets();
         try {
           this.walletInfo = await this.aeSdk.connectToWallet(connection);
