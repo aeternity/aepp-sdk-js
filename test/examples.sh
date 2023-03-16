@@ -31,6 +31,12 @@ run_node_example transfer-ae.mjs
 # TODO: revisit --ignore-scripts after solving https://github.com/npm/cli/issues/4202
 perl -i -pe 's/"prepare"/"rem-prepare"/g' package.json
 
+echo Build vue-cli-4-autorest test
+cd ./test/environment/vue-cli-4-autorest
+npm i
+npm run build
+cd ../../..
+
 echo Build example aepp
 cd ./examples/browser/aepp
 npm i

@@ -22,7 +22,7 @@ debug/
 coverage.*
 .nyc_output/
 /**/package-lock.json
-/examples/**/dist
+/**/dist
 /examples/**/artifacts
 .history
 .site

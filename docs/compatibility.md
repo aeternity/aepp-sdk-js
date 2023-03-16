@@ -9,7 +9,7 @@ This package is expected to work in these environments:
 | Browser using script tag, umd         |                                                                               |
 | webpack@4                             | requires a fix to work with mjs build [webpack-4]                             |
 | webpack@5                             |                                                                               |
-| @vue/cli@4 (webpack@4)                |                                                                               |
+| @vue/cli@4 (webpack@4)                | requires aliases to ESM versions of autorest deps [vue-cli4]                  |
 | @vue/cli@5 (webpack@5)                |                                                                               |
 | create-react-app@4 (webpack@4)        | mjs build is not compatible with webpack@4 [cra-webpack-4]                    |
 | create-react-app@5 (webpack@5)        |                                                                               |
@@ -23,4 +23,5 @@ This package is expected to work in these environments:
 [cra-webpack-4]: https://github.com/aeternity/aepp-sdk-js/issues/1529
 [jest]: https://github.com/facebook/jest/issues/4422#issuecomment-770274099
 [typescript]: README.md#typescript-projects
+[vue-cli4]: README.md#vue-cli4
 [vite]: https://github.com/vitejs/vite/issues/9062#issuecomment-1202167352
