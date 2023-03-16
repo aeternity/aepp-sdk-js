@@ -22,5 +22,5 @@ This package is expected to work in these environments:
 [webpack-4]: https://github.com/webpack/webpack/issues/7482#issuecomment-394884837
 [cra-webpack-4]: https://github.com/aeternity/aepp-sdk-js/issues/1529
 [jest]: https://github.com/facebook/jest/issues/4422#issuecomment-770274099
-[typescript]: index.md#typescript-projects
+[typescript]: README.md#typescript-projects
 [vite]: https://github.com/vitejs/vite/issues/9062#issuecomment-1202167352
