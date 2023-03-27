@@ -13,6 +13,7 @@ module.exports = {
         'compiler',
         'contract',
         'deps',
+        'deps-dev',
         'node',
         'oracle',
         'release',
