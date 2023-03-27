@@ -1,29 +1,6 @@
 const path = require('path');
 
 module.exports = {
-  pages: {
-    popup: {
-      template: 'public/browser-extension.html',
-      entry: './src/popup.js',
-      title: 'Popup',
-    },
-  },
-  pluginOptions: {
-    browserExtension: {
-      componentOptions: {
-        background: {
-          entry: 'src/background.js',
-        },
-        contentScripts: {
-          entries: {
-            'content-script': [
-              'src/content-script.js',
-            ],
-          },
-        },
-      },
-    },
-  },
   // required for `instanceof RestError`
   configureWebpack: {
     resolve: {

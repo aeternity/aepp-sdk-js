@@ -14,7 +14,7 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 ## Guides & Examples
 
 Introduction
-- [Installation](docs/index.md)
+- [Installation](docs/README.md)
 - [Quick Start](docs/quick-start.md)
 
 Usage guides:
