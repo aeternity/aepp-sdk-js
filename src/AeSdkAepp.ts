@@ -110,7 +110,8 @@ export default class AeSdkAepp extends AeSdkBase {
         },
         [METHODS.updateNetwork]: (params) => {
           const { node } = params;
-          if (node != null) this.addNode(node.name, new Node(node.url), true);
+          this.pool.delete(name);
+          if (node != null) this.addNode(name, new Node(node.url), true);
           this.onNetworkChange(params);
         },
         [METHODS.closeConnection]: (params) => {

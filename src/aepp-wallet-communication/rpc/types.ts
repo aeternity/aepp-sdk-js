@@ -17,6 +17,7 @@ export interface Accounts {
 }
 
 export interface Node {
+  // TODO: name is not used, can be removed
   name: string;
   url: string;
 }
