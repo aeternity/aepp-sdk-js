@@ -10,8 +10,6 @@
       
       
       
-        <link rel="next" href="quick-start/">
-      
       <link rel="icon" href="images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.10">
     
@@ -252,127 +250,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Installation
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
-        Installation
+    <li class="md-nav__item">
+      <a href="index.md" class="md-nav__link">
+        None
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#direct-script-include-via-cdn" class="md-nav__link">
-    Direct &lt;script&gt; include via CDN
-  </a>
-  
-    <nav class="md-nav" aria-label="Direct &lt;script&gt; include via CDN">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#latest-sdk-version" class="md-nav__link">
-    Latest SDK version
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#specific-sdk-version" class="md-nav__link">
-    Specific SDK version
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#browser-script-tag" class="md-nav__link">
-    Browser &lt;script&gt; tag
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#npm" class="md-nav__link">
-    NPM
-  </a>
-  
-    <nav class="md-nav" aria-label="NPM">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#latest-release" class="md-nav__link">
-    Latest Release
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pre-release" class="md-nav__link">
-    Pre Release
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#specific-github-branch" class="md-nav__link">
-    Specific Github Branch
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#typescript-projects" class="md-nav__link">
-    TypeScript projects
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#command-line-interface-cli" class="md-nav__link">
-    Command Line Interface (CLI)
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1140,6 +1022,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#vue-cli4" class="md-nav__link">
+    Vue CLI@4
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1231,6 +1120,20 @@ This may be done in <code>tsconfig.json</code>:
 <span class="w">}</span>
 </code></pre></div>
 SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.</p>
+<h3 id="vue-cli4">Vue CLI@4</h3>
+<p>SDK checks are not working correctly because CLI picks both ESM and CJS versions of <code>autorest</code>
+dependencies. To fix this, you need to specify aliases in <code>vue.config.js</code>.
+<div class="highlight"><pre><span></span><code><span class="w">module.exports = {</span>
+<span class="w"> </span> configureWebpack: {
+<span class="w"> </span>   resolve: {
+<span class="w"> </span>     alias: {
+<span class="gi">+       &#39;@azure/core-client&#39;: &#39;@azure/core-client/dist-esm/src/index.js&#39;,</span>
+<span class="gi">+       &#39;@azure/core-rest-pipeline&#39;: &#39;@azure/core-rest-pipeline/dist-esm/src/index.js&#39;,</span>
+<span class="w"> </span>     },
+<span class="w"> </span>   },
+<span class="w"> </span> },
+<span class="w">};</span>
+</code></pre></div></p>
 <h2 id="command-line-interface-cli">Command Line Interface (CLI)</h2>
 <p>If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the <a href="https://github.com/aeternity/aepp-cli-js">💻 CLI</a> and follow the instructions mentioned there.</p>
 
