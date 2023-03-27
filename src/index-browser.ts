@@ -18,7 +18,9 @@ export {
 export { default as getTransactionSignerAddress } from './tx/transaction-signer';
 export * from './utils/amount-formatter';
 export * from './utils/hd-wallet';
-export { encode, decode, Encoding } from './utils/encoder';
+export {
+  encode, decode, Encoding, Encoded,
+} from './utils/encoder';
 export * from './aens';
 export { default as Contract } from './contract/Contract';
 export type { ContractMethodsBase } from './contract/Contract';
