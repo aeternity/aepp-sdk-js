@@ -92,8 +92,7 @@ export default class AeSdkAepp extends AeSdkBase {
    */
   async connectToWallet(
     connection: BrowserConnection,
-    { connectNode = false, name = 'wallet-node', select = false }:
-    { connectNode?: boolean; name?: string; select?: boolean } = {},
+    { connectNode = false, name = 'wallet-node' }: { connectNode?: boolean; name?: string } = {},
   ): Promise<WalletInfo> {
     if (this.rpcClient != null) throw new AlreadyConnectedError('You are already connected to wallet');
     let disconnectParams: any;
@@ -125,7 +124,7 @@ export default class AeSdkAepp extends AeSdkBase {
       .request(METHODS.connect, { name: this.name, version: RPC_VERSION, connectNode });
     if (connectNode) {
       if (node == null) throw new RpcConnectionError('Missing URLs of the Node');
-      this.addNode(name, new Node(node.url), select);
+      this.addNode(name, new Node(node.url), true);
     }
     this.rpcClient = client;
     return walletInfo;

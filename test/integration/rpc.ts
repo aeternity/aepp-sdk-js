@@ -524,7 +524,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       wallet.addRpcClient(connectionFromWalletToAepp);
       await aepp.connectToWallet(
         connectionFromAeppToWallet,
-        { connectNode: true, name: 'wallet-node', select: true },
+        { connectNode: true, name: 'wallet-node' },
       );
     });
 
