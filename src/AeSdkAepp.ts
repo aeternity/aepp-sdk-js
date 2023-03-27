@@ -4,7 +4,7 @@ import AccountBase from './account/Base';
 import AccountRpc from './account/Rpc';
 import { decode, Encoded } from './utils/encoder';
 import {
-  Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi,
+  Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi, Node as NodeRpc,
 } from './aepp-wallet-communication/rpc/types';
 import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
 import { METHODS, SUBSCRIPTION_TYPES } from './aepp-wallet-communication/schema';
@@ -93,9 +93,19 @@ export default class AeSdkAepp extends AeSdkBase {
   async connectToWallet(
     connection: BrowserConnection,
     { connectNode = false, name = 'wallet-node' }: { connectNode?: boolean; name?: string } = {},
-  ): Promise<WalletInfo> {
+  ): Promise<WalletInfo & { node?: NodeRpc }> {
     if (this.rpcClient != null) throw new AlreadyConnectedError('You are already connected to wallet');
     let disconnectParams: any;
+
+    const updateNetwork = (params: Network): void => {
+      if (connectNode) {
+        if (params.node?.url == null) throw new RpcConnectionError('Missing URLs of the Node');
+        this.pool.delete(name);
+        this.addNode(name, new Node(params.node.url), true);
+      }
+      this.onNetworkChange(params);
+    };
+
     const client = new RpcClient<WalletApi, AeppApi>(
       connection,
       () => {
@@ -108,12 +118,7 @@ export default class AeSdkAepp extends AeSdkBase {
           this._accounts = params;
           this.onAddressChange(params);
         },
-        [METHODS.updateNetwork]: (params) => {
-          const { node } = params;
-          this.pool.delete(name);
-          if (node != null) this.addNode(name, new Node(node.url), true);
-          this.onNetworkChange(params);
-        },
+        [METHODS.updateNetwork]: updateNetwork,
         [METHODS.closeConnection]: (params) => {
           disconnectParams = params;
           client.connection.disconnect();
@@ -121,12 +126,9 @@ export default class AeSdkAepp extends AeSdkBase {
         [METHODS.readyToConnect]: () => {},
       },
     );
-    const { node, ...walletInfo } = await client
+    const walletInfo = await client
       .request(METHODS.connect, { name: this.name, version: RPC_VERSION, connectNode });
-    if (connectNode) {
-      if (node == null) throw new RpcConnectionError('Missing URLs of the Node');
-      this.addNode(name, new Node(node.url), true);
-    }
+    updateNetwork(walletInfo);
     this.rpcClient = client;
     return walletInfo;
   }
