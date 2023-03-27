@@ -62,7 +62,7 @@ export default class AccountGeneralized extends AccountBase {
       }
 
       if (sourceCode == null || args == null) {
-        throw new InvalidAuthDataError('Auth data must contain source code and arguments.');
+        throw new InvalidAuthDataError('Auth data must contain sourceCode and args or callData.');
       }
       const contract = await Contract.initialize({ onCompiler, onNode, sourceCode });
       return contract._calldata.encode(contract._name, this.#authFun, args);
