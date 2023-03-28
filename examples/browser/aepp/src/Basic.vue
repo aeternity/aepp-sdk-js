@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import { encode, Encoding } from '@aeternity/aepp-sdk';
 import Value from './Value.vue';
 
@@ -72,10 +72,7 @@ export default {
     spendPayload: '',
     spendPromise: null,
   }),
-  computed: {
-    ...mapState('aeSdk', ['address', 'networkId']),
-    ...mapGetters('aeSdk', ['aeSdk']),
-  },
+  computed: mapState(['aeSdk', 'address', 'networkId']),
   mounted() {
     this.$watch(
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],

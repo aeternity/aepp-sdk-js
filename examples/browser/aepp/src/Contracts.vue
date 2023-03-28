@@ -79,7 +79,7 @@
 
 <script>
 import { shallowRef } from 'vue';
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import Value from './Value.vue';
 
 const contractSourceCode = `
@@ -101,7 +101,7 @@ export default {
     deployPromise: null,
     callPromise: null,
   }),
-  computed: mapGetters('aeSdk', ['aeSdk']),
+  computed: mapState(['aeSdk']),
   methods: {
     async create() {
       // Contract instance can't be in deep reactive https://stackoverflow.com/a/69010240

@@ -50,7 +50,7 @@
 import {
   walletDetector, BrowserWindowMessageConnection, RpcConnectionDenyError,
 } from '@aeternity/aepp-sdk';
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   data: () => ({
@@ -62,7 +62,7 @@ export default {
     walletInfo: null,
   }),
   computed: {
-    ...mapGetters('aeSdk', ['aeSdk']),
+    ...mapState(['aeSdk']),
     walletName() {
       if (!this.aeSdk) return 'SDK is not ready';
       if (!this.walletConnected) return 'Wallet is not connected';
@@ -104,7 +104,7 @@ export default {
         }
         this.walletConnected = true;
         const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected');
-        this.$store.commit('aeSdk/setAddress', Object.keys(current)[0]);
+        this.$store.commit('setAddress', Object.keys(current)[0]);
       } finally {
         this.walletConnecting = false;
       }
