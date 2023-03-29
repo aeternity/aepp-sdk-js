@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import Connect from './Connect.vue';
 import Basic from './Basic.vue';
 import Contracts from './Contracts.vue';
@@ -38,7 +38,7 @@ import Contracts from './Contracts.vue';
 export default {
   components: { Connect, Basic, Contracts },
   data: () => ({ view: '' }),
-  computed: mapGetters('aeSdk', ['aeSdk']),
+  computed: mapState(['aeSdk']),
 };
 </script>
 

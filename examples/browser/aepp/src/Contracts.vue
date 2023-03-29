@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <template v-if="createPromise">
+  <template v-if="contract">
     <h2>Compile Contract</h2>
     <div class="group">
       <button @click="compilePromise = compile()">
@@ -32,7 +32,7 @@
     </div>
   </template>
 
-  <template v-if="createPromise">
+  <template v-if="contract">
     <h2>Deploy Contract</h2>
     <div class="group">
       <div>
@@ -78,7 +78,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { shallowRef } from 'vue';
+import { mapState } from 'vuex';
 import Value from './Value.vue';
 
 const contractSourceCode = `
@@ -95,23 +96,27 @@ export default {
     deployArg: 5,
     callArg: 7,
     createPromise: null,
+    contract: null,
     compilePromise: null,
     deployPromise: null,
     callPromise: null,
   }),
-  computed: mapGetters('aeSdk', ['aeSdk']),
+  computed: mapState(['aeSdk']),
   methods: {
-    create() {
-      return this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode });
+    async create() {
+      // Contract instance can't be in deep reactive https://stackoverflow.com/a/69010240
+      this.contract = shallowRef(
+        await this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode }),
+      );
     },
     async compile() {
-      return (await this.createPromise).$compile();
+      return this.contract.$compile();
     },
     async deploy() {
-      return (await this.createPromise).$deploy([this.deployArg]);
+      return this.contract.$deploy([this.deployArg]);
     },
     async call() {
-      return (await this.createPromise).calc(this.callArg);
+      return this.contract.calc(this.callArg);
     },
   },
 };
