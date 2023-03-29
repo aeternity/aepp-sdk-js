@@ -84,17 +84,20 @@ describe('Aepp<->Wallet', function aeppWallet() {
     target: connections.walletWindow,
   });
   const handlerReject = (): void => { throw new Error('test reject'); };
+  let aeSdk: AeSdk;
   let account: AccountBase;
+
+  before(async () => {
+    aeSdk = await getSdk();
+    [account] = Object.values(aeSdk.accounts);
+  });
 
   describe('New RPC Wallet-AEPP: AEPP node', () => {
     const keypair = generateKeyPair();
-    let aeSdk: AeSdk;
     let aepp: AeSdkAepp;
     let wallet: AeSdkWallet;
 
     before(async () => {
-      aeSdk = await getSdk();
-      [account] = Object.values(aeSdk.accounts);
       wallet = new AeSdkWallet({
         nodes: [{ name: 'local', instance: node }],
         accounts: [account, MemoryAccount.generate()],
@@ -524,7 +527,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       wallet.addRpcClient(connectionFromWalletToAepp);
       await aepp.connectToWallet(
         connectionFromAeppToWallet,
-        { connectNode: true, name: 'wallet-node', select: true },
+        { connectNode: true, name: 'wallet-node' },
       );
     });
 
