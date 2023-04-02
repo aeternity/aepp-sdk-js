@@ -203,6 +203,30 @@ describe('Contract instance', () => {
     expect(testContract.$options.bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
   });
 
+  it('compiles contract by sourceCodePath', async () => {
+    const ctr = await aeSdk.initializeContract({
+      aci: [{
+        contract: {
+          functions: [{
+            arguments: [{ name: 'x', type: 'int' }],
+            name: 'increment',
+            payable: false,
+            returns: 'int',
+            stateful: false,
+          },
+          ],
+          kind: 'contract_main',
+          name: 'Increment',
+          payable: false,
+          typedefs: [],
+        },
+      }],
+      sourceCodePath: './test/integration/contracts/Increment.aes',
+    });
+    expect(ctr.$options.bytecode).to.equal(undefined);
+    expect(await ctr.$compile()).to.satisfy((b: string) => b.startsWith('cb_'));
+  });
+
   it('fails on calling without deployment', () => expect(testContract.intFn(2))
     .to.be.rejectedWith(MissingContractAddressError, 'Can\'t dry-run contract without address'));
 
@@ -275,7 +299,8 @@ describe('Contract instance', () => {
 
   it('generates by bytecode and aci', async () => aeSdk.initializeContract({ bytecode: testContractBytecode, aci: testContractAci }));
 
-  it('fails on generation without arguments', () => expect(aeSdk.initializeContract()).to.be.rejectedWith(MissingContractDefError, 'Either ACI or source code is required'));
+  it('fails on generation without arguments', () => expect(aeSdk.initializeContract())
+    .to.be.rejectedWith(MissingContractDefError, 'Either ACI or sourceCode or sourceCodePath is required'));
 
   it('calls by aci', async () => {
     const contract = await aeSdk.initializeContract<TestContractApi>(

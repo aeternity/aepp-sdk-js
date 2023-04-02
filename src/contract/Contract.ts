@@ -132,11 +132,19 @@ class Contract<M extends ContractMethodsBase> {
    */
   async $compile(): Promise<Encoded.ContractBytearray> {
     if (this.$options.bytecode != null) return this.$options.bytecode;
-    if (this.$options.sourceCode == null) throw new IllegalArgumentError('Can\'t compile without source code');
     if (this.$options.onCompiler == null) throw new IllegalArgumentError('Can\'t compile without compiler');
-    this.$options.bytecode = (await this.$options.onCompiler
-      .compileBySourceCode(this.$options.sourceCode, this.$options.fileSystem)
-    ).bytecode;
+    if (this.$options.sourceCode != null) {
+      const { bytecode } = await this.$options.onCompiler
+        .compileBySourceCode(this.$options.sourceCode, this.$options.fileSystem);
+      this.$options.bytecode = bytecode;
+    }
+    if (this.$options.sourceCodePath != null) {
+      const { bytecode } = await this.$options.onCompiler.compile(this.$options.sourceCodePath);
+      this.$options.bytecode = bytecode;
+    }
+    if (this.$options.bytecode == null) {
+      throw new IllegalArgumentError('Can\'t compile without sourceCode and sourceCodePath');
+    }
     return this.$options.bytecode;
   }
 
@@ -478,7 +486,7 @@ class Contract<M extends ContractMethodsBase> {
       ) as Encoded.ContractAddress;
     }
 
-    if (address == null && sourceCode == null && bytecode == null) {
+    if (address == null && sourceCode == null && sourceCodePath == null && bytecode == null) {
       throw new MissingContractAddressError('Can\'t create instance by ACI without address');
     }
 
@@ -495,12 +503,25 @@ class Contract<M extends ContractMethodsBase> {
       else if (sourceCode != null) {
         if (onCompiler == null) throw new IllegalArgumentError('Can\'t validate bytecode without compiler');
         isValid = await onCompiler.validateBySourceCode(onChanBytecode, sourceCode, fileSystem);
+      } else if (sourceCodePath != null) {
+        if (onCompiler == null) throw new IllegalArgumentError('Can\'t validate bytecode without compiler');
+        isValid = await onCompiler.validate(onChanBytecode, sourceCodePath);
       }
-      if (!isValid) throw new BytecodeMismatchError(sourceCode != null ? 'source code' : 'bytecode');
+      if (!isValid) {
+        throw new BytecodeMismatchError((sourceCode ?? sourceCodePath) != null ? 'source code' : 'bytecode');
+      }
     }
 
     return new ContractWithMethods<M>({
-      onCompiler, onNode, sourceCode, bytecode, aci, address, fileSystem, ...otherOptions,
+      onCompiler,
+      onNode,
+      sourceCode,
+      sourceCodePath,
+      bytecode,
+      aci,
+      address,
+      fileSystem,
+      ...otherOptions,
     });
   }
 

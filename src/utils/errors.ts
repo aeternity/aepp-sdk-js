@@ -488,7 +488,7 @@ export class MissingContractAddressError extends ContractError {
  */
 export class MissingContractDefError extends ContractError {
   constructor() {
-    super('Either ACI or source code is required');
+    super('Either ACI or sourceCode or sourceCodePath is required');
     this.name = 'MissingContractDefError';
   }
 }
