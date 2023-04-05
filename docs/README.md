@@ -98,5 +98,24 @@ module.exports = {
 };
 ```
 
+### Vue@3
+Reactivity in Vue@3 [based on] Proxy class. Proxy is [not compatible] with private fields of ES
+classes. AeSdk and Contract classes uses private fields, so if you make an instance of these
+classes reactive then the app may fail with
+
+> TypeError: attempted to get private field on non-instance
+
+AeSdk and Contract classes doesn’t have a state intended to be tracked using reactivity. Therefore
+to solve this issue we suggest to avoid making their instances reactive. One of the ways is to use
+Vue's integrated utilities: [shallowRef], [shallowReactive]. The idea is to make reactive only the
+root variable, to don't make it reactive in deep. You can find it implementation in the
+[æpp example].
+
+[based on]: https://vuejs.org/guide/extras/reactivity-in-depth.html#how-reactivity-works-in-vue
+[not compatible]: https://github.com/tc39/proposal-class-fields/issues/106
+[shallowRef]: https://vuejs.org/api/reactivity-advanced.html#shallowref
+[shallowReactive]: https://vuejs.org/api/reactivity-advanced.html#shallowreactive
+[æpp example]: ../examples/browser/aepp/
+
 ## Command Line Interface (CLI)
 If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the [💻 CLI](https://github.com/aeternity/aepp-cli-js) and follow the instructions mentioned there.
