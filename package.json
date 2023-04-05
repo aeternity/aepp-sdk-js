@@ -35,7 +35,7 @@
     "build:types": "tsc && node tooling/downlevel/run.mjs",
     "build:es": "babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
     "build:api": "node tooling/autorest/compiler-prepare.mjs && autorest tooling/autorest/compiler.yaml && autorest tooling/autorest/node.yaml",
-    "build:generate": "tooling/generate-schema.ts",
+    "build:generate": "ts-node --transpileOnly tooling/generate-schema.ts",
     "build": "npm run build:api && npm run build:generate && webpack && npm run build:types && npm run build:es && npm run build:assets",
     "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.mjs",
     "docs:api": "typedoc",
