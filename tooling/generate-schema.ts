@@ -1,4 +1,4 @@
-#!/usr/bin/env -S ts-node --transpile-only
+#!/usr/bin/env -S ts-node --transpileOnly
 import ts, { factory, IntersectionTypeNode, TypeNode } from 'typescript';
 import { writeFileSync } from 'fs';
 import { basename } from 'path';
