@@ -13,6 +13,9 @@ export type Aci = Array<{
     name: string;
     event?: any;
     functions: FunctionAci[];
+    kind: string; // known values: 'contract_main'
+    payable: boolean;
+    typedefs: any[];
   };
 }>;
 
