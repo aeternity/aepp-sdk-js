@@ -2,12 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [13.0.0-beta.0](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.3...v13.0.0-beta.0) (2023-03-01)
+## [13.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.0.0-beta.0...v13.0.0) (2023-04-06)
 
 
 ### ⚠ BREAKING CHANGES
 
-Please check out [migration guide](./guides/migration/13.0.0.md).
+Please check out [migration guide](./guides/migration/13.0.0.md), and release notes for the [beta release](#1300-beta0-2023-03-01).
+
+* **aepp:** All wallet provided nodes have the same name
+Specified in `name` option of `connectToWallet`.
+* **aepp:** Select option removed from connectToWallet
+If you are using `connectNode` then the current node would always be the same as wallet provides.
+
+### Features
+
+* **aepp:** call `onNetworkChange` after connection ([5854cae](https://github.com/aeternity/aepp-sdk-js/commit/5854cae16dc8372214a715a6f5313a8a02ce091c))
+* export Encoded type ([026f4c1](https://github.com/aeternity/aepp-sdk-js/commit/026f4c1340a1b839a11d5c9e725cacadfe3c8fee))
+
+
+### Bug Fixes
+
+* **aepp:** use the same name for all nodes provided by wallet ([0ece313](https://github.com/aeternity/aepp-sdk-js/commit/0ece3131c72103e961de96dfbb8a4a64babaef9c))
+* **chain:** reduce /2 number of blocks to wait before throwing timeout ([44de66b](https://github.com/aeternity/aepp-sdk-js/commit/44de66bbb504c7f3565b16a9305a65b7e9fa252a))
+* **contract:** add missed `sourceCodePath` cases ([5be4cd9](https://github.com/aeternity/aepp-sdk-js/commit/5be4cd99bba2499287241c8e0c432dd57a277d89))
+
+
+* **aepp:** remove select option in connectToWallet ([adf9c3e](https://github.com/aeternity/aepp-sdk-js/commit/adf9c3ecd7f64194fcdf3183a46c7c5c1c6e8714))
+
+## [13.0.0-beta.0](https://github.com/aeternity/aepp-sdk-js/compare/v12.1.3...v13.0.0-beta.0) (2023-03-01)
+
+
+### ⚠ BREAKING CHANGES
 
 #### Wallet
 * `onSign`, `onMessageSign` callbacks were removed on the wallet side
