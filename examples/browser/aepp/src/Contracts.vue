@@ -5,7 +5,7 @@
       <div>Contract Source Code</div>
       <div>
         <textarea
-          v-model="contractSource"
+          v-model="contractSourceCode"
           placeholder="Contact source code"
         />
       </div>
@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <template v-if="createPromise">
+  <template v-if="contract">
     <h2>Compile Contract</h2>
     <div class="group">
       <button @click="compilePromise = compile()">
@@ -32,7 +32,7 @@
     </div>
   </template>
 
-  <template v-if="createPromise">
+  <template v-if="contract">
     <h2>Deploy Contract</h2>
     <div class="group">
       <div>
@@ -78,44 +78,46 @@
 </template>
 
 <script>
-import Value from './Value.vue'
-import { mapState, mapGetters } from 'vuex'
+import { shallowRef } from 'vue';
+import { mapState } from 'vuex';
+import Value from './Value.vue';
 
-const contractSource = `
+const contractSourceCode = `
 contract Multiplier =
   record state = { factor: int }
   entrypoint init(f : int) : state = { factor = f }
   entrypoint calc(x : int) = x * state.factor
-`.trim()
+`.trim();
 
 export default {
   components: { Value },
   data: () => ({
-    contractSource,
+    contractSourceCode,
     deployArg: 5,
     callArg: 7,
     createPromise: null,
+    contract: null,
     compilePromise: null,
     deployPromise: null,
-    callPromise: null
+    callPromise: null,
   }),
-  computed: {
-    ...mapState('aeSdk', ['address', 'networkId']),
-    ...mapGetters('aeSdk', ['aeSdk'])
-  },
+  computed: mapState(['aeSdk']),
   methods: {
-    create () {
-      return this.aeSdk.getContractInstance({ source: this.contractSource })
+    async create() {
+      // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue-3
+      this.contract = shallowRef(
+        await this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode }),
+      );
     },
-    async compile () {
-      return (await this.createPromise).compile()
+    async compile() {
+      return this.contract.$compile();
     },
-    async deploy () {
-      return (await this.createPromise).deploy([this.deployArg])
+    async deploy() {
+      return this.contract.$deploy([this.deployArg]);
     },
-    async call () {
-      return (await this.createPromise).methods.calc(this.callArg)
-    }
-  }
-}
+    async call() {
+      return this.contract.calc(this.callArg);
+    },
+  },
+};
 </script>

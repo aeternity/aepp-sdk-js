@@ -1,14 +1,14 @@
 # Contracts
 
 ## Introduction
-The smart contract language of the æternity blockchain is [Sophia](https://aeternity.com/aesophia). It is a functional language in the ML family, strongly typed and has restricted mutable state.
+The smart contract language of the æternity blockchain is [Sophia](https://docs.aeternity.com/aesophia). It is a functional language in the ML family, strongly typed and has restricted mutable state.
 
 Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into [aepp-sophia-examples](https://github.com/aeternity/aepp-sophia-examples) and start rapid prototyping using [AEstudio](https://studio.aepps.com).
 
 The SDK needs to interact with following components in order to enable smart contract interactions on the æternity blockchain:
 
 - [æternity](https://github.com/aeternity/aeternity) (host your own one or use the public testnet node at `https://testnet.aeternity.io`)
-- [aesophia_http](https://github.com/aeternity/aesophia_http) (host your own one or use the public compiler at `https://compiler.aepps.com`)
+- [aesophia_http](https://github.com/aeternity/aesophia_http) (host your own one or use the public compiler at `https://v7.compiler.stg.aepps.com`)
 
 Note:
 
@@ -17,9 +17,9 @@ Note:
 ## 1. Specify imports
 ```js
 // node.js import
-const { AeSdk, MemoryAccount, Node } = require('@aeternity/aepp-sdk')
+const { AeSdk, MemoryAccount, Node, CompilerHttp } = require('@aeternity/aepp-sdk')
 // ES import
-import { AeSdk, MemoryAccount, Node } from '@aeternity/aepp-sdk'
+import { AeSdk, MemoryAccount, Node, CompilerHttp } from '@aeternity/aepp-sdk'
 ```
 
 ## 2. Create an instance of the SDK
@@ -27,18 +27,13 @@ When creating an instance of the SDK you need to provide an account which will b
 
 ```js
 const node = new Node('https://testnet.aeternity.io') // ideally host your own node
-const account = new MemoryAccount({
-  // provide a valid keypair with your secretKey and publicKey
-  keypair: { secretKey: SECRET_KEY, publicKey: PUBLIC_KEY }
-})
+const account = new MemoryAccount(SECRET_KEY)
 
 const aeSdk = new AeSdk({
-  nodes: [
-    { name: 'testnet', instance: node }
-  ],
-  compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler
+  nodes: [{ name: 'testnet', instance: node }],
+  accounts: [account],
+  onCompiler: new CompilerHttp('https://v7.compiler.stg.aepps.com'), // ideally host your own compiler
 })
-await aeSdk.addAccount(accoount, { select: true })
 ```
 
 Note:
@@ -53,15 +48,15 @@ Note:
 
 ```js
 const sourceCode = ... // source code of the contract
-const contractInstance = await aeSdk.getContractInstance({ source: sourceCode })
+const contract = await aeSdk.initializeContract({ sourceCode })
 ```
 
 Note:
 
-- If your contract includes external dependencies which are not part of the [standard library](https://aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
+- If your contract includes external dependencies which are not part of the [standard library](https://docs.aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
   ```js
   const fileSystem = ... // key-value map with name of the include as key and source code of the include as value
-  const contractInstance = await aeSdk.getContractInstance({ source: sourceCode, fileSystem })
+  const contract = await aeSdk.initializeContract({ sourceCode, fileSystem })
   ```
 
 ### By ACI and bytecode
@@ -70,7 +65,7 @@ If you pre-compiled the contracts you can also initialize a contract instance by
 ```js
 const aci = ... // ACI of the contract
 const bytecode = ... // bytecode of the contract
-const contractInstance = await aeSdk.getContractInstance({ aci, bytecode })
+const contract = await aeSdk.initializeContract({ aci, bytecode })
 ```
 
 ### By ACI and contract address
@@ -78,16 +73,16 @@ In many cases an application doesn't need to deploy a contract or verify its byt
 
 ```js
 const aci = ... // ACI of the contract
-const contractAddress = ... // the address of the contract
-const contractInstance = await aeSdk.getContractInstance({ aci, contractAddress })
+const address = ... // the address of the contract
+const contract = await aeSdk.initializeContract({ aci, address })
 ```
 
 ### Options
 
-- Following attributes can be provided via `options` to `getContractInstance`:
+- Following attributes can be provided via `options` to `initializeContract`:
     - `aci` (default: obtained via http compiler)
         - The Contract ACI.
-    - `contractAddress`
+    - `address`
         - The address where the contract is located at.
         - To be used if a contract is already deployed.
     - `fileSystem` (default: {})
@@ -118,16 +113,15 @@ contract Increment =
         state.count
 ```
 
-The contract can be deployed using the `contractInstance` in two different ways:
+The contract can be deployed using the `contract` in two different ways:
 
 ```js
-const tx = await contractInstance.deploy([1]) // recommended
+const tx = await contract.$deploy([1])
 // or
-const tx = await contractInstance.methods.init(1)
+const tx = await contract.init(1)
 
 // after successful deployment you can look up the transaction and the deploy information
-console.log(tx)
-console.log(contractInstance.deployInfo) // { owner, transaction, address, result, rawTx }
+console.log(tx) // { owner, transaction, address, result, rawTx }
 ```
 
 Note:
@@ -143,25 +137,25 @@ if they should produce changes to the state of the smart contract, see `incremen
 According to the example above you can call the `stateful` entrypoint `increment` by using one of the following lines:
 
 ```js
-const tx = await contractInstance.methods.increment(3) // recommended
+const tx = await contract.increment(3) // recommended
 // or
-const tx = await contractInstance.methods.increment.send(3)
+const tx = await contract.increment(3, { callStatic: false })
 // or
-const tx = await contractInstance.call('increment', [3])
+const tx = await contract.$call('increment', [3])
 ```
 
 Note:
 
-- The functions `send` and `call` provide an explicit way to tell the SDK to sign and broadcast the transaction.
+- The `callStatic: false` option provide an explicit way to tell the SDK to sign and broadcast the transaction.
 - When using the `increment` function directly the SDK will automatically determine if it's a `stateful` entrypoint.
 
 ### b) Regular entrypoints
 The æternity node can expose an API endpoint that allows to execute a `dry-run` for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the `get_count` entrypoint of the example above:
 
 ```js
-const tx = await contractInstance.methods.get_count() // recommended
+const tx = await contract.get_count() // recommended
 // or
-const tx = await contractInstance.methods.get_count.get()
+const tx = await contract.get_count({ callStatic: true })
 
 // access the decoded result returned by the execution of the entrypoint
 console.log(tx.decodedResult);
@@ -169,7 +163,7 @@ console.log(tx.decodedResult);
 
 Note:
 
-- The functions `get` and `callStatic` provide an explicit way to tell the SDK to perform a `dry-run` and to **NOT** broadcast the transaction.
+- The `callStatic` option provide an explicit way to tell the SDK to perform a `dry-run` and to **NOT** broadcast the transaction.
 - When using the `get_count` function directly the SDK will automatically determine that the function is not declared `stateful` and thus perform a `dry-run`, too.
 
 ### c) Payable entrypoints
@@ -184,11 +178,9 @@ payable stateful entrypoint fund_project(project_id: int) =
 In order to successfully call the `fund_project` entrypoint you need to provide at least 50 `aettos`. You can do this by providing the desired amount of `aettos` using one of the following lines:
 
 ```js
-const tx = await contractInstance.methods.fund_project(1, { amount: 50 }) // recommended
+const tx = await contract.fund_project(1, { amount: 50 }) // recommended
 // or
-const tx = await contractInstance.methods.fund_project.send(1, { amount: 50 })
-// or
-const tx = await contractInstance.call('fund_project', [1], { amount: 50 })
+const tx = await contract.$call('fund_project', [1], { amount: 50 })
 ```
 
 ## Transaction options

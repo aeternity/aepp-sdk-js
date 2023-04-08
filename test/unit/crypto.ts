@@ -1,33 +1,18 @@
-/*
- * ISC License (ISC)
- * Copyright (c) 2022 aeternity developers
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
- *  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
- *  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
- *  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
- *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- *  PERFORMANCE OF THIS SOFTWARE.
- */
-
 import '..';
 import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
-import * as Crypto from '../../src/utils/crypto';
-import { buildTxHash, unpackTx, decode } from '../../src';
+import {
+  buildTxHash, decode,
+  generateKeyPair, getAddressFromPriv, verifyMessage, isValidKeypair, isAddressValid, hash, genSalt,
+  sign, verify, messageToHash, signMessage,
+} from '../../src';
 import { Encoded } from '../../src/utils/encoder';
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing
 const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8';
 const privateKey = Buffer.from(privateKeyAsHex, 'hex');
-const publicKeyWithPrefix: Encoded.AccountAddress = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm';
-const publicKey = decode(publicKeyWithPrefix);
+const address: Encoded.AccountAddress = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm';
 
 const txBinaryAsArray = [
   248, 76, 12, 1, 160, 35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58,
@@ -49,41 +34,42 @@ const expectedHash = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK';
 describe('crypto', () => {
   describe('generateKeyPair', () => {
     it('generates an account key pair', () => {
-      const keyPair = Crypto.generateKeyPair();
+      const keyPair = generateKeyPair();
       assert.ok(keyPair);
       expect(keyPair.publicKey).to.satisfy((b: string) => b.startsWith('ak_'));
       assert.isAtLeast(keyPair.publicKey.length, 51);
       assert.isAtMost(keyPair.publicKey.length, 53);
     });
+
     it('Address from secret', () => {
-      Crypto.getAddressFromPriv(privateKeyAsHex).should.be.equal(publicKeyWithPrefix);
+      getAddressFromPriv(privateKeyAsHex).should.be.equal(address);
     });
   });
 
   describe('isValidKeypair', () => {
     it('verify the generated key pair', () => {
-      const keyPair = Crypto.generateKeyPair(true);
+      const keyPair = generateKeyPair(true);
       assert.ok(keyPair);
-      const verifyResult = Crypto.isValidKeypair(keyPair.secretKey, keyPair.publicKey);
+      const verifyResult = isValidKeypair(keyPair.secretKey, keyPair.publicKey);
       assert.isTrue(verifyResult);
     });
   });
 
   it('isAddressValid', () => {
-    expect(Crypto.isAddressValid('test')).to.be.equal(false);
-    expect(Crypto.isAddressValid('ak_11111111111111111111111111111111273Yts')).to.be.equal(true);
+    expect(isAddressValid('test')).to.be.equal(false);
+    expect(isAddressValid('ak_11111111111111111111111111111111273Yts')).to.be.equal(true);
   });
 
   describe('sign', () => {
     it('should produce correct signature', () => {
-      const s = Crypto.sign(txBinary, privateKey);
+      const s = sign(txBinary, privateKey);
       expect(s).to.eql(signature);
     });
   });
 
   describe('verify', () => {
     it('should verify tx with correct signature', () => {
-      const result = Crypto.verify(txBinary, signature, publicKey);
+      const result = verify(txBinary, signature, address);
       assert.isTrue(result);
     });
   });
@@ -100,48 +86,48 @@ describe('crypto', () => {
     const longMessage = 'test'.repeat(256);
     const longMessageHash = Buffer.from('J9bibOHrlicf0tYQxe1lW69LdDAxETwPmrafKjjQwvs=', 'base64');
 
-    it('calculates a hash of a long message', () => expect(Crypto.messageToHash(longMessage)).to.eql(longMessageHash));
+    it('calculates a hash of a long message', () => expect(messageToHash(longMessage)).to.eql(longMessageHash));
 
     describe('sign', () => {
       it('should produce correct signature of message', () => {
-        const s = Crypto.signMessage(message, privateKey);
+        const s = signMessage(message, privateKey);
         expect(s).to.eql(messageSignature);
       });
 
       it('should produce correct signature of message with non-ASCII chars', () => {
-        const s = Crypto.signMessage(messageNonASCII, privateKey);
+        const s = signMessage(messageNonASCII, privateKey);
         expect(s).to.eql(messageNonASCIISignature);
       });
     });
 
     describe('verify', () => {
       it('should verify message', () => {
-        const result = Crypto.verifyMessage(message, messageSignature, publicKey);
+        const result = verifyMessage(message, messageSignature, address);
         assert.isTrue(result);
       });
 
       it('should verify message with non-ASCII chars', () => {
-        const result = Crypto.verifyMessage(messageNonASCII, messageNonASCIISignature, publicKey);
+        const result = verifyMessage(messageNonASCII, messageNonASCIISignature, address);
         assert.isTrue(result);
       });
     });
   });
 
   it('hashing produces 256 bit blake2b byte buffers', () => {
-    const hash = Crypto.hash('foobar');
-    hash.should.be.a('Uint8Array');
-    Buffer.from(hash).toString('hex').should.be.equal('93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47');
+    const h = hash('foobar');
+    h.should.be.a('Uint8Array');
+    Buffer.from(h).toString('hex').should.be.equal('93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47');
   });
+
   it('salt produces random sequences every time', () => {
-    const salt1 = Crypto.genSalt();
-    const salt2 = Crypto.genSalt();
+    const salt1 = genSalt();
+    const salt2 = genSalt();
     salt1.should.be.a('Number');
     salt2.should.be.a('Number');
     salt1.should.not.be.equal(salt2);
   });
+
   it('Can produce tx hash', () => {
-    const rlpEncodedTx = unpackTx(txRaw).rlpEncoded;
-    buildTxHash(txRaw).should.be.equal(expectedHash);
-    buildTxHash(rlpEncodedTx).should.be.equal(expectedHash);
+    buildTxHash(decode(txRaw)).should.be.equal(expectedHash);
   });
 });

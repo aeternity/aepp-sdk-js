@@ -1,20 +1,17 @@
 import { AensName } from '../constants';
 import { produceNameId, isNameValid } from '../helpers';
-import { writeId, readId } from '../address';
-import { Encoded } from '../../../utils/encoder';
+import address from './address';
+import { Encoded, Encoding } from '../../../utils/encoder';
+
+const addressName = address(Encoding.Name);
 
 export default {
+  ...addressName,
+
   /**
    * @param value - AENS name ID
    */
   serialize(value: AensName | Encoded.Name): Buffer {
-    return writeId(isNameValid(value) ? produceNameId(value) : value);
-  },
-
-  /**
-   * @param value - AENS name ID Buffer
-   */
-  deserialize(value: Buffer): Encoded.Name {
-    return readId(value) as Encoded.Name;
+    return addressName.serialize(isNameValid(value) ? produceNameId(value) : value);
   },
 };

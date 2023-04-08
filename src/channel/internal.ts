@@ -1,59 +1,77 @@
-/*
- * ISC License (ISC)
- * Copyright (c) 2018 aeternity developers
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
- *  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
- *  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
- *  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
- *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- *  PERFORMANCE OF THIS SOFTWARE.
- */
-
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { EventEmitter } from 'events';
 import BigNumber from 'bignumber.js';
-import type Channel from '.';
+import type Channel from './Base';
 import JsonBig from '../utils/json-big';
 import { pascalToSnake } from '../utils/string';
 import { Encoded } from '../utils/encoder';
 import {
-  BaseError, ChannelCallError, ChannelPingTimedOutError, UnknownChannelStateError,
+  BaseError,
+  ChannelCallError,
+  ChannelPingTimedOutError,
+  UnexpectedTsError,
+  UnknownChannelStateError,
+  ChannelIncomingMessageError,
+  ChannelError,
 } from '../utils/errors';
+import { encodeContractAddress } from '../utils/crypto';
+import { buildTx } from '../tx/builder';
 
-interface ChannelAction {
+export interface ChannelEvents {
+  statusChanged: (status: ChannelStatus) => void;
+  stateChanged: (tx: Encoded.Transaction | '') => void;
+  depositLocked: () => void;
+  ownDepositLocked: () => void;
+  withdrawLocked: () => void;
+  ownWithdrawLocked: () => void;
+  peerDisconnected: () => void;
+  channelReestablished: () => void;
+  error: (error: Error) => void;
+  onChainTx: (tx: Encoded.Transaction, details: { info: string; type: string }) => void;
+  message: (message: string | Object) => void;
+  newContract: (contractAddress: Encoded.ContractAddress) => void;
+}
+
+export interface ChannelAction {
   guard: (channel: Channel, state?: ChannelFsm) => boolean;
   action: (channel: Channel, state?: ChannelFsm) => ChannelFsm;
 }
 
-export type SignTxWithTag = (tag: string, tx: Encoded.Transaction, options?: object) => (
+interface SignOptions {
+  updates?: any[];
+  [k: string]: any;
+}
+export type SignTxWithTag = (tag: string, tx: Encoded.Transaction, options?: SignOptions) => (
   Promise<Encoded.Transaction>
 );
 // TODO: SignTx shouldn't return number or null
-export type SignTx = (tx: Encoded.Transaction, options?: object) => (
+export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
   Promise<Encoded.Transaction | number | null>
 );
 
 export interface ChannelOptions {
-  existingFsmId?: string;
+  existingFsmId?: Encoded.Bytearray;
   url: string;
-  role: 'initiator' | 'responder';
+
+  /**
+   * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
+   */
   initiatorId: Encoded.AccountAddress;
   responderId: Encoded.AccountAddress;
+  lockPeriod: number;
   pushAmount: number;
   initiatorAmount: BigNumber;
   responderAmount: BigNumber;
   channelReserve?: BigNumber | number;
-  signedTx?: string;
   ttl?: number;
   host: string;
   port: number;
-  lockPeriod: number;
+  role: 'initiator' | 'responder';
+  minimumDepthStrategy?: 'txfee' | 'plain';
+  minimumDepth?: number;
+  fee?: BigNumber | number;
+  gasPrice?: BigNumber | number;
+
+  signedTx?: string;
   existingChannelId?: string;
   offChainTx?: string;
   reconnectTx?: string;
@@ -76,7 +94,7 @@ export interface ChannelHandler extends Function {
 }
 
 export interface ChannelState {
-  signedTx: any;
+  signedTx: Encoded.Transaction;
   resolve: (r?: any) => void;
   reject: (e: BaseError) => void;
   sign: SignTx;
@@ -99,7 +117,6 @@ export interface ChannelFsm {
 
 export interface ChannelMessage {
   id?: number;
-  jsonrpc: string;
   method: string;
   params: any;
   payload?: any;
@@ -119,37 +136,22 @@ interface ChannelMessageError {
 
 // Send ping message every 10 seconds
 const PING_TIMEOUT_MS = 10000;
-// Close connection if pong message is not received within 5 seconds
-const PONG_TIMEOUT_MS = 5000;
+// Close connection if pong message is not received within 15 seconds
+const PONG_TIMEOUT_MS = 15000;
 
-// TODO: move to Channel instance to avoid is-null checks and for easier debugging
-export const options = new WeakMap<Channel, ChannelOptions>();
-export const status = new WeakMap<Channel, string>();
-export const state = new WeakMap<Channel, Encoded.Transaction>();
-const fsm = new WeakMap<Channel, ChannelFsm>();
-const websockets = new WeakMap<Channel, W3CWebSocket>();
-export const eventEmitters = new WeakMap<Channel, EventEmitter>();
-const messageQueue = new WeakMap<Channel, string[]>();
-const messageQueueLocked = new WeakMap<Channel, boolean>();
-const actionQueue = new WeakMap<Channel, ChannelAction[]>();
-const actionQueueLocked = new WeakMap<Channel, boolean>();
-const sequence = new WeakMap<Channel, number>();
-export const channelId = new WeakMap<Channel, string>();
-const rpcCallbacks = new WeakMap<Channel, Map<number, Function>>();
-const pingTimeoutId = new WeakMap<Channel, NodeJS.Timeout>();
-const pongTimeoutId = new WeakMap<Channel, NodeJS.Timeout>();
-export const fsmId = new WeakMap<Channel, string>();
-
-export function emit(channel: Channel, ...args: any[]): void {
+export function emit<E extends keyof ChannelEvents>(
+  channel: Channel,
+  ...args: [E, ...Parameters<ChannelEvents[E]>]
+): void {
   const [eventName, ...rest] = args;
-  eventEmitters.get(channel)?.emit(eventName, ...rest);
+  channel._eventEmitter.emit(eventName, ...rest);
 }
 
 function enterState(channel: Channel, nextState: ChannelFsm): void {
   if (nextState == null) {
     throw new UnknownChannelStateError();
   }
-  fsm.set(channel, nextState);
+  channel._fsm = nextState;
   if (nextState?.handler?.enter != null) {
     nextState.handler.enter(channel);
   }
@@ -157,122 +159,122 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
   void dequeueAction(channel);
 }
 
-export function changeStatus(channel: Channel, newStatus: string): void {
-  const prevStatus = status.get(channel);
-  if (newStatus !== prevStatus) {
-    status.set(channel, newStatus);
-    emit(channel, 'statusChanged', newStatus);
-  }
+// TODO: rewrite to enum
+export type ChannelStatus = 'connecting' | 'connected' | 'accepted' | 'halfSigned' | 'signed'
+| 'open' | 'closing' | 'closed' | 'died' | 'disconnected';
+
+export function changeStatus(channel: Channel, newStatus: ChannelStatus): void {
+  if (newStatus === channel._status) return;
+  channel._status = newStatus;
+  emit(channel, 'statusChanged', newStatus);
 }
 
-export function changeState(channel: Channel, newState: Encoded.Transaction): void {
-  state.set(channel, newState);
+export function changeState(channel: Channel, newState: Encoded.Transaction | ''): void {
+  channel._state = newState;
   emit(channel, 'stateChanged', newState);
 }
 
-export function send(channel: Channel, message: ChannelMessage): void {
-  const debug: boolean = options.get(channel)?.debug ?? false;
-  if (debug) console.log('Send message: ', message);
+function send(channel: Channel, message: ChannelMessage): void {
+  if (channel._options.debug) console.log('Send message: ', message);
+  channel._websocket.send(JsonBig.stringify({ jsonrpc: '2.0', ...message }));
+}
 
-  websockets.get(channel)?.send(JsonBig.stringify(message));
+export function notify(channel: Channel, method: string, params: object = {}): void {
+  send(channel, { method, params });
 }
 
 async function dequeueAction(channel: Channel): Promise<void> {
-  const locked = actionQueueLocked.get(channel);
-  const queue = actionQueue.get(channel) ?? [];
-  if (Boolean(locked) || queue.length === 0) {
-    return;
-  }
-  const singleFsm = fsm.get(channel);
-  if (singleFsm == null) return;
-  const index = queue.findIndex((action: ChannelAction) => action.guard(channel, singleFsm));
-  if (index === -1) {
-    return;
-  }
-  actionQueue.set(channel, queue.filter((_: ChannelAction, i: number) => index !== i));
-  actionQueueLocked.set(channel, true);
-  const nextState: ChannelFsm = await Promise.resolve(queue[index].action(channel, singleFsm));
-  actionQueueLocked.set(channel, false);
+  if (channel._isActionQueueLocked) return;
+  const queue = channel._actionQueue;
+  if (queue.length === 0) return;
+  const index = queue.findIndex((action) => action.guard(channel, channel._fsm));
+  if (index === -1) return;
+  channel._actionQueue = queue.filter((_, i) => index !== i);
+  channel._isActionQueueLocked = true;
+  const nextState: ChannelFsm = await queue[index].action(channel, channel._fsm);
+  channel._isActionQueueLocked = false;
   enterState(channel, nextState);
 }
 
-export function enqueueAction(
+export async function enqueueAction(
   channel: Channel,
   guard: ChannelAction['guard'],
-  action: ChannelAction['action'],
-): void {
-  const queue = actionQueue.get(channel) ?? [];
-  actionQueue.set(channel, [
-    ...queue,
-    { guard, action },
-  ]);
+  action: () => { handler: ChannelHandler; state?: Partial<ChannelState> },
+): Promise<any> {
+  const promise = new Promise((resolve, reject) => {
+    channel._actionQueue.push({
+      guard,
+      action() {
+        const res = action();
+        return { ...res, state: { ...res.state, resolve, reject } };
+      },
+    });
+  });
   void dequeueAction(channel);
+  return promise;
 }
 
-async function handleMessage(channel: Channel, message: string): Promise<void> {
-  const fsmState = fsm.get(channel);
-  if (fsmState == null) throw new UnknownChannelStateError();
-  const { handler, state: st } = fsmState;
-  enterState(channel, await Promise.resolve(handler(channel, message, st)));
+async function handleMessage(channel: Channel, message: ChannelMessage): Promise<void> {
+  const { handler, state: st } = channel._fsm;
+  const nextState = await Promise.resolve(handler(channel, message, st));
+  enterState(channel, nextState);
+  // TODO: emit message and handler name (?) to move this code to Contract constructor
+  if (
+    message?.params?.data?.updates?.[0]?.op === 'OffChainNewContract'
+    // if name is channelOpen, the contract was created by other participant
+    && nextState?.handler.name === 'channelOpen'
+  ) {
+    const round = channel.round();
+    if (round == null) throw new UnexpectedTsError('Round is null');
+    const owner = message?.params?.data?.updates?.[0]?.owner;
+    emit(channel, 'newContract', encodeContractAddress(owner, round + 1));
+  }
 }
 
 async function dequeueMessage(channel: Channel): Promise<void> {
-  const locked: boolean = messageQueueLocked.get(channel) ?? false;
-  if (locked) return;
-  const messages: string[] = messageQueue.get(channel) ?? [];
-  if (messages.length === 0) return;
-  messageQueueLocked.set(channel, true);
-  while (messages.length > 0) {
-    const message: string = messages.shift() ?? '';
+  if (channel._isMessageQueueLocked) return;
+  channel._isMessageQueueLocked = true;
+  while (channel._messageQueue.length > 0) {
+    const message = channel._messageQueue.shift();
+    if (message == null) throw new UnexpectedTsError();
     try {
       await handleMessage(channel, message);
     } catch (error) {
-      console.error('Error handling incoming message:');
-      console.error(message);
-      console.error(error);
+      emit(channel, 'error', new ChannelIncomingMessageError(error, message));
     }
   }
-  messageQueueLocked.set(channel, false);
+  channel._isMessageQueueLocked = false;
 }
 
 export function disconnect(channel: Channel): void {
-  websockets.get(channel)?.close();
-  const pingTimeoutIdValue = pingTimeoutId.get(channel);
-  const pongTimeoutIdValue = pongTimeoutId.get(channel);
-  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
-  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
+  channel._websocket.close();
+  clearTimeout(channel._pingTimeoutId);
 }
 
 function ping(channel: Channel): void {
-  const pingTimeoutIdValue = pingTimeoutId.get(channel);
-  const pongTimeoutIdValue = pongTimeoutId.get(channel);
-  if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
-  if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
-  pingTimeoutId.set(channel, setTimeout(() => {
-    send(channel, {
-      jsonrpc: '2.0',
-      method: 'channels.system',
-      params: {
-        action: 'ping',
-      },
-    });
-    pongTimeoutId.set(channel, setTimeout(() => {
+  clearTimeout(channel._pingTimeoutId);
+  channel._pingTimeoutId = setTimeout(() => {
+    notify(channel, 'channels.system', { action: 'ping' });
+    channel._pingTimeoutId = setTimeout(() => {
       disconnect(channel);
       emit(channel, 'error', new ChannelPingTimedOutError());
-    }, PONG_TIMEOUT_MS));
-  }, PING_TIMEOUT_MS));
+    }, PONG_TIMEOUT_MS);
+  }, PING_TIMEOUT_MS);
 }
 
 function onMessage(channel: Channel, data: string): void {
   const message = JsonBig.parse(data);
-  const debug: boolean = options.get(channel)?.debug ?? false;
-  if (debug) console.log('Receive message: ', message);
+  if (channel._options.debug) console.log('Receive message: ', message);
   if (message.id != null) {
-    const callback = rpcCallbacks.get(channel)?.get(message.id);
+    const callback = channel._rpcCallbacks.get(message.id);
+    if (callback == null) {
+      emit(channel, 'error', new ChannelError(`Can't find callback by id: ${message.id}`));
+      return;
+    }
     try {
-      callback?.(message);
+      callback(message);
     } finally {
-      rpcCallbacks.get(channel)?.delete(message.id);
+      channel._rpcCallbacks.delete(message.id);
     }
     return;
   }
@@ -281,36 +283,28 @@ function onMessage(channel: Channel, data: string): void {
     return;
   }
   if (message.method === 'channels.system.pong') {
-    if (
-      (message.params.channel_id === channelId.get(channel))
-      // Skip channelId check if channelId is not known yet
-      || (channelId.get(channel) == null)
-    ) {
+    if (message.params.channel_id === channel._channelId || channel._channelId == null) {
       ping(channel);
     }
     return;
   }
-  messageQueue.get(channel)?.push(message);
+  channel._messageQueue.push(message);
   void dequeueMessage(channel);
 }
 
 export async function call(channel: Channel, method: string, params: any): Promise<any> {
   return new Promise((resolve, reject) => {
-    const currentSequence: number = sequence.get(channel) ?? 0;
-    const id = sequence.set(channel, currentSequence + 1).get(channel) ?? 1;
-    rpcCallbacks.get(channel)?.set(
-      id,
-      (message: { result: PromiseLike<any>; error?: ChannelMessageError }) => {
-        if (message.error != null) {
-          const [{ message: details } = { message: '' }] = message.error.data ?? [];
-          return reject(new ChannelCallError(message.error.message + details));
-        }
-        return resolve(message.result);
-      },
-    );
-    send(channel, {
-      jsonrpc: '2.0', method, id, params,
+    const id = channel._nextRpcMessageId;
+    channel._nextRpcMessageId += 1;
+    channel._rpcCallbacks.set(id, (
+      message: { result: PromiseLike<any>; error?: ChannelMessageError },
+    ) => {
+      if (message.error != null) {
+        const details = message.error.data[0].message ?? '';
+        reject(new ChannelCallError(message.error.message + details));
+      } else resolve(message.result);
     });
+    send(channel, { method, id, params });
   });
 }
 
@@ -320,42 +314,37 @@ export async function initialize(
   openHandler: Function,
   { url, ...channelOptions }: ChannelOptions,
 ): Promise<void> {
-  options.set(channel, { url, ...channelOptions });
-  fsm.set(channel, { handler: connectionHandler });
-  eventEmitters.set(channel, new EventEmitter());
-  sequence.set(channel, 0);
-  rpcCallbacks.set(channel, new Map());
-  messageQueue.set(channel, []);
+  channel._options = { url, ...channelOptions };
+  channel._fsm = { handler: connectionHandler };
 
   const wsUrl = new URL(url);
   Object.entries(channelOptions)
     .filter(([key]) => !['sign', 'debug'].includes(key))
-    .forEach(([key, value]) => wsUrl.searchParams.set(pascalToSnake(key), value));
+    .forEach(([key, value]) => wsUrl.searchParams.set(pascalToSnake(key), value.toString()));
   wsUrl.searchParams.set('protocol', 'json-rpc');
   changeStatus(channel, 'connecting');
-  const ws = new W3CWebSocket(wsUrl.toString());
+  channel._websocket = new W3CWebSocket(wsUrl.toString());
   await new Promise<void>((resolve, reject) => {
-    Object.assign(ws, {
+    Object.assign(channel._websocket, {
       onerror: reject,
       onopen: async () => {
         resolve();
         changeStatus(channel, 'connected');
         if (channelOptions.reconnectTx != null) {
           enterState(channel, { handler: openHandler });
-          const signedTx = (await call(channel, 'channels.get.offchain_state', {})).signed_tx;
-          changeState(channel, signedTx);
+          const { signedTx } = await channel.state();
+          if (signedTx == null) {
+            throw new ChannelError('`signedTx` missed in state while reconnection');
+          }
+          changeState(channel, buildTx(signedTx));
         }
         ping(channel);
       },
       onclose: () => {
         changeStatus(channel, 'disconnected');
-        const pingTimeoutIdValue = pingTimeoutId.get(channel);
-        const pongTimeoutIdValue = pongTimeoutId.get(channel);
-        if (pingTimeoutIdValue != null) clearTimeout(pingTimeoutIdValue);
-        if (pongTimeoutIdValue != null) clearTimeout(pongTimeoutIdValue);
+        clearTimeout(channel._pingTimeoutId);
       },
       onmessage: ({ data }: { data: string }) => onMessage(channel, data),
     });
   });
-  websockets.set(channel, ws);
 }

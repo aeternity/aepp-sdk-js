@@ -1,9 +1,8 @@
 import BigNumber from 'bignumber.js';
 import { getMinimumNameFee } from '../helpers';
 import { InsufficientNameFeeError } from '../../../utils/errors';
-import { Int } from './u-int';
 import coinAmount from './coin-amount';
-import { AensName } from '../constants';
+import { AensName, Int } from '../constants';
 
 export default {
   ...coinAmount,
@@ -26,7 +25,8 @@ export default {
   serialize(
     value: Int | undefined,
     txFields: { name: AensName } & Parameters<typeof coinAmount['serialize']>[1],
+    parameters: Parameters<typeof coinAmount['serialize']>[2],
   ): Buffer {
-    return coinAmount.serializeOptional.call(this, value, txFields);
+    return coinAmount.serialize.call(this, value, txFields, parameters);
   },
 };

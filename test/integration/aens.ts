@@ -1,29 +1,13 @@
-/*
- * ISC License (ISC)
- * Copyright (c) 2022 aeternity developers
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
- *  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
- *  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
- *  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
- *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- *  PERFORMANCE OF THIS SOFTWARE.
- */
-
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
-import { randomName } from '../utils';
+import { assertNotNull, randomName } from '../utils';
 import {
   AeSdk, generateKeyPair, buildContractId, computeAuctionEndBlock, computeBidFee,
-  AensPointerContextError, UnexpectedTsError,
+  AensPointerContextError, UnexpectedTsError, encode, decode, Encoding,
 } from '../../src';
 import { pause } from '../../src/utils/other';
+import { ContractMethodsBase } from '../../src/contract/Contract';
 
 describe('Aens', () => {
   let aeSdk: AeSdk;
@@ -35,12 +19,11 @@ describe('Aens', () => {
 
   it('claims names', async () => {
     const preclaim = await aeSdk.aensPreclaim(name);
-    preclaim.should.be.an('object');
+    expect(preclaim.commitmentId).to.satisfy((s: string) => s.startsWith('cm_'));
+
     const claimed = await preclaim.claim();
-    claimed.should.be.an('object');
-    if (claimed.id == null || claimed.ttl == null) throw new UnexpectedTsError();
-    claimed.id.should.be.a('string');
-    claimed.ttl.should.be.an('number');
+    expect(claimed.id).to.be.a('string');
+    expect(claimed.ttl).to.be.an('number');
   });
 
   it('queries names', async () => {
@@ -54,8 +37,7 @@ describe('Aens', () => {
     .aensQuery(randomName(13)).should.eventually.be.rejected);
 
   it('Spend using name with invalid pointers', async () => {
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     const { pointers } = await aeSdk.getName(name);
     pointers.length.should.be.equal(0);
     await expect(aeSdk.spend(100, name, { onAccount }))
@@ -63,24 +45,27 @@ describe('Aens', () => {
   });
 
   it('Call contract using AENS name', async () => {
-    const source = 'contract Identity ='
+    const sourceCode = 'contract Identity ='
       + '  entrypoint getArg(x : int) = x';
-    const contract = await aeSdk.getContractInstance({ source });
-    await contract.deploy([]);
+    interface ContractApi extends ContractMethodsBase {
+      getArg: (x: number) => bigint;
+    }
+    let contract = await aeSdk.initializeContract<ContractApi>({ sourceCode });
+    await contract.$deploy([]);
     const nameObject = await aeSdk.aensQuery(name);
-    if (contract.deployInfo.address == null) throw new UnexpectedTsError();
-    await nameObject.update({ contract_pubkey: contract.deployInfo.address });
+    assertNotNull(contract.$options.address);
+    await nameObject.update({ contract_pubkey: contract.$options.address });
 
-    const contractByName = await aeSdk.getContractInstance({ source, contractAddress: name });
-    expect((await contractByName.methods.getArg(42)).decodedResult).to.be.equal(42n);
+    contract = await aeSdk.initializeContract<ContractApi>({ sourceCode, address: name });
+    expect((await contract.getArg(42)).decodedResult).to.be.equal(42n);
   });
 
   const address = generateKeyPair().publicKey;
   const pointers = {
     myKey: address,
     account_pubkey: address,
-    oracle_pubkey: address.replace('ak', 'ok'),
-    channel: address.replace('ak', 'ch'),
+    oracle_pubkey: encode(decode(address), Encoding.OracleAddress),
+    channel: encode(decode(address), Encoding.Channel),
     contract_pubkey: buildContractId(address, 13),
   };
   const pointersNode = Object.entries(pointers).map(([key, id]) => ({ key, id }));
@@ -93,8 +78,7 @@ describe('Aens', () => {
   it('throws error on updating names not owned by the account', async () => {
     const preclaim = await aeSdk.aensPreclaim(randomName(13));
     await preclaim.claim();
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     if (onAccount == null) throw new UnexpectedTsError();
     await aeSdk.aensUpdate(name, {}, { onAccount, blocks: 1 }).should.eventually.be.rejected;
   });
@@ -131,15 +115,13 @@ describe('Aens', () => {
   });
 
   it('Spend by name', async () => {
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     await aeSdk.spend(100, name, { onAccount });
   });
 
   it('transfers names', async () => {
     const claim = await aeSdk.aensQuery(name);
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     if (onAccount == null) throw new UnexpectedTsError();
     await claim.transfer(onAccount);
 
@@ -150,8 +132,7 @@ describe('Aens', () => {
   });
 
   it('revoke names', async () => {
-    const current = await aeSdk.address();
-    const onAccountIndex = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccountIndex = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     if (onAccountIndex == null) throw new UnexpectedTsError();
     const onAccount = aeSdk.accounts[onAccountIndex];
     const aensName = await aeSdk.aensQuery(name);
@@ -163,8 +144,7 @@ describe('Aens', () => {
   });
 
   it('PreClaim name using specific account', async () => {
-    const current = await aeSdk.address();
-    const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+    const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
 
     const preclaim = await aeSdk.aensPreclaim(name, { onAccount });
     preclaim.should.be.an('object');
@@ -174,8 +154,7 @@ describe('Aens', () => {
 
   describe('name auctions', () => {
     it('claims names', async () => {
-      const current = await aeSdk.address();
-      const onAccount = aeSdk.addresses().find((acc) => acc !== current);
+      const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
       const nameShort = randomName(12);
 
       const preclaim = await aeSdk.aensPreclaim(nameShort);
@@ -189,8 +168,7 @@ describe('Aens', () => {
         .aensBid(nameShort, bidFee, { onAccount });
       bid.should.be.an('object');
 
-      const isAuctionFinished = await aeSdk.getName(nameShort).catch(() => false);
-      isAuctionFinished.should.be.equal(false);
+      await expect(aeSdk.getName(nameShort)).to.be.rejectedWith('error: Name not found');
 
       if (bid.blockHeight == null) throw new UnexpectedTsError();
       const auctionEndBlock = computeAuctionEndBlock(nameShort, bid.blockHeight);

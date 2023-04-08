@@ -63,8 +63,8 @@ export default class RpcClient <
     }
 
     const request = msg as JsonRpcRequest;
-    let result; let
-      error;
+    let result;
+    let error;
     try {
       if (!(request.method in this.#methods)) throw new RpcMethodNotFoundError();
       const methodName = request.method as keyof LocalApi;
@@ -94,13 +94,13 @@ export default class RpcClient <
     id: number,
     method: keyof RemoteApi | keyof LocalApi, // TODO: remove as far it is not required in JSON RPC
     result?: any,
-    error?: any,
+    error?: RpcError,
   ): void {
     this.connection.sendMessage({
       jsonrpc: '2.0',
       id,
       method,
-      ...error != null ? { error } : { result },
+      ...error != null ? { error: error.toJSON() } : { result },
     });
   }
 

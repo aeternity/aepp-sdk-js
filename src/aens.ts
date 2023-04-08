@@ -1,20 +1,3 @@
-/*
- * ISC License (ISC)
- * Copyright (c) 2022 aeternity developers
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
- *  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
- *  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
- *  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
- *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- *  PERFORMANCE OF THIS SOFTWARE.
- */
-
 /**
  * Aens methods - routines to interact with the æternity naming system
  *
@@ -31,15 +14,15 @@ import {
 } from './tx/builder/constants';
 import { ArgumentError } from './utils/errors';
 import { Encoded } from './utils/encoder';
-import { send, SendOptions } from './spend';
-import { getName, getHeight } from './chain';
-import { _buildTx, BuildTxOptions } from './tx';
+import { sendTransaction, SendTransactionOptions, getName } from './chain';
+import { buildTxAsync, BuildTxOptions } from './tx/builder';
 import { TransformNodeType } from './Node';
 import { NameEntry, NamePointer } from './apis/node';
 import AccountBase from './account/Base';
+import { AddressEncodings } from './tx/builder/field-types/address';
 
 interface KeyPointers {
-  [key: string]: string | Buffer;
+  [key: string]: Encoded.Generic<AddressEncodings>;
 }
 
 /**
@@ -66,18 +49,19 @@ interface KeyPointers {
 export async function aensRevoke(
   name: AensName,
   options: AensRevokeOptions,
-): ReturnType<typeof send> {
-  const nameRevokeTx = await _buildTx(Tag.NameRevokeTx, {
+): ReturnType<typeof sendTransaction> {
+  const nameRevokeTx = await buildTxAsync({
     ...options,
+    tag: Tag.NameRevokeTx,
     nameId: name,
-    accountId: await options.onAccount.address(options),
+    accountId: options.onAccount.address,
   });
-  return send(nameRevokeTx, options);
+  return sendTransaction(nameRevokeTx, options);
 }
 
 interface AensRevokeOptions extends
-  BuildTxOptions<Tag.NameRevokeTx, 'nameId' | 'accountId'>,
-  SendOptions {}
+  BuildTxOptions<Tag.NameRevokeTx, 'nameId' | 'accountId' | 'onNode'>,
+  SendTransactionOptions {}
 
 /**
  * Update a name
@@ -112,30 +96,31 @@ export async function aensUpdate(
   name: AensName,
   pointers: KeyPointers,
   { extendPointers, ...options }: AensUpdateOptions,
-): ReturnType<typeof send> {
+): ReturnType<typeof sendTransaction> {
   const allPointers = {
     ...extendPointers === true && Object.fromEntries(
-      (await getName(name, options)).pointers
-        .map(({ key, id }: { key: string; id: string }) => [key, id]),
+      (await getName(name, options)).pointers.map(({ key, id }) => [key, id]),
     ),
     ...pointers,
   };
 
-  const nameUpdateTx = await _buildTx(Tag.NameUpdateTx, {
+  const nameUpdateTx = await buildTxAsync({
     clientTtl: CLIENT_TTL,
     nameTtl: NAME_TTL,
     ...options,
+    tag: Tag.NameUpdateTx,
     nameId: name,
-    accountId: await options.onAccount.address(options),
-    pointers: Object.entries(allPointers).map(([key, id]) => ({ key, id: id.toString() })),
+    accountId: options.onAccount.address,
+    pointers: Object.entries(allPointers)
+      .map(([key, id]: [string, Encoded.Generic<AddressEncodings>]) => ({ key, id })),
   });
 
-  return send(nameUpdateTx, options);
+  return sendTransaction(nameUpdateTx, options);
 }
 
 interface AensUpdateOptions extends
-  BuildTxOptions<Tag.NameUpdateTx, 'nameId' | 'accountId' | 'pointers' | 'clientTtl' | 'nameTtl'>,
-  SendOptions {
+  BuildTxOptions<Tag.NameUpdateTx, 'nameId' | 'accountId' | 'pointers' | 'clientTtl' | 'nameTtl' | 'onNode'>,
+  SendTransactionOptions {
   extendPointers?: boolean;
   clientTtl?: number;
   nameTtl?: number;
@@ -168,20 +153,21 @@ export async function aensTransfer(
   name: AensName,
   account: Encoded.AccountAddress,
   options: AensTransferOptions,
-): ReturnType<typeof send> {
-  const nameTransferTx = await _buildTx(Tag.NameTransferTx, {
+): ReturnType<typeof sendTransaction> {
+  const nameTransferTx = await buildTxAsync({
     ...options,
+    tag: Tag.NameTransferTx,
     nameId: name,
-    accountId: await options.onAccount.address(options),
+    accountId: options.onAccount.address,
     recipientId: account,
   });
 
-  return send(nameTransferTx, options);
+  return sendTransaction(nameTransferTx, options);
 }
 
 interface AensTransferOptions extends
-  BuildTxOptions<Tag.NameTransferTx, 'nameId' | 'accountId' | 'recipientId'>,
-  SendOptions {}
+  BuildTxOptions<Tag.NameTransferTx, 'nameId' | 'accountId' | 'recipientId' | 'onNode'>,
+  SendTransactionOptions {}
 
 /**
  * Query the AENS name info from the node
@@ -296,14 +282,15 @@ export async function aensClaim(
   salt: number,
   options: AensClaimOptions,
 ): Promise<AensClaimReturnType> {
-  const claimTx = await _buildTx(Tag.NameClaimTx, {
+  const claimTx = await buildTxAsync({
     ...options,
-    accountId: await options.onAccount.address(options),
+    tag: Tag.NameClaimTx,
+    accountId: options.onAccount.address,
     nameSalt: salt,
     name,
   });
 
-  const result = await send(claimTx, options);
+  const result = await sendTransaction(claimTx, options);
   if (!isAuctionName(name)) {
     const nameInter = result.blockHeight != null && result.blockHeight > 0
       ? await aensQuery(name, options)
@@ -314,10 +301,10 @@ export async function aensClaim(
 }
 
 type AensClaimOptionsType = BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'nameSalt' | 'name'>
-& SendOptions & Parameters<typeof aensQuery>[1];
+& SendTransactionOptions & Parameters<typeof aensQuery>[1];
 interface AensClaimOptions extends AensClaimOptionsType {}
 interface AensClaimReturnType extends
-  Awaited<ReturnType<typeof send>>,
+  Awaited<ReturnType<typeof sendTransaction>>,
   Partial<Awaited<ReturnType<typeof aensQuery>>> {}
 
 /**
@@ -345,38 +332,37 @@ interface AensClaimReturnType extends
  * ```
  */
 export async function aensPreclaim(name: AensName, options: AensPreclaimOptions): Promise<Readonly<
-Awaited<ReturnType<typeof send>> & {
-  height: number;
+Awaited<ReturnType<typeof sendTransaction>> & {
   salt: number;
   commitmentId: string;
   claim: (opts?: Parameters<typeof aensClaim>[2]) => ReturnType<typeof aensClaim>;
 }
 >> {
   const salt = genSalt();
-  const height = await getHeight(options);
   const commitmentId = commitmentHash(name, salt);
 
-  const preclaimTx = await _buildTx(Tag.NamePreclaimTx, {
+  const preclaimTx = await buildTxAsync({
     ...options,
-    accountId: await options.onAccount.address(options),
+    tag: Tag.NamePreclaimTx,
+    accountId: options.onAccount.address,
     commitmentId,
   });
 
   return Object.freeze({
-    ...await send(preclaimTx, options),
-    height,
+    ...await sendTransaction(preclaimTx, options),
     salt,
     commitmentId,
     async claim(opts?: Parameters<typeof aensClaim>[2]) {
-      return aensClaim(name, salt, { ...options, ...opts });
+      const { version, ...otherOptions } = options;
+      return aensClaim(name, salt, { ...otherOptions, ...opts });
     },
   });
 }
 
 interface AensPreclaimOptions extends
-  BuildTxOptions<Tag.NamePreclaimTx, 'accountId' | 'commitmentId'>,
-  SendOptions,
-  AensClaimOptions {}
+  BuildTxOptions<Tag.NamePreclaimTx, 'accountId' | 'commitmentId' | 'onNode'>,
+  SendTransactionOptions,
+  Omit<AensClaimOptions, 'version'> {}
 
 /**
  * Bid to name auction

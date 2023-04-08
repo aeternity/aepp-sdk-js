@@ -1,6 +1,7 @@
-import { send } from '../../spend';
 import { Encoded } from '../../utils/encoder';
 import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema';
+import { TransformNodeType } from '../../Node';
+import { SignedTx } from '../../apis/node';
 
 export interface WalletInfo {
   id: string;
@@ -16,6 +17,7 @@ export interface Accounts {
 }
 
 export interface Node {
+  // TODO: name is not used, can be removed
   name: string;
   url: string;
 }
@@ -43,13 +45,26 @@ export interface WalletApi {
   [METHODS.address]: () => Promise<Encoded.AccountAddress[]>;
 
   [METHODS.sign]: ((
-    p: { tx: Encoded.Transaction; onAccount: Encoded.AccountAddress; returnSigned: boolean }
+    p: {
+      tx: Encoded.Transaction;
+      onAccount: Encoded.AccountAddress;
+      returnSigned: boolean;
+      /**
+       * @deprecated Wallet provided networkId will be used (current network)
+       * required to maintain backward compatibility with wallets using SDK v11.0.1 and below
+       * @see {@link https://github.com/aeternity/aepp-sdk-js/commit/153fd89a52c4eab39fcd659b356b36d32129c1ba}
+       */
+      networkId: string;
+    }
   ) => Promise<{
     /**
      * @deprecated this is not a hash at all, will be removed later at the same time
      * as dropping ability to broadcast transaction by wallet
      */
-    transactionHash?: Awaited<ReturnType<typeof send>>;
+    transactionHash?: Partial<TransformNodeType<SignedTx>> & {
+      hash: Encoded.TxHash;
+      rawTx: Encoded.Transaction;
+    };
     signedTransaction?: Encoded.Transaction;
   }>);
 

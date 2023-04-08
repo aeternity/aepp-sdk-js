@@ -21,10 +21,15 @@ debug/
 /coverage
 coverage.*
 .nyc_output/
-/examples/**/package-lock.json
-/examples/**/dist
+/**/package-lock.json
+/**/dist
 /examples/**/artifacts
 .history
 .site
 site
 /src/apis/
+/src/tx/builder/schema.generated.ts
+/tooling/autorest/compiler-swagger.yaml
+/test/environment/ledger/browser
+/types-legacy
+/bin

@@ -3,6 +3,8 @@ import { IllegalArgumentError } from '../../../utils/errors';
 import { MIN_GAS_PRICE, Tag } from '../constants';
 import coinAmount from './coin-amount';
 import { isKeyOfObject } from '../../../utils/other';
+import { decode, Encoded } from '../../../utils/encoder';
+import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
 
 const BASE_GAS = 15000;
 const GAS_PER_BYTE = 20;
@@ -75,7 +77,7 @@ const TX_FEE_OTHER_GAS = (
   }
 };
 
-function getOracleRelativeTtl(params: any, txType: Tag): number {
+function getOracleRelativeTtl(params: any): number {
   const ttlKeys = {
     [Tag.OracleRegisterTx]: 'oracleTtlValue',
     [Tag.OracleExtendTx]: 'oracleTtlValue',
@@ -83,22 +85,30 @@ function getOracleRelativeTtl(params: any, txType: Tag): number {
     [Tag.OracleResponseTx]: 'responseTtlValue',
   } as const;
 
-  if (!isKeyOfObject(txType, ttlKeys)) return 1;
-  return params[ttlKeys[txType]];
+  const { tag } = params;
+  if (!isKeyOfObject(tag, ttlKeys)) return 1;
+  return params[ttlKeys[tag]];
 }
 
 /**
  * Calculate fee based on tx type and params
  */
-export function buildFee(txType: Tag, buildTx: any): BigNumber {
-  const { rlpEncoded: { length }, txObject } = buildTx;
+export function buildFee(
+  builtTx: Encoded.Transaction,
+  unpackTx: typeof unpackTxType,
+  buildTx: typeof buildTxType,
+): BigNumber {
+  const { length } = decode(builtTx);
+  const txObject = unpackTx(builtTx);
 
-  return TX_FEE_BASE_GAS(txType)
-    .plus(TX_FEE_OTHER_GAS(txType, length, {
-      relativeTtl: getOracleRelativeTtl(txObject, txType),
-      innerTxSize: [Tag.GaMetaTx, Tag.PayingForTx].includes(txType)
-        ? txObject.tx.tx.encodedTx.rlpEncoded.length
-        : 0,
+  let innerTxSize = 0;
+  if (txObject.tag === Tag.GaMetaTx || txObject.tag === Tag.PayingForTx) {
+    innerTxSize = decode(buildTx(txObject.tx.encodedTx)).length;
+  }
+
+  return TX_FEE_BASE_GAS(txObject.tag)
+    .plus(TX_FEE_OTHER_GAS(txObject.tag, length, {
+      relativeTtl: getOracleRelativeTtl(txObject), innerTxSize,
     }))
     .times(MIN_GAS_PRICE);
 }
@@ -106,18 +116,18 @@ export function buildFee(txType: Tag, buildTx: any): BigNumber {
 /**
  * Calculate min fee
  * @category transaction builder
- * @param txType - Transaction type
  * @param rebuildTx - Callback to get built transaction with specific fee
  */
-export function calculateMinFee(
-  txType: Tag,
-  rebuildTx: (value: BigNumber) => any,
+function calculateMinFee(
+  rebuildTx: (value: BigNumber) => Encoded.Transaction,
+  unpackTx: typeof unpackTxType,
+  buildTx: typeof buildTxType,
 ): BigNumber {
   let fee = new BigNumber(0);
   let previousFee;
   do {
     previousFee = fee;
-    fee = buildFee(txType, rebuildTx(fee));
+    fee = buildFee(rebuildTx(fee), unpackTx, buildTx);
   } while (!fee.eq(previousFee));
   return fee;
 }
@@ -127,17 +137,27 @@ export default {
 
   serializeAettos(
     _value: string | undefined,
-    { txType, rebuildTx, _computingMinFee }:
-    { txType: Tag; rebuildTx: (params: any) => any; _computingMinFee?: string },
+    {
+      rebuildTx, unpackTx, buildTx, _computingMinFee, _pickBiggerFee,
+    }: {
+      rebuildTx: (params: any) => Encoded.Transaction;
+      unpackTx: typeof unpackTxType;
+      buildTx: typeof buildTxType;
+      _computingMinFee?: BigNumber;
+      _pickBiggerFee?: boolean;
+    },
   ): string {
-    if (_computingMinFee != null) return _computingMinFee;
-    const minFee = calculateMinFee(txType, (fee) => rebuildTx({ _computingMinFee: fee }));
+    if (_computingMinFee != null) return _computingMinFee.toFixed();
+    const minFee = calculateMinFee(
+      (fee) => rebuildTx({ _computingMinFee: fee }),
+      unpackTx,
+      buildTx,
+    );
     const value = new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
+      if (_pickBiggerFee === true) return minFee.toFixed();
       throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger then ${minFee}`);
     }
     return value.toFixed();
   },
-
-  serialize: coinAmount.serializeOptional,
 };

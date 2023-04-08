@@ -29,55 +29,84 @@
 
 <script>
 import {
-  MemoryAccount, AeSdkWallet, Node, generateKeyPair,
+  MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE,
-  RpcConnectionDenyError, RpcRejectedByUserError
-} from '@aeternity/aepp-sdk'
-import Value from './Value'
+  RpcConnectionDenyError, RpcRejectedByUserError,
+} from '@aeternity/aepp-sdk';
+import Value from './Value.vue';
 
 export default {
   components: { Value },
-  data () {
+  data() {
     return {
       runningInFrame: window.parent !== window,
       nodeName: '',
       address: '',
       balancePromise: null,
-    }
+    };
   },
   methods: {
-    async shareWalletInfo (clientId, { interval = 5000, attemps = 5 } = {}) {
-      this.aeSdk.shareWalletInfo(clientId)
-      while (attemps -= 1) {
-        await new Promise(resolve => setTimeout(resolve, interval))
-        this.aeSdk.shareWalletInfo(clientId)
+    async shareWalletInfo(clientId, { interval = 5000, attemps = 5 } = {}) {
+      this.aeSdk.shareWalletInfo(clientId);
+      while (attemps) {
+        await new Promise((resolve) => {
+          setTimeout(resolve, interval);
+        });
+        this.aeSdk.shareWalletInfo(clientId);
+        attemps -= 1;
       }
-      console.log('Finish sharing wallet info')
+      console.log('Finish sharing wallet info');
     },
-    disconnect () {
-      Object.values(this.aeSdk.rpcClients).forEach(client => {
-        client.notify(METHODS.closeConnection)
-        client.disconnect()
-      })
+    disconnect() {
+      Object.values(this.aeSdk.rpcClients).forEach((client) => {
+        client.notify(METHODS.closeConnection);
+        client.disconnect();
+      });
     },
-    async switchAccount () {
-      this.address = this.aeSdk.addresses().find(a => a !== this.address)
-      this.aeSdk.selectAccount(this.address)
+    async switchAccount() {
+      this.address = this.aeSdk.addresses().find((a) => a !== this.address);
+      this.aeSdk.selectAccount(this.address);
     },
-    async switchNode () {
+    async switchNode() {
       this.nodeName = (await this.aeSdk.getNodesInPool())
         .map(({ name }) => name)
-        .find(name => name !== this.nodeName)
-      this.aeSdk.selectNode(this.nodeName)
-    }
+        .find((name) => name !== this.nodeName);
+      this.aeSdk.selectNode(this.nodeName);
+    },
   },
-  async mounted () {
-    const aeppInfo = {}
-    const genConfirmCallback = (getActionName) => (aeppId, params) => {
-      if (!confirm(`Client ${aeppInfo[aeppId].name} with id ${aeppId} want to ${getActionName(params)}`)) {
-        throw new RpcRejectedByUserError()
+  mounted() {
+    const aeppInfo = {};
+    const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
+      if (!confirm([
+        `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}`,
+        JSON.stringify(parameters, null, 2),
+      ].join('\n'))) {
+        throw new RpcRejectedByUserError();
+      }
+    };
+
+    class AccountMemoryProtected extends MemoryAccount {
+      async signTransaction(tx, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+        if (id != null) {
+          genConfirmCallback(`sign transaction ${tx}`)(id, options, aeppOrigin);
+        }
+        return super.signTransaction(tx, options);
+      }
+
+      async signMessage(message, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+        if (id != null) {
+          genConfirmCallback(`sign message ${message}`)(id, options, aeppOrigin);
+        }
+        return super.signMessage(message, options);
+      }
+
+      static generate() {
+        // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
+        return new AccountMemoryProtected(generateKeyPair().secretKey);
       }
     }
+
+    let clientId;
     this.aeSdk = new AeSdkWallet({
       id: window.origin,
       type: WALLET_TYPE.window,
@@ -85,47 +114,42 @@ export default {
         { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
         { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
       ],
-      compilerUrl: 'https://compiler.aepps.com',
+      accounts: [
+        new AccountMemoryProtected('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'),
+        AccountMemoryProtected.generate(),
+      ],
+      onCompiler: new CompilerHttp('https://v7.compiler.stg.aepps.com'),
       name: 'Wallet Iframe',
-      onConnection: (aeppId, params) => {
-        if (!confirm(`Client ${params.name} with id ${aeppId} want to connect`)) {
-          throw new RpcConnectionDenyError()
+      onConnection: (aeppId, params, origin) => {
+        if (!confirm(`Client ${params.name} with id ${aeppId} at ${origin} want to connect`)) {
+          throw new RpcConnectionDenyError();
         }
-        aeppInfo[aeppId] = params
+        aeppInfo[aeppId] = params;
       },
-      onSubscription: genConfirmCallback(() => 'subscription'),
-      onSign: genConfirmCallback(({ returnSigned, tx }) => `${returnSigned ? 'sign' : 'sign and broadcast'} ${JSON.stringify(tx)}`),
-      onMessageSign: genConfirmCallback(() => 'message sign'),
-      onAskAccounts: genConfirmCallback(() => 'get accounts'),
-      onDisconnect (message, client) {
-        this.shareWalletInfo(clientId)
-      }
-    })
-    await this.aeSdk.addAccount(new MemoryAccount({
-      keypair: {
-        publicKey: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
-        secretKey: 'bf66e1c256931870908a649572ed0257876bb84e3cdf71efb12f56c7335fad54d5cf08400e988222f26eb4b02c8f89077457467211a6e6d955edb70749c6a33b',
-      }
-    }), { select: true })
-    await this.aeSdk.addAccount(new MemoryAccount({ keypair: generateKeyPair() }))
+      onSubscription: genConfirmCallback('subscription'),
+      onAskAccounts: genConfirmCallback('get accounts'),
+      onDisconnect() {
+        this.shareWalletInfo(clientId);
+      },
+    });
 
-    this.nodeName = this.aeSdk.selectedNodeName
-    this.address = this.aeSdk.addresses()[0]
+    this.nodeName = this.aeSdk.selectedNodeName;
+    [this.address] = this.aeSdk.addresses();
 
-    const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow
-    const connection = new BrowserWindowMessageConnection({ target })
-    const clientId = this.aeSdk.addRpcClient(connection)
-    this.shareWalletInfo(clientId)
+    const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow;
+    const connection = new BrowserWindowMessageConnection({ target });
+    clientId = this.aeSdk.addRpcClient(connection);
+    this.shareWalletInfo(clientId);
 
     this.$watch(
       ({ address, nodeName }) => [address, nodeName],
       ([address]) => {
-        this.balancePromise = this.aeSdk.getBalance(address)
+        this.balancePromise = this.aeSdk.getBalance(address);
       },
-      { immediate: true }
-    )
-  }
-}
+      { immediate: true },
+    );
+  },
+};
 </script>
 
 <style lang="scss" src="./styles.scss" />

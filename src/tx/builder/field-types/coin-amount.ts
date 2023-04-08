@@ -1,27 +1,24 @@
-import uInt, { Int } from './u-int';
+import uInt from './u-int';
+import { Int } from '../constants';
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../../utils/amount-formatter';
-import { ArgumentError } from '../../../utils/errors';
-
-export interface Options { denomination?: AE_AMOUNT_FORMATS }
 
 export default {
   ...uInt,
 
   serializeAettos(value: string | undefined): string {
-    if (value == null) throw new ArgumentError('value', 'provided', value);
-    return value;
+    return value ?? '0';
   },
 
-  serializeOptional(value: Int | undefined, { denomination, ...options }: Options): Buffer {
+  serialize(
+    value: Int | undefined,
+    params: {},
+    { denomination = AE_AMOUNT_FORMATS.AETTOS }: { denomination?: AE_AMOUNT_FORMATS },
+  ): Buffer {
     return uInt.serialize(
       this.serializeAettos(
         value != null ? formatAmount(value, { denomination }) : value,
-        options,
+        params,
       ),
     );
-  },
-
-  serialize(value: Int, options: Options): Buffer {
-    return this.serializeOptional(value, options);
   },
 };

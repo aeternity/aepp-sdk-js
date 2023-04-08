@@ -5,6 +5,7 @@ module.exports = {
       2,
       'always',
       [
+        'account',
         'aens',
         'aepp',
         'chain',
@@ -12,6 +13,7 @@ module.exports = {
         'compiler',
         'contract',
         'deps',
+        'deps-dev',
         'node',
         'oracle',
         'release',

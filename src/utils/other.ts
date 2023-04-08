@@ -1,3 +1,5 @@
+import { RestError } from '@azure/core-rest-pipeline';
+
 export const pause = async (duration: number): Promise<void> => new Promise((resolve) => {
   setTimeout(resolve, duration);
 });
@@ -30,7 +32,10 @@ export const concatBuffers = isWebpack4Buffer
  * @param key - Maybe object key
  * @param object - Object
  */
-export function isKeyOfObject<T>(key: string | number | symbol, object: T): key is keyof T {
+export function isKeyOfObject<T extends object>(
+  key: string | number | symbol,
+  object: T,
+): key is keyof T {
   return key in object;
 }
 
@@ -42,3 +47,13 @@ export function isKeyOfObject<T>(key: string | number | symbol, object: T): key 
 export function isItemOfArray<T>(item: any, array: readonly T[]): item is T {
   return array.includes(item);
 }
+
+export function isAccountNotFoundError(error: Error): boolean {
+  return error instanceof RestError && error.statusCode === 404
+    && error.message.includes('Account not found');
+}
+
+// based on https://stackoverflow.com/a/50375286/6176994
+export type UnionToIntersection<Union> =
+  (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
+    ? Intersection : never;

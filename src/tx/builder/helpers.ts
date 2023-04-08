@@ -14,8 +14,6 @@ import {
 } from './constants';
 import { ceil } from '../../utils/bignumber';
 import { ArgumentError, IllegalBidFeeError } from '../../utils/errors';
-import { NamePointer } from '../../apis/node';
-import { readId, writeId } from './address';
 
 /**
  * JavaScript-based Transaction builder helper function's
@@ -62,16 +60,6 @@ export function oracleQueryId(
 }
 
 /**
- * Format the salt into a 64-byte hex string
- * @category transaction builder
- * @param salt - Random number
- * @returns Zero-padded hex string of salt
- */
-export function formatSalt(salt: number): Buffer {
-  return Buffer.from(salt.toString(16).padStart(64, '0'), 'hex');
-}
-
-/**
  * Encode an AENS name
  * @category AENS
  * @param name - Name to encode
@@ -82,11 +70,11 @@ export function produceNameId(name: AensName): Encoded.Name {
 }
 
 /**
- * Generate the commitment hash by hashing the formatted salt and
+ * Generate the commitment hash by hashing the salt and
  * name, base 58 encoding the result and prepending 'cm_'
  * @category transaction builder
  * @param name - Name to be registered
- * @param salt - Random salt
+ * @param salt - Random number
  * @returns Commitment hash
  */
 export function commitmentHash(
@@ -94,19 +82,12 @@ export function commitmentHash(
   salt: number = genSalt(),
 ): Encoded.Commitment {
   return encode(
-    hash(concatBuffers([Buffer.from(name.toLowerCase()), formatSalt(salt)])),
+    hash(concatBuffers([
+      Buffer.from(name.toLowerCase()),
+      Buffer.from(salt.toString(16).padStart(64, '0'), 'hex'),
+    ])),
     Encoding.Commitment,
   );
-}
-
-/**
- * Utility function to convert int to bytes
- * @category transaction builder
- * @param val - Value
- * @returns Buffer Buffer from number(BigEndian)
- */
-export function writeInt(val: number | string | BigNumber): Buffer {
-  return toBytes(val, true);
 }
 
 /**
@@ -117,37 +98,6 @@ export function writeInt(val: number | string | BigNumber): Buffer {
  */
 export function readInt(buf: Buffer = Buffer.from([])): string {
   return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10);
-}
-
-/**
- * Helper function to build pointers for name update TX
- * @category transaction builder
- * @param pointers - Array of pointers
- * `([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])`
- * @returns Serialized pointers array
- */
-export function buildPointers(pointers: NamePointer[]): Buffer[][] {
-  return pointers.map(
-    (p) => [
-      toBytes(p.key),
-      writeId(p.id as Parameters<typeof writeId>[0]),
-    ],
-  );
-}
-
-/**
- * Helper function to read pointers from name update TX
- * @category transaction builder
- * @param pointers - Array of pointers
- * @returns Deserialize pointer array
- */
-export function readPointers(pointers: Array<[key: string, id: Buffer]>): NamePointer[] {
-  return pointers.map(
-    ([key, id]) => ({
-      key: key.toString(),
-      id: readId(id),
-    }),
-  );
 }
 
 const AENS_SUFFIX = '.chain';
@@ -232,10 +182,10 @@ export function computeBidFee(
  */
 export function computeAuctionEndBlock(name: AensName, claimHeight: number): number {
   const length = name.length - AENS_SUFFIX.length;
-  const h = (length <= 4 && 62 * NAME_BID_TIMEOUT_BLOCKS)
-    || (length <= 8 && 31 * NAME_BID_TIMEOUT_BLOCKS)
-    || (length <= 12 && NAME_BID_TIMEOUT_BLOCKS)
-    || 0;
+  const h = (length <= 4 ? 62 * NAME_BID_TIMEOUT_BLOCKS : null)
+    ?? (length <= 8 ? 31 * NAME_BID_TIMEOUT_BLOCKS : null)
+    ?? (length <= 12 ? NAME_BID_TIMEOUT_BLOCKS : null)
+    ?? 0;
   return h + claimHeight;
 }
 

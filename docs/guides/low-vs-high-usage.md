@@ -25,44 +25,35 @@ async function init () {
 
   const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
-    compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler!
+    accounts: [new MemoryAccount('<SECRET_KEY_HERE>')],
   })
-  await aeSdk.addAccount(
-    new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}}),
-    { select: true }
-  )
 
   // log transaction info
   console.log(await aeSdk.spend(100, 'ak_...'))
 }
 ```
 
-## Low-level SDK usage (use [API](https://aeternity.com/protocol/node/api) endpoints directly)
-Example spend function, using the SDK, talking directly to the [**API**](https://aeternity.com/protocol/node/api):
+## Low-level SDK usage (use [API](https://docs.aeternity.com/protocol/node/api) endpoints directly)
+Example spend function, using the SDK, talking directly to the [**API**](https://docs.aeternity.com/protocol/node/api):
 ```js
-import { MemoryAccount, Node, AeSdk } from '@aeternity/aepp-sdk'
+import { MemoryAccount, Node, AeSdk, Tag } from '@aeternity/aepp-sdk'
 
 async function spend (amount, recipient) {
   const node = new Node('https://testnet.aeternity.io') // ideally host your own node!
   const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
-    compilerUrl: 'https://compiler.aepps.com', // ideally host your own compiler!
+    accounts: [new MemoryAccount('<SECRET_KEY_HERE>')],
   })
-  await aeSdk.addAccount(
-    new MemoryAccount({keypair: {secretKey: '<PRIV_KEY_HERE>', publicKey: '<PUB_KEY_HERE>'}}),
-    { select: true }
-  )
 
-  // builds an unsigned SpendTx using the debug endpoint of the node's API
+  // builds an unsigned SpendTx using integrated transaction builder
   const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-    senderId: await aeSdk.address(),
+    senderId: aeSdk.address,
     recipientId: recipient,
-    fee: 18000000000000, // you must provide enough fee
     amount, // aettos
     payload: 'using low-level api is funny'
   })
 
-  // sign the encoded transaction returned by the node
+  // sign the encoded transaction
   const signedTx = await aeSdk.signTransaction(spendTx)
 
   // broadcast the signed tx to the node

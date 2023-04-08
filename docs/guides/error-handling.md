@@ -6,142 +6,133 @@ This guide shows you how to handle errors originating from the SDK. SDK by defau
 
 ```
 BaseError
-│   ArgumentError
-│   IllegalArgumentError
-│   ArgumentCountMismatchError
-│   InsufficientBalanceError
-│   MissingParamError
-│   NoSerializerFoundError
-│   RequestTimedOutError
-│   TxTimedOutError
-│   TypeError
-│   UnsupportedPlatformError
-│   UnsupportedProtocolError
-│   NotImplementedError
-│   UnsupportedVersionError
-└───InternalError
-│   │   UnexpectedTsError
+├── ArgumentError
+├── IllegalArgumentError
+├── ArgumentCountMismatchError
+├── InsufficientBalanceError
+├── MissingParamError
+├── NoSerializerFoundError
+├── RequestTimedOutError
+├── TxTimedOutError
+├── TypeError
+├── UnsupportedPlatformError
+├── UnsupportedProtocolError
+├── NotImplementedError
+├── UnsupportedVersionError
 │
-└───AccountError
-│   │   InvalidKeypairError
-│   │   UnavailableAccountError
+├── InternalError
+│   └── UnexpectedTsError
 │
-└───AensError
-│   │   AensPointerContextError
-│   │   InsufficientNameFeeError
-│   │   InvalidAensNameError
+├── AccountError
+│   └── UnavailableAccountError
 │
-└───AeppError
-│   │   InvalidRpcMessageError
-│   │   MissingCallbackError
-│   │   UnAuthorizedAccountError
-│   │   UnknownRpcClientError
-│   │   UnsubscribedAccountError
+├── AensError
+│   ├── AensPointerContextError
+│   ├── InsufficientNameFeeError
+│   └── InvalidAensNameError
 │
-└───ChannelError
-│   │   ChannelCallError
-│   │   ChannelConnectionError
-│   │   ChannelPingTimedOutError
-│   │   UnexpectedChannelMessageError
-│   │   UnknownChannelStateError
+├── AeppError
+│   ├── InvalidRpcMessageError
+│   ├── MissingCallbackError
+│   ├── UnAuthorizedAccountError
+│   ├── UnknownRpcClientError
+│   └── UnsubscribedAccountError
 │
-└───CompilerError
-│   │   InvalidAuthDataError
+├── ChannelError
+│   ├── ChannelCallError
+│   ├── ChannelConnectionError
+│   ├── ChannelPingTimedOutError
+│   ├── UnexpectedChannelMessageError
+│   ├── ChannelIncomingMessageError
+│   └── UnknownChannelStateError
 │
-└───ContractError
-│   │   BytecodeMismatchError
-│   │   DuplicateContractError
-│   │   InactiveContractError
-│   │   InvalidMethodInvocationError
-│   │   MissingContractAddressError
-│   │   MissingContractDefError
-│   │   MissingFunctionNameError
-│   │   NodeInvocationError
-│   │   NoSuchContractFunctionError
-│   │   NotPayableFunctionError
-│   │   MissingEventDefinitionError
-│   │   AmbiguousEventDefinitionError
+├── CompilerError
+│   └── InvalidAuthDataError
 │
-└───CryptographyError
-│   │   InvalidChecksumError
-│   │   DerivationError
-│   │   InvalidPasswordError
-│   │   MerkleTreeHashMismatchError
-│   │   MissingNodeInTreeError
-│   │   UnknownNodeLengthError
-│   │   UnknownPathNibbleError
+├── ContractError
+│   ├── BytecodeMismatchError
+│   ├── DuplicateContractError
+│   ├── InactiveContractError
+│   ├── InvalidMethodInvocationError
+│   ├── MissingContractAddressError
+│   ├── MissingContractDefError
+│   ├── MissingFunctionNameError
+│   ├── NodeInvocationError
+│   ├── NoSuchContractFunctionError
+│   ├── NotPayableFunctionError
+│   ├── MissingEventDefinitionError
+│   └── AmbiguousEventDefinitionError
 │
-└───NodeError
-│   │   DuplicateNodeError
-│   │   NodeNotFoundError
+├── CryptographyError
+│   ├── InvalidChecksumError
+│   ├── DerivationError
+│   ├── InvalidPasswordError
+│   ├── MerkleTreeHashMismatchError
+│   ├── MissingNodeInTreeError
+│   ├── UnknownNodeLengthError
+│   └── UnknownPathNibbleError
 │
-└───TransactionError
-│   │   DecodeError
-│   │   EncodeError
-│   │   PayloadLengthError
-│   │   DryRunError
-│   │   IllegalBidFeeError
-│   │   InvalidSignatureError
-│   │   InvalidTxError
-│   │   InvalidTxParamsError
-│   │   PrefixNotFoundError
-│   │   SchemaNotFoundError
-│   │   TagNotFoundError
-│   │   TxNotInChainError
-│   │   UnknownTxError
-│   │   UnsupportedABIversionError
-│   │   UnsupportedVMversionError
+├── NodeError
+│   ├── DuplicateNodeError
+│   └── NodeNotFoundError
 │
-└̌───WalletError
-│   │   AlreadyConnectedError
-│   │   NoWalletConnectedError
-│   │   RpcConnectionError
+├── TransactionError
+│   ├── DecodeError
+│   ├── EncodeError
+│   ├── PayloadLengthError
+│   ├── DryRunError
+│   ├── IllegalBidFeeError
+│   ├── InvalidSignatureError
+│   ├── InvalidTxError
+│   ├── PrefixNotFoundError
+│   ├── SchemaNotFoundError
+│   ├── TagNotFoundError
+│   └── TxNotInChainError
 │
-└̌───RpcError
-│   │   RpcInvalidTransactionError
-│   │   RpcBroadcastError
-│   │   RpcRejectedByUserError
-│   │   RpcUnsupportedProtocolError
-│   │   RpcConnectionDenyError
-│   │   RpcNotAuthorizeError
-│   │   RpcPermissionDenyError
-│   │   RpcInternalError
+├── WalletError
+│   ├── AlreadyConnectedError
+│   ├── NoWalletConnectedError
+│   └── RpcConnectionError
+│
+├── RpcError
+│   ├── RpcInvalidTransactionError
+│   ├── RpcBroadcastError
+│   ├── RpcRejectedByUserError
+│   ├── RpcUnsupportedProtocolError
+│   ├── RpcConnectionDenyError
+│   ├── RpcNotAuthorizeError
+│   ├── RpcPermissionDenyError
+│   └── RpcInternalError
 ```
 
 ## Usage
 
 ```js
 // import required error classes
-const {
+import {
   AeSdk,
   Node,
   MemoryAccount,
-  generateKeyPair,
-  InvalidTxParamsError,
+  ArgumentError,
   InvalidAensNameError
-} = require('@aeternity/aepp-sdk')
+} from '@aeternity/aepp-sdk'
 
 // setup
-const NODE_URL = 'https://testnet.aeternity.io'
-const PAYER_ACCOUNT_KEYPAIR = generateKeyPair()
-const NEW_USER_KEYPAIR = generateKeyPair()
-
-const payerAccount = new MemoryAccount({ keypair: PAYER_ACCOUNT_KEYPAIR })
-const newUserAccount = new MemoryAccount({ keypair: NEW_USER_KEYPAIR })
-const node = new Node(NODE_URL)
+const payerAccount = MemoryAccount.generate()
+const newUserAccount = MemoryAccount.generate()
+const node = new Node('https://testnet.aeternity.io')
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
+  accounts: [payerAccount, newUserAccount],
 })
-await aeSdk.addAccount(payerAccount, { select: true })
-await aeSdk.addAccount(newUserAccount)
 
 // catch exceptions
 try {
-  const spendTxResult = await aeSdk.spend(-1, await newUserAccount.address(), { onAccount: payerAccount})
-} catch(err) {
-  if(err instanceof InvalidTxParamsError){
+  const spendTxResult = await aeSdk.spend(-1, newUserAccount.address, { onAccount: payerAccount})
+} catch (err) {
+  if (err instanceof ArgumentError) {
     console.log(`Amount specified is not valid, ${err.message}`)
-  } else if(err instanceof InvalidAensNameError) {
+  } else if (err instanceof InvalidAensNameError) {
     console.log(`Address specified is not valid, ${err.message}`)
   }
 }

@@ -1,13 +1,12 @@
-import BigNumber from 'bignumber.js';
-import { readInt, writeInt } from '../helpers';
+import { readInt } from '../helpers';
+import { Int } from '../constants';
 import { ArgumentError } from '../../../utils/errors';
-
-export type Int = number | string | BigNumber;
+import { toBytes } from '../../../utils/bytes';
 
 export default {
   serialize(value: Int): Buffer {
     if (value < 0) throw new ArgumentError('value', 'greater or equal to 0', value);
-    return writeInt(value);
+    return toBytes(value, true);
   },
 
   deserialize(value: Buffer): string {

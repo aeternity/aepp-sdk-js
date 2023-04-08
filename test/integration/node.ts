@@ -1,22 +1,6 @@
-/*
- * ISC License (ISC)
- * Copyright (c) 2022 aeternity developers
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
- *  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
- *  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
- *  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
- *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- *  PERFORMANCE OF THIS SOFTWARE.
- */
-
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
 import { url, ignoreVersion } from '.';
 import { AeSdkBase, Node, NodeNotFoundError } from '../../src';
 
@@ -42,6 +26,27 @@ describe('Node client', () => {
     await expect(node.getTransactionByHash('th_test'))
       .to.be.rejectedWith('v3/transactions/th_test error: Invalid hash');
   });
+
+  it('retries requests if failed', async () => ([
+    ['ak_test', 1],
+    ['ak_2CxRaRcMUGn9s5UwN36UhdrtZVFUbgG1BSX5tUAyQbCNneUwti', 4],
+  ] as const).reduce(async (prev, [address, requestCount]) => {
+    await prev;
+
+    let counter = 0;
+    node.pipeline.addPolicy({
+      name: 'counter',
+      async sendRequest(request: PipelineRequest, next: SendRequest): Promise<PipelineResponse> {
+        counter += 1;
+        return next(request);
+      },
+    }, { phase: 'Deserialize' });
+
+    await node.getAccountByPubkey(address).catch(() => {});
+
+    node.pipeline.removePolicy({ name: 'counter' });
+    expect(counter).to.be.equal(requestCount);
+  }, Promise.resolve()));
 
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {

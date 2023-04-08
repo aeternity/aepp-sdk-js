@@ -1,22 +1,6 @@
-/*
- * ISC License (ISC)
- * Copyright (c) 2022 aeternity developers
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
- *  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
- *  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
- *  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
- *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- *  PERFORMANCE OF THIS SOFTWARE.
- */
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
 import verifyTransaction, { ValidatorResult } from './tx/validator';
-import { pause } from './utils/other';
+import { isAccountNotFoundError, pause } from './utils/other';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
 import { DRY_RUN_ACCOUNT } from './tx/builder/schema';
 import { AensName } from './tx/builder/constants';
@@ -29,8 +13,11 @@ import {
   Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx,
 } from './apis/node';
-import { decode, Encoded, Encoding } from './utils/encoder';
+import {
+  decode, encode, Encoded, Encoding,
+} from './utils/encoder';
 import AccountBase from './account/Base';
+import { buildTxHash } from './tx/builder';
 
 /**
  * @category chain
@@ -89,7 +76,7 @@ export async function getHeight({ onNode }: { onNode: Node }): Promise<number> {
 export async function poll(
   th: Encoded.TxHash,
   {
-    blocks = 10, interval, onNode, ...options
+    blocks = 5, interval, onNode, ...options
   }:
   { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<TransformNodeType<SignedTx>> {
@@ -154,24 +141,33 @@ export async function waitForTxConfirm(
 }
 
 /**
- * Submit a signed transaction for mining
+ * Signs and submits transaction for mining
  * @category chain
- * @param tx - Transaction to submit
+ * @param txUnsigned - Transaction to sign and submit
  * @param options - Options
  * @param options.onNode - Node to use
  * @param options.onAccount - Account to use
- * @param options.verify - Verify transaction before sending
+ * @param options.verify - Verify transaction before broadcast, throw error if not
  * @param options.waitMined - Ensure that transaction get into block
  * @param options.confirm - Number of micro blocks that should be mined after tx get included
  * @returns Transaction details
  */
 export async function sendTransaction(
-  tx: Encoded.Transaction,
+  txUnsigned: Encoded.Transaction,
   {
-    onNode, onAccount, verify = true, waitMined = true, confirm, ...options
+    onNode, onAccount, verify = true, waitMined = true, confirm, innerTx, ...options
   }:
   SendTransactionOptions,
 ): Promise<SendTransactionReturnType> {
+  const tx = await onAccount.signTransaction(txUnsigned, {
+    ...options,
+    onNode,
+    innerTx,
+    networkId: await onNode.getNetworkId(),
+  });
+
+  if (innerTx === true) return { hash: buildTxHash(tx), rawTx: tx };
+
   if (verify) {
     const validation = await verifyTransaction(tx, onNode);
     if (validation.length > 0) {
@@ -184,7 +180,7 @@ export async function sendTransaction(
   try {
     let __queue;
     try {
-      __queue = onAccount != null ? `tx-${await onAccount.address(options)}` : null;
+      __queue = onAccount != null ? `tx-${onAccount.address}` : null;
     } catch (error) {
       __queue = null;
     }
@@ -221,12 +217,13 @@ export async function sendTransaction(
 
 type SendTransactionOptionsType = {
   onNode: Node;
-  onAccount?: AccountBase;
+  onAccount: AccountBase;
   verify?: boolean;
   waitMined?: boolean;
   confirm?: boolean | number;
-} & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>;
-interface SendTransactionOptions extends SendTransactionOptionsType {}
+} & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
+& Parameters<AccountBase['signTransaction']>[1];
+export interface SendTransactionOptions extends SendTransactionOptionsType {}
 interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
   hash: Encoded.TxHash;
   rawTx: Encoded.Transaction;
@@ -263,11 +260,18 @@ export async function getAccount(
  * @param options.hash - The block hash on which to obtain the balance for (default: top of chain)
  */
 export async function getBalance(
-  address: Encoded.AccountAddress | Encoded.ContractAddress,
+  address: Encoded.AccountAddress | Encoded.ContractAddress | Encoded.OracleAddress,
   { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
   { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1],
 ): Promise<string> {
-  const { balance } = await getAccount(address, options).catch(() => ({ balance: 0n }));
+  const addr = address.startsWith('ok_')
+    ? encode(decode(address), Encoding.AccountAddress)
+    : address as Encoded.AccountAddress | Encoded.ContractAddress;
+
+  const { balance } = await getAccount(addr, options).catch((error) => {
+    if (!isAccountNotFoundError(error)) throw error;
+    return { balance: 0n };
+  });
 
   return formatAmount(balance, { targetDenomination: format });
 }
@@ -350,7 +354,7 @@ export async function getMicroBlockHeader(
 interface TxDryRunArguments {
   tx: Encoded.Transaction;
   accountAddress: Encoded.AccountAddress;
-  top?: number;
+  top?: number | Encoded.KeyBlockHash | Encoded.MicroBlockHash;
   txEvents?: any;
   resolve: Function;
   reject: Function;
@@ -364,8 +368,10 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
 
   let dryRunRes;
   try {
+    const top = typeof rs[0].top === 'number'
+      ? (await getKeyBlock(rs[0].top, { onNode })).hash : rs[0].top;
     dryRunRes = await onNode.protectedDryRunTxs({
-      top: rs[0].top,
+      top,
       txEvents: rs[0].txEvents,
       txs: rs.map((req) => ({ tx: req.tx })),
       accounts: Array.from(new Set(rs.map((req) => req.accountAddress)))
@@ -403,7 +409,7 @@ export async function txDryRun(
   {
     top, txEvents, combine, onNode,
   }:
-  { top?: number; txEvents?: boolean; combine?: boolean; onNode: Node },
+  { top?: TxDryRunArguments['top']; txEvents?: boolean; combine?: boolean; onNode: Node },
 ): Promise<{
     txEvents?: TransformNodeType<DryRunResults['txEvents']>;
   } & TransformNodeType<DryRunResult>> {

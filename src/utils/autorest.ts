@@ -2,7 +2,7 @@ import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pi
 import { AdditionalPolicyConfig } from '@azure/core-client';
 import { pause } from './other';
 import semverSatisfies from './semver-satisfies';
-import { UnsupportedVersionError } from './errors';
+import { UnexpectedTsError, UnsupportedVersionError } from './errors';
 
 export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
   const requestQueues = new Map<string, Promise<unknown>>();
@@ -31,7 +31,7 @@ export const genCombineGetRequestsPolicy = (): AdditionalPolicyConfig => {
 
   return {
     policy: {
-      name: 'combine-requests',
+      name: 'combine-get-requests',
       async sendRequest(request, next) {
         if (request.method !== 'GET') return next(request);
         const key = JSON.stringify([request.url, request.body]);
@@ -42,6 +42,24 @@ export const genCombineGetRequestsPolicy = (): AdditionalPolicyConfig => {
         } finally {
           pendingGetRequests.delete(key);
         }
+      },
+    },
+    position: 'perCall',
+  };
+};
+
+export const genAggressiveCacheGetResponsesPolicy = (): AdditionalPolicyConfig => {
+  const getRequests = new Map<string, Promise<PipelineResponse>>();
+
+  return {
+    policy: {
+      name: 'aggressive-cache-get-responses',
+      async sendRequest(request, next) {
+        if (request.method !== 'GET') return next(request);
+        const key = JSON.stringify([request.url, request.body]);
+        const response = getRequests.get(key) ?? next(request);
+        getRequests.set(key, response);
+        return response;
       },
     },
     position: 'perCall',
@@ -79,15 +97,53 @@ export const genErrorFormatterPolicy = (
 export const genVersionCheckPolicy = (
   name: string,
   ignorePath: string,
-  versionPromise: Promise<string>,
+  versionPromise: Promise<string | Error>,
   geVersion: string,
   ltVersion: string,
 ): PipelinePolicy => ({
   name: 'version-check',
   async sendRequest(request, next) {
     if (new URL(request.url).pathname === ignorePath) return next(request);
-    const args = [await versionPromise, geVersion, ltVersion] as const;
+    const version = await versionPromise;
+    if (version instanceof Error) throw version;
+    const args = [version, geVersion, ltVersion] as const;
     if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args);
     return next(request);
   },
+});
+
+export const genRetryOnFailurePolicy = (
+  retryCount: number,
+  retryOverallDelay: number,
+): AdditionalPolicyConfig => ({
+  policy: {
+    name: 'retry-on-failure',
+    async sendRequest(request, next) {
+      const statusesToNotRetry = [200, 400, 403];
+
+      const intervals = new Array(retryCount).fill(0)
+        .map((_, idx) => ((idx + 1) / retryCount) ** 2);
+      const intervalSum = intervals.reduce((a, b) => a + b);
+      const intervalsInMs = intervals.map((el) => (el / intervalSum) * retryOverallDelay);
+
+      let error: Error | undefined;
+      for (let attempt = 0; attempt <= retryCount; attempt += 1) {
+        if (error != null) {
+          if (
+            !(error instanceof RestError)
+            || statusesToNotRetry.includes(error.response?.status ?? 0)
+          ) throw error;
+          await pause(intervalsInMs[attempt - 1]);
+        }
+        try {
+          return await next(request);
+        } catch (e) {
+          error = e;
+        }
+      }
+      if (error == null) throw new UnexpectedTsError();
+      throw error;
+    },
+  },
+  position: 'perCall',
 });

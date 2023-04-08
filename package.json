@@ -1,31 +1,56 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "12.1.3",
+  "version": "13.0.0",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "types": "es/index.d.ts",
+  "typesVersions": {
+    "<4.5": {
+      "es/index.d.ts": [
+        "./types-legacy/ts4.2/index.d.ts"
+      ]
+    },
+    "<4.7": {
+      "es/index.d.ts": [
+        "./types-legacy/ts4.5/index.d.ts"
+      ]
+    }
+  },
   "module": "es/index.mjs",
   "browser": {
+    "es/index.mjs": "./es/index-browser.mjs",
     "dist/aepp-sdk.js": "./dist/aepp-sdk.browser.js"
+  },
+  "exports": {
+    "node": {
+      "import": "./es/index.mjs",
+      "default": "./dist/aepp-sdk.js"
+    },
+    "import": "./es/index-browser.mjs",
+    "default": "./dist/aepp-sdk.browser.js"
   },
   "sideEffects": false,
   "scripts": {
-    "build:es": "tsc && babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
-    "build:api": "npx autorest tooling/autorest/compiler.yaml --output-artifact:code-model-v4 && npx autorest tooling/autorest/node.yaml --output-artifact:code-model-v4",
-    "build": "npm run build:api && webpack --mode=production && npm run build:es",
-    "build:dev": "webpack --mode=development && npm run build:es",
-    "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
+    "build:assets": "node tooling/fetch-aesophia-cli.mjs",
+    "build:types": "tsc && node tooling/downlevel/run.mjs",
+    "build:es": "babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
+    "build:api": "node tooling/autorest/compiler-prepare.mjs && autorest tooling/autorest/compiler.yaml && autorest tooling/autorest/node.yaml",
+    "build:generate": "ts-node --transpileOnly tooling/generate-schema.ts",
+    "build": "npm run build:api && npm run build:generate && webpack && npm run build:types && npm run build:es && npm run build:assets",
+    "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.mjs",
     "docs:api": "typedoc",
     "commitlint": "commitlint --from develop",
-    "lint": "eslint . --ext .ts,.js,.mjs",
-    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "test": "nyc mocha './test/unit/' './test/integration/'",
-    "test:integration": "nyc mocha './test/integration/'",
-    "test:unit": "nyc mocha './test/unit/'",
+    "lint": "npm run lint:types && eslint . --ext .ts,.js,.mjs",
+    "lint:types": "tsc -p tsconfig.tests.json",
+    "test": "mocha './test/unit/' './test/integration/'",
+    "test:integration": "mocha './test/integration/'",
+    "test:unit": "mocha './test/unit/'",
     "test:watch": "mocha './test/unit/' './test/integration/' --watch",
     "prepare": "npm run build",
     "prepublishOnly": "test/examples.sh && npm run docs:examples && npm run docs:api",
-    "release": "standard-version --skip.tag --infile docs/CHANGELOG.md"
+    "release": "standard-version --skip.tag --infile docs/CHANGELOG.md",
+    "release-alpha": "npm run release -- --prerelease alpha",
+    "release-beta": "npm run release -- --prerelease beta"
   },
   "license": "ISC",
   "keywords": [
@@ -35,21 +60,22 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/aepp-calldata": "^1.3.0",
-    "@aeternity/argon2-browser": "^0.1.2",
+    "@aeternity/aepp-calldata": "^1.4.0",
+    "@aeternity/argon2": "^0.0.1",
     "@aeternity/uuid": "^0.0.1",
     "@azure/core-client": "1.6.0",
-    "@azure/core-rest-pipeline": "^1.9.0",
-    "@babel/runtime-corejs3": "^7.18.9",
+    "@azure/core-rest-pipeline": "^1.10.1",
+    "@babel/runtime-corejs3": "^7.21.0",
+    "@ledgerhq/hw-transport": "^6.28.1",
     "@types/aes-js": "^3.1.1",
-    "@types/argon2-browser": "^1.18.1",
     "@types/json-bigint": "^1.0.1",
+    "@types/node": "~18.11.9",
     "@types/sha.js": "^2.4.0",
-    "@types/uuid": "^8.3.4",
-    "@types/webextension-polyfill": "^0.9.0",
+    "@types/uuid": "^9.0.1",
+    "@types/webextension-polyfill": "^0.10.0",
     "@types/websocket": "^1.0.5",
     "aes-js": "^3.1.2",
-    "bignumber.js": "^9.0.2",
+    "bignumber.js": "^9.1.1",
     "bip32-path": "^0.4.2",
     "blakejs": "^1.2.1",
     "bs58": "^5.0.0",
@@ -69,55 +95,80 @@
     "url": "https://github.com/aeternity/aepp-sdk-js"
   },
   "devDependencies": {
-    "@babel/cli": "^7.18.9",
-    "@babel/core": "^7.18.9",
-    "@babel/node": "^7.18.9",
-    "@babel/plugin-transform-runtime": "^7.18.9",
-    "@babel/preset-env": "^7.18.9",
-    "@babel/preset-typescript": "^7.18.6",
-    "@babel/register": "^7.18.9",
-    "@commitlint/cli": "^17.0.3",
-    "@commitlint/config-conventional": "^17.0.3",
-    "@types/chai": "^4.3.1",
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.0",
+    "@babel/node": "^7.20.7",
+    "@babel/plugin-transform-runtime": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-typescript": "^7.21.0",
+    "@babel/register": "^7.21.0",
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
+    "@ledgerhq/hw-transport-mocker": "^6.27.12",
+    "@ledgerhq/hw-transport-node-hid-singleton": "^6.28.9",
+    "@ledgerhq/hw-transport-webusb": "^6.27.12",
+    "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
-    "@types/mocha": "^9.1.1",
+    "@types/mocha": "^10.0.1",
+    "@types/node-hid": "^1.3.1",
     "@types/sinon": "^10.0.13",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "@typescript-eslint/parser": "^5.31.0",
-    "babel-loader": "^8.2.5",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "autorest": "^3.6.3",
+    "babel-loader": "^9.1.2",
     "babel-plugin-add-import-extension": "^1.6.0",
     "babel-plugin-import-globals": "^2.0.0",
     "babel-plugin-transform-default-named-imports": "^1.2.2",
-    "chai": "^4.3.6",
+    "babel-plugin-transform-import-meta": "^2.2.0",
+    "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
-    "codecov": "^3.8.3",
-    "eslint": "^8.20.0",
+    "downlevel-dts": "github:aeternity/downlevel-dts",
+    "eslint": "^8.35.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-plugin-rulesdir": "^0.2.1",
-    "eslint-plugin-tsdoc": "^0.2.16",
-    "mocha": "^10.0.0",
+    "eslint-plugin-rulesdir": "^0.2.2",
+    "eslint-plugin-tsdoc": "^0.2.17",
+    "html-webpack-plugin": "^5.5.0",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "sinon": "^14.0.0",
+    "sinon": "^15.0.1",
     "source-map": "^0.7.4",
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.1",
-    "typedoc": "^0.23.9",
-    "typedoc-plugin-missing-exports": "^0.23.0",
-    "typescript": "^4.7.4",
-    "webpack": "^5.74.0",
-    "webpack-bundle-analyzer": "^4.5.0",
-    "webpack-cli": "^4.10.0"
+    "typedoc": "^0.23.26",
+    "typedoc-plugin-missing-exports": "^1.0.0",
+    "typescript": "^4.9.5",
+    "webpack": "^5.75.0",
+    "webpack-bundle-analyzer": "^4.8.0",
+    "webpack-cli": "^5.0.1"
   },
   "files": [
     "dist",
+    "bin",
+    "types-legacy",
     "src",
     "es"
   ],
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie 11"
-  ]
+  "browserslist": {
+    "node": [
+      "node >= 14.19"
+    ],
+    "browser": [
+      "> 1%",
+      "last 2 versions",
+      "not dead",
+      "not ie 11"
+    ],
+    "production": [
+      "node >= 14.19",
+      "> 1%",
+      "last 2 versions",
+      "not dead",
+      "not ie 11"
+    ]
+  },
+  "engines": {
+    "node": ">=14.19.0"
+  },
+  "packageManager": "npm@8.19.3"
 }

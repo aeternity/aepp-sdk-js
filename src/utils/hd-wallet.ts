@@ -4,20 +4,18 @@ import { fromString } from 'bip32-path';
 import aesjs from 'aes-js';
 import { sha256hash, encode, Encoding } from './encoder';
 import { CryptographyError } from './errors';
-import { bytesToHex } from './bytes';
 import { concatBuffers } from './other';
 
 const Ecb = aesjs.ModeOfOperation.ecb;
 
-// TODO: at least don't export `encryptKey` and `decryptKey`
+// TODO: use mnemonic encryption instead of AES
 /**
  * Encrypt given data using `password`
  * @param password - Password to encrypt with
  * @param binaryData - Data to encrypt
  * @returns Encrypted data
- * @deprecated use 'sha.js' and 'aes-js' packages directly instead
  */
-export function encryptKey(password: string, binaryData: Uint8Array): Uint8Array {
+function encryptKey(password: string, binaryData: Uint8Array): Uint8Array {
   const hashedPasswordBytes = sha256hash(password);
   const aesEcb = new Ecb(hashedPasswordBytes);
   return aesEcb.encrypt(binaryData);
@@ -28,9 +26,8 @@ export function encryptKey(password: string, binaryData: Uint8Array): Uint8Array
  * @param password - Password to decrypt with
  * @param encrypted - Data to decrypt
  * @returns Decrypted data
- * @deprecated use 'sha.js' and 'aes-js' packages directly instead
  */
-export function decryptKey(password: string, encrypted: Uint8Array): Uint8Array {
+function decryptKey(password: string, encrypted: Uint8Array): Uint8Array {
   const encryptedBytes = Buffer.from(encrypted);
   const hashedPasswordBytes = sha256hash(password);
   const aesEcb = new Ecb(hashedPasswordBytes);
@@ -72,6 +69,9 @@ type Bip32PathT<MaxLen extends number, H extends 'H' | 'h' | '\''> = MaxLen exte
 type Bip32Path<MaxLen extends number> =
   '' | Bip32PathT<MaxLen, 'H'> | Bip32PathT<MaxLen, 'h'> | Bip32PathT<MaxLen, '\''>;
 
+/**
+ * @category hd-wallet
+ */
 export function deriveChild({ secretKey, chainCode }: KeyTreeNode, index: number): KeyTreeNode {
   if (index < HARDENED_OFFSET) {
     throw new DerivationError(`Segment ${index} is not hardened`);
@@ -90,6 +90,9 @@ export function deriveChild({ secretKey, chainCode }: KeyTreeNode, index: number
   };
 }
 
+/**
+ * @category hd-wallet
+ */
 export function derivePathFromKey(path: Bip32Path<5>, key: KeyTreeNode): KeyTreeNode {
   const segments = path === '' ? [] : fromString(path).toPathArray();
   segments.forEach((segment, i) => {
@@ -101,6 +104,9 @@ export function derivePathFromKey(path: Bip32Path<5>, key: KeyTreeNode): KeyTree
   return segments.reduce((parentKey, segment) => deriveChild(parentKey, segment), key);
 }
 
+/**
+ * @category hd-wallet
+ */
 export function getMasterKeyFromSeed(seed: Uint8Array): KeyTreeNode {
   const I = hmac(seed, ED25519_CURVE);
   const IL = I.slice(0, 32);
@@ -111,6 +117,9 @@ export function getMasterKeyFromSeed(seed: Uint8Array): KeyTreeNode {
   };
 }
 
+/**
+ * @category hd-wallet
+ */
 export function derivePathFromSeed(path: 'm' | `m/${Bip32Path<5>}`, seed: Uint8Array): KeyTreeNode {
   if (!['m', 'm/'].includes(path.slice(0, 2))) {
     throw new DerivationError('Root element is required');
@@ -122,23 +131,32 @@ export function derivePathFromSeed(path: 'm' | `m/${Bip32Path<5>}`, seed: Uint8A
 function formatAccount(keys: nacl.SignKeyPair): Account {
   const { secretKey, publicKey } = keys;
   return {
-    secretKey: bytesToHex(secretKey),
+    secretKey: Buffer.from(secretKey).toString('hex'),
     publicKey: encode(publicKey, Encoding.AccountAddress),
   };
 }
 
+/**
+ * @category hd-wallet
+ */
 export function getKeyPair(secretKey: Uint8Array): nacl.SignKeyPair {
   return nacl.sign.keyPair.fromSeed(secretKey);
 }
 
+/**
+ * @category hd-wallet
+ */
 export function generateSaveHDWalletFromSeed(seed: Uint8Array, password: string): HDWallet {
   const walletKey = derivePathFromSeed('m/44h/457h', seed);
   return {
-    secretKey: bytesToHex(encryptKey(password, walletKey.secretKey)),
-    chainCode: bytesToHex(encryptKey(password, walletKey.chainCode)),
+    secretKey: Buffer.from(encryptKey(password, walletKey.secretKey)).toString('hex'),
+    chainCode: Buffer.from(encryptKey(password, walletKey.chainCode)).toString('hex'),
   };
 }
 
+/**
+ * @category hd-wallet
+ */
 export function getSaveHDWalletAccounts(
   saveHDWallet: HDWallet,
   password: string,
@@ -152,6 +170,9 @@ export function getSaveHDWalletAccounts(
     .map((_, idx) => formatAccount(getKeyPair(derivePathFromKey(`${idx}h/0h/0h`, walletKey).secretKey)));
 }
 
+/**
+ * @category hd-wallet
+ */
 export const getHdWalletAccountFromSeed = (
   seed: Uint8Array,
   accountIdx: number,

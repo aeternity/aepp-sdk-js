@@ -1,5 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
+import { AensName, Int } from '../tx/builder/constants';
+import * as Encoded from './encoder-types';
 
 /**
  * aepp-sdk originated error
@@ -116,8 +118,8 @@ export class WalletError extends BaseError {
  * @category exception
  */
 export class ArgumentError extends BaseError {
-  constructor(argumentName: string, requirement: string, argumentValue: any) {
-    super(`${argumentName} should be ${requirement}, got ${String(argumentValue)} instead`);
+  constructor(argumentName: string, requirement: unknown, argumentValue: unknown) {
+    super(`${argumentName} should be ${requirement}, got ${argumentValue} instead`);
     this.name = 'ArgumentError';
   }
 }
@@ -186,7 +188,7 @@ export class RequestTimedOutError extends BaseError {
  * @category exception
  */
 export class TxTimedOutError extends BaseError {
-  constructor(blocks: number, th: string) {
+  constructor(blocks: number, th: Encoded.TxHash) {
     super([
       `Giving up after ${blocks} blocks mined`,
       `transaction hash: ${th}`,
@@ -268,18 +270,8 @@ export class UnexpectedTsError extends InternalError {
 /**
  * @category exception
  */
-export class InvalidKeypairError extends AccountError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'InvalidKeypairError';
-  }
-}
-
-/**
- * @category exception
- */
 export class UnavailableAccountError extends AccountError {
-  constructor(address: string) {
+  constructor(address: Encoded.AccountAddress) {
     super(`Account for ${address} not available`);
     this.name = 'UnavailableAccountError';
   }
@@ -289,7 +281,7 @@ export class UnavailableAccountError extends AccountError {
  * @category exception
  */
 export class AensPointerContextError extends AensError {
-  constructor(nameOrId: string, prefix: string) {
+  constructor(nameOrId: AensName | Encoded.Name, prefix: string) {
     super(`Name ${nameOrId} don't have pointers for ${prefix}`);
     this.name = 'AensPointerContextError';
   }
@@ -339,7 +331,7 @@ export class MissingCallbackError extends AeppError {
  * @category exception
  */
 export class UnAuthorizedAccountError extends AeppError {
-  constructor(onAccount: string) {
+  constructor(onAccount: Encoded.AccountAddress) {
     super(`You do not have access to account ${onAccount}`);
     this.name = 'UnAuthorizedAccountError';
   }
@@ -408,6 +400,22 @@ export class UnexpectedChannelMessageError extends ChannelError {
 /**
  * @category exception
  */
+export class ChannelIncomingMessageError extends ChannelError {
+  handlerError: BaseError;
+
+  incomingMessage: { [key: string]: any };
+
+  constructor(handlerError: BaseError, incomingMessage: { [key: string]: any }) {
+    super(handlerError.message);
+    this.handlerError = handlerError;
+    this.incomingMessage = incomingMessage;
+    this.name = 'ChannelIncomingMessageError';
+  }
+}
+
+/**
+ * @category exception
+ */
 export class UnknownChannelStateError extends ChannelError {
   constructor() {
     super('State Channels FSM entered unknown state');
@@ -429,7 +437,7 @@ export class InvalidAuthDataError extends CompilerError {
  * @category exception
  */
 export class BytecodeMismatchError extends ContractError {
-  constructor(source: string) {
+  constructor(source: 'source code' | 'bytecode') {
     super(`Contract ${source} do not correspond to the bytecode deployed on the chain`);
     this.name = 'BytecodeMismatchError';
   }
@@ -449,7 +457,7 @@ export class DuplicateContractError extends ContractError {
  * @category exception
  */
 export class InactiveContractError extends ContractError {
-  constructor(contractAddress: string) {
+  constructor(contractAddress: Encoded.ContractAddress) {
     super(`Contract with address ${contractAddress} not active`);
     this.name = 'InactiveContractError';
   }
@@ -480,7 +488,7 @@ export class MissingContractAddressError extends ContractError {
  */
 export class MissingContractDefError extends ContractError {
   constructor() {
-    super('Either ACI or source code is required');
+    super('Either ACI or sourceCode or sourceCodePath is required');
     this.name = 'MissingContractDefError';
   }
 }
@@ -499,9 +507,9 @@ export class MissingFunctionNameError extends ContractError {
  * @category exception
  */
 export class NodeInvocationError extends ContractError {
-  transaction: string;
+  transaction?: Encoded.Transaction;
 
-  constructor(message: string, transaction: string) {
+  constructor(message: string, transaction?: Encoded.Transaction) {
     super(`Invocation failed${message == null ? '' : `: "${message}"`}`);
     this.name = 'NodeInvocationError';
     this.transaction = transaction;
@@ -522,7 +530,7 @@ export class NoSuchContractFunctionError extends ContractError {
  * @category exception
  */
 export class NotPayableFunctionError extends ContractError {
-  constructor(amount: string, fn: string) {
+  constructor(amount: Int, fn: string) {
     super(
       `You try to pay "${amount}" to function "${fn}" which is not payable. `
       + 'Only payable function can accept coins',
@@ -535,7 +543,7 @@ export class NotPayableFunctionError extends ContractError {
  * @category exception
  */
 export class MissingEventDefinitionError extends ContractError {
-  constructor(eventNameHash: string, eventAddress: string) {
+  constructor(eventNameHash: string, eventAddress: Encoded.ContractAddress) {
     super(
       `Can't find definition of ${eventNameHash} event emitted by ${eventAddress}`
       + ' (use omitUnknown option to ignore events like this)',
@@ -548,10 +556,10 @@ export class MissingEventDefinitionError extends ContractError {
  * @category exception
  */
 export class AmbiguousEventDefinitionError extends ContractError {
-  constructor(eventAddress: string, matchedEvents: Array<[string, string]>) {
+  constructor(eventAddress: Encoded.ContractAddress, matchedEvents: Array<[string, string]>) {
     super(
-      `Found multiple definitions of "${matchedEvents[0][1]}" event emitted by ${eventAddress}`
-      + ` in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts`
+      `Found multiple definitions of "${matchedEvents[0][1]}" event with different types emitted by`
+      + ` ${eventAddress} in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts`
       + ' (use contractAddressToName option to specify contract name corresponding to address)',
     );
     this.name = 'AmbiguousEventDefinitionError';
@@ -691,16 +699,6 @@ export class InvalidSignatureError extends TransactionError {
 /**
  * @category exception
  */
-export class InvalidTxParamsError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'InvalidTxParamsError';
-  }
-}
-
-/**
- * @category exception
- */
 export class PrefixNotFoundError extends TransactionError {
   constructor(tag: number) {
     super(`Prefix for id-tag ${tag} not found.`);
@@ -712,8 +710,8 @@ export class PrefixNotFoundError extends TransactionError {
  * @category exception
  */
 export class SchemaNotFoundError extends TransactionError {
-  constructor(schemaName: string, key: string, version: number) {
-    super(`Transaction ${schemaName} not implemented for ${key} version ${version}`);
+  constructor(key: string, version: number) {
+    super(`Transaction schema not implemented for tag ${key} version ${version}`);
     this.name = 'SchemaNotFoundError';
   }
 }
@@ -732,39 +730,9 @@ export class TagNotFoundError extends TransactionError {
  * @category exception
  */
 export class TxNotInChainError extends TransactionError {
-  constructor(txHash: string) {
+  constructor(txHash: Encoded.TxHash) {
     super(`Transaction ${txHash} is removed from chain`);
     this.name = 'TxNotInChainError';
-  }
-}
-
-/**
- * @category exception
- */
-export class UnknownTxError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'UnknownTxError';
-  }
-}
-
-/**
- * @category exception
- */
-export class UnsupportedABIversionError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'UnsupportedABIversionError';
-  }
-}
-
-/**
- * @category exception
- */
-export class UnsupportedVMversionError extends TransactionError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'UnsupportedVMversionError';
   }
 }
 

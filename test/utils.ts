@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js';
+import { expect } from 'chai';
 import { AensName } from '../src';
 
 function randomString(len: number): string {
@@ -14,3 +16,19 @@ function randomString(len: number): string {
 export function randomName(length: number): AensName {
   return `${randomString(length)}.chain`;
 }
+
+export function assertNotNull(value: any): asserts value {
+  expect([undefined, null]).to.not.include(value);
+}
+
+export function ensureEqual<T>(value: any, equalTo: T): asserts value is T {
+  expect(value).to.be.equal(equalTo);
+}
+
+export type ChainTtl = { FixedTTL: [bigint] }
+| { RelativeTTL: [bigint] } | { AbsoluteTTL: [bigint] };
+
+export type InputNumber = number | bigint | string | BigNumber;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function checkOnlyTypes(cb: Function): void {}

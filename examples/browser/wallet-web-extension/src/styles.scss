@@ -1,0 +1,39 @@
+@import '~tailwindcss/dist/base';
+@import '~tailwindcss/dist/components';
+@import '~tailwindcss/dist/utilities';
+
+body {
+  @extend .p-4;
+}
+
+button {
+  @extend .w-32, .p-2, .m-2, .rounded-full, .bg-purple-500, .text-white, .text-xs;
+
+  &:disabled {
+    @extend .bg-purple-300, .cursor-not-allowed;
+  }
+}
+
+h2 {
+  @extend .mt-2, .font-bold, .text-2xl;
+}
+
+.group {
+  @extend .border, .mt-4, .rounded, .bg-gray-100, .font-mono;
+
+  > div {
+    @extend .sm\:flex;
+
+    > * {
+      @extend .p-2;
+    }
+
+    > :nth-child(1) {
+      @extend .sm\:w-1\/4, .font-semibold, .sm\:font-normal, .self-center;
+    }
+
+    > :nth-child(2) {
+      @extend .sm\:w-3\/4, .break-words, .whitespace-pre-wrap;
+    }
+  }
+}

@@ -2,21 +2,24 @@ name: Test & build
 on: [push, pull_request]
 jobs:
   main:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
+      - run: |
+          wget -q https://packages.erlang-solutions.com/erlang/debian/pool/esl-erlang_25.0.4-1~ubuntu~jammy_amd64.deb
+          sudo apt install --allow-downgrades ./esl-erlang_25.0.4-1~ubuntu~jammy_amd64.deb
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: 18.x
       - uses: actions/cache@v3
         with:
           path: |
             ~/.npm
             ~/.autorest
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-      - run: npm ci --ignore-scripts
+      - run: npm ci
       - name: Run Commitlint
         env:
           EVENT_TYPE: ${{ github.event_name }}
@@ -28,7 +31,6 @@ jobs:
           else
             npx commitlint --from $BASE --to $HEAD --verbose
           fi
-      - run: npm run build
       - run: npm run lint
       - run: docker-compose up -d
       - name: Ensure that node is running
@@ -36,8 +38,10 @@ jobs:
           while [[ `curl -s -o /dev/null -w %{http_code} localhost:3013/api` != 200 ]]; do
             sleep 0.2;
           done
-      - run: npm run test
-      - run: npm run report-coverage
-        if: always()
+      - run: npx nyc npm run test
+      - run: npx nyc report --reporter=text-lcov > coverage.lcov
+      - uses: codecov/codecov-action@v3
+        with:
+          files: coverage.lcov
       - run: docker-compose logs
         if: always()

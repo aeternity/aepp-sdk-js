@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js';
 import { mapObject } from '../../utils/other';
 
+export const MAX_AUTH_FUN_GAS = 50000;
+export type Int = number | string | BigNumber;
 // # AENS
 export type AensName = `${string}.chain`;
 export const NAME_TTL = 180000;
@@ -56,6 +58,35 @@ export const NAME_BID_RANGES = mapObject({
   1: 5702887,
 }, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]);
 
+export enum ConsensusProtocolVersion {
+  Iris = 5,
+  Ceres = 6,
+}
+
+/**
+ * @category transaction builder
+ * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
+ */
+export enum VmVersion {
+  NoVm = 0,
+  Sophia = 1,
+  SophiaImprovementsMinerva = 3,
+  SophiaImprovementsFortuna = 4,
+  Fate = 5,
+  SophiaImprovementsLima = 6,
+  Fate2 = 7,
+}
+
+/**
+ * @category transaction builder
+ * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
+ */
+export enum AbiVersion {
+  NoAbi = 0,
+  Sophia = 1,
+  Fate = 3,
+}
+
 /**
  * Enum with tag types
  * @category transaction builder
@@ -67,13 +98,13 @@ export enum Tag {
   Account = 10,
   SignedTx = 11,
   SpendTx = 12,
-  // Oracle = 20,
+  Oracle = 20,
   // OracleQuery = 21,
   OracleRegisterTx = 22,
   OracleQueryTx = 23,
   OracleResponseTx = 24,
   OracleExtendTx = 25,
-  // Name = 30,
+  Name = 30,
   // NameCommitment = 31,
   NameClaimTx = 32,
   NamePreclaimTx = 33,
@@ -115,10 +146,11 @@ export enum Tag {
   NameserviceMtree = 624,
   OraclesMtree = 625,
   AccountsMtree = 626,
-  CompilerSophia = 70,
+  // CompilerSophia = 70,
   GaAttachTx = 80,
   GaMetaTx = 81,
   PayingForTx = 82,
+  GaMetaTxAuthData = 810,
   // KeyBlock = 100,
   // MicroBlock = 101,
   // LightMicroBlock = 102,

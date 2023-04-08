@@ -3,21 +3,12 @@ import BigNumber from 'bignumber.js';
 import { OperationArguments, OperationSpec } from '@azure/core-client';
 import {
   genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
-  genVersionCheckPolicy,
+  genVersionCheckPolicy, genRetryOnFailurePolicy,
 } from './utils/autorest';
 import { Node as NodeApi, NodeOptionalParams, ErrorModel } from './apis/node';
 import { mapObject } from './utils/other';
 import { Encoded } from './utils/encoder';
-import { MissingParamError } from './utils/errors';
-
-/**
- * Obtain networkId from account or node
- */
-export async function getNetworkId({ networkId }: { networkId?: string } = {}): Promise<string> {
-  const res = networkId ?? this.networkId ?? (await this.api?.getStatus())?.networkId;
-  if (res != null) return res;
-  throw new MissingParamError('networkId is not provided');
-}
+import { ConsensusProtocolVersion } from './tx/builder/constants';
 
 const bigIntPropertyNames = [
   'balance', 'queryFee', 'fee', 'amount', 'nameFee', 'channelAmount',
@@ -27,14 +18,14 @@ const bigIntPropertyNames = [
 
 const numberPropertyNames = [
   'time', 'gas', 'gasUsed', 'nameSalt',
-  'nonce', 'nextNonce', 'height', 'blockHeight', 'top', 'topBlockHeight',
+  'nonce', 'nextNonce', 'height', 'blockHeight', 'topBlockHeight',
   'ttl', 'nameTtl', 'clientTtl',
   'inbound', 'outbound', 'peerCount', 'pendingTransactionsCount', 'effectiveAtHeight',
   'version', 'solutions', 'round',
 ] as const;
 
 class NodeTransformed extends NodeApi {
-  async sendOperationRequest(
+  override async sendOperationRequest(
     operationArguments: OperationArguments,
     operationSpec: OperationSpec,
   ): Promise<any> {
@@ -101,7 +92,9 @@ export type TransformNodeType<Type> =
                   ? PreserveOptional<number, Type[Property]>
                   : Property extends 'txHash'
                     ? PreserveOptional<Encoded.TxHash, Type[Property]>
-                    : TransformNodeType<Type[Property]>
+                    : Property extends 'bytecode'
+                      ? PreserveOptional<Encoded.ContractBytearray, Type[Property]>
+                      : TransformNodeType<Type[Property]>
             }
             : Type;
 type NodeTransformedApi = new (...args: ConstructorParameters<typeof NodeApi>) => {
@@ -114,20 +107,28 @@ export interface NodeInfo {
   url: string;
   nodeNetworkId: string;
   version: string;
-  consensusProtocolVersion: number;
+  consensusProtocolVersion: ConsensusProtocolVersion;
 }
 
 export default class Node extends (NodeTransformed as unknown as NodeTransformedApi) {
-  url: string;
+  #networkIdPromise?: Promise<string | Error>;
 
   /**
    * @param url - Url for node API
    * @param options - Options
    * @param options.ignoreVersion - Don't check node version
+   * @param options.retryCount - Amount of extra requests to do in case of failure
+   * @param options.retryOverallDelay - Time in ms to wait between all retries
    */
   constructor(
     url: string,
-    { ignoreVersion = false, ...options }: NodeOptionalParams & { ignoreVersion?: boolean } = {},
+    {
+      ignoreVersion = false, retryCount = 3, retryOverallDelay = 800, ...options
+    }: NodeOptionalParams & {
+      ignoreVersion?: boolean;
+      retryCount?: number;
+      retryOverallDelay?: number;
+    } = {},
   ) {
     // eslint-disable-next-line constructor-super
     super(url, {
@@ -135,18 +136,27 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       additionalPolicies: [
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
+        genRetryOnFailurePolicy(retryCount, retryOverallDelay),
         genErrorFormatterPolicy((body: ErrorModel) => ` ${body.reason}`),
       ],
       ...options,
     });
-    this.url = url;
     if (!ignoreVersion) {
-      const versionPromise = this.getStatus().then(({ nodeVersion }) => nodeVersion);
+      const statusPromise = this.getStatus();
+      const versionPromise = statusPromise.then(({ nodeVersion }) => nodeVersion, (error) => error);
+      this.#networkIdPromise = statusPromise.then(({ networkId }) => networkId, (error) => error);
       this.pipeline.addPolicy(
         genVersionCheckPolicy('node', '/v3/status', versionPromise, '6.2.0', '7.0.0'),
       );
     }
     this.intAsString = true;
+  }
+
+  async getNetworkId(): Promise<string> {
+    this.#networkIdPromise ??= this.getStatus().then(({ networkId }) => networkId);
+    const networkId = await this.#networkIdPromise;
+    if (networkId instanceof Error) throw networkId;
+    return networkId;
   }
 
   async getNodeInfo(): Promise<NodeInfo> {
@@ -164,7 +174,7 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       )
       .version;
     return {
-      url: this.url,
+      url: this.$host,
       nodeNetworkId,
       version,
       consensusProtocolVersion,

@@ -1,7 +1,7 @@
 # AENS (æternity naming system)
 
 ## Introduction
-This guide shows you how to perform all the operations that you need within the lifecycle of [æternity naming system (AENS)](https://aeternity.com/protocol/AENS.html) using the SDK.
+This guide shows you how to perform all the operations that you need within the lifecycle of [æternity naming system (AENS)](https://docs.aeternity.com/protocol/AENS.html) using the SDK.
 
 If you successfully claimed a name it will expire after 180000 keyblocks (~375 days). You will need to update your name before it expires!
 
@@ -311,7 +311,7 @@ console.log(nameTransferTx)
     fee: 17300000000000,
     nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',
     nonce: 33,
-    recipientId: 'ak_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR',
+    recipientId: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
     type: 'NameTransferTx',
     version: 1
   },
@@ -359,7 +359,7 @@ Note:
 - After a timeout of `2016` keyblocks the name will be available for claiming again.
 
 ## Delegate signature to contract (AENS interface)
-It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the [AENS interface](https://aeternity.com/aesophia/latest/sophia_features/#aens-interface) and perform AENS related actions on behalf of your account.
+It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the [AENS interface](https://docs.aeternity.com/aesophia/latest/sophia_features/#aens-interface) and perform AENS related actions on behalf of your account.
 
 This functionality could for example be used to build an AENS marketplace.
 
@@ -368,17 +368,16 @@ This functionality could for example be used to build an AENS marketplace.
 
 const aeSdk = new AeSdk({ ... }) // init the SDK instance with AeSdk class
 
-// contract address
-const contractId = 'ct_asd2ks...'
+const contractAddress = 'ct_asd2ks...'
 // AENS name
 const name = 'example.chain'
 // Sign with a specific account
-const onAccount = await aeSdk.address()
+const onAccount = aeSdk.address
 
 // this signature will allow the contract to perform a pre-claim on your behalf
-const preClaimSig = await aeSdk.createAensDelegationSignature(contractId, { onAccount })
+const preClaimSig = await aeSdk.createDelegationSignature(contractAddress, [])
 
 // this signature will allow the contract to perform
 // any name related transaction for a specific name that you own
-const aensDelegationSig = await aeSdk.createAensDelegationSignature(contractId, { name, onAccount })
+const aensDelegationSig = await aeSdk.createDelegationSignature(contractAddress, [name], { onAccount })
 ```

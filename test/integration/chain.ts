@@ -1,33 +1,32 @@
-/*
- * ISC License (ISC)
- * Copyright (c) 2022 aeternity developers
- *
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
- *  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
- *  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
- *  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- *  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
- *  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
- *  PERFORMANCE OF THIS SOFTWARE.
- */
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { spy } from 'sinon';
-import http from 'http';
+import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
 import { getSdk } from '.';
 import {
-  generateKeyPair, AeSdk, Tag, UnexpectedTsError,
+  generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount,
 } from '../../src';
 import { Encoded } from '../../src/utils/encoder';
+import { assertNotNull } from '../utils';
 
 describe('Node Chain', () => {
   let aeSdk: AeSdk;
   let aeSdkWithoutAccount: AeSdk;
   const { publicKey } = generateKeyPair();
+
+  function resetRequestCounter(): () => number {
+    let counter = 0;
+    [aeSdk, aeSdkWithoutAccount].forEach((sdk) => {
+      sdk.api.pipeline.removePolicy({ name: 'counter' });
+      sdk.api.pipeline.addPolicy({
+        name: 'counter',
+        async sendRequest(request: PipelineRequest, next: SendRequest): Promise<PipelineResponse> {
+          counter += 1;
+          return next(request);
+        },
+      }, { phase: 'Deserialize' });
+    });
+    return () => counter;
+  }
 
   before(async () => {
     aeSdk = await getSdk();
@@ -39,13 +38,12 @@ describe('Node Chain', () => {
   });
 
   it('combines height queries', async () => {
-    const httpSpy = spy(http, 'request');
+    const getCount = resetRequestCounter();
     const heights = await Promise.all(
       new Array(5).fill(undefined).map(async () => aeSdk.getHeight()),
     );
     expect(heights).to.eql(heights.map(() => heights[0]));
-    expect(httpSpy.callCount).to.be.equal(1);
-    httpSpy.restore();
+    expect(getCount()).to.be.equal(1);
   });
 
   it('waits for specified heights', async () => {
@@ -87,13 +85,11 @@ describe('Node Chain', () => {
   });
 
   it('polls for transactions', async () => {
-    const senderId = await aeSdk.address();
-    const tx = await aeSdk.buildTx(Tag.SpendTx, {
+    const tx = await aeSdk.buildTx({
+      tag: Tag.SpendTx,
       amount: 1,
-      senderId,
+      senderId: aeSdk.address,
       recipientId: publicKey,
-      payload: '',
-      ttl: Number.MAX_SAFE_INTEGER,
     });
     const signed = await aeSdk.signTransaction(tx);
     const { txHash } = await aeSdk.api.postTransaction({ tx: signed });
@@ -103,69 +99,85 @@ describe('Node Chain', () => {
   });
 
   it('Wait for transaction confirmation', async () => {
-    const txData = await aeSdk.spend(1000, await aeSdk.address(), { confirm: true });
+    const txData = await aeSdk.spend(1000, aeSdk.address, { confirm: true });
     if (txData.blockHeight == null) throw new UnexpectedTsError();
     const isConfirmed = (await aeSdk.getHeight()) >= txData.blockHeight + 3;
 
     isConfirmed.should.be.equal(true);
 
-    const txData2 = await aeSdk.spend(1000, await aeSdk.address(), { confirm: 4 });
+    const txData2 = await aeSdk.spend(1000, aeSdk.address, { confirm: 4 });
     if (txData2.blockHeight == null) throw new UnexpectedTsError();
     const isConfirmed2 = (await aeSdk.getHeight()) >= txData2.blockHeight + 4;
     isConfirmed2.should.be.equal(true);
   });
 
-  const accounts = new Array(10).fill(undefined).map(() => generateKeyPair());
+  it('doesn\'t make extra requests', async () => {
+    let getCount;
+    let hash;
+    getCount = resetRequestCounter();
+    hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
+    expect(getCount()).to.be.equal(2); // nonce, post tx
+    await aeSdk.poll(hash);
+
+    getCount = resetRequestCounter();
+    hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
+    expect(getCount()).to.be.equal(2); // nonce, post tx
+    await aeSdk.poll(hash);
+
+    getCount = resetRequestCounter();
+    hash = (await aeSdk.spend(100, publicKey, { waitMined: false })).hash;
+    expect(getCount()).to.be.equal(5); // nonce, validator(acc, height, status), post tx
+    await aeSdk.poll(hash);
+  });
+
+  const accounts = new Array(10).fill(undefined).map(() => MemoryAccount.generate());
   const transactions: Encoded.TxHash[] = [];
 
   it('multiple spends from one account', async () => {
-    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address());
-    const httpSpy = spy(http, 'request');
+    const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
+    const getCount = resetRequestCounter();
     const spends = await Promise.all(accounts.map(async (account, idx) => aeSdk.spend(
       Math.floor(Math.random() * 1000 + 1e16),
-      account.publicKey,
+      account.address,
       { nonce: nextNonce + idx, verify: false, waitMined: false },
     )));
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
-    expect(httpSpy.args.length).to.be.equal(2 + txPostCount);
-    httpSpy.restore();
+    expect(getCount()).to.be.equal(txPostCount);
   });
 
   it('multiple spends from different accounts', async () => {
-    const receiver = await aeSdk.address();
-    const httpSpy = spy(http, 'request');
+    const getCount = resetRequestCounter();
     const spends = await Promise.all(
-      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e15, receiver, {
+      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e15, aeSdk.address, {
         nonce: 1, verify: false, onAccount, waitMined: false,
       })),
     );
     transactions.push(...spends.map(({ hash }) => hash));
-    const accountGetCount = accounts.length;
     const txPostCount = accounts.length;
-    expect(httpSpy.args.length).to.be.equal(1 + accountGetCount + txPostCount);
-    httpSpy.restore();
+    expect(getCount()).to.be.equal(txPostCount);
   });
 
   it('ensure transactions mined', async () => Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));
 
   it('multiple contract dry-runs calls at one request', async () => {
-    const contract = await aeSdk.getContractInstance({
-      source:
+    const contract = await aeSdk.initializeContract<{ foo: (x: number) => bigint }>({
+      sourceCode:
         'contract Test =\n'
         + '  entrypoint foo(x : int) = x * 100',
     });
-    await contract.deploy();
-    const { result: { gasUsed: gasLimit } } = await contract.methods.foo(5);
-    const { nextNonce } = await aeSdk.api.getAccountNextNonce(await aeSdk.address());
-    const httpSpy = spy(http, 'request');
+    await contract.$deploy([]);
+    const { result } = await contract.foo(5);
+    assertNotNull(result);
+    const { gasUsed: gasLimit } = result;
+    const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
+    const getCount = resetRequestCounter();
     const numbers = new Array(32).fill(undefined).map((v, idx) => idx * 2);
     const results = (await Promise.all(
-      numbers.map((v, idx) => contract.methods
+      numbers.map(async (v, idx) => contract
         .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true })),
     )).map((r) => r.decodedResult);
     expect(results).to.be.eql(numbers.map((v) => BigInt(v * 100)));
-    expect(httpSpy.args.length).to.be.equal(2);
-    httpSpy.restore();
+    expect(getCount()).to.be.equal(2);
   });
 });

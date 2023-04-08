@@ -56,8 +56,9 @@
 </template>
 
 <script>
-import Value from './Value.vue'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex';
+import { encode, Encoding } from '@aeternity/aepp-sdk';
+import Value from './Value.vue';
 
 export default {
   components: { Value },
@@ -69,30 +70,28 @@ export default {
     spendTo: '',
     spendAmount: '',
     spendPayload: '',
-    spendPromise: null
+    spendPromise: null,
   }),
-  computed: {
-    ...mapState('aeSdk', ['address', 'networkId']),
-    ...mapGetters('aeSdk', ['aeSdk'])
-  },
-  mounted () {
+  computed: mapState(['aeSdk', 'address', 'networkId']),
+  mounted() {
     this.$watch(
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
       ([aeSdk, address]) => {
-        if (!aeSdk) return
-        this.compilerVersionPromise = aeSdk.compilerApi.aPIVersion()
-          .then(({ apiVersion }) => apiVersion)
-        this.balancePromise = aeSdk.getBalance(address)
-        this.heightPromise = aeSdk.getHeight()
-        this.nodeInfoPromise = aeSdk.getNodeInfo()
+        if (!aeSdk) return;
+        this.compilerVersionPromise = aeSdk.compilerApi.version();
+        this.balancePromise = aeSdk.getBalance(address);
+        this.heightPromise = aeSdk.getHeight();
+        this.nodeInfoPromise = aeSdk.getNodeInfo();
       },
-      { immediate: true }
-    )
+      { immediate: true },
+    );
   },
   methods: {
-    spend () {
-      return this.aeSdk.spend(this.spendAmount, this.spendTo, { payload: this.spendPayload })
-    }
-  }
-}
+    spend() {
+      return this.aeSdk.spend(this.spendAmount, this.spendTo, {
+        payload: encode(new TextEncoder().encode(this.spendPayload), Encoding.Bytearray),
+      });
+    },
+  },
+};
 </script>
