@@ -15,10 +15,13 @@ import {
   Contract,
   hash,
   AE_AMOUNT_FORMATS,
+  Tag,
 } from '../../src';
 import { getSdk } from '.';
 import { Encoded } from '../../src/utils/encoder';
-import { assertNotNull, ChainTtl, InputNumber } from '../utils';
+import {
+  assertNotNull, ChainTtl, ensureEqual, InputNumber,
+} from '../utils';
 import { Aci } from '../../src/contract/compiler/Base';
 import { ContractMethodsBase, ContractCallObject } from '../../src/contract/Contract';
 
@@ -261,7 +264,18 @@ describe('Contract instance', () => {
   });
 
   it('calls', async () => {
-    expect((await testContract.intFn(2)).decodedResult).to.be.equal(2n);
+    const res = await testContract.intFn(2);
+    expect(res.decodedResult).to.be.equal(2n);
+    ensureEqual<Tag.ContractCallTx>(res.tx.tag, Tag.ContractCallTx);
+    expect(res.tx.fee).to.be.equal('182000000000000');
+  });
+
+  it('calls on chain', async () => {
+    const res = await testContract.intFn(2, { callStatic: false });
+    expect(res.decodedResult).to.be.equal(2n);
+    ensureEqual<Tag.SignedTx>(res.tx.tag, Tag.SignedTx);
+    ensureEqual<Tag.ContractCallTx>(res.tx.encodedTx.tag, Tag.ContractCallTx);
+    expect(res.tx.encodedTx.fee).to.be.equal('182000000000000');
   });
 
   it('calls without waitMined and get result later', async () => {
@@ -505,7 +519,9 @@ describe('Contract instance', () => {
     });
 
     it('sets maximum possible gas limit for dry-run contract calls', async () => {
-      const { tx: { gasLimit } } = await contract.intFn(4);
+      const { tx } = await contract.intFn(4);
+      ensureEqual<Tag.ContractCallTx>(tx.tag, Tag.ContractCallTx);
+      const { gasLimit } = tx;
       expect(gasLimit).to.be.equal(5817980);
       await expect(contract.intFn(4, { gasLimit: gasLimit + 1 }))
         .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 5817981 must be less or equal to 5817980');
