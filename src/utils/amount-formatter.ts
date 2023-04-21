@@ -85,7 +85,7 @@ const getNearestPrefix = (exponent: number): Prefix => prefixes.reduce((p, n) =>
 const getLowerBoundPrefix = (exponent: number): Prefix => prefixes
   .find((p) => p.magnitude <= exponent) ?? prefixes[prefixes.length - 1];
 
-export default (rawValue: string | number | BigNumber): string => {
+export const prefixedAmount = (rawValue: string | number | BigNumber): string => {
   const value: BigNumber = new BigNumber(rawValue);
 
   const exp = value.e ?? 0;
