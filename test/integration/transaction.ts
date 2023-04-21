@@ -3,10 +3,9 @@ import { expect } from 'chai';
 import { getSdk } from './index';
 import {
   AeSdk,
-  commitmentHash, oracleQueryId, decode, encode,
+  commitmentHash, oracleQueryId, decode, encode, Encoded, Encoding,
   ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS, buildTx, unpackTx,
 } from '../../src';
-import { Encoded, Encoding } from '../../src/utils/encoder';
 
 const nonce = 1;
 const nameTtl = 1;

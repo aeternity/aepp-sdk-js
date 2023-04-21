@@ -8,8 +8,7 @@ import { getSdk } from '.';
 import {
   unpackTx,
   buildTxHash,
-  encode,
-  decode,
+  encode, decode, Encoded, Encoding,
   Tag,
   AbiVersion,
   VmVersion,
@@ -22,13 +21,12 @@ import {
   Contract,
   Channel,
   buildTx,
+  MemoryAccount,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 import {
   ChannelOptions, notify, SignTx, SignTxWithTag,
 } from '../../src/channel/internal';
-import MemoryAccount from '../../src/account/Memory';
-import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual } from '../utils';
 

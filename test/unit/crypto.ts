@@ -2,11 +2,10 @@ import '..';
 import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
 import {
-  buildTxHash, decode,
+  buildTxHash, decode, Encoded,
   generateKeyPair, getAddressFromPriv, verifyMessage, isValidKeypair, isAddressValid, hash, genSalt,
   sign, verify, messageToHash, signMessage,
 } from '../../src';
-import { Encoded } from '../../src/utils/encoder';
 
 // These keys are fixations for the encryption lifecycle tests and will
 // not be used for signing

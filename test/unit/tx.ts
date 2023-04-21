@@ -6,14 +6,13 @@ import BigNumber from 'bignumber.js';
 import { checkOnlyTypes, randomName } from '../utils';
 import {
   genSalt,
-  decode, encode,
+  decode, encode, Encoding, Encoded,
   getDefaultPointerKey, commitmentHash, getMinimumNameFee, isNameValid, produceNameId,
   toBytes,
   buildTx, unpackTx,
   NAME_BID_RANGES, Tag, AbiVersion, VmVersion,
   SchemaNotFoundError, ArgumentError, AeSdk,
 } from '../../src';
-import { Encoding, Encoded } from '../../src/utils/encoder';
 
 describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {

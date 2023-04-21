@@ -3,9 +3,8 @@ import { expect } from 'chai';
 import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
 import { getSdk } from '.';
 import {
-  generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount,
+  generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount, Encoded,
 } from '../../src';
-import { Encoded } from '../../src/utils/encoder';
 import { assertNotNull } from '../utils';
 
 describe('Node Chain', () => {

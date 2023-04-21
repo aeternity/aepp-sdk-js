@@ -3,9 +3,8 @@ import { describe, it } from 'mocha';
 import { readFile } from 'fs/promises';
 import { compilerUrl, ignoreVersion } from '.';
 import {
-  CompilerBase, CompilerHttpNode, CompilerCli, CompilerError, getFileSystem,
+  CompilerBase, CompilerHttpNode, CompilerCli, CompilerError, getFileSystem, Encoded,
 } from '../../src';
-import { Encoded } from '../../src/utils/encoder';
 
 function testCompiler(compiler: CompilerBase): void {
   const inclSourceCodePath = './test/integration/contracts/Includes.aes';

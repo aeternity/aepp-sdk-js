@@ -1,8 +1,7 @@
 import {
-  AeSdk, CompilerHttpNode, MemoryAccount, Node,
+  AeSdk, CompilerHttpNode, MemoryAccount, Node, Encoded,
 } from '../../src';
 import '..';
-import { Encoded } from '../../src/utils/encoder';
 
 export const url = process.env.TEST_URL ?? 'http://localhost:3013';
 export const compilerUrl = process.env.COMPILER_URL ?? 'http://localhost:3080';

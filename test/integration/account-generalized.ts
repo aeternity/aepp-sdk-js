@@ -10,11 +10,10 @@ import {
   Tag,
   unpackTx,
   buildTx,
-  Contract,
+  Contract, ContractMethodsBase,
   MIN_GAS_PRICE,
+  Encoded,
 } from '../../src';
-import { Encoded } from '../../src/utils/encoder';
-import { ContractMethodsBase } from '../../src/contract/Contract';
 import { ensureEqual } from '../utils';
 
 const sourceCode = `contract BlindAuth =

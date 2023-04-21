@@ -16,7 +16,7 @@ import {
   Tag,
   WALLET_TYPE,
   unpackTx,
-  decode,
+  decode, encode, Encoded, Encoding,
   MESSAGE_DIRECTION,
   METHODS,
   RPC_STATUS,
@@ -38,7 +38,6 @@ import {
   getSdk, ignoreVersion, networkId, url, compilerUrl,
 } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
-import { encode, Encoded, Encoding } from '../../src/utils/encoder';
 
 const WindowPostMessageFake = (
   name: string,

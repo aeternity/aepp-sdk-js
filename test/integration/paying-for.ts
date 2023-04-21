@@ -3,9 +3,8 @@ import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
 import {
-  AeSdk, Contract, MemoryAccount, Tag, UnexpectedTsError,
+  AeSdk, Contract, MemoryAccount, Tag, UnexpectedTsError, Encoded,
 } from '../../src';
-import { Encoded } from '../../src/utils/encoder';
 import { InputNumber } from '../utils';
 
 describe('Paying for transaction of another account', () => {
