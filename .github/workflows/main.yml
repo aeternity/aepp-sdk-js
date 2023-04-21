@@ -9,7 +9,7 @@ jobs:
           sudo apt install --allow-downgrades ./esl-erlang_25.0.4-1~ubuntu~jammy_amd64.deb
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 100
       - uses: actions/setup-node@v2
         with:
           node-version: 18.x
@@ -21,16 +21,11 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
       - run: npm ci
       - name: Run Commitlint
+        if: github.event_name == 'pull_request'
         env:
-          EVENT_TYPE: ${{ github.event_name }}
           HEAD: ${{ github.event.pull_request.head.sha }}
           BASE: ${{ github.event.pull_request.base.sha }}
-        run: |
-          if [ "$EVENT_TYPE" = "push" ]; then
-            npx commitlint --from HEAD~${{ github.event.push.commits }} --to HEAD --verbose
-          else
-            npx commitlint --from $BASE --to $HEAD --verbose
-          fi
+        run: npx commitlint --from $BASE --to $HEAD --verbose
       - run: npm run lint
       - run: docker-compose up -d
       - name: Ensure that node is running
