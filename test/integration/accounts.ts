@@ -6,8 +6,8 @@ import {
   AeSdk, MemoryAccount,
   generateKeyPair, AE_AMOUNT_FORMATS,
   UnavailableAccountError, TypeError, ArgumentError, UnexpectedTsError,
+  encode, Encoding, Encoded,
 } from '../../src';
-import { Encoded } from '../../src/utils/encoder';
 
 describe('Accounts', () => {
   let aeSdk: AeSdk;
@@ -119,6 +119,12 @@ describe('Accounts', () => {
     ret.should.have.property('tx');
     if (ret.tx == null) throw new UnexpectedTsError();
     ret.tx.should.include({ amount: bigAmount, recipientId: publicKey });
+  });
+
+  it('spends with a payload', async () => {
+    const payload = encode(Buffer.from([1, 2, 3, 4]), Encoding.Bytearray);
+    const { tx } = await aeSdk.spend(1, receiver.address, { payload });
+    expect(tx?.payload).to.be.equal('ba_AQIDBI3kcuI=');
   });
 
   it('Get Account by block height/hash', async () => {
