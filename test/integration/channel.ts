@@ -734,14 +734,14 @@ describe('Channel', () => {
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      lockPeriod: 5,
+      lockPeriod: 2,
       role: 'initiator',
       sign: initiatorSignTag,
       port: 3004,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      lockPeriod: 5,
+      lockPeriod: 2,
       role: 'responder',
       sign: responderSignTag,
       port: 3004,
