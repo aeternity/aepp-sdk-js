@@ -4,12 +4,9 @@ import {
   addTransactionHandler, getSdk, ignoreVersion, networkId, url,
 } from '.';
 import {
-  AeSdk, Node, buildTxHash, poll, Tag, unpackTx, getTransactionSignerAddress, buildTx,
-} from '../../src';
-import {
+  AeSdk, Node, buildTxHash, poll, Tag, unpackTx, getTransactionSignerAddress, buildTx, Encoded,
   getExecutionCost, getExecutionCostBySignedTx, getExecutionCostUsingNode,
-} from '../../src/tx/execution-cost';
-import { Encoded } from '../../src/utils/encoder';
+} from '../../src';
 import { pause } from '../../src/utils/other';
 
 const node = new Node(url, { ignoreVersion });

@@ -4,10 +4,9 @@ import { getSdk } from '.';
 import { assertNotNull, randomName } from '../utils';
 import {
   AeSdk, generateKeyPair, buildContractId, computeAuctionEndBlock, computeBidFee,
-  AensPointerContextError, UnexpectedTsError, encode, decode, Encoding,
+  AensPointerContextError, UnexpectedTsError, encode, decode, Encoding, ContractMethodsBase,
 } from '../../src';
 import { pause } from '../../src/utils/other';
-import { ContractMethodsBase } from '../../src/contract/Contract';
 
 describe('Aens', () => {
   let aeSdk: AeSdk;

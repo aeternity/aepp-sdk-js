@@ -3,7 +3,7 @@ import { before, describe, it } from 'mocha';
 import BigNumber from 'bignumber.js';
 import {
   AeSdk,
-  decode,
+  decode, Encoded,
   BytecodeMismatchError,
   InvalidAensNameError,
   MissingContractAddressError,
@@ -12,18 +12,17 @@ import {
   MissingEventDefinitionError,
   AmbiguousEventDefinitionError,
   IllegalArgumentError,
-  Contract,
+  Contract, ContractMethodsBase,
   hash,
   AE_AMOUNT_FORMATS,
   Tag,
 } from '../../src';
 import { getSdk } from '.';
-import { Encoded } from '../../src/utils/encoder';
 import {
   assertNotNull, ChainTtl, ensureEqual, InputNumber,
 } from '../utils';
 import { Aci } from '../../src/contract/compiler/Base';
-import { ContractMethodsBase, ContractCallObject } from '../../src/contract/Contract';
+import { ContractCallObject } from '../../src/contract/Contract';
 
 const identityContractSourceCode = `
 contract Identity =

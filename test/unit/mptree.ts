@@ -5,14 +5,13 @@ import { decode as rlpDecode } from 'rlp';
 import type { Input } from 'rlp';
 import genMPTreeField from '../../src/tx/builder/field-types/mptree';
 import {
-  Encoding,
+  Encoding, Encoded,
   Tag,
   unpackTx,
   MerkleTreeHashMismatchError,
   MissingNodeInTreeError,
   UnknownNodeLengthError,
 } from '../../src';
-import { Encoded } from '../../src/utils/encoder';
 
 const field = genMPTreeField(Encoding.AccountAddress, Tag.Account);
 type MPTreeBinary = Parameters<typeof field.deserialize>[0];

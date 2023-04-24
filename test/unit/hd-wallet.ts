@@ -6,10 +6,8 @@ import {
   getMasterKeyFromSeed,
   getSaveHDWalletAccounts,
   DerivationError,
-} from '../../src';
-import {
   encode, decode, Encoded, Encoding,
-} from '../../src/utils/encoder';
+} from '../../src';
 import { concatBuffers } from '../../src/utils/other';
 
 describe('hd wallet', () => {

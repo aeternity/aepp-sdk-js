@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import prefixedAmount from '../../src/utils/amount-formatter';
+import { prefixedAmount } from '../../src';
 
 const MAGNITUDE = 18;
 describe('prefixedAmount', () => {

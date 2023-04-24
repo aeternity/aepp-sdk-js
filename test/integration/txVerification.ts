@@ -2,10 +2,8 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, Node, InvalidTxError, ArgumentError, Tag,
+  AeSdk, Node, InvalidTxError, ArgumentError, Tag, MemoryAccount, verifyTransaction,
 } from '../../src';
-import MemoryAccount from '../../src/account/Memory';
-import verifyTransaction from '../../src/tx/validator';
 
 describe('Verify Transaction', () => {
   let aeSdk: AeSdk;

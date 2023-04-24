@@ -8,8 +8,7 @@ import { getSdk } from '.';
 import {
   unpackTx,
   buildTxHash,
-  encode,
-  decode,
+  encode, decode, Encoded, Encoding,
   Tag,
   AbiVersion,
   VmVersion,
@@ -22,13 +21,12 @@ import {
   Contract,
   Channel,
   buildTx,
+  MemoryAccount,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 import {
   ChannelOptions, notify, SignTx, SignTxWithTag,
 } from '../../src/channel/internal';
-import MemoryAccount from '../../src/account/Memory';
-import { Encoded, Encoding } from '../../src/utils/encoder';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual } from '../utils';
 
@@ -736,14 +734,14 @@ describe('Channel', () => {
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      lockPeriod: 5,
+      lockPeriod: 2,
       role: 'initiator',
       sign: initiatorSignTag,
       port: 3004,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      lockPeriod: 5,
+      lockPeriod: 2,
       role: 'responder',
       sign: responderSignTag,
       port: 3004,
