@@ -2933,10 +2933,10 @@ aesophia_cli format
 <div class="highlight"><pre><span></span><code><span class="gd">-import { AeSdk } from &#39;@aeternity/aepp-sdk&#39;;</span>
 <span class="gi">+import { AeSdk, CompilerHttp } from &#39;@aeternity/aepp-sdk&#39;;</span>
 
-<span class="w">const aeSdk = new AeSdk({</span>
+const aeSdk = new AeSdk({
 <span class="gd">-  compilerUrl: &lt;compiler url&gt;,</span>
 <span class="gi">+  onCompiler: new CompilerHttp(&lt;compiler url&gt;),</span>
-<span class="w">});</span>
+});
 </code></pre></div></p>
 <h4 id="methods-of-compilerhttp-moved-to-api-property">Methods of <code>CompilerHttp</code> moved to <code>api</code> property</h4>
 <p>Apply a patch:

@@ -2533,7 +2533,7 @@ For example:
 <h2 id="node-and-compiler">Node and Compiler</h2>
 <h4 id="node-compiler-previously-contractcompilerhttp-are-classes-instead-of-a-stamps"><code>Node</code>, <code>Compiler</code> (previously <code>ContractCompilerHttp</code>) are classes instead of a stamps</h4>
 <p>For example:
-<div class="highlight"><pre><span></span><code><span class="w">import { Node } from &#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code>import { Node } from &#39;@aeternity/aepp-sdk&#39;
 
 <span class="gd">-const node = await Node({ url, ignoreVersion: false })</span>
 <span class="gi">+const node = new Node(url, { ignoreVersion: false })</span>
@@ -2692,7 +2692,7 @@ Use own implementation if needed.</p>
 <p>Use <code>webextension-polyfill</code> package instead.</p>
 <h4 id="sharewalletinfo-accepts-rpc-client-id-instead-of-callback"><code>shareWalletInfo</code> accepts rpc client id instead of callback</h4>
 <p>For example:
-<div class="highlight"><pre><span></span><code><span class="w">const connection = new BrowserRuntimeConnection({ port })</span>
+<div class="highlight"><pre><span></span><code>const connection = new BrowserRuntimeConnection({ port })
 <span class="gd">-aeSdk.addRpcClient(connection)</span>
 <span class="gd">-aeSdk.shareWalletInfo(port.postMessage.bind(port))</span>
 <span class="gi">+const rpcClientId = aeSdk.addRpcClient(connection)</span>

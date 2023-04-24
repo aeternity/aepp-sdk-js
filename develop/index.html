@@ -1115,7 +1115,7 @@
 <p>To work properly, sdk requires to enable <code>allowSyntheticDefaultImports</code> flag and register folder
 that contains type definitions for third-party packages sdk depends on.
 This may be done in <code>tsconfig.json</code>:
-<div class="highlight"><pre><span></span><code><span class="w">{</span>
+<div class="highlight"><pre><span></span><code>{
 <span class="w"> </span> &quot;compilerOptions&quot;: {
 <span class="w"> </span>   ...
 <span class="gi">+   &quot;typeRoots&quot;: [</span>
@@ -1124,13 +1124,14 @@ This may be done in <code>tsconfig.json</code>:
 <span class="gi">+   ],</span>
 <span class="gi">+   &quot;allowSyntheticDefaultImports&quot;: true</span>
 <span class="w"> </span> }
-<span class="w">}</span>
+}
 </code></pre></div>
 SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.</p>
+<p>Ensure that you have <code>strictFunctionTypes</code> option not enabled (as it is in VS code and <code>ts-node</code> by default), otherwise some of SDK types won't work correctly (see <a href="https://github.com/aeternity/aepp-sdk-js/issues/1793">#1793</a>).</p>
 <h3 id="vue-cli4">Vue CLI@4</h3>
 <p>SDK checks are not working correctly because CLI picks both ESM and CJS versions of <code>autorest</code>
 dependencies. To fix this, you need to specify aliases in <code>vue.config.js</code>.
-<div class="highlight"><pre><span></span><code><span class="w">module.exports = {</span>
+<div class="highlight"><pre><span></span><code>module.exports = {
 <span class="w"> </span> configureWebpack: {
 <span class="w"> </span>   resolve: {
 <span class="w"> </span>     alias: {
@@ -1139,7 +1140,7 @@ dependencies. To fix this, you need to specify aliases in <code>vue.config.js</c
 <span class="w"> </span>     },
 <span class="w"> </span>   },
 <span class="w"> </span> },
-<span class="w">};</span>
+};
 </code></pre></div></p>
 <h3 id="vue3">Vue@3</h3>
 <p>Reactivity in Vue@3 <a href="https://vuejs.org/guide/extras/reactivity-in-depth.html#how-reactivity-works-in-vue">based on</a> Proxy class. Proxy is <a href="https://github.com/tc39/proposal-class-fields/issues/106">not compatible</a> with private fields of ES
