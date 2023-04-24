@@ -72,7 +72,7 @@ type TxData = Awaited<ReturnType<typeof sendTransaction>>;
 interface SendAndProcessReturnType {
   result?: ContractCallObject;
   hash: TxData['hash'];
-  tx: TxUnpacked & { tag: Tag.ContractCallTx | Tag.ContractCreateTx };
+  tx: TxUnpacked & { tag: Tag.SignedTx | Tag.ContractCallTx | Tag.ContractCreateTx };
   txData: TxData;
   rawTx: Encoded.Transaction;
 }
