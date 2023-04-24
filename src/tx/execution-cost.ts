@@ -11,6 +11,23 @@ import getTransactionSignerAddress from './transaction-signer';
  * Calculates the cost of transaction execution
  * Provides an upper cost of contract-call-related transactions because of `gasLimit`.
  * Also assumes that oracle query fee is 0 unless it is provided in options.
+ *
+ * The idea is that if you need to show transaction details with some accuracy you can define
+ * expense fields that you want to show separately. And to show `getExecutionCost` result as a fee,
+ * subtracting all fields shown separately.
+ *
+ * @example
+ * ```vue
+ * <template>
+ * Amount: {{ txUnpacked.amount }}
+ * Name fee: {{ txUnpacked.nameFee }}
+ * Other fees: {{ getExecutionCost(txEncoded) - txUnpacked.amount - txUnpacked.nameFee }}
+ * </template>
+ * ```
+ *
+ * Doing this way you won't worry to show wrong fee for a transaction you may not support. Because
+ * the SDK calculates the overall price of any transaction on its side.
+ *
  * @param transaction - Transaction to calculate the cost of
  * @param innerTx - Should be provided if transaction wrapped with Tag.PayingForTx
  * @param gasUsed - Amount of gas actually used to make calculation more accurate
