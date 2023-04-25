@@ -82,6 +82,8 @@ This may be done in `tsconfig.json`:
 ```
 SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.
 
+Ensure that you have `strictFunctionTypes` option not enabled (as it is in VS code and `ts-node` by default), otherwise some of SDK types won't work correctly (see [#1793](https://github.com/aeternity/aepp-sdk-js/issues/1793)).
+
 ### Vue CLI@4
 SDK checks are not working correctly because CLI picks both ESM and CJS versions of `autorest`
 dependencies. To fix this, you need to specify aliases in `vue.config.js`.

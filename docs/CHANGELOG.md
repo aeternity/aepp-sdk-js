@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.0.1](https://github.com/aeternity/aepp-sdk-js/compare/v13.0.0...v13.0.1) (2023-04-24)
+
+
+### Bug Fixes
+
+* **contract:** return type of call/deploy on chain ([c493707](https://github.com/aeternity/aepp-sdk-js/commit/c49370756fa3ed3a6f37bad2cefcbbd858ff94ee))
+* export of `prefixedAmount` helper ([9b3f68f](https://github.com/aeternity/aepp-sdk-js/commit/9b3f68f99b3943c42c4639c3a247ee9881229d18))
+
 ## [13.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.0.0-beta.0...v13.0.0) (2023-04-06)
 
 

@@ -8,17 +8,14 @@ import {
   IllegalArgumentError,
   NodeInvocationError,
   commitmentHash,
-  decode,
-  encode,
+  decode, encode, Encoded, Encoding,
   DRY_RUN_ACCOUNT,
   messageToHash,
   genSalt,
   UnexpectedTsError,
   AeSdk,
-  Contract,
+  Contract, ContractMethodsBase,
 } from '../../src';
-import { Encoded, Encoding } from '../../src/utils/encoder';
-import { ContractMethodsBase } from '../../src/contract/Contract';
 
 const identitySourceCode = `
 contract Identity =

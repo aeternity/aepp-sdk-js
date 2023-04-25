@@ -1,8 +1,9 @@
 import '..';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import MemoryAccount from '../../src/account/Memory';
-import { generateKeyPair, verifyMessage, ArgumentError } from '../../src';
+import {
+  MemoryAccount, generateKeyPair, verifyMessage, ArgumentError,
+} from '../../src';
 
 const testAcc = generateKeyPair();
 

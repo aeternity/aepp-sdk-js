@@ -4,10 +4,10 @@ import { RestError } from '@azure/core-rest-pipeline';
 import { getSdk } from '.';
 import {
   AeSdk, UnexpectedTsError,
-  decode, encode, registerOracle,
-  ORACLE_TTL_TYPES, Encoding, RequestTimedOutError,
+  decode, encode, Encoding, Encoded,
+  registerOracle,
+  ORACLE_TTL_TYPES, RequestTimedOutError,
 } from '../../src';
-import { Encoded } from '../../src/utils/encoder';
 
 describe('Oracle', () => {
   let aeSdk: AeSdk;

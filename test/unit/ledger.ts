@@ -17,10 +17,9 @@ import {
   unpackTx,
   verify,
   verifyMessage,
-  decode,
+  decode, Encoded,
   hash,
 } from '../../src';
-import { Encoded } from '../../src/utils/encoder';
 
 const compareWithRealDevice = false; // switch to true for manual testing
 // ledger should be initialized with mnemonic:
