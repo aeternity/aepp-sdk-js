@@ -22,7 +22,7 @@ interface Wallets { [key: string]: Wallet }
  */
 export default (
   connection: BrowserConnection,
-  onDetected: ({ wallets, newWallet }: { wallets: Wallets; newWallet?: Wallet }) => void,
+  onDetected: ({ wallets, newWallet }: { wallets: Wallets; newWallet: Wallet }) => void,
 ): () => void => {
   if (window == null) throw new UnsupportedPlatformError('Window object not found, you can run wallet detector only in browser');
   const wallets: Wallets = {};
@@ -49,7 +49,6 @@ export default (
     wallets[wallet.info.id] = wallet;
     onDetected({ wallets, newWallet: wallet });
   }, () => {});
-  if (Object.keys(wallets).length > 0) onDetected({ wallets });
 
   return () => connection.disconnect();
 };
