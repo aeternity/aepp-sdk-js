@@ -41,24 +41,27 @@ import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types
 
 const WindowPostMessageFake = (
   name: string,
-): ImplPostMessage & { name: string; messages: any[] } => ({
-  name,
-  messages: [],
-  addEventListener(onEvent: string, listener: any) {
-    this.listener = listener;
-  },
-  removeEventListener() {
-    return () => null;
-  },
-  postMessage(source: any, msg: any) {
-    this.messages.push(msg);
-    setTimeout(() => {
-      if (typeof this.listener === 'function') {
-        this.listener({ data: msg, origin: 'http://origin.test', source });
-      }
-    });
-  },
-});
+): ImplPostMessage & { name: string; messages: any[] } => {
+  let listener: (event: any) => void;
+  return {
+    name,
+    messages: [],
+    addEventListener(onEvent: string, _listener: typeof listener) {
+      listener = _listener;
+    },
+    removeEventListener() {
+      return () => null;
+    },
+    postMessage(source: any, msg: any) {
+      this.messages.push(msg);
+      setTimeout(() => {
+        if (typeof listener === 'function') {
+          listener({ data: msg, origin: 'http://origin.test', source });
+        }
+      });
+    },
+  };
+};
 
 const getConnections = (): { walletWindow: ImplPostMessage; aeppWindow: ImplPostMessage } => {
   // @ts-expect-error workaround for tests

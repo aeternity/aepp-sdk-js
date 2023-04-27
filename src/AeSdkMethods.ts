@@ -147,7 +147,7 @@ Object.assign(AeSdkMethods.prototype, mapObject<Function, Function>(
   methods,
   ([name, handler]) => [
     name,
-    function methodWrapper(...args: any[]) {
+    function methodWrapper(this: AeSdkMethods, ...args: any[]) {
       args.length = handler.length;
       const options = args[args.length - 1];
       args[args.length - 1] = {

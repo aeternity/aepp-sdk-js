@@ -18,6 +18,7 @@
     "preserveConstEnums": true,
     "declaration": true,
     "downlevelIteration": true,
+    "noImplicitThis": true,
     "strictPropertyInitialization": true,
     "strictNullChecks": true,
     "useUnknownInCatchVariables": true,

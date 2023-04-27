@@ -5,7 +5,8 @@ import { AE_AMOUNT_FORMATS, formatAmount } from '../../../utils/amount-formatter
 export default {
   ...uInt,
 
-  serializeAettos(value: string | undefined): string {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  serializeAettos(value: string | undefined, params: {}): string {
     return value ?? '0';
   },
 
