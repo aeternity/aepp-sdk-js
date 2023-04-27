@@ -1,6 +1,6 @@
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
 import verifyTransaction, { ValidatorResult } from './tx/validator';
-import { isAccountNotFoundError, pause } from './utils/other';
+import { ensureError, isAccountNotFoundError, pause } from './utils/other';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
 import { DRY_RUN_ACCOUNT } from './tx/builder/schema';
 import { AensName } from './tx/builder/constants';
@@ -208,6 +208,7 @@ export async function sendTransaction(
     }
     return { hash: txHash, rawTx: tx };
   } catch (error) {
+    ensureError(error);
     throw Object.assign(error, {
       rawTx: tx,
       verifyTx: async () => verifyTransaction(tx, onNode),

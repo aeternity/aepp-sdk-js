@@ -20,6 +20,7 @@
     "downlevelIteration": true,
     "strictPropertyInitialization": true,
     "strictNullChecks": true,
+    "useUnknownInCatchVariables": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "./node_modules/@types",

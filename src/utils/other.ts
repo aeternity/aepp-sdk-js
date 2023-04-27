@@ -57,3 +57,8 @@ export function isAccountNotFoundError(error: Error): boolean {
 export type UnionToIntersection<Union> =
   (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
     ? Intersection : never;
+
+export function ensureError(error: unknown): asserts error is Error {
+  if (error instanceof Error) return;
+  throw error;
+}
