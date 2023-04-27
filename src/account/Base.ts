@@ -63,5 +63,5 @@ export default abstract class AccountBase {
   /**
    * Account address
    */
-  readonly address: Encoded.AccountAddress;
+  readonly address!: Encoded.AccountAddress;
 }

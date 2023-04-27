@@ -18,6 +18,7 @@
     "preserveConstEnums": true,
     "declaration": true,
     "downlevelIteration": true,
+    "strictPropertyInitialization": true,
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [

@@ -55,7 +55,7 @@ function snakeToPascalObjKeys<Type>(obj: object): Type {
 export default class Channel {
   _eventEmitter = new EventEmitter();
 
-  _pingTimeoutId: NodeJS.Timeout;
+  _pingTimeoutId!: NodeJS.Timeout;
 
   _nextRpcMessageId = 0;
 
@@ -73,13 +73,13 @@ export default class Channel {
 
   _status: ChannelStatus = 'disconnected';
 
-  _fsm: ChannelFsm;
+  _fsm!: ChannelFsm;
 
-  _websocket: W3CWebSocket;
+  _websocket!: W3CWebSocket;
 
   _state: Encoded.Transaction | '' = '';
 
-  _options: ChannelOptions;
+  _options!: ChannelOptions;
 
   _channelId?: Encoded.Channel;
 

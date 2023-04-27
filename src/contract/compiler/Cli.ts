@@ -22,7 +22,7 @@ const getPackagePath = (): string => {
 export default class CompilerCli extends CompilerBase {
   #path: string;
 
-  #ensureCompatibleVersion: Promise<void>;
+  #ensureCompatibleVersion = Promise.resolve();
 
   constructor(
     compilerPath = resolve(getPackagePath(), './bin/aesophia_cli'),
