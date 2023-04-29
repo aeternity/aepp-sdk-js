@@ -12,6 +12,7 @@ module.exports = {
         'channel',
         'compiler',
         'contract',
+        'middleware',
         'deps',
         'deps-dev',
         'node',

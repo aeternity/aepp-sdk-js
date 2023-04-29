@@ -82,6 +82,7 @@
     "@types/uuid": "^9.0.1",
     "@types/webextension-polyfill": "^0.10.0",
     "@types/websocket": "^1.0.5",
+    "@types/ws": "^8.5.4",
     "aes-js": "^3.1.2",
     "bignumber.js": "^9.1.1",
     "bip32-path": "^0.4.2",
@@ -89,6 +90,7 @@
     "bs58": "^5.0.0",
     "buffer": "^6.0.3",
     "events": "^3.3.0",
+    "isomorphic-ws": "^5.0.0",
     "json-bigint": "^1.0.0",
     "process": "^0.11.10",
     "rlp": "^3.0.0",
@@ -96,7 +98,8 @@
     "tweetnacl": "^1.0.3",
     "tweetnacl-auth": "^1.0.1",
     "varuint-bitcoin": "^1.1.2",
-    "websocket": "^1.0.34"
+    "websocket": "^1.0.34",
+    "ws": "^8.13.0"
   },
   "repository": {
     "type": "git",

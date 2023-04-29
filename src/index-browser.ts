@@ -43,6 +43,11 @@ export { default as AccountLedgerFactory } from './account/LedgerFactory';
 export { default as CompilerBase } from './contract/compiler/Base';
 export { default as CompilerHttp } from './contract/compiler/Http';
 export { default as Channel } from './channel/Contract';
+export {
+  default as _MiddlewareSubscriber,
+  MiddlewareSubscriberError as _MiddlewareSubscriberError,
+  MiddlewareSubscriberDisconnected as _MiddlewareSubscriberDisconnected,
+} from './MiddlewareSubscriber';
 
 export { default as connectionProxy } from './aepp-wallet-communication/connection-proxy';
 export * from './aepp-wallet-communication/schema';
