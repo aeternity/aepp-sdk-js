@@ -1,4 +1,3 @@
----
 peers: []
 
 http:
@@ -35,4 +34,4 @@ mining:
       edge_bits: 15
 
 fork_management:
-  network_id: "ae_devnet"
+  network_id: "ae_mainnet"

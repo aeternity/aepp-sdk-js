@@ -1,12 +1,16 @@
 version: '3'
 services:
-  node:
-    image: aeternity/aeternity:${NODE_TAG}
+  middleware:
+    image: aeternity/ae_mdw:${MIDDLEWARE_TAG}
     hostname: node
-    ports: ["3013:3013", "3113:3113", "3014:3014", "3114:3114"]
+    ports: ["3013:3013", "3113:3113", "3014:3014", "3114:3114", "4000:4000", "4001:4001"]
     volumes:
-      - ./docker/aeternity_node_mean16.yaml:/home/aeternity/node/aeternity.yaml
-      - ./docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
+      - ./docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity.yaml
+      - ./docker/accounts_test.json:/home/aeternity/node/local/rel/aeternity/data/aecore/.genesis/accounts_test.json
+      # remove after fixing https://github.com/aeternity/ae_mdw/issues/1281
+      - ./docker/mdw.db:/home/aeternity/node/local/rel/aeternity/data/mdw.db
+    environment:
+      AETERNITY_CONFIG: /home/aeternity/aeternity.yaml
 
   compiler:
     image: aeternity/aesophia_http:${COMPILER_TAG}
