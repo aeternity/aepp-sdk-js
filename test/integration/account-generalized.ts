@@ -86,7 +86,7 @@ describe('Generalized Account', () => {
       .eql((await authContract.getTxHash()).decodedResult);
 
     const gaMetaTxParams = unpackTx(rawTx, Tag.SignedTx).encodedTx;
-    if (gaMetaTxParams.tag !== Tag.GaMetaTx) throw new Error('Unexpected nested transaction');
+    ensureEqual<Tag.GaMetaTx>(gaMetaTxParams.tag, Tag.GaMetaTx);
     const spendTx = buildTx(gaMetaTxParams.tx.encodedTx);
     const { fee, gasPrice } = gaMetaTxParams;
     expect(new Uint8Array(await aeSdk.buildAuthTxHash(spendTx, { fee, gasPrice }))).to.be
