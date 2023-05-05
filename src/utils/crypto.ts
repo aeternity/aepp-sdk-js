@@ -8,6 +8,7 @@ import { concatBuffers } from './other';
 import {
   decode, encode, Encoded, Encoding,
 } from './encoder';
+import { ArgumentError } from './errors';
 
 /**
  * Generate address from secret key
@@ -32,6 +33,10 @@ export function isAddressValid(
 ): boolean {
   try {
     decode(address as Encoded.Generic<typeof prefix>);
+    const actualPrefix = address.split('_')[0];
+    if (actualPrefix !== prefix) {
+      throw new ArgumentError('Encoded string type', prefix, actualPrefix);
+    }
     return true;
   } catch (e) {
     return false;

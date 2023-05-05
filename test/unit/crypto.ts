@@ -56,6 +56,7 @@ describe('crypto', () => {
 
   it('isAddressValid', () => {
     expect(isAddressValid('test')).to.be.equal(false);
+    expect(isAddressValid('th_11111111111111111111111111111111273Yts')).to.be.equal(false);
     expect(isAddressValid('ak_11111111111111111111111111111111273Yts')).to.be.equal(true);
   });
 
