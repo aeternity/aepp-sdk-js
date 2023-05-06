@@ -80,7 +80,7 @@
 <script>
 import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
-import Value from './Value.vue';
+import Value from './components/Value.vue';
 
 const contractSourceCode = `
 contract Multiplier =
