@@ -44,9 +44,9 @@ export default {
     this.$watch(
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
       ([aeSdk, address]) => {
-        if (!aeSdk) return;
         this.compilerVersionPromise = aeSdk.compilerApi.version();
-        this.balancePromise = aeSdk.getBalance(address);
+        this.balancePromise = address
+          ? aeSdk.getBalance(address) : Promise.reject(new Error('Address not available'));
         this.heightPromise = aeSdk.getHeight();
         this.nodeInfoPromise = aeSdk.getNodeInfo();
       },

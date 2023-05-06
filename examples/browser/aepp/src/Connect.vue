@@ -64,7 +64,6 @@ export default {
   computed: {
     ...mapState(['aeSdk']),
     walletName() {
-      if (!this.aeSdk) return 'SDK is not ready';
       if (!this.walletConnected) return 'Wallet is not connected';
       return this.walletInfo.name;
     },
@@ -113,7 +112,6 @@ export default {
       await this.aeSdk.disconnectWallet();
       this.walletConnected = false;
       if (this.reverseIframe) this.reverseIframe.remove();
-      this.$emit('aeSdk', null);
     },
   },
 };

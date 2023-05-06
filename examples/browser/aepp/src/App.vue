@@ -3,10 +3,7 @@
 
   <Connect />
 
-  <div
-    v-if="aeSdk"
-    class="nav"
-  >
+  <div class="nav">
     <a
       href="#"
       :class="{ active: view === 'Basic' }"
@@ -24,7 +21,7 @@
   </div>
 
   <Component
-    v-if="aeSdk && view"
+    v-if="view"
     :is="view"
   />
 </template>

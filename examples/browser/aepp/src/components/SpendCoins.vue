@@ -18,10 +18,7 @@
       <div>Payload</div>
       <div><input v-model="spendPayload"></div>
     </div>
-    <button
-      :disabled="!aeSdk"
-      @click="spendPromise = spend()"
-    >
+    <button @click="spendPromise = spend()">
       Spend
     </button>
     <div v-if="spendPromise">
