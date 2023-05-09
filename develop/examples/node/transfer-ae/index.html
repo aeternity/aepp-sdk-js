@@ -313,6 +313,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../guides/address-length/" class="md-nav__link">
+        The range of possible address length
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../guides/aens/" class="md-nav__link">
         AENS (æternity naming system)
       </a>
@@ -430,17 +444,17 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
       
       
       
-        <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
           Wallet interaction
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_3_9">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_10">
           <span class="md-nav__icon md-icon"></span>
           Wallet interaction
         </label>
@@ -757,6 +771,82 @@
     <li class="md-nav__item">
       <a href="../account-generalized/" class="md-nav__link">
         Create and use Generalized Accounts
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+          Browser
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          Browser
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../browser/aepp/" class="md-nav__link">
+        Aepp example
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../browser/wallet-iframe/" class="md-nav__link">
+        Iframe wallet example
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../browser/wallet-web-extension.zip" class="md-nav__link">
+        Webextension wallet example
       </a>
     </li>
   
@@ -1166,7 +1256,7 @@ Note:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Transaction mined&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">tx</span><span class="p">);</span>
 </code></pre></div>
-Alternatively, you can use <a href="https://docs.aeternity.com/aepp-sdk-js/latest/api/functions/transferFunds.html">transferFunds</a>
+Alternatively, you can use <a href="https://docs.aeternity.com/aepp-sdk-js/v13.0.1/api/functions/transferFunds.html">transferFunds</a>
 method to transfer a fraction of your AE to another account.</p>
 <h2 id="6-get-ae-balance-of-recipient-after-transfer">6. Get AE balance of recipient (after transfer)</h2>
 <p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">balanceAfter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getBalance</span><span class="p">(</span><span class="nx">recipient</span><span class="p">);</span>
