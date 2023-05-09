@@ -7,6 +7,7 @@ import CompilerBase, { Aci } from './Base';
 import { Encoded } from '../../utils/encoder';
 import { CompilerError, InternalError, UnsupportedVersionError } from '../../utils/errors';
 import semverSatisfies from '../../utils/semver-satisfies';
+import { ensureError } from '../../utils/other';
 
 const getPackagePath = (): string => {
   const path = dirname(fileURLToPath(import.meta.url));
@@ -22,7 +23,7 @@ const getPackagePath = (): string => {
 export default class CompilerCli extends CompilerBase {
   #path: string;
 
-  #ensureCompatibleVersion: Promise<void>;
+  #ensureCompatibleVersion = Promise.resolve();
 
   constructor(
     compilerPath = resolve(getPackagePath(), './bin/aesophia_cli'),
@@ -81,6 +82,7 @@ export default class CompilerCli extends CompilerBase {
         aci: aci as Aci,
       };
     } catch (error) {
+      ensureError(error);
       throw new CompilerError(error.message);
     }
   }

@@ -401,11 +401,11 @@ export class UnexpectedChannelMessageError extends ChannelError {
  * @category exception
  */
 export class ChannelIncomingMessageError extends ChannelError {
-  handlerError: BaseError;
+  handlerError: Error;
 
   incomingMessage: { [key: string]: any };
 
-  constructor(handlerError: BaseError, incomingMessage: { [key: string]: any }) {
+  constructor(handlerError: Error, incomingMessage: { [key: string]: any }) {
     super(handlerError.message);
     this.handlerError = handlerError;
     this.incomingMessage = incomingMessage;

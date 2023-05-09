@@ -64,7 +64,7 @@ const rpcErrors: Array<(new (data?: any) => RpcError) & { code: number }> = [];
 export abstract class RpcError extends BaseError {
   static code: number;
 
-  code: number;
+  code!: number;
 
   data?: any;
 

@@ -2,7 +2,7 @@ import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pi
 import { AdditionalPolicyConfig } from '@azure/core-client';
 import { pause } from './other';
 import semverSatisfies from './semver-satisfies';
-import { UnexpectedTsError, UnsupportedVersionError } from './errors';
+import { UnsupportedVersionError } from './errors';
 
 export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
   const requestQueues = new Map<string, Promise<unknown>>();
@@ -126,22 +126,17 @@ export const genRetryOnFailurePolicy = (
       const intervalSum = intervals.reduce((a, b) => a + b);
       const intervalsInMs = intervals.map((el) => (el / intervalSum) * retryOverallDelay);
 
-      let error: Error | undefined;
+      let error = new RestError('Not expected to be thrown');
       for (let attempt = 0; attempt <= retryCount; attempt += 1) {
-        if (error != null) {
-          if (
-            !(error instanceof RestError)
-            || statusesToNotRetry.includes(error.response?.status ?? 0)
-          ) throw error;
-          await pause(intervalsInMs[attempt - 1]);
-        }
+        if (attempt !== 0) await pause(intervalsInMs[attempt - 1]);
         try {
           return await next(request);
         } catch (e) {
+          if (!(e instanceof RestError)) throw e;
+          if (statusesToNotRetry.includes(e.response?.status ?? 0)) throw e;
           error = e;
         }
       }
-      if (error == null) throw new UnexpectedTsError();
       throw error;
     },
   },
