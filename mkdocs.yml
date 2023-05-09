@@ -46,7 +46,7 @@ markdown_extensions:
   - pymdownx.superfences
 
 nav:
-  - index.md
+  - README.md
   - quick-start.md
   - Usage Guides:
     - guides/aens.md
@@ -71,7 +71,7 @@ nav:
         - examples/node/paying-for-spend-tx.md
       - examples/node/account-generalized.md
     - tutorials/vuejs/helloworld-blockheight.md
-  - 'API Reference': api/
+  - 'API Reference': api/index.html
   - compatibility.md
   - Changelog: CHANGELOG.md
   - Migration Guides:
