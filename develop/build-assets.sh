@@ -12,13 +12,15 @@ mkdir -p docs/examples/browser
 echo Build example aepp
 cd ./examples/browser/aepp
 npm i
-VUE_APP_WALLET_URL=/examples/browser/wallet PUBLIC_PATH=/examples/browser/aepp/ npm run build
+VUE_APP_WALLET_URL=../wallet-iframe/ PUBLIC_PATH=./ npm run build
+rm -rf ../../../docs/examples/browser/aepp
 mv dist/ ../../../docs/examples/browser/aepp
 
 echo Build example wallet-iframe
 cd ../wallet-iframe
 npm i
-VUE_APP_AEPP_URL=/examples/browser/aepp PUBLIC_PATH=/examples/browser/wallet-iframe/ npm run build
+VUE_APP_AEPP_URL=../aepp/ PUBLIC_PATH=./ npm run build
+rm -rf ../../../docs/examples/browser/wallet-iframe
 mv dist/ ../../../docs/examples/browser/wallet-iframe
 
 echo Build example wallet-web-extension
