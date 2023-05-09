@@ -47,7 +47,7 @@
     "test:unit": "mocha './test/unit/'",
     "test:watch": "mocha './test/unit/' './test/integration/' --watch",
     "prepare": "npm run build",
-    "prepublishOnly": "test/examples.sh && npm run docs:examples && npm run docs:api",
+    "prepublishOnly": "test/examples.sh",
     "release": "standard-version --skip.tag --infile docs/CHANGELOG.md",
     "release-alpha": "npm run release -- --prerelease alpha",
     "release-beta": "npm run release -- --prerelease beta"

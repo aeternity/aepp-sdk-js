@@ -37,20 +37,6 @@ npm i
 npm run build
 cd ../../..
 
-echo Build example aepp
-cd ./examples/browser/aepp
-npm i
-npm run build
-
-echo Build example wallet-iframe
-cd ../wallet-iframe
-npm i
-npm run build
-
-echo Build example wallet-web-extension
-cd ../wallet-web-extension
-npm i
-npm run build
-
-cd ../../..
 perl -i -pe 's/"rem-prepare"/"prepare"/g' package.json
+
+./docs/build-assets.sh

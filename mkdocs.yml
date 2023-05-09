@@ -71,6 +71,10 @@ nav:
         - examples/node/paying-for-contract-call-tx.md
         - examples/node/paying-for-spend-tx.md
       - examples/node/account-generalized.md
+    - Browser:
+      - 'Aepp example': examples/browser/aepp/index.html
+      - 'Iframe wallet example': examples/browser/wallet-iframe/index.html
+      - 'Webextension wallet example': examples/browser/wallet-web-extension.zip
     - tutorials/vuejs/helloworld-blockheight.md
   - 'API Reference': api/index.html
   - compatibility.md

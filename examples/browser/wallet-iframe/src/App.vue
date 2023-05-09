@@ -23,7 +23,7 @@
   <iframe
     v-if="!runningInFrame"
     ref="aepp"
-    src="http://localhost:9001"
+    :src="aeppUrl"
   />
 </template>
 
@@ -37,14 +37,13 @@ import Value from './Value.vue';
 
 export default {
   components: { Value },
-  data() {
-    return {
-      runningInFrame: window.parent !== window,
-      nodeName: '',
-      address: '',
-      balancePromise: null,
-    };
-  },
+  data: () => ({
+    aeppUrl: process.env.VUE_APP_AEPP_URL ?? 'http://localhost:9001',
+    runningInFrame: window.parent !== window,
+    nodeName: '',
+    address: '',
+    balancePromise: null,
+  }),
   methods: {
     async shareWalletInfo(clientId, { interval = 5000, attemps = 5 } = {}) {
       this.aeSdk.shareWalletInfo(clientId);

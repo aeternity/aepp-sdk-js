@@ -58,7 +58,7 @@ export default {
     walletConnected: false,
     walletConnecting: null,
     reverseIframe: null,
-    reverseIframeWalletUrl: 'http://localhost:9000',
+    reverseIframeWalletUrl: process.env.VUE_APP_WALLET_URL ?? 'http://localhost:9000',
     walletInfo: null,
   }),
   computed: {
