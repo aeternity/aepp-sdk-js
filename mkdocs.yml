@@ -49,6 +49,7 @@ nav:
   - README.md
   - quick-start.md
   - Usage Guides:
+    - guides/address-length.md
     - guides/aens.md
     - guides/contracts.md
     - guides/contract-events.md
