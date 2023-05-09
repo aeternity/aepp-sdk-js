@@ -13,15 +13,13 @@ echo Build example aepp
 cd ./examples/browser/aepp
 npm i
 VUE_APP_WALLET_URL=../wallet-iframe/ PUBLIC_PATH=./ npm run build
-rm -rf ../../../docs/examples/browser/aepp
-mv dist/ ../../../docs/examples/browser/aepp
+mv -f dist/ ../../../docs/examples/browser/aepp
 
 echo Build example wallet-iframe
 cd ../wallet-iframe
 npm i
 VUE_APP_AEPP_URL=../aepp/ PUBLIC_PATH=./ npm run build
-rm -rf ../../../docs/examples/browser/wallet-iframe
-mv dist/ ../../../docs/examples/browser/wallet-iframe
+mv -f dist/ ../../../docs/examples/browser/wallet-iframe
 
 echo Build example wallet-web-extension
 cd ../wallet-web-extension
