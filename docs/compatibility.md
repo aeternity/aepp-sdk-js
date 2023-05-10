@@ -25,5 +25,5 @@ This package is expected to work in these environments:
 [jest]: https://github.com/facebook/jest/issues/4422#issuecomment-770274099
 [typescript]: README.md#typescript-projects
 [vue-cli4]: README.md#vue-cli4
-[vue-3]: README.md#vue-3
+[vue-3]: README.md#vue3
 [vite]: https://github.com/vitejs/vite/issues/9062#issuecomment-1202167352
