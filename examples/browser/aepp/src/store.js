@@ -10,7 +10,7 @@ const store = createStore({
   state: {
     address: undefined,
     networkId: undefined,
-    // AeSdkAepp instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue-3
+    // AeSdkAepp instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
     aeSdk: shallowReactive(new AeSdkAepp({
       name: 'Simple æpp',
       nodes: [
