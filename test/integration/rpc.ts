@@ -223,11 +223,10 @@ describe('Aepp<->Wallet', function aeppWallet() {
       Object.keys(subscriptionResponse.address.connected).length.should.be.equal(1);
     });
 
-    it('Try to use `onAccount` for not existent account', () => {
+    it('Try to use `onAccount` for not existent account', async () => {
       const { publicKey } = generateKeyPair();
-      expect(() => {
-        aepp.spend(100, publicKey, { onAccount: publicKey });
-      }).to.throw(UnAuthorizedAccountError, `You do not have access to account ${publicKey}`);
+      await expect(aepp.spend(100, publicKey, { onAccount: publicKey }))
+        .to.be.rejectedWith(UnAuthorizedAccountError, `You do not have access to account ${publicKey}`);
     });
 
     it('aepp accepts key pairs in onAccount', async () => {
