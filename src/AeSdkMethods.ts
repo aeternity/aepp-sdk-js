@@ -11,25 +11,29 @@ import Node from './Node';
 import { TxParamsAsync } from './tx/builder/schema.generated';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
-import { ArgumentError, NotImplementedError, TypeError } from './utils/errors';
+import { NotImplementedError } from './utils/errors';
+import CompilerBase from './contract/compiler/Base';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
 
-export function getValueOrErrorProxy<Value extends object>(valueCb: () => Value): Value {
+export function getValueOrErrorProxy<Value extends object | undefined>(
+  valueCb: () => Value,
+): NonNullable<Value> {
   return new Proxy({}, {
     ...Object.fromEntries([
       'apply', 'construct', 'defineProperty', 'deleteProperty', 'getOwnPropertyDescriptor',
       'getPrototypeOf', 'isExtensible', 'ownKeys', 'preventExtensions', 'set', 'setPrototypeOf',
     ].map((name) => [name, () => { throw new NotImplementedError(`${name} proxy request`); }])),
     get(t: {}, property: string | symbol, receiver: any) {
-      const target = valueCb();
+      const target = valueCb() as object; // to get a native exception in case it missed
       const value = Reflect.get(target, property, receiver);
       return typeof value === 'function' ? value.bind(target) : value;
     },
     has(t: {}, property: string | symbol) {
-      return Reflect.has(valueCb(), property);
+      const target = valueCb() as object; // to get a native exception in case it missed
+      return Reflect.has(target, property);
     },
-  }) as Value;
+  }) as NonNullable<Value>;
 }
 
 const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
@@ -51,9 +55,8 @@ type GetMethodsOptions <Methods extends { [key: string]: Function }> =
       ? Args[Decrement<Args['length']>] : never
   };
 type MethodsOptions = GetMethodsOptions<typeof methods>;
-interface AeSdkMethodsOptions
+export interface AeSdkMethodsOptions
   extends Partial<UnionToIntersection<MethodsOptions[keyof MethodsOptions]>> {
-  nodes?: Array<{ name: string; instance: Node }>;
 }
 
 /**
@@ -79,24 +82,15 @@ class AeSdkMethods {
     Object.assign(this._options, options);
   }
 
-  /**
-   * Resolves an account
-   * @param account - ak-address, instance of AccountBase, or keypair
-   */
-  // eslint-disable-next-line class-methods-use-this
-  _resolveAccount(account?: OnAccount): AccountBase {
-    if (typeof account === 'string') throw new NotImplementedError('Address in AccountResolver');
-    if (typeof account === 'object') return account;
-    throw new TypeError(
-      'Account should be an address (ak-prefixed string), '
-      + `or instance of AccountBase, got ${String(account)} instead`,
-    );
-  }
-
-  _getOptions(): AeSdkMethodsOptions & { onAccount: AccountBase } {
+  _getOptions(
+    callOptions: AeSdkMethodsOptions = {},
+  ): AeSdkMethodsOptions & { onAccount: AccountBase; onCompiler: CompilerBase; onNode: Node } {
     return {
       ...this._options,
-      onAccount: getValueOrErrorProxy(() => this._resolveAccount()),
+      onAccount: getValueOrErrorProxy(() => this._options.onAccount),
+      onNode: getValueOrErrorProxy(() => this._options.onNode),
+      onCompiler: getValueOrErrorProxy(() => this._options.onCompiler),
+      ...callOptions,
     };
   }
 
@@ -107,16 +101,7 @@ class AeSdkMethods {
   async initializeContract<Methods extends ContractMethodsBase>(
     options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode'> & { onNode?: Node },
   ): Promise<Contract<Methods>> {
-    const { onNode, onCompiler, ...otherOptions } = this._getOptions();
-    if (onCompiler == null || onNode == null) {
-      throw new ArgumentError('onCompiler, onNode', 'provided', null);
-    }
-    return Contract.initialize<Methods>({
-      ...otherOptions,
-      onNode,
-      onCompiler,
-      ...options,
-    });
+    return Contract.initialize<Methods>(this._getOptions(options as AeSdkMethodsOptions));
   }
 }
 
@@ -150,15 +135,13 @@ Object.assign(AeSdkMethods.prototype, mapObject<Function, Function>(
     function methodWrapper(this: AeSdkMethods, ...args: any[]) {
       args.length = handler.length;
       const options = args[args.length - 1];
-      args[args.length - 1] = {
-        ...this._getOptions(),
-        ...options,
-        ...options?.onAccount != null && { onAccount: this._resolveAccount(options.onAccount) },
-      };
+      args[args.length - 1] = this._getOptions(options);
       return handler(...args);
     },
   ],
 ));
 
-export default AeSdkMethods as new (options?: ConstructorParameters<typeof AeSdkMethods>[0]) =>
-AeSdkMethods & AeSdkMethodsTransformed;
+type AeSdkMethodsTyped = AeSdkMethods & AeSdkMethodsTransformed;
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+const AeSdkMethodsTyped = AeSdkMethods as new (options?: AeSdkMethodsOptions) => AeSdkMethodsTyped;
+export default AeSdkMethodsTyped;

@@ -149,19 +149,17 @@ describe('Accounts', () => {
       tx.senderId.should.be.equal(onAccount);
     });
 
-    it('Fail on invalid account', () => {
-      expect(() => {
-        aeSdk.spend(1, aeSdk.address, { onAccount: 1 as any });
-      }).to.throw(
+    it('Fail on invalid account', async () => {
+      await expect(aeSdk.spend(1, aeSdk.address, { onAccount: 1 as any })).to.be.rejectedWith(
         TypeError,
         'Account should be an address (ak-prefixed string), or instance of AccountBase, got 1 instead',
       );
     });
 
-    it('Fail on non exist account', () => {
-      expect(() => {
-        aeSdk.spend(1, aeSdk.address, { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' });
-      }).to.throw(
+    it('Fail on non exist account', async () => {
+      await expect(
+        aeSdk.spend(1, aeSdk.address, { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' }),
+      ).to.be.rejectedWith(
         UnavailableAccountError,
         'Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available',
       );
