@@ -87,7 +87,10 @@ export default {
     class AccountMemoryProtected extends MemoryAccount {
       async signTransaction(tx, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
         if (id != null) {
-          genConfirmCallback(`sign transaction ${tx}`)(id, options, aeppOrigin);
+          const opt = { ...options };
+          if (opt.onCompiler) opt.onCompiler = '<Compiler>';
+          if (opt.onNode) opt.onNode = '<Node>';
+          genConfirmCallback(`sign transaction ${tx}`)(id, opt, aeppOrigin);
         }
         return super.signTransaction(tx, options);
       }
