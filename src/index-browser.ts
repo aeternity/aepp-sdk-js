@@ -50,3 +50,4 @@ export { default as walletDetector } from './aepp-wallet-communication/wallet-de
 export { default as BrowserRuntimeConnection } from './aepp-wallet-communication/connection/BrowserRuntime';
 export { default as BrowserWindowMessageConnection } from './aepp-wallet-communication/connection/BrowserWindowMessage';
 export * from './utils/errors';
+export * from './deprecated';

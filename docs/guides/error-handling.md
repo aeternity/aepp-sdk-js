@@ -96,7 +96,6 @@ BaseError
 │
 ├── RpcError
 │   ├── RpcInvalidTransactionError
-│   ├── RpcBroadcastError
 │   ├── RpcRejectedByUserError
 │   ├── RpcUnsupportedProtocolError
 │   ├── RpcConnectionDenyError

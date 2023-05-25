@@ -4,7 +4,7 @@ import verifyTransaction from './tx/validator';
 import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
 import {
   METHODS, RPC_STATUS, SUBSCRIPTION_TYPES, WALLET_TYPE,
-  RpcBroadcastError, RpcInvalidTransactionError,
+  RpcInvalidTransactionError,
   RpcNotAuthorizeError, RpcPermissionDenyError, RpcUnsupportedProtocolError,
 } from './aepp-wallet-communication/schema';
 import { InternalError, UnknownRpcClientError } from './utils/errors';
@@ -20,7 +20,6 @@ import {
 } from './aepp-wallet-communication/rpc/types';
 import { Encoded } from './utils/encoder';
 import jsonBig from './utils/json-big';
-import { ensureError } from './utils/other';
 
 type RpcClientWallet = RpcClient<AeppApi, WalletApi>;
 
@@ -260,8 +259,7 @@ export default class AeSdkWallet extends AeSdk {
             } catch (error) {
               const validation = await verifyTransaction(tx, this.api);
               if (validation.length > 0) throw new RpcInvalidTransactionError(validation);
-              ensureError(error);
-              throw new RpcBroadcastError(error.message);
+              throw error;
             }
           },
           [METHODS.signMessage]: async ({ message, onAccount = this.address }, origin) => {
