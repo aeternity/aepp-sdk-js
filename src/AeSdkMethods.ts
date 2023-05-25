@@ -11,7 +11,6 @@ import Node from './Node';
 import { TxParamsAsync } from './tx/builder/schema.generated';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
-import { NotImplementedError } from './utils/errors';
 import CompilerBase from './contract/compiler/Base';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
@@ -19,21 +18,20 @@ export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
 export function getValueOrErrorProxy<Value extends object | undefined>(
   valueCb: () => Value,
 ): NonNullable<Value> {
-  return new Proxy({}, {
-    ...Object.fromEntries([
+  return new Proxy(
+    {},
+    Object.fromEntries(([
       'apply', 'construct', 'defineProperty', 'deleteProperty', 'getOwnPropertyDescriptor',
       'getPrototypeOf', 'isExtensible', 'ownKeys', 'preventExtensions', 'set', 'setPrototypeOf',
-    ].map((name) => [name, () => { throw new NotImplementedError(`${name} proxy request`); }])),
-    get(t: {}, property: string | symbol, receiver: any) {
+      'get', 'has',
+    ] as const).map((name) => [name, (t: {}, ...args: unknown[]) => {
       const target = valueCb() as object; // to get a native exception in case it missed
-      const value = Reflect.get(target, property, receiver);
-      return typeof value === 'function' ? value.bind(target) : value;
-    },
-    has(t: {}, property: string | symbol) {
-      const target = valueCb() as object; // to get a native exception in case it missed
-      return Reflect.has(target, property);
-    },
-  }) as NonNullable<Value>;
+      const res = (Reflect[name] as any)(target, ...args);
+      return typeof res === 'function' && name === 'get'
+        ? res.bind(target) // otherwise it fails with attempted to get private field on non-instance
+        : res;
+    }])),
+  ) as NonNullable<Value>;
 }
 
 const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
