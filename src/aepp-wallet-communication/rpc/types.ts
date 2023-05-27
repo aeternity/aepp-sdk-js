@@ -55,6 +55,7 @@ export interface WalletApi {
        * @see {@link https://github.com/aeternity/aepp-sdk-js/commit/153fd89a52c4eab39fcd659b356b36d32129c1ba}
        */
       networkId: string;
+      innerTx?: boolean;
     }
   ) => Promise<{
     /**

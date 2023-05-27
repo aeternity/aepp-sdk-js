@@ -35,13 +35,13 @@ export default class AccountRpc extends AccountBase {
     tx: Encoded.Transaction,
     { innerTx, networkId }: Parameters<AccountBase['signTransaction']>[1] = {},
   ): Promise<Encoded.Transaction> {
-    if (innerTx != null) throw new NotImplementedError('innerTx option in AccountRpc');
     if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
     const res = await this._rpcClient.request(METHODS.sign, {
       onAccount: this.address,
       tx,
       returnSigned: true,
       networkId,
+      innerTx,
     });
     if (res.signedTransaction == null) {
       throw new UnsupportedProtocolError('signedTransaction is missed in wallet response');

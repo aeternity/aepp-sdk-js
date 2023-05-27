@@ -144,6 +144,7 @@ validators.push(
     return [{ message, key: 'InvalidAccountType', checkedKeys: ['tag'] }];
   },
   // TODO: revert nonce check
+  // TODO: ensure nonce valid when paying for own tx
   (tx, { consensusProtocolVersion }) => {
     const oracleCall = Tag.Oracle === tx.tag || Tag.OracleRegisterTx === tx.tag;
     const contractCreate = Tag.ContractCreateTx === tx.tag || Tag.GaAttachTx === tx.tag;
