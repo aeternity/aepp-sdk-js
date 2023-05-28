@@ -17,8 +17,8 @@ directive:
 
 version: ^3.6.3
 use-extension:
-  '@autorest/typescript': ^6.0.0-rc.7
-  '@autorest/modelerfour': ^4.26.0
+  '@autorest/typescript': ^6.0.2
+  '@autorest/modelerfour': ^4.26.2
 # replace with a link to https://github.com/aeternity/aesophia_http/blob/master/config/swagger.yaml
 # at specific version after fixing https://github.com/aeternity/aesophia_http/issues/87
 input-file: compiler-swagger.yaml

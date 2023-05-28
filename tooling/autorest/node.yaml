@@ -159,8 +159,8 @@ directive:
 
 version: ^3.6.3
 use-extension:
-  '@autorest/typescript': ^6.0.0-rc.7
-  '@autorest/modelerfour': ^4.26.0
+  '@autorest/typescript': ^6.0.2
+  '@autorest/modelerfour': ^4.26.2
 input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.5.2/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
