@@ -1,0 +1,376 @@
+---
+directive:
+  - from: openapi-document
+    where: $.paths.*.get.responses
+    transform: >
+      Object.entries($)
+        .filter(([key]) => key !== '200')
+        .forEach(([, value]) => value['x-ms-error-response'] = true)
+    reason: >
+      throw errors even for explained response with not 200 code
+      https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
+
+  - from: openapi-document
+    where: $.paths.*.get.produces^
+    transform: >
+      delete $.produces;
+    reason: >
+      Schema violation: must NOT have additional properties (paths > /aex141 > get)
+      additionalProperty: produces
+      https://github.com/aeternity/ae_mdw/issues/1345
+
+  - from: openapi-document
+    where: $.paths.*.get.parameters[?(@.type)]
+    transform: >
+      if ($.schema) throw new Error('Defined both schema and type');
+      $.schema = { type: $.type };
+      delete $.type;
+    reason: >
+      Schema violation: must NOT have additional properties (paths > /aex141 > get > parameters > 2)
+      additionalProperty: type
+      https://github.com/aeternity/ae_mdw/issues/1352
+
+  - from: openapi-document
+    where: $.paths.*.get.responses[?(@.schema)]
+    transform: >
+      if ($.content) throw new Error('Defined both schema and content');
+      $.content = { 'application/json': { schema: $.schema } };
+      delete $.schema;
+    reason: >
+      Schema violation: must NOT have additional properties
+      (paths > /aex141/{id} > get > responses > 400)
+      additionalProperty: schema
+      https://github.com/aeternity/ae_mdw/issues/1351
+
+  - from: openapi-document
+    where: $.components.schemas.Activity.properties.payload.enum
+    transform: return $.filter((el) => !el.$ref.includes('Aex141TransferEvent'))
+    reason: >
+      Ref '#/components/schemas/Aex141TransferEvent' is not referencing a valid location.
+      components,schemas,Activity,properties,payload,enum,2
+      https://github.com/aeternity/ae_mdw/issues/1344
+
+  - from: openapi-document
+    where: $.components.schemas.Activity.properties.payload
+    transform: >
+      $.oneOf = $.enum;
+      delete $.enum;
+    reason: >
+      Error: Enum types of 'object' and format 'undefined' are not supported.
+      Correct your input (Activity-payload).
+      https://github.com/aeternity/ae_mdw/issues/1362
+
+  - from: openapi-document
+    where: $.components.schemas.Activity.properties
+    transform: >
+      $.block_hash = { type: 'string' }
+    reason: >
+      Property block_hash is missed on Activity
+      https://github.com/aeternity/ae_mdw/issues/1360
+
+  - from: openapi-document
+    where: $.components.schemas.Activity
+    transform: $.required = ['block_hash', 'height', 'payload', 'type'];
+    reason: >
+      Required is missed on Activity
+      https://github.com/aeternity/ae_mdw/issues/1361
+
+  - from: openapi-document
+    where: $.components.schemas.PaginatedResponse
+    transform: >
+      $.required = ['next', 'prev'];
+      $.properties.next.nullable = true;
+      $.properties.prev.nullable = true;
+    reason: >
+      Required and nullable are missed on Activity
+      https://github.com/aeternity/ae_mdw/issues/1361
+
+  - from: openapi-document
+    where: $.paths./accounts/{id}/activities.get.responses.200.content.application/json.schema.allOf[0]
+    transform: $.required = ['data']
+    reason: >
+      Property 'data' is not marked as required in /accounts/{id}/activities
+      https://github.com/aeternity/ae_mdw/issues/1361
+
+  - from: openapi-document
+    where: $.paths./aex9/{contractId}/balances/{accountId}/history.get.responses.200
+    transform: $.description = 'Returns a the history of balance of an account on a contract'
+    reason: >
+      Schema violation: must have required property 'description'
+      (paths > /aex9/{contractId}/balances/{accountId}/history > get > responses > 200)
+      missingProperty: description
+      https://github.com/aeternity/ae_mdw/issues/1350
+
+  - from: openapi-document
+    where: $.components.schemas.Aex9TransferEvent.properties
+    set: {}
+    reason: >
+      Schema violation: must be object (components > schemas > Aex9TransferEvent > properties)
+      https://github.com/aeternity/ae_mdw/issues/1346
+
+  - from: openapi-document
+    where: $.components.schemas.InternalTransferEvent.properties.kind.enum
+    transform: return [...new Set($)]
+    reason: >
+      Schema violation: must NOT have duplicate items (items ## 9 and 13 are identical)
+      (components > schemas > InternalTransferEvent > properties > kind > enum)
+      https://github.com/aeternity/ae_mdw/issues/1347
+
+  - from: openapi-document
+    where: $.components.schemas.Name.properties.info.properties.claims
+    transform: delete $.expire_height
+    reason: >
+      Schema violation: must NOT have additional properties
+      (components > schemas > Name > properties > info > properties > claims)
+      additionalProperty: expire_height
+      https://github.com/aeternity/ae_mdw/issues/1348
+
+  - from: openapi-document
+    where: $.paths./txs/count.get.parameters.0
+    transform: $.in = 'query'
+    reason: >
+      Schema violation: must be equal to one of the allowed values
+      (paths > /txs/count > get > parameters > 0 > required)
+      allowedValues: true
+      https://github.com/aeternity/ae_mdw/issues/1349
+
+  - from: openapi-document
+    where: $.components.schemas
+    transform: >
+      [
+        'Activity', 'Aex9TransferEvent', 'Auction', 'ContractCall', 'ContractLog', 'DeltaStat',
+        'InternalContractCallEvent', 'InternalTransferEvent', 'Name', 'NameClaim',
+        'NameClaimEvent', 'NameTransfer', 'NameUpdate', 'PaginatedResponse', 'Tx',
+      ].forEach((name) => $[name].type = 'object');
+    reason: >
+      The schema 'Activity' with an undefined type and declared properties is a bit ambiguous.
+      This has been auto-corrected to 'type:object'
+      https://github.com/aeternity/ae_mdw/issues/1363
+
+  - from: openapi-document
+    where: $.components.schemas.Auction.properties.info.properties.status
+    transform: $.type = 'string'
+    reason: >
+      The enum schema 'Auction-info-status' with an undefined type and enum values is ambiguous.
+      This has been auto-corrected to 'type:string'
+      https://github.com/aeternity/ae_mdw/issues/1364
+
+  - from: openapi-document
+    where: $.components.schemas.Transfer.properties.kind
+    transform: $.type = 'string'
+    reason: >
+      The enum schema 'Transfer-kind' with an undefined type and enum values is ambiguous.
+      This has been auto-corrected to 'type:string'
+      https://github.com/aeternity/ae_mdw/issues/1364
+
+  - from: openapi-document
+    where: $.paths./names/search.get.responses.200.content.application/json.schema.allOf[0].properties.data.items.allOf[1].properties.status
+    transform: $.type = 'string'
+    reason: >
+      The enum schema 'get-200-application-json-allOf-properties-items-1-status' with an undefined
+      type and enum values is ambiguous. This has been auto-corrected to 'type:string'
+      https://github.com/aeternity/ae_mdw/issues/1364
+
+  - from: openapi-document
+    where: $.paths./txs.get.parameters[0].schema.items
+    transform: $.type = 'string'
+    reason: >
+      The enum schema 'get-0-itemsItem' with an undefined type and enum values is ambiguous.
+      This has been auto-corrected to 'type:string'
+      https://github.com/aeternity/ae_mdw/issues/1364
+
+  - from: openapi-document
+    where: $.paths.*.get.responses.200.content.application/json.schema.allOf^
+    transform: $.type ??= 'object'
+    reason: >
+      The schema 'paths·ulsf14·v2-aex141·get·responses·200·content·application-json·schema' with
+      an undefined type and 'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected
+      to 'type:object'
+      https://github.com/aeternity/ae_mdw/issues/1365
+
+  - from: openapi-document
+    where: $.paths./names/search.get.responses.200.content.application/json.schema.allOf[0].properties.data.items.allOf^
+    transform: $.type ??= 'object'
+    reason: >
+      The schema 'get-200-application-json-allOf-properties-itemsItem' with an undefined type and
+      'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected to 'type:object'
+      https://github.com/aeternity/ae_mdw/issues/1365
+
+  - from: openapi-document
+    where: $.paths.*.get.parameters.*.schema.oneOf^
+    transform: $.type ??= 'string'
+    reason: >
+      The schema 'paths·u0n47u·v2-keyblocks-hash_orkbi·get·parameters·0·schema' with an undefined
+      type and 'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected
+      to 'type:object'
+      TODO: investigate and fill an issue
+
+  - from: openapi-document
+    where: $.components.schemas.Aex141Response.properties.extensions
+    transform: >
+      $.items = { type: 'string' };
+    reason: >
+      Array schema 'schemas:15' is missing schema for items
+      https://github.com/aeternity/ae_mdw/issues/1359
+
+  - from: openapi-document
+    where: $.components.schemas.Aex9Response.properties.extensions
+    transform: >
+      $.items = { type: 'string' };
+    reason: >
+      Array schema 'schemas:15' is missing schema for items
+      https://github.com/aeternity/ae_mdw/issues/1359
+
+  - from: openapi-document
+    where: $.components.schemas.Aex9BalanceRangeResponse.properties.range
+    transform: >
+      $.items = { type: 'integer' };
+    reason: >
+      Array schema 'schemas:15' is missing schema for items
+      https://github.com/aeternity/ae_mdw/issues/1359
+
+  - from: openapi-document
+    where: $.components.schemas.Aex9BalancesRangeResponse.properties.range
+    transform: >
+      $.items = { type: 'integer' };
+    reason: >
+      Array schema 'schemas:15' is missing schema for items
+      https://github.com/aeternity/ae_mdw/issues/1359
+
+  - from: openapi-document
+    where: $.components.schemas.ContractLog.properties.args
+    transform: >
+      $.items = { type: 'integer' };
+    reason: >
+      Array schema 'schemas:15' is missing schema for items
+      https://github.com/aeternity/ae_mdw/issues/1359
+
+  - from: openapi-document
+    where: $.components.schemas.Tx.properties.signatures
+    transform: >
+      $.items = { type: 'integer' };
+    reason: >
+      Array schema 'schemas:15' is missing schema for items
+      https://github.com/aeternity/ae_mdw/issues/1359
+
+  - from: openapi-document
+    where: $.paths./contracts/logs.get.parameters
+    transform: return $.filter((param) => param.name !== 'function')
+    reason: >
+      SyntaxError: Variable declaration expected. (258:14)
+      256 |   };
+      257 |
+      258 | export const function: OperationQueryParameter = {
+          |              ^
+      259 |     parameterPath: ["options","function"],mapper: {
+      260 |       serializedName: "function",
+      261 |       type: {
+      https://github.com/aeternity/ae_mdw/issues/1358
+      https://github.com/Azure/autorest.typescript/issues/1871
+
+  - from: openapi-document
+    where: $.paths.*.get
+    transform: $.operationId = $.operationId.replace(/(_[a-z])/g, (group) => group[1].toUpperCase())
+    reason: >
+      Otherwise autorest groups operations by 'get' prefix
+      https://github.com/aeternity/ae_mdw/issues/1357
+
+  - from: openapi-document
+    where: $.paths
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      $['/status'] = {
+        get: {
+          description: 'Get status',
+          operationId: 'getStatus',
+          responses: {
+            200: {
+              description: 'Status',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      mdw_async_tasks: {
+                        type: 'object',
+                        properties: {
+                          long_tasks: { type: 'number' },
+                          producer_buffer: { type: 'number' },
+                          total_pending: { type: 'number' },
+                        },
+                        required: ['long_tasks', 'producer_buffer', 'total_pending'],
+                      },
+                      mdw_gens_per_minute: { type: 'number' },
+                      mdw_height: { type: 'number' },
+                      mdw_last_migration: { type: 'number' },
+                      mdw_revision: { type: 'string' },
+                      mdw_synced: { type: 'boolean' },
+                      mdw_syncing: { type: 'boolean', },
+                      mdw_tx_index: { type: 'number' },
+                      mdw_version: { type: 'string' },
+                      node_height: { type: 'number' },
+                      node_progress: { type: 'number' },
+                      node_revision: { type: 'string' },
+                      node_syncing: { type: 'boolean' },
+                      node_version: { type: 'string' },
+                    },
+                    required: [
+                      'mdw_async_tasks',
+                      'mdw_gens_per_minute',
+                      'mdw_height',
+                      'mdw_last_migration',
+                      'mdw_revision',
+                      'mdw_synced',
+                      'mdw_syncing',
+                      'mdw_tx_index',
+                      'mdw_version',
+                      'node_height',
+                      'node_progress',
+                      'node_revision',
+                      'node_syncing',
+                      'node_version',
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+    reason: >
+      Missed definition of '/status' endpoint in openapi
+      https://github.com/aeternity/ae_mdw/issues/1356
+
+  - from: openapi-document
+    where: $.servers
+    transform: $ = []
+    reason: remove a server with /mdw/v2 url
+
+  - from: openapi-document
+    where: $.paths
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      const apiPrefix = '/v2';
+      Object.keys($).forEach(key => {
+        $[apiPrefix + key] = $[key];
+        delete $[key];
+      });
+    reason: to don't add /v2 prefix to $host parameter
+
+  - from: openapi-document
+    where: $.info.title
+    set: middleware
+    reason: the whole SDK already about aeternity
+
+version: ^3.6.3
+use-extension:
+  '@autorest/typescript': ^6.0.2
+  '@autorest/modelerfour': ^4.26.2
+input-file: middleware-openapi.yaml
+output-folder: ../../src/apis/middleware
+source-code-folder-path: .
+generator: typescript
+generate-metadata: false
+add-credentials: false
+modelerfour:
+  seal-single-value-enum-by-default: false
