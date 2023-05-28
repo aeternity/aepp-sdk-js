@@ -103,13 +103,6 @@ directive:
     reason: use more precise form to avoid oneOf
 
   - from: openapi-document
-    where: $.paths['/accounts/{pubkey}/next-nonce'].get.responses.200.content['application/json'].schema
-    transform: $.type = 'object';
-    reason:
-      add missed object type
-      fixed in https://github.com/aeternity/aeternity/pull/3795
-
-  - from: openapi-document
     where: $.paths.*.*.parameters[?(@.$ref && !@.$ref.includes('intAsString'))]
     transform: >
       const relativePath = $.$ref.replace(/^#\//, '').split('/');
