@@ -103,7 +103,7 @@ type NodeTransformedApi = new (...args: ConstructorParameters<typeof NodeApi>) =
     ? NodeApi[Name] : TransformNodeType<NodeApi[Name]>
 };
 
-export interface NodeInfo {
+interface NodeInfo {
   url: string;
   nodeNetworkId: string;
   version: string;
