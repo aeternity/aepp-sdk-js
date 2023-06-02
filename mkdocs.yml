@@ -74,7 +74,7 @@ nav:
     - Browser:
       - 'Aepp example': examples/browser/aepp/index.html
       - 'Iframe wallet example': examples/browser/wallet-iframe/index.html
-      - 'Webextension wallet example': examples/browser/wallet-web-extension.zip
+      - 'Webextension wallet example': examples/browser/wallet-web-extension/packed.zip
     - tutorials/vuejs/helloworld-blockheight.md
   - 'API Reference': api/index.html
   - compatibility.md
