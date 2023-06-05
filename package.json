@@ -8,11 +8,17 @@
     "<4.5": {
       "es/index.d.ts": [
         "./types-legacy/ts4.2/index.d.ts"
+      ],
+      "es/index-browser.d.ts": [
+        "./types-legacy/ts4.2/index-browser.d.ts"
       ]
     },
     "<4.7": {
       "es/index.d.ts": [
         "./types-legacy/ts4.5/index.d.ts"
+      ],
+      "es/index-browser.d.ts": [
+        "./types-legacy/ts4.5/index-browser.d.ts"
       ]
     }
   },
@@ -23,9 +29,11 @@
   },
   "exports": {
     "node": {
+      "types": "./es/index.d.ts",
       "import": "./es/index.mjs",
       "default": "./dist/aepp-sdk.js"
     },
+    "types": "./es/index-browser.d.ts",
     "import": "./es/index-browser.mjs",
     "default": "./dist/aepp-sdk.browser.js"
   },
