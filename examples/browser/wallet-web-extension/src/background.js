@@ -42,7 +42,10 @@ const genConfirmCallback = (action) => async (aeppId, parameters, aeppOrigin) =>
 class AccountMemoryProtected extends MemoryAccount {
   async signTransaction(transaction, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
-      await genConfirmCallback('sign transaction')(id, { ...options, transaction }, aeppOrigin);
+      const opt = { ...options };
+      if (opt.onCompiler) opt.onCompiler = '<Compiler>';
+      if (opt.onNode) opt.onNode = '<Node>';
+      await genConfirmCallback('sign transaction')(id, { ...opt, transaction }, aeppOrigin);
     }
     return super.signTransaction(transaction, options);
   }
