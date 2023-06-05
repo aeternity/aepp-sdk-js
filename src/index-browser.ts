@@ -48,6 +48,7 @@ export {
   MiddlewareSubscriberError as _MiddlewareSubscriberError,
   MiddlewareSubscriberDisconnected as _MiddlewareSubscriberDisconnected,
 } from './MiddlewareSubscriber';
+export { default as _Middleware } from './Middleware';
 
 export { default as connectionProxy } from './aepp-wallet-communication/connection-proxy';
 export * from './aepp-wallet-communication/schema';
