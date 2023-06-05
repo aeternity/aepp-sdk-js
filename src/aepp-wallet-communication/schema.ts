@@ -102,22 +102,6 @@ rpcErrors.push(RpcInvalidTransactionError);
 /**
  * @category exception
  */
-export class RpcBroadcastError extends RpcError {
-  static override code = 3;
-
-  override code = 3;
-
-  constructor(data?: any) {
-    super('Broadcast failed');
-    this.data = data;
-    this.name = 'RpcBroadcastError';
-  }
-}
-rpcErrors.push(RpcBroadcastError);
-
-/**
- * @category exception
- */
 export class RpcRejectedByUserError extends RpcError {
   static override code = 4;
 

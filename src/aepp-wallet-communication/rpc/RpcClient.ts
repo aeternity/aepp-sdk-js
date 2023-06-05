@@ -1,6 +1,7 @@
 import { RpcError, RpcInternalError, RpcMethodNotFoundError } from '../schema';
 import BrowserConnection from '../connection/Browser';
 import { InvalidRpcMessageError, MissingCallbackError } from '../../utils/errors';
+import { ensureError } from '../../utils/other';
 
 interface JsonRpcRequest {
   jsonrpc: '2.0';
@@ -64,17 +65,24 @@ export default class RpcClient <
 
     const request = msg as JsonRpcRequest;
     let result;
-    let error;
+    let error: Error | undefined;
     try {
       if (!(request.method in this.#methods)) throw new RpcMethodNotFoundError();
       const methodName = request.method as keyof LocalApi;
       result = await this.#methods[methodName](request.params, origin);
     } catch (e) {
-      error = e instanceof RpcError ? e : new RpcInternalError();
+      ensureError(e);
+      error = e;
     }
     if (request.id != null) {
-      this.#sendResponse(request.id, request.method as keyof LocalApi, result, error);
+      this.#sendResponse(
+        request.id,
+        request.method as keyof LocalApi,
+        result,
+        error == null || error instanceof RpcError ? error : new RpcInternalError(),
+      );
     }
+    if (error != null && !(error instanceof RpcError)) throw error;
   }
 
   #sendRequest(
