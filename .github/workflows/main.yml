@@ -1,5 +1,5 @@
 name: Test & build
-on: [push, pull_request]
+on: [pull_request]
 jobs:
   main:
     runs-on: ubuntu-22.04

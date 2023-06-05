@@ -1,7 +1,7 @@
 version: '3'
 services:
   node:
-    image: aeternity/aeternity:${NODE_TAG}
+    image: aeternity/aeternity:v6.8.1
     hostname: node
     ports: ["3013:3013", "3113:3113", "3014:3014", "3114:3114"]
     volumes:
@@ -9,6 +9,6 @@ services:
       - ./docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
 
   compiler:
-    image: aeternity/aesophia_http:${COMPILER_TAG}
+    image: aeternity/aesophia_http:v7.2.0
     hostname: compiler
     ports: ["3080:3080"]
