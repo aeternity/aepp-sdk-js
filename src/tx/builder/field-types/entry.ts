@@ -29,7 +29,7 @@ export default function genEntryField<T extends Tag = Tag>(tag?: T): {
 
     deserialize(buf, { unpackTx }) {
       const tx = unpackTx(encode(buf, Encoding.Transaction));
-      if (tag != null && tx.tag !== tag) throw new ArgumentError('Tag', tag, tx.tag);
+      if (tag != null && tx.tag !== tag) throw new ArgumentError('Tag', Tag[tag], Tag[tx.tag]);
       return tx;
     },
   };

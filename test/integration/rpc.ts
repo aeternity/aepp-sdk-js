@@ -21,7 +21,6 @@ import {
   METHODS,
   RPC_STATUS,
   generateKeyPair,
-  hash,
   verify,
   NoWalletConnectedError,
   UnAuthorizedAccountError,
@@ -32,7 +31,7 @@ import {
   verifyMessage,
   buildTx,
 } from '../../src';
-import { concatBuffers } from '../../src/utils/other';
+import { getBufferToSign } from '../../src/account/Memory';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
 import {
   getSdk, ignoreVersion, networkId, url, compilerUrl,
@@ -300,23 +299,23 @@ describe('Aepp<->Wallet', function aeppWallet() {
         .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
     });
 
-    it('Sign transaction: wallet allow', async () => {
-      // @ts-expect-error removes object property to restore the original behavior
-      delete wallet._resolveAccount().signTransaction;
-      const tx = await aepp.buildTx({
-        tag: Tag.SpendTx,
-        senderId: aepp.address,
-        recipientId: aepp.address,
-        amount: 0,
-      });
+    [false, true].forEach((innerTx) => {
+      it(`Sign${innerTx ? ' inner' : ''} transaction`, async () => {
+        // @ts-expect-error removes object property to restore the original behavior
+        delete wallet._resolveAccount().signTransaction;
+        const tx = await aepp.buildTx({
+          tag: Tag.SpendTx,
+          senderId: aepp.address,
+          recipientId: aepp.address,
+          amount: 0,
+        });
 
-      const signedTx = await aepp.signTransaction(tx);
-      const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
-      const { signatures: [signature], encodedTx } = unpackedTx;
-      const txWithNetwork = concatBuffers([
-        Buffer.from(networkId), hash(decode(buildTx(encodedTx))),
-      ]);
-      expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
+        const signedTx = await aepp.signTransaction(tx, { innerTx });
+        const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
+        const { signatures: [signature], encodedTx } = unpackedTx;
+        const txWithNetwork = getBufferToSign(buildTx(encodedTx), networkId, innerTx);
+        expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
+      });
     });
 
     it('Try to sign using unpermited account', async () => {

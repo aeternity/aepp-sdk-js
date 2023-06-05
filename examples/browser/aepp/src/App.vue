@@ -18,6 +18,13 @@
     >
       Smart contracts
     </a>
+    <a
+      href="#"
+      :class="{ active: view === 'PayForTx' }"
+      @click="view = 'PayForTx'"
+    >
+      Pay for transaction
+    </a>
   </div>
 
   <Component
@@ -31,9 +38,12 @@ import { mapState } from 'vuex';
 import Connect from './Connect.vue';
 import Basic from './Basic.vue';
 import Contracts from './Contracts.vue';
+import PayForTx from './PayForTx.vue';
 
 export default {
-  components: { Connect, Basic, Contracts },
+  components: {
+    Connect, Basic, Contracts, PayForTx,
+  },
   data: () => ({ view: '' }),
   computed: mapState(['aeSdk']),
 };

@@ -242,14 +242,21 @@ export default class AeSdkWallet extends AeSdk {
             await this.onAskAccounts(id, params, origin);
             return this.addresses();
           },
-          [METHODS.sign]: async ({ tx, onAccount = this.address, returnSigned }, origin) => {
+          [METHODS.sign]: async (
+            {
+              tx, onAccount = this.address, returnSigned, innerTx,
+            },
+            origin,
+          ) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }
 
-            const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
-            if (returnSigned) {
+            const parameters = {
+              onAccount, aeppOrigin: origin, aeppRpcClientId: id, innerTx,
+            };
+            if (returnSigned || innerTx === true) {
               return { signedTransaction: await this.signTransaction(tx, parameters) };
             }
             try {
