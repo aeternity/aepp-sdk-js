@@ -59,6 +59,39 @@ export function oracleQueryId(
   return encode(b2bHash, Encoding.OracleQueryId);
 }
 
+const AENS_SUFFIX = '.chain';
+
+export function nameToPunycode(maybeName: string): AensName {
+  const [name, suffix, ...other] = maybeName.split('.');
+  if (other.length !== 0) throw new ArgumentError('aens name', 'including only one dot', maybeName);
+  if (suffix !== AENS_SUFFIX.slice(1)) {
+    throw new ArgumentError('aens name', `suffixed with ${AENS_SUFFIX}`, maybeName);
+  }
+  if (/\p{Emoji_Presentation}/u.test(name)) {
+    throw new ArgumentError('aens name', 'not containing emoji', maybeName);
+  }
+  let punycode;
+  try {
+    const u = new URL(`http://${name}.${suffix}`);
+    if (u.username + u.password + u.port + u.search + u.hash !== '' || u.pathname !== '/') {
+      throw new ArgumentError('aens name', 'valid', maybeName);
+    }
+    punycode = u.host;
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('Invalid URL')) {
+      throw new ArgumentError('aens name', 'valid', maybeName);
+    }
+    throw error;
+  }
+  if (!/^[a-z0-9.-]+$/i.test(punycode)) {
+    throw new ArgumentError('aens name', 'without illegal chars', maybeName);
+  }
+  if (punycode.length > 63 + AENS_SUFFIX.length) {
+    throw new ArgumentError('aens name', 'not too long', maybeName);
+  }
+  return punycode as AensName;
+}
+
 /**
  * Encode an AENS name
  * @category AENS
@@ -100,16 +133,18 @@ export function readInt(buf: Buffer = Buffer.from([])): string {
   return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10);
 }
 
-const AENS_SUFFIX = '.chain';
-
 /**
  * Is AENS name valid
  * @category AENS
  * @param name - AENS name
  */
-export function isNameValid(name: string): name is AensName {
-  // TODO: probably there are stronger requirements
-  return name.endsWith(AENS_SUFFIX);
+export function isNameValid(maybeName: string): maybeName is AensName {
+  try {
+    nameToPunycode(maybeName);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 const encodingToPointerKey = [
