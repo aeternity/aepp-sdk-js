@@ -1,5 +1,6 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
+import { ensureName, ArgumentError } from '../../src';
 import { nameToPunycode } from '../../src/tx/builder/helpers';
 
 const tests = [{
@@ -260,6 +261,37 @@ describe('AENS utils', () => {
         const name = Buffer.from(unicodeAsHex, 'hex').toString();
         expect(nameToPunycode(name)).to.be.equal(punycode);
       });
+    });
+  });
+
+  describe('ensureName', () => {
+    it('fails if more than 2 labels', () => {
+      expect(() => ensureName('test.test.chain'))
+        .to.throw(ArgumentError, 'aens name should be including only one dot, got test.test.chain instead');
+    });
+
+    it('fails if wrong top level label', () => {
+      expect(() => ensureName('test.test'))
+        .to.throw(ArgumentError, 'aens name should be suffixed with .chain, got test.test instead');
+    });
+
+    it('fails if invalid char in label', () => {
+      expect(() => ensureName('te/st.chain'))
+        .to.throw(ArgumentError, 'aens name should be valid, got te/st.chain instead');
+      expect(() => ensureName('te%st.chain'))
+        .to.throw(ArgumentError, 'aens name should be valid, got te%st.chain instead');
+      expect(() => ensureName('te!st.chain'))
+        .to.throw(ArgumentError, 'aens name should be without illegal chars, got te!st.chain instead');
+    });
+
+    it('fails if emoji char in label', () => {
+      expect(() => ensureName('🚀.chain'))
+        .to.throw(ArgumentError, 'aens name should be not containing emoji, got 🚀.chain instead');
+    });
+
+    it('fails if name too long', () => {
+      expect(() => ensureName('ldiDxa1Yxy1iiTRztYEN4F8nrnfZib3Q1MllPghmst8fjJ1sI3DXzOoAddE2ETxp.chain'))
+        .to.throw(ArgumentError, 'aens name should be not too long, got ldiDxa1Yxy1iiTRztYEN4F8nrnfZib3Q1MllPghmst8fjJ1sI3DXzOoAddE2ETxp.chain instead');
     });
   });
 });

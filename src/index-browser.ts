@@ -16,7 +16,7 @@ export {
   buildTx, buildTxAsync, buildTxHash, unpackTx, buildContractIdByContractTx,
 } from './tx/builder';
 export {
-  buildContractId, oracleQueryId, produceNameId, commitmentHash, readInt, isNameValid,
+  buildContractId, oracleQueryId, produceNameId, commitmentHash, readInt, isNameValid, ensureName,
   getDefaultPointerKey, getMinimumNameFee, computeBidFee, computeAuctionEndBlock, isAuctionName,
 } from './tx/builder/helpers';
 export {

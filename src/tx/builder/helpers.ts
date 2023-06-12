@@ -134,13 +134,23 @@ export function readInt(buf: Buffer = Buffer.from([])): string {
 }
 
 /**
+ * Ensure that name is valid AENS name, would throw an exception otherwise
+ * @category AENS
+ * @param name - AENS name
+ */
+export function ensureName(maybeName: string): asserts maybeName is AensName {
+  nameToPunycode(maybeName);
+}
+
+/**
  * Is AENS name valid
  * @category AENS
  * @param name - AENS name
  */
+// TODO: consider renaming to isName
 export function isNameValid(maybeName: string): maybeName is AensName {
   try {
-    nameToPunycode(maybeName);
+    ensureName(maybeName);
     return true;
   } catch (error) {
     return false;
