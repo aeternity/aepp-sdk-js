@@ -1,6 +1,8 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { ensureName, ArgumentError } from '../../src';
+import {
+  ensureName, ArgumentError, isAuctionName, computeAuctionEndBlock,
+} from '../../src';
 import { nameToPunycode } from '../../src/tx/builder/helpers';
 
 const tests = [{
@@ -292,6 +294,42 @@ describe('AENS utils', () => {
     it('fails if name too long', () => {
       expect(() => ensureName('ldiDxa1Yxy1iiTRztYEN4F8nrnfZib3Q1MllPghmst8fjJ1sI3DXzOoAddE2ETxp.chain'))
         .to.throw(ArgumentError, 'aens name should be not too long, got ldiDxa1Yxy1iiTRztYEN4F8nrnfZib3Q1MllPghmst8fjJ1sI3DXzOoAddE2ETxp.chain instead');
+    });
+  });
+
+  describe('isAuctionName', () => {
+    it('checks non-auction name', () => {
+      expect(isAuctionName('1234567890123.chain')).to.be.equal(false);
+    });
+
+    it('checks auction name', () => {
+      expect(isAuctionName('123456789012.chain')).to.be.equal(true);
+    });
+
+    it('checks non-auction unicode name', () => {
+      expect(isAuctionName('æ23456.chain')).to.be.equal(false);
+    });
+
+    it('checks auction unicode name', () => {
+      expect(isAuctionName('æ2345.chain')).to.be.equal(true);
+    });
+  });
+
+  describe('computeAuctionEndBlock', () => {
+    it('computes for longest auction', () => {
+      expect(computeAuctionEndBlock('123456789012.chain', 1)).to.be.equal(481);
+    });
+
+    it('computes for shortest auction', () => {
+      expect(computeAuctionEndBlock('1.chain', 1)).to.be.equal(29761);
+    });
+
+    it('computes for longest unicode auction', () => {
+      expect(computeAuctionEndBlock('æ2345.chain', 1)).to.be.equal(481);
+    });
+
+    it('computes for shortest unicode auction', () => {
+      expect(computeAuctionEndBlock('æ.chain', 1)).to.be.equal(14881);
     });
   });
 });

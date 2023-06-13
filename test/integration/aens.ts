@@ -1,9 +1,9 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
-import { assertNotNull, randomName } from '../utils';
+import { assertNotNull, randomName, randomString } from '../utils';
 import {
-  AeSdk, generateKeyPair, buildContractId, computeAuctionEndBlock, computeBidFee,
+  AeSdk, generateKeyPair, buildContractId, computeBidFee, ensureName, produceNameId,
   AensPointerContextError, UnexpectedTsError, encode, decode, Encoding, ContractMethodsBase,
 } from '../../src';
 import { pause } from '../../src/utils/other';
@@ -16,13 +16,61 @@ describe('Aens', () => {
     aeSdk = await getSdk(2);
   });
 
-  it('claims names', async () => {
+  it('claims a name', async () => {
     const preclaim = await aeSdk.aensPreclaim(name);
     expect(preclaim.commitmentId).to.satisfy((s: string) => s.startsWith('cm_'));
 
     const claimed = await preclaim.claim();
     expect(claimed.id).to.be.a('string');
     expect(claimed.ttl).to.be.an('number');
+  });
+
+  it('claims a unicode name', async () => {
+    const n = `испытаниЕ-æpP-${randomString(4)}.chain`;
+    ensureName(n);
+    const preclaim = await aeSdk.aensPreclaim(n);
+    const claimed = await preclaim.claim();
+
+    expect(claimed.ttl).to.be.a('number');
+    expect(claimed.update).to.be.a('function');
+    expect(claimed.transfer).to.be.a('function');
+    expect(claimed.revoke).to.be.a('function');
+    expect(claimed.extendTtl).to.be.a('function');
+    assertNotNull(claimed.tx);
+    assertNotNull(claimed.signatures);
+    expect(claimed).to.be.eql({
+      tx: {
+        fee: 16960000000000n,
+        nonce: claimed.tx.nonce,
+        accountId: aeSdk.address,
+        name: n,
+        nameSalt: claimed.tx.nameSalt,
+        nameFee: 300000000000000n,
+        version: 2,
+        type: 'NameClaimTx',
+      },
+      blockHeight: claimed.blockHeight,
+      blockHash: claimed.blockHash,
+      hash: claimed.hash,
+      signatures: [claimed.signatures[0]],
+      rawTx: claimed.rawTx,
+      id: produceNameId(n),
+      owner: aeSdk.address,
+      ttl: claimed.ttl,
+      pointers: [],
+      update: claimed.update,
+      transfer: claimed.transfer,
+      revoke: claimed.revoke,
+      extendTtl: claimed.extendTtl,
+    });
+
+    const queried = await aeSdk.api.getNameEntryByName(n);
+    expect(queried).to.eql({
+      id: produceNameId(n),
+      owner: aeSdk.address,
+      ttl: claimed.ttl,
+      pointers: [],
+    });
   });
 
   it('queries names', async () => {
@@ -152,7 +200,7 @@ describe('Aens', () => {
   });
 
   describe('name auctions', () => {
-    it('claims names', async () => {
+    it('claims a name', async () => {
       const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
       const nameShort = randomName(12);
 
@@ -168,10 +216,18 @@ describe('Aens', () => {
       bid.should.be.an('object');
 
       await expect(aeSdk.getName(nameShort)).to.be.rejectedWith('error: Name not found');
+    });
 
-      if (bid.blockHeight == null) throw new UnexpectedTsError();
-      const auctionEndBlock = computeAuctionEndBlock(nameShort, bid.blockHeight);
-      console.log(`BID STARTED AT ${bid.blockHeight} WILL END AT ${auctionEndBlock}`);
+    it('claims a unicode name', async () => {
+      const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
+      const nameShort = `æ${randomString(4)}.chain`;
+      ensureName(nameShort);
+
+      const preclaim = await aeSdk.aensPreclaim(nameShort);
+      await preclaim.claim();
+      await aeSdk.aensBid(nameShort, computeBidFee(nameShort), { onAccount });
+
+      await expect(aeSdk.getName(nameShort)).to.be.rejectedWith('error: Name not found');
     });
   });
 });

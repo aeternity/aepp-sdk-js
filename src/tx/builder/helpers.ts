@@ -99,7 +99,7 @@ export function nameToPunycode(maybeName: string): AensName {
  * @returns `nm_` prefixed encoded AENS name
  */
 export function produceNameId(name: AensName): Encoded.Name {
-  return encode(hash(name.toLowerCase()), Encoding.Name);
+  return encode(hash(nameToPunycode(name)), Encoding.Name);
 }
 
 /**
@@ -116,7 +116,7 @@ export function commitmentHash(
 ): Encoded.Commitment {
   return encode(
     hash(concatBuffers([
-      Buffer.from(name.toLowerCase()),
+      Buffer.from(nameToPunycode(name)),
       Buffer.from(salt.toString(16).padStart(64, '0'), 'hex'),
     ])),
     Encoding.Commitment,
@@ -190,7 +190,7 @@ export function getDefaultPointerKey(
  * @returns the minimum fee for the AENS name auction
  */
 export function getMinimumNameFee(name: AensName): BigNumber {
-  const nameLength = name.length - AENS_SUFFIX.length;
+  const nameLength = nameToPunycode(name).length - AENS_SUFFIX.length;
   return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)];
 }
 
@@ -226,7 +226,7 @@ export function computeBidFee(
  * @returns Auction end height
  */
 export function computeAuctionEndBlock(name: AensName, claimHeight: number): number {
-  const length = name.length - AENS_SUFFIX.length;
+  const length = nameToPunycode(name).length - AENS_SUFFIX.length;
   const h = (length <= 4 ? 62 * NAME_BID_TIMEOUT_BLOCKS : null)
     ?? (length <= 8 ? 31 * NAME_BID_TIMEOUT_BLOCKS : null)
     ?? (length <= 12 ? NAME_BID_TIMEOUT_BLOCKS : null)
@@ -239,5 +239,5 @@ export function computeAuctionEndBlock(name: AensName, claimHeight: number): num
  * @category AENS
  */
 export function isAuctionName(name: AensName): boolean {
-  return name.length < 13 + AENS_SUFFIX.length;
+  return nameToPunycode(name).length < 13 + AENS_SUFFIX.length;
 }

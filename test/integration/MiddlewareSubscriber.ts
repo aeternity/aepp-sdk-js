@@ -112,7 +112,8 @@ describe('MiddlewareSubscriber', () => {
     return response.json();
   }
 
-  it('subscribes for new transactions', async () => {
+  // TODO: enable after solving https://github.com/aeternity/ae_mdw/issues/1336
+  it.skip('subscribes for new transactions', async () => {
     const [{ hash }, transaction] = await Promise.all([
       aeSdk.spend(1, account.address),
       new Promise((resolve, reject) => {

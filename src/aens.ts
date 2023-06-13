@@ -379,7 +379,7 @@ interface AensPreclaimOptions extends
  * @example
  * ```js
  * const name = 'test.chain'
- * const bidFee = computeBidFee(name, startFee, incrementPercentage)
+ * const bidFee = computeBidFee(name, { startFee, increment: 0.42 })
  *
  * await sdkInstance.aensBid(name, 213109412839123, { ttl, fee, nonce })
  * ```
