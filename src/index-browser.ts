@@ -22,7 +22,7 @@ export {
 export {
   MAX_AUTH_FUN_GAS, NAME_TTL, NAME_MAX_TTL, NAME_MAX_CLIENT_TTL, CLIENT_TTL, MIN_GAS_PRICE,
   NAME_FEE_MULTIPLIER, NAME_FEE_BID_INCREMENT, NAME_BID_TIMEOUT_BLOCKS, NAME_MAX_LENGTH_FEE,
-  NAME_BID_MAX_LENGTH, NAME_BID_RANGES, ConsensusProtocolVersion, VmVersion, AbiVersion, Tag,
+  NAME_BID_RANGES, ConsensusProtocolVersion, VmVersion, AbiVersion, Tag,
 } from './tx/builder/constants';
 export type { Int, AensName } from './tx/builder/constants';
 // TODO: move to constants
@@ -108,4 +108,4 @@ export {
   TagNotFoundError, TxNotInChainError, AlreadyConnectedError, NoWalletConnectedError,
   RpcConnectionError,
 } from './utils/errors';
-export { RpcBroadcastError } from './deprecated';
+export { RpcBroadcastError, NAME_BID_MAX_LENGTH } from './deprecated';
