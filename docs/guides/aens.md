@@ -1,9 +1,9 @@
 # AENS (æternity naming system)
 
 ## Introduction
-This guide shows you how to perform all the operations that you need within the lifecycle of [æternity naming system (AENS)](https://docs.aeternity.com/protocol/AENS.html) using the SDK.
+This guide shows you how to perform all the operations that you need within the lifecycle of [æternity naming system (AENS)](https://docs.aeternity.com/protocol/AENS/) using the SDK.
 
-If you successfully claimed a name it will expire after 180000 keyblocks (~375 days). You will need to update your name before it expires!
+If you successfully claimed a name it will expire after 180000 key blocks (~375 days). You will need to update your name before it expires!
 
 ## 1. Claim a name
 Claiming an AENS name requires you (at least) 2 transactions:
@@ -36,7 +36,7 @@ console.log(preClaimTx)
   tx: {
     accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
     commitmentId: 'cm_2igvW9egddKh77gDdE8mjotmL8PzE7Tf2Q639Q5stUqWQoEfap',
-    fee: 16620000000000,
+    fee: 16620000000000n,
     nonce: 18,
     type: 'NamePreclaimTx',
     version: 1
@@ -52,10 +52,10 @@ console.log(preClaimTx)
 
 Note:
 
-- After transaction is included, you have `300` keyblocks to broadcast `claim` transaction with
+- After transaction is included, you have `300` key blocks to broadcast `claim` transaction with
 the same `salt` and it should be signed with the same private key as `pre-claim`.
-    - As the `pre-claim` is required to avoid front running it is recommended to wait with the actual `claim` until at least 1 keyblock has been mined so that nobody knows which name you aim to claim.
-    - The corresponding `claim` cannot be included in the same keyblock anyway. The protocol doesn't allow that.
+    - As the `pre-claim` is required to avoid front running it is recommended to wait with the actual `claim` until at least 1 key block has been mined so that nobody knows which name you aim to claim.
+    - The corresponding `claim` cannot be included in the same key block anyway. The protocol doesn't allow that.
 - You should check if the name is still available before performing a `pre-claim`. The protocol itself doesn't reject a `pre-claim` transaction if the name isn't available anymore.
 - As you can see above in the logs the result (`preClaimTx`) of the `aensPreclaim` has bound a `claim` function that you can make use of to perform the actual claim.
     - In case you want to perform the actual claim at a later point you should remember the `salt` that has been used for the `pre-claim`
@@ -63,9 +63,9 @@ the same `salt` and it should be signed with the same private key as `pre-claim`
 ### Claim
 This example assumes that you perform the actual `claim` manually by having remembered the required `salt`. In most cases you'd probably use the `claim` function that is bound to the result of the `aensPreclaim` function directly (see above).
 
-Depending on the length of the name the actual `claim` will result in direct ownership of the AENS name or start an auction:
+Depending on the length of the name in punycode the actual `claim` will result in direct ownership of the AENS name or start an auction:
 
-- `Name length` > 12: ownership of the name is immediately transfered to your account
+- `Name length` > 12: ownership of the name is immediately transferred to your account
 - `Name length` <= 12: an `auction` is started
 
 ```js
@@ -87,10 +87,10 @@ console.log(claimTx)
   ],
   tx: {
     accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
-    fee: 16800000000000,
+    fee: 16800000000000n,
     name: 'testNameForTheGuide.chain',
-    nameFee: '2865700000000000000',
-    nameSalt: '7595805618692717',
+    nameFee: 2865700000000000000n,
+    nameSalt: 7595805618692717,
     nonce: 19,
     type: 'NameClaimTx',
     version: 2
@@ -131,7 +131,7 @@ const increment = 0.05 // 5%, the minimum required increment
 // startFee is OPTIONAL and defaults to minimum calculated fee for the name in general
 // startFee MUST be at least the nameFee of the last bid
 // increment is OPTIONAL and defaults to 0.05
-const nameFee = computeBidFee(name, startFee, increment)
+const nameFee = computeBidFee(name, { startFee, increment })
 const bidTx = await aeSdk.aensBid(name, nameFee)
 
 console.log(bidTx)
@@ -147,9 +147,9 @@ console.log(`BID PLACED AT ${bidTx.blockHeight} WILL END AT ${computeAuctionEndB
   ],
   tx: {
     accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
-    fee: 16520000000000,
+    fee: 16520000000000n,
     name: 'auctiontest1.chain',
-    nameFee: '3159434250000000000',
+    nameFee: 3159434250000000000n,
     nameSalt: 0,
     nonce: 24,
     type: 'NameClaimTx',
@@ -172,7 +172,7 @@ Now that you own your AENS name you might want to update it in order to:
 
 - Set pointers to `accounts`, `oracles`, `contracts` or `channels`.
 - Extend the TTL before it expires.
-    - By default a name will have a TTL of 180000 keyblocks (~375 days). It cannot be extended longer than 180000 keyblocks.
+    - By default a name will have a TTL of 180000 key blocks (~375 days). It cannot be extended longer than 180000 key blocks.
 
 ### Set pointers & update TTL
 ```js
@@ -208,7 +208,7 @@ console.log(nameUpdateTx)
   tx: {
     accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
     clientTtl: 84600,
-    fee: 17800000000000,
+    fee: 17800000000000n,
     nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',
     nameTtl: 180000,
     nonce: 27,
@@ -264,7 +264,7 @@ console.log(nameUpdateTx)
   tx: {
     accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
     clientTtl: 100000,
-    fee: 17800000000000,
+    fee: 17800000000000n,
     nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',
     nameTtl: 100000,
     nonce: 28,
@@ -308,7 +308,7 @@ console.log(nameTransferTx)
   ],
   tx: {
     accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
-    fee: 17300000000000,
+    fee: 17300000000000n,
     nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',
     nonce: 33,
     recipientId: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
@@ -356,7 +356,7 @@ console.log(nameRevokeTx)
 Note:
 
 - On revocation the name enters in a `revoked` state.
-- After a timeout of `2016` keyblocks the name will be available for claiming again.
+- After a timeout of `2016` key blocks the name will be available for claiming again.
 
 ## Delegate signature to contract (AENS interface)
 It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the [AENS interface](https://docs.aeternity.com/aesophia/latest/sophia_features/#aens-interface) and perform AENS related actions on behalf of your account.

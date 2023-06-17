@@ -23,7 +23,7 @@ import { buildTxHash } from './tx/builder';
  * @category chain
  */
 export function _getPollInterval(
-  type: 'block' | 'microblock',
+  type: 'block' | 'microblock', // TODO: rename to 'key-block' | 'micro-block'
   { _expectedMineRate = 180000, _microBlockCycle = 3000, _maxPollInterval = 5000 }:
   { _expectedMineRate?: number; _microBlockCycle?: number; _maxPollInterval?: number },
 ): number {

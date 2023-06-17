@@ -59,6 +59,39 @@ export function oracleQueryId(
   return encode(b2bHash, Encoding.OracleQueryId);
 }
 
+const AENS_SUFFIX = '.chain';
+
+export function nameToPunycode(maybeName: string): AensName {
+  const [name, suffix, ...other] = maybeName.split('.');
+  if (other.length !== 0) throw new ArgumentError('aens name', 'including only one dot', maybeName);
+  if (suffix !== AENS_SUFFIX.slice(1)) {
+    throw new ArgumentError('aens name', `suffixed with ${AENS_SUFFIX}`, maybeName);
+  }
+  if (/\p{Emoji_Presentation}/u.test(name)) {
+    throw new ArgumentError('aens name', 'not containing emoji', maybeName);
+  }
+  let punycode;
+  try {
+    const u = new URL(`http://${name}.${suffix}`);
+    if (u.username + u.password + u.port + u.search + u.hash !== '' || u.pathname !== '/') {
+      throw new ArgumentError('aens name', 'valid', maybeName);
+    }
+    punycode = u.host;
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('Invalid URL')) {
+      throw new ArgumentError('aens name', 'valid', maybeName);
+    }
+    throw error;
+  }
+  if (!/^[a-z0-9.-]+$/i.test(punycode)) {
+    throw new ArgumentError('aens name', 'without illegal chars', maybeName);
+  }
+  if (punycode.length > 63 + AENS_SUFFIX.length) {
+    throw new ArgumentError('aens name', 'not too long', maybeName);
+  }
+  return punycode as AensName;
+}
+
 /**
  * Encode an AENS name
  * @category AENS
@@ -66,7 +99,7 @@ export function oracleQueryId(
  * @returns `nm_` prefixed encoded AENS name
  */
 export function produceNameId(name: AensName): Encoded.Name {
-  return encode(hash(name.toLowerCase()), Encoding.Name);
+  return encode(hash(nameToPunycode(name)), Encoding.Name);
 }
 
 /**
@@ -83,7 +116,7 @@ export function commitmentHash(
 ): Encoded.Commitment {
   return encode(
     hash(concatBuffers([
-      Buffer.from(name.toLowerCase()),
+      Buffer.from(nameToPunycode(name)),
       Buffer.from(salt.toString(16).padStart(64, '0'), 'hex'),
     ])),
     Encoding.Commitment,
@@ -100,16 +133,28 @@ export function readInt(buf: Buffer = Buffer.from([])): string {
   return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10);
 }
 
-const AENS_SUFFIX = '.chain';
+/**
+ * Ensure that name is valid AENS name, would throw an exception otherwise
+ * @category AENS
+ * @param name - AENS name
+ */
+export function ensureName(maybeName: string): asserts maybeName is AensName {
+  nameToPunycode(maybeName);
+}
 
 /**
  * Is AENS name valid
  * @category AENS
  * @param name - AENS name
  */
-export function isNameValid(name: string): name is AensName {
-  // TODO: probably there are stronger requirements
-  return name.endsWith(AENS_SUFFIX);
+// TODO: consider renaming to isName
+export function isNameValid(maybeName: string): maybeName is AensName {
+  try {
+    ensureName(maybeName);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 const encodingToPointerKey = [
@@ -145,7 +190,7 @@ export function getDefaultPointerKey(
  * @returns the minimum fee for the AENS name auction
  */
 export function getMinimumNameFee(name: AensName): BigNumber {
-  const nameLength = name.length - AENS_SUFFIX.length;
+  const nameLength = nameToPunycode(name).length - AENS_SUFFIX.length;
   return NAME_BID_RANGES[Math.min(nameLength, NAME_MAX_LENGTH_FEE)];
 }
 
@@ -181,7 +226,7 @@ export function computeBidFee(
  * @returns Auction end height
  */
 export function computeAuctionEndBlock(name: AensName, claimHeight: number): number {
-  const length = name.length - AENS_SUFFIX.length;
+  const length = nameToPunycode(name).length - AENS_SUFFIX.length;
   const h = (length <= 4 ? 62 * NAME_BID_TIMEOUT_BLOCKS : null)
     ?? (length <= 8 ? 31 * NAME_BID_TIMEOUT_BLOCKS : null)
     ?? (length <= 12 ? NAME_BID_TIMEOUT_BLOCKS : null)
@@ -194,5 +239,5 @@ export function computeAuctionEndBlock(name: AensName, claimHeight: number): num
  * @category AENS
  */
 export function isAuctionName(name: AensName): boolean {
-  return name.length < 13 + AENS_SUFFIX.length;
+  return nameToPunycode(name).length < 13 + AENS_SUFFIX.length;
 }
