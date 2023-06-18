@@ -44,6 +44,9 @@ export {
   encode, decode, Encoding, Encoded,
 } from './utils/encoder';
 export {
+  encodeFateValue, decodeFateValue, hashTypedData, hashDomain, hashJson,
+} from './utils/typed-data';
+export {
   aensRevoke, aensUpdate, aensTransfer, aensQuery, aensClaim, aensPreclaim, aensBid,
 } from './aens';
 export { default as Contract } from './contract/Contract';

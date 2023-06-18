@@ -168,6 +168,14 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
 
+  async signTypedData(
+    data: Encoded.ContractBytearray,
+    aci: Parameters<AccountBase['signTypedData']>[1],
+    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTypedData']>[2] = {},
+  ): Promise<Encoded.Signature> {
+    return this._resolveAccount(onAccount).signTypedData(data, aci, options);
+  }
+
   override _getOptions(callOptions: AeSdkMethodsOptions = {}): {
     onNode: Node;
     onAccount: AccountBase;

@@ -40,6 +40,11 @@ export default class AccountLedger extends AccountBase {
     throw new NotImplementedError('RAW signing using Ledger HW');
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  override async signTypedData(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('Typed data signing using Ledger HW');
+  }
+
   override async signTransaction(
     tx: Encoded.Transaction,
     { innerTx, networkId }: { innerTx?: boolean; networkId?: string } = {},
