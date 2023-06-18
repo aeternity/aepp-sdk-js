@@ -52,8 +52,21 @@ export default class AccountRpc extends AccountBase {
     return Buffer.from(signature, 'hex');
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  override async signTypedData(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('Typed data signing using wallet');
+  override async signTypedData(
+    data: Encoded.ContractBytearray,
+    aci: Parameters<AccountBase['signTypedData']>[1],
+    {
+      name, version, contractAddress, networkId,
+    }: Parameters<AccountBase['signTypedData']>[2] = {},
+  ): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(METHODS.signTypedData, {
+      onAccount: this.address,
+      domain: {
+        name, version, networkId, contractAddress,
+      },
+      aci,
+      data,
+    });
+    return signature;
   }
 }

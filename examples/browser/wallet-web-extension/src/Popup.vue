@@ -23,7 +23,6 @@
 
 <script>
 import browser from 'webextension-polyfill';
-import { unpackTx } from '@aeternity/aepp-sdk';
 
 export default {
   data: () => ({
@@ -37,7 +36,6 @@ export default {
     const data = new URL(location).searchParams.get('data');
     if (data != null) {
       const { aeppOrigin, action, popupId, ...params } = JSON.parse(data);
-      if (params.transaction) params.unpackedTx = unpackTx(params.transaction);
       this.aeppOrigin = aeppOrigin;
       this.action = action;
       this.popupId = popupId;
