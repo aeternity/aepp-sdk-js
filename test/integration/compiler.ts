@@ -12,16 +12,11 @@ function testCompiler(compiler: CompilerBase): void {
   let inclSourceCode: string;
   let inclFileSystem: Record<string, string>;
   const inclBytecode = 'cb_+QEGRgOg7BH1sCv+p2IrS0Pn3/i6AfE8lOGUuC71lLPn6mbUm9PAuNm4cv4AWolkAjcCBwcHFBQAAgD+RNZEHwA3ADcAGg6CPwEDP/5Nt4A5AjcCBwcHDAECDAEABAMRAFqJZP6SiyA2ADcBBwcMAwgMAQAEAxFNt4A5/pSgnxIANwF3BwwBAAQDEarAwob+qsDChgI3AXcHPgQAALhgLwYRAFqJZD0uU3VibGlicmFyeS5zdW0RRNZEHxFpbml0EU23gDkxLkxpYnJhcnkuc3VtEZKLIDYRdGVzdBGUoJ8SJWdldExlbmd0aBGqwMKGOS5TdHJpbmcubGVuZ3Rogi8AhTcuMS4wAGHgFTw=';
-  // TODO: use Includes.aes after fixing https://github.com/aeternity/aesophia_cli/issues/74
-  const incSourceCodePath = './test/integration/contracts/Increment.aes';
-  let incSourceCode: string;
-  const incBytecode = 'cb_+G1GA6Cln3BxyOo1iNITGseMS58ZfBbRNB0x8Ix7Bh54qZlSOcC4QKD+Er1R0wA3AQcHFDQAAgD+RNZEHwA3ADcAGg6CPwEDP5svAhESvVHTJWluY3JlbWVudBFE1kQfEWluaXSCLwCFNy4wLjEAfImpuQ==';
   const testBytecode = 'cb_+GhGA6BgYgXqYB9ctBcQ8mJ0+we5OXhb9PpsSQWP2DhPx9obn8C4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBd3cBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTcuMC4xAMXqWXc=';
 
   before(async () => {
     inclSourceCode = await readFile(inclSourceCodePath, 'utf8');
     inclFileSystem = await getFileSystem(inclSourceCodePath);
-    incSourceCode = await readFile(incSourceCodePath, 'utf8');
   });
 
   it('returns version', async () => {
@@ -60,20 +55,19 @@ function testCompiler(compiler: CompilerBase): void {
   });
 
   it('validates bytecode by path', async () => {
-    expect(await compiler.validate(incBytecode, incSourceCodePath))
-      .to.be.equal(true);
-    expect(await compiler.validate(testBytecode, incSourceCodePath)).to.be.equal(false);
+    expect(await compiler.validate(inclBytecode, inclSourceCodePath)).to.be.equal(true);
+    expect(await compiler.validate(testBytecode, inclSourceCodePath)).to.be.equal(false);
     const invalidBytecode = `${testBytecode}test` as Encoded.ContractBytearray;
-    expect(await compiler.validate(invalidBytecode, incSourceCodePath))
-      .to.be.equal(false);
+    expect(await compiler.validate(invalidBytecode, inclSourceCodePath)).to.be.equal(false);
   });
 
   it('validates bytecode by source code', async () => {
-    expect(await compiler.validateBySourceCode(incBytecode, incSourceCode))
+    expect(await compiler.validateBySourceCode(inclBytecode, inclSourceCode, inclFileSystem))
       .to.be.equal(true);
-    expect(await compiler.validateBySourceCode(testBytecode, incSourceCode)).to.be.equal(false);
+    expect(await compiler.validateBySourceCode(testBytecode, inclSourceCode, inclFileSystem))
+      .to.be.equal(false);
     const invalidBytecode = `${testBytecode}test` as Encoded.ContractBytearray;
-    expect(await compiler.validateBySourceCode(invalidBytecode, incSourceCode))
+    expect(await compiler.validateBySourceCode(invalidBytecode, inclSourceCode, inclFileSystem))
       .to.be.equal(false);
   });
 }
