@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { readFile } from 'fs/promises';
 import { compilerUrl, ignoreVersion } from '.';
+import inclAci from './contracts/Includes.json';
 import {
   CompilerBase, CompilerHttpNode, CompilerCli, CompilerError, getFileSystem, Encoded,
 } from '../../src';
@@ -30,15 +31,13 @@ function testCompiler(compiler: CompilerBase): void {
   it('compiles and generates aci by path', async () => {
     const { bytecode, aci } = await compiler.compile(inclSourceCodePath);
     expect(bytecode).to.equal(inclBytecode);
-    expect(aci).to.have.length(6);
-    expect(aci[aci.length - 1]).to.have.property('contract');
+    expect(aci).to.eql(inclAci);
   });
 
   it('compiles and generates aci by source code', async () => {
     const { bytecode, aci } = await compiler.compileBySourceCode(inclSourceCode, inclFileSystem);
     expect(bytecode).to.equal(inclBytecode);
-    expect(aci).to.have.length(6);
-    expect(aci[aci.length - 1]).to.have.property('contract');
+    expect(aci).to.eql(inclAci);
   });
 
   it('throws clear exception if compile broken contract', async () => {
