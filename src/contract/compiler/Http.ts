@@ -70,7 +70,7 @@ export default class CompilerHttp extends CompilerBase {
       return res as { bytecode: Encoded.ContractBytearray; aci: Aci };
     } catch (error) {
       if (error instanceof RestError && error.statusCode === 400) {
-        throw new CompilerError(error.message.replace(/^aci error:/, 'compile error:'));
+        throw new CompilerError(error.message);
       }
       throw error;
     }
