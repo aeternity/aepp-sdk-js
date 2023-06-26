@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env npx ts-node
 import {
   Node, AeSdk, MemoryAccount, CompilerHttp,
 } from '../..';

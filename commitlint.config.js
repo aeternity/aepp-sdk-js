@@ -13,6 +13,7 @@ module.exports = {
         'compiler',
         'contract',
         'middleware',
+        'docs', // TODO: remove after releasing 13.1.0
         'deps',
         'deps-dev',
         'node',

@@ -53,7 +53,7 @@ console.log(`Balance of ${recipient} (before): ${balanceBefore} aettos`);
 // Calling the `spend` function will create, sign and broadcast a `SpendTx` to the network.
 const tx = await aeSdk.spend(amount, recipient);
 console.log('Transaction mined', tx);
-// Alternatively, you can use [transferFunds](https://docs.aeternity.com/aepp-sdk-js/v13.0.1/api/functions/transferFunds.html)
+// Alternatively, you can use [transferFunds](https://docs.aeternity.com/aepp-sdk-js/v13.1.0/api/functions/transferFunds.html)
 // method to transfer a fraction of your AE to another account.
 
 // ## 6. Get AE balance of recipient (after transfer)

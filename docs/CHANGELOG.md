@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.0.1...v13.1.0) (2023-07-07)
+
+
+### Features
+
+* **account:** support signing typed data ([e5acdd4](https://github.com/aeternity/aepp-sdk-js/commit/e5acdd44e056cd60638088d74753f912809e63d2))
+* **aens:** add `ensureName` helper to check names ([f1322b1](https://github.com/aeternity/aepp-sdk-js/commit/f1322b13ab99860719ca47dda8e277ece6f7823c))
+* **aens:** support unicode names claim ([f837e90](https://github.com/aeternity/aepp-sdk-js/commit/f837e9081b0ac7eefa942f31e3056b00bd3768eb))
+* **aepp,wallet:** support inner transaction signing ([725782b](https://github.com/aeternity/aepp-sdk-js/commit/725782b8d84ac426d3a192d40de8e1e155e370bc))
+* **aepp,wallet:** support signing typed data ([78ce3b2](https://github.com/aeternity/aepp-sdk-js/commit/78ce3b259377a719dbf7ada7bf3b744e630f0dac))
+* **compiler:** add `generateAci`, `generateAciBySourceCode` ([981bcf2](https://github.com/aeternity/aepp-sdk-js/commit/981bcf252432a3b96aca92ccd682214c124009e2))
+* **middleware:** generate autorest wrapper ([bd08a08](https://github.com/aeternity/aepp-sdk-js/commit/bd08a087509bb47acf49cd015d5d7016b544094e))
+* **middleware:** implement MiddlewareSubscriber ([b51b0a3](https://github.com/aeternity/aepp-sdk-js/commit/b51b0a3ffb7258f3ed1f25395b95811f39ba0cc7))
+
+
+### Bug Fixes
+
+* `onAccount` option in AeSdkMethods ([290758b](https://github.com/aeternity/aepp-sdk-js/commit/290758b1884dc36209194bc6bd760c6063f9edd3))
+* **aens:** more accurate name check in `isNameValid` ([b62dcc6](https://github.com/aeternity/aepp-sdk-js/commit/b62dcc655f086cdf28611837e1ed3de2bae09d37))
+* **aepp:** call `onDetected` always with `newWallet` ([80d97fa](https://github.com/aeternity/aepp-sdk-js/commit/80d97fa4b3d2c3fd5fb710c2bdaae10ab521f129))
+* **contract:** use fallback account if `onAccount` not provided ([9033cd7](https://github.com/aeternity/aepp-sdk-js/commit/9033cd799be5974ebf28a49df181eeb63b1fce84))
+* converting proxied options to JSON ([efebbd1](https://github.com/aeternity/aepp-sdk-js/commit/efebbd139ea85c35e28bdcfe907670743f9fc1f4))
+* provide types in exports field of package.json ([dbd19e7](https://github.com/aeternity/aepp-sdk-js/commit/dbd19e70bca2d6dbc5b2392db478bb98936b63f2))
+* reject prefixes other then provided in isAddressValid ([9462add](https://github.com/aeternity/aepp-sdk-js/commit/9462adde8fab9848fca0a6d9a382dbd34f5e2b8f))
+* **tx-builder:** `buildTx` produces the same type as `unpackTx` accepts ([d3d6c88](https://github.com/aeternity/aepp-sdk-js/commit/d3d6c88607abbfb74acf016fba886540938b216d))
+* **tx-builder:** decode tag in entry error message ([db0d96f](https://github.com/aeternity/aepp-sdk-js/commit/db0d96f156f3e8cfe52c6a7d7411c359f6dae35c))
+* **wallet:** emit internal error if something broke while broadcast ([332d1b5](https://github.com/aeternity/aepp-sdk-js/commit/332d1b567f69bf6b7d3567af43fb805556ac015b))
+* **wallet:** throw reason of internal error to handle it in wallet ([276699b](https://github.com/aeternity/aepp-sdk-js/commit/276699ba22539f75591754d2e2c3c503d528fdf4))
+
 ### [13.0.1](https://github.com/aeternity/aepp-sdk-js/compare/v13.0.0...v13.0.1) (2023-04-24)
 
 
