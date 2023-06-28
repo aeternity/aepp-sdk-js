@@ -269,6 +269,14 @@ describe('Contract instance', () => {
     expect(res.tx.fee).to.be.equal('182000000000000');
   });
 
+  it('calls with fallback account if onAccount is not provided', async () => {
+    const account = testContract.$options.onAccount;
+    delete testContract.$options.onAccount;
+    const res = await testContract.intFn(2);
+    expect(res.decodedResult).to.be.equal(2n);
+    testContract.$options.onAccount = account;
+  });
+
   it('calls on chain', async () => {
     const res = await testContract.intFn(2, { callStatic: false });
     expect(res.decodedResult).to.be.equal(2n);
