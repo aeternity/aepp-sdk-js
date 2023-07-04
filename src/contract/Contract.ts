@@ -324,6 +324,7 @@ class Contract<M extends ContractMethodsBase> {
       const useFallbackAccount = callStatic === true && (
         (error instanceof TypeError && error.message === 'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead')
         || (error instanceof NoWalletConnectedError)
+        || (error instanceof InternalError && error.message === 'Use fallback account')
       );
       if (!useFallbackAccount) throw error;
       callerId = DRY_RUN_ACCOUNT.pub;
