@@ -1278,8 +1278,8 @@
 
 <h1 id="aens-ternity-naming-system">AENS (æternity naming system)</h1>
 <h2 id="introduction">Introduction</h2>
-<p>This guide shows you how to perform all the operations that you need within the lifecycle of <a href="https://docs.aeternity.com/protocol/AENS.html">æternity naming system (AENS)</a> using the SDK.</p>
-<p>If you successfully claimed a name it will expire after 180000 keyblocks (~375 days). You will need to update your name before it expires!</p>
+<p>This guide shows you how to perform all the operations that you need within the lifecycle of <a href="https://docs.aeternity.com/protocol/AENS/">æternity naming system (AENS)</a> using the SDK.</p>
+<p>If you successfully claimed a name it will expire after 180000 key blocks (~375 days). You will need to update your name before it expires!</p>
 <h2 id="1-claim-a-name">1. Claim a name</h2>
 <p>Claiming an AENS name requires you (at least) 2 transactions:</p>
 <ul>
@@ -1314,7 +1314,7 @@
 <span class="cm">  tx: {</span>
 <span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
 <span class="cm">    commitmentId: &#39;cm_2igvW9egddKh77gDdE8mjotmL8PzE7Tf2Q639Q5stUqWQoEfap&#39;,</span>
-<span class="cm">    fee: 16620000000000,</span>
+<span class="cm">    fee: 16620000000000n,</span>
 <span class="cm">    nonce: 18,</span>
 <span class="cm">    type: &#39;NamePreclaimTx&#39;,</span>
 <span class="cm">    version: 1</span>
@@ -1329,10 +1329,10 @@
 </code></pre></div>
 <p>Note:</p>
 <ul>
-<li>After transaction is included, you have <code>300</code> keyblocks to broadcast <code>claim</code> transaction with
+<li>After transaction is included, you have <code>300</code> key blocks to broadcast <code>claim</code> transaction with
 the same <code>salt</code> and it should be signed with the same private key as <code>pre-claim</code>.<ul>
-<li>As the <code>pre-claim</code> is required to avoid front running it is recommended to wait with the actual <code>claim</code> until at least 1 keyblock has been mined so that nobody knows which name you aim to claim.</li>
-<li>The corresponding <code>claim</code> cannot be included in the same keyblock anyway. The protocol doesn't allow that.</li>
+<li>As the <code>pre-claim</code> is required to avoid front running it is recommended to wait with the actual <code>claim</code> until at least 1 key block has been mined so that nobody knows which name you aim to claim.</li>
+<li>The corresponding <code>claim</code> cannot be included in the same key block anyway. The protocol doesn't allow that.</li>
 </ul>
 </li>
 <li>You should check if the name is still available before performing a <code>pre-claim</code>. The protocol itself doesn't reject a <code>pre-claim</code> transaction if the name isn't available anymore.</li>
@@ -1343,9 +1343,9 @@ the same <code>salt</code> and it should be signed with the same private key as 
 </ul>
 <h3 id="claim">Claim</h3>
 <p>This example assumes that you perform the actual <code>claim</code> manually by having remembered the required <code>salt</code>. In most cases you'd probably use the <code>claim</code> function that is bound to the result of the <code>aensPreclaim</code> function directly (see above).</p>
-<p>Depending on the length of the name the actual <code>claim</code> will result in direct ownership of the AENS name or start an auction:</p>
+<p>Depending on the length of the name in punycode the actual <code>claim</code> will result in direct ownership of the AENS name or start an auction:</p>
 <ul>
-<li><code>Name length</code> &gt; 12: ownership of the name is immediately transfered to your account</li>
+<li><code>Name length</code> &gt; 12: ownership of the name is immediately transferred to your account</li>
 <li><code>Name length</code> &lt;= 12: an <code>auction</code> is started</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">salt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">7595805618692717</span><span class="w"> </span><span class="c1">// salt from pre-claim transaction</span>
@@ -1366,10 +1366,10 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
 <span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
-<span class="cm">    fee: 16800000000000,</span>
+<span class="cm">    fee: 16800000000000n,</span>
 <span class="cm">    name: &#39;testNameForTheGuide.chain&#39;,</span>
-<span class="cm">    nameFee: &#39;2865700000000000000&#39;,</span>
-<span class="cm">    nameSalt: &#39;7595805618692717&#39;,</span>
+<span class="cm">    nameFee: 2865700000000000000n,</span>
+<span class="cm">    nameSalt: 7595805618692717,</span>
 <span class="cm">    nonce: 19,</span>
 <span class="cm">    type: &#39;NameClaimTx&#39;,</span>
 <span class="cm">    version: 2</span>
@@ -1413,7 +1413,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="c1">// startFee is OPTIONAL and defaults to minimum calculated fee for the name in general</span>
 <span class="c1">// startFee MUST be at least the nameFee of the last bid</span>
 <span class="c1">// increment is OPTIONAL and defaults to 0.05</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">nameFee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">computeBidFee</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">startFee</span><span class="p">,</span><span class="w"> </span><span class="nx">increment</span><span class="p">)</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">nameFee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">computeBidFee</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">startFee</span><span class="p">,</span><span class="w"> </span><span class="nx">increment</span><span class="w"> </span><span class="p">})</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">bidTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">aensBid</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">nameFee</span><span class="p">)</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bidTx</span><span class="p">)</span>
@@ -1429,9 +1429,9 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
 <span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
-<span class="cm">    fee: 16520000000000,</span>
+<span class="cm">    fee: 16520000000000n,</span>
 <span class="cm">    name: &#39;auctiontest1.chain&#39;,</span>
-<span class="cm">    nameFee: &#39;3159434250000000000&#39;,</span>
+<span class="cm">    nameFee: 3159434250000000000n,</span>
 <span class="cm">    nameSalt: 0,</span>
 <span class="cm">    nonce: 24,</span>
 <span class="cm">    type: &#39;NameClaimTx&#39;,</span>
@@ -1455,7 +1455,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <ul>
 <li>Set pointers to <code>accounts</code>, <code>oracles</code>, <code>contracts</code> or <code>channels</code>.</li>
 <li>Extend the TTL before it expires.<ul>
-<li>By default a name will have a TTL of 180000 keyblocks (~375 days). It cannot be extended longer than 180000 keyblocks.</li>
+<li>By default a name will have a TTL of 180000 key blocks (~375 days). It cannot be extended longer than 180000 key blocks.</li>
 </ul>
 </li>
 </ul>
@@ -1492,7 +1492,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="cm">  tx: {</span>
 <span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
 <span class="cm">    clientTtl: 84600,</span>
-<span class="cm">    fee: 17800000000000,</span>
+<span class="cm">    fee: 17800000000000n,</span>
 <span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
 <span class="cm">    nameTtl: 180000,</span>
 <span class="cm">    nonce: 27,</span>
@@ -1545,7 +1545,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="cm">  tx: {</span>
 <span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
 <span class="cm">    clientTtl: 100000,</span>
-<span class="cm">    fee: 17800000000000,</span>
+<span class="cm">    fee: 17800000000000n,</span>
 <span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
 <span class="cm">    nameTtl: 100000,</span>
 <span class="cm">    nonce: 28,</span>
@@ -1588,7 +1588,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
 <span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
-<span class="cm">    fee: 17300000000000,</span>
+<span class="cm">    fee: 17300000000000n,</span>
 <span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
 <span class="cm">    nonce: 33,</span>
 <span class="cm">    recipientId: &#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;,</span>
@@ -1633,7 +1633,7 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <p>Note:</p>
 <ul>
 <li>On revocation the name enters in a <code>revoked</code> state.</li>
-<li>After a timeout of <code>2016</code> keyblocks the name will be available for claiming again.</li>
+<li>After a timeout of <code>2016</code> key blocks the name will be available for claiming again.</li>
 </ul>
 <h2 id="delegate-signature-to-contract-aens-interface">Delegate signature to contract (AENS interface)</h2>
 <p>It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the <a href="https://docs.aeternity.com/aesophia/latest/sophia_features/#aens-interface">AENS interface</a> and perform AENS related actions on behalf of your account.</p>
