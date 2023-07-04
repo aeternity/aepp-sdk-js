@@ -7,7 +7,7 @@ import ContractByteArrayEncoder from '@aeternity/aepp-calldata/src/ContractByteA
 import AciTypeResolver from '@aeternity/aepp-calldata/src/AciTypeResolver.js';
 import canonicalize from 'canonicalize';
 import { Encoded, decode } from './encoder';
-import { hash } from './crypto';
+import { hash, messagePrefixLength } from './crypto';
 import { concatBuffers } from './other';
 
 /**
@@ -89,5 +89,7 @@ export function hashTypedData(
   aci: AciValue,
   domain: Domain,
 ): Buffer {
-  return hash(concatBuffers([hashDomain(domain), hashJson(aci), hash(decode(data))]));
+  return hash(concatBuffers([
+    messagePrefixLength, new Uint8Array([0]), hashDomain(domain), hashJson(aci), hash(decode(data)),
+  ]));
 }

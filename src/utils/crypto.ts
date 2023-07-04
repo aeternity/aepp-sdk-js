@@ -157,11 +157,13 @@ export function verify(
   return nacl.sign.detached.verify(data, signature, decode(address));
 }
 
+const messagePrefix = Buffer.from('aeternity Signed Message:\n', 'utf8');
+export const messagePrefixLength = varuintEncode(messagePrefix.length);
+
 // TODO: consider rename to hashMessage
 export function messageToHash(message: string): Buffer {
-  const p = Buffer.from('aeternity Signed Message:\n', 'utf8');
   const msg = Buffer.from(message, 'utf8');
-  return hash(concatBuffers([varuintEncode(p.length), p, varuintEncode(msg.length), msg]));
+  return hash(concatBuffers([messagePrefixLength, messagePrefix, varuintEncode(msg.length), msg]));
 }
 
 export function signMessage(message: string, privateKey: string | Buffer): Uint8Array {

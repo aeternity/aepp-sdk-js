@@ -71,12 +71,12 @@ describe('typed data', () => {
   describe('hashTypedData', () => {
     it('hashes int', async () => {
       const hash = hashTypedData(plainData, plainAci, domain);
-      expect(hash.toString('base64')).to.be.equal('dx3qpMQlMMijJAWfbecuoqsKDESjXZ0XoOfy7WIpRO0=');
+      expect(hash.toString('base64')).to.be.equal('XoUMXvMeNlw9taOVS+QTUlMNP0LUV/4wYX9dEuX/S+E=');
     });
 
     it('hashes record', async () => {
       const hash = hashTypedData(recordData, recordAci, domain);
-      expect(hash.toString('base64')).to.be.equal('WagBbUVTNJ+q/PUYUJbOno+pNM5Z1XNvdIZ4cLjiTwU=');
+      expect(hash.toString('base64')).to.be.equal('Rl4vsrwkDaEu6FXUHf4WMmIBESYJLGijJSLWyIrNPsg=');
     });
   });
 
@@ -120,7 +120,8 @@ describe('typed data', () => {
           + '\n  entrypoint hashTypedData(parameter: int): hash ='
           + `\n    let typeHash = Crypto.blake2b("${typeJson}")`
           + '\n    let dataHash = Crypto.blake2b(getTypedData(parameter))'
-          + '\n    Crypto.blake2b(Bytes.concat(getDomainHash(), Bytes.concat(typeHash, dataHash)))'
+          + '\n    let payload = Bytes.concat(getDomainHash(), Bytes.concat(typeHash, dataHash))'
+          + '\n    Crypto.blake2b(Bytes.concat(#1a00, payload))'
           + '\n'
           + '\n  entrypoint verify(parameter: int, pub: address, sig: signature): bool ='
           + '\n    require(parameter > 40 && parameter < 50, "Invalid parameter")'
