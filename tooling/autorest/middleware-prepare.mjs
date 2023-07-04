@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { spawnSync } from 'child_process';
 
 const run = (getOutput, command, ...args) => {
@@ -10,7 +12,8 @@ const run = (getOutput, command, ...args) => {
   return stdout?.toString().trim();
 };
 
-const id = run(true, 'docker', 'create', 'aeternity/ae_mdw:1.51.0');
-const openapi = '/home/aeternity/node/lib/ae_mdw-1.51.0/priv/static/swagger/swagger_v2.yaml';
+const version = '1.52.0';
+const id = run(true, 'docker', 'create', `aeternity/ae_mdw:${version}`);
+const openapi = `/home/aeternity/node/lib/ae_mdw-${version}/priv/static/swagger/swagger_v2.yaml`;
 run(false, 'docker', 'cp', `${id}:${openapi}`, './tooling/autorest/middleware-openapi.yaml');
 run(false, 'docker', 'rm', '-v', id);

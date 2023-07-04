@@ -19,19 +19,7 @@ directive:
     reason: >
       Schema violation: must NOT have additional properties (paths > /aex141 > get > parameters > 2)
       additionalProperty: type
-      https://github.com/aeternity/ae_mdw/issues/1421
-
-  - from: openapi-document
-    where: $.paths.*.get.responses[?(@.schema)]
-    transform: >
-      if ($.content) throw new Error('Defined both schema and content');
-      $.content = { 'application/json': { schema: $.schema } };
-      delete $.schema;
-    reason: >
-      Schema violation: must NOT have additional properties
-      (paths > /aex141/{id} > get > responses > 400)
-      additionalProperty: schema
-      https://github.com/aeternity/ae_mdw/pull/1422
+      https://github.com/aeternity/ae_mdw/issues/1428
 
   - from: openapi-document
     where: $.components.schemas.Activity.properties.payload.oneOf
@@ -47,21 +35,6 @@ directive:
     reason: >
       Error: modelProperties cannot be null or undefined in the mapper
       https://github.com/Azure/autorest/issues/4118
-
-  - from: openapi-document
-    where: $.components.schemas.PaginatedResponse
-    transform: $.required = ['next', 'prev'];
-    reason: >
-      Required is missed on PaginatedResponse
-      https://github.com/aeternity/ae_mdw/pull/1426
-
-  - from: openapi-document
-    where: $.components.schemas
-    transform: "['NameClaimEvent'].forEach((name) => $[name].type = 'object')"
-    reason: >
-      The schema 'Activity' with an undefined type and declared properties is a bit ambiguous.
-      This has been auto-corrected to 'type:object'
-      https://github.com/aeternity/ae_mdw/pull/1424
 
   - from: openapi-document
     where: $.paths.*.get.responses.200.content.application/json.schema.allOf^
@@ -102,13 +75,15 @@ directive:
       https://github.com/aeternity/ae_mdw/issues/1357
 
   - from: openapi-document
-    where: $.components.schemas.Status.properties
+    where: $.paths./aex9/account-balances/{account_id}.get.responses.200.content.application/json.allOf^
     transform: >
-      if ($doc.info.title === 'middleware') return $;
-      $.mdw_tx_index = { type: 'integer' };
+      $.schema = { allOf: $.allOf };
+      delete $.allOf;
     reason: >
-      `mdw_tx_index` missed in definition of '/status' endpoint
-      https://github.com/aeternity/ae_mdw/pull/1427
+      Schema violation: must NOT have additional properties (paths >
+      /v2/aex9/account-balances/{account_id} > get > responses > 200 > content > application/json)
+      additionalProperty: allOf
+      https://github.com/aeternity/ae_mdw/pull/1437
 
   - from: openapi-document
     where: $.servers
