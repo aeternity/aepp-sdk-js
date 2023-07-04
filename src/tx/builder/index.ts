@@ -23,6 +23,9 @@ export function getSchema(tag: Tag, version?: number): Array<[string, Field]> {
   return Object.entries(schema);
 }
 
+type TxEncoding = Encoding.Transaction | Encoding.Poi | Encoding.StateTrees
+| Encoding.CallStateTree;
+
 /**
  * Build transaction hash
  * @category transaction builder
@@ -31,15 +34,9 @@ export function getSchema(tag: Tag, version?: number): Array<[string, Field]> {
  * @param options.prefix - Prefix of transaction
  * @returns object Base64Check transaction hash with 'tx_' prefix
  */
-export function buildTx<
-  E extends Encoding = Encoding.Transaction,
->(
+export function buildTx<E extends TxEncoding = Encoding.Transaction>(
   params: TxParams,
-  {
-    prefix,
-  }: {
-    prefix?: E;
-  } = {},
+  { prefix }: { prefix?: E } = {},
 ): Encoded.Generic<E> {
   const schema = getSchema(params.tag, params.version);
 
@@ -92,7 +89,7 @@ export async function buildTxAsync(params: TxParamsAsync): Promise<Encoded.Trans
  * @returns Object with transaction param's
  */
 export function unpackTx<TxType extends Tag>(
-  encodedTx: Encoded.Transaction | Encoded.Poi | Encoded.StateTrees | Encoded.CallStateTree,
+  encodedTx: Encoded.Generic<TxEncoding>,
   txType?: TxType,
 ): TxUnpacked & { tag: TxType } {
   const binary = rlpDecode(decode(encodedTx));

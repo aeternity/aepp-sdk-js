@@ -17,7 +17,7 @@ describe('MiddlewareSubscriber', () => {
       },
       mdwGensPerMinute: res.mdwGensPerMinute,
       mdwHeight: res.mdwHeight,
-      mdwLastMigration: 20230519120000,
+      mdwLastMigration: res.mdwLastMigration,
       mdwRevision: res.mdwRevision,
       mdwSynced: true,
       mdwSyncing: true,
