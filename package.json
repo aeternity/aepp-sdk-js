@@ -29,10 +29,14 @@
   },
   "exports": {
     "node": {
+      "types@<4.5": "./types-legacy/ts4.2/index.d.ts",
+      "types@<4.7": "./types-legacy/ts4.5/index.d.ts",
       "types": "./es/index.d.ts",
       "import": "./es/index.mjs",
       "default": "./dist/aepp-sdk.js"
     },
+    "types@<4.5": "./types-legacy/ts4.2/index-browser.d.ts",
+    "types@<4.7": "./types-legacy/ts4.5/index-browser.d.ts",
     "types": "./es/index-browser.d.ts",
     "import": "./es/index-browser.mjs",
     "default": "./dist/aepp-sdk.browser.js"
