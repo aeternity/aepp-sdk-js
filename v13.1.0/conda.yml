@@ -1,0 +1,6 @@
+dependencies:
+  - python=3.11.*
+  - nodejs=18.*
+  - pip
+  - pip:
+    - -r file:requirements.txt
