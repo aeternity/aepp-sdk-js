@@ -23,7 +23,7 @@
   <iframe
     v-if="!runningInFrame"
     ref="aepp"
-    src="http://localhost:9001"
+    :src="aeppUrl"
   />
 </template>
 
@@ -31,20 +31,19 @@
 import {
   MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE,
-  RpcConnectionDenyError, RpcRejectedByUserError,
+  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, decodeFateValue,
 } from '@aeternity/aepp-sdk';
 import Value from './Value.vue';
 
 export default {
   components: { Value },
-  data() {
-    return {
-      runningInFrame: window.parent !== window,
-      nodeName: '',
-      address: '',
-      balancePromise: null,
-    };
-  },
+  data: () => ({
+    aeppUrl: process.env.VUE_APP_AEPP_URL ?? 'http://localhost:9001',
+    runningInFrame: window.parent !== window,
+    nodeName: '',
+    address: '',
+    balancePromise: null,
+  }),
   methods: {
     async shareWalletInfo(clientId, { interval = 5000, attemps = 5 } = {}) {
       this.aeSdk.shareWalletInfo(clientId);
@@ -79,7 +78,7 @@ export default {
     const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
       if (!confirm([
         `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}`,
-        JSON.stringify(parameters, null, 2),
+        Value.methods.valueToString(parameters),
       ].join('\n'))) {
         throw new RpcRejectedByUserError();
       }
@@ -88,7 +87,10 @@ export default {
     class AccountMemoryProtected extends MemoryAccount {
       async signTransaction(tx, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
         if (id != null) {
-          genConfirmCallback(`sign transaction ${tx}`)(id, options, aeppOrigin);
+          const opt = { ...options, unpackedTx: unpackTx(tx) };
+          if (opt.onCompiler) opt.onCompiler = '<Compiler>';
+          if (opt.onNode) opt.onNode = '<Node>';
+          genConfirmCallback(`sign transaction ${tx}`)(id, opt, aeppOrigin);
         }
         return super.signTransaction(tx, options);
       }
@@ -98,6 +100,14 @@ export default {
           genConfirmCallback(`sign message ${message}`)(id, options, aeppOrigin);
         }
         return super.signMessage(message, options);
+      }
+
+      async signTypedData(data, aci, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+        if (id != null) {
+          const opt = { ...options, aci, decodedData: decodeFateValue(data, aci) };
+          genConfirmCallback(`sign typed data ${data}`)(id, opt, aeppOrigin);
+        }
+        return super.signTypedData(data, aci, options);
       }
 
       static generate() {
@@ -118,7 +128,7 @@ export default {
         new AccountMemoryProtected('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'),
         AccountMemoryProtected.generate(),
       ],
-      onCompiler: new CompilerHttp('https://v7.compiler.stg.aepps.com'),
+      onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
       name: 'Wallet Iframe',
       onConnection: (aeppId, params, origin) => {
         if (!confirm(`Client ${params.name} with id ${aeppId} at ${origin} want to connect`)) {

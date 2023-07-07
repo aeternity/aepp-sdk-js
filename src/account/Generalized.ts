@@ -38,6 +38,11 @@ export default class AccountGeneralized extends AccountBase {
     throw new NotImplementedError('Can\'t sign using generalized account');
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  override async signTypedData(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('Can\'t sign using generalized account');
+  }
+
   override async signTransaction(
     tx: Encoded.Transaction,
     { authData, onCompiler, onNode }: Parameters<AccountBase['signTransaction']>[1],

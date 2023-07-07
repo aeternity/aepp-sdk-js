@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import { expect } from 'chai';
 import { AensName } from '../src';
 
-function randomString(len: number): string {
+export function randomString(len: number): string {
   const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let string = '';
   for (let i = 0; i < len; i += 1) {

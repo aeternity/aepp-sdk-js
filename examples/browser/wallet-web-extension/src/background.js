@@ -1,15 +1,23 @@
 import browser from 'webextension-polyfill';
 import {
   AeSdkWallet, CompilerHttp, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection,
-  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError,
+  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, decodeFateValue,
 } from '@aeternity/aepp-sdk';
+
+function stringifyBigint(value) {
+  return JSON.stringify(
+    value,
+    (k, v) => (typeof v === 'bigint' ? `${v} (as BigInt)` : v),
+    2,
+  );
+}
 
 let popupCounter = 0;
 async function confirmInPopup(parameters) {
   const popupUrl = new URL(browser.runtime.getURL('./popup.html'));
   const popupId = popupCounter;
   popupCounter += 1;
-  popupUrl.searchParams.set('data', JSON.stringify({ ...parameters, popupId }));
+  popupUrl.searchParams.set('data', stringifyBigint({ ...parameters, popupId }));
   await browser.windows.create({
     url: popupUrl.toString(),
     type: 'popup',
@@ -42,7 +50,10 @@ const genConfirmCallback = (action) => async (aeppId, parameters, aeppOrigin) =>
 class AccountMemoryProtected extends MemoryAccount {
   async signTransaction(transaction, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
-      await genConfirmCallback('sign transaction')(id, { ...options, transaction }, aeppOrigin);
+      const opt = { ...options, transaction, unpackedTx: unpackTx(transaction) };
+      if (opt.onCompiler) opt.onCompiler = '<Compiler>';
+      if (opt.onNode) opt.onNode = '<Node>';
+      await genConfirmCallback('sign transaction')(id, opt, aeppOrigin);
     }
     return super.signTransaction(transaction, options);
   }
@@ -54,6 +65,16 @@ class AccountMemoryProtected extends MemoryAccount {
     return super.signMessage(message, options);
   }
 
+  async signTypedData(data, aci, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+    if (id != null) {
+      const opt = {
+        ...options, aci, data, decodedData: decodeFateValue(data, aci),
+      };
+      await genConfirmCallback('sign typed data')(id, opt, aeppOrigin);
+    }
+    return super.signTypedData(data, aci, options);
+  }
+
   static generate() {
     // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
     return new AccountMemoryProtected(generateKeyPair().secretKey);
@@ -61,7 +82,7 @@ class AccountMemoryProtected extends MemoryAccount {
 }
 
 const aeSdk = new AeSdkWallet({
-  onCompiler: new CompilerHttp('https://v7.compiler.stg.aepps.com'),
+  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
   nodes: [{
     name: 'testnet',
     instance: new Node('https://testnet.aeternity.io'),

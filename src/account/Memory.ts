@@ -7,6 +7,7 @@ import {
   decode, encode, Encoded, Encoding,
 } from '../utils/encoder';
 import { concatBuffers } from '../utils/other';
+import { hashTypedData, AciValue } from '../utils/typed-data';
 import { buildTx } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
 
@@ -73,5 +74,19 @@ export default class AccountMemory extends AccountBase {
 
   override async signMessage(message: string, options?: any): Promise<Uint8Array> {
     return this.sign(messageToHash(message), options);
+  }
+
+  override async signTypedData(
+    data: Encoded.ContractBytearray,
+    aci: AciValue,
+    {
+      name, version, networkId, contractAddress, ...options
+    }: Parameters<AccountBase['signTypedData']>[2] = {},
+  ): Promise<Encoded.Signature> {
+    const dHash = hashTypedData(data, aci, {
+      name, version, networkId, contractAddress,
+    });
+    const signature = await this.sign(dHash, options);
+    return encode(signature, Encoding.Signature);
   }
 }

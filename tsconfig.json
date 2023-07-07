@@ -9,21 +9,21 @@
     "emitDeclarationOnly": true,
     "isolatedModules": true,
     "outDir": "./es",
-    "noImplicitAny": true,
     "noImplicitOverride": true,
-    "module": "es2020",
-    "target": "es2020",
-    "lib": ["es2020", "dom"],
+    "module": "es2022",
+    "target": "es2022",
+    "lib": ["es2022", "dom"],
     "moduleResolution": "node",
     "preserveConstEnums": true,
     "declaration": true,
     "downlevelIteration": true,
-    "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "./node_modules/@types",
       "./src/typings"
-    ]
+    ],
+    "strict": true,
+    "strictFunctionTypes": false, // see https://github.com/aeternity/aepp-sdk-js/issues/1793
   },
   "include": [
     "src/**/*"

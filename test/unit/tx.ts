@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { encode as rlpEncode } from 'rlp';
 import BigNumber from 'bignumber.js';
-import { checkOnlyTypes, randomName } from '../utils';
+import { checkOnlyTypes, ensureEqual, randomName } from '../utils';
 import {
   genSalt,
   decode, encode, Encoding, Encoded,
@@ -215,7 +215,7 @@ describe('Tx', () => {
         Tag.SignedTx,
       );
       expect(signatures).to.have.lengthOf(2);
-      if (encodedTx.tag !== Tag.ChannelOffChainTx) throw new Error('Unexpected nested transaction');
+      ensureEqual<Tag.ChannelOffChainTx>(encodedTx.tag, Tag.ChannelOffChainTx);
       expect(encodedTx.channelId).to.be.satisfy((s: string) => s.startsWith('ch_'));
       expect(encodedTx.round).to.be.equal(3);
       expect(encodedTx.stateHash).to.be.satisfy((s: string) => s.startsWith('st_'));

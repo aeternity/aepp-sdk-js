@@ -55,7 +55,7 @@ export default class CompilerHttp extends CompilerBase {
       const versionPromise = this.api.apiVersion()
         .then(({ apiVersion }) => apiVersion, (error) => error);
       this.api.pipeline.addPolicy(
-        genVersionCheckPolicy('compiler', '/api-version', versionPromise, '7.1.1', '8.0.0'),
+        genVersionCheckPolicy('compiler', '/api-version', versionPromise, '7.3.0', '8.0.0'),
       );
     }
   }
@@ -70,7 +70,7 @@ export default class CompilerHttp extends CompilerBase {
       return res as { bytecode: Encoded.ContractBytearray; aci: Aci };
     } catch (error) {
       if (error instanceof RestError && error.statusCode === 400) {
-        throw new CompilerError(error.message.replace(/^aci error:/, 'compile error:'));
+        throw new CompilerError(error.message);
       }
       throw error;
     }
@@ -78,6 +78,25 @@ export default class CompilerHttp extends CompilerBase {
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
   async compile(path: string): Promise<{ bytecode: Encoded.ContractBytearray; aci: Aci }> {
+    throw new NotImplementedError('File system access, use CompilerHttpNode instead');
+  }
+
+  async generateAciBySourceCode(
+    sourceCode: string,
+    fileSystem?: Record<string, string>,
+  ): Promise<Aci> {
+    try {
+      return await this.api.generateACI({ code: sourceCode, options: { fileSystem } });
+    } catch (error) {
+      if (error instanceof RestError && error.statusCode === 400) {
+        throw new CompilerError(error.message);
+      }
+      throw error;
+    }
+  }
+
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
+  async generateAci(path: string): Promise<Aci> {
     throw new NotImplementedError('File system access, use CompilerHttpNode instead');
   }
 

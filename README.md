@@ -1,6 +1,8 @@
 # [æternity](https://aeternity.com)'s JavaScript SDK
 
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/aeternity/aepp-sdk-js.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/aeternity/aepp-sdk-js/context:javascript)
+[![main action](https://github.com/aeternity/aepp-sdk-js/actions/workflows/main.yml/badge.svg)](https://github.com/aeternity/aepp-sdk-js/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/aeternity/aepp-sdk-js/branch/develop/graph/badge.svg?token=wON6gOciRP)](https://codecov.io/gh/aeternity/aepp-sdk-js)
+[![docs](https://github.com/aeternity/aepp-sdk-js/actions/workflows/docs-develop.yml/badge.svg)](https://github.com/aeternity/aepp-sdk-js/actions/workflows/docs-develop.yml)
 [![npm](https://img.shields.io/npm/v/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
 [![npm](https://img.shields.io/npm/l/@aeternity/aepp-sdk.svg)](https://www.npmjs.com/package/@aeternity/aepp-sdk)
 
@@ -50,7 +52,7 @@ We keep our [Changelog](docs/CHANGELOG.md) up to date.
 ## License
 
 ISC License (ISC)
-Copyright © 2018 æternity developers
+Copyright © 2023 æternity developers
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

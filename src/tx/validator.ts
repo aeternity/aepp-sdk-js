@@ -1,3 +1,4 @@
+import { RestError } from '@azure/core-rest-pipeline';
 import { hash, verify } from '../utils/crypto';
 import { TxUnpacked } from './builder/schema.generated';
 import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version';
@@ -143,6 +144,7 @@ validators.push(
     return [{ message, key: 'InvalidAccountType', checkedKeys: ['tag'] }];
   },
   // TODO: revert nonce check
+  // TODO: ensure nonce valid when paying for own tx
   (tx, { consensusProtocolVersion }) => {
     const oracleCall = Tag.Oracle === tx.tag || Tag.OracleRegisterTx === tx.tag;
     const contractCreate = Tag.ContractCreateTx === tx.tag || Tag.GaAttachTx === tx.tag;
@@ -183,9 +185,9 @@ validators.push(
         checkedKeys: ['contractId'],
       }];
     } catch (error) {
-      if (error.response?.parsedBody?.reason == null) throw error;
+      if (!(error instanceof RestError) || error.response?.bodyAsText == null) throw error;
       return [{
-        message: error.response.parsedBody.reason,
+        message: JSON.parse(error.response.bodyAsText).reason, // TODO: use parsedBody instead
         key: 'ContractNotFound',
         checkedKeys: ['contractId'],
       }];

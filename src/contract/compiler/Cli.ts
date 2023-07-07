@@ -7,6 +7,7 @@ import CompilerBase, { Aci } from './Base';
 import { Encoded } from '../../utils/encoder';
 import { CompilerError, InternalError, UnsupportedVersionError } from '../../utils/errors';
 import semverSatisfies from '../../utils/semver-satisfies';
+import { ensureError } from '../../utils/other';
 
 const getPackagePath = (): string => {
   const path = dirname(fileURLToPath(import.meta.url));
@@ -22,7 +23,7 @@ const getPackagePath = (): string => {
 export default class CompilerCli extends CompilerBase {
   #path: string;
 
-  #ensureCompatibleVersion: Promise<void>;
+  #ensureCompatibleVersion = Promise.resolve();
 
   constructor(
     compilerPath = resolve(getPackagePath(), './bin/aesophia_cli'),
@@ -32,7 +33,7 @@ export default class CompilerCli extends CompilerBase {
     this.#path = compilerPath;
     if (ignoreVersion !== true) {
       this.#ensureCompatibleVersion = this.version().then((version) => {
-        const versions = [version, '7.0.1', '8.0.0'] as const;
+        const versions = [version, '7.2.1', '8.0.0'] as const;
         if (!semverSatisfies(...versions)) throw new UnsupportedVersionError('compiler', ...versions);
       });
     }
@@ -78,9 +79,10 @@ export default class CompilerCli extends CompilerBase {
       ]);
       return {
         bytecode: bytecode.trimEnd() as Encoded.ContractBytearray,
-        aci: aci as Aci,
+        aci,
       };
     } catch (error) {
+      ensureError(error);
       throw new CompilerError(error.message);
     }
   }
@@ -92,6 +94,28 @@ export default class CompilerCli extends CompilerBase {
     const tmp = await CompilerCli.#saveContractToTmpDir(sourceCode, fileSystem);
     try {
       return await this.compile(tmp);
+    } finally {
+      await rm(dirname(tmp), { recursive: true });
+    }
+  }
+
+  async generateAci(path: string): Promise<Aci> {
+    await this.#ensureCompatibleVersion;
+    try {
+      return JSON.parse(await this.#run('--no_code', '--create_json_aci', path));
+    } catch (error) {
+      ensureError(error);
+      throw new CompilerError(error.message);
+    }
+  }
+
+  async generateAciBySourceCode(
+    sourceCode: string,
+    fileSystem?: Record<string, string>,
+  ): Promise<Aci> {
+    const tmp = await CompilerCli.#saveContractToTmpDir(sourceCode, fileSystem);
+    try {
+      return await this.generateAci(tmp);
     } finally {
       await rm(dirname(tmp), { recursive: true });
     }

@@ -3,10 +3,7 @@
 
   <Connect />
 
-  <div
-    v-if="aeSdk"
-    class="nav"
-  >
+  <div class="nav">
     <a
       href="#"
       :class="{ active: view === 'Basic' }"
@@ -21,10 +18,24 @@
     >
       Smart contracts
     </a>
+    <a
+      href="#"
+      :class="{ active: view === 'PayForTx' }"
+      @click="view = 'PayForTx'"
+    >
+      Pay for transaction
+    </a>
+    <a
+      href="#"
+      :class="{ active: view === 'TypedData' }"
+      @click="view = 'TypedData'"
+    >
+      Typed data
+    </a>
   </div>
 
   <Component
-    v-if="aeSdk && view"
+    v-if="view"
     :is="view"
   />
 </template>
@@ -34,9 +45,13 @@ import { mapState } from 'vuex';
 import Connect from './Connect.vue';
 import Basic from './Basic.vue';
 import Contracts from './Contracts.vue';
+import PayForTx from './PayForTx.vue';
+import TypedData from './TypedData.vue';
 
 export default {
-  components: { Connect, Basic, Contracts },
+  components: {
+    Connect, Basic, Contracts, PayForTx, TypedData,
+  },
   data: () => ({ view: '' }),
   computed: mapState(['aeSdk']),
 };

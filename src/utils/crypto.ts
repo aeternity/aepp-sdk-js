@@ -8,6 +8,7 @@ import { concatBuffers } from './other';
 import {
   decode, encode, Encoded, Encoding,
 } from './encoder';
+import { ArgumentError } from './errors';
 
 /**
  * Generate address from secret key
@@ -32,6 +33,10 @@ export function isAddressValid(
 ): boolean {
   try {
     decode(address as Encoded.Generic<typeof prefix>);
+    const actualPrefix = address.split('_')[0];
+    if (actualPrefix !== prefix) {
+      throw new ArgumentError('Encoded string type', prefix, actualPrefix);
+    }
     return true;
   } catch (e) {
     return false;
@@ -152,10 +157,13 @@ export function verify(
   return nacl.sign.detached.verify(data, signature, decode(address));
 }
 
+const messagePrefix = Buffer.from('aeternity Signed Message:\n', 'utf8');
+export const messagePrefixLength = varuintEncode(messagePrefix.length);
+
+// TODO: consider rename to hashMessage
 export function messageToHash(message: string): Buffer {
-  const p = Buffer.from('aeternity Signed Message:\n', 'utf8');
   const msg = Buffer.from(message, 'utf8');
-  return hash(concatBuffers([varuintEncode(p.length), p, varuintEncode(msg.length), msg]));
+  return hash(concatBuffers([messagePrefixLength, messagePrefix, varuintEncode(msg.length), msg]));
 }
 
 export function signMessage(message: string, privateKey: string | Buffer): Uint8Array {
@@ -169,6 +177,8 @@ export function signMessage(message: string, privateKey: string | Buffer): Uint8
  * @param address - Address to verify against
  * @returns is data was signed by address
  */
+// TODO: deprecate in favour of `verify(messageToHash(message), ...`, also the name is confusing
+// it should contain "signature"
 export function verifyMessage(
   message: string,
   signature: Uint8Array,

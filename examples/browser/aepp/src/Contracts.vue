@@ -80,7 +80,7 @@
 <script>
 import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
-import Value from './Value.vue';
+import Value from './components/Value.vue';
 
 const contractSourceCode = `
 contract Multiplier =
@@ -104,7 +104,7 @@ export default {
   computed: mapState(['aeSdk']),
   methods: {
     async create() {
-      // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue-3
+      // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
       this.contract = shallowRef(
         await this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode }),
       );

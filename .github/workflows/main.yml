@@ -1,5 +1,5 @@
 name: Test & build
-on: [push, pull_request]
+on: [pull_request]
 jobs:
   main:
     runs-on: ubuntu-22.04
@@ -7,10 +7,10 @@ jobs:
       - run: |
           wget -q https://packages.erlang-solutions.com/erlang/debian/pool/esl-erlang_25.0.4-1~ubuntu~jammy_amd64.deb
           sudo apt install --allow-downgrades ./esl-erlang_25.0.4-1~ubuntu~jammy_amd64.deb
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 100
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: 18.x
       - uses: actions/cache@v3

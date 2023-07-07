@@ -13,7 +13,7 @@ In case you're not using any JS bundling/compilation technique, the SDK can also
 ```html
 <script src="https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.js"></script>
 ```
-...where `VERSION` is the version number of the SDK you want to use (eg. `8.1.0`).
+...where `VERSION` is the version number of the SDK you want to use (eg. `13.1.0`).
 
 ### Browser `<script>` tag
 The bundle will assign the SDK to a global variable called `Aeternity` that makes all functionalities of the SDK accessible.

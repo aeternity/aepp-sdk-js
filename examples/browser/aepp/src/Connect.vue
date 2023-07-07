@@ -58,13 +58,12 @@ export default {
     walletConnected: false,
     walletConnecting: null,
     reverseIframe: null,
-    reverseIframeWalletUrl: 'http://localhost:9000',
+    reverseIframeWalletUrl: process.env.VUE_APP_WALLET_URL ?? 'http://localhost:9000',
     walletInfo: null,
   }),
   computed: {
     ...mapState(['aeSdk']),
     walletName() {
-      if (!this.aeSdk) return 'SDK is not ready';
       if (!this.walletConnected) return 'Wallet is not connected';
       return this.walletInfo.name;
     },
@@ -113,7 +112,6 @@ export default {
       await this.aeSdk.disconnectWallet();
       this.walletConnected = false;
       if (this.reverseIframe) this.reverseIframe.remove();
-      this.$emit('aeSdk', null);
     },
   },
 };

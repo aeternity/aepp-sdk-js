@@ -36,6 +36,7 @@ export const enum METHODS {
   connect = 'connection.open',
   sign = 'transaction.sign',
   signMessage = 'message.sign',
+  signTypedData = 'typedData.sign',
   subscribeAddress = 'address.subscribe',
   updateNetwork = 'networkId.update',
   closeConnection = 'connection.close',
@@ -64,7 +65,7 @@ const rpcErrors: Array<(new (data?: any) => RpcError) & { code: number }> = [];
 export abstract class RpcError extends BaseError {
   static code: number;
 
-  code: number;
+  code!: number;
 
   data?: any;
 
@@ -98,22 +99,6 @@ export class RpcInvalidTransactionError extends RpcError {
   }
 }
 rpcErrors.push(RpcInvalidTransactionError);
-
-/**
- * @category exception
- */
-export class RpcBroadcastError extends RpcError {
-  static override code = 3;
-
-  override code = 3;
-
-  constructor(data?: any) {
-    super('Broadcast failed');
-    this.data = data;
-    this.name = 'RpcBroadcastError';
-  }
-}
-rpcErrors.push(RpcBroadcastError);
 
 /**
  * @category exception

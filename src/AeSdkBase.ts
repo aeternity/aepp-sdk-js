@@ -1,9 +1,11 @@
 import Node from './Node';
 import AccountBase from './account/Base';
-import { CompilerError, DuplicateNodeError, NodeNotFoundError } from './utils/errors';
+import {
+  CompilerError, DuplicateNodeError, NodeNotFoundError, NotImplementedError, TypeError,
+} from './utils/errors';
 import { Encoded } from './utils/encoder';
 import CompilerBase from './contract/compiler/Base';
-import AeSdkMethods, { OnAccount, getValueOrErrorProxy } from './AeSdkMethods';
+import AeSdkMethods, { OnAccount, getValueOrErrorProxy, AeSdkMethodsOptions } from './AeSdkMethods';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 
@@ -23,7 +25,7 @@ export default class AeSdkBase extends AeSdkMethods {
    * @param options.nodes - Array of nodes
    */
   constructor(
-    { nodes = [], ...options }: ConstructorParameters<typeof AeSdkMethods>[0] & {
+    { nodes = [], ...options }: AeSdkMethodsOptions & {
       nodes?: Array<{ name: string; instance: Node }>;
     } = {},
   ) {
@@ -127,6 +129,19 @@ export default class AeSdkBase extends AeSdkMethods {
     return [];
   }
 
+  /**
+   * Resolves an account
+   * @param account - ak-address, instance of AccountBase, or keypair
+   */
+  _resolveAccount(account: OnAccount = this._options.onAccount): AccountBase {
+    if (typeof account === 'string') throw new NotImplementedError('Address in AccountResolver');
+    if (typeof account === 'object') return account;
+    throw new TypeError(
+      'Account should be an address (ak-prefixed string), '
+      + `or instance of AccountBase, got ${String(account)} instead`,
+    );
+  }
+
   get address(): Encoded.AccountAddress {
     return this._resolveAccount().address;
   }
@@ -153,15 +168,25 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
 
-  override _getOptions(): {
+  async signTypedData(
+    data: Encoded.ContractBytearray,
+    aci: Parameters<AccountBase['signTypedData']>[1],
+    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTypedData']>[2] = {},
+  ): Promise<Encoded.Signature> {
+    return this._resolveAccount(onAccount).signTypedData(data, aci, options);
+  }
+
+  override _getOptions(callOptions: AeSdkMethodsOptions = {}): {
     onNode: Node;
     onAccount: AccountBase;
     onCompiler: CompilerBase;
   } {
     return {
-      ...super._getOptions(),
+      ...this._options,
       onNode: getValueOrErrorProxy(() => this.api),
       onCompiler: getValueOrErrorProxy(() => this.compilerApi),
+      ...callOptions,
+      onAccount: getValueOrErrorProxy(() => this._resolveAccount(callOptions.onAccount)),
     };
   }
 }

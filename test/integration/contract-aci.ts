@@ -23,6 +23,7 @@ import {
 } from '../utils';
 import { Aci } from '../../src/contract/compiler/Base';
 import { ContractCallObject } from '../../src/contract/Contract';
+import includesAci from './contracts/Includes.json';
 
 const identityContractSourceCode = `
 contract Identity =
@@ -207,23 +208,8 @@ describe('Contract instance', () => {
 
   it('compiles contract by sourceCodePath', async () => {
     const ctr = await aeSdk.initializeContract({
-      aci: [{
-        contract: {
-          functions: [{
-            arguments: [{ name: 'x', type: 'int' }],
-            name: 'increment',
-            payable: false,
-            returns: 'int',
-            stateful: false,
-          },
-          ],
-          kind: 'contract_main',
-          name: 'Increment',
-          payable: false,
-          typedefs: [],
-        },
-      }],
-      sourceCodePath: './test/integration/contracts/Increment.aes',
+      aci: includesAci,
+      sourceCodePath: './test/integration/contracts/Includes.aes',
     });
     expect(ctr.$options.bytecode).to.equal(undefined);
     expect(await ctr.$compile()).to.satisfy((b: string) => b.startsWith('cb_'));
@@ -267,6 +253,14 @@ describe('Contract instance', () => {
     expect(res.decodedResult).to.be.equal(2n);
     ensureEqual<Tag.ContractCallTx>(res.tx.tag, Tag.ContractCallTx);
     expect(res.tx.fee).to.be.equal('182000000000000');
+  });
+
+  it('calls with fallback account if onAccount is not provided', async () => {
+    const account = testContract.$options.onAccount;
+    delete testContract.$options.onAccount;
+    const res = await testContract.intFn(2);
+    expect(res.decodedResult).to.be.equal(2n);
+    testContract.$options.onAccount = account;
   });
 
   it('calls on chain', async () => {

@@ -28,20 +28,17 @@ export default class AccountRpc extends AccountBase {
     throw new NotImplementedError('RAW signing using wallet');
   }
 
-  /**
-   * @returns Signed transaction
-   */
   override async signTransaction(
     tx: Encoded.Transaction,
     { innerTx, networkId }: Parameters<AccountBase['signTransaction']>[1] = {},
   ): Promise<Encoded.Transaction> {
-    if (innerTx != null) throw new NotImplementedError('innerTx option in AccountRpc');
     if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
     const res = await this._rpcClient.request(METHODS.sign, {
       onAccount: this.address,
       tx,
       returnSigned: true,
       networkId,
+      innerTx,
     });
     if (res.signedTransaction == null) {
       throw new UnsupportedProtocolError('signedTransaction is missed in wallet response');
@@ -49,12 +46,27 @@ export default class AccountRpc extends AccountBase {
     return res.signedTransaction;
   }
 
-  /**
-   * @returns Signed message
-   */
   override async signMessage(message: string): Promise<Uint8Array> {
     const { signature } = await this._rpcClient
       .request(METHODS.signMessage, { onAccount: this.address, message });
     return Buffer.from(signature, 'hex');
+  }
+
+  override async signTypedData(
+    data: Encoded.ContractBytearray,
+    aci: Parameters<AccountBase['signTypedData']>[1],
+    {
+      name, version, contractAddress, networkId,
+    }: Parameters<AccountBase['signTypedData']>[2] = {},
+  ): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(METHODS.signTypedData, {
+      onAccount: this.address,
+      domain: {
+        name, version, networkId, contractAddress,
+      },
+      aci,
+      data,
+    });
+    return signature;
   }
 }

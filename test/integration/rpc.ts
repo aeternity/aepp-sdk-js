@@ -21,7 +21,6 @@ import {
   METHODS,
   RPC_STATUS,
   generateKeyPair,
-  hash,
   verify,
   NoWalletConnectedError,
   UnAuthorizedAccountError,
@@ -31,8 +30,9 @@ import {
   AccountBase,
   verifyMessage,
   buildTx,
+  hashTypedData,
 } from '../../src';
-import { concatBuffers } from '../../src/utils/other';
+import { getBufferToSign } from '../../src/account/Memory';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
 import {
   getSdk, ignoreVersion, networkId, url, compilerUrl,
@@ -41,24 +41,27 @@ import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types
 
 const WindowPostMessageFake = (
   name: string,
-): ImplPostMessage & { name: string; messages: any[] } => ({
-  name,
-  messages: [],
-  addEventListener(onEvent: string, listener: any) {
-    this.listener = listener;
-  },
-  removeEventListener() {
-    return () => null;
-  },
-  postMessage(source: any, msg: any) {
-    this.messages.push(msg);
-    setTimeout(() => {
-      if (typeof this.listener === 'function') {
-        this.listener({ data: msg, origin: 'http://origin.test', source });
-      }
-    });
-  },
-});
+): ImplPostMessage & { name: string; messages: any[] } => {
+  let listener: (event: any) => void;
+  return {
+    name,
+    messages: [],
+    addEventListener(onEvent: string, _listener: typeof listener) {
+      listener = _listener;
+    },
+    removeEventListener() {
+      return () => null;
+    },
+    postMessage(source: any, msg: any) {
+      this.messages.push(msg);
+      setTimeout(() => {
+        if (typeof listener === 'function') {
+          listener({ data: msg, origin: 'http://origin.test', source });
+        }
+      });
+    },
+  };
+};
 
 const getConnections = (): { walletWindow: ImplPostMessage; aeppWindow: ImplPostMessage } => {
   // @ts-expect-error workaround for tests
@@ -220,11 +223,10 @@ describe('Aepp<->Wallet', function aeppWallet() {
       Object.keys(subscriptionResponse.address.connected).length.should.be.equal(1);
     });
 
-    it('Try to use `onAccount` for not existent account', () => {
+    it('Try to use `onAccount` for not existent account', async () => {
       const { publicKey } = generateKeyPair();
-      expect(() => {
-        aepp.spend(100, publicKey, { onAccount: publicKey });
-      }).to.throw(UnAuthorizedAccountError, `You do not have access to account ${publicKey}`);
+      await expect(aepp.spend(100, publicKey, { onAccount: publicKey }))
+        .to.be.rejectedWith(UnAuthorizedAccountError, `You do not have access to account ${publicKey}`);
     });
 
     it('aepp accepts key pairs in onAccount', async () => {
@@ -298,23 +300,23 @@ describe('Aepp<->Wallet', function aeppWallet() {
         .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
     });
 
-    it('Sign transaction: wallet allow', async () => {
-      // @ts-expect-error removes object property to restore the original behavior
-      delete wallet._resolveAccount().signTransaction;
-      const tx = await aepp.buildTx({
-        tag: Tag.SpendTx,
-        senderId: aepp.address,
-        recipientId: aepp.address,
-        amount: 0,
-      });
+    [false, true].forEach((innerTx) => {
+      it(`Sign${innerTx ? ' inner' : ''} transaction`, async () => {
+        // @ts-expect-error removes object property to restore the original behavior
+        delete wallet._resolveAccount().signTransaction;
+        const tx = await aepp.buildTx({
+          tag: Tag.SpendTx,
+          senderId: aepp.address,
+          recipientId: aepp.address,
+          amount: 0,
+        });
 
-      const signedTx = await aepp.signTransaction(tx);
-      const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
-      const { signatures: [signature], encodedTx } = unpackedTx;
-      const txWithNetwork = concatBuffers([
-        Buffer.from(networkId), hash(decode(buildTx(encodedTx))),
-      ]);
-      expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
+        const signedTx = await aepp.signTransaction(tx, { innerTx });
+        const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
+        const { signatures: [signature], encodedTx } = unpackedTx;
+        const txWithNetwork = getBufferToSign(buildTx(encodedTx), networkId, innerTx);
+        expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
+      });
     });
 
     it('Try to sign using unpermited account', async () => {
@@ -354,38 +356,84 @@ describe('Aepp<->Wallet', function aeppWallet() {
       res.blockHeight.should.be.a('number');
     });
 
-    it('Sign message: rejected', async () => {
-      let origin;
-      wallet._resolveAccount().signMessage = (message, { aeppOrigin } = {}) => {
-        origin = aeppOrigin;
-        throw new RpcRejectedByUserError();
-      };
-      await expect(aepp.signMessage('test')).to.be.eventually
-        .rejectedWith('Operation rejected by user').with.property('code', 4);
-      expect(origin).to.be.equal('http://origin.test');
+    describe('Sign message', () => {
+      it('rejected by wallet', async () => {
+        let origin;
+        wallet._resolveAccount().signMessage = (message, { aeppOrigin } = {}) => {
+          origin = aeppOrigin;
+          throw new RpcRejectedByUserError();
+        };
+        await expect(aepp.signMessage('test')).to.be.eventually
+          .rejectedWith('Operation rejected by user').with.property('code', 4);
+        expect(origin).to.be.equal('http://origin.test');
+      });
+
+      it('works', async () => {
+        // @ts-expect-error removes object property to restore the original behavior
+        delete wallet._resolveAccount().signMessage;
+        const messageSig = await aepp.signMessage('test');
+        messageSig.should.be.instanceof(Buffer);
+        expect(verifyMessage('test', messageSig, aepp.address)).to.be.equal(true);
+      });
+
+      it('fails with unknown error', async () => {
+        wallet._resolveAccount().signMessage = () => {
+          throw new Error('test');
+        };
+        await expect(aepp.signMessage('test', { onAccount: account.address }))
+          .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
+      });
+
+      it('signs using specific account', async () => {
+        const onAccount = wallet.addresses()[1];
+        const messageSig = await aepp.signMessage('test', { onAccount });
+        expect(verifyMessage('test', messageSig, onAccount)).to.be.equal(true);
+      });
     });
 
-    it('Sign message', async () => {
-      // @ts-expect-error removes object property to restore the original behavior
-      delete wallet._resolveAccount().signMessage;
-      const messageSig = await aepp.signMessage('test');
-      messageSig.should.be.instanceof(Buffer);
-      expect(verifyMessage('test', messageSig, aepp.address)).to.be.equal(true);
-    });
+    describe('Sign typed data', () => {
+      const recordAci = {
+        record: [
+          { name: 'operation', type: 'string' },
+          { name: 'parameter', type: 'int' },
+        ],
+      } as const;
+      const recordData = 'cb_KxF0ZXN0VANAuWU=';
 
-    it('Sign message fails with unknown error', async () => {
-      wallet._resolveAccount().signMessage = () => {
-        throw new Error('test');
-      };
-      await expect(aepp.signMessage('test', { onAccount: account.address }))
-        .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
-    });
+      it('rejected by wallet', async () => {
+        let origin;
+        wallet._resolveAccount().signTypedData = (data, aci, { aeppOrigin } = {}) => {
+          origin = aeppOrigin;
+          throw new RpcRejectedByUserError();
+        };
+        await expect(aepp.signTypedData(recordData, recordAci)).to.be.eventually
+          .rejectedWith('Operation rejected by user').with.property('code', 4);
+        expect(origin).to.be.equal('http://origin.test');
+      });
 
-    it('Sign message using specific account', async () => {
-      const onAccount = wallet.addresses()[1];
-      const messageSig = await aepp.signMessage('test', { onAccount });
-      messageSig.should.be.instanceof(Buffer);
-      expect(verifyMessage('test', messageSig, onAccount)).to.be.equal(true);
+      it('works', async () => {
+        // @ts-expect-error removes object property to restore the original behavior
+        delete wallet._resolveAccount().signTypedData;
+        const messageSig = await aepp.signTypedData(recordData, recordAci);
+        expect(messageSig).to.satisfy((s: string) => s.startsWith('sg_'));
+        const hash = hashTypedData(recordData, recordAci, {});
+        expect(verify(hash, decode(messageSig), aepp.address)).to.be.equal(true);
+      });
+
+      it('fails with unknown error', async () => {
+        wallet._resolveAccount().signTypedData = () => {
+          throw new Error('test');
+        };
+        await expect(aepp.signTypedData(recordData, recordAci, { onAccount: account.address }))
+          .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
+      });
+
+      it('signs using specific account', async () => {
+        const onAccount = wallet.addresses()[1];
+        const messageSig = await aepp.signTypedData(recordData, recordAci, { onAccount });
+        const hash = hashTypedData(recordData, recordAci, {});
+        expect(verify(hash, decode(messageSig), onAccount)).to.be.equal(true);
+      });
     });
 
     it('Sign and broadcast invalid transaction', async () => {
@@ -404,37 +452,39 @@ describe('Aepp<->Wallet', function aeppWallet() {
         .rejectedWith('Transaction verification errors: TTL 1 is already expired, current height is');
     });
 
-    it('Add new account to wallet: receive notification for update accounts', async () => {
-      if (aepp._accounts == null) throw new UnexpectedTsError();
-      const connectedLength = Object.keys(aepp._accounts.connected).length;
-      const accountsPromise = new Promise<Accounts>((resolve) => {
-        aepp.onAddressChange = resolve;
+    describe('Subscriptions', () => {
+      it('Add new account to wallet: receive notification for update accounts', async () => {
+        if (aepp._accounts == null) throw new UnexpectedTsError();
+        const connectedLength = Object.keys(aepp._accounts.connected).length;
+        const accountsPromise = new Promise<Accounts>((resolve) => {
+          aepp.onAddressChange = resolve;
+        });
+        wallet.addAccount(MemoryAccount.generate());
+        expect(Object.keys((await accountsPromise).connected).length).to.equal(connectedLength + 1);
       });
-      wallet.addAccount(MemoryAccount.generate());
-      expect(Object.keys((await accountsPromise).connected).length).to.equal(connectedLength + 1);
-    });
 
-    it('Receive update for wallet select account', async () => {
-      if (aepp._accounts == null) throw new UnexpectedTsError();
-      const connectedAccount = Object
-        .keys(aepp._accounts.connected)[0] as Encoded.AccountAddress;
-      const accountsPromise = new Promise<Accounts>((resolve) => {
-        aepp.onAddressChange = resolve;
+      it('Receive update for wallet select account', async () => {
+        if (aepp._accounts == null) throw new UnexpectedTsError();
+        const connectedAccount = Object
+          .keys(aepp._accounts.connected)[0] as Encoded.AccountAddress;
+        const accountsPromise = new Promise<Accounts>((resolve) => {
+          aepp.onAddressChange = resolve;
+        });
+        wallet.selectAccount(connectedAccount);
+        const { connected, current } = await accountsPromise;
+        if (current == null || connected == null) throw new UnexpectedTsError();
+        expect(current[connectedAccount]).to.be.eql({});
+        expect(Object.keys(connected).includes(connectedAccount)).to.be.equal(false);
       });
-      wallet.selectAccount(connectedAccount);
-      const { connected, current } = await accountsPromise;
-      if (current == null || connected == null) throw new UnexpectedTsError();
-      expect(current[connectedAccount]).to.be.eql({});
-      expect(Object.keys(connected).includes(connectedAccount)).to.be.equal(false);
-    });
 
-    it('Aepp: receive notification for network update', async () => {
-      const message = await new Promise<Network>((resolve) => {
-        aepp.onNetworkChange = (msg: any) => resolve(msg);
-        wallet.addNode('second_node', node, true);
+      it('Aepp: receive notification for network update', async () => {
+        const message = await new Promise<Network>((resolve) => {
+          aepp.onNetworkChange = (msg: any) => resolve(msg);
+          wallet.addNode('second_node', node, true);
+        });
+        message.networkId.should.be.equal(networkId);
+        expect(wallet.selectedNodeName).to.be.equal('second_node');
       });
-      message.networkId.should.be.equal(networkId);
-      expect(wallet.selectedNodeName).to.be.equal('second_node');
     });
 
     it('Try to connect unsupported protocol', async () => {
@@ -442,44 +492,46 @@ describe('Aepp<->Wallet', function aeppWallet() {
       await expect(aepp.rpcClient.request(METHODS.connect, { name: 'test-aepp', version: 2 as 1, connectNode: false })).to.be.eventually.rejectedWith('Unsupported Protocol Version').with.property('code', 5);
     });
 
-    it('Disconnect from wallet', async () => {
-      const walletDisconnect: Promise<any> = new Promise((resolve) => {
-        wallet.onDisconnect = (...args: any) => resolve(args);
+    describe('Disconnect', () => {
+      it('Disconnect from wallet', async () => {
+        const walletDisconnect: Promise<any> = new Promise((resolve) => {
+          wallet.onDisconnect = (...args: any) => resolve(args);
+        });
+        const aeppDisconnect: Promise<any> = new Promise((resolve) => {
+          aepp.onDisconnect = (...args: any) => resolve(args);
+        });
+        connectionFromWalletToAepp.sendMessage({
+          method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0',
+        });
+        const [aeppMessage] = await aeppDisconnect;
+        aeppMessage.reason.should.be.equal('bye');
+        connectionFromAeppToWallet.sendMessage({
+          method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0',
+        });
+        const [, walletMessage] = await walletDisconnect;
+        walletMessage.reason.should.be.equal('bye');
       });
-      const aeppDisconnect: Promise<any> = new Promise((resolve) => {
-        aepp.onDisconnect = (...args: any) => resolve(args);
-      });
-      connectionFromWalletToAepp.sendMessage({
-        method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0',
-      });
-      const [aeppMessage] = await aeppDisconnect;
-      aeppMessage.reason.should.be.equal('bye');
-      connectionFromAeppToWallet.sendMessage({
-        method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0',
-      });
-      const [, walletMessage] = await walletDisconnect;
-      walletMessage.reason.should.be.equal('bye');
-    });
 
-    it('Remove rpc client', async () => {
-      wallet.onConnection = () => {};
-      const id = wallet.addRpcClient(new BrowserWindowMessageConnection({
-        self: connections.walletWindow,
-        target: connections.aeppWindow,
-      }));
-      await aepp.connectToWallet(
-        new BrowserWindowMessageConnection({
-          self: connections.aeppWindow,
-          target: connections.walletWindow,
-        }),
-      );
+      it('Remove rpc client', async () => {
+        wallet.onConnection = () => {};
+        const id = wallet.addRpcClient(new BrowserWindowMessageConnection({
+          self: connections.walletWindow,
+          target: connections.aeppWindow,
+        }));
+        await aepp.connectToWallet(
+          new BrowserWindowMessageConnection({
+            self: connections.aeppWindow,
+            target: connections.walletWindow,
+          }),
+        );
 
-      wallet.removeRpcClient(id);
-      Array.from(wallet._clients.keys()).length.should.be.equal(0);
-    });
+        wallet.removeRpcClient(id);
+        Array.from(wallet._clients.keys()).length.should.be.equal(0);
+      });
 
-    it('Remove rpc client: client not found', () => {
-      expect(() => wallet.removeRpcClient('a1')).to.throw(UnknownRpcClientError, 'RpcClient with id a1 do not exist');
+      it('Remove rpc client: client not found', () => {
+        expect(() => wallet.removeRpcClient('a1')).to.throw(UnknownRpcClientError, 'RpcClient with id a1 do not exist');
+      });
     });
   });
 

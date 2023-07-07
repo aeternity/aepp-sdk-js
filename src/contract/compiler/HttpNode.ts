@@ -18,6 +18,12 @@ export default class CompilerHttpNode extends HttpBrowser {
     return this.compileBySourceCode(sourceCode, fileSystem);
   }
 
+  override async generateAci(path: string): Promise<Aci> {
+    const fileSystem = await getFileSystem(path);
+    const sourceCode = await readFile(path, 'utf8');
+    return this.generateAciBySourceCode(sourceCode, fileSystem);
+  }
+
   override async validate(bytecode: Encoded.ContractBytearray, path: string): Promise<boolean> {
     const fileSystem = await getFileSystem(path);
     const sourceCode = await readFile(path, 'utf8');

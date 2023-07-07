@@ -1,0 +1,120 @@
+---
+directive:
+  - from: openapi-document
+    where: $.paths.*.get.responses
+    transform: >
+      Object.entries($)
+        .filter(([key]) => key !== '200')
+        .forEach(([, value]) => value['x-ms-error-response'] = true)
+    reason: >
+      throw errors even for explained response with not 200 code
+      https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
+
+  - from: openapi-document
+    where: $.paths.*.get.parameters[?(@.type)]
+    transform: >
+      if ($.schema) throw new Error('Defined both schema and type');
+      $.schema = { type: $.type };
+      delete $.type;
+    reason: >
+      Schema violation: must NOT have additional properties (paths > /aex141 > get > parameters > 2)
+      additionalProperty: type
+      https://github.com/aeternity/ae_mdw/issues/1428
+
+  - from: openapi-document
+    where: $.components.schemas.Activity.properties.payload.oneOf
+    transform: return $.filter((el) => !el.$ref.includes('Aex141TransferEvent'))
+    reason: >
+      Ref '#/components/schemas/Aex141TransferEvent' is not referencing a valid location.
+      components,schemas,Activity,properties,payload,enum,2
+      https://github.com/aeternity/ae_mdw/issues/1344
+
+  - from: openapi-document
+    where: $.components.schemas.Activity.properties.payload
+    transform: delete $.oneOf;
+    reason: >
+      Error: modelProperties cannot be null or undefined in the mapper
+      https://github.com/Azure/autorest/issues/4118
+
+  - from: openapi-document
+    where: $.paths.*.get.responses.200.content.application/json.schema.allOf^
+    transform: $.type ??= 'object'
+    reason: >
+      The schema 'paths·ulsf14·v2-aex141·get·responses·200·content·application-json·schema' with
+      an undefined type and 'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected
+      to 'type:object'
+      https://github.com/Azure/autorest/issues/4118
+
+  - from: openapi-document
+    where: $.paths./names/search.get.responses.200.content.application/json.schema.allOf[0].properties.data.items.allOf^
+    transform: $.type ??= 'object'
+    reason: >
+      The schema 'get-200-application-json-allOf-properties-itemsItem' with an undefined type and
+      'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected to 'type:object'
+      https://github.com/Azure/autorest/issues/4118
+
+  - from: openapi-document
+    where: $.paths.*.get.parameters.*.schema.oneOf^
+    transform: $.type ??= 'string'
+    reason: >
+      The schema 'paths·u0n47u·v2-keyblocks-hash_orkbi·get·parameters·0·schema' with an undefined
+      type and 'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected
+      to 'type:object'
+      https://github.com/Azure/autorest/issues/4118
+
+  - from: openapi-document
+    where: $.paths./contracts/logs.get.parameters
+    transform: return $.filter((param) => param.name !== 'function')
+    reason: https://github.com/Azure/autorest.typescript/issues/1871
+
+  - from: openapi-document
+    where: $.paths.*.get
+    transform: $.operationId = $.operationId.replace(/(_[a-z])/g, (group) => group[1].toUpperCase())
+    reason: >
+      Otherwise autorest groups operations by 'get' prefix
+      https://github.com/aeternity/ae_mdw/issues/1357
+
+  - from: openapi-document
+    where: $.paths./aex9/account-balances/{account_id}.get.responses.200.content.application/json.allOf^
+    transform: >
+      $.schema = { allOf: $.allOf };
+      delete $.allOf;
+    reason: >
+      Schema violation: must NOT have additional properties (paths >
+      /v2/aex9/account-balances/{account_id} > get > responses > 200 > content > application/json)
+      additionalProperty: allOf
+      https://github.com/aeternity/ae_mdw/pull/1437
+
+  - from: openapi-document
+    where: $.servers
+    transform: $ = []
+    reason: remove a server with /mdw/v2 url
+
+  - from: openapi-document
+    where: $.paths
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      const apiPrefix = '/v2';
+      Object.keys($).forEach(key => {
+        $[apiPrefix + key] = $[key];
+        delete $[key];
+      });
+    reason: to don't add /v2 prefix to $host parameter
+
+  - from: openapi-document
+    where: $.info.title
+    set: middleware
+    reason: the whole SDK already about aeternity
+
+version: ^3.6.3
+use-extension:
+  '@autorest/typescript': ^6.0.2
+  '@autorest/modelerfour': ^4.26.2
+input-file: middleware-openapi.yaml
+output-folder: ../../src/apis/middleware
+source-code-folder-path: .
+generator: typescript
+generate-metadata: false
+add-credentials: false
+modelerfour:
+  seal-single-value-enum-by-default: false

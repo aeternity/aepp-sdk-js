@@ -15,6 +15,7 @@ import {
 } from '../utils/errors';
 import { encodeContractAddress } from '../utils/crypto';
 import { buildTx } from '../tx/builder';
+import { ensureError } from '../utils/other';
 
 export interface ChannelEvents {
   statusChanged: (status: ChannelStatus) => void;
@@ -240,6 +241,7 @@ async function dequeueMessage(channel: Channel): Promise<void> {
     try {
       await handleMessage(channel, message);
     } catch (error) {
+      ensureError(error);
       emit(channel, 'error', new ChannelIncomingMessageError(error, message));
     }
   }
