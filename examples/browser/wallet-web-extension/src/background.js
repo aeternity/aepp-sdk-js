@@ -1,15 +1,23 @@
 import browser from 'webextension-polyfill';
 import {
   AeSdkWallet, CompilerHttp, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection,
-  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError,
+  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, decodeFateValue,
 } from '@aeternity/aepp-sdk';
+
+function stringifyBigint(value) {
+  return JSON.stringify(
+    value,
+    (k, v) => (typeof v === 'bigint' ? `${v} (as BigInt)` : v),
+    2,
+  );
+}
 
 let popupCounter = 0;
 async function confirmInPopup(parameters) {
   const popupUrl = new URL(browser.runtime.getURL('./popup.html'));
   const popupId = popupCounter;
   popupCounter += 1;
-  popupUrl.searchParams.set('data', JSON.stringify({ ...parameters, popupId }));
+  popupUrl.searchParams.set('data', stringifyBigint({ ...parameters, popupId }));
   await browser.windows.create({
     url: popupUrl.toString(),
     type: 'popup',
@@ -42,10 +50,10 @@ const genConfirmCallback = (action) => async (aeppId, parameters, aeppOrigin) =>
 class AccountMemoryProtected extends MemoryAccount {
   async signTransaction(transaction, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
-      const opt = { ...options };
+      const opt = { ...options, transaction, unpackedTx: unpackTx(transaction) };
       if (opt.onCompiler) opt.onCompiler = '<Compiler>';
       if (opt.onNode) opt.onNode = '<Node>';
-      await genConfirmCallback('sign transaction')(id, { ...opt, transaction }, aeppOrigin);
+      await genConfirmCallback('sign transaction')(id, opt, aeppOrigin);
     }
     return super.signTransaction(transaction, options);
   }
@@ -55,6 +63,16 @@ class AccountMemoryProtected extends MemoryAccount {
       await genConfirmCallback('sign message')(id, { ...options, message }, aeppOrigin);
     }
     return super.signMessage(message, options);
+  }
+
+  async signTypedData(data, aci, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+    if (id != null) {
+      const opt = {
+        ...options, aci, data, decodedData: decodeFateValue(data, aci),
+      };
+      await genConfirmCallback('sign typed data')(id, opt, aeppOrigin);
+    }
+    return super.signTypedData(data, aci, options);
   }
 
   static generate() {

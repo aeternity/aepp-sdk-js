@@ -2,6 +2,7 @@ import { Encoded } from '../utils/encoder';
 import Node from '../Node';
 import CompilerBase from '../contract/compiler/Base';
 import { Int } from '../tx/builder/constants';
+import { AciValue, Domain } from '../utils/typed-data';
 
 interface AuthData {
   fee?: Int;
@@ -42,7 +43,7 @@ export default abstract class AccountBase {
    * Sign message
    * @param message - Message to sign
    * @param options - Options
-   * @returns Signature as hex string of Uint8Array
+   * @returns Signature
    */
   abstract signMessage(
     message: string,
@@ -53,10 +54,26 @@ export default abstract class AccountBase {
   ): Promise<Uint8Array>;
 
   /**
+   * Sign typed data
+   * @param type - Type of data to sign
+   * @param data - Encoded data to sign
+   * @param options - Options
+   * @returns Signature
+   */
+  abstract signTypedData(
+    data: Encoded.ContractBytearray,
+    aci: AciValue,
+    options?: Domain & {
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+  ): Promise<Encoded.Signature>;
+
+  /**
    * Sign data blob
    * @param data - Data blob to sign
    * @param options - Options
-   * @returns Signed data blob
+   * @returns Signature
    */
   abstract sign(data: string | Uint8Array, options?: any): Promise<Uint8Array>;
 

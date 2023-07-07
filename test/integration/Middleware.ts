@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import '../index';
 import { _Middleware } from '../../src';
 
-describe('MiddlewareSubscriber', () => {
+describe('Middleware API', () => {
   // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/1336
   const middleware = new _Middleware('https://testnet.aeternity.io/mdw/');
 

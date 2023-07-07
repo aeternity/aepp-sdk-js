@@ -25,6 +25,13 @@
     >
       Pay for transaction
     </a>
+    <a
+      href="#"
+      :class="{ active: view === 'TypedData' }"
+      @click="view = 'TypedData'"
+    >
+      Typed data
+    </a>
   </div>
 
   <Component
@@ -39,10 +46,11 @@ import Connect from './Connect.vue';
 import Basic from './Basic.vue';
 import Contracts from './Contracts.vue';
 import PayForTx from './PayForTx.vue';
+import TypedData from './TypedData.vue';
 
 export default {
   components: {
-    Connect, Basic, Contracts, PayForTx,
+    Connect, Basic, Contracts, PayForTx, TypedData,
   },
   data: () => ({ view: '' }),
   computed: mapState(['aeSdk']),

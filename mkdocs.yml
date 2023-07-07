@@ -58,6 +58,7 @@ nav:
     - guides/batch-requests.md
     - guides/error-handling.md
     - guides/low-vs-high-usage.md
+    - guides/typed-data.md
     - Wallet interaction:
       - guides/connect-aepp-to-wallet.md
       - guides/build-wallet.md

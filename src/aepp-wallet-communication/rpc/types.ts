@@ -1,4 +1,5 @@
 import { Encoded } from '../../utils/encoder';
+import { Domain, AciValue } from '../../utils/typed-data';
 import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema';
 import { TransformNodeType } from '../../Node';
 import { SignedTx } from '../../apis/node';
@@ -72,6 +73,15 @@ export interface WalletApi {
   [METHODS.signMessage]: (
     p: { message: string; onAccount: Encoded.AccountAddress }
   ) => Promise<{ signature: string }>;
+
+  [METHODS.signTypedData]: (
+    p: {
+      domain: Domain;
+      aci: AciValue;
+      data: Encoded.ContractBytearray;
+      onAccount: Encoded.AccountAddress;
+    },
+  ) => Promise<{ signature: Encoded.Signature }>;
 }
 
 export interface AeppApi {

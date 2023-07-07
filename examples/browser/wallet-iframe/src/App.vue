@@ -31,7 +31,7 @@
 import {
   MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE,
-  RpcConnectionDenyError, RpcRejectedByUserError,
+  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, decodeFateValue,
 } from '@aeternity/aepp-sdk';
 import Value from './Value.vue';
 
@@ -78,7 +78,7 @@ export default {
     const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
       if (!confirm([
         `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}`,
-        JSON.stringify(parameters, null, 2),
+        Value.methods.valueToString(parameters),
       ].join('\n'))) {
         throw new RpcRejectedByUserError();
       }
@@ -87,7 +87,7 @@ export default {
     class AccountMemoryProtected extends MemoryAccount {
       async signTransaction(tx, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
         if (id != null) {
-          const opt = { ...options };
+          const opt = { ...options, unpackedTx: unpackTx(tx) };
           if (opt.onCompiler) opt.onCompiler = '<Compiler>';
           if (opt.onNode) opt.onNode = '<Node>';
           genConfirmCallback(`sign transaction ${tx}`)(id, opt, aeppOrigin);
@@ -100,6 +100,14 @@ export default {
           genConfirmCallback(`sign message ${message}`)(id, options, aeppOrigin);
         }
         return super.signMessage(message, options);
+      }
+
+      async signTypedData(data, aci, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+        if (id != null) {
+          const opt = { ...options, aci, decodedData: decodeFateValue(data, aci) };
+          genConfirmCallback(`sign typed data ${data}`)(id, opt, aeppOrigin);
+        }
+        return super.signTypedData(data, aci, options);
       }
 
       static generate() {

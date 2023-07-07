@@ -280,6 +280,21 @@ export default class AeSdkWallet extends AeSdk {
               signature: Buffer.from(await this.signMessage(message, parameters)).toString('hex'),
             };
           },
+          [METHODS.signTypedData]: async ({
+            domain, aci, data, onAccount = this.address,
+          }, origin) => {
+            if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
+            if (!this.addresses().includes(onAccount)) {
+              throw new RpcPermissionDenyError(onAccount);
+            }
+
+            const parameters = {
+              ...domain, onAccount, aeppOrigin: origin, aeppRpcClientId: id,
+            };
+            return {
+              signature: await this.signTypedData(data, aci, parameters),
+            };
+          },
         },
       ),
     };
