@@ -148,7 +148,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Should receive `announcePresence` message from wallet', async () => {
-      const isReceived: any = new Promise((resolve) => {
+      const isReceived = new Promise<boolean>((resolve) => {
         if (connections.aeppWindow.addEventListener == null) throw new UnexpectedTsError();
         connections.aeppWindow.addEventListener('message', (msg) => {
           resolve(msg.data.method === 'connection.announcePresence');
@@ -479,7 +479,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
       it('Aepp: receive notification for network update', async () => {
         const message = await new Promise<Network>((resolve) => {
-          aepp.onNetworkChange = (msg: any) => resolve(msg);
+          aepp.onNetworkChange = (msg) => resolve(msg);
           wallet.addNode('second_node', node, true);
         });
         message.networkId.should.be.equal(networkId);
