@@ -58,6 +58,7 @@
 <script>
 import {
   walletDetector, BrowserWindowMessageConnection, RpcConnectionDenyError, RpcRejectedByUserError,
+  WalletConnectorFrame,
 } from '@aeternity/aepp-sdk';
 import { mapState } from 'vuex';
 
@@ -93,6 +94,7 @@ export default {
             stopDetection();
             resolve(newWallet.getConnection());
             this.cancelWalletDetection = null;
+            this.walletInfo = newWallet.info;
           }
         });
         this.cancelWalletDetection = () => {
@@ -103,25 +105,40 @@ export default {
         };
       });
     },
+    async setNode(networkId) {
+      const [{ name }] = (await this.aeSdk.getNodesInPool())
+        .filter((node) => node.nodeNetworkId === networkId);
+      this.aeSdk.selectNode(name);
+      this.$store.commit('setNetworkId', networkId);
+    },
+    setAccount(account) {
+      if (Object.keys(this.aeSdk.accounts).length) this.aeSdk.removeAccount(this.aeSdk.address);
+      this.aeSdk.addAccount(account, { select: true });
+      this.$store.commit('setAddress', account.address);
+    },
     async connect() {
       this.walletConnecting = true;
-      this.aeSdk.onDisconnect = () => {
-        this.walletConnected = false;
-        this.walletInfo = null;
-        this.$store.commit('setAddress', undefined);
-        if (this.reverseIframe) this.reverseIframe.remove();
-      };
       try {
         const connection = await this.detectWallets();
         try {
-          this.walletInfo = await this.aeSdk.connectToWallet(connection);
+          this.walletConnector = await WalletConnectorFrame.connect('Simple æpp', connection);
         } catch (error) {
           if (error instanceof RpcConnectionDenyError) connection.disconnect();
           throw error;
         }
+        this.walletConnector.on('disconnect', () => {
+          this.walletConnected = false;
+          this.walletInfo = null;
+          this.$store.commit('setAddress', undefined);
+          if (this.reverseIframe) this.reverseIframe.remove();
+        });
         this.walletConnected = true;
-        const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected');
-        this.$store.commit('setAddress', Object.keys(current)[0]);
+
+        this.setNode(this.walletConnector.networkId);
+        this.walletConnector.on('networkIdChange', (networkId) => this.setNode(networkId));
+
+        this.walletConnector.on('accountsChange', (accounts) => this.setAccount(accounts[0]));
+        await this.walletConnector.subscribeAccounts('subscribe', 'current');
       } catch (error) {
         if (
           error.message === 'Wallet detection cancelled'
@@ -134,7 +151,7 @@ export default {
       }
     },
     disconnect() {
-      this.aeSdk.disconnectWallet();
+      this.walletConnector.disconnect();
     },
   },
 };

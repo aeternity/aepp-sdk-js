@@ -62,6 +62,8 @@ export { default as AeSdkMethods } from './AeSdkMethods';
 export { default as AeSdkBase } from './AeSdkBase';
 export { default as AeSdk } from './AeSdk';
 export { default as AeSdkAepp } from './AeSdkAepp';
+export { default as WalletConnectorFrame } from './aepp-wallet-communication/WalletConnectorFrame';
+export { default as WalletConnectorFrameWithNode } from './aepp-wallet-communication/WalletConnectorFrameWithNode';
 export { default as AeSdkWallet } from './AeSdkWallet';
 export { default as Node } from './Node';
 export { default as verifyTransaction } from './tx/validator';
