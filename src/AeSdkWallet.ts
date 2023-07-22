@@ -219,10 +219,10 @@ export default class AeSdkWallet extends AeSdk {
           [METHODS.subscribeAddress]: async ({ type, value }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
 
-            await this.onSubscription(id, { type, value }, origin);
-
             switch (type) {
               case SUBSCRIPTION_TYPES.subscribe:
+                // TODO: remove `type` as it always subscribe
+                await this.onSubscription(id, { type, value }, origin);
                 client.addressSubscription.add(value);
                 break;
               case SUBSCRIPTION_TYPES.unsubscribe:
