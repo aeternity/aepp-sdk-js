@@ -34,6 +34,30 @@
     >
       Cancel detection
     </button>
+
+    <template v-if="walletConnected">
+      <br>
+      <button @click="getAccounts">
+        Get accounts
+      </button>
+      <button @click="subscribeAccounts('subscribe', 'current')">
+        Subscribe current
+      </button>
+      <button @click="subscribeAccounts('unsubscribe', 'current')">
+        Unsubscribe current
+      </button>
+      <button @click="subscribeAccounts('subscribe', 'connected')">
+        Subscribe connected
+      </button>
+      <button @click="subscribeAccounts('unsubscribe', 'connected')">
+        Unsubscribe connected
+      </button>
+
+      <div>
+        <div>Accounts</div>
+        <div>{{ rpcAccounts.map((account) => account.address.slice(0, 8)).join(', ') }}</div>
+      </div>
+    </template>
   </div>
 
   <div class="group">
@@ -71,6 +95,7 @@ export default {
     reverseIframeWalletUrl: process.env.VUE_APP_WALLET_URL ?? 'http://localhost:9000',
     walletInfo: null,
     cancelWalletDetection: null,
+    rpcAccounts: [],
   }),
   computed: {
     ...mapState(['aeSdk']),
@@ -80,6 +105,13 @@ export default {
     },
   },
   methods: {
+    async getAccounts() {
+      this.rpcAccounts = await this.walletConnector.getAccounts();
+      if (this.rpcAccounts.length) this.setAccount(this.rpcAccounts[0]);
+    },
+    async subscribeAccounts(type, value) {
+      await this.walletConnector.subscribeAccounts(type, value);
+    },
     async detectWallets() {
       if (this.connectMethod === 'reverse-iframe') {
         this.reverseIframe = document.createElement('iframe');
@@ -129,6 +161,7 @@ export default {
         this.walletConnector.on('disconnect', () => {
           this.walletConnected = false;
           this.walletInfo = null;
+          this.rpcAccounts = [];
           this.$store.commit('setAddress', undefined);
           if (this.reverseIframe) this.reverseIframe.remove();
         });
@@ -137,8 +170,10 @@ export default {
         this.setNode(this.walletConnector.networkId);
         this.walletConnector.on('networkIdChange', (networkId) => this.setNode(networkId));
 
-        this.walletConnector.on('accountsChange', (accounts) => this.setAccount(accounts[0]));
-        await this.walletConnector.subscribeAccounts('subscribe', 'current');
+        this.walletConnector.on('accountsChange', (accounts) => {
+          this.rpcAccounts = accounts;
+          if (accounts.length) this.setAccount(accounts[0]);
+        });
       } catch (error) {
         if (
           error.message === 'Wallet detection cancelled'
