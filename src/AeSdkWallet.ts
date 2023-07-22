@@ -106,13 +106,23 @@ export default class AeSdkWallet extends AeSdk {
     this._type = type;
   }
 
+  _getAccountsForClient({ addressSubscription }: RpcClientsInfo): Accounts {
+    const { current, connected } = this.getAccounts();
+    return {
+      current: addressSubscription.has('current') || addressSubscription.has('connected')
+        ? current : {},
+      connected: addressSubscription.has('connected') ? connected : {},
+    };
+  }
+
   _pushAccountsToApps(): void {
     if (this._clients == null) return;
     Array.from(this._clients.keys())
       .filter((clientId) => this._isRpcClientConnected(clientId))
       .map((clientId) => this._getClient(clientId))
       .filter((client) => client.addressSubscription.size !== 0)
-      .forEach((client) => client.rpc.notify(METHODS.updateAddress, this.getAccounts()));
+      .forEach((client) => client.rpc
+        .notify(METHODS.updateAddress, this._getAccountsForClient(client)));
   }
 
   override selectAccount(address: Encoded.AccountAddress): void {
@@ -230,7 +240,7 @@ export default class AeSdkWallet extends AeSdk {
 
             return {
               subscription: Array.from(client.addressSubscription),
-              address: this.getAccounts(),
+              address: this._getAccountsForClient(client),
             };
           },
           [METHODS.address]: async (params, origin) => {
