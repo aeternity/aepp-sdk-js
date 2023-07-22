@@ -13,18 +13,26 @@
       </label>
       <div><input v-model="reverseIframeWalletUrl"></div>
     </div>
-    <button
-      v-if="connectMethod && !walletConnected"
-      :disabled="walletConnecting"
-      @click="connect"
-    >
-      Connect
-    </button>
+
     <button
       v-if="walletConnected"
       @click="disconnect"
     >
       Disconnect
+    </button>
+    <button
+      v-else-if="connectMethod"
+      :disabled="walletConnecting"
+      @click="connect"
+    >
+      Connect
+    </button>
+
+    <button
+      v-if="cancelWalletDetection"
+      @click="cancelWalletDetection"
+    >
+      Cancel detection
     </button>
   </div>
 
@@ -34,6 +42,7 @@
       <div>
         {{
           (walletConnected && 'Wallet connected')
+          || (cancelWalletDetection && 'Wallet detection')
           || (walletConnecting && 'Wallet connecting')
           || 'Ready to connect to wallet'
         }}
@@ -48,7 +57,7 @@
 
 <script>
 import {
-  walletDetector, BrowserWindowMessageConnection, RpcConnectionDenyError,
+  walletDetector, BrowserWindowMessageConnection, RpcConnectionDenyError, RpcRejectedByUserError,
 } from '@aeternity/aepp-sdk';
 import { mapState } from 'vuex';
 
@@ -60,6 +69,7 @@ export default {
     reverseIframe: null,
     reverseIframeWalletUrl: process.env.VUE_APP_WALLET_URL ?? 'http://localhost:9000',
     walletInfo: null,
+    cancelWalletDetection: null,
   }),
   computed: {
     ...mapState(['aeSdk']),
@@ -69,32 +79,40 @@ export default {
     },
   },
   methods: {
-    async scanForWallets() {
-      return new Promise((resolve) => {
-        let stopScan;
-
-        const handleWallets = async ({ wallets, newWallet }) => {
-          newWallet = newWallet || Object.values(wallets)[0];
+    async detectWallets() {
+      if (this.connectMethod === 'reverse-iframe') {
+        this.reverseIframe = document.createElement('iframe');
+        this.reverseIframe.src = this.reverseIframeWalletUrl;
+        this.reverseIframe.style.display = 'none';
+        document.body.appendChild(this.reverseIframe);
+      }
+      const connection = new BrowserWindowMessageConnection();
+      return new Promise((resolve, reject) => {
+        const stopDetection = walletDetector(connection, async ({ newWallet }) => {
           if (confirm(`Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`)) {
-            stopScan();
+            stopDetection();
             resolve(newWallet.getConnection());
+            this.cancelWalletDetection = null;
           }
+        });
+        this.cancelWalletDetection = () => {
+          reject(new Error('Wallet detection cancelled'));
+          stopDetection();
+          this.cancelWalletDetection = null;
+          if (this.reverseIframe) this.reverseIframe.remove();
         };
-
-        const scannerConnection = new BrowserWindowMessageConnection();
-        stopScan = walletDetector(scannerConnection, handleWallets);
       });
     },
     async connect() {
       this.walletConnecting = true;
+      this.aeSdk.onDisconnect = () => {
+        this.walletConnected = false;
+        this.walletInfo = null;
+        this.$store.commit('setAddress', undefined);
+        if (this.reverseIframe) this.reverseIframe.remove();
+      };
       try {
-        if (this.connectMethod === 'reverse-iframe') {
-          this.reverseIframe = document.createElement('iframe');
-          this.reverseIframe.src = this.reverseIframeWalletUrl;
-          this.reverseIframe.style.display = 'none';
-          document.body.appendChild(this.reverseIframe);
-        }
-        const connection = await this.scanForWallets();
+        const connection = await this.detectWallets();
         try {
           this.walletInfo = await this.aeSdk.connectToWallet(connection);
         } catch (error) {
@@ -104,14 +122,19 @@ export default {
         this.walletConnected = true;
         const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected');
         this.$store.commit('setAddress', Object.keys(current)[0]);
+      } catch (error) {
+        if (
+          error.message === 'Wallet detection cancelled'
+          || error instanceof RpcConnectionDenyError
+          || error instanceof RpcRejectedByUserError
+        ) return;
+        throw error;
       } finally {
         this.walletConnecting = false;
       }
     },
-    async disconnect() {
-      await this.aeSdk.disconnectWallet();
-      this.walletConnected = false;
-      if (this.reverseIframe) this.reverseIframe.remove();
+    disconnect() {
+      this.aeSdk.disconnectWallet();
     },
   },
 };
