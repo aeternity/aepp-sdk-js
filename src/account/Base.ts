@@ -1,7 +1,7 @@
 import { Encoded } from '../utils/encoder';
 import Node from '../Node';
 import CompilerBase from '../contract/compiler/Base';
-import { Int } from '../tx/builder/constants';
+import { AensName, Int } from '../tx/builder/constants';
 import { AciValue, Domain } from '../utils/typed-data';
 import { NotImplementedError } from '../utils/errors';
 
@@ -74,6 +74,80 @@ export default abstract class AccountBase {
     /* eslint-enable @typescript-eslint/no-unused-vars */
   ): Promise<Encoded.Signature> {
     throw new NotImplementedError('signTypedData method');
+  }
+
+  /**
+   * Sign delegation of AENS, oracle operations to a contract
+   * @param contractAddress - Address of a contract to delegate permissions to
+   * @param options - Options
+   * @returns Signature
+   */
+  // TODO: make abstract in the next major release
+  // eslint-disable-next-line class-methods-use-this
+  async signDelegationToContract(
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    contractAddress: Encoded.ContractAddress,
+    networkId: string,
+    options?: {
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+    /* eslint-enable @typescript-eslint/no-unused-vars */
+  ): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signDelegationToContract method');
+  }
+
+  /**
+   * Sign delegation of an AENS name to a contract
+   * @param contractAddress - Address of a contract to delegate permissions to
+   * @param name - AENS name to manage by a contract
+   * @param options - Options
+   * @returns Signature
+   */
+  // TODO: make abstract in the next major release
+  // eslint-disable-next-line class-methods-use-this
+  async signNameDelegationToContract(
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    contractAddress: Encoded.ContractAddress,
+    name: AensName,
+    networkId: string,
+    options?: {
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+    /* eslint-enable @typescript-eslint/no-unused-vars */
+  ): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signNameDelegationToContract method');
+  }
+
+  /**
+   * Sign delegation of oracle query to a contract
+   *
+   * Warning! Implementations needs to ensure that decoded oracle query id is not equal to decoded
+   * current account address unless https://github.com/aeternity/aesophia/issues/475 is fixed.
+   *
+   * Warning! Implementations needs to ensure that oracle query and contract exists unless
+   * https://github.com/aeternity/aesophia/issues/474 is fixed.
+   *
+   * @param contractAddress - Address of a contract to delegate permissions to
+   * @param oracleQueryId - Oracle query ID to reply by a contract
+   * @param options - Options
+   * @returns Signature
+   */
+  // TODO: make abstract in the next major release
+  // eslint-disable-next-line class-methods-use-this
+  async signOracleQueryDelegationToContract(
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    contractAddress: Encoded.ContractAddress,
+    oracleQueryId: Encoded.OracleQueryId,
+    networkId: string,
+    options?: {
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+    /* eslint-enable @typescript-eslint/no-unused-vars */
+  ): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signOracleQueryDelegationToContract method');
   }
 
   /**

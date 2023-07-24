@@ -9,7 +9,8 @@ import {
 import { concatBuffers } from '../utils/other';
 import { hashTypedData, AciValue } from '../utils/typed-data';
 import { buildTx } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
+import { Tag, AensName } from '../tx/builder/constants';
+import { produceNameId } from '../tx/builder/helpers';
 
 const secretKeys = new WeakMap();
 
@@ -87,6 +88,54 @@ export default class AccountMemory extends AccountBase {
       name, version, networkId, contractAddress,
     });
     const signature = await this.sign(dHash, options);
+    return encode(signature, Encoding.Signature);
+  }
+
+  override async signDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    networkId: string,
+  ): Promise<Encoded.Signature> {
+    const payload = concatBuffers([
+      Buffer.from(networkId),
+      decode(this.address),
+      decode(contractAddress),
+    ]);
+    const signature = await this.sign(payload);
+    return encode(signature, Encoding.Signature);
+  }
+
+  override async signNameDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    name: AensName,
+    networkId: string,
+  ): Promise<Encoded.Signature> {
+    const payload = concatBuffers([
+      Buffer.from(networkId),
+      decode(this.address),
+      decode(produceNameId(name)),
+      decode(contractAddress),
+    ]);
+    const signature = await this.sign(payload);
+    return encode(signature, Encoding.Signature);
+  }
+
+  override async signOracleQueryDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    oracleQueryId: Encoded.OracleQueryId,
+    networkId: string,
+  ): Promise<Encoded.Signature> {
+    const oracleQueryIdDecoded = decode(oracleQueryId);
+    const addressDecoded = decode(this.address);
+    // TODO: remove after fixing https://github.com/aeternity/aesophia/issues/475
+    if (oracleQueryIdDecoded.compare(addressDecoded) === 0) {
+      throw new ArgumentError('oracleQueryId', 'not equal to account address', oracleQueryId);
+    }
+    const payload = concatBuffers([
+      Buffer.from(networkId),
+      oracleQueryIdDecoded,
+      decode(contractAddress),
+    ]);
+    const signature = await this.sign(payload);
     return encode(signature, Encoding.Signature);
   }
 }

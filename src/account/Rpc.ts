@@ -69,4 +69,19 @@ export default class AccountRpc extends AccountBase {
     });
     return signature;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  override async signDelegationToContract(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signing delegation to contract using wallet');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  override async signNameDelegationToContract(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signing delegation to contract using wallet');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  override async signOracleQueryDelegationToContract(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signing delegation to contract using wallet');
+  }
 }

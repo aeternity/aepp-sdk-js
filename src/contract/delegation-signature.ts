@@ -1,9 +1,13 @@
 import { decode, Encoded } from '../utils/encoder';
+import { ArgumentError } from '../utils/errors';
 import { AensName } from '../tx/builder/constants';
 import AccountBase from '../account/Base';
-import { concatBuffers } from '../utils/other';
-import { isNameValid, produceNameId } from '../tx/builder/helpers';
+import { isNameValid } from '../tx/builder/helpers';
 import Node from '../Node';
+
+function ensureOracleQuery(oq: string): asserts oq is Encoded.OracleQueryId {
+  if (!oq.startsWith('oq_')) throw new ArgumentError('oq', 'oracle query', oq);
+}
 
 /**
  * Helper to generate a signature to delegate
@@ -17,6 +21,7 @@ import Node from '../Node';
  * @param options.onAccount - Account to use
  * @param options.onNode - Node to use
  * @returns Signature
+ * @deprecated use methods `sign*DelegationToContract` of Account instance instead
  * @example
  * ```js
  * const aeSdk = new AeSdk({ ... })
@@ -42,15 +47,36 @@ import Node from '../Node';
 export default async function createDelegationSignature(
   contractAddress: Encoded.ContractAddress,
   ids: Array<Encoded.Any | AensName>,
-  options: { omitAddress?: boolean; onAccount: AccountBase; onNode: Node },
+  { onAccount, omitAddress, ...options }: {
+    omitAddress?: boolean;
+    onAccount: AccountBase;
+    onNode: Node;
+  },
 ): Promise<Uint8Array> {
-  return options.onAccount.sign(
-    concatBuffers([
-      Buffer.from(await options.onNode.getNetworkId()),
-      ...options.omitAddress === true ? [] : [decode(options.onAccount.address)],
-      ...ids.map((e) => (isNameValid(e) ? produceNameId(e) : e)).map((e) => decode(e)),
-      decode(contractAddress),
-    ]),
-    options,
+  if (ids.length > 1) throw new ArgumentError('ids', 'shorter than 2', ids);
+  const networkId = await options.onNode.getNetworkId();
+  if (ids.length === 0) {
+    if (omitAddress === true) {
+      throw new ArgumentError('omitAddress', 'equal false', omitAddress);
+    }
+    return decode(await onAccount.signDelegationToContract(contractAddress, networkId));
+  }
+
+  const [payload] = ids;
+  if (isNameValid(payload)) {
+    if (omitAddress === true) {
+      throw new ArgumentError('omitAddress', 'equal false', omitAddress);
+    }
+    return decode(
+      await onAccount.signNameDelegationToContract(contractAddress, payload, networkId),
+    );
+  }
+
+  ensureOracleQuery(payload);
+  if (omitAddress !== true) {
+    throw new ArgumentError('omitAddress', 'equal true', omitAddress);
+  }
+  return decode(
+    await onAccount.signOracleQueryDelegationToContract(contractAddress, payload, networkId),
   );
 }
