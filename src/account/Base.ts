@@ -3,6 +3,7 @@ import Node from '../Node';
 import CompilerBase from '../contract/compiler/Base';
 import { Int } from '../tx/builder/constants';
 import { AciValue, Domain } from '../utils/typed-data';
+import { NotImplementedError } from '../utils/errors';
 
 interface AuthData {
   fee?: Int;
@@ -60,14 +61,20 @@ export default abstract class AccountBase {
    * @param options - Options
    * @returns Signature
    */
-  abstract signTypedData(
+  // TODO: make abstract in the next major release
+  // eslint-disable-next-line class-methods-use-this
+  async signTypedData(
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     data: Encoded.ContractBytearray,
     aci: AciValue,
     options?: Domain & {
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
-  ): Promise<Encoded.Signature>;
+    /* eslint-enable @typescript-eslint/no-unused-vars */
+  ): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signTypedData method');
+  }
 
   /**
    * Sign data blob
