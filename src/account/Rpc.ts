@@ -4,6 +4,7 @@ import { ArgumentError, NotImplementedError, UnsupportedProtocolError } from '..
 import { Encoded } from '../utils/encoder';
 import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
 import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
+import { AensName } from '../tx/builder/constants';
 
 /**
  * Account provided by wallet
@@ -70,18 +71,37 @@ export default class AccountRpc extends AccountBase {
     return signature;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  override async signDelegationToContract(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signing delegation to contract using wallet');
+  override async signDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+  ): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
+      onAccount: this.address,
+      contractAddress,
+    });
+    return signature;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  override async signNameDelegationToContract(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signing delegation to contract using wallet');
+  override async signNameDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    name: AensName,
+  ): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
+      onAccount: this.address,
+      contractAddress,
+      name,
+    });
+    return signature;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  override async signOracleQueryDelegationToContract(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signing delegation to contract using wallet');
+  override async signOracleQueryDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    oracleQueryId: Encoded.OracleQueryId,
+  ): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
+      onAccount: this.address,
+      contractAddress,
+      oracleQueryId,
+    });
+    return signature;
   }
 }

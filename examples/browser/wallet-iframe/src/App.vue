@@ -110,6 +110,46 @@ export default {
         return super.signTypedData(data, aci, options);
       }
 
+      async signDelegationToContract(
+        contractAddress,
+        networkId,
+        { aeppRpcClientId: id, aeppOrigin, ...options },
+      ) {
+        if (id != null) {
+          const opt = { ...options, contractAddress, networkId };
+          genConfirmCallback('sign delegation to contract')(id, opt, aeppOrigin);
+        }
+        return super.signDelegationToContract(contractAddress, networkId, options);
+      }
+
+      async signNameDelegationToContract(
+        contractAddress,
+        name,
+        networkId,
+        { aeppRpcClientId: id, aeppOrigin, ...options },
+      ) {
+        if (id != null) {
+          const opt = { ...options, contractAddress, name, networkId };
+          genConfirmCallback('sign delegation of name to contract')(id, opt, aeppOrigin);
+        }
+        return super.signNameDelegationToContract(contractAddress, name, networkId, options);
+      }
+
+      async signOracleQueryDelegationToContract(
+        contractAddress,
+        oracleQueryId,
+        networkId,
+        { aeppRpcClientId: id, aeppOrigin, ...options },
+      ) {
+        if (id != null) {
+          const opt = { ...options, contractAddress, oracleQueryId, networkId };
+          genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
+        }
+        return super.signOracleQueryDelegationToContract(
+          contractAddress, oracleQueryId, networkId, options,
+        );
+      }
+
       static generate() {
         // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
         return new AccountMemoryProtected(generateKeyPair().secretKey);

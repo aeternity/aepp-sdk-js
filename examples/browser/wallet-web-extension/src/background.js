@@ -75,6 +75,46 @@ class AccountMemoryProtected extends MemoryAccount {
     return super.signTypedData(data, aci, options);
   }
 
+  async signDelegationToContract(
+    contractAddress,
+    networkId,
+    { aeppRpcClientId: id, aeppOrigin, ...options },
+  ) {
+    if (id != null) {
+      const opt = { ...options, contractAddress, networkId };
+      await genConfirmCallback('sign delegation to contract')(id, opt, aeppOrigin);
+    }
+    return super.signDelegationToContract(contractAddress, networkId, options);
+  }
+
+  async signNameDelegationToContract(
+    contractAddress,
+    name,
+    networkId,
+    { aeppRpcClientId: id, aeppOrigin, ...options },
+  ) {
+    if (id != null) {
+      const opt = { ...options, contractAddress, name, networkId };
+      await genConfirmCallback('sign delegation of name to contract')(id, opt, aeppOrigin);
+    }
+    return super.signNameDelegationToContract(contractAddress, name, networkId, options);
+  }
+
+  async signOracleQueryDelegationToContract(
+    contractAddress,
+    oracleQueryId,
+    networkId,
+    { aeppRpcClientId: id, aeppOrigin, ...options },
+  ) {
+    if (id != null) {
+      const opt = { ...options, contractAddress, oracleQueryId, networkId };
+      await genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
+    }
+    return super.signOracleQueryDelegationToContract(
+      contractAddress, oracleQueryId, networkId, options,
+    );
+  }
+
   static generate() {
     // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
     return new AccountMemoryProtected(generateKeyPair().secretKey);

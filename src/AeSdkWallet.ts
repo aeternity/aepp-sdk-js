@@ -295,6 +295,24 @@ export default class AeSdkWallet extends AeSdk {
               signature: await this.signTypedData(data, aci, parameters),
             };
           },
+          [METHODS.signDelegationToContract]: async ({
+            contractAddress, name, oracleQueryId, onAccount = this.address,
+          }, origin) => {
+            if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
+            if (!this.addresses().includes(onAccount)) {
+              throw new RpcPermissionDenyError(onAccount);
+            }
+
+            const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
+            const signature = await (
+              (name == null ? null : this
+                .signNameDelegationToContract(contractAddress, name, parameters))
+              ?? (oracleQueryId == null ? null : this
+                .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, parameters))
+              ?? this.signDelegationToContract(contractAddress, parameters)
+            );
+            return { signature };
+          },
         },
       ),
     };
