@@ -112,42 +112,37 @@ export default {
 
       async signDelegationToContract(
         contractAddress,
-        networkId,
         { aeppRpcClientId: id, aeppOrigin, ...options },
       ) {
         if (id != null) {
-          const opt = { ...options, contractAddress, networkId };
+          const opt = { ...options, contractAddress };
           genConfirmCallback('sign delegation to contract')(id, opt, aeppOrigin);
         }
-        return super.signDelegationToContract(contractAddress, networkId, options);
+        return super.signDelegationToContract(contractAddress, options);
       }
 
       async signNameDelegationToContract(
         contractAddress,
         name,
-        networkId,
         { aeppRpcClientId: id, aeppOrigin, ...options },
       ) {
         if (id != null) {
-          const opt = { ...options, contractAddress, name, networkId };
+          const opt = { ...options, contractAddress, name };
           genConfirmCallback('sign delegation of name to contract')(id, opt, aeppOrigin);
         }
-        return super.signNameDelegationToContract(contractAddress, name, networkId, options);
+        return super.signNameDelegationToContract(contractAddress, name, options);
       }
 
       async signOracleQueryDelegationToContract(
         contractAddress,
         oracleQueryId,
-        networkId,
         { aeppRpcClientId: id, aeppOrigin, ...options },
       ) {
         if (id != null) {
-          const opt = { ...options, contractAddress, oracleQueryId, networkId };
+          const opt = { ...options, contractAddress, oracleQueryId };
           genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
         }
-        return super.signOracleQueryDelegationToContract(
-          contractAddress, oracleQueryId, networkId, options,
-        );
+        return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
       }
 
       static generate() {

@@ -59,7 +59,7 @@ export default async function createDelegationSignature(
     if (omitAddress === true) {
       throw new ArgumentError('omitAddress', 'equal false', omitAddress);
     }
-    return decode(await onAccount.signDelegationToContract(contractAddress, networkId));
+    return decode(await onAccount.signDelegationToContract(contractAddress, { networkId }));
   }
 
   const [payload] = ids;
@@ -68,7 +68,7 @@ export default async function createDelegationSignature(
       throw new ArgumentError('omitAddress', 'equal false', omitAddress);
     }
     return decode(
-      await onAccount.signNameDelegationToContract(contractAddress, payload, networkId),
+      await onAccount.signNameDelegationToContract(contractAddress, payload, { networkId }),
     );
   }
 
@@ -77,6 +77,6 @@ export default async function createDelegationSignature(
     throw new ArgumentError('omitAddress', 'equal true', omitAddress);
   }
   return decode(
-    await onAccount.signOracleQueryDelegationToContract(contractAddress, payload, networkId),
+    await onAccount.signOracleQueryDelegationToContract(contractAddress, payload, { networkId }),
   );
 }

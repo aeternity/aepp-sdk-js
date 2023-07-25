@@ -441,7 +441,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
       it('rejected by wallet', async () => {
         let origin;
-        wallet._resolveAccount().signDelegationToContract = (ct, netId, { aeppOrigin } = {}) => {
+        wallet._resolveAccount().signDelegationToContract = (contractAddr, { aeppOrigin } = {}) => {
           origin = aeppOrigin;
           throw new RpcRejectedByUserError();
         };

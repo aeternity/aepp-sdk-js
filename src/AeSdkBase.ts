@@ -1,7 +1,6 @@
 import Node from './Node';
 import AccountBase from './account/Base';
 import {
-  ArgumentError,
   CompilerError, DuplicateNodeError, NodeNotFoundError, NotImplementedError, TypeError,
 } from './utils/errors';
 import { Encoded } from './utils/encoder';
@@ -180,40 +179,37 @@ export default class AeSdkBase extends AeSdkMethods {
 
   async signDelegationToContract(
     contractAddress: Encoded.ContractAddress,
-    { onAccount, ...options }: { onAccount?: OnAccount; networkId?: string }
-    & Parameters<AccountBase['signDelegationToContract']>[2] = {},
+    { onAccount, ...options }: { onAccount?: OnAccount }
+    & Parameters<AccountBase['signDelegationToContract']>[1] = {},
   ): Promise<Encoded.Signature> {
-    const networkId = options?.networkId
-      ?? (this.selectedNodeName !== null ? await this.api.getNetworkId() : undefined);
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
+    options.networkId ??= this.selectedNodeName !== null
+      ? await this.api.getNetworkId() : undefined;
     return this._resolveAccount(onAccount)
-      .signDelegationToContract(contractAddress, networkId, options);
+      .signDelegationToContract(contractAddress, options);
   }
 
   async signNameDelegationToContract(
     contractAddress: Encoded.ContractAddress,
     name: AensName,
-    { onAccount, ...options }: { onAccount?: OnAccount; networkId?: string }
-    & Parameters<AccountBase['signNameDelegationToContract']>[3] = {},
+    { onAccount, ...options }: { onAccount?: OnAccount }
+    & Parameters<AccountBase['signNameDelegationToContract']>[2] = {},
   ): Promise<Encoded.Signature> {
-    const networkId = options?.networkId
-      ?? (this.selectedNodeName !== null ? await this.api.getNetworkId() : undefined);
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
+    options.networkId ??= this.selectedNodeName !== null
+      ? await this.api.getNetworkId() : undefined;
     return this._resolveAccount(onAccount)
-      .signNameDelegationToContract(contractAddress, name, networkId, options);
+      .signNameDelegationToContract(contractAddress, name, options);
   }
 
   async signOracleQueryDelegationToContract(
     contractAddress: Encoded.ContractAddress,
     oracleQueryId: Encoded.OracleQueryId,
-    { onAccount, ...options }: { onAccount?: OnAccount; networkId?: string }
-    & Parameters<AccountBase['signOracleQueryDelegationToContract']>[3] = {},
+    { onAccount, ...options }: { onAccount?: OnAccount }
+    & Parameters<AccountBase['signOracleQueryDelegationToContract']>[2] = {},
   ): Promise<Encoded.Signature> {
-    const networkId = options?.networkId
-      ?? (this.selectedNodeName !== null ? await this.api.getNetworkId() : undefined);
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
+    options.networkId ??= this.selectedNodeName !== null
+      ? await this.api.getNetworkId() : undefined;
     return this._resolveAccount(onAccount)
-      .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, networkId, options);
+      .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
   }
 
   override _getOptions(callOptions: AeSdkMethodsOptions = {}): {

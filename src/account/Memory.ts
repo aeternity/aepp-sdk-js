@@ -93,8 +93,9 @@ export default class AccountMemory extends AccountBase {
 
   override async signDelegationToContract(
     contractAddress: Encoded.ContractAddress,
-    networkId: string,
+    { networkId }: { networkId?: string } = {},
   ): Promise<Encoded.Signature> {
+    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
     const payload = concatBuffers([
       Buffer.from(networkId),
       decode(this.address),
@@ -107,8 +108,9 @@ export default class AccountMemory extends AccountBase {
   override async signNameDelegationToContract(
     contractAddress: Encoded.ContractAddress,
     name: AensName,
-    networkId: string,
+    { networkId }: { networkId?: string } = {},
   ): Promise<Encoded.Signature> {
+    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
     const payload = concatBuffers([
       Buffer.from(networkId),
       decode(this.address),
@@ -122,7 +124,7 @@ export default class AccountMemory extends AccountBase {
   override async signOracleQueryDelegationToContract(
     contractAddress: Encoded.ContractAddress,
     oracleQueryId: Encoded.OracleQueryId,
-    networkId: string,
+    { networkId }: { networkId?: string } = {},
   ): Promise<Encoded.Signature> {
     const oracleQueryIdDecoded = decode(oracleQueryId);
     const addressDecoded = decode(this.address);
@@ -130,6 +132,7 @@ export default class AccountMemory extends AccountBase {
     if (oracleQueryIdDecoded.compare(addressDecoded) === 0) {
       throw new ArgumentError('oracleQueryId', 'not equal to account address', oracleQueryId);
     }
+    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
     const payload = concatBuffers([
       Buffer.from(networkId),
       oracleQueryIdDecoded,

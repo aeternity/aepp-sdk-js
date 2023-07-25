@@ -87,8 +87,8 @@ export default abstract class AccountBase {
   async signDelegationToContract(
     /* eslint-disable @typescript-eslint/no-unused-vars */
     contractAddress: Encoded.ContractAddress,
-    networkId: string,
     options?: {
+      networkId?: string;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
@@ -110,8 +110,8 @@ export default abstract class AccountBase {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     contractAddress: Encoded.ContractAddress,
     name: AensName,
-    networkId: string,
     options?: {
+      networkId?: string;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
@@ -140,8 +140,8 @@ export default abstract class AccountBase {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     contractAddress: Encoded.ContractAddress,
     oracleQueryId: Encoded.OracleQueryId,
-    networkId: string,
     options?: {
+      networkId?: string;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
