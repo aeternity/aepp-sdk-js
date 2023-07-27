@@ -296,7 +296,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         recipientId: keypair.publicKey,
         amount: 0,
       });
-      await expect(aepp.signTransaction(tx, { onAccount: account.address }))
+      await expect(aepp.signTransaction(tx))
         .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
     });
 
@@ -380,7 +380,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         wallet._resolveAccount().signMessage = () => {
           throw new Error('test');
         };
-        await expect(aepp.signMessage('test', { onAccount: account.address }))
+        await expect(aepp.signMessage('test'))
           .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
       });
 
@@ -424,7 +424,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         wallet._resolveAccount().signTypedData = () => {
           throw new Error('test');
         };
-        await expect(aepp.signTypedData(recordData, recordAci, { onAccount: account.address }))
+        await expect(aepp.signTypedData(recordData, recordAci))
           .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
       });
 
@@ -433,6 +433,42 @@ describe('Aepp<->Wallet', function aeppWallet() {
         const messageSig = await aepp.signTypedData(recordData, recordAci, { onAccount });
         const hash = hashTypedData(recordData, recordAci, {});
         expect(verify(hash, decode(messageSig), onAccount)).to.be.equal(true);
+      });
+    });
+
+    describe('Sign delegation to contract', () => {
+      const contractAddress = 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh';
+
+      it('rejected by wallet', async () => {
+        let origin;
+        wallet._resolveAccount().signDelegationToContract = (contractAddr, { aeppOrigin } = {}) => {
+          origin = aeppOrigin;
+          throw new RpcRejectedByUserError();
+        };
+        await expect(aepp.signDelegationToContract(contractAddress)).to.be.eventually
+          .rejectedWith('Operation rejected by user').with.property('code', 4);
+        expect(origin).to.be.equal('http://origin.test');
+      });
+
+      it('works', async () => {
+        // @ts-expect-error removes object property to restore the original behavior
+        delete wallet._resolveAccount().signDelegationToContract;
+        const signature = await aepp.signDelegationToContract(contractAddress);
+        expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
+      });
+
+      it('fails with unknown error', async () => {
+        wallet._resolveAccount().signDelegationToContract = () => {
+          throw new Error('test');
+        };
+        await expect(aepp.signDelegationToContract(contractAddress))
+          .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
+      });
+
+      it('signs using specific account', async () => {
+        const onAccount = wallet.addresses()[1];
+        const signature = await aepp.signDelegationToContract(contractAddress, { onAccount });
+        expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
       });
     });
 
