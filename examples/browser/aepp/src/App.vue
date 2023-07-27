@@ -48,7 +48,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import Connect from './Connect.vue';
 import Basic from './Basic.vue';
 import Contracts from './Contracts.vue';
@@ -61,7 +60,6 @@ export default {
     Connect, Basic, Contracts, PayForTx, TypedData, DelegationSignature,
   },
   data: () => ({ view: '' }),
-  computed: mapState(['aeSdk']),
 };
 </script>
 

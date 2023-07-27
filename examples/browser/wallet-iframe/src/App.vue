@@ -14,10 +14,26 @@
       <div>Balance</div>
       <Value :value="balancePromise" />
     </div>
+    <div>
+      <div>RPC client</div>
+      <div>status: {{ clientStatus ?? 'no client' }}, id: {{ clientId ?? 'not defined' }}</div>
+    </div>
 
     <button @click="switchAccount">Switch Account</button>
     <button @click="switchNode">Switch Node</button>
-    <button @click="disconnect">Disconnect</button>
+
+    <button
+      v-if="clientStatus === 'CONNECTED'"
+      @click="disconnect"
+    >
+      Disconnect
+    </button>
+    <button
+      v-else
+      @click="() => (stopSharingWalletInfo ?? shareWalletInfo)()"
+    >
+      {{ stopSharingWalletInfo ? 'Stop sharing' : 'Share wallet info' }}
+    </button>
   </div>
 
   <iframe
@@ -30,7 +46,7 @@
 <script>
 import {
   MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
-  BrowserWindowMessageConnection, METHODS, WALLET_TYPE,
+  BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
   RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, decodeFateValue,
 } from '@aeternity/aepp-sdk';
 import Value from './Value.vue';
@@ -43,24 +59,42 @@ export default {
     nodeName: '',
     address: '',
     balancePromise: null,
+    clientId: null,
+    clientStatus: null,
+    stopSharingWalletInfo: null,
   }),
   methods: {
-    async shareWalletInfo(clientId, { interval = 5000, attemps = 5 } = {}) {
-      this.aeSdk.shareWalletInfo(clientId);
-      while (attemps) {
-        await new Promise((resolve) => {
-          setTimeout(resolve, interval);
-        });
-        this.aeSdk.shareWalletInfo(clientId);
-        attemps -= 1;
+    shareWalletInfo({ interval = 5000, attempts = 5 } = {}) {
+      const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow;
+      const connection = new BrowserWindowMessageConnection({ target });
+      this.clientId = this.aeSdk.addRpcClient(connection);
+
+      this.aeSdk.shareWalletInfo(this.clientId);
+      const intervalId = setInterval(() => {
+        this.aeSdk.shareWalletInfo(this.clientId);
+        attempts -= 1;
+        if (!attempts) return this.stopSharingWalletInfo();
+      }, interval);
+
+      this.stopSharingWalletInfo = () => {
+        clearInterval(intervalId);
+        // TODO: replace with clientStatus
+        const client = this.aeSdk._getClient(this.clientId);
+        if (client.status === RPC_STATUS.WAITING_FOR_CONNECTION_REQUEST) {
+          this.aeSdk.removeRpcClient(this.clientId);
+        }
+        this.stopSharingWalletInfo = null;
       }
-      console.log('Finish sharing wallet info');
     },
     disconnect() {
-      Object.values(this.aeSdk.rpcClients).forEach((client) => {
-        client.notify(METHODS.closeConnection);
-        client.disconnect();
-      });
+      // TODO: move to removeRpcClient (would be a semi-breaking change)
+      const client = this.aeSdk._getClient(this.clientId);
+      if (client.status === RPC_STATUS.CONNECTED) {
+        client.rpc.notify(METHODS.closeConnection, null);
+      }
+
+      this.aeSdk.removeRpcClient(this.clientId);
+      this.clientId = null;
     },
     async switchAccount() {
       this.address = this.aeSdk.addresses().find((a) => a !== this.address);
@@ -71,6 +105,14 @@ export default {
         .map(({ name }) => name)
         .find((name) => name !== this.nodeName);
       this.aeSdk.selectNode(this.nodeName);
+    },
+    updateClientStatus() {
+      if (!this.clientId) {
+        this.clientStatus = null;
+        return;
+      }
+      const client = this.aeSdk._getClient(this.clientId);
+      this.clientStatus = client.status;
     },
   },
   mounted() {
@@ -151,7 +193,6 @@ export default {
       }
     }
 
-    let clientId;
     this.aeSdk = new AeSdkWallet({
       id: window.origin,
       type: WALLET_TYPE.window,
@@ -170,21 +211,20 @@ export default {
           throw new RpcConnectionDenyError();
         }
         aeppInfo[aeppId] = params;
+        setTimeout(() => this.stopSharingWalletInfo());
       },
       onSubscription: genConfirmCallback('subscription'),
       onAskAccounts: genConfirmCallback('get accounts'),
-      onDisconnect() {
-        this.shareWalletInfo(clientId);
+      onDisconnect: (clientId) => {
+        console.log('disconnected client', clientId);
+        this.clientId = null;
       },
     });
 
+    if (this.runningInFrame) this.shareWalletInfo();
+
     this.nodeName = this.aeSdk.selectedNodeName;
     [this.address] = this.aeSdk.addresses();
-
-    const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow;
-    const connection = new BrowserWindowMessageConnection({ target });
-    clientId = this.aeSdk.addRpcClient(connection);
-    this.shareWalletInfo(clientId);
 
     this.$watch(
       ({ address, nodeName }) => [address, nodeName],
@@ -193,6 +233,10 @@ export default {
       },
       { immediate: true },
     );
+
+    // TODO: replace setInterval with subscription after refactoring
+    setInterval(() => this.updateClientStatus(), 1000);
+    this.$watch(({ clientId }) => [clientId], () => this.updateClientStatus(), { immediate: true });
   },
 };
 </script>

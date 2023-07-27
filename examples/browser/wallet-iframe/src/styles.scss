@@ -15,7 +15,7 @@ body {
 }
 
 button {
-  @extend .w-32, .p-2, .m-2, .rounded-full, .bg-purple-500, .text-white, .text-xs;
+  @extend .w-40, .p-2, .m-2, .rounded-full, .bg-purple-500, .text-white, .text-xs;
 
   &:disabled {
     @extend .bg-purple-300, .cursor-not-allowed;

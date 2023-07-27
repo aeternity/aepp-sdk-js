@@ -106,12 +106,23 @@ export default class AeSdkWallet extends AeSdk {
     this._type = type;
   }
 
+  _getAccountsForClient({ addressSubscription }: RpcClientsInfo): Accounts {
+    const { current, connected } = this.getAccounts();
+    return {
+      current: addressSubscription.has('current') || addressSubscription.has('connected')
+        ? current : {},
+      connected: addressSubscription.has('connected') ? connected : {},
+    };
+  }
+
   _pushAccountsToApps(): void {
     if (this._clients == null) return;
     Array.from(this._clients.keys())
-      .filter((clientId) => this._isRpcClientSubscribed(clientId))
-      .map((clientId) => this._getClient(clientId).rpc)
-      .forEach((client) => client.notify(METHODS.updateAddress, this.getAccounts()));
+      .filter((clientId) => this._isRpcClientConnected(clientId))
+      .map((clientId) => this._getClient(clientId))
+      .filter((client) => client.addressSubscription.size !== 0)
+      .forEach((client) => client.rpc
+        .notify(METHODS.updateAddress, this._getAccountsForClient(client)));
   }
 
   override selectAccount(address: Encoded.AccountAddress): void {
@@ -147,11 +158,6 @@ export default class AeSdkWallet extends AeSdk {
     const client = this._clients.get(clientId);
     if (client == null) throw new UnknownRpcClientError(clientId);
     return client;
-  }
-
-  _isRpcClientSubscribed(clientId: string): boolean {
-    return this._isRpcClientConnected(clientId)
-      && this._getClient(clientId).addressSubscription.size !== 0;
   }
 
   _isRpcClientConnected(clientId: string): boolean {
@@ -219,10 +225,10 @@ export default class AeSdkWallet extends AeSdk {
           [METHODS.subscribeAddress]: async ({ type, value }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
 
-            await this.onSubscription(id, { type, value }, origin);
-
             switch (type) {
               case SUBSCRIPTION_TYPES.subscribe:
+                // TODO: remove `type` as it always subscribe
+                await this.onSubscription(id, { type, value }, origin);
                 client.addressSubscription.add(value);
                 break;
               case SUBSCRIPTION_TYPES.unsubscribe:
@@ -234,11 +240,11 @@ export default class AeSdkWallet extends AeSdk {
 
             return {
               subscription: Array.from(client.addressSubscription),
-              address: this.getAccounts(),
+              address: this._getAccountsForClient(client),
             };
           },
           [METHODS.address]: async (params, origin) => {
-            if (!this._isRpcClientSubscribed(id)) throw new RpcNotAuthorizeError();
+            if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
             await this.onAskAccounts(id, params, origin);
             return this.addresses();
           },
