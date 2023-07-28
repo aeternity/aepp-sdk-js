@@ -197,7 +197,7 @@ export async function sendTransaction(
         rawTx: tx,
       };
       // wait for transaction confirmation
-      if (confirm != null && (confirm === true || confirm > 0)) {
+      if (confirm != null && +confirm > 0) {
         const c = typeof confirm === 'boolean' ? undefined : confirm;
         return {
           ...txData,
