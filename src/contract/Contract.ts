@@ -312,7 +312,7 @@ class Contract<M extends ContractMethodsBase> {
 
     if (fn == null) throw new MissingFunctionNameError();
     if (fn === 'init' && callStatic !== true) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
-    if (fn !== 'init' && opt.amount != null && +opt.amount > 0 && !fnAci.payable) {
+    if (fn !== 'init' && opt.amount != null && Number(opt.amount) > 0 && !fnAci.payable) {
       throw new NotPayableFunctionError(opt.amount, fn);
     }
 

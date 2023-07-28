@@ -412,6 +412,15 @@ describe('Contract instance', () => {
     balanceAfter.should.be.equal(`${+contractBalance + 100}`);
   });
 
+  it('pays to payable function using BigInt', async () => {
+    assertNotNull(testContract.$options.address);
+    const contractBalance = await aeSdk.getBalance(testContract.$options.address);
+    // bigint is not assignable to amount
+    await testContract.stringFn('test', { amount: 100n as unknown as string, callStatic: false });
+    const balanceAfter = await aeSdk.getBalance(testContract.$options.address);
+    balanceAfter.should.be.equal(`${+contractBalance + 100}`);
+  });
+
   it('calls on specific account', async () => {
     const onAccount = aeSdk.accounts[aeSdk.addresses()[1]];
     const { result } = await testContract.intFn(123, { onAccount });
