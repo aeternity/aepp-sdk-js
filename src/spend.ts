@@ -60,11 +60,11 @@ interface SpendOptions extends SpendOptionsType {}
  * ```
  */
 export async function transferFunds(
-  fraction: number | string,
+  fraction: number | string, // TODO: accept only number
   recipientIdOrName: AensName | Encoded.AccountAddress,
   options: TransferFundsOptions,
 ): ReturnType<typeof sendTransaction> {
-  if (fraction < 0 || fraction > 1) {
+  if (+fraction < 0 || +fraction > 1) {
     throw new ArgumentError('fraction', 'a number between 0 and 1', fraction);
   }
   const recipientId = await resolveName<Encoding.AccountAddress>(

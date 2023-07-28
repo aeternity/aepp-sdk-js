@@ -4,6 +4,7 @@ import { ArgumentError, NotImplementedError, UnsupportedProtocolError } from '..
 import { Encoded } from '../utils/encoder';
 import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
 import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
+import { AensName } from '../tx/builder/constants';
 
 /**
  * Account provided by wallet
@@ -66,6 +67,40 @@ export default class AccountRpc extends AccountBase {
       },
       aci,
       data,
+    });
+    return signature;
+  }
+
+  override async signDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+  ): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
+      onAccount: this.address,
+      contractAddress,
+    });
+    return signature;
+  }
+
+  override async signNameDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    name: AensName,
+  ): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
+      onAccount: this.address,
+      contractAddress,
+      name,
+    });
+    return signature;
+  }
+
+  override async signOracleQueryDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    oracleQueryId: Encoded.OracleQueryId,
+  ): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
+      onAccount: this.address,
+      contractAddress,
+      oracleQueryId,
     });
     return signature;
   }

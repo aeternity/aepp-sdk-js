@@ -5,7 +5,7 @@ import { getSdk } from '.';
 import {
   AeSdk, Contract, MemoryAccount, Tag, UnexpectedTsError, Encoded,
 } from '../../src';
-import { InputNumber } from '../utils';
+import { InputNumber, assertNotNull } from '../utils';
 
 describe('Paying for transaction of another account', () => {
   let aeSdk: AeSdk;
@@ -48,12 +48,13 @@ describe('Paying for transaction of another account', () => {
       stateful entrypoint setValue(x: int) = put(state{ value = x })`;
 
   let contractAddress: Encoded.ContractAddress;
-  let aeSdkNotPayingFee: any;
-  let payingContract: Contract<{
+  let aeSdkNotPayingFee: AeSdk;
+  type TestContract = Contract<{
     init: (x: InputNumber) => void;
     getValue: () => bigint;
     setValue: (x: InputNumber) => void;
   }>;
+  let payingContract: TestContract;
 
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);
@@ -62,8 +63,9 @@ describe('Paying for transaction of another account', () => {
       waitMined: false,
       innerTx: true,
     });
-    const contract = await aeSdkNotPayingFee.initializeContract({ sourceCode });
+    const contract: TestContract = await aeSdkNotPayingFee.initializeContract({ sourceCode });
     const { rawTx: contractDeployTx, address } = await contract.$deploy([42]);
+    assertNotNull(address);
     contractAddress = address;
     await aeSdk.payForTransaction(contractDeployTx);
     payingContract = await aeSdkNotPayingFee.initializeContract({ sourceCode, address });

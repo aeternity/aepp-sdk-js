@@ -504,5 +504,12 @@ describe('Contract', () => {
       const queryObject2 = await aeSdk.getQueryObject(oracle.id, queryId);
       queryObject2.decodedResponse.should.be.equal(r);
     });
+
+    it('fails trying to create general delegation as oracle query', async () => {
+      const fakeQueryId = encode(decode(aeSdk.address), Encoding.OracleQueryId);
+      await expect(
+        aeSdk.createDelegationSignature(contractAddress, [fakeQueryId], { omitAddress: true }),
+      ).to.be.rejectedWith('not equal to account address');
+    });
   });
 });

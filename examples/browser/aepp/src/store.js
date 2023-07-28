@@ -25,7 +25,6 @@ const store = createStore({
         store.commit('setNetworkId', networkId);
       },
       onAddressChange: ({ current }) => store.commit('setAddress', Object.keys(current)[0]),
-      onDisconnect: () => alert('Aepp is disconnected'),
     })),
   },
   mutations: {

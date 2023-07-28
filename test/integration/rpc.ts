@@ -24,7 +24,6 @@ import {
   verify,
   NoWalletConnectedError,
   UnAuthorizedAccountError,
-  UnexpectedTsError,
   UnknownRpcClientError,
   UnsubscribedAccountError,
   AccountBase,
@@ -38,6 +37,7 @@ import {
   getSdk, ignoreVersion, networkId, url, compilerUrl,
 } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
+import { assertNotNull } from '../utils';
 
 const WindowPostMessageFake = (
   name: string,
@@ -148,8 +148,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Should receive `announcePresence` message from wallet', async () => {
-      const isReceived: any = new Promise((resolve) => {
-        if (connections.aeppWindow.addEventListener == null) throw new UnexpectedTsError();
+      const isReceived = new Promise<boolean>((resolve) => {
         connections.aeppWindow.addEventListener('message', (msg) => {
           resolve(msg.data.method === 'connection.announcePresence');
         });
@@ -296,7 +295,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         recipientId: keypair.publicKey,
         amount: 0,
       });
-      await expect(aepp.signTransaction(tx, { onAccount: account.address }))
+      await expect(aepp.signTransaction(tx))
         .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
     });
 
@@ -321,7 +320,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     it('Try to sign using unpermited account', async () => {
       const { publicKey: pub } = generateKeyPair();
-      if (aepp.rpcClient == null) throw new UnexpectedTsError();
+      assertNotNull(aepp.rpcClient);
       await expect(aepp.rpcClient.request(METHODS.sign, {
         tx: 'tx_+NkLAfhCuECIIeWttRUiZ32uriBdmM1t+dCg90KuG2ABxOiuXqzpAul6uTWvsyfx3EFJDah6trudrityh+6XSX3mkPEimhgGuJH4jzIBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYgbwW1nTsgAAKEB6bv2BOYRtUYKOzmZ6Xcbb2BBfXPOfFUZ4S9+EnoSJcqIG8FtZ07IAACIAWNFeF2KAAAKAIYSMJzlQADAoDBrIcoop8JfZ4HOD9p3nDTiNthj7jjl+ArdHwEMUrvQgitwOr/v3Q==',
         onAccount: pub,
@@ -351,8 +350,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
         payload: encode(Buffer.from('zerospend'), Encoding.Bytearray),
       });
       const res = await aepp.sendTransaction(tx);
-      if (res.tx?.payload == null || res.blockHeight == null) throw new UnexpectedTsError();
+      assertNotNull(res.tx?.payload);
       decode(res.tx.payload as Encoded.Any).toString().should.be.equal('zerospend2');
+      assertNotNull(res.blockHeight);
       res.blockHeight.should.be.a('number');
     });
 
@@ -380,7 +380,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         wallet._resolveAccount().signMessage = () => {
           throw new Error('test');
         };
-        await expect(aepp.signMessage('test', { onAccount: account.address }))
+        await expect(aepp.signMessage('test'))
           .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
       });
 
@@ -424,7 +424,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         wallet._resolveAccount().signTypedData = () => {
           throw new Error('test');
         };
-        await expect(aepp.signTypedData(recordData, recordAci, { onAccount: account.address }))
+        await expect(aepp.signTypedData(recordData, recordAci))
           .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
       });
 
@@ -433,6 +433,42 @@ describe('Aepp<->Wallet', function aeppWallet() {
         const messageSig = await aepp.signTypedData(recordData, recordAci, { onAccount });
         const hash = hashTypedData(recordData, recordAci, {});
         expect(verify(hash, decode(messageSig), onAccount)).to.be.equal(true);
+      });
+    });
+
+    describe('Sign delegation to contract', () => {
+      const contractAddress = 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh';
+
+      it('rejected by wallet', async () => {
+        let origin;
+        wallet._resolveAccount().signDelegationToContract = (contractAddr, { aeppOrigin } = {}) => {
+          origin = aeppOrigin;
+          throw new RpcRejectedByUserError();
+        };
+        await expect(aepp.signDelegationToContract(contractAddress)).to.be.eventually
+          .rejectedWith('Operation rejected by user').with.property('code', 4);
+        expect(origin).to.be.equal('http://origin.test');
+      });
+
+      it('works', async () => {
+        // @ts-expect-error removes object property to restore the original behavior
+        delete wallet._resolveAccount().signDelegationToContract;
+        const signature = await aepp.signDelegationToContract(contractAddress);
+        expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
+      });
+
+      it('fails with unknown error', async () => {
+        wallet._resolveAccount().signDelegationToContract = () => {
+          throw new Error('test');
+        };
+        await expect(aepp.signDelegationToContract(contractAddress))
+          .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
+      });
+
+      it('signs using specific account', async () => {
+        const onAccount = wallet.addresses()[1];
+        const signature = await aepp.signDelegationToContract(contractAddress, { onAccount });
+        expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
       });
     });
 
@@ -454,7 +490,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
     describe('Subscriptions', () => {
       it('Add new account to wallet: receive notification for update accounts', async () => {
-        if (aepp._accounts == null) throw new UnexpectedTsError();
+        assertNotNull(aepp._accounts);
         const connectedLength = Object.keys(aepp._accounts.connected).length;
         const accountsPromise = new Promise<Accounts>((resolve) => {
           aepp.onAddressChange = resolve;
@@ -464,7 +500,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       });
 
       it('Receive update for wallet select account', async () => {
-        if (aepp._accounts == null) throw new UnexpectedTsError();
+        assertNotNull(aepp._accounts);
         const connectedAccount = Object
           .keys(aepp._accounts.connected)[0] as Encoded.AccountAddress;
         const accountsPromise = new Promise<Accounts>((resolve) => {
@@ -472,14 +508,13 @@ describe('Aepp<->Wallet', function aeppWallet() {
         });
         wallet.selectAccount(connectedAccount);
         const { connected, current } = await accountsPromise;
-        if (current == null || connected == null) throw new UnexpectedTsError();
         expect(current[connectedAccount]).to.be.eql({});
         expect(Object.keys(connected).includes(connectedAccount)).to.be.equal(false);
       });
 
       it('Aepp: receive notification for network update', async () => {
         const message = await new Promise<Network>((resolve) => {
-          aepp.onNetworkChange = (msg: any) => resolve(msg);
+          aepp.onNetworkChange = (msg) => resolve(msg);
           wallet.addNode('second_node', node, true);
         });
         message.networkId.should.be.equal(networkId);
@@ -488,7 +523,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Try to connect unsupported protocol', async () => {
-      if (aepp.rpcClient == null) throw new UnexpectedTsError();
+      assertNotNull(aepp.rpcClient);
       await expect(aepp.rpcClient.request(METHODS.connect, { name: 'test-aepp', version: 2 as 1, connectNode: false })).to.be.eventually.rejectedWith('Unsupported Protocol Version').with.property('code', 5);
     });
 
@@ -610,8 +645,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
         payload: encode(Buffer.from('zerospend'), Encoding.Bytearray),
       });
       const res = await aepp.sendTransaction(tx);
-      if (res.tx?.payload == null || res.blockHeight == null) throw new UnexpectedTsError();
+      assertNotNull(res.tx?.payload);
       decode(res.tx.payload as Encoded.Any).toString().should.be.equal('zerospend2');
+      assertNotNull(res.blockHeight);
       res.blockHeight.should.be.a('number');
     });
 
@@ -621,7 +657,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         wallet.addNode('second_node', node, true);
       });
       message.networkId.should.be.equal(networkId);
-      if (message.node == null) throw new UnexpectedTsError();
+      assertNotNull(message.node);
       message.node.should.be.an('object');
       expect(wallet.selectedNodeName).to.be.equal('second_node');
     });

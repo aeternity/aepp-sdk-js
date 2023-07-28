@@ -75,6 +75,41 @@ class AccountMemoryProtected extends MemoryAccount {
     return super.signTypedData(data, aci, options);
   }
 
+  async signDelegationToContract(
+    contractAddress,
+    { aeppRpcClientId: id, aeppOrigin, ...options },
+  ) {
+    if (id != null) {
+      const opt = { ...options, contractAddress };
+      await genConfirmCallback('sign delegation to contract')(id, opt, aeppOrigin);
+    }
+    return super.signDelegationToContract(contractAddress, options);
+  }
+
+  async signNameDelegationToContract(
+    contractAddress,
+    name,
+    { aeppRpcClientId: id, aeppOrigin, ...options },
+  ) {
+    if (id != null) {
+      const opt = { ...options, contractAddress, name };
+      await genConfirmCallback('sign delegation of name to contract')(id, opt, aeppOrigin);
+    }
+    return super.signNameDelegationToContract(contractAddress, name, options);
+  }
+
+  async signOracleQueryDelegationToContract(
+    contractAddress,
+    oracleQueryId,
+    { aeppRpcClientId: id, aeppOrigin, ...options },
+  ) {
+    if (id != null) {
+      const opt = { ...options, contractAddress, oracleQueryId };
+      await genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
+    }
+    return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
+  }
+
   static generate() {
     // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
     return new AccountMemoryProtected(generateKeyPair().secretKey);

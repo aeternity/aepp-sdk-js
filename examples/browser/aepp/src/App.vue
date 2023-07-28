@@ -32,6 +32,13 @@
     >
       Typed data
     </a>
+    <a
+      href="#"
+      :class="{ active: view === 'DelegationSignature' }"
+      @click="view = 'DelegationSignature'"
+    >
+      Delegation signature
+    </a>
   </div>
 
   <Component
@@ -41,19 +48,18 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import Connect from './Connect.vue';
 import Basic from './Basic.vue';
 import Contracts from './Contracts.vue';
 import PayForTx from './PayForTx.vue';
 import TypedData from './TypedData.vue';
+import DelegationSignature from './DelegationSignature.vue';
 
 export default {
   components: {
-    Connect, Basic, Contracts, PayForTx, TypedData,
+    Connect, Basic, Contracts, PayForTx, TypedData, DelegationSignature,
   },
   data: () => ({ view: '' }),
-  computed: mapState(['aeSdk']),
 };
 </script>
 

@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from './index';
 import {
-  AeSdk,
+  AeSdk, Contract,
   commitmentHash, oracleQueryId, decode, encode, Encoded, Encoding,
   ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS, buildTx, unpackTx,
 } from '../../src';
@@ -44,7 +44,7 @@ describe('Transaction', () => {
   let aeSdk: AeSdk;
   const address = 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E';
   const oracleId = encode(decode(address), Encoding.OracleAddress);
-  let contract: any;
+  let contract: Contract<{}>;
 
   before(async () => {
     aeSdk = await getSdk(0);
