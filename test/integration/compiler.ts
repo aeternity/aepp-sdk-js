@@ -1,6 +1,6 @@
+import { readFile } from 'fs/promises';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { readFile } from 'fs/promises';
 import { compilerUrl, ignoreVersion } from '.';
 import inclAci from './contracts/Includes.json';
 import {

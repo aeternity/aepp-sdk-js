@@ -2,10 +2,11 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
+import { assertNotNull } from '../utils';
 import {
   AeSdk, MemoryAccount,
   generateKeyPair, AE_AMOUNT_FORMATS,
-  UnavailableAccountError, TypeError, ArgumentError, UnexpectedTsError,
+  UnavailableAccountError, TypeError, ArgumentError,
   encode, Encoding, Encoded,
 } from '../../src';
 
@@ -54,7 +55,7 @@ describe('Accounts', () => {
       const balanceBefore = new BigNumber(await aeSdk.getBalance(aeSdk.address));
       const { tx } = await aeSdk.transferFunds(fraction, receiver.address);
       const balanceAfter = new BigNumber(await aeSdk.getBalance(aeSdk.address));
-      if (tx == null || tx.amount == null) throw new UnexpectedTsError();
+      assertNotNull(tx?.amount);
       return {
         balanceBefore,
         balanceAfter,
@@ -98,14 +99,14 @@ describe('Accounts', () => {
   it('spends coins', async () => {
     const ret = await aeSdk.spend(1, receiver.address);
     ret.should.have.property('tx');
-    if (ret.tx == null) throw new UnexpectedTsError();
+    assertNotNull(ret.tx);
     ret.tx.should.include({ amount: 1n, recipientId: receiver.address });
   });
 
   it('spends coins in AE format', async () => {
     const ret = await aeSdk.spend(1, receiver.address, { denomination: AE_AMOUNT_FORMATS.AE });
     ret.should.have.property('tx');
-    if (ret.tx == null) throw new UnexpectedTsError();
+    assertNotNull(ret.tx);
     ret.tx.should.include({ amount: 10n ** 18n, recipientId: receiver.address });
   });
 
@@ -117,7 +118,7 @@ describe('Accounts', () => {
     const balanceAfter = await aeSdk.getBalance(publicKey);
     balanceAfter.should.be.equal(bigAmount.toString());
     ret.should.have.property('tx');
-    if (ret.tx == null) throw new UnexpectedTsError();
+    assertNotNull(ret.tx);
     ret.tx.should.include({ amount: bigAmount, recipientId: publicKey });
   });
 
@@ -130,11 +131,12 @@ describe('Accounts', () => {
   it('Get Account by block height/hash', async () => {
     await aeSdk.awaitHeight(await aeSdk.getHeight() + 3);
     const spend = await aeSdk.spend(123, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi');
-    if (spend.blockHeight == null || spend.tx?.amount == null) throw new UnexpectedTsError();
+    assertNotNull(spend.blockHeight);
     await aeSdk.awaitHeight(spend.blockHeight + 2);
     const accountAfterSpend = await aeSdk.getAccount(aeSdk.address);
     const accountBeforeSpendByHash = await aeSdk
       .getAccount(aeSdk.address, { height: spend.blockHeight - 1 });
+    assertNotNull(spend.tx?.amount);
     expect(accountBeforeSpendByHash.balance - accountAfterSpend.balance).to.be
       .equal(spend.tx.fee + spend.tx.amount);
   });
@@ -145,7 +147,7 @@ describe('Accounts', () => {
       const onAccount = accounts.find((acc) => acc !== aeSdk.address);
 
       const { tx } = await aeSdk.spend(1, aeSdk.address, { onAccount });
-      if (tx?.senderId == null) throw new UnexpectedTsError();
+      assertNotNull(tx?.senderId);
       tx.senderId.should.be.equal(onAccount);
     });
 

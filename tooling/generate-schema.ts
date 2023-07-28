@@ -1,7 +1,7 @@
 #!/usr/bin/env -S ts-node --transpileOnly
-import ts, { factory, IntersectionTypeNode, TypeNode } from 'typescript';
 import { writeFileSync } from 'fs';
 import { basename } from 'path';
+import ts, { factory, IntersectionTypeNode, TypeNode } from 'typescript';
 import { txSchema } from '../src/tx/builder/schema';
 import { Tag } from '../src/tx/builder/constants';
 
