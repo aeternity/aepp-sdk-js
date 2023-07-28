@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.2.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.1.0...v13.2.0) (2023-07-28)
+
+
+### Features
+
+* **account:** add methods to generate delegation signatures ([18bdf5a](https://github.com/aeternity/aepp-sdk-js/commit/18bdf5a113afac2c9a0c99555e2e301f043fa3ab))
+* **aepp,wallet:** support delegation signatures ([fd0dc43](https://github.com/aeternity/aepp-sdk-js/commit/fd0dc439418d2b63935bb8bbfb04020ef0884ecc))
+
+
+### Bug Fixes
+
+* **account:** add implementation of `signTypedData` in AccountBase ([fc6e42f](https://github.com/aeternity/aepp-sdk-js/commit/fc6e42f1229c5bebb0a0802126bd7ea5c8726f3d))
+* **wallet:** don't ask to confirm unsubscription ([e2ffc25](https://github.com/aeternity/aepp-sdk-js/commit/e2ffc25021d16b197bba41c88520e0a842b88ba9))
+* **wallet:** don't require to be subscribed to request addresses ([36920b4](https://github.com/aeternity/aepp-sdk-js/commit/36920b4234a00be4e3cc2728372e875b361f9409))
+* **wallet:** return accounts according to subscription ([fa900c0](https://github.com/aeternity/aepp-sdk-js/commit/fa900c0481cc898211a3d99d22d57d34cac02177))
+
 ## [13.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.0.1...v13.1.0) (2023-07-07)
 
 
