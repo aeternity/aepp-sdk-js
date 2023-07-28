@@ -38,6 +38,7 @@
     "validation": {
       "invalidLink": true
     },
+    "plugin": ["typedoc-plugin-missing-exports"],
     "readme": "none"
   }
 }
