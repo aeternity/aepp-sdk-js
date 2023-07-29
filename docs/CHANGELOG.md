@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.2.1](https://github.com/aeternity/aepp-sdk-js/compare/v13.2.0...v13.2.1) (2023-07-28)
+
+
+### Bug Fixes
+
+* use `Number` instead of unary plus for BigInt ([33fcfb4](https://github.com/aeternity/aepp-sdk-js/commit/33fcfb452b7340b73a13300e19cfeb83a94406c2))
+
 ## [13.2.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.1.0...v13.2.0) (2023-07-28)
 
 
