@@ -19,7 +19,7 @@ export const ProtocolToVmAbi = {
   },
   [ConsensusProtocolVersion.Ceres]: {
     'contract-create': {
-      vmVersion: [VmVersion.Fate2], abiVersion: [AbiVersion.Fate],
+      vmVersion: [VmVersion.Fate3], abiVersion: [AbiVersion.Fate],
     },
     'contract-call': {
       vmVersion: [], abiVersion: [AbiVersion.Fate],
