@@ -375,8 +375,8 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
       top,
       txEvents: rs[0].txEvents,
       txs: rs.map((req) => ({ tx: req.tx })),
-      accounts: Array.from(new Set(rs.map((req) => req.accountAddress)))
-        .map((pubKey) => ({ pubKey, amount: DRY_RUN_ACCOUNT.amount })),
+      ...rs.map((req) => req.accountAddress).includes(DRY_RUN_ACCOUNT.pub)
+        && { accounts: [{ pubKey: DRY_RUN_ACCOUNT.pub, amount: DRY_RUN_ACCOUNT.amount }] },
     });
   } catch (error) {
     rs.forEach(({ reject }) => reject(error));
