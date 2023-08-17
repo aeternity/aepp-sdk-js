@@ -9,13 +9,13 @@ import {
   NodeInvocationError,
   commitmentHash,
   decode, encode, Encoded, Encoding,
-  DRY_RUN_ACCOUNT,
   messageToHash,
   genSalt,
   UnexpectedTsError,
   AeSdk,
   Contract, ContractMethodsBase,
 } from '../../src';
+import { DRY_RUN_ACCOUNT } from '../../src/tx/builder/schema';
 
 const identitySourceCode = `
 contract Identity =

@@ -27,7 +27,7 @@ export {
 export type { Int, AensName } from './tx/builder/constants';
 // TODO: move to constants
 export {
-  ORACLE_TTL_TYPES, ORACLE_TTL, QUERY_TTL, RESPONSE_TTL, DRY_RUN_ACCOUNT, CallReturnType,
+  ORACLE_TTL_TYPES, ORACLE_TTL, QUERY_TTL, RESPONSE_TTL, CallReturnType,
 } from './tx/builder/schema';
 export {
   getExecutionCost, getExecutionCostBySignedTx, getExecutionCostUsingNode,
