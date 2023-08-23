@@ -48,7 +48,7 @@ All notable changes to this project will be documented in this file. See [standa
 * **contract:** use fallback account if `onAccount` not provided ([9033cd7](https://github.com/aeternity/aepp-sdk-js/commit/9033cd799be5974ebf28a49df181eeb63b1fce84))
 * converting proxied options to JSON ([efebbd1](https://github.com/aeternity/aepp-sdk-js/commit/efebbd139ea85c35e28bdcfe907670743f9fc1f4))
 * provide types in exports field of package.json ([dbd19e7](https://github.com/aeternity/aepp-sdk-js/commit/dbd19e70bca2d6dbc5b2392db478bb98936b63f2))
-* reject prefixes other then provided in isAddressValid ([9462add](https://github.com/aeternity/aepp-sdk-js/commit/9462adde8fab9848fca0a6d9a382dbd34f5e2b8f))
+* reject prefixes other than provided in isAddressValid ([9462add](https://github.com/aeternity/aepp-sdk-js/commit/9462adde8fab9848fca0a6d9a382dbd34f5e2b8f))
 * **tx-builder:** `buildTx` produces the same type as `unpackTx` accepts ([d3d6c88](https://github.com/aeternity/aepp-sdk-js/commit/d3d6c88607abbfb74acf016fba886540938b216d))
 * **tx-builder:** decode tag in entry error message ([db0d96f](https://github.com/aeternity/aepp-sdk-js/commit/db0d96f156f3e8cfe52c6a7d7411c359f6dae35c))
 * **wallet:** emit internal error if something broke while broadcast ([332d1b5](https://github.com/aeternity/aepp-sdk-js/commit/332d1b567f69bf6b7d3567af43fb805556ac015b))

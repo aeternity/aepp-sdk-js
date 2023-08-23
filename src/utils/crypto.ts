@@ -190,7 +190,7 @@ export function verifyMessage(
 /**
  * Check key pair for validity
  *
- * Sign a message, and then verifying that signature
+ * Signs a message, and then verifies that signature
  * @param privateKey - Private key to verify
  * @param publicKey - Public key to verify as hex string
  * @returns Valid?

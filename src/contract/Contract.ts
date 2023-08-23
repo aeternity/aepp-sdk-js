@@ -122,7 +122,7 @@ interface GetCallResultByHashReturnType<M extends ContractMethodsBase, Fn extend
  * const staticCallResult = await contractIns.$call('setState', [123], { callStatic: true })
  * ```
  * Also you can call contract like: `await contractIns.setState(123, options)`
- * Then sdk decide to make on-chain or static call(dry-run API) transaction based on function is
+ * Then sdk decide to make on-chain or static call (dry-run API) transaction based on function is
  * stateful or not
  */
 class Contract<M extends ContractMethodsBase> {
