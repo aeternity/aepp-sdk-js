@@ -1,7 +1,7 @@
 version: '3'
 services:
   node:
-    image: aeternity/aeternity:master@sha256:824d40d60fcf4a07d805bba6b6880e182331a971bb8e4793d45d66eaa5e568fa
+    image: aeternity/aeternity:master@sha256:4ab3f2e33f02b0b96a0cb1b16544cd62498d0b4b983ba74e12b2564f2b908834
     hostname: node
     ports: ["3013:3013", "3113:3113", "3014:3014", "3114:3114"]
     volumes:

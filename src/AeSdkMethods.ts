@@ -89,6 +89,7 @@ class AeSdkMethods {
     };
   }
 
+  // TODO: omit onNode from options, because it is already in context
   async buildTx(options: TxParamsAsync): Promise<Encoded.Transaction> {
     return buildTxAsync({ ...this.getContext(), ...options });
   }

@@ -14,7 +14,7 @@ import { ConsensusProtocolVersion } from './tx/builder/constants';
 const bigIntPropertyNames = [
   'balance', 'queryFee', 'fee', 'amount', 'nameFee', 'channelAmount',
   'initiatorAmount', 'responderAmount', 'channelReserve', 'initiatorAmountFinal',
-  'responderAmountFinal', 'gasPrice', 'deposit',
+  'responderAmountFinal', 'gasPrice', 'minGasPrice', 'deposit',
 ] as const;
 
 const numberPropertyNames = [
@@ -22,7 +22,7 @@ const numberPropertyNames = [
   'nonce', 'nextNonce', 'height', 'blockHeight', 'topBlockHeight',
   'ttl', 'nameTtl', 'clientTtl',
   'inbound', 'outbound', 'peerCount', 'pendingTransactionsCount', 'effectiveAtHeight',
-  'version', 'solutions', 'round',
+  'version', 'solutions', 'round', 'minutes', 'utilization',
 ] as const;
 
 class NodeTransformed extends NodeApi {
@@ -112,8 +112,6 @@ interface NodeInfo {
 }
 
 export default class Node extends (NodeTransformed as unknown as NodeTransformedApi) {
-  #networkIdPromise?: Promise<string | Error>;
-
   /**
    * @param url - Url for node API
    * @param options - Options
@@ -145,9 +143,8 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       ...options,
     });
     if (!ignoreVersion) {
-      const statusPromise = this.getStatus();
-      const versionPromise = statusPromise.then(({ nodeVersion }) => nodeVersion, (error) => error);
-      this.#networkIdPromise = statusPromise.then(({ networkId }) => networkId, (error) => error);
+      const versionPromise = this._getCachedStatus()
+        .then(({ nodeVersion }) => nodeVersion, (error) => error);
       this.pipeline.addPolicy(
         genVersionCheckPolicy('node', '/v3/status', versionPromise, '6.2.0', '7.0.0'),
       );
@@ -155,15 +152,27 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
     this.intAsString = true;
   }
 
+  #cachedStatusPromise?: ReturnType<Node['getStatus']>;
+
+  async _getCachedStatus(): ReturnType<Node['getStatus']> {
+    this.#cachedStatusPromise ??= this.getStatus();
+    return this.#cachedStatusPromise;
+  }
+
+  // @ts-expect-error use code generation to create node class?
+  override async getStatus(
+    ...args: Parameters<InstanceType<NodeTransformedApi>['getStatus']>
+  ): ReturnType<InstanceType<NodeTransformedApi>['getStatus']> {
+    this.#cachedStatusPromise = super.getStatus(...args);
+    return this.#cachedStatusPromise;
+  }
+
   /**
    * Returns network ID provided by node.
    * This method won't do extra requests on subsequent calls.
    */
   async getNetworkId(): Promise<string> {
-    this.#networkIdPromise ??= this.getStatus().then(({ networkId }) => networkId);
-    const networkId = await this.#networkIdPromise;
-    if (networkId instanceof Error) throw networkId;
-    return networkId;
+    return (await this._getCachedStatus()).networkId;
   }
 
   async getNodeInfo(): Promise<NodeInfo> {

@@ -152,6 +152,9 @@ describe('Node Chain', () => {
   });
 
   it('multiple spends from different accounts', async () => {
+    await aeSdkWithoutAccount.spend(0, aeSdk.address, {
+      onAccount: Object.values(aeSdk.accounts)[0],
+    });
     const getCount = bindRequestCounter(aeSdkWithoutAccount.api);
     const spends = await Promise.all(
       accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e14, aeSdk.address, {
