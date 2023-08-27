@@ -20,60 +20,36 @@
   </div>
 
   <template v-if="contract">
-    <h2>Compile Contract</h2>
-    <div class="group">
-      <button @click="() => { compilePromise = compile(); }">
-        Compile
-      </button>
-      <div v-if="compilePromise">
-        <div>Bytecode</div>
-        <Value :value="compilePromise" />
-      </div>
-    </div>
+    <FieldAction
+      title="Compile Contract"
+      action-title="Compile"
+      :action-handler="compile"
+      result-title="Bytecode"
+    />
   </template>
 
   <template v-if="contract">
-    <h2>Deploy Contract</h2>
-    <div class="group">
-      <div>
-        <div>Deploy argument</div>
-        <div>
-          <input
-            v-model="deployArg"
-            placeholder="Deploy argument"
-          >
-        </div>
-      </div>
-      <button @click="() => { deployPromise = deploy(); }">
-        Deploy
-      </button>
-      <div v-if="deployPromise">
-        <div>Deployed Contract</div>
-        <Value :value="deployPromise" />
-      </div>
-    </div>
+    <FieldAction
+      title="Deploy Contract"
+      arg-title="Deploy argument"
+      arg-placeholder="Deploy argument"
+      arg-default-value="5"
+      action-title="Deploy"
+      :action-handler="deploy"
+      result-title="Deployed Contract"
+    />
   </template>
 
   <template v-if="deployPromise">
-    <h2>Call Contract</h2>
-    <div class="group">
-      <div>
-        <div>Call argument</div>
-        <div>
-          <input
-            v-model="callArg"
-            placeholder="Call argument"
-          >
-        </div>
-      </div>
-      <button @click="() => { callPromise = call(); }">
-        Call
-      </button>
-      <div v-if="callPromise">
-        <div>Call Result</div>
-        <Value :value="callPromise" />
-      </div>
-    </div>
+    <FieldAction
+      title="Call Contract"
+      arg-title="Call argument"
+      arg-placeholder="Call argument"
+      arg-default-value="7"
+      action-title="Call"
+      :action-handler="call"
+      result-title="Call Result"
+    />
   </template>
 </template>
 
@@ -81,6 +57,7 @@
 import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
 import Value from './components/Value.vue';
+import FieldAction from './components/FieldAction.vue';
 
 const contractSourceCode = `
 contract Multiplier =
@@ -90,16 +67,12 @@ contract Multiplier =
 `.trim();
 
 export default {
-  components: { Value },
+  components: { Value, FieldAction },
   data: () => ({
     contractSourceCode,
-    deployArg: 5,
-    callArg: 7,
     createPromise: null,
     contract: null,
-    compilePromise: null,
     deployPromise: null,
-    callPromise: null,
   }),
   computed: mapState(['aeSdk']),
   methods: {
@@ -112,11 +85,12 @@ export default {
     async compile() {
       return this.contract.$compile();
     },
-    async deploy() {
-      return this.contract.$deploy([this.deployArg]);
+    async deploy(arg) {
+      this.deployPromise = this.contract.$deploy([arg]);
+      return this.deployPromise;
     },
-    async call() {
-      return this.contract.calc(this.callArg);
+    async call(arg) {
+      return this.contract.calc(arg);
     },
   },
 };
