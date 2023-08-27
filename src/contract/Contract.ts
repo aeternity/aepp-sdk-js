@@ -252,12 +252,12 @@ class Contract<M extends ContractMethodsBase> {
       code: this.$options.bytecode,
       ownerId,
     });
-    this.$options.address = buildContractIdByContractTx(tx);
     const { hash, ...other } = await this.#sendAndProcess(
       tx,
       'init',
       { ...opt, onAccount: opt.onAccount },
     );
+    this.$options.address = buildContractIdByContractTx(tx);
     return {
       ...other,
       ...other.result?.log != null && {
