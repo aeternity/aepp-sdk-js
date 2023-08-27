@@ -18,7 +18,7 @@
       <div>Payload</div>
       <div><input v-model="spendPayload"></div>
     </div>
-    <button @click="spendPromise = spend()">
+    <button @click="() => { spendPromise = spend(); }">
       Spend
     </button>
     <div v-if="spendPromise">

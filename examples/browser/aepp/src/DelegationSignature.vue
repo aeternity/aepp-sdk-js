@@ -25,7 +25,7 @@
       </label>
       <div><input v-model="oracleQueryId"></div>
     </div>
-    <button @click="signPromise = sign()">
+    <button @click="() => { signPromise = sign(); }">
       Sign
     </button>
     <div v-if="signPromise">

@@ -28,7 +28,7 @@
         (only if you want to pay for this transaction yourself)
       </div>
     </div>
-    <button @click="generatePromise = generate()">
+    <button @click="() => { generatePromise = generate(); }">
       Generate
     </button>
     <div v-if="generatePromise">

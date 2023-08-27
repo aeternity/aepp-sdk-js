@@ -10,7 +10,7 @@
         >
       </div>
     </div>
-    <button @click="messageSignPromise = messageSign()">
+    <button @click="() => { messageSignPromise = messageSign(); }">
       Sign message
     </button>
     <div v-if="messageSignPromise">

@@ -10,7 +10,7 @@
         />
       </div>
     </div>
-    <button @click="createPromise = create()">
+    <button @click="() => { createPromise = create(); }">
       Create
     </button>
     <div v-if="createPromise">
@@ -22,7 +22,7 @@
   <template v-if="contract">
     <h2>Compile Contract</h2>
     <div class="group">
-      <button @click="compilePromise = compile()">
+      <button @click="() => { compilePromise = compile(); }">
         Compile
       </button>
       <div v-if="compilePromise">
@@ -44,7 +44,7 @@
           >
         </div>
       </div>
-      <button @click="deployPromise = deploy()">
+      <button @click="() => { deployPromise = deploy(); }">
         Deploy
       </button>
       <div v-if="deployPromise">
@@ -66,7 +66,7 @@
           >
         </div>
       </div>
-      <button @click="callPromise = call()">
+      <button @click="() => { callPromise = call(); }">
         Call
       </button>
       <div v-if="callPromise">

@@ -68,7 +68,7 @@
 
   <h2>Sign</h2>
   <div class="group">
-    <button @click="signPromise = signTypedData()">
+    <button @click="() => { signPromise = signTypedData(); }">
       Sign
     </button>
     <div v-if="signPromise">
@@ -97,7 +97,7 @@
         >
       </div>
     </div>
-    <button @click="verifyPromise = verifyTypedData()">
+    <button @click="() => { verifyPromise = verifyTypedData(); }">
       Verify
     </button>
     <div v-if="verifyPromise">

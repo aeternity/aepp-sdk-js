@@ -12,7 +12,7 @@
         >
       </div>
     </div>
-    <button @click="signInnerTxPromise = signInnerTx()">
+    <button @click="() => { signInnerTxPromise = signInnerTx(); }">
       Sign
     </button>
     <div v-if="signInnerTxPromise">
@@ -32,7 +32,7 @@
         >
       </div>
     </div>
-    <button @click="payForTxPromise = payForTx()">
+    <button @click="() => { payForTxPromise = payForTx(); }">
       Pay for transaction
     </button>
     <div v-if="payForTxPromise">
