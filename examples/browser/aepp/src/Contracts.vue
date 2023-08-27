@@ -42,12 +42,22 @@
 
   <template v-if="deployPromise">
     <FieldAction
-      title="Call Contract"
+      title="Call Contract on chain"
       arg-title="Call argument"
       arg-placeholder="Call argument"
       arg-default-value="7"
       action-title="Call"
-      :action-handler="call"
+      :action-handler="callOnChain"
+      result-title="Call Result"
+    />
+
+    <FieldAction
+      title="Call Contract using dry-run (static)"
+      arg-title="Call argument"
+      arg-placeholder="Call argument"
+      arg-default-value="8"
+      action-title="Call"
+      :action-handler="callStatic"
       result-title="Call Result"
     />
   </template>
@@ -62,8 +72,14 @@ import FieldAction from './components/FieldAction.vue';
 const contractSourceCode = `
 contract Multiplier =
   record state = { factor: int }
-  entrypoint init(f : int) : state = { factor = f }
-  entrypoint calc(x : int) = x * state.factor
+
+  entrypoint init(f : int) = { factor = f }
+
+  stateful entrypoint setFactor(f : int) =
+    put(state{ factor = f })
+
+  entrypoint multiplyByFactor(x : int) =
+    x * state.factor
 `.trim();
 
 export default {
@@ -89,8 +105,11 @@ export default {
       this.deployPromise = this.contract.$deploy([arg]);
       return this.deployPromise;
     },
-    async call(arg) {
-      return this.contract.calc(arg);
+    async callOnChain(arg) {
+      return this.contract.setFactor(arg);
+    },
+    async callStatic(arg) {
+      return this.contract.multiplyByFactor(arg);
     },
   },
 };
