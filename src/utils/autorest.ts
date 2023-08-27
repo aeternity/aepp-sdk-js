@@ -15,10 +15,10 @@ export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
         request.headers.delete('__queue');
         const getResponse = async (): Promise<PipelineResponse> => next(request);
         if (key == null) return getResponse();
-        const req = (requestQueues.get(key) ?? Promise.resolve()).then(getResponse, getResponse);
-        // TODO: remove after fixing https://github.com/aeternity/aeternity/issues/3803
+        const req = (requestQueues.get(key) ?? Promise.resolve()).then(getResponse);
+        // TODO: remove pause after fixing https://github.com/aeternity/aeternity/issues/3803
         // gap to ensure that node won't reject the nonce
-        requestQueues.set(key, req.then(async () => pause(750)));
+        requestQueues.set(key, req.then(async () => pause(750), () => {}));
         return req;
       },
     },
