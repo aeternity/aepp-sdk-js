@@ -66,16 +66,12 @@
     </div>
   </div>
 
-  <h2>Sign</h2>
-  <div class="group">
-    <button @click="signPromise = signTypedData()">
-      Sign
-    </button>
-    <div v-if="signPromise">
-      <div>Signature</div>
-      <Value :value="signPromise" />
-    </div>
-  </div>
+  <FieldAction
+    title="Sign"
+    action-title="Sign"
+    :action-handler="signTypedData"
+    result-title="Signature"
+  />
 
   <h2>Verify</h2>
   <div class="group">
@@ -97,7 +93,7 @@
         >
       </div>
     </div>
-    <button @click="verifyPromise = verifyTypedData()">
+    <button @click="() => { verifyPromise = verifyTypedData(); }">
       Verify
     </button>
     <div v-if="verifyPromise">
@@ -113,10 +109,11 @@ import {
   hashTypedData, encodeFateValue, verify, decode,
 } from '@aeternity/aepp-sdk';
 import Value from './components/Value.vue';
+import FieldAction from './components/FieldAction.vue';
 
 export default {
   components: {
-    Value,
+    Value, FieldAction,
   },
   data: () => ({
     domain: {
@@ -135,7 +132,6 @@ export default {
       operation: 'test',
       parameter: 42,
     }),
-    signPromise: null,
     verifySignature: null,
     verifyAddress: null,
     verifyPromise: null,
