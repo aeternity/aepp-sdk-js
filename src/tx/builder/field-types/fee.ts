@@ -156,7 +156,7 @@ export default {
     const value = new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
       if (_pickBiggerFee === true) return minFee.toFixed();
-      throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger then ${minFee}`);
+      throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger than ${minFee}`);
     }
     return value.toFixed();
   },
