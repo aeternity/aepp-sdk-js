@@ -68,6 +68,13 @@ Note:
   const contract = await aeSdk.initializeContract({ sourceCode, fileSystem })
   ```
 
+### By path to source code (available only in Node.js)
+It can be used with both CompilerCli and CompilerHttp. This way contract imports would be handled automatically, with no need to provide `fileSystem` option.
+```js
+const sourceCodePath = './example.aes'
+const contract = await aeSdk.initializeContract({ sourceCodePath })
+```
+
 ### By ACI and bytecode
 If you pre-compiled the contracts you can also initialize a contract instance by providing ACI and bytecode:
 
@@ -102,6 +109,10 @@ const contract = await aeSdk.initializeContract({ aci, address })
         - For most of these additional options it doesn't make sense to define them at contract instance level.
         - You wouldn't want to provide an `amount` to each transaction or use the same `nonce` which would result in invalid transactions.
         - For options like `ttl` or `gasPrice` it does absolutely make sense to set this on contract instance level.
+
+### Keep bytecode and ACI for future use
+After the contract is initialized you can persist values of `contract._aci` and `contract.$options.bytecode`.
+They can be provided for subsequent contract initializations to don't depend on a compiler.
 
 ## 5. Deploy the contract
 
