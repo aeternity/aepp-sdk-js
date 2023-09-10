@@ -210,3 +210,10 @@ As already stated various times in the guide it is possible to provide [transact
 Sometimes you might wonder how to pass params to the JavaScript method that calls an entrypoint of your Sophia smart contract.
 The conversion between JS and Sophia values is handled by aepp-calldata library.
 Refer to [its documentation](https://www.npmjs.com/package/@aeternity/aepp-calldata#data-types) to find the right type to use.
+
+## Generate file system object in Node.js
+To do so you can use [getFileSystem](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/functions/getFileSystem.html) function.
+In most cases, you don't need to do it explicitly. Prefer to use `sourceCodePath` instead `sourceCode` in
+[Contract::initialize](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/_internal_.Contract.html#initialize),
+and [compile](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerBase.html#compile)
+instead [compileBySourceCode](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerBase.html#compileBySourceCode) in CompilerBase.
