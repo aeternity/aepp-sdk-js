@@ -5,24 +5,33 @@ The smart contract language of the æternity blockchain is [Sophia](https://docs
 
 Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into [aepp-sophia-examples](https://github.com/aeternity/aepp-sophia-examples) and start rapid prototyping using [AEstudio](https://studio.aepps.com).
 
-The SDK needs to interact with following components in order to enable smart contract interactions on the æternity blockchain:
-
-- [æternity](https://github.com/aeternity/aeternity) (host your own one or use the public testnet node at `https://testnet.aeternity.io`)
-- [aesophia_http](https://github.com/aeternity/aesophia_http) (host your own one or use the public compiler at `https://v7.compiler.aepps.com`)
-
-Note:
-
-- For production deployments you should ***always*** host these services by yourself.
-
 ## 1. Specify imports
 ```js
 // node.js import
-const { AeSdk, MemoryAccount, Node, CompilerHttp } = require('@aeternity/aepp-sdk')
+const { AeSdk, MemoryAccount, Node } = require('@aeternity/aepp-sdk')
 // ES import
-import { AeSdk, MemoryAccount, Node, CompilerHttp } from '@aeternity/aepp-sdk'
+import { AeSdk, MemoryAccount, Node } from '@aeternity/aepp-sdk'
+// additionally you may need to import CompilerCli or CompilerHttp
 ```
 
-## 2. Create an instance of the SDK
+## 2. Setup compiler
+Compiler primarily used to generate bytecode to deploy a contract.
+Skip this step if you have a contract bytecode or need to interact with an already deployed contract.
+Out-of-the-box SDK supports [aesophia_cli](https://github.com/aeternity/aesophia_cli) and [aesophia_http](https://github.com/aeternity/aesophia_http) implemented in [CompilerCli](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerCli.html) and [CompilerHttp](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerHttp.html) respectively.
+
+CompilerCli is available only in Node.js and requires Erlang installed (`escript` available in `$PATH`), Windows is supported.
+```js
+const compiler = new CompilerCli()
+```
+
+CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since [compiler.aepps.com](https://v7.compiler.aepps.com/api) is planned to be decommissioned. An example of how to run it using [docker-compose](https://github.com/aeternity/aepp-sdk-js/blob/cd8dd7f76a6323383349b48400af0d69c2cfd88e/docker-compose.yml#L11-L14).
+```js
+const compiler = new CompilerHttp('https://v7.compiler.aepps.com') // host your own compiler
+```
+
+Both compiler classes implement the [same interface](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerBase.html) that can be used to generate bytecode and ACI without a Contract instance.
+
+## 3. Create an instance of the SDK
 When creating an instance of the SDK you need to provide an account which will be used to sign transactions like `ContractCreateTx` and `ContractCallTx` that will be broadcasted to the network.
 
 ```js
@@ -32,7 +41,7 @@ const account = new MemoryAccount(SECRET_KEY)
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
   accounts: [account],
-  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'), // ideally host your own compiler
+  onCompiler: compiler, // remove if step #2 skipped
 })
 ```
 
@@ -42,7 +51,7 @@ Note:
 - For each transaction you can choose a specific account to use for signing (by default the first account will be used), see [transaction options](../transaction-options.md).
     - This is specifically important and useful for writing tests.
 
-## 3. Initialize the contract instance
+## 4. Initialize the contract instance
 
 ### By source code
 
@@ -80,7 +89,7 @@ const contract = await aeSdk.initializeContract({ aci, address })
 ### Options
 
 - Following attributes can be provided via `options` to `initializeContract`:
-    - `aci` (default: obtained via http compiler)
+    - `aci` (default: obtained via `onCompiler`)
         - The Contract ACI.
     - `address`
         - The address where the contract is located at.
@@ -94,7 +103,7 @@ const contract = await aeSdk.initializeContract({ aci, address })
         - You wouldn't want to provide an `amount` to each transaction or use the same `nonce` which would result in invalid transactions.
         - For options like `ttl` or `gasPrice` it does absolutely make sense to set this on contract instance level.
 
-## 4. Deploy the contract
+## 5. Deploy the contract
 
 If you have a Sophia contract source code that looks like this:
 ```sophia
@@ -131,7 +140,7 @@ Note:
 - In Sophia all `public functions` are called `entrypoints` and need to be declared as `stateful`
 if they should produce changes to the state of the smart contract, see `increment(value: int)`.
 
-## 5. Call contract entrypoints
+## 6. Call contract entrypoints
 
 ### a) Stateful entrypoints
 According to the example above you can call the `stateful` entrypoint `increment` by using one of the following lines:
