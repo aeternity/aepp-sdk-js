@@ -19,6 +19,19 @@ export type Aci = Array<{
   };
 }>;
 
+export type CompileResult = Promise<{
+  bytecode: Encoded.ContractBytearray;
+  aci: Aci;
+  warnings: Array<{
+    message: string;
+    pos: {
+      file?: string;
+      line: number;
+      col: number;
+    };
+  }>;
+}>;
+
 /**
  * A base class for all compiler implementations
  */
@@ -29,10 +42,7 @@ export default abstract class CompilerBase {
    * @param path - Path to contract source code
    * @returns ACI and bytecode
    */
-  abstract compile(path: string): Promise<{
-    bytecode: Encoded.ContractBytearray;
-    aci: Aci;
-  }>;
+  abstract compile(path: string): CompileResult;
 
   /**
    * Compile contract by contract's source code
@@ -50,10 +60,7 @@ export default abstract class CompilerBase {
   abstract compileBySourceCode(
     sourceCode: string,
     fileSystem?: Record<string, string>,
-  ): Promise<{
-    bytecode: Encoded.ContractBytearray;
-    aci: Aci;
-  }>;
+  ): CompileResult;
 
   /**
    * Generate contract's ACI by contract's path
