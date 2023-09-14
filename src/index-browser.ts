@@ -43,9 +43,7 @@ export {
 export {
   encode, decode, Encoding, Encoded,
 } from './utils/encoder';
-export {
-  encodeFateValue, decodeFateValue, hashTypedData, hashDomain, hashJson,
-} from './utils/typed-data';
+export { hashTypedData, hashDomain, hashJson } from './utils/typed-data';
 export {
   aensRevoke, aensUpdate, aensTransfer, aensQuery, aensClaim, aensPreclaim, aensBid,
 } from './aens';
@@ -111,4 +109,6 @@ export {
   TagNotFoundError, TxNotInChainError, AlreadyConnectedError, NoWalletConnectedError,
   RpcConnectionError,
 } from './utils/errors';
-export { RpcBroadcastError, NAME_BID_MAX_LENGTH } from './deprecated';
+export {
+  RpcBroadcastError, NAME_BID_MAX_LENGTH, encodeFateValue, decodeFateValue,
+} from './deprecated';

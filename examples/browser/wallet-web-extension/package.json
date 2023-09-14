@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@aeternity/aepp-calldata": "^1.5.1",
     "@aeternity/aepp-sdk": "file:../../..",
     "core-js": "^3.32.1",
     "tailwindcss": "^2.2.19",

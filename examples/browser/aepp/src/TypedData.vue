@@ -105,9 +105,8 @@
 
 <script>
 import { mapState } from 'vuex';
-import {
-  hashTypedData, encodeFateValue, verify, decode,
-} from '@aeternity/aepp-sdk';
+import { hashTypedData, verify, decode } from '@aeternity/aepp-sdk';
+import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import Value from './components/Value.vue';
 import FieldAction from './components/FieldAction.vue';
 
@@ -145,7 +144,8 @@ export default {
       return JSON.parse(this.aci);
     },
     dataEncoded() {
-      return encodeFateValue(this.dataParsed, this.aciParsed);
+      const dataType = new TypeResolver().resolveType(this.aciParsed);
+      return new ContractByteArrayEncoder().encodeWithType(this.dataParsed, dataType);
     },
     hash() {
       return hashTypedData(this.dataEncoded, this.aciParsed, this.domain);

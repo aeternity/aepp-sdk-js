@@ -1,8 +1,9 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import canonicalize from 'canonicalize';
+import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import {
-  AeSdk, Contract, decode, Encoded, encodeFateValue, decodeFateValue,
+  AeSdk, Contract, decode, Encoded,
   hashDomain, hashJson, hashTypedData,
 } from '../../src';
 import { Domain } from '../../src/utils/typed-data';
@@ -20,7 +21,6 @@ describe('typed data', () => {
   });
 
   const plainAci = 'int';
-  const plainDataDecoded = 42n;
   const plainData = 'cb_VNLOFXc=';
 
   const recordAci = {
@@ -29,31 +29,7 @@ describe('typed data', () => {
       { name: 'parameter', type: 'int' },
     ],
   } as const;
-  const recordDataDecoded = {
-    operation: 'test',
-    parameter: 42n,
-  };
   const recordData = 'cb_KxF0ZXN0VANAuWU=';
-
-  describe('encodeFateValue', () => {
-    it('encodes plain value', () => {
-      expect(encodeFateValue(plainDataDecoded, plainAci)).to.be.equal(plainData);
-    });
-
-    it('encodes record value', () => {
-      expect(encodeFateValue(recordDataDecoded, recordAci)).to.be.equal(recordData);
-    });
-  });
-
-  describe('decodeFateValue', () => {
-    it('decodes plain value', () => {
-      expect(decodeFateValue(plainData, plainAci)).to.be.eql(plainDataDecoded);
-    });
-
-    it('decodes record value', () => {
-      expect(decodeFateValue(recordData, recordAci)).to.be.eql(recordDataDecoded);
-    });
-  });
 
   const domain: Domain = {
     name: 'Test app',
@@ -140,14 +116,18 @@ describe('typed data', () => {
       expect(domainHash).to.be.eql(hashDomain(domain));
     });
 
+    const recordType = new TypeResolver().resolveType(recordAci, {});
+
     it('calculates typed data hash', async () => {
-      const data = encodeFateValue({ operation: 'test', parameter: 43 }, recordAci);
+      const data = new ContractByteArrayEncoder()
+        .encodeWithType({ operation: 'test', parameter: 43 }, recordType);
       const typedDataHash = Buffer.from((await contract.hashTypedData(43)).decodedResult);
       expect(typedDataHash).to.be.eql(hashTypedData(data, recordAci, domain));
     });
 
     it('verifies signature', async () => {
-      const data = encodeFateValue({ operation: 'test', parameter: 45 }, recordAci);
+      const data = new ContractByteArrayEncoder()
+        .encodeWithType({ operation: 'test', parameter: 45 }, recordType);
       const signature = await aeSdk.signTypedData(data, recordAci, domain);
       const signatureDecoded = decode(signature);
 

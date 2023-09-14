@@ -47,8 +47,9 @@
 import {
   MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
-  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, decodeFateValue,
+  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx,
 } from '@aeternity/aepp-sdk';
+import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import Value from './Value.vue';
 
 export default {
@@ -146,7 +147,9 @@ export default {
 
       async signTypedData(data, aci, { aeppRpcClientId: id, aeppOrigin, ...options }) {
         if (id != null) {
-          const opt = { ...options, aci, decodedData: decodeFateValue(data, aci) };
+          const dataType = new TypeResolver().resolveType(aci);
+          const decodedData = new ContractByteArrayEncoder().decodeWithType(data, dataType);
+          const opt = { ...options, aci, decodedData };
           genConfirmCallback(`sign typed data ${data}`)(id, opt, aeppOrigin);
         }
         return super.signTypedData(data, aci, options);
