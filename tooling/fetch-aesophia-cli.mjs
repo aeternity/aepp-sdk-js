@@ -3,7 +3,7 @@ import { dirname } from 'path';
 import { writeFileSync, readFileSync, mkdirSync } from 'fs';
 
 const path = './bin/aesophia_cli';
-const hash = 'KSUb0KzzM3zhM2cbHeQRqnBvRR7CHvC5Lb9VFw3RPfmC5FOYuxHvRYYsMWwFbrYg76L9fPv5IypKEZbdGohXgA==';
+const hash = 'nmCEcWHKEq5ZJ8Rv3LHlDUdnC9taCWMUjau795MN25XBMkGi2wwI0uR28HATsW8UyrzN21dcsl9ZSoICUVlrrw==';
 
 function ensureBinaryCorrect() {
   const buffer = readFileSync(path);
@@ -16,7 +16,7 @@ try {
 } catch {
   console.log('Fetching aesophia_cli');
   const request = await fetch(
-    'https://github.com/aeternity/aesophia_cli/releases/download/v7.2.1/aesophia_cli',
+    'https://github.com/aeternity/aesophia_cli/releases/download/v7.4.0/aesophia_cli',
   );
   const body = Buffer.from(await request.arrayBuffer());
   mkdirSync(dirname(path), { recursive: true });
