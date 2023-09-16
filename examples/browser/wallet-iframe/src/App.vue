@@ -67,7 +67,7 @@ import Value from './Value.vue';
 export default {
   components: { Value },
   data: () => ({
-    nextAeppUrl: process.env.VUE_APP_AEPP_URL ?? 'http://localhost:9001',
+    nextAeppUrl: process.env.VUE_APP_AEPP_URL ?? `http://${location.hostname}:9001`,
     aeppUrl: '',
     runningInFrame: window.parent !== window,
     nodeName: '',
