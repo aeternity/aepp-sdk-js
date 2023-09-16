@@ -34,12 +34,15 @@ export default (
     const wallet = {
       info: params,
       getConnection() {
-        const isExtension = params.type === 'extension';
         return new BrowserWindowMessageConnection({
-          sendDirection: isExtension ? MESSAGE_DIRECTION.to_waellet : undefined,
-          receiveDirection: isExtension ? MESSAGE_DIRECTION.to_aepp : undefined,
           target: source,
-          origin: isExtension ? window.origin : params.origin,
+          ...params.type === 'extension' ? {
+            sendDirection: MESSAGE_DIRECTION.to_waellet,
+            receiveDirection: MESSAGE_DIRECTION.to_aepp,
+            ...window.origin !== 'null' && { origin: window.origin },
+          } : {
+            origin: params.origin,
+          },
         });
       },
     };
