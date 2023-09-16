@@ -7,6 +7,7 @@ import {
 } from './utils/autorest';
 import { Node as NodeApi, NodeOptionalParams, ErrorModel } from './apis/node';
 import { mapObject } from './utils/other';
+import { UnsupportedVersionError } from './utils/errors';
 import { Encoded } from './utils/encoder';
 import { ConsensusProtocolVersion } from './tx/builder/constants';
 
@@ -161,11 +162,12 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
 
   async getNodeInfo(): Promise<NodeInfo> {
     const {
-      nodeVersion: version,
+      nodeVersion,
       networkId: nodeNetworkId,
       protocols,
       topBlockHeight,
     } = await this.getStatus();
+
     const consensusProtocolVersion = protocols
       .filter(({ effectiveAtHeight }) => topBlockHeight >= effectiveAtHeight)
       .reduce(
@@ -173,10 +175,19 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
         { effectiveAtHeight: -1, version: 0 },
       )
       .version;
+    if (ConsensusProtocolVersion[consensusProtocolVersion] == null) {
+      const version = consensusProtocolVersion.toString();
+      const versions = Object.values(ConsensusProtocolVersion)
+        .filter((el) => typeof el === 'number').map((el) => +el);
+      const geVersion = Math.min(...versions).toString();
+      const ltVersion = (Math.max(...versions) + 1).toString();
+      throw new UnsupportedVersionError('consensus protocol', version, geVersion, ltVersion);
+    }
+
     return {
       url: this.$host,
       nodeNetworkId,
-      version,
+      version: nodeVersion,
       consensusProtocolVersion,
     };
   }

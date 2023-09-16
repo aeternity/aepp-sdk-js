@@ -1,8 +1,11 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { createSandbox } from 'sinon';
 import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
 import { url, ignoreVersion } from '.';
-import { AeSdkBase, Node, NodeNotFoundError } from '../../src';
+import {
+  AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion,
+} from '../../src';
 
 describe('Node client', () => {
   let node: Node;
@@ -47,6 +50,15 @@ describe('Node client', () => {
     node.pipeline.removePolicy({ name: 'counter' });
     expect(counter).to.be.equal(requestCount);
   }, Promise.resolve()));
+
+  it('throws exception if unsupported protocol', async () => {
+    const sandbox = createSandbox();
+    sandbox.stub(ConsensusProtocolVersion, 'Iris').value(undefined);
+    sandbox.stub(ConsensusProtocolVersion, '5' as 'Iris').value(undefined);
+    await expect(node.getNodeInfo()).to.be
+      .rejectedWith('Unsupported consensus protocol version 5. Supported: >= 6 < 7');
+    sandbox.restore();
+  });
 
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {
