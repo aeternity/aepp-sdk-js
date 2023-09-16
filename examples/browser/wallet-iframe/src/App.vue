@@ -3,6 +3,19 @@
 
   <div class="group">
     <div>
+      <div>Aepp URL</div>
+      <form
+        novalidate
+        @submit.prevent="navigate"
+      >
+        <input
+          type="url"
+          v-model="nextAeppUrl"
+          @focus="$event.target.select()"
+        >
+      </form>
+    </div>
+    <div>
       <div>Address</div>
       <div>{{ address }}</div>
     </div>
@@ -54,7 +67,8 @@ import Value from './Value.vue';
 export default {
   components: { Value },
   data: () => ({
-    aeppUrl: process.env.VUE_APP_AEPP_URL ?? 'http://localhost:9001',
+    nextAeppUrl: process.env.VUE_APP_AEPP_URL ?? 'http://localhost:9001',
+    aeppUrl: '',
     runningInFrame: window.parent !== window,
     nodeName: '',
     address: '',
@@ -64,6 +78,13 @@ export default {
     stopSharingWalletInfo: null,
   }),
   methods: {
+    navigate() {
+      if (!/^https?:\/\//.test(this.nextAeppUrl)) this.nextAeppUrl = 'http://' + this.nextAeppUrl;
+      this.aeppUrl = '';
+      this.$nextTick(() => {
+        this.aeppUrl = this.nextAeppUrl;
+      });
+    },
     shareWalletInfo({ interval = 5000, attempts = 5 } = {}) {
       const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow;
       const connection = new BrowserWindowMessageConnection({ target });
@@ -116,6 +137,8 @@ export default {
     },
   },
   mounted() {
+    this.navigate();
+
     const aeppInfo = {};
     const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
       if (!confirm([
