@@ -1,5 +1,9 @@
 <template>
-  <h2>Wallet Iframe</h2>
+  <input id="toggle-aepp" type="checkbox" />
+  <h2>
+    Wallet Iframe
+    <label for="toggle-aepp" />
+  </h2>
 
   <div class="group">
     <div>
@@ -265,3 +269,40 @@ export default {
 </script>
 
 <style lang="scss" src="./styles.scss" />
+
+<style lang="scss" scoped>
+input[id=toggle-aepp] {
+  display: none;
+}
+
+label[for=toggle-aepp]::after {
+  font-size: initial;
+  font-weight: initial;
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+
+@media (max-width: 450px), (max-height: 650px) {
+  input[id=toggle-aepp] {
+    &:checked ~ {
+      h2 label[for=toggle-aepp]::after {
+        content: 'Hide aepp';
+      }
+
+      .group {
+        display: none;
+      }
+    }
+
+    &:not(:checked) ~ {
+      h2 label[for=toggle-aepp]::after {
+        content: 'Show aepp';
+      }
+
+      iframe {
+        display: none;
+      }
+    }
+  }
+}
+</style>

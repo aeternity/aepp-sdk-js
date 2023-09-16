@@ -6,7 +6,7 @@ body {
   @extend .bg-gray-300;
 
   #app {
-    @extend .p-4, .flex, .flex-col, .w-full, .h-screen;
+    @extend .p-4, .flex, .flex-col, .w-full, .min-h-screen;
 
     iframe {
       @extend .flex-grow, .mt-4, .bg-white, .border, .border-black, .border-dashed;
