@@ -44,6 +44,7 @@ import {
 } from '../chain';
 import AccountBase from '../account/Base';
 import { TxUnpacked } from '../tx/builder/schema.generated';
+import { isAccountNotFoundError } from '../utils/other';
 
 type ContractAci = NonNullable<Aci[0]['contract']>;
 type FunctionAci = ContractAci['functions'][0];
@@ -332,10 +333,15 @@ class Contract<M extends ContractMethodsBase> {
     const callData = this._calldata.encode(this._name, fn, params);
 
     if (callStatic === true) {
-      if (opt.nonce == null && top != null) {
-        const topKey = typeof top === 'number' ? 'height' : 'hash';
-        opt.nonce = (await getAccount(callerId, { [topKey]: top, onNode })).nonce + 1;
+      if (opt.nonce == null) {
+        const topOption = top != null && { [typeof top === 'number' ? 'height' : 'hash']: top };
+        const account = await getAccount(callerId, { ...topOption, onNode }).catch((error) => {
+          if (!isAccountNotFoundError(error)) throw error;
+          return { kind: 'basic', nonce: 0 };
+        });
+        opt.nonce = account.kind === 'generalized' ? 0 : account.nonce + 1;
       }
+
       const txOpt = { ...opt, onNode, callData };
       let tx;
       if (fn === 'init') {
