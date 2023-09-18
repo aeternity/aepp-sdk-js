@@ -12,7 +12,6 @@ export function randomString(len: number): string {
   return string;
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export function randomName(length: number = 15): AensName {
   return `${randomString(length)}.chain`;
 }

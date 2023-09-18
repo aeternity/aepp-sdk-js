@@ -4,7 +4,6 @@ import { RpcError } from './aepp-wallet-communication/schema';
  * @category exception
  * @deprecated this exception is not thrown anymore
  */
-// eslint-disable-next-line import/prefer-default-export
 export class RpcBroadcastError extends RpcError {
   static override code = 3;
 
