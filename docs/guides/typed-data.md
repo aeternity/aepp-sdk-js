@@ -30,10 +30,8 @@ corresponds to the data
 
 ## Implementation
 
-- [encodeFateValue](https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L44-L52) — use to generate the first argument for `signTypedData`;
-- [AccountBase::signTypedData](https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/account/Base.ts#L63-L70) — calculates signature, supported in MemoryAccount and in aepp-wallet connection;
+- [AccountBase:signTypedData](https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/account/Base.ts#L63-L70) — calculates signature, supported in MemoryAccount and in aepp-wallet connection;
 - [hashTypedData](https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L87-L95) — calculates the overall hash of typed data to sign;
-- [decodeFateValue](https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L55-L63) — use to preview data to sign on wallet side;
 - [hashJson](https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L16-L18) — deterministic hashing of an arbitrary JS value, used to calculate `hash(aci)`;
 - [hashDomain](https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L68-L85) — use for debugging or to prepare the hash value for smart contract.
 
