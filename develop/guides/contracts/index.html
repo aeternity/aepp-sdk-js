@@ -391,23 +391,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-create-an-instance-of-the-sdk" class="md-nav__link">
-    2. Create an instance of the SDK
+  <a href="#2-setup-compiler" class="md-nav__link">
+    2. Setup compiler
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-initialize-the-contract-instance" class="md-nav__link">
-    3. Initialize the contract instance
+  <a href="#3-create-an-instance-of-the-sdk" class="md-nav__link">
+    3. Create an instance of the SDK
   </a>
   
-    <nav class="md-nav" aria-label="3. Initialize the contract instance">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-initialize-the-contract-instance" class="md-nav__link">
+    4. Initialize the contract instance
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Initialize the contract instance">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#by-source-code" class="md-nav__link">
     By source code
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-path-to-source-code-available-only-in-nodejs" class="md-nav__link">
+    By path to source code (available only in Node.js)
   </a>
   
 </li>
@@ -433,24 +447,31 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#keep-bytecode-and-aci-for-future-use" class="md-nav__link">
+    Keep bytecode and ACI for future use
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-deploy-the-contract" class="md-nav__link">
-    4. Deploy the contract
+  <a href="#5-deploy-the-contract" class="md-nav__link">
+    5. Deploy the contract
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-call-contract-entrypoints" class="md-nav__link">
-    5. Call contract entrypoints
+  <a href="#6-call-contract-entrypoints" class="md-nav__link">
+    6. Call contract entrypoints
   </a>
   
-    <nav class="md-nav" aria-label="5. Call contract entrypoints">
+    <nav class="md-nav" aria-label="6. Call contract entrypoints">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -489,6 +510,13 @@
         <li class="md-nav__item">
   <a href="#sophia-datatype-cheatsheet" class="md-nav__link">
     Sophia datatype cheatsheet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generate-file-system-object-in-nodejs" class="md-nav__link">
+    Generate file system object in Node.js
   </a>
   
 </li>
@@ -1228,23 +1256,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-create-an-instance-of-the-sdk" class="md-nav__link">
-    2. Create an instance of the SDK
+  <a href="#2-setup-compiler" class="md-nav__link">
+    2. Setup compiler
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-initialize-the-contract-instance" class="md-nav__link">
-    3. Initialize the contract instance
+  <a href="#3-create-an-instance-of-the-sdk" class="md-nav__link">
+    3. Create an instance of the SDK
   </a>
   
-    <nav class="md-nav" aria-label="3. Initialize the contract instance">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-initialize-the-contract-instance" class="md-nav__link">
+    4. Initialize the contract instance
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Initialize the contract instance">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#by-source-code" class="md-nav__link">
     By source code
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-path-to-source-code-available-only-in-nodejs" class="md-nav__link">
+    By path to source code (available only in Node.js)
   </a>
   
 </li>
@@ -1270,24 +1312,31 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#keep-bytecode-and-aci-for-future-use" class="md-nav__link">
+    Keep bytecode and ACI for future use
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-deploy-the-contract" class="md-nav__link">
-    4. Deploy the contract
+  <a href="#5-deploy-the-contract" class="md-nav__link">
+    5. Deploy the contract
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-call-contract-entrypoints" class="md-nav__link">
-    5. Call contract entrypoints
+  <a href="#6-call-contract-entrypoints" class="md-nav__link">
+    6. Call contract entrypoints
   </a>
   
-    <nav class="md-nav" aria-label="5. Call contract entrypoints">
+    <nav class="md-nav" aria-label="6. Call contract entrypoints">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1330,6 +1379,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#generate-file-system-object-in-nodejs" class="md-nav__link">
+    Generate file system object in Node.js
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1350,22 +1406,25 @@
 <h2 id="introduction">Introduction</h2>
 <p>The smart contract language of the æternity blockchain is <a href="https://docs.aeternity.com/aesophia">Sophia</a>. It is a functional language in the ML family, strongly typed and has restricted mutable state.</p>
 <p>Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into <a href="https://github.com/aeternity/aepp-sophia-examples">aepp-sophia-examples</a> and start rapid prototyping using <a href="https://studio.aepps.com">AEstudio</a>.</p>
-<p>The SDK needs to interact with following components in order to enable smart contract interactions on the æternity blockchain:</p>
-<ul>
-<li><a href="https://github.com/aeternity/aeternity">æternity</a> (host your own one or use the public testnet node at <code>https://testnet.aeternity.io</code>)</li>
-<li><a href="https://github.com/aeternity/aesophia_http">aesophia_http</a> (host your own one or use the public compiler at <code>https://v7.compiler.aepps.com</code>)</li>
-</ul>
-<p>Note:</p>
-<ul>
-<li>For production deployments you should <strong><em>always</em></strong> host these services by yourself.</li>
-</ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <div class="highlight"><pre><span></span><code><span class="c1">// node.js import</span>
-<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
 <span class="c1">// ES import</span>
-<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<span class="c1">// additionally you may need to import CompilerCli or CompilerHttp</span>
 </code></pre></div>
-<h2 id="2-create-an-instance-of-the-sdk">2. Create an instance of the SDK</h2>
+<h2 id="2-setup-compiler">2. Setup compiler</h2>
+<p>Compiler primarily used to generate bytecode to deploy a contract.
+Skip this step if you have a contract bytecode or need to interact with an already deployed contract.
+Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">aesophia_cli</a> and <a href="https://github.com/aeternity/aesophia_http">aesophia_http</a> implemented in <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerCli.html">CompilerCli</a> and <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerHttp.html">CompilerHttp</a> respectively.</p>
+<p>CompilerCli is available only in Node.js and requires Erlang installed (<code>escript</code> available in <code>$PATH</code>), Windows is supported.
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerCli</span><span class="p">()</span>
+</code></pre></div></p>
+<p>CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since <a href="https://v7.compiler.aepps.com/api">compiler.aepps.com</a> is planned to be decommissioned. An example of how to run it using <a href="https://github.com/aeternity/aepp-sdk-js/blob/cd8dd7f76a6323383349b48400af0d69c2cfd88e/docker-compose.yml#L11-L14">docker-compose</a>.
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="s1">&#39;https://v7.compiler.aepps.com&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1">// host your own compiler</span>
+</code></pre></div></p>
+<p>Both compiler classes implement the <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerBase.html">same interface</a> that can be used to generate bytecode and ACI without a Contract instance.</p>
+<h2 id="3-create-an-instance-of-the-sdk">3. Create an instance of the SDK</h2>
 <p>When creating an instance of the SDK you need to provide an account which will be used to sign transactions like <code>ContractCreateTx</code> and <code>ContractCallTx</code> that will be broadcasted to the network.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1">// ideally host your own node</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="nx">SECRET_KEY</span><span class="p">)</span>
@@ -1373,7 +1432,7 @@
 <span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
 <span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
 <span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">account</span><span class="p">],</span>
-<span class="w">  </span><span class="nx">onCompiler</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="s1">&#39;https://v7.compiler.aepps.com&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1">// ideally host your own compiler</span>
+<span class="w">  </span><span class="nx">onCompiler</span><span class="o">:</span><span class="w"> </span><span class="nx">compiler</span><span class="p">,</span><span class="w"> </span><span class="c1">// remove if step #2 skipped</span>
 <span class="p">})</span>
 </code></pre></div>
 <p>Note:</p>
@@ -1384,7 +1443,7 @@
 </ul>
 </li>
 </ul>
-<h2 id="3-initialize-the-contract-instance">3. Initialize the contract instance</h2>
+<h2 id="4-initialize-the-contract-instance">4. Initialize the contract instance</h2>
 <h3 id="by-source-code">By source code</h3>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// source code of the contract</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">initializeContract</span><span class="p">({</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="p">})</span>
@@ -1396,6 +1455,11 @@
 <span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">initializeContract</span><span class="p">({</span><span class="w"> </span><span class="nx">sourceCode</span><span class="p">,</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="p">})</span>
 </code></pre></div></li>
 </ul>
+<h3 id="by-path-to-source-code-available-only-in-nodejs">By path to source code (available only in Node.js)</h3>
+<p>It can be used with both CompilerCli and CompilerHttp. This way contract imports would be handled automatically, with no need to provide <code>fileSystem</code> option.
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sourceCodePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;./example.aes&#39;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">initializeContract</span><span class="p">({</span><span class="w"> </span><span class="nx">sourceCodePath</span><span class="w"> </span><span class="p">})</span>
+</code></pre></div></p>
 <h3 id="by-aci-and-bytecode">By ACI and bytecode</h3>
 <p>If you pre-compiled the contracts you can also initialize a contract instance by providing ACI and bytecode:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">aci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// ACI of the contract</span>
@@ -1411,7 +1475,7 @@
 <h3 id="options">Options</h3>
 <ul>
 <li>Following attributes can be provided via <code>options</code> to <code>initializeContract</code>:<ul>
-<li><code>aci</code> (default: obtained via http compiler)<ul>
+<li><code>aci</code> (default: obtained via <code>onCompiler</code>)<ul>
 <li>The Contract ACI.</li>
 </ul>
 </li>
@@ -1437,7 +1501,10 @@
 </ul>
 </li>
 </ul>
-<h2 id="4-deploy-the-contract">4. Deploy the contract</h2>
+<h3 id="keep-bytecode-and-aci-for-future-use">Keep bytecode and ACI for future use</h3>
+<p>After the contract is initialized you can persist values of <code>contract._aci</code> and <code>contract.$options.bytecode</code>.
+They can be provided for subsequent contract initializations to don't depend on a compiler.</p>
+<h2 id="5-deploy-the-contract">5. Deploy the contract</h2>
 <p>If you have a Sophia contract source code that looks like this:
 <div class="highlight"><pre><span></span><code><span class="k">contract</span><span class="w"> </span><span class="nf">Increment</span><span class="w"> </span><span class="ow">=</span>
 
@@ -1468,7 +1535,7 @@
 <li>In Sophia all <code>public functions</code> are called <code>entrypoints</code> and need to be declared as <code>stateful</code>
 if they should produce changes to the state of the smart contract, see <code>increment(value: int)</code>.</li>
 </ul>
-<h2 id="5-call-contract-entrypoints">5. Call contract entrypoints</h2>
+<h2 id="6-call-contract-entrypoints">6. Call contract entrypoints</h2>
 <h3 id="a-stateful-entrypoints">a) Stateful entrypoints</h3>
 <p>According to the example above you can call the <code>stateful</code> entrypoint <code>increment</code> by using one of the following lines:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">increment</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span><span class="w"> </span><span class="c1">// recommended</span>
@@ -1510,88 +1577,15 @@ if they should produce changes to the state of the smart contract, see <code>inc
 <h2 id="transaction-options">Transaction options</h2>
 <p>As already stated various times in the guide it is possible to provide <a href="../../transaction-options/">transaction options</a> as object to a function of the SDK that builds and potentially broadcasts a transaction. This object can be passed as additional param to each of these functions and overrides the default settings.</p>
 <h2 id="sophia-datatype-cheatsheet">Sophia datatype cheatsheet</h2>
-<p>Sometimes you might wonder how to pass params to the JavaScript method that calls an entrypoint of your Sophia smart contract. The following table may help you out.</p>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Sophia entrypoint definition</th>
-<th>JavaScript method call</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>int</td>
-<td><code>add_two(one: int, two: int)</code></td>
-<td><code>add_two(1 , 2)</code></td>
-</tr>
-<tr>
-<td>address</td>
-<td><code>set_owner(owner: address)</code></td>
-<td><code>set_owner('ak_1337...')</code></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><code>is_it_true(answer: bool)</code></td>
-<td><code>is_it_true(true)</code></td>
-</tr>
-<tr>
-<td>bits</td>
-<td><code>give_me_bits(input: bits)</code></td>
-<td><code>give_me_bits(0b10110n)</code></td>
-</tr>
-<tr>
-<td>bytes</td>
-<td><code>get_bytes(test: bytes(3))</code></td>
-<td><code>get_bytes(new Uint8Array([0x1, 0x1f, 0x10]))</code></td>
-</tr>
-<tr>
-<td>string</td>
-<td><code>hello_world(say_hello: string)</code></td>
-<td><code>hello_world('Hello!')</code></td>
-</tr>
-<tr>
-<td>list</td>
-<td><code>have_a_few(candy: list(string))</code></td>
-<td><code>have_a_few(['Skittles', 'M&amp;Ms', 'JellyBelly'])</code></td>
-</tr>
-<tr>
-<td>tuple</td>
-<td><code>a_few_things(things: (string * int * map(address, bool)))</code></td>
-<td><code>a_few_things(['hola', 3, new Map([['ak_1337...', true]])])</code></td>
-</tr>
-<tr>
-<td>record</td>
-<td><code>record user = {</code><br />&nbsp; &nbsp; &nbsp; &nbsp; <code>firstname: string,</code> <br /> &nbsp; &nbsp; &nbsp; &nbsp; <code>lastname: string</code> <br /> <code>}</code> <br />  <br />  <code>get_firstname(input: user): string</code></td>
-<td><code>get_firstname({'firstname': 'Alfred', 'lastname': 'Mustermann'})</code></td>
-</tr>
-<tr>
-<td>map</td>
-<td><code>balances(values: map(address, int))</code></td>
-<td><code>balances(new Map([['ak_1337...', 123], ['ak_FCKGW...', 321], ['ak_Rm5U...', 999]]))</code></td>
-</tr>
-<tr>
-<td>option()</td>
-<td><code>number_defined(value: option(int)): bool =</code><br />  &nbsp; &nbsp; &nbsp; &nbsp; <code>Option.is_some(value)</code></td>
-<td><code>// the datatype in the option()</code> <br /> <code>number_defined(1337) // int in this case</code></td>
-</tr>
-<tr>
-<td>hash</td>
-<td><code>a_gram(of: hash)</code></td>
-<td><code>// 32 bytes signature</code> <br />  <code>a_gram('af01...490f')</code></td>
-</tr>
-<tr>
-<td>signature</td>
-<td><code>one_signature(sig: signature)</code></td>
-<td><code>// 64 bytes signature</code> <br />  <code>one_signature('af01...490f')</code></td>
-</tr>
-<tr>
-<td>functions</td>
-<td>(Higher order) functions are not allowed in <code>entrypoint</code> params</td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<p>Sometimes you might wonder how to pass params to the JavaScript method that calls an entrypoint of your Sophia smart contract.
+The conversion between JS and Sophia values is handled by aepp-calldata library.
+Refer to <a href="https://www.npmjs.com/package/@aeternity/aepp-calldata#data-types">its documentation</a> to find the right type to use.</p>
+<h2 id="generate-file-system-object-in-nodejs">Generate file system object in Node.js</h2>
+<p>To do so you can use <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/functions/getFileSystem.html">getFileSystem</a> function.
+In most cases, you don't need to do it explicitly. Prefer to use <code>sourceCodePath</code> instead <code>sourceCode</code> in
+<a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/_internal_.Contract.html#initialize">Contract::initialize</a>,
+and <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerBase.html#compile">compile</a>
+instead <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerBase.html#compileBySourceCode">compileBySourceCode</a> in CompilerBase.</p>
 
 
 

@@ -16,8 +16,8 @@
 <li><a href="CompilerCli.html">CompilerCli</a></li></ul>
 <h1>Class CompilerCli</h1></div>
 <section class="tsd-panel tsd-comment">
-<div class="tsd-comment tsd-typography"><p>A wrapper around aesophia_cli, available only in Node.js
-Assumes that <code>escript</code> is available in PATH.</p>
+<div class="tsd-comment tsd-typography"><p>A wrapper around aesophia_cli, available only in Node.js.
+Requires Erlang installed, assumes that <code>escript</code> is available in PATH.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></section>
 <section class="tsd-panel tsd-hierarchy">
@@ -27,7 +27,7 @@ Assumes that <code>escript</code> is available in PATH.</p>
 <ul class="tsd-hierarchy">
 <li><span class="target">CompilerCli</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/e9cfe8181/src/contract/compiler/Cli.ts#L23">contract/compiler/Cli.ts:23</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/27f353026/src/contract/compiler/Cli.ts#L23">contract/compiler/Cli.ts:23</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -52,22 +52,32 @@ Assumes that <code>escript</code> is available in PATH.</p>
 <section class="tsd-panel tsd-member"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_CompilerCli"><span class="tsd-kind-constructor-signature">new <wbr/>Compiler<wbr/>Cli</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">compilerPath</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">__namedParameters</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="CompilerCli.html" class="tsd-signature-type tsd-kind-class">CompilerCli</a><a href="#constructor.new_CompilerCli" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_CompilerCli"><span class="tsd-kind-constructor-signature">new <wbr/>Compiler<wbr/>Cli</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">compilerPath</span><span class="tsd-signature-symbol">?</span>, <span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="CompilerCli.html" class="tsd-signature-type tsd-kind-class">CompilerCli</a><a href="#constructor.new_CompilerCli" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">compilerPath</span>: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = ...</span></h5></li>
+<h5><span class="tsd-kind-parameter">compilerPath</span>: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = ...</span></h5>
+<div class="tsd-comment tsd-typography"><p>A path to aesophia_cli binary, by default uses the integrated one</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li>
 <li>
-<h5><span class="tsd-kind-parameter">__namedParameters</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">ignoreVersion</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> = {}</span></h5>
+<h5><span class="tsd-kind-parameter">options</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">ignoreVersion</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> = {}</span></h5>
+<div class="tsd-comment tsd-typography"><p>Options</p>
+</div>
+<div class="tsd-comment tsd-typography"></div>
 <ul class="tsd-parameters">
 <li class="tsd-parameter">
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-property">ignore<wbr/>Version</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5></li></ul></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="CompilerCli.html" class="tsd-signature-type tsd-kind-class">CompilerCli</a></h4><aside class="tsd-sources">
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-property">ignore<wbr/>Version</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5>
+<div class="tsd-comment tsd-typography"><p>Don&#39;t ensure that the compiler is supported</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="CompilerCli.html" class="tsd-signature-type tsd-kind-class">CompilerCli</a></h4>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="CompilerBase.html">CompilerBase</a>.<a href="CompilerBase.html#constructor">constructor</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/e9cfe8181/src/contract/compiler/Cli.ts#L28">contract/compiler/Cli.ts:28</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/27f353026/src/contract/compiler/Cli.ts#L33">contract/compiler/Cli.ts:33</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member"><a id="compile" class="tsd-anchor"></a>
@@ -91,7 +101,7 @@ Available only in Node.js</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="CompilerBase.html">CompilerBase</a>.<a href="CompilerBase.html#compile">compile</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/e9cfe8181/src/contract/compiler/Cli.ts#L70">contract/compiler/Cli.ts:70</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/27f353026/src/contract/compiler/Cli.ts#L75">contract/compiler/Cli.ts:75</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="compileBySourceCode" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>compile<wbr/>By<wbr/>Source<wbr/>Code</span><a href="#compileBySourceCode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -121,7 +131,7 @@ include into the main contract</p>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="CompilerBase.html">CompilerBase</a>.<a href="CompilerBase.html#compileBySourceCode">compileBySourceCode</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/e9cfe8181/src/contract/compiler/Cli.ts#L90">contract/compiler/Cli.ts:90</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/27f353026/src/contract/compiler/Cli.ts#L95">contract/compiler/Cli.ts:95</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="generateAci" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>generate<wbr/>Aci</span><a href="#generateAci" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -143,7 +153,7 @@ Available only in Node.js</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="CompilerBase.html">CompilerBase</a>.<a href="CompilerBase.html#generateAci">generateAci</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/e9cfe8181/src/contract/compiler/Cli.ts#L102">contract/compiler/Cli.ts:102</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/27f353026/src/contract/compiler/Cli.ts#L107">contract/compiler/Cli.ts:107</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="generateAciBySourceCode" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>generate<wbr/>Aci<wbr/>By<wbr/>Source<wbr/>Code</span><a href="#generateAciBySourceCode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -173,7 +183,7 @@ include into the main contract</p>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="CompilerBase.html">CompilerBase</a>.<a href="CompilerBase.html#generateAciBySourceCode">generateAciBySourceCode</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/e9cfe8181/src/contract/compiler/Cli.ts#L112">contract/compiler/Cli.ts:112</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/27f353026/src/contract/compiler/Cli.ts#L117">contract/compiler/Cli.ts:117</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="validate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>validate</span><a href="#validate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -200,7 +210,7 @@ Available only in Node.js</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="CompilerBase.html">CompilerBase</a>.<a href="CompilerBase.html#validate">validate</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/e9cfe8181/src/contract/compiler/Cli.ts#L124">contract/compiler/Cli.ts:124</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/27f353026/src/contract/compiler/Cli.ts#L129">contract/compiler/Cli.ts:129</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="validateBySourceCode" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>validate<wbr/>By<wbr/>Source<wbr/>Code</span><a href="#validateBySourceCode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -234,7 +244,7 @@ include into the main contract</p>
 </div><aside class="tsd-sources">
 <p>Overrides <a href="CompilerBase.html">CompilerBase</a>.<a href="CompilerBase.html#validateBySourceCode">validateBySourceCode</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/e9cfe8181/src/contract/compiler/Cli.ts#L133">contract/compiler/Cli.ts:133</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/27f353026/src/contract/compiler/Cli.ts#L138">contract/compiler/Cli.ts:138</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="version" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>version</span><a href="#version" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -245,7 +255,7 @@ include into the main contract</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="CompilerBase.html">CompilerBase</a>.<a href="CompilerBase.html#version">version</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/e9cfe8181/src/contract/compiler/Cli.ts#L146">contract/compiler/Cli.ts:146</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/27f353026/src/contract/compiler/Cli.ts#L151">contract/compiler/Cli.ts:151</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
