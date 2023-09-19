@@ -117,7 +117,7 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
   /**
    * @param url - Url for node API
    * @param options - Options
-   * @param options.ignoreVersion - Don't check node version
+   * @param options.ignoreVersion - Don't ensure that the node is supported
    * @param options.retryCount - Amount of extra requests to do in case of failure
    * @param options.retryOverallDelay - Time in ms to wait between all retries
    */
