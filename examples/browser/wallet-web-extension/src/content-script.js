@@ -19,7 +19,7 @@ import {
   const extConnection = new BrowserRuntimeConnection({ port });
   const pageConnection = new BrowserWindowMessageConnection({
     target: window,
-    origin: window.origin,
+    ...window.origin !== 'null' && { origin: window.origin },
     sendDirection: MESSAGE_DIRECTION.to_aepp,
     receiveDirection: MESSAGE_DIRECTION.to_waellet,
   });
