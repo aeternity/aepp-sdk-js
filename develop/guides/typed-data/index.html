@@ -1177,10 +1177,8 @@ corresponds to the data
 <p><code>domain</code> and <code>data</code> are fate-encoded before hashing. <code>aci</code> is prepared for hashing according to <a href="https://tools.ietf.org/html/rfc8785">RFC8785</a>.</p>
 <h2 id="implementation">Implementation</h2>
 <ul>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L44-L52">encodeFateValue</a> — use to generate the first argument for <code>signTypedData</code>;</li>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/account/Base.ts#L63-L70">AccountBase::signTypedData</a> — calculates signature, supported in MemoryAccount and in aepp-wallet connection;</li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/account/Base.ts#L63-L70">AccountBase:signTypedData</a> — calculates signature, supported in MemoryAccount and in aepp-wallet connection;</li>
 <li><a href="https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L87-L95">hashTypedData</a> — calculates the overall hash of typed data to sign;</li>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L55-L63">decodeFateValue</a> — use to preview data to sign on wallet side;</li>
 <li><a href="https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L16-L18">hashJson</a> — deterministic hashing of an arbitrary JS value, used to calculate <code>hash(aci)</code>;</li>
 <li><a href="https://github.com/aeternity/aepp-sdk-js/blob/5952a7b9f4d0cf30ad7caa0831dfb974d1e91afc/src/utils/typed-data.ts#L68-L85">hashDomain</a> — use for debugging or to prepare the hash value for smart contract.</li>
 </ul>
