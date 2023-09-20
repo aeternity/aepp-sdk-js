@@ -17,7 +17,7 @@ import { AeSdk, MemoryAccount, Node } from '@aeternity/aepp-sdk'
 ## 2. Setup compiler
 Compiler primarily used to generate bytecode to deploy a contract.
 Skip this step if you have a contract bytecode or need to interact with an already deployed contract.
-Out-of-the-box SDK supports [aesophia_cli](https://github.com/aeternity/aesophia_cli) and [aesophia_http](https://github.com/aeternity/aesophia_http) implemented in [CompilerCli](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerCli.html) and [CompilerHttp](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerHttp.html) respectively.
+Out-of-the-box SDK supports [aesophia_cli](https://github.com/aeternity/aesophia_cli) and [aesophia_http](https://github.com/aeternity/aesophia_http) implemented in [CompilerCli](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerCli.html) and [CompilerHttp](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerHttp.html) respectively.
 
 CompilerCli is available only in Node.js and requires Erlang installed (`escript` available in `$PATH`), Windows is supported.
 ```js
@@ -29,7 +29,7 @@ CompilerHttp requires a hosted compiler service. Preferable to host your own com
 const compiler = new CompilerHttp('https://v7.compiler.aepps.com') // host your own compiler
 ```
 
-Both compiler classes implement the [same interface](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerBase.html) that can be used to generate bytecode and ACI without a Contract instance.
+Both compiler classes implement the [same interface](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html) that can be used to generate bytecode and ACI without a Contract instance.
 
 ## 3. Create an instance of the SDK
 When creating an instance of the SDK you need to provide an account which will be used to sign transactions like `ContractCreateTx` and `ContractCallTx` that will be broadcasted to the network.
@@ -212,8 +212,8 @@ The conversion between JS and Sophia values is handled by aepp-calldata library.
 Refer to [its documentation](https://www.npmjs.com/package/@aeternity/aepp-calldata#data-types) to find the right type to use.
 
 ## Generate file system object in Node.js
-To do so you can use [getFileSystem](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/functions/getFileSystem.html) function.
+To do so you can use [getFileSystem](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/functions/getFileSystem.html) function.
 In most cases, you don't need to do it explicitly. Prefer to use `sourceCodePath` instead `sourceCode` in
-[Contract::initialize](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/_internal_.Contract.html#initialize),
-and [compile](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerBase.html#compile)
-instead [compileBySourceCode](https://docs.aeternity.com/aepp-sdk-js/v13.2.1/api/classes/CompilerBase.html#compileBySourceCode) in CompilerBase.
+[Contract::initialize](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/_internal_.Contract.html#initialize),
+and [compile](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html#compile)
+instead [compileBySourceCode](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html#compileBySourceCode) in CompilerBase.

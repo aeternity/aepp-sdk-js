@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.2.2](https://github.com/aeternity/aepp-sdk-js/compare/v13.2.1...v13.2.2) (2023-09-20)
+
+
+### Bug Fixes
+
+* use proper vm version in Ceres ([bcaa5cf](https://github.com/aeternity/aepp-sdk-js/commit/bcaa5cfe0f8a23a641d9db993b312e2d54cfdd60))
+* **aepp,wallet:** connect to web-extension if opened over file:/// ([da6a025](https://github.com/aeternity/aepp-sdk-js/commit/da6a0257e995db38e32888390961eb870a482777))
+* **aepp:** use complete type of WalletInfo object ([eeba565](https://github.com/aeternity/aepp-sdk-js/commit/eeba56576b97afda6739fa8cd0f9e5c6f039651f))
+* **contract:** don't mark contract as deployed if tx failed ([cc4222d](https://github.com/aeternity/aepp-sdk-js/commit/cc4222db8dc979c878e6e51bea9634484b826de7))
+* **contract:** use current nonce in static calls ([758bdfc](https://github.com/aeternity/aepp-sdk-js/commit/758bdfc75a1dd8e4ff0646ddeaa10e19b1a4d5d1))
+* **node:** don't retry 500 code responses ([696e7db](https://github.com/aeternity/aepp-sdk-js/commit/696e7db88605a385789d741f2704aba2c1cee972))
+* **node:** throw clear error message if unsupported protocol ([21dfe34](https://github.com/aeternity/aepp-sdk-js/commit/21dfe34b3645d95b4c54d99e8517a33634b3751f))
+* **node:** uncatchable exception if request failed in queue ([dec62a4](https://github.com/aeternity/aepp-sdk-js/commit/dec62a474cad4639b81cbef46ff606c384f7ab53))
+* typos in error messages and docs ([5c84671](https://github.com/aeternity/aepp-sdk-js/commit/5c846712a32a110e1a5df25d5c4366046d9558f5))
+
 ### [13.2.1](https://github.com/aeternity/aepp-sdk-js/compare/v13.2.0...v13.2.1) (2023-07-28)
 
 
