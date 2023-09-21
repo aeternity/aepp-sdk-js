@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "13.2.1",
+  "version": "13.2.2",
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "types": "es/index.d.ts",
@@ -75,7 +75,7 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/aepp-calldata": "^1.4.0",
+    "@aeternity/aepp-calldata": "^1.5.1",
     "@aeternity/argon2": "^0.0.1",
     "@aeternity/uuid": "^0.0.1",
     "@azure/core-client": "1.6.0",

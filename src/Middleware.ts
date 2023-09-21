@@ -105,7 +105,7 @@ export default class Middleware
   /**
    * @param url - Url for middleware API
    * @param options - Options
-   * @param options.ignoreVersion - Don't check node version
+   * @param options.ignoreVersion - Don't ensure that the middleware is supported
    * @param options.retryCount - Amount of extra requests to do in case of failure
    * @param options.retryOverallDelay - Time in ms to wait between all retries
    */

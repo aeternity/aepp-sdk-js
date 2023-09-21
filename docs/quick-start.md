@@ -1,5 +1,6 @@
 # Quick Start
-In this example we will send 1 _AE_ coin from one account to another
+In this example we will send 1 _AE_ coin from one account to another.
+For more specific information on setups with Frameworks and TypeScript, please refer to the [installation instructions](./README.md).
 
 ## 1. Specify imports
 For the following snippets in the guide you need to specify multiple imports.

@@ -279,6 +279,22 @@ describe('Contract instance', () => {
     expect(decodedResult).to.be.equal('test');
   });
 
+  it('calls with correct nonce if transaction stuck in mempool', async () => {
+    const sdk = await getSdk();
+    await sdk.transferFunds(1, aeSdk.address);
+
+    await sdk.spend(1, sdk.address, { waitMined: false, verify: false });
+    const [nonce, nextNonce] = await Promise.all([
+      sdk.getAccount(sdk.address).then((res) => res.nonce),
+      sdk.api.getAccountNextNonce(sdk.address).then((res) => res.nextNonce),
+    ]);
+    expect(nonce + 2).to.be.equal(nextNonce);
+
+    const contract = await sdk
+      .initializeContract({ aci: testContractAci, address: testContract.$options.address });
+    await contract.intFn(2, { callStatic: true });
+  });
+
   it('gets actual options from AeSdkBase', async () => {
     const [address1, address2] = aeSdk.addresses();
     let { result } = await testContract.intFn(2);

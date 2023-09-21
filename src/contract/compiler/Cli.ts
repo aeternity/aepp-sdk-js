@@ -17,14 +17,19 @@ const getPackagePath = (): string => {
 };
 
 /**
- * A wrapper around aesophia_cli, available only in Node.js
- * Assumes that `escript` is available in PATH.
+ * A wrapper around aesophia_cli, available only in Node.js.
+ * Requires Erlang installed, assumes that `escript` is available in PATH.
  */
 export default class CompilerCli extends CompilerBase {
   #path: string;
 
   #ensureCompatibleVersion = Promise.resolve();
 
+  /**
+   * @param compilerPath - A path to aesophia_cli binary, by default uses the integrated one
+   * @param options - Options
+   * @param options.ignoreVersion - Don't ensure that the compiler is supported
+   */
   constructor(
     compilerPath = resolve(getPackagePath(), './bin/aesophia_cli'),
     { ignoreVersion }: { ignoreVersion?: boolean } = {},

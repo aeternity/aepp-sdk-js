@@ -1,10 +1,4 @@
-// js extension is required for mjs build
-// @ts-expect-error see https://github.com/aeternity/aepp-calldata-js/issues/216
-// eslint-disable-next-line import/extensions
-import ContractByteArrayEncoder from '@aeternity/aepp-calldata/src/ContractByteArrayEncoder.js';
-// @ts-expect-error see https://github.com/aeternity/aepp-calldata-js/issues/216
-// eslint-disable-next-line import/extensions
-import AciTypeResolver from '@aeternity/aepp-calldata/src/AciTypeResolver.js';
+import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import canonicalize from 'canonicalize';
 import { Encoded, decode } from './encoder';
 import { hash, messagePrefixLength } from './crypto';
@@ -40,28 +34,6 @@ export interface Domain {
   contractAddress?: Encoded.ContractAddress;
 }
 
-// TODO: replace with api on calldata side https://github.com/aeternity/aepp-calldata-js/issues/216
-export function encodeFateValue(
-  value: unknown,
-  aci: AciValue,
-): Encoded.ContractBytearray {
-  const contractByteArrayEncoder = new ContractByteArrayEncoder();
-  const aciTypeResolver = new AciTypeResolver([]);
-  aciTypeResolver.isCustomType = () => false;
-  return contractByteArrayEncoder.encode(aciTypeResolver.resolveType(aci), value);
-}
-
-// TODO: replace with api on calldata side https://github.com/aeternity/aepp-calldata-js/issues/216
-export function decodeFateValue(
-  value: Encoded.ContractBytearray,
-  aci: AciValue,
-): Encoded.ContractBytearray {
-  const contractByteArrayEncoder = new ContractByteArrayEncoder();
-  const aciTypeResolver = new AciTypeResolver([]);
-  aciTypeResolver.isCustomType = () => false;
-  return contractByteArrayEncoder.decodeWithType(value, aciTypeResolver.resolveType(aci));
-}
-
 /**
  * Hashes domain object, can be used to inline domain hash to contract source code
  */
@@ -81,7 +53,9 @@ export function hashDomain(domain: Domain): Buffer {
       type: { option: ['contract_pubkey'] },
     }],
   } as const;
-  return hash(decode(encodeFateValue(domain, domainAci)));
+  const domainType = new TypeResolver().resolveType(domainAci, {});
+  const fateValue = new ContractByteArrayEncoder().encodeWithType(domain, domainType);
+  return hash(decode(fateValue));
 }
 
 export function hashTypedData(

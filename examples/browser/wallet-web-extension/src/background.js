@@ -1,8 +1,9 @@
 import browser from 'webextension-polyfill';
 import {
   AeSdkWallet, CompilerHttp, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection,
-  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, decodeFateValue,
+  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx,
 } from '@aeternity/aepp-sdk';
+import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 
 function stringifyBigint(value) {
   return JSON.stringify(
@@ -67,8 +68,10 @@ class AccountMemoryProtected extends MemoryAccount {
 
   async signTypedData(data, aci, { aeppRpcClientId: id, aeppOrigin, ...options }) {
     if (id != null) {
+      const dataType = new TypeResolver().resolveType(aci);
+      const decodedData = new ContractByteArrayEncoder().decodeWithType(data, dataType);
       const opt = {
-        ...options, aci, data, decodedData: decodeFateValue(data, aci),
+        ...options, aci, data, decodedData,
       };
       await genConfirmCallback('sign typed data')(id, opt, aeppOrigin);
     }

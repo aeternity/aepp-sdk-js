@@ -9,7 +9,7 @@ export interface WalletInfo {
   id: string;
   name: string;
   networkId: string;
-  origin: string;
+  origin: string; // TODO: origin needs to be provided by transport
   type: WALLET_TYPE;
 }
 
