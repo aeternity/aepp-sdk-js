@@ -84,7 +84,9 @@ export default {
   }),
   methods: {
     navigate() {
-      if (!/^https?:\/\//.test(this.nextAeppUrl)) this.nextAeppUrl = 'http://' + this.nextAeppUrl;
+      if (!/^https?:\/\//.test(this.nextAeppUrl) && !this.nextAeppUrl.startsWith('.')) {
+        this.nextAeppUrl = 'http://' + this.nextAeppUrl;
+      }
       this.aeppUrl = '';
       this.$nextTick(() => {
         this.aeppUrl = this.nextAeppUrl;
