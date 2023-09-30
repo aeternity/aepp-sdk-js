@@ -215,7 +215,7 @@ export async function aensQuery(
     }
     ) => ReturnType<typeof aensRevoke>;
     extendTtl: (
-      nameTtl: number,
+      nameTtl?: number,
       options?: Omit<Parameters<typeof aensQuery>[1], 'onNode' | 'onCompiler' | 'onAccount'>
     ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
   }
