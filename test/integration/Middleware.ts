@@ -25,9 +25,9 @@ describe('Middleware API', () => {
       mdwVersion: res.mdwVersion,
       nodeHeight: res.nodeHeight,
       nodeProgress: 100,
-      nodeRevision: 'a42c1b1e84dabdad350005213a2a9334113a6832',
+      nodeRevision: '4d9fd25ad9d449c6e9805cd46a3cb8150fc4b6c1',
       nodeSyncing: false,
-      nodeVersion: '6.8.1',
+      nodeVersion: '6.11.0',
     };
     expect(res).to.be.eql(expectedRes);
   });
