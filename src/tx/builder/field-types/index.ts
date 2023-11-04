@@ -26,6 +26,7 @@ import shortUIntConst from './short-u-int-const';
 import string from './string';
 import ttl from './ttl';
 import uInt from './u-int';
+import withDefault from './with-default';
 import wrapped from './wrapped';
 
 export type BinaryData = Buffer | Buffer[] | Buffer[][]
@@ -66,5 +67,6 @@ export {
   string,
   ttl,
   uInt,
+  withDefault,
   wrapped,
 };
