@@ -10,6 +10,8 @@ You register an oracle that responds with the temperature of the city that is in
 To register an oracle you need to provide a `queryFormat` and a `responseFormat` to the `registerOracle` function of the SDK. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtlValue`, see [transaction options](../transaction-options.md#oracleregistertx).
 
 ```js
+import { AeSdk } from '@aeternity/aepp-sdk'
+
 // init an instance of the SDK using the AeSdk class
 const aeSdk = new AeSdk({ ... })
 
@@ -37,50 +39,49 @@ Note:
 
 ## 2. Some party: query an oracle and poll for response
 
-### Query
+### Query (preferred)
 After the oracle has been registered and as long as it isn't expired, everybody that knows the `oracleId` can query it.
 
 ```js
-const oracleId = 'ok_...';
+import { OracleClient } from '@aeternity/aepp-sdk'
 
+const oracleId = 'ok_...';
 const options = {
   queryFee: 1337, // should cover the requested fee of the oracle and defaults to 0
   queryTtlType: ORACLE_TTL_TYPES.delta, // optional and defaults to ORACLE_TTL_TYPES.delta
   queryTtlValue: 20, // optional and defaults to 10
   responseTtlType: ORACLE_TTL_TYPES.delta, // optional and defaults to ORACLE_TTL_TYPES.delta
   responseTtlValue: 50, // optional and defaults to 10
+  interval: 6000, // response polling interval
 };
 
-// using the oracle object in case you need to instantiate the oracle object first
-const oracle = await aeSdk.getOracleObject(oracleId)
-const query = await oracle.postQuery('{"city": "Berlin"}', options)
-
-// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
-const query = await aeSdk.postQueryToOracle(oracleId, '{"city": "Berlin"}', options)
+// to query an oracle you need to instantiate the OracleClient object first
+const oracleClient = new OracleClient(oracleId, aeSdk.getContext())
+const response = await oracle.query('{"city": "Berlin"}', options)
+console.log('Decoded oracle response', response)
 ```
 
 Note:
 
 - Again, take a look into the [transaction options](../transaction-options.md#oraclequerytx) to see what (other) options you can provide.
 
-### Poll for response
-Now you have access to the query object and can poll for the response to that specific query:
+Alternatively, you can post query and poll for response using separate methods from below.
+
+### Post query (alternative)
 
 ```js
-const oracleId = 'ok_...';
-const queryId = 'oq_...';
+const { queryId } = await oracle.postQuery('{"city": "Berlin"}') // oq_...
 
-// using the query instance
-const query = await aeSdk.getQueryObject(oracleId, queryId) // in case you need to get the query instance first
-const response = await query.pollForResponse({ interval: 6000 })
+console.log('Oracle query ID', queryId)
+```
 
-// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
-const response = await aeSdk.pollForQueryResponse(oracleId, queryId, { interval: 6000 })
+### Poll for response (alternative)
+Now you have query ID that can be used to poll for the response:
 
-// decode the oracle response
-// the decode function returns a buffer that needs to be converted to a string
-const decodedResponse = String(response.decode());
-console.log(decodedResponse)
+```js
+const response = await oracleClient.pollForResponse(queryId)
+
+console.log('Decoded oracle response', response)
 ```
 
 ## 3. Oracle: poll for queries and respond

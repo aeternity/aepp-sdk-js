@@ -7,14 +7,12 @@
  */
 
 import { mapObject, pause } from './utils/other';
-import { oracleQueryId } from './tx/builder/helpers';
-import { unpackTx, buildTxAsync, BuildTxOptions } from './tx/builder';
+import { buildTxAsync, BuildTxOptions } from './tx/builder';
 import { Tag } from './tx/builder/constants';
-import { RequestTimedOutError } from './utils/errors';
 import {
   decode, encode, Encoded, Encoding,
 } from './utils/encoder';
-import { _getPollInterval, getHeight } from './chain';
+import { _getPollInterval } from './chain';
 import { sendTransaction, SendTransactionOptions } from './send-transaction';
 import Node from './Node';
 import AccountBase from './account/Base';
@@ -62,36 +60,6 @@ export function pollForQueries(
 }
 
 /**
- * Poll for oracle query response
- * @category oracle
- * @param oracleId - Oracle public key
- * @param queryId - Oracle Query id
- * @param options - Options object
- * @param options.interval - Poll interval
- * @param options.onNode - Node to use
- * @returns OracleQuery object
- */
-export async function pollForQueryResponse(
-  oracleId: Encoded.OracleAddress,
-  queryId: Encoded.OracleQueryId,
-  { interval, ...options }:
-  { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
-): Promise<string> {
-  interval ??= await _getPollInterval('micro-block', options);
-  let height;
-  let ttl;
-  let response;
-  do {
-    ({ response, ttl } = await options.onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId));
-    const responseBuffer = decode(response as Encoded.OracleResponse);
-    if (responseBuffer.length > 0) return responseBuffer.toString();
-    await pause(interval);
-    height = await getHeight({ ...options, cached: true });
-  } while (ttl >= height);
-  throw new RequestTimedOutError(height);
-}
-
-/**
  * Constructor for OracleQuery Object (helper object for using OracleQuery)
  * @category oracle
  * @param oracleId - Oracle public key
@@ -102,7 +70,7 @@ export async function pollForQueryResponse(
 export async function getQueryObject(
   oracleId: Encoded.OracleAddress,
   queryId: Encoded.OracleQueryId,
-  options: RespondToQueryOptions & Parameters<typeof pollForQueryResponse>[2],
+  options: RespondToQueryOptions,
 ): Promise<GetQueryObjectReturnType> {
   const record = await options.onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId);
   return {
@@ -113,7 +81,6 @@ export async function getQueryObject(
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       respondToQuery(queryId, response, { ...options, ...opt })
     ),
-    pollForResponse: async (opt) => pollForQueryResponse(oracleId, queryId, { ...options, ...opt }),
   };
 }
 
@@ -122,47 +89,7 @@ interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQue
   decodedResponse: string;
   respond: (response: string, options?: Parameters<typeof respondToQuery>[2]) =>
   ReturnType<typeof respondToQuery>;
-  pollForResponse: (options?: Parameters<typeof pollForQueryResponse>[2]) =>
-  ReturnType<typeof pollForQueryResponse>;
 }
-
-/**
- * Post query to oracle
- * @category oracle
- * @param oracleId - Oracle public key
- * @param query - Oracle query object
- * @param options - Options object
- * @returns Query object
- */
-export async function postQueryToOracle(
-  oracleId: Encoded.OracleAddress,
-  query: string,
-  options: PostQueryToOracleOptions,
-): Promise<
-  Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getQueryObject>>
-  > {
-  const senderId = options.onAccount.address;
-
-  const oracleQueryTx = await buildTxAsync({
-    _isInternalBuild: true,
-    ...options,
-    tag: Tag.OracleQueryTx,
-    oracleId,
-    senderId,
-    query,
-  });
-  const { nonce } = unpackTx(oracleQueryTx, Tag.OracleQueryTx);
-  const queryId = oracleQueryId(senderId, nonce, oracleId);
-  return {
-    ...await sendTransaction(oracleQueryTx, options),
-    ...await getQueryObject(oracleId, queryId, options),
-  };
-}
-
-type PostQueryToOracleOptionsType = Parameters<typeof sendTransaction>[1]
-& Parameters<typeof getQueryObject>[2]
-& BuildTxOptions<Tag.OracleQueryTx, 'oracleId' | 'senderId' | 'query'>;
-interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
 
 /**
  * Extend oracle ttl
@@ -243,7 +170,6 @@ export async function getOracleObject(
     ...mapObject<Function, Function>(
       {
         pollQueries: pollForQueries,
-        postQuery: postQueryToOracle,
         respondToQuery,
         extendOracle: extendOracleTtl,
         getQuery: getQueryObject,
@@ -270,7 +196,6 @@ interface GetOracleObjectReturnType extends Awaited<ReturnType<Node['getOracleBy
   queries: OracleQueries;
   // TODO: replace getOracleObject with a class
   pollQueries: (cb: Parameters<typeof pollForQueries>[1]) => ReturnType<typeof pollForQueries>;
-  postQuery: Function;
   respondToQuery: Function;
   extendOracle: Function;
   getQuery: Function;

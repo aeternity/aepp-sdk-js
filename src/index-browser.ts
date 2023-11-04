@@ -57,9 +57,10 @@ export {
 export { default as Contract } from './contract/Contract';
 export type { ContractMethodsBase } from './contract/Contract';
 export {
-  pollForQueries, pollForQueryResponse, getQueryObject, postQueryToOracle, extendOracleTtl,
+  pollForQueries, getQueryObject, extendOracleTtl,
   respondToQuery, getOracleObject, registerOracle,
 } from './oracle';
+export { default as OracleClient } from './oracle/OracleClient';
 export { spend, transferFunds, payForTransaction } from './spend';
 export { createGeneralizedAccount, buildAuthTxHash, buildAuthTxHashByGaMetaTx } from './contract/ga';
 
