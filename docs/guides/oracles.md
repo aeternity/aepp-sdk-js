@@ -18,7 +18,7 @@ const oracleTtlOptions = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue
 // OR set a specific block height to expire
 const oracleTtlOptions = { oracleTtlType: ORACLE_TTL_TYPES.block, oracleTtlValue: 555555 }
 
-// queryFee is optional and defaults to 30000
+// queryFee is optional and defaults to 0
 // oracleTtlValue is optional and defaults to 500
 // oracleTtlType is optional and defaults to ORACLE_TTL_TYPES.delta
 const options = { queryFee: 1337, ...oracleTtlOptions }
@@ -44,7 +44,7 @@ After the oracle has been registered and as long as it isn't expired, everybody 
 const oracleId = 'ok_...';
 
 const options = {
-  queryFee: 1337, // should cover the requested fee of the oracle and defaults to 30000
+  queryFee: 1337, // should cover the requested fee of the oracle and defaults to 0
   queryTtlType: ORACLE_TTL_TYPES.delta, // optional and defaults to ORACLE_TTL_TYPES.delta
   queryTtlValue: 20, // optional and defaults to 10
   responseTtlType: ORACLE_TTL_TYPES.delta, // optional and defaults to ORACLE_TTL_TYPES.delta
