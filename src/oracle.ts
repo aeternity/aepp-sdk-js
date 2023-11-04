@@ -9,12 +9,6 @@
 import { mapObject, pause } from './utils/other';
 import { oracleQueryId } from './tx/builder/helpers';
 import { unpackTx, buildTxAsync, BuildTxOptions } from './tx/builder';
-import {
-  ORACLE_TTL,
-  ORACLE_TTL_TYPES,
-  QUERY_TTL,
-  RESPONSE_TTL,
-} from './tx/builder/schema';
 import { Tag } from './tx/builder/constants';
 import { RequestTimedOutError } from './utils/errors';
 import {
@@ -156,10 +150,6 @@ export async function postQueryToOracle(
   const senderId = options.onAccount.address;
 
   const oracleQueryTx = await buildTxAsync({
-    queryTtlType: QUERY_TTL.type,
-    queryTtlValue: QUERY_TTL.value,
-    responseTtlType: RESPONSE_TTL.type,
-    responseTtlValue: RESPONSE_TTL.value,
     ...options,
     tag: Tag.OracleQueryTx,
     oracleId,
@@ -176,13 +166,7 @@ export async function postQueryToOracle(
 
 type PostQueryToOracleOptionsType = Parameters<typeof sendTransaction>[1]
 & Parameters<typeof getQueryObject>[2]
-& BuildTxOptions<Tag.OracleQueryTx, 'oracleId' | 'senderId' | 'query' | 'queryTtlType' | 'queryTtlValue' | 'responseTtlType' | 'responseTtlValue'>
-& {
-  queryTtlType?: ORACLE_TTL_TYPES;
-  queryTtlValue?: number;
-  responseTtlType?: ORACLE_TTL_TYPES;
-  responseTtlValue?: number;
-};
+& BuildTxOptions<Tag.OracleQueryTx, 'oracleId' | 'senderId' | 'query'>;
 interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
 
 /**
@@ -200,8 +184,6 @@ Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getOracl
 > {
   const oracleId = encode(decode(options.onAccount.address), Encoding.OracleAddress);
   const oracleExtendTx = await buildTxAsync({
-    oracleTtlType: ORACLE_TTL.type,
-    oracleTtlValue: ORACLE_TTL.value,
     ...options,
     tag: Tag.OracleExtendTx,
     oracleId,
@@ -214,8 +196,7 @@ Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getOracl
 }
 
 type ExtendOracleTtlOptionsType = SendTransactionOptions & Parameters<typeof getOracleObject>[1]
-& BuildTxOptions<Tag.OracleExtendTx, 'oracleTtlType' | 'oracleTtlValue' | 'callerId' | 'oracleId'>
-& { oracleTtlType?: ORACLE_TTL_TYPES; oracleTtlValue?: number };
+& BuildTxOptions<Tag.OracleExtendTx, 'callerId' | 'oracleId'>;
 interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
 
 /**
@@ -238,8 +219,6 @@ export async function respondToQuery(
   > {
   const oracleId = encode(decode(options.onAccount.address), Encoding.OracleAddress);
   const oracleRespondTx = await buildTxAsync({
-    responseTtlType: RESPONSE_TTL.type,
-    responseTtlValue: RESPONSE_TTL.value,
     ...options,
     tag: Tag.OracleResponseTx,
     oracleId,
@@ -254,8 +233,7 @@ export async function respondToQuery(
 }
 
 type RespondToQueryOptionsType = SendTransactionOptions & Parameters<typeof getOracleObject>[1]
-& BuildTxOptions<Tag.OracleResponseTx, 'callerId' | 'oracleId' | 'queryId' | 'response' | 'responseTtlType' | 'responseTtlValue'>
-& { responseTtlType?: ORACLE_TTL_TYPES; responseTtlValue?: number };
+& BuildTxOptions<Tag.OracleResponseTx, 'callerId' | 'oracleId' | 'queryId' | 'response'>;
 interface RespondToQueryOptions extends RespondToQueryOptionsType {}
 
 /**
@@ -330,8 +308,6 @@ export async function registerOracle(
   > {
   const accountId = options.onAccount.address;
   const oracleRegisterTx = await buildTxAsync({
-    oracleTtlValue: ORACLE_TTL.value,
-    oracleTtlType: ORACLE_TTL.type,
     ...options,
     tag: Tag.OracleRegisterTx,
     accountId,
@@ -345,9 +321,5 @@ export async function registerOracle(
 }
 
 type RegisterOracleOptionsType = SendTransactionOptions & Parameters<typeof getOracleObject>[1]
-& BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat' | 'oracleTtlType' | 'oracleTtlValue'>
-& {
-  oracleTtlType?: ORACLE_TTL_TYPES;
-  oracleTtlValue?: number;
-};
+& BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat'>;
 interface RegisterOracleOptions extends RegisterOracleOptionsType {}

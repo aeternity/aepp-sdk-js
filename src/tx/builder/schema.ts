@@ -20,10 +20,6 @@ export enum ORACLE_TTL_TYPES {
   block = 1,
 }
 
-// # ORACLE
-export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
-export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
-export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 // # CONTRACT
 export const DRY_RUN_ACCOUNT = {
   pub: 'ak_11111111111111111111111111111111273Yts',
@@ -302,8 +298,8 @@ export const txSchema = [{
   queryFormat: string,
   responseFormat: string,
   queryFee: coinAmount,
-  oracleTtlType: enumeration(ORACLE_TTL_TYPES),
-  oracleTtlValue: shortUInt,
+  oracleTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  oracleTtlValue: withDefault(500, shortUInt),
   fee,
   ttl,
   abiVersion,
@@ -312,8 +308,8 @@ export const txSchema = [{
   version: shortUIntConst(1, true),
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
   nonce: nonce('oracleId'),
-  oracleTtlType: enumeration(ORACLE_TTL_TYPES),
-  oracleTtlValue: shortUInt,
+  oracleTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  oracleTtlValue: withDefault(500, shortUInt),
   fee,
   ttl,
 }, {
@@ -324,10 +320,10 @@ export const txSchema = [{
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
   query: string,
   queryFee,
-  queryTtlType: enumeration(ORACLE_TTL_TYPES),
-  queryTtlValue: shortUInt,
-  responseTtlType: enumeration(ORACLE_TTL_TYPES),
-  responseTtlValue: shortUInt,
+  queryTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  queryTtlValue: withDefault(10, shortUInt),
+  responseTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  responseTtlValue: withDefault(10, shortUInt),
   fee,
   ttl,
 }, {
@@ -337,8 +333,8 @@ export const txSchema = [{
   nonce: nonce('oracleId'),
   queryId: encoded(Encoding.OracleQueryId),
   response: string,
-  responseTtlType: enumeration(ORACLE_TTL_TYPES),
-  responseTtlValue: shortUInt,
+  responseTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  responseTtlValue: withDefault(10, shortUInt),
   fee,
   ttl,
 }, {

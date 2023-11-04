@@ -24,9 +24,9 @@ const payload = encode(Buffer.from('test'), Encoding.Bytearray);
 const queryFormat = '{\'city\': str}';
 const responseFormat = '{\'tmp\': num}';
 const queryFee = 30000;
-const oracleTtl = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 500 };
-const responseTtl = { responseTtlType: ORACLE_TTL_TYPES.delta, responseTtlValue: 100 };
-const queryTtl = { queryTtlType: ORACLE_TTL_TYPES.delta, queryTtlValue: 100 };
+const oracleTtl = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 1234 };
+const responseTtl = { responseTtlType: ORACLE_TTL_TYPES.delta, responseTtlValue: 123 };
+const queryTtl = { queryTtlType: ORACLE_TTL_TYPES.delta, queryTtlValue: 12 };
 const query = '{\'city\': \'Berlin\'}';
 const queryResponse = '{\'tmp\': 101}';
 
@@ -140,8 +140,18 @@ describe('Transaction', () => {
       callData: contract._calldata.encode('Identity', 'getArg', [2]),
     }),
   ], [
+    'oracle register simple',
+    'tx_+E4WAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19AACCAfSGDy5ouwgAAACEKur2',
+    async () => aeSdk.buildTx({
+      tag: Tag.OracleRegisterTx,
+      nonce,
+      accountId: address,
+      queryFormat,
+      responseFormat,
+    }),
+  ], [
     'oracle register',
-    'tx_+FAWAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19gnUwAIIB9IYPN7jqmAAAAFrPoGY=',
+    'tx_+FAWAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABjXsnY2l0eSc6IHN0cn2Meyd0bXAnOiBudW19gnUwAIIE0oYPVuvwVAAAANBbp7Q=',
     async () => aeSdk.buildTx({
       tag: Tag.OracleRegisterTx,
       nonce,
@@ -152,8 +162,14 @@ describe('Transaction', () => {
       ...oracleTtl,
     }),
   ], [
-    'oracle extend',
+    'oracle extend simple',
     'tx_8RkBoQSEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAAEAggH0hg6itfGYAAC5Cppj',
+    async () => aeSdk.buildTx({
+      tag: Tag.OracleExtendTx, nonce, oracleId,
+    }),
+  ], [
+    'oracle extend',
+    'tx_8RkBoQSEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAAEAggTShg7B6PdUAADOPxKu',
     async () => aeSdk.buildTx({
       tag: Tag.OracleExtendTx, nonce, oracleId, ...oracleTtl,
     }),
@@ -174,9 +190,7 @@ describe('Transaction', () => {
         tag: Tag.OracleQueryTx,
         nonce,
         oracleId,
-        ...responseTtl,
         query,
-        ...queryTtl,
         senderId: address,
       });
       sandbox.restore();
@@ -184,7 +198,7 @@ describe('Transaction', () => {
     },
   ], [
     'oracle post query',
-    'tx_+GkXAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoQSEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAJJ7J2NpdHknOiAnQmVybGluJ32CdTAAZABkhg+bJBmGAABcZrGe',
+    'tx_+GkXAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoQSEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAJJ7J2NpdHknOiAnQmVybGluJ32CdTAADAB7hg+XamzmAACKXhOU',
     async () => aeSdk.buildTx({
       tag: Tag.OracleQueryTx,
       nonce,
@@ -196,8 +210,18 @@ describe('Transaction', () => {
       senderId: address,
     }),
   ], [
+    'oracle respond query simple',
+    'tx_+F0YAaEEhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoLpilW+m1a50IepD5pClPlSP54fnFbPvEU5kIgFZExwhjHsndG1wJzogMTAxfQAKhg9fTbS8AADlFWOV',
+    async () => aeSdk.buildTx({
+      tag: Tag.OracleResponseTx,
+      nonce,
+      oracleId,
+      queryId: oracleQueryId(address, nonce, oracleId),
+      response: queryResponse,
+    }),
+  ], [
     'oracle respond query',
-    'tx_+F0YAaEEhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoLpilW+m1a50IepD5pClPlSP54fnFbPvEU5kIgFZExwhjHsndG1wJzogMTAxfQBkhg9jQvwmAADiJk0r',
+    'tx_+F0YAaEEhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoLpilW+m1a50IepD5pClPlSP54fnFbPvEU5kIgFZExwhjHsndG1wJzogMTAxfQB7hg9kMWdOAAB6Zd3I',
     async () => aeSdk.buildTx({
       tag: Tag.OracleResponseTx,
       nonce,
