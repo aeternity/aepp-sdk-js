@@ -1,5 +1,6 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { createSandbox } from 'sinon';
 import { getSdk } from './index';
 import {
   AeSdk, Contract,
@@ -156,6 +157,31 @@ describe('Transaction', () => {
     async () => aeSdk.buildTx({
       tag: Tag.OracleExtendTx, nonce, oracleId, ...oracleTtl,
     }),
+  ], [
+    'oracle post query simple',
+    'tx_+GkXAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoQSEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAJJ7J2NpdHknOiAnQmVybGluJ32CMDkACgAKhg+XLtIcAAA6bZb1',
+    async () => {
+      const sandbox = createSandbox();
+      sandbox.replace(aeSdk.api, 'getOracleByPubkey', async () => Promise.resolve({
+        id: oracleId,
+        responseFormat,
+        queryFormat,
+        queryFee: 12345n,
+        abiVersion: '0',
+        ttl: 42,
+      }));
+      const tx = await aeSdk.buildTx({
+        tag: Tag.OracleQueryTx,
+        nonce,
+        oracleId,
+        ...responseTtl,
+        query,
+        ...queryTtl,
+        senderId: address,
+      });
+      sandbox.restore();
+      return tx;
+    },
   ], [
     'oracle post query',
     'tx_+GkXAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoQSEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAJJ7J2NpdHknOiAnQmVybGluJ32CdTAAZABkhg+bJBmGAABcZrGe',

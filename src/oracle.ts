@@ -153,7 +153,6 @@ export async function postQueryToOracle(
 ): Promise<
   Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getQueryObject>>
   > {
-  options.queryFee ??= (await options.onNode.getOracleByPubkey(oracleId)).queryFee.toString();
   const senderId = options.onAccount.address;
 
   const oracleQueryTx = await buildTxAsync({

@@ -8,7 +8,7 @@ import { Tag } from './constants';
 import SchemaTypes from './SchemaTypes';
 import {
   uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
+  address, pointers, queryFee, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
   array, boolean, ctVersion, abiVersion, ttl, nonce, map, wrapped,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
@@ -307,7 +307,7 @@ export const txSchema = [{
   nonce: nonce('senderId'),
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
   query: string,
-  queryFee: coinAmount,
+  queryFee,
   queryTtlType: enumeration(ORACLE_TTL_TYPES),
   queryTtlValue: shortUInt,
   responseTtlType: enumeration(ORACLE_TTL_TYPES),

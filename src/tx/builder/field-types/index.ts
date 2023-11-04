@@ -19,6 +19,7 @@ import nameFee from './name-fee';
 import nameId from './name-id';
 import nonce from './nonce';
 import pointers from './pointers';
+import queryFee from './query-fee';
 import raw from './raw';
 import shortUInt from './short-u-int';
 import shortUIntConst from './short-u-int-const';
@@ -58,6 +59,7 @@ export {
   nameId,
   nonce,
   pointers,
+  queryFee,
   raw,
   shortUInt,
   shortUIntConst,
