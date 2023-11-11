@@ -153,6 +153,10 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
     this.intAsString = true;
   }
 
+  /**
+   * Returns network ID provided by node.
+   * This method won't do extra requests on subsequent calls.
+   */
   async getNetworkId(): Promise<string> {
     this.#networkIdPromise ??= this.getStatus().then(({ networkId }) => networkId);
     const networkId = await this.#networkIdPromise;
