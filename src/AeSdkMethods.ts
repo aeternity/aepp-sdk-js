@@ -80,26 +80,32 @@ class AeSdkMethods {
     Object.assign(this._options, options);
   }
 
-  _getOptions(
-    callOptions: AeSdkMethodsOptions = {},
+  /**
+   * Returns sdk instance options with references to current account, node, compiler.
+   * Used to create an instance (Contract, Oracle) bound to AeSdk state.
+   * @param mergeWith - Merge context with these extra options
+   * @returns Context object
+   */
+  getContext(
+    mergeWith: AeSdkMethodsOptions = {},
   ): AeSdkMethodsOptions & { onAccount: AccountBase; onCompiler: CompilerBase; onNode: Node } {
     return {
       ...this._options,
       onAccount: getValueOrErrorProxy(() => this._options.onAccount),
       onNode: getValueOrErrorProxy(() => this._options.onNode),
       onCompiler: getValueOrErrorProxy(() => this._options.onCompiler),
-      ...callOptions,
+      ...mergeWith,
     };
   }
 
   async buildTx(options: TxParamsAsync): Promise<Encoded.Transaction> {
-    return buildTxAsync({ ...this._getOptions(), ...options });
+    return buildTxAsync({ ...this.getContext(), ...options });
   }
 
   async initializeContract<Methods extends ContractMethodsBase>(
     options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode'> & { onNode?: Node },
   ): Promise<Contract<Methods>> {
-    return Contract.initialize<Methods>(this._getOptions(options as AeSdkMethodsOptions));
+    return Contract.initialize<Methods>(this.getContext(options as AeSdkMethodsOptions));
   }
 }
 
@@ -133,7 +139,7 @@ Object.assign(AeSdkMethods.prototype, mapObject<Function, Function>(
     function methodWrapper(this: AeSdkMethods, ...args: any[]) {
       args.length = handler.length;
       const options = args[args.length - 1];
-      args[args.length - 1] = this._getOptions(options);
+      args[args.length - 1] = this.getContext(options);
       return handler(...args);
     },
   ],

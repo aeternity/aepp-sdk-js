@@ -462,14 +462,14 @@ describe('Contract instance', () => {
       }
     }
 
-    const contract1 = new TestContract(aeSdk._getOptions());
+    const contract1 = new TestContract(aeSdk.getContext());
     expect(contract1._aci).to.be.an('array');
     expect(contract1.$options).to.be.an('object');
     await contract1.$deploy([]);
     expect((await contract1.getArg(42)).decodedResult).to.be.equal(42n);
 
     const contract2 = await TestContract.initialize({
-      ...aeSdk._getOptions(),
+      ...aeSdk.getContext(),
       address: contract1.$options.address,
     });
     expect(contract2._aci).to.be.an('array');
