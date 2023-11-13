@@ -56,10 +56,7 @@ export {
 } from './aens';
 export { default as Contract } from './contract/Contract';
 export type { ContractMethodsBase } from './contract/Contract';
-export {
-  pollForQueries, extendOracleTtl,
-  respondToQuery, getOracleObject, registerOracle,
-} from './oracle';
+export { default as Oracle } from './oracle/Oracle';
 export { default as OracleClient } from './oracle/OracleClient';
 export { spend, transferFunds, payForTransaction } from './spend';
 export { createGeneralizedAccount, buildAuthTxHash, buildAuthTxHashByGaMetaTx } from './contract/ga';

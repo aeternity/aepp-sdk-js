@@ -3,68 +3,73 @@ import { expect } from 'chai';
 import { RestError } from '@azure/core-rest-pipeline';
 import { getSdk, networkId } from '.';
 import {
-  AeSdk, decode, encode, Encoding, Encoded, registerOracle, ORACLE_TTL_TYPES, OracleClient,
+  AeSdk, decode, encode, Encoding, Encoded, ORACLE_TTL_TYPES, Oracle, OracleClient,
 } from '../../src';
 import { assertNotNull } from '../utils';
 
 describe('Oracle', () => {
   let aeSdk: AeSdk;
-  let oracle: Awaited<ReturnType<typeof registerOracle>>;
+  let oracle: Oracle;
   let oracleClient: OracleClient;
   const queryResponse = '{"tmp": 30}';
 
   before(async () => {
     aeSdk = await getSdk(3);
-  });
-
-  it('Register Oracle with 5000 TTL', async () => {
     const expectedOracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
-    const height = await aeSdk.getHeight();
-    oracle = await aeSdk.registerOracle(
-      '{"city": "str"}',
-      '{"tmp": "num"}',
-      { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 5000 },
-    );
-    const ttl = height + 5000;
-    expect(oracle.ttl).to.be.within(ttl, ttl + 4);
-    oracle.id.should.be.equal(expectedOracleId);
-    oracleClient = new OracleClient(oracle.id, {
+    oracle = new Oracle(aeSdk.accounts[aeSdk.address], aeSdk.getContext());
+    expect(oracle.address).to.be.equal(expectedOracleId);
+    oracleClient = new OracleClient(oracle.address, {
       ...aeSdk.getContext(),
       onAccount: aeSdk.accounts[aeSdk.addresses()[1]],
     });
+    expect(oracleClient.address).to.be.equal(expectedOracleId);
   });
 
-  it('Extend Oracle', async () => {
-    const extendedOracle = await oracle.extendOracle(
-      { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 7450 },
-    );
-    expect(extendedOracle.ttl).to.be.equal(oracle.ttl + 7450);
-  });
-
-  it('Pool for queries', (done) => {
-    let count = 0;
-    const stopPolling = oracle.pollQueries(() => {
-      count += 1;
-      expect(count).to.be.lessThanOrEqual(3);
-      if (count !== 3) return;
-      stopPolling();
-      done();
+  describe('Oracle', () => {
+    it('registers with 5000 TTL', async () => {
+      const height = await aeSdk.getHeight();
+      await oracle.register(
+        '{"city": "str"}',
+        '{"tmp": "num"}',
+        { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 5000 },
+      );
+      const oracleState = await oracle.getState();
+      const ttl = height + 5000;
+      expect(oracleState.ttl).to.be.within(ttl, ttl + 4);
+      expect(oracleState.id).to.be.equal(oracle.address);
     });
-    oracleClient.postQuery('{"city": "Berlin2"}')
-      .then(async () => oracleClient.postQuery('{"city": "Berlin3"}'))
-      .then(async () => oracleClient.postQuery('{"city": "Berlin4"}'));
-  });
 
-  it('Respond to query', async () => {
-    const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}');
-    oracle = await aeSdk.respondToQuery(queryId, queryResponse);
-    const query = await oracleClient.getQuery(queryId);
+    it('extends TTL', async () => {
+      const { ttl: ttlBefore } = await oracle.getState();
+      await oracle.extendTtl({ oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 7450 });
+      const { ttl } = await oracle.getState();
+      expect(ttl).to.be.equal(ttlBefore + 7450);
+    });
 
-    expect(query.decodedResponse).to.be.equal(queryResponse);
-    expect(decode(query.response as Encoded.OracleResponse).toString()).to.be.equal(queryResponse);
+    it('polls for queries', (done) => {
+      let count = 0;
+      const stopPolling = oracle.pollQueries(() => {
+        count += 1;
+        expect(count).to.be.lessThanOrEqual(3);
+        if (count !== 3) return;
+        stopPolling();
+        done();
+      });
+      oracleClient.postQuery('{"city": "Berlin2"}')
+        .then(async () => oracleClient.postQuery('{"city": "Berlin3"}'))
+        .then(async () => oracleClient.postQuery('{"city": "Berlin4"}'));
+    });
 
-    const response = await oracleClient.pollForResponse(queryId);
-    response.should.be.equal(queryResponse);
+    it('responds to query', async () => {
+      const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}');
+      await oracle.respondToQuery(queryId, queryResponse);
+
+      const query = await aeSdk.api.getOracleQueryByPubkeyAndQueryId(oracle.address, queryId);
+      expect(decode(query.response as Encoded.OracleResponse).toString())
+        .to.be.equal(queryResponse);
+      const response = await oracleClient.pollForResponse(queryId);
+      expect(response).to.be.equal(queryResponse);
+    });
   });
 
   describe('OracleClient', () => {
@@ -99,15 +104,14 @@ describe('Oracle', () => {
   });
 
   describe('Oracle query fee settings', () => {
-    let oracleWithFee: Awaited<ReturnType<typeof registerOracle>>;
+    let oracleWithFee: Oracle;
     let oracleWithFeeClient: OracleClient;
     const queryFee = 24000n;
 
     before(async () => {
-      await aeSdk.selectAccount(aeSdk.addresses()[2]);
-      oracleWithFee = await aeSdk
-        .registerOracle('{"city": "str"}', '{"tmp": "num"}', { queryFee: queryFee.toString() });
-      oracleWithFeeClient = new OracleClient(oracleWithFee.id, aeSdk.getContext());
+      oracleWithFee = new Oracle(aeSdk.accounts[aeSdk.addresses()[2]], aeSdk.getContext());
+      await oracleWithFee.register('{"city": "str"}', '{"tmp": "num"}', { queryFee: queryFee.toString() });
+      oracleWithFeeClient = new OracleClient(oracleWithFee.address, aeSdk.getContext());
     });
 
     it('Post Oracle Query without query fee', async () => {

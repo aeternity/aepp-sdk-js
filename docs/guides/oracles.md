@@ -5,16 +5,24 @@
 This guide shows you how to perform all the operations that you need within the lifecycle of [oracles](https://docs.aeternity.com/protocol/oracles) using the SDK.
 
 ## 1. Oracle: register
-You register an oracle that responds with the temperature of the city that is included in the query.
+Let's register an oracle that responds with the temperature of the city that is included in the query.
 
-To register an oracle you need to provide a `queryFormat` and a `responseFormat` to the `registerOracle` function of the SDK. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtlValue`, see [transaction options](../transaction-options.md#oracleregistertx).
+Firstly, you need to create an instance of `Oracle` class. This class requires an account that would be used to sign operations on behalf of the oracle. So one account can host only one oracle, and this oracle address would be the same as the corresponding account address except for a different prefix (`ok_` instead of `ak_`). This means that it's not possible to manage multiple oracles using the same account.
 
 ```js
-import { AeSdk } from '@aeternity/aepp-sdk'
+import { AeSdk, Oracle } from '@aeternity/aepp-sdk'
 
 // init an instance of the SDK using the AeSdk class
 const aeSdk = new AeSdk({ ... })
+// it should be an instance of AccountBase with non-zero balance
+const oracleAccount = new MemoryAccount(...)
 
+const oracle = new Oracle(oracleAccount, aeSdk.getContext())
+```
+
+To register an oracle on-chain you need to provide a `queryFormat` and a `responseFormat` to the `register` function of `Oracle` class. In addition to the common transaction options you can provide the oracle specific options `queryFee` and `oracleTtlValue`, see [transaction options](../transaction-options.md#oracleregistertx).
+
+```js
 // set TTL with a delta of 1000 blocks
 const oracleTtlOptions = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 1000 }
 // OR set a specific block height to expire
@@ -26,16 +34,13 @@ const oracleTtlOptions = { oracleTtlType: ORACLE_TTL_TYPES.block, oracleTtlValue
 const options = { queryFee: 1337, ...oracleTtlOptions }
 
 // the first argument is the queryFormat and the second is the responseFormat
-const oracle = await aeSdk.registerOracle('{"city": "str"}', '{"temperature": "int"}', options)
+await oracle.register('{"city": "str"}', '{"temperature": "int"}', options)
 ```
 
 Note:
 
-- By default the oracle will exist for the next 500 KeyBlocks.
+- By default the oracle will exist for the next 500 key blocks.
 - If you intend to keep your oracle running longer you should increase the `oracleTtlValue` and/or set up a service that automatically extends the TTL before it expires.
-- The `oracleId` will be similar to the address of the account that registered the Oracle.
-   - The only difference is the prefix that will be `ok_` instead of `ak_`
-   - This means that each account can only host 1 oracle. It's not possible to manage multiple oracles using the same account.
 
 ## 2. Some party: query an oracle and poll for response
 
@@ -57,7 +62,7 @@ const options = {
 
 // to query an oracle you need to instantiate the OracleClient object first
 const oracleClient = new OracleClient(oracleId, aeSdk.getContext())
-const response = await oracle.query('{"city": "Berlin"}', options)
+const response = await oracleClient.query('{"city": "Berlin"}', options)
 console.log('Decoded oracle response', response)
 ```
 
@@ -68,9 +73,10 @@ Note:
 Alternatively, you can post query and poll for response using separate methods from below.
 
 ### Post query (alternative)
+To post a query without waiting for a response do the below.
 
 ```js
-const { queryId } = await oracle.postQuery('{"city": "Berlin"}') // oq_...
+const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}') // oq_...
 
 console.log('Oracle query ID', queryId)
 ```
@@ -110,8 +116,7 @@ const oracleId = 'ok_...';
 const queryId = 'oq_...';
 const options = { onAccount: 'ak_...' } // only the account of the oracle can respond to the query
 
-// using the aeSdk (instance of AeSdk class) by providing the queryId
-await aeSdk.respondToQuery(queryId, '{"temperature": 27.5}', options)
+await oracle.respondToQuery(queryId, '{"temperature": 27.5}', options)
 ```
 
 Note:
@@ -123,17 +128,11 @@ Note:
 As mentioned above an Oracle has a certain TTL that can be specified when registering it. You might want to extend the TTL of the oracle before it expires. You can do that as follows:
 
 ```js
-const oracleId = 'ok_...';
-
 // extend TTL by additional 500 blocks (based on current expiration height of the oracle)
 const options = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 500 }
 
-// using the oracle instance
-const oracle = await aeSdk.getOracleObject(oracleId)
-const extendedOracle = await oracle.extendOracle(options)
-
-// OR using the aeSdk (instance of AeSdk class) directly
-const extendedOracle = await aeSdk.extendOracleTtl(options)
+// using the Oracle instance
+await oracle.extend(options)
 ```
 
 ## 5. Get the current state from the node
@@ -147,4 +146,6 @@ Both Oracle and OracleClient have methods to get their state from the node.
 ## Example applications
 
 - [ae-oracle-pricefeed](https://github.com/aeternity/ae-oracle-pricefeed)
-      - NodeJS example that registers an oracle, extends it if required and responds to queries automatically.
+  NodeJS example that registers an oracle, extends it if required and responds to queries automatically.
+- [tipping-oracle-service](https://github.com/superhero-com/tipping-oracle-service)
+  application that registers an oracle to check the presence of an AE address at a specific page
