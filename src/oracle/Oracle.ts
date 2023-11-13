@@ -1,4 +1,3 @@
-import { pause } from '../utils/other';
 import { buildTxAsync, BuildTxOptions } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
 import { LogicError, UnexpectedTsError } from '../utils/errors';
@@ -92,30 +91,31 @@ export default class Oracle extends OracleBase {
   ): () => void {
     const opt = { ...this.options, ...options };
     const knownQueryIds = new Set();
+
+    let isChecking = false;
     const checkNewQueries = async (): Promise<void> => {
+      if (isChecking) return;
+      isChecking = true;
       const queries = (await opt.onNode.getOracleQueriesByPubkey(this.address)).oracleQueries ?? [];
-      queries
+      const filtered = queries
         .filter(({ id }) => !knownQueryIds.has(id))
         .map((query) => decodeQuery(query))
-        .filter((query) => options.includeResponded === true || query.decodedResponse === '')
-        .forEach((query) => {
-          knownQueryIds.add(query.id);
-          onQuery(query);
-        });
+        .filter((query) => options.includeResponded === true || query.decodedResponse === '');
+      filtered.forEach((query) => knownQueryIds.add(query.id));
+      isChecking = false;
+      await Promise.all(filtered.map((query) => onQuery(query)));
     };
 
-    let stopped = false;
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    checkNewQueries();
+    const idPromise = (async () => {
       const interval = opt.interval ?? await _getPollInterval('micro-block', opt);
-      while (!stopped) { // eslint-disable-line no-unmodified-loop-condition
-        // TODO: allow to handle this error somehow
-        await checkNewQueries().catch(console.error);
-        await pause(interval);
-      }
+      return setInterval(async () => checkNewQueries(), interval);
     })();
-    return () => { stopped = true; };
+
+    return async () => {
+      const id = await idPromise;
+      clearInterval(id);
+    };
   }
 
   /**
