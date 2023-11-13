@@ -24,7 +24,7 @@ const oracleTtlOptions = { oracleTtlType: ORACLE_TTL_TYPES.block, oracleTtlValue
 const options = { queryFee: 1337, ...oracleTtlOptions }
 
 // the first argument is the queryFormat and the second is the responseFormat
-const oracle = await aeSdk.registerOracle("{'city': string}", "{'temperature': int}", options)
+const oracle = await aeSdk.registerOracle('{"city": "str"}', '{"temperature": "int"}', options)
 ```
 
 Note:
@@ -53,10 +53,10 @@ const options = {
 
 // using the oracle object in case you need to instantiate the oracle object first
 const oracle = await aeSdk.getOracleObject(oracleId)
-const query = await oracle.postQuery("{'city': 'Berlin'}", options)
+const query = await oracle.postQuery('{"city": "Berlin"}', options)
 
 // OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
-const query = await aeSdk.postQueryToOracle(oracleId, "{'city': 'Berlin'}", options)
+const query = await aeSdk.postQueryToOracle(oracleId, '{"city": "Berlin"}', options)
 ```
 
 Note:
@@ -111,10 +111,10 @@ const options = { onAccount: 'ak_...' } // only the account of the oracle can re
 
 // using the query instance
 const query = await aeSdk.getQueryObject(oracleId, queryId)
-await query.respond('{ "temperature": 27.5 }', options)
+await query.respond('{"temperature": 27.5}', options)
 
 // OR using the aeSdk (instance of AeSdk class) directly by providing the queryId
-await aeSdk.respondToQuery(queryId, '{ "temperature": 27.5 }', options)
+await aeSdk.respondToQuery(queryId, '{"temperature": 27.5}', options)
 ```
 
 Note:
