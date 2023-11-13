@@ -16,8 +16,7 @@ import { _getPollInterval } from './chain';
 import { sendTransaction, SendTransactionOptions } from './send-transaction';
 import Node from './Node';
 import AccountBase from './account/Base';
-
-type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['oracleQueries'];
+import { OracleQueryNode } from './oracle/OracleBase';
 
 /**
  * Poll for oracle queries
@@ -31,7 +30,7 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
  */
 export function pollForQueries(
   oracleId: Encoded.OracleAddress,
-  onQuery: (query: OracleQueries[number]) => void,
+  onQuery: (query: OracleQueryNode) => void,
   { interval, ...options }: { interval?: number; onNode: Node }
   & Parameters<typeof _getPollInterval>[1],
 ): () => void {
@@ -57,38 +56,6 @@ export function pollForQueries(
     }
   })();
   return () => { stopped = true; };
-}
-
-/**
- * Constructor for OracleQuery Object (helper object for using OracleQuery)
- * @category oracle
- * @param oracleId - Oracle public key
- * @param queryId - Oracle Query id
- * @param options - Options
- * @returns OracleQuery object
- */
-export async function getQueryObject(
-  oracleId: Encoded.OracleAddress,
-  queryId: Encoded.OracleQueryId,
-  options: RespondToQueryOptions,
-): Promise<GetQueryObjectReturnType> {
-  const record = await options.onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId);
-  return {
-    ...record,
-    decodedQuery: decode(record.query as Encoded.OracleQueryId).toString(),
-    decodedResponse: decode(record.response as Encoded.OracleResponse).toString(),
-    respond: async (response, opt) => (
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      respondToQuery(queryId, response, { ...options, ...opt })
-    ),
-  };
-}
-
-interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQueryByPubkeyAndQueryId']>> {
-  decodedQuery: string;
-  decodedResponse: string;
-  respond: (response: string, options?: Parameters<typeof respondToQuery>[2]) =>
-  ReturnType<typeof respondToQuery>;
 }
 
 /**
@@ -172,7 +139,6 @@ export async function getOracleObject(
         pollQueries: pollForQueries,
         respondToQuery,
         extendOracle: extendOracleTtl,
-        getQuery: getQueryObject,
       },
       ([name, handler]) => [
         name,
@@ -193,7 +159,7 @@ export async function getOracleObject(
 
 interface GetOracleObjectReturnType extends Awaited<ReturnType<Node['getOracleByPubkey']>> {
   id: Encoded.OracleAddress;
-  queries: OracleQueries;
+  queries: OracleQueryNode[];
   // TODO: replace getOracleObject with a class
   pollQueries: (cb: Parameters<typeof pollForQueries>[1]) => ReturnType<typeof pollForQueries>;
   respondToQuery: Function;

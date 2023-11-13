@@ -58,7 +58,7 @@ describe('Oracle', () => {
   it('Respond to query', async () => {
     const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}');
     oracle = await aeSdk.respondToQuery(queryId, queryResponse);
-    const query = await oracle.getQuery(queryId);
+    const query = await oracleClient.getQuery(queryId);
 
     expect(query.decodedResponse).to.be.equal(queryResponse);
     expect(decode(query.response as Encoded.OracleResponse).toString()).to.be.equal(queryResponse);

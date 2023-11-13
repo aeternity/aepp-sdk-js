@@ -6,7 +6,7 @@ import {
 import { getSdk } from '.';
 import {
   commitmentHash, decode, encode, Encoded, Encoding,
-  genSalt, AeSdk, Contract, ConsensusProtocolVersion,
+  genSalt, AeSdk, Contract, ConsensusProtocolVersion, OracleClient,
 } from '../../src';
 
 describe('Operation delegation', () => {
@@ -218,7 +218,7 @@ contract DelegateTest =
   describe('Oracle', () => {
     let oracle: Awaited<ReturnType<typeof aeSdk.getOracleObject>>;
     let oracleId: Encoded.OracleAddress;
-    let queryObject: Awaited<ReturnType<typeof aeSdk.getQueryObject>>;
+    let queryObject: Awaited<ReturnType<OracleClient['getQuery']>>;
     let delegationSignature: Uint8Array;
     const queryFee = 500000;
     const ttl: ChainTtl = { RelativeTTL: [50n] };
@@ -292,9 +292,9 @@ contract DelegateTest =
         .createQuery(oracle.id, q, 1000 + queryFee, ttl, ttl, { amount: 5 * queryFee });
       assertNotNull(query.result);
       query.result.returnType.should.be.equal('ok');
-      queryObject = await aeSdk.getQueryObject(oracle.id, query.decodedResult);
-      queryObject.should.be.an('object');
-      queryObject.decodedQuery.should.be.equal(q);
+      const oracleClient = new OracleClient(oracle.id, aeSdk.getContext());
+      queryObject = await oracleClient.getQuery(query.decodedResult);
+      expect(queryObject.decodedQuery).to.be.equal(q);
     });
 
     it('responds to query', async () => {
@@ -307,8 +307,9 @@ contract DelegateTest =
       const { result } = await contract.respond(oracle.id, queryId, respondSig, r);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
-      const queryObject2 = await aeSdk.getQueryObject(oracle.id, queryId);
-      queryObject2.decodedResponse.should.be.equal(r);
+      const oracleClient = new OracleClient(oracle.id, aeSdk.getContext());
+      const queryObject2 = await oracleClient.getQuery(queryId);
+      expect(queryObject2.decodedResponse).to.be.equal(r);
     });
 
     it('fails trying to create general delegation as oracle query', async () => {

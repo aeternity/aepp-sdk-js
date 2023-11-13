@@ -110,11 +110,7 @@ const oracleId = 'ok_...';
 const queryId = 'oq_...';
 const options = { onAccount: 'ak_...' } // only the account of the oracle can respond to the query
 
-// using the query instance
-const query = await aeSdk.getQueryObject(oracleId, queryId)
-await query.respond('{"temperature": 27.5}', options)
-
-// OR using the aeSdk (instance of AeSdk class) directly by providing the queryId
+// using the aeSdk (instance of AeSdk class) by providing the queryId
 await aeSdk.respondToQuery(queryId, '{"temperature": 27.5}', options)
 ```
 
@@ -139,6 +135,14 @@ const extendedOracle = await oracle.extendOracle(options)
 // OR using the aeSdk (instance of AeSdk class) directly
 const extendedOracle = await aeSdk.extendOracleTtl(options)
 ```
+
+## 5. Get the current state from the node
+
+Both Oracle and OracleClient have methods to get their state from the node.
+
+`Oracle:getState`, `OracleClient:getState` returns the same value as `Node:getOracleByPubkey`, but without arguments (it uses the oracle address provided in the constructor).
+
+`Oracle:getQuery`, `OracleClient:getQuery` corresponds to `Node:getOracleQueryByPubkeyAndQueryId`, adding `decodedQuery`, `decodedResponse` based on the oracle type.
 
 ## Example applications
 
