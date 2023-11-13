@@ -93,7 +93,7 @@ export {
   CryptographyError, NodeError, TransactionError, WalletError, ArgumentError, IllegalArgumentError,
   ArgumentCountMismatchError, InsufficientBalanceError, MissingParamError, NoSerializerFoundError,
   RequestTimedOutError, TxTimedOutError, TypeError, UnsupportedPlatformError,
-  UnsupportedProtocolError, NotImplementedError, UnsupportedVersionError, InternalError,
+  UnsupportedProtocolError, NotImplementedError, UnsupportedVersionError, LogicError, InternalError,
   UnexpectedTsError, UnavailableAccountError, AensPointerContextError, InsufficientNameFeeError,
   InvalidAensNameError, InvalidRpcMessageError, MissingCallbackError, UnAuthorizedAccountError,
   UnknownRpcClientError, UnsubscribedAccountError, ChannelCallError, ChannelConnectionError,
