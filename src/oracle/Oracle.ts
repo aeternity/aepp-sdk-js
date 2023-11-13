@@ -87,7 +87,8 @@ export default class Oracle extends OracleBase {
    */
   pollQueries(
     onQuery: (query: OracleQuery) => void,
-    options: { interval?: number } & Partial<Parameters<typeof _getPollInterval>[1]> = {},
+    options: { interval?: number; includeResponded?: boolean } &
+    Partial<Parameters<typeof _getPollInterval>[1]> = {},
   ): () => void {
     const opt = { ...this.options, ...options };
     const knownQueryIds = new Set();
@@ -95,9 +96,11 @@ export default class Oracle extends OracleBase {
       const queries = (await opt.onNode.getOracleQueriesByPubkey(this.address)).oracleQueries ?? [];
       queries
         .filter(({ id }) => !knownQueryIds.has(id))
+        .map((query) => decodeQuery(query))
+        .filter((query) => options.includeResponded === true || query.decodedResponse === '')
         .forEach((query) => {
           knownQueryIds.add(query.id);
-          onQuery(decodeQuery(query));
+          onQuery(query);
         });
     };
 

@@ -47,18 +47,38 @@ describe('Oracle', () => {
       expect(ttl).to.be.equal(ttlBefore + 7450);
     });
 
-    it('polls for queries', (done) => {
-      let count = 0;
-      const stopPolling = oracle.pollQueries(() => {
-        count += 1;
-        expect(count).to.be.lessThanOrEqual(3);
-        if (count !== 3) return;
-        stopPolling();
-        done();
+    async function pollNQueries(
+      orc: Oracle,
+      count: number,
+      includeResponded: boolean = false,
+    ): Promise<string[]> {
+      const res: string[] = [];
+      return new Promise((resolve) => {
+        const stopPolling = orc.pollQueries((query) => {
+          res.push(query.decodedQuery);
+          if (res.length !== count) return;
+          stopPolling();
+          resolve(res);
+        }, { includeResponded });
       });
-      oracleClient.postQuery('{"city": "Berlin2"}')
-        .then(async () => oracleClient.postQuery('{"city": "Berlin3"}'))
-        .then(async () => oracleClient.postQuery('{"city": "Berlin4"}'));
+    }
+
+    const queries = [2, 3, 4].map((i) => `{"city": "Berlin${i}"}`);
+
+    it('polls for queries', async () => {
+      const pollPromise = pollNQueries(oracle, 3);
+      for (const q of queries) { // eslint-disable-line no-restricted-syntax
+        await oracleClient.postQuery(q);
+      }
+      expect(await pollPromise).to.eql(queries);
+    });
+
+    it('can poll for responded queries', async () => {
+      const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}');
+      await oracle.respondToQuery(queryId, queryResponse);
+      expect(await pollNQueries(oracle, 3)).to.have.same.members(queries);
+      expect(await pollNQueries(oracle, 4, true))
+        .to.have.same.members([...queries, '{"city": "Berlin"}']);
     });
 
     it('responds to query', async () => {
