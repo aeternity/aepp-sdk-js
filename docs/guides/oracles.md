@@ -92,24 +92,42 @@ console.log('Decoded oracle response', response)
 
 ## 3. Oracle: poll for queries and respond
 
-### Poll for queries
+### Handle queries (preferred)
+
 Typically, the oracle itself polls for its own queries and responds as soon as possible:
+
+```js
+const stopHandling = await oracle.handleQueries((query) => {
+  if (query.decodedQuery === '{"city": "Berlin"}') {
+    return '{"temperature": 27.5}';
+  }
+  return '{"error": "Unknown request"}';
+}, { interval: 1000 }) // polling interval in milliseconds
+
+stopHandling()
+```
+
+This way, the oracle would respond with the temperature in a requested city. It needs to be done before the query's TTL expires.
+
+Note:
+- Of course, the oracle itself would either use an API to get the current temperature for a certain city or ideally directly communicate with measuring devices located in that specific city.
+- As far as Oracle class is bound to a specific account provided while creation, it is not necessary to pass the `onAccount` option.
+
+The above is the simplest way to respond to queries, though you can manually subscribe for new queries and respond to them.
+
+### Poll for queries (alternative)
+To subscribe to new queries without responding to them:
 
 ```js
 const stopPolling = await oracle.pollQueries((query) => {
   console.log(query) // log a new query
 }, { interval: 1000 }) // polling interval in milliseconds
 
-stopPolling() // stop polling
+stopPolling()
 ```
 
-Note:
-
-- Probably the oracle would respond here directly (see below) instead of just logging the queries.
-
-### Respond to query
-If the oracle recognizes that it has been queried it can respond to the query as long as the query's TTL
-has not been expired.
+### Respond to query (alternative)
+If the oracle recognizes that it has been queried it can respond to the query.
 
 ```js
 const oracleId = 'ok_...';
@@ -118,11 +136,6 @@ const options = { onAccount: 'ak_...' } // only the account of the oracle can re
 
 await oracle.respondToQuery(queryId, '{"temperature": 27.5}', options)
 ```
-
-Note:
-
-- Of course the oracle itself would either use an API to get the current temperature for a certain city or ideally directly communicate with measuring devices located in that specific city.
-- If the AeSdk class is initialized with the oracle's account there is no need to pass the `onAccount` option as this is done implicitely.
 
 ## 4. Oracle: extend
 As mentioned above an Oracle has a certain TTL that can be specified when registering it. You might want to extend the TTL of the oracle before it expires. You can do that as follows:

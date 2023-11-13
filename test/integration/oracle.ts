@@ -3,9 +3,10 @@ import { expect } from 'chai';
 import { RestError } from '@azure/core-rest-pipeline';
 import { getSdk, networkId } from '.';
 import {
-  AeSdk, decode, encode, Encoding, Encoded, ORACLE_TTL_TYPES, Oracle, OracleClient,
+  AeSdk, decode, encode, Encoding, Encoded, ORACLE_TTL_TYPES, Oracle, OracleClient, LogicError,
 } from '../../src';
 import { assertNotNull } from '../utils';
+import { pause } from '../../src/utils/other';
 
 describe('Oracle', () => {
   let aeSdk: AeSdk;
@@ -69,6 +70,62 @@ describe('Oracle', () => {
         .to.be.equal(queryResponse);
       const response = await oracleClient.pollForResponse(queryId);
       expect(response).to.be.equal(queryResponse);
+    });
+
+    it('handles query', async () => {
+      const stop = oracle.handleQueries((queryEntry) => (
+        JSON.stringify({ ...JSON.parse(queryEntry.decodedQuery), response: true })
+      ));
+      const response = await oracleClient.query('{"test": 42}');
+      expect(response).to.be.equal('{"test":42,"response":true}');
+      await stop();
+    });
+
+    it('fails to bind two query handles', async () => {
+      const stop = oracle.handleQueries(() => 'handle 1');
+      try {
+        expect(() => oracle.handleQueries(() => 'handle 2')).to
+          .throw(LogicError, 'Another query handler already running, it needs to be stopped to run a new one');
+      } finally {
+        await stop();
+      }
+    });
+
+    async function postQueries(qs: string[]): Promise<Array<Promise<string>>> {
+      const res: Array<Promise<string>> = [];
+      for (const query of qs) { // eslint-disable-line no-restricted-syntax
+        const { queryId } = await oracleClient.postQuery(query);
+        res.push(oracleClient.pollForResponse(queryId));
+      }
+      return res;
+    }
+
+    it('responds to queries already created', async () => {
+      const responsePromises = await postQueries(['foo', 'bar']);
+      const stop = oracle.handleQueries(({ decodedQuery }) => `response to ${decodedQuery}`);
+      try {
+        const res = await Promise.all(responsePromises);
+        expect(res).to.be.eql(['response to foo', 'response to bar']);
+      } finally {
+        await stop();
+      }
+    });
+
+    it('responds to queries in different order', async () => {
+      const responsePromises = await postQueries(['500', '250', '400']);
+      const stop = oracle.handleQueries(async ({ decodedQuery }) => {
+        await pause(+decodedQuery);
+        return decodedQuery;
+      });
+      const res: string[] = [];
+      try {
+        await Promise.all(
+          responsePromises.map(async (promise) => promise.then((r) => res.push(r))),
+        );
+        expect(res).to.be.eql(['250', '400', '500']);
+      } finally {
+        await stop();
+      }
     });
   });
 

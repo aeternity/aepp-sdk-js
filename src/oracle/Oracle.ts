@@ -1,6 +1,7 @@
 import { pause } from '../utils/other';
 import { buildTxAsync, BuildTxOptions } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
+import { LogicError, UnexpectedTsError } from '../utils/errors';
 import {
   decode, encode, Encoded, Encoding,
 } from '../utils/encoder';
@@ -33,7 +34,7 @@ export default class Oracle extends OracleBase {
   constructor(
     public readonly account: AccountBase,
     public override options: OracleRegisterOptions & OracleExtendTtlOptions &
-    Parameters<Oracle['pollQueries']>[1] & OracleRespondToQueryOptions & { onNode: Node },
+    Parameters<Oracle['handleQueries']>[1] & { onNode: Node },
   ) {
     super(encode(decode(account.address), Encoding.OracleAddress), options);
   }
@@ -135,5 +136,51 @@ export default class Oracle extends OracleBase {
       response,
     });
     return sendTransaction(oracleRespondTx, { ...opt, onAccount: this.account });
+  }
+
+  #handleQueriesPromise?: Promise<void>;
+
+  /**
+   * Respond to queries to oracle based on callback value
+   * @param getResponse - Callback to respond on query
+   * @param options - Options object
+   * @param options.interval - Poll interval (default: 5000)
+   * @returns Callback to stop polling function
+   */
+  handleQueries(
+    getResponse: (q: OracleQuery) => Promise<string> | string,
+    options: Parameters<Oracle['pollQueries']>[1] & OracleRespondToQueryOptions = {},
+  ): () => void {
+    if (this.#handleQueriesPromise != null) {
+      throw new LogicError('Another query handler already running, it needs to be stopped to run a new one');
+    }
+    const opt = { ...this.options, ...options };
+
+    let queuePromise = Promise.resolve();
+    const handler = async (q: OracleQuery): Promise<void> => {
+      const response = await getResponse(q);
+      const respondPromise = queuePromise
+        .then(async () => this.respondToQuery(q.id, response, opt));
+      queuePromise = respondPromise.then(() => {}, () => {});
+      await respondPromise;
+    };
+
+    this.#handleQueriesPromise = Promise.resolve();
+    const stopPoll = this.pollQueries(
+      async (query: OracleQuery) => {
+        const promise = handler(query);
+        if (this.#handleQueriesPromise == null) throw new UnexpectedTsError();
+        this.#handleQueriesPromise = this.#handleQueriesPromise
+          .then(async () => promise).then(() => {}, () => {});
+        return promise;
+      },
+      opt,
+    );
+
+    return async () => {
+      stopPoll();
+      await this.#handleQueriesPromise;
+      this.#handleQueriesPromise = undefined;
+    };
   }
 }
