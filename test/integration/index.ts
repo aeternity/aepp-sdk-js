@@ -1,5 +1,5 @@
 import {
-  AeSdk, CompilerHttpNode, MemoryAccount, Node, Encoded,
+  AeSdk, CompilerHttpNode, CompilerCli8, MemoryAccount, Node, Encoded, ConsensusProtocolVersion,
 } from '../../src';
 import '..';
 
@@ -36,6 +36,10 @@ export async function getSdk(accountCount = 1): Promise<AeSdk> {
     _expectedMineRate: 1000,
     _microBlockCycle: 300,
   });
+  // TODO: remove after release aesophia_http@8
+  if ((await sdk.api.getNodeInfo()).consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
+    sdk._options.onCompiler = new CompilerCli8();
+  }
   for (let i = 0; i < accounts.length; i += 1) {
     await sdk.spend(1e32, accounts[i].address, { onAccount: genesisAccount });
   }

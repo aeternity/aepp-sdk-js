@@ -4,7 +4,7 @@ import { getSdk } from './index';
 import {
   AeSdk, Contract,
   commitmentHash, oracleQueryId, decode, encode, Encoded, Encoding,
-  ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS, buildTx, unpackTx,
+  ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS, buildTx, unpackTx, ConsensusProtocolVersion,
 } from '../../src';
 
 const nonce = 1;
@@ -63,7 +63,10 @@ describe('Transaction', () => {
   });
 
   const contractId = 'ct_TCQVoset7Y4qEyV5tgEAJAqa2Foz8J1EXqoGpq3fB6dWH5roe';
-  const transactions: Array<[string, Encoded.Transaction, () => Promise<Encoded.Transaction>]> = [[
+  const transactions: Array<[
+    string, (() => Promise<Encoded.Transaction>) | Encoded.Transaction,
+    () => Promise<Encoded.Transaction>,
+  ]> = [[
     'spend',
     'tx_+F0MAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg9e1n8oAAABhHRlc3QLK3OW',
     async () => aeSdk.buildTx({
@@ -107,7 +110,13 @@ describe('Transaction', () => {
     }),
   ], [
     'contract create',
-    'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNy40LjAAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfPz3ZtIU=',
+    async () => {
+      const { consensusProtocolVersion } = await aeSdk.api.getNodeInfo();
+      if (consensusProtocolVersion === ConsensusProtocolVersion.Iris) {
+        return 'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNy40LjAAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfPz3ZtIU=';
+      }
+      return 'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFOC4wLjAAgwgAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfP6UPXo4=';
+    },
     async () => aeSdk.buildTx({
       tag: Tag.ContractCreateTx,
       nonce,
@@ -173,7 +182,8 @@ describe('Transaction', () => {
     }),
   ]];
 
-  transactions.forEach(([txName, expected, getter]) => it(`build of ${txName} transaction`, async () => {
+  transactions.forEach(([txName, getExpected, getter]) => it(`build of ${txName} transaction`, async () => {
+    const expected = typeof getExpected === 'function' ? await getExpected() : getExpected;
     expect(await getter()).to.be.equal(expected);
     expect(buildTx(unpackTx(expected))).to.be.equal(expected);
   }));
