@@ -85,7 +85,7 @@ function testCompiler(compiler: CompilerBase): void {
     )).to.be.rejectedWith(
       CompilerError,
       compiler instanceof CompilerCli
-        ? /Command failed: escript .+[\\/]bin[\\/]aesophia_cli( --create_json_aci)? .+\.aes\nType error( in '.+\.aes')? at line 3, col 3:\nDuplicate definitions of `getArg` at\n {2}- line 2, column 3\n {2}- line 3, column 3\n\n/m
+        ? /Command failed: escript .+[\\/]bin[\\/]aesophia_cli( --create_json_aci)? .+\.aes( --no_warning all)?\nType error( in '.+\.aes')? at line 3, col 3:\nDuplicate definitions of `getArg` at\n {2}- line 2, column 3\n {2}- line 3, column 3\n\n/m
         : 'compile error:\n'
         + 'type_error:3:3: Duplicate definitions of `getArg` at\n'
         + '  - line 2, column 3\n'

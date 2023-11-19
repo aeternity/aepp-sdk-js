@@ -79,7 +79,7 @@ export default class CompilerCli extends CompilerBase {
     await this.#ensureCompatibleVersion;
     try {
       const [bytecode, aci] = await Promise.all([
-        this.#run(path),
+        this.#run(path, '--no_warning', 'all'),
         this.#run('--create_json_aci', path).then((res) => JSON.parse(res)),
       ]);
       return {
