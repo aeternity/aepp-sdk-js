@@ -9,7 +9,7 @@ import { CompilerError, InternalError, UnsupportedVersionError } from '../../uti
 import semverSatisfies from '../../utils/semver-satisfies';
 import { ensureError } from '../../utils/other';
 
-const getPackagePath = (): string => {
+export const getPackagePath = (): string => {
   const path = dirname(fileURLToPath(import.meta.url));
   if (basename(path) === 'dist') return resolve(path, '..');
   if (basename(path) === 'compiler') return resolve(path, '../../..');
@@ -19,6 +19,7 @@ const getPackagePath = (): string => {
 /**
  * A wrapper around aesophia_cli, available only in Node.js.
  * Requires Erlang installed, assumes that `escript` is available in PATH.
+ * @category contract
  */
 export default class CompilerCli extends CompilerBase {
   #path: string;
@@ -38,7 +39,7 @@ export default class CompilerCli extends CompilerBase {
     this.#path = compilerPath;
     if (ignoreVersion !== true) {
       this.#ensureCompatibleVersion = this.version().then((version) => {
-        const versions = [version, '7.2.1', '8.0.0'] as const;
+        const versions = [version, '7.2.1', '9.0.0'] as const;
         if (!semverSatisfies(...versions)) throw new UnsupportedVersionError('compiler', ...versions);
       });
     }
