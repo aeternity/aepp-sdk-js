@@ -79,7 +79,6 @@ describe('Contract', () => {
     }>({
           sourceCode:
             'include "String.aes"'
-            + '\ninclude "Option.aes"'
             + '\n'
             + '\ncontract Sign ='
             + '\n  entrypoint int_to_binary (i: int): string ='
@@ -90,7 +89,7 @@ describe('Contract', () => {
             + '\n  entrypoint includes (str: string, pat: string): bool ='
             + '\n    switch(String.contains(str, pat))'
             + '\n      None => false'
-            + '\n      Some(c) => true'
+            + '\n      Some(_) => true'
             + '\n'
             + '\n  entrypoint message_to_hash (message: string): hash ='
             + '\n    let prefix = "aeternity Signed Message:\\n"'
