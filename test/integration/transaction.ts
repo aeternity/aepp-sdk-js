@@ -50,7 +50,7 @@ describe('Transaction', () => {
 
   before(async () => {
     aeSdk = await getSdk(0);
-    contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
+    contract = await Contract.initialize({ ...aeSdk.getContext(), sourceCode: contractSourceCode });
   });
 
   it('build spend tx using denomination amount', async () => {

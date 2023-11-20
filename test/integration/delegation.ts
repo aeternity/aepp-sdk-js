@@ -66,7 +66,8 @@ describe('Operation delegation', () => {
 
     before(async () => {
       aens = isIris ? 'AENS' : 'AENSv2';
-      contract = await aeSdk.initializeContract({
+      contract = await Contract.initialize({
+        ...aeSdk.getContext(),
         sourceCode: `
 @compiler ${isIris ? '>= 7' : '>= 8'}
 @compiler ${isIris ? '< 8' : '< 9'}
@@ -237,7 +238,8 @@ contract DelegateTest =
     let contractAddress: Encoded.ContractAddress;
 
     before(async () => {
-      contract = await aeSdk.initializeContract({
+      contract = await Contract.initialize({
+        ...aeSdk.getContext(),
         sourceCode:
           'contract DelegateTest =\n'
           + '  stateful payable entrypoint signedRegisterOracle(\n'

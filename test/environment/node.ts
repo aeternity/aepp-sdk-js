@@ -1,6 +1,6 @@
 #!/usr/bin/env npx ts-node
 import {
-  Node, AeSdk, MemoryAccount, CompilerHttp,
+  Node, AeSdk, MemoryAccount, CompilerHttp, Contract,
 } from '../..';
 
 const contractSourceCode = `
@@ -20,9 +20,9 @@ const aeSdk = new AeSdk({
   console.log('Height:', await aeSdk.getHeight());
   console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map);
 
-  const contract = await aeSdk.initializeContract<{
+  const contract = await Contract.initialize<{
     getArg: (x: Map<string, number | bigint | string>) => Map<string, bigint>;
-  }>({ sourceCode: contractSourceCode });
+  }>({ ...aeSdk.getContext(), sourceCode: contractSourceCode });
   const deployInfo = await contract.$deploy([]);
   console.log('Contract deployed at', deployInfo.address);
   const map = new Map([['foo', 42], ['bar', 43]]);

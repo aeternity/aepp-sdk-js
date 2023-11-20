@@ -71,7 +71,8 @@ describe('typed data', () => {
       const typeJson = (canonicalize(recordAci) ?? '').replaceAll('"', '\\"');
       const isIris = (await aeSdk.api.getNodeInfo())
         .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
-      contract = await aeSdk.initializeContract({
+      contract = await Contract.initialize({
+        ...aeSdk.getContext(),
         sourceCode: ''
           + '\ninclude "String.aes"'
           + '\ninclude "Option.aes"'
