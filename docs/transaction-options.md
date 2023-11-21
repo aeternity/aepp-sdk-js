@@ -62,7 +62,7 @@ The following options are sepcific for each tx-type.
   - For bids in an auction you need to explicitely calculate the required `nameFee` based on the last bid
 
 ### NameUpdateTx
-- `clientTtl` (default: `84600`)
+- `clientTtl` (default: `3600`, one hour)
   - This option is an indicator for indexing tools to know how long (in seconds) they could or should cache the name information.
 - `nameTtl` (default: `180000`)
   - This option tells the protocol the relative TTL based on the current block height.

@@ -78,7 +78,7 @@ interface AensRevokeOptions extends
  * @param options.nonce - nonce
  * @param options.nameTtl - Name ttl represented in number of
  * blocks (Max value is 50000 blocks)
- * @param options.clientTtl=84600 a suggestion as to how long any
+ * @param options.clientTtl a suggestion as to how long any
  * clients should cache this information
  * @throws Invalid pointer array error
  * @example

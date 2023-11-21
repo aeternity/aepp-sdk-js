@@ -10,7 +10,7 @@ export const NAME_TTL = 180000;
 // # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
 // # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
 export const NAME_MAX_TTL = 36000;
-export const NAME_MAX_CLIENT_TTL = 84600;
+export const NAME_MAX_CLIENT_TTL = 60 * 60;
 export const CLIENT_TTL = NAME_MAX_CLIENT_TTL;
 export const MIN_GAS_PRICE = 1e9;
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
