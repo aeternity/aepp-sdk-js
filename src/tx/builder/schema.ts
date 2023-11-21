@@ -9,7 +9,7 @@ import SchemaTypes from './SchemaTypes';
 import {
   uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
   address, pointers, queryFee, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array, boolean, ctVersion, abiVersion, ttl, nonce, map, wrapped,
+  array, boolean, ctVersion, abiVersion, ttl, nonce, map, withDefault, wrapped,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
 import { idTagToEncoding } from './field-types/address';
@@ -195,9 +195,10 @@ export const txSchema = [{
   accountId: address(Encoding.AccountAddress),
   nonce: nonce('accountId'),
   nameId,
-  nameTtl: shortUInt,
+  // https://github.com/aeternity/protocol/blob/fd17982/AENS.md#update
+  nameTtl: withDefault(180000, shortUInt),
   pointers,
-  clientTtl: shortUInt,
+  clientTtl: withDefault(60 * 60, shortUInt),
   fee,
   ttl,
 }, {

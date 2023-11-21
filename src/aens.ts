@@ -9,9 +9,7 @@
 import BigNumber from 'bignumber.js';
 import { genSalt } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
-import {
-  CLIENT_TTL, NAME_TTL, Tag, AensName,
-} from './tx/builder/constants';
+import { Tag, AensName } from './tx/builder/constants';
 import { ArgumentError } from './utils/errors';
 import { Encoded } from './utils/encoder';
 import { sendTransaction, SendTransactionOptions, getName } from './chain';
@@ -105,8 +103,6 @@ export async function aensUpdate(
   };
 
   const nameUpdateTx = await buildTxAsync({
-    clientTtl: CLIENT_TTL,
-    nameTtl: NAME_TTL,
     ...options,
     tag: Tag.NameUpdateTx,
     nameId: name,
@@ -168,6 +164,8 @@ export async function aensTransfer(
 interface AensTransferOptions extends
   BuildTxOptions<Tag.NameTransferTx, 'nameId' | 'accountId' | 'recipientId' | 'onNode'>,
   SendTransactionOptions {}
+
+const NAME_TTL = 180000;
 
 /**
  * Query the AENS name info from the node

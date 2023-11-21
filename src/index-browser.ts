@@ -20,7 +20,7 @@ export {
   getDefaultPointerKey, getMinimumNameFee, computeBidFee, computeAuctionEndBlock, isAuctionName,
 } from './tx/builder/helpers';
 export {
-  MAX_AUTH_FUN_GAS, NAME_TTL, NAME_MAX_TTL, NAME_MAX_CLIENT_TTL, CLIENT_TTL, MIN_GAS_PRICE,
+  MAX_AUTH_FUN_GAS, MIN_GAS_PRICE,
   NAME_FEE_MULTIPLIER, NAME_FEE_BID_INCREMENT, NAME_BID_TIMEOUT_BLOCKS, NAME_MAX_LENGTH_FEE,
   NAME_BID_RANGES, ConsensusProtocolVersion, VmVersion, AbiVersion, Tag,
 } from './tx/builder/constants';
@@ -111,4 +111,5 @@ export {
 } from './utils/errors';
 export {
   RpcBroadcastError, NAME_BID_MAX_LENGTH, encodeFateValue, decodeFateValue,
+  NAME_TTL, NAME_MAX_TTL, NAME_MAX_CLIENT_TTL, CLIENT_TTL,
 } from './deprecated';
