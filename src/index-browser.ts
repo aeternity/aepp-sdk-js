@@ -116,5 +116,4 @@ export {
 } from './utils/errors';
 export {
   RpcBroadcastError, NAME_BID_MAX_LENGTH, encodeFateValue, decodeFateValue,
-  NAME_TTL, NAME_MAX_TTL, NAME_MAX_CLIENT_TTL, CLIENT_TTL,
 } from './deprecated';
