@@ -10,7 +10,6 @@ import BigNumber from 'bignumber.js';
 import { genSalt } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
 import { Tag, AensName } from './tx/builder/constants';
-import { ArgumentError } from './utils/errors';
 import { Encoded } from './utils/encoder';
 import { sendTransaction, SendTransactionOptions, getName } from './chain';
 import { buildTxAsync, BuildTxOptions } from './tx/builder';
@@ -165,8 +164,6 @@ interface AensTransferOptions extends
   BuildTxOptions<Tag.NameTransferTx, 'nameId' | 'accountId' | 'recipientId' | 'onNode'>,
   SendTransactionOptions {}
 
-const NAME_TTL = 180000;
-
 /**
  * Query the AENS name info from the node
  * and return the object with info and predefined functions for manipulating name
@@ -238,11 +235,7 @@ export async function aensQuery(
     async revoke(options) {
       return aensRevoke(name, { ...opt, ...options });
     },
-    async extendTtl(nameTtl = NAME_TTL, options = {}) {
-      if (nameTtl > NAME_TTL || nameTtl <= 0) {
-        throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl);
-      }
-
+    async extendTtl(nameTtl, options = {}) {
       return {
         ...await aensUpdate(name, {}, {
           ...opt, ...options, nameTtl, extendPointers: true,

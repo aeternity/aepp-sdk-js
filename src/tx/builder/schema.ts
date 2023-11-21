@@ -197,7 +197,15 @@ export const txSchema = [{
   nonce: nonce('accountId'),
   nameId,
   // https://github.com/aeternity/protocol/blob/fd17982/AENS.md#update
-  nameTtl: withDefault(180000, shortUInt),
+  nameTtl: withFormatting(
+    (nameTtl) => {
+      const NAME_TTL = 180000;
+      nameTtl ??= NAME_TTL;
+      if (nameTtl >= 1 && nameTtl <= NAME_TTL) return nameTtl;
+      throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl);
+    },
+    shortUInt,
+  ),
   pointers,
   clientTtl: withDefault(60 * 60, shortUInt),
   fee,
