@@ -7,11 +7,12 @@
 import { Tag } from './constants';
 import SchemaTypes from './SchemaTypes';
 import {
-  uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
+  uInt, shortUInt, coinAmount, name, nameId, nameFee, gasLimit, gasPrice, fee,
   address, pointers, queryFee, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array, boolean, ctVersion, abiVersion, ttl, nonce, map, withDefault, wrapped,
+  array, boolean, ctVersion, abiVersion, ttl, nonce, map, withDefault, withFormatting, wrapped,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
+import { ArgumentError } from '../../utils/errors';
 import { idTagToEncoding } from './field-types/address';
 
 export enum ORACLE_TTL_TYPES {
@@ -227,7 +228,7 @@ export const txSchema = [{
   log: encoded(Encoding.ContractBytearray),
   active: boolean,
   referers: array(address(Encoding.AccountAddress)),
-  deposit,
+  deposit: coinAmount,
 }, {
   tag: shortUIntConst(Tag.ContractCreateTx),
   version: shortUIntConst(1, true),
@@ -237,7 +238,13 @@ export const txSchema = [{
   ctVersion,
   fee,
   ttl,
-  deposit,
+  deposit: withFormatting(
+    (value = 0) => {
+      if (+value === 0) return value;
+      throw new ArgumentError('deposit', 'equal 0 (because is not refundable)', value);
+    },
+    coinAmount,
+  ),
   amount: coinAmount,
   gasLimit,
   gasPrice,

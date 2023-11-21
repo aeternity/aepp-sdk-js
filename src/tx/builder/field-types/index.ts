@@ -4,7 +4,6 @@ import array from './array';
 import boolean from './boolean';
 import coinAmount from './coin-amount';
 import ctVersion from './ct-version';
-import deposit from './deposit';
 import encoded from './encoded';
 import entry from './entry';
 import enumeration from './enumeration';
@@ -27,6 +26,7 @@ import string from './string';
 import ttl from './ttl';
 import uInt from './u-int';
 import withDefault from './with-default';
+import withFormatting from './with-formatting';
 import wrapped from './wrapped';
 
 export type BinaryData = Buffer | Buffer[] | Buffer[][]
@@ -45,7 +45,6 @@ export {
   boolean,
   coinAmount,
   ctVersion,
-  deposit,
   encoded,
   entry,
   enumeration,
@@ -68,5 +67,6 @@ export {
   ttl,
   uInt,
   withDefault,
+  withFormatting,
   wrapped,
 };

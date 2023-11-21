@@ -2,6 +2,7 @@ import coinAmount from './coin-amount';
 import { IllegalArgumentError } from '../../../utils/errors';
 import { MIN_GAS_PRICE } from '../constants';
 
+// TODO: use withFormatting after using a single type for coins representation
 export default {
   ...coinAmount,
 

@@ -5,7 +5,7 @@ import {
 } from '../utils';
 import { getSdk } from '.';
 import {
-  IllegalArgumentError,
+  ArgumentError,
   NodeInvocationError,
   commitmentHash,
   decode, encode, Encoded, Encoding,
@@ -45,8 +45,8 @@ describe('Contract', () => {
   it('throws exception if deploy deposit is not zero', async () => {
     delete identityContract.$options.address;
     await expect(identityContract.$deploy([], { deposit: 10 })).to.be.rejectedWith(
-      IllegalArgumentError,
-      'Contract deposit is not refundable, so it should be equal 0, got 10 instead',
+      ArgumentError,
+      'deposit should be equal 0 (because is not refundable), got 10 instead',
     );
   });
 
