@@ -36,7 +36,6 @@ export async function getSdk(accountCount = 1): Promise<AeSdk> {
     _expectedMineRate: 1000,
     _microBlockCycle: 300,
   });
-  await sdk.awaitHeight(2);
   for (let i = 0; i < accounts.length; i += 1) {
     await sdk.spend(1e32, accounts[i].address, { onAccount: genesisAccount });
   }
