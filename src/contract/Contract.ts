@@ -6,7 +6,6 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import { DRY_RUN_ACCOUNT } from '../tx/builder/schema';
 import { Tag, AensName } from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
@@ -108,6 +107,11 @@ interface GetCallResultByHashReturnType<M extends ContractMethodsBase, Fn extend
   decodedResult: ReturnType<M[Fn]>;
   decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
 }
+
+export const DRY_RUN_ACCOUNT = {
+  address: 'ak_11111111111111111111111111111111273Yts',
+  amount: 100000000000000000000000000000000000n,
+} as const;
 
 /**
  * Generate contract ACI object with predefined js methods for contract usage - can be used for
@@ -303,7 +307,7 @@ class Contract<M extends ContractMethodsBase> {
     options: Partial<BuildTxOptions<Tag.ContractCallTx, 'callerId' | 'contractId' | 'callData'>>
     & Parameters<Contract<M>['$decodeEvents']>[1]
     & Omit<SendTransactionOptions, 'onAccount' | 'onNode'>
-    & Omit<Parameters<typeof txDryRun>[2], 'onNode'>
+    & Omit<Parameters<typeof txDryRun>[1], 'onNode'>
     & { onAccount?: AccountBase; onNode?: Node; callStatic?: boolean } = {},
   ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
@@ -328,7 +332,11 @@ class Contract<M extends ContractMethodsBase> {
         || (error instanceof InternalError && error.message === 'Use fallback account')
       );
       if (!useFallbackAccount) throw error;
-      callerId = DRY_RUN_ACCOUNT.pub;
+      callerId = DRY_RUN_ACCOUNT.address;
+      opt.addAccounts ??= [];
+      if (!opt.addAccounts.some((a) => a.address === DRY_RUN_ACCOUNT.address)) {
+        opt.addAccounts.push(DRY_RUN_ACCOUNT);
+      }
     }
     const callData = this._calldata.encode(this._name, fn, params);
 
@@ -356,7 +364,7 @@ class Contract<M extends ContractMethodsBase> {
         });
       }
 
-      const { callObj, ...dryRunOther } = await txDryRun(tx, callerId, { ...opt, top });
+      const { callObj, ...dryRunOther } = await txDryRun(tx, { ...opt, top });
       if (callObj == null) {
         throw new InternalError(`callObj is not available for transaction ${tx}`);
       }

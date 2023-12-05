@@ -22,7 +22,7 @@ import {
   assertNotNull, ChainTtl, ensureEqual, InputNumber,
 } from '../utils';
 import { Aci } from '../../src/contract/compiler/Base';
-import { ContractCallObject } from '../../src/contract/Contract';
+import { ContractCallObject, DRY_RUN_ACCOUNT } from '../../src/contract/Contract';
 import includesAci from './contracts/Includes.json';
 
 const identityContractSourceCode = `
@@ -476,6 +476,57 @@ describe('Contract instance', () => {
     expect(contract2._aci).to.be.an('array');
     expect(contract2.$options).to.be.an('object');
     expect((await contract2.getArg(42)).decodedResult).to.be.equal(42n);
+  });
+
+  describe('Dry-run balance', () => {
+    let contract: Contract<{
+      getBalance: (a: Encoded.AccountAddress) => bigint;
+    }>;
+
+    before(async () => {
+      contract = await aeSdk.initializeContract({
+        sourceCode:
+          'contract Test =\n'
+          + '  entrypoint getBalance(addr : address) =\n'
+          + '    Chain.balance(addr)',
+      });
+      await contract.$deploy([]);
+    });
+
+    const callFee = 6000000000000000n;
+
+    it('returns correct balance for anonymous called anonymously', async () => {
+      const { decodedResult } = await contract
+        .getBalance(DRY_RUN_ACCOUNT.address, { onAccount: undefined });
+      expect(decodedResult).to.be.equal(DRY_RUN_ACCOUNT.amount - callFee);
+    });
+
+    it('returns correct balance for anonymous called by on-chain account', async () => {
+      const { decodedResult } = await contract.getBalance(DRY_RUN_ACCOUNT.address);
+      expect(decodedResult).to.be.equal(0n);
+    });
+
+    it('returns correct balance for on-chain account called anonymously', async () => {
+      const balance = BigInt(await aeSdk.getBalance(aeSdk.address));
+      const { decodedResult } = await contract.getBalance(aeSdk.address, { onAccount: undefined });
+      expect(decodedResult).to.be.equal(balance);
+    });
+
+    it('returns correct balance for on-chain account called by itself', async () => {
+      const balance = BigInt(await aeSdk.getBalance(aeSdk.address));
+      const { decodedResult } = await contract.getBalance(aeSdk.address);
+      expect(decodedResult).to.be.equal(balance - callFee);
+    });
+
+    it('returns increased balance using addAccounts option', async () => {
+      const balance = BigInt(await aeSdk.getBalance(aeSdk.address));
+      const increaseBy = 10000n;
+      const { decodedResult } = await contract.getBalance(
+        aeSdk.address,
+        { addAccounts: [{ address: aeSdk.address, amount: increaseBy }] },
+      );
+      expect(decodedResult).to.be.equal(balance - callFee + increaseBy);
+    });
   });
 
   describe('Gas', () => {

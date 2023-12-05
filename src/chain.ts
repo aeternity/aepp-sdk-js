@@ -1,8 +1,8 @@
+import canonicalize from 'canonicalize';
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
 import verifyTransaction, { ValidatorResult } from './tx/validator';
 import { ensureError, isAccountNotFoundError, pause } from './utils/other';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
-import { DRY_RUN_ACCOUNT } from './tx/builder/schema';
 import { AensName } from './tx/builder/constants';
 import {
   AensPointerContextError, DryRunError, InvalidAensNameError, TransactionError,
@@ -354,7 +354,7 @@ export async function getMicroBlockHeader(
 
 interface TxDryRunArguments {
   tx: Encoded.Transaction;
-  accountAddress: Encoded.AccountAddress;
+  addAccounts?: Array<{ address: Encoded.AccountAddress; amount: bigint }>;
   top?: number | Encoded.KeyBlockHash | Encoded.MicroBlockHash;
   txEvents?: any;
   resolve: Function;
@@ -375,8 +375,7 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
       top,
       txEvents: rs[0].txEvents,
       txs: rs.map((req) => ({ tx: req.tx })),
-      accounts: Array.from(new Set(rs.map((req) => req.accountAddress)))
-        .map((pubKey) => ({ pubKey, amount: DRY_RUN_ACCOUNT.amount })),
+      accounts: rs[0].addAccounts?.map(({ address, amount }) => ({ pubKey: address, amount })),
     });
   } catch (error) {
     rs.forEach(({ reject }) => reject(error));
@@ -385,11 +384,9 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
 
   const { results, txEvents } = dryRunRes;
   results.forEach(({ result, reason, ...resultPayload }, idx) => {
-    const {
-      resolve, reject, tx, accountAddress,
-    } = rs[idx];
+    const { resolve, reject, tx } = rs[idx];
     if (result === 'ok') resolve({ ...resultPayload, txEvents });
-    else reject(Object.assign(new DryRunError(reason as string), { tx, accountAddress }));
+    else reject(Object.assign(new DryRunError(reason as string), { tx }));
   });
 }
 
@@ -397,7 +394,6 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
  * Transaction dry-run
  * @category chain
  * @param tx - transaction to execute
- * @param accountAddress - address that will be used to execute transaction
  * @param options - Options
  * @param options.top - hash of block on which to make dry-run
  * @param options.txEvents - collect and return on-chain tx events that would result from the call
@@ -406,20 +402,26 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
  */
 export async function txDryRun(
   tx: Encoded.Transaction,
-  accountAddress: Encoded.AccountAddress,
   {
-    top, txEvents, combine, onNode,
+    top, txEvents, combine, onNode, addAccounts,
   }:
-  { top?: TxDryRunArguments['top']; txEvents?: boolean; combine?: boolean; onNode: Node },
+  {
+    top?: TxDryRunArguments['top'];
+    txEvents?: boolean;
+    combine?: boolean;
+    onNode: Node;
+    addAccounts?: TxDryRunArguments['addAccounts'];
+  },
 ): Promise<{
     txEvents?: TransformNodeType<DryRunResults['txEvents']>;
   } & TransformNodeType<DryRunResult>> {
-  const key = combine === true ? [top, txEvents].join() : 'immediate';
+  const key = combine === true
+    ? canonicalize({ top, txEvents, addAccounts }) ?? 'empty' : 'immediate';
   const requests = txDryRunRequests.get(key) ?? [];
   txDryRunRequests.set(key, requests);
   return new Promise((resolve, reject) => {
     requests.push({
-      tx, accountAddress, top, txEvents, resolve, reject,
+      tx, addAccounts, top, txEvents, resolve, reject,
     });
     if (combine !== true) {
       void txDryRunHandler(key, onNode);
