@@ -14,7 +14,7 @@ import {
   genSalt,
   UnexpectedTsError,
   AeSdk,
-  Contract, ContractMethodsBase,
+  Contract, ContractMethodsBase, ConsensusProtocolVersion,
 } from '../../src';
 
 const identitySourceCode = `
@@ -79,7 +79,6 @@ describe('Contract', () => {
     }>({
           sourceCode:
             'include "String.aes"'
-            + '\ninclude "Option.aes"'
             + '\n'
             + '\ncontract Sign ='
             + '\n  entrypoint int_to_binary (i: int): string ='
@@ -90,7 +89,7 @@ describe('Contract', () => {
             + '\n  entrypoint includes (str: string, pat: string): bool ='
             + '\n    switch(String.contains(str, pat))'
             + '\n      None => false'
-            + '\n      Some(c) => true'
+            + '\n      Some(_) => true'
             + '\n'
             + '\n  entrypoint message_to_hash (message: string): hash ='
             + '\n    let prefix = "aeternity Signed Message:\\n"'
@@ -296,6 +295,7 @@ describe('Contract', () => {
     let contract: Contract<{
       getName: (name: string) => {
         'AENS.Name': [Encoded.AccountAddress, ChainTtl, Map<string, string>];
+        'AENSv2.Name': [Encoded.AccountAddress, ChainTtl, Map<string, string>];
       };
       signedPreclaim: (addr: Encoded.AccountAddress, chash: Uint8Array, sign: Uint8Array) => void;
       signedClaim: (
@@ -316,34 +316,44 @@ describe('Contract', () => {
         owner: Encoded.AccountAddress,
         name: string,
         key: string,
-        pt: { 'AENS.OraclePt': readonly [Encoded.Any] },
+        pt: {
+          'AENS.OraclePt'?: readonly [Encoded.Any];
+          'AENSv2.OraclePt'?: readonly [Encoded.Any];
+        },
         sign: Uint8Array
       ) => void;
     }>;
     let contractAddress: Encoded.ContractAddress;
+    let aens: string;
 
     before(async () => {
+      const isIris = (await aeSdk.api.getNodeInfo())
+        .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+      aens = isIris ? 'AENS' : 'AENSv2';
       contract = await aeSdk.initializeContract({
-        sourceCode:
-          'contract DelegateTest =\n'
-          + '  entrypoint getName(name: string): option(AENS.name) =\n'
-          + '    AENS.lookup(name)\n'
-          + '  stateful payable entrypoint signedPreclaim(addr: address, chash: hash, sign: signature): unit =\n'
-          + '    AENS.preclaim(addr, chash, signature = sign)\n'
-          + '  stateful entrypoint signedClaim(\n'
-          + '    addr: address, name: string, salt: int, name_fee: int, sign: signature): unit =\n'
-          + '    AENS.claim(addr, name, salt, name_fee, signature = sign)\n'
-          + '  stateful entrypoint signedTransfer(\n'
-          + '    owner: address, new_owner: address, name: string, sign: signature): unit =\n'
-          + '    AENS.transfer(owner, new_owner, name, signature = sign)\n'
-          + '  stateful entrypoint signedRevoke(owner: address, name: string, sign: signature): unit =\n'
-          + '    AENS.revoke(owner, name, signature = sign)\n'
-          + '  stateful entrypoint signedUpdate(\n'
-          + '    owner: address, name: string, key: string, pt: AENS.pointee, sig: signature) =\n'
-          + '    switch(AENS.lookup(name))\n'
-          + '      None => ()\n'
-          + '      Some(AENS.Name(_, _, ptrs)) =>\n'
-          + '        AENS.update(owner, name, None, None, Some(ptrs{[key] = pt}), signature = sig)',
+        sourceCode: `
+@compiler ${isIris ? '>= 7' : '>= 8'}
+@compiler ${isIris ? '< 8' : '< 9'}
+
+contract DelegateTest =
+  entrypoint getName(name: string): option(${aens}.name) =
+    ${aens}.lookup(name)
+  stateful payable entrypoint signedPreclaim(addr: address, chash: hash, sign: signature): unit =
+    ${aens}.preclaim(addr, chash, signature = sign)
+  stateful entrypoint signedClaim(
+    addr: address, name: string, salt: int, name_fee: int, sign: signature): unit =
+    ${aens}.claim(addr, name, salt, name_fee, signature = sign)
+  stateful entrypoint signedTransfer(
+    owner: address, new_owner: address, name: string, sign: signature): unit =
+    ${aens}.transfer(owner, new_owner, name, signature = sign)
+  stateful entrypoint signedRevoke(owner: address, name: string, sign: signature): unit =
+    ${aens}.revoke(owner, name, signature = sign)
+  stateful entrypoint signedUpdate(
+    owner: address, name: string, key: string, pt: ${aens}.pointee, sig: signature) =
+    switch(${aens}.lookup(name))
+      None => ()
+      Some(${aens}.Name(_, _, ptrs)) =>
+        ${aens}.update(owner, name, None, None, Some(ptrs{[key] = pt}), signature = sig)`,
       });
       await contract.$deploy([]);
       assertNotNull(contract.$options.address);
@@ -373,14 +383,14 @@ describe('Contract', () => {
     });
 
     it('gets', async () => {
-      const nameEntry = (await contract.getName(name)).decodedResult['AENS.Name'];
+      const nameEntry = (await contract.getName(name)).decodedResult[`${aens}.Name`];
       expect(nameEntry[0]).to.be.equal(owner);
       expect(nameEntry[1].FixedTTL[0]).to.be.a('bigint');
       expect(nameEntry[2]).to.be.eql(new Map());
     });
 
     it('updates', async () => {
-      const pointee = { 'AENS.OraclePt': [newOwner] as const };
+      const pointee = { [`${aens}.OraclePt`]: [newOwner] as const };
       const { result } = await contract
         .signedUpdate(owner, name, 'oracle', pointee, delegationSignature);
       assertNotNull(result);

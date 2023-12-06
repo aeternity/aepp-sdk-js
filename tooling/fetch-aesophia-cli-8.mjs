@@ -2,8 +2,8 @@ import { createHash } from 'crypto';
 import { dirname } from 'path';
 import { writeFileSync, readFileSync, mkdirSync } from 'fs';
 
-const path = './bin/aesophia_cli';
-const hash = 'nmCEcWHKEq5ZJ8Rv3LHlDUdnC9taCWMUjau795MN25XBMkGi2wwI0uR28HATsW8UyrzN21dcsl9ZSoICUVlrrw==';
+const path = './bin/aesophia_cli_8';
+const hash = 'tZdsd7XH1e4C10MIzM0TY0IFcpkPBZqZMPdJ1ln9GDVsgjVCCK86YKCK5KtKqQzhNKSXaE01ZjAfTEYOSV7uIg==';
 
 function ensureBinaryCorrect() {
   const buffer = readFileSync(path);
@@ -14,9 +14,9 @@ function ensureBinaryCorrect() {
 try {
   ensureBinaryCorrect();
 } catch {
-  console.log('Fetching aesophia_cli');
+  console.log('Fetching aesophia_cli_8');
   const request = await fetch(
-    'https://github.com/aeternity/aesophia_cli/releases/download/v7.4.0/aesophia_cli',
+    'https://github.com/aeternity/aesophia_cli/raw/df63ff9f4fdcfc437c90b90914fd1a7081d2bbbe/aesophia_cli',
   );
   const body = Buffer.from(await request.arrayBuffer());
   mkdirSync(dirname(path), { recursive: true });

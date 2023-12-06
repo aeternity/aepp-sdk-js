@@ -47,7 +47,6 @@ include "testLib"
 contract StateContract =
   type number = int
   record state = { value: string, key: number, testOption: option(string) }
-  record yesEr = { t: number}
 
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
@@ -56,10 +55,10 @@ contract StateContract =
   entrypoint retrieve() : string*int = (state.value, state.key)
   stateful entrypoint setKey(key: number) = put(state{key = key})
 
-  entrypoint remoteContract(a: RemoteI) : int = 1
-  entrypoint remoteArgs(a: RemoteI.test_record) : RemoteI.test_type = 1
+  entrypoint remoteContract(_: RemoteI) : int = 1
+  entrypoint remoteArgs(_: RemoteI.test_record) : RemoteI.test_type = 1
   entrypoint unitFn(a: unit) = a
-  entrypoint intFn(a: int) : int = a
+  entrypoint intFn(a: int) : int = TestLib.sum(a, 0)
   payable entrypoint stringFn(a: string) : string = a
   entrypoint boolFn(a: bool) : bool = a
   entrypoint addressFn(a: address) : address = a
@@ -81,7 +80,7 @@ contract StateContract =
   entrypoint listOption(s: option(list(int*string))) : option(list(int*string)) = s
 
   entrypoint testFn(a: list(int), b: bool) : list(int)*bool = (a, b)
-  entrypoint approve(tx_id: int, remote_contract: RemoteI) : int = tx_id
+  entrypoint approve(remote_contract: RemoteI) : RemoteI = remote_contract
 
   entrypoint hashFn(s: hash): hash = s
   entrypoint signatureFn(s: signature): signature = s
@@ -94,9 +93,9 @@ contract StateContract =
   entrypoint datTypeFn(s: dateUnit): dateUnit = s
   entrypoint datTypeGFn(x : one_or_both(int, string)) : int =
     switch(x)
-      Left(x)    => x
+      Left(p)    => p
       Right(_)   => abort("asdasd")
-      Both(x, _) => x
+      Both(p, _) => p
 
   entrypoint chainTtlFn(t: Chain.ttl): Chain.ttl = t
 
@@ -148,7 +147,7 @@ interface TestContractApi extends ContractMethodsBase {
   listOption: (s?: Array<[InputNumber, string]>) => Array<[bigint, string]> | undefined;
 
   testFn: (a: InputNumber[], b: boolean) => [bigint[], boolean];
-  approve: (tx_id: InputNumber, remote_contract: Encoded.ContractAddress) => bigint;
+  approve: (remote_contract: Encoded.ContractAddress) => Encoded.ContractAddress;
 
   hashFn: (s: Uint8Array | string) => Uint8Array;
   signatureFn: (s: Uint8Array | string) => Uint8Array;
@@ -1069,8 +1068,8 @@ describe('Contract instance', () => {
     });
 
     it('Call contract with contract type argument', async () => {
-      const result = await testContract.approve(0, 'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh');
-      expect(result.decodedResult).to.be.equal(0n);
+      const result = await testContract.approve('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh');
+      expect(result.decodedResult).to.be.equal('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh');
     });
   });
 });

@@ -43,7 +43,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build:assets": "node tooling/fetch-aesophia-cli.mjs",
+    "build:assets": "node tooling/fetch-aesophia-cli.mjs && node tooling/fetch-aesophia-cli-8.mjs",
     "build:types": "tsc && node tooling/downlevel/run.mjs",
     "build:es": "babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
     "build:api:node": "autorest tooling/autorest/node.yaml",
@@ -75,7 +75,7 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/aepp-calldata": "^1.5.1",
+    "@aeternity/aepp-calldata": "github:aeternity/aepp-calldata-js#7cce0a6d23ec0ba5f23f46acf9d4254a9346c9c9",
     "@aeternity/argon2": "^0.0.1",
     "@aeternity/uuid": "^0.0.1",
     "@azure/core-client": "1.6.0",
