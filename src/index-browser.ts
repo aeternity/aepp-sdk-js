@@ -42,9 +42,7 @@ export {
   encode, decode, Encoding, Encoded,
 } from './utils/encoder';
 export { hashTypedData, hashDomain, hashJson } from './utils/typed-data';
-export {
-  aensRevoke, aensUpdate, aensTransfer, aensQuery, aensClaim, aensPreclaim, aensBid,
-} from './aens';
+export { default as Name } from './aens';
 export { default as Contract } from './contract/Contract';
 export type { ContractMethodsBase } from './contract/Contract';
 export {
@@ -109,6 +107,5 @@ export {
 } from './utils/errors';
 export {
   RpcBroadcastError, NAME_BID_MAX_LENGTH, encodeFateValue, decodeFateValue,
-  NAME_TTL, NAME_MAX_TTL, NAME_MAX_CLIENT_TTL, CLIENT_TTL,
   ORACLE_TTL, QUERY_TTL, RESPONSE_TTL,
 } from './deprecated';

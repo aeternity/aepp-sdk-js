@@ -395,7 +395,7 @@ contract DelegateTest =
         .signedUpdate(owner, name, 'oracle', pointee, delegationSignature);
       assertNotNull(result);
       expect(result.returnType).to.be.equal('ok');
-      expect((await aeSdk.aensQuery(name)).pointers).to.be.eql([{
+      expect((await aeSdk.api.getNameEntryByName(name)).pointers).to.be.eql([{
         key: 'oracle',
         id: newOwner.replace('ak', 'ok'),
       }]);
@@ -417,7 +417,7 @@ contract DelegateTest =
       const { result } = await contract.signedRevoke(newOwner, name, revokeSig);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
-      await expect(aeSdk.aensQuery(name)).to.be.rejectedWith(Error);
+      await expect(aeSdk.api.getNameEntryByName(name)).to.be.rejectedWith(Error);
     });
   });
 

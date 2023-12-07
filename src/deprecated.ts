@@ -42,26 +42,6 @@ export function decodeFateValue(value: Encoded.ContractBytearray, aci: AciValue)
 }
 
 /**
- * @deprecated inlined in buildTx or use `180000`
- */
-export const NAME_TTL = 180000;
-
-/**
- * @deprecated inlined in buildTx or use `36000`
- */
-export const NAME_MAX_TTL = 36000;
-
-/**
- * @deprecated inlined in buildTx or use `60 * 60`
- */
-export const NAME_MAX_CLIENT_TTL = 60 * 60;
-
-/**
- * @deprecated inlined in buildTx or use `60 * 60`
- */
-export const CLIENT_TTL = NAME_MAX_CLIENT_TTL;
-
-/**
  * @deprecated inlined in buildTx or use `{ type: ORACLE_TTL_TYPES.delta, value: 500 }`
  */
 export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };

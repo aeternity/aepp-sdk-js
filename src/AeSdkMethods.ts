@@ -1,5 +1,4 @@
 import * as chainMethods from './chain';
-import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
 import Contract, { ContractMethodsBase } from './contract/Contract';
@@ -38,7 +37,6 @@ const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
 
 const methods = {
   ...chainMethodsOther,
-  ...aensMethods,
   ...spendMethods,
   ...oracleMethods,
   createDelegationSignature,
@@ -99,7 +97,8 @@ class AeSdkMethods {
   }
 
   async buildTx(options: TxParamsAsync): Promise<Encoded.Transaction> {
-    return buildTxAsync({ ...this.getContext(), ...options });
+    // TODO: remove `any` at the same time as AeSdk class
+    return buildTxAsync({ ...this.getContext() as any, ...options });
   }
 
   async initializeContract<Methods extends ContractMethodsBase>(

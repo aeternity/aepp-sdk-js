@@ -62,3 +62,6 @@ export function ensureError(error: unknown): asserts error is Error {
   if (error instanceof Error) return;
   throw error;
 }
+
+// based on https://stackoverflow.com/a/61108377/6176994
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;

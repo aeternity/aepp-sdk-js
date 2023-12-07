@@ -10,375 +10,289 @@ import BigNumber from 'bignumber.js';
 import { genSalt } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
 import { Tag, AensName } from './tx/builder/constants';
+import { LogicError } from './utils/errors';
 import { Encoded } from './utils/encoder';
+import { Optional } from './utils/other';
 import { sendTransaction, SendTransactionOptions, getName } from './chain';
 import { buildTxAsync, BuildTxOptions } from './tx/builder';
-import { TransformNodeType } from './Node';
-import { NameEntry, NamePointer } from './apis/node';
+import Node from './Node';
 import AccountBase from './account/Base';
 import { AddressEncodings } from './tx/builder/field-types/address';
+
+interface NameRevokeOptions extends
+  BuildTxOptions<Tag.NameRevokeTx, 'nameId' | 'accountId'>,
+  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
 interface KeyPointers {
   [key: string]: Encoded.Generic<AddressEncodings>;
 }
 
-/**
- * Revoke a name
- * @category AENS
- * @param name - Name hash
- * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @returns Transaction result
- * @example
- * ```js
- * const name = 'test.chain'
- * const nameObject = await sdkInstance.aensQuery(name)
- *
- * await sdkInstance.aensRevoke(name, { fee, ttl , nonce })
- * // or
- * await nameObject.revoke({ fee, ttl, nonce })
- * ```
- */
-export async function aensRevoke(
-  name: AensName,
-  options: AensRevokeOptions,
-): ReturnType<typeof sendTransaction> {
-  const nameRevokeTx = await buildTxAsync({
-    ...options,
-    tag: Tag.NameRevokeTx,
-    nameId: name,
-    accountId: options.onAccount.address,
-  });
-  return sendTransaction(nameRevokeTx, options);
-}
-
-interface AensRevokeOptions extends
-  BuildTxOptions<Tag.NameRevokeTx, 'nameId' | 'accountId' | 'onNode'>,
-  SendTransactionOptions {}
-
-/**
- * Update a name
- * @category AENS
- * @param name - AENS name
- * @param pointers - Map of pointer keys to corresponding addresses
- * @param options - Options
- * @param options.extendPointers - Get the pointers from the node and merge with provided
- * ones. Pointers with the same type will be overwritten
- * @param options.onAccount - Make operation on specific account from sdk (you
- * pass publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @param options.nameTtl - Name ttl represented in number of
- * blocks (Max value is 50000 blocks)
- * @param options.clientTtl a suggestion as to how long any
- * clients should cache this information
- * @throws Invalid pointer array error
- * @example
- * ```js
- * const name = 'test.chain'
- * const pointersArray = ['ak_asd23dasdas...,' 'ct_asdf34fasdasd...']
- * const nameObject = await sdkInstance.aensQuery(name)
- *
- * await sdkInstance.aensUpdate(name, pointersArray, { nameTtl, ttl, fee, nonce, clientTtl })
- * // or
- * await nameObject.update(pointers, { nameTtl, ttl, fee, nonce, clientTtl })
- * ```
- */
-export async function aensUpdate(
-  name: AensName,
-  pointers: KeyPointers,
-  { extendPointers, ...options }: AensUpdateOptions,
-): ReturnType<typeof sendTransaction> {
-  const allPointers = {
-    ...extendPointers === true && Object.fromEntries(
-      (await getName(name, options)).pointers.map(({ key, id }) => [key, id]),
-    ),
-    ...pointers,
-  };
-
-  const nameUpdateTx = await buildTxAsync({
-    ...options,
-    tag: Tag.NameUpdateTx,
-    nameId: name,
-    accountId: options.onAccount.address,
-    pointers: Object.entries(allPointers)
-      .map(([key, id]: [string, Encoded.Generic<AddressEncodings>]) => ({ key, id })),
-  });
-
-  return sendTransaction(nameUpdateTx, options);
-}
-
-interface AensUpdateOptions extends
-  BuildTxOptions<Tag.NameUpdateTx, 'nameId' | 'accountId' | 'pointers' | 'clientTtl' | 'nameTtl' | 'onNode'>,
-  SendTransactionOptions {
+interface NameUpdateOptions extends
+  BuildTxOptions<Tag.NameUpdateTx, 'nameId' | 'accountId' | 'pointers'>,
+  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {
   extendPointers?: boolean;
-  clientTtl?: number;
-  nameTtl?: number;
 }
 
-/**
- * Transfer a domain to another account
- * @category AENS
- * @param name - AENS name
- * @param account - Recipient account publick key
- * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @returns Transaction result
- * @example
- * ```js
- * const name = 'test.chain'
- * const recipientPub = 'ak_asd23dasdas...'
- * const nameObject = await sdkInstance.aensQuery(name)
- *
- * await sdkInstance.aensTransfer(name, recipientPub, { ttl, fee, nonce })
- * // or
- * await nameObject.transfer(recipientPub, { ttl, fee, nonce })
- * ```
- */
-export async function aensTransfer(
-  name: AensName,
-  account: Encoded.AccountAddress,
-  options: AensTransferOptions,
-): ReturnType<typeof sendTransaction> {
-  const nameTransferTx = await buildTxAsync({
-    ...options,
-    tag: Tag.NameTransferTx,
-    nameId: name,
-    accountId: options.onAccount.address,
-    recipientId: account,
-  });
+interface NameTransferOptions extends
+  BuildTxOptions<Tag.NameTransferTx, 'nameId' | 'accountId' | 'recipientId'>,
+  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
-  return sendTransaction(nameTransferTx, options);
-}
+interface NamePreclaimOptions extends
+  BuildTxOptions<Tag.NamePreclaimTx, 'accountId' | 'commitmentId'>,
+  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
-interface AensTransferOptions extends
-  BuildTxOptions<Tag.NameTransferTx, 'nameId' | 'accountId' | 'recipientId' | 'onNode'>,
-  SendTransactionOptions {}
+interface NameClaimOptions extends
+  BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'nameSalt' | 'name'>,
+  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
 /**
- * Query the AENS name info from the node
- * and return the object with info and predefined functions for manipulating name
  * @category AENS
- * @param name - AENS name
- * @param opt - Options
- * @returns
  * @example
  * ```js
- * const nameObject = sdkInstance.aensQuery('test.chain')
- * console.log(nameObject)
- * {
- *  id, // name hash
- *  pointers, // array of pointers
- *  update, // Update name function
- *  extendTtl, // Extend Ttl name function
- *  transfer, // Transfer name function
- *  revoke // Revoke name function
- * }
+ * const name = new Name('test.chain', aeSdk.getContext())
  * ```
  */
-export async function aensQuery(
-  name: AensName,
-  opt: Parameters<typeof getName>[1] & Parameters<typeof aensUpdate>[2]
-  & Parameters<typeof aensTransfer>[2],
-): Promise<Readonly<
-  TransformNodeType<NameEntry> & {
+export default class Name {
+  #salt?: number;
+
+  options: { onNode: Node; onAccount: AccountBase } & NameRevokeOptions & NameUpdateOptions
+  & NameTransferOptions & NamePreclaimOptions & NameClaimOptions;
+
+  /**
+   * @param value - AENS name
+   * @param options - Options
+   * @param options.onNode - Node to use
+   * @param options.onAccount - Account to use
+   */
+  constructor(
+    public readonly value: AensName,
+    options: { onNode: Node; onAccount: AccountBase },
+  ) {
+    this.options = options;
+  }
+
+  /**
+   * Revoke a name
+   * @param options - Options
+   * @param options.onAccount - Account to use
+   * @param options.fee - fee
+   * @param options.ttl - ttl
+   * @param options.nonce - nonce
+   * @returns mined transaction details
+   * @example
+   * ```js
+   * await name.revoke({ fee, ttl, nonce })
+   * ```
+   */
+  async revoke(options: NameRevokeOptions = {}): ReturnType<typeof sendTransaction> {
+    const opt = { ...this.options, ...options };
+    const tx = await buildTxAsync({
+      ...opt,
+      tag: Tag.NameRevokeTx,
+      nameId: this.value,
+      accountId: opt.onAccount.address,
+    });
+    return sendTransaction(tx, opt);
+  }
+
+  /**
+   * Update a name
+   * @param pointers - Map of pointer keys to corresponding addresses
+   * @param options - Options
+   * @param options.extendPointers - Get the pointers from the node and merge with provided
+   * ones. Pointers with the same type will be overwritten
+   * @param options.onAccount - Account to use
+   * @param options.fee - fee
+   * @param options.ttl - ttl
+   * @param options.nonce - nonce
+   * @param options.nameTtl - represents in number of blocks (max and default is 180000)
+   * @param options.clientTtl - a suggestion in seconds as to how long any clients should cache this
+   * information
+   * @example
+   * ```js
+   * const name = 'test.chain'
+   * const channel = 'ch_2519mBs...'
+   * const pointers = {
+   *   account_pubkey: 'ak_asd23dasdas...,',
+   *   contract_pubkey: 'ct_asdf34fasdasd...',
+   *   [getDefaultPointerKey(channel)]: channel,
+   * }
+   * await name.update(pointers, { nameTtl, ttl, fee, nonce, clientTtl })
+   * ```
+   */
+  async update(
+    pointers: KeyPointers,
+    options: NameUpdateOptions = {},
+  ): ReturnType<typeof sendTransaction> {
+    const { extendPointers, ...opt } = { ...this.options, ...options };
+    const allPointers = {
+      ...extendPointers === true && Object.fromEntries(
+        (await getName(this.value, opt)).pointers.map(({ key, id }) => [key, id]),
+      ),
+      ...pointers,
+    };
+    const tx = await buildTxAsync({
+      ...opt,
+      tag: Tag.NameUpdateTx,
+      nameId: this.value,
+      accountId: opt.onAccount.address,
+      pointers: Object.entries(allPointers)
+        .map(([key, id]: [string, Encoded.Generic<AddressEncodings>]) => ({ key, id })),
+    });
+    return sendTransaction(tx, opt);
+  }
+
+  /**
+   * Transfer a name to another account
+   * @param address - Recipient account public key
+   * @param options - Options
+   * @param options.onAccount - Account to use
+   * @param options.fee - fee
+   * @param options.ttl - ttl
+   * @param options.nonce - nonce
+   * @returns mined transaction details
+   * @example
+   * ```js
+   * await name.transfer('ak_asd23dasdas...', { ttl, fee, nonce })
+   * ```
+   */
+  async transfer(
+    address: Encoded.AccountAddress,
+    options: NameTransferOptions = {},
+  ): ReturnType<typeof sendTransaction> {
+    const opt = { ...this.options, ...options };
+    const tx = await buildTxAsync({
+      ...opt,
+      tag: Tag.NameTransferTx,
+      nameId: this.value,
+      accountId: opt.onAccount.address,
+      recipientId: address,
+    });
+    return sendTransaction(tx, opt);
+  }
+
+  /**
+   * Query the AENS name info from the node
+   * and return the object with info and predefined functions for manipulating name
+   * @param opt - Options
+   * @example
+   * ```js
+   * const nameEntry = await name.getNodeState()
+   * console.log(nameEntry.owner)
+   * ```
+   */
+  async getNodeState(options: { onNode?: Node } = {}): Promise<
+  Awaited<ReturnType<Node['getNameEntryByName']>> & {
     id: Encoded.Name;
     owner: Encoded.AccountAddress;
-    pointers: KeyPointers | NamePointer[];
-    ttl: number;
-    update: (
-      pointers: KeyPointers,
-      options?: Omit<Parameters<typeof aensQuery>[1], 'onNode' | 'onCompiler' | 'onAccount'> & {
-        onAccount?: AccountBase;
-      }
-    ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
-    transfer: (
-      account: Encoded.AccountAddress,
-      options?: Parameters<typeof aensQuery>[1]
-    ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
-    revoke: (options?: Omit<Parameters<typeof aensRevoke>[1], 'onNode' | 'onCompiler' | 'onAccount'> & {
-      onAccount?: AccountBase;
+  }
+  > {
+    const onNode = this.options.onNode ?? options.onNode;
+    const nameEntry = await onNode.getNameEntryByName(this.value);
+    return {
+      ...nameEntry,
+      id: nameEntry.id as Encoded.Name,
+      owner: nameEntry.owner as Encoded.AccountAddress,
+    };
+  }
+
+  /**
+   *
+   * @param nameTtl - represents in number of blocks (max and default is 180000)
+   * @param options - Options
+   * @returns mined transaction details
+   */
+  async extendTtl(
+    nameTtl?: number,
+    options: Omit<Parameters<Name['update']>[1], 'extendPointers' | 'nameTtl'> = {},
+  ): ReturnType<Name['update']> {
+    return this.update({}, { ...options, nameTtl, extendPointers: true });
+  }
+
+  /**
+   * Claim a previously preclaimed registration. This can only be done after the preclaim step
+   * @param options - options
+   * @param options.onAccount - Account to use
+   * @param options.fee - fee
+   * @param options.ttl - ttl
+   * @param options.nonce - nonce
+   * @param options.nameFee - name fee (by default calculated by sdk)
+   * @returns mined transaction details
+   * @example
+   * ```js
+   * await name.claim({ ttl, fee, nonce, nameFee })
+   * ```
+   */
+  async claim(options: NameClaimOptions = {}): ReturnType<typeof sendTransaction> {
+    if (this.#salt == null) throw new LogicError('Name needs to be preclaimed firstly');
+    const opt = { ...this.options, ...options };
+    const tx = await buildTxAsync({
+      ...opt,
+      tag: Tag.NameClaimTx,
+      accountId: opt.onAccount.address,
+      nameSalt: this.#salt,
+      name: this.value,
+    });
+    return sendTransaction(tx, opt);
+  }
+
+  /**
+   * Preclaim a name. Sends a hash of the name and a random salt to the node
+   * @param options - Options
+   * @param options.onAccount - Account to use
+   * @param options.fee - fee
+   * @param options.ttl - ttl
+   * @param options.nonce - nonce
+   * @example
+   * ```js
+   * await name.preclaim({ ttl, fee, nonce })
+   * ```
+   */
+  async preclaim(options: NamePreclaimOptions = {}): ReturnType<typeof sendTransaction> {
+    const opt = { ...this.options, ...options };
+    const salt = genSalt();
+    const tx = await buildTxAsync({
+      ...opt,
+      tag: Tag.NamePreclaimTx,
+      accountId: opt.onAccount.address,
+      commitmentId: commitmentHash(this.value, salt),
+    });
+    const result = await sendTransaction(tx, opt);
+    this.#salt = salt;
+    return result;
+  }
+
+  /**
+   * Bid to name auction
+   * @param nameFee - Name fee (bid fee)
+   * @param options - Options
+   * @param options.onAccount - Account to use
+   * @param options.fee - fee
+   * @param options.ttl - ttl
+   * @param options.nonce - nonce
+   * @returns mined transaction details
+   * @example
+   * ```js
+   * const bidFee = computeBidFee(name.value, { startFee, increment: 0.42 })
+   * await name.bid(213109412839123, { ttl, fee, nonce })
+   * ```
+   */
+  async bid(
+    nameFee: number | string | BigNumber,
+    options: Omit<NameClaimOptions, 'nameFee'> = {},
+  ): ReturnType<typeof sendTransaction> {
+    if (!isAuctionName(this.value)) {
+      throw new LogicError('This is not auction name, so cant make a bid!');
     }
-    ) => ReturnType<typeof aensRevoke>;
-    extendTtl: (
-      nameTtl?: number,
-      options?: Omit<Parameters<typeof aensQuery>[1], 'onNode' | 'onCompiler' | 'onAccount'>
-    ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
+    const opt = { ...this.options, ...options };
+    const tx = await buildTxAsync({
+      ...opt,
+      tag: Tag.NameClaimTx,
+      accountId: opt.onAccount.address,
+      nameSalt: 0,
+      name: this.value,
+      nameFee,
+    });
+    return sendTransaction(tx, opt);
   }
-  >> {
-  const nameEntry = await getName(name, opt);
-  return Object.freeze({
-    ...nameEntry,
-    id: nameEntry.id as Encoded.Name,
-    owner: nameEntry.owner as Encoded.AccountAddress,
-    async update(pointers, options) {
-      return {
-        ...await aensUpdate(name, pointers, { ...opt, ...options }),
-        ...await aensQuery(name, { ...opt, ...options }),
-      };
-    },
-    async transfer(account, options) {
-      return {
-        ...await aensTransfer(name, account, { ...opt, ...options }),
-        ...await aensQuery(name, { ...opt, ...options }),
-      };
-    },
-    async revoke(options) {
-      return aensRevoke(name, { ...opt, ...options });
-    },
-    async extendTtl(nameTtl, options = {}) {
-      return {
-        ...await aensUpdate(name, {}, {
-          ...opt, ...options, nameTtl, extendPointers: true,
-        }),
-        ...await aensQuery(name, { ...opt, ...options }),
-      };
-    },
-  });
-}
-
-/**
- * Claim a previously preclaimed registration. This can only be done after the
- * preclaim step
- * @category AENS
- * @param name - AENS name
- * @param salt - Salt from pre-claim, or 0 if it's a bid
- * @param options - options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @param options.nameFee - Name Fee (By default calculated by sdk)
- * @returns the result of the claim
- * @example
- * ```js
- * const name = 'test.chain'
- * const salt = preclaimResult.salt // salt from pre-claim transaction
- *
- * await sdkInstance.aensClaim(name, salt, { ttl, fee, nonce, nameFee })
- * ```
- */
-export async function aensClaim(
-  name: AensName,
-  salt: number,
-  options: AensClaimOptions,
-): Promise<AensClaimReturnType> {
-  const claimTx = await buildTxAsync({
-    ...options,
-    tag: Tag.NameClaimTx,
-    accountId: options.onAccount.address,
-    nameSalt: salt,
-    name,
-  });
-
-  const result = await sendTransaction(claimTx, options);
-  if (!isAuctionName(name)) {
-    const nameInter = result.blockHeight != null && result.blockHeight > 0
-      ? await aensQuery(name, options)
-      : {};
-    return Object.assign(result, nameInter);
-  }
-  return result;
-}
-
-type AensClaimOptionsType = BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'nameSalt' | 'name'>
-& SendTransactionOptions & Parameters<typeof aensQuery>[1];
-interface AensClaimOptions extends AensClaimOptionsType {}
-interface AensClaimReturnType extends
-  Awaited<ReturnType<typeof sendTransaction>>,
-  Partial<Awaited<ReturnType<typeof aensQuery>>> {}
-
-/**
- * Preclaim a name. Sends a hash of the name and a random salt to the node
- * @category AENS
- * @param name - AENS name
- * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @example
- * ```js
- * const name = 'test.chain'
- * const salt = preclaimResult.salt // salt from pre-claim transaction
- *
- * await sdkInstance.aensPreclaim(name, { ttl, fee, nonce })
- * {
- *   ...transactionResult,
- *   claim, // Claim function (options={}) => claimTransactionResult
- *   salt,
- *   commitmentId
- * }
- * ```
- */
-export async function aensPreclaim(name: AensName, options: AensPreclaimOptions): Promise<Readonly<
-Awaited<ReturnType<typeof sendTransaction>> & {
-  salt: number;
-  commitmentId: string;
-  claim: (opts?: Parameters<typeof aensClaim>[2]) => ReturnType<typeof aensClaim>;
-}
->> {
-  const salt = genSalt();
-  const commitmentId = commitmentHash(name, salt);
-
-  const preclaimTx = await buildTxAsync({
-    ...options,
-    tag: Tag.NamePreclaimTx,
-    accountId: options.onAccount.address,
-    commitmentId,
-  });
-
-  return Object.freeze({
-    ...await sendTransaction(preclaimTx, options),
-    salt,
-    commitmentId,
-    async claim(opts?: Parameters<typeof aensClaim>[2]) {
-      const { version, ...otherOptions } = options;
-      return aensClaim(name, salt, { ...otherOptions, ...opts });
-    },
-  });
-}
-
-interface AensPreclaimOptions extends
-  BuildTxOptions<Tag.NamePreclaimTx, 'accountId' | 'commitmentId' | 'onNode'>,
-  SendTransactionOptions,
-  Omit<AensClaimOptions, 'version'> {}
-
-/**
- * Bid to name auction
- * @category AENS
- * @param name - Domain name
- * @param nameFee - Name fee (bid fee)
- * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @returns Transaction result
- * @example
- * ```js
- * const name = 'test.chain'
- * const bidFee = computeBidFee(name, { startFee, increment: 0.42 })
- *
- * await sdkInstance.aensBid(name, 213109412839123, { ttl, fee, nonce })
- * ```
- */
-export async function aensBid(
-  name: AensName,
-  nameFee: number | string | BigNumber,
-  options: Omit<Parameters<typeof aensClaim>[2], 'nameFee'>,
-): ReturnType<typeof aensClaim> {
-  return aensClaim(name, 0, { ...options, nameFee });
 }
