@@ -1313,7 +1313,7 @@ Some of these are common and can be provided for each transaction type. Others a
 </ul>
 <h3 id="nameupdatetx">NameUpdateTx</h3>
 <ul>
-<li><code>clientTtl</code> (default: <code>84600</code>)</li>
+<li><code>clientTtl</code> (default: <code>3600</code>, one hour)</li>
 <li>This option is an indicator for indexing tools to know how long (in seconds) they could or should cache the name information.</li>
 <li><code>nameTtl</code> (default: <code>180000</code>)</li>
 <li>This option tells the protocol the relative TTL based on the current block height.</li>
@@ -1321,7 +1321,7 @@ Some of these are common and can be provided for each transaction type. Others a
 </ul>
 <h3 id="oracleregistertx">OracleRegisterTx</h3>
 <ul>
-<li><code>queryFee</code> (default: <code>30000</code>)</li>
+<li><code>queryFee</code> (default: <code>0</code>)</li>
 <li>The fee in <code>aettos</code> that the oracle requests in order to provide a response.</li>
 <li><code>oracleTtlValue</code> (default: <code>500</code>)</li>
 <li>The TTL of the oracle that defines its expiration.</li>
@@ -1331,7 +1331,7 @@ Some of these are common and can be provided for each transaction type. Others a
 </ul>
 <h3 id="oraclequerytx">OracleQueryTx</h3>
 <ul>
-<li><code>queryFee</code> (default: <code>30000</code>)</li>
+<li><code>queryFee</code> (default: <code>0</code>)</li>
 <li>The fee in <code>aettos</code> that will be payed to the oracle.</li>
 <li><code>queryTtlValue</code> (default: <code>10</code>)</li>
 <li>The TTL of the query that defines its expiration. The oracle needs to respond before the <code>queryTtl</code> expires.</li>
