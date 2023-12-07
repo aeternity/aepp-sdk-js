@@ -117,7 +117,7 @@ interface GetCallResultByHashReturnType<M extends ContractMethodsBase, Fn extend
  * @returns JS Contract API
  * @example
  * ```js
- * const contractIns = await aeSdk.initializeContract({ sourceCode })
+ * const contractIns = await Contract.initialize({ ...aeSdk.getContext(), sourceCode })
  * await contractIns.$deploy([321]) or await contractIns.init(321)
  * const callResult = await contractIns.$call('setState', [123])
  * const staticCallResult = await contractIns.$call('setState', [123], { callStatic: true })

@@ -12,7 +12,7 @@
 //
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 import {
-  AeSdk, CompilerHttp, Node, MemoryAccount,
+  AeSdk, Contract, CompilerHttp, Node, MemoryAccount,
 } from '@aeternity/aepp-sdk';
 
 // **Note**:
@@ -55,7 +55,9 @@ const aeSdk = new AeSdk({
 // Knowing the source code allows you to initialize a contract instance and interact with the
 // contract in a convenient way.
 console.log(CONTRACT_SOURCE_CODE);
-const contract = await aeSdk.initializeContract({ sourceCode: CONTRACT_SOURCE_CODE });
+const contract = await Contract.initialize({
+  ...aeSdk.getOptions(), sourceCode: CONTRACT_SOURCE_CODE,
+});
 
 // ## 5. Compile the contract
 // The `$compile` function sends a raw Sophia contract as string

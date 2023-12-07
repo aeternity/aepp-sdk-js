@@ -8,7 +8,9 @@
 Open developer console
 <script src="../../dist/aepp-sdk.browser-script.js"></script>
 <script type="text/javascript">
-const { Node, AeSdkAepp, CompilerHttp, walletDetector, BrowserWindowMessageConnection } = Aeternity;
+const {
+  Node, AeSdkAepp, CompilerHttp, walletDetector, BrowserWindowMessageConnection, Contract,
+} = Aeternity;
 
 const contractSourceCode = `
 contract Test =
@@ -51,7 +53,9 @@ async function detectWallets() {
   console.log('Height:', await aeSdk.getHeight());
   console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map);
 
-  const contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
+  const contract = await Contract.initialize({
+    ...aeSdk.getContext(), sourceCode: contractSourceCode,
+  });
   const deployInfo = await contract.$deploy([]);
   console.log('Contract deployed at', deployInfo.address);
   const map = new Map([['foo', 42], ['bar', 43]]);

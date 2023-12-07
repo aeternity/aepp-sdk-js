@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
 import { getSdk } from '.';
 import {
-  generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount, Encoded,
+  generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount, Encoded, Contract,
 } from '../../src';
 import { assertNotNull } from '../utils';
 
@@ -160,7 +160,8 @@ describe('Node Chain', () => {
   it('ensure transactions mined', async () => Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));
 
   it('multiple contract dry-runs calls at one request', async () => {
-    const contract = await aeSdk.initializeContract<{ foo: (x: number) => bigint }>({
+    const contract = await Contract.initialize<{ foo: (x: number) => bigint }>({
+      ...aeSdk.getContext(),
       sourceCode:
         'contract Test =\n'
         + '  entrypoint foo(x : int) = x * 100',

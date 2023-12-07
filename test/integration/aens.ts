@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { getSdk } from '.';
 import { assertNotNull, randomName, randomString } from '../utils';
 import {
-  AeSdk, generateKeyPair, buildContractId, computeBidFee, ensureName, produceNameId,
+  AeSdk, generateKeyPair, buildContractId, computeBidFee, ensureName, produceNameId, Contract,
   AensPointerContextError, UnexpectedTsError, encode, decode, Encoding, ContractMethodsBase,
 } from '../../src';
 import { pause } from '../../src/utils/other';
@@ -97,13 +97,15 @@ describe('Aens', () => {
     interface ContractApi extends ContractMethodsBase {
       getArg: (x: number) => bigint;
     }
-    let contract = await aeSdk.initializeContract<ContractApi>({ sourceCode });
+    let contract = await Contract.initialize<ContractApi>({ ...aeSdk.getContext(), sourceCode });
     await contract.$deploy([]);
     const nameObject = await aeSdk.aensQuery(name);
     assertNotNull(contract.$options.address);
     await nameObject.update({ contract_pubkey: contract.$options.address });
 
-    contract = await aeSdk.initializeContract<ContractApi>({ sourceCode, address: name });
+    contract = await Contract.initialize<ContractApi>({
+      ...aeSdk.getContext(), sourceCode, address: name,
+    });
     expect((await contract.getArg(42)).decodedResult).to.be.equal(42n);
   });
 

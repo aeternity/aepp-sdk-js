@@ -2,7 +2,6 @@ import * as chainMethods from './chain';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
-import Contract, { ContractMethodsBase } from './contract/Contract';
 import createDelegationSignature from './contract/delegation-signature';
 import * as contractGaMethods from './contract/ga';
 import { buildTxAsync } from './tx/builder';
@@ -100,12 +99,6 @@ class AeSdkMethods {
 
   async buildTx(options: TxParamsAsync): Promise<Encoded.Transaction> {
     return buildTxAsync({ ...this.getContext(), ...options });
-  }
-
-  async initializeContract<Methods extends ContractMethodsBase>(
-    options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode'> & { onNode?: Node },
-  ): Promise<Contract<Methods>> {
-    return Contract.initialize<Methods>(this.getContext(options as AeSdkMethodsOptions));
   }
 }
 

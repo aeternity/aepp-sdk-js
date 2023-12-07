@@ -818,7 +818,9 @@ describe('Channel', () => {
       sign: responderSignTag,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
-    contract = await aeSdkInitiatior.initializeContract({ sourceCode: contractSourceCode });
+    contract = await Contract.initialize({
+      ...aeSdkInitiatior.getContext(), sourceCode: contractSourceCode,
+    });
     const initiatorNewContract = sinon.spy();
     initiatorCh.on('newContract', initiatorNewContract);
     const responderNewContract = sinon.spy();

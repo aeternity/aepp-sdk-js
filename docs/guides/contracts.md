@@ -53,11 +53,13 @@ Note:
 
 ## 4. Initialize the contract instance
 
+To do so, we need to prepare an options object, which can be done in multiple ways.
+
 ### By source code
 
 ```js
 const sourceCode = ... // source code of the contract
-const contract = await aeSdk.initializeContract({ sourceCode })
+const options = { sourceCode }
 ```
 
 Note:
@@ -65,14 +67,14 @@ Note:
 - If your contract includes external dependencies which are not part of the [standard library](https://docs.aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
   ```js
   const fileSystem = ... // key-value map with name of the include as key and source code of the include as value
-  const contract = await aeSdk.initializeContract({ sourceCode, fileSystem })
+  const options = { sourceCode, fileSystem }
   ```
 
 ### By path to source code (available only in Node.js)
 It can be used with both CompilerCli and CompilerHttp. This way contract imports would be handled automatically, with no need to provide `fileSystem` option.
 ```js
 const sourceCodePath = './example.aes'
-const contract = await aeSdk.initializeContract({ sourceCodePath })
+const options = { sourceCodePath }
 ```
 
 ### By ACI and bytecode
@@ -81,7 +83,7 @@ If you pre-compiled the contracts you can also initialize a contract instance by
 ```js
 const aci = ... // ACI of the contract
 const bytecode = ... // bytecode of the contract
-const contract = await aeSdk.initializeContract({ aci, bytecode })
+const options = { aci, bytecode }
 ```
 
 ### By ACI and contract address
@@ -90,12 +92,19 @@ In many cases an application doesn't need to deploy a contract or verify its byt
 ```js
 const aci = ... // ACI of the contract
 const address = ... // the address of the contract
-const contract = await aeSdk.initializeContract({ aci, address })
+const options = { aci, address }
 ```
+
+### Create contract instance
+Do it by `Contract::initialize`.
+```js
+const contract = await Contract.initialize({ ...aeSdk.getContext(), ...options })
+```
+`AeSdk:getContext` is used to get base options to instantiate contracts. These options include the current account, node, and compiler. They are referenced using Proxy class, pointing to the latest values specified in AeSdk. So, if you change the selected node in the AeSdk instance, it will be also changed in bound contract instances.
 
 ### Options
 
-- Following attributes can be provided via `options` to `initializeContract`:
+- Following attributes can be provided via `options` to `Contract::initialize`:
     - `aci` (default: obtained via `onCompiler`)
         - The Contract ACI.
     - `address`

@@ -30,6 +30,7 @@ import {
   verifyMessage,
   buildTx,
   hashTypedData,
+  Contract,
 } from '../../src';
 import { getBufferToSign } from '../../src/account/Memory';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
@@ -121,7 +122,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('aepp can do static calls without connection to wallet', async () => {
-      const contract = await aeSdk.initializeContract({
+      const contract = await Contract.initialize({
+        ...aeSdk.getContext(),
         sourceCode: 'contract Test =\n'
           + '  entrypoint getArg(x : int) = x',
       });
@@ -131,7 +133,8 @@ describe('Aepp<->Wallet', function aeppWallet() {
         nodes: [{ name: 'test', instance: node }],
         onCompiler: new CompilerHttp(compilerUrl),
       });
-      const contractAepp = await aeppSdk.initializeContract<{ getArg: (a: number) => number }>({
+      const contractAepp = await Contract.initialize<{ getArg: (a: number) => number }>({
+        ...aeppSdk.getContext(),
         aci: contract._aci,
         address: contract.$options.address,
       });

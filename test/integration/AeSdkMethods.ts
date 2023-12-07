@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { getSdk, url, compilerUrl } from '.';
 import { assertNotNull } from '../utils';
 import {
-  AeSdkMethods, Node, CompilerHttp, AccountBase,
+  AeSdkMethods, Node, CompilerHttp, AccountBase, Contract,
 } from '../../src';
 
 describe('AeSdkMethods', () => {
@@ -27,7 +27,8 @@ describe('AeSdkMethods', () => {
   });
 
   it('created contract remains connected to sdk', async () => {
-    const contract = await aeSdkMethods.initializeContract({
+    const contract = await Contract.initialize({
+      ...aeSdkMethods.getContext(),
       sourceCode: ''
       + 'contract Identity =\n'
       + '  entrypoint getArg(x : int) = x',

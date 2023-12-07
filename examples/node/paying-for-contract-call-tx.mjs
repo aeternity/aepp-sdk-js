@@ -31,7 +31,7 @@
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
 // Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 import {
-  AeSdk, CompilerHttp, Node, MemoryAccount, Tag,
+  AeSdk, Contract, CompilerHttp, Node, MemoryAccount, Tag,
 } from '@aeternity/aepp-sdk';
 
 // **Note**:
@@ -100,9 +100,9 @@ const aeSdk = new AeSdk({
 //  1. Sign the transaction by providing `innerTx: true` as transaction option.
 //      - The transaction will be signed in a special way that is required for inner transactions.
 //
-const contract = await aeSdk.initializeContract(
-  { sourceCode: CONTRACT_SOURCE_CODE, address: CONTRACT_ADDRESS },
-);
+const contract = await Contract.initialize({
+  ...aeSdk.getContext(), sourceCode: CONTRACT_SOURCE_CODE, address: CONTRACT_ADDRESS,
+});
 const calldata = contract._calldata.encode('PayingForTxExample', 'set_last_caller', []);
 const contractCallTx = await aeSdk.buildTx({
   tag: Tag.ContractCallTx,

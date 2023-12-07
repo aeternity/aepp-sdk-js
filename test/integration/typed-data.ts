@@ -68,7 +68,8 @@ describe('typed data', () => {
     before(async () => {
       aeSdk = await getSdk();
       const typeJson = (canonicalize(recordAci) ?? '').replaceAll('"', '\\"');
-      contract = await aeSdk.initializeContract({
+      contract = await Contract.initialize({
+        ...aeSdk.getContext(),
         sourceCode: ''
           + '\ninclude "String.aes"'
           + '\ninclude "Option.aes"'
