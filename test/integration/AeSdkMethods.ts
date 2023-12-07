@@ -37,8 +37,8 @@ describe('AeSdkMethods', () => {
     expect(contract.$options.onAccount?.address).to.be.eql(accounts[1].address);
   });
 
-  it('converts options to JSON', () => {
-    const options = aeSdkMethods._getOptions();
+  it('converts context to JSON', () => {
+    const options = aeSdkMethods.getContext();
     const data = JSON.parse(JSON.stringify(options));
     data.onNode._httpClient = '<removed>';
     data.onCompiler.api._httpClient = '<removed>';

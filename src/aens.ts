@@ -9,10 +9,7 @@
 import BigNumber from 'bignumber.js';
 import { genSalt } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
-import {
-  CLIENT_TTL, NAME_TTL, Tag, AensName,
-} from './tx/builder/constants';
-import { ArgumentError } from './utils/errors';
+import { Tag, AensName } from './tx/builder/constants';
 import { Encoded } from './utils/encoder';
 import { sendTransaction, SendTransactionOptions, getName } from './chain';
 import { buildTxAsync, BuildTxOptions } from './tx/builder';
@@ -78,7 +75,7 @@ interface AensRevokeOptions extends
  * @param options.nonce - nonce
  * @param options.nameTtl - Name ttl represented in number of
  * blocks (Max value is 50000 blocks)
- * @param options.clientTtl=84600 a suggestion as to how long any
+ * @param options.clientTtl a suggestion as to how long any
  * clients should cache this information
  * @throws Invalid pointer array error
  * @example
@@ -105,8 +102,6 @@ export async function aensUpdate(
   };
 
   const nameUpdateTx = await buildTxAsync({
-    clientTtl: CLIENT_TTL,
-    nameTtl: NAME_TTL,
     ...options,
     tag: Tag.NameUpdateTx,
     nameId: name,
@@ -240,11 +235,7 @@ export async function aensQuery(
     async revoke(options) {
       return aensRevoke(name, { ...opt, ...options });
     },
-    async extendTtl(nameTtl = NAME_TTL, options = {}) {
-      if (nameTtl > NAME_TTL || nameTtl <= 0) {
-        throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl);
-      }
-
+    async extendTtl(nameTtl, options = {}) {
       return {
         ...await aensUpdate(name, {}, {
           ...opt, ...options, nameTtl, extendPointers: true,

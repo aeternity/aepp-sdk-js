@@ -212,7 +212,11 @@ export default class AeSdkBase extends AeSdkMethods {
       .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
   }
 
-  override _getOptions(callOptions: AeSdkMethodsOptions = {}): {
+  /**
+   * The same as AeSdkMethods:getContext, but it would resolve ak_-prefixed address in
+   * `mergeWith.onAccount` to AccountBase.
+   */
+  override getContext(mergeWith: AeSdkMethodsOptions = {}): AeSdkMethodsOptions & {
     onNode: Node;
     onAccount: AccountBase;
     onCompiler: CompilerBase;
@@ -221,8 +225,10 @@ export default class AeSdkBase extends AeSdkMethods {
       ...this._options,
       onNode: getValueOrErrorProxy(() => this.api),
       onCompiler: getValueOrErrorProxy(() => this.compilerApi),
-      ...callOptions,
-      onAccount: getValueOrErrorProxy(() => this._resolveAccount(callOptions.onAccount)),
+      ...mergeWith,
+      onAccount: mergeWith.onAccount != null
+        ? this._resolveAccount(mergeWith.onAccount)
+        : getValueOrErrorProxy(() => this._resolveAccount()),
     };
   }
 }

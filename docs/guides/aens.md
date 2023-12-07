@@ -207,7 +207,7 @@ console.log(nameUpdateTx)
   ],
   tx: {
     accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
-    clientTtl: 84600,
+    clientTtl: 3600,
     fee: 17800000000000n,
     nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',
     nameTtl: 180000,

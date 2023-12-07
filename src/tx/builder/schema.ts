@@ -7,11 +7,12 @@
 import { Tag } from './constants';
 import SchemaTypes from './SchemaTypes';
 import {
-  uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array, boolean, ctVersion, abiVersion, ttl, nonce, map, wrapped,
+  uInt, shortUInt, coinAmount, name, nameId, nameFee, gasLimit, gasPrice, fee,
+  address, pointers, queryFee, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
+  array, boolean, ctVersion, abiVersion, ttl, nonce, map, withDefault, withFormatting, wrapped,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
+import { ArgumentError } from '../../utils/errors';
 import { idTagToEncoding } from './field-types/address';
 
 export enum ORACLE_TTL_TYPES {
@@ -19,10 +20,6 @@ export enum ORACLE_TTL_TYPES {
   block = 1,
 }
 
-// # ORACLE
-export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
-export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
-export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
 // # CONTRACT
 export const DRY_RUN_ACCOUNT = {
   pub: 'ak_11111111111111111111111111111111273Yts',
@@ -195,9 +192,18 @@ export const txSchema = [{
   accountId: address(Encoding.AccountAddress),
   nonce: nonce('accountId'),
   nameId,
-  nameTtl: shortUInt,
+  // https://github.com/aeternity/protocol/blob/fd17982/AENS.md#update
+  nameTtl: withFormatting(
+    (nameTtl) => {
+      const NAME_TTL = 180000;
+      nameTtl ??= NAME_TTL;
+      if (nameTtl >= 1 && nameTtl <= NAME_TTL) return nameTtl;
+      throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl);
+    },
+    shortUInt,
+  ),
   pointers,
-  clientTtl: shortUInt,
+  clientTtl: withDefault(60 * 60, shortUInt),
   fee,
   ttl,
 }, {
@@ -226,7 +232,7 @@ export const txSchema = [{
   log: encoded(Encoding.ContractBytearray),
   active: boolean,
   referers: array(address(Encoding.AccountAddress)),
-  deposit,
+  deposit: coinAmount,
 }, {
   tag: shortUIntConst(Tag.ContractCreateTx),
   version: shortUIntConst(1, true),
@@ -236,7 +242,13 @@ export const txSchema = [{
   ctVersion,
   fee,
   ttl,
-  deposit,
+  deposit: withFormatting(
+    (value = 0) => {
+      if (+value === 0) return value;
+      throw new ArgumentError('deposit', 'equal 0 (because is not refundable)', value);
+    },
+    coinAmount,
+  ),
   amount: coinAmount,
   gasLimit,
   gasPrice,
@@ -286,8 +298,8 @@ export const txSchema = [{
   queryFormat: string,
   responseFormat: string,
   queryFee: coinAmount,
-  oracleTtlType: enumeration(ORACLE_TTL_TYPES),
-  oracleTtlValue: shortUInt,
+  oracleTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  oracleTtlValue: withDefault(500, shortUInt),
   fee,
   ttl,
   abiVersion,
@@ -296,8 +308,8 @@ export const txSchema = [{
   version: shortUIntConst(1, true),
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
   nonce: nonce('oracleId'),
-  oracleTtlType: enumeration(ORACLE_TTL_TYPES),
-  oracleTtlValue: shortUInt,
+  oracleTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  oracleTtlValue: withDefault(500, shortUInt),
   fee,
   ttl,
 }, {
@@ -307,11 +319,11 @@ export const txSchema = [{
   nonce: nonce('senderId'),
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
   query: string,
-  queryFee: coinAmount,
-  queryTtlType: enumeration(ORACLE_TTL_TYPES),
-  queryTtlValue: shortUInt,
-  responseTtlType: enumeration(ORACLE_TTL_TYPES),
-  responseTtlValue: shortUInt,
+  queryFee,
+  queryTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  queryTtlValue: withDefault(10, shortUInt),
+  responseTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  responseTtlValue: withDefault(10, shortUInt),
   fee,
   ttl,
 }, {
@@ -321,8 +333,8 @@ export const txSchema = [{
   nonce: nonce('oracleId'),
   queryId: encoded(Encoding.OracleQueryId),
   response: string,
-  responseTtlType: enumeration(ORACLE_TTL_TYPES),
-  responseTtlValue: shortUInt,
+  responseTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  responseTtlValue: withDefault(10, shortUInt),
   fee,
   ttl,
 }, {

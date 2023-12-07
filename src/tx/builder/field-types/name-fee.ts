@@ -18,7 +18,7 @@ export default {
   },
 
   /**
-   * @param value - AENS name fee Buffer
+   * @param value - AENS name fee
    * @param txFields - Transaction fields
    * @param txFields.name - AENS Name in transaction
    */

@@ -62,14 +62,14 @@ The following options are sepcific for each tx-type.
   - For bids in an auction you need to explicitely calculate the required `nameFee` based on the last bid
 
 ### NameUpdateTx
-- `clientTtl` (default: `84600`)
+- `clientTtl` (default: `3600`, one hour)
   - This option is an indicator for indexing tools to know how long (in seconds) they could or should cache the name information.
 - `nameTtl` (default: `180000`)
   - This option tells the protocol the relative TTL based on the current block height.
   - `180000` is the maximum possible value
 
 ### OracleRegisterTx
-- `queryFee` (default: `30000`)
+- `queryFee` (default: `0`)
   - The fee in `aettos` that the oracle requests in order to provide a response.
 - `oracleTtlValue` (default: `500`)
   - The TTL of the oracle that defines its expiration.
@@ -78,7 +78,7 @@ The following options are sepcific for each tx-type.
   - `ORACLE_TTL_TYPES.block`: TTL value treated as absolute block height
 
 ### OracleQueryTx
-- `queryFee` (default: `30000`)
+- `queryFee` (default: `0`)
   - The fee in `aettos` that will be payed to the oracle.
 - `queryTtlValue` (default: `10`)
   - The TTL of the query that defines its expiration. The oracle needs to respond before the `queryTtl` expires.

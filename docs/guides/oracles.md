@@ -18,13 +18,13 @@ const oracleTtlOptions = { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue
 // OR set a specific block height to expire
 const oracleTtlOptions = { oracleTtlType: ORACLE_TTL_TYPES.block, oracleTtlValue: 555555 }
 
-// queryFee is optional and defaults to 30000
+// queryFee is optional and defaults to 0
 // oracleTtlValue is optional and defaults to 500
 // oracleTtlType is optional and defaults to ORACLE_TTL_TYPES.delta
 const options = { queryFee: 1337, ...oracleTtlOptions }
 
 // the first argument is the queryFormat and the second is the responseFormat
-const oracle = await aeSdk.registerOracle("{'city': string}", "{'temperature': int}", options)
+const oracle = await aeSdk.registerOracle('{"city": "str"}', '{"temperature": "int"}', options)
 ```
 
 Note:
@@ -44,7 +44,7 @@ After the oracle has been registered and as long as it isn't expired, everybody 
 const oracleId = 'ok_...';
 
 const options = {
-  queryFee: 1337, // should cover the requested fee of the oracle and defaults to 30000
+  queryFee: 1337, // should cover the requested fee of the oracle and defaults to 0
   queryTtlType: ORACLE_TTL_TYPES.delta, // optional and defaults to ORACLE_TTL_TYPES.delta
   queryTtlValue: 20, // optional and defaults to 10
   responseTtlType: ORACLE_TTL_TYPES.delta, // optional and defaults to ORACLE_TTL_TYPES.delta
@@ -53,10 +53,10 @@ const options = {
 
 // using the oracle object in case you need to instantiate the oracle object first
 const oracle = await aeSdk.getOracleObject(oracleId)
-const query = await oracle.postQuery("{'city': 'Berlin'}", options)
+const query = await oracle.postQuery('{"city": "Berlin"}', options)
 
 // OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId
-const query = await aeSdk.postQueryToOracle(oracleId, "{'city': 'Berlin'}", options)
+const query = await aeSdk.postQueryToOracle(oracleId, '{"city": "Berlin"}', options)
 ```
 
 Note:
@@ -111,10 +111,10 @@ const options = { onAccount: 'ak_...' } // only the account of the oracle can re
 
 // using the query instance
 const query = await aeSdk.getQueryObject(oracleId, queryId)
-await query.respond('{ "temperature": 27.5 }', options)
+await query.respond('{"temperature": 27.5}', options)
 
 // OR using the aeSdk (instance of AeSdk class) directly by providing the queryId
-await aeSdk.respondToQuery(queryId, '{ "temperature": 27.5 }', options)
+await aeSdk.respondToQuery(queryId, '{"temperature": 27.5}', options)
 ```
 
 Note:

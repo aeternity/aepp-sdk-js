@@ -4,7 +4,6 @@ import array from './array';
 import boolean from './boolean';
 import coinAmount from './coin-amount';
 import ctVersion from './ct-version';
-import deposit from './deposit';
 import encoded from './encoded';
 import entry from './entry';
 import enumeration from './enumeration';
@@ -19,12 +18,15 @@ import nameFee from './name-fee';
 import nameId from './name-id';
 import nonce from './nonce';
 import pointers from './pointers';
+import queryFee from './query-fee';
 import raw from './raw';
 import shortUInt from './short-u-int';
 import shortUIntConst from './short-u-int-const';
 import string from './string';
 import ttl from './ttl';
 import uInt from './u-int';
+import withDefault from './with-default';
+import withFormatting from './with-formatting';
 import wrapped from './wrapped';
 
 export type BinaryData = Buffer | Buffer[] | Buffer[][]
@@ -43,7 +45,6 @@ export {
   boolean,
   coinAmount,
   ctVersion,
-  deposit,
   encoded,
   entry,
   enumeration,
@@ -58,11 +59,14 @@ export {
   nameId,
   nonce,
   pointers,
+  queryFee,
   raw,
   shortUInt,
   shortUIntConst,
   string,
   ttl,
   uInt,
+  withDefault,
+  withFormatting,
   wrapped,
 };

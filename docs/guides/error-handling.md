@@ -19,6 +19,7 @@ BaseError
 ├── UnsupportedProtocolError
 ├── NotImplementedError
 ├── UnsupportedVersionError
+├── LogicError
 │
 ├── InternalError
 │   └── UnexpectedTsError
