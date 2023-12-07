@@ -6,7 +6,7 @@ import {
 import { getSdk } from '.';
 import {
   commitmentHash, decode, encode, Encoded, Encoding,
-  genSalt, AeSdk, Contract, ConsensusProtocolVersion, Oracle, OracleClient,
+  genSalt, AeSdk, Contract, ConsensusProtocolVersion, Oracle, OracleClient, Name,
 } from '../../src';
 
 describe('Operation delegation', () => {
@@ -125,7 +125,7 @@ contract DelegateTest =
         .signedUpdate(owner, name, 'oracle', pointee, delegationSignature);
       assertNotNull(result);
       expect(result.returnType).to.be.equal('ok');
-      expect((await aeSdk.aensQuery(name)).pointers).to.be.eql([{
+      expect((await aeSdk.api.getNameEntryByName(name)).pointers).to.be.eql([{
         key: 'oracle',
         id: newOwner.replace('ak', 'ok'),
       }]);
@@ -137,7 +137,7 @@ contract DelegateTest =
       if (isIris) return;
       const pointee: Pointee = { 'AENSv2.DataPt': [dataPt] };
       await contract.signedUpdate(owner, name, 'test key', pointee, delegationSignature);
-      expect((await aeSdk.aensQuery(name)).pointers[0]).to.be.eql({
+      expect((await aeSdk.api.getNameEntryByName(name)).pointers[0]).to.be.eql({
         key: 'test key',
         id: encode(dataPt, Encoding.Bytearray),
       });
@@ -173,7 +173,7 @@ contract DelegateTest =
       const { result } = await contract.signedRevoke(newOwner, name, revokeSig);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
-      await expect(aeSdk.aensQuery(name)).to.be.rejectedWith(Error);
+      await expect(aeSdk.api.getNameEntryByName(name)).to.be.rejectedWith(Error);
     });
 
     it('works using wildcard delegation signature', async () => {
@@ -200,7 +200,8 @@ contract DelegateTest =
       ]);
 
       await contract.signedTransfer(owner, newOwner, n, allNamesDelSig);
-      await aeSdk.aensTransfer(n, owner, { onAccount: newOwner });
+      await new Name(n, aeSdk.getContext())
+        .transfer(owner, { onAccount: aeSdk.accounts[newOwner] });
 
       await contract.signedRevoke(owner, n, allNamesDelSig);
     });

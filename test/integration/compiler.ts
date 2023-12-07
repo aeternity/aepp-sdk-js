@@ -169,7 +169,7 @@ describe('CompilerHttp', () => {
     const c = new CompilerHttpNode('https://compilaer.aepps.com');
     await expect(c.compileBySourceCode('test'))
       .to.be.rejectedWith('getaddrinfo ENOTFOUND compilaer.aepps.com');
-  });
+  }).timeout(16000);
 
   describe('getFileSystem', () => {
     it('reads file system', async () => {

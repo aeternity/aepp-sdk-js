@@ -53,12 +53,12 @@ export function isAccountNotFoundError(error: Error): boolean {
     && error.message.includes('Account not found');
 }
 
-// based on https://stackoverflow.com/a/50375286/6176994
+// based on https://stackoverflow.com/a/50375286
 export type UnionToIntersection<Union> =
   (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
     ? Intersection : never;
 
-// based on https://stackoverflow.com/a/61108377/6176994
+// based on https://stackoverflow.com/a/61108377
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 export function ensureError(error: unknown): asserts error is Error {
