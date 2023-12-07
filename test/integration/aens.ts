@@ -4,7 +4,7 @@ import { getSdk } from '.';
 import { assertNotNull, randomName, randomString } from '../utils';
 import {
   AeSdk, generateKeyPair, buildContractId, computeBidFee, ensureName, produceNameId,
-  AensPointerContextError, UnexpectedTsError, encode, decode, Encoding, ContractMethodsBase,
+  AensPointerContextError, encode, decode, Encoding, ContractMethodsBase,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
@@ -126,7 +126,7 @@ describe('Aens', () => {
     const preclaim = await aeSdk.aensPreclaim(randomName(13));
     await preclaim.claim();
     const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
-    if (onAccount == null) throw new UnexpectedTsError();
+    assertNotNull(onAccount);
     await aeSdk.aensUpdate(name, {}, { onAccount, blocks: 1 }).should.eventually.be.rejected;
   });
 
@@ -155,7 +155,7 @@ describe('Aens', () => {
     const nameObject = await aeSdk.aensQuery(name);
     const extendResult: Awaited<ReturnType<typeof aeSdk.aensUpdate>> = await nameObject
       .extendTtl(10000);
-    if (extendResult.blockHeight == null) throw new UnexpectedTsError();
+    assertNotNull(extendResult.blockHeight);
     return extendResult.should.be.deep.include({
       ttl: extendResult.blockHeight + 10000,
     });
@@ -169,7 +169,7 @@ describe('Aens', () => {
   it('transfers names', async () => {
     const claim = await aeSdk.aensQuery(name);
     const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
-    if (onAccount == null) throw new UnexpectedTsError();
+    assertNotNull(onAccount);
     await claim.transfer(onAccount);
 
     const claim2 = await aeSdk.aensQuery(name);
@@ -180,7 +180,7 @@ describe('Aens', () => {
 
   it('revoke names', async () => {
     const onAccountIndex = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
-    if (onAccountIndex == null) throw new UnexpectedTsError();
+    assertNotNull(onAccountIndex);
     const onAccount = aeSdk.accounts[onAccountIndex];
     const aensName = await aeSdk.aensQuery(name);
 
@@ -195,7 +195,7 @@ describe('Aens', () => {
 
     const preclaim = await aeSdk.aensPreclaim(name, { onAccount });
     preclaim.should.be.an('object');
-    if (preclaim.tx?.accountId == null) throw new UnexpectedTsError();
+    assertNotNull(preclaim.tx?.accountId);
     preclaim.tx.accountId.should.be.equal(onAccount);
   });
 
