@@ -104,7 +104,8 @@ describe('Aens', () => {
     await nameObject.update({ contract_pubkey: contract.$options.address });
 
     contract = await aeSdk.initializeContract<ContractApi>({ sourceCode, address: name });
-    expect((await contract.getArg(42)).decodedResult).to.be.equal(42n);
+    expect((await contract.getArg(42, { callStatic: true })).decodedResult).to.be.equal(42n);
+    expect((await contract.getArg(42, { callStatic: false })).decodedResult).to.be.equal(42n);
   });
 
   const address = generateKeyPair().publicKey;

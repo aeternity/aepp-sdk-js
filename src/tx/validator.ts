@@ -176,6 +176,8 @@ validators.push(
   },
   async (tx, { node }) => {
     if (Tag.ContractCallTx !== tx.tag) return [];
+    // TODO: remove after solving https://github.com/aeternity/aeternity/issues/3669
+    if (tx.contractId.startsWith('nm_')) return [];
     try {
       const { active } = await node.getContract(tx.contractId);
       if (active) return [];
