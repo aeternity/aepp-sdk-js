@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import canonicalize from 'canonicalize';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import {
-  AeSdk, Contract, decode, Encoded,
+  AeSdk, ConsensusProtocolVersion, Contract, decode, Encoded,
   hashDomain, hashJson, hashTypedData,
 } from '../../src';
 import { Domain } from '../../src/utils/typed-data';
@@ -68,6 +68,8 @@ describe('typed data', () => {
     before(async () => {
       aeSdk = await getSdk();
       const typeJson = (canonicalize(recordAci) ?? '').replaceAll('"', '\\"');
+      const isIris = (await aeSdk.api.getNodeInfo())
+        .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
       contract = await aeSdk.initializeContract({
         sourceCode: ''
           + '\ninclude "String.aes"'
@@ -82,8 +84,7 @@ describe('typed data', () => {
           + '\n  entrypoint getDomain(): domain =' // kind of EIP-5267
           + '\n    { name = Some("Test app"),'
           + '\n      version = Some(2),'
-          // TODO: don't hardcode network id after solving https://github.com/aeternity/aesophia/issues/461
-          + '\n      networkId = Some("ae_devnet"),'
+          + `\n      networkId = Some(${isIris ? '"ae_devnet"' : 'Chain.network_id'}),`
           + '\n      contractAddress = Some(Address.to_contract(Contract.address)) }'
           + '\n'
           + '\n  entrypoint getDomainHash() = Crypto.blake2b(getDomain())'
