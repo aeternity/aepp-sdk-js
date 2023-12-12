@@ -1,6 +1,8 @@
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp';
 import { Field, BinaryData } from './field-types';
-import { ArgumentError, DecodeError, SchemaNotFoundError } from '../../utils/errors';
+import {
+  ArgumentError, DecodeError, SchemaNotFoundError, InternalError,
+} from '../../utils/errors';
 import {
   Encoding, Encoded, encode, decode,
 } from '../../utils/encoder';
@@ -8,7 +10,7 @@ import { readInt } from './helpers';
 
 type Schemas = ReadonlyArray<{
   tag: { constValue: number } & Field;
-  version: { constValue: number } & Field;
+  version: { constValue: number; constValueOptional: boolean } & Field;
 }>;
 
 export function getSchema(
@@ -19,7 +21,11 @@ export function getSchema(
 ): Array<[string, Field]> {
   const subSchemas = schemas.filter((s) => s.tag.constValue === tag);
   if (subSchemas.length === 0) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
-  version ??= Math.max(...subSchemas.map((s) => s.version.constValue));
+  if (version == null) {
+    const defaultSchema = subSchemas.find((schema) => schema.version.constValueOptional);
+    if (defaultSchema == null) throw new InternalError(`Can't find default schema of ${Tag[tag]} (${tag})`);
+    version = defaultSchema.version.constValue;
+  }
   const schema = subSchemas.find((s) => s.version.constValue === version);
   if (schema == null) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, version);
   return Object.entries(schema);
