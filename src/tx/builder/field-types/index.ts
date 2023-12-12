@@ -18,6 +18,7 @@ export { default as nameFee } from './name-fee';
 export { default as nameId } from './name-id';
 export { default as nonce } from './nonce';
 export { default as pointers } from './pointers';
+export { default as pointers2 } from './pointers2';
 export { default as queryFee } from './query-fee';
 export { default as raw } from './raw';
 export { default as shortUInt } from './short-u-int';

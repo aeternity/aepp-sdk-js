@@ -145,14 +145,23 @@ describe('Aens', () => {
   });
 
   const address = generateKeyPair().publicKey;
-  const pointers = {
-    myKey: address,
-    account_pubkey: address,
-    oracle_pubkey: encode(decode(address), Encoding.OracleAddress),
-    channel: encode(decode(address), Encoding.Channel),
-    contract_pubkey: buildContractId(address, 13),
-  };
-  const pointersNode = Object.entries(pointers).map(([key, id]) => ({ key, id }));
+  let pointers: Parameters<AeSdk['aensUpdate']>[1];
+  let pointersNode: Array<{ key: string; id: typeof pointers[string] }>;
+  let isIris: boolean;
+
+  before(async () => {
+    isIris = (await aeSdk.api.getNodeInfo())
+      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+    pointers = {
+      myKey: address,
+      ...!isIris && { 'my raw key': encode(Buffer.from('my raw value'), Encoding.Bytearray) },
+      account_pubkey: address,
+      oracle_pubkey: encode(decode(address), Encoding.OracleAddress),
+      channel: encode(decode(address), Encoding.Channel),
+      contract_pubkey: buildContractId(address, 13),
+    };
+    pointersNode = Object.entries(pointers).map(([key, id]) => ({ key, id }));
+  });
 
   it('updates', async () => {
     const nameObject = await aeSdk.aensQuery(name);
@@ -186,6 +195,14 @@ describe('Aens', () => {
     );
     await expect(nameObject.update(pointers33))
       .to.be.rejectedWith('Expected 32 pointers or less, got 33 instead');
+  });
+
+  it('throws error on setting too long raw pointer', async () => {
+    const nameObject = await aeSdk.aensQuery(name);
+    const pointersRaw = { raw: encode(Buffer.from('t'.repeat(1025)), Encoding.Bytearray) };
+    await expect(nameObject.update(pointersRaw)).to.be.rejectedWith(isIris
+      ? 'Raw pointers are available only in Ceres, the current protocol is Iris'
+      : 'Raw pointer should be shorter than 1025 bytes, got 1025 bytes instead');
   });
 
   it('Extend name ttl', async () => {

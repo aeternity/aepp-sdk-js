@@ -7,10 +7,11 @@
  */
 
 import BigNumber from 'bignumber.js';
-import { genSalt } from './utils/crypto';
+import { genSalt, isAddressValid } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
-import { Tag, AensName } from './tx/builder/constants';
-import { Encoded } from './utils/encoder';
+import { Tag, AensName, ConsensusProtocolVersion } from './tx/builder/constants';
+import { Encoded, Encoding } from './utils/encoder';
+import { UnsupportedProtocolError } from './utils/errors';
 import { sendTransaction, SendTransactionOptions, getName } from './chain';
 import { buildTxAsync, BuildTxOptions } from './tx/builder';
 import { TransformNodeType } from './Node';
@@ -19,7 +20,7 @@ import AccountBase from './account/Base';
 import { AddressEncodings } from './tx/builder/field-types/address';
 
 interface KeyPointers {
-  [key: string]: Encoded.Generic<AddressEncodings>;
+  [key: string]: Encoded.Generic<AddressEncodings | Encoding.Bytearray>;
 }
 
 /**
@@ -101,9 +102,18 @@ export async function aensUpdate(
     ...pointers,
   };
 
+  const hasRawPointers = Object.values(allPointers)
+    .some((v) => isAddressValid(v, Encoding.Bytearray));
+  const isIris = (await options.onNode.getNodeInfo())
+    .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+  if (hasRawPointers && isIris) {
+    throw new UnsupportedProtocolError('Raw pointers are available only in Ceres, the current protocol is Iris');
+  }
+
   const nameUpdateTx = await buildTxAsync({
     ...options,
     tag: Tag.NameUpdateTx,
+    version: hasRawPointers ? 2 : 1,
     nameId: name,
     accountId: options.onAccount.address,
     pointers: Object.entries(allPointers)

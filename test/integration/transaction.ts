@@ -98,6 +98,22 @@ describe('Transaction', () => {
       tag: Tag.NameUpdateTx, accountId: senderId, nonce, nameId, nameTtl, pointers, clientTtl,
     }),
   ], [
+    'name update v2',
+    'tx_+JwiAqEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPAH4SfKOYWNjb3VudF9wdWJrZXmiAQHhMrjx3begTmO3+pZHmlS7xSWlMafxvAzkkhIZAwZ/sNWIdGVzdCBrZXmLAnRlc3QgdmFsdWUBhhCENFlgAABtaPdX',
+    async () => aeSdk.buildTx({
+      tag: Tag.NameUpdateTx,
+      version: 2,
+      accountId: senderId,
+      nonce,
+      nameId,
+      nameTtl,
+      pointers: [
+        ...pointers,
+        { key: 'test key', id: encode(Buffer.from('test value'), Encoding.Bytearray) },
+      ],
+      clientTtl,
+    }),
+  ], [
     'name revoke',
     'tx_+E8jAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQL1zlEz+3+D5h4MF9POub3zp5zJ2fj6VUWGMNOhCyMYPIYPHaUyOAAA94BVgw==',
     async () => aeSdk.buildTx({
