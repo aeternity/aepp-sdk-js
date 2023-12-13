@@ -119,7 +119,7 @@ export const genRetryOnFailurePolicy = (
   policy: {
     name: 'retry-on-failure',
     async sendRequest(request, next) {
-      const statusesToNotRetry = [200, 400, 403, 500];
+      const statusesToNotRetry = [200, 400, 403, 410, 500];
 
       const intervals = new Array(retryCount).fill(0)
         .map((_, idx) => ((idx + 1) / retryCount) ** 2);
