@@ -4,7 +4,7 @@ import { getSdk } from '.';
 import { assertNotNull, randomName, randomString } from '../utils';
 import {
   AeSdk, generateKeyPair, buildContractId, computeBidFee, ensureName, produceNameId,
-  AensPointerContextError, encode, decode, Encoding, ContractMethodsBase,
+  AensPointerContextError, encode, decode, Encoding, ContractMethodsBase, ConsensusProtocolVersion,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
@@ -23,6 +23,42 @@ describe('Aens', () => {
     const claimed = await preclaim.claim();
     expect(claimed.id).to.be.a('string');
     expect(claimed.ttl).to.be.an('number');
+  });
+
+  it('claims a long name without preclaim', async () => {
+    const isIris = (await aeSdk.api.getNodeInfo())
+      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+    if (isIris) return;
+    const n = randomName(13);
+    const claimed = await aeSdk.aensClaim(n, 0);
+    assertNotNull(claimed.tx);
+    assertNotNull(claimed.blockHeight);
+    assertNotNull(claimed.signatures);
+    expect(claimed).to.be.eql({
+      tx: {
+        fee: 16540000000000n,
+        nonce: claimed.tx.nonce,
+        accountId: aeSdk.address,
+        name: n,
+        nameSalt: 0,
+        nameFee: 1771100000000000000n,
+        version: 2,
+        type: 'NameClaimTx',
+      },
+      blockHeight: claimed.blockHeight,
+      blockHash: claimed.blockHash,
+      hash: claimed.hash,
+      signatures: [claimed.signatures[0]],
+      rawTx: claimed.rawTx,
+      id: claimed.id,
+      owner: aeSdk.address,
+      ttl: claimed.blockHeight + 180000,
+      pointers: [],
+      update: claimed.update,
+      transfer: claimed.transfer,
+      revoke: claimed.revoke,
+      extendTtl: claimed.extendTtl,
+    });
   });
 
   it('claims a unicode name', async () => {
