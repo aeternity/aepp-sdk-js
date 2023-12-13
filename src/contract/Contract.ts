@@ -7,7 +7,7 @@
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
 import { DRY_RUN_ACCOUNT } from '../tx/builder/schema';
-import { Tag, AensName } from '../tx/builder/constants';
+import { Tag, AensName, ConsensusProtocolVersion } from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
 } from '../tx/builder';
@@ -45,6 +45,7 @@ import {
 import AccountBase from '../account/Base';
 import { TxUnpacked } from '../tx/builder/schema.generated';
 import { isAccountNotFoundError } from '../utils/other';
+import { isNameValid, produceNameId } from '../tx/builder/helpers';
 
 type ContractAci = NonNullable<Aci[0]['contract']>;
 type FunctionAci = ContractAci['functions'][0];
@@ -308,7 +309,9 @@ class Contract<M extends ContractMethodsBase> {
   ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
     const fnAci = this.#getFunctionAci(fn);
-    const contractId = this.$options.address;
+    const { address, name } = this.$options;
+    // TODO: call `produceNameId` on buildTx side
+    const contractId = name != null ? produceNameId(name) : address;
     const { onNode } = opt;
 
     if (fn == null) throw new MissingFunctionNameError();
@@ -485,12 +488,16 @@ class Contract<M extends ContractMethodsBase> {
     }
     if (aci == null) throw new MissingContractDefError();
 
+    let name;
     if (address != null) {
       address = await resolveName(
         address,
         'contract_pubkey',
         { resolveByNode: true, onNode },
       ) as Encoded.ContractAddress;
+      const isIris = (await onNode.getNodeInfo())
+        .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+      if (!isIris && isNameValid(address)) name = address;
     }
 
     if (address == null && sourceCode == null && sourceCodePath == null && bytecode == null) {
@@ -527,6 +534,7 @@ class Contract<M extends ContractMethodsBase> {
       bytecode,
       aci,
       address,
+      name,
       fileSystem,
       ...otherOptions,
     });
@@ -548,6 +556,10 @@ class Contract<M extends ContractMethodsBase> {
     bytecode?: Encoded.ContractBytearray;
     aci: Aci;
     address?: Encoded.ContractAddress;
+    /**
+     * Supported only in Ceres
+     */
+    name?: AensName;
     sourceCodePath?: Parameters<CompilerBase['compile']>[0];
     sourceCode?: Parameters<CompilerBase['compileBySourceCode']>[0];
     fileSystem?: Parameters<CompilerBase['compileBySourceCode']>[1];

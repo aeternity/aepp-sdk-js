@@ -154,6 +154,7 @@ export const txSchema = [{
   tag: shortUIntConst(Tag.SpendTx),
   version: shortUIntConst(1, true),
   senderId: address(Encoding.AccountAddress),
+  // TODO: accept also an AENS name
   recipientId: address(Encoding.AccountAddress, Encoding.Name),
   amount: coinAmount,
   fee,
@@ -212,6 +213,7 @@ export const txSchema = [{
   accountId: address(Encoding.AccountAddress),
   nonce: nonce('accountId'),
   nameId,
+  // TODO: accept also an AENS name
   recipientId: address(Encoding.AccountAddress, Encoding.Name),
   fee,
   ttl,
@@ -258,6 +260,7 @@ export const txSchema = [{
   version: shortUIntConst(1, true),
   callerId: address(Encoding.AccountAddress),
   nonce: nonce('callerId'),
+  // TODO: accept also an AENS name
   contractId: address(Encoding.ContractAddress, Encoding.Name),
   abiVersion,
   fee,
@@ -306,6 +309,7 @@ export const txSchema = [{
 }, {
   tag: shortUIntConst(Tag.OracleExtendTx),
   version: shortUIntConst(1, true),
+  // TODO: accept also an AENS name
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
   nonce: nonce('oracleId'),
   oracleTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
@@ -317,6 +321,7 @@ export const txSchema = [{
   version: shortUIntConst(1, true),
   senderId: address(Encoding.AccountAddress),
   nonce: nonce('senderId'),
+  // TODO: accept also an AENS name
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
   query: string,
   queryFee,
