@@ -93,6 +93,17 @@ export default class AccountRpc extends AccountBase {
     return signature;
   }
 
+  override async signAllNamesDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+  ): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
+      onAccount: this.address,
+      contractAddress,
+      allNames: true,
+    });
+    return signature;
+  }
+
   override async signOracleQueryDelegationToContract(
     contractAddress: Encoded.ContractAddress,
     oracleQueryId: Encoded.OracleQueryId,

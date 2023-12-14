@@ -325,9 +325,10 @@ describe('Contract', () => {
     }>;
     let contractAddress: Encoded.ContractAddress;
     let aens: string;
+    let isIris: boolean;
 
     before(async () => {
-      const isIris = (await aeSdk.api.getNodeInfo())
+      isIris = (await aeSdk.api.getNodeInfo())
         .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
       aens = isIris ? 'AENS' : 'AENSv2';
       contract = await aeSdk.initializeContract({
@@ -418,6 +419,35 @@ contract DelegateTest =
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
       await expect(aeSdk.aensQuery(name)).to.be.rejectedWith(Error);
+    });
+
+    it('works using wildcard delegation signature', async () => {
+      if (isIris) return;
+      const allNamesDelSig = decode(await aeSdk.signAllNamesDelegationToContract(contractAddress));
+      const n = randomName(15);
+
+      const commitmentId = decode(commitmentHash(n, salt));
+      await contract.signedPreclaim(owner, commitmentId, allNamesDelSig);
+      await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
+
+      await contract.signedClaim(owner, n, salt, 20e18, allNamesDelSig);
+
+      const pointee = { 'AENSv2.OraclePt': [newOwner] as const };
+      await contract.signedUpdate(owner, n, 'oracle', pointee, allNamesDelSig);
+
+      const nameEntry = (await contract.getName(n)).decodedResult['AENSv2.Name'];
+      const ttl = nameEntry[1].FixedTTL[0];
+      expect(ttl).to.be.a('bigint');
+      expect(nameEntry).to.be.eql([
+        owner,
+        { FixedTTL: [ttl] },
+        new Map([['oracle', { 'AENSv2.OraclePt': [newOwner] }]]),
+      ]);
+
+      await contract.signedTransfer(owner, newOwner, n, allNamesDelSig);
+      await aeSdk.aensTransfer(n, owner, { onAccount: newOwner });
+
+      await contract.signedRevoke(owner, n, allNamesDelSig);
     });
   });
 

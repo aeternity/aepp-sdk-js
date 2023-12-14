@@ -207,6 +207,17 @@ export default {
         return super.signNameDelegationToContract(contractAddress, name, options);
       }
 
+      async signAllNamesDelegationToContract(
+        contractAddress,
+        { aeppRpcClientId: id, aeppOrigin, ...options },
+      ) {
+        if (id != null) {
+          const opt = { ...options, contractAddress };
+          genConfirmCallback('sign delegation of all names to contract')(id, opt, aeppOrigin);
+        }
+        return super.signAllNamesDelegationToContract(contractAddress, options);
+      }
+
       async signOracleQueryDelegationToContract(
         contractAddress,
         oracleQueryId,

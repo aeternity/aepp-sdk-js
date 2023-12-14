@@ -8,7 +8,7 @@
     <div>
       <label>
         <input v-model="type" type="radio" value="general">
-        AENS and oracle
+        AENS preclaim and oracle
       </label>
     </div>
     <div>
@@ -17,6 +17,12 @@
         AENS name
       </label>
       <div><input v-model="name"></div>
+    </div>
+    <div>
+      <label>
+        <input v-model="type" type="radio" value="all-names">
+        All AENS names
+      </label>
     </div>
     <div>
       <label>
@@ -56,6 +62,8 @@ export default {
           return this.aeSdk.signDelegationToContract(this.contractAddress);
         case 'name':
           return this.aeSdk.signNameDelegationToContract(this.contractAddress, this.name);
+        case 'all-names':
+          return this.aeSdk.signAllNamesDelegationToContract(this.contractAddress);
         case 'oracle-query':
           return this.aeSdk
             .signOracleQueryDelegationToContract(this.contractAddress, this.oracleQueryId);
