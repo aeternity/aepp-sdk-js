@@ -38,10 +38,16 @@ contract Identity =
 `;
 
 async function waitForChannel(channel: Channel): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     channel.on('statusChanged', (status: string) => {
-      if (status === 'open') {
-        resolve();
+      switch (status) {
+        case 'open':
+          resolve();
+          break;
+        case 'disconnected':
+          reject(new Error('Unexpected SC status: disconnected'));
+          break;
+        default:
       }
     });
   });
@@ -135,12 +141,14 @@ describe('Channel', () => {
       role: 'initiator',
       sign: initiatorSignTag,
     });
+    const initiatorChOpenPromise = waitForChannel(initiatorCh);
     responderCh = await Channel.initialize({
       ...sharedParams,
       role: 'responder',
       sign: responderSignTag,
     });
-    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
+    const responderChOpenPromise = waitForChannel(responderCh);
+    await Promise.all([initiatorChOpenPromise, responderChOpenPromise]);
     expect(initiatorCh.round()).to.equal(1);
     expect(responderCh.round()).to.equal(1);
 
