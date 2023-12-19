@@ -121,6 +121,21 @@ export default class AccountMemory extends AccountBase {
     return encode(signature, Encoding.Signature);
   }
 
+  override async signAllNamesDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    { networkId }: { networkId?: string } = {},
+  ): Promise<Encoded.Signature> {
+    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
+    const payload = concatBuffers([
+      Buffer.from(networkId),
+      decode(this.address),
+      Buffer.from('AENS'),
+      decode(contractAddress),
+    ]);
+    const signature = await this.sign(payload);
+    return encode(signature, Encoding.Signature);
+  }
+
   override async signOracleQueryDelegationToContract(
     contractAddress: Encoded.ContractAddress,
     oracleQueryId: Encoded.OracleQueryId,

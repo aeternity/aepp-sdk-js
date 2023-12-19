@@ -200,6 +200,17 @@ export default class AeSdkBase extends AeSdkMethods {
       .signNameDelegationToContract(contractAddress, name, options);
   }
 
+  async signAllNamesDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    { onAccount, ...options }: { onAccount?: OnAccount }
+    & Parameters<AccountBase['signAllNamesDelegationToContract']>[1] = {},
+  ): Promise<Encoded.Signature> {
+    options.networkId ??= this.selectedNodeName !== null
+      ? await this.api.getNetworkId() : undefined;
+    return this._resolveAccount(onAccount)
+      .signAllNamesDelegationToContract(contractAddress, options);
+  }
+
   async signOracleQueryDelegationToContract(
     contractAddress: Encoded.ContractAddress,
     oracleQueryId: Encoded.OracleQueryId,

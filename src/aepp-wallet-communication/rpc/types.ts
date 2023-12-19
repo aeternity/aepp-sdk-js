@@ -89,6 +89,7 @@ export interface WalletApi {
       contractAddress: Encoded.ContractAddress;
       name?: AensName;
       oracleQueryId?: Encoded.OracleQueryId;
+      allNames?: boolean;
       onAccount: Encoded.AccountAddress;
     },
   ) => Promise<{ signature: Encoded.Signature }>;

@@ -302,7 +302,7 @@ export default class AeSdkWallet extends AeSdk {
             };
           },
           [METHODS.signDelegationToContract]: async ({
-            contractAddress, name, oracleQueryId, onAccount = this.address,
+            contractAddress, name, oracleQueryId, allNames, onAccount = this.address,
           }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
             if (!this.addresses().includes(onAccount)) {
@@ -315,6 +315,8 @@ export default class AeSdkWallet extends AeSdk {
                 .signNameDelegationToContract(contractAddress, name, parameters))
               ?? (oracleQueryId == null ? null : this
                 .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, parameters))
+              ?? (allNames !== true ? null : this
+                .signAllNamesDelegationToContract(contractAddress, parameters))
               ?? this.signDelegationToContract(contractAddress, parameters)
             );
             return { signature };

@@ -56,6 +56,11 @@ export default class AccountLedger extends AccountBase {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  override async signAllNamesDelegationToContract(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signing delegation to contract using Ledger HW');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   override async signOracleQueryDelegationToContract(): Promise<Encoded.Signature> {
     throw new NotImplementedError('signing delegation to contract using Ledger HW');
   }

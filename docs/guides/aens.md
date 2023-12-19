@@ -371,13 +371,14 @@ const aeSdk = new AeSdk({ ... }) // init the SDK instance with AeSdk class
 const contractAddress = 'ct_asd2ks...'
 // AENS name
 const name = 'example.chain'
-// Sign with a specific account
-const onAccount = aeSdk.address
 
 // this signature will allow the contract to perform a pre-claim on your behalf
-const preClaimSig = await aeSdk.createDelegationSignature(contractAddress, [])
+const preClaimSig = await aeSdk.signDelegationToContract(contractAddress)
 
 // this signature will allow the contract to perform
 // any name related transaction for a specific name that you own
-const aensDelegationSig = await aeSdk.createDelegationSignature(contractAddress, [name], { onAccount })
+const nameDelegationSig = await aeSdk.signNameDelegationToContract(contractAddress, name)
+
+// alternatively, you can generate a delegation signature suitable for every name you own
+const allNamesDelegationSig = await aeSdk.signAllNamesDelegationToContract(contractAddress)
 ```
