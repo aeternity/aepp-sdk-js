@@ -104,7 +104,6 @@ describe('Channel', () => {
     port: 3114,
     lockPeriod: 1,
     statePassword: 'correct horse battery staple',
-    debug: false,
     initiatorId: 'ak_',
     responderId: 'ak_',
     role: 'initiator',

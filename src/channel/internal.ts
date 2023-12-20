@@ -1,4 +1,4 @@
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import { w3cwebsocket as W3CWebSocket, ICloseEvent } from 'websocket';
 import BigNumber from 'bignumber.js';
 import type Channel from './Base';
 import JsonBig from '../utils/json-big';
@@ -85,7 +85,7 @@ export interface ChannelOptions {
   timeoutInitialized?: number;
   timeoutAwaitingOpen?: number;
   statePassword?: string;
-  debug: boolean;
+  debug?: boolean;
   sign: SignTxWithTag;
   offchainTx?: string;
 }
@@ -152,6 +152,7 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
   if (nextState == null) {
     throw new UnknownChannelStateError();
   }
+  channel._debug('enter state', nextState.handler.name);
   channel._fsm = nextState;
   if (nextState?.handler?.enter != null) {
     nextState.handler.enter(channel);
@@ -164,7 +165,8 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
 export type ChannelStatus = 'connecting' | 'connected' | 'accepted' | 'halfSigned' | 'signed'
 | 'open' | 'closing' | 'closed' | 'died' | 'disconnected';
 
-export function changeStatus(channel: Channel, newStatus: ChannelStatus): void {
+export function changeStatus(channel: Channel, newStatus: ChannelStatus, debug?: unknown): void {
+  channel._debug(newStatus, `(prev. ${channel._status})`, debug ?? '');
   if (newStatus === channel._status) return;
   channel._status = newStatus;
   emit(channel, 'statusChanged', newStatus);
@@ -176,7 +178,7 @@ export function changeState(channel: Channel, newState: Encoded.Transaction | ''
 }
 
 function send(channel: Channel, message: ChannelMessage): void {
-  if (channel._options.debug) console.log('Send message: ', message);
+  channel._debug('send message', message.method, message.params);
   channel._websocket.send(JsonBig.stringify({ jsonrpc: '2.0', ...message }));
 }
 
@@ -266,7 +268,7 @@ function ping(channel: Channel): void {
 
 function onMessage(channel: Channel, data: string): void {
   const message = JsonBig.parse(data);
-  if (channel._options.debug) console.log('Receive message: ', message);
+  channel._debug('received message', message.method, message.params);
   if (message.id != null) {
     const callback = channel._rpcCallbacks.get(message.id);
     if (callback == null) {
@@ -317,7 +319,6 @@ export async function initialize(
   { url, ...channelOptions }: ChannelOptions,
 ): Promise<void> {
   channel._options = { url, ...channelOptions };
-  channel._fsm = { handler: connectionHandler };
 
   const wsUrl = new URL(url);
   Object.entries(channelOptions)
@@ -329,9 +330,9 @@ export async function initialize(
   await new Promise<void>((resolve, reject) => {
     Object.assign(channel._websocket, {
       onerror: reject,
-      onopen: async () => {
+      onopen: async (event: Event) => {
         resolve();
-        changeStatus(channel, 'connected');
+        changeStatus(channel, 'connected', event);
         if (channelOptions.reconnectTx != null) {
           enterState(channel, { handler: openHandler });
           const { signedTx } = await channel.state();
@@ -339,11 +340,13 @@ export async function initialize(
             throw new ChannelError('`signedTx` missed in state while reconnection');
           }
           changeState(channel, buildTx(signedTx));
+        } else {
+          enterState(channel, { handler: connectionHandler });
         }
         ping(channel);
       },
-      onclose: () => {
-        changeStatus(channel, 'disconnected');
+      onclose: (event: ICloseEvent) => {
+        changeStatus(channel, 'disconnected', event);
         clearTimeout(channel._pingTimeoutId);
       },
       onmessage: ({ data }: { data: string }) => onMessage(channel, data),
