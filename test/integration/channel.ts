@@ -101,7 +101,7 @@ describe('Channel', () => {
     channelReserve: 0,
     ttl: 10000,
     host: 'localhost',
-    port: 3001,
+    port: 3114,
     lockPeriod: 1,
     statePassword: 'correct horse battery staple',
     debug: false,
