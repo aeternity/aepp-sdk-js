@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { compilerUrl, compilerUrl7, ignoreVersion } from '.';
+import { compilerUrl, compilerUrl7 } from '.';
 import inclAci from './contracts/Includes.json';
 import {
   CompilerBase, CompilerHttpNode, CompilerCli, CompilerCli8, CompilerError, getFileSystem, Encoded,
@@ -158,11 +158,11 @@ function testCompiler(compiler: CompilerBase, isAesophia7: boolean): void {
 
 describe('CompilerHttp', () => {
   describe('version 7', () => {
-    testCompiler(new CompilerHttpNode(compilerUrl7, { ignoreVersion }), true);
+    testCompiler(new CompilerHttpNode(compilerUrl7), true);
   });
 
   describe('version 8', () => {
-    testCompiler(new CompilerHttpNode(compilerUrl, { ignoreVersion }), false);
+    testCompiler(new CompilerHttpNode(compilerUrl), false);
   });
 
   it('throws exception if used invalid compiler url', async () => {

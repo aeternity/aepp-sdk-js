@@ -1,7 +1,7 @@
 import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import {
-  addTransactionHandler, getSdk, ignoreVersion, networkId, url,
+  addTransactionHandler, getSdk, networkId, url,
 } from '.';
 import {
   AeSdk, Node, buildTxHash, poll, Tag, unpackTx, getTransactionSignerAddress, buildTx, Encoded,
@@ -9,7 +9,7 @@ import {
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
-const node = new Node(url, { ignoreVersion });
+const node = new Node(url);
 interface TxAndCost { tx: Encoded.Transaction; cost: bigint }
 const sentTxPromises: Array<Promise<TxAndCost | undefined>> = [];
 

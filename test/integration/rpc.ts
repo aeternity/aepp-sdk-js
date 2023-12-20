@@ -34,7 +34,7 @@ import {
 import { getBufferToSign } from '../../src/account/Memory';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
 import {
-  getSdk, ignoreVersion, networkId, url, compilerUrl,
+  getSdk, networkId, url, compilerUrl,
 } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
 import { assertNotNull } from '../utils';
@@ -75,7 +75,7 @@ const getConnections = (): { walletWindow: ImplPostMessage; aeppWindow: ImplPost
 
 describe('Aepp<->Wallet', function aeppWallet() {
   this.timeout(2000);
-  const node = new Node(url, { ignoreVersion });
+  const node = new Node(url);
   const connections = getConnections();
   const connectionFromWalletToAepp = new BrowserWindowMessageConnection({
     self: connections.walletWindow,
