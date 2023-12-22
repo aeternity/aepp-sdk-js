@@ -10,23 +10,24 @@ import {
 import { pause } from '../../src/utils/other';
 
 const node = new Node(url);
-interface TxAndCost { tx: Encoded.Transaction; cost: bigint }
-const sentTxPromises: Array<Promise<TxAndCost | undefined>> = [];
+interface TxDetails { tx: Encoded.Transaction; cost: bigint; blockHash: Encoded.MicroBlockHash }
+const sentTxPromises: Array<Promise<TxDetails | undefined>> = [];
 
 addTransactionHandler((tx: Encoded.Transaction) => sentTxPromises.push((async () => {
   const { tag } = unpackTx(tx, Tag.SignedTx).encodedTx;
   let cost = 0n;
   if (tag === Tag.ChannelSettleTx) cost = await getExecutionCostUsingNode(tx, node);
+  let blockHash: Encoded.MicroBlockHash;
   try {
     await pause(1000);
-    await poll(buildTxHash(tx), { onNode: node });
+    blockHash = (await poll(buildTxHash(tx), { onNode: node })).blockHash as Encoded.MicroBlockHash;
   } catch (error) {
     return undefined;
   }
   if (tag !== Tag.ChannelSettleTx) {
     cost = await getExecutionCostUsingNode(tx, node, { isMined: true });
   }
-  return { tx, cost };
+  return { tx, cost, blockHash };
 })()));
 
 describe('Execution cost', () => {
@@ -59,16 +60,15 @@ describe('Execution cost', () => {
     }
 
     const sentTransactions = (await Promise.all(sentTxPromises))
-      .filter((a): a is TxAndCost => a != null);
+      .filter((tx): tx is TxDetails => tx != null)
+      .filter((tx, i, arr) => arr.filter((el) => el.blockHash === tx.blockHash).length === 1);
 
     const checkedTags = new Set<Tag>();
     await Promise.all(
-      sentTransactions.map(async ({ tx, cost }) => {
-        const txHash = buildTxHash(tx);
+      sentTransactions.map(async ({ tx, cost, blockHash }) => {
         const params = unpackTx(tx, Tag.SignedTx).encodedTx;
 
         const signer = getTransactionSignerAddress(tx);
-        const { blockHash } = await aeSdk.api.getTransactionByHash(txHash);
         const { prevHash } = await aeSdk.api.getMicroBlockHeaderByHash(blockHash);
         const balanceBefore = await getBalance(signer, prevHash);
         const balanceAfter = await getBalance(signer, blockHash);

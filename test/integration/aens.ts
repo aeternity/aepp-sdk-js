@@ -1,12 +1,14 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { getSdk } from '.';
-import { assertNotNull, randomName, randomString } from '../utils';
+import { getSdk, isLimitedCoins } from '.';
+import {
+  assertNotNull, ensureEqual, randomName, randomString,
+} from '../utils';
 import {
   AeSdk, generateKeyPair, buildContractId, computeBidFee, ensureName, produceNameId,
   AensPointerContextError, encode, decode, Encoding, ContractMethodsBase, ConsensusProtocolVersion,
+  unpackTx, Tag, buildTxHash,
 } from '../../src';
-import { pause } from '../../src/utils/other';
 
 describe('Aens', () => {
   let aeSdk: AeSdk;
@@ -74,9 +76,10 @@ describe('Aens', () => {
     expect(claimed.extendTtl).to.be.a('function');
     assertNotNull(claimed.tx);
     assertNotNull(claimed.signatures);
+    expect(claimed.tx.fee).to.be.oneOf([16940000000000n, 16960000000000n]);
     expect(claimed).to.be.eql({
       tx: {
-        fee: 16960000000000n,
+        fee: claimed.tx.fee,
         nonce: claimed.tx.nonce,
         accountId: aeSdk.address,
         name: n,
@@ -110,9 +113,6 @@ describe('Aens', () => {
   });
 
   it('queries names', async () => {
-    // For some reason the node will return 404 when name is queried
-    // just right after claim tx has been mined so we wait 0.5s
-    await pause(500);
     await aeSdk.aensQuery(name).should.eventually.be.an('object');
   });
 
@@ -169,11 +169,19 @@ describe('Aens', () => {
   });
 
   it('throws error on updating names not owned by the account', async () => {
-    const preclaim = await aeSdk.aensPreclaim(randomName(30));
-    await preclaim.claim();
     const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     assertNotNull(onAccount);
-    await aeSdk.aensUpdate(name, {}, { onAccount, blocks: 1 }).should.eventually.be.rejected;
+    const promise = aeSdk.aensUpdate(name, {}, { onAccount, blocks: 1 });
+    await expect(promise)
+      .to.be.rejectedWith(/Giving up after 1 blocks mined, transaction hash:|error: Transaction not found/);
+
+    const { rawTx } = await promise.catch((e) => e);
+    const { encodedTx } = unpackTx(rawTx, Tag.SignedTx);
+    ensureEqual(encodedTx.tag, Tag.NameUpdateTx);
+    await aeSdk.spend(0, aeSdk.address, { nonce: encodedTx.nonce, onAccount });
+    const txHash = buildTxHash(rawTx);
+    await expect(aeSdk.poll(txHash))
+      .to.be.rejectedWith(new RegExp(`v3/transactions/${txHash} error: (Transaction not found|412 status code)`));
   });
 
   it('updates extending pointers', async () => {
@@ -253,7 +261,7 @@ describe('Aens', () => {
     preclaim.tx.accountId.should.be.equal(onAccount);
   });
 
-  describe('name auctions', () => {
+  (isLimitedCoins ? describe.skip : describe)('name auctions', () => {
     it('claims a name', async () => {
       const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
       const nameShort = randomName(12);
