@@ -27,16 +27,11 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: npx commitlint --from $BASE --to $HEAD --verbose
       - run: npm run lint
-      - run: docker-compose up -d
-      - name: Ensure that node is running
-        run: |
-          while [[ `curl -s -o /dev/null -w %{http_code} localhost:3013/api` != 200 ]]; do
-            sleep 0.2;
-          done
+      - run: docker compose up -d --wait
       - run: npx nyc npm run test
       - run: npx nyc report --reporter=text-lcov > coverage.lcov
       - uses: codecov/codecov-action@v3
         with:
           files: coverage.lcov
-      - run: docker-compose logs
+      - run: docker compose logs
         if: always()
