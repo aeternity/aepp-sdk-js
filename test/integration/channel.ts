@@ -106,6 +106,7 @@ describe('Channel', () => {
     initiatorId: 'ak_',
     responderId: 'ak_',
     role: 'initiator',
+    minimumDepth: 0,
   };
 
   before(async () => {
