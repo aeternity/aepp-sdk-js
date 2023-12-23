@@ -7,6 +7,7 @@ services:
     volumes:
       - ./docker/aeternity_node_mean16.yaml:/home/aeternity/node/aeternity.yaml
       - ./docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
+    stop_grace_period: 0s
 
   compiler:
     image: aeternity/aesophia_http:v7.6.0
