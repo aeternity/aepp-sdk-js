@@ -63,6 +63,11 @@ export default class AccountGeneralized extends AccountBase {
     throw new NotImplementedError('signing delegation to contract using generalized account');
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  override async signDelegation(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signing delegation using generalized account');
+  }
+
   override async signTransaction(
     tx: Encoded.Transaction,
     { authData, onCompiler, onNode }: Parameters<AccountBase['signTransaction']>[1],

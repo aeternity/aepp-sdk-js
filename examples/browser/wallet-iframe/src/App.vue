@@ -64,7 +64,7 @@
 import {
   MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
-  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx,
+  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import Value from './Value.vue';
@@ -228,6 +228,14 @@ export default {
           genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
         }
         return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
+      }
+
+      async signDelegation(delegation, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+        if (id != null) {
+          const opt = { ...options, ...unpackDelegation(delegation) };
+          genConfirmCallback('sign delegation')(id, opt, aeppOrigin);
+        }
+        return super.signDelegation(delegation, options);
       }
 
       static generate() {

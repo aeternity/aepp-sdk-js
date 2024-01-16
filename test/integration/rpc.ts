@@ -441,33 +441,43 @@ describe('Aepp<->Wallet', function aeppWallet() {
 
       it('rejected by wallet', async () => {
         let origin;
+        wallet._resolveAccount().signDelegation = (delegation, { aeppOrigin } = {}) => {
+          origin = aeppOrigin;
+          throw new RpcRejectedByUserError();
+        };
         wallet._resolveAccount().signDelegationToContract = (contractAddr, { aeppOrigin } = {}) => {
           origin = aeppOrigin;
           throw new RpcRejectedByUserError();
         };
-        await expect(aepp.signDelegationToContract(contractAddress)).to.be.eventually
-          .rejectedWith('Operation rejected by user').with.property('code', 4);
+        await expect(aepp.signDelegationToContract(contractAddress, { isOracle: false }))
+          .to.be.eventually.rejectedWith('Operation rejected by user').with.property('code', 4);
         expect(origin).to.be.equal('http://origin.test');
       });
 
       it('works', async () => {
         // @ts-expect-error removes object property to restore the original behavior
+        delete wallet._resolveAccount().signDelegation;
+        // @ts-expect-error removes object property to restore the original behavior
         delete wallet._resolveAccount().signDelegationToContract;
-        const signature = await aepp.signDelegationToContract(contractAddress);
+        const signature = await aepp.signDelegationToContract(contractAddress, { isOracle: false });
         expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
       });
 
       it('fails with unknown error', async () => {
+        wallet._resolveAccount().signDelegation = () => {
+          throw new Error('test');
+        };
         wallet._resolveAccount().signDelegationToContract = () => {
           throw new Error('test');
         };
-        await expect(aepp.signDelegationToContract(contractAddress))
+        await expect(aepp.signDelegationToContract(contractAddress, { isOracle: false }))
           .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
       });
 
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
-        const signature = await aepp.signDelegationToContract(contractAddress, { onAccount });
+        const signature = await aepp
+          .signDelegationToContract(contractAddress, { onAccount, isOracle: false });
         expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
       });
     });

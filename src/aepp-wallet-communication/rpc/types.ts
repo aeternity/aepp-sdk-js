@@ -90,6 +90,14 @@ export interface WalletApi {
       name?: AensName;
       oracleQueryId?: Encoded.OracleQueryId;
       allNames?: boolean;
+      isOracle?: boolean;
+      onAccount: Encoded.AccountAddress;
+    },
+  ) => Promise<{ signature: Encoded.Signature }>;
+
+  [METHODS.signDelegation]: (
+    p: {
+      delegation: Encoded.Bytearray;
       onAccount: Encoded.AccountAddress;
     },
   ) => Promise<{ signature: Encoded.Signature }>;

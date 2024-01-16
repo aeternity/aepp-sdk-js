@@ -286,11 +286,18 @@ describe('Contract', () => {
     });
   });
 
+  let isIris: boolean;
+  before(async () => {
+    isIris = (await aeSdk.api.getNodeInfo())
+      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+  });
+
   describe('AENS operation delegation', () => {
     const name = randomName(15);
     const salt = genSalt();
     let owner: Encoded.AccountAddress;
     let newOwner: Encoded.AccountAddress;
+    // TODO: replace with Encoded.Signature after solving https://github.com/aeternity/aepp-calldata-js/issues/240
     let delegationSignature: Uint8Array;
     let contract: Contract<{
       getName: (name: string) => {
@@ -325,11 +332,8 @@ describe('Contract', () => {
     }>;
     let contractAddress: Encoded.ContractAddress;
     let aens: string;
-    let isIris: boolean;
 
     before(async () => {
-      isIris = (await aeSdk.api.getNodeInfo())
-        .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
       aens = isIris ? 'AENS' : 'AENSv2';
       contract = await aeSdk.initializeContract({
         sourceCode: `
@@ -366,7 +370,8 @@ contract DelegateTest =
       const commitmentId = commitmentHash(name, salt);
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId);
-      const preclaimSig = await aeSdk.createDelegationSignature(contractAddress, []);
+      const preclaimSig = await aeSdk
+        .createDelegationSignature(contractAddress, [], { isOracle: false });
       const { result } = await contract.signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
@@ -449,6 +454,15 @@ contract DelegateTest =
 
       await contract.signedRevoke(owner, n, allNamesDelSig);
     });
+
+    it('claims without preclaim', async () => {
+      const n = randomName(15);
+      const nameFee = 20e18;
+      const dlgSig = await aeSdk.createDelegationSignature(contractAddress, [n]);
+      const { result } = await contract.signedClaim(aeSdk.address, n, 0, nameFee, dlgSig);
+      assertNotNull(result);
+      result.returnType.should.be.equal('ok');
+    });
   });
 
   describe('Oracle operation delegation', () => {
@@ -501,7 +515,8 @@ contract DelegateTest =
     });
 
     it('registers', async () => {
-      delegationSignature = await aeSdk.createDelegationSignature(contractAddress, []);
+      delegationSignature = await aeSdk
+        .createDelegationSignature(contractAddress, [], { isOracle: true });
       const { result } = await contract
         .signedRegisterOracle(aeSdk.address, delegationSignature, queryFee, ttl);
       assertNotNull(result);
@@ -546,6 +561,7 @@ contract DelegateTest =
     });
 
     it('fails trying to create general delegation as oracle query', async () => {
+      if (!isIris) return;
       const fakeQueryId = encode(decode(aeSdk.address), Encoding.OracleQueryId);
       await expect(
         aeSdk.createDelegationSignature(contractAddress, [fakeQueryId], { omitAddress: true }),

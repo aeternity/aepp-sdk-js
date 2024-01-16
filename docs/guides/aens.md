@@ -373,7 +373,7 @@ const contractAddress = 'ct_asd2ks...'
 const name = 'example.chain'
 
 // this signature will allow the contract to perform a pre-claim on your behalf
-const preClaimSig = await aeSdk.signDelegationToContract(contractAddress)
+const preClaimSig = await aeSdk.signDelegationToContract(contractAddress, { isOracle: false })
 
 // this signature will allow the contract to perform
 // any name related transaction for a specific name that you own

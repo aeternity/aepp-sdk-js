@@ -65,6 +65,11 @@ export default class AccountLedger extends AccountBase {
     throw new NotImplementedError('signing delegation to contract using Ledger HW');
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  override async signDelegation(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signing delegation using Ledger HW');
+  }
+
   override async signTransaction(
     tx: Encoded.Transaction,
     { innerTx, networkId }: { innerTx?: boolean; networkId?: string } = {},
