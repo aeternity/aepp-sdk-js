@@ -27,6 +27,8 @@ export {
 export type { Int, AensName } from './tx/builder/constants';
 // TODO: move to constants
 export { ORACLE_TTL_TYPES, DRY_RUN_ACCOUNT, CallReturnType } from './tx/builder/schema';
+export { DelegationTag } from './tx/builder/delegation/schema';
+export { packDelegation, unpackDelegation } from './tx/builder/delegation';
 export {
   getExecutionCost, getExecutionCostBySignedTx, getExecutionCostUsingNode,
 } from './tx/execution-cost';

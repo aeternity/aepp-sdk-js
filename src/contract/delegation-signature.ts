@@ -47,19 +47,25 @@ function ensureOracleQuery(oq: string): asserts oq is Encoded.OracleQueryId {
 export default async function createDelegationSignature(
   contractAddress: Encoded.ContractAddress,
   ids: Array<Encoded.Any | AensName>,
-  { onAccount, omitAddress, ...options }: {
+  {
+    onAccount, omitAddress, isOracle, ...options
+  }: {
     omitAddress?: boolean;
     onAccount: AccountBase;
+    isOracle?: boolean;
     onNode: Node;
   },
 ): Promise<Uint8Array> {
   if (ids.length > 1) throw new ArgumentError('ids', 'shorter than 2', ids);
-  const networkId = await options.onNode.getNetworkId();
+  const { nodeNetworkId, consensusProtocolVersion } = await options.onNode.getNodeInfo();
+  const signOpts = { networkId: nodeNetworkId, consensusProtocolVersion };
   if (ids.length === 0) {
     if (omitAddress === true) {
       throw new ArgumentError('omitAddress', 'equal false', omitAddress);
     }
-    return decode(await onAccount.signDelegationToContract(contractAddress, { networkId }));
+    return decode(
+      await onAccount.signDelegationToContract(contractAddress, { ...signOpts, isOracle }),
+    );
   }
 
   const [payload] = ids;
@@ -68,7 +74,7 @@ export default async function createDelegationSignature(
       throw new ArgumentError('omitAddress', 'equal false', omitAddress);
     }
     return decode(
-      await onAccount.signNameDelegationToContract(contractAddress, payload, { networkId }),
+      await onAccount.signNameDelegationToContract(contractAddress, payload, signOpts),
     );
   }
 
@@ -77,6 +83,6 @@ export default async function createDelegationSignature(
     throw new ArgumentError('omitAddress', 'equal true', omitAddress);
   }
   return decode(
-    await onAccount.signOracleQueryDelegationToContract(contractAddress, payload, { networkId }),
+    await onAccount.signOracleQueryDelegationToContract(contractAddress, payload, signOpts),
   );
 }

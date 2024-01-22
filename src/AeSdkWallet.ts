@@ -302,13 +302,14 @@ export default class AeSdkWallet extends AeSdk {
             };
           },
           [METHODS.signDelegationToContract]: async ({
-            contractAddress, name, oracleQueryId, allNames, onAccount = this.address,
+            contractAddress, name, oracleQueryId, allNames, onAccount = this.address, isOracle,
           }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }
 
+            isOracle ??= false;
             const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
             const signature = await (
               (name == null ? null : this
@@ -317,8 +318,15 @@ export default class AeSdkWallet extends AeSdk {
                 .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, parameters))
               ?? (allNames !== true ? null : this
                 .signAllNamesDelegationToContract(contractAddress, parameters))
-              ?? this.signDelegationToContract(contractAddress, parameters)
+              ?? this.signDelegationToContract(contractAddress, { ...parameters, isOracle })
             );
+            return { signature };
+          },
+          [METHODS.signDelegation]: async ({ delegation, onAccount = this.address }, origin) => {
+            if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
+            if (!this.addresses().includes(onAccount)) throw new RpcPermissionDenyError(onAccount);
+            const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
+            const signature = await this.signDelegation(delegation, parameters);
             return { signature };
           },
         },

@@ -1,7 +1,7 @@
 import browser from 'webextension-polyfill';
 import {
   AeSdkWallet, CompilerHttp, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection,
-  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx,
+  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 
@@ -122,6 +122,14 @@ class AccountMemoryProtected extends MemoryAccount {
       await genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
     }
     return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
+  }
+
+  async signDelegation(delegation, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+    if (id != null) {
+      const opt = { ...options, ...unpackDelegation(delegation) };
+      await genConfirmCallback('sign delegation')(id, opt, aeppOrigin);
+    }
+    return super.signDelegation(delegation, options);
   }
 
   static generate() {

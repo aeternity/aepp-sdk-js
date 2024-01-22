@@ -1,7 +1,7 @@
 import { Encoded } from '../utils/encoder';
 import Node from '../Node';
 import CompilerBase from '../contract/compiler/Base';
-import { AensName, Int } from '../tx/builder/constants';
+import { AensName, ConsensusProtocolVersion, Int } from '../tx/builder/constants';
 import { AciValue, Domain } from '../utils/typed-data';
 import { NotImplementedError } from '../utils/errors';
 
@@ -80,7 +80,10 @@ export default abstract class AccountBase {
    * Sign delegation of AENS, oracle operations to a contract
    * @param contractAddress - Address of a contract to delegate permissions to
    * @param options - Options
+   * @param options.isOracle - Use to generate an oracle delegation signature in Ceres, otherwise an
+   * AENS preclaim delegation signature would be generated
    * @returns Signature
+   * @deprecated use AccountBase:signDelegation in Ceres
    */
   // TODO: make abstract in the next major release
   // eslint-disable-next-line class-methods-use-this
@@ -89,6 +92,8 @@ export default abstract class AccountBase {
     contractAddress: Encoded.ContractAddress,
     options?: {
       networkId?: string;
+      consensusProtocolVersion?: ConsensusProtocolVersion;
+      isOracle?: boolean;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
@@ -103,6 +108,7 @@ export default abstract class AccountBase {
    * @param name - AENS name to manage by a contract
    * @param options - Options
    * @returns Signature
+   * @deprecated use AccountBase:signDelegation in Ceres
    */
   // TODO: make abstract in the next major release
   // eslint-disable-next-line class-methods-use-this
@@ -112,6 +118,7 @@ export default abstract class AccountBase {
     name: AensName,
     options?: {
       networkId?: string;
+      consensusProtocolVersion?: ConsensusProtocolVersion;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
@@ -125,6 +132,7 @@ export default abstract class AccountBase {
    * @param contractAddress - Address of a contract to delegate permissions to
    * @param options - Options
    * @returns Signature
+   * @deprecated use AccountBase:signDelegation in Ceres
    */
   // TODO: make abstract in the next major release
   // eslint-disable-next-line class-methods-use-this
@@ -133,6 +141,7 @@ export default abstract class AccountBase {
     contractAddress: Encoded.ContractAddress,
     options?: {
       networkId?: string;
+      consensusProtocolVersion?: ConsensusProtocolVersion;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
@@ -154,6 +163,7 @@ export default abstract class AccountBase {
    * @param oracleQueryId - Oracle query ID to reply by a contract
    * @param options - Options
    * @returns Signature
+   * @deprecated use AccountBase:signDelegation in Ceres
    */
   // TODO: make abstract in the next major release
   // eslint-disable-next-line class-methods-use-this
@@ -163,6 +173,7 @@ export default abstract class AccountBase {
     oracleQueryId: Encoded.OracleQueryId,
     options?: {
       networkId?: string;
+      consensusProtocolVersion?: ConsensusProtocolVersion;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
@@ -183,4 +194,25 @@ export default abstract class AccountBase {
    * Account address
    */
   readonly address!: Encoded.AccountAddress;
+
+  /**
+   * Sign delegation, works only in Ceres
+   * @param delegation - Delegation to sign
+   * @param options - Options
+   * @returns Signature
+   */
+  // TODO: make abstract in the next major release
+  // eslint-disable-next-line class-methods-use-this
+  async signDelegation(
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    delegation: Encoded.Bytearray,
+    options?: {
+      networkId?: string;
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+    /* eslint-enable @typescript-eslint/no-unused-vars */
+  ): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signDelegation method');
+  }
 }
