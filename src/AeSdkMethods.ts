@@ -1,7 +1,6 @@
 import * as chainMethods from './chain';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
-import * as oracleMethods from './oracle';
 import Contract, { ContractMethodsBase } from './contract/Contract';
 import createDelegationSignature from './contract/delegation-signature';
 import * as contractGaMethods from './contract/ga';
@@ -40,7 +39,6 @@ const methods = {
   ...chainMethodsOther,
   ...aensMethods,
   ...spendMethods,
-  ...oracleMethods,
   createDelegationSignature,
   ...contractGaMethods,
 } as const;

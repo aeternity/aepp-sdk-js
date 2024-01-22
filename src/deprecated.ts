@@ -2,7 +2,6 @@ import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata
 import { AciValue } from './utils/typed-data';
 import { Encoded } from './utils/encoder';
 import { RpcError } from './aepp-wallet-communication/schema';
-import { ORACLE_TTL_TYPES } from './tx/builder/schema';
 
 /**
  * @category exception
@@ -60,18 +59,3 @@ export const NAME_MAX_CLIENT_TTL = 60 * 60;
  * @deprecated inlined in buildTx or use `60 * 60`
  */
 export const CLIENT_TTL = NAME_MAX_CLIENT_TTL;
-
-/**
- * @deprecated inlined in buildTx or use `{ type: ORACLE_TTL_TYPES.delta, value: 500 }`
- */
-export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
-
-/**
- * @deprecated inlined in buildTx or use `{ type: ORACLE_TTL_TYPES.delta, value: 10 }`
- */
-export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
-
-/**
- * @deprecated inlined in buildTx or use `{ type: ORACLE_TTL_TYPES.delta, value: 10 }`
- */
-export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
