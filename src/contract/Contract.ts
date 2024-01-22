@@ -288,7 +288,7 @@ class Contract<M extends ContractMethodsBase> {
         arguments: [], name: 'init', payable: false, returns: 'unit', stateful: true,
       };
     }
-    throw new NoSuchContractFunctionError(`Function ${name} doesn't exist in contract`);
+    throw new NoSuchContractFunctionError(name);
   }
 
   /**

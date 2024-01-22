@@ -16,6 +16,7 @@ import {
   hash,
   AE_AMOUNT_FORMATS,
   Tag,
+  NoSuchContractFunctionError,
 } from '../../src';
 import { getSdk } from '.';
 import {
@@ -292,6 +293,11 @@ describe('Contract instance', () => {
     const contract = await sdk
       .initializeContract({ aci: testContractAci, address: testContract.$options.address });
     await contract.intFn(2, { callStatic: true });
+  });
+
+  it('fails with error if function missed', async () => {
+    await expect(testContract.$call('notExisting', []))
+      .to.be.rejectedWith(NoSuchContractFunctionError, 'Function notExisting doesn\'t exist in contract');
   });
 
   it('gets actual options from AeSdkBase', async () => {
