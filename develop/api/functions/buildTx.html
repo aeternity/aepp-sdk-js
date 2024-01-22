@@ -17,39 +17,43 @@
 <h1>Function buildTx</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="buildTx"><span class="tsd-kind-call-signature">build<wbr/>Tx</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">params</span>, <span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Encoded.Generic.html" class="tsd-signature-type tsd-kind-type-alias">Generic</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">&gt;</span><a href="#buildTx" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="buildTx"><span class="tsd-kind-call-signature">build<wbr/>Tx</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">params</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Encoded.Transaction.html" class="tsd-signature-type tsd-kind-type-alias">Transaction</a><a href="#buildTx" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Build transaction hash</p>
+<div class="tsd-comment tsd-typography"><p>Build transaction</p>
 </div>
-<section class="tsd-panel">
-<h4>Type Parameters</h4>
-<ul class="tsd-type-parameter-list">
-<li>
-<h4><span class="tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol"> extends </span><a href="../types/_internal_.TxEncoding.html" class="tsd-signature-type tsd-kind-type-alias">TxEncoding</a> = <a href="../enums/Encoding.html#Transaction" class="tsd-signature-type tsd-kind-enum-member">Transaction</a></h4></li></ul></section>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
 <h5><span class="tsd-kind-parameter">params</span>: <a href="../types/_internal_.TxParams.html" class="tsd-signature-type tsd-kind-type-alias">TxParams</a></h5>
-<div class="tsd-comment tsd-typography"><p>Object with tx params</p>
+<div class="tsd-comment tsd-typography"><p>Transaction params</p>
 </div>
-<div class="tsd-comment tsd-typography"></div></li>
-<li>
-<h5><span class="tsd-kind-parameter">options</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">prefix</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol"> = {}</span></h5>
-<div class="tsd-comment tsd-typography"><p>options</p>
-</div>
-<div class="tsd-comment tsd-typography"></div>
-<ul class="tsd-parameters">
-<li class="tsd-parameter">
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-property">prefix</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type tsd-kind-type-parameter">E</span></h5>
-<div class="tsd-comment tsd-typography"><p>Prefix of transaction</p>
-</div>
-<div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="../types/Encoded.Generic.html" class="tsd-signature-type tsd-kind-type-alias">Generic</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">&gt;</span></h4><p>object Base64Check transaction hash with &#39;tx_&#39; prefix</p>
+<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../types/Encoded.Transaction.html" class="tsd-signature-type tsd-kind-type-alias">Transaction</a></h4><p>Encoded transaction</p>
 
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/b2653eb99/src/tx/builder/index.ts#L37">tx/builder/index.ts:37</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/d925d2951/src/tx/builder/index.ts#L32">tx/builder/index.ts:32</a></li></ul></aside></li>
+<li class="tsd-signature tsd-anchor-link" id="buildTx-1"><span class="tsd-kind-call-signature">build<wbr/>Tx</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">params</span>, <span class="tsd-kind-parameter">__namedParameters</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../types/Encoded.Generic.html" class="tsd-signature-type tsd-kind-type-alias">Generic</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">&gt;</span><a href="#buildTx-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<section class="tsd-panel">
+<h4>Type Parameters</h4>
+<ul class="tsd-type-parameter-list">
+<li>
+<h4><span class="tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol"> extends </span><a href="../types/_internal_.TxEncoding.html" class="tsd-signature-type tsd-kind-type-alias">TxEncoding</a></h4></li></ul></section>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">params</span>: <a href="../types/_internal_.TxParams.html" class="tsd-signature-type tsd-kind-type-alias">TxParams</a></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">__namedParameters</span>: <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">prefix</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h5>
+<ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">prefix</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type tsd-kind-type-parameter">E</span></h5></li></ul></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../types/Encoded.Generic.html" class="tsd-signature-type tsd-kind-type-alias">Generic</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type tsd-kind-type-parameter">E</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/aeternity/aepp-sdk-js/blob/d925d2951/src/tx/builder/index.ts#L33">tx/builder/index.ts:33</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -72,6 +76,7 @@
 <li><a href="../enums/AbiVersion.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>AbiVersion</a></li>
 <li><a href="../enums/CallReturnType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>CallReturnType</a></li>
 <li><a href="../enums/ConsensusProtocolVersion.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>ConsensusProtocolVersion</a></li>
+<li><a href="../enums/DelegationTag.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>DelegationTag</a></li>
 <li><a href="../enums/Encoding.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>Encoding</a></li>
 <li><a href="../enums/MESSAGE_DIRECTION.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>MESSAGE_DIRECTION</a></li>
 <li><a href="../enums/METHODS.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-8"></use></svg>METHODS</a></li>
@@ -86,7 +91,6 @@
 <li><a href="../classes/AccountGeneralized.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>AccountGeneralized</a></li>
 <li><a href="../classes/AccountLedger.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>AccountLedger</a></li>
 <li><a href="../classes/AccountLedgerFactory.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>AccountLedgerFactory</a></li>
-<li><a href="../classes/AeSdk.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>AeSdk</a></li>
 <li>Loading...</li></ul></nav></div></div></div>
 <div class="tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" rel="noopener" target="_blank">TypeDoc</a></p></div>
