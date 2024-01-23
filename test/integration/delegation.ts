@@ -20,6 +20,12 @@ describe('Operation delegation', () => {
   });
 
   describe('AENS', () => {
+    interface Pointee {
+      'AENS.OraclePt'?: readonly [Encoded.AccountAddress];
+      'AENSv2.OraclePt'?: readonly [Encoded.AccountAddress];
+      'AENSv2.DataPt'?: readonly [Uint8Array];
+    }
+
     const name = randomName(15);
     const salt = genSalt();
     let owner: Encoded.AccountAddress;
@@ -50,10 +56,7 @@ describe('Operation delegation', () => {
         owner: Encoded.AccountAddress,
         name: string,
         key: string,
-        pt: {
-          'AENS.OraclePt'?: readonly [Encoded.Any];
-          'AENSv2.OraclePt'?: readonly [Encoded.Any];
-        },
+        pt: Pointee,
         sign: Uint8Array
       ) => void;
     }>;
@@ -115,15 +118,8 @@ contract DelegateTest =
       result.returnType.should.be.equal('ok');
     });
 
-    it('gets', async () => {
-      const nameEntry = (await contract.getName(name)).decodedResult[`${aens}.Name`];
-      expect(nameEntry[0]).to.be.equal(owner);
-      expect(nameEntry[1].FixedTTL[0]).to.be.a('bigint');
-      expect(nameEntry[2]).to.be.eql(new Map());
-    });
-
     it('updates', async () => {
-      const pointee = { [`${aens}.OraclePt`]: [newOwner] as const };
+      const pointee: Pointee = { [`${aens}.OraclePt`]: [newOwner] };
       const { result } = await contract
         .signedUpdate(owner, name, 'oracle', pointee, delegationSignature);
       assertNotNull(result);
@@ -132,6 +128,32 @@ contract DelegateTest =
         key: 'oracle',
         id: newOwner.replace('ak', 'ok'),
       }]);
+    });
+
+    const dataPt = new Uint8Array(Buffer.from('test value'));
+
+    it('updates with raw pointer', async () => {
+      if (isIris) return;
+      const pointee: Pointee = { 'AENSv2.DataPt': [dataPt] };
+      await contract.signedUpdate(owner, name, 'test key', pointee, delegationSignature);
+      expect((await aeSdk.aensQuery(name)).pointers[0]).to.be.eql({
+        key: 'test key',
+        id: encode(dataPt, Encoding.Bytearray),
+      });
+    });
+
+    it('gets', async () => {
+      const nameEntry = (await contract.getName(name)).decodedResult[`${aens}.Name`];
+      const ttl = nameEntry[1].FixedTTL[0];
+      expect(ttl).to.be.a('bigint');
+      expect(nameEntry).to.be.eql([
+        owner,
+        { FixedTTL: [ttl] },
+        new Map([
+          ['oracle', { [`${aens}.OraclePt`]: [newOwner] }],
+          ...isIris ? [] : [['test key', { 'AENSv2.DataPt': [dataPt] }]] as const,
+        ]),
+      ]);
     });
 
     it('transfers', async () => {
@@ -164,7 +186,7 @@ contract DelegateTest =
 
       await contract.signedClaim(owner, n, salt, 20e18, allNamesDelSig);
 
-      const pointee = { 'AENSv2.OraclePt': [newOwner] as const };
+      const pointee: Pointee = { 'AENSv2.OraclePt': [newOwner] };
       await contract.signedUpdate(owner, n, 'oracle', pointee, allNamesDelSig);
 
       const nameEntry = (await contract.getName(n)).decodedResult['AENSv2.Name'];
