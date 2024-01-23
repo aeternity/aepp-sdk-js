@@ -4,7 +4,7 @@ import { assert, expect } from 'chai';
 import {
   buildTxHash, decode, Encoded,
   generateKeyPair, getAddressFromPriv, verifyMessage, isValidKeypair, isAddressValid, hash, genSalt,
-  sign, verify, messageToHash, signMessage,
+  sign, verify, messageToHash, signMessage, Encoding,
 } from '../../src';
 
 // These keys are fixations for the encryption lifecycle tests and will
@@ -54,10 +54,33 @@ describe('crypto', () => {
     });
   });
 
-  it('isAddressValid', () => {
-    expect(isAddressValid('test')).to.be.equal(false);
-    expect(isAddressValid('th_11111111111111111111111111111111273Yts')).to.be.equal(false);
-    expect(isAddressValid('ak_11111111111111111111111111111111273Yts')).to.be.equal(true);
+  describe('isAddressValid', () => {
+    it('rejects invalid encoded data', () => {
+      expect(isAddressValid('test')).to.be.equal(false);
+      expect(isAddressValid('th_11111111111111111111111111111111273Yts')).to.be.equal(false);
+      expect(isAddressValid('ak_11111111111111111111111111111111273Yts', Encoding.TxHash))
+        .to.be.equal(false);
+    });
+
+    it('returns true for a valid address', () => {
+      const maybeValue: string = 'ak_11111111111111111111111111111111273Yts';
+      const result = isAddressValid(maybeValue);
+      expect(result).to.be.equal(true);
+      // @ts-expect-error `result` is not chcked yet
+      let value: Encoded.AccountAddress = maybeValue;
+      if (result) value = maybeValue;
+      expect(value);
+    });
+
+    it('correctly checks against multiple encodings', () => {
+      const maybeValue: string = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK';
+      const result = isAddressValid(maybeValue, Encoding.Name, Encoding.TxHash);
+      expect(result).to.be.equal(true);
+      // @ts-expect-error `result` is not chcked yet
+      let value: Encoded.Name | Encoded.TxHash = maybeValue;
+      if (result) value = maybeValue;
+      expect(value);
+    });
   });
 
   describe('sign', () => {

@@ -79,7 +79,6 @@ BaseError
 │
 ├── TransactionError
 │   ├── DecodeError
-│   ├── EncodeError
 │   ├── PayloadLengthError
 │   ├── DryRunError
 │   ├── IllegalBidFeeError
