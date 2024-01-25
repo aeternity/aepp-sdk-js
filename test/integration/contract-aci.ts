@@ -86,6 +86,7 @@ contract StateContract =
   entrypoint hashFn(s: hash): hash = s
   entrypoint signatureFn(s: signature): signature = s
   entrypoint bytesFn(s: bytes(32)): bytes(32) = s
+  entrypoint bytesAnySizeFn(s: bytes) = s
 
   entrypoint bitsFn(s: bits): bits = s
 
@@ -153,6 +154,7 @@ interface TestContractApi extends ContractMethodsBase {
   hashFn: (s: Uint8Array | string) => Uint8Array;
   signatureFn: (s: Uint8Array | string) => Uint8Array;
   bytesFn: (s: Uint8Array | string) => Uint8Array;
+  bytesAnySizeFn: (s: Uint8Array | string) => Uint8Array;
 
   bitsFn: (s: InputNumber) => bigint;
 
@@ -1038,6 +1040,21 @@ describe('Contract instance', () => {
         const hashAsHex = await testContract.bytesFn(decoded.toString('hex'));
         hashAsBuffer.decodedResult.should.be.eql(decoded);
         hashAsHex.decodedResult.should.be.eql(decoded);
+      });
+    });
+
+    describe('Bytes any size', () => {
+      it('Invalid type', async () => {
+        await expect(testContract.bytesAnySizeFn({} as any))
+          .to.be.rejectedWith('Should be one of: Array, ArrayBuffer, hex string, Number, BigInt; got [object Object] instead');
+      });
+
+      it('Valid', async () => {
+        const decoded = Buffer.from('0xdeadbeef', 'hex');
+        const { decodedResult: hashAsBuffer } = await testContract.bytesAnySizeFn(decoded);
+        const { decodedResult: hashAsHex } = await testContract.bytesAnySizeFn(decoded.toString('hex'));
+        expect(hashAsBuffer).to.be.eql(decoded);
+        expect(hashAsHex).to.be.eql(decoded);
       });
     });
 
