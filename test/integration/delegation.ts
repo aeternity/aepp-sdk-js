@@ -205,6 +205,7 @@ contract DelegateTest =
     });
 
     it('claims without preclaim', async () => {
+      if (isIris) return;
       const n = randomName(15);
       const nameFee = 20e18;
       const dlgSig = await aeSdk.createDelegationSignature(contractAddress, [n]);
