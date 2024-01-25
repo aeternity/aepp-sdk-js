@@ -101,6 +101,8 @@ contract StateContract =
 
   entrypoint chainTtlFn(t: Chain.ttl) = t
 
+  entrypoint aensV2Name(name: AENSv2.name) = name
+
   stateful entrypoint recursion(t: string) =
     put(state{value = t})
     recursion(t)
@@ -112,6 +114,17 @@ const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUW
 
 type DateUnit = { Year: [] } | { Month: [] } | { Day: [] };
 type OneOrBoth<First, Second> = { Left: [First] } | { Both: [First, Second] } | { Right: [Second] };
+
+interface AENSv2Name {
+  'AENSv2.Name': [
+    Encoded.AccountAddress,
+    ChainTtl,
+    Map<string, {
+      'AENSv2.OraclePt'?: [Encoded.AccountAddress];
+      'AENSv2.DataPt'?: [Uint8Array];
+    }>,
+  ];
+}
 
 interface TestContractApi extends ContractMethodsBase {
   init: (value: string, key: InputNumber, testOption?: string) => void;
@@ -164,6 +177,8 @@ interface TestContractApi extends ContractMethodsBase {
   datTypeGFn: (s: OneOrBoth<InputNumber, string>) => bigint;
 
   chainTtlFn: (t: ChainTtl) => ChainTtl;
+
+  aensV2Name: (name: AENSv2Name) => AENSv2Name;
 
   recursion: (t: string) => string;
 }
@@ -1080,6 +1095,27 @@ describe('Contract instance', () => {
       it('Valid', async () => {
         const value: ChainTtl = { FixedTTL: [50n] };
         expect((await testContract.chainTtlFn(value)).decodedResult).to.be.eql(value);
+      });
+    });
+
+    describe('AENSv2.name', () => {
+      it('Invalid', async () => {
+        await expect(testContract.aensV2Name({ 'AENSv2.Name': ['test'] } as any))
+          .to.be.rejectedWith('"AENSv2.Name" variant constructor expects 3 argument(s) but got 1 instead');
+      });
+
+      it('Valid', async () => {
+        const value: AENSv2Name = {
+          'AENSv2.Name': [
+            'ak_nRqnePWC6yGWBmR4wfN3AvQnqbv2TizxKJdvGXj8p7YZrUZ5J',
+            { FixedTTL: [180205n] },
+            new Map([
+              ['oracle', { 'AENSv2.OraclePt': ['ak_nRqnePWC6yGWBmR4wfN3AvQnqbv2TizxKJdvGXj8p7YZrUZ5J'] }],
+              ['test key', { 'AENSv2.DataPt': [Buffer.from('test value')] }],
+            ]),
+          ],
+        };
+        expect((await testContract.aensV2Name(value)).decodedResult).to.be.eql(value);
       });
     });
   });
