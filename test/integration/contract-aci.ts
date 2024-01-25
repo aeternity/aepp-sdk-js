@@ -28,17 +28,17 @@ import includesAci from './contracts/Includes.json';
 
 const identityContractSourceCode = `
 contract Identity =
- entrypoint getArg(x : int) = x
+ entrypoint getArg(x: int) = x
 `;
 
 const libContractSource = `
 namespace TestLib =
-  function sum(x: int, y: int) : int = x + y
+  function sum(x: int, y: int) = x + y
 `;
 
 const testContractSourceCode = `
 namespace Test =
-  function double(x: int): int = x*2
+  function double(x: int) = x * 2
 
 contract interface RemoteI =
   type test_type = int
@@ -52,56 +52,56 @@ contract StateContract =
   datatype dateUnit = Year | Month | Day
   datatype one_or_both('a, 'b) = Left('a) | Right('b) | Both('a, 'b)
 
-  entrypoint init(value: string, key: int, testOption: option(string)) : state = { value = value, key = key, testOption = testOption }
-  entrypoint retrieve() : string*int = (state.value, state.key)
+  entrypoint init(value: string, key: int, testOption: option(string)): state = { value = value, key = key, testOption = testOption }
+  entrypoint retrieve(): string*int = (state.value, state.key)
   stateful entrypoint setKey(key: number) = put(state{key = key})
 
-  entrypoint remoteContract(_: RemoteI) : int = 1
-  entrypoint remoteArgs(_: RemoteI.test_record) : RemoteI.test_type = 1
+  entrypoint remoteContract(_: RemoteI) = 1
+  entrypoint remoteArgs(_: RemoteI.test_record): RemoteI.test_type = 1
   entrypoint unitFn(a: unit) = a
-  entrypoint intFn(a: int) : int = TestLib.sum(a, 0)
-  payable entrypoint stringFn(a: string) : string = a
-  entrypoint boolFn(a: bool) : bool = a
-  entrypoint addressFn(a: address) : address = a
+  entrypoint intFn(a: int) = TestLib.sum(a, 0)
+  payable entrypoint stringFn(a: string) = a
+  entrypoint boolFn(a: bool) = a
+  entrypoint addressFn(a: address) = a
 
-  entrypoint tupleFn (a: string*int) : string*int = a
-  entrypoint tupleInTupleFn (a: (string*int)*int) : (string*int)*int = a
-  entrypoint tupleWithList (a: list(int)*int) : list(int)*int = a
+  entrypoint tupleFn(a: string*int) = a
+  entrypoint tupleInTupleFn(a: (string*int)*int) = a
+  entrypoint tupleWithList(a: list(int)*int) = a
 
-  entrypoint listFn(a: list(int)) : list(int) = a
-  entrypoint listInListFn(a: list(list(int))) : list(list(int)) = a
+  entrypoint listFn(a: list(int)) = a
+  entrypoint listInListFn(a: list(list(int))) = a
 
-  entrypoint mapFn(a: map(address, string*int)) : map(address, string*int) = a
-  entrypoint mapOptionFn(a: map(address, string*option(int))) : map(address, string*option(int)) = a
+  entrypoint mapFn(a: map(address, string*int)) = a
+  entrypoint mapOptionFn(a: map(address, string*option(int))) = a
 
-  entrypoint getRecord() : state = state
+  entrypoint getRecord() = state
   stateful entrypoint setRecord(s: state) = put(s)
 
-  entrypoint intOption(s: option(int)) : option(int) = s
-  entrypoint listOption(s: option(list(int*string))) : option(list(int*string)) = s
+  entrypoint intOption(s: option(int)) = s
+  entrypoint listOption(s: option(list(int*string))) = s
 
-  entrypoint testFn(a: list(int), b: bool) : list(int)*bool = (a, b)
-  entrypoint approve(remote_contract: RemoteI) : RemoteI = remote_contract
+  entrypoint testFn(a: list(int), b: bool) = (a, b)
+  entrypoint approve(remote_contract: RemoteI) = remote_contract
 
-  entrypoint hashFn(s: hash): hash = s
-  entrypoint signatureFn(s: signature): signature = s
-  entrypoint bytesFn(s: bytes(32)): bytes(32) = s
+  entrypoint hashFn(s: hash) = s
+  entrypoint signatureFn(s: signature) = s
+  entrypoint bytesFn(s: bytes(32)) = s
   entrypoint bytesAnySizeFn(s: bytes) = s
 
-  entrypoint bitsFn(s: bits): bits = s
+  entrypoint bitsFn(s: bits) = s
 
-  entrypoint usingExternalLib(s: int): int = Test.double(s)
+  entrypoint usingExternalLib(s: int) = Test.double(s)
 
-  entrypoint datTypeFn(s: dateUnit): dateUnit = s
-  entrypoint datTypeGFn(x : one_or_both(int, string)) : int =
+  entrypoint datTypeFn(s: dateUnit) = s
+  entrypoint datTypeGFn(x: one_or_both(int, string)) : int =
     switch(x)
       Left(p)    => p
       Right(_)   => abort("asdasd")
       Both(p, _) => p
 
-  entrypoint chainTtlFn(t: Chain.ttl): Chain.ttl = t
+  entrypoint chainTtlFn(t: Chain.ttl) = t
 
-  stateful entrypoint recursion(t: string): string =
+  stateful entrypoint recursion(t: string) =
     put(state{value = t})
     recursion(t)
 `;
@@ -356,7 +356,7 @@ describe('Contract instance', () => {
             + 'include "String.aes"\n'
             + '\n'
             + 'contract interface Animal =\n'
-            + '  entrypoint sound : () => string\n'
+            + '  entrypoint sound: () => string\n'
             + ''
             + 'contract Cat: Animal =\n'
             + '  entrypoint sound() = "meow"\n'
@@ -581,7 +581,7 @@ describe('Contract instance', () => {
       contract = await aeSdk.initializeContract({
         sourceCode: 'contract interface RemoteI =\n'
           + '  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int) | DuplicateSameType(int)\n'
-          + '  entrypoint emitEvents : (bool) => unit\n'
+          + '  entrypoint emitEvents: (bool) => unit\n'
           + '\n'
           + 'contract StateContract =\n'
           + '  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int) | Duplicate(string) | DuplicateSameType(int)\n'
@@ -590,7 +590,7 @@ describe('Contract instance', () => {
           + '    Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))\n'
           + '    Chain.event(AnotherEvent2(true, "This is not indexed", 1))\n'
           + '\n'
-          + '  stateful entrypoint emitEvents(remote: RemoteI, duplicate: bool) : unit =\n'
+          + '  stateful entrypoint emitEvents(remote: RemoteI, duplicate: bool): unit =\n'
           + '    Chain.event(TheFirstEvent(42))\n'
           + '    Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))\n'
           + '    remote.emitEvents(duplicate)\n'
