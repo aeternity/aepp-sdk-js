@@ -1467,20 +1467,20 @@ the same <code>salt</code> and it should be signed with the same private key as 
 <h2 id="2-update-a-name">2. Update a name</h2>
 <p>Now that you own your AENS name you might want to update it in order to:</p>
 <ul>
-<li>Set pointers to <code>accounts</code>, <code>oracles</code>, <code>contracts</code> or <code>channels</code>.</li>
+<li>Set pointers to <code>accounts</code>, <code>oracles</code>, <code>contracts</code>, <code>channels</code>, or store binary data.</li>
 <li>Extend the TTL before it expires.<ul>
 <li>By default a name will have a TTL of 180000 key blocks (~375 days). It cannot be extended longer than 180000 key blocks.</li>
 </ul>
 </li>
 </ul>
 <h3 id="set-pointers-update-ttl">Set pointers &amp; update TTL</h3>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getDefaultPointerKey</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getDefaultPointerKey</span><span class="p">,</span><span class="w"> </span><span class="nx">encode</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;testNameForTheGuide.chain&#39;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">pointers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">account_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">customKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">customKey</span><span class="o">:</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="s1">&#39;example data&#39;</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Bytearray</span><span class="p">),</span>
 <span class="w">  </span><span class="p">[</span><span class="nx">getDefaultPointerKey</span><span class="p">(</span><span class="nx">oracle</span><span class="p">)]</span><span class="o">:</span><span class="w"> </span><span class="nx">oracle</span><span class="p">,</span><span class="w"> </span><span class="c1">// the same as `oracle_pubkey: oracle,`</span>
 <span class="w">  </span><span class="nx">contract_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ct_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">channel</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
