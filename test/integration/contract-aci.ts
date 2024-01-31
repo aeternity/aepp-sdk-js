@@ -17,6 +17,7 @@ import {
   AE_AMOUNT_FORMATS,
   Tag,
   NoSuchContractFunctionError,
+  ConsensusProtocolVersion,
 } from '../../src';
 import { getSdk } from '.';
 import {
@@ -36,7 +37,7 @@ namespace TestLib =
   function sum(x: int, y: int) = x + y
 `;
 
-const testContractSourceCode = `
+const getTestContractSourceCode = (isIris: boolean): string => `
 namespace Test =
   function double(x: int) = x * 2
 
@@ -86,7 +87,7 @@ contract StateContract =
   entrypoint hashFn(s: hash) = s
   entrypoint signatureFn(s: signature) = s
   entrypoint bytesFn(s: bytes(32)) = s
-  entrypoint bytesAnySizeFn(s: bytes) = s
+  ${isIris ? '' : 'entrypoint bytesAnySizeFn(s: bytes) = s'}
 
   entrypoint bitsFn(s: bits) = s
 
@@ -101,6 +102,8 @@ contract StateContract =
 
   entrypoint chainTtlFn(t: Chain.ttl) = t
 
+  ${isIris ? '' : 'entrypoint aensV2Name(name: AENSv2.name) = name'}
+
   stateful entrypoint recursion(t: string) =
     put(state{value = t})
     recursion(t)
@@ -112,6 +115,17 @@ const notExistingContractAddress = 'ct_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUW
 
 type DateUnit = { Year: [] } | { Month: [] } | { Day: [] };
 type OneOrBoth<First, Second> = { Left: [First] } | { Both: [First, Second] } | { Right: [Second] };
+
+interface AENSv2Name {
+  'AENSv2.Name': [
+    Encoded.AccountAddress,
+    ChainTtl,
+    Map<string, {
+      'AENSv2.OraclePt'?: [Encoded.AccountAddress];
+      'AENSv2.DataPt'?: [Uint8Array];
+    }>,
+  ];
+}
 
 interface TestContractApi extends ContractMethodsBase {
   init: (value: string, key: InputNumber, testOption?: string) => void;
@@ -165,11 +179,15 @@ interface TestContractApi extends ContractMethodsBase {
 
   chainTtlFn: (t: ChainTtl) => ChainTtl;
 
+  aensV2Name: (name: AENSv2Name) => AENSv2Name;
+
   recursion: (t: string) => string;
 }
 
 describe('Contract instance', () => {
   let aeSdk: AeSdk;
+  let isIris: boolean;
+  let testContractSourceCode: string;
   let testContract: Contract<TestContractApi>;
   let testContractAddress: Encoded.ContractAddress;
   let testContractAci: Aci;
@@ -177,6 +195,9 @@ describe('Contract instance', () => {
 
   before(async () => {
     aeSdk = await getSdk(2);
+    isIris = (await aeSdk.api.getNodeInfo())
+      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+    testContractSourceCode = getTestContractSourceCode(isIris);
     const res = await aeSdk.compilerApi.compileBySourceCode(testContractSourceCode, fileSystem);
     testContractAci = res.aci;
     testContractBytecode = res.bytecode;
@@ -1045,11 +1066,13 @@ describe('Contract instance', () => {
 
     describe('Bytes any size', () => {
       it('Invalid type', async () => {
+        if (isIris) return;
         await expect(testContract.bytesAnySizeFn({} as any))
           .to.be.rejectedWith('Should be one of: Array, ArrayBuffer, hex string, Number, BigInt; got [object Object] instead');
       });
 
       it('Valid', async () => {
+        if (isIris) return;
         const decoded = Buffer.from('0xdeadbeef', 'hex');
         const { decodedResult: hashAsBuffer } = await testContract.bytesAnySizeFn(decoded);
         const { decodedResult: hashAsHex } = await testContract.bytesAnySizeFn(decoded.toString('hex'));
@@ -1080,6 +1103,29 @@ describe('Contract instance', () => {
       it('Valid', async () => {
         const value: ChainTtl = { FixedTTL: [50n] };
         expect((await testContract.chainTtlFn(value)).decodedResult).to.be.eql(value);
+      });
+    });
+
+    describe('AENSv2.name', () => {
+      it('Invalid', async () => {
+        if (isIris) return;
+        await expect(testContract.aensV2Name({ 'AENSv2.Name': ['test'] } as any))
+          .to.be.rejectedWith('"AENSv2.Name" variant constructor expects 3 argument(s) but got 1 instead');
+      });
+
+      it('Valid', async () => {
+        if (isIris) return;
+        const value: AENSv2Name = {
+          'AENSv2.Name': [
+            'ak_nRqnePWC6yGWBmR4wfN3AvQnqbv2TizxKJdvGXj8p7YZrUZ5J',
+            { FixedTTL: [180205n] },
+            new Map([
+              ['oracle', { 'AENSv2.OraclePt': ['ak_nRqnePWC6yGWBmR4wfN3AvQnqbv2TizxKJdvGXj8p7YZrUZ5J'] }],
+              ['test key', { 'AENSv2.DataPt': [Buffer.from('test value')] }],
+            ]),
+          ],
+        };
+        expect((await testContract.aensV2Name(value)).decodedResult).to.be.eql(value);
       });
     });
   });

@@ -170,19 +170,19 @@ Note:
 ## 2. Update a name
 Now that you own your AENS name you might want to update it in order to:
 
-- Set pointers to `accounts`, `oracles`, `contracts` or `channels`.
+- Set pointers to `accounts`, `oracles`, `contracts`, `channels`, or store binary data.
 - Extend the TTL before it expires.
     - By default a name will have a TTL of 180000 key blocks (~375 days). It cannot be extended longer than 180000 key blocks.
 
 ### Set pointers & update TTL
 ```js
-import { getDefaultPointerKey } from '@aeternity/aepp-sdk'
+import { getDefaultPointerKey, encode, Encoding } from '@aeternity/aepp-sdk'
 
 const name = 'testNameForTheGuide.chain'
 const oracle = 'ok_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk'
 const pointers = {
   account_pubkey: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
-  customKey: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
+  customKey: encode(Buffer.from('example data'), Encoding.Bytearray),
   [getDefaultPointerKey(oracle)]: oracle, // the same as `oracle_pubkey: oracle,`
   contract_pubkey: 'ct_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',
   channel: 'ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',

@@ -7,8 +7,8 @@
 import { Tag } from './constants';
 import SchemaTypes from './SchemaTypes';
 import {
-  uInt, shortUInt, coinAmount, name, nameId, nameFee, gasLimit, gasPrice, fee,
-  address, pointers, queryFee, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
+  uInt, shortUInt, coinAmount, name, nameId, nameFee, gasLimit, gasPrice, fee, address, pointers,
+  pointers2, queryFee, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
   array, boolean, ctVersion, abiVersion, ttl, nonce, map, withDefault, withFormatting, wrapped,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
@@ -129,6 +129,19 @@ interface MapOracles {
 
 const mapOracles = map(Encoding.OracleAddress, Tag.Oracle) as unknown as MapOracles;
 
+// TODO: inline after dropping Iris compatibility
+const clientTtl = withDefault(60 * 60, shortUInt);
+// https://github.com/aeternity/protocol/blob/fd17982/AENS.md#update
+const nameTtl = withFormatting(
+  (value) => {
+    const NAME_TTL = 180000;
+    value ??= NAME_TTL;
+    if (value >= 1 && value <= NAME_TTL) return value;
+    throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, value);
+  },
+  shortUInt,
+);
+
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts}
  */
@@ -193,18 +206,20 @@ export const txSchema = [{
   accountId: address(Encoding.AccountAddress),
   nonce: nonce('accountId'),
   nameId,
-  // https://github.com/aeternity/protocol/blob/fd17982/AENS.md#update
-  nameTtl: withFormatting(
-    (nameTtl) => {
-      const NAME_TTL = 180000;
-      nameTtl ??= NAME_TTL;
-      if (nameTtl >= 1 && nameTtl <= NAME_TTL) return nameTtl;
-      throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl);
-    },
-    shortUInt,
-  ),
+  nameTtl,
   pointers,
-  clientTtl: withDefault(60 * 60, shortUInt),
+  clientTtl,
+  fee,
+  ttl,
+}, {
+  tag: shortUIntConst(Tag.NameUpdateTx),
+  version: shortUIntConst(2),
+  accountId: address(Encoding.AccountAddress),
+  nonce: nonce('accountId'),
+  nameId,
+  nameTtl,
+  pointers: pointers2,
+  clientTtl,
   fee,
   ttl,
 }, {
