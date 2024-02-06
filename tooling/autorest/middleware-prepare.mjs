@@ -5,13 +5,19 @@ import { spawnSync } from 'child_process';
 import restoreFile from '../restore-file.mjs';
 
 const run = (getOutput, command, ...args) => {
-  const { error, stdout } = spawnSync(
+  const {
+    error, stdout, stderr, status,
+  } = spawnSync(
     command,
     args,
     { shell: true, ...!getOutput && { stdio: 'inherit' } },
   );
   if (error) throw error;
-  return stdout?.toString().trim();
+  if (status) {
+    if (getOutput) console.error(stderr?.toString().trimEnd());
+    process.exit(status);
+  }
+  return stdout?.toString().trimEnd();
 };
 
 const name = './tooling/autorest/middleware-openapi.yaml';
