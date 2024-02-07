@@ -63,11 +63,6 @@ directive:
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
-    where: $.paths./contracts/logs.get.parameters
-    transform: return $.filter((param) => param.name !== 'function')
-    reason: https://github.com/Azure/autorest.typescript/issues/1871
-
-  - from: openapi-document
     where: $.paths.*.get
     transform: $.operationId = $.operationId.replace(/(_[a-z])/g, (group) => group[1].toUpperCase())
     reason: >
@@ -108,7 +103,7 @@ directive:
 
 version: ^3.6.3
 use-extension:
-  '@autorest/typescript': ^6.0.2
+  '@autorest/typescript': ^6.0.15
   '@autorest/modelerfour': ^4.26.2
 input-file: middleware-openapi.yaml
 output-folder: ../../src/apis/middleware
