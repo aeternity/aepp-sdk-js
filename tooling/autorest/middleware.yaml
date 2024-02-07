@@ -11,17 +11,6 @@ directive:
       https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
 
   - from: openapi-document
-    where: $.paths.*.get.parameters[?(@.type)]
-    transform: >
-      if ($.schema) throw new Error('Defined both schema and type');
-      $.schema = { type: $.type };
-      delete $.type;
-    reason: >
-      Schema violation: must NOT have additional properties (paths > /aex141 > get > parameters > 2)
-      additionalProperty: type
-      https://github.com/aeternity/ae_mdw/issues/1428
-
-  - from: openapi-document
     where: $.components.schemas.Activity.properties.payload.oneOf
     transform: return $.filter((el) => !el.$ref.includes('Aex141TransferEvent'))
     reason: >
@@ -68,17 +57,6 @@ directive:
     reason: >
       Otherwise autorest groups operations by 'get' prefix
       https://github.com/aeternity/ae_mdw/issues/1357
-
-  - from: openapi-document
-    where: $.paths./aex9/account-balances/{account_id}.get.responses.200.content.application/json.allOf^
-    transform: >
-      $.schema = { allOf: $.allOf };
-      delete $.allOf;
-    reason: >
-      Schema violation: must NOT have additional properties (paths >
-      /v2/aex9/account-balances/{account_id} > get > responses > 200 > content > application/json)
-      additionalProperty: allOf
-      https://github.com/aeternity/ae_mdw/pull/1437
 
   - from: openapi-document
     where: $.servers

@@ -12,7 +12,7 @@ const run = (getOutput, command, ...args) => {
   return stdout?.toString().trim();
 };
 
-const version = '1.53.0';
+const version = '1.68.1';
 const id = run(true, 'docker', 'create', `aeternity/ae_mdw:${version}`);
 const openapi = `/home/aeternity/node/lib/ae_mdw-${version}/priv/static/swagger/swagger_v2.yaml`;
 run(false, 'docker', 'cp', `${id}:${openapi}`, './tooling/autorest/middleware-openapi.yaml');
