@@ -101,10 +101,10 @@ directive:
     set: middleware
     reason: the whole SDK already about aeternity
 
-version: ^3.6.3
+version: ^3.7.1
 use-extension:
   '@autorest/typescript': ^6.0.15
-  '@autorest/modelerfour': ^4.26.2
+  '@autorest/modelerfour': ^4.27.0
 input-file: middleware-openapi.yaml
 output-folder: ../../src/apis/middleware
 source-code-folder-path: .

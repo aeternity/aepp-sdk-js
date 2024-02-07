@@ -150,10 +150,10 @@ directive:
     set: node
     reason: the whole SDK already about aeternity
 
-version: ^3.6.3
+version: ^3.7.1
 use-extension:
-  '@autorest/typescript': ^6.0.2
-  '@autorest/modelerfour': ^4.26.2
+  '@autorest/typescript': ^6.0.15
+  '@autorest/modelerfour': ^4.27.0
 input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.5.2/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
