@@ -1,4 +1,4 @@
-mkdocs==1.4.2
+mkdocs==1.5.3
 mkdocs-simple-hooks==0.1.5
-mkdocs-material==9.0.10
-mike==1.1.2
+mkdocs-material==9.5.8
+mike==2.0.0
