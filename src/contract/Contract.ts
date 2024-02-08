@@ -542,7 +542,7 @@ class Contract<M extends ContractMethodsBase> {
 
   _aci: Aci;
 
-  #aciContract: ContractAci;
+  readonly #aciContract: ContractAci;
 
   _name: string;
 
