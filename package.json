@@ -189,5 +189,11 @@
   "engines": {
     "node": ">=14.19.0"
   },
-  "packageManager": "npm@8.19.3"
+  "packageManager": "npm@8.19.3",
+  "contributors": [
+    "Till Kolter <till.kolter@gmail.com>",
+    "Alexander Kahl <ak@sodosopa.io>",
+    "Nazar Duchak <omelko39@gmail.com>",
+    "Denis Davidyuk <denis_davidyuk@hotmail.com>"
+  ]
 }
