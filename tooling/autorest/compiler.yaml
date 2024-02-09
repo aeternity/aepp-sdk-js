@@ -15,10 +15,10 @@ directive:
       throw errors even for explained response with not 200 code
       https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
 
-version: ^3.6.3
+version: ^3.7.1
 use-extension:
-  '@autorest/typescript': ^6.0.2
-  '@autorest/modelerfour': ^4.26.2
+  '@autorest/typescript': ^6.0.15
+  '@autorest/modelerfour': ^4.27.0
 # replace with a link to https://github.com/aeternity/aesophia_http/blob/master/config/swagger.yaml
 # at specific version after fixing https://github.com/aeternity/aesophia_http/issues/87
 input-file: compiler-swagger.yaml
