@@ -2,8 +2,9 @@ import { copyFileSync, appendFileSync } from 'fs';
 import { spawnSync } from 'child_process';
 
 const run = (...args) => {
-  const { error } = spawnSync('npx', args, { stdio: 'inherit', shell: true });
+  const { error, status } = spawnSync('npx', args, { stdio: 'inherit', shell: true });
   if (error) throw error;
+  if (status) process.exit(status);
 };
 
 console.log('Generating types for typescript@4.2');
