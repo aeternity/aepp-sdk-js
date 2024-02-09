@@ -5,7 +5,7 @@ import {
   CompilerError as CompilerErrorApi,
 } from '../../apis/compiler';
 import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../../utils/autorest';
-import CompilerBase, { Aci } from './Base';
+import CompilerBase, { Aci, CompileResult } from './Base';
 import { Encoded } from '../../utils/encoder';
 import { CompilerError, NotImplementedError } from '../../utils/errors';
 
@@ -63,11 +63,14 @@ export default class CompilerHttp extends CompilerBase {
   async compileBySourceCode(
     sourceCode: string,
     fileSystem?: Record<string, string>,
-  ): Promise<{ bytecode: Encoded.ContractBytearray; aci: Aci }> {
+  ): CompileResult {
     try {
-      const res = await this.api.compileContract({ code: sourceCode, options: { fileSystem } });
+      const cmpOut = await this.api.compileContract({ code: sourceCode, options: { fileSystem } });
+      cmpOut.warnings ??= []; // TODO: remove after requiring http compiler above or equal to 8.0.0
+      const warnings = cmpOut.warnings.map(({ type, ...warning }) => warning);
+      const res = { ...cmpOut, warnings };
       // TODO: should be fixed when the compiledAci interface gets updated
-      return res as { bytecode: Encoded.ContractBytearray; aci: Aci };
+      return res as Awaited<CompileResult>;
     } catch (error) {
       if (error instanceof RestError && error.statusCode === 400) {
         throw new CompilerError(error.message);
@@ -77,7 +80,7 @@ export default class CompilerHttp extends CompilerBase {
   }
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
-  async compile(path: string): Promise<{ bytecode: Encoded.ContractBytearray; aci: Aci }> {
+  async compile(path: string): CompileResult {
     throw new NotImplementedError('File system access, use CompilerHttpNode instead');
   }
 

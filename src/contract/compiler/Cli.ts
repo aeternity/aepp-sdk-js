@@ -3,7 +3,7 @@ import { tmpdir } from 'os';
 import { resolve, dirname, basename } from 'path';
 import { mkdir, writeFile, rm } from 'fs/promises';
 import { fileURLToPath } from 'url';
-import CompilerBase, { Aci } from './Base';
+import CompilerBase, { Aci, CompileResult } from './Base';
 import { Encoded } from '../../utils/encoder';
 import { CompilerError, InternalError, UnsupportedVersionError } from '../../utils/errors';
 import semverSatisfies from '../../utils/semver-satisfies';
@@ -45,14 +45,19 @@ export default class CompilerCli extends CompilerBase {
     }
   }
 
-  async #run(...parameters: string[]): Promise<string> {
+  async #runWithStderr(...parameters: string[]): Promise<{ stderr: string; stdout: string }> {
     return new Promise((pResolve, pReject) => {
       execFile('escript', [this.#path, ...parameters], (error, stdout, stderr) => {
         if (error != null) pReject(error);
-        else if (stderr !== '') pReject(new CompilerError(stderr));
-        else pResolve(stdout);
+        else pResolve({ stdout, stderr });
       });
     });
+  }
+
+  async #run(...parameters: string[]): Promise<string> {
+    const { stderr, stdout } = await this.#runWithStderr(...parameters);
+    if (stderr !== '') throw new CompilerError(stderr);
+    return stdout;
   }
 
   static async #saveContractToTmpDir(
@@ -73,19 +78,29 @@ export default class CompilerCli extends CompilerBase {
     return sourceCodePath;
   }
 
-  async compile(path: string): Promise<{
-    bytecode: Encoded.ContractBytearray;
-    aci: Aci;
-  }> {
+  async compile(path: string): CompileResult {
     await this.#ensureCompatibleVersion;
     try {
-      const [bytecode, aci] = await Promise.all([
-        this.#run(path, '--no_warning', 'all'),
-        this.#run('--create_json_aci', path).then((res) => JSON.parse(res)),
+      const [compileRes, aci] = await Promise.all([
+        this.#runWithStderr(path),
+        this.generateAci(path),
       ]);
       return {
-        bytecode: bytecode.trimEnd() as Encoded.ContractBytearray,
+        bytecode: compileRes.stdout.trimEnd() as Encoded.ContractBytearray,
         aci,
+        warnings: compileRes.stderr.split('Warning in ').slice(1).map((warning) => {
+          const reg = /^'(.+)' at line (\d+), col (\d+):\n(.+)$/s;
+          const match = warning.match(reg);
+          if (match == null) throw new InternalError(`Can't parse compiler output: "${warning}"`);
+          return {
+            message: match[4].trimEnd(),
+            pos: {
+              ...match[1] !== path && { file: match[1] },
+              line: +match[2],
+              col: +match[3],
+            },
+          };
+        }),
       };
     } catch (error) {
       ensureError(error);
@@ -93,10 +108,10 @@ export default class CompilerCli extends CompilerBase {
     }
   }
 
-  async compileBySourceCode(sourceCode: string, fileSystem?: Record<string, string>): Promise<{
-    bytecode: Encoded.ContractBytearray;
-    aci: Aci;
-  }> {
+  async compileBySourceCode(
+    sourceCode: string,
+    fileSystem?: Record<string, string>,
+  ): CompileResult {
     const tmp = await CompilerCli.#saveContractToTmpDir(sourceCode, fileSystem);
     try {
       return await this.compile(tmp);
