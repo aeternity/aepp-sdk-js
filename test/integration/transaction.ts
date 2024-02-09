@@ -130,9 +130,9 @@ describe('Transaction', () => {
     async () => {
       const { consensusProtocolVersion } = await aeSdk.api.getNodeInfo();
       if (consensusProtocolVersion === ConsensusProtocolVersion.Iris) {
-        return 'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNy40LjAAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfPz3ZtIU=';
+        return 'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNy40LjEAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfP+mk9Ac=';
       }
-      return 'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFOC4wLjAAgwgAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfP6UPXo4=';
+      return 'tx_+LQqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuG74bEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCJOC4wLjAtcmMxAIMIAAOGR4XNQ+AAAAAAg0xLQIQ7msoAhysRRNZEHz+l4Zcy';
     },
     async () => aeSdk.buildTx({
       tag: Tag.ContractCreateTx,

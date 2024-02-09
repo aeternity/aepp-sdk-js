@@ -151,7 +151,7 @@ export default class CompilerCli extends CompilerBase {
 
   async version(): Promise<string> {
     const verMessage = await this.#run('--version');
-    const ver = verMessage.match(/Sophia compiler version ([\d.]+)\n/)?.[1];
+    const ver = verMessage.match(/Sophia compiler version ([\d.]+.*)\n/)?.[1];
     if (ver == null) throw new CompilerError('Can\'t get compiler version');
     return ver;
   }

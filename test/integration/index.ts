@@ -1,10 +1,11 @@
 import {
-  AeSdk, CompilerHttpNode, CompilerCli8, MemoryAccount, Node, Encoded, ConsensusProtocolVersion,
+  AeSdk, CompilerHttpNode, MemoryAccount, Node, Encoded, ConsensusProtocolVersion,
 } from '../../src';
 import '..';
 
 export const url = process.env.TEST_URL ?? 'http://localhost:3013';
 export const compilerUrl = process.env.COMPILER_URL ?? 'http://localhost:3080';
+export const compilerUrl7 = process.env.COMPILER_7_URL ?? 'http://localhost:3081';
 const secretKey = process.env.SECRET_KEY ?? '9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200';
 export const networkId = process.env.TEST_NETWORK_ID ?? 'ae_devnet';
 export const ignoreVersion = process.env.IGNORE_VERSION === 'true';
@@ -36,9 +37,9 @@ export async function getSdk(accountCount = 1): Promise<AeSdk> {
     _expectedMineRate: 1000,
     _microBlockCycle: 300,
   });
-  // TODO: remove after release aesophia_http@8
-  if ((await sdk.api.getNodeInfo()).consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-    sdk._options.onCompiler = new CompilerCli8();
+  // TODO: remove after dropping aesophia@7
+  if ((await sdk.api.getNodeInfo()).consensusProtocolVersion === ConsensusProtocolVersion.Iris) {
+    sdk._options.onCompiler = new CompilerHttpNode(compilerUrl7);
   }
   for (let i = 0; i < accounts.length; i += 1) {
     await sdk.spend(1e32, accounts[i].address, { onAccount: genesisAccount });
