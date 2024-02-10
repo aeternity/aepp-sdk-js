@@ -49,43 +49,139 @@ export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
   Promise<Encoded.Transaction | number | null>
 );
 
+/**
+ * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
+ */
 export interface ChannelOptions {
   existingFsmId?: Encoded.Bytearray;
+  /**
+   * Channel url (for example: "ws://localhost:3001")
+   */
   url: string;
 
   /**
-   * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
+   * Initiator's public key
    */
   initiatorId: Encoded.AccountAddress;
+  /**
+   * Responder's public key
+   */
   responderId: Encoded.AccountAddress;
+  /**
+   * Amount of blocks for disputing a solo close
+   */
   lockPeriod: number;
+  /**
+   * Initial deposit in favour of the responder by the initiator
+   */
   pushAmount: number;
+  /**
+   * Amount of coins the initiator has committed to the channel
+   */
   initiatorAmount: BigNumber;
+  /**
+   * Amount of coins the responder has committed to the channel
+   */
   responderAmount: BigNumber;
+  /**
+   * The minimum amount both peers need to maintain
+   */
   channelReserve?: BigNumber | number;
+  /**
+   * Minimum block height to include the channel_create_tx
+   */
   ttl?: number;
+  /**
+   * Host of the responder's node
+   */
   host: string;
+  /**
+   * The port of the responders node
+   */
   port: number;
+  /**
+   * Participant role
+   */
   role: 'initiator' | 'responder';
+  /**
+   * How to calculate minimum depth (default: txfee)
+   */
   minimumDepthStrategy?: 'txfee' | 'plain';
+  /**
+   * The minimum amount of blocks to be mined
+   */
   minimumDepth?: number;
+  /**
+   * The fee to be used for the channel open transaction
+   */
   fee?: BigNumber | number;
+  /**
+   * Used for the fee computation of the channel open transaction
+   */
   gasPrice?: BigNumber | number;
 
   signedTx?: string;
+  /**
+   * Existing channel id (required if reestablishing a channel)
+   */
   existingChannelId?: string;
+  /**
+   * Offchain transaction (required if reestablishing a channel)
+   */
   offChainTx?: string;
   reconnectTx?: string;
+  /**
+   * The time waiting for a new event to be initiated (default: 600000)
+   */
   timeoutIdle?: number;
+  /**
+   * The time waiting for the initiator to produce the create channel transaction after the noise
+   * session had been established (default: 120000)
+   */
   timeoutFundingCreate?: number;
+  /**
+   * The time frame the other client has to sign an off-chain update after our client had initiated
+   * and signed it. This applies only for double signed on-chain intended updates: channel create
+   * transaction, deposit, withdrawal and etc. (default: 120000)
+   */
   timeoutFundingSign?: number;
+  /**
+   * The time frame the other client has to confirm an on-chain transaction reaching maturity
+   * (passing minimum depth) after the local node has detected this. This applies only for double
+   * signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc.
+   * (default: 360000)
+   */
   timeoutFundingLock?: number;
+  /**
+   * The time frame the client has to return a signed off-chain update or to decline it.
+   * This applies for all off-chain updates (default: 500000)
+   */
   timeoutSign?: number;
+  /**
+   * The time frame the other client has to react to an event. This applies for all off-chain
+   * updates that are not meant to land on-chain, as well as some special cases: opening a noise
+   * connection, mutual closing acknowledgement and reestablishing an existing channel
+   * (default: 120000)
+   */
   timeoutAccept?: number;
+  /**
+   * the time frame the responder has to accept an incoming noise session.
+   * Applicable only for initiator (default: timeout_accept's value)
+   */
   timeoutInitialized?: number;
+  /**
+   * The time frame the initiator has to start an outgoing noise session to the responder's node.
+   * Applicable only for responder (default: timeout_idle's value)
+   */
   timeoutAwaitingOpen?: number;
   statePassword?: string;
+  /**
+   * Log websocket communication and state changes
+   */
   debug?: boolean;
+  /**
+   * Function which verifies and signs transactions
+   */
   sign: SignTxWithTag;
   offchainTx?: string;
 }
@@ -100,6 +196,9 @@ export interface ChannelState {
   reject: (e: BaseError) => void;
   sign: SignTx;
   handler?: ChannelHandler;
+  /**
+   * Called when transaction has been posted on chain
+   */
   onOnChainTx?: (tx: Encoded.Transaction) => void;
   onOwnWithdrawLocked?: () => void;
   onWithdrawLocked?: () => void;

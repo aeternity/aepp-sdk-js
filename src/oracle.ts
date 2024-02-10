@@ -133,11 +133,6 @@ interface GetQueryObjectReturnType extends Awaited<ReturnType<Node['getOracleQue
  * @param oracleId - Oracle public key
  * @param query - Oracle query object
  * @param options - Options object
- * @param options.queryTtl - queryTtl Oracle query time to leave
- * @param options.responseTtl - queryFee Oracle query response time to leave
- * @param options.queryFee - queryFee Oracle query fee
- * @param options.fee - fee Transaction fee
- * @param options.ttl - Transaction time to leave
  * @returns Query object
  */
 export async function postQueryToOracle(
@@ -173,10 +168,6 @@ interface PostQueryToOracleOptions extends PostQueryToOracleOptionsType {}
  * Extend oracle ttl
  * @category oracle
  * @param options - Options object
- * @param options.fee - fee Transaction fee
- * @param options.ttl - Transaction time to leave
- * @param options.oracleTtlType - Oracle time to leave for extend
- * @param options.oracleTtlValue - Oracle time to leave for extend
  * @returns Oracle object
  */
 export async function extendOracleTtl(options: ExtendOracleTtlOptions): Promise<
@@ -205,9 +196,6 @@ interface ExtendOracleTtlOptions extends ExtendOracleTtlOptionsType {}
  * @param queryId - Oracle query id
  * @param response - Oracle query response
  * @param options - Options object
- * @param options.responseTtl - responseTtl Query response time to leave
- * @param options.fee - Transaction fee
- * @param options.ttl - Transaction time to leave
  * @returns Oracle object
  */
 export async function respondToQuery(
@@ -292,11 +280,6 @@ interface GetOracleObjectReturnType extends Awaited<ReturnType<Node['getOracleBy
  * @param queryFormat - Format of query
  * @param responseFormat - Format of query response
  * @param options - Options
- * @param options.queryFee - Oracle query Fee
- * @param options - Options object
- * @param options.abiVersion - Always 0 (do not use virtual machine)
- * @param options.fee - Transaction fee
- * @param options.ttl - Transaction time to leave
  * @returns Oracle object
  */
 export async function registerOracle(

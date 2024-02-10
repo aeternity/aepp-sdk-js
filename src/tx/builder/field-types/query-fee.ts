@@ -4,6 +4,9 @@ import Node from '../../../Node';
 import { Encoded } from '../../../utils/encoder';
 import { ArgumentError } from '../../../utils/errors';
 
+/**
+ * Oracle query fee
+ */
 export default {
   ...coinAmount,
 

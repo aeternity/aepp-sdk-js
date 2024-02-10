@@ -22,11 +22,15 @@ export function getAddressFromPriv(secret: string | Uint8Array): Encoded.Account
 }
 
 /**
+ * Check if address is valid
+ * @param maybeAddress - Address to check
+ */
+export function isAddressValid(maybeAddress: string): maybeAddress is Encoded.AccountAddress;
+/**
  * Check if data is encoded in one of provided encodings
  * @param maybeEncoded - Data to check
  * @param encodings - Rest parameters with encodings to check against
  */
-export function isAddressValid(maybeEncoded: string): maybeEncoded is Encoded.AccountAddress;
 export function isAddressValid<E extends Encoding>(
   maybeEncoded: string,
   ...encodings: E[]

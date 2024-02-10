@@ -28,11 +28,6 @@ interface KeyPointers {
  * @category AENS
  * @param name - Name hash
  * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
  * @returns Transaction result
  * @example
  * ```js
@@ -67,17 +62,6 @@ interface AensRevokeOptions extends
  * @param name - AENS name
  * @param pointers - Map of pointer keys to corresponding addresses
  * @param options - Options
- * @param options.extendPointers - Get the pointers from the node and merge with provided
- * ones. Pointers with the same type will be overwritten
- * @param options.onAccount - Make operation on specific account from sdk (you
- * pass publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @param options.nameTtl - Name ttl represented in number of
- * blocks (Max value is 50000 blocks)
- * @param options.clientTtl a suggestion as to how long any
- * clients should cache this information
  * @throws Invalid pointer array error
  * @example
  * ```js
@@ -126,8 +110,18 @@ export async function aensUpdate(
 interface AensUpdateOptions extends
   BuildTxOptions<Tag.NameUpdateTx, 'nameId' | 'accountId' | 'pointers' | 'clientTtl' | 'nameTtl' | 'onNode'>,
   SendTransactionOptions {
+  /**
+   * Get the pointers from the node and merge with provided ones. Pointers with the same key will be
+   * overwritten.
+   */
   extendPointers?: boolean;
+  /**
+   * a suggestion as to how long any clients should cache this information
+   */
   clientTtl?: number;
+  /**
+   * Name ttl represented in number of blocks (Max value is 50000 blocks)
+   */
   nameTtl?: number;
 }
 
@@ -137,11 +131,6 @@ interface AensUpdateOptions extends
  * @param name - AENS name
  * @param account - Recipient account publick key
  * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
  * @returns Transaction result
  * @example
  * ```js
@@ -180,7 +169,6 @@ interface AensTransferOptions extends
  * @category AENS
  * @param name - AENS name
  * @param opt - Options
- * @returns
  * @example
  * ```js
  * const nameObject = sdkInstance.aensQuery('test.chain')
@@ -261,15 +249,9 @@ export async function aensQuery(
  * preclaim step
  * @category AENS
  * @param name - AENS name
- * @param salt - Salt from pre-claim, or 0 if it's a bid
+ * @param salt - Salt from pre-claim, or 0 if it's a bid or claiming without preclaim (in Ceres)
  * @param options - options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @param options.nameFee - Name Fee (By default calculated by sdk)
- * @returns the result of the claim
+ * @returns Transaction result
  * @example
  * ```js
  * const name = 'test.chain'
@@ -313,11 +295,6 @@ interface AensClaimReturnType extends
  * @category AENS
  * @param name - AENS name
  * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
  * @example
  * ```js
  * const name = 'test.chain'
@@ -371,11 +348,6 @@ interface AensPreclaimOptions extends
  * @param name - Domain name
  * @param nameFee - Name fee (bid fee)
  * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
  * @returns Transaction result
  * @example
  * ```js

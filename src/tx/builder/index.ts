@@ -25,11 +25,14 @@ type TxEncoding = Encoding.Transaction | Encoding.Poi | Encoding.StateTrees
  * Build transaction
  * @category transaction builder
  * @param params - Transaction params
- * @param options - options
- * @param options.prefix - Output encoding
- * @returns Encoded transaction
  */
 export function buildTx(params: TxParams): Encoded.Transaction;
+/**
+ * Build node entry with a custom encoding
+ * @param params - Entry params
+ * @param options - Options
+ * @param options.prefix - Output encoding
+ */
 export function buildTx<E extends TxEncoding>(
   params: TxParams,
   { prefix }: { prefix: E },

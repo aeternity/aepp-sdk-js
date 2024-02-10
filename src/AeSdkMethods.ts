@@ -116,7 +116,13 @@ type RequiredKeys<T> = {
 type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T;
 
 type ReplaceOnAccount<Options> = Options extends { onAccount: any }
-  ? Omit<Options, 'onAccount'> & { onAccount: OnAccount } : Options;
+  ? Omit<Options, 'onAccount'> & {
+    /**
+     * Make operation on specific account by providing address (to use account from sdk) or instance
+     * of AccountBase (like MemoryAccount)
+     */
+    onAccount: OnAccount;
+  } : Options;
 
 type MakeOptional<Options> = OptionalIfNotRequired<[
   Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'> & Partial<ReplaceOnAccount<Options>>,

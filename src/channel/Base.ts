@@ -99,53 +99,6 @@ export default class Channel {
 
   /**
    * @param options - Channel params
-   * @param options.url - Channel url (for example: "ws://localhost:3001")
-   * @param options.role - Participant role ("initiator" or "responder")
-   * @param options.initiatorId - Initiator's public key
-   * @param options.responderId - Responder's public key
-   * @param options.pushAmount - Initial deposit in favour of the responder by the initiator
-   * @param options.initiatorAmount - Amount of coins the initiator has committed to
-   * the channel
-   * @param options.responderAmount - Amount of coins the responder has committed to
-   * the channel
-   * @param options.channelReserve - The minimum amount both peers need to maintain
-   * @param options.ttl - Minimum block height to include the channel_create_tx
-   * @param options.host - Host of the responder's node
-   * @param options.port - The port of the responders node
-   * @param options.lockPeriod - Amount of blocks for disputing a solo close
-   * @param options.minimumDepthStrategy - How to calculate minimum depth (default: txfee)
-   * @param options.minimumDepth - The minimum amount of blocks to be mined
-   * @param options.fee - The fee to be used for the channel open transaction
-   * @param options.gasPrice - Used for the fee computation of the channel open transaction
-   * @param options.existingChannelId - Existing channel id (required if reestablishing a
-   * channel)
-   * @param options.offchainTx - Offchain transaction (required if reestablishing
-   * a channel)
-   * @param options.timeoutIdle - The time waiting for a new event to be initiated
-   * (default: 600000)
-   * @param options.timeoutFundingCreate - The time waiting for the initiator to produce
-   * the create channel transaction after the noise session had been established (default: 120000)
-   * @param options.timeoutFundingSign - The time frame the other client has to sign an
-   * off-chain update after our client had initiated and signed it. This applies only for double
-   * signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc.
-   * (default: 120000)
-   * @param options.timeoutFundingLock - The time frame the other client has to confirm an
-   * on-chain transaction reaching maturity (passing minimum depth) after the local node has
-   * detected this. This applies only for double signed on-chain intended updates: channel create
-   * transaction, deposit, withdrawal and etc. (default: 360000)
-   * @param options.timeoutSign - The time frame the client has to return a signed
-   * off-chain update or to decline it. This applies for all off-chain updates (default: 500000)
-   * @param options.timeoutAccept - The time frame the other client has to react to an
-   * event. This applies for all off-chain updates that are not meant to land on-chain, as well as
-   * some special cases: opening a noise connection, mutual closing acknowledgement and
-   * reestablishing an existing channel (default: 120000)
-   * @param options.timeoutInitialized - the time frame the responder has to accept an
-   * incoming noise session. Applicable only for initiator (default: timeout_accept's value)
-   * @param options.timeoutAwaitingOpen - The time frame the initiator has to start an
-   * outgoing noise session to the responder's node. Applicable only for responder (default:
-   * timeout_idle's value)
-   * @param options.debug=false - Log websocket communication
-   * @param options.sign - Function which verifies and signs transactions
    */
   static async initialize(options: ChannelOptions): Promise<Channel> {
     return Channel._initialize(new Channel(), options);
