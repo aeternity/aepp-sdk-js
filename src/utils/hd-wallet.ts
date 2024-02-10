@@ -71,6 +71,8 @@ type Bip32Path<MaxLen extends number> =
 
 /**
  * @category hd-wallet
+ * @param keyTreeNode - A node of key tree
+ * @param index - index of child node to derive
  */
 export function deriveChild({ secretKey, chainCode }: KeyTreeNode, index: number): KeyTreeNode {
   if (index < HARDENED_OFFSET) {

@@ -550,6 +550,9 @@ class Contract<M extends ContractMethodsBase> {
 
   $options: Omit<ConstructorParameters<typeof Contract>[0], 'aci'>;
 
+  /**
+   * @param options - Options
+   */
   constructor({ aci, ...otherOptions }: {
     onCompiler?: CompilerBase;
     onNode: Node;

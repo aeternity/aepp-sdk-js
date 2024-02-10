@@ -9,6 +9,9 @@ export default class AeSdk extends AeSdkBase {
 
   selectedAddress?: Encoded.AccountAddress;
 
+  /**
+   * @param options - Options
+   */
   constructor(
     { accounts, ...options }: { accounts?: AccountBase[] }
     & ConstructorParameters<typeof AeSdkBase>[0] = {},

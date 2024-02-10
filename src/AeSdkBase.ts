@@ -147,6 +147,11 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount().address;
   }
 
+  /**
+   * Sign data blob
+   * @param data - Data to sign
+   * @param options - Options
+   */
   async sign(
     data: string | Uint8Array,
     { onAccount, ...options }: { onAccount?: OnAccount } = {},
@@ -154,6 +159,11 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).sign(data, options);
   }
 
+  /**
+   * Sign encoded transaction
+   * @param tx - Transaction to sign
+   * @param options - Options
+   */
   async signTransaction(
     tx: Encoded.Transaction,
     { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTransaction']>[1] = {},
@@ -162,6 +172,11 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).signTransaction(tx, { networkId, ...options });
   }
 
+  /**
+   * Sign message
+   * @param message - Message to sign
+   * @param options - Options
+   */
   async signMessage(
     message: string,
     { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signMessage']>[1] = {},
@@ -169,6 +184,12 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
 
+  /**
+   * Sign typed data
+   * @param data - Encoded data to sign
+   * @param aci - Type of data to sign
+   * @param options - Options
+   */
   async signTypedData(
     data: Encoded.ContractBytearray,
     aci: Parameters<AccountBase['signTypedData']>[1],
@@ -179,6 +200,8 @@ export default class AeSdkBase extends AeSdkMethods {
 
   /**
    * @deprecated use AeSdkBase:signDelegation in Ceres
+   * @param contractAddress - Contract address
+   * @param options - Options
    */
   async signDelegationToContract(
     contractAddress: Encoded.ContractAddress,
@@ -195,6 +218,9 @@ export default class AeSdkBase extends AeSdkMethods {
 
   /**
    * @deprecated use AeSdkBase:signDelegation in Ceres
+   * @param contractAddress - Contract address
+   * @param name - AENS name
+   * @param options - Options
    */
   async signNameDelegationToContract(
     contractAddress: Encoded.ContractAddress,
@@ -212,6 +238,8 @@ export default class AeSdkBase extends AeSdkMethods {
 
   /**
    * @deprecated use AeSdkBase:signDelegation in Ceres
+   * @param contractAddress - Contract address
+   * @param options - Options
    */
   async signAllNamesDelegationToContract(
     contractAddress: Encoded.ContractAddress,
@@ -228,6 +256,9 @@ export default class AeSdkBase extends AeSdkMethods {
 
   /**
    * @deprecated use AeSdkBase:signDelegation in Ceres
+   * @param contractAddress - Contract address
+   * @param oracleQueryId - Oracle query id
+   * @param options - Options
    */
   async signOracleQueryDelegationToContract(
     contractAddress: Encoded.ContractAddress,
@@ -243,6 +274,11 @@ export default class AeSdkBase extends AeSdkMethods {
       .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
   }
 
+  /**
+   * Sign delegation, works only in Ceres
+   * @param delegation - Delegation to sign
+   * @param options - Options
+   */
   async signDelegation(
     delegation: Encoded.Bytearray,
     { onAccount, ...options }: { onAccount?: OnAccount }

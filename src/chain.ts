@@ -21,6 +21,8 @@ import { buildTxHash } from './tx/builder';
 
 /**
  * @category chain
+ * @param type - Type
+ * @param options - Options
  */
 export function _getPollInterval(
   type: 'block' | 'microblock', // TODO: rename to 'key-block' | 'micro-block'
@@ -57,6 +59,7 @@ export class InvalidTxError extends TransactionError {
 /**
  * Obtain current height of the chain
  * @category chain
+ * @param options - Options
  * @returns Current chain height
  */
 export async function getHeight({ onNode }: { onNode: Node }): Promise<number> {
