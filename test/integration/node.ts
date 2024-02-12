@@ -1,7 +1,9 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { createSandbox } from 'sinon';
-import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
+import {
+  PipelineRequest, PipelineResponse, RestError, SendRequest,
+} from '@azure/core-rest-pipeline';
 import { url } from '.';
 import {
   AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion,
@@ -28,6 +30,24 @@ describe('Node client', () => {
   it('throws clear exceptions when can\'t get transaction by hash', async () => {
     await expect(node.getTransactionByHash('th_test'))
       .to.be.rejectedWith('v3/transactions/th_test error: Invalid hash');
+  });
+
+  it('throws clear exceptions when body is empty', async () => {
+    node.pipeline.addPolicy({
+      name: 'remove-response-body',
+      async sendRequest(request, next) {
+        try {
+          return await next(request);
+        } catch (error) {
+          if (!(error instanceof RestError) || error.response == null) throw error;
+          error.response.bodyAsText = '';
+          throw error;
+        }
+      },
+    });
+    await expect(node.getTransactionByHash('th_test'))
+      .to.be.rejectedWith('v3/transactions/th_test error: 400 status code');
+    node.pipeline.removePolicy({ name: 'remove-response-body' });
   });
 
   it('retries requests if failed', async () => ([

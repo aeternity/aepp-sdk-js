@@ -83,7 +83,7 @@ export default class Channel {
 
   _options!: ChannelOptions;
 
-  #debugId: number;
+  readonly #debugId: number;
 
   _channelId?: Encoded.Channel;
 

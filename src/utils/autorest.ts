@@ -82,10 +82,10 @@ export const genErrorFormatterPolicy = (
         try {
           body = JSON.parse(error.response.bodyAsText);
         } catch (e) {
-          throw error;
+          body = null;
         }
         error.message = `${new URL(error.request.url).pathname.slice(1)} error`;
-        const message = getMessage(body);
+        const message = body == null ? ` ${error.response.status} status code` : getMessage(body);
         if (message !== '') error.message += `:${message}`;
         throw error;
       }
