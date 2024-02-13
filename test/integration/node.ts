@@ -49,6 +49,11 @@ describe('Node client', () => {
     node.pipeline.removePolicy({ name: 'remove-response-body' });
   });
 
+  it('throws clear exceptions if ECONNREFUSED', async () => {
+    const n = new Node('http://localhost:60148', { retryCount: 0 });
+    await expect(n.getStatus()).to.be.rejectedWith('v3/status error: ECONNREFUSED');
+  });
+
   it('retries requests if failed', async () => ([
     ['ak_test', 1],
     ['ak_2CxRaRcMUGn9s5UwN36UhdrtZVFUbgG1BSX5tUAyQbCNneUwti', 4],
