@@ -14,8 +14,9 @@
       
         <link rel="next" href="../12.0.0/">
       
+      
       <link rel="icon" href="../../../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.10">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.8">
     
     
       
@@ -23,14 +24,17 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.0d440cfe.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.f2e4d321.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.2505c338.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
+
     
+    
+      
     
     
       
@@ -62,9 +66,6 @@
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink">
   
     
-    
-      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
-    
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
@@ -80,7 +81,7 @@
       
     </div>
     
-      <div data-md-component="outdated" hidden>
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
@@ -99,7 +100,9 @@
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../../.." title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
       
@@ -108,6 +111,7 @@
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
+      
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
@@ -127,29 +131,39 @@
       </div>
     </div>
     
-      <form class="md-header__option" data-md-component="palette">
-        
-          
-          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
-          
-            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
-            </label>
-          
-        
-          
-          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
-          
-            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
-            </label>
-          
-        
-      </form>
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
       <label class="md-header__button md-icon" for="__search">
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
       </label>
       <div class="md-search" data-md-component="search" role="dialog">
@@ -158,16 +172,20 @@
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
           <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
           </a>
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
       </nav>
@@ -193,7 +211,7 @@
         <a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -223,6 +241,7 @@
                     
 
 
+
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../../.." title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
@@ -238,7 +257,7 @@
       <a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -250,14 +269,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../.." class="md-nav__link">
-        Installation
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
       </a>
     </li>
   
@@ -265,14 +289,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../quick-start/" class="md-nav__link">
-        Quick Start
+        
+  
+  <span class="md-ellipsis">
+    Quick Start
+  </span>
+  
+
       </a>
     </li>
   
@@ -280,265 +309,381 @@
     
       
       
-      
-
+  
   
   
   
     
+    
+    
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
-      
-      
-      
-        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-          Usage Guides
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_3">
-          <span class="md-nav__icon md-icon"></span>
-          Usage Guides
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
           
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage Guides
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Usage Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../address-length/" class="md-nav__link">
-        The range of possible address length
+        
+  
+  <span class="md-ellipsis">
+    The range of possible address length
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../aens/" class="md-nav__link">
-        AENS (æternity naming system)
+        
+  
+  <span class="md-ellipsis">
+    AENS (æternity naming system)
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../contracts/" class="md-nav__link">
-        Contracts
+        
+  
+  <span class="md-ellipsis">
+    Contracts
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../contract-events/" class="md-nav__link">
-        Contract Events
+        
+  
+  <span class="md-ellipsis">
+    Contract Events
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../oracles/" class="md-nav__link">
-        Oracles
+        
+  
+  <span class="md-ellipsis">
+    Oracles
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../paying-for-tx/" class="md-nav__link">
-        PayingForTx (Meta-Transactions)
+        
+  
+  <span class="md-ellipsis">
+    PayingForTx (Meta-Transactions)
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../batch-requests/" class="md-nav__link">
-        Batch Transactions
+        
+  
+  <span class="md-ellipsis">
+    Batch Transactions
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../error-handling/" class="md-nav__link">
-        Error Handling
+        
+  
+  <span class="md-ellipsis">
+    Error Handling
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../low-vs-high-usage/" class="md-nav__link">
-        Low vs High level API
+        
+  
+  <span class="md-ellipsis">
+    Low vs High level API
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../typed-data/" class="md-nav__link">
-        Typed data hashing and signing
+        
+  
+  <span class="md-ellipsis">
+    Typed data hashing and signing
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     
+    
+    
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
-      
-      
-      
-        <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
-          Wallet interaction
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_3_11">
-          <span class="md-nav__icon md-icon"></span>
-          Wallet interaction
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
+        
           
+          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Wallet interaction
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_11">
+            <span class="md-nav__icon md-icon"></span>
+            Wallet interaction
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../connect-aepp-to-wallet/" class="md-nav__link">
-        Connect an æpp to a wallet
+        
+  
+  <span class="md-ellipsis">
+    Connect an æpp to a wallet
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../build-wallet/" class="md-nav__link">
-        How to build a wallet
+        
+  
+  <span class="md-ellipsis">
+    How to build a wallet
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../ledger-wallet/" class="md-nav__link">
-        Ledger Hardware Wallet
+        
+  
+  <span class="md-ellipsis">
+    Ledger Hardware Wallet
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../transaction-options/" class="md-nav__link">
-        Transaction options
+        
+  
+  <span class="md-ellipsis">
+    Transaction options
+  </span>
+  
+
       </a>
     </li>
   
@@ -546,277 +691,387 @@
     
       
       
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples & Tutorials
+  </span>
+  
 
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Examples & Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
   
   
   
     
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
-      
-      
-      
-        <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-          Examples & Tutorials
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_5">
-          <span class="md-nav__icon md-icon"></span>
-          Examples & Tutorials
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
+    
+    
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
-      
-      
-      
-        <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
-          NodeJS
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_5_1">
-          <span class="md-nav__icon md-icon"></span>
-          NodeJS
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
+        
           
+          <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    NodeJS
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            NodeJS
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../examples/node/transfer-ae/" class="md-nav__link">
-        Transfer AE
+        
+  
+  <span class="md-ellipsis">
+    Transfer AE
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../examples/node/contract-interaction/" class="md-nav__link">
-        Compile & Deploy a Sophia Smart Contract
+        
+  
+  <span class="md-ellipsis">
+    Compile & Deploy a Sophia Smart Contract
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     
+    
+    
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1_3" >
-      
-      
-      
-        <label class="md-nav__link" for="__nav_5_1_3" id="__nav_5_1_3_label" tabindex="0">
-          PayingForTx
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_1_3_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_5_1_3">
-          <span class="md-nav__icon md-icon"></span>
-          PayingForTx
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1_3" >
+        
           
+          <label class="md-nav__link" for="__nav_5_1_3" id="__nav_5_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    PayingForTx
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            PayingForTx
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../examples/node/paying-for-contract-call-tx/" class="md-nav__link">
-        InnerTx: ContractCallTx
+        
+  
+  <span class="md-ellipsis">
+    InnerTx: ContractCallTx
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../examples/node/paying-for-spend-tx/" class="md-nav__link">
-        InnerTx: SpendTx
+        
+  
+  <span class="md-ellipsis">
+    InnerTx: SpendTx
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../examples/node/account-generalized/" class="md-nav__link">
-        Create and use Generalized Accounts
+        
+  
+  <span class="md-ellipsis">
+    Create and use Generalized Accounts
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     
+    
+    
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
-      
-      
-      
-        <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
-          Browser
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_5_2">
-          <span class="md-nav__icon md-icon"></span>
-          Browser
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
           
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Browser
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Browser
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../examples/browser/aepp/" class="md-nav__link">
-        Aepp example
+        
+  
+  <span class="md-ellipsis">
+    Aepp example
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../examples/browser/wallet-iframe/" class="md-nav__link">
-        Iframe wallet example
+        
+  
+  <span class="md-ellipsis">
+    Iframe wallet example
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../examples/browser/wallet-web-extension/packed.zip" class="md-nav__link">
-        Webextension wallet example
+        
+  
+  <span class="md-ellipsis">
+    Webextension wallet example
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../tutorials/vuejs/helloworld-blockheight/" class="md-nav__link">
-        Vue.js HelloWorld
+        
+  
+  <span class="md-ellipsis">
+    Vue.js HelloWorld
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../api/" class="md-nav__link">
-        API Reference
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
       </a>
     </li>
   
@@ -824,14 +1079,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../compatibility/" class="md-nav__link">
-        Compatibility Table
+        
+  
+  <span class="md-ellipsis">
+    Compatibility Table
+  </span>
+  
+
       </a>
     </li>
   
@@ -839,14 +1099,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../CHANGELOG/" class="md-nav__link">
-        Changelog
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
       </a>
     </li>
   
@@ -854,40 +1119,49 @@
     
       
       
-      
-
   
   
     
   
   
+  
+    
+    
+    
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
-      
-      
-      
-        <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
-          Migration Guides
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_9">
-          <span class="md-nav__icon md-icon"></span>
-          Migration Guides
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
           
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Migration Guides
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            Migration Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
   
   
     
+  
   
   
     <li class="md-nav__item md-nav__item--active">
@@ -899,12 +1173,24 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Migration to 13.0.0
+          
+  
+  <span class="md-ellipsis">
+    Migration to 13.0.0
+  </span>
+  
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Migration to 13.0.0
+        
+  
+  <span class="md-ellipsis">
+    Migration to 13.0.0
+  </span>
+  
+
       </a>
       
         
@@ -924,7 +1210,9 @@
       
         <li class="md-nav__item">
   <a href="#wallet" class="md-nav__link">
-    Wallet
+    <span class="md-ellipsis">
+      Wallet
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Wallet">
@@ -932,7 +1220,9 @@
         
           <li class="md-nav__item">
   <a href="#onsign-onmessagesign-callbacks-were-removed-on-the-wallet-side" class="md-nav__link">
-    onSign, onMessageSign callbacks were removed on the wallet side
+    <span class="md-ellipsis">
+      onSign, onMessageSign callbacks were removed on the wallet side
+    </span>
   </a>
   
 </li>
@@ -944,7 +1234,9 @@
       
         <li class="md-nav__item">
   <a href="#aepp" class="md-nav__link">
-    Aepp
+    <span class="md-ellipsis">
+      Aepp
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Aepp">
@@ -952,14 +1244,18 @@
         
           <li class="md-nav__item">
   <a href="#all-wallet-provided-nodes-have-the-same-name" class="md-nav__link">
-    All wallet provided nodes have the same name
+    <span class="md-ellipsis">
+      All wallet provided nodes have the same name
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#select-option-removed-from-connecttowallet" class="md-nav__link">
-    Select option removed from connectToWallet
+    <span class="md-ellipsis">
+      Select option removed from connectToWallet
+    </span>
   </a>
   
 </li>
@@ -971,7 +1267,9 @@
       
         <li class="md-nav__item">
   <a href="#contract" class="md-nav__link">
-    Contract
+    <span class="md-ellipsis">
+      Contract
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Contract">
@@ -979,133 +1277,171 @@
         
           <li class="md-nav__item">
   <a href="#aci-format-used-the-same-as-returned-by-aesophia_cli" class="md-nav__link">
-    ACI format used the same as returned by aesophia_cli
+    <span class="md-ellipsis">
+      ACI format used the same as returned by aesophia_cli
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#params-argument-in-deploy-and-call-is-required" class="md-nav__link">
-    params argument in $deploy and $call is required
+    <span class="md-ellipsis">
+      params argument in $deploy and $call is required
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contract-methods-accessible-on-the-instance-itself" class="md-nav__link">
-    Contract methods accessible on the instance itself
+    <span class="md-ellipsis">
+      Contract methods accessible on the instance itself
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractmethodsnamegetsend-removed" class="md-nav__link">
-    contract.methods.&lt;name&gt;.get,send removed
+    <span class="md-ellipsis">
+      contract.methods.&lt;name&gt;.get,send removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractbytecodesourcecode-moved-to-contractoptions" class="md-nav__link">
-    contract.bytecode,sourceCode moved to contract.$options
+    <span class="md-ellipsis">
+      contract.bytecode,sourceCode moved to contract.$options
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractcalldata-renamed-to-contract_calldata" class="md-nav__link">
-    contract.calldata renamed to contract._calldata
+    <span class="md-ellipsis">
+      contract.calldata renamed to contract._calldata
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractoptions-renamed-to-contractoptions" class="md-nav__link">
-    contract.options renamed to contract.$options
+    <span class="md-ellipsis">
+      contract.options renamed to contract.$options
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractdeployinfo-removed" class="md-nav__link">
-    contract.deployInfo removed
+    <span class="md-ellipsis">
+      contract.deployInfo removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractdecodeevents-renamed-to-contractdecodeevents" class="md-nav__link">
-    contract.decodeEvents renamed to contract.$decodeEvents
+    <span class="md-ellipsis">
+      contract.decodeEvents renamed to contract.$decodeEvents
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractcall-renamed-to-contractcall" class="md-nav__link">
-    contract.call renamed to contract.$call
+    <span class="md-ellipsis">
+      contract.call renamed to contract.$call
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractcompile-renamed-to-contractcompile" class="md-nav__link">
-    contract.compile renamed to contract.$compile
+    <span class="md-ellipsis">
+      contract.compile renamed to contract.$compile
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractdeploy-renamed-to-contractdeploy" class="md-nav__link">
-    contract.deploy renamed to contract.$deploy
+    <span class="md-ellipsis">
+      contract.deploy renamed to contract.$deploy
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#createaensdelegationsignature-createoracledelegationsignature-removed" class="md-nav__link">
-    createAensDelegationSignature, createOracleDelegationSignature removed
+    <span class="md-ellipsis">
+      createAensDelegationSignature, createOracleDelegationSignature removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#use-sourcecode-instead-of-source" class="md-nav__link">
-    use sourceCode instead of source
+    <span class="md-ellipsis">
+      use sourceCode instead of source
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#getcontractinstance-accepts-address-instead-of-contractaddress" class="md-nav__link">
-    getContractInstance accepts address instead of contractAddress
+    <span class="md-ellipsis">
+      getContractInstance accepts address instead of contractAddress
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#getcontractinstance-function-replaced-with-contract-class" class="md-nav__link">
-    getContractInstance function replaced with Contract class
+    <span class="md-ellipsis">
+      getContractInstance function replaced with Contract class
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#aesdkgetcontractinstance-renamed-to-aesdkinitializecontract" class="md-nav__link">
-    AeSdk.getContractInstance renamed to AeSdk.initializeContract
+    <span class="md-ellipsis">
+      AeSdk.getContractInstance renamed to AeSdk.initializeContract
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#preparetxparams-getvmversion-are-not-exported-anymore" class="md-nav__link">
-    prepareTxParams, getVmVersion are not exported anymore
+    <span class="md-ellipsis">
+      prepareTxParams, getVmVersion are not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#isga-method-removed" class="md-nav__link">
-    isGA method removed
+    <span class="md-ellipsis">
+      isGA method removed
+    </span>
   </a>
   
 </li>
@@ -1117,7 +1453,9 @@
       
         <li class="md-nav__item">
   <a href="#transaction-builder" class="md-nav__link">
-    Transaction builder
+    <span class="md-ellipsis">
+      Transaction builder
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Transaction builder">
@@ -1125,231 +1463,297 @@
         
           <li class="md-nav__item">
   <a href="#writeint-function-removed" class="md-nav__link">
-    writeInt function removed
+    <span class="md-ellipsis">
+      writeInt function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#returntype-of-contract-call-result-structure-is-a-value-of-callreturntype-enum" class="md-nav__link">
-    returnType of contract call result structure is a value of CallReturnType enum
+    <span class="md-ellipsis">
+      returnType of contract call result structure is a value of CallReturnType enum
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#writeid-readid-functions-removed" class="md-nav__link">
-    writeId, readId functions removed
+    <span class="md-ellipsis">
+      writeId, readId functions removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#readpointers-buildpointers-functions-removed" class="md-nav__link">
-    readPointers, buildPointers functions removed
+    <span class="md-ellipsis">
+      readPointers, buildPointers functions removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#formatsalt-function-removed" class="md-nav__link">
-    formatSalt function removed
+    <span class="md-ellipsis">
+      formatSalt function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#validateparams-unpackrawtx-functions-removed" class="md-nav__link">
-    validateParams, unpackRawTx functions removed
+    <span class="md-ellipsis">
+      validateParams, unpackRawTx functions removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#amount-constant-removed" class="md-nav__link">
-    AMOUNT constant removed
+    <span class="md-ellipsis">
+      AMOUNT constant removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#statetrees-fields-decoded-as-objects-mapping-key-to-decoded-entry-instead-of-internals" class="md-nav__link">
-    StateTrees fields decoded as objects mapping key to decoded entry instead of internals
+    <span class="md-ellipsis">
+      StateTrees fields decoded as objects mapping key to decoded entry instead of internals
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#the-content-of-tagmtree-entries-decoded-and-moved-to-payload-field" class="md-nav__link">
-    The content of Tag.*Mtree entries decoded and moved to payload field
+    <span class="md-ellipsis">
+      The content of Tag.*Mtree entries decoded and moved to payload field
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#tx_schema-txparamscommon-txschema-txtypeschemas-are-not-exported-anymore" class="md-nav__link">
-    TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas are not exported anymore
+    <span class="md-ellipsis">
+      TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas are not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#tx_ttl-is-not-exported-anymore" class="md-nav__link">
-    TX_TTL is not exported anymore
+    <span class="md-ellipsis">
+      TX_TTL is not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#enum-field_types-is-not-exported-anymore" class="md-nav__link">
-    Enum FIELD_TYPES is not exported anymore
+    <span class="md-ellipsis">
+      Enum FIELD_TYPES is not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#not-able-to-buildunpack-compilersophia-entry-tag-70" class="md-nav__link">
-    Not able to build/unpack CompilerSophia entry (tag 70)
+    <span class="md-ellipsis">
+      Not able to build/unpack CompilerSophia entry (tag 70)
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#enums-protocol_vm_abi-interface-ctversion-not-exported-anymore" class="md-nav__link">
-    Enums PROTOCOL_VM_ABI, interface CtVersion not exported anymore
+    <span class="md-ellipsis">
+      Enums PROTOCOL_VM_ABI, interface CtVersion not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#enums-vm_versions-abi_versions-protocol_versions-renamed" class="md-nav__link">
-    Enums VM_VERSIONS, ABI_VERSIONS, PROTOCOL_VERSIONS renamed
+    <span class="md-ellipsis">
+      Enums VM_VERSIONS, ABI_VERSIONS, PROTOCOL_VERSIONS renamed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#statehash-of-channel-entry-decoded-as-st_-prefixed-string-instead-of-hex" class="md-nav__link">
-    stateHash of Channel entry decoded as st_-prefixed string instead of hex
+    <span class="md-ellipsis">
+      stateHash of Channel entry decoded as st_-prefixed string instead of hex
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#spendtx-payload-doesnt-accept-arbitrary-strings-anymore" class="md-nav__link">
-    SpendTx payload doesn't accept arbitrary strings anymore
+    <span class="md-ellipsis">
+      SpendTx payload doesn't accept arbitrary strings anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#verifytransaction-doesnt-accept-parent-tx-types-anymore" class="md-nav__link">
-    verifyTransaction doesn't accept parent tx types anymore
+    <span class="md-ellipsis">
+      verifyTransaction doesn't accept parent tx types anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-doesnt-accept-excludekeys-option-anymore" class="md-nav__link">
-    buildTx doesn't accept excludeKeys option anymore
+    <span class="md-ellipsis">
+      buildTx doesn't accept excludeKeys option anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#use-version-instead-of-vsn-vsn-in-unpacktx-buildtx" class="md-nav__link">
-    Use version instead of VSN, vsn in unpackTx, buildTx
+    <span class="md-ellipsis">
+      Use version instead of VSN, vsn in unpackTx, buildTx
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-accepts-transaction-type-and-version-in-the-first-argument" class="md-nav__link">
-    buildTx accepts transaction type and version in the first argument
+    <span class="md-ellipsis">
+      buildTx accepts transaction type and version in the first argument
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#aesdkbuildtx-accepts-tag-in-options" class="md-nav__link">
-    AeSdk.buildTx accepts tag in options
+    <span class="md-ellipsis">
+      AeSdk.buildTx accepts tag in options
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#sync-buildtx-accepts-denomination-in-the-first-argument" class="md-nav__link">
-    sync buildTx accepts denomination in the first argument
+    <span class="md-ellipsis">
+      sync buildTx accepts denomination in the first argument
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#unpacktx-return-an-object-of-transaction-parameters" class="md-nav__link">
-    unpackTx return an object of transaction parameters
+    <span class="md-ellipsis">
+      unpackTx return an object of transaction parameters
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#unpacktx-doesnt-return-rlpencoded-anymore" class="md-nav__link">
-    unpackTx doesn't return rlpEncoded anymore
+    <span class="md-ellipsis">
+      unpackTx doesn't return rlpEncoded anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#unpacktx-doesnt-return-txtype-anymore" class="md-nav__link">
-    unpackTx doesn't return txType anymore
+    <span class="md-ellipsis">
+      unpackTx doesn't return txType anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-return-string-instead-of-object" class="md-nav__link">
-    buildTx return string instead of object
+    <span class="md-ellipsis">
+      buildTx return string instead of object
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-doesnt-return-txobject-anymore" class="md-nav__link">
-    buildTx doesn't return txObject anymore
+    <span class="md-ellipsis">
+      buildTx doesn't return txObject anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-doesnt-return-binary-anymore" class="md-nav__link">
-    buildTx doesn't return binary anymore
+    <span class="md-ellipsis">
+      buildTx doesn't return binary anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-doesnt-return-rlpencoded-anymore" class="md-nav__link">
-    buildTx doesn't return rlpEncoded anymore
+    <span class="md-ellipsis">
+      buildTx doesn't return rlpEncoded anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#key-of-mtreevalue-entry-decoded-as-a-buffer-instead-of-a-hex" class="md-nav__link">
-    key of MtreeValue entry decoded as a buffer instead of a hex
+    <span class="md-ellipsis">
+      key of MtreeValue entry decoded as a buffer instead of a hex
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#txbuilder-accepts-and-returns-poi-field-unpacked-as-treespoi" class="md-nav__link">
-    TxBuilder accepts and returns poi field unpacked as TreesPoi
+    <span class="md-ellipsis">
+      TxBuilder accepts and returns poi field unpacked as TreesPoi
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#get-method-of-mptree-accepts-and-returns-typed-values" class="md-nav__link">
-    get method of MPTree accepts and returns typed values
+    <span class="md-ellipsis">
+      get method of MPTree accepts and returns typed values
+    </span>
   </a>
   
 </li>
@@ -1361,7 +1765,9 @@
       
         <li class="md-nav__item">
   <a href="#compiler" class="md-nav__link">
-    Compiler
+    <span class="md-ellipsis">
+      Compiler
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Compiler">
@@ -1369,28 +1775,36 @@
         
           <li class="md-nav__item">
   <a href="#compiler-export-renamed-to-compilerhttp" class="md-nav__link">
-    Compiler export renamed to CompilerHttp
+    <span class="md-ellipsis">
+      Compiler export renamed to CompilerHttp
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#removed-aesdkcompilerurl-aesdksetcompilerurl" class="md-nav__link">
-    removed AeSdk:compilerUrl, AeSdk:setCompilerUrl
+    <span class="md-ellipsis">
+      removed AeSdk:compilerUrl, AeSdk:setCompilerUrl
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#methods-of-compilerhttp-moved-to-api-property" class="md-nav__link">
-    Methods of CompilerHttp moved to api property
+    <span class="md-ellipsis">
+      Methods of CompilerHttp moved to api property
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#dropped-compatibility-with-aesophia_http-below-711-aesophia_cli-below-701" class="md-nav__link">
-    Dropped compatibility with aesophia_http below 7.1.1, aesophia_cli below 7.0.1
+    <span class="md-ellipsis">
+      Dropped compatibility with aesophia_http below 7.1.1, aesophia_cli below 7.0.1
+    </span>
   </a>
   
 </li>
@@ -1402,7 +1816,9 @@
       
         <li class="md-nav__item">
   <a href="#account" class="md-nav__link">
-    Account
+    <span class="md-ellipsis">
+      Account
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Account">
@@ -1410,56 +1826,72 @@
         
           <li class="md-nav__item">
   <a href="#creategeneralizedaccount-accepts-sourcecode-in-options" class="md-nav__link">
-    createGeneralizedAccount accepts sourceCode in options
+    <span class="md-ellipsis">
+      createGeneralizedAccount accepts sourceCode in options
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#createmetatx-removed" class="md-nav__link">
-    createMetaTx removed
+    <span class="md-ellipsis">
+      createMetaTx removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#accountrpc-constructor-accepts-arguments-one-by-one" class="md-nav__link">
-    AccountRpc constructor accepts arguments one by one
+    <span class="md-ellipsis">
+      AccountRpc constructor accepts arguments one by one
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#accountmemory-requires-networkid-in-signtransaction" class="md-nav__link">
-    AccountMemory requires networkId in signTransaction
+    <span class="md-ellipsis">
+      AccountMemory requires networkId in signTransaction
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#accountbase-simplified" class="md-nav__link">
-    AccountBase simplified
+    <span class="md-ellipsis">
+      AccountBase simplified
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#address-in-accountbase-is-a-property" class="md-nav__link">
-    address in AccountBase is a property
+    <span class="md-ellipsis">
+      address in AccountBase is a property
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#memoryaccount-accepts-only-secretkey" class="md-nav__link">
-    MemoryAccount accepts only secretKey
+    <span class="md-ellipsis">
+      MemoryAccount accepts only secretKey
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#memoryaccount-is-not-compatible-with-ga" class="md-nav__link">
-    MemoryAccount is not compatible with GA
+    <span class="md-ellipsis">
+      MemoryAccount is not compatible with GA
+    </span>
   </a>
   
 </li>
@@ -1471,7 +1903,9 @@
       
         <li class="md-nav__item">
   <a href="#node" class="md-nav__link">
-    Node
+    <span class="md-ellipsis">
+      Node
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Node">
@@ -1479,7 +1913,9 @@
         
           <li class="md-nav__item">
   <a href="#url-property-of-node-removed" class="md-nav__link">
-    url property of Node removed
+    <span class="md-ellipsis">
+      url property of Node removed
+    </span>
   </a>
   
 </li>
@@ -1491,7 +1927,9 @@
       
         <li class="md-nav__item">
   <a href="#oracle" class="md-nav__link">
-    Oracle
+    <span class="md-ellipsis">
+      Oracle
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Oracle">
@@ -1499,28 +1937,36 @@
         
           <li class="md-nav__item">
   <a href="#query_fee-is-not-exported-anymore" class="md-nav__link">
-    QUERY_FEE is not exported anymore
+    <span class="md-ellipsis">
+      QUERY_FEE is not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#oracles-created-without-queryfee-by-default" class="md-nav__link">
-    Oracles created without queryFee by default
+    <span class="md-ellipsis">
+      Oracles created without queryFee by default
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#aesdkextendoraclettl-aesdkrespondtoquery-doesnt-accept-oracleid" class="md-nav__link">
-    AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId
+    <span class="md-ellipsis">
+      AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#onquery-callback-of-pollforqueries-oraclepollqueries-accepts-a-single-query" class="md-nav__link">
-    onQuery callback of pollForQueries, oracle.pollQueries accepts a single query
+    <span class="md-ellipsis">
+      onQuery callback of pollForQueries, oracle.pollQueries accepts a single query
+    </span>
   </a>
   
 </li>
@@ -1532,7 +1978,9 @@
       
         <li class="md-nav__item">
   <a href="#chain" class="md-nav__link">
-    Chain
+    <span class="md-ellipsis">
+      Chain
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Chain">
@@ -1540,7 +1988,9 @@
         
           <li class="md-nav__item">
   <a href="#send-inlined-into-sendtransaction" class="md-nav__link">
-    send inlined into sendTransaction
+    <span class="md-ellipsis">
+      send inlined into sendTransaction
+    </span>
   </a>
   
 </li>
@@ -1552,7 +2002,9 @@
       
         <li class="md-nav__item">
   <a href="#aens" class="md-nav__link">
-    AENS
+    <span class="md-ellipsis">
+      AENS
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="AENS">
@@ -1560,7 +2012,9 @@
         
           <li class="md-nav__item">
   <a href="#height-removed-from-the-output-of-aenspreclaim" class="md-nav__link">
-    height removed from the output of aensPreclaim
+    <span class="md-ellipsis">
+      height removed from the output of aensPreclaim
+    </span>
   </a>
   
 </li>
@@ -1572,7 +2026,9 @@
       
         <li class="md-nav__item">
   <a href="#channel" class="md-nav__link">
-    Channel
+    <span class="md-ellipsis">
+      Channel
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Channel">
@@ -1580,21 +2036,27 @@
         
           <li class="md-nav__item">
   <a href="#channelstate-returns-unpacked-entries" class="md-nav__link">
-    Channel:state returns unpacked entries
+    <span class="md-ellipsis">
+      Channel:state returns unpacked entries
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#all-channel-events-emitted-in-snakecase" class="md-nav__link">
-    All channel events emitted in snakeCase
+    <span class="md-ellipsis">
+      All channel events emitted in snakeCase
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#channelpoi-returns-unpacked-treespoi" class="md-nav__link">
-    Channel:poi returns unpacked TreesPoi
+    <span class="md-ellipsis">
+      Channel:poi returns unpacked TreesPoi
+    </span>
   </a>
   
 </li>
@@ -1606,7 +2068,9 @@
       
         <li class="md-nav__item">
   <a href="#other" class="md-nav__link">
-    Other
+    <span class="md-ellipsis">
+      Other
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Other">
@@ -1614,196 +2078,252 @@
         
           <li class="md-nav__item">
   <a href="#onaccount-doesnt-accept-keypair" class="md-nav__link">
-    onAccount doesn't accept keypair
+    <span class="md-ellipsis">
+      onAccount doesn't accept keypair
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#bignumbertobytearray-removed" class="md-nav__link">
-    bigNumberToByteArray removed
+    <span class="md-ellipsis">
+      bigNumberToByteArray removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#str2buf-function-removed" class="md-nav__link">
-    str2buf function removed
+    <span class="md-ellipsis">
+      str2buf function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#getaddressfrompriv-doesnt-accept-private-key-as-base64-encoded-or-raw-string" class="md-nav__link">
-    getAddressFromPriv doesn't accept private key as base64-encoded or raw string
+    <span class="md-ellipsis">
+      getAddressFromPriv doesn't accept private key as base64-encoded or raw string
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#isvalidkeypair-doesnt-accept-public-key-as-base64-encoded-string" class="md-nav__link">
-    isValidKeypair doesn't accept public key as base64-encoded string
+    <span class="md-ellipsis">
+      isValidKeypair doesn't accept public key as base64-encoded string
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#bytestohex-function-removed" class="md-nav__link">
-    bytesToHex function removed
+    <span class="md-ellipsis">
+      bytesToHex function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#hextobytes-function-removed" class="md-nav__link">
-    hexToBytes function removed
+    <span class="md-ellipsis">
+      hexToBytes function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#rename-umd-export-to-aeternity" class="md-nav__link">
-    rename umd export to Aeternity
+    <span class="md-ellipsis">
+      rename umd export to Aeternity
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#subpaths-imports-of-sdk-are-not-allowed" class="md-nav__link">
-    Subpaths imports of SDK are not allowed
+    <span class="md-ellipsis">
+      Subpaths imports of SDK are not allowed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#removed-getnetworkid-from-aesdkbase" class="md-nav__link">
-    Removed getNetworkId from AeSdkBase
+    <span class="md-ellipsis">
+      Removed getNetworkId from AeSdkBase
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#address-a-getter-in-aesdkbase" class="md-nav__link">
-    address a getter in AeSdkBase
+    <span class="md-ellipsis">
+      address a getter in AeSdkBase
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#addaccount-is-a-sync-function" class="md-nav__link">
-    addAccount is a sync function
+    <span class="md-ellipsis">
+      addAccount is a sync function
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#verifymessage-removed-from-accounts-and-aesdkbase" class="md-nav__link">
-    verifyMessage removed from accounts and AeSdkBase
+    <span class="md-ellipsis">
+      verifyMessage removed from accounts and AeSdkBase
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#verify-and-verifymessage-accepts-address-instead-of-hex-string-or-uint8array" class="md-nav__link">
-    verify and verifyMessage accepts address instead of hex string or Uint8Array
+    <span class="md-ellipsis">
+      verify and verifyMessage accepts address instead of hex string or Uint8Array
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#node12-not-supported" class="md-nav__link">
-    node@12 not supported
+    <span class="md-ellipsis">
+      node@12 not supported
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#removeaccount-throws-an-error-if-the-account-is-not-found" class="md-nav__link">
-    removeAccount throws an error if the account is not found
+    <span class="md-ellipsis">
+      removeAccount throws an error if the account is not found
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#signmessage-always-returns-uint8array" class="md-nav__link">
-    signMessage always returns Uint8Array
+    <span class="md-ellipsis">
+      signMessage always returns Uint8Array
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#encryptkey-decryptkey-are-not-exported-anymore" class="md-nav__link">
-    encryptKey, decryptKey are not exported anymore
+    <span class="md-ellipsis">
+      encryptKey, decryptKey are not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#sha256hash-is-not-exported-anymore" class="md-nav__link">
-    sha256hash is not exported anymore
+    <span class="md-ellipsis">
+      sha256hash is not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#height-method-removed" class="md-nav__link">
-    height method removed
+    <span class="md-ellipsis">
+      height method removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#signusingga-method-removed" class="md-nav__link">
-    signUsingGA method removed
+    <span class="md-ellipsis">
+      signUsingGA method removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#pointer_key_by_prefix-removed" class="md-nav__link">
-    POINTER_KEY_BY_PREFIX removed
+    <span class="md-ellipsis">
+      POINTER_KEY_BY_PREFIX removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#id_tag_prefix-prefix_id_tag-id_tag-removed" class="md-nav__link">
-    ID_TAG_PREFIX, PREFIX_ID_TAG, ID_TAG removed
+    <span class="md-ellipsis">
+      ID_TAG_PREFIX, PREFIX_ID_TAG, ID_TAG removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#tx_type-removed" class="md-nav__link">
-    TX_TYPE removed.
+    <span class="md-ellipsis">
+      TX_TYPE removed.
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#gas_max-removed" class="md-nav__link">
-    GAS_MAX removed
+    <span class="md-ellipsis">
+      GAS_MAX removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#calculateminfee-removed" class="md-nav__link">
-    calculateMinFee removed
+    <span class="md-ellipsis">
+      calculateMinFee removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#salt-createsalt-removed" class="md-nav__link">
-    salt, createSalt removed
+    <span class="md-ellipsis">
+      salt, createSalt removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#pointer-removed" class="md-nav__link">
-    Pointer removed
+    <span class="md-ellipsis">
+      Pointer removed
+    </span>
   </a>
   
 </li>
@@ -1820,143 +2340,202 @@
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../12.0.0/" class="md-nav__link">
-        Migration to 12.0.0
+        
+  
+  <span class="md-ellipsis">
+    Migration to 12.0.0
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../11.0.0/" class="md-nav__link">
-        Migration to 11.0.0
+        
+  
+  <span class="md-ellipsis">
+    Migration to 11.0.0
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../10.0.0/" class="md-nav__link">
-        Migration to 10.0.0
+        
+  
+  <span class="md-ellipsis">
+    Migration to 10.0.0
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../9.0.0/" class="md-nav__link">
-        Migration to 9.0.0
+        
+  
+  <span class="md-ellipsis">
+    Migration to 9.0.0
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../7.0.0/" class="md-nav__link">
-        Migration to 7.0.0
+        
+  
+  <span class="md-ellipsis">
+    Migration to 7.0.0
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
+  
   
   
   
     
+    
+    
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
-      
-      
-      
-        <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
-          Contribute
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_10">
-          <span class="md-nav__icon md-icon"></span>
-          Contribute
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
           
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Contribute
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Contribute
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../contrib/" class="md-nav__link">
-        Development
+        
+  
+  <span class="md-ellipsis">
+    Development
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../../contrib/releases/" class="md-nav__link">
-        Releases
+        
+  
+  <span class="md-ellipsis">
+    Releases
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1989,7 +2568,9 @@
       
         <li class="md-nav__item">
   <a href="#wallet" class="md-nav__link">
-    Wallet
+    <span class="md-ellipsis">
+      Wallet
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Wallet">
@@ -1997,7 +2578,9 @@
         
           <li class="md-nav__item">
   <a href="#onsign-onmessagesign-callbacks-were-removed-on-the-wallet-side" class="md-nav__link">
-    onSign, onMessageSign callbacks were removed on the wallet side
+    <span class="md-ellipsis">
+      onSign, onMessageSign callbacks were removed on the wallet side
+    </span>
   </a>
   
 </li>
@@ -2009,7 +2592,9 @@
       
         <li class="md-nav__item">
   <a href="#aepp" class="md-nav__link">
-    Aepp
+    <span class="md-ellipsis">
+      Aepp
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Aepp">
@@ -2017,14 +2602,18 @@
         
           <li class="md-nav__item">
   <a href="#all-wallet-provided-nodes-have-the-same-name" class="md-nav__link">
-    All wallet provided nodes have the same name
+    <span class="md-ellipsis">
+      All wallet provided nodes have the same name
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#select-option-removed-from-connecttowallet" class="md-nav__link">
-    Select option removed from connectToWallet
+    <span class="md-ellipsis">
+      Select option removed from connectToWallet
+    </span>
   </a>
   
 </li>
@@ -2036,7 +2625,9 @@
       
         <li class="md-nav__item">
   <a href="#contract" class="md-nav__link">
-    Contract
+    <span class="md-ellipsis">
+      Contract
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Contract">
@@ -2044,133 +2635,171 @@
         
           <li class="md-nav__item">
   <a href="#aci-format-used-the-same-as-returned-by-aesophia_cli" class="md-nav__link">
-    ACI format used the same as returned by aesophia_cli
+    <span class="md-ellipsis">
+      ACI format used the same as returned by aesophia_cli
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#params-argument-in-deploy-and-call-is-required" class="md-nav__link">
-    params argument in $deploy and $call is required
+    <span class="md-ellipsis">
+      params argument in $deploy and $call is required
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contract-methods-accessible-on-the-instance-itself" class="md-nav__link">
-    Contract methods accessible on the instance itself
+    <span class="md-ellipsis">
+      Contract methods accessible on the instance itself
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractmethodsnamegetsend-removed" class="md-nav__link">
-    contract.methods.&lt;name&gt;.get,send removed
+    <span class="md-ellipsis">
+      contract.methods.&lt;name&gt;.get,send removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractbytecodesourcecode-moved-to-contractoptions" class="md-nav__link">
-    contract.bytecode,sourceCode moved to contract.$options
+    <span class="md-ellipsis">
+      contract.bytecode,sourceCode moved to contract.$options
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractcalldata-renamed-to-contract_calldata" class="md-nav__link">
-    contract.calldata renamed to contract._calldata
+    <span class="md-ellipsis">
+      contract.calldata renamed to contract._calldata
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractoptions-renamed-to-contractoptions" class="md-nav__link">
-    contract.options renamed to contract.$options
+    <span class="md-ellipsis">
+      contract.options renamed to contract.$options
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractdeployinfo-removed" class="md-nav__link">
-    contract.deployInfo removed
+    <span class="md-ellipsis">
+      contract.deployInfo removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractdecodeevents-renamed-to-contractdecodeevents" class="md-nav__link">
-    contract.decodeEvents renamed to contract.$decodeEvents
+    <span class="md-ellipsis">
+      contract.decodeEvents renamed to contract.$decodeEvents
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractcall-renamed-to-contractcall" class="md-nav__link">
-    contract.call renamed to contract.$call
+    <span class="md-ellipsis">
+      contract.call renamed to contract.$call
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractcompile-renamed-to-contractcompile" class="md-nav__link">
-    contract.compile renamed to contract.$compile
+    <span class="md-ellipsis">
+      contract.compile renamed to contract.$compile
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#contractdeploy-renamed-to-contractdeploy" class="md-nav__link">
-    contract.deploy renamed to contract.$deploy
+    <span class="md-ellipsis">
+      contract.deploy renamed to contract.$deploy
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#createaensdelegationsignature-createoracledelegationsignature-removed" class="md-nav__link">
-    createAensDelegationSignature, createOracleDelegationSignature removed
+    <span class="md-ellipsis">
+      createAensDelegationSignature, createOracleDelegationSignature removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#use-sourcecode-instead-of-source" class="md-nav__link">
-    use sourceCode instead of source
+    <span class="md-ellipsis">
+      use sourceCode instead of source
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#getcontractinstance-accepts-address-instead-of-contractaddress" class="md-nav__link">
-    getContractInstance accepts address instead of contractAddress
+    <span class="md-ellipsis">
+      getContractInstance accepts address instead of contractAddress
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#getcontractinstance-function-replaced-with-contract-class" class="md-nav__link">
-    getContractInstance function replaced with Contract class
+    <span class="md-ellipsis">
+      getContractInstance function replaced with Contract class
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#aesdkgetcontractinstance-renamed-to-aesdkinitializecontract" class="md-nav__link">
-    AeSdk.getContractInstance renamed to AeSdk.initializeContract
+    <span class="md-ellipsis">
+      AeSdk.getContractInstance renamed to AeSdk.initializeContract
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#preparetxparams-getvmversion-are-not-exported-anymore" class="md-nav__link">
-    prepareTxParams, getVmVersion are not exported anymore
+    <span class="md-ellipsis">
+      prepareTxParams, getVmVersion are not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#isga-method-removed" class="md-nav__link">
-    isGA method removed
+    <span class="md-ellipsis">
+      isGA method removed
+    </span>
   </a>
   
 </li>
@@ -2182,7 +2811,9 @@
       
         <li class="md-nav__item">
   <a href="#transaction-builder" class="md-nav__link">
-    Transaction builder
+    <span class="md-ellipsis">
+      Transaction builder
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Transaction builder">
@@ -2190,231 +2821,297 @@
         
           <li class="md-nav__item">
   <a href="#writeint-function-removed" class="md-nav__link">
-    writeInt function removed
+    <span class="md-ellipsis">
+      writeInt function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#returntype-of-contract-call-result-structure-is-a-value-of-callreturntype-enum" class="md-nav__link">
-    returnType of contract call result structure is a value of CallReturnType enum
+    <span class="md-ellipsis">
+      returnType of contract call result structure is a value of CallReturnType enum
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#writeid-readid-functions-removed" class="md-nav__link">
-    writeId, readId functions removed
+    <span class="md-ellipsis">
+      writeId, readId functions removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#readpointers-buildpointers-functions-removed" class="md-nav__link">
-    readPointers, buildPointers functions removed
+    <span class="md-ellipsis">
+      readPointers, buildPointers functions removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#formatsalt-function-removed" class="md-nav__link">
-    formatSalt function removed
+    <span class="md-ellipsis">
+      formatSalt function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#validateparams-unpackrawtx-functions-removed" class="md-nav__link">
-    validateParams, unpackRawTx functions removed
+    <span class="md-ellipsis">
+      validateParams, unpackRawTx functions removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#amount-constant-removed" class="md-nav__link">
-    AMOUNT constant removed
+    <span class="md-ellipsis">
+      AMOUNT constant removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#statetrees-fields-decoded-as-objects-mapping-key-to-decoded-entry-instead-of-internals" class="md-nav__link">
-    StateTrees fields decoded as objects mapping key to decoded entry instead of internals
+    <span class="md-ellipsis">
+      StateTrees fields decoded as objects mapping key to decoded entry instead of internals
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#the-content-of-tagmtree-entries-decoded-and-moved-to-payload-field" class="md-nav__link">
-    The content of Tag.*Mtree entries decoded and moved to payload field
+    <span class="md-ellipsis">
+      The content of Tag.*Mtree entries decoded and moved to payload field
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#tx_schema-txparamscommon-txschema-txtypeschemas-are-not-exported-anymore" class="md-nav__link">
-    TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas are not exported anymore
+    <span class="md-ellipsis">
+      TX_SCHEMA, TxParamsCommon, TxSchema, TxTypeSchemas are not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#tx_ttl-is-not-exported-anymore" class="md-nav__link">
-    TX_TTL is not exported anymore
+    <span class="md-ellipsis">
+      TX_TTL is not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#enum-field_types-is-not-exported-anymore" class="md-nav__link">
-    Enum FIELD_TYPES is not exported anymore
+    <span class="md-ellipsis">
+      Enum FIELD_TYPES is not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#not-able-to-buildunpack-compilersophia-entry-tag-70" class="md-nav__link">
-    Not able to build/unpack CompilerSophia entry (tag 70)
+    <span class="md-ellipsis">
+      Not able to build/unpack CompilerSophia entry (tag 70)
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#enums-protocol_vm_abi-interface-ctversion-not-exported-anymore" class="md-nav__link">
-    Enums PROTOCOL_VM_ABI, interface CtVersion not exported anymore
+    <span class="md-ellipsis">
+      Enums PROTOCOL_VM_ABI, interface CtVersion not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#enums-vm_versions-abi_versions-protocol_versions-renamed" class="md-nav__link">
-    Enums VM_VERSIONS, ABI_VERSIONS, PROTOCOL_VERSIONS renamed
+    <span class="md-ellipsis">
+      Enums VM_VERSIONS, ABI_VERSIONS, PROTOCOL_VERSIONS renamed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#statehash-of-channel-entry-decoded-as-st_-prefixed-string-instead-of-hex" class="md-nav__link">
-    stateHash of Channel entry decoded as st_-prefixed string instead of hex
+    <span class="md-ellipsis">
+      stateHash of Channel entry decoded as st_-prefixed string instead of hex
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#spendtx-payload-doesnt-accept-arbitrary-strings-anymore" class="md-nav__link">
-    SpendTx payload doesn't accept arbitrary strings anymore
+    <span class="md-ellipsis">
+      SpendTx payload doesn't accept arbitrary strings anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#verifytransaction-doesnt-accept-parent-tx-types-anymore" class="md-nav__link">
-    verifyTransaction doesn't accept parent tx types anymore
+    <span class="md-ellipsis">
+      verifyTransaction doesn't accept parent tx types anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-doesnt-accept-excludekeys-option-anymore" class="md-nav__link">
-    buildTx doesn't accept excludeKeys option anymore
+    <span class="md-ellipsis">
+      buildTx doesn't accept excludeKeys option anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#use-version-instead-of-vsn-vsn-in-unpacktx-buildtx" class="md-nav__link">
-    Use version instead of VSN, vsn in unpackTx, buildTx
+    <span class="md-ellipsis">
+      Use version instead of VSN, vsn in unpackTx, buildTx
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-accepts-transaction-type-and-version-in-the-first-argument" class="md-nav__link">
-    buildTx accepts transaction type and version in the first argument
+    <span class="md-ellipsis">
+      buildTx accepts transaction type and version in the first argument
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#aesdkbuildtx-accepts-tag-in-options" class="md-nav__link">
-    AeSdk.buildTx accepts tag in options
+    <span class="md-ellipsis">
+      AeSdk.buildTx accepts tag in options
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#sync-buildtx-accepts-denomination-in-the-first-argument" class="md-nav__link">
-    sync buildTx accepts denomination in the first argument
+    <span class="md-ellipsis">
+      sync buildTx accepts denomination in the first argument
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#unpacktx-return-an-object-of-transaction-parameters" class="md-nav__link">
-    unpackTx return an object of transaction parameters
+    <span class="md-ellipsis">
+      unpackTx return an object of transaction parameters
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#unpacktx-doesnt-return-rlpencoded-anymore" class="md-nav__link">
-    unpackTx doesn't return rlpEncoded anymore
+    <span class="md-ellipsis">
+      unpackTx doesn't return rlpEncoded anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#unpacktx-doesnt-return-txtype-anymore" class="md-nav__link">
-    unpackTx doesn't return txType anymore
+    <span class="md-ellipsis">
+      unpackTx doesn't return txType anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-return-string-instead-of-object" class="md-nav__link">
-    buildTx return string instead of object
+    <span class="md-ellipsis">
+      buildTx return string instead of object
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-doesnt-return-txobject-anymore" class="md-nav__link">
-    buildTx doesn't return txObject anymore
+    <span class="md-ellipsis">
+      buildTx doesn't return txObject anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-doesnt-return-binary-anymore" class="md-nav__link">
-    buildTx doesn't return binary anymore
+    <span class="md-ellipsis">
+      buildTx doesn't return binary anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#buildtx-doesnt-return-rlpencoded-anymore" class="md-nav__link">
-    buildTx doesn't return rlpEncoded anymore
+    <span class="md-ellipsis">
+      buildTx doesn't return rlpEncoded anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#key-of-mtreevalue-entry-decoded-as-a-buffer-instead-of-a-hex" class="md-nav__link">
-    key of MtreeValue entry decoded as a buffer instead of a hex
+    <span class="md-ellipsis">
+      key of MtreeValue entry decoded as a buffer instead of a hex
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#txbuilder-accepts-and-returns-poi-field-unpacked-as-treespoi" class="md-nav__link">
-    TxBuilder accepts and returns poi field unpacked as TreesPoi
+    <span class="md-ellipsis">
+      TxBuilder accepts and returns poi field unpacked as TreesPoi
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#get-method-of-mptree-accepts-and-returns-typed-values" class="md-nav__link">
-    get method of MPTree accepts and returns typed values
+    <span class="md-ellipsis">
+      get method of MPTree accepts and returns typed values
+    </span>
   </a>
   
 </li>
@@ -2426,7 +3123,9 @@
       
         <li class="md-nav__item">
   <a href="#compiler" class="md-nav__link">
-    Compiler
+    <span class="md-ellipsis">
+      Compiler
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Compiler">
@@ -2434,28 +3133,36 @@
         
           <li class="md-nav__item">
   <a href="#compiler-export-renamed-to-compilerhttp" class="md-nav__link">
-    Compiler export renamed to CompilerHttp
+    <span class="md-ellipsis">
+      Compiler export renamed to CompilerHttp
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#removed-aesdkcompilerurl-aesdksetcompilerurl" class="md-nav__link">
-    removed AeSdk:compilerUrl, AeSdk:setCompilerUrl
+    <span class="md-ellipsis">
+      removed AeSdk:compilerUrl, AeSdk:setCompilerUrl
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#methods-of-compilerhttp-moved-to-api-property" class="md-nav__link">
-    Methods of CompilerHttp moved to api property
+    <span class="md-ellipsis">
+      Methods of CompilerHttp moved to api property
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#dropped-compatibility-with-aesophia_http-below-711-aesophia_cli-below-701" class="md-nav__link">
-    Dropped compatibility with aesophia_http below 7.1.1, aesophia_cli below 7.0.1
+    <span class="md-ellipsis">
+      Dropped compatibility with aesophia_http below 7.1.1, aesophia_cli below 7.0.1
+    </span>
   </a>
   
 </li>
@@ -2467,7 +3174,9 @@
       
         <li class="md-nav__item">
   <a href="#account" class="md-nav__link">
-    Account
+    <span class="md-ellipsis">
+      Account
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Account">
@@ -2475,56 +3184,72 @@
         
           <li class="md-nav__item">
   <a href="#creategeneralizedaccount-accepts-sourcecode-in-options" class="md-nav__link">
-    createGeneralizedAccount accepts sourceCode in options
+    <span class="md-ellipsis">
+      createGeneralizedAccount accepts sourceCode in options
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#createmetatx-removed" class="md-nav__link">
-    createMetaTx removed
+    <span class="md-ellipsis">
+      createMetaTx removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#accountrpc-constructor-accepts-arguments-one-by-one" class="md-nav__link">
-    AccountRpc constructor accepts arguments one by one
+    <span class="md-ellipsis">
+      AccountRpc constructor accepts arguments one by one
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#accountmemory-requires-networkid-in-signtransaction" class="md-nav__link">
-    AccountMemory requires networkId in signTransaction
+    <span class="md-ellipsis">
+      AccountMemory requires networkId in signTransaction
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#accountbase-simplified" class="md-nav__link">
-    AccountBase simplified
+    <span class="md-ellipsis">
+      AccountBase simplified
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#address-in-accountbase-is-a-property" class="md-nav__link">
-    address in AccountBase is a property
+    <span class="md-ellipsis">
+      address in AccountBase is a property
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#memoryaccount-accepts-only-secretkey" class="md-nav__link">
-    MemoryAccount accepts only secretKey
+    <span class="md-ellipsis">
+      MemoryAccount accepts only secretKey
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#memoryaccount-is-not-compatible-with-ga" class="md-nav__link">
-    MemoryAccount is not compatible with GA
+    <span class="md-ellipsis">
+      MemoryAccount is not compatible with GA
+    </span>
   </a>
   
 </li>
@@ -2536,7 +3261,9 @@
       
         <li class="md-nav__item">
   <a href="#node" class="md-nav__link">
-    Node
+    <span class="md-ellipsis">
+      Node
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Node">
@@ -2544,7 +3271,9 @@
         
           <li class="md-nav__item">
   <a href="#url-property-of-node-removed" class="md-nav__link">
-    url property of Node removed
+    <span class="md-ellipsis">
+      url property of Node removed
+    </span>
   </a>
   
 </li>
@@ -2556,7 +3285,9 @@
       
         <li class="md-nav__item">
   <a href="#oracle" class="md-nav__link">
-    Oracle
+    <span class="md-ellipsis">
+      Oracle
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Oracle">
@@ -2564,28 +3295,36 @@
         
           <li class="md-nav__item">
   <a href="#query_fee-is-not-exported-anymore" class="md-nav__link">
-    QUERY_FEE is not exported anymore
+    <span class="md-ellipsis">
+      QUERY_FEE is not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#oracles-created-without-queryfee-by-default" class="md-nav__link">
-    Oracles created without queryFee by default
+    <span class="md-ellipsis">
+      Oracles created without queryFee by default
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#aesdkextendoraclettl-aesdkrespondtoquery-doesnt-accept-oracleid" class="md-nav__link">
-    AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId
+    <span class="md-ellipsis">
+      AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#onquery-callback-of-pollforqueries-oraclepollqueries-accepts-a-single-query" class="md-nav__link">
-    onQuery callback of pollForQueries, oracle.pollQueries accepts a single query
+    <span class="md-ellipsis">
+      onQuery callback of pollForQueries, oracle.pollQueries accepts a single query
+    </span>
   </a>
   
 </li>
@@ -2597,7 +3336,9 @@
       
         <li class="md-nav__item">
   <a href="#chain" class="md-nav__link">
-    Chain
+    <span class="md-ellipsis">
+      Chain
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Chain">
@@ -2605,7 +3346,9 @@
         
           <li class="md-nav__item">
   <a href="#send-inlined-into-sendtransaction" class="md-nav__link">
-    send inlined into sendTransaction
+    <span class="md-ellipsis">
+      send inlined into sendTransaction
+    </span>
   </a>
   
 </li>
@@ -2617,7 +3360,9 @@
       
         <li class="md-nav__item">
   <a href="#aens" class="md-nav__link">
-    AENS
+    <span class="md-ellipsis">
+      AENS
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="AENS">
@@ -2625,7 +3370,9 @@
         
           <li class="md-nav__item">
   <a href="#height-removed-from-the-output-of-aenspreclaim" class="md-nav__link">
-    height removed from the output of aensPreclaim
+    <span class="md-ellipsis">
+      height removed from the output of aensPreclaim
+    </span>
   </a>
   
 </li>
@@ -2637,7 +3384,9 @@
       
         <li class="md-nav__item">
   <a href="#channel" class="md-nav__link">
-    Channel
+    <span class="md-ellipsis">
+      Channel
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Channel">
@@ -2645,21 +3394,27 @@
         
           <li class="md-nav__item">
   <a href="#channelstate-returns-unpacked-entries" class="md-nav__link">
-    Channel:state returns unpacked entries
+    <span class="md-ellipsis">
+      Channel:state returns unpacked entries
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#all-channel-events-emitted-in-snakecase" class="md-nav__link">
-    All channel events emitted in snakeCase
+    <span class="md-ellipsis">
+      All channel events emitted in snakeCase
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#channelpoi-returns-unpacked-treespoi" class="md-nav__link">
-    Channel:poi returns unpacked TreesPoi
+    <span class="md-ellipsis">
+      Channel:poi returns unpacked TreesPoi
+    </span>
   </a>
   
 </li>
@@ -2671,7 +3426,9 @@
       
         <li class="md-nav__item">
   <a href="#other" class="md-nav__link">
-    Other
+    <span class="md-ellipsis">
+      Other
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Other">
@@ -2679,196 +3436,252 @@
         
           <li class="md-nav__item">
   <a href="#onaccount-doesnt-accept-keypair" class="md-nav__link">
-    onAccount doesn't accept keypair
+    <span class="md-ellipsis">
+      onAccount doesn't accept keypair
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#bignumbertobytearray-removed" class="md-nav__link">
-    bigNumberToByteArray removed
+    <span class="md-ellipsis">
+      bigNumberToByteArray removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#str2buf-function-removed" class="md-nav__link">
-    str2buf function removed
+    <span class="md-ellipsis">
+      str2buf function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#getaddressfrompriv-doesnt-accept-private-key-as-base64-encoded-or-raw-string" class="md-nav__link">
-    getAddressFromPriv doesn't accept private key as base64-encoded or raw string
+    <span class="md-ellipsis">
+      getAddressFromPriv doesn't accept private key as base64-encoded or raw string
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#isvalidkeypair-doesnt-accept-public-key-as-base64-encoded-string" class="md-nav__link">
-    isValidKeypair doesn't accept public key as base64-encoded string
+    <span class="md-ellipsis">
+      isValidKeypair doesn't accept public key as base64-encoded string
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#bytestohex-function-removed" class="md-nav__link">
-    bytesToHex function removed
+    <span class="md-ellipsis">
+      bytesToHex function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#hextobytes-function-removed" class="md-nav__link">
-    hexToBytes function removed
+    <span class="md-ellipsis">
+      hexToBytes function removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#rename-umd-export-to-aeternity" class="md-nav__link">
-    rename umd export to Aeternity
+    <span class="md-ellipsis">
+      rename umd export to Aeternity
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#subpaths-imports-of-sdk-are-not-allowed" class="md-nav__link">
-    Subpaths imports of SDK are not allowed
+    <span class="md-ellipsis">
+      Subpaths imports of SDK are not allowed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#removed-getnetworkid-from-aesdkbase" class="md-nav__link">
-    Removed getNetworkId from AeSdkBase
+    <span class="md-ellipsis">
+      Removed getNetworkId from AeSdkBase
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#address-a-getter-in-aesdkbase" class="md-nav__link">
-    address a getter in AeSdkBase
+    <span class="md-ellipsis">
+      address a getter in AeSdkBase
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#addaccount-is-a-sync-function" class="md-nav__link">
-    addAccount is a sync function
+    <span class="md-ellipsis">
+      addAccount is a sync function
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#verifymessage-removed-from-accounts-and-aesdkbase" class="md-nav__link">
-    verifyMessage removed from accounts and AeSdkBase
+    <span class="md-ellipsis">
+      verifyMessage removed from accounts and AeSdkBase
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#verify-and-verifymessage-accepts-address-instead-of-hex-string-or-uint8array" class="md-nav__link">
-    verify and verifyMessage accepts address instead of hex string or Uint8Array
+    <span class="md-ellipsis">
+      verify and verifyMessage accepts address instead of hex string or Uint8Array
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#node12-not-supported" class="md-nav__link">
-    node@12 not supported
+    <span class="md-ellipsis">
+      node@12 not supported
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#removeaccount-throws-an-error-if-the-account-is-not-found" class="md-nav__link">
-    removeAccount throws an error if the account is not found
+    <span class="md-ellipsis">
+      removeAccount throws an error if the account is not found
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#signmessage-always-returns-uint8array" class="md-nav__link">
-    signMessage always returns Uint8Array
+    <span class="md-ellipsis">
+      signMessage always returns Uint8Array
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#encryptkey-decryptkey-are-not-exported-anymore" class="md-nav__link">
-    encryptKey, decryptKey are not exported anymore
+    <span class="md-ellipsis">
+      encryptKey, decryptKey are not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#sha256hash-is-not-exported-anymore" class="md-nav__link">
-    sha256hash is not exported anymore
+    <span class="md-ellipsis">
+      sha256hash is not exported anymore
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#height-method-removed" class="md-nav__link">
-    height method removed
+    <span class="md-ellipsis">
+      height method removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#signusingga-method-removed" class="md-nav__link">
-    signUsingGA method removed
+    <span class="md-ellipsis">
+      signUsingGA method removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#pointer_key_by_prefix-removed" class="md-nav__link">
-    POINTER_KEY_BY_PREFIX removed
+    <span class="md-ellipsis">
+      POINTER_KEY_BY_PREFIX removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#id_tag_prefix-prefix_id_tag-id_tag-removed" class="md-nav__link">
-    ID_TAG_PREFIX, PREFIX_ID_TAG, ID_TAG removed
+    <span class="md-ellipsis">
+      ID_TAG_PREFIX, PREFIX_ID_TAG, ID_TAG removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#tx_type-removed" class="md-nav__link">
-    TX_TYPE removed.
+    <span class="md-ellipsis">
+      TX_TYPE removed.
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#gas_max-removed" class="md-nav__link">
-    GAS_MAX removed
+    <span class="md-ellipsis">
+      GAS_MAX removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#calculateminfee-removed" class="md-nav__link">
-    calculateMinFee removed
+    <span class="md-ellipsis">
+      calculateMinFee removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#salt-createsalt-removed" class="md-nav__link">
-    salt, createSalt removed
+    <span class="md-ellipsis">
+      salt, createSalt removed
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#pointer-removed" class="md-nav__link">
-    Pointer removed
+    <span class="md-ellipsis">
+      Pointer removed
+    </span>
   </a>
   
 </li>
@@ -2891,7 +3704,6 @@
               <article class="md-content__inner md-typeset">
                 
                   
-
 
 
 <h1 id="migration-to-1300">Migration to 13.0.0</h1>
@@ -3186,6 +3998,13 @@ sdk check/provides gasLimit by itself while building a transaction.</p>
 
 
 
+
+
+
+
+
+
+
                 
               </article>
             </div>
@@ -3193,6 +4012,7 @@ sdk check/provides gasLimit by itself while building a transaction.</p>
           
   <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
       </main>
@@ -3220,10 +4040,11 @@ sdk check/provides gasLimit by itself while building a transaction.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "search": "../../../assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.6df46069.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.8fd75fb4.min.js"></script>
       
     
   </body>
