@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { expect } from 'chai';
-import { AensName } from '../src';
+import { AensName, Node } from '../src';
 
 export function randomString(len: number): string {
   const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -31,3 +31,18 @@ export type InputNumber = number | bigint | string | BigNumber;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function checkOnlyTypes(cb: Function): void {}
+
+export function bindRequestCounter(node: Node): () => number {
+  let counter = 0;
+  node.pipeline.addPolicy({
+    name: 'counter',
+    async sendRequest(request, next) {
+      counter += 1;
+      return next(request);
+    },
+  }, { phase: 'Deserialize' });
+  return () => {
+    node.pipeline.removePolicy({ name: 'counter' });
+    return counter;
+  };
+}

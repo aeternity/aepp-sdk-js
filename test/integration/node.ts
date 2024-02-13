@@ -1,13 +1,12 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { createSandbox } from 'sinon';
-import {
-  PipelineRequest, PipelineResponse, RestError, SendRequest,
-} from '@azure/core-rest-pipeline';
+import { RestError } from '@azure/core-rest-pipeline';
 import { url } from '.';
 import {
   AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion,
 } from '../../src';
+import { bindRequestCounter } from '../utils';
 
 describe('Node client', () => {
   let node: Node;
@@ -56,19 +55,9 @@ describe('Node client', () => {
   ] as const).reduce(async (prev, [address, requestCount]) => {
     await prev;
 
-    let counter = 0;
-    node.pipeline.addPolicy({
-      name: 'counter',
-      async sendRequest(request: PipelineRequest, next: SendRequest): Promise<PipelineResponse> {
-        counter += 1;
-        return next(request);
-      },
-    }, { phase: 'Deserialize' });
-
+    const getCount = bindRequestCounter(node);
     await node.getAccountByPubkey(address).catch(() => {});
-
-    node.pipeline.removePolicy({ name: 'counter' });
-    expect(counter).to.be.equal(requestCount);
+    expect(getCount()).to.be.equal(requestCount);
   }, Promise.resolve()));
 
   it('throws exception if unsupported protocol', async () => {

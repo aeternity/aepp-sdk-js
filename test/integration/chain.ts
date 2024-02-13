@@ -1,31 +1,15 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
 import { getSdk } from '.';
 import {
   generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount, Encoded,
 } from '../../src';
-import { assertNotNull } from '../utils';
+import { assertNotNull, bindRequestCounter } from '../utils';
 
 describe('Node Chain', () => {
   let aeSdk: AeSdk;
   let aeSdkWithoutAccount: AeSdk;
   const { publicKey } = generateKeyPair();
-
-  function resetRequestCounter(): () => number {
-    let counter = 0;
-    [aeSdk, aeSdkWithoutAccount].forEach((sdk) => {
-      sdk.api.pipeline.removePolicy({ name: 'counter' });
-      sdk.api.pipeline.addPolicy({
-        name: 'counter',
-        async sendRequest(request: PipelineRequest, next: SendRequest): Promise<PipelineResponse> {
-          counter += 1;
-          return next(request);
-        },
-      }, { phase: 'Deserialize' });
-    });
-    return () => counter;
-  }
 
   before(async () => {
     aeSdk = await getSdk();
@@ -37,7 +21,7 @@ describe('Node Chain', () => {
   });
 
   it('combines height queries', async () => {
-    const getCount = resetRequestCounter();
+    const getCount = bindRequestCounter(aeSdk.api);
     const heights = await Promise.all(
       new Array(5).fill(undefined).map(async () => aeSdk.getHeight()),
     );
@@ -113,17 +97,17 @@ describe('Node Chain', () => {
   it('doesn\'t make extra requests', async () => {
     let getCount;
     let hash;
-    getCount = resetRequestCounter();
+    getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
     expect(getCount()).to.be.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
-    getCount = resetRequestCounter();
+    getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
     expect(getCount()).to.be.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
-    getCount = resetRequestCounter();
+    getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, publicKey, { waitMined: false })).hash;
     expect(getCount()).to.be.equal(5); // nonce, validator(acc, height, status), post tx
     await aeSdk.poll(hash);
@@ -134,7 +118,7 @@ describe('Node Chain', () => {
 
   it('multiple spends from one account', async () => {
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
-    const getCount = resetRequestCounter();
+    const getCount = bindRequestCounter(aeSdk.api);
     const spends = await Promise.all(accounts.map(async (account, idx) => aeSdk.spend(
       Math.floor(Math.random() * 1000 + 1e15),
       account.address,
@@ -146,7 +130,7 @@ describe('Node Chain', () => {
   });
 
   it('multiple spends from different accounts', async () => {
-    const getCount = resetRequestCounter();
+    const getCount = bindRequestCounter(aeSdkWithoutAccount.api);
     const spends = await Promise.all(
       accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e14, aeSdk.address, {
         nonce: 1, verify: false, onAccount, waitMined: false,
@@ -170,7 +154,7 @@ describe('Node Chain', () => {
     assertNotNull(result);
     const { gasUsed: gasLimit } = result;
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
-    const getCount = resetRequestCounter();
+    const getCount = bindRequestCounter(aeSdk.api);
     const numbers = new Array(32).fill(undefined).map((v, idx) => idx * 2);
     const results = (await Promise.all(
       numbers.map(async (v, idx) => contract
