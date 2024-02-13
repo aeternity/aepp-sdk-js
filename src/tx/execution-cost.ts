@@ -4,7 +4,7 @@ import { Tag } from './builder/constants';
 import { verify } from '../utils/crypto';
 import { getBufferToSign } from '../account/Memory';
 import { IllegalArgumentError, InternalError, TransactionError } from '../utils/errors';
-import Node from '../Node';
+import Node from '../node/Direct';
 import getTransactionSignerAddress from './transaction-signer';
 
 /**

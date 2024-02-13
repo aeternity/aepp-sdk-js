@@ -3,7 +3,7 @@ import { ArgumentError } from '../utils/errors';
 import { AensName } from '../tx/builder/constants';
 import AccountBase from '../account/Base';
 import { isNameValid } from '../tx/builder/helpers';
-import Node from '../Node';
+import Node from '../node/Direct';
 
 function ensureOracleQuery(oq: string): asserts oq is Encoded.OracleQueryId {
   if (!oq.startsWith('oq_')) throw new ArgumentError('oq', 'oracle query', oq);
