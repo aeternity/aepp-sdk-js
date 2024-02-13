@@ -81,6 +81,7 @@ export default async function verifyTransaction(
     ignoreVersion: true,
     pipeline: nodeNotCached.pipeline.clone(),
     additionalPolicies: [genAggressiveCacheGetResponsesPolicy()],
+    _disableGatewayWarning: true,
   });
   return verifyTransactionInternal(unpackTx(transaction), node, []);
 }

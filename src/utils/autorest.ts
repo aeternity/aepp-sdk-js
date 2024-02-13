@@ -117,6 +117,13 @@ export const genVersionCheckPolicy = (
   },
 });
 
+export const getIntervals = (retryCount: number, retryOverallDelay: number): number[] => {
+  const intervals = new Array(retryCount).fill(0)
+    .map((_, idx) => ((idx + 1) / retryCount) ** 2);
+  const intervalSum = intervals.reduce((a, b) => a + b, 0);
+  return intervals.map((el) => Math.floor((el / intervalSum) * retryOverallDelay));
+};
+
 export const genRetryOnFailurePolicy = (
   retryCount: number,
   retryOverallDelay: number,
@@ -125,20 +132,10 @@ export const genRetryOnFailurePolicy = (
     name: 'retry-on-failure',
     async sendRequest(request, next) {
       const statusesToNotRetry = [200, 400, 403, 410, 500];
-
-      const intervals = new Array(retryCount).fill(0)
-        .map((_, idx) => ((idx + 1) / retryCount) ** 2);
-      const intervalSum = intervals.reduce((a, b) => a + b, 0);
-      const intervalsInMs = intervals.map((e) => Math.floor((e / intervalSum) * retryOverallDelay));
-
+      const intervals = getIntervals(retryCount, retryOverallDelay);
       let error = new RestError('Not expected to be thrown');
       for (let attempt = 0; attempt <= retryCount; attempt += 1) {
-        if (attempt !== 0) {
-          await pause(intervalsInMs[attempt - 1]);
-          const urlParsed = new URL(request.url);
-          urlParsed.searchParams.set('__sdk-retry', attempt.toString());
-          request.url = urlParsed.toString();
-        }
+        if (attempt !== 0) await pause(intervals[attempt - 1]);
         try {
           return await next(request);
         } catch (e) {
