@@ -117,7 +117,7 @@ root variable, to don't make it reactive in deep. You can find it implementation
 [not compatible]: https://github.com/tc39/proposal-class-fields/issues/106
 [shallowRef]: https://vuejs.org/api/reactivity-advanced.html#shallowref
 [shallowReactive]: https://vuejs.org/api/reactivity-advanced.html#shallowreactive
-[æpp example]: ../examples/browser/aepp/
+[æpp example]: https://github.com/aeternity/aepp-sdk-js/tree/71da12b5df56b41f7317d1fb064e44e8ea118d6c/examples/browser/aepp
 
 ## Command Line Interface (CLI)
 If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the [💻 CLI](https://github.com/aeternity/aepp-cli-js) and follow the instructions mentioned there.

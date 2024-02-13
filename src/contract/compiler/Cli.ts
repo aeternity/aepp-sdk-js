@@ -22,9 +22,9 @@ export const getPackagePath = (): string => {
  * @category contract
  */
 export default class CompilerCli extends CompilerBase {
-  #path: string;
+  readonly #path: string;
 
-  #ensureCompatibleVersion = Promise.resolve();
+  readonly #ensureCompatibleVersion = Promise.resolve();
 
   /**
    * @param compilerPath - A path to aesophia_cli binary, by default uses the integrated one

@@ -56,8 +56,8 @@ export default abstract class AccountBase {
 
   /**
    * Sign typed data
-   * @param type - Type of data to sign
    * @param data - Encoded data to sign
+   * @param aci - Type of data to sign
    * @param options - Options
    * @returns Signature
    */

@@ -96,7 +96,7 @@ const aeSdk = new AeSdk({
 //  1. Create the `ContractCreateTx` by providing all required params.
 //      - You could omit `amount`, `gasLimit` and `gasPrice` if you choose to stick to the default
 //        values (see
-//        [transaction options](../../../transaction-options#contractcreatetx-contractcalltx))
+//        [transaction options](../../transaction-options.md#contractcreatetx-contractcalltx))
 //  1. Sign the transaction by providing `innerTx: true` as transaction option.
 //      - The transaction will be signed in a special way that is required for inner transactions.
 //

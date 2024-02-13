@@ -230,10 +230,6 @@ export default class ChannelSpend extends Channel {
    * @param amount - Amount of coins to withdraw
    * @param sign - Function which verifies and signs withdraw transaction
    * @param callbacks - Callbacks
-   * @param callbacks.onOnChainTx - Called when withdraw transaction has been posted
-   * on chain
-   * @param callbacks.onOwnWithdrawLocked
-   * @param callbacks.onWithdrawLocked
    * @example
    * ```js
    * channel.withdraw(
@@ -305,10 +301,6 @@ export default class ChannelSpend extends Channel {
    * @param amount - Amount of coins to deposit
    * @param sign - Function which verifies and signs deposit transaction
    * @param callbacks - Callbacks
-   * @param callbacks.onOnChainTx - Called when deposit transaction has been posted
-   * on chain
-   * @param callbacks.onOwnDepositLocked
-   * @param callbacks.onDepositLocked
    * @example
    * ```js
    * channel.deposit(

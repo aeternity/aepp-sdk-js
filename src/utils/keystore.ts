@@ -45,7 +45,13 @@ export interface Keystore {
     cipher_params: {
       nonce: string;
     };
+    /**
+     * Key derivation function name.
+     */
     kdf: keyof typeof DERIVED_KEY_FUNCTIONS;
+    /**
+     * Key derivation function parameters.
+     */
     kdf_params: {
       memlimit_kib: number;
       opslimit: number;
@@ -149,8 +155,6 @@ export async function recover(
  * @param nonce - Randomly generated 24byte nonce.
  * @param salt - Randomly generated 16byte salt.
  * @param options - Encryption parameters.
- * @param options.kdf - Key derivation function.
- * @param options.kdf_params - KDF parameters.
  */
 export async function dump(
   name: string,

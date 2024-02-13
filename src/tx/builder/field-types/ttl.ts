@@ -2,6 +2,9 @@ import shortUInt from './short-u-int';
 import Node from '../../../Node';
 import { ArgumentError } from '../../../utils/errors';
 
+/**
+ * Time to leave
+ */
 export default {
   ...shortUInt,
 

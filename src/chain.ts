@@ -21,6 +21,8 @@ import { buildTxHash } from './tx/builder';
 
 /**
  * @category chain
+ * @param type - Type
+ * @param options - Options
  */
 export function _getPollInterval(
   type: 'block' | 'microblock', // TODO: rename to 'key-block' | 'micro-block'
@@ -57,6 +59,7 @@ export class InvalidTxError extends TransactionError {
 /**
  * Obtain current height of the chain
  * @category chain
+ * @param options - Options
  * @returns Current chain height
  */
 export async function getHeight({ onNode }: { onNode: Node }): Promise<number> {
@@ -145,11 +148,6 @@ export async function waitForTxConfirm(
  * @category chain
  * @param txUnsigned - Transaction to sign and submit
  * @param options - Options
- * @param options.onNode - Node to use
- * @param options.onAccount - Account to use
- * @param options.verify - Verify transaction before broadcast, throw error if not
- * @param options.waitMined - Ensure that transaction get into block
- * @param options.confirm - Number of micro blocks that should be mined after tx get included
  * @returns Transaction details
  */
 export async function sendTransaction(
@@ -217,10 +215,25 @@ export async function sendTransaction(
 }
 
 type SendTransactionOptionsType = {
+  /**
+   * Node to use
+   */
   onNode: Node;
+  /**
+   * Account to use
+   */
   onAccount: AccountBase;
+  /**
+   * Verify transaction before broadcast, throw error if not
+   */
   verify?: boolean;
+  /**
+   * Ensure that transaction get into block
+   */
   waitMined?: boolean;
+  /**
+   * Number of micro blocks that should be mined after tx get included
+   */
   confirm?: boolean | number;
 } & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
 & Parameters<AccountBase['signTransaction']>[1];

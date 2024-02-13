@@ -22,7 +22,6 @@ import CompilerBase from './compiler/Base';
  * Convert current account to GA
  * @category contract
  * @param authFnName - Authorization function name
- * @param sourceCode - Auth contract source code
  * @param args - init arguments
  * @param options - Options
  * @returns General Account Object
