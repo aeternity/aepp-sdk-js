@@ -62,6 +62,7 @@ export { default as AeSdk } from './AeSdk';
 export { default as AeSdkAepp } from './AeSdkAepp';
 export { default as AeSdkWallet } from './AeSdkWallet';
 export { default as Node } from './node/Direct';
+export { default as NodeGateway } from './node/Gateway';
 export { default as verifyTransaction } from './tx/validator';
 export { default as AccountBase } from './account/Base';
 export { default as MemoryAccount } from './account/Memory';

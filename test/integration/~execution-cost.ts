@@ -9,7 +9,7 @@ import {
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
-const node = new Node(url);
+const node = new Node(url, { _disableGatewayWarning: true });
 interface TxDetails { tx: Encoded.Transaction; cost: bigint; blockHash: Encoded.MicroBlockHash }
 const sentTxPromises: Array<Promise<TxDetails | undefined>> = [];
 

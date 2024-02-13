@@ -27,19 +27,30 @@ export default class NodeDefault extends NodeBase {
   constructor(
     url: string,
     {
-      ignoreVersion = false, retryCount = 3, retryOverallDelay = 800, ...options
+      ignoreVersion = false, _disableGatewayWarning = false,
+      retryCount = 3, retryOverallDelay = 800,
+      ...options
     }: NodeOptionalParams & {
       ignoreVersion?: boolean;
+      _disableGatewayWarning?: boolean;
       retryCount?: number;
       retryOverallDelay?: number;
     } = {},
   ) {
+    const { hostname } = new URL(url);
+    if (
+      !_disableGatewayWarning
+      && ['mainnet.aeternity.io', 'testnet.aeternity.io'].includes(hostname)
+    ) {
+      console.warn(`Node: use NodeGateway to connect to ${hostname} for better reliability.`);
+    }
     // eslint-disable-next-line constructor-super
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
+        // TODO: move to NodeGateway in the next breaking release
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
         genErrorFormatterPolicy((body: ErrorModel) => ` ${body.reason}`),
       ],
