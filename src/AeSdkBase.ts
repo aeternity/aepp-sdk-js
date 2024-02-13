@@ -1,4 +1,4 @@
-import Node from './Node';
+import Node from './node/Direct';
 import AccountBase from './account/Base';
 import {
   CompilerError, DuplicateNodeError, NodeNotFoundError, NotImplementedError, TypeError,

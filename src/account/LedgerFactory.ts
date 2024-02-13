@@ -3,7 +3,7 @@ import AccountLedger, { CLA, GET_ADDRESS, GET_APP_CONFIGURATION } from './Ledger
 import { UnsupportedVersionError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
 import semverSatisfies from '../utils/semver-satisfies';
-import Node from '../Node';
+import Node from '../node/Direct';
 
 /**
  * A factory class that generates instances of AccountLedger based on provided transport.

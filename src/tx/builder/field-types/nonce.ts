@@ -1,6 +1,6 @@
 import { isAccountNotFoundError } from '../../../utils/other';
 import shortUInt from './short-u-int';
-import Node from '../../../Node';
+import Node from '../../../node/Direct';
 import { ArgumentError } from '../../../utils/errors';
 import { NextNonceStrategy } from '../../../apis/node';
 

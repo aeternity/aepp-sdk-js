@@ -10,7 +10,8 @@ import {
   AensPointerContextError, DryRunError, InvalidAensNameError, TransactionError,
   TxTimedOutError, TxNotInChainError, InternalError,
 } from './utils/errors';
-import Node, { TransformNodeType } from './Node';
+import { TransformNodeType } from './node/Base';
+import Node from './node/Direct';
 import {
   Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
   Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx,

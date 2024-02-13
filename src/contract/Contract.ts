@@ -37,7 +37,8 @@ import {
   ContractCallObject as NodeContractCallObject, Event as NodeEvent,
 } from '../apis/node';
 import CompilerBase, { Aci } from './compiler/Base';
-import Node, { TransformNodeType } from '../Node';
+import { TransformNodeType } from '../node/Base';
+import Node from '../node/Direct';
 import {
   getAccount, getContract, getContractByteCode, resolveName, txDryRun, sendTransaction,
   SendTransactionOptions,

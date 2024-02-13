@@ -14,7 +14,7 @@ import { ArgumentError, IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
 import Contract from './Contract';
-import Node from '../Node';
+import Node from '../node/Direct';
 import { sendTransaction, SendTransactionOptions, getAccount } from '../chain';
 import CompilerBase from './compiler/Base';
 

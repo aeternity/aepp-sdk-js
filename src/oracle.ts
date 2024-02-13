@@ -17,7 +17,7 @@ import {
 import {
   _getPollInterval, getHeight, sendTransaction, SendTransactionOptions,
 } from './chain';
-import Node from './Node';
+import Node from './node/Direct';
 import AccountBase from './account/Base';
 
 type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['oracleQueries'];

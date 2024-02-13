@@ -15,7 +15,7 @@ import {
   UnAuthorizedAccountError,
   RpcConnectionError,
 } from './utils/errors';
-import Node from './Node';
+import Node from './node/Direct';
 import BrowserConnection from './aepp-wallet-communication/connection/Browser';
 
 /**
