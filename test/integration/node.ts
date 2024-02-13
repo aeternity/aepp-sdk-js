@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { createSandbox } from 'sinon';
 import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
-import { url, ignoreVersion } from '.';
+import { url } from '.';
 import {
   AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion,
 } from '../../src';
@@ -11,7 +11,7 @@ describe('Node client', () => {
   let node: Node;
 
   before(async () => {
-    node = new Node(url, { ignoreVersion });
+    node = new Node(url);
   });
 
   it('wraps endpoints', () => {
@@ -74,7 +74,7 @@ describe('Node client', () => {
     it('Can change Node', async () => {
       const nodes = new AeSdkBase({
         nodes: [
-          { name: 'first', instance: new Node(url, { ignoreVersion }) },
+          { name: 'first', instance: new Node(url) },
           { name: 'second', instance: node },
         ],
       });
@@ -88,7 +88,7 @@ describe('Node client', () => {
     it('Fail on undefined node', async () => {
       const nodes = new AeSdkBase({
         nodes: [
-          { name: 'first', instance: new Node(url, { ignoreVersion }) },
+          { name: 'first', instance: new Node(url) },
           { name: 'second', instance: node },
         ],
       });

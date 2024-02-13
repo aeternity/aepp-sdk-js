@@ -31,6 +31,8 @@ function snakeToPascalObjKeys<Type>(obj: object): Type {
   }), {}) as Type;
 }
 
+let channelCounter = 0;
+
 /**
  * Channel
  * @example
@@ -81,7 +83,19 @@ export default class Channel {
 
   _options!: ChannelOptions;
 
+  #debugId: number;
+
   _channelId?: Encoded.Channel;
+
+  protected constructor() {
+    channelCounter += 1;
+    this.#debugId = channelCounter;
+  }
+
+  _debug(...args: any[]): void {
+    if (this._options.debug !== true) return;
+    console.debug(`Channel #${this.#debugId}`, ...args);
+  }
 
   /**
    * @param options - Channel params
