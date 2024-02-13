@@ -26,7 +26,8 @@ describe('Operation delegation', () => {
       'AENSv2.DataPt'?: readonly [Uint8Array];
     }
 
-    const name = randomName(15);
+    const name = randomName(30);
+    const nameFee = 500000000000001;
     const salt = genSalt();
     let owner: Encoded.AccountAddress;
     let newOwner: Encoded.AccountAddress;
@@ -111,7 +112,6 @@ contract DelegateTest =
     });
 
     it('claims', async () => {
-      const nameFee = 20e18; // 20 AE
       const { result } = await contract
         .signedClaim(owner, name, salt, nameFee, delegationSignature);
       assertNotNull(result);
@@ -178,13 +178,13 @@ contract DelegateTest =
     it('works using wildcard delegation signature', async () => {
       if (isIris) return;
       const allNamesDelSig = decode(await aeSdk.signAllNamesDelegationToContract(contractAddress));
-      const n = randomName(15);
+      const n = randomName(30);
 
       const commitmentId = decode(commitmentHash(n, salt));
       await contract.signedPreclaim(owner, commitmentId, allNamesDelSig);
       await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
 
-      await contract.signedClaim(owner, n, salt, 20e18, allNamesDelSig);
+      await contract.signedClaim(owner, n, salt, nameFee, allNamesDelSig);
 
       const pointee: Pointee = { 'AENSv2.OraclePt': [newOwner] };
       await contract.signedUpdate(owner, n, 'oracle', pointee, allNamesDelSig);
@@ -206,8 +206,7 @@ contract DelegateTest =
 
     it('claims without preclaim', async () => {
       if (isIris) return;
-      const n = randomName(15);
-      const nameFee = 20e18;
+      const n = randomName(30);
       const dlgSig = await aeSdk.createDelegationSignature(contractAddress, [n]);
       const { result } = await contract.signedClaim(aeSdk.address, n, 0, nameFee, dlgSig);
       assertNotNull(result);

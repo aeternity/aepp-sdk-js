@@ -6,6 +6,7 @@ import '..';
 export const url = process.env.TEST_URL ?? 'http://localhost:3013';
 export const compilerUrl = process.env.COMPILER_URL ?? 'http://localhost:3080';
 export const compilerUrl7 = process.env.COMPILER_7_URL ?? 'http://localhost:3081';
+export const channelUrl = process.env.CHANNEL_URL ?? 'ws://localhost:3014/channel';
 const secretKey = process.env.SECRET_KEY ?? '9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200';
 export const networkId = process.env.TEST_NETWORK_ID ?? 'ae_devnet';
 const genesisAccount = new MemoryAccount(secretKey);
@@ -41,7 +42,7 @@ export async function getSdk(accountCount = 1): Promise<AeSdk> {
     sdk._options.onCompiler = new CompilerHttpNode(compilerUrl7);
   }
   for (let i = 0; i < accounts.length; i += 1) {
-    await sdk.spend(1e32, accounts[i].address, { onAccount: genesisAccount });
+    await sdk.spend(5e18, accounts[i].address, { onAccount: genesisAccount });
   }
   return sdk;
 }

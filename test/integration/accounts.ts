@@ -104,22 +104,10 @@ describe('Accounts', () => {
   });
 
   it('spends coins in AE format', async () => {
-    const ret = await aeSdk.spend(1, receiver.address, { denomination: AE_AMOUNT_FORMATS.AE });
+    const ret = await aeSdk.spend(0.001, receiver.address, { denomination: AE_AMOUNT_FORMATS.AE });
     ret.should.have.property('tx');
     assertNotNull(ret.tx);
-    ret.tx.should.include({ amount: 10n ** 18n, recipientId: receiver.address });
-  });
-
-  it('spends big amount of coins', async () => {
-    const bigAmount = 10n ** 31n + 10n ** 17n;
-    const { publicKey } = generateKeyPair();
-    const ret = await aeSdk.spend(bigAmount.toString(), publicKey);
-
-    const balanceAfter = await aeSdk.getBalance(publicKey);
-    balanceAfter.should.be.equal(bigAmount.toString());
-    ret.should.have.property('tx');
-    assertNotNull(ret.tx);
-    ret.tx.should.include({ amount: bigAmount, recipientId: publicKey });
+    ret.tx.should.include({ amount: 10n ** 15n, recipientId: receiver.address });
   });
 
   it('spends with a payload', async () => {

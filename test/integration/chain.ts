@@ -136,7 +136,7 @@ describe('Node Chain', () => {
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     const getCount = resetRequestCounter();
     const spends = await Promise.all(accounts.map(async (account, idx) => aeSdk.spend(
-      Math.floor(Math.random() * 1000 + 1e16),
+      Math.floor(Math.random() * 1000 + 1e15),
       account.address,
       { nonce: nextNonce + idx, verify: false, waitMined: false },
     )));
@@ -148,7 +148,7 @@ describe('Node Chain', () => {
   it('multiple spends from different accounts', async () => {
     const getCount = resetRequestCounter();
     const spends = await Promise.all(
-      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e15, aeSdk.address, {
+      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e14, aeSdk.address, {
         nonce: 1, verify: false, onAccount, waitMined: false,
       })),
     );

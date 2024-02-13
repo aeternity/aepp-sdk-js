@@ -4,7 +4,7 @@ import {
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
-import { getSdk } from '.';
+import { getSdk, channelUrl } from '.';
 import {
   unpackTx,
   buildTxHash,
@@ -28,8 +28,6 @@ import {
 } from '../../src/channel/internal';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual } from '../utils';
-
-const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
 
 const contractSourceCode = `
 contract Identity =
@@ -93,10 +91,10 @@ describe('Channel', () => {
     return buildTx(signedTx);
   };
   const sharedParams: Omit<ChannelOptions, 'sign'> = {
-    url: wsUrl,
+    url: channelUrl,
     pushAmount: 3,
-    initiatorAmount: new BigNumber('100e18'),
-    responderAmount: new BigNumber('100e18'),
+    initiatorAmount: 1e15,
+    responderAmount: 1e15,
     channelReserve: 0,
     ttl: 10000,
     host: 'localhost',
@@ -196,7 +194,7 @@ describe('Channel', () => {
     responderShouldRejectUpdate = false;
     const roundBefore = initiatorCh.round();
     assertNotNull(roundBefore);
-    const amount = new BigNumber('10e18');
+    const amount = 1e14;
     const result = await initiatorCh.update(
       aeSdkInitiatior.address,
       aeSdkResponder.address,
@@ -214,7 +212,7 @@ describe('Channel', () => {
       sinon.match.string,
       {
         updates: [{
-          amount: amount.toString(),
+          amount,
           from: aeSdkInitiatior.address,
           to: aeSdkResponder.address,
           op: 'OffChainTransfer',
@@ -227,7 +225,7 @@ describe('Channel', () => {
       sinon.match.string,
       {
         updates: [{
-          amount: amount.toString(),
+          amount,
           from: aeSdkInitiatior.address,
           to: aeSdkResponder.address,
           op: 'OffChainTransfer',
@@ -240,7 +238,7 @@ describe('Channel', () => {
     expect(initiatorSign.firstCall.args[1]).to.eql({
       updates: [
         {
-          amount: amount.toString(),
+          amount,
           from: aeSdkInitiatior.address,
           to: aeSdkResponder.address,
           op: 'OffChainTransfer',
@@ -379,7 +377,7 @@ describe('Channel', () => {
   });
 
   it('can request a withdraw and accept', async () => {
-    const amount = new BigNumber('2e18');
+    const amount = 1e14;
     const onOnChainTx = sinon.spy();
     const onOwnWithdrawLocked = sinon.spy();
     const onWithdrawLocked = sinon.spy();
@@ -405,7 +403,7 @@ describe('Channel', () => {
       sinon.match.string,
       {
         updates: [{
-          amount: amount.toString(),
+          amount,
           op: 'OffChainWithdrawal',
           to: aeSdkInitiatior.address,
         }],
@@ -417,7 +415,7 @@ describe('Channel', () => {
       sinon.match.string,
       {
         updates: [{
-          amount: amount.toString(),
+          amount,
           op: 'OffChainWithdrawal',
           to: aeSdkInitiatior.address,
         }],
@@ -430,7 +428,7 @@ describe('Channel', () => {
   });
 
   it('can request a withdraw and reject', async () => {
-    const amount = new BigNumber('2e18');
+    const amount = 1e14;
     const onOnChainTx = sinon.spy();
     const onOwnWithdrawLocked = sinon.spy();
     const onWithdrawLocked = sinon.spy();
@@ -454,7 +452,7 @@ describe('Channel', () => {
       sinon.match.string,
       {
         updates: [{
-          amount: amount.toString(),
+          amount,
           op: 'OffChainWithdrawal',
           to: aeSdkInitiatior.address,
         }],
@@ -466,7 +464,7 @@ describe('Channel', () => {
       sinon.match.string,
       {
         updates: [{
-          amount: amount.toString(),
+          amount,
           op: 'OffChainWithdrawal',
           to: aeSdkInitiatior.address,
         }],
@@ -501,7 +499,7 @@ describe('Channel', () => {
   });
 
   it('can request a deposit and accept', async () => {
-    const amount = new BigNumber('2e18');
+    const amount = 1e15;
     const onOnChainTx = sinon.spy();
     const onOwnDepositLocked = sinon.spy();
     const onDepositLocked = sinon.spy();
@@ -552,7 +550,7 @@ describe('Channel', () => {
   });
 
   it('can request a deposit and reject', async () => {
-    const amount = new BigNumber('2e18');
+    const amount = 1e15;
     const onOnChainTx = sinon.spy();
     const onOwnDepositLocked = sinon.spy();
     const onDepositLocked = sinon.spy();
@@ -690,7 +688,7 @@ describe('Channel', () => {
     const { signedTx } = await initiatorCh.update(
       initiatorAddr,
       responderAddr,
-      new BigNumber('3e18'),
+      1e14,
       initiatorSign,
     );
     assertNotNull(signedTx);
@@ -873,7 +871,7 @@ describe('Channel', () => {
     await responderCh.createContract({
       code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
-      deposit: new BigNumber('10e18'),
+      deposit: 1e14,
       vmVersion: VmVersion.Fate,
       abiVersion: AbiVersion.Fate,
     }, responderSign);
@@ -893,7 +891,7 @@ describe('Channel', () => {
     const result = await initiatorCh.createContract({
       code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
-      deposit: new BigNumber('10e18'),
+      deposit: 1e14,
       vmVersion: VmVersion.Fate,
       abiVersion: AbiVersion.Fate,
     }, initiatorSign);
@@ -907,7 +905,7 @@ describe('Channel', () => {
       {
         code: await contract.$compile(),
         callData: contract._calldata.encode('Identity', 'init', []),
-        deposit: new BigNumber('10e18'),
+        deposit: 1e14,
         vmVersion: VmVersion.Fate,
         abiVersion: AbiVersion.Fate,
       },
@@ -921,7 +919,7 @@ describe('Channel', () => {
     const result = await initiatorCh.createContract({
       code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
-      deposit: new BigNumber('10e18'),
+      deposit: 1e14,
       vmVersion: VmVersion.Fate,
       abiVersion: AbiVersion.Fate,
     }, initiatorSign);
@@ -937,8 +935,9 @@ describe('Channel', () => {
     const addresses = [aeSdkInitiatior.address, aeSdkResponder.address, contractAddr];
     const balances = await initiatorCh.balances(addresses);
     balances.should.be.an('object');
-    balances[aeSdkInitiatior.address].should.be.a('string');
-    balances[aeSdkResponder.address].should.be.a('string');
+    // TODO: use the same type not depending on value after fixing https://github.com/aeternity/aepp-sdk-js/issues/1926
+    balances[aeSdkInitiatior.address].should.be.a('number');
+    balances[aeSdkResponder.address].should.be.a('number');
     balances[contractAddr].should.be.equal(1000);
     expect(balances).to.eql(await responderCh.balances(addresses));
   });
