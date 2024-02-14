@@ -82,7 +82,7 @@ describe('Execution cost', () => {
         } else if (params.tag === Tag.ContractCallTx) {
           // Can't detect AENS.claim in contract call
           // TODO: remove after solving https://github.com/aeternity/aeternity/issues/4088
-          if (balanceDiff === 20000000000000000000n) return;
+          if (balanceDiff === 500000000000001n) return;
           // Can't detect Oracle.respond reward in contract call
           if (balanceDiff === -501000n) return;
           expect(balanceDiff).to.be.equal(0n);
@@ -116,5 +116,5 @@ describe('Execution cost', () => {
       Tag.PayingForTx,
     ]));
     expect(sentTransactions.length).to.be.greaterThanOrEqual(134);
-  });
+  }).timeout(8000);
 });

@@ -10,10 +10,10 @@ import { pause } from '../../src/utils/other';
 
 describe('Aens', () => {
   let aeSdk: AeSdk;
-  const name = randomName(13); // 13 name length doesn't trigger auction
+  const name = randomName(30);
 
   before(async () => {
-    aeSdk = await getSdk(2);
+    aeSdk = await getSdk(3);
   });
 
   it('claims a name', async () => {
@@ -29,19 +29,19 @@ describe('Aens', () => {
     const isIris = (await aeSdk.api.getNodeInfo())
       .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
     if (isIris) return;
-    const n = randomName(13);
+    const n = randomName(30);
     const claimed = await aeSdk.aensClaim(n, 0);
     assertNotNull(claimed.tx);
     assertNotNull(claimed.blockHeight);
     assertNotNull(claimed.signatures);
     expect(claimed).to.be.eql({
       tx: {
-        fee: 16540000000000n,
+        fee: 16860000000000n,
         nonce: claimed.tx.nonce,
         accountId: aeSdk.address,
         name: n,
         nameSalt: 0,
-        nameFee: 1771100000000000000n,
+        nameFee: 500000000000000n,
         version: 2,
         type: 'NameClaimTx',
       },
@@ -117,7 +117,7 @@ describe('Aens', () => {
   });
 
   it('throws error on querying non-existent name', () => aeSdk
-    .aensQuery(randomName(13)).should.eventually.be.rejected);
+    .aensQuery(randomName(30)).should.eventually.be.rejected);
 
   it('Spend using name with invalid pointers', async () => {
     const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
@@ -169,7 +169,7 @@ describe('Aens', () => {
   });
 
   it('throws error on updating names not owned by the account', async () => {
-    const preclaim = await aeSdk.aensPreclaim(randomName(13));
+    const preclaim = await aeSdk.aensPreclaim(randomName(30));
     await preclaim.claim();
     const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
     assertNotNull(onAccount);
@@ -273,13 +273,12 @@ describe('Aens', () => {
     });
 
     it('claims a unicode name', async () => {
-      const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
       const nameShort = `æ${randomString(4)}.chain`;
       ensureName(nameShort);
 
       const preclaim = await aeSdk.aensPreclaim(nameShort);
       await preclaim.claim();
-      await aeSdk.aensBid(nameShort, computeBidFee(nameShort), { onAccount });
+      await aeSdk.aensBid(nameShort, computeBidFee(nameShort), { onAccount: aeSdk.addresses()[2] });
 
       await expect(aeSdk.getName(nameShort)).to.be.rejectedWith('error: Name not found');
     });

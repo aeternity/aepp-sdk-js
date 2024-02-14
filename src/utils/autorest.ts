@@ -76,16 +76,21 @@ export const genErrorFormatterPolicy = (
         return await next(request);
       } catch (error) {
         if (!(error instanceof RestError) || error.request == null) throw error;
-        if (error.response?.bodyAsText == null) throw error;
+        const prefix = `${new URL(error.request.url).pathname.slice(1)} error`;
+
+        if (error.response?.bodyAsText == null) {
+          if (error.message === '') error.message = `${prefix}: ${error.code}`;
+          throw error;
+        }
 
         let body;
         try {
           body = JSON.parse(error.response.bodyAsText);
         } catch (e) {
-          throw error;
+          body = null;
         }
-        error.message = `${new URL(error.request.url).pathname.slice(1)} error`;
-        const message = getMessage(body);
+        error.message = prefix;
+        const message = body == null ? ` ${error.response.status} status code` : getMessage(body);
         if (message !== '') error.message += `:${message}`;
         throw error;
       }
@@ -123,7 +128,7 @@ export const genRetryOnFailurePolicy = (
 
       const intervals = new Array(retryCount).fill(0)
         .map((_, idx) => ((idx + 1) / retryCount) ** 2);
-      const intervalSum = intervals.reduce((a, b) => a + b);
+      const intervalSum = intervals.reduce((a, b) => a + b, 0);
       const intervalsInMs = intervals.map((el) => (el / intervalSum) * retryOverallDelay);
 
       let error = new RestError('Not expected to be thrown');

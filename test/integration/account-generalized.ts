@@ -95,7 +95,7 @@ describe('Generalized Account', () => {
 
   it('accepts a function in authData', async () => {
     let spendTx;
-    const fee = 1e16;
+    const fee = 1e15;
     const gasPrice = MIN_GAS_PRICE + 1;
     const { rawTx } = await aeSdk.spend(10000, publicKey, {
       authData: async (tx) => {

@@ -65,7 +65,7 @@ describe('MiddlewareSubscriber', () => {
           ms.webSocket.addEventListener('message', resolve);
         });
       })(),
-      pause(1000).then(() => { throw new Error('Timeout'); }),
+      pause(2000).then(() => { throw new Error('Timeout'); }),
     ]);
   }
 

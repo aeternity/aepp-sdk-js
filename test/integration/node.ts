@@ -1,11 +1,12 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { createSandbox } from 'sinon';
-import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
+import { RestError } from '@azure/core-rest-pipeline';
 import { url } from '.';
 import {
   AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion,
 } from '../../src';
+import { bindRequestCounter } from '../utils';
 
 describe('Node client', () => {
   let node: Node;
@@ -30,25 +31,38 @@ describe('Node client', () => {
       .to.be.rejectedWith('v3/transactions/th_test error: Invalid hash');
   });
 
+  it('throws clear exceptions when body is empty', async () => {
+    node.pipeline.addPolicy({
+      name: 'remove-response-body',
+      async sendRequest(request, next) {
+        try {
+          return await next(request);
+        } catch (error) {
+          if (!(error instanceof RestError) || error.response == null) throw error;
+          error.response.bodyAsText = '';
+          throw error;
+        }
+      },
+    });
+    await expect(node.getTransactionByHash('th_test'))
+      .to.be.rejectedWith('v3/transactions/th_test error: 400 status code');
+    node.pipeline.removePolicy({ name: 'remove-response-body' });
+  });
+
+  it('throws clear exceptions if ECONNREFUSED', async () => {
+    const n = new Node('http://localhost:60148', { retryCount: 0 });
+    await expect(n.getStatus()).to.be.rejectedWith('v3/status error: ECONNREFUSED');
+  });
+
   it('retries requests if failed', async () => ([
     ['ak_test', 1],
     ['ak_2CxRaRcMUGn9s5UwN36UhdrtZVFUbgG1BSX5tUAyQbCNneUwti', 4],
   ] as const).reduce(async (prev, [address, requestCount]) => {
     await prev;
 
-    let counter = 0;
-    node.pipeline.addPolicy({
-      name: 'counter',
-      async sendRequest(request: PipelineRequest, next: SendRequest): Promise<PipelineResponse> {
-        counter += 1;
-        return next(request);
-      },
-    }, { phase: 'Deserialize' });
-
+    const getCount = bindRequestCounter(node);
     await node.getAccountByPubkey(address).catch(() => {});
-
-    node.pipeline.removePolicy({ name: 'counter' });
-    expect(counter).to.be.equal(requestCount);
+    expect(getCount()).to.be.equal(requestCount);
   }, Promise.resolve()));
 
   it('throws exception if unsupported protocol', async () => {

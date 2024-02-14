@@ -78,11 +78,11 @@ export interface ChannelOptions {
   /**
    * Amount of coins the initiator has committed to the channel
    */
-  initiatorAmount: BigNumber;
+  initiatorAmount: BigNumber | number;
   /**
    * Amount of coins the responder has committed to the channel
    */
-  responderAmount: BigNumber;
+  responderAmount: BigNumber | number;
   /**
    * The minimum amount both peers need to maintain
    */

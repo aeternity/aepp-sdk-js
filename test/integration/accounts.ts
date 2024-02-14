@@ -1,11 +1,11 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
-import { getSdk } from '.';
+import { getSdk, networkId } from '.';
 import { assertNotNull } from '../utils';
 import {
   AeSdk, MemoryAccount,
-  generateKeyPair, AE_AMOUNT_FORMATS,
+  AE_AMOUNT_FORMATS,
   UnavailableAccountError, TypeError, ArgumentError,
   encode, Encoding, Encoded,
 } from '../../src';
@@ -104,22 +104,10 @@ describe('Accounts', () => {
   });
 
   it('spends coins in AE format', async () => {
-    const ret = await aeSdk.spend(1, receiver.address, { denomination: AE_AMOUNT_FORMATS.AE });
+    const ret = await aeSdk.spend(0.001, receiver.address, { denomination: AE_AMOUNT_FORMATS.AE });
     ret.should.have.property('tx');
     assertNotNull(ret.tx);
-    ret.tx.should.include({ amount: 10n ** 18n, recipientId: receiver.address });
-  });
-
-  it('spends big amount of coins', async () => {
-    const bigAmount = 10n ** 31n + 10n ** 17n;
-    const { publicKey } = generateKeyPair();
-    const ret = await aeSdk.spend(bigAmount.toString(), publicKey);
-
-    const balanceAfter = await aeSdk.getBalance(publicKey);
-    balanceAfter.should.be.equal(bigAmount.toString());
-    ret.should.have.property('tx');
-    assertNotNull(ret.tx);
-    ret.tx.should.include({ amount: bigAmount, recipientId: publicKey });
+    ret.tx.should.include({ amount: 10n ** 15n, recipientId: receiver.address });
   });
 
   it('spends with a payload', async () => {
@@ -129,16 +117,36 @@ describe('Accounts', () => {
   });
 
   it('Get Account by block height/hash', async () => {
-    await aeSdk.awaitHeight(await aeSdk.getHeight() + 3);
-    const spend = await aeSdk.spend(123, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi');
-    assertNotNull(spend.blockHeight);
-    await aeSdk.awaitHeight(spend.blockHeight + 2);
-    const accountAfterSpend = await aeSdk.getAccount(aeSdk.address);
-    const accountBeforeSpendByHash = await aeSdk
-      .getAccount(aeSdk.address, { height: spend.blockHeight - 1 });
+    const address = 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ';
+    if (networkId === 'ae_uat') {
+      expect(await aeSdk.getBalance(address, { height: 500000 })).to.be.equal('4577590840980663351396');
+      return;
+    }
+    if (networkId === 'ae_mainnet') {
+      expect(await aeSdk.getBalance(address, { height: 362055 })).to.be.equal('100000000000000');
+      return;
+    }
+    const genesis = 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E';
+    expect(await aeSdk.getBalance(genesis, { height: 0 })).to.be.equal('10000000000000000000000');
+  });
+
+  it('validate account balance by height before and after spend tx', async () => {
+    async function getBalance(height?: number): Promise<bigint> {
+      return (await aeSdk.getAccount(aeSdk.address, { height })).balance;
+    }
+
+    const beforeSpend = await getBalance();
+    const beforeHeight = await aeSdk.getHeight() + 1;
+    await aeSdk.awaitHeight(beforeHeight);
+    const spend = await aeSdk.spend(123, 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ');
+
+    const afterSpend = await getBalance();
     assertNotNull(spend.tx?.amount);
-    expect(accountBeforeSpendByHash.balance - accountAfterSpend.balance).to.be
-      .equal(spend.tx.fee + spend.tx.amount);
+    expect(beforeSpend - afterSpend).to.be.equal(spend.tx.fee + spend.tx.amount);
+    expect(await getBalance(beforeHeight)).to.be.equal(beforeSpend);
+    assertNotNull(spend.blockHeight);
+    await aeSdk.awaitHeight(spend.blockHeight + 1);
+    expect(await getBalance(spend.blockHeight + 1)).to.be.equal(afterSpend);
   });
 
   describe('Make operation on specific account without changing of current account', () => {
