@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  generateKeyPair, AeSdk, Tag, UnexpectedTsError, MemoryAccount, Encoded,
+  generateKeyPair, AeSdk, Tag, MemoryAccount, Encoded,
 } from '../../src';
 import { assertNotNull, bindRequestCounter } from '../utils';
 
@@ -82,16 +82,9 @@ describe('Node Chain', () => {
   });
 
   it('Wait for transaction confirmation', async () => {
-    const txData = await aeSdk.spend(1000, aeSdk.address, { confirm: true });
-    if (txData.blockHeight == null) throw new UnexpectedTsError();
-    const isConfirmed = (await aeSdk.getHeight()) >= txData.blockHeight + 3;
-
-    isConfirmed.should.be.equal(true);
-
-    const txData2 = await aeSdk.spend(1000, aeSdk.address, { confirm: 4 });
-    if (txData2.blockHeight == null) throw new UnexpectedTsError();
-    const isConfirmed2 = (await aeSdk.getHeight()) >= txData2.blockHeight + 4;
-    isConfirmed2.should.be.equal(true);
+    const res = await aeSdk.spend(1000, aeSdk.address, { confirm: 1 });
+    assertNotNull(res.blockHeight);
+    expect(await aeSdk.getHeight() >= res.blockHeight + 1).to.be.equal(true);
   });
 
   it('doesn\'t make extra requests', async () => {

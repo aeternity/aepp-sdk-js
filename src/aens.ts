@@ -14,7 +14,7 @@ import { Encoded, Encoding } from './utils/encoder';
 import { UnsupportedProtocolError } from './utils/errors';
 import { sendTransaction, SendTransactionOptions, getName } from './chain';
 import { buildTxAsync, BuildTxOptions } from './tx/builder';
-import { TransformNodeType } from './Node';
+import { TransformNodeType } from './node/Base';
 import { NameEntry, NamePointer } from './apis/node';
 import AccountBase from './account/Base';
 import { AddressEncodings } from './tx/builder/field-types/address';

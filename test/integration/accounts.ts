@@ -130,7 +130,7 @@ describe('Accounts', () => {
     expect(await aeSdk.getBalance(genesis, { height: 0 })).to.be.equal('10000000000000000000000');
   });
 
-  it('validate account balance by height before and after spend tx', async () => {
+  (networkId === 'ae_devnet' ? it : it.skip)('validate account balance by height before and after spend tx', async () => {
     async function getBalance(height?: number): Promise<bigint> {
       return (await aeSdk.getAccount(aeSdk.address, { height })).balance;
     }

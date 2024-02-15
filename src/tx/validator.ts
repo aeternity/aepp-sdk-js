@@ -6,7 +6,8 @@ import { Tag, ConsensusProtocolVersion } from './builder/constants';
 import { buildTx, unpackTx } from './builder';
 import { concatBuffers, isAccountNotFoundError } from '../utils/other';
 import { Encoded, decode } from '../utils/encoder';
-import Node, { TransformNodeType } from '../Node';
+import { TransformNodeType } from '../node/Base';
+import Node from '../node/Direct';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
 import { UnexpectedTsError } from '../utils/errors';
@@ -80,6 +81,7 @@ export default async function verifyTransaction(
     ignoreVersion: true,
     pipeline: nodeNotCached.pipeline.clone(),
     additionalPolicies: [genAggressiveCacheGetResponsesPolicy()],
+    _disableGatewayWarning: true,
   });
   return verifyTransactionInternal(unpackTx(transaction), node, []);
 }

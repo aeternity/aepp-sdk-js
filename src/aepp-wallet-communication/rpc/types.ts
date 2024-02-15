@@ -1,7 +1,7 @@
 import { Encoded } from '../../utils/encoder';
 import { Domain, AciValue } from '../../utils/typed-data';
 import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema';
-import { TransformNodeType } from '../../Node';
+import { TransformNodeType } from '../../node/Base';
 import { SignedTx } from '../../apis/node';
 import { AensName } from '../../tx/builder/constants';
 

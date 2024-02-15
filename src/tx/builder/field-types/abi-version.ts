@@ -1,6 +1,6 @@
 import { Tag, ConsensusProtocolVersion, AbiVersion } from '../constants';
 import { getProtocolDetails } from './ct-version';
-import Node from '../../../Node';
+import Node from '../../../node/Direct';
 
 export default {
   _getProtocolDetails(c: ConsensusProtocolVersion, tag: Tag): AbiVersion {
