@@ -30,8 +30,10 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: npx commitlint --from $BASE --to $HEAD --verbose
       - run: npm run lint
-      - run: docker compose up -d --wait
+      - run: docker compose up compiler -d --wait
       - run: npx nyc npm test
+        env:
+          NETWORK: testnet
       - run: npx nyc report --reporter=text-lcov > coverage.lcov
       - uses: codecov/codecov-action@v4
         with:
