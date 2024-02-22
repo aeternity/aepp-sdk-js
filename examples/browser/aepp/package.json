@@ -9,6 +9,7 @@
   "dependencies": {
     "@aeternity/aepp-calldata": "^1.5.1",
     "@aeternity/aepp-sdk": "file:../../..",
+    "@ledgerhq/hw-transport-webusb": "^6.27.17",
     "buffer": "^6.0.3",
     "core-js": "^3.32.1",
     "tailwindcss": "^2.2.19",
@@ -20,6 +21,9 @@
     "@vue/cli-service": "~5.0.8",
     "sass": "^1.66.1",
     "sass-loader": "^13.3.2"
+  },
+  "peerDependencies": {
+    "webpack": "^5.0.0"
   },
   "browserslist": [
     "> 1%",
