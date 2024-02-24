@@ -206,5 +206,6 @@ describe('Accounts', () => {
     const th = await aeSdk.spend(1, receiver.address, { waitMined: false });
     th.should.be.a('object');
     th.hash.slice(0, 3).should.equal('th_');
+    await aeSdk.poll(th.hash);
   });
 });
