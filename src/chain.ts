@@ -26,14 +26,14 @@ import { buildTxHash } from './tx/builder';
  */
 export function _getPollInterval(
   type: 'block' | 'microblock', // TODO: rename to 'key-block' | 'micro-block'
-  { _expectedMineRate = 180000, _microBlockCycle = 3000, _maxPollInterval = 5000 }:
-  { _expectedMineRate?: number; _microBlockCycle?: number; _maxPollInterval?: number },
+  { _expectedMineRate = 180000, _microBlockCycle = 3000 }:
+  { _expectedMineRate?: number; _microBlockCycle?: number },
 ): number {
   const base = {
     block: _expectedMineRate,
     microblock: _microBlockCycle,
   }[type];
-  return Math.min(base / 3, _maxPollInterval);
+  return Math.floor(base / 3);
 }
 
 /**
@@ -107,7 +107,7 @@ export async function awaitHeight(
   { interval, onNode, ...options }:
   { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<number> {
-  interval ??= _getPollInterval('block', options);
+  interval ??= Math.min(_getPollInterval('block', options), 5000);
   let currentHeight;
   do {
     if (currentHeight != null) await pause(interval);
