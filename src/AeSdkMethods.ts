@@ -6,7 +6,7 @@ import Contract, { ContractMethodsBase } from './contract/Contract';
 import createDelegationSignature from './contract/delegation-signature';
 import * as contractGaMethods from './contract/ga';
 import { buildTxAsync } from './tx/builder';
-import { mapObject, UnionToIntersection } from './utils/other';
+import { mapObject, UnionToIntersection, wrapWithProxy } from './utils/other';
 import Node from './Node';
 import { TxParamsAsync } from './tx/builder/schema.generated';
 import AccountBase from './account/Base';
@@ -14,25 +14,6 @@ import { Encoded } from './utils/encoder';
 import CompilerBase from './contract/compiler/Base';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
-
-export function getValueOrErrorProxy<Value extends object | undefined>(
-  valueCb: () => Value,
-): NonNullable<Value> {
-  return new Proxy(
-    {},
-    Object.fromEntries(([
-      'apply', 'construct', 'defineProperty', 'deleteProperty', 'getOwnPropertyDescriptor',
-      'getPrototypeOf', 'isExtensible', 'ownKeys', 'preventExtensions', 'set', 'setPrototypeOf',
-      'get', 'has',
-    ] as const).map((name) => [name, (t: {}, ...args: unknown[]) => {
-      const target = valueCb() as object; // to get a native exception in case it missed
-      const res = (Reflect[name] as any)(target, ...args);
-      return typeof res === 'function' && name === 'get'
-        ? res.bind(target) // otherwise it fails with attempted to get private field on non-instance
-        : res;
-    }])),
-  ) as NonNullable<Value>;
-}
 
 const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
 
@@ -57,6 +38,12 @@ export interface AeSdkMethodsOptions
   extends Partial<UnionToIntersection<MethodsOptions[keyof MethodsOptions]>> {
 }
 
+export interface WrappedOptions {
+  onAccount: AccountBase;
+  onCompiler: CompilerBase;
+  onNode: Node;
+}
+
 /**
  * AeSdkMethods is the composition of:
  * - chain methods
@@ -73,11 +60,18 @@ export interface AeSdkMethodsOptions
 class AeSdkMethods {
   _options: AeSdkMethodsOptions = {};
 
+  readonly #wrappedOptions: WrappedOptions;
+
   /**
    * @param options - Options
    */
   constructor(options: AeSdkMethodsOptions = {}) {
     Object.assign(this._options, options);
+    this.#wrappedOptions = {
+      onAccount: wrapWithProxy(() => this._options.onAccount),
+      onNode: wrapWithProxy(() => this._options.onNode),
+      onCompiler: wrapWithProxy(() => this._options.onCompiler),
+    };
   }
 
   /**
@@ -86,14 +80,10 @@ class AeSdkMethods {
    * @param mergeWith - Merge context with these extra options
    * @returns Context object
    */
-  getContext(
-    mergeWith: AeSdkMethodsOptions = {},
-  ): AeSdkMethodsOptions & { onAccount: AccountBase; onCompiler: CompilerBase; onNode: Node } {
+  getContext(mergeWith: AeSdkMethodsOptions = {}): AeSdkMethodsOptions & WrappedOptions {
     return {
       ...this._options,
-      onAccount: getValueOrErrorProxy(() => this._options.onAccount),
-      onNode: getValueOrErrorProxy(() => this._options.onNode),
-      onCompiler: getValueOrErrorProxy(() => this._options.onCompiler),
+      ...this.#wrappedOptions,
       ...mergeWith,
     };
   }

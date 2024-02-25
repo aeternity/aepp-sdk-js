@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  generateKeyPair, AeSdk, Tag, MemoryAccount, Encoded,
+  generateKeyPair, AeSdk, Tag, MemoryAccount, Encoded, Node,
 } from '../../src';
 import { assertNotNull, bindRequestCounter } from '../utils';
 
@@ -16,17 +16,45 @@ describe('Node Chain', () => {
     aeSdkWithoutAccount = await getSdk(0);
   });
 
-  it('determines the height', async () => {
-    expect(await aeSdkWithoutAccount.getHeight()).to.be.a('number');
-  });
+  describe('getHeight', () => {
+    it('determines the height', async () => {
+      expect(await aeSdkWithoutAccount.getHeight()).to.be.a('number');
+    });
 
-  it('combines height queries', async () => {
-    const getCount = bindRequestCounter(aeSdk.api);
-    const heights = await Promise.all(
-      new Array(5).fill(undefined).map(async () => aeSdk.getHeight()),
-    );
-    expect(heights).to.eql(heights.map(() => heights[0]));
-    expect(getCount()).to.be.equal(1);
+    it('combines height queries', async () => {
+      const getCount = bindRequestCounter(aeSdk.api);
+      const heights = await Promise.all(
+        new Array(5).fill(undefined).map(async () => aeSdk.getHeight()),
+      );
+      expect(heights).to.eql(heights.map(() => heights[0]));
+      expect(getCount()).to.be.equal(1);
+    });
+
+    it('returns height from cache', async () => {
+      const height = await aeSdk.getHeight();
+      const getCount = bindRequestCounter(aeSdk.api);
+      expect(await aeSdk.getHeight({ cached: true })).to.be.equal(height);
+      expect(getCount()).to.be.equal(0);
+    });
+
+    it('returns not cached height if network changed', async () => {
+      const height = await aeSdk.getHeight();
+      aeSdk.addNode('test-2', new Node(`${aeSdk.api.$host}/`), true);
+      const getCount = bindRequestCounter(aeSdk.api);
+      expect(await aeSdk.getHeight({ cached: true })).to.be.equal(height);
+      expect(getCount()).to.be.equal(1);
+      aeSdk.selectNode('test');
+      aeSdk.pool.delete('test-2');
+    });
+
+    it('uses correct cache key if node changed while doing request', async () => {
+      const heightPromise = aeSdk.getHeight();
+      aeSdk.addNode('test-2', new Node('http://example.com'), true);
+      await heightPromise;
+      await expect(aeSdk.getHeight({ cached: true }))
+        .to.be.rejectedWith('v3/status error: 404 status code');
+      aeSdk.selectNode('test');
+    });
   });
 
   it('waits for specified heights', async () => {

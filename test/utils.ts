@@ -33,16 +33,17 @@ export type InputNumber = number | bigint | string | BigNumber;
 export function checkOnlyTypes(cb: Function): void {}
 
 export function bindRequestCounter(node: Node): () => number {
+  const name = `counter-${randomString(6)}`;
   let counter = 0;
   node.pipeline.addPolicy({
-    name: 'counter',
+    name,
     async sendRequest(request, next) {
       counter += 1;
       return next(request);
     },
   }, { phase: 'Deserialize' });
   return () => {
-    node.pipeline.removePolicy({ name: 'counter' });
+    node.pipeline.removePolicy({ name });
     return counter;
   };
 }

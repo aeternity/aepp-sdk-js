@@ -87,7 +87,7 @@ export async function pollForQueryResponse(
     const responseBuffer = decode(response as Encoded.OracleResponse);
     if (responseBuffer.length > 0) return responseBuffer.toString();
     await pause(interval);
-    height = await getHeight({ onNode });
+    height = await getHeight({ ...options, onNode, cached: true });
   } while (ttl >= height);
   throw new RequestTimedOutError(height);
 }
