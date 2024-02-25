@@ -133,7 +133,12 @@ export const genRetryOnFailurePolicy = (
 
       let error = new RestError('Not expected to be thrown');
       for (let attempt = 0; attempt <= retryCount; attempt += 1) {
-        if (attempt !== 0) await pause(intervalsInMs[attempt - 1]);
+        if (attempt !== 0) {
+          await pause(intervalsInMs[attempt - 1]);
+          const urlParsed = new URL(request.url);
+          urlParsed.searchParams.set('__sdk-retry', attempt.toString());
+          request.url = urlParsed.toString();
+        }
         try {
           return await next(request);
         } catch (e) {
