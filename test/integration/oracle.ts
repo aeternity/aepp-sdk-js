@@ -1,12 +1,9 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { RestError } from '@azure/core-rest-pipeline';
-import { getSdk } from '.';
+import { getSdk, networkId } from '.';
 import {
-  AeSdk, UnexpectedTsError,
-  decode, encode, Encoding, Encoded,
-  registerOracle,
-  ORACLE_TTL_TYPES, RequestTimedOutError,
+  AeSdk, UnexpectedTsError, decode, encode, Encoding, Encoded, registerOracle, ORACLE_TTL_TYPES,
 } from '../../src';
 
 describe('Oracle', () => {
@@ -57,16 +54,18 @@ describe('Oracle', () => {
       .then(() => oracle.postQuery('{"city": "Berlin4"}'));
   });
 
+  const timeout = networkId === 'ae_devnet' ? 8000 : 600000;
   it('Poll for response for query without response', async () => {
-    const query = await oracle.postQuery('{"city": "Berlin"}', { queryTtlValue: 2 });
-    await query.pollForResponse().should.be.rejectedWith(RequestTimedOutError);
-  });
+    const query = await oracle.postQuery('{"city": "Berlin"}', { queryTtlValue: 1 });
+    await query.pollForResponse()
+      .should.be.rejectedWith(/Giving up at height|error: Query not found/);
+  }).timeout(timeout);
 
   it('Poll for response for query that is already expired without response', async () => {
-    const query = await oracle.postQuery('{"city": "Berlin"}', { queryTtlValue: 2 });
-    await aeSdk.awaitHeight(await aeSdk.getHeight() + 3);
+    const query = await oracle.postQuery('{"city": "Berlin"}', { queryTtlValue: 1 });
+    await aeSdk.awaitHeight(await aeSdk.getHeight() + 2);
     await query.pollForResponse().should.be.rejectedWith(RestError, 'Query not found');
-  });
+  }).timeout(timeout);
 
   it('Respond to query', async () => {
     let query = await oracle.postQuery('{"city": "Berlin"}');

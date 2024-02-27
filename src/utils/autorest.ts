@@ -129,7 +129,7 @@ export const genRetryOnFailurePolicy = (
       const intervals = new Array(retryCount).fill(0)
         .map((_, idx) => ((idx + 1) / retryCount) ** 2);
       const intervalSum = intervals.reduce((a, b) => a + b, 0);
-      const intervalsInMs = intervals.map((el) => (el / intervalSum) * retryOverallDelay);
+      const intervalsInMs = intervals.map((e) => Math.floor((e / intervalSum) * retryOverallDelay));
 
       let error = new RestError('Not expected to be thrown');
       for (let attempt = 0; attempt <= retryCount; attempt += 1) {

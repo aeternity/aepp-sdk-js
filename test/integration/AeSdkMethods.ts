@@ -1,21 +1,20 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { getSdk, url, compilerUrl } from '.';
+import { getSdk } from '.';
 import { assertNotNull } from '../utils';
-import {
-  AeSdkMethods, Node, CompilerHttp, AccountBase,
-} from '../../src';
+import { AeSdkMethods, AccountBase } from '../../src';
 
 describe('AeSdkMethods', () => {
   let accounts: AccountBase[];
   let aeSdkMethods: AeSdkMethods;
 
   before(async () => {
-    accounts = Object.values((await getSdk(2)).accounts);
+    const sdk = await getSdk(2);
+    accounts = Object.values(sdk.accounts);
     aeSdkMethods = new AeSdkMethods({
       onAccount: accounts[0],
-      onNode: new Node(url),
-      onCompiler: new CompilerHttp(compilerUrl),
+      onNode: sdk.api,
+      onCompiler: sdk.compilerApi,
     });
   });
 
@@ -91,7 +90,7 @@ describe('AeSdkMethods', () => {
             { name: 'logPolicy' },
           ],
         },
-        $host: 'http://localhost:3013',
+        $host: data.onNode.$host,
         intAsString: true,
       },
       onCompiler: {
@@ -134,7 +133,7 @@ describe('AeSdkMethods', () => {
               { name: 'logPolicy' },
             ],
           },
-          $host: 'http://localhost:3080',
+          $host: data.onCompiler.api.$host,
         },
       },
     });

@@ -106,12 +106,12 @@ contract DelegateTest =
       const { result } = await contract.signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
-      await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
       // signature for any other name related operations
       delegationSignature = await aeSdk.createDelegationSignature(contractAddress, [name]);
     });
 
     it('claims', async () => {
+      await aeSdk.awaitHeight(1 + await aeSdk.getHeight());
       const { result } = await contract
         .signedClaim(owner, name, salt, nameFee, delegationSignature);
       assertNotNull(result);

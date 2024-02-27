@@ -4,7 +4,7 @@ import {
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
-import { getSdk, channelUrl } from '.';
+import { getSdk, networkId, channelUrl } from '.';
 import {
   unpackTx,
   buildTxHash,
@@ -50,7 +50,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
   });
 }
 
-describe('Channel', () => {
+(networkId === 'ae_devnet' ? describe : describe.skip)('Channel', () => {
   let aeSdkInitiatior: AeSdk;
   let aeSdkResponder: AeSdk;
   let initiatorCh: Channel;

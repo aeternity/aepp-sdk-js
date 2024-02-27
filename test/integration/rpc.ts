@@ -33,9 +33,7 @@ import {
 } from '../../src';
 import { getBufferToSign } from '../../src/account/Memory';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
-import {
-  getSdk, networkId, url, compilerUrl,
-} from '.';
+import { getSdk, networkId, compilerUrl } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
 import { assertNotNull } from '../utils';
 
@@ -74,8 +72,7 @@ const getConnections = (): { walletWindow: ImplPostMessage; aeppWindow: ImplPost
 };
 
 describe('Aepp<->Wallet', function aeppWallet() {
-  this.timeout(2000);
-  const node = new Node(url);
+  this.timeout(8000);
   const connections = getConnections();
   const connectionFromWalletToAepp = new BrowserWindowMessageConnection({
     self: connections.walletWindow,
@@ -86,11 +83,13 @@ describe('Aepp<->Wallet', function aeppWallet() {
     target: connections.walletWindow,
   });
   const handlerReject = (): void => { throw new Error('test reject'); };
+  let node: Node;
   let aeSdk: AeSdk;
   let account: AccountBase;
 
   before(async () => {
     aeSdk = await getSdk();
+    node = aeSdk.api;
     [account] = Object.values(aeSdk.accounts);
   });
 
