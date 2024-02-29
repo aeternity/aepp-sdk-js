@@ -48,7 +48,7 @@ async function verifyTransactionInternal(
       })
       // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
       .then((acc) => ({ ...acc, id: acc.id as Encoded.AccountAddress })),
-    node.getCurrentKeyBlockHeight(),
+    node.getCurrentKeyBlockHeight(), // TODO: don't request height on each validation, use caching
     node.getNodeInfo(),
   ]);
 

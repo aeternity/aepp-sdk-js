@@ -1,6 +1,8 @@
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
 import verifyTransaction, { ValidatorResult } from './tx/validator';
-import { ensureError, isAccountNotFoundError, pause } from './utils/other';
+import {
+  ensureError, isAccountNotFoundError, pause, unwrapProxy,
+} from './utils/other';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
 import { DRY_RUN_ACCOUNT } from './tx/builder/schema';
 import { AensName } from './tx/builder/constants';
@@ -26,14 +28,14 @@ import { buildTxHash } from './tx/builder';
  */
 export function _getPollInterval(
   type: 'block' | 'microblock', // TODO: rename to 'key-block' | 'micro-block'
-  { _expectedMineRate = 180000, _microBlockCycle = 3000, _maxPollInterval = 5000 }:
-  { _expectedMineRate?: number; _microBlockCycle?: number; _maxPollInterval?: number },
+  { _expectedMineRate = 180000, _microBlockCycle = 3000 }:
+  { _expectedMineRate?: number; _microBlockCycle?: number },
 ): number {
   const base = {
     block: _expectedMineRate,
     microblock: _microBlockCycle,
   }[type];
-  return Math.min(base / 3, _maxPollInterval);
+  return Math.floor(base / 3);
 }
 
 /**
@@ -56,14 +58,33 @@ export class InvalidTxError extends TransactionError {
   }
 }
 
+const heightCache: WeakMap<Node, { time: number; height: number }> = new WeakMap();
+
 /**
  * Obtain current height of the chain
  * @category chain
  * @param options - Options
+ * @param options.cached - Get height from the cache. The lag behind the actual height shouldn't
+ * be more than 1 block. Use if needed to reduce requests count, and approximate value can be used.
+ * For example, for timeout check in transaction status polling.
  * @returns Current chain height
  */
-export async function getHeight({ onNode }: { onNode: Node }): Promise<number> {
-  return (await onNode.getCurrentKeyBlockHeight()).height;
+export async function getHeight(
+  { cached = false, ...options }: {
+    onNode: Node;
+    cached?: boolean;
+  } & Parameters<typeof _getPollInterval>[1],
+): Promise<number> {
+  const onNode = unwrapProxy(options.onNode);
+  if (cached) {
+    const cache = heightCache.get(onNode);
+    if (cache?.time != null && cache.time > Date.now() - _getPollInterval('block', options)) {
+      return cache.height;
+    }
+  }
+  const { height } = await onNode.getCurrentKeyBlockHeight();
+  heightCache.set(onNode, { height, time: Date.now() });
+  return height;
 }
 
 /**
@@ -84,12 +105,12 @@ export async function poll(
   { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<TransformNodeType<SignedTx>> {
   interval ??= _getPollInterval('microblock', options);
-  const max = await getHeight({ onNode }) + blocks;
+  const max = await getHeight({ ...options, onNode, cached: true }) + blocks;
   do {
     const tx = await onNode.getTransactionByHash(th);
     if (tx.blockHeight !== -1) return tx;
     await pause(interval);
-  } while (await getHeight({ onNode }) < max);
+  } while (await getHeight({ ...options, onNode, cached: true }) < max);
   throw new TxTimedOutError(blocks, th);
 }
 
@@ -107,11 +128,11 @@ export async function awaitHeight(
   { interval, onNode, ...options }:
   { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<number> {
-  interval ??= _getPollInterval('block', options);
+  interval ??= Math.min(_getPollInterval('block', options), 5000);
   let currentHeight;
   do {
     if (currentHeight != null) await pause(interval);
-    currentHeight = (await onNode.getCurrentKeyBlockHeight()).height;
+    currentHeight = await getHeight({ onNode });
   } while (currentHeight < height);
   return currentHeight;
 }

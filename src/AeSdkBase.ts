@@ -4,8 +4,9 @@ import {
   CompilerError, DuplicateNodeError, NodeNotFoundError, NotImplementedError, TypeError,
 } from './utils/errors';
 import { Encoded } from './utils/encoder';
+import { wrapWithProxy } from './utils/other';
 import CompilerBase from './contract/compiler/Base';
-import AeSdkMethods, { OnAccount, getValueOrErrorProxy, AeSdkMethodsOptions } from './AeSdkMethods';
+import AeSdkMethods, { OnAccount, AeSdkMethodsOptions, WrappedOptions } from './AeSdkMethods';
 import { AensName } from './tx/builder/constants';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
@@ -21,6 +22,8 @@ export default class AeSdkBase extends AeSdkMethods {
 
   selectedNodeName?: string;
 
+  readonly #wrappedOptions: WrappedOptions;
+
   /**
    * @param options - Options
    * @param options.nodes - Array of nodes
@@ -33,6 +36,12 @@ export default class AeSdkBase extends AeSdkMethods {
     super(options);
 
     nodes.forEach(({ name, instance }, i) => this.addNode(name, instance, i === 0));
+
+    this.#wrappedOptions = {
+      onNode: wrapWithProxy(() => this.api),
+      onCompiler: wrapWithProxy(() => this.compilerApi),
+      onAccount: wrapWithProxy(() => this._resolveAccount()),
+    };
   }
 
   // TODO: consider dropping this getter, because:
@@ -293,19 +302,14 @@ export default class AeSdkBase extends AeSdkMethods {
    * The same as AeSdkMethods:getContext, but it would resolve ak_-prefixed address in
    * `mergeWith.onAccount` to AccountBase.
    */
-  override getContext(mergeWith: AeSdkMethodsOptions = {}): AeSdkMethodsOptions & {
-    onNode: Node;
-    onAccount: AccountBase;
-    onCompiler: CompilerBase;
-  } {
+  override getContext(mergeWith: AeSdkMethodsOptions = {}): AeSdkMethodsOptions & WrappedOptions {
     return {
       ...this._options,
-      onNode: getValueOrErrorProxy(() => this.api),
-      onCompiler: getValueOrErrorProxy(() => this.compilerApi),
+      ...this.#wrappedOptions,
       ...mergeWith,
-      onAccount: mergeWith.onAccount != null
-        ? this._resolveAccount(mergeWith.onAccount)
-        : getValueOrErrorProxy(() => this._resolveAccount()),
+      ...mergeWith.onAccount != null && {
+        onAccount: this._resolveAccount(mergeWith.onAccount),
+      },
     };
   }
 }
