@@ -260,7 +260,7 @@ class Contract<M extends ContractMethodsBase> {
       'init',
       { ...opt, onAccount: opt.onAccount },
     );
-    this.$options.address = buildContractIdByContractTx(tx);
+    this.$options.address = buildContractIdByContractTx(other.rawTx);
     return {
       ...other,
       ...other.result?.log != null && {

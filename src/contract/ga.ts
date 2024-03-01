@@ -58,10 +58,10 @@ export async function createGeneralizedAccount(
     callData: contract._calldata.encode(contract._name, 'init', args),
     authFun: hash(authFnName),
   });
-  const contractId = buildContractIdByContractTx(tx);
   const { hash: transaction, rawTx } = await sendTransaction(tx, {
     onNode, onAccount, onCompiler, ...options,
   });
+  const contractId = buildContractIdByContractTx(rawTx);
 
   return Object.freeze({
     owner: ownerId,

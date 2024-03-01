@@ -105,7 +105,7 @@ export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.Tx
 }
 
 /**
- * Build a contract public key by contractCreateTx or gaAttach
+ * Build a contract public key by contractCreateTx, gaAttach or signedTx
  * @category contract
  * @param contractTx - Transaction
  * @returns Contract public key
@@ -113,7 +113,8 @@ export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.Tx
 export function buildContractIdByContractTx(
   contractTx: Encoded.Transaction,
 ): Encoded.ContractAddress {
-  const params = unpackTx(contractTx);
+  let params = unpackTx(contractTx);
+  if (Tag.SignedTx === params.tag) params = params.encodedTx;
   if (Tag.ContractCreateTx !== params.tag && Tag.GaAttachTx !== params.tag) {
     throw new ArgumentError('contractTx', 'a contractCreateTx or gaAttach', params.tag);
   }
