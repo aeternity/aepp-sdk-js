@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js';
-import {
-  sendTransaction, getBalance, resolveName, SendTransactionOptions,
-} from './chain';
+import { getBalance, resolveName } from './chain';
+import { sendTransaction, SendTransactionOptions } from './send-transaction';
 import { buildTxAsync, BuildTxOptions, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
 import { Encoded, Encoding } from './utils/encoder';

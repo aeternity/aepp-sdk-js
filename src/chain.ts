@@ -1,13 +1,10 @@
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
-import verifyTransaction, { ValidatorResult } from './tx/validator';
-import {
-  ensureError, isAccountNotFoundError, pause, unwrapProxy,
-} from './utils/other';
+import { isAccountNotFoundError, pause, unwrapProxy } from './utils/other';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
 import { DRY_RUN_ACCOUNT } from './tx/builder/schema';
 import { AensName } from './tx/builder/constants';
 import {
-  AensPointerContextError, DryRunError, InvalidAensNameError, TransactionError,
+  AensPointerContextError, DryRunError, InvalidAensNameError,
   TxTimedOutError, TxNotInChainError, InternalError,
 } from './utils/errors';
 import Node, { TransformNodeType } from './Node';
@@ -18,8 +15,6 @@ import {
 import {
   decode, encode, Encoded, Encoding,
 } from './utils/encoder';
-import AccountBase from './account/Base';
-import { buildTxHash } from './tx/builder';
 
 /**
  * @category chain
@@ -36,26 +31,6 @@ export function _getPollInterval(
     microblock: _microBlockCycle,
   }[type];
   return Math.floor(base / 3);
-}
-
-/**
- * @category exception
- */
-export class InvalidTxError extends TransactionError {
-  validation: ValidatorResult[];
-
-  transaction: Encoded.Transaction;
-
-  constructor(
-    message: string,
-    validation: ValidatorResult[],
-    transaction: Encoded.Transaction,
-  ) {
-    super(message);
-    this.name = 'InvalidTxError';
-    this.validation = validation;
-    this.transaction = transaction;
-  }
 }
 
 const heightCache: WeakMap<Node, { time: number; height: number }> = new WeakMap();
@@ -162,107 +137,6 @@ export async function waitForTxConfirm(
     default:
       return waitForTxConfirm(txHash, { onNode, confirm, ...options });
   }
-}
-
-/**
- * Signs and submits transaction for mining
- * @category chain
- * @param txUnsigned - Transaction to sign and submit
- * @param options - Options
- * @returns Transaction details
- */
-export async function sendTransaction(
-  txUnsigned: Encoded.Transaction,
-  {
-    onNode, onAccount, verify = true, waitMined = true, confirm, innerTx, ...options
-  }:
-  SendTransactionOptions,
-): Promise<SendTransactionReturnType> {
-  const tx = await onAccount.signTransaction(txUnsigned, {
-    ...options,
-    onNode,
-    innerTx,
-    networkId: await onNode.getNetworkId(),
-  });
-
-  if (innerTx === true) return { hash: buildTxHash(tx), rawTx: tx };
-
-  if (verify) {
-    const validation = await verifyTransaction(tx, onNode);
-    if (validation.length > 0) {
-      const message = `Transaction verification errors: ${
-        validation.map((v: { message: string }) => v.message).join(', ')}`;
-      throw new InvalidTxError(message, validation, tx);
-    }
-  }
-
-  try {
-    let __queue;
-    try {
-      __queue = onAccount != null ? `tx-${onAccount.address}` : null;
-    } catch (error) {
-      __queue = null;
-    }
-    const { txHash } = await onNode.postTransaction(
-      { tx },
-      __queue != null ? { requestOptions: { customHeaders: { __queue } } } : {},
-    );
-
-    if (waitMined) {
-      const pollResult = await poll(txHash, { onNode, ...options });
-      const txData = {
-        ...pollResult,
-        hash: pollResult.hash as Encoded.TxHash,
-        rawTx: tx,
-      };
-      // wait for transaction confirmation
-      if (confirm != null && +confirm > 0) {
-        const c = typeof confirm === 'boolean' ? undefined : confirm;
-        return {
-          ...txData,
-          confirmationHeight: await waitForTxConfirm(txHash, { onNode, confirm: c, ...options }),
-        };
-      }
-      return txData;
-    }
-    return { hash: txHash, rawTx: tx };
-  } catch (error) {
-    ensureError(error);
-    throw Object.assign(error, {
-      rawTx: tx,
-      verifyTx: async () => verifyTransaction(tx, onNode),
-    });
-  }
-}
-
-type SendTransactionOptionsType = {
-  /**
-   * Node to use
-   */
-  onNode: Node;
-  /**
-   * Account to use
-   */
-  onAccount: AccountBase;
-  /**
-   * Verify transaction before broadcast, throw error if not
-   */
-  verify?: boolean;
-  /**
-   * Ensure that transaction get into block
-   */
-  waitMined?: boolean;
-  /**
-   * Number of micro blocks that should be mined after tx get included
-   */
-  confirm?: boolean | number;
-} & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
-& Parameters<AccountBase['signTransaction']>[1];
-export interface SendTransactionOptions extends SendTransactionOptionsType {}
-interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
-  hash: Encoded.TxHash;
-  rawTx: Encoded.Transaction;
-  confirmationHeight?: number;
 }
 
 /**

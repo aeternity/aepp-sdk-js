@@ -15,7 +15,8 @@ import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
 import Contract from './Contract';
 import Node from '../Node';
-import { sendTransaction, SendTransactionOptions, getAccount } from '../chain';
+import { getAccount } from '../chain';
+import { sendTransaction, SendTransactionOptions } from '../send-transaction';
 import CompilerBase from './compiler/Base';
 
 /**

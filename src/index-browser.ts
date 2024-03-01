@@ -1,9 +1,10 @@
 export {
-  _getPollInterval, InvalidTxError, getHeight, poll, awaitHeight, waitForTxConfirm, sendTransaction,
+  _getPollInterval, getHeight, poll, awaitHeight, waitForTxConfirm,
   getAccount, getBalance, getCurrentGeneration, getGeneration, getMicroBlockTransactions,
   getKeyBlock, getMicroBlockHeader, txDryRun, getContractByteCode, getContract, getName,
   resolveName,
 } from './chain';
+export { InvalidTxError, sendTransaction } from './send-transaction';
 export {
   getAddressFromPriv, isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
   generateKeyPairFromSecret, generateKeyPair, sign, verify, messageToHash, signMessage,

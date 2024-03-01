@@ -39,9 +39,9 @@ import {
 import CompilerBase, { Aci } from './compiler/Base';
 import Node, { TransformNodeType } from '../Node';
 import {
-  getAccount, getContract, getContractByteCode, resolveName, txDryRun, sendTransaction,
-  SendTransactionOptions,
+  getAccount, getContract, getContractByteCode, resolveName, txDryRun,
 } from '../chain';
+import { sendTransaction, SendTransactionOptions } from '../send-transaction';
 import AccountBase from '../account/Base';
 import { TxUnpacked } from '../tx/builder/schema.generated';
 import { isAccountNotFoundError } from '../utils/other';
