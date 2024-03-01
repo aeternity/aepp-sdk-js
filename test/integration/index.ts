@@ -1,4 +1,4 @@
-import { after } from 'mocha';
+import { after, afterEach } from 'mocha';
 import {
   AeSdk, CompilerHttpNode, MemoryAccount, Node, Encoded, ConsensusProtocolVersion,
 } from '../../src';
@@ -25,6 +25,7 @@ const configuration = {
   testnet: {
     networkId: 'ae_uat',
     url: 'https://testnet.aeternity.io',
+    debugUrl: 'https://testnet.aeternity.io',
     channelUrl: 'wss://testnet.aeternity.io/channel',
     // TODO: deploy v8 compiler and v7.4.1
     compilerUrl: 'http://localhost:3080',
@@ -45,6 +46,7 @@ const configuration = {
   '': {
     networkId: 'ae_devnet',
     url: 'http://localhost:3013',
+    debugUrl: 'http://localhost:3113',
     channelUrl: 'ws://localhost:3014/channel',
     compilerUrl: 'http://localhost:3080',
     compilerUrl7: 'http://localhost:3081',
@@ -116,3 +118,16 @@ export async function getSdk(accountCount = 1): Promise<AeSdk> {
 
   return sdk;
 }
+
+afterEach(async function describeTxError() {
+  const { err } = this.currentTest ?? {};
+  if (configuration.debugUrl == null || err?.message == null) return;
+  const match = err.message.match(/Giving up after \d+ blocks mined, transaction hash: (th_.+)/);
+  if (match == null) return;
+  const hash = match[1];
+  const u = `${configuration.debugUrl}/v3/debug/check-tx/pool/${hash}`;
+  const response = await fetch(u);
+  if (response.status !== 200) throw new Error(`Invalid ${u} response: ${response.status}`);
+  const { status } = await response.json();
+  err.message += ` (node-provided transaction status: ${status})`;
+});
