@@ -16,9 +16,7 @@ export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
         const getResponse = async (): Promise<PipelineResponse> => next(request);
         if (key == null) return getResponse();
         const req = (requestQueues.get(key) ?? Promise.resolve()).then(getResponse);
-        // TODO: remove pause after fixing https://github.com/aeternity/aeternity/issues/3803
-        // gap to ensure that node won't reject the nonce
-        requestQueues.set(key, req.then(async () => pause(750), () => {}));
+        requestQueues.set(key, req.catch(() => {}));
         return req;
       },
     },
@@ -124,7 +122,9 @@ export const genRetryOnFailurePolicy = (
   policy: {
     name: 'retry-on-failure',
     async sendRequest(request, next) {
-      const statusesToNotRetry = [200, 400, 403, 410, 500];
+      const retryCode = request.headers.get('__retry-code') ?? NaN;
+      request.headers.delete('__retry-code');
+      const statusesToNotRetry = [200, 400, 403, 410, 500].filter((c) => c !== +retryCode);
 
       const intervals = new Array(retryCount).fill(0)
         .map((_, idx) => ((idx + 1) / retryCount) ** 2);

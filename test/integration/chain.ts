@@ -137,6 +137,7 @@ describe('Node Chain', () => {
   const accounts = new Array(10).fill(undefined).map(() => MemoryAccount.generate());
   const transactions: Encoded.TxHash[] = [];
 
+  const txPostRetry = '/v3/transactions?int-as-string=true&__sdk-retry=';
   it('multiple spends from one account', async () => {
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     const getCount = bindRequestCounter(aeSdk.api);
@@ -147,7 +148,7 @@ describe('Node Chain', () => {
     )));
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
-    expect(getCount()).to.be.equal(txPostCount);
+    expect(getCount({ exclude: [txPostRetry] })).to.be.equal(txPostCount);
   });
 
   it('multiple spends from different accounts', async () => {

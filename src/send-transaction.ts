@@ -67,10 +67,15 @@ export async function sendTransaction(
     } catch (error) {
       __queue = null;
     }
-    const { txHash } = await onNode.postTransaction(
-      { tx },
-      __queue != null ? { requestOptions: { customHeaders: { __queue } } } : {},
-    );
+    const { txHash } = await onNode.postTransaction({ tx }, {
+      requestOptions: {
+        customHeaders: {
+          // TODO: remove __retry-code after fixing https://github.com/aeternity/aeternity/issues/3803
+          '__retry-code': '400',
+          ...__queue != null ? { __queue } : {},
+        },
+      },
+    });
 
     if (waitMined) {
       const pollResult = await poll(txHash, { onNode, ...options });
