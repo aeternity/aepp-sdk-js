@@ -128,6 +128,7 @@ describe('Node Chain', () => {
     expect(getCount()).to.be.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
+    await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, publicKey, { waitMined: false })).hash;
     expect(getCount()).to.be.equal(5); // nonce, validator(acc, height, status), post tx
@@ -140,6 +141,7 @@ describe('Node Chain', () => {
   const txPostRetry = '/v3/transactions?int-as-string=true&__sdk-retry=';
   it('multiple spends from one account', async () => {
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
+    await aeSdk.getHeight({ cached: false });
     const getCount = bindRequestCounter(aeSdk.api);
     const spends = await Promise.all(accounts.map(async (account, idx) => aeSdk.spend(
       Math.floor(Math.random() * 1000 + 1e15),
@@ -160,7 +162,7 @@ describe('Node Chain', () => {
     );
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
-    expect(getCount()).to.be.equal(txPostCount);
+    expect(getCount()).to.be.equal(txPostCount + 1); // height for relative ttl
   });
 
   it('ensure transactions mined', async () => Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));

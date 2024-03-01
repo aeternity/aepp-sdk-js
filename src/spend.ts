@@ -22,6 +22,7 @@ export async function spend(
 ): ReturnType<typeof sendTransaction> {
   return sendTransaction(
     await buildTxAsync({
+      _isInternalBuild: true,
       ...options,
       tag: Tag.SpendTx,
       senderId: options.onAccount.address,
@@ -78,7 +79,12 @@ export async function transferFunds(
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP);
   const { fee } = unpackTx(
     await buildTxAsync({
-      ...options, tag: Tag.SpendTx, senderId, recipientId, amount: desiredAmount,
+      _isInternalBuild: true,
+      ...options,
+      tag: Tag.SpendTx,
+      senderId,
+      recipientId,
+      amount: desiredAmount,
     }),
     Tag.SpendTx,
   );
@@ -86,7 +92,12 @@ export async function transferFunds(
   const amount = desiredAmount.plus(fee).gt(balance) ? balance.minus(fee) : desiredAmount;
   return sendTransaction(
     await buildTxAsync({
-      ...options, tag: Tag.SpendTx, senderId, recipientId, amount,
+      _isInternalBuild: true,
+      ...options,
+      tag: Tag.SpendTx,
+      senderId,
+      recipientId,
+      amount,
     }),
     options,
   );
@@ -109,7 +120,11 @@ export async function payForTransaction(
 ): ReturnType<typeof sendTransaction> {
   return sendTransaction(
     await buildTxAsync({
-      ...options, tag: Tag.PayingForTx, payerId: options.onAccount.address, tx: transaction,
+      _isInternalBuild: true,
+      ...options,
+      tag: Tag.PayingForTx,
+      payerId: options.onAccount.address,
+      tx: transaction,
     }),
     options,
   );

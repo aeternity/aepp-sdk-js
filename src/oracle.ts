@@ -144,6 +144,7 @@ export async function postQueryToOracle(
   const senderId = options.onAccount.address;
 
   const oracleQueryTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.OracleQueryTx,
     oracleId,
@@ -174,6 +175,7 @@ Awaited<ReturnType<typeof sendTransaction>> & Awaited<ReturnType<typeof getOracl
 > {
   const oracleId = encode(decode(options.onAccount.address), Encoding.OracleAddress);
   const oracleExtendTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.OracleExtendTx,
     oracleId,
@@ -206,6 +208,7 @@ export async function respondToQuery(
   > {
   const oracleId = encode(decode(options.onAccount.address), Encoding.OracleAddress);
   const oracleRespondTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.OracleResponseTx,
     oracleId,
@@ -290,6 +293,7 @@ export async function registerOracle(
   > {
   const accountId = options.onAccount.address;
   const oracleRegisterTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.OracleRegisterTx,
     accountId,

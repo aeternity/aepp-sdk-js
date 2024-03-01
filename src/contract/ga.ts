@@ -49,6 +49,7 @@ export async function createGeneralizedAccount(
   });
 
   const tx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.GaAttachTx,
     onNode,

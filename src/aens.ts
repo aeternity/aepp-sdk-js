@@ -45,6 +45,7 @@ export async function aensRevoke(
   options: AensRevokeOptions,
 ): ReturnType<typeof sendTransaction> {
   const nameRevokeTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NameRevokeTx,
     nameId: name,
@@ -96,6 +97,7 @@ export async function aensUpdate(
   }
 
   const nameUpdateTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NameUpdateTx,
     version: hasRawPointers ? 2 : 1,
@@ -150,6 +152,7 @@ export async function aensTransfer(
   options: AensTransferOptions,
 ): ReturnType<typeof sendTransaction> {
   const nameTransferTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NameTransferTx,
     nameId: name,
@@ -267,6 +270,7 @@ export async function aensClaim(
   options: AensClaimOptions,
 ): Promise<AensClaimReturnType> {
   const claimTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NameClaimTx,
     accountId: options.onAccount.address,
@@ -321,6 +325,7 @@ Awaited<ReturnType<typeof sendTransaction>> & {
   const commitmentId = commitmentHash(name, salt);
 
   const preclaimTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NamePreclaimTx,
     accountId: options.onAccount.address,

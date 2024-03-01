@@ -17,14 +17,17 @@ export default {
     value: number | undefined,
     params: {},
     // TODO: { absoluteTtl: true } | { absoluteTtl: false, onNode: Node }
-    { onNode, absoluteTtl, ...options }: {
+    {
+      onNode, absoluteTtl, _isInternalBuild, ...options
+    }: {
       onNode?: Node;
       absoluteTtl?: boolean;
+      _isInternalBuild?: boolean;
     } & Parameters<typeof _getPollInterval>[1],
   ) {
-    if (absoluteTtl !== true && value !== 0 && value != null) {
+    if (absoluteTtl !== true && value !== 0 && (value != null || _isInternalBuild === true)) {
       if (onNode == null) throw new ArgumentError('onNode', 'provided', onNode);
-      value += await getHeight({ ...options, onNode, cached: true });
+      value = (value ?? 3) + await getHeight({ ...options, onNode, cached: true });
     }
     return value;
   },
