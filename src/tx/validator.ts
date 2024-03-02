@@ -115,7 +115,7 @@ validators.push(
   },
   (tx, { height }) => {
     if (!('ttl' in tx)) return [];
-    if (tx.ttl === 0 || tx.ttl >= height) return [];
+    if (tx.ttl === 0 || tx.ttl > height) return [];
     return [{
       message: `TTL ${tx.ttl} is already expired, current height is ${height}`,
       key: 'ExpiredTTL',
