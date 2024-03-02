@@ -6,8 +6,9 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import { DRY_RUN_ACCOUNT } from '../tx/builder/schema';
-import { Tag, AensName, ConsensusProtocolVersion } from '../tx/builder/constants';
+import {
+  Tag, AensName, ConsensusProtocolVersion, DRY_RUN_ACCOUNT,
+} from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
 } from '../tx/builder';

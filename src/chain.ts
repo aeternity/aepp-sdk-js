@@ -1,8 +1,7 @@
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
 import { isAccountNotFoundError, pause, unwrapProxy } from './utils/other';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
-import { DRY_RUN_ACCOUNT } from './tx/builder/schema';
-import { AensName } from './tx/builder/constants';
+import { AensName, DRY_RUN_ACCOUNT } from './tx/builder/constants';
 import {
   AensPointerContextError, DryRunError, InvalidAensNameError,
   TxTimedOutError, TxNotInChainError, InternalError,

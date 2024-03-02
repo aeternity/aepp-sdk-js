@@ -23,11 +23,11 @@ export {
 export {
   MAX_AUTH_FUN_GAS, MIN_GAS_PRICE,
   NAME_FEE_MULTIPLIER, NAME_FEE_BID_INCREMENT, NAME_BID_TIMEOUT_BLOCKS, NAME_MAX_LENGTH_FEE,
-  NAME_BID_RANGES, ConsensusProtocolVersion, VmVersion, AbiVersion, Tag,
+  NAME_BID_RANGES, ConsensusProtocolVersion, VmVersion, AbiVersion, Tag, DRY_RUN_ACCOUNT,
 } from './tx/builder/constants';
 export type { Int, AensName } from './tx/builder/constants';
 // TODO: move to constants
-export { ORACLE_TTL_TYPES, DRY_RUN_ACCOUNT, CallReturnType } from './tx/builder/schema';
+export { ORACLE_TTL_TYPES, CallReturnType } from './tx/builder/schema';
 export { DelegationTag } from './tx/builder/delegation/schema';
 export { packDelegation, unpackDelegation } from './tx/builder/delegation';
 export {

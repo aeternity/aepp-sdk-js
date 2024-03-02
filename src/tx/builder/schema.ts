@@ -20,12 +20,6 @@ export enum ORACLE_TTL_TYPES {
   block = 1,
 }
 
-// # CONTRACT
-export const DRY_RUN_ACCOUNT = {
-  pub: 'ak_11111111111111111111111111111111273Yts',
-  amount: 100000000000000000000000000000000000n,
-} as const;
-
 export enum CallReturnType {
   Ok = 0,
   Error = 1,
