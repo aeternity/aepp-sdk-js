@@ -1,5 +1,5 @@
 import { Encoded } from '../utils/encoder';
-import Node from '../Node';
+import Node from '../node/Direct';
 import CompilerBase from '../contract/compiler/Base';
 import { AensName, ConsensusProtocolVersion, Int } from '../tx/builder/constants';
 import { AciValue, Domain } from '../utils/typed-data';

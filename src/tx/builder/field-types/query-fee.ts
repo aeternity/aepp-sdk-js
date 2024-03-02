@@ -1,6 +1,6 @@
 import coinAmount from './coin-amount';
 import { Int } from '../constants';
-import Node from '../../../Node';
+import Node from '../../../node/Direct';
 import { Encoded } from '../../../utils/encoder';
 import { ArgumentError } from '../../../utils/errors';
 

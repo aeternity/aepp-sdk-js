@@ -1,5 +1,5 @@
 import { ConsensusProtocolVersion, VmVersion, AbiVersion } from '../constants';
-import Node from '../../../Node';
+import Node from '../../../node/Direct';
 
 /*
  * First abi/vm by default

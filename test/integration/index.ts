@@ -1,6 +1,6 @@
 import { after } from 'mocha';
 import {
-  AeSdk, CompilerHttpNode, MemoryAccount, Node, Encoded, ConsensusProtocolVersion,
+  AeSdk, CompilerHttpNode, MemoryAccount, Node, NodeGateway, Encoded, ConsensusProtocolVersion,
 } from '../../src';
 import '..';
 
@@ -70,8 +70,8 @@ export function addTransactionHandler(cb: TransactionHandler): void {
   transactionHandlers.push(cb);
 }
 
-class NodeHandleTx extends Node {
-  // @ts-expect-error use code generation to create node class?
+class NodeHandleTx extends (network == null ? Node : NodeGateway) {
+  // @ts-expect-error use code generation to create node class or integrate bigint to autorest
   override async postTransaction(
     ...args: Parameters<Node['postTransaction']>
   ): ReturnType<Node['postTransaction']> {

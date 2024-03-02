@@ -7,7 +7,7 @@ import createDelegationSignature from './contract/delegation-signature';
 import * as contractGaMethods from './contract/ga';
 import { buildTxAsync } from './tx/builder';
 import { mapObject, UnionToIntersection, wrapWithProxy } from './utils/other';
-import Node from './Node';
+import Node from './node/Direct';
 import { TxParamsAsync } from './tx/builder/schema.generated';
 import AccountBase from './account/Base';
 import { Encoded } from './utils/encoder';
