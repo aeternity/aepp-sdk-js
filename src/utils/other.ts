@@ -27,30 +27,6 @@ export const concatBuffers = isWebpack4Buffer
   )
   : Buffer.concat;
 
-export function wrapWithProxy<Value extends object | undefined>(
-  valueCb: () => Value,
-): NonNullable<Value> {
-  return new Proxy(
-    {},
-    Object.fromEntries(([
-      'apply', 'construct', 'defineProperty', 'deleteProperty', 'getOwnPropertyDescriptor',
-      'getPrototypeOf', 'isExtensible', 'ownKeys', 'preventExtensions', 'set', 'setPrototypeOf',
-      'get', 'has',
-    ] as const).map((name) => [name, (t: {}, ...args: unknown[]) => {
-      if (name === 'get' && args[0] === '_wrappedValue') return valueCb();
-      const target = valueCb() as object; // to get a native exception in case it missed
-      const res = (Reflect[name] as any)(target, ...args);
-      return typeof res === 'function' && name === 'get'
-        ? res.bind(target) // otherwise it fails with attempted to get private field on non-instance
-        : res;
-    }])),
-  ) as NonNullable<Value>;
-}
-
-export function unwrapProxy<Value extends object>(value: Value): Value {
-  return (value as { _wrappedValue?: Value })._wrappedValue ?? value;
-}
-
 /**
  * Object key type guard
  * @param key - Maybe object key

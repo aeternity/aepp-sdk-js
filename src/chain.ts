@@ -1,5 +1,6 @@
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
-import { isAccountNotFoundError, pause, unwrapProxy } from './utils/other';
+import { isAccountNotFoundError, pause } from './utils/other';
+import { unwrapProxy } from './utils/wrap-proxy';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
 import { AensName, DRY_RUN_ACCOUNT } from './tx/builder/constants';
 import {
