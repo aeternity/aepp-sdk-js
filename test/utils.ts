@@ -32,18 +32,28 @@ export type InputNumber = number | bigint | string | BigNumber;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function checkOnlyTypes(cb: Function): void {}
 
-export function bindRequestCounter(node: Node): () => number {
-  const name = `counter-${randomString(6)}`;
-  let counter = 0;
+export function bindRequestTracker(node: Node): () => string[] {
+  const name = `tracker-${randomString(6)}`;
+  const requestUrls: string[] = [];
   node.pipeline.addPolicy({
     name,
     async sendRequest(request, next) {
-      counter += 1;
+      requestUrls.push(request.url);
       return next(request);
     },
   }, { phase: 'Deserialize' });
   return () => {
     node.pipeline.removePolicy({ name });
-    return counter;
+    return requestUrls;
   };
+}
+
+export function bindRequestCounter(
+  node: Node,
+): (params?: { filter?: string[]; exclude?: string[] }) => number {
+  const getRequestUrls = bindRequestTracker(node);
+  return ({ filter = [], exclude = [] } = {}) => getRequestUrls()
+    .filter((url) => !exclude.some((p) => url.includes(p)))
+    .filter((url) => (filter.length === 0) || filter.some((p) => url.includes(p)))
+    .length;
 }

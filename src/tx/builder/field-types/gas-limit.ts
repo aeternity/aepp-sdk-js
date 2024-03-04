@@ -33,7 +33,7 @@ export default {
 
     const gasLimitMax = tag === Tag.GaMetaTx ? MAX_AUTH_FUN_GAS : calculateGasLimitMax(
       gasMax,
-      (gasLimit) => rebuildTx({ _computingGasLimit: gasLimit, _pickBiggerFee: true }),
+      (gasLimit) => rebuildTx({ _computingGasLimit: gasLimit, _canIncreaseFee: true }),
       unpackTx,
       buildTx,
     );

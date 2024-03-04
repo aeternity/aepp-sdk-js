@@ -6,8 +6,9 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import { DRY_RUN_ACCOUNT } from '../tx/builder/schema';
-import { Tag, AensName, ConsensusProtocolVersion } from '../tx/builder/constants';
+import {
+  Tag, AensName, ConsensusProtocolVersion, DRY_RUN_ACCOUNT,
+} from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
 } from '../tx/builder';
@@ -39,9 +40,9 @@ import {
 import CompilerBase, { Aci } from './compiler/Base';
 import Node, { TransformNodeType } from '../Node';
 import {
-  getAccount, getContract, getContractByteCode, resolveName, txDryRun, sendTransaction,
-  SendTransactionOptions,
+  getAccount, getContract, getContractByteCode, resolveName, txDryRun,
 } from '../chain';
+import { sendTransaction, SendTransactionOptions } from '../send-transaction';
 import AccountBase from '../account/Base';
 import { TxUnpacked } from '../tx/builder/schema.generated';
 import { isAccountNotFoundError } from '../utils/other';
@@ -259,7 +260,7 @@ class Contract<M extends ContractMethodsBase> {
       'init',
       { ...opt, onAccount: opt.onAccount },
     );
-    this.$options.address = buildContractIdByContractTx(tx);
+    this.$options.address = buildContractIdByContractTx(other.rawTx);
     return {
       ...other,
       ...other.result?.log != null && {

@@ -1,4 +1,5 @@
 import * as chainMethods from './chain';
+import { sendTransaction } from './send-transaction';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
@@ -15,10 +16,9 @@ import CompilerBase from './contract/compiler/Base';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
 
-const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
-
 const methods = {
-  ...chainMethodsOther,
+  ...chainMethods,
+  sendTransaction,
   ...aensMethods,
   ...spendMethods,
   ...oracleMethods,

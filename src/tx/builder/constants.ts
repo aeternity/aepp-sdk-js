@@ -1,6 +1,11 @@
 import BigNumber from 'bignumber.js';
 import { mapObject } from '../../utils/other';
 
+export const DRY_RUN_ACCOUNT = {
+  pub: 'ak_11111111111111111111111111111111273Yts',
+  amount: 100000000000000000000000000000000000n,
+} as const;
+
 export const MAX_AUTH_FUN_GAS = 50000;
 export type Int = number | string | BigNumber;
 export type AensName = `${string}.chain`;

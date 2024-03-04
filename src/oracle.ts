@@ -14,9 +14,8 @@ import { RequestTimedOutError } from './utils/errors';
 import {
   decode, encode, Encoded, Encoding,
 } from './utils/encoder';
-import {
-  _getPollInterval, getHeight, sendTransaction, SendTransactionOptions,
-} from './chain';
+import { _getPollInterval, getHeight } from './chain';
+import { sendTransaction, SendTransactionOptions } from './send-transaction';
 import Node from './Node';
 import AccountBase from './account/Base';
 

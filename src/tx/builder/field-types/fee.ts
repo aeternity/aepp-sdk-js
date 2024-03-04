@@ -138,14 +138,14 @@ export default {
   serializeAettos(
     _value: string | undefined,
     {
-      rebuildTx, unpackTx, buildTx, _computingMinFee, _pickBiggerFee,
+      rebuildTx, unpackTx, buildTx, _computingMinFee,
     }: {
       rebuildTx: (params: any) => Encoded.Transaction;
       unpackTx: typeof unpackTxType;
       buildTx: typeof buildTxType;
       _computingMinFee?: BigNumber;
-      _pickBiggerFee?: boolean;
     },
+    { _canIncreaseFee }: { _canIncreaseFee?: boolean },
   ): string {
     if (_computingMinFee != null) return _computingMinFee.toFixed();
     const minFee = calculateMinFee(
@@ -155,9 +155,17 @@ export default {
     );
     const value = new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
-      if (_pickBiggerFee === true) return minFee.toFixed();
+      if (_canIncreaseFee === true) return minFee.toFixed();
       throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger than ${minFee}`);
     }
     return value.toFixed();
+  },
+
+  serialize(
+    value: Parameters<typeof coinAmount.serialize>[0],
+    params: Parameters<typeof coinAmount.serialize>[1],
+    options: { _canIncreaseFee?: boolean } & Parameters<typeof coinAmount.serialize>[2],
+  ): Buffer {
+    return coinAmount.serialize.call(this, value, params, options);
   },
 };
