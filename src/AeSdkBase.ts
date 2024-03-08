@@ -4,7 +4,7 @@ import {
   CompilerError, DuplicateNodeError, NodeNotFoundError, NotImplementedError, TypeError,
 } from './utils/errors';
 import { Encoded } from './utils/encoder';
-import { wrapWithProxy } from './utils/other';
+import { wrapWithProxy } from './utils/wrap-proxy';
 import CompilerBase from './contract/compiler/Base';
 import AeSdkMethods, { OnAccount, AeSdkMethodsOptions, WrappedOptions } from './AeSdkMethods';
 import { AensName } from './tx/builder/constants';
