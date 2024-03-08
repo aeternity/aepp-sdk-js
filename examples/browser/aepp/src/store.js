@@ -1,4 +1,4 @@
-import { shallowReactive } from 'vue';
+import { shallowRef } from 'vue';
 import { createStore } from 'vuex';
 import { AeSdkAepp, Node, CompilerHttp } from '@aeternity/aepp-sdk';
 
@@ -11,7 +11,7 @@ const store = createStore({
     address: undefined,
     networkId: undefined,
     // AeSdkAepp instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
-    aeSdk: shallowReactive(new AeSdkAepp({
+    aeSdk: shallowRef(new AeSdkAepp({
       name: 'Simple æpp',
       nodes: [
         { name: 'testnet', instance: new Node(TESTNET_NODE_URL) },

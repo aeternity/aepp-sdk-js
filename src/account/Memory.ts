@@ -2,7 +2,7 @@ import AccountBase from './Base';
 import {
   generateKeyPairFromSecret, sign, generateKeyPair, hash, messageToHash, messagePrefixLength,
 } from '../utils/crypto';
-import { ArgumentError } from '../utils/errors';
+import { ArgumentError, UnexpectedTsError } from '../utils/errors';
 import {
   decode, encode, Encoded, Encoding,
 } from '../utils/encoder';
@@ -14,7 +14,7 @@ import { produceNameId } from '../tx/builder/helpers';
 import { DelegationTag } from '../tx/builder/delegation/schema';
 import { packDelegation } from '../tx/builder/delegation';
 
-const secretKeys = new WeakMap();
+const secretKeys = new WeakMap<AccountMemory, Uint8Array>();
 
 export function getBufferToSign(
   transaction: Encoded.Transaction,
@@ -44,7 +44,7 @@ export default class AccountMemory extends AccountBase {
     }
     secretKeys.set(this, secretKey);
     this.address = encode(
-      generateKeyPairFromSecret(secretKeys.get(this)).publicKey,
+      generateKeyPairFromSecret(secretKey).publicKey,
       Encoding.AccountAddress,
     );
   }
@@ -58,7 +58,9 @@ export default class AccountMemory extends AccountBase {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override async sign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
-    return sign(data, secretKeys.get(this));
+    const secretKey = secretKeys.get(this);
+    if (secretKey == null) throw new UnexpectedTsError();
+    return sign(data, secretKey);
   }
 
   override async signTransaction(
