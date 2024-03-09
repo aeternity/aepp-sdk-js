@@ -2,9 +2,10 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { createSandbox } from 'sinon';
 import { RestError } from '@azure/core-rest-pipeline';
+import { FullOperationResponse } from '@azure/core-client';
 import { url } from '.';
 import {
-  AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion,
+  AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion, MemoryAccount, buildTx, Tag,
 } from '../../src';
 import { bindRequestCounter } from '../utils';
 
@@ -39,7 +40,7 @@ describe('Node client', () => {
           return await next(request);
         } catch (error) {
           if (!(error instanceof RestError) || error.response == null) throw error;
-          error.response.bodyAsText = '';
+          (error.response as FullOperationResponse).parsedBody = null;
           throw error;
         }
       },
@@ -76,6 +77,16 @@ describe('Node client', () => {
     await expect(node.getNodeInfo()).to.be
       .rejectedWith(`Unsupported consensus protocol version ${message}`);
     sandbox.restore();
+  });
+
+  it('throws exception with code', async () => {
+    const account = MemoryAccount.generate();
+    const spendTx = buildTx({
+      tag: Tag.SpendTx, recipientId: account.address, senderId: account.address, nonce: 1e9,
+    });
+    const tx = await account.signTransaction(spendTx, { networkId: await node.getNetworkId() });
+    await expect(node.postTransaction({ tx }))
+      .to.be.rejectedWith(RestError, 'v3/transactions error: Invalid tx (nonce_too_high)');
   });
 
   describe('Node Pool', () => {

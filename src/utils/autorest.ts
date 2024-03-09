@@ -1,5 +1,5 @@
 import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pipeline';
-import { AdditionalPolicyConfig } from '@azure/core-client';
+import { AdditionalPolicyConfig, FullOperationResponse } from '@azure/core-client';
 import { pause } from './other';
 import semverSatisfies from './semver-satisfies';
 import { UnsupportedVersionError } from './errors';
@@ -81,12 +81,7 @@ export const genErrorFormatterPolicy = (
           throw error;
         }
 
-        let body;
-        try {
-          body = JSON.parse(error.response.bodyAsText);
-        } catch (e) {
-          body = null;
-        }
+        const body = (error.response as FullOperationResponse).parsedBody;
         error.message = prefix;
         const message = body == null ? ` ${error.response.status} status code` : getMessage(body);
         if (message !== '') error.message += `:${message}`;
