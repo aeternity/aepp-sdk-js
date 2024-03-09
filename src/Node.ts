@@ -138,7 +138,9 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
-        genErrorFormatterPolicy((body: ErrorModel) => ` ${body.reason}`),
+        genErrorFormatterPolicy((body: ErrorModel) => [
+          ' ', body.reason, body.errorCode == null ? '' : ` (${body.errorCode})`,
+        ].join('')),
       ],
       ...options,
     });
