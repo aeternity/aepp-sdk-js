@@ -78,7 +78,7 @@
     "@aeternity/aepp-calldata": "github:aeternity/aepp-calldata-js#8e9c8b8e1b394a01be1c84b13cf76271f7624d38",
     "@aeternity/argon2": "^0.0.1",
     "@aeternity/uuid": "^0.0.1",
-    "@azure/core-client": "1.6.0",
+    "@azure/core-client": "^1.8.0",
     "@azure/core-rest-pipeline": "^1.14.0",
     "@babel/runtime-corejs3": "^7.23.9",
     "@ledgerhq/hw-transport": "^6.30.3",
