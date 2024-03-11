@@ -73,7 +73,7 @@ directive:
     where: $.components.schemas.Tx
     transform: >
       if ($doc.info.title === 'node') return $;
-      const base = $.allOf[0];
+      const { discriminator, ...base } = $.allOf[0];
       const transactions = base.properties.type.enum.map(txName => $doc.components.schemas[txName]);
       return {
         ...base,
