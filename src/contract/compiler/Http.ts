@@ -1,4 +1,6 @@
-import { RestError } from '@azure/core-rest-pipeline';
+import {
+  RestError, userAgentPolicyName, setClientRequestIdPolicyName,
+} from '@azure/core-rest-pipeline';
 import {
   Compiler as CompilerApi,
   ErrorModel,
@@ -51,6 +53,8 @@ export default class CompilerHttp extends CompilerBase {
         }),
       ],
     });
+    this.api.pipeline.removePolicy({ name: userAgentPolicyName });
+    this.api.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
     if (ignoreVersion !== true) {
       const versionPromise = this.api.apiVersion()
         .then(({ apiVersion }) => apiVersion, (error) => error);

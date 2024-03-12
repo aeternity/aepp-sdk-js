@@ -1,6 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
 import { OperationArguments, OperationSpec } from '@azure/core-client';
+import { userAgentPolicyName, setClientRequestIdPolicyName } from '@azure/core-rest-pipeline';
 import {
   genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
   genVersionCheckPolicy, genRetryOnFailurePolicy,
@@ -130,6 +131,8 @@ export default class Middleware
       ],
       ...options,
     });
+    this.pipeline.removePolicy({ name: userAgentPolicyName });
+    this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
     if (!ignoreVersion) {
       const statusPromise = this.getStatus();
       const versionPromise = statusPromise.then(({ mdwVersion }) => mdwVersion, (error) => error);
