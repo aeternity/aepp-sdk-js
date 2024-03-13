@@ -24,11 +24,6 @@ const TX_FEE_BASE_GAS = (txType: Tag): BigNumber => {
   const feeFactors = {
     [Tag.ChannelForceProgressTx]: 30,
     [Tag.ChannelOffChainTx]: 0,
-    [Tag.ChannelOffChainUpdateCallContract]: 0,
-    [Tag.ChannelOffChainUpdateCreateContract]: 0,
-    [Tag.ChannelOffChainUpdateDeposit]: 0,
-    [Tag.ChannelOffChainUpdateWithdraw]: 0,
-    [Tag.ChannelOffChainUpdateTransfer]: 0,
     [Tag.ContractCreateTx]: 5,
     [Tag.ContractCallTx]: 12,
     [Tag.GaAttachTx]: 5,
