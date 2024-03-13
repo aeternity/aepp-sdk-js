@@ -2,15 +2,19 @@
 import { writeFileSync } from 'fs';
 import { basename } from 'path';
 import ts, { factory, IntersectionTypeNode, TypeNode } from 'typescript';
-import { txSchema } from '../src/tx/builder/schema';
-import { Tag as TxTag } from '../src/tx/builder/constants';
-import { DelegationTag, schemas as delegationSchema } from '../src/tx/builder/delegation/schema';
 
-function generate(isDelegation: boolean): void {
-  const prefix = isDelegation ? 'Dlg' : 'Tx';
-  const destPath = `src/tx/builder/${isDelegation ? 'delegation/' : ''}schema.generated.ts`;
-  const [Tag, schemas] = isDelegation ? [DelegationTag, delegationSchema] : [TxTag, txSchema];
-  const typesToGenerate = ['Params', ...isDelegation ? [] : ['ParamsAsync'], 'Unpacked'];
+function generate(
+  prefix: string,
+  folder: string,
+  Tag: any,
+  schemas: any,
+  generateAsync: boolean,
+  category: string,
+  tagName: string | null,
+  tagInConstants: boolean,
+): void {
+  const destPath = `src/tx/builder/${folder}schema.generated.ts`;
+  const typesToGenerate = ['Params', ...generateAsync ? ['ParamsAsync'] : [], 'Unpacked'];
 
   const sourceFile = ts.createSourceFile(basename(destPath), '', ts.ScriptTarget.Latest);
 
@@ -18,7 +22,7 @@ function generate(isDelegation: boolean): void {
     return ts.addSyntheticLeadingComment(
       node,
       ts.SyntaxKind.MultiLineCommentTrivia,
-      `*\n * @category ${isDelegation ? 'delegation signature' : 'transaction builder'}\n `,
+      `*\n * @category ${category}\n `,
       true,
     );
   }
@@ -56,13 +60,13 @@ function generate(isDelegation: boolean): void {
             factory.createIdentifier(`${prefix}Params`),
             factory.createIdentifier(`${prefix}ParamsComplex`),
           ),
-          ...isDelegation ? [] : [
+          ...generateAsync ? [
             factory.createImportSpecifier(
               false,
               factory.createIdentifier('TxParamsAsync'),
               factory.createIdentifier('TxParamsAsyncComplex'),
             ),
-          ],
+          ] : [],
           factory.createImportSpecifier(
             false,
             factory.createIdentifier(`${prefix}Unpacked`),
@@ -80,11 +84,11 @@ function generate(isDelegation: boolean): void {
         undefined,
         factory.createNamedImports([factory.createImportSpecifier(
           false,
-          isDelegation ? factory.createIdentifier('DelegationTag') : undefined,
+          tagName == null ? undefined : factory.createIdentifier(tagName),
           factory.createIdentifier('Tag'),
         )]),
       ),
-      factory.createStringLiteral(isDelegation ? './schema' : './constants'),
+      factory.createStringLiteral(tagInConstants ? './constants' : './schema'),
       undefined,
     ),
     ...schemas.map((schema) => {
@@ -92,7 +96,7 @@ function generate(isDelegation: boolean): void {
       const version = schema.version.constValue;
       const name = `${tag}${version}`;
       return typesToGenerate.map((kind) => {
-        const isVersionOptional = schema.version.constValueOptional && kind !== 'Unpacked';
+        const isVersionOptional = schema.version.constValueOptional === true && kind !== 'Unpacked';
         const innerType = factory.createIntersectionTypeNode([
           factory.createTypeReferenceNode(
             factory.createIdentifier(`${prefix}${kind}Complex`),
@@ -168,5 +172,15 @@ ${ts.createPrinter().printList(ts.ListFormat.MultiLine, list, sourceFile)}`;
   writeFileSync(destPath, result);
 }
 
-generate(true);
-generate(false);
+(async () => {
+  const { DelegationTag, schemas: delegationSchema } = await import('../src/tx/builder/delegation/schema');
+  generate('Dlg', 'delegation/', DelegationTag, delegationSchema, false, 'delegation signature', 'DelegationTag', false);
+
+  const { EntryTag } = await import('../src/tx/builder/entry/constants');
+  const { schemas: entrySchema } = await import('../src/tx/builder/entry/schema');
+  generate('Ent', 'entry/', EntryTag, entrySchema, false, 'entry builder', 'EntryTag', true);
+
+  const { Tag: TxTag } = await import('../src/tx/builder/constants');
+  const { txSchema } = await import('../src/tx/builder/schema');
+  generate('Tx', '', TxTag, txSchema, true, 'transaction builder', null, true);
+})();
