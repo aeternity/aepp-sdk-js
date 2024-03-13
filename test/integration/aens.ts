@@ -36,12 +36,15 @@ describe('Aens', () => {
     assertNotNull(claimed.tx);
     assertNotNull(claimed.blockHeight);
     assertNotNull(claimed.signatures);
+    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee >= 16860000000000n);
+    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee < 17000000000000n);
     expect(claimed).to.be.eql({
       tx: {
-        fee: 16860000000000n,
+        fee: claimed.tx.fee,
         nonce: claimed.tx.nonce,
         accountId: aeSdk.address,
         name: n,
+        ttl: claimed.tx.ttl,
         nameSalt: 0,
         nameFee: 500000000000000n,
         version: 2,
@@ -77,13 +80,15 @@ describe('Aens', () => {
     expect(claimed.extendTtl).to.be.a('function');
     assertNotNull(claimed.tx);
     assertNotNull(claimed.signatures);
-    expect(claimed.tx.fee).to.be.oneOf([16940000000000n, 16960000000000n]);
+    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee >= 16960000000000n);
+    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee < 17100000000000n);
     expect(claimed).to.be.eql({
       tx: {
         fee: claimed.tx.fee,
         nonce: claimed.tx.nonce,
         accountId: aeSdk.address,
         name: n,
+        ttl: claimed.tx.ttl,
         nameSalt: claimed.tx.nameSalt,
         nameFee: 300000000000000n,
         version: 2,

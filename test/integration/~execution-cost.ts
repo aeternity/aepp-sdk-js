@@ -38,7 +38,7 @@ describe('Execution cost', () => {
   });
 
   it('calculates execution cost for spend tx', async () => {
-    const { rawTx } = await aeSdk.spend(100, aeSdk.address);
+    const { rawTx } = await aeSdk.spend(100, aeSdk.address, { ttl: 0 });
     const expectedCost = 16660000000000n;
     expect(getExecutionCostBySignedTx(rawTx, networkId)).to.equal(expectedCost);
     expect(getExecutionCost(buildTx(unpackTx(rawTx, Tag.SignedTx).encodedTx)))

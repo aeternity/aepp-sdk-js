@@ -63,12 +63,14 @@ export async function getHeight(
 }
 
 /**
- * Wait for a transaction to be mined
+ * Return transaction details if it is mined, fail otherwise.
+ * If the transaction has ttl specified then would wait till it leaves the mempool.
+ * Otherwise would fail if a specified amount of blocks were mined.
  * @category chain
  * @param th - The hash of transaction to poll
  * @param options - Options
  * @param options.interval - Interval (in ms) at which to poll the chain
- * @param options.blocks - Number of blocks mined after which to fail
+ * @param options.blocks - Number of blocks mined after which to fail if transaction ttl is not set
  * @param options.onNode - Node to use
  * @returns The transaction as it was mined
  */
@@ -80,12 +82,16 @@ export async function poll(
   { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<TransformNodeType<SignedTx>> {
   interval ??= _getPollInterval('microblock', options);
-  const max = await getHeight({ ...options, onNode, cached: true }) + blocks;
+  let max;
   do {
     const tx = await onNode.getTransactionByHash(th);
     if (tx.blockHeight !== -1) return tx;
+    if (max == null) {
+      max = tx.tx.ttl !== 0 ? -1
+        : await getHeight({ ...options, onNode, cached: true }) + blocks;
+    }
     await pause(interval);
-  } while (await getHeight({ ...options, onNode, cached: true }) < max);
+  } while (max === -1 ? true : await getHeight({ ...options, onNode, cached: true }) < max);
   throw new TxTimedOutError(blocks, th);
 }
 

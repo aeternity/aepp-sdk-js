@@ -248,6 +248,7 @@ class Contract<M extends ContractMethodsBase> {
     const ownerId = opt.onAccount.address;
     if (this.$options.bytecode == null) throw new IllegalArgumentError('Can\'t deploy without bytecode');
     const tx = await buildTxAsync({
+      _isInternalBuild: true,
       ...opt,
       tag: Tag.ContractCreateTx,
       gasLimit: opt.gasLimit ?? await this._estimateGas('init', params, opt),
@@ -379,6 +380,7 @@ class Contract<M extends ContractMethodsBase> {
     if (top != null) throw new IllegalArgumentError('Can\'t handle `top` option in on-chain contract call');
     if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
     const tx = await buildTxAsync({
+      _isInternalBuild: true,
       ...opt,
       tag: Tag.ContractCallTx,
       gasLimit: opt.gasLimit ?? await this._estimateGas(fn, params, opt),

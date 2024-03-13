@@ -11,7 +11,11 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
     value: number | undefined,
     params: {},
     // TODO: replace `string` with AddressEncodings
-    options: { [key in SenderKey]: string } & { strategy?: NextNonceStrategy; onNode?: Node },
+    options: { [key in SenderKey]: string } & {
+      strategy?: NextNonceStrategy;
+      onNode?: Node;
+      _isInternalBuild?: boolean;
+    },
   ) => Promise<number>;
   deserialize: (value: Buffer) => number;
   senderKey: string;
@@ -21,6 +25,8 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
 
     async prepare(value, params, options) {
       if (value != null) return value;
+      // TODO: uncomment the below line
+      // if (options._isInternalBuild === true) return 0;
       const { onNode, strategy } = options;
       const senderId = options[senderKey];
       const requirement = 'provided (or provide `nonce` instead)';

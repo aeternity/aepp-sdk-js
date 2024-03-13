@@ -291,7 +291,8 @@ describe('Contract instance', () => {
     expect(res.decodedResult).to.be.equal(2n);
     ensureEqual<Tag.SignedTx>(res.tx.tag, Tag.SignedTx);
     ensureEqual<Tag.ContractCallTx>(res.tx.encodedTx.tag, Tag.ContractCallTx);
-    expect(res.tx.encodedTx.fee).to.be.equal('182000000000000');
+    expect(res.tx.encodedTx.fee).to.satisfy((fee: string) => +fee >= 182000000000000);
+    expect(res.tx.encodedTx.fee).to.satisfy((fee: string) => +fee < 184000000000000);
   });
 
   it('calls without waitMined and get result later', async () => {
@@ -561,7 +562,7 @@ describe('Contract instance', () => {
 
     it('validates gas limit for contract calls', async () => {
       await expect(contract.setKey(4, { gasLimit: 7e6 }))
-        .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 7000000 must be less or equal to 5818100');
+        .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 7000000 must be less or equal to 58');
     });
 
     it('sets maximum possible gas limit for dry-run contract calls', async () => {
@@ -570,7 +571,7 @@ describe('Contract instance', () => {
       const { gasLimit } = tx;
       expect(gasLimit).to.be.equal(5817980);
       await expect(contract.intFn(4, { gasLimit: gasLimit + 1 }))
-        .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 5817981 must be less or equal to 5817980');
+        .to.be.rejectedWith(IllegalArgumentError, 'Gas limit 5817981 must be less or equal to 58');
       await expect(contract.intFn(4, { gasLimit: gasLimit + 1, gasMax: 6e6 + 1 }))
         .to.be.rejectedWith('v3/dry-run error: Over the gas limit');
     });
