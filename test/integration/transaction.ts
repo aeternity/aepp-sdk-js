@@ -1,9 +1,9 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { createSandbox } from 'sinon';
+import { stub, createSandbox, replace } from 'sinon';
 import { getSdk } from './index';
 import {
-  AeSdk, Contract,
+  AeSdk, Contract, Node,
   commitmentHash, oracleQueryId, decode, encode, Encoded, Encoding,
   ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS, buildTx, unpackTx, ConsensusProtocolVersion,
 } from '../../src';
@@ -36,6 +36,7 @@ contract Identity =
   entrypoint getArg(x : int) = x
 `;
 const gasLimit = 5e6;
+const contractId = 'ct_TCQVoset7Y4qEyV5tgEAJAqa2Foz8J1EXqoGpq3fB6dWH5roe';
 
 // Name
 const nameSalt = 4204563566073083;
@@ -63,7 +64,76 @@ describe('Transaction', () => {
     spendAe.should.be.equal(spendAettos);
   });
 
-  const contractId = 'ct_TCQVoset7Y4qEyV5tgEAJAqa2Foz8J1EXqoGpq3fB6dWH5roe';
+  describe('gas price from node', () => {
+    function nodeReplaceRecentGasPrices(minGasPrice: bigint, utilization: number = 80): Node {
+      const node = new Node(aeSdk.api.$host);
+      replace(node, 'getRecentGasPrices', async () => Promise.resolve([{
+        minGasPrice,
+        utilization,
+        minutes: 1,
+      }]));
+      return node;
+    }
+
+    it('calculates fee in spend tx based on gas price', async () => {
+      const spendTx = await aeSdk.buildTx({
+        tag: Tag.SpendTx,
+        senderId,
+        recipientId,
+        nonce,
+        onNode: nodeReplaceRecentGasPrices(1000000023n),
+      });
+      const { fee } = unpackTx(spendTx, Tag.SpendTx);
+      expect(fee).to.be.equal((16660n * 1010000023n).toString());
+    });
+
+    it('uses min gas price if utilization is low', async () => {
+      const spendTx = await aeSdk.buildTx({
+        tag: Tag.SpendTx,
+        senderId,
+        recipientId,
+        nonce,
+        onNode: nodeReplaceRecentGasPrices(1000000023n, 60),
+      });
+      const { fee } = unpackTx(spendTx, Tag.SpendTx);
+      expect(fee).to.be.equal((16660n * 1000000000n).toString());
+    });
+
+    it('calculates fee in contract call based on gas price', async () => {
+      const spendTx = await aeSdk.buildTx({
+        tag: Tag.ContractCallTx,
+        nonce,
+        callerId: address,
+        contractId,
+        amount,
+        gasLimit,
+        callData: contract._calldata.encode('Identity', 'getArg', [2]),
+        onNode: nodeReplaceRecentGasPrices(1000000023n),
+      });
+      const { fee, gasPrice } = unpackTx(spendTx, Tag.ContractCallTx);
+      expect(fee).to.be.equal((182020n * 1010000023n).toString());
+      expect(gasPrice).to.be.equal('1010000023');
+    });
+
+    it('warns if gas price too big', async () => {
+      const s = stub(console, 'warn');
+      const spendTx = await aeSdk.buildTx({
+        tag: Tag.SpendTx,
+        senderId,
+        recipientId,
+        nonce,
+        onNode: nodeReplaceRecentGasPrices(99900000000000n),
+      });
+      expect(s.firstCall.args).to.be.eql([
+        'Estimated gas price 100899000000000 exceeds the maximum safe value for unknown reason. '
+        + 'It will be limited to 100000000000000. To overcome this restriction provide `gasPrice`/`fee` in options.',
+      ]);
+      s.restore();
+      const { fee } = unpackTx(spendTx, Tag.SpendTx);
+      expect(fee).to.be.equal((16660n * 100000000000000n).toString());
+    });
+  });
+
   const transactions: Array<[
     string, (() => Promise<Encoded.Transaction>) | Encoded.Transaction,
     () => Promise<Encoded.Transaction>,

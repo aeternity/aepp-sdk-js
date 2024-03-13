@@ -89,6 +89,19 @@ describe('Node client', () => {
       .to.be.rejectedWith(RestError, 'v3/transactions error: Invalid tx (nonce_too_high)');
   });
 
+  it('returns recent gas prices', async () => {
+    const example: Awaited<ReturnType<typeof node.getRecentGasPrices>> = [
+      { minGasPrice: 0n, minutes: 5, utilization: 0 },
+    ];
+    expect(example);
+
+    const actual = await node.getRecentGasPrices();
+    expect(actual).to.be.eql([1, 5, 15, 60].map((minutes, idx) => {
+      const { minGasPrice, utilization } = actual[idx];
+      return { minGasPrice, minutes, utilization };
+    }));
+  });
+
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {
       const nodes = new AeSdkBase({});

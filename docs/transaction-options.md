@@ -32,7 +32,7 @@ These options are common and can be provided to every tx-type:
     If the strategy is set to `continuity`, then transactions in the mempool are checked if there are gaps - missing nonces that prevent transactions with greater nonces to get included
 - `ttl` (default: `0`)
   - Should be set if you want the transaction to be only valid until a certain block height is reached.
-- `fee` (default: calculated for each tx-type)
+- `fee` (default: calculated for each tx-type, based on network demand)
   - The minimum fee is dependent on the tx-type.
   - You can provide a higher fee to additionally reward the miners.
 - `innerTx` (default: `false`)
@@ -53,7 +53,7 @@ The following options are sepcific for each tx-type.
   - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
 - `gasLimit`
   - Maximum amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
-- `gasPrice` (default: `1e9`)
+- `gasPrice` (default: based on network demand, minimum: `1e9`)
   - To increase chances to get your transaction included quickly you can use a higher gasPrice.
 
 ### NameClaimTx

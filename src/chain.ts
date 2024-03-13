@@ -53,7 +53,7 @@ export async function getHeight(
   const onNode = unwrapProxy(options.onNode);
   if (cached) {
     const cache = heightCache.get(onNode);
-    if (cache?.time != null && cache.time > Date.now() - _getPollInterval('block', options)) {
+    if (cache != null && cache.time > Date.now() - _getPollInterval('block', options)) {
       return cache.height;
     }
   }

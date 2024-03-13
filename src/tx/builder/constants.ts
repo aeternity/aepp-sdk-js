@@ -9,7 +9,7 @@ export const DRY_RUN_ACCOUNT = {
 export const MAX_AUTH_FUN_GAS = 50000;
 export type Int = number | string | BigNumber;
 export type AensName = `${string}.chain`;
-export const MIN_GAS_PRICE = 1e9;
+export const MIN_GAS_PRICE = 1e9; // TODO: don't use number for ae
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
 export const NAME_FEE_MULTIPLIER = 1e14; // 100000000000000
 export const NAME_FEE_BID_INCREMENT = 0.05; // # the increment is in percentage

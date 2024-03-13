@@ -54,6 +54,7 @@ export function buildTx(
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
   Omit<TxParamsAsync & { tag: TxType }, 'tag' | OmitFields>;
 
+// TODO: require onNode because it is the only reason this builder is async [breaking change]
 /**
  * Build transaction async (may request node for additional data)
  * @category transaction builder
