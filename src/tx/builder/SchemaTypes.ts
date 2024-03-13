@@ -1,4 +1,4 @@
-import { Field as OriginalField } from './field-types';
+import { Field as OriginalField } from './field-types/interface';
 import { UnionToIntersection } from '../../utils/other';
 
 // TODO: figure out why this override is necessary

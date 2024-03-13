@@ -6,122 +6,69 @@
 
 import { Tag } from './constants';
 import SchemaTypes from './SchemaTypes';
-import {
-  uInt, shortUInt, coinAmount, name, nameId, nameFee, gasLimit, gasPrice, fee, address, pointers,
-  pointers2, queryFee, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array, boolean, ctVersion, abiVersion, ttl, nonce, map, withDefault, withFormatting, wrapped,
-} from './field-types';
+import abiVersion from './field-types/abi-version';
+import address, { idTagToEncoding } from './field-types/address';
+import array from './field-types/array';
+import coinAmount from './field-types/coin-amount';
+import ctVersion from './field-types/ct-version';
+import encoded from './field-types/encoded';
+import entry from './field-types/entry';
+import enumeration from './field-types/enumeration';
+import fee from './field-types/fee';
+import gasLimit from './field-types/gas-limit';
+import gasPrice from './field-types/gas-price';
+import name from './field-types/name';
+import nameFee from './field-types/name-fee';
+import nameId from './field-types/name-id';
+import nonce from './field-types/nonce';
+import pointers from './field-types/pointers';
+import pointers2 from './field-types/pointers2';
+import queryFee from './field-types/query-fee';
+import raw from './field-types/raw';
+import shortUInt from './field-types/short-u-int';
+import shortUIntConst from './field-types/short-u-int-const';
+import string from './field-types/string';
+import transaction from './field-types/transaction';
+import ttl from './field-types/ttl';
+import uInt from './field-types/u-int';
+import withDefault from './field-types/with-default';
+import withFormatting from './field-types/with-formatting';
 import { Encoded, Encoding } from '../../utils/encoder';
 import { ArgumentError } from '../../utils/errors';
-import { idTagToEncoding } from './field-types/address';
+import { EntryTag } from './entry/constants';
+import { EntParams, EntUnpacked } from './entry/schema.generated';
 
 export enum ORACLE_TTL_TYPES {
   delta = 0,
   block = 1,
 }
 
-export enum CallReturnType {
-  Ok = 0,
-  Error = 1,
-  Revert = 2,
-}
-
 // TODO: figure out how to omit overriding types of recursive fields
-interface EntryAny {
+interface TransactionAny {
   serialize: (value: TxParams | Uint8Array | Encoded.Transaction) => Buffer;
   deserialize: (value: Buffer) => TxUnpacked;
   recursiveType: true;
 }
 
-const entryAny = entry() as unknown as EntryAny;
+const transactionAny = transaction() as unknown as TransactionAny;
 
-interface EntrySignedTx {
+interface TransactionSignedTx {
   serialize: (value: TxParams & { tag: Tag.SignedTx } | Uint8Array | Encoded.Transaction) => Buffer;
   deserialize: (value: Buffer) => TxUnpacked & { tag: Tag.SignedTx };
   recursiveType: true;
 }
 
-const entrySignedTx = entry(Tag.SignedTx) as unknown as EntrySignedTx;
-
-interface EntryMtreeValueArray {
-  serialize: (
-    value: Array<TxParams & { tag: Tag.MtreeValue } | Uint8Array | Encoded.Transaction>,
-  ) => Buffer[];
-  deserialize: (value: Buffer[]) => Array<TxUnpacked & { tag: Tag.MtreeValue }>;
-  recursiveType: true;
-}
-
-const entryMtreeValueArray = array(entry(Tag.MtreeValue)) as unknown as EntryMtreeValueArray;
+const transactionSignedTx = transaction(Tag.SignedTx) as unknown as TransactionSignedTx;
 
 interface EntryTreesPoi {
-  serialize: (value: TxParams & { tag: Tag.TreesPoi } | Uint8Array | Encoded.Transaction) => Buffer;
-  deserialize: (value: Buffer) => TxUnpacked & { tag: Tag.TreesPoi };
-  recursiveType: true;
-}
-
-const entryTreesPoi = entry(Tag.TreesPoi) as unknown as EntryTreesPoi;
-
-interface MapContracts {
   serialize: (
-    value: Record<Encoded.ContractAddress, TxParams & { tag: Tag.Contract }>,
+    value: EntParams & { tag: EntryTag.TreesPoi } | Uint8Array | Encoded.Transaction,
   ) => Buffer;
-  deserialize: (
-    value: Buffer,
-  ) => Record<Encoded.ContractAddress, TxUnpacked & { tag: Tag.Contract }>;
+  deserialize: (value: Buffer) => EntUnpacked & { tag: EntryTag.TreesPoi };
   recursiveType: true;
 }
 
-const mapContracts = map(Encoding.ContractAddress, Tag.Contract) as unknown as MapContracts;
-
-interface MapAccounts {
-  serialize: (
-    value: Record<Encoded.AccountAddress, TxParams & { tag: Tag.Account }>,
-  ) => Buffer;
-  deserialize: (value: Buffer) => Record<Encoded.AccountAddress, TxUnpacked & { tag: Tag.Account }>;
-  recursiveType: true;
-}
-
-const mapAccounts = map(Encoding.AccountAddress, Tag.Account) as unknown as MapAccounts;
-
-interface MapCalls {
-  serialize: (
-    value: Record<Encoded.Bytearray, TxParams & { tag: Tag.ContractCall }>,
-  ) => Buffer;
-  deserialize: (value: Buffer) => Record<Encoded.Bytearray, TxUnpacked & { tag: Tag.ContractCall }>;
-  recursiveType: true;
-}
-
-const mapCalls = map(Encoding.Bytearray, Tag.ContractCall) as unknown as MapCalls;
-
-interface MapChannels {
-  serialize: (
-    value: Record<Encoded.Channel, TxParams & { tag: Tag.Channel }>,
-  ) => Buffer;
-  deserialize: (value: Buffer) => Record<Encoded.Channel, TxUnpacked & { tag: Tag.Channel }>;
-  recursiveType: true;
-}
-
-const mapChannels = map(Encoding.Channel, Tag.Channel) as unknown as MapChannels;
-
-interface MapNames {
-  serialize: (
-    value: Record<Encoded.Name, TxParams & { tag: Tag.Name }>,
-  ) => Buffer;
-  deserialize: (value: Buffer) => Record<Encoded.Name, TxUnpacked & { tag: Tag.Name }>;
-  recursiveType: true;
-}
-
-const mapNames = map(Encoding.Name, Tag.Name) as unknown as MapNames;
-
-interface MapOracles {
-  serialize: (
-    value: Record<Encoded.OracleAddress, TxParams & { tag: Tag.Oracle }>,
-  ) => Buffer;
-  deserialize: (value: Buffer) => Record<Encoded.OracleAddress, TxUnpacked & { tag: Tag.Oracle }>;
-  recursiveType: true;
-}
-
-const mapOracles = map(Encoding.OracleAddress, Tag.Oracle) as unknown as MapOracles;
+const entryTreesPoi = entry(EntryTag.TreesPoi) as unknown as EntryTreesPoi;
 
 // TODO: inline after dropping Iris compatibility
 const clientTtl = withDefault(60 * 60, shortUInt);
@@ -140,23 +87,10 @@ const nameTtl = withFormatting(
  * @see {@link https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts}
  */
 export const txSchema = [{
-  tag: shortUIntConst(Tag.Account),
-  version: shortUIntConst(1),
-  nonce: shortUInt,
-  balance: uInt,
-}, {
-  tag: shortUIntConst(Tag.Account),
-  version: shortUIntConst(2, true),
-  flags: uInt,
-  nonce: shortUInt,
-  balance: uInt,
-  gaContract: address(Encoding.ContractAddress, Encoding.Name),
-  gaAuthFun: encoded(Encoding.ContractBytearray),
-}, {
   tag: shortUIntConst(Tag.SignedTx),
   version: shortUIntConst(1, true),
   signatures: array(raw),
-  encodedTx: entryAny,
+  encodedTx: transactionAny,
 }, {
   tag: shortUIntConst(Tag.SpendTx),
   version: shortUIntConst(1, true),
@@ -168,14 +102,6 @@ export const txSchema = [{
   ttl,
   nonce: nonce('senderId'),
   payload: encoded(Encoding.Bytearray, true),
-}, {
-  tag: shortUIntConst(Tag.Name),
-  version: shortUIntConst(1, true),
-  accountId: address(Encoding.AccountAddress),
-  nameTtl: shortUInt,
-  status: raw,
-  clientTtl: shortUInt,
-  pointers,
 }, {
   tag: shortUIntConst(Tag.NamePreclaimTx),
   version: shortUIntConst(1, true),
@@ -235,16 +161,6 @@ export const txSchema = [{
   fee,
   ttl,
 }, {
-  tag: shortUIntConst(Tag.Contract),
-  version: shortUIntConst(1, true),
-  owner: address(Encoding.AccountAddress),
-  ctVersion,
-  code: encoded(Encoding.ContractBytearray),
-  log: encoded(Encoding.ContractBytearray),
-  active: boolean,
-  referers: array(address(Encoding.AccountAddress)),
-  deposit: coinAmount,
-}, {
   tag: shortUIntConst(Tag.ContractCreateTx),
   version: shortUIntConst(1, true),
   ownerId: address(Encoding.AccountAddress),
@@ -278,30 +194,6 @@ export const txSchema = [{
   gasLimit,
   gasPrice,
   callData: encoded(Encoding.ContractBytearray),
-}, {
-  tag: shortUIntConst(Tag.ContractCall),
-  version: shortUIntConst(2, true),
-  callerId: address(Encoding.AccountAddress),
-  callerNonce: shortUInt,
-  height: shortUInt,
-  contractId: address(Encoding.ContractAddress),
-  // TODO: rename after resolving https://github.com/aeternity/protocol/issues/506
-  gasPrice: uInt,
-  gasUsed: shortUInt,
-  returnValue: encoded(Encoding.ContractBytearray),
-  returnType: enumeration(CallReturnType),
-  // TODO: add serialization for
-  //  <log> :: [ { <address> :: id, [ <topics> :: binary() }, <data> :: binary() } ]
-  log: array(raw),
-}, {
-  tag: shortUIntConst(Tag.Oracle),
-  version: shortUIntConst(1, true),
-  accountId: address(Encoding.AccountAddress),
-  queryFormat: string,
-  responseFormat: string,
-  queryFee: coinAmount,
-  oracleTtlValue: shortUInt,
-  abiVersion,
 }, {
   tag: shortUIntConst(Tag.OracleRegisterTx),
   version: shortUIntConst(1, true),
@@ -448,24 +340,6 @@ export const txSchema = [{
   round: shortUInt,
   stateHash: encoded(Encoding.State),
 }, {
-  tag: shortUIntConst(Tag.Channel),
-  version: shortUIntConst(3, true),
-  initiator: address(Encoding.AccountAddress),
-  responder: address(Encoding.AccountAddress),
-  channelAmount: uInt,
-  initiatorAmount: uInt,
-  responderAmount: uInt,
-  channelReserve: uInt,
-  initiatorDelegateIds: array(address(...idTagToEncoding)),
-  responderDelegateIds: array(address(...idTagToEncoding)),
-  stateHash: encoded(Encoding.State),
-  round: shortUInt,
-  soloRound: uInt,
-  lockPeriod: uInt,
-  lockedUntil: uInt,
-  initiatorAuth: encoded(Encoding.ContractBytearray),
-  responderAuth: encoded(Encoding.ContractBytearray),
-}, {
   tag: shortUIntConst(Tag.ChannelSnapshotSoloTx),
   version: shortUIntConst(1, true),
   channelId: address(Encoding.Channel),
@@ -475,99 +349,12 @@ export const txSchema = [{
   fee,
   nonce: nonce('fromId'),
 }, {
-  tag: shortUIntConst(Tag.ChannelOffChainUpdateTransfer),
-  version: shortUIntConst(1, true),
-  from: address(Encoding.AccountAddress),
-  to: address(Encoding.AccountAddress),
-  amount: uInt,
-}, {
-  tag: shortUIntConst(Tag.ChannelOffChainUpdateDeposit),
-  version: shortUIntConst(1, true),
-  from: address(Encoding.AccountAddress),
-  amount: uInt,
-}, {
-  tag: shortUIntConst(Tag.ChannelOffChainUpdateWithdraw),
-  version: shortUIntConst(1, true),
-  from: address(Encoding.AccountAddress),
-  amount: uInt,
-}, {
-  tag: shortUIntConst(Tag.ChannelOffChainUpdateCreateContract),
-  version: shortUIntConst(1, true),
-  owner: address(Encoding.AccountAddress),
-  ctVersion,
-  code: encoded(Encoding.ContractBytearray),
-  deposit: uInt,
-  callData: encoded(Encoding.ContractBytearray),
-}, {
-  tag: shortUIntConst(Tag.ChannelOffChainUpdateCallContract),
-  version: shortUIntConst(1, true),
-  caller: address(Encoding.AccountAddress),
-  contract: address(Encoding.ContractAddress),
-  abiVersion,
-  amount: uInt,
-  callData: encoded(Encoding.ContractBytearray),
-  callStack: raw,
-  gasPrice,
-  gasLimit,
-}, {
   tag: shortUIntConst(Tag.ChannelClientReconnectTx),
   version: shortUIntConst(1, true),
   channelId: address(Encoding.Channel),
   round: shortUInt,
   role: string,
   pubkey: address(Encoding.AccountAddress),
-}, {
-  tag: shortUIntConst(Tag.TreesPoi),
-  version: shortUIntConst(1, true),
-  // TODO: inline an extra wrapping array after resolving https://github.com/aeternity/protocol/issues/505
-  accounts: array(mptree(Encoding.AccountAddress, Tag.Account)),
-  calls: array(mptree(Encoding.Bytearray, Tag.ContractCall)),
-  channels: array(mptree(Encoding.Channel, Tag.Channel)),
-  contracts: array(mptree(Encoding.ContractAddress, Tag.Contract)),
-  ns: array(mptree(Encoding.Name, Tag.Name)),
-  oracles: array(mptree(Encoding.OracleAddress, Tag.Oracle)),
-}, {
-  tag: shortUIntConst(Tag.StateTrees),
-  version: shortUIntConst(0, true),
-  contracts: wrapped(Tag.ContractsMtree) as unknown as MapContracts,
-  calls: wrapped(Tag.CallsMtree) as unknown as MapCalls,
-  channels: wrapped(Tag.ChannelsMtree) as unknown as MapChannels,
-  ns: wrapped(Tag.NameserviceMtree) as unknown as MapNames,
-  oracles: wrapped(Tag.OraclesMtree) as unknown as MapOracles,
-  accounts: wrapped(Tag.AccountsMtree) as unknown as MapAccounts,
-}, {
-  tag: shortUIntConst(Tag.Mtree),
-  version: shortUIntConst(1, true),
-  values: entryMtreeValueArray,
-}, {
-  tag: shortUIntConst(Tag.MtreeValue),
-  version: shortUIntConst(1, true),
-  key: raw,
-  value: raw,
-}, {
-  tag: shortUIntConst(Tag.ContractsMtree),
-  version: shortUIntConst(1, true),
-  payload: mapContracts,
-}, {
-  tag: shortUIntConst(Tag.CallsMtree),
-  version: shortUIntConst(1, true),
-  payload: mapCalls,
-}, {
-  tag: shortUIntConst(Tag.ChannelsMtree),
-  version: shortUIntConst(1, true),
-  payload: mapChannels,
-}, {
-  tag: shortUIntConst(Tag.NameserviceMtree),
-  version: shortUIntConst(1, true),
-  payload: mapNames,
-}, {
-  tag: shortUIntConst(Tag.OraclesMtree),
-  version: shortUIntConst(1, true),
-  payload: mapOracles,
-}, {
-  tag: shortUIntConst(Tag.AccountsMtree),
-  version: shortUIntConst(1, true),
-  payload: mapAccounts,
 }, {
   tag: shortUIntConst(Tag.GaAttachTx),
   version: shortUIntConst(1, true),
@@ -590,20 +377,14 @@ export const txSchema = [{
   fee,
   gasLimit,
   gasPrice,
-  tx: entrySignedTx,
+  tx: transactionSignedTx,
 }, {
   tag: shortUIntConst(Tag.PayingForTx),
   version: shortUIntConst(1, true),
   payerId: address(Encoding.AccountAddress),
   nonce: nonce('payerId'),
   fee,
-  tx: entrySignedTx,
-}, {
-  tag: shortUIntConst(Tag.GaMetaTxAuthData),
-  version: shortUIntConst(1, true),
-  fee: coinAmount,
-  gasPrice,
-  txHash: encoded(Encoding.TxHash),
+  tx: transactionSignedTx,
 }] as const;
 
 type TxSchema = SchemaTypes<typeof txSchema>;

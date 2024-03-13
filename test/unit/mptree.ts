@@ -6,17 +6,17 @@ import type { Input } from 'rlp';
 import genMPTreeField from '../../src/tx/builder/field-types/mptree';
 import {
   Encoding, Encoded,
-  Tag,
-  unpackTx,
+  EntryTag,
+  unpackEntry,
   MerkleTreeHashMismatchError,
   MissingNodeInTreeError,
   UnknownNodeLengthError,
 } from '../../src';
 
-const field = genMPTreeField(Encoding.AccountAddress, Tag.Account);
+const field = genMPTreeField(Encoding.AccountAddress, EntryTag.Account);
 type MPTreeBinary = Parameters<typeof field.deserialize>[0];
 const deserialize = (d: MPTreeBinary): ReturnType<typeof field.deserialize> => (
-  field.deserialize(d, { unpackTx })
+  field.deserialize(d, { unpackEntry })
 );
 const hexToTreeBinary = (hex: string): MPTreeBinary => rlpDecode(Buffer.from(hex, 'hex') as Input) as MPTreeBinary;
 

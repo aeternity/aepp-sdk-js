@@ -1,5 +1,5 @@
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp';
-import { Field, BinaryData } from './field-types';
+import { Field, BinaryData } from './field-types/interface';
 import {
   ArgumentError, DecodeError, SchemaNotFoundError, InternalError,
 } from '../../utils/errors';
