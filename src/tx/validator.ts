@@ -146,7 +146,7 @@ validators.push(
   // TODO: revert nonce check
   // TODO: ensure nonce valid when paying for own tx
   (tx, { consensusProtocolVersion }) => {
-    const oracleCall = Tag.Oracle === tx.tag || Tag.OracleRegisterTx === tx.tag;
+    const oracleCall = Tag.OracleRegisterTx === tx.tag;
     const contractCreate = Tag.ContractCreateTx === tx.tag || Tag.GaAttachTx === tx.tag;
     const contractCall = Tag.ContractCallTx === tx.tag || Tag.GaMetaTx === tx.tag;
     const type = (oracleCall ? 'oracle-call' : null)
