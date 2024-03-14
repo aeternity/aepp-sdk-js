@@ -146,10 +146,9 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
     this.pipeline.removePolicy({ name: userAgentPolicyName });
     this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
     if (!ignoreVersion) {
-      const versionPromise = this._getCachedStatus()
-        .then(({ nodeVersion }) => nodeVersion, (error) => error);
+      const getVersion = async (): Promise<string> => (await this._getCachedStatus()).nodeVersion;
       this.pipeline.addPolicy(
-        genVersionCheckPolicy('node', '/v3/status', versionPromise, '6.2.0', '7.0.0'),
+        genVersionCheckPolicy('node', '/v3/status', getVersion, '6.2.0', '7.0.0'),
       );
     }
     this.intAsString = true;
@@ -158,8 +157,8 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
   #cachedStatusPromise?: ReturnType<Node['getStatus']>;
 
   async _getCachedStatus(): ReturnType<Node['getStatus']> {
-    this.#cachedStatusPromise ??= this.getStatus();
-    return this.#cachedStatusPromise;
+    if (this.#cachedStatusPromise != null) return this.#cachedStatusPromise;
+    return this.getStatus();
   }
 
   // @ts-expect-error use code generation to create node class?

@@ -134,10 +134,14 @@ export default class Middleware
     this.pipeline.removePolicy({ name: userAgentPolicyName });
     this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
     if (!ignoreVersion) {
-      const statusPromise = this.getStatus();
-      const versionPromise = statusPromise.then(({ mdwVersion }) => mdwVersion, (error) => error);
+      let version: string | undefined;
+      const getVersion = async (): Promise<string> => {
+        if (version != null) return version;
+        version = (await this.getStatus()).mdwVersion;
+        return version;
+      };
       this.pipeline.addPolicy(
-        genVersionCheckPolicy('middleware', '/v2/status', versionPromise, '1.47.0', '2.0.0'),
+        genVersionCheckPolicy('middleware', '/v2/status', getVersion, '1.47.0', '2.0.0'),
       );
     }
   }

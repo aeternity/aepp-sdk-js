@@ -102,6 +102,13 @@ describe('Node client', () => {
     }));
   });
 
+  it('doesn\'t remember failed version request', async () => {
+    const n = new Node('http://example.com');
+    await expect(n.getTopHeader()).to.be.rejectedWith('v3/status error: 404 status code');
+    n.$host = url;
+    expect(await n.getTopHeader()).to.be.an('object');
+  });
+
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {
       const nodes = new AeSdkBase({});

@@ -56,10 +56,14 @@ export default class CompilerHttp extends CompilerBase {
     this.api.pipeline.removePolicy({ name: userAgentPolicyName });
     this.api.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
     if (ignoreVersion !== true) {
-      const versionPromise = this.api.apiVersion()
-        .then(({ apiVersion }) => apiVersion, (error) => error);
+      let version: string | undefined;
+      const getVersion = async (): Promise<string> => {
+        if (version != null) return version;
+        version = (await this.api.apiVersion()).apiVersion;
+        return version;
+      };
       this.api.pipeline.addPolicy(
-        genVersionCheckPolicy('compiler', '/api-version', versionPromise, '7.3.0', '9.0.0'),
+        genVersionCheckPolicy('compiler', '/api-version', getVersion, '7.3.0', '9.0.0'),
       );
     }
   }
