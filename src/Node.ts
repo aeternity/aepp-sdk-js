@@ -166,8 +166,9 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
   override async getStatus(
     ...args: Parameters<InstanceType<NodeTransformedApi>['getStatus']>
   ): ReturnType<InstanceType<NodeTransformedApi>['getStatus']> {
-    this.#cachedStatusPromise = super.getStatus(...args);
-    return this.#cachedStatusPromise;
+    const promise = super.getStatus(...args);
+    promise.then(() => { this.#cachedStatusPromise = promise; }, () => {});
+    return promise;
   }
 
   /**

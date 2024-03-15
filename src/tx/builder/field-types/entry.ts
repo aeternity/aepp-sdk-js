@@ -2,7 +2,6 @@ import {
   decode, encode, Encoded, Encoding,
 } from '../../../utils/encoder';
 import { Tag } from '../constants';
-import { ArgumentError } from '../../../utils/errors';
 import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
 
 export default function genEntryField<T extends Tag = Tag>(tag?: T): {
@@ -28,9 +27,7 @@ export default function genEntryField<T extends Tag = Tag>(tag?: T): {
     },
 
     deserialize(buf, { unpackTx }) {
-      const tx = unpackTx(encode(buf, Encoding.Transaction));
-      if (tag != null && tx.tag !== tag) throw new ArgumentError('Tag', Tag[tag], Tag[tx.tag]);
-      return tx;
+      return unpackTx(encode(buf, Encoding.Transaction), tag);
     },
   };
 }
