@@ -1532,6 +1532,7 @@ But this isn't the fastest approach, because on each iteration SDK would:</p>
 <span class="p">)</span>
 </code></pre></div>
 This way, SDK would make a single request to get info about the sender account and a transaction post request per each item in the <code>spends</code> array.</p>
+<p>Additionally, you may want to set <code>gasPrice</code> and <code>fee</code> to have predictable expenses. By default, SDK sets them based on the current network demand.</p>
 <h2 id="multiple-contract-static-calls">Multiple contract static calls</h2>
 <p>Basically, the dry-run endpoint of the node is used to run them. Doing requests one by one, like
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
