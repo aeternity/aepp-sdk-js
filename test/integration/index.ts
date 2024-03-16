@@ -44,7 +44,7 @@ const configuration = {
     },
   },
   '': {
-    networkId: 'ae_devnet',
+    networkId: 'ae_dev',
     url: 'http://localhost:3013',
     debugUrl: 'http://localhost:3113',
     channelUrl: 'ws://localhost:3014/channel',

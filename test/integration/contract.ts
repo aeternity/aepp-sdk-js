@@ -4,7 +4,7 @@ import { assertNotNull, InputNumber } from '../utils';
 import { getSdk } from '.';
 import {
   ArgumentError, NodeInvocationError, Encoded, DRY_RUN_ACCOUNT,
-  messageToHash, UnexpectedTsError, AeSdk, Contract, ContractMethodsBase,
+  messageToHash, UnexpectedTsError, AeSdk, Contract, ContractMethodsBase, isAddressValid, Encoding,
 } from '../../src';
 
 const identitySourceCode = `
@@ -188,8 +188,15 @@ describe('Contract', () => {
     await aeSdk.spend(1, aeSdk.address);
     const topHeader = await aeSdk.api.getTopHeader();
     const beforeKeyBlockHash = topHeader.prevKeyHash as Encoded.KeyBlockHash;
-    const beforeMicroBlockHash = topHeader.hash as Encoded.MicroBlockHash;
     expect(beforeKeyBlockHash).to.satisfy((s: string) => s.startsWith('kh_'));
+
+    type BlockHash = Encoded.KeyBlockHash | Encoded.MicroBlockHash;
+    const getMicroBlockHash = async (blockHash: BlockHash): Promise<Encoded.MicroBlockHash> => {
+      if (isAddressValid(blockHash, Encoding.MicroBlockHash)) return blockHash;
+      const hash = (await aeSdk.api.getKeyBlockByHash(blockHash)).prevHash as BlockHash;
+      return getMicroBlockHash(hash);
+    };
+    const beforeMicroBlockHash = await getMicroBlockHash(topHeader.hash as BlockHash);
     expect(beforeMicroBlockHash).to.satisfy((s: string) => s.startsWith('mh_'));
 
     await contract.call();

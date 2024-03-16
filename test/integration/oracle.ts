@@ -54,7 +54,7 @@ describe('Oracle', () => {
       .then(() => oracle.postQuery('{"city": "Berlin4"}'));
   });
 
-  const timeout = networkId === 'ae_devnet' ? 8000 : 700000;
+  const timeout = networkId === 'ae_dev' ? 8000 : 700000;
   it('Poll for response for query without response', async () => {
     const query = await oracle.postQuery('{"city": "Berlin"}', { queryTtlValue: 1 });
     await query.pollForResponse()

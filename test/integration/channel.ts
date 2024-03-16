@@ -50,7 +50,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
   });
 }
 
-(networkId === 'ae_devnet' ? describe : describe.skip)('Channel', () => {
+(networkId === 'ae_dev' ? describe : describe.skip)('Channel', () => {
   let aeSdkInitiatior: AeSdk;
   let aeSdkResponder: AeSdk;
   let initiatorCh: Channel;

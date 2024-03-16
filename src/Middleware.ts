@@ -141,7 +141,7 @@ export default class Middleware
         return version;
       };
       this.pipeline.addPolicy(
-        genVersionCheckPolicy('middleware', '/v2/status', getVersion, '1.47.0', '2.0.0'),
+        genVersionCheckPolicy('middleware', '/mdw/v2/status', getVersion, '1.47.0', '2.0.0'),
       );
     }
   }
