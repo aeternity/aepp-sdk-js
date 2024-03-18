@@ -30,7 +30,7 @@ These options are common and can be provided to every tx-type:
   - The strategy to obtain next nonce for an account via node API
   - If set to `max`, then the greatest nonce seen in the account or currently in the transaction pool is incremented with 1 and returned.
     If the strategy is set to `continuity`, then transactions in the mempool are checked if there are gaps - missing nonces that prevent transactions with greater nonces to get included
-- `ttl` (default: `0`)
+- `ttl` (default: `0` if `buildTx` used, current height + `3` otherwise)
   - Should be set if you want the transaction to be only valid until a certain block height is reached.
 - `fee` (default: calculated for each tx-type, based on network demand)
   - The minimum fee is dependent on the tx-type.
