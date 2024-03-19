@@ -1659,7 +1659,7 @@ Some of these are common and can be provided for each transaction type. Others a
 <li>The strategy to obtain next nonce for an account via node API</li>
 <li>If set to <code>max</code>, then the greatest nonce seen in the account or currently in the transaction pool is incremented with 1 and returned.
     If the strategy is set to <code>continuity</code>, then transactions in the mempool are checked if there are gaps - missing nonces that prevent transactions with greater nonces to get included</li>
-<li><code>ttl</code> (default: <code>0</code>)</li>
+<li><code>ttl</code> (default: <code>0</code> if <code>buildTx</code> used, current height + <code>3</code> otherwise)</li>
 <li>Should be set if you want the transaction to be only valid until a certain block height is reached.</li>
 <li><code>fee</code> (default: calculated for each tx-type, based on network demand)</li>
 <li>The minimum fee is dependent on the tx-type.</li>
