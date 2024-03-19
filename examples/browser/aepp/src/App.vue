@@ -39,6 +39,13 @@
     >
       Delegation signature
     </a>
+    <a
+      href="#"
+      :class="{ active: view === 'Jwt' }"
+      @click="view = 'Jwt'"
+    >
+      JWT
+    </a>
   </div>
 
   <Component
@@ -54,10 +61,11 @@ import Contracts from './Contracts.vue';
 import PayForTx from './PayForTx.vue';
 import TypedData from './TypedData.vue';
 import DelegationSignature from './DelegationSignature.vue';
+import Jwt from './Jwt.vue';
 
 export default {
   components: {
-    Connect, Basic, Contracts, PayForTx, TypedData, DelegationSignature,
+    Connect, Basic, Contracts, PayForTx, TypedData, DelegationSignature, Jwt,
   },
   data: () => ({ view: '' }),
 };
