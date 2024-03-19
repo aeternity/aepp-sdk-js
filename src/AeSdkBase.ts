@@ -169,6 +169,24 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
 
+  /**
+   * Sign message JWT
+   * @param message - Message to sign
+   * @param options - Options
+   */
+  async signMessageJWT(
+    message: object,
+    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signMessage']>[1] = {},
+  ): Promise<string> {
+    return this._resolveAccount(onAccount).signMessageJWT(message, options);
+  }
+
+  /**
+   * Sign typed data
+   * @param data - Encoded data to sign
+   * @param aci - Type of data to sign
+   * @param options - Options
+   */
   async signTypedData(
     data: Encoded.ContractBytearray,
     aci: Parameters<AccountBase['signTypedData']>[1],

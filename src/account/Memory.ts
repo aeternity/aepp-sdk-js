@@ -1,8 +1,8 @@
 import AccountBase from './Base';
 import {
-  generateKeyPairFromSecret, sign, generateKeyPair, hash, messageToHash,
+  generateKeyPairFromSecret, sign, generateKeyPair, hash, messageToHash, signJWT,
 } from '../utils/crypto';
-import { ArgumentError } from '../utils/errors';
+import { ArgumentError, UnexpectedTsError } from '../utils/errors';
 import {
   decode, encode, Encoded, Encoding,
 } from '../utils/encoder';
@@ -75,6 +75,19 @@ export default class AccountMemory extends AccountBase {
 
   override async signMessage(message: string, options?: any): Promise<Uint8Array> {
     return this.sign(messageToHash(message), options);
+  }
+
+  override async signMessageJWT(
+    message: object,
+    options?: { expireAt?: number },
+  ): Promise<string> {
+    const secretKey = secretKeys.get(this);
+    if (secretKey == null) throw new UnexpectedTsError();
+    const expireAt = options?.expireAt === undefined
+      ? new Date().getTime() + 30 * 60 * 1000 // default to 30min
+      : options.expireAt;
+
+    return signJWT(message, expireAt, secretKey);
   }
 
   override async signTypedData(

@@ -148,4 +148,9 @@ export default class AccountLedger extends AccountBase {
     );
     return response.subarray(0, 64);
   }
+
+  override async signMessageJWT(): Promise<string> {
+    // could probably be done, but not really needed
+    throw new NotImplementedError('Can\'t sign jwt using ledger account');
+  }
 }

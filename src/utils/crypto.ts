@@ -4,6 +4,7 @@ import nacl, { SignKeyPair } from 'tweetnacl';
 import { blake2b } from 'blakejs/blake2b.js';
 import { encode as varuintEncode } from 'varuint-bitcoin';
 
+import base64url from 'base64url';
 import { concatBuffers } from './other';
 import {
   decode, encode, Encoded, Encoding,
@@ -140,6 +141,18 @@ export function generateKeyPair(raw = false): {
  */
 export function sign(data: string | Uint8Array, privateKey: string | Uint8Array): Uint8Array {
   return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey));
+}
+
+export async function signJWT(
+  message: object,
+  expireAt: number,
+  privateKey: Uint8Array,
+): Promise<string> {
+  const header = { alg: 'EdDSA', typ: 'JWT' };
+  const payload = { ...message, exp: expireAt };
+  const body = `${base64url.encode(JSON.stringify(header))}.${base64url.encode(JSON.stringify(payload))}`;
+  const signature = sign(body, privateKey);
+  return `${body}.${base64url.encode(Buffer.from(signature))}`;
 }
 
 /**

@@ -75,6 +75,10 @@ export interface WalletApi {
     p: { message: string; onAccount: Encoded.AccountAddress }
   ) => Promise<{ signature: string }>;
 
+  [METHODS.signMessageJWT]: (
+    p: { message: object; onAccount: Encoded.AccountAddress; options?: { expireAt?: number } }
+  ) => Promise<{ signature: string }>;
+
   [METHODS.signTypedData]: (
     p: {
       domain: Domain;

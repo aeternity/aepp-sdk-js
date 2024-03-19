@@ -53,6 +53,14 @@ export default class AccountRpc extends AccountBase {
     return Buffer.from(signature, 'hex');
   }
 
+  override async signMessageJWT(message: object, options?: {
+    expireAt?: number;
+  }): Promise<string> {
+    const { signature } = await this._rpcClient
+      .request(METHODS.signMessageJWT, { onAccount: this.address, message, options });
+    return signature;
+  }
+
   override async signTypedData(
     data: Encoded.ContractBytearray,
     aci: Parameters<AccountBase['signTypedData']>[1],

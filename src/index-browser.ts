@@ -6,7 +6,7 @@ export {
 } from './chain';
 export {
   getAddressFromPriv, isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
-  generateKeyPairFromSecret, generateKeyPair, sign, verify, messageToHash, signMessage,
+  generateKeyPairFromSecret, generateKeyPair, sign, signJWT, verify, messageToHash, signMessage,
   verifyMessage, isValidKeypair,
 } from './utils/crypto';
 export { recover, dump } from './utils/keystore';
