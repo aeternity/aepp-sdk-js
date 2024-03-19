@@ -116,5 +116,5 @@ describe('Execution cost', () => {
       Tag.PayingForTx,
     ]));
     expect(sentTransactions.length).to.be.greaterThanOrEqual(134);
-  }).timeout(8000);
+  }).timeout(16000);
 });

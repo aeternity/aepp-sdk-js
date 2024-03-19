@@ -1,5 +1,6 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { stub } from 'sinon';
 import { getSdk } from '.';
 import {
   generateKeyPair, AeSdk, Tag, MemoryAccount, Encoded, Node,
@@ -42,7 +43,7 @@ describe('Node Chain', () => {
       aeSdk.addNode('test-2', new Node(`${aeSdk.api.$host}/`), true);
       const getCount = bindRequestCounter(aeSdk.api);
       expect(await aeSdk.getHeight({ cached: true })).to.be.equal(height);
-      expect(getCount()).to.be.equal(1);
+      expect(getCount()).to.be.equal(2); // status, height
       aeSdk.selectNode('test');
       aeSdk.pool.delete('test-2');
     });
@@ -118,11 +119,14 @@ describe('Node Chain', () => {
   it('doesn\'t make extra requests', async () => {
     let getCount;
     let hash;
+
+    await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
     expect(getCount()).to.be.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
+    await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
     expect(getCount()).to.be.equal(2); // nonce, post tx
@@ -157,15 +161,17 @@ describe('Node Chain', () => {
     await aeSdkWithoutAccount.spend(0, aeSdk.address, {
       onAccount: Object.values(aeSdk.accounts)[0],
     });
+    const s = stub(aeSdkWithoutAccount._options, '_expectedMineRate').value(60_000);
     const getCount = bindRequestCounter(aeSdkWithoutAccount.api);
     const spends = await Promise.all(
       accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e14, aeSdk.address, {
         nonce: 1, verify: false, onAccount, waitMined: false,
       })),
     );
+    s.restore();
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
-    expect(getCount()).to.be.equal(txPostCount + 1); // height for relative ttl
+    expect(getCount()).to.be.equal(txPostCount);
   });
 
   it('ensure transactions mined', async () => Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));

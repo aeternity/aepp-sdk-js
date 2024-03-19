@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Run several clients and render stats</title>
+  <title>Dynamic gas price</title>
 </head>
 <body>
 
@@ -48,18 +48,9 @@
   }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="../../dist/aepp-sdk.browser-script.js"></script>
 <script type="text/javascript">
-const commonOptions = {
-  type: 'line',
-  plugins: {
-    colors: {
-      forceOverride: true
-    }
-  },
-};
-
 const [chartGasPrice, chartUtilization, chartOverallGas, chartOperationCount] = [
   'chart-gas-price', 'chart-utilization', 'chart-overall-gas', 'chart-operation-count',
 ].map((id) => new Chart(document.getElementById(id), {
@@ -67,12 +58,16 @@ const [chartGasPrice, chartUtilization, chartOverallGas, chartOperationCount] = 
   data: {
     labels: [],
     datasets: [],
-  }
+  },
+  options: {
+    animation: false,
+  },
 }));
 
 chartOverallGas.data.datasets[0] = {
   label: 'Overall used gas',
   data: [],
+  pointStyle: false,
 };
 
 const { Node, AeSdk, MemoryAccount, CompilerHttp, MIN_GAS_PRICE } = Aeternity;
@@ -171,11 +166,13 @@ async function addClient(fixedGasPrice) {
     label: `client ${idx}`,
     borderColor: colorDark,
     data: new Array(chartGasPrice.data.labels.length).fill(minGasPriceToShow),
+    pointStyle: false,
   });
   chartOperationCount.data.datasets.push({
     label: `client ${idx} mined`,
     borderColor: colorDark,
     data: new Array(chartOperationCount.data.labels.length).fill(-1),
+    pointStyle: false,
   }, {
     label: `client ${idx} failed`,
     borderColor: colorLight,
@@ -243,10 +240,12 @@ renderClients();
     chartGasPrice.data.datasets.push({
       label: `node ${minutes} min`,
       data: [],
+      pointStyle: false,
     });
     chartUtilization.data.datasets.push({
       label: `node ${minutes} min`,
       data: [],
+      pointStyle: false,
     });
   });
 
