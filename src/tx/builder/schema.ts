@@ -162,7 +162,7 @@ export const txSchema = [{
   version: shortUIntConst(1, true),
   senderId: address(Encoding.AccountAddress),
   // TODO: accept also an AENS name
-  recipientId: address(Encoding.AccountAddress, Encoding.Name),
+  recipientId: address(Encoding.AccountAddress, Encoding.ContractAddress, Encoding.Name),
   amount: coinAmount,
   fee,
   ttl,

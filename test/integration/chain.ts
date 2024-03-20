@@ -135,7 +135,7 @@ describe('Node Chain', () => {
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, publicKey, { waitMined: false })).hash;
-    expect(getCount()).to.be.equal(5); // nonce, validator(acc, height, status), post tx
+    expect(getCount()).to.be.equal(6); // nonce, validator(acc, recipient, height, status), post tx
     await aeSdk.poll(hash);
   });
 
