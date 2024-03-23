@@ -1,11 +1,11 @@
 import { RestError } from '@azure/core-rest-pipeline';
-import { hash, verify } from '../utils/crypto';
+import { hash, isAddressValid, verify } from '../utils/crypto';
 import { TxUnpacked } from './builder/schema.generated';
 import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version';
 import { Tag, ConsensusProtocolVersion } from './builder/constants';
 import { buildTx, unpackTx } from './builder';
 import { concatBuffers, isAccountNotFoundError } from '../utils/other';
-import { Encoded, decode } from '../utils/encoder';
+import { Encoded, Encoding, decode } from '../utils/encoder';
 import Node, { TransformNodeType } from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
@@ -130,6 +130,19 @@ validators.push(
       message: `Account balance ${account.balance} is not enough to execute the transaction that costs ${cost}`,
       key: 'InsufficientBalance',
       checkedKeys: ['amount', 'fee', 'nameFee', 'gasLimit', 'gasPrice'],
+    }];
+  },
+  async (tx, { node }) => {
+    if (tx.tag !== Tag.SpendTx || isAddressValid(tx.recipientId, Encoding.Name)) return [];
+    const recipient = await node.getAccountByPubkey(tx.recipientId).catch((error) => {
+      if (!isAccountNotFoundError(error)) throw error;
+      return null;
+    });
+    if (recipient == null || recipient.payable === true) return [];
+    return [{
+      message: 'Recipient account is not payable',
+      key: 'RecipientAccountNotPayable',
+      checkedKeys: ['recipientId'],
     }];
   },
   (tx, { account }) => {

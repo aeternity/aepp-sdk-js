@@ -18,6 +18,7 @@ import {
   Tag,
   NoSuchContractFunctionError,
   ConsensusProtocolVersion,
+  InvalidTxError,
 } from '../../src';
 import { getSdk } from '.';
 import {
@@ -464,6 +465,30 @@ describe('Contract instance', () => {
     await testContract.stringFn('test', { amount: 100n as unknown as string, callStatic: false });
     const balanceAfter = await aeSdk.getBalance(testContract.$options.address);
     balanceAfter.should.be.equal(`${+contractBalance + 100}`);
+  });
+
+  it('fails to pay to not payable contract', async () => {
+    assertNotNull(testContract.$options.address);
+    const error = await expect(aeSdk.spend(1, testContract.$options.address))
+      .to.be.rejectedWith(InvalidTxError, 'Transaction verification errors: Recipient account is not payable');
+    expect(error.validation).to.be.eql([{
+      message: 'Recipient account is not payable',
+      key: 'RecipientAccountNotPayable',
+      checkedKeys: ['recipientId'],
+    }]);
+  });
+
+  it('pays to payable contract', async () => {
+    const contract = await aeSdk.initializeContract({
+      sourceCode: ''
+        + 'payable contract Main =\n'
+        + '  record state = { key: int }\n'
+        + '  entrypoint init() = { key = 0 }\n',
+    });
+    const { address } = await contract.$deploy([]);
+    assertNotNull(address);
+    await aeSdk.spend(42, address);
+    expect(await aeSdk.getBalance(address)).to.be.equal('42');
   });
 
   it('calls on specific account', async () => {
