@@ -38,7 +38,7 @@ export default class AccountGeneralized extends AccountBase {
     throw new NotImplementedError('Can\'t sign using generalized account');
   }
 
-  override async signMessageJWT(): Promise<string> {
+  override async signJWT(): Promise<`${string}.${string}`> {
     throw new NotImplementedError('Can\'t sign jwt using generalized account');
   }
 

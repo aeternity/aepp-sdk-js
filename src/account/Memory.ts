@@ -77,17 +77,12 @@ export default class AccountMemory extends AccountBase {
     return this.sign(messageToHash(message), options);
   }
 
-  override async signMessageJWT(
+  override async signJWT(
     message: object,
-    options?: { expireAt?: number },
-  ): Promise<string> {
+  ): Promise<`${string}.${string}`> {
     const secretKey = secretKeys.get(this);
     if (secretKey == null) throw new UnexpectedTsError();
-    const expireAt = options?.expireAt === undefined
-      ? new Date().getTime() + 30 * 60 * 1000 // default to 30min
-      : options.expireAt;
-
-    return signJWT(message, expireAt, secretKey);
+    return signJWT(message, secretKey);
   }
 
   override async signTypedData(

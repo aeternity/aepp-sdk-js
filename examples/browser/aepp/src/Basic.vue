@@ -27,7 +27,7 @@
 
   <MessageSign />
 
-  <MessageJWTSign />
+  <SignJWT />
 </template>
 
 <script>
@@ -35,10 +35,10 @@ import { mapState } from 'vuex';
 import Value from './components/Value.vue';
 import SpendCoins from './components/SpendCoins.vue';
 import MessageSign from './components/MessageSign.vue';
-import MessageJWTSign from './components/MessageJWTSign.vue';
+import SignJWT from './components/SignJWT.vue';
 
 export default {
-  components: { Value, SpendCoins, MessageSign, MessageJWTSign },
+  components: { Value, SpendCoins, MessageSign, SignJWT },
   data: () => ({
     balancePromise: null,
     heightPromise: null,

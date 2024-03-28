@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { RestError } from '@azure/core-rest-pipeline';
 
 export const pause = async (duration: number): Promise<void> => new Promise((resolve) => {
@@ -61,4 +62,11 @@ export type UnionToIntersection<Union> =
 export function ensureError(error: unknown): asserts error is Error {
   if (error instanceof Error) return;
   throw error;
+}
+
+export function toBase64Url(buffer: Buffer): string {
+  return buffer.toString('base64')
+    .replace(/\//g, '_')
+    .replace(/\+/g, '-')
+    .replace(/=+$/, '');
 }

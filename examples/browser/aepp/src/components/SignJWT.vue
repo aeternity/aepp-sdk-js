@@ -18,7 +18,7 @@ export default {
   computed: mapState(['aeSdk']),
   methods: {
     messageSignJWT(messageToSign) {
-      return this.aeSdk.signMessageJWT(JSON.parse(messageToSign));
+      return this.aeSdk.signJWT(JSON.parse(messageToSign));
     },
   },
 };

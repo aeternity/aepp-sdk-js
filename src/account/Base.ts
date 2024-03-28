@@ -54,14 +54,13 @@ export default abstract class AccountBase {
     },
   ): Promise<Uint8Array>;
 
-  abstract signMessageJWT(
+  abstract signJWT(
     message: object,
     options?: {
       aeppOrigin?: string;
-      expireAt?: number; // unixtime ms
       aeppRpcClientId?: string;
     },
-  ): Promise<string>;
+  ): Promise<`${string}.${string}`>;
 
   /**
    * Sign typed data

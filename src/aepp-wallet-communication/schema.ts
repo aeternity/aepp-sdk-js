@@ -36,7 +36,7 @@ export const enum METHODS {
   connect = 'connection.open',
   sign = 'transaction.sign',
   signMessage = 'message.sign',
-  signMessageJWT = 'message.signJWT',
+  signJWT = 'message.signJWT',
   signTypedData = 'typedData.sign',
   signDelegationToContract = 'delegationToContract.sign',
   subscribeAddress = 'address.subscribe',

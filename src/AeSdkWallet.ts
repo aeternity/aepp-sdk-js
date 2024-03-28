@@ -286,10 +286,9 @@ export default class AeSdkWallet extends AeSdk {
               signature: Buffer.from(await this.signMessage(message, parameters)).toString('hex'),
             };
           },
-          [METHODS.signMessageJWT]: async ({
+          [METHODS.signJWT]: async ({
             message,
             onAccount = this.address,
-            options,
           }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
             if (!this.addresses().includes(onAccount)) {
@@ -297,10 +296,10 @@ export default class AeSdkWallet extends AeSdk {
             }
 
             const parameters = {
-              onAccount, aeppOrigin: origin, aeppRpcClientId: id, ...options,
+              onAccount, aeppOrigin: origin, aeppRpcClientId: id,
             };
             return {
-              signature: await this.signMessageJWT(message, parameters),
+              signedPayload: await this.signJWT(message, parameters),
             };
           },
           [METHODS.signTypedData]: async ({

@@ -4,8 +4,8 @@ import nacl, { SignKeyPair } from 'tweetnacl';
 import { blake2b } from 'blakejs/blake2b.js';
 import { encode as varuintEncode } from 'varuint-bitcoin';
 
-import base64url from 'base64url';
-import { concatBuffers } from './other';
+import canonicalize from 'canonicalize';
+import { concatBuffers, toBase64Url } from './other';
 import {
   decode, encode, Encoded, Encoding,
 } from './encoder';
@@ -145,14 +145,27 @@ export function sign(data: string | Uint8Array, privateKey: string | Uint8Array)
 
 export async function signJWT(
   message: object,
-  expireAt: number,
   privateKey: Uint8Array,
-): Promise<string> {
+): Promise<`${string}.${string}`> {
   const header = { alg: 'EdDSA', typ: 'JWT' };
-  const payload = { ...message, exp: expireAt };
-  const body = `${base64url.encode(JSON.stringify(header))}.${base64url.encode(JSON.stringify(payload))}`;
+
+  const keyPair = nacl.sign.keyPair.fromSecretKey(Buffer.from(privateKey));
+  const subJwk = {
+    kty: 'OKP',
+    crv: 'Ed25519',
+    x: toBase64Url(Buffer.from(keyPair.publicKey)),
+  };
+
+  const payload = { sub_jwk: subJwk, ...message };
+
+  const encodedHeader = toBase64Url(Buffer.from(canonicalize(header)!));
+  const encodedPayload = toBase64Url(Buffer.from(canonicalize(payload)!));
+
+  const body = `${encodedHeader}.${encodedPayload}`;
   const signature = sign(body, privateKey);
-  return `${body}.${base64url.encode(Buffer.from(signature))}`;
+  const encodedSignature = toBase64Url(Buffer.from(signature));
+
+  return `${body}.${encodedSignature}`;
 }
 
 /**

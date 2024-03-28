@@ -174,11 +174,11 @@ export default class AeSdkBase extends AeSdkMethods {
    * @param message - Message to sign
    * @param options - Options
    */
-  async signMessageJWT(
+  async signJWT(
     message: object,
-    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signMessage']>[1] = {},
-  ): Promise<string> {
-    return this._resolveAccount(onAccount).signMessageJWT(message, options);
+    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signJWT']>[1] = {},
+  ): Promise<`${string}.${string}`> {
+    return this._resolveAccount(onAccount).signJWT(message, options);
   }
 
   /**
