@@ -34,6 +34,7 @@ export const enum METHODS {
   updateAddress = 'address.update',
   address = 'address.get',
   connect = 'connection.open',
+  unsafeSign = 'data.unsafeSign',
   sign = 'transaction.sign',
   signMessage = 'message.sign',
   signTypedData = 'typedData.sign',

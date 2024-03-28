@@ -46,6 +46,10 @@ export interface WalletApi {
 
   [METHODS.address]: () => Promise<Encoded.AccountAddress[]>;
 
+  [METHODS.unsafeSign]: (
+    p: { data: Encoded.Bytearray; onAccount: Encoded.AccountAddress }
+  ) => Promise<{ signature: Encoded.Signature }>;
+
   [METHODS.sign]: ((
     p: {
       tx: Encoded.Transaction;

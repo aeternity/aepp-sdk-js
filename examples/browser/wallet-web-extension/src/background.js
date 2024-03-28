@@ -107,7 +107,7 @@ class AccountMemoryProtected extends MemoryAccount {
   ) {
     if (id != null) {
       const opt = { ...options, contractAddress };
-      genConfirmCallback('sign delegation of all names to contract')(id, opt, aeppOrigin);
+      await genConfirmCallback('sign delegation of all names to contract')(id, opt, aeppOrigin);
     }
     return super.signAllNamesDelegationToContract(contractAddress, options);
   }
@@ -122,6 +122,13 @@ class AccountMemoryProtected extends MemoryAccount {
       await genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
     }
     return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
+  }
+
+  async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+    if (id != null) {
+      await genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);
+    }
+    return super.sign(data, options);
   }
 
   async signDelegation(delegation, { aeppRpcClientId: id, aeppOrigin, ...options }) {

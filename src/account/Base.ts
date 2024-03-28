@@ -188,7 +188,13 @@ export default abstract class AccountBase {
    * @param options - Options
    * @returns Signature
    */
-  abstract sign(data: string | Uint8Array, options?: any): Promise<Uint8Array>;
+  abstract sign(
+    data: string | Uint8Array,
+    options?: {
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+  ): Promise<Uint8Array>;
 
   /**
    * Account address
