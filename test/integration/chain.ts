@@ -50,7 +50,7 @@ describe('Node Chain', () => {
 
     it('uses correct cache key if node changed while doing request', async () => {
       const heightPromise = aeSdk.getHeight();
-      aeSdk.addNode('test-2', new Node('http://example.com'), true);
+      aeSdk.addNode('test-2', new Node('https://test.stg.aepps.com'), true);
       await heightPromise;
       await expect(aeSdk.getHeight({ cached: true }))
         .to.be.rejectedWith('v3/status error: 404 status code');

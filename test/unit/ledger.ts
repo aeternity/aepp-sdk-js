@@ -113,7 +113,7 @@ describe('Ledger HW', () => {
       addresses: Encoded.AccountAddress[] = [];
 
       constructor() {
-        super('http://example.com', { ignoreVersion: true });
+        super('https://test.stg.aepps.com', { ignoreVersion: true });
       }
 
       // eslint-disable-next-line class-methods-use-this
