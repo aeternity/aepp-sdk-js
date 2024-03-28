@@ -437,6 +437,43 @@ describe('Aepp<->Wallet', function aeppWallet() {
       });
     });
 
+    describe('Sign raw data', () => {
+      const rawData = Buffer.from('test payload');
+
+      it('rejected by wallet', async () => {
+        let origin;
+        const s = stub(wallet._resolveAccount(), 'sign').callsFake((data, { aeppOrigin } = {}) => {
+          origin = aeppOrigin;
+          throw new RpcRejectedByUserError();
+        });
+        await expect(aepp.sign(rawData)).to.be.eventually
+          .rejectedWith('Operation rejected by user').with.property('code', 4);
+        expect(origin).to.be.equal('http://origin.test');
+        s.restore();
+      });
+
+      it('works', async () => {
+        const signature = await aepp.sign(rawData);
+        expect(signature).to.be.instanceOf(Buffer);
+        expect(verify(rawData, signature, aepp.address)).to.be.equal(true);
+      });
+
+      it('fails with unknown error', async () => {
+        const s = stub(wallet._resolveAccount(), 'sign')
+          .callsFake(() => { throw new Error('test'); });
+        await expect(aepp.sign(rawData)).to.be.eventually
+          .rejectedWith('The peer failed to execute your request due to unknown error')
+          .with.property('code', 12);
+        s.restore();
+      });
+
+      it('signs using specific account', async () => {
+        const onAccount = wallet.addresses()[1];
+        const signature = await aepp.sign(rawData, { onAccount });
+        expect(verify(rawData, signature, onAccount)).to.be.equal(true);
+      });
+    });
+
     describe('Sign delegation to contract', () => {
       const contractAddress = 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh';
 
