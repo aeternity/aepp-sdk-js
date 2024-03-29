@@ -18,7 +18,9 @@ import {
   WalletApi,
   WalletInfo,
 } from './aepp-wallet-communication/rpc/types';
-import { Encoded } from './utils/encoder';
+import {
+  Encoded, Encoding, encode, decode,
+} from './utils/encoder';
 import jsonBig from './utils/json-big';
 
 type RpcClientWallet = RpcClient<AeppApi, WalletApi>;
@@ -320,6 +322,13 @@ export default class AeSdkWallet extends AeSdk {
                 .signAllNamesDelegationToContract(contractAddress, parameters))
               ?? this.signDelegationToContract(contractAddress, { ...parameters, isOracle })
             );
+            return { signature };
+          },
+          [METHODS.unsafeSign]: async ({ data, onAccount = this.address }, origin) => {
+            if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
+            if (!this.addresses().includes(onAccount)) throw new RpcPermissionDenyError(onAccount);
+            const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
+            const signature = encode(await this.sign(decode(data), parameters), Encoding.Signature);
             return { signature };
           },
           [METHODS.signDelegation]: async ({ delegation, onAccount = this.address }, origin) => {
