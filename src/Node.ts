@@ -161,7 +161,7 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
     return this.getStatus();
   }
 
-  // @ts-expect-error use code generation to create node class?
+  /** @ts-expect-error use code generation to create node class? */
   override async getStatus(
     ...args: Parameters<InstanceType<NodeTransformedApi>['getStatus']>
   ): ReturnType<InstanceType<NodeTransformedApi>['getStatus']> {
