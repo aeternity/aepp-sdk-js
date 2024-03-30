@@ -1,5 +1,5 @@
-import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pipeline';
-import { AdditionalPolicyConfig, FullOperationResponse } from '@azure/core-client';
+import { RestError, PipelineResponse } from '@azure/core-rest-pipeline';
+import { AdditionalPolicyConfig, FullOperationResponse, OperationOptions } from '@azure/core-client';
 import { pause } from './other';
 import semverSatisfies from './semver-satisfies';
 import { UnsupportedVersionError } from './errors';
@@ -94,18 +94,24 @@ export const genErrorFormatterPolicy = (
 
 export const genVersionCheckPolicy = (
   name: string,
-  ignorePath: string,
-  versionCb: () => Promise<string>,
+  versionCb: (options: OperationOptions) => Promise<string>,
   geVersion: string,
   ltVersion: string,
-): PipelinePolicy => ({
-  name: 'version-check',
-  async sendRequest(request, next) {
-    if (new URL(request.url).pathname === ignorePath) return next(request);
-    const args = [await versionCb(), geVersion, ltVersion] as const;
-    if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args);
-    return next(request);
+): AdditionalPolicyConfig => ({
+  policy: {
+    name: 'version-check',
+    async sendRequest(request, next) {
+      if (request.headers.has('__version-check')) {
+        request.headers.delete('__version-check');
+        return next(request);
+      }
+      const options = { requestOptions: { customHeaders: { '__version-check': 'true' } } };
+      const args = [await versionCb(options), geVersion, ltVersion] as const;
+      if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args);
+      return next(request);
+    },
   },
+  position: 'perCall',
 });
 
 export const genRetryOnFailurePolicy = (

@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
-import { OperationArguments, OperationSpec } from '@azure/core-client';
+import { OperationArguments, OperationOptions, OperationSpec } from '@azure/core-client';
 import { userAgentPolicyName, setClientRequestIdPolicyName } from '@azure/core-rest-pipeline';
 import {
   genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
@@ -120,10 +120,20 @@ export default class Middleware
       retryOverallDelay?: number;
     } = {},
   ) {
+    let version: string | undefined;
+    const getVersion = async (opts: OperationOptions): Promise<string> => {
+      if (version != null) return version;
+      version = (await this.getStatus(opts)).mdwVersion;
+      return version;
+    };
+
     // eslint-disable-next-line constructor-super
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
+        ...ignoreVersion ? [] : [
+          genVersionCheckPolicy('middleware', getVersion, '1.47.0', '2.0.0'),
+        ],
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
@@ -133,16 +143,5 @@ export default class Middleware
     });
     this.pipeline.removePolicy({ name: userAgentPolicyName });
     this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
-    if (!ignoreVersion) {
-      let version: string | undefined;
-      const getVersion = async (): Promise<string> => {
-        if (version != null) return version;
-        version = (await this.getStatus()).mdwVersion;
-        return version;
-      };
-      this.pipeline.addPolicy(
-        genVersionCheckPolicy('middleware', '/mdw/v2/status', getVersion, '1.47.0', '2.0.0'),
-      );
-    }
   }
 }
