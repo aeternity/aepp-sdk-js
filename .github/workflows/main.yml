@@ -27,7 +27,7 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: npx commitlint --from $BASE --to $HEAD --verbose
       - run: npm run lint
-      # TODO: remove after merging https://github.com/aeternity/aeternity/pull/4307
+      # TODO: remove after merging https://github.com/aeternity/aeternity/pull/4319
       - run: chmod 666 ./docker/accounts-pub.json
       - run: docker compose up -d --wait
       - run: npx nyc npm run test

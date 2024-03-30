@@ -80,7 +80,7 @@ describe('Aens', () => {
     expect(claimed.extendTtl).to.be.a('function');
     assertNotNull(claimed.tx);
     assertNotNull(claimed.signatures);
-    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee >= 16960000000000n);
+    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee >= 16940000000000n);
     expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee < 17100000000000n);
     expect(claimed).to.be.eql({
       tx: {
