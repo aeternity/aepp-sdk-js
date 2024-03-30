@@ -143,5 +143,7 @@ export default class Middleware
     });
     this.pipeline.removePolicy({ name: userAgentPolicyName });
     this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
+    // TODO: use instead our retry policy
+    this.pipeline.removePolicy({ name: 'defaultRetryPolicy' });
   }
 }

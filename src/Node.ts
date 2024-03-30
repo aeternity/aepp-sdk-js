@@ -149,6 +149,8 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
     });
     this.pipeline.removePolicy({ name: userAgentPolicyName });
     this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
+    // TODO: use instead our retry policy
+    this.pipeline.removePolicy({ name: 'defaultRetryPolicy' });
     this.intAsString = true;
   }
 
