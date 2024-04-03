@@ -1,5 +1,10 @@
 name: Test & build
-on: [pull_request]
+on:
+  push:
+    branches:
+      master
+      develop
+  pull_request:
 jobs:
   main:
     runs-on: ubuntu-22.04
@@ -30,7 +35,7 @@ jobs:
       # TODO: remove after merging https://github.com/aeternity/aeternity/pull/4319
       - run: chmod 666 ./docker/accounts-pub.json
       - run: docker compose up -d --wait
-      - run: npx nyc npm run test
+      - run: npx nyc npm test
       - run: npx nyc report --reporter=text-lcov > coverage.lcov
       - uses: codecov/codecov-action@v4
         with:
