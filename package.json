@@ -75,7 +75,7 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/aepp-calldata": "github:aeternity/aepp-calldata-js#8e9c8b8e1b394a01be1c84b13cf76271f7624d38",
+    "@aeternity/aepp-calldata": "^1.7.0",
     "@aeternity/argon2": "^0.0.1",
     "@aeternity/uuid": "^0.0.1",
     "@azure/core-client": "^1.8.0",
