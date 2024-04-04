@@ -130,6 +130,7 @@ type SendTransactionOptionsType = {
 export interface SendTransactionOptions extends SendTransactionOptionsType {}
 interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
   hash: Encoded.TxHash;
+  // TODO: use `SignedTx.encodedTx` instead
   rawTx: Encoded.Transaction;
   confirmationHeight?: number;
 }
