@@ -1,6 +1,7 @@
 import {
   RestError, userAgentPolicyName, setClientRequestIdPolicyName,
 } from '@azure/core-rest-pipeline';
+import { OperationOptions } from '@azure/core-client';
 import {
   Compiler as CompilerApi,
   ErrorModel,
@@ -31,11 +32,20 @@ export default class CompilerHttp extends CompilerBase {
    * @param options - Options
    * @param options.ignoreVersion - Don't check compiler version
    */
-  constructor(compilerUrl: string, { ignoreVersion }: { ignoreVersion?: boolean } = {}) {
+  constructor(compilerUrl: string, { ignoreVersion = false }: { ignoreVersion?: boolean } = {}) {
     super();
+
+    let version: string | undefined;
+    const getVersion = async (opts: OperationOptions): Promise<string> => {
+      if (version != null) return version;
+      version = (await this.api.apiVersion(opts)).apiVersion;
+      return version;
+    };
+
     this.api = new CompilerApi(compilerUrl, {
       allowInsecureConnection: true,
       additionalPolicies: [
+        ...ignoreVersion ? [] : [genVersionCheckPolicy('compiler', getVersion, '7.3.0', '9.0.0')],
         genErrorFormatterPolicy((body: GeneralCompilerError | CompilerErrorApi[]) => {
           let message = '';
           if ('reason' in body) {
@@ -55,17 +65,6 @@ export default class CompilerHttp extends CompilerBase {
     });
     this.api.pipeline.removePolicy({ name: userAgentPolicyName });
     this.api.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
-    if (ignoreVersion !== true) {
-      let version: string | undefined;
-      const getVersion = async (): Promise<string> => {
-        if (version != null) return version;
-        version = (await this.api.apiVersion()).apiVersion;
-        return version;
-      };
-      this.api.pipeline.addPolicy(
-        genVersionCheckPolicy('compiler', '/api-version', getVersion, '7.3.0', '9.0.0'),
-      );
-    }
   }
 
   async compileBySourceCode(

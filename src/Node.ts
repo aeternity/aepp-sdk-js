@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
-import { OperationArguments, OperationSpec } from '@azure/core-client';
+import { OperationArguments, OperationOptions, OperationSpec } from '@azure/core-client';
 import { userAgentPolicyName, setClientRequestIdPolicyName } from '@azure/core-rest-pipeline';
 import {
   genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
@@ -130,10 +130,14 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       retryOverallDelay?: number;
     } = {},
   ) {
+    const getVersion = async (opts: OperationOptions): Promise<string> => (
+      (await this._getCachedStatus(opts)).nodeVersion
+    );
     // eslint-disable-next-line constructor-super
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
+        ...ignoreVersion ? [] : [genVersionCheckPolicy('node', getVersion, '6.2.0', '7.0.0')],
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
@@ -145,23 +149,20 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
     });
     this.pipeline.removePolicy({ name: userAgentPolicyName });
     this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
-    if (!ignoreVersion) {
-      const getVersion = async (): Promise<string> => (await this._getCachedStatus()).nodeVersion;
-      this.pipeline.addPolicy(
-        genVersionCheckPolicy('node', '/v3/status', getVersion, '6.2.0', '7.0.0'),
-      );
-    }
+    // TODO: use instead our retry policy
+    this.pipeline.removePolicy({ name: 'defaultRetryPolicy' });
     this.intAsString = true;
   }
 
   #cachedStatusPromise?: ReturnType<Node['getStatus']>;
 
-  async _getCachedStatus(): ReturnType<Node['getStatus']> {
+  async _getCachedStatus(options?: OperationOptions): ReturnType<Node['getStatus']> {
     if (this.#cachedStatusPromise != null) return this.#cachedStatusPromise;
-    return this.getStatus();
+    return this.getStatus(options);
   }
 
-  // @ts-expect-error use code generation to create node class?
+  // eslint-disable-next-line rulesdir/tsdoc-syntax
+  /** @ts-expect-error use code generation to create node class? */
   override async getStatus(
     ...args: Parameters<InstanceType<NodeTransformedApi>['getStatus']>
   ): ReturnType<InstanceType<NodeTransformedApi>['getStatus']> {
