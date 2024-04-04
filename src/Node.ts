@@ -23,7 +23,7 @@ const numberPropertyNames = [
   'nonce', 'nextNonce', 'height', 'blockHeight', 'topBlockHeight',
   'ttl', 'nameTtl', 'clientTtl',
   'inbound', 'outbound', 'peerCount', 'pendingTransactionsCount', 'effectiveAtHeight',
-  'version', 'solutions', 'round', 'minutes', 'utilization',
+  'version', 'solutions', 'round', 'minutes', 'utilization', 'difficulty', 'hashrate',
 ] as const;
 
 class NodeTransformed extends NodeApi {
