@@ -2,6 +2,53 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.3.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.2.2...v13.3.0) (2024-04-08)
+
+
+### ⚠ Ceres and aehopsia@8 compatibility not stable, since they are not officially released yet
+
+### Features
+
+* accept multiple encodings in `isAddressValid`, add TS asserts ([2c21139](https://github.com/aeternity/aepp-sdk-js/commit/2c211399df3232e1830ead946ab49e971f4af70b))
+* add `getContext` method to AeSdk ([04508d0](https://github.com/aeternity/aepp-sdk-js/commit/04508d0df67f111c627144381a30d087e314873f))
+* **aens:** support update with raw pointers ([db2659a](https://github.com/aeternity/aepp-sdk-js/commit/db2659a30ed9a076387d4efbddfa4d6efd85bee3))
+* **aepp,wallet:** allow raw data sign ([7d0136d](https://github.com/aeternity/aepp-sdk-js/commit/7d0136d24d0949faec1047c1e1449727c753a160))
+* **chain:** add `cache` option to `getHeight` ([c7d0955](https://github.com/aeternity/aepp-sdk-js/commit/c7d09555632826d9eff62197c2708d14b870c68f))
+* **compiler:** add CompilerCli8 class ([29f1cd3](https://github.com/aeternity/aepp-sdk-js/commit/29f1cd3549af63cd88b83853d50c572bdc7feef8))
+* **compiler:** provide compilation warnings ([d0ec012](https://github.com/aeternity/aepp-sdk-js/commit/d0ec0121ac6e82f44f55809190d46b92048435e5))
+* **compiler:** update cli and http compilers to 7.4.0 ([2041d8b](https://github.com/aeternity/aepp-sdk-js/commit/2041d8bcba9b8ef118b439a59526843d50c2f75f))
+* **contract:** resolve names on node side in Ceres ([474f0fd](https://github.com/aeternity/aepp-sdk-js/commit/474f0fde0e209696aab4348e1bd67d893e33d6f4))
+* **contract:** support all names delegation to contract ([92dae86](https://github.com/aeternity/aepp-sdk-js/commit/92dae869cf6d2483ffbe849f431d111d71c2f3ea))
+* jwt utilities ([c747ce6](https://github.com/aeternity/aepp-sdk-js/commit/c747ce66e2c13925bb2eee36418bc88b44aa8bd5))
+* **node:** add param indicating retry ([6f0dbd8](https://github.com/aeternity/aepp-sdk-js/commit/6f0dbd8dbd437b0c280983576788493009a09127))
+* **node:** show error code if available ([2cce91d](https://github.com/aeternity/aepp-sdk-js/commit/2cce91dba7a7e474c55b5efa86b0618316701bbb))
+* spend to payable contract ([7621716](https://github.com/aeternity/aepp-sdk-js/commit/76217161be62999bd091e76c10f67606c88e4c9b))
+* support new delegation format in Ceres ([786e954](https://github.com/aeternity/aepp-sdk-js/commit/786e954d4a0149d1647271bcaadc69bb250c357a))
+* **tx-builder:** get actual gas price from node ([09d19bf](https://github.com/aeternity/aepp-sdk-js/commit/09d19bff34ef5212dfa48bfe5c18bd28fd07be99))
+* **tx-builder:** pick `queryFee` from the node if not provided ([ca495c8](https://github.com/aeternity/aepp-sdk-js/commit/ca495c810352f5aa6a4f17fba136ccbee7297b7e))
+* **tx-builder:** reject used accounts in GaAttachTx in Ceres ([88b1d5d](https://github.com/aeternity/aepp-sdk-js/commit/88b1d5dfc626940983d854f2dd344ad231037ed3))
+* **tx-builder:** validate `nameTtl` in NameUpdateTx ([bca877e](https://github.com/aeternity/aepp-sdk-js/commit/bca877efa76ed0eb9e0c3b6c60bcbcad3c0d9008))
+
+
+### Bug Fixes
+
+* **aens:** make `extendTtl` argument optional ([028876f](https://github.com/aeternity/aepp-sdk-js/commit/028876fb79d2dd5eb2b9d96336b068900db1f837))
+* **aens:** reduce default client ttl to one hour ([daf7fa0](https://github.com/aeternity/aepp-sdk-js/commit/daf7fa0d9306f75f4d5305b26ed6a4aba98e0435))
+* **chain:** poll till ttl if defined to ensure tx can't be mined ([0751244](https://github.com/aeternity/aepp-sdk-js/commit/0751244c9f7df75bdd7009d878c9235cdabcc796))
+* **contract:** build address by signed tx ([60a283b](https://github.com/aeternity/aepp-sdk-js/commit/60a283bdb745b15902dc615fdaaf0eed55429ca1))
+* **contract:** don't duplicate NoSuchContractFunctionError message ([2f3bba5](https://github.com/aeternity/aepp-sdk-js/commit/2f3bba529d7abd5a3da90e085b38faf74f1d4cea))
+* improve error message when no wrapped value ([054bc89](https://github.com/aeternity/aepp-sdk-js/commit/054bc89b940cacdeae1f804153ef39c3fa1e0026))
+* **node,middleware,compiler:** version check if deployed at path ([450296e](https://github.com/aeternity/aepp-sdk-js/commit/450296e7f275e9cec3af2c76a50af201b1929dd6))
+* **node,middleware:** remove duplicate retry policy ([f6470a2](https://github.com/aeternity/aepp-sdk-js/commit/f6470a21a211c7655ff07f7853b92447a29ea262))
+* **node:** add missed conversion of `difficulty` and `hashrate` to number ([271ff5e](https://github.com/aeternity/aepp-sdk-js/commit/271ff5ef53b217f7c490fcc63d83a88ffbb858cd))
+* **node:** don't remember failed version request ([fba0e79](https://github.com/aeternity/aepp-sdk-js/commit/fba0e79800e86f7774978f60f7113b1797213751))
+* **node:** show correct error message if body is missed ([ed10482](https://github.com/aeternity/aepp-sdk-js/commit/ed10482d3641c64a4af8374d7000b8f4a467d55c))
+* **node:** show correct error message if ECONNREFUSED ([ef347a1](https://github.com/aeternity/aepp-sdk-js/commit/ef347a16e9ceebc405e878af28d3198e312eb309))
+* **tx-builder:** don't accept ttl equal to block height ([d9cde12](https://github.com/aeternity/aepp-sdk-js/commit/d9cde12f50cd3530d74338fe500c622b27bcbbb9))
+* **tx-builder:** don't estimate gas for non-transactions ([f72167a](https://github.com/aeternity/aepp-sdk-js/commit/f72167a8b1d79a54de37c016fb87c55ff4c12da5))
+* **tx-builder:** limit ttl to 3 in case tx built internally ([08d14c2](https://github.com/aeternity/aepp-sdk-js/commit/08d14c2d50c480ccc25f2dc67b0a09d1487c35bb))
+* **tx-builder:** remove invalid oracle tx type in validator ([78e7c48](https://github.com/aeternity/aepp-sdk-js/commit/78e7c488b7e826946b426fbb0ed83366091bdbdd))
+
 ## [13.2.2](https://github.com/aeternity/aepp-sdk-js/compare/v13.2.1...v13.2.2) (2023-09-20)
 
 
