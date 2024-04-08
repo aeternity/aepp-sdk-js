@@ -10,6 +10,10 @@ export {
   generateKeyPairFromSecret, generateKeyPair, sign, verify, messageToHash, signMessage,
   verifyMessage, isValidKeypair,
 } from './utils/crypto';
+export {
+  signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt,
+} from './utils/jwt';
+export type { Jwt } from './utils/jwt';
 export { recover, dump } from './utils/keystore';
 export type { Keystore } from './utils/keystore';
 export { toBytes } from './utils/bytes';
