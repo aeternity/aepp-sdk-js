@@ -1,18 +1,20 @@
 import AccountBase from './Base';
 import {
-  generateKeyPairFromSecret, sign, generateKeyPair, hash, messageToHash,
+  generateKeyPairFromSecret, sign, generateKeyPair, hash, messageToHash, messagePrefixLength,
 } from '../utils/crypto';
-import { ArgumentError } from '../utils/errors';
+import { ArgumentError, UnexpectedTsError } from '../utils/errors';
 import {
   decode, encode, Encoded, Encoding,
 } from '../utils/encoder';
 import { concatBuffers } from '../utils/other';
 import { hashTypedData, AciValue } from '../utils/typed-data';
 import { buildTx } from '../tx/builder';
-import { Tag, AensName } from '../tx/builder/constants';
+import { Tag, AensName, ConsensusProtocolVersion } from '../tx/builder/constants';
 import { produceNameId } from '../tx/builder/helpers';
+import { DelegationTag } from '../tx/builder/delegation/schema';
+import { packDelegation } from '../tx/builder/delegation';
 
-const secretKeys = new WeakMap();
+const secretKeys = new WeakMap<AccountMemory, Uint8Array>();
 
 export function getBufferToSign(
   transaction: Encoded.Transaction,
@@ -42,7 +44,7 @@ export default class AccountMemory extends AccountBase {
     }
     secretKeys.set(this, secretKey);
     this.address = encode(
-      generateKeyPairFromSecret(secretKeys.get(this)).publicKey,
+      generateKeyPairFromSecret(secretKey).publicKey,
       Encoding.AccountAddress,
     );
   }
@@ -56,7 +58,9 @@ export default class AccountMemory extends AccountBase {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override async sign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
-    return sign(data, secretKeys.get(this));
+    const secretKey = secretKeys.get(this);
+    if (secretKey == null) throw new UnexpectedTsError();
+    return sign(data, secretKey);
   }
 
   override async signTransaction(
@@ -93,8 +97,24 @@ export default class AccountMemory extends AccountBase {
 
   override async signDelegationToContract(
     contractAddress: Encoded.ContractAddress,
-    { networkId }: { networkId?: string } = {},
+    { networkId, consensusProtocolVersion, isOracle }: {
+      networkId?: string;
+      consensusProtocolVersion?: ConsensusProtocolVersion;
+      isOracle?: boolean;
+    } = {},
   ): Promise<Encoded.Signature> {
+    if (isOracle == null) {
+      const protocol = (consensusProtocolVersion != null) ? ConsensusProtocolVersion[consensusProtocolVersion] : 'unknown';
+      console.warn(`AccountMemory:signDelegationToContract: isOracle is not set. By default, sdk would generate an AENS preclaim delegation signature, but it won't be the same as the oracle delegation signature in Ceres (current protocol is ${protocol}).`);
+    }
+    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
+      const delegation = packDelegation({
+        tag: isOracle === true ? DelegationTag.Oracle : DelegationTag.AensPreclaim,
+        accountAddress: this.address,
+        contractAddress,
+      });
+      return this.signDelegation(delegation, { networkId });
+    }
     if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
     const payload = concatBuffers([
       Buffer.from(networkId),
@@ -108,8 +128,17 @@ export default class AccountMemory extends AccountBase {
   override async signNameDelegationToContract(
     contractAddress: Encoded.ContractAddress,
     name: AensName,
-    { networkId }: { networkId?: string } = {},
+    { networkId, consensusProtocolVersion }: {
+      networkId?: string;
+      consensusProtocolVersion?: ConsensusProtocolVersion;
+    } = {},
   ): Promise<Encoded.Signature> {
+    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
+      const delegation = packDelegation({
+        tag: DelegationTag.AensName, accountAddress: this.address, contractAddress, nameId: name,
+      });
+      return this.signDelegation(delegation, { networkId });
+    }
     if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
     const payload = concatBuffers([
       Buffer.from(networkId),
@@ -121,11 +150,44 @@ export default class AccountMemory extends AccountBase {
     return encode(signature, Encoding.Signature);
   }
 
+  override async signAllNamesDelegationToContract(
+    contractAddress: Encoded.ContractAddress,
+    { networkId, consensusProtocolVersion }: {
+      networkId?: string;
+      consensusProtocolVersion?: ConsensusProtocolVersion;
+    } = {},
+  ): Promise<Encoded.Signature> {
+    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
+      const delegation = packDelegation({
+        tag: DelegationTag.AensWildcard, accountAddress: this.address, contractAddress,
+      });
+      return this.signDelegation(delegation, { networkId });
+    }
+    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
+    const payload = concatBuffers([
+      Buffer.from(networkId),
+      decode(this.address),
+      Buffer.from('AENS'),
+      decode(contractAddress),
+    ]);
+    const signature = await this.sign(payload);
+    return encode(signature, Encoding.Signature);
+  }
+
   override async signOracleQueryDelegationToContract(
     contractAddress: Encoded.ContractAddress,
     oracleQueryId: Encoded.OracleQueryId,
-    { networkId }: { networkId?: string } = {},
+    { networkId, consensusProtocolVersion }: {
+      networkId?: string;
+      consensusProtocolVersion?: ConsensusProtocolVersion;
+    } = {},
   ): Promise<Encoded.Signature> {
+    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
+      const delegation = packDelegation({
+        tag: DelegationTag.OracleResponse, queryId: oracleQueryId, contractAddress,
+      });
+      return this.signDelegation(delegation, { networkId });
+    }
     const oracleQueryIdDecoded = decode(oracleQueryId);
     const addressDecoded = decode(this.address);
     // TODO: remove after fixing https://github.com/aeternity/aesophia/issues/475
@@ -137,6 +199,18 @@ export default class AccountMemory extends AccountBase {
       Buffer.from(networkId),
       oracleQueryIdDecoded,
       decode(contractAddress),
+    ]);
+    const signature = await this.sign(payload);
+    return encode(signature, Encoding.Signature);
+  }
+
+  override async signDelegation(
+    delegation: Encoded.Bytearray,
+    { networkId }: { networkId?: string } = {},
+  ): Promise<Encoded.Signature> {
+    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
+    const payload = concatBuffers([
+      messagePrefixLength, new Uint8Array([1]), Buffer.from(networkId), decode(delegation),
     ]);
     const signature = await this.sign(payload);
     return encode(signature, Encoding.Signature);

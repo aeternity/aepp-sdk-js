@@ -64,7 +64,7 @@
 import {
   MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
-  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx,
+  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import Value from './Value.vue';
@@ -129,9 +129,8 @@ export default {
       this.aeSdk.selectAccount(this.address);
     },
     async switchNode() {
-      this.nodeName = (await this.aeSdk.getNodesInPool())
-        .map(({ name }) => name)
-        .find((name) => name !== this.nodeName);
+      const names = (await this.aeSdk.getNodesInPool()).map(({ name }) => name);
+      this.nodeName = names[(names.indexOf(this.nodeName) + 1) % names.length];
       this.aeSdk.selectNode(this.nodeName);
     },
     updateClientStatus() {
@@ -207,6 +206,17 @@ export default {
         return super.signNameDelegationToContract(contractAddress, name, options);
       }
 
+      async signAllNamesDelegationToContract(
+        contractAddress,
+        { aeppRpcClientId: id, aeppOrigin, ...options },
+      ) {
+        if (id != null) {
+          const opt = { ...options, contractAddress };
+          genConfirmCallback('sign delegation of all names to contract')(id, opt, aeppOrigin);
+        }
+        return super.signAllNamesDelegationToContract(contractAddress, options);
+      }
+
       async signOracleQueryDelegationToContract(
         contractAddress,
         oracleQueryId,
@@ -217,6 +227,21 @@ export default {
           genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
         }
         return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
+      }
+
+      async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+        if (id != null) {
+          genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);
+        }
+        return super.sign(data, options);
+      }
+
+      async signDelegation(delegation, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+        if (id != null) {
+          const opt = { ...options, ...unpackDelegation(delegation) };
+          genConfirmCallback('sign delegation')(id, opt, aeppOrigin);
+        }
+        return super.signDelegation(delegation, options);
       }
 
       static generate() {
@@ -231,6 +256,7 @@ export default {
       nodes: [
         { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
         { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
+        { name: 'ae_next', instance: new Node('https://next.aeternity.io') },
       ],
       accounts: [
         new AccountMemoryProtected('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'),

@@ -4,7 +4,7 @@ import nacl, { SignKeyPair } from 'tweetnacl';
 import { blake2b } from 'blakejs/blake2b.js';
 import { encode as varuintEncode } from 'varuint-bitcoin';
 
-import { concatBuffers } from './other';
+import { concatBuffers, isItemOfArray } from './other';
 import {
   decode, encode, Encoded, Encoding,
 } from './encoder';
@@ -23,22 +23,32 @@ export function getAddressFromPriv(secret: string | Uint8Array): Encoded.Account
 
 /**
  * Check if address is valid
- * @param address - Address
- * @param prefix - Transaction prefix. Default: 'ak'
- * @returns is valid
+ * @param maybeAddress - Address to check
  */
-export function isAddressValid(
-  address: string,
-  prefix: Encoding = Encoding.AccountAddress,
-): boolean {
+export function isAddressValid(maybeAddress: string): maybeAddress is Encoded.AccountAddress;
+/**
+ * Check if data is encoded in one of provided encodings
+ * @param maybeEncoded - Data to check
+ * @param encodings - Rest parameters with encodings to check against
+ */
+export function isAddressValid<E extends Encoding>(
+  maybeEncoded: string,
+  ...encodings: E[]
+): maybeEncoded is Encoded.Generic<E>;
+export function isAddressValid(maybeEncoded: string, ...encodings: Encoding[]): boolean {
+  if (encodings.length === 0) encodings = [Encoding.AccountAddress];
   try {
-    decode(address as Encoded.Generic<typeof prefix>);
-    const actualPrefix = address.split('_')[0];
-    if (actualPrefix !== prefix) {
-      throw new ArgumentError('Encoded string type', prefix, actualPrefix);
+    decode(maybeEncoded as Encoded.Any);
+    const encoding = maybeEncoded.split('_')[0];
+    if (!isItemOfArray(encoding, encodings)) {
+      throw new ArgumentError(
+        'Encoded string type',
+        encodings.length > 1 ? `one of ${encodings.join(', ')}` : encodings[0],
+        encoding,
+      );
     }
     return true;
-  } catch (e) {
+  } catch (error) {
     return false;
   }
 }

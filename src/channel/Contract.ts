@@ -30,10 +30,25 @@ function snakeToPascalObjKeys<Type>(obj: object): Type {
 }
 
 interface CallContractOptions {
+  /**
+   * Amount the caller of the contract commits to it
+   */
   amount?: number | BigNumber;
+  /**
+   * ABI encoded compiled AEVM call data for the code
+   */
   callData?: Encoded.ContractBytearray;
+  /**
+   * Version of the ABI
+   */
   abiVersion?: AbiVersion;
+  /**
+   * Address of the contract to call
+   */
   contract?: Encoded.ContractAddress;
+}
+
+interface CallContractResult extends CallContractOptions {
   returnValue?: any;
   gasUsed?: number | BigNumber;
   gasPrice?: number | BigNumber;
@@ -175,10 +190,6 @@ export default class ChannelContract extends ChannelSpend {
    * if a call with a similar computation amount is to be forced on-chain.
    *
    * @param options - Options
-   * @param options.amount - Amount the caller of the contract commits to it
-   * @param options.callData - ABI encoded compiled AEVM call data for the code
-   * @param options.contract - Address of the contract to call
-   * @param options.abiVersion - Version of the ABI
    * @param sign - Function which verifies and signs contract call transaction
    * @example
    * ```js
@@ -248,12 +259,6 @@ export default class ChannelContract extends ChannelSpend {
    * Trigger a force progress contract call
    * This call is going on-chain
    * @param options - Options
-   * @param options.amount - Amount the caller of the contract commits to it
-   * @param options.callData - ABI encoded compiled AEVM call data for the code
-   * @param options.contract - Address of the contract to call
-   * @param options.abiVersion - Version of the ABI
-   * @param options.gasPrice=1000000000]
-   * @param options.gasLimit=1000000]
    * @param sign - Function which verifies and signs contract force progress transaction
    * @param callbacks - Callbacks
    * @example
@@ -276,11 +281,7 @@ export default class ChannelContract extends ChannelSpend {
   async forceProgress(
     {
       amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = MIN_GAS_PRICE,
-    }: {
-      amount: number;
-      callData: Encoded.ContractBytearray;
-      contract: Encoded.ContractAddress;
-      abiVersion: AbiVersion;
+    }: CallContractOptions & {
       gasLimit?: number;
       gasPrice?: number;
     },
@@ -352,10 +353,6 @@ export default class ChannelContract extends ChannelSpend {
    * top of the blockchain as seen by the node.
    *
    * @param options - Options
-   * @param options.amount - Amount the caller of the contract commits to it
-   * @param options.callData - ABI encoded compiled AEVM call data for the code
-   * @param options.contract - Address of the contract to call
-   * @param options.abiVersion - Version of the ABI
    * @example
    * ```js
    * channel.callContractStatic({
@@ -372,13 +369,8 @@ export default class ChannelContract extends ChannelSpend {
   async callContractStatic(
     {
       amount, callData, contract, abiVersion,
-    }: {
-      amount: number;
-      callData: Encoded.ContractBytearray;
-      contract: Encoded.ContractAddress;
-      abiVersion: AbiVersion;
-    },
-  ): Promise<CallContractOptions> {
+    }: CallContractOptions,
+  ): Promise<CallContractResult> {
     return snakeToPascalObjKeys(await call(this, 'channels.dry_run.call_contract', {
       amount,
       call_data: callData,

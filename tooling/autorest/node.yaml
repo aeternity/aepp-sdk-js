@@ -7,6 +7,11 @@ directive:
         if (!$[key].oneOf) return;
         $[key] = $[key].oneOf.find(({ type }) => type === 'string');
       });
+      const { utilization } = $.GasPrices.items.properties;
+      Object.assign(utilization, {
+        oneOf: undefined,
+        ...(utilization.oneOf ?? []).find(({ type }) => type === 'string'),
+      });
     reason:
       fix parsing of big numbers
       remove after fixing https://github.com/aeternity/aeternity/issues/3891
@@ -73,7 +78,7 @@ directive:
     where: $.components.schemas.Tx
     transform: >
       if ($doc.info.title === 'node') return $;
-      const base = $.allOf[0];
+      const { discriminator, ...base } = $.allOf[0];
       const transactions = base.properties.type.enum.map(txName => $doc.components.schemas[txName]);
       return {
         ...base,
@@ -150,11 +155,11 @@ directive:
     set: node
     reason: the whole SDK already about aeternity
 
-version: ^3.6.3
+version: ^3.7.1
 use-extension:
-  '@autorest/typescript': ^6.0.2
-  '@autorest/modelerfour': ^4.26.2
-input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.5.2/apps/aehttp/priv/oas3.yaml
+  '@autorest/typescript': ^6.0.15
+  '@autorest/modelerfour': ^4.27.0
+input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.13.0/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
 generator: typescript

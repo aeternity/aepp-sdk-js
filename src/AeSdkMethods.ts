@@ -1,4 +1,5 @@
 import * as chainMethods from './chain';
+import { sendTransaction } from './send-transaction';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import * as oracleMethods from './oracle';
@@ -7,6 +8,7 @@ import createDelegationSignature from './contract/delegation-signature';
 import * as contractGaMethods from './contract/ga';
 import { buildTxAsync } from './tx/builder';
 import { mapObject, UnionToIntersection } from './utils/other';
+import { wrapWithProxy } from './utils/wrap-proxy';
 import Node from './Node';
 import { TxParamsAsync } from './tx/builder/schema.generated';
 import AccountBase from './account/Base';
@@ -15,29 +17,9 @@ import CompilerBase from './contract/compiler/Base';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
 
-export function getValueOrErrorProxy<Value extends object | undefined>(
-  valueCb: () => Value,
-): NonNullable<Value> {
-  return new Proxy(
-    {},
-    Object.fromEntries(([
-      'apply', 'construct', 'defineProperty', 'deleteProperty', 'getOwnPropertyDescriptor',
-      'getPrototypeOf', 'isExtensible', 'ownKeys', 'preventExtensions', 'set', 'setPrototypeOf',
-      'get', 'has',
-    ] as const).map((name) => [name, (t: {}, ...args: unknown[]) => {
-      const target = valueCb() as object; // to get a native exception in case it missed
-      const res = (Reflect[name] as any)(target, ...args);
-      return typeof res === 'function' && name === 'get'
-        ? res.bind(target) // otherwise it fails with attempted to get private field on non-instance
-        : res;
-    }])),
-  ) as NonNullable<Value>;
-}
-
-const { InvalidTxError: _2, ...chainMethodsOther } = chainMethods;
-
 const methods = {
-  ...chainMethodsOther,
+  ...chainMethods,
+  sendTransaction,
   ...aensMethods,
   ...spendMethods,
   ...oracleMethods,
@@ -57,6 +39,12 @@ export interface AeSdkMethodsOptions
   extends Partial<UnionToIntersection<MethodsOptions[keyof MethodsOptions]>> {
 }
 
+export interface WrappedOptions {
+  onAccount: AccountBase;
+  onCompiler: CompilerBase;
+  onNode: Node;
+}
+
 /**
  * AeSdkMethods is the composition of:
  * - chain methods
@@ -73,33 +61,43 @@ export interface AeSdkMethodsOptions
 class AeSdkMethods {
   _options: AeSdkMethodsOptions = {};
 
+  readonly #wrappedOptions: WrappedOptions;
+
   /**
    * @param options - Options
    */
   constructor(options: AeSdkMethodsOptions = {}) {
     Object.assign(this._options, options);
-  }
-
-  _getOptions(
-    callOptions: AeSdkMethodsOptions = {},
-  ): AeSdkMethodsOptions & { onAccount: AccountBase; onCompiler: CompilerBase; onNode: Node } {
-    return {
-      ...this._options,
-      onAccount: getValueOrErrorProxy(() => this._options.onAccount),
-      onNode: getValueOrErrorProxy(() => this._options.onNode),
-      onCompiler: getValueOrErrorProxy(() => this._options.onCompiler),
-      ...callOptions,
+    this.#wrappedOptions = {
+      onAccount: wrapWithProxy(() => this._options.onAccount),
+      onNode: wrapWithProxy(() => this._options.onNode),
+      onCompiler: wrapWithProxy(() => this._options.onCompiler),
     };
   }
 
+  /**
+   * Returns sdk instance options with references to current account, node, compiler.
+   * Used to create an instance (Contract, Oracle) bound to AeSdk state.
+   * @param mergeWith - Merge context with these extra options
+   * @returns Context object
+   */
+  getContext(mergeWith: AeSdkMethodsOptions = {}): AeSdkMethodsOptions & WrappedOptions {
+    return {
+      ...this._options,
+      ...this.#wrappedOptions,
+      ...mergeWith,
+    };
+  }
+
+  // TODO: omit onNode from options, because it is already in context
   async buildTx(options: TxParamsAsync): Promise<Encoded.Transaction> {
-    return buildTxAsync({ ...this._getOptions(), ...options });
+    return buildTxAsync({ ...this.getContext(), ...options });
   }
 
   async initializeContract<Methods extends ContractMethodsBase>(
     options?: Omit<Parameters<typeof Contract.initialize>[0], 'onNode'> & { onNode?: Node },
   ): Promise<Contract<Methods>> {
-    return Contract.initialize<Methods>(this._getOptions(options as AeSdkMethodsOptions));
+    return Contract.initialize<Methods>(this.getContext(options as AeSdkMethodsOptions));
   }
 }
 
@@ -110,7 +108,13 @@ type RequiredKeys<T> = {
 type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T;
 
 type ReplaceOnAccount<Options> = Options extends { onAccount: any }
-  ? Omit<Options, 'onAccount'> & { onAccount: OnAccount } : Options;
+  ? Omit<Options, 'onAccount'> & {
+    /**
+     * Make operation on specific account by providing address (to use account from sdk) or instance
+     * of AccountBase (like MemoryAccount)
+     */
+    onAccount: OnAccount;
+  } : Options;
 
 type MakeOptional<Options> = OptionalIfNotRequired<[
   Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'> & Partial<ReplaceOnAccount<Options>>,
@@ -133,7 +137,7 @@ Object.assign(AeSdkMethods.prototype, mapObject<Function, Function>(
     function methodWrapper(this: AeSdkMethods, ...args: any[]) {
       args.length = handler.length;
       const options = args[args.length - 1];
-      args[args.length - 1] = this._getOptions(options);
+      args[args.length - 1] = this.getContext(options);
       return handler(...args);
     },
   ],

@@ -101,7 +101,7 @@ describe('Tx', () => {
 
     it('fails to unpack tx with more RLP items than in schema', () => {
       expect(() => unpackTx('tx_+GIMAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg92HvYQAAABhHRlc3SEdGVzdK2Ldck='))
-        .to.throw(ArgumentError, 'Transaction RLP length should be 9, got 10 instead');
+        .to.throw(ArgumentError, 'RLP length should be 9, got 10 instead');
     });
 
     it('unpacks unknown transaction', () => {

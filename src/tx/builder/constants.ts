@@ -1,18 +1,15 @@
 import BigNumber from 'bignumber.js';
 import { mapObject } from '../../utils/other';
 
+export const DRY_RUN_ACCOUNT = {
+  pub: 'ak_11111111111111111111111111111111273Yts',
+  amount: 100000000000000000000000000000000000n,
+} as const;
+
 export const MAX_AUTH_FUN_GAS = 50000;
 export type Int = number | string | BigNumber;
-// # AENS
 export type AensName = `${string}.chain`;
-export const NAME_TTL = 180000;
-// # max number of block into the future that the name is going to be available
-// # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
-// # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
-export const NAME_MAX_TTL = 36000;
-export const NAME_MAX_CLIENT_TTL = 84600;
-export const CLIENT_TTL = NAME_MAX_CLIENT_TTL;
-export const MIN_GAS_PRICE = 1e9;
+export const MIN_GAS_PRICE = 1e9; // TODO: don't use number for ae
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
 export const NAME_FEE_MULTIPLIER = 1e14; // 100000000000000
 export const NAME_FEE_BID_INCREMENT = 0.05; // # the increment is in percentage

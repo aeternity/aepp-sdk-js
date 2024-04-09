@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { getSdk } from '.';
 import {
   AeSdk, Node, InvalidTxError, ArgumentError, Tag, MemoryAccount, verifyTransaction,
+  ConsensusProtocolVersion, buildTxAsync,
 } from '../../src';
 
 describe('Verify Transaction', () => {
@@ -75,14 +76,34 @@ describe('Verify Transaction', () => {
   });
 
   it('verifies nameFee for nameClaim transaction', async () => {
-    const tx = 'tx_+KILAfhCuEDpKJambBPcIhemdxhFNwweD8QlInCqNQY2EHyCuP/gQZOyute/X1PxlWpbsOqvEwIqOFRIlr3kgXNhSAaIC9wEuFr4WCACoQE0ePUJYiVSDsuUDUOsQUw2XGWtPSLDefg5djhul3bfqgORc29tZUF1Y3Rpb24uY2hhaW6HDwTrMteR15AJQ0VVyE5TcqKSstgfbGV6hg9HjghAAABn0LtV';
-    const errors = await verifyTransaction(tx, node);
-    expect(errors.map(({ key }) => key)).to.include('InsufficientBalance');
+    const nameClaim = await buildTxAsync({
+      tag: Tag.NameClaimTx,
+      accountId: aeSdk.address,
+      name: 'someAuction.chain',
+      nameSalt: 42,
+      nameFee: 1e20,
+      onNode: node,
+    });
+    const nameClaimSigned = await aeSdk.signTransaction(nameClaim);
+    const errors = await verifyTransaction(nameClaimSigned, node);
+    expect(errors.map(({ key }) => key)).to.eql(['InsufficientBalance']);
   });
 
   it('verifies contractId for contractCall transaction', async () => {
-    const contractCall = 'tx_+GIrAaEBSzqoqjLLKO9NzXLgIBsTC+sNe5ronuTV/lr8IBJNlAECoQV/aqb9TshuuhhzeovvJCD/WmSOnqF8RCu4eY8hXYg/DgOGpYctWWAAAACCE4iEO5rKAIgrEYB4IJIbCmfzF0w=';
+    const contractCall = 'tx_+GIrAaEBSzqoqjLLKO9NzXLgIBsTC+sNe5ronuTV/lr8IBJNlAECoQVsu3CPls4zVNRpYBFsOpvTFqgOE181MuyfIhOyaTAbZQOGpYctWWAAAACCE4iEO5rKAIgrEYB4IJIbCjOz7+M=';
     const errors = await verifyTransaction(contractCall, node);
     expect(errors.map(({ key }) => key)).to.include('ContractNotFound');
+  });
+
+  it('verifies nonce of gaAttach transaction', async () => {
+    const gaAttach = 'tx_+QEWUAGhAUfN4Ejc4KynKrM1XI1D2AWlqBrTeCVywu9B6hV4rnriAri0+LJGA6BFoqzc6YC/ewZLk3eumqCWL/K7O2Wqy+x14Zbcx4rB0MC4hbhV/kTWRB8ANwA3ABoOgq+CAAEAPwEDP/5s8lcLADcBBxd3AoJ3AAg8AgT7A01Ob3QgaW4gQXV0aCBjb250ZXh0AQP//qsVVmEANwCHAjcANwGXQAECgqovAxFE1kQfEWluaXQRbPJXCyVhdXRob3JpemURqxVWYSVnZXRUeEhhc2iCLwCFOC4wLjAAoGzyVwsKFZm3CCkeUKo9rxPQx/JIS8M33a0kE6N/1KAJgwgAA4ZJUs52OAAAa4Q7msoAhysRRNZEHz/z50Zp';
+    const errors = await verifyTransaction(gaAttach, node);
+    const isIris = (await aeSdk.api.getNodeInfo())
+      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+    expect(errors.find((e) => e.key === 'AccountUsed')).to.eql(isIris ? undefined : {
+      message: 'Account ak_Yd9EiaBy8GNXWLkMuH53H9hiCyEuL3RKxN4wYKhN8xDnjKRpb can\'t become generalized because it is already used',
+      key: 'AccountUsed',
+      checkedKeys: ['nonce'],
+    });
   });
 });

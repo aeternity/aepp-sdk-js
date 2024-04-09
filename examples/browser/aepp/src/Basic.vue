@@ -26,6 +26,8 @@
   <SpendCoins />
 
   <MessageSign />
+
+  <DataSign />
 </template>
 
 <script>
@@ -33,9 +35,12 @@ import { mapState } from 'vuex';
 import Value from './components/Value.vue';
 import SpendCoins from './components/SpendCoins.vue';
 import MessageSign from './components/MessageSign.vue';
+import DataSign from './components/DataSign.vue';
 
 export default {
-  components: { Value, SpendCoins, MessageSign },
+  components: {
+    Value, SpendCoins, MessageSign, DataSign,
+  },
   data: () => ({
     balancePromise: null,
     heightPromise: null,

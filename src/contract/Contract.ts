@@ -6,8 +6,9 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import { DRY_RUN_ACCOUNT } from '../tx/builder/schema';
-import { Tag, AensName } from '../tx/builder/constants';
+import {
+  Tag, AensName, ConsensusProtocolVersion, DRY_RUN_ACCOUNT,
+} from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
 } from '../tx/builder';
@@ -39,12 +40,13 @@ import {
 import CompilerBase, { Aci } from './compiler/Base';
 import Node, { TransformNodeType } from '../Node';
 import {
-  getAccount, getContract, getContractByteCode, resolveName, txDryRun, sendTransaction,
-  SendTransactionOptions,
+  getAccount, getContract, getContractByteCode, resolveName, txDryRun,
 } from '../chain';
+import { sendTransaction, SendTransactionOptions } from '../send-transaction';
 import AccountBase from '../account/Base';
 import { TxUnpacked } from '../tx/builder/schema.generated';
 import { isAccountNotFoundError } from '../utils/other';
+import { isNameValid, produceNameId } from '../tx/builder/helpers';
 
 type ContractAci = NonNullable<Aci[0]['contract']>;
 type FunctionAci = ContractAci['functions'][0];
@@ -246,6 +248,7 @@ class Contract<M extends ContractMethodsBase> {
     const ownerId = opt.onAccount.address;
     if (this.$options.bytecode == null) throw new IllegalArgumentError('Can\'t deploy without bytecode');
     const tx = await buildTxAsync({
+      _isInternalBuild: true,
       ...opt,
       tag: Tag.ContractCreateTx,
       gasLimit: opt.gasLimit ?? await this._estimateGas('init', params, opt),
@@ -258,7 +261,7 @@ class Contract<M extends ContractMethodsBase> {
       'init',
       { ...opt, onAccount: opt.onAccount },
     );
-    this.$options.address = buildContractIdByContractTx(tx);
+    this.$options.address = buildContractIdByContractTx(other.rawTx);
     return {
       ...other,
       ...other.result?.log != null && {
@@ -287,7 +290,7 @@ class Contract<M extends ContractMethodsBase> {
         arguments: [], name: 'init', payable: false, returns: 'unit', stateful: true,
       };
     }
-    throw new NoSuchContractFunctionError(`Function ${name} doesn't exist in contract`);
+    throw new NoSuchContractFunctionError(name);
   }
 
   /**
@@ -308,7 +311,9 @@ class Contract<M extends ContractMethodsBase> {
   ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
     const fnAci = this.#getFunctionAci(fn);
-    const contractId = this.$options.address;
+    const { address, name } = this.$options;
+    // TODO: call `produceNameId` on buildTx side
+    const contractId = name != null ? produceNameId(name) : address;
     const { onNode } = opt;
 
     if (fn == null) throw new MissingFunctionNameError();
@@ -375,6 +380,7 @@ class Contract<M extends ContractMethodsBase> {
     if (top != null) throw new IllegalArgumentError('Can\'t handle `top` option in on-chain contract call');
     if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
     const tx = await buildTxAsync({
+      _isInternalBuild: true,
       ...opt,
       tag: Tag.ContractCallTx,
       gasLimit: opt.gasLimit ?? await this._estimateGas(fn, params, opt),
@@ -485,12 +491,16 @@ class Contract<M extends ContractMethodsBase> {
     }
     if (aci == null) throw new MissingContractDefError();
 
+    let name;
     if (address != null) {
       address = await resolveName(
         address,
         'contract_pubkey',
         { resolveByNode: true, onNode },
       ) as Encoded.ContractAddress;
+      const isIris = (await onNode.getNodeInfo())
+        .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+      if (!isIris && isNameValid(address)) name = address;
     }
 
     if (address == null && sourceCode == null && sourceCodePath == null && bytecode == null) {
@@ -527,6 +537,7 @@ class Contract<M extends ContractMethodsBase> {
       bytecode,
       aci,
       address,
+      name,
       fileSystem,
       ...otherOptions,
     });
@@ -534,7 +545,7 @@ class Contract<M extends ContractMethodsBase> {
 
   _aci: Aci;
 
-  #aciContract: ContractAci;
+  readonly #aciContract: ContractAci;
 
   _name: string;
 
@@ -542,12 +553,19 @@ class Contract<M extends ContractMethodsBase> {
 
   $options: Omit<ConstructorParameters<typeof Contract>[0], 'aci'>;
 
+  /**
+   * @param options - Options
+   */
   constructor({ aci, ...otherOptions }: {
     onCompiler?: CompilerBase;
     onNode: Node;
     bytecode?: Encoded.ContractBytearray;
     aci: Aci;
     address?: Encoded.ContractAddress;
+    /**
+     * Supported only in Ceres
+     */
+    name?: AensName;
     sourceCodePath?: Parameters<CompilerBase['compile']>[0];
     sourceCode?: Parameters<CompilerBase['compileBySourceCode']>[0];
     fileSystem?: Parameters<CompilerBase['compileBySourceCode']>[1];

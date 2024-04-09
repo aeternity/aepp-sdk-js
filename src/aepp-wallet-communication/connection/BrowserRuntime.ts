@@ -12,6 +12,9 @@ export default class BrowserRuntimeConnection extends BrowserConnection {
 
   #listeners?: [(message: any, port: Runtime.Port) => void, () => void];
 
+  /**
+   * @param options - Options
+   */
   constructor({ port, ...options }: { port: Runtime.Port; debug: boolean }) {
     super(options);
     this.port = port;

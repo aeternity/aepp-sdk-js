@@ -54,8 +54,18 @@ export default class AccountGeneralized extends AccountBase {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  override async signAllNamesDelegationToContract(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signing delegation to contract using generalized account');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   override async signOracleQueryDelegationToContract(): Promise<Encoded.Signature> {
     throw new NotImplementedError('signing delegation to contract using generalized account');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  override async signDelegation(): Promise<Encoded.Signature> {
+    throw new NotImplementedError('signing delegation using generalized account');
   }
 
   override async signTransaction(

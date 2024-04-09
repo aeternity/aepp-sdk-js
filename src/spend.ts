@@ -1,10 +1,9 @@
 import BigNumber from 'bignumber.js';
-import {
-  sendTransaction, getBalance, resolveName, SendTransactionOptions,
-} from './chain';
+import { getBalance, resolveName } from './chain';
+import { sendTransaction, SendTransactionOptions } from './send-transaction';
 import { buildTxAsync, BuildTxOptions, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
-import { Encoded, Encoding } from './utils/encoder';
+import { Encoded } from './utils/encoder';
 import { Tag, AensName } from './tx/builder/constants';
 import AccountBase from './account/Base';
 
@@ -18,15 +17,16 @@ import AccountBase from './account/Base';
  */
 export async function spend(
   amount: number | string,
-  recipientIdOrName: Encoded.AccountAddress | AensName,
+  recipientIdOrName: Encoded.AccountAddress | Encoded.ContractAddress | AensName,
   options: SpendOptions,
 ): ReturnType<typeof sendTransaction> {
   return sendTransaction(
     await buildTxAsync({
+      _isInternalBuild: true,
       ...options,
       tag: Tag.SpendTx,
       senderId: options.onAccount.address,
-      recipientId: await resolveName<Encoding.AccountAddress>(
+      recipientId: await resolveName(
         recipientIdOrName,
         'account_pubkey',
         options,
@@ -61,13 +61,13 @@ interface SpendOptions extends SpendOptionsType {}
  */
 export async function transferFunds(
   fraction: number | string, // TODO: accept only number
-  recipientIdOrName: AensName | Encoded.AccountAddress,
+  recipientIdOrName: AensName | Encoded.AccountAddress | Encoded.ContractAddress,
   options: TransferFundsOptions,
 ): ReturnType<typeof sendTransaction> {
   if (+fraction < 0 || +fraction > 1) {
     throw new ArgumentError('fraction', 'a number between 0 and 1', fraction);
   }
-  const recipientId = await resolveName<Encoding.AccountAddress>(
+  const recipientId = await resolveName(
     recipientIdOrName,
     'account_pubkey',
     options,
@@ -79,7 +79,12 @@ export async function transferFunds(
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP);
   const { fee } = unpackTx(
     await buildTxAsync({
-      ...options, tag: Tag.SpendTx, senderId, recipientId, amount: desiredAmount,
+      _isInternalBuild: true,
+      ...options,
+      tag: Tag.SpendTx,
+      senderId,
+      recipientId,
+      amount: desiredAmount,
     }),
     Tag.SpendTx,
   );
@@ -87,7 +92,12 @@ export async function transferFunds(
   const amount = desiredAmount.plus(fee).gt(balance) ? balance.minus(fee) : desiredAmount;
   return sendTransaction(
     await buildTxAsync({
-      ...options, tag: Tag.SpendTx, senderId, recipientId, amount,
+      _isInternalBuild: true,
+      ...options,
+      tag: Tag.SpendTx,
+      senderId,
+      recipientId,
+      amount,
     }),
     options,
   );
@@ -110,7 +120,11 @@ export async function payForTransaction(
 ): ReturnType<typeof sendTransaction> {
   return sendTransaction(
     await buildTxAsync({
-      ...options, tag: Tag.PayingForTx, payerId: options.onAccount.address, tx: transaction,
+      _isInternalBuild: true,
+      ...options,
+      tag: Tag.PayingForTx,
+      payerId: options.onAccount.address,
+      tx: transaction,
     }),
     options,
   );

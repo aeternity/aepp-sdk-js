@@ -1,7 +1,7 @@
 import browser from 'webextension-polyfill';
 import {
   AeSdkWallet, CompilerHttp, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection,
-  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx,
+  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 
@@ -101,6 +101,17 @@ class AccountMemoryProtected extends MemoryAccount {
     return super.signNameDelegationToContract(contractAddress, name, options);
   }
 
+  async signAllNamesDelegationToContract(
+    contractAddress,
+    { aeppRpcClientId: id, aeppOrigin, ...options },
+  ) {
+    if (id != null) {
+      const opt = { ...options, contractAddress };
+      await genConfirmCallback('sign delegation of all names to contract')(id, opt, aeppOrigin);
+    }
+    return super.signAllNamesDelegationToContract(contractAddress, options);
+  }
+
   async signOracleQueryDelegationToContract(
     contractAddress,
     oracleQueryId,
@@ -111,6 +122,21 @@ class AccountMemoryProtected extends MemoryAccount {
       await genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
     }
     return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
+  }
+
+  async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+    if (id != null) {
+      await genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);
+    }
+    return super.sign(data, options);
+  }
+
+  async signDelegation(delegation, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+    if (id != null) {
+      const opt = { ...options, ...unpackDelegation(delegation) };
+      await genConfirmCallback('sign delegation')(id, opt, aeppOrigin);
+    }
+    return super.signDelegation(delegation, options);
   }
 
   static generate() {

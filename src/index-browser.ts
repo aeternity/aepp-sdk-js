@@ -1,14 +1,19 @@
 export {
-  _getPollInterval, InvalidTxError, getHeight, poll, awaitHeight, waitForTxConfirm, sendTransaction,
+  _getPollInterval, getHeight, poll, awaitHeight, waitForTxConfirm,
   getAccount, getBalance, getCurrentGeneration, getGeneration, getMicroBlockTransactions,
   getKeyBlock, getMicroBlockHeader, txDryRun, getContractByteCode, getContract, getName,
   resolveName,
 } from './chain';
+export { InvalidTxError, sendTransaction } from './send-transaction';
 export {
   getAddressFromPriv, isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
   generateKeyPairFromSecret, generateKeyPair, sign, verify, messageToHash, signMessage,
   verifyMessage, isValidKeypair,
 } from './utils/crypto';
+export {
+  signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt,
+} from './utils/jwt';
+export type { Jwt } from './utils/jwt';
 export { recover, dump } from './utils/keystore';
 export type { Keystore } from './utils/keystore';
 export { toBytes } from './utils/bytes';
@@ -20,15 +25,15 @@ export {
   getDefaultPointerKey, getMinimumNameFee, computeBidFee, computeAuctionEndBlock, isAuctionName,
 } from './tx/builder/helpers';
 export {
-  MAX_AUTH_FUN_GAS, NAME_TTL, NAME_MAX_TTL, NAME_MAX_CLIENT_TTL, CLIENT_TTL, MIN_GAS_PRICE,
+  MAX_AUTH_FUN_GAS, MIN_GAS_PRICE,
   NAME_FEE_MULTIPLIER, NAME_FEE_BID_INCREMENT, NAME_BID_TIMEOUT_BLOCKS, NAME_MAX_LENGTH_FEE,
-  NAME_BID_RANGES, ConsensusProtocolVersion, VmVersion, AbiVersion, Tag,
+  NAME_BID_RANGES, ConsensusProtocolVersion, VmVersion, AbiVersion, Tag, DRY_RUN_ACCOUNT,
 } from './tx/builder/constants';
 export type { Int, AensName } from './tx/builder/constants';
 // TODO: move to constants
-export {
-  ORACLE_TTL_TYPES, ORACLE_TTL, QUERY_TTL, RESPONSE_TTL, DRY_RUN_ACCOUNT, CallReturnType,
-} from './tx/builder/schema';
+export { ORACLE_TTL_TYPES, CallReturnType } from './tx/builder/schema';
+export { DelegationTag } from './tx/builder/delegation/schema';
+export { packDelegation, unpackDelegation } from './tx/builder/delegation';
 export {
   getExecutionCost, getExecutionCostBySignedTx, getExecutionCostUsingNode,
 } from './tx/execution-cost';
@@ -93,7 +98,7 @@ export {
   CryptographyError, NodeError, TransactionError, WalletError, ArgumentError, IllegalArgumentError,
   ArgumentCountMismatchError, InsufficientBalanceError, MissingParamError, NoSerializerFoundError,
   RequestTimedOutError, TxTimedOutError, TypeError, UnsupportedPlatformError,
-  UnsupportedProtocolError, NotImplementedError, UnsupportedVersionError, InternalError,
+  UnsupportedProtocolError, NotImplementedError, UnsupportedVersionError, LogicError, InternalError,
   UnexpectedTsError, UnavailableAccountError, AensPointerContextError, InsufficientNameFeeError,
   InvalidAensNameError, InvalidRpcMessageError, MissingCallbackError, UnAuthorizedAccountError,
   UnknownRpcClientError, UnsubscribedAccountError, ChannelCallError, ChannelConnectionError,
@@ -111,4 +116,6 @@ export {
 } from './utils/errors';
 export {
   RpcBroadcastError, NAME_BID_MAX_LENGTH, encodeFateValue, decodeFateValue,
+  NAME_TTL, NAME_MAX_TTL, NAME_MAX_CLIENT_TTL, CLIENT_TTL,
+  ORACLE_TTL, QUERY_TTL, RESPONSE_TTL,
 } from './deprecated';

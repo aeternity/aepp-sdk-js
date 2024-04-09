@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { expect } from 'chai';
-import { AensName } from '../src';
+import { AensName, Node } from '../src';
 
 export function randomString(len: number): string {
   const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -31,3 +31,29 @@ export type InputNumber = number | bigint | string | BigNumber;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function checkOnlyTypes(cb: Function): void {}
+
+export function bindRequestTracker(node: Node): () => string[] {
+  const name = `tracker-${randomString(6)}`;
+  const requestUrls: string[] = [];
+  node.pipeline.addPolicy({
+    name,
+    async sendRequest(request, next) {
+      requestUrls.push(request.url);
+      return next(request);
+    },
+  }, { phase: 'Deserialize' });
+  return () => {
+    node.pipeline.removePolicy({ name });
+    return requestUrls;
+  };
+}
+
+export function bindRequestCounter(
+  node: Node,
+): (params?: { filter?: string[]; exclude?: string[] }) => number {
+  const getRequestUrls = bindRequestTracker(node);
+  return ({ filter = [], exclude = [] } = {}) => getRequestUrls()
+    .filter((url) => !exclude.some((p) => url.includes(p)))
+    .filter((url) => (filter.length === 0) || filter.some((p) => url.includes(p)))
+    .length;
+}

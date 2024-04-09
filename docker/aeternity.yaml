@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://github.com/aeternity/aeternity/raw/master/apps/aeutils/priv/aeternity_config_schema.json
+
+system:
+  dev_mode: true
+  plugins:
+    # TODO: remove after merging https://github.com/aeternity/aeternity/pull/4303
+    - name: aeplugin_dev_mode
+
+http:
+  internal:
+    debug_endpoints: true
+    listen_address: 0.0.0.0
+  endpoints:
+    dry-run: true
+
+websocket:
+  channel:
+    listen_address: 0.0.0.0
+
+chain:
+  persist: false
+  hard_forks:
+    "1": 0
+    "6": 1

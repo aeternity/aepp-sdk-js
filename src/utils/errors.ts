@@ -250,6 +250,16 @@ export class UnsupportedVersionError extends BaseError {
 /**
  * @category exception
  */
+export class LogicError extends BaseError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LogicError';
+  }
+}
+
+/**
+ * @category exception
+ */
 export class InternalError extends BaseError {
   constructor(message: string) {
     super(message);

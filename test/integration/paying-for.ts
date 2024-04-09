@@ -62,6 +62,7 @@ describe('Paying for transaction of another account', () => {
     Object.assign(aeSdkNotPayingFee._options, {
       waitMined: false,
       innerTx: true,
+      ttl: 0,
     });
     const contract: TestContract = await aeSdkNotPayingFee.initializeContract({ sourceCode });
     const { rawTx: contractDeployTx, address } = await contract.$deploy([42]);

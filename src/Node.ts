@@ -1,6 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import BigNumber from 'bignumber.js';
-import { OperationArguments, OperationSpec } from '@azure/core-client';
+import { OperationArguments, OperationOptions, OperationSpec } from '@azure/core-client';
+import { userAgentPolicyName, setClientRequestIdPolicyName } from '@azure/core-rest-pipeline';
 import {
   genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
   genVersionCheckPolicy, genRetryOnFailurePolicy,
@@ -14,7 +15,7 @@ import { ConsensusProtocolVersion } from './tx/builder/constants';
 const bigIntPropertyNames = [
   'balance', 'queryFee', 'fee', 'amount', 'nameFee', 'channelAmount',
   'initiatorAmount', 'responderAmount', 'channelReserve', 'initiatorAmountFinal',
-  'responderAmountFinal', 'gasPrice', 'deposit',
+  'responderAmountFinal', 'gasPrice', 'minGasPrice', 'deposit',
 ] as const;
 
 const numberPropertyNames = [
@@ -22,7 +23,7 @@ const numberPropertyNames = [
   'nonce', 'nextNonce', 'height', 'blockHeight', 'topBlockHeight',
   'ttl', 'nameTtl', 'clientTtl',
   'inbound', 'outbound', 'peerCount', 'pendingTransactionsCount', 'effectiveAtHeight',
-  'version', 'solutions', 'round',
+  'version', 'solutions', 'round', 'minutes', 'utilization', 'difficulty', 'hashrate',
 ] as const;
 
 class NodeTransformed extends NodeApi {
@@ -112,8 +113,6 @@ interface NodeInfo {
 }
 
 export default class Node extends (NodeTransformed as unknown as NodeTransformedApi) {
-  #networkIdPromise?: Promise<string | Error>;
-
   /**
    * @param url - Url for node API
    * @param options - Options
@@ -131,33 +130,53 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
       retryOverallDelay?: number;
     } = {},
   ) {
+    const getVersion = async (opts: OperationOptions): Promise<string> => (
+      (await this._getCachedStatus(opts)).nodeVersion
+    );
     // eslint-disable-next-line constructor-super
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
+        ...ignoreVersion ? [] : [genVersionCheckPolicy('node', getVersion, '6.2.0', '7.0.0')],
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
-        genErrorFormatterPolicy((body: ErrorModel) => ` ${body.reason}`),
+        genErrorFormatterPolicy((body: ErrorModel) => [
+          ' ', body.reason, body.errorCode == null ? '' : ` (${body.errorCode})`,
+        ].join('')),
       ],
       ...options,
     });
-    if (!ignoreVersion) {
-      const statusPromise = this.getStatus();
-      const versionPromise = statusPromise.then(({ nodeVersion }) => nodeVersion, (error) => error);
-      this.#networkIdPromise = statusPromise.then(({ networkId }) => networkId, (error) => error);
-      this.pipeline.addPolicy(
-        genVersionCheckPolicy('node', '/v3/status', versionPromise, '6.2.0', '7.0.0'),
-      );
-    }
+    this.pipeline.removePolicy({ name: userAgentPolicyName });
+    this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
+    // TODO: use instead our retry policy
+    this.pipeline.removePolicy({ name: 'defaultRetryPolicy' });
     this.intAsString = true;
   }
 
+  #cachedStatusPromise?: ReturnType<Node['getStatus']>;
+
+  async _getCachedStatus(options?: OperationOptions): ReturnType<Node['getStatus']> {
+    if (this.#cachedStatusPromise != null) return this.#cachedStatusPromise;
+    return this.getStatus(options);
+  }
+
+  // eslint-disable-next-line rulesdir/tsdoc-syntax
+  /** @ts-expect-error use code generation to create node class? */
+  override async getStatus(
+    ...args: Parameters<InstanceType<NodeTransformedApi>['getStatus']>
+  ): ReturnType<InstanceType<NodeTransformedApi>['getStatus']> {
+    const promise = super.getStatus(...args);
+    promise.then(() => { this.#cachedStatusPromise = promise; }, () => {});
+    return promise;
+  }
+
+  /**
+   * Returns network ID provided by node.
+   * This method won't do extra requests on subsequent calls.
+   */
   async getNetworkId(): Promise<string> {
-    this.#networkIdPromise ??= this.getStatus().then(({ networkId }) => networkId);
-    const networkId = await this.#networkIdPromise;
-    if (networkId instanceof Error) throw networkId;
-    return networkId;
+    return (await this._getCachedStatus()).networkId;
   }
 
   async getNodeInfo(): Promise<NodeInfo> {

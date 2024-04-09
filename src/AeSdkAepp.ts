@@ -88,7 +88,6 @@ export default class AeSdkAepp extends AeSdkBase {
    * @param options - Options
    * @param options.connectNode - Request wallet to bind node
    * @param options.name - Node name
-   * @param options.select - Select this node as current
    */
   async connectToWallet(
     connection: BrowserConnection,

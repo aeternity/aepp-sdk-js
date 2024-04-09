@@ -1,5 +1,5 @@
-import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pipeline';
-import { AdditionalPolicyConfig } from '@azure/core-client';
+import { RestError, PipelineResponse } from '@azure/core-rest-pipeline';
+import { AdditionalPolicyConfig, FullOperationResponse, OperationOptions } from '@azure/core-client';
 import { pause } from './other';
 import semverSatisfies from './semver-satisfies';
 import { UnsupportedVersionError } from './errors';
@@ -16,9 +16,7 @@ export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
         const getResponse = async (): Promise<PipelineResponse> => next(request);
         if (key == null) return getResponse();
         const req = (requestQueues.get(key) ?? Promise.resolve()).then(getResponse);
-        // TODO: remove pause after fixing https://github.com/aeternity/aeternity/issues/3803
-        // gap to ensure that node won't reject the nonce
-        requestQueues.set(key, req.then(async () => pause(750), () => {}));
+        requestQueues.set(key, req.catch(() => {}));
         return req;
       },
     },
@@ -76,16 +74,16 @@ export const genErrorFormatterPolicy = (
         return await next(request);
       } catch (error) {
         if (!(error instanceof RestError) || error.request == null) throw error;
-        if (error.response?.bodyAsText == null) throw error;
+        const prefix = `${new URL(error.request.url).pathname.slice(1)} error`;
 
-        let body;
-        try {
-          body = JSON.parse(error.response.bodyAsText);
-        } catch (e) {
+        if (error.response?.bodyAsText == null) {
+          if (error.message === '') error.message = `${prefix}: ${error.code}`;
           throw error;
         }
-        error.message = `${new URL(error.request.url).pathname.slice(1)} error`;
-        const message = getMessage(body);
+
+        const body = (error.response as FullOperationResponse).parsedBody;
+        error.message = prefix;
+        const message = body == null ? ` ${error.response.status} status code` : getMessage(body);
         if (message !== '') error.message += `:${message}`;
         throw error;
       }
@@ -96,20 +94,24 @@ export const genErrorFormatterPolicy = (
 
 export const genVersionCheckPolicy = (
   name: string,
-  ignorePath: string,
-  versionPromise: Promise<string | Error>,
+  versionCb: (options: OperationOptions) => Promise<string>,
   geVersion: string,
   ltVersion: string,
-): PipelinePolicy => ({
-  name: 'version-check',
-  async sendRequest(request, next) {
-    if (new URL(request.url).pathname === ignorePath) return next(request);
-    const version = await versionPromise;
-    if (version instanceof Error) throw version;
-    const args = [version, geVersion, ltVersion] as const;
-    if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args);
-    return next(request);
+): AdditionalPolicyConfig => ({
+  policy: {
+    name: 'version-check',
+    async sendRequest(request, next) {
+      if (request.headers.has('__version-check')) {
+        request.headers.delete('__version-check');
+        return next(request);
+      }
+      const options = { requestOptions: { customHeaders: { '__version-check': 'true' } } };
+      const args = [await versionCb(options), geVersion, ltVersion] as const;
+      if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args);
+      return next(request);
+    },
   },
+  position: 'perCall',
 });
 
 export const genRetryOnFailurePolicy = (
@@ -119,16 +121,23 @@ export const genRetryOnFailurePolicy = (
   policy: {
     name: 'retry-on-failure',
     async sendRequest(request, next) {
-      const statusesToNotRetry = [200, 400, 403, 500];
+      const retryCode = request.headers.get('__retry-code') ?? NaN;
+      request.headers.delete('__retry-code');
+      const statusesToNotRetry = [200, 400, 403, 410, 500].filter((c) => c !== +retryCode);
 
       const intervals = new Array(retryCount).fill(0)
         .map((_, idx) => ((idx + 1) / retryCount) ** 2);
-      const intervalSum = intervals.reduce((a, b) => a + b);
-      const intervalsInMs = intervals.map((el) => (el / intervalSum) * retryOverallDelay);
+      const intervalSum = intervals.reduce((a, b) => a + b, 0);
+      const intervalsInMs = intervals.map((e) => Math.floor((e / intervalSum) * retryOverallDelay));
 
       let error = new RestError('Not expected to be thrown');
       for (let attempt = 0; attempt <= retryCount; attempt += 1) {
-        if (attempt !== 0) await pause(intervalsInMs[attempt - 1]);
+        if (attempt !== 0) {
+          await pause(intervalsInMs[attempt - 1]);
+          const urlParsed = new URL(request.url);
+          urlParsed.searchParams.set('__sdk-retry', attempt.toString());
+          request.url = urlParsed.toString();
+        }
         try {
           return await next(request);
         } catch (e) {

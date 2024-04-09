@@ -1,11 +1,14 @@
-import { RestError } from '@azure/core-rest-pipeline';
+import {
+  RestError, userAgentPolicyName, setClientRequestIdPolicyName,
+} from '@azure/core-rest-pipeline';
+import { OperationOptions } from '@azure/core-client';
 import {
   Compiler as CompilerApi,
   ErrorModel,
   CompilerError as CompilerErrorApi,
 } from '../../apis/compiler';
 import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../../utils/autorest';
-import CompilerBase, { Aci } from './Base';
+import CompilerBase, { Aci, CompileResult } from './Base';
 import { Encoded } from '../../utils/encoder';
 import { CompilerError, NotImplementedError } from '../../utils/errors';
 
@@ -29,11 +32,20 @@ export default class CompilerHttp extends CompilerBase {
    * @param options - Options
    * @param options.ignoreVersion - Don't check compiler version
    */
-  constructor(compilerUrl: string, { ignoreVersion }: { ignoreVersion?: boolean } = {}) {
+  constructor(compilerUrl: string, { ignoreVersion = false }: { ignoreVersion?: boolean } = {}) {
     super();
+
+    let version: string | undefined;
+    const getVersion = async (opts: OperationOptions): Promise<string> => {
+      if (version != null) return version;
+      version = (await this.api.apiVersion(opts)).apiVersion;
+      return version;
+    };
+
     this.api = new CompilerApi(compilerUrl, {
       allowInsecureConnection: true,
       additionalPolicies: [
+        ...ignoreVersion ? [] : [genVersionCheckPolicy('compiler', getVersion, '7.3.0', '9.0.0')],
         genErrorFormatterPolicy((body: GeneralCompilerError | CompilerErrorApi[]) => {
           let message = '';
           if ('reason' in body) {
@@ -51,23 +63,21 @@ export default class CompilerHttp extends CompilerBase {
         }),
       ],
     });
-    if (ignoreVersion !== true) {
-      const versionPromise = this.api.apiVersion()
-        .then(({ apiVersion }) => apiVersion, (error) => error);
-      this.api.pipeline.addPolicy(
-        genVersionCheckPolicy('compiler', '/api-version', versionPromise, '7.3.0', '8.0.0'),
-      );
-    }
+    this.api.pipeline.removePolicy({ name: userAgentPolicyName });
+    this.api.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
   }
 
   async compileBySourceCode(
     sourceCode: string,
     fileSystem?: Record<string, string>,
-  ): Promise<{ bytecode: Encoded.ContractBytearray; aci: Aci }> {
+  ): CompileResult {
     try {
-      const res = await this.api.compileContract({ code: sourceCode, options: { fileSystem } });
+      const cmpOut = await this.api.compileContract({ code: sourceCode, options: { fileSystem } });
+      cmpOut.warnings ??= []; // TODO: remove after requiring http compiler above or equal to 8.0.0
+      const warnings = cmpOut.warnings.map(({ type, ...warning }) => warning);
+      const res = { ...cmpOut, warnings };
       // TODO: should be fixed when the compiledAci interface gets updated
-      return res as { bytecode: Encoded.ContractBytearray; aci: Aci };
+      return res as Awaited<CompileResult>;
     } catch (error) {
       if (error instanceof RestError && error.statusCode === 400) {
         throw new CompilerError(error.message);
@@ -77,7 +87,7 @@ export default class CompilerHttp extends CompilerBase {
   }
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
-  async compile(path: string): Promise<{ bytecode: Encoded.ContractBytearray; aci: Aci }> {
+  async compile(path: string): CompileResult {
     throw new NotImplementedError('File system access, use CompilerHttpNode instead');
   }
 

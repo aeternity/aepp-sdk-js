@@ -15,14 +15,14 @@ import { concatBuffers } from '../utils/other';
 import AccountBase from '../account/Base';
 import Contract from './Contract';
 import Node from '../Node';
-import { sendTransaction, SendTransactionOptions, getAccount } from '../chain';
+import { getAccount } from '../chain';
+import { sendTransaction, SendTransactionOptions } from '../send-transaction';
 import CompilerBase from './compiler/Base';
 
 /**
  * Convert current account to GA
  * @category contract
  * @param authFnName - Authorization function name
- * @param sourceCode - Auth contract source code
  * @param args - init arguments
  * @param options - Options
  * @returns General Account Object
@@ -49,6 +49,7 @@ export async function createGeneralizedAccount(
   });
 
   const tx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.GaAttachTx,
     onNode,
@@ -58,10 +59,10 @@ export async function createGeneralizedAccount(
     callData: contract._calldata.encode(contract._name, 'init', args),
     authFun: hash(authFnName),
   });
-  const contractId = buildContractIdByContractTx(tx);
   const { hash: transaction, rawTx } = await sendTransaction(tx, {
     onNode, onAccount, onCompiler, ...options,
   });
+  const contractId = buildContractIdByContractTx(rawTx);
 
   return Object.freeze({
     owner: ownerId,

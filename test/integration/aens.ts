@@ -1,19 +1,21 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { getSdk } from '.';
-import { assertNotNull, randomName, randomString } from '../utils';
+import { getSdk, isLimitedCoins } from '.';
+import {
+  assertNotNull, ensureEqual, randomName, randomString,
+} from '../utils';
 import {
   AeSdk, generateKeyPair, buildContractId, computeBidFee, ensureName, produceNameId,
-  AensPointerContextError, UnexpectedTsError, encode, decode, Encoding, ContractMethodsBase,
+  AensPointerContextError, encode, decode, Encoding, ContractMethodsBase, ConsensusProtocolVersion,
+  unpackTx, Tag, buildTxHash,
 } from '../../src';
-import { pause } from '../../src/utils/other';
 
 describe('Aens', () => {
   let aeSdk: AeSdk;
-  const name = randomName(13); // 13 name length doesn't trigger auction
+  const name = randomName(30);
 
   before(async () => {
-    aeSdk = await getSdk(2);
+    aeSdk = await getSdk(3);
   });
 
   it('claims a name', async () => {
@@ -23,6 +25,46 @@ describe('Aens', () => {
     const claimed = await preclaim.claim();
     expect(claimed.id).to.be.a('string');
     expect(claimed.ttl).to.be.an('number');
+  });
+
+  it('claims a long name without preclaim', async () => {
+    const isIris = (await aeSdk.api.getNodeInfo())
+      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+    if (isIris) return;
+    const n = randomName(30);
+    const claimed = await aeSdk.aensClaim(n, 0);
+    assertNotNull(claimed.tx);
+    assertNotNull(claimed.blockHeight);
+    assertNotNull(claimed.signatures);
+    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee >= 16860000000000n);
+    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee < 17000000000000n);
+    expect(claimed).to.be.eql({
+      tx: {
+        fee: claimed.tx.fee,
+        nonce: claimed.tx.nonce,
+        accountId: aeSdk.address,
+        name: n,
+        ttl: claimed.tx.ttl,
+        nameSalt: 0,
+        nameFee: 500000000000000n,
+        version: 2,
+        type: 'NameClaimTx',
+      },
+      blockHeight: claimed.blockHeight,
+      blockHash: claimed.blockHash,
+      encodedTx: claimed.encodedTx,
+      hash: claimed.hash,
+      signatures: [claimed.signatures[0]],
+      rawTx: claimed.rawTx,
+      id: claimed.id,
+      owner: aeSdk.address,
+      ttl: claimed.blockHeight + 180000,
+      pointers: [],
+      update: claimed.update,
+      transfer: claimed.transfer,
+      revoke: claimed.revoke,
+      extendTtl: claimed.extendTtl,
+    });
   });
 
   it('claims a unicode name', async () => {
@@ -38,12 +80,15 @@ describe('Aens', () => {
     expect(claimed.extendTtl).to.be.a('function');
     assertNotNull(claimed.tx);
     assertNotNull(claimed.signatures);
+    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee >= 16940000000000n);
+    expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee < 17100000000000n);
     expect(claimed).to.be.eql({
       tx: {
-        fee: 16960000000000n,
+        fee: claimed.tx.fee,
         nonce: claimed.tx.nonce,
         accountId: aeSdk.address,
         name: n,
+        ttl: claimed.tx.ttl,
         nameSalt: claimed.tx.nameSalt,
         nameFee: 300000000000000n,
         version: 2,
@@ -51,6 +96,7 @@ describe('Aens', () => {
       },
       blockHeight: claimed.blockHeight,
       blockHash: claimed.blockHash,
+      encodedTx: claimed.encodedTx,
       hash: claimed.hash,
       signatures: [claimed.signatures[0]],
       rawTx: claimed.rawTx,
@@ -74,14 +120,11 @@ describe('Aens', () => {
   });
 
   it('queries names', async () => {
-    // For some reason the node will return 404 when name is queried
-    // just right after claim tx has been mined so we wait 0.5s
-    await pause(500);
     await aeSdk.aensQuery(name).should.eventually.be.an('object');
   });
 
   it('throws error on querying non-existent name', () => aeSdk
-    .aensQuery(randomName(13)).should.eventually.be.rejected);
+    .aensQuery(randomName(30)).should.eventually.be.rejected);
 
   it('Spend using name with invalid pointers', async () => {
     const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
@@ -104,18 +147,28 @@ describe('Aens', () => {
     await nameObject.update({ contract_pubkey: contract.$options.address });
 
     contract = await aeSdk.initializeContract<ContractApi>({ sourceCode, address: name });
-    expect((await contract.getArg(42)).decodedResult).to.be.equal(42n);
+    expect((await contract.getArg(42, { callStatic: true })).decodedResult).to.be.equal(42n);
+    expect((await contract.getArg(42, { callStatic: false })).decodedResult).to.be.equal(42n);
   });
 
   const address = generateKeyPair().publicKey;
-  const pointers = {
-    myKey: address,
-    account_pubkey: address,
-    oracle_pubkey: encode(decode(address), Encoding.OracleAddress),
-    channel: encode(decode(address), Encoding.Channel),
-    contract_pubkey: buildContractId(address, 13),
-  };
-  const pointersNode = Object.entries(pointers).map(([key, id]) => ({ key, id }));
+  let pointers: Parameters<AeSdk['aensUpdate']>[1];
+  let pointersNode: Array<{ key: string; id: typeof pointers[string] }>;
+  let isIris: boolean;
+
+  before(async () => {
+    isIris = (await aeSdk.api.getNodeInfo())
+      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+    pointers = {
+      myKey: address,
+      ...!isIris && { 'my raw key': encode(Buffer.from('my raw value'), Encoding.Bytearray) },
+      account_pubkey: address,
+      oracle_pubkey: encode(decode(address), Encoding.OracleAddress),
+      channel: encode(decode(address), Encoding.Channel),
+      contract_pubkey: buildContractId(address, 13),
+    };
+    pointersNode = Object.entries(pointers).map(([key, id]) => ({ key, id }));
+  });
 
   it('updates', async () => {
     const nameObject = await aeSdk.aensQuery(name);
@@ -123,11 +176,19 @@ describe('Aens', () => {
   });
 
   it('throws error on updating names not owned by the account', async () => {
-    const preclaim = await aeSdk.aensPreclaim(randomName(13));
-    await preclaim.claim();
     const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
-    if (onAccount == null) throw new UnexpectedTsError();
-    await aeSdk.aensUpdate(name, {}, { onAccount, blocks: 1 }).should.eventually.be.rejected;
+    assertNotNull(onAccount);
+    const promise = aeSdk.aensUpdate(name, {}, { onAccount, blocks: 1 });
+    await expect(promise)
+      .to.be.rejectedWith(/Giving up after 1 blocks mined, transaction hash:|error: Transaction not found/);
+
+    const { rawTx } = await promise.catch((e) => e);
+    const { encodedTx } = unpackTx(rawTx, Tag.SignedTx);
+    ensureEqual(encodedTx.tag, Tag.NameUpdateTx);
+    await aeSdk.spend(0, aeSdk.address, { nonce: encodedTx.nonce, onAccount });
+    const txHash = buildTxHash(rawTx);
+    await expect(aeSdk.poll(txHash))
+      .to.be.rejectedWith(new RegExp(`v3/transactions/${txHash} error: (Transaction not found|412 status code)`));
   });
 
   it('updates extending pointers', async () => {
@@ -151,11 +212,19 @@ describe('Aens', () => {
       .to.be.rejectedWith('Expected 32 pointers or less, got 33 instead');
   });
 
+  it('throws error on setting too long raw pointer', async () => {
+    const nameObject = await aeSdk.aensQuery(name);
+    const pointersRaw = { raw: encode(Buffer.from('t'.repeat(1025)), Encoding.Bytearray) };
+    await expect(nameObject.update(pointersRaw)).to.be.rejectedWith(isIris
+      ? 'Raw pointers are available only in Ceres, the current protocol is Iris'
+      : 'Raw pointer should be shorter than 1025 bytes, got 1025 bytes instead');
+  });
+
   it('Extend name ttl', async () => {
     const nameObject = await aeSdk.aensQuery(name);
     const extendResult: Awaited<ReturnType<typeof aeSdk.aensUpdate>> = await nameObject
       .extendTtl(10000);
-    if (extendResult.blockHeight == null) throw new UnexpectedTsError();
+    assertNotNull(extendResult.blockHeight);
     return extendResult.should.be.deep.include({
       ttl: extendResult.blockHeight + 10000,
     });
@@ -169,7 +238,7 @@ describe('Aens', () => {
   it('transfers names', async () => {
     const claim = await aeSdk.aensQuery(name);
     const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
-    if (onAccount == null) throw new UnexpectedTsError();
+    assertNotNull(onAccount);
     await claim.transfer(onAccount);
 
     const claim2 = await aeSdk.aensQuery(name);
@@ -180,7 +249,7 @@ describe('Aens', () => {
 
   it('revoke names', async () => {
     const onAccountIndex = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
-    if (onAccountIndex == null) throw new UnexpectedTsError();
+    assertNotNull(onAccountIndex);
     const onAccount = aeSdk.accounts[onAccountIndex];
     const aensName = await aeSdk.aensQuery(name);
 
@@ -195,11 +264,11 @@ describe('Aens', () => {
 
     const preclaim = await aeSdk.aensPreclaim(name, { onAccount });
     preclaim.should.be.an('object');
-    if (preclaim.tx?.accountId == null) throw new UnexpectedTsError();
+    assertNotNull(preclaim.tx?.accountId);
     preclaim.tx.accountId.should.be.equal(onAccount);
   });
 
-  describe('name auctions', () => {
+  (isLimitedCoins ? describe.skip : describe)('name auctions', () => {
     it('claims a name', async () => {
       const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
       const nameShort = randomName(12);
@@ -219,13 +288,12 @@ describe('Aens', () => {
     });
 
     it('claims a unicode name', async () => {
-      const onAccount = aeSdk.addresses().find((acc) => acc !== aeSdk.address);
       const nameShort = `æ${randomString(4)}.chain`;
       ensureName(nameShort);
 
       const preclaim = await aeSdk.aensPreclaim(nameShort);
       await preclaim.claim();
-      await aeSdk.aensBid(nameShort, computeBidFee(nameShort), { onAccount });
+      await aeSdk.aensBid(nameShort, computeBidFee(nameShort), { onAccount: aeSdk.addresses()[2] });
 
       await expect(aeSdk.getName(nameShort)).to.be.rejectedWith('error: Name not found');
     });

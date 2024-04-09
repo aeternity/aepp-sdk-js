@@ -1,17 +1,19 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { createSandbox } from 'sinon';
-import { PipelineRequest, PipelineResponse, SendRequest } from '@azure/core-rest-pipeline';
-import { url, ignoreVersion } from '.';
+import { RestError } from '@azure/core-rest-pipeline';
+import { FullOperationResponse } from '@azure/core-client';
+import { url } from '.';
 import {
-  AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion,
+  AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion, MemoryAccount, buildTx, Tag,
 } from '../../src';
+import { bindRequestCounter } from '../utils';
 
 describe('Node client', () => {
   let node: Node;
 
   before(async () => {
-    node = new Node(url, { ignoreVersion });
+    node = new Node(url);
   });
 
   it('wraps endpoints', () => {
@@ -30,34 +32,81 @@ describe('Node client', () => {
       .to.be.rejectedWith('v3/transactions/th_test error: Invalid hash');
   });
 
+  it('throws clear exceptions when body is empty', async () => {
+    node.pipeline.addPolicy({
+      name: 'remove-response-body',
+      async sendRequest(request, next) {
+        try {
+          return await next(request);
+        } catch (error) {
+          if (!(error instanceof RestError) || error.response == null) throw error;
+          (error.response as FullOperationResponse).parsedBody = null;
+          throw error;
+        }
+      },
+    });
+    await expect(node.getTransactionByHash('th_test'))
+      .to.be.rejectedWith('v3/transactions/th_test error: 400 status code');
+    node.pipeline.removePolicy({ name: 'remove-response-body' });
+  });
+
+  it('throws clear exceptions if ECONNREFUSED', async () => {
+    const n = new Node('http://localhost:60148', { retryCount: 0 });
+    await expect(n.getStatus()).to.be.rejectedWith('v3/status error: ECONNREFUSED');
+  });
+
   it('retries requests if failed', async () => ([
     ['ak_test', 1],
     ['ak_2CxRaRcMUGn9s5UwN36UhdrtZVFUbgG1BSX5tUAyQbCNneUwti', 4],
   ] as const).reduce(async (prev, [address, requestCount]) => {
     await prev;
 
-    let counter = 0;
-    node.pipeline.addPolicy({
-      name: 'counter',
-      async sendRequest(request: PipelineRequest, next: SendRequest): Promise<PipelineResponse> {
-        counter += 1;
-        return next(request);
-      },
-    }, { phase: 'Deserialize' });
-
+    const getCount = bindRequestCounter(node);
     await node.getAccountByPubkey(address).catch(() => {});
-
-    node.pipeline.removePolicy({ name: 'counter' });
-    expect(counter).to.be.equal(requestCount);
+    expect(getCount()).to.be.equal(requestCount);
   }, Promise.resolve()));
 
   it('throws exception if unsupported protocol', async () => {
     const sandbox = createSandbox();
-    sandbox.stub(ConsensusProtocolVersion, 'Iris').value(undefined);
-    sandbox.stub(ConsensusProtocolVersion, '5' as 'Iris').value(undefined);
+    const [name, version, message] = {
+      5: ['Iris', '5', '5. Supported: >= 6 < 7'],
+      6: ['Ceres', '6', '6. Supported: >= 5 < 6'],
+    }[(await node.getNodeInfo()).consensusProtocolVersion];
+    sandbox.stub(ConsensusProtocolVersion, name as any).value(undefined);
+    sandbox.stub(ConsensusProtocolVersion, version as any).value(undefined);
     await expect(node.getNodeInfo()).to.be
-      .rejectedWith('Unsupported consensus protocol version 5. Supported: >= 6 < 7');
+      .rejectedWith(`Unsupported consensus protocol version ${message}`);
     sandbox.restore();
+  });
+
+  it('throws exception with code', async () => {
+    const account = MemoryAccount.generate();
+    const spendTx = buildTx({
+      tag: Tag.SpendTx, recipientId: account.address, senderId: account.address, nonce: 1e9,
+    });
+    const tx = await account.signTransaction(spendTx, { networkId: await node.getNetworkId() });
+    await expect(node.postTransaction({ tx }))
+      .to.be.rejectedWith(RestError, 'v3/transactions error: Invalid tx (nonce_too_high)');
+  });
+
+  it('returns recent gas prices', async () => {
+    const example: Awaited<ReturnType<typeof node.getRecentGasPrices>> = [
+      { minGasPrice: 0n, minutes: 5, utilization: 0 },
+    ];
+    expect(example);
+
+    const actual = await node.getRecentGasPrices();
+    expect(actual).to.be.eql([1, 5, 15, 60].map((minutes, idx) => {
+      const { minGasPrice, utilization } = actual[idx];
+      return { minGasPrice, minutes, utilization };
+    }));
+  });
+
+  it('doesn\'t remember failed version request', async () => {
+    const n = new Node('https://test.stg.aepps.com');
+    await expect(n.getTopHeader()).to.be.rejectedWith('v3/status error: 404 status code');
+    n.$host = url;
+    expect(await n.getTopHeader()).to.be.an('object');
   });
 
   describe('Node Pool', () => {
@@ -70,7 +119,7 @@ describe('Node client', () => {
     it('Can change Node', async () => {
       const nodes = new AeSdkBase({
         nodes: [
-          { name: 'first', instance: new Node(url, { ignoreVersion }) },
+          { name: 'first', instance: new Node(url) },
           { name: 'second', instance: node },
         ],
       });
@@ -84,7 +133,7 @@ describe('Node client', () => {
     it('Fail on undefined node', async () => {
       const nodes = new AeSdkBase({
         nodes: [
-          { name: 'first', instance: new Node(url, { ignoreVersion }) },
+          { name: 'first', instance: new Node(url) },
           { name: 'second', instance: node },
         ],
       });

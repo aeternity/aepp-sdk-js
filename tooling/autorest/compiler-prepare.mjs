@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-const swaggerUrl = 'https://raw.githubusercontent.com/aeternity/aesophia_http/v7.4.0/config/swagger.yaml';
+const swaggerUrl = 'https://raw.githubusercontent.com/aeternity/aesophia_http/v8.0.0-rc1/config/swagger.yaml';
 
 const response = await fetch(swaggerUrl);
 console.assert(response.status === 200, 'Invalid response code', response.status);

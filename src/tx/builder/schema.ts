@@ -7,27 +7,18 @@
 import { Tag } from './constants';
 import SchemaTypes from './SchemaTypes';
 import {
-  uInt, shortUInt, coinAmount, name, nameId, nameFee, deposit, gasLimit, gasPrice, fee,
-  address, pointers, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
-  array, boolean, ctVersion, abiVersion, ttl, nonce, map, wrapped,
+  uInt, shortUInt, coinAmount, name, nameId, nameFee, gasLimit, gasPrice, fee, address, pointers,
+  pointers2, queryFee, entry, enumeration, mptree, shortUIntConst, string, encoded, raw,
+  array, boolean, ctVersion, abiVersion, ttl, nonce, map, withDefault, withFormatting, wrapped,
 } from './field-types';
 import { Encoded, Encoding } from '../../utils/encoder';
+import { ArgumentError } from '../../utils/errors';
 import { idTagToEncoding } from './field-types/address';
 
 export enum ORACLE_TTL_TYPES {
   delta = 0,
   block = 1,
 }
-
-// # ORACLE
-export const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
-export const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
-export const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
-// # CONTRACT
-export const DRY_RUN_ACCOUNT = {
-  pub: 'ak_11111111111111111111111111111111273Yts',
-  amount: 100000000000000000000000000000000000n,
-} as const;
 
 export enum CallReturnType {
   Ok = 0,
@@ -132,6 +123,19 @@ interface MapOracles {
 
 const mapOracles = map(Encoding.OracleAddress, Tag.Oracle) as unknown as MapOracles;
 
+// TODO: inline after dropping Iris compatibility
+const clientTtl = withDefault(60 * 60, shortUInt);
+// https://github.com/aeternity/protocol/blob/fd17982/AENS.md#update
+const nameTtl = withFormatting(
+  (value) => {
+    const NAME_TTL = 180000;
+    value ??= NAME_TTL;
+    if (value >= 1 && value <= NAME_TTL) return value;
+    throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, value);
+  },
+  shortUInt,
+);
+
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts}
  */
@@ -157,7 +161,8 @@ export const txSchema = [{
   tag: shortUIntConst(Tag.SpendTx),
   version: shortUIntConst(1, true),
   senderId: address(Encoding.AccountAddress),
-  recipientId: address(Encoding.AccountAddress, Encoding.Name),
+  // TODO: accept also an AENS name
+  recipientId: address(Encoding.AccountAddress, Encoding.ContractAddress, Encoding.Name),
   amount: coinAmount,
   fee,
   ttl,
@@ -195,9 +200,20 @@ export const txSchema = [{
   accountId: address(Encoding.AccountAddress),
   nonce: nonce('accountId'),
   nameId,
-  nameTtl: shortUInt,
+  nameTtl,
   pointers,
-  clientTtl: shortUInt,
+  clientTtl,
+  fee,
+  ttl,
+}, {
+  tag: shortUIntConst(Tag.NameUpdateTx),
+  version: shortUIntConst(2),
+  accountId: address(Encoding.AccountAddress),
+  nonce: nonce('accountId'),
+  nameId,
+  nameTtl,
+  pointers: pointers2,
+  clientTtl,
   fee,
   ttl,
 }, {
@@ -206,6 +222,7 @@ export const txSchema = [{
   accountId: address(Encoding.AccountAddress),
   nonce: nonce('accountId'),
   nameId,
+  // TODO: accept also an AENS name
   recipientId: address(Encoding.AccountAddress, Encoding.Name),
   fee,
   ttl,
@@ -226,7 +243,7 @@ export const txSchema = [{
   log: encoded(Encoding.ContractBytearray),
   active: boolean,
   referers: array(address(Encoding.AccountAddress)),
-  deposit,
+  deposit: coinAmount,
 }, {
   tag: shortUIntConst(Tag.ContractCreateTx),
   version: shortUIntConst(1, true),
@@ -236,7 +253,13 @@ export const txSchema = [{
   ctVersion,
   fee,
   ttl,
-  deposit,
+  deposit: withFormatting(
+    (value = 0) => {
+      if (+value === 0) return value;
+      throw new ArgumentError('deposit', 'equal 0 (because is not refundable)', value);
+    },
+    coinAmount,
+  ),
   amount: coinAmount,
   gasLimit,
   gasPrice,
@@ -246,6 +269,7 @@ export const txSchema = [{
   version: shortUIntConst(1, true),
   callerId: address(Encoding.AccountAddress),
   nonce: nonce('callerId'),
+  // TODO: accept also an AENS name
   contractId: address(Encoding.ContractAddress, Encoding.Name),
   abiVersion,
   fee,
@@ -286,18 +310,19 @@ export const txSchema = [{
   queryFormat: string,
   responseFormat: string,
   queryFee: coinAmount,
-  oracleTtlType: enumeration(ORACLE_TTL_TYPES),
-  oracleTtlValue: shortUInt,
+  oracleTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  oracleTtlValue: withDefault(500, shortUInt),
   fee,
   ttl,
   abiVersion,
 }, {
   tag: shortUIntConst(Tag.OracleExtendTx),
   version: shortUIntConst(1, true),
+  // TODO: accept also an AENS name
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
   nonce: nonce('oracleId'),
-  oracleTtlType: enumeration(ORACLE_TTL_TYPES),
-  oracleTtlValue: shortUInt,
+  oracleTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  oracleTtlValue: withDefault(500, shortUInt),
   fee,
   ttl,
 }, {
@@ -305,13 +330,14 @@ export const txSchema = [{
   version: shortUIntConst(1, true),
   senderId: address(Encoding.AccountAddress),
   nonce: nonce('senderId'),
+  // TODO: accept also an AENS name
   oracleId: address(Encoding.OracleAddress, Encoding.Name),
   query: string,
-  queryFee: coinAmount,
-  queryTtlType: enumeration(ORACLE_TTL_TYPES),
-  queryTtlValue: shortUInt,
-  responseTtlType: enumeration(ORACLE_TTL_TYPES),
-  responseTtlValue: shortUInt,
+  queryFee,
+  queryTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  queryTtlValue: withDefault(10, shortUInt),
+  responseTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  responseTtlValue: withDefault(10, shortUInt),
   fee,
   ttl,
 }, {
@@ -321,8 +347,8 @@ export const txSchema = [{
   nonce: nonce('oracleId'),
   queryId: encoded(Encoding.OracleQueryId),
   response: string,
-  responseTtlType: enumeration(ORACLE_TTL_TYPES),
-  responseTtlValue: shortUInt,
+  responseTtlType: withDefault(ORACLE_TTL_TYPES.delta, enumeration(ORACLE_TTL_TYPES)),
+  responseTtlValue: withDefault(10, shortUInt),
   fee,
   ttl,
 }, {

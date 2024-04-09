@@ -25,6 +25,8 @@ await Promise.all(spends.map(({ amount, address }, idx) =>
 ```
 This way, SDK would make a single request to get info about the sender account and a transaction post request per each item in the `spends` array.
 
+Additionally, you may want to set `gasPrice` and `fee` to have predictable expenses. By default, SDK sets them based on the current network demand.
+
 ## Multiple contract static calls
 Basically, the dry-run endpoint of the node is used to run them. Doing requests one by one, like
 ```js

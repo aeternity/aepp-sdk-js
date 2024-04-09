@@ -1,4 +1,4 @@
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import { w3cwebsocket as W3CWebSocket, ICloseEvent } from 'websocket';
 import BigNumber from 'bignumber.js';
 import type Channel from './Base';
 import JsonBig from '../utils/json-big';
@@ -49,43 +49,139 @@ export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
   Promise<Encoded.Transaction | number | null>
 );
 
+/**
+ * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
+ */
 export interface ChannelOptions {
   existingFsmId?: Encoded.Bytearray;
+  /**
+   * Channel url (for example: "ws://localhost:3001")
+   */
   url: string;
 
   /**
-   * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
+   * Initiator's public key
    */
   initiatorId: Encoded.AccountAddress;
+  /**
+   * Responder's public key
+   */
   responderId: Encoded.AccountAddress;
+  /**
+   * Amount of blocks for disputing a solo close
+   */
   lockPeriod: number;
+  /**
+   * Initial deposit in favour of the responder by the initiator
+   */
   pushAmount: number;
-  initiatorAmount: BigNumber;
-  responderAmount: BigNumber;
+  /**
+   * Amount of coins the initiator has committed to the channel
+   */
+  initiatorAmount: BigNumber | number;
+  /**
+   * Amount of coins the responder has committed to the channel
+   */
+  responderAmount: BigNumber | number;
+  /**
+   * The minimum amount both peers need to maintain
+   */
   channelReserve?: BigNumber | number;
+  /**
+   * Minimum block height to include the channel_create_tx
+   */
   ttl?: number;
+  /**
+   * Host of the responder's node
+   */
   host: string;
+  /**
+   * The port of the responders node
+   */
   port: number;
+  /**
+   * Participant role
+   */
   role: 'initiator' | 'responder';
+  /**
+   * How to calculate minimum depth (default: txfee)
+   */
   minimumDepthStrategy?: 'txfee' | 'plain';
+  /**
+   * The minimum amount of blocks to be mined
+   */
   minimumDepth?: number;
+  /**
+   * The fee to be used for the channel open transaction
+   */
   fee?: BigNumber | number;
+  /**
+   * Used for the fee computation of the channel open transaction
+   */
   gasPrice?: BigNumber | number;
 
   signedTx?: string;
+  /**
+   * Existing channel id (required if reestablishing a channel)
+   */
   existingChannelId?: string;
+  /**
+   * Offchain transaction (required if reestablishing a channel)
+   */
   offChainTx?: string;
   reconnectTx?: string;
+  /**
+   * The time waiting for a new event to be initiated (default: 600000)
+   */
   timeoutIdle?: number;
+  /**
+   * The time waiting for the initiator to produce the create channel transaction after the noise
+   * session had been established (default: 120000)
+   */
   timeoutFundingCreate?: number;
+  /**
+   * The time frame the other client has to sign an off-chain update after our client had initiated
+   * and signed it. This applies only for double signed on-chain intended updates: channel create
+   * transaction, deposit, withdrawal and etc. (default: 120000)
+   */
   timeoutFundingSign?: number;
+  /**
+   * The time frame the other client has to confirm an on-chain transaction reaching maturity
+   * (passing minimum depth) after the local node has detected this. This applies only for double
+   * signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc.
+   * (default: 360000)
+   */
   timeoutFundingLock?: number;
+  /**
+   * The time frame the client has to return a signed off-chain update or to decline it.
+   * This applies for all off-chain updates (default: 500000)
+   */
   timeoutSign?: number;
+  /**
+   * The time frame the other client has to react to an event. This applies for all off-chain
+   * updates that are not meant to land on-chain, as well as some special cases: opening a noise
+   * connection, mutual closing acknowledgement and reestablishing an existing channel
+   * (default: 120000)
+   */
   timeoutAccept?: number;
+  /**
+   * the time frame the responder has to accept an incoming noise session.
+   * Applicable only for initiator (default: timeout_accept's value)
+   */
   timeoutInitialized?: number;
+  /**
+   * The time frame the initiator has to start an outgoing noise session to the responder's node.
+   * Applicable only for responder (default: timeout_idle's value)
+   */
   timeoutAwaitingOpen?: number;
   statePassword?: string;
-  debug: boolean;
+  /**
+   * Log websocket communication and state changes
+   */
+  debug?: boolean;
+  /**
+   * Function which verifies and signs transactions
+   */
   sign: SignTxWithTag;
   offchainTx?: string;
 }
@@ -100,6 +196,9 @@ export interface ChannelState {
   reject: (e: BaseError) => void;
   sign: SignTx;
   handler?: ChannelHandler;
+  /**
+   * Called when transaction has been posted on chain
+   */
   onOnChainTx?: (tx: Encoded.Transaction) => void;
   onOwnWithdrawLocked?: () => void;
   onWithdrawLocked?: () => void;
@@ -152,6 +251,7 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
   if (nextState == null) {
     throw new UnknownChannelStateError();
   }
+  channel._debug('enter state', nextState.handler.name);
   channel._fsm = nextState;
   if (nextState?.handler?.enter != null) {
     nextState.handler.enter(channel);
@@ -164,7 +264,8 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
 export type ChannelStatus = 'connecting' | 'connected' | 'accepted' | 'halfSigned' | 'signed'
 | 'open' | 'closing' | 'closed' | 'died' | 'disconnected';
 
-export function changeStatus(channel: Channel, newStatus: ChannelStatus): void {
+export function changeStatus(channel: Channel, newStatus: ChannelStatus, debug?: unknown): void {
+  channel._debug(newStatus, `(prev. ${channel._status})`, debug ?? '');
   if (newStatus === channel._status) return;
   channel._status = newStatus;
   emit(channel, 'statusChanged', newStatus);
@@ -176,7 +277,7 @@ export function changeState(channel: Channel, newState: Encoded.Transaction | ''
 }
 
 function send(channel: Channel, message: ChannelMessage): void {
-  if (channel._options.debug) console.log('Send message: ', message);
+  channel._debug('send message', message.method, message.params);
   channel._websocket.send(JsonBig.stringify({ jsonrpc: '2.0', ...message }));
 }
 
@@ -266,7 +367,7 @@ function ping(channel: Channel): void {
 
 function onMessage(channel: Channel, data: string): void {
   const message = JsonBig.parse(data);
-  if (channel._options.debug) console.log('Receive message: ', message);
+  channel._debug('received message', message.method, message.params);
   if (message.id != null) {
     const callback = channel._rpcCallbacks.get(message.id);
     if (callback == null) {
@@ -317,7 +418,6 @@ export async function initialize(
   { url, ...channelOptions }: ChannelOptions,
 ): Promise<void> {
   channel._options = { url, ...channelOptions };
-  channel._fsm = { handler: connectionHandler };
 
   const wsUrl = new URL(url);
   Object.entries(channelOptions)
@@ -329,9 +429,9 @@ export async function initialize(
   await new Promise<void>((resolve, reject) => {
     Object.assign(channel._websocket, {
       onerror: reject,
-      onopen: async () => {
+      onopen: async (event: Event) => {
         resolve();
-        changeStatus(channel, 'connected');
+        changeStatus(channel, 'connected', event);
         if (channelOptions.reconnectTx != null) {
           enterState(channel, { handler: openHandler });
           const { signedTx } = await channel.state();
@@ -339,11 +439,13 @@ export async function initialize(
             throw new ChannelError('`signedTx` missed in state while reconnection');
           }
           changeState(channel, buildTx(signedTx));
+        } else {
+          enterState(channel, { handler: connectionHandler });
         }
         ping(channel);
       },
-      onclose: () => {
-        changeStatus(channel, 'disconnected');
+      onclose: (event: ICloseEvent) => {
+        changeStatus(channel, 'disconnected', event);
         clearTimeout(channel._pingTimeoutId);
       },
       onmessage: ({ data }: { data: string }) => onMessage(channel, data),

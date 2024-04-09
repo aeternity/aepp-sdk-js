@@ -52,7 +52,7 @@ We keep our [Changelog](docs/CHANGELOG.md) up to date.
 ## License
 
 ISC License (ISC)
-Copyright © 2023 æternity developers
+Copyright © 2024 æternity developers
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

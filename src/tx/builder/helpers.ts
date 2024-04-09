@@ -136,7 +136,7 @@ export function readInt(buf: Buffer = Buffer.from([])): string {
 /**
  * Ensure that name is valid AENS name, would throw an exception otherwise
  * @category AENS
- * @param name - AENS name
+ * @param maybeName - AENS name
  */
 export function ensureName(maybeName: string): asserts maybeName is AensName {
   nameToPunycode(maybeName);
@@ -145,7 +145,7 @@ export function ensureName(maybeName: string): asserts maybeName is AensName {
 /**
  * Is AENS name valid
  * @category AENS
- * @param name - AENS name
+ * @param maybeName - AENS name
  */
 // TODO: consider renaming to isName
 export function isNameValid(maybeName: string): maybeName is AensName {

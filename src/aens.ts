@@ -7,14 +7,13 @@
  */
 
 import BigNumber from 'bignumber.js';
-import { genSalt } from './utils/crypto';
+import { genSalt, isAddressValid } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
-import {
-  CLIENT_TTL, NAME_TTL, Tag, AensName,
-} from './tx/builder/constants';
-import { ArgumentError } from './utils/errors';
-import { Encoded } from './utils/encoder';
-import { sendTransaction, SendTransactionOptions, getName } from './chain';
+import { Tag, AensName, ConsensusProtocolVersion } from './tx/builder/constants';
+import { Encoded, Encoding } from './utils/encoder';
+import { UnsupportedProtocolError } from './utils/errors';
+import { getName } from './chain';
+import { sendTransaction, SendTransactionOptions } from './send-transaction';
 import { buildTxAsync, BuildTxOptions } from './tx/builder';
 import { TransformNodeType } from './Node';
 import { NameEntry, NamePointer } from './apis/node';
@@ -22,7 +21,7 @@ import AccountBase from './account/Base';
 import { AddressEncodings } from './tx/builder/field-types/address';
 
 interface KeyPointers {
-  [key: string]: Encoded.Generic<AddressEncodings>;
+  [key: string]: Encoded.Generic<AddressEncodings | Encoding.Bytearray>;
 }
 
 /**
@@ -30,11 +29,6 @@ interface KeyPointers {
  * @category AENS
  * @param name - Name hash
  * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
  * @returns Transaction result
  * @example
  * ```js
@@ -51,6 +45,7 @@ export async function aensRevoke(
   options: AensRevokeOptions,
 ): ReturnType<typeof sendTransaction> {
   const nameRevokeTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NameRevokeTx,
     nameId: name,
@@ -69,17 +64,6 @@ interface AensRevokeOptions extends
  * @param name - AENS name
  * @param pointers - Map of pointer keys to corresponding addresses
  * @param options - Options
- * @param options.extendPointers - Get the pointers from the node and merge with provided
- * ones. Pointers with the same type will be overwritten
- * @param options.onAccount - Make operation on specific account from sdk (you
- * pass publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @param options.nameTtl - Name ttl represented in number of
- * blocks (Max value is 50000 blocks)
- * @param options.clientTtl=84600 a suggestion as to how long any
- * clients should cache this information
  * @throws Invalid pointer array error
  * @example
  * ```js
@@ -104,11 +88,19 @@ export async function aensUpdate(
     ...pointers,
   };
 
+  const hasRawPointers = Object.values(allPointers)
+    .some((v) => isAddressValid(v, Encoding.Bytearray));
+  const isIris = (await options.onNode.getNodeInfo())
+    .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
+  if (hasRawPointers && isIris) {
+    throw new UnsupportedProtocolError('Raw pointers are available only in Ceres, the current protocol is Iris');
+  }
+
   const nameUpdateTx = await buildTxAsync({
-    clientTtl: CLIENT_TTL,
-    nameTtl: NAME_TTL,
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NameUpdateTx,
+    version: hasRawPointers ? 2 : 1,
     nameId: name,
     accountId: options.onAccount.address,
     pointers: Object.entries(allPointers)
@@ -121,8 +113,18 @@ export async function aensUpdate(
 interface AensUpdateOptions extends
   BuildTxOptions<Tag.NameUpdateTx, 'nameId' | 'accountId' | 'pointers' | 'clientTtl' | 'nameTtl' | 'onNode'>,
   SendTransactionOptions {
+  /**
+   * Get the pointers from the node and merge with provided ones. Pointers with the same key will be
+   * overwritten.
+   */
   extendPointers?: boolean;
+  /**
+   * a suggestion as to how long any clients should cache this information
+   */
   clientTtl?: number;
+  /**
+   * Name ttl represented in number of blocks (Max value is 50000 blocks)
+   */
   nameTtl?: number;
 }
 
@@ -132,11 +134,6 @@ interface AensUpdateOptions extends
  * @param name - AENS name
  * @param account - Recipient account publick key
  * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
  * @returns Transaction result
  * @example
  * ```js
@@ -155,6 +152,7 @@ export async function aensTransfer(
   options: AensTransferOptions,
 ): ReturnType<typeof sendTransaction> {
   const nameTransferTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NameTransferTx,
     nameId: name,
@@ -175,7 +173,6 @@ interface AensTransferOptions extends
  * @category AENS
  * @param name - AENS name
  * @param opt - Options
- * @returns
  * @example
  * ```js
  * const nameObject = sdkInstance.aensQuery('test.chain')
@@ -215,7 +212,7 @@ export async function aensQuery(
     }
     ) => ReturnType<typeof aensRevoke>;
     extendTtl: (
-      nameTtl: number,
+      nameTtl?: number,
       options?: Omit<Parameters<typeof aensQuery>[1], 'onNode' | 'onCompiler' | 'onAccount'>
     ) => ReturnType<typeof aensUpdate> & ReturnType<typeof aensQuery>;
   }
@@ -240,11 +237,7 @@ export async function aensQuery(
     async revoke(options) {
       return aensRevoke(name, { ...opt, ...options });
     },
-    async extendTtl(nameTtl = NAME_TTL, options = {}) {
-      if (nameTtl > NAME_TTL || nameTtl <= 0) {
-        throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, nameTtl);
-      }
-
+    async extendTtl(nameTtl, options = {}) {
       return {
         ...await aensUpdate(name, {}, {
           ...opt, ...options, nameTtl, extendPointers: true,
@@ -260,15 +253,9 @@ export async function aensQuery(
  * preclaim step
  * @category AENS
  * @param name - AENS name
- * @param salt - Salt from pre-claim, or 0 if it's a bid
+ * @param salt - Salt from pre-claim, or 0 if it's a bid or claiming without preclaim (in Ceres)
  * @param options - options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
- * @param options.nameFee - Name Fee (By default calculated by sdk)
- * @returns the result of the claim
+ * @returns Transaction result
  * @example
  * ```js
  * const name = 'test.chain'
@@ -283,6 +270,7 @@ export async function aensClaim(
   options: AensClaimOptions,
 ): Promise<AensClaimReturnType> {
   const claimTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NameClaimTx,
     accountId: options.onAccount.address,
@@ -312,11 +300,6 @@ interface AensClaimReturnType extends
  * @category AENS
  * @param name - AENS name
  * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
  * @example
  * ```js
  * const name = 'test.chain'
@@ -342,6 +325,7 @@ Awaited<ReturnType<typeof sendTransaction>> & {
   const commitmentId = commitmentHash(name, salt);
 
   const preclaimTx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.NamePreclaimTx,
     accountId: options.onAccount.address,
@@ -370,11 +354,6 @@ interface AensPreclaimOptions extends
  * @param name - Domain name
  * @param nameFee - Name fee (bid fee)
  * @param options - Options
- * @param options.onAccount - Make operation on specific account from sdk (you pass
- * publickKey) or using provided KeyPair(Can be keypair object or MemoryAccount)
- * @param options.fee - fee
- * @param options.ttl - ttl
- * @param options.nonce - nonce
  * @returns Transaction result
  * @example
  * ```js

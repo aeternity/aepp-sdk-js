@@ -6,20 +6,20 @@ def pre_build(**kwargs):
   subprocess.run(['./docs/build-assets.sh'], check=True)
 
 def replacer(match):
-  filename = f'{match.group(3)}.{match.group(4)}'
-  url = f'https://raw.githubusercontent.com/{match.group(1)}/{match.group(2)}/{filename}'
+  filename = f"{match.group('filename')}.{match.group('extension')}"
+  url = f"https://raw.githubusercontent.com/{match.group('user')}/{match.group('commit')}/{filename}"
   code = urllib.request.urlopen(url).read().decode('utf-8')
-  extension = 'js' if match.group(4) == 'vue' else match.group(4)
+  extension = 'js' if match.group('extension') == 'vue' else match.group('extension')
   return '\n'.join(
     [f'``` {extension} title="{filename}"'] +
-    code.split('\n')[int(match.group(5)) - 1:int(match.group(6))] +
+    code.split('\n')[int(match.group('begin')) - 1:int(match.group('end'))] +
     ['```', f'View at [GitHub]({match.group(0)})']
   )
 
 def page_markdown(markdown, **kwargs):
   return re.sub(
     re.compile(
-      r'^https://github.com/([\w/\-]+)/blob/([0-9a-f]+)/([\w\d\-/\.]+)\.(\w+)#L(\d+)-L(\d+)$',
+      r'^https://github.com/(?P<user>[\w/\-]+)/blob/(?P<commit>[0-9a-f]+)/(?P<filename>[\w\d\-/\.]+)\.(?P<extension>\w+)#L(?P<begin>\d+)-L(?P<end>\d+)$',
       re.MULTILINE,
     ),
     replacer,

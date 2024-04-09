@@ -25,9 +25,9 @@ describe('Middleware API', () => {
       mdwVersion: res.mdwVersion,
       nodeHeight: res.nodeHeight,
       nodeProgress: 100,
-      nodeRevision: 'a42c1b1e84dabdad350005213a2a9334113a6832',
+      nodeRevision: res.nodeRevision,
       nodeSyncing: false,
-      nodeVersion: '6.8.1',
+      nodeVersion: res.nodeVersion,
     };
     expect(res).to.be.eql(expectedRes);
   });
@@ -37,8 +37,7 @@ describe('Middleware API', () => {
     const expectedRes: typeof res = {
       data: [{
         blockHash: 'mh_LAo6Cg6d8LGDpxJ3se2aGJZbCubDZyC6GonHK58MKiW4a4LWb',
-        // @ts-expect-error https://github.com/aeternity/ae_mdw/issues/1454
-        block_time: 1684995426848,
+        blockTime: 1684995426848,
         height: 779178,
         payload: {
           block_hash: 'mh_LAo6Cg6d8LGDpxJ3se2aGJZbCubDZyC6GonHK58MKiW4a4LWb',
@@ -75,8 +74,7 @@ describe('Middleware API', () => {
         type: 'GAMetaTxEvent',
       }, {
         blockHash: 'mh_2R1PVwTNP3Jha7oRby9Me3SRBP4R9he6RMH6eCCJGyVBHAzy5f',
-        // @ts-expect-error https://github.com/aeternity/ae_mdw/issues/1454
-        block_time: 1684995366595,
+        blockTime: 1684995366595,
         height: 779178,
         payload: {
           block_hash: 'mh_2R1PVwTNP3Jha7oRby9Me3SRBP4R9he6RMH6eCCJGyVBHAzy5f',
@@ -115,8 +113,7 @@ describe('Middleware API', () => {
         type: 'GAAttachTxEvent',
       }, {
         blockHash: 'mh_25snWYwTkU1xjPCcH592XVNzL894qSpF4yqnt8tABKGEVm6nSz',
-        // @ts-expect-error https://github.com/aeternity/ae_mdw/issues/1454
-        block_time: 1684995336526,
+        blockTime: 1684995336526,
         height: 779178,
         payload: {
           block_hash: 'mh_25snWYwTkU1xjPCcH592XVNzL894qSpF4yqnt8tABKGEVm6nSz',

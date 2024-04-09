@@ -46,6 +46,10 @@ export interface WalletApi {
 
   [METHODS.address]: () => Promise<Encoded.AccountAddress[]>;
 
+  [METHODS.unsafeSign]: (
+    p: { data: Encoded.Bytearray; onAccount: Encoded.AccountAddress }
+  ) => Promise<{ signature: Encoded.Signature }>;
+
   [METHODS.sign]: ((
     p: {
       tx: Encoded.Transaction;
@@ -89,6 +93,15 @@ export interface WalletApi {
       contractAddress: Encoded.ContractAddress;
       name?: AensName;
       oracleQueryId?: Encoded.OracleQueryId;
+      allNames?: boolean;
+      isOracle?: boolean;
+      onAccount: Encoded.AccountAddress;
+    },
+  ) => Promise<{ signature: Encoded.Signature }>;
+
+  [METHODS.signDelegation]: (
+    p: {
+      delegation: Encoded.Bytearray;
       onAccount: Encoded.AccountAddress;
     },
   ) => Promise<{ signature: Encoded.Signature }>;

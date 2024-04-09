@@ -34,7 +34,7 @@ perl -i -pe 's/"prepare"/"rem-prepare"/g' package.json
 echo Build vue-cli-4-autorest test
 cd ./test/environment/vue-cli-4-autorest
 npm i
-npm run build
+NODE_OPTIONS=--openssl-legacy-provider npm run build
 cd ../../..
 
 perl -i -pe 's/"rem-prepare"/"prepare"/g' package.json

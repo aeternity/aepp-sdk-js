@@ -19,6 +19,7 @@ BaseError
 ├── UnsupportedProtocolError
 ├── NotImplementedError
 ├── UnsupportedVersionError
+├── LogicError
 │
 ├── InternalError
 │   └── UnexpectedTsError
@@ -78,7 +79,6 @@ BaseError
 │
 ├── TransactionError
 │   ├── DecodeError
-│   ├── EncodeError
 │   ├── PayloadLengthError
 │   ├── DryRunError
 │   ├── IllegalBidFeeError

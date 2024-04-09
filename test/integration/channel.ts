@@ -4,7 +4,7 @@ import {
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
-import { getSdk } from '.';
+import { getSdk, networkId, channelUrl } from '.';
 import {
   unpackTx,
   buildTxHash,
@@ -21,7 +21,6 @@ import {
   Contract,
   Channel,
   buildTx,
-  MemoryAccount,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 import {
@@ -30,24 +29,28 @@ import {
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual } from '../utils';
 
-const wsUrl = process.env.TEST_WS_URL ?? 'ws://localhost:3014/channel';
-
 const contractSourceCode = `
 contract Identity =
   entrypoint getArg(x : int) : int = x
 `;
 
 async function waitForChannel(channel: Channel): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     channel.on('statusChanged', (status: string) => {
-      if (status === 'open') {
-        resolve();
+      switch (status) {
+        case 'open':
+          resolve();
+          break;
+        case 'disconnected':
+          reject(new Error('Unexpected SC status: disconnected'));
+          break;
+        default:
       }
     });
   });
 }
 
-describe('Channel', () => {
+(networkId === 'ae_dev' ? describe : describe.skip)('Channel', () => {
   let aeSdkInitiatior: AeSdk;
   let aeSdkResponder: AeSdk;
   let initiatorCh: Channel;
@@ -88,29 +91,27 @@ describe('Channel', () => {
     return buildTx(signedTx);
   };
   const sharedParams: Omit<ChannelOptions, 'sign'> = {
-    url: wsUrl,
+    url: channelUrl,
     pushAmount: 3,
-    initiatorAmount: new BigNumber('100e18'),
-    responderAmount: new BigNumber('100e18'),
+    initiatorAmount: 1e15,
+    responderAmount: 1e15,
     channelReserve: 0,
     ttl: 10000,
     host: 'localhost',
-    port: 3001,
+    port: 3114,
     lockPeriod: 1,
     statePassword: 'correct horse battery staple',
-    debug: false,
     initiatorId: 'ak_',
     responderId: 'ak_',
     role: 'initiator',
+    minimumDepth: 0,
   };
 
   before(async () => {
     aeSdkInitiatior = await getSdk();
-    aeSdkResponder = await getSdk(0);
-    aeSdkResponder.addAccount(MemoryAccount.generate(), { select: true });
+    aeSdkResponder = await getSdk();
     sharedParams.initiatorId = aeSdkInitiatior.address;
     sharedParams.responderId = aeSdkResponder.address;
-    await aeSdkInitiatior.spend(new BigNumber('500e18').toString(), aeSdkResponder.address);
   });
 
   after(() => {
@@ -135,25 +136,27 @@ describe('Channel', () => {
       role: 'initiator',
       sign: initiatorSignTag,
     });
+    const initiatorChOpenPromise = waitForChannel(initiatorCh);
     responderCh = await Channel.initialize({
       ...sharedParams,
       role: 'responder',
       sign: responderSignTag,
     });
-    await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
+    const responderChOpenPromise = waitForChannel(responderCh);
+    await Promise.all([initiatorChOpenPromise, responderChOpenPromise]);
     expect(initiatorCh.round()).to.equal(1);
     expect(responderCh.round()).to.equal(1);
 
     sinon.assert.calledOnce(initiatorSignTag);
     sinon.assert.calledWithExactly(
       initiatorSignTag,
-      sinon.match('initiator_sign'),
+      'initiator_sign',
       sinon.match.string,
     );
     sinon.assert.calledOnce(responderSignTag);
     sinon.assert.calledWithExactly(
       responderSignTag,
-      sinon.match('responder_sign'),
+      'responder_sign',
       sinon.match.string,
     );
     const expectedTxParams = {
@@ -191,7 +194,7 @@ describe('Channel', () => {
     responderShouldRejectUpdate = false;
     const roundBefore = initiatorCh.round();
     assertNotNull(roundBefore);
-    const amount = new BigNumber('10e18');
+    const amount = 1e14;
     const result = await initiatorCh.update(
       aeSdkInitiatior.address,
       aeSdkResponder.address,
@@ -205,29 +208,29 @@ describe('Channel', () => {
     sinon.assert.calledOnce(responderSignTag);
     sinon.assert.calledWithExactly(
       responderSignTag,
-      sinon.match('update_ack'),
+      'update_ack',
       sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
-          amount: sinon.match(amount.toString()),
-          from: sinon.match(aeSdkInitiatior.address),
-          to: sinon.match(aeSdkResponder.address),
-          op: sinon.match('OffChainTransfer'),
-        }]),
-      }),
+      {
+        updates: [{
+          amount,
+          from: aeSdkInitiatior.address,
+          to: aeSdkResponder.address,
+          op: 'OffChainTransfer',
+        }],
+      },
     );
     sinon.assert.calledOnce(initiatorSign);
     sinon.assert.calledWithExactly(
       initiatorSign,
       sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
-          amount: sinon.match(amount.toString()),
-          from: sinon.match(aeSdkInitiatior.address),
-          to: sinon.match(aeSdkResponder.address),
-          op: sinon.match('OffChainTransfer'),
-        }]),
-      }),
+      {
+        updates: [{
+          amount,
+          from: aeSdkInitiatior.address,
+          to: aeSdkResponder.address,
+          op: 'OffChainTransfer',
+        }],
+      },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelOffChainTx>(tx.tag, Tag.ChannelOffChainTx);
@@ -235,7 +238,7 @@ describe('Channel', () => {
     expect(initiatorSign.firstCall.args[1]).to.eql({
       updates: [
         {
-          amount: amount.toString(),
+          amount,
           from: aeSdkInitiatior.address,
           to: aeSdkResponder.address,
           op: 'OffChainTransfer',
@@ -260,29 +263,29 @@ describe('Channel', () => {
     sinon.assert.calledOnce(responderSignTag);
     sinon.assert.calledWithExactly(
       responderSignTag,
-      sinon.match('update_ack'),
+      'update_ack',
       sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
-          amount: sinon.match(amount),
-          from: sinon.match(aeSdkResponder.address),
-          to: sinon.match(aeSdkInitiatior.address),
-          op: sinon.match('OffChainTransfer'),
-        }]),
-      }),
+      {
+        updates: [{
+          amount,
+          from: aeSdkResponder.address,
+          to: aeSdkInitiatior.address,
+          op: 'OffChainTransfer',
+        }],
+      },
     );
     sinon.assert.calledOnce(initiatorSign);
     sinon.assert.calledWithExactly(
       initiatorSign,
       sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
-          amount: sinon.match(amount),
-          from: sinon.match(aeSdkResponder.address),
-          to: sinon.match(aeSdkInitiatior.address),
-          op: sinon.match('OffChainTransfer'),
-        }]),
-      }),
+      {
+        updates: [{
+          amount,
+          from: aeSdkResponder.address,
+          to: aeSdkInitiatior.address,
+          op: 'OffChainTransfer',
+        }],
+      },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     expect(tx.tag).to.be.equal(Tag.ChannelOffChainTx);
@@ -374,7 +377,7 @@ describe('Channel', () => {
   });
 
   it('can request a withdraw and accept', async () => {
-    const amount = new BigNumber('2e18');
+    const amount = 1e14;
     const onOnChainTx = sinon.spy();
     const onOwnWithdrawLocked = sinon.spy();
     const onWithdrawLocked = sinon.spy();
@@ -396,27 +399,27 @@ describe('Channel', () => {
     sinon.assert.calledOnce(responderSignTag);
     sinon.assert.calledWithExactly(
       responderSignTag,
-      sinon.match('withdraw_ack'),
+      'withdraw_ack',
       sinon.match.string,
-      sinon.match({
+      {
         updates: [{
-          amount: amount.toString(),
+          amount,
           op: 'OffChainWithdrawal',
           to: aeSdkInitiatior.address,
         }],
-      }),
+      },
     );
     sinon.assert.calledOnce(initiatorSign);
     sinon.assert.calledWithExactly(
       initiatorSign,
       sinon.match.string,
-      sinon.match({
+      {
         updates: [{
-          amount: amount.toString(),
+          amount,
           op: 'OffChainWithdrawal',
           to: aeSdkInitiatior.address,
         }],
-      }),
+      },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelWithdrawTx>(tx.tag, Tag.ChannelWithdrawTx);
@@ -425,7 +428,7 @@ describe('Channel', () => {
   });
 
   it('can request a withdraw and reject', async () => {
-    const amount = new BigNumber('2e18');
+    const amount = 1e14;
     const onOnChainTx = sinon.spy();
     const onOwnWithdrawLocked = sinon.spy();
     const onWithdrawLocked = sinon.spy();
@@ -445,27 +448,27 @@ describe('Channel', () => {
     sinon.assert.calledOnce(responderSignTag);
     sinon.assert.calledWithExactly(
       responderSignTag,
-      sinon.match('withdraw_ack'),
+      'withdraw_ack',
       sinon.match.string,
-      sinon.match({
+      {
         updates: [{
-          amount: amount.toString(),
+          amount,
           op: 'OffChainWithdrawal',
           to: aeSdkInitiatior.address,
         }],
-      }),
+      },
     );
     sinon.assert.calledOnce(initiatorSign);
     sinon.assert.calledWithExactly(
       initiatorSign,
       sinon.match.string,
-      sinon.match({
+      {
         updates: [{
-          amount: amount.toString(),
+          amount,
           op: 'OffChainWithdrawal',
           to: aeSdkInitiatior.address,
         }],
-      }),
+      },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelWithdrawTx>(tx.tag, Tag.ChannelWithdrawTx);
@@ -496,7 +499,7 @@ describe('Channel', () => {
   });
 
   it('can request a deposit and accept', async () => {
-    const amount = new BigNumber('2e18');
+    const amount = 1e15;
     const onOnChainTx = sinon.spy();
     const onOwnDepositLocked = sinon.spy();
     const onDepositLocked = sinon.spy();
@@ -518,27 +521,27 @@ describe('Channel', () => {
     sinon.assert.calledOnce(responderSignTag);
     sinon.assert.calledWithExactly(
       responderSignTag,
-      sinon.match('deposit_ack'),
+      'deposit_ack',
       sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
+      {
+        updates: [{
           amount: amount.toString(),
           op: 'OffChainDeposit',
           from: aeSdkInitiatior.address,
-        }]),
-      }),
+        }],
+      },
     );
     sinon.assert.calledOnce(initiatorSign);
     sinon.assert.calledWithExactly(
       initiatorSign,
       sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
+      {
+        updates: [{
           amount: amount.toString(),
           op: 'OffChainDeposit',
           from: aeSdkInitiatior.address,
-        }]),
-      }),
+        }],
+      },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelDepositTx>(tx.tag, Tag.ChannelDepositTx);
@@ -547,7 +550,7 @@ describe('Channel', () => {
   });
 
   it('can request a deposit and reject', async () => {
-    const amount = new BigNumber('2e18');
+    const amount = 1e15;
     const onOnChainTx = sinon.spy();
     const onOwnDepositLocked = sinon.spy();
     const onDepositLocked = sinon.spy();
@@ -567,15 +570,15 @@ describe('Channel', () => {
     sinon.assert.calledOnce(responderSignTag);
     sinon.assert.calledWithExactly(
       responderSignTag,
-      sinon.match('deposit_ack'),
+      'deposit_ack',
       sinon.match.string,
-      sinon.match({
+      {
         updates: [{
           amount: amount.toString(),
           op: 'OffChainDeposit',
           from: aeSdkInitiatior.address,
         }],
-      }),
+      },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelDepositTx>(tx.tag, Tag.ChannelDepositTx);
@@ -612,7 +615,7 @@ describe('Channel', () => {
     sinon.assert.calledOnce(responderSignTag);
     sinon.assert.calledWithExactly(
       responderSignTag,
-      sinon.match('shutdown_sign_ack'),
+      'shutdown_sign_ack',
       sinon.match.string,
       sinon.match.any,
     );
@@ -685,7 +688,7 @@ describe('Channel', () => {
     const { signedTx } = await initiatorCh.update(
       initiatorAddr,
       responderAddr,
-      new BigNumber('3e18'),
+      1e14,
       initiatorSign,
     );
     assertNotNull(signedTx);
@@ -840,10 +843,10 @@ describe('Channel', () => {
     sinon.assert.calledTwice(responderSignTag);
     sinon.assert.calledWithExactly(
       responderSignTag,
-      sinon.match('update_ack'),
+      'update_ack',
       sinon.match.string,
-      sinon.match({
-        updates: sinon.match([{
+      {
+        updates: [{
           abi_version: AbiVersion.Fate,
           call_data: callData,
           code: await contract.$compile(),
@@ -851,8 +854,8 @@ describe('Channel', () => {
           op: 'OffChainNewContract',
           owner: sinon.match.string,
           vm_version: VmVersion.Fate,
-        }]),
-      }),
+        }],
+      },
     );
     async function getContractAddresses(channel: Channel): Promise<Encoded.ContractAddress[]> {
       return Object.keys((await channel.state()).trees.contracts) as Encoded.ContractAddress[];
@@ -868,7 +871,7 @@ describe('Channel', () => {
     await responderCh.createContract({
       code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
-      deposit: new BigNumber('10e18'),
+      deposit: 1e14,
       vmVersion: VmVersion.Fate,
       abiVersion: AbiVersion.Fate,
     }, responderSign);
@@ -888,7 +891,7 @@ describe('Channel', () => {
     const result = await initiatorCh.createContract({
       code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
-      deposit: new BigNumber('10e18'),
+      deposit: 1e14,
       vmVersion: VmVersion.Fate,
       abiVersion: AbiVersion.Fate,
     }, initiatorSign);
@@ -902,7 +905,7 @@ describe('Channel', () => {
       {
         code: await contract.$compile(),
         callData: contract._calldata.encode('Identity', 'init', []),
-        deposit: new BigNumber('10e18'),
+        deposit: 1e14,
         vmVersion: VmVersion.Fate,
         abiVersion: AbiVersion.Fate,
       },
@@ -916,7 +919,7 @@ describe('Channel', () => {
     const result = await initiatorCh.createContract({
       code: await contract.$compile(),
       callData: contract._calldata.encode('Identity', 'init', []),
-      deposit: new BigNumber('10e18'),
+      deposit: 1e14,
       vmVersion: VmVersion.Fate,
       abiVersion: AbiVersion.Fate,
     }, initiatorSign);
@@ -932,8 +935,9 @@ describe('Channel', () => {
     const addresses = [aeSdkInitiatior.address, aeSdkResponder.address, contractAddr];
     const balances = await initiatorCh.balances(addresses);
     balances.should.be.an('object');
-    balances[aeSdkInitiatior.address].should.be.a('string');
-    balances[aeSdkResponder.address].should.be.a('string');
+    // TODO: use the same type not depending on value after fixing https://github.com/aeternity/aepp-sdk-js/issues/1926
+    balances[aeSdkInitiatior.address].should.be.a('number');
+    balances[aeSdkResponder.address].should.be.a('number');
     balances[contractAddr].should.be.equal(1000);
     expect(balances).to.eql(await responderCh.balances(addresses));
   });
@@ -1227,7 +1231,7 @@ describe('Channel', () => {
     });
 
     it('when posting an update with insufficient balance', async () => {
-      await update({ amount: new BigNumber('999e18') }).should.eventually.be.rejectedWith(InsufficientBalanceError, 'Insufficient balance');
+      await update({ amount: 999e18 }).should.eventually.be.rejectedWith(InsufficientBalanceError, 'Insufficient balance');
     });
 
     it('when posting an update with incorrect address', async () => {

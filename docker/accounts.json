@@ -1,0 +1,6 @@
+[{
+  "pub_key": "ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E",
+  "initial_balance": 10000000000000000000000,
+  "// TODO: encode using base58 after fixing": "https://github.com/aeternity/aeplugin_dev_mode/issues/32",
+  "priv_key": "sk_nr177aDHmvcqQuzjghpW7/FjWbbfN2zwSa7plVZfAi+hhfna"
+}]

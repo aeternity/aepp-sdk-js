@@ -1,5 +1,0 @@
-version: 2
-mkdocs:
-  configuration: mkdocs.yml
-conda:
-  environment: docs/conda.yml
