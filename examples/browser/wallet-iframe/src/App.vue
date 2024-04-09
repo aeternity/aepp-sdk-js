@@ -129,9 +129,8 @@ export default {
       this.aeSdk.selectAccount(this.address);
     },
     async switchNode() {
-      this.nodeName = (await this.aeSdk.getNodesInPool())
-        .map(({ name }) => name)
-        .find((name) => name !== this.nodeName);
+      const names = (await this.aeSdk.getNodesInPool()).map(({ name }) => name);
+      this.nodeName = names[(names.indexOf(this.nodeName) + 1) % names.length];
       this.aeSdk.selectNode(this.nodeName);
     },
     updateClientStatus() {
@@ -257,6 +256,7 @@ export default {
       nodes: [
         { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
         { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
+        { name: 'ae_next', instance: new Node('https://next.aeternity.io') },
       ],
       accounts: [
         new AccountMemoryProtected('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'),

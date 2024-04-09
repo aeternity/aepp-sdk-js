@@ -2,10 +2,6 @@ import { shallowRef } from 'vue';
 import { createStore } from 'vuex';
 import { AeSdkAepp, Node, CompilerHttp } from '@aeternity/aepp-sdk';
 
-const TESTNET_NODE_URL = 'https://testnet.aeternity.io';
-const MAINNET_NODE_URL = 'https://mainnet.aeternity.io';
-const COMPILER_URL = 'https://v7.compiler.aepps.com';
-
 const store = createStore({
   state: {
     address: undefined,
@@ -14,10 +10,11 @@ const store = createStore({
     aeSdk: shallowRef(new AeSdkAepp({
       name: 'Simple æpp',
       nodes: [
-        { name: 'testnet', instance: new Node(TESTNET_NODE_URL) },
-        { name: 'mainnet', instance: new Node(MAINNET_NODE_URL) },
+        { name: 'testnet', instance: new Node('https://testnet.aeternity.io') },
+        { name: 'mainnet', instance: new Node('https://mainnet.aeternity.io') },
+        { name: 'next', instance: new Node('https://next.aeternity.io') },
       ],
-      onCompiler: new CompilerHttp(COMPILER_URL),
+      onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
       async onNetworkChange({ networkId }) {
         const [{ name }] = (await this.getNodesInPool())
           .filter((node) => node.nodeNetworkId === networkId);
