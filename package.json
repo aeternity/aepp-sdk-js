@@ -111,7 +111,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aeternity/aepp-sdk-js"
+    "url": "git+https://github.com/aeternity/aepp-sdk-js.git"
   },
   "devDependencies": {
     "@babel/cli": "^7.23.9",
