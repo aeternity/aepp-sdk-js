@@ -10,9 +10,6 @@ services:
       interval: 2s
     volumes:
       - ./docker/aeternity.yaml:/home/aeternity/node/aeternity.yaml
-      - ./docker/accounts.json:/home/aeternity/node/data/aeplugin_dev_mode/devmode_prefunded_accounts.json
-      # TODO: remove after merging https://github.com/aeternity/aeternity/pull/4319
-      - ./docker/accounts-pub.json:/home/aeternity/node/data/aeplugin_dev_mode/devmode_prefunded_accounts-PUB.json
     stop_grace_period: 0s
 
   emitter:
