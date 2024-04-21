@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.1](https://github.com/aeternity/aepp-sdk-js/compare/v13.3.0...v13.3.1) (2024-04-19)
+
+
+### Bug Fixes
+
+* **node:** mark as compatible with 7.0.0 ([562eda9](https://github.com/aeternity/aepp-sdk-js/commit/562eda9d50b73b15801a1f78c8f0578a425acfe9))
+
 ## [13.3.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.2.2...v13.3.0) (2024-04-08)
 
 

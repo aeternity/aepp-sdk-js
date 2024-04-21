@@ -17,7 +17,7 @@ export async function getCachedIncreasedGasPrice(node: Node): Promise<bigint> {
   // TODO: remove after requiring node@6.13.0
   const { nodeVersion } = await node._getCachedStatus();
   // TODO: remove remove '6.12.0+' check after releasing 6.13.0
-  if (!nodeVersion.startsWith('6.12.0+') && !semverSatisfies(nodeVersion, '6.13.0', '7.0.0')) {
+  if (!nodeVersion.startsWith('6.12.0+') && !semverSatisfies(nodeVersion, '6.13.0', '8.0.0')) {
     return 0n;
   }
 

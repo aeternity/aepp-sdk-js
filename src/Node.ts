@@ -137,7 +137,7 @@ export default class Node extends (NodeTransformed as unknown as NodeTransformed
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        ...ignoreVersion ? [] : [genVersionCheckPolicy('node', getVersion, '6.2.0', '7.0.0')],
+        ...ignoreVersion ? [] : [genVersionCheckPolicy('node', getVersion, '6.2.0', '8.0.0')],
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
