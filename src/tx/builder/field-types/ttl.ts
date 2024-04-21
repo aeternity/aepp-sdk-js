@@ -23,7 +23,7 @@ export default {
       onNode?: Node;
       absoluteTtl?: boolean;
       _isInternalBuild?: boolean;
-    } & Parameters<typeof _getPollInterval>[1],
+    } & Omit<Parameters<typeof _getPollInterval>[1], 'onNode'>,
   ) {
     if (absoluteTtl !== true && value !== 0 && (value != null || _isInternalBuild === true)) {
       if (onNode == null) throw new ArgumentError('onNode', 'provided', onNode);
