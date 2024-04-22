@@ -7,19 +7,20 @@ npm run docs:api
 
 # TODO: revisit --ignore-scripts after solving https://github.com/npm/cli/issues/4202
 perl -i -pe 's/"prepare"/"rem-prepare"/g' package.json
+rm -rf docs/examples/browser
 mkdir -p docs/examples/browser
 
 echo Build example aepp
 cd ./examples/browser/aepp
 npm i
 VUE_APP_WALLET_URL=../wallet-iframe/ PUBLIC_PATH=./ npm run build -- --report
-mv -f dist/ ../../../docs/examples/browser/aepp
+mv dist/ ../../../docs/examples/browser/aepp
 
 echo Build example wallet-iframe
 cd ../wallet-iframe
 npm i
 VUE_APP_AEPP_URL=../aepp/ PUBLIC_PATH=./ npm run build -- --report
-mv -f dist/ ../../../docs/examples/browser/wallet-iframe
+mv dist/ ../../../docs/examples/browser/wallet-iframe
 
 echo Build example wallet-web-extension
 cd ../wallet-web-extension
