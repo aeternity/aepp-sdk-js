@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.2](https://github.com/aeternity/aepp-sdk-js/compare/v13.3.1...v13.3.2) (2024-04-22)
+
+
+### Bug Fixes
+
+* **contract:** detect if ACI doesn't match called contract ([8c4287f](https://github.com/aeternity/aepp-sdk-js/commit/8c4287f2cdd1690ed2e07410a322659e4f17f2d3))
+* ttl validation error in dev mode by reducing polling intervals ([6f8cdc9](https://github.com/aeternity/aepp-sdk-js/commit/6f8cdc9dd82a7dd7f146739d472dc07018f8d230))
+
 ### [13.3.1](https://github.com/aeternity/aepp-sdk-js/compare/v13.3.0...v13.3.1) (2024-04-19)
 
 
