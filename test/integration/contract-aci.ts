@@ -19,6 +19,7 @@ import {
   NoSuchContractFunctionError,
   ConsensusProtocolVersion,
   InvalidTxError,
+  ContractError,
 } from '../../src';
 import { getSdk } from '.';
 import {
@@ -360,6 +361,18 @@ describe('Contract instance', () => {
       { aci: testContractAci, address: testContract.$options.address },
     );
     expect((await contract.intFn(3)).decodedResult).to.be.equal(3n);
+  });
+
+  it('fails if aci doesn\'t match called contract', async () => {
+    const aci = structuredClone(testContractAci);
+    const fn = aci.at(-1)?.contract?.functions.find(({ name }) => name === 'intFn');
+    assertNotNull(fn);
+    fn.arguments.push(fn.arguments[0]);
+    const contract = await aeSdk.initializeContract<{
+      intFn: (a: InputNumber, b: InputNumber) => bigint;
+    }>({ aci, address: testContract.$options.address });
+    await expect(contract.intFn(3, 2)).to.be
+      .rejectedWith(ContractError, 'ACI doesn\'t match called contract. Error provided by node: Expected 1 arguments, got 2');
   });
 
   it('deploys and calls by bytecode and aci', async () => {

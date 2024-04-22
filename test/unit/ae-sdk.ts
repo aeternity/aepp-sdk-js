@@ -4,8 +4,8 @@ import '../index';
 import { AeSdk } from '../../src';
 
 describe('AeSdk', () => {
-  it('executes methods without node, compiler, accounts', () => {
-    const aeSdk = new AeSdk();
-    expect(aeSdk._getPollInterval('block')).to.be.a('number');
+  it('executes methods without node, compiler, accounts', async () => {
+    const aeSdk = new AeSdk({ _expectedMineRate: 1000 });
+    expect(await aeSdk._getPollInterval('key-block')).to.be.equal(333);
   });
 });

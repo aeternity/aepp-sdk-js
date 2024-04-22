@@ -171,6 +171,9 @@ class Contract<M extends ContractMethodsBase> {
         break;
       case 'error':
         message = decode(returnValue).toString();
+        if (/Expected \d+ arguments, got \d+/.test(message)) {
+          throw new ContractError(`ACI doesn't match called contract. Error provided by node: ${message}`);
+        }
         break;
       default:
         throw new InternalError(`Unknown return type: ${returnType}`);

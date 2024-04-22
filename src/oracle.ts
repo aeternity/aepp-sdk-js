@@ -34,13 +34,12 @@ type OracleQueries = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['orac
 export function pollForQueries(
   oracleId: Encoded.OracleAddress,
   onQuery: (query: OracleQueries[number]) => void,
-  { interval, onNode, ...options }: { interval?: number; onNode: Node }
+  { interval, ...options }: { interval?: number; onNode: Node }
   & Parameters<typeof _getPollInterval>[1],
 ): () => void {
-  interval ??= _getPollInterval('microblock', options);
   const knownQueryIds = new Set();
   const checkNewQueries = async (): Promise<void> => {
-    const queries = ((await onNode.getOracleQueriesByPubkey(oracleId)).oracleQueries ?? [])
+    const queries = ((await options.onNode.getOracleQueriesByPubkey(oracleId)).oracleQueries ?? [])
       .filter(({ id }) => !knownQueryIds.has(id));
     queries.forEach((query) => {
       knownQueryIds.add(query.id);
@@ -52,6 +51,7 @@ export function pollForQueries(
 
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   (async () => {
+    interval ??= await _getPollInterval('micro-block', options);
     while (!stopped) { // eslint-disable-line no-unmodified-loop-condition
       // TODO: allow to handle this error somehow
       await checkNewQueries().catch(console.error);
@@ -74,19 +74,19 @@ export function pollForQueries(
 export async function pollForQueryResponse(
   oracleId: Encoded.OracleAddress,
   queryId: Encoded.OracleQueryId,
-  { interval, onNode, ...options }:
+  { interval, ...options }:
   { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<string> {
-  interval ??= _getPollInterval('microblock', options);
+  interval ??= await _getPollInterval('micro-block', options);
   let height;
   let ttl;
   let response;
   do {
-    ({ response, ttl } = await onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId));
+    ({ response, ttl } = await options.onNode.getOracleQueryByPubkeyAndQueryId(oracleId, queryId));
     const responseBuffer = decode(response as Encoded.OracleResponse);
     if (responseBuffer.length > 0) return responseBuffer.toString();
     await pause(interval);
-    height = await getHeight({ ...options, onNode, cached: true });
+    height = await getHeight({ ...options, cached: true });
   } while (ttl >= height);
   throw new RequestTimedOutError(height);
 }

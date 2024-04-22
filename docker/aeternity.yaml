@@ -22,3 +22,5 @@ chain:
   hard_forks:
     "1": 0
     "6": 1
+  genesis_accounts:
+    ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E: 10000000000000000000000
