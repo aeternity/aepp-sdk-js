@@ -21,15 +21,25 @@ import {
  * @param type - Type
  * @param options - Options
  */
-export function _getPollInterval(
-  type: 'block' | 'microblock', // TODO: rename to 'key-block' | 'micro-block'
-  { _expectedMineRate = 180000, _microBlockCycle = 3000 }:
-  { _expectedMineRate?: number; _microBlockCycle?: number },
-): number {
-  const base = {
-    block: _expectedMineRate,
-    microblock: _microBlockCycle,
-  }[type];
+export async function _getPollInterval(
+  type: 'key-block' | 'micro-block',
+  { _expectedMineRate, _microBlockCycle, onNode }:
+  { _expectedMineRate?: number; _microBlockCycle?: number; onNode: Node },
+): Promise<number> {
+  const getVal = async (
+    t: string,
+    val: number | undefined,
+    devModeDef: number,
+    def: number,
+  ): Promise<number | null> => {
+    if (t !== type) return null;
+    if (val != null) return val;
+    return await onNode?.getNetworkId() === 'ae_dev' ? devModeDef : def;
+  };
+
+  const base = await getVal('key-block', _expectedMineRate, 0, 180000)
+    ?? await getVal('micro-block', _microBlockCycle, 0, 3000)
+    ?? (() => { throw new InternalError(`Unknown type: ${type}`); })();
   return Math.floor(base / 3);
 }
 
@@ -53,7 +63,7 @@ export async function getHeight(
   const onNode = unwrapProxy(options.onNode);
   if (cached) {
     const cache = heightCache.get(onNode);
-    if (cache != null && cache.time > Date.now() - _getPollInterval('block', options)) {
+    if (cache != null && cache.time > Date.now() - await _getPollInterval('key-block', options)) {
       return cache.height;
     }
   }
@@ -77,21 +87,21 @@ export async function getHeight(
 export async function poll(
   th: Encoded.TxHash,
   {
-    blocks = 5, interval, onNode, ...options
+    blocks = 5, interval, ...options
   }:
   { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<TransformNodeType<SignedTx>> {
-  interval ??= _getPollInterval('microblock', options);
+  interval ??= await _getPollInterval('micro-block', options);
   let max;
   do {
-    const tx = await onNode.getTransactionByHash(th);
+    const tx = await options.onNode.getTransactionByHash(th);
     if (tx.blockHeight !== -1) return tx;
     if (max == null) {
       max = tx.tx.ttl !== 0 ? -1
-        : await getHeight({ ...options, onNode, cached: true }) + blocks;
+        : await getHeight({ ...options, cached: true }) + blocks;
     }
     await pause(interval);
-  } while (max === -1 ? true : await getHeight({ ...options, onNode, cached: true }) < max);
+  } while (max === -1 ? true : await getHeight({ ...options, cached: true }) < max);
   throw new TxTimedOutError(blocks, th);
 }
 
@@ -106,14 +116,14 @@ export async function poll(
  */
 export async function awaitHeight(
   height: number,
-  { interval, onNode, ...options }:
+  { interval, ...options }:
   { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<number> {
-  interval ??= Math.min(_getPollInterval('block', options), 5000);
+  interval ??= Math.min(await _getPollInterval('key-block', options), 5000);
   let currentHeight;
   do {
     if (currentHeight != null) await pause(interval);
-    currentHeight = await getHeight({ onNode });
+    currentHeight = await getHeight(options);
   } while (currentHeight < height);
   return currentHeight;
 }
