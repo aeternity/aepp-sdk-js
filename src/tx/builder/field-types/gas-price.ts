@@ -16,10 +16,7 @@ export async function getCachedIncreasedGasPrice(node: Node): Promise<bigint> {
 
   // TODO: remove after requiring node@6.13.0
   const { nodeVersion } = await node._getCachedStatus();
-  // TODO: remove remove '6.12.0+' check after releasing 6.13.0
-  if (!nodeVersion.startsWith('6.12.0+') && !semverSatisfies(nodeVersion, '6.13.0', '8.0.0')) {
-    return 0n;
-  }
+  if (!semverSatisfies(nodeVersion, '6.13.0')) return 0n;
 
   const { minGasPrice, utilization } = (await node.getRecentGasPrices())[0];
   let gasPrice = utilization < 70 ? 0n : BigInt(
