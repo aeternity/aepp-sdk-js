@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - run: |
-          wget -q https://packages.erlang-solutions.com/erlang/debian/pool/esl-erlang_25.0.4-1~ubuntu~jammy_amd64.deb
-          sudo apt install --allow-downgrades ./esl-erlang_25.0.4-1~ubuntu~jammy_amd64.deb
+          wget -q https://packages.erlang-solutions.com/erlang/debian/pool/esl-erlang_25.2.3-1~ubuntu~jammy_amd64.deb
+          sudo apt install ./esl-erlang_25.2.3-1~ubuntu~jammy_amd64.deb
       - uses: actions/checkout@v4
         with:
           fetch-depth: 100
