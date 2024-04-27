@@ -358,11 +358,12 @@ export default class AeSdkWallet extends AeSdk {
    * @returns Object with wallet information
    */
   async getWalletInfo(): Promise<WalletInfo> {
+    const { origin } = window.location;
     return {
       id: this.id,
       name: this.name,
       networkId: await this.api.getNetworkId(),
-      origin: window.location.origin,
+      origin: origin === 'file://' ? '*' : origin,
       type: this._type,
     };
   }
