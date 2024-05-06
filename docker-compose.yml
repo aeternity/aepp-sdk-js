@@ -1,4 +1,3 @@
-version: '3'
 services:
   node:
     # TODO: switch to master after merging https://github.com/aeternity/aeternity/pull/4303

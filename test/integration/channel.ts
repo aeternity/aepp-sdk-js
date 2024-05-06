@@ -96,7 +96,6 @@ async function waitForChannel(channel: Channel): Promise<void> {
     initiatorAmount: 1e15,
     responderAmount: 1e15,
     channelReserve: 0,
-    ttl: 10000,
     host: 'localhost',
     port: 3114,
     lockPeriod: 1,
