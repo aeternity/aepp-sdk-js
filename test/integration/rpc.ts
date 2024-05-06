@@ -72,8 +72,7 @@ const getConnections = (): { walletWindow: ImplPostMessage; aeppWindow: ImplPost
   return { walletWindow, aeppWindow };
 };
 
-describe('Aepp<->Wallet', function aeppWallet() {
-  this.timeout(8000);
+describe('Aepp<->Wallet', () => {
   const connections = getConnections();
   const connectionFromWalletToAepp = new BrowserWindowMessageConnection({
     self: connections.walletWindow,

@@ -166,9 +166,9 @@ describe('CompilerHttp', () => {
   });
 
   it('throws exception if used invalid compiler url', async () => {
-    const c = new CompilerHttpNode('https://compiler.aepps.comas');
+    const c = new CompilerHttpNode('https://compilaer.aepps.com');
     await expect(c.compileBySourceCode('test'))
-      .to.be.rejectedWith('getaddrinfo ENOTFOUND compiler.aepps.comas');
+      .to.be.rejectedWith('getaddrinfo ENOTFOUND compilaer.aepps.com');
   });
 
   describe('getFileSystem', () => {
