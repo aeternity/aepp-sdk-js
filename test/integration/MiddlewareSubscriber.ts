@@ -125,7 +125,7 @@ describe('MiddlewareSubscriber', () => {
       }),
     ]);
     expect(transaction).to.be.eql(await fetchNodeRaw(`transactions/${hash}`));
-  }).timeout(80_000);
+  });
 
   // TODO: enable after fixing https://github.com/aeternity/ae_mdw/issues/1337
   it.skip('subscribes for account', async () => {
@@ -138,7 +138,7 @@ describe('MiddlewareSubscriber', () => {
       });
     });
     expect(transaction).to.be.eql(await fetchNodeRaw(`transactions/${hash}`));
-  }).timeout(80_000);
+  });
 
   // TODO: enable after solving https://github.com/aeternity/ae_mdw/issues/1336
   it.skip('subscribes for micro block', async () => {
@@ -153,7 +153,7 @@ describe('MiddlewareSubscriber', () => {
       }),
     ]);
     expect(microBlock).to.be.eql(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`));
-  }).timeout(80_000);
+  });
 
   // TODO: enable after solving https://github.com/aeternity/ae_mdw/issues/1336
   it.skip('subscribes simultaneously for micro block', async () => {
@@ -177,5 +177,5 @@ describe('MiddlewareSubscriber', () => {
     ]);
     expect(transaction).to.be.eql(await fetchNodeRaw(`transactions/${hash}`));
     expect(microBlock).to.be.eql(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`));
-  }).timeout(80_000);
+  });
 });
