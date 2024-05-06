@@ -48,7 +48,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
   });
 }
 
-(networkId === 'ae_dev' ? describe : describe.skip)('Channel', () => {
+describe('Channel', () => {
   let aeSdk: AeSdk;
   let initiator: MemoryAccount;
   let responder: MemoryAccount;
