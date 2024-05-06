@@ -174,7 +174,6 @@ export interface ChannelOptions {
    * Applicable only for responder (default: timeout_idle's value)
    */
   timeoutAwaitingOpen?: number;
-  statePassword?: string;
   /**
    * Log websocket communication and state changes
    */
