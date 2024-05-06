@@ -27,7 +27,7 @@ import {
   ChannelOptions, notify, SignTx, SignTxWithTag,
 } from '../../src/channel/internal';
 import { appendSignature } from '../../src/channel/handlers';
-import { assertNotNull, ensureEqual } from '../utils';
+import { assertNotNull, ensureEqual, ensureInstanceOf } from '../utils';
 
 const contractSourceCode = `
 contract Identity =
@@ -176,8 +176,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
   });
 
   it('emits error on handling incoming messages', async () => {
-    const getError = new Promise<ChannelIncomingMessageError>((resolve) => {
-      function handler(error: ChannelIncomingMessageError): void {
+    const getError = new Promise<Error>((resolve) => {
+      function handler(error: Error): void {
         resolve(error);
         initiatorCh.off('error', handler);
       }
@@ -185,6 +185,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
     notify(initiatorCh, 'not-existing-method');
     const error = await getError;
+    ensureInstanceOf(error, ChannelIncomingMessageError);
     expect(error.incomingMessage.error.message).to.be.equal('Method not found');
     expect(() => { throw error.handlerError; })
       .to.throw(UnknownChannelStateError, 'State Channels FSM entered unknown state');
