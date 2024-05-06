@@ -52,7 +52,7 @@ export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
  */
-export interface ChannelOptions {
+interface CommonChannelOptions {
   existingFsmId?: Encoded.Bytearray;
   /**
    * Channel url (for example: "ws://localhost:3001")
@@ -92,17 +92,9 @@ export interface ChannelOptions {
    */
   ttl?: number;
   /**
-   * Host of the responder's node
-   */
-  host: string;
-  /**
-   * The port of the responders node
+   * The port of the responder's node
    */
   port: number;
-  /**
-   * Participant role
-   */
-  role: 'initiator' | 'responder';
   /**
    * How to calculate minimum depth (default: txfee)
    */
@@ -184,6 +176,22 @@ export interface ChannelOptions {
   sign: SignTxWithTag;
   offchainTx?: Encoded.Transaction;
 }
+
+export type ChannelOptions = CommonChannelOptions & ({
+  /**
+   * Participant role
+   */
+  role: 'initiator';
+  /**
+   * Host of the responder's node
+   */
+  host: string;
+} | {
+  /**
+   * Participant role
+   */
+  role: 'responder';
+});
 
 export interface ChannelHandler extends Function {
   enter?: Function;

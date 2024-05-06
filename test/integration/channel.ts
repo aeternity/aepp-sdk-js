@@ -91,7 +91,6 @@ async function waitForChannel(channel: Channel): Promise<void> {
     initiatorAmount: 1e15,
     responderAmount: 1e15,
     channelReserve: 0,
-    host: 'localhost',
     port: 3114,
     lockPeriod: 1,
     initiatorId: 'ak_' as Encoded.AccountAddress,
@@ -100,6 +99,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
   };
   const initiatorParams = {
     role: 'initiator',
+    host: 'localhost',
     sign: initiatorSignTag,
   } as const;
   const responderParams = {
