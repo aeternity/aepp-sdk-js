@@ -56,8 +56,6 @@ async function waitForChannel(channel: Channel): Promise<void> {
   let initiatorCh: Channel;
   let responderCh: Channel;
   let responderShouldRejectUpdate: number | boolean;
-  let existingChannelId: Encoded.Bytearray;
-  let offchainTx: string;
   let contractAddress: Encoded.ContractAddress;
   let callerNonce: number;
   let contract: Contract<{}>;
@@ -626,6 +624,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
     // TODO: check `initiatorAmountFinal` and `responderAmountFinal`
   });
 
+  let existingChannelId: Encoded.Channel;
+  let offchainTx: Encoded.Transaction;
   it('can leave a channel', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
@@ -639,12 +639,11 @@ async function waitForChannel(channel: Channel): Promise<void> {
       role: 'responder',
       sign: responderSignTag,
     });
-
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     initiatorCh.round(); // existingChannelRound
     const result = await initiatorCh.leave();
-    result.channelId.should.be.a('string');
-    result.signedTx.should.be.a('string');
+    expect(result.channelId).to.satisfy((t: string) => t.startsWith('ch_'));
+    expect(result.signedTx).to.satisfy((t: string) => t.startsWith('tx_'));
     existingChannelId = result.channelId;
     offchainTx = result.signedTx;
   });
@@ -654,6 +653,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
       ...sharedParams,
       role: 'initiator',
       port: 3002,
+      // @ts-expect-error TODO: use existingChannelId instead existingFsmId
       existingFsmId: existingChannelId,
       offchainTx,
       sign: initiatorSignTag,
@@ -1091,6 +1091,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     await aeSdkInitiatior.sendTransaction(snapshotSoloTx);
   });
 
+  // https://github.com/aeternity/protocol/blob/d634e7a3f3110657900759b183d0734e61e5803a/node/api/channels_api_usage.md#reestablish
   it('can reconnect', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
