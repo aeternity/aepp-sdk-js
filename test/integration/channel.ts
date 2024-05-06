@@ -670,7 +670,6 @@ async function waitForChannel(channel: Channel): Promise<void> {
     initiatorCh = await Channel.initialize({
       ...sharedParams,
       ...initiatorParams,
-      port: 3002,
       // @ts-expect-error TODO: use existingChannelId instead existingFsmId
       existingFsmId: existingChannelId,
       offchainTx,
@@ -685,15 +684,14 @@ async function waitForChannel(channel: Channel): Promise<void> {
   it('can solo close a channel', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
+    await recreateAccounts();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
       ...initiatorParams,
-      port: 3003,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
       ...responderParams,
-      port: 3003,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
 
@@ -718,6 +716,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
     await aeSdk.sendTransaction(closeSoloTx, { onAccount: initiator });
+
     const settleTx = await aeSdk.buildTx({
       tag: Tag.ChannelSettleTx,
       channelId: await initiatorCh.id(),
@@ -727,6 +726,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
     const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
     await aeSdk.sendTransaction(settleTx, { onAccount: initiator });
+
     const [initiatorBalanceAfterClose, responderBalanceAfterClose] = await getBalances();
     new BigNumber(initiatorBalanceAfterClose)
       .minus(initiatorBalanceBeforeClose)
@@ -747,13 +747,11 @@ async function waitForChannel(channel: Channel): Promise<void> {
       ...sharedParams,
       ...initiatorParams,
       lockPeriod: 2,
-      port: 3004,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
       ...responderParams,
       lockPeriod: 2,
-      port: 3004,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     const [initiatorBalanceBeforeClose, responderBalanceBeforeClose] = await getBalances();
@@ -778,6 +776,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
     await aeSdk.sendTransaction(closeSoloTx, { onAccount: initiator });
+
     assertNotNull(recentUpdate.signedTx);
     const slashTx = await aeSdk.buildTx({
       tag: Tag.ChannelSlashTx,
@@ -797,6 +796,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
     const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
     await aeSdk.sendTransaction(settleTx, { onAccount: responder });
+
     const [initiatorBalanceAfterClose, responderBalanceAfterClose] = await getBalances();
     new BigNumber(initiatorBalanceAfterClose)
       .minus(initiatorBalanceBeforeClose)
@@ -817,12 +817,10 @@ async function waitForChannel(channel: Channel): Promise<void> {
     initiatorCh = await Channel.initialize({
       ...sharedParams,
       ...initiatorParams,
-      port: 3005,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
       ...responderParams,
-      port: 3005,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     contract = await Contract.initialize({ ...aeSdk.getContext(), sourceCode: contractSourceCode });
@@ -1085,7 +1083,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
     // TODO: contractState deserialization
   });
-  // TODO fix this
+
   it.skip('can post snapshot solo transaction', async () => {
     const snapshotSoloTx = await aeSdk.buildTx({
       tag: Tag.ChannelSnapshotSoloTx,
@@ -1093,6 +1091,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
       fromId: initiator.address,
       payload: await initiatorSignedTx(),
     });
+    // TODO: fix this, error: invalid_at_protocol
     await aeSdk.sendTransaction(snapshotSoloTx, { onAccount: initiator });
   });
 
@@ -1103,14 +1102,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
     initiatorCh = await Channel.initialize({
       ...sharedParams,
       ...initiatorParams,
-      port: 3006,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
       ...responderParams,
-      port: 3006,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
+    expect(await initiatorCh.round()).to.be.equal(1);
     const result = await initiatorCh.update(
       initiator.address,
       responder.address,
@@ -1124,12 +1122,12 @@ async function waitForChannel(channel: Channel): Promise<void> {
     const ch = await Channel.initialize({
       ...sharedParams,
       ...initiatorParams,
-      port: 3006,
       existingChannelId: channelId,
       existingFsmId: fsmId,
     });
     await waitForChannel(ch);
-    ch.fsmId().should.equal(fsmId);
+    expect(ch.fsmId()).to.be.equal(fsmId);
+    expect(await ch.round()).to.be.equal(2);
     const state = await ch.state();
     assertNotNull(state.signedTx);
     expect(state.signedTx.encodedTx.tag).to.be.equal(Tag.ChannelOffChainTx);
@@ -1141,14 +1139,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
     initiatorCh = await Channel.initialize({
       ...sharedParams,
       ...initiatorParams,
-      port: 3007,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
       ...responderParams,
-      port: 3007,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
+    expect(await responderCh.round()).to.be.equal(1);
     initiatorCh.disconnect();
     const { accepted } = await responderCh.update(
       initiator.address,
@@ -1157,6 +1154,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
       responderSign,
     );
     expect(accepted).to.equal(false);
+    expect(await responderCh.round()).to.be.equal(1);
     const result = await responderCh.update(
       initiator.address,
       responder.address,
@@ -1166,9 +1164,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
       ),
     );
     result.accepted.should.equal(true);
+    expect(await responderCh.round()).to.be.equal(2);
     expect(result.signedTx).to.be.a('string');
-    initiatorCh.disconnect();
-    initiatorCh.disconnect();
   });
 
   describe('throws errors', () => {
@@ -1178,12 +1175,10 @@ async function waitForChannel(channel: Channel): Promise<void> {
       initiatorCh = await Channel.initialize({
         ...sharedParams,
         ...initiatorParams,
-        port: 3008,
       });
       responderCh = await Channel.initialize({
         ...sharedParams,
         ...responderParams,
-        port: 3008,
       });
       await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     });
@@ -1194,16 +1189,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
 
     async function update(
-      { from, amount }: {
-        from?: Encoded.AccountAddress;
-        amount?: number | BigNumber;
-      },
-    ): Promise<{
-        accepted: boolean;
-        signedTx?: string;
-        errorCode?: number;
-        errorMessage?: string;
-      }> {
+      { from, amount }: { from?: Encoded.AccountAddress; amount?: number },
+    ): ReturnType<typeof initiatorCh.update> {
       return initiatorCh.update(
         from ?? initiator.address,
         responder.address,
