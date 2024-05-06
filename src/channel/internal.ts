@@ -74,7 +74,7 @@ export interface ChannelOptions {
   /**
    * Initial deposit in favour of the responder by the initiator
    */
-  pushAmount: number;
+  pushAmount: BigNumber | number;
   /**
    * Amount of coins the initiator has committed to the channel
    */
@@ -120,16 +120,16 @@ export interface ChannelOptions {
    */
   gasPrice?: BigNumber | number;
 
-  signedTx?: string;
+  signedTx?: Encoded.Transaction;
   /**
    * Existing channel id (required if reestablishing a channel)
    */
-  existingChannelId?: string;
+  existingChannelId?: Encoded.Channel;
   /**
    * Offchain transaction (required if reestablishing a channel)
    */
-  offChainTx?: string;
-  reconnectTx?: string;
+  offChainTx?: Encoded.Transaction;
+  reconnectTx?: Encoded.Transaction;
   /**
    * The time waiting for a new event to be initiated (default: 600000)
    */
@@ -182,7 +182,7 @@ export interface ChannelOptions {
    * Function which verifies and signs transactions
    */
   sign: SignTxWithTag;
-  offchainTx?: string;
+  offchainTx?: Encoded.Transaction;
 }
 
 export interface ChannelHandler extends Function {
