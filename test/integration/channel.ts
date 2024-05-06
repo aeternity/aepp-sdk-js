@@ -24,7 +24,7 @@ import {
 } from '../../src';
 import { pause } from '../../src/utils/other';
 import {
-  ChannelOptions, notify, SignTx, SignTxWithTag,
+  notify, SignTx, SignTxWithTag,
 } from '../../src/channel/internal';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual } from '../utils';
@@ -88,7 +88,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     assertNotNull(signedTx);
     return buildTx(signedTx);
   };
-  const sharedParams: Omit<ChannelOptions, 'sign'> = {
+  const sharedParams = {
     url: channelUrl,
     pushAmount: 3,
     initiatorAmount: 1e15,
@@ -98,8 +98,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
     host: 'localhost',
     port: 3114,
     lockPeriod: 1,
-    initiatorId: 'ak_',
-    responderId: 'ak_',
+    initiatorId: 'ak_' as Encoded.AccountAddress,
+    responderId: 'ak_' as Encoded.AccountAddress,
     role: 'initiator',
     minimumDepth: 0,
   };
