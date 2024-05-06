@@ -23,9 +23,7 @@ import {
   buildTx,
 } from '../../src';
 import { pause } from '../../src/utils/other';
-import {
-  ChannelOptions, notify, SignTx, SignTxWithTag,
-} from '../../src/channel/internal';
+import { notify, SignTx, SignTxWithTag } from '../../src/channel/internal';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual, ensureInstanceOf } from '../utils';
 
@@ -90,7 +88,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     assertNotNull(signedTx);
     return buildTx(signedTx);
   };
-  const sharedParams: Omit<ChannelOptions, 'sign'> = {
+  const sharedParams = {
     url: channelUrl,
     pushAmount: 3,
     initiatorAmount: 1e15,
@@ -99,11 +97,18 @@ async function waitForChannel(channel: Channel): Promise<void> {
     host: 'localhost',
     port: 3114,
     lockPeriod: 1,
-    initiatorId: 'ak_',
-    responderId: 'ak_',
-    role: 'initiator',
+    initiatorId: 'ak_' as Encoded.AccountAddress,
+    responderId: 'ak_' as Encoded.AccountAddress,
     minimumDepth: 0,
   };
+  const initiatorParams = {
+    role: 'initiator',
+    sign: initiatorSignTag,
+  } as const;
+  const responderParams = {
+    role: 'responder',
+    sign: responderSignTag,
+  } as const;
 
   before(async () => {
     aeSdkInitiatior = await getSdk();
@@ -131,14 +136,12 @@ async function waitForChannel(channel: Channel): Promise<void> {
   it('can open a channel', async () => {
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
-      sign: initiatorSignTag,
+      ...initiatorParams,
     });
     const initiatorChOpenPromise = waitForChannel(initiatorCh);
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
-      sign: responderSignTag,
+      ...responderParams,
     });
     const responderChOpenPromise = waitForChannel(responderCh);
     await Promise.all([initiatorChOpenPromise, responderChOpenPromise]);
@@ -157,20 +160,26 @@ async function waitForChannel(channel: Channel): Promise<void> {
       'responder_sign',
       sinon.match.string,
     );
-    const expectedTxParams = {
+    const initiatorTx = unpackTx(initiatorSignTag.firstCall.args[1], Tag.ChannelCreateTx);
+    const responderTx = unpackTx(responderSignTag.firstCall.args[1], Tag.ChannelCreateTx);
+    const expectedParams = {
+      channelReserve: '0',
+      fee: '17680000000000',
       initiator: aeSdkInitiatior.address,
+      initiatorAmount: '1000000000000000',
+      initiatorDelegateIds: [],
+      lockPeriod: '1',
+      nonce: 1,
       responder: aeSdkResponder.address,
-      initiatorAmount: sharedParams.initiatorAmount.toString(),
-      responderAmount: sharedParams.responderAmount.toString(),
-      channelReserve: sharedParams?.channelReserve?.toString(),
-      lockPeriod: sharedParams.lockPeriod.toString(),
+      responderAmount: '1000000000000000',
+      responderDelegateIds: [],
+      stateHash: initiatorTx.stateHash,
+      tag: Tag.ChannelCreateTx,
+      ttl: 0,
+      version: 2,
     };
-    const initiatorTx = unpackTx(initiatorSignTag.firstCall.args[1]);
-    const responderTx = unpackTx(responderSignTag.firstCall.args[1]);
-    expect(initiatorTx.tag).to.be.equal(Tag.ChannelCreateTx);
-    initiatorTx.should.eql({ ...initiatorTx, ...expectedTxParams });
-    expect(responderTx.tag).to.be.equal(Tag.ChannelCreateTx);
-    responderTx.should.eql({ ...responderTx, ...expectedTxParams });
+    expect(initiatorTx).to.eql(expectedParams);
+    expect(responderTx).to.eql(expectedParams);
   });
 
   it('emits error on handling incoming messages', async () => {
@@ -631,13 +640,11 @@ async function waitForChannel(channel: Channel): Promise<void> {
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
-      sign: initiatorSignTag,
+      ...initiatorParams,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
-      sign: responderSignTag,
+      ...responderParams,
     });
 
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
@@ -652,11 +659,10 @@ async function waitForChannel(channel: Channel): Promise<void> {
   it('can reestablish a channel', async () => {
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
+      ...initiatorParams,
       port: 3002,
       existingFsmId: existingChannelId,
       offchainTx,
-      sign: initiatorSignTag,
     });
     await waitForChannel(initiatorCh);
     // TODO: why node doesn't return signed_tx when channel is reestablished?
@@ -670,15 +676,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
+      ...initiatorParams,
       port: 3003,
-      sign: initiatorSignTag,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
+      ...responderParams,
       port: 3003,
-      sign: responderSignTag,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
 
@@ -736,16 +740,14 @@ async function waitForChannel(channel: Channel): Promise<void> {
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
+      ...initiatorParams,
       lockPeriod: 2,
-      role: 'initiator',
-      sign: initiatorSignTag,
       port: 3004,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
+      ...responderParams,
       lockPeriod: 2,
-      role: 'responder',
-      sign: responderSignTag,
       port: 3004,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
@@ -809,15 +811,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
+      ...initiatorParams,
       port: 3005,
-      sign: initiatorSignTag,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
+      ...responderParams,
       port: 3005,
-      sign: responderSignTag,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     contract = await Contract.initialize({
@@ -1098,16 +1098,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
+      ...initiatorParams,
       port: 3006,
-      sign: initiatorSignTag,
     });
-
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
+      ...responderParams,
       port: 3006,
-      sign: responderSignTag,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     const result = await initiatorCh.update(
@@ -1122,10 +1119,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
     initiatorCh.disconnect();
     const ch = await Channel.initialize({
       ...sharedParams,
-      url: sharedParams.url,
-      host: sharedParams.host,
+      ...initiatorParams,
       port: 3006,
-      role: 'initiator',
       existingChannelId: channelId,
       existingFsmId: fsmId,
       sign: responderSignTag,
@@ -1151,15 +1146,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
+      ...initiatorParams,
       port: 3007,
-      sign: initiatorSignTag,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
+      ...responderParams,
       port: 3007,
-      sign: responderSignTag,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     initiatorCh.disconnect();
@@ -1190,15 +1183,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
       responderCh.disconnect();
       initiatorCh = await Channel.initialize({
         ...sharedParams,
-        role: 'initiator',
+        ...initiatorParams,
         port: 3008,
-        sign: initiatorSignTag,
       });
       responderCh = await Channel.initialize({
         ...sharedParams,
-        role: 'responder',
+        ...responderParams,
         port: 3008,
-        sign: responderSignTag,
       });
       await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     });
