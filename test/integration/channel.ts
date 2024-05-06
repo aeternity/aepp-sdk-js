@@ -100,7 +100,6 @@ async function waitForChannel(channel: Channel): Promise<void> {
     host: 'localhost',
     port: 3114,
     lockPeriod: 1,
-    statePassword: 'correct horse battery staple',
     initiatorId: 'ak_',
     responderId: 'ak_',
     role: 'initiator',
