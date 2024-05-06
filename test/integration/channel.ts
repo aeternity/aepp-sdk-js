@@ -22,7 +22,6 @@ import {
   Channel,
   buildTx,
 } from '../../src';
-import { pause } from '../../src/utils/other';
 import { notify, SignTx, SignTxWithTag } from '../../src/channel/internal';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull, ensureEqual, ensureInstanceOf } from '../utils';
@@ -1123,23 +1122,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
       port: 3006,
       existingChannelId: channelId,
       existingFsmId: fsmId,
-      sign: responderSignTag,
     });
     await waitForChannel(ch);
     ch.fsmId().should.equal(fsmId);
-    // TODO: why node doesn't return signed_tx when channel is reestablished?
-    // await new Promise((resolve) => {
-    //   const checkRound = () => {
-    //     ch.round().should.equal(round)
-    //     // TODO: enable line below
-    //     // ch.off('stateChanged', checkRound)
-    //     resolve()
-    //   }
-    //   ch.on('stateChanged', checkRound)
-    // })
-    await ch.state().should.eventually.be.fulfilled;
-    await pause(10 * 1000);
-  }).timeout(80000);
+    const state = await ch.state();
+    assertNotNull(state.signedTx);
+    expect(state.signedTx.encodedTx.tag).to.be.equal(Tag.ChannelOffChainTx);
+  });
 
   it('can post backchannel update', async () => {
     initiatorCh.disconnect();
