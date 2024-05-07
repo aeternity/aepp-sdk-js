@@ -45,13 +45,16 @@ describe('MiddlewareSubscriber', () => {
   });
 
   it('fails to subscribe to invalid address', async () => {
+    let unsubscribe: (() => void) | undefined;
     const promise = new Promise((resolve, reject) => {
-      middleware.subscribeObject('ak_test', (payload, error) => {
+      unsubscribe = middleware.subscribeObject('ak_test', (payload, error) => {
         if (error != null) reject(error);
         else resolve(payload);
       });
     });
     await expect(promise).to.be.rejectedWith(_MiddlewareSubscriberError, 'invalid target: ak_test');
+    assertNotNull(unsubscribe);
+    unsubscribe();
   });
 
   async function ensureConnected(ms: _MiddlewareSubscriber): Promise<void> {

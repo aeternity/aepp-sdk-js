@@ -1129,6 +1129,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     expect(ch.fsmId()).to.be.equal(fsmId);
     expect(await ch.round()).to.be.equal(2);
     const state = await ch.state();
+    ch.disconnect();
     assertNotNull(state.signedTx);
     expect(state.signedTx.encodedTx.tag).to.be.equal(Tag.ChannelOffChainTx);
   });
