@@ -31,9 +31,11 @@ export {
 } from './tx/builder/constants';
 export type { Int, AensName } from './tx/builder/constants';
 // TODO: move to constants
-export { ORACLE_TTL_TYPES, CallReturnType } from './tx/builder/schema';
+export { ORACLE_TTL_TYPES } from './tx/builder/schema';
 export { DelegationTag } from './tx/builder/delegation/schema';
 export { packDelegation, unpackDelegation } from './tx/builder/delegation';
+export { EntryTag, CallReturnType } from './tx/builder/entry/constants';
+export { packEntry, unpackEntry } from './tx/builder/entry';
 export {
   getExecutionCost, getExecutionCostBySignedTx, getExecutionCostUsingNode,
 } from './tx/execution-cost';

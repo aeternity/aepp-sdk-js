@@ -1,5 +1,7 @@
 import SchemaTypes from '../SchemaTypes';
-import { address, nameId, shortUIntConst } from '../field-types';
+import address from '../field-types/address';
+import nameId from '../field-types/name-id';
+import shortUIntConst from '../field-types/short-u-int-const';
 import {
   Encoded, Encoding, decode, encode,
 } from '../../../utils/encoder';
