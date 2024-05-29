@@ -146,7 +146,7 @@ export default class AeSdkAepp extends AeSdkBase {
    * @returns Addresses from wallet
    */
   async askAddresses(): Promise<Encoded.AccountAddress[]> {
-    this._ensureAccountAccess();
+    this._ensureConnected();
     return this.rpcClient.request(METHODS.address, undefined);
   }
 
