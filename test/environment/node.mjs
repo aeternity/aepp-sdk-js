@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import {
-  Node, AeSdk, MemoryAccount, CompilerHttp,
+  Node, AeSdk, MemoryAccount, CompilerHttp, Contract,
 // eslint-disable-next-line import/extensions
 } from '../../es/index.mjs';
 
@@ -20,7 +20,9 @@ const aeSdk = new AeSdk({
 console.log('Height:', await aeSdk.getHeight());
 console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map);
 
-const contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
+const contract = await Contract.initialize({
+  ...aeSdk.getContext(), sourceCode: contractSourceCode,
+});
 const deployInfo = await contract.$deploy([]);
 console.log('Contract deployed at', deployInfo.address);
 const map = new Map([['foo', 42], ['bar', 43]]);

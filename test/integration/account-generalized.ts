@@ -51,7 +51,9 @@ describe('Generalized Account', () => {
     accountBeforeGa = Object.values(aeSdk.accounts)[0] as MemoryAccount;
     const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', [], { sourceCode });
     expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.be.equal('generalized');
-    authContract = await aeSdk.initializeContract({ sourceCode, address: gaContractId });
+    authContract = await Contract.initialize({
+      ...aeSdk.getContext(), sourceCode, address: gaContractId,
+    });
   });
 
   it('Fail on make GA on already GA', async () => {
@@ -129,11 +131,12 @@ describe('Generalized Account', () => {
   // TODO: enable after resolving https://github.com/aeternity/aeternity/issues/4087
   // TODO: copy to examples/node/account-generalized.mjs
   it.skip('deploys and calls contract', async () => {
-    const contract = await aeSdk.initializeContract<{
+    const contract = await Contract.initialize<{
       init: (value: number) => void;
       getState: () => number;
       setState: (value: number) => void;
     }>({
+          ...aeSdk.getContext(),
           sourceCode: ''
             + 'contract Stateful =\n'
             + '  record state = { value: int }\n'

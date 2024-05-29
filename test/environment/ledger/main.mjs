@@ -1,5 +1,5 @@
 import {
-  Node, AeSdk, CompilerHttp, AccountLedgerFactory,
+  Node, AeSdk, CompilerHttp, AccountLedgerFactory, Contract,
 // eslint-disable-next-line import/extensions
 } from '../../../es/index.mjs';
 
@@ -27,7 +27,9 @@ export default async function run(transport) {
 contract Test =
  entrypoint getArg(x : int) = x + 1
 `;
-  const contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
+  const contract = await Contract.initialize({
+    ...aeSdk.getContext(), sourceCode: contractSourceCode,
+  });
   const deployInfo = await contract.$deploy([]);
   console.log('Contract deployed at', deployInfo.address);
 

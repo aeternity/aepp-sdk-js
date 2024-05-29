@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import { assertNotNull } from '../utils';
-import { AeSdkMethods, AccountBase } from '../../src';
+import { AeSdkMethods, AccountBase, Contract } from '../../src';
 
 describe('AeSdkMethods', () => {
   let accounts: AccountBase[];
@@ -26,7 +26,8 @@ describe('AeSdkMethods', () => {
   });
 
   it('created contract remains connected to sdk', async () => {
-    const contract = await aeSdkMethods.initializeContract({
+    const contract = await Contract.initialize({
+      ...aeSdkMethods.getContext(),
       sourceCode: ''
       + 'contract Identity =\n'
       + '  entrypoint getArg(x : int) = x',

@@ -66,6 +66,7 @@
 <script>
 import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
+import { Contract } from '@aeternity/aepp-sdk';
 import Value from './components/Value.vue';
 import FieldAction from './components/FieldAction.vue';
 
@@ -95,7 +96,9 @@ export default {
     async create() {
       // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
       this.contract = shallowRef(
-        await this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode }),
+        await Contract.initialize({
+          ...this.aeSdk.getContext(), sourceCode: this.contractSourceCode,
+        }),
       );
     },
     async compile() {
