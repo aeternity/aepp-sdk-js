@@ -1688,7 +1688,7 @@
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>You need to import <code>AeSdk</code>, <code>Node</code> and <code>MemoryAccount</code> classes from the SDK.
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span>
 <span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 </code></pre></div>
 <strong>Note</strong>:</p>
@@ -1733,7 +1733,9 @@ Note:</p>
 <p>Knowing the source code allows you to initialize a contract instance and interact with the
 contract in a convenient way.
 <div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">CONTRACT_SOURCE_CODE</span><span class="p">);</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">initializeContract</span><span class="p">({</span><span class="w"> </span><span class="nx">sourceCode</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE_CODE</span><span class="w"> </span><span class="p">});</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Contract</span><span class="p">.</span><span class="nx">initialize</span><span class="p">({</span>
+<span class="w">  </span><span class="p">...</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOptions</span><span class="p">(),</span><span class="w"> </span><span class="nx">sourceCode</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE_CODE</span><span class="p">,</span>
+<span class="p">});</span>
 </code></pre></div></p>
 <h2 id="5-compile-the-contract">5. Compile the contract</h2>
 <p>The <code>$compile</code> function sends a raw Sophia contract as string

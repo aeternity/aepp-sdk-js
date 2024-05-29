@@ -523,6 +523,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#create-contract-instance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create contract instance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#options" class="md-nav__link">
     <span class="md-ellipsis">
       Options
@@ -1728,6 +1737,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#create-contract-instance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create contract instance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#options" class="md-nav__link">
     <span class="md-ellipsis">
       Options
@@ -1885,37 +1903,43 @@ Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">
 </li>
 </ul>
 <h2 id="4-initialize-the-contract-instance">4. Initialize the contract instance</h2>
+<p>To do so, we need to prepare an options object, which can be done in multiple ways.</p>
 <h3 id="by-source-code">By source code</h3>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// source code of the contract</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">initializeContract</span><span class="p">({</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
 <li>If your contract includes external dependencies which are not part of the <a href="https://docs.aeternity.com/aesophia/latest/sophia_stdlib">standard library</a> you should initialize the contract using:
   <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// key-value map with name of the include as key and source code of the include as value</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">initializeContract</span><span class="p">({</span><span class="w"> </span><span class="nx">sourceCode</span><span class="p">,</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">sourceCode</span><span class="p">,</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div></li>
 </ul>
 <h3 id="by-path-to-source-code-available-only-in-nodejs">By path to source code (available only in Node.js)</h3>
 <p>It can be used with both CompilerCli and CompilerHttp. This way contract imports would be handled automatically, with no need to provide <code>fileSystem</code> option.
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sourceCodePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;./example.aes&#39;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">initializeContract</span><span class="p">({</span><span class="w"> </span><span class="nx">sourceCodePath</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">sourceCodePath</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div></p>
 <h3 id="by-aci-and-bytecode">By ACI and bytecode</h3>
 <p>If you pre-compiled the contracts you can also initialize a contract instance by providing ACI and bytecode:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">aci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// ACI of the contract</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">bytecode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// bytecode of the contract</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">initializeContract</span><span class="p">({</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">bytecode</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">bytecode</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 <h3 id="by-aci-and-contract-address">By ACI and contract address</h3>
 <p>In many cases an application doesn't need to deploy a contract or verify its bytecode. In this case you'd want to initialize the instance by just providing the ACI and the contract address. This is also possible:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">aci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// ACI of the contract</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// the address of the contract</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">initializeContract</span><span class="p">({</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
+<h3 id="create-contract-instance">Create contract instance</h3>
+<p>Do it by <code>Contract::initialize</code>.
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Contract</span><span class="p">.</span><span class="nx">initialize</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(),</span><span class="w"> </span><span class="p">...</span><span class="nx">options</span><span class="w"> </span><span class="p">})</span>
+</code></pre></div>
+<code>AeSdk:getContext</code> is used to get base options to instantiate contracts. These options include the current account, node, and compiler. They are referenced using Proxy class, pointing to the latest values specified in AeSdk. So, if you change the selected node in the AeSdk instance, it will be also changed in bound contract instances.</p>
 <h3 id="options">Options</h3>
 <ul>
-<li>Following attributes can be provided via <code>options</code> to <code>initializeContract</code>:<ul>
+<li>Following attributes can be provided via <code>options</code> to <code>Contract::initialize</code>:<ul>
 <li><code>aci</code> (default: obtained via <code>onCompiler</code>)<ul>
 <li>The Contract ACI.</li>
 </ul>
