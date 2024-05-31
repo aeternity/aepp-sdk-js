@@ -6,7 +6,7 @@ import {
 import { getSdk } from '.';
 import {
   commitmentHash, decode, encode, Encoded, Encoding,
-  genSalt, AeSdk, Contract, ConsensusProtocolVersion,
+  genSalt, AeSdk, Contract, ConsensusProtocolVersion, Oracle, OracleClient,
 } from '../../src';
 
 describe('Operation delegation', () => {
@@ -216,9 +216,8 @@ contract DelegateTest =
   });
 
   describe('Oracle', () => {
-    let oracle: Awaited<ReturnType<typeof aeSdk.getOracleObject>>;
-    let oracleId: Encoded.OracleAddress;
-    let queryObject: Awaited<ReturnType<typeof aeSdk.getQueryObject>>;
+    let oracle: OracleClient;
+    let queryObject: Awaited<ReturnType<OracleClient['getQuery']>>;
     let delegationSignature: Uint8Array;
     const queryFee = 500000;
     const ttl: ChainTtl = { RelativeTTL: [50n] };
@@ -262,7 +261,10 @@ contract DelegateTest =
       await contract.$deploy([]);
       assertNotNull(contract.$options.address);
       contractAddress = contract.$options.address;
-      oracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
+      oracle = new OracleClient(
+        encode(decode(aeSdk.address), Encoding.OracleAddress),
+        aeSdk.getContext(),
+      );
     });
 
     it('registers', async () => {
@@ -272,43 +274,43 @@ contract DelegateTest =
         .signedRegisterOracle(aeSdk.address, delegationSignature, queryFee, ttl);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
-      oracle = await aeSdk.getOracleObject(oracleId);
-      oracle.id.should.be.equal(oracleId);
     });
 
     it('extends', async () => {
-      const { result } = await contract.signedExtendOracle(oracleId, delegationSignature, ttl);
+      const prevState = await oracle.getState();
+      const { result } = await contract
+        .signedExtendOracle(oracle.address, delegationSignature, ttl);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
-      const oracleExtended = await aeSdk.getOracleObject(oracleId);
-      oracleExtended.ttl.should.be.equal(oracle.ttl + 50);
+      const state = await oracle.getState();
+      expect(state.ttl).to.be.equal(prevState.ttl + 50);
     });
 
     it('creates query', async () => {
       const q = 'Hello!';
       // TODO: don't register an extra oracle after fixing https://github.com/aeternity/aepp-sdk-js/issues/1419
-      oracle = await aeSdk.registerOracle('string', 'int', { queryFee, onAccount: aeSdk.addresses()[1] });
+      const orc = new Oracle(aeSdk.accounts[aeSdk.addresses()[1]], aeSdk.getContext());
+      await orc.register('string', 'int', { queryFee });
+      oracle = new OracleClient(orc.address, aeSdk.getContext());
+
       const query = await contract
-        .createQuery(oracle.id, q, 1000 + queryFee, ttl, ttl, { amount: 5 * queryFee });
+        .createQuery(oracle.address, q, 1000 + queryFee, ttl, ttl, { amount: 5 * queryFee });
       assertNotNull(query.result);
       query.result.returnType.should.be.equal('ok');
-      queryObject = await aeSdk.getQueryObject(oracle.id, query.decodedResult);
-      queryObject.should.be.an('object');
-      queryObject.decodedQuery.should.be.equal(q);
+      queryObject = await oracle.getQuery(query.decodedResult);
+      expect(queryObject.decodedQuery).to.be.equal(q);
     });
 
     it('responds to query', async () => {
       const r = 'Hi!';
-      // TODO type should be corrected in node api
-      const queryId = queryObject.id as Encoded.OracleQueryId;
       aeSdk.selectAccount(aeSdk.addresses()[1]);
       const respondSig = await aeSdk
-        .createDelegationSignature(contractAddress, [queryId], { omitAddress: true });
-      const { result } = await contract.respond(oracle.id, queryId, respondSig, r);
+        .createDelegationSignature(contractAddress, [queryObject.id], { omitAddress: true });
+      const { result } = await contract.respond(oracle.address, queryObject.id, respondSig, r);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
-      const queryObject2 = await aeSdk.getQueryObject(oracle.id, queryId);
-      queryObject2.decodedResponse.should.be.equal(r);
+      const queryObject2 = await oracle.getQuery(queryObject.id);
+      expect(queryObject2.decodedResponse).to.be.equal(r);
     });
 
     it('fails trying to create general delegation as oracle query', async () => {

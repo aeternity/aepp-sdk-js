@@ -56,10 +56,8 @@ export {
 } from './aens';
 export { default as Contract } from './contract/Contract';
 export type { ContractMethodsBase } from './contract/Contract';
-export {
-  pollForQueries, pollForQueryResponse, getQueryObject, postQueryToOracle, extendOracleTtl,
-  respondToQuery, getOracleObject, registerOracle,
-} from './oracle';
+export { default as Oracle } from './oracle/Oracle';
+export { default as OracleClient } from './oracle/OracleClient';
 export { spend, transferFunds, payForTransaction } from './spend';
 export { createGeneralizedAccount, buildAuthTxHash, buildAuthTxHashByGaMetaTx } from './contract/ga';
 
@@ -119,5 +117,4 @@ export {
 export {
   RpcBroadcastError, NAME_BID_MAX_LENGTH, encodeFateValue, decodeFateValue,
   NAME_TTL, NAME_MAX_TTL, NAME_MAX_CLIENT_TTL, CLIENT_TTL,
-  ORACLE_TTL, QUERY_TTL, RESPONSE_TTL,
 } from './deprecated';

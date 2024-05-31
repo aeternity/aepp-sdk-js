@@ -2,7 +2,6 @@ import * as chainMethods from './chain';
 import { sendTransaction } from './send-transaction';
 import * as aensMethods from './aens';
 import * as spendMethods from './spend';
-import * as oracleMethods from './oracle';
 import createDelegationSignature from './contract/delegation-signature';
 import * as contractGaMethods from './contract/ga';
 import { buildTxAsync } from './tx/builder';
@@ -21,7 +20,6 @@ const methods = {
   sendTransaction,
   ...aensMethods,
   ...spendMethods,
-  ...oracleMethods,
   createDelegationSignature,
   ...contractGaMethods,
 } as const;
