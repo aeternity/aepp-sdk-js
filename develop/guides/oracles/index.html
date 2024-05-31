@@ -511,18 +511,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#query" class="md-nav__link">
+  <a href="#query-preferred" class="md-nav__link">
     <span class="md-ellipsis">
-      Query
+      Query (preferred)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#poll-for-response" class="md-nav__link">
+  <a href="#post-query-alternative" class="md-nav__link">
     <span class="md-ellipsis">
-      Poll for response
+      Post query (alternative)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#poll-for-response-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      Poll for response (alternative)
     </span>
   </a>
   
@@ -544,18 +553,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#poll-for-queries" class="md-nav__link">
+  <a href="#handle-queries-preferred" class="md-nav__link">
     <span class="md-ellipsis">
-      Poll for queries
+      Handle queries (preferred)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#respond-to-query" class="md-nav__link">
+  <a href="#poll-for-queries-alternative" class="md-nav__link">
     <span class="md-ellipsis">
-      Respond to query
+      Poll for queries (alternative)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#respond-to-query-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      Respond to query (alternative)
     </span>
   </a>
   
@@ -570,6 +588,15 @@
   <a href="#4-oracle-extend" class="md-nav__link">
     <span class="md-ellipsis">
       4. Oracle: extend
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-get-the-current-state-from-the-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Get the current state from the node
     </span>
   </a>
   
@@ -1593,18 +1620,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#query" class="md-nav__link">
+  <a href="#query-preferred" class="md-nav__link">
     <span class="md-ellipsis">
-      Query
+      Query (preferred)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#poll-for-response" class="md-nav__link">
+  <a href="#post-query-alternative" class="md-nav__link">
     <span class="md-ellipsis">
-      Poll for response
+      Post query (alternative)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#poll-for-response-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      Poll for response (alternative)
     </span>
   </a>
   
@@ -1626,18 +1662,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#poll-for-queries" class="md-nav__link">
+  <a href="#handle-queries-preferred" class="md-nav__link">
     <span class="md-ellipsis">
-      Poll for queries
+      Handle queries (preferred)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#respond-to-query" class="md-nav__link">
+  <a href="#poll-for-queries-alternative" class="md-nav__link">
     <span class="md-ellipsis">
-      Respond to query
+      Poll for queries (alternative)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#respond-to-query-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      Respond to query (alternative)
     </span>
   </a>
   
@@ -1652,6 +1697,15 @@
   <a href="#4-oracle-extend" class="md-nav__link">
     <span class="md-ellipsis">
       4. Oracle: extend
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-get-the-current-state-from-the-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Get the current state from the node
     </span>
   </a>
   
@@ -1685,12 +1739,19 @@
 <h2 id="introduction">Introduction</h2>
 <p>This guide shows you how to perform all the operations that you need within the lifecycle of <a href="https://docs.aeternity.com/protocol/oracles">oracles</a> using the SDK.</p>
 <h2 id="1-oracle-register">1. Oracle: register</h2>
-<p>You register an oracle that responds with the temperature of the city that is included in the query.</p>
-<p>To register an oracle you need to provide a <code>queryFormat</code> and a <code>responseFormat</code> to the <code>registerOracle</code> function of the SDK. In addition to the common transaction options you can provide the oracle specific options <code>queryFee</code> and <code>oracleTtlValue</code>, see <a href="../../transaction-options/#oracleregistertx">transaction options</a>.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// init an instance of the SDK using the AeSdk class</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
+<p>Let's register an oracle that responds with the temperature of the city that is included in the query.</p>
+<p>Firstly, you need to create an instance of <code>Oracle</code> class. This class requires an account that would be used to sign operations on behalf of the oracle. So one account can host only one oracle, and this oracle address would be the same as the corresponding account address except for a different prefix (<code>ok_</code> instead of <code>ak_</code>). This means that it's not possible to manage multiple oracles using the same account.</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Oracle</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 
-<span class="c1">// set TTL with a delta of 1000 blocks</span>
+<span class="c1">// init an instance of the SDK using the AeSdk class</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
+<span class="c1">// it should be an instance of AccountBase with non-zero balance</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracleAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(...)</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Oracle</span><span class="p">(</span><span class="nx">oracleAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">())</span>
+</code></pre></div>
+<p>To register an oracle on-chain you need to provide a <code>queryFormat</code> and a <code>responseFormat</code> to the <code>register</code> function of <code>Oracle</code> class. In addition to the common transaction options you can provide the oracle specific options <code>queryFee</code> and <code>oracleTtlValue</code>, see <a href="../../transaction-options/#oracleregistertx">transaction options</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// set TTL with a delta of 1000 blocks</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">oracleTtlOptions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">oracleTtlType</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="nx">oracleTtlValue</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="p">}</span>
 <span class="c1">// OR set a specific block height to expire</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">oracleTtlOptions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">oracleTtlType</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">block</span><span class="p">,</span><span class="w"> </span><span class="nx">oracleTtlValue</span><span class="o">:</span><span class="w"> </span><span class="mf">555555</span><span class="w"> </span><span class="p">}</span>
@@ -1701,109 +1762,101 @@
 <span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">queryFee</span><span class="o">:</span><span class="w"> </span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">oracleTtlOptions</span><span class="w"> </span><span class="p">}</span>
 
 <span class="c1">// the first argument is the queryFormat and the second is the responseFormat</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">registerOracle</span><span class="p">(</span><span class="s1">&#39;{&quot;city&quot;: &quot;str&quot;}&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{&quot;temperature&quot;: &quot;int&quot;}&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s1">&#39;{&quot;city&quot;: &quot;str&quot;}&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{&quot;temperature&quot;: &quot;int&quot;}&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
-<li>By default the oracle will exist for the next 500 KeyBlocks.</li>
+<li>By default the oracle will exist for the next 500 key blocks.</li>
 <li>If you intend to keep your oracle running longer you should increase the <code>oracleTtlValue</code> and/or set up a service that automatically extends the TTL before it expires.</li>
-<li>The <code>oracleId</code> will be similar to the address of the account that registered the Oracle.</li>
-<li>The only difference is the prefix that will be <code>ok_</code> instead of <code>ak_</code></li>
-<li>This means that each account can only host 1 oracle. It's not possible to manage multiple oracles using the same account.</li>
 </ul>
 <h2 id="2-some-party-query-an-oracle-and-poll-for-response">2. Some party: query an oracle and poll for response</h2>
-<h3 id="query">Query</h3>
+<h3 id="query-preferred">Query (preferred)</h3>
 <p>After the oracle has been registered and as long as it isn't expired, everybody that knows the <code>oracleId</code> can query it.</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracleId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_...&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">OracleClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
 
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracleId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_...&#39;</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">queryFee</span><span class="o">:</span><span class="w"> </span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="c1">// should cover the requested fee of the oracle and defaults to 0</span>
 <span class="w">  </span><span class="nx">queryTtlType</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="c1">// optional and defaults to ORACLE_TTL_TYPES.delta</span>
 <span class="w">  </span><span class="nx">queryTtlValue</span><span class="o">:</span><span class="w"> </span><span class="mf">20</span><span class="p">,</span><span class="w"> </span><span class="c1">// optional and defaults to 10</span>
 <span class="w">  </span><span class="nx">responseTtlType</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="c1">// optional and defaults to ORACLE_TTL_TYPES.delta</span>
 <span class="w">  </span><span class="nx">responseTtlValue</span><span class="o">:</span><span class="w"> </span><span class="mf">50</span><span class="p">,</span><span class="w"> </span><span class="c1">// optional and defaults to 10</span>
+<span class="w">  </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="mf">6000</span><span class="p">,</span><span class="w"> </span><span class="c1">// response polling interval</span>
 <span class="p">};</span>
 
-<span class="c1">// using the oracle object in case you need to instantiate the oracle object first</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">postQuery</span><span class="p">(</span><span class="s1">&#39;{&quot;city&quot;: &quot;Berlin&quot;}&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
-
-<span class="c1">// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">postQueryToOracle</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{&quot;city&quot;: &quot;Berlin&quot;}&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
+<span class="c1">// to query an oracle you need to instantiate the OracleClient object first</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracleClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">OracleClient</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">())</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracleClient</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="s1">&#39;{&quot;city&quot;: &quot;Berlin&quot;}&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Decoded oracle response&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">response</span><span class="p">)</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
 <li>Again, take a look into the <a href="../../transaction-options/#oraclequerytx">transaction options</a> to see what (other) options you can provide.</li>
 </ul>
-<h3 id="poll-for-response">Poll for response</h3>
-<p>Now you have access to the query object and can poll for the response to that specific query:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracleId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_...&#39;</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">queryId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;oq_...&#39;</span><span class="p">;</span>
+<p>Alternatively, you can post query and poll for response using separate methods from below.</p>
+<h3 id="post-query-alternative">Post query (alternative)</h3>
+<p>To post a query without waiting for a response do the below.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">queryId</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracleClient</span><span class="p">.</span><span class="nx">postQuery</span><span class="p">(</span><span class="s1">&#39;{&quot;city&quot;: &quot;Berlin&quot;}&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1">// oq_...</span>
 
-<span class="c1">// using the query instance</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">)</span><span class="w"> </span><span class="c1">// in case you need to get the query instance first</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">query</span><span class="p">.</span><span class="nx">pollForResponse</span><span class="p">({</span><span class="w"> </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="mf">6000</span><span class="w"> </span><span class="p">})</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Oracle query ID&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="poll-for-response-alternative">Poll for response (alternative)</h3>
+<p>Now you have query ID that can be used to poll for the response:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracleClient</span><span class="p">.</span><span class="nx">pollForResponse</span><span class="p">(</span><span class="nx">queryId</span><span class="p">)</span>
 
-<span class="c1">// OR using the aeSdk (instance of AeSdk class) directly by providing the oracleId</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">pollForQueryResponse</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="mf">6000</span><span class="w"> </span><span class="p">})</span>
-
-<span class="c1">// decode the oracle response</span>
-<span class="c1">// the decode function returns a buffer that needs to be converted to a string</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">decodedResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">decode</span><span class="p">());</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">decodedResponse</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Decoded oracle response&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">response</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="3-oracle-poll-for-queries-and-respond">3. Oracle: poll for queries and respond</h2>
-<h3 id="poll-for-queries">Poll for queries</h3>
+<h3 id="handle-queries-preferred">Handle queries (preferred)</h3>
 <p>Typically, the oracle itself polls for its own queries and responds as soon as possible:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">stopHandling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">handleQueries</span><span class="p">((</span><span class="nx">query</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">query</span><span class="p">.</span><span class="nx">decodedQuery</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;{&quot;city&quot;: &quot;Berlin&quot;}&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">&#39;{&quot;temperature&quot;: 27.5}&#39;</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="s1">&#39;{&quot;error&quot;: &quot;Unknown request&quot;}&#39;</span><span class="p">;</span>
+<span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// polling interval in milliseconds</span>
+
+<span class="nx">stopHandling</span><span class="p">()</span>
+</code></pre></div>
+<p>This way, the oracle would respond with the temperature in a requested city. It needs to be done before the query's TTL expires.</p>
+<p>Note:
+- Of course, the oracle itself would either use an API to get the current temperature for a certain city or ideally directly communicate with measuring devices located in that specific city.
+- As far as Oracle class is bound to a specific account provided while creation, it is not necessary to pass the <code>onAccount</code> option.</p>
+<p>The above is the simplest way to respond to queries, though you can manually subscribe for new queries and respond to them.</p>
+<h3 id="poll-for-queries-alternative">Poll for queries (alternative)</h3>
+<p>To subscribe to new queries without responding to them:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">stopPolling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">pollQueries</span><span class="p">((</span><span class="nx">query</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">query</span><span class="p">)</span><span class="w"> </span><span class="c1">// log a new query</span>
 <span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">interval</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// polling interval in milliseconds</span>
 
-<span class="nx">stopPolling</span><span class="p">()</span><span class="w"> </span><span class="c1">// stop polling</span>
+<span class="nx">stopPolling</span><span class="p">()</span>
 </code></pre></div>
-<p>Note:</p>
-<ul>
-<li>Probably the oracle would respond here directly (see below) instead of just logging the queries.</li>
-</ul>
-<h3 id="respond-to-query">Respond to query</h3>
-<p>If the oracle recognizes that it has been queried it can respond to the query as long as the query's TTL
-has not been expired.</p>
+<h3 id="respond-to-query-alternative">Respond to query (alternative)</h3>
+<p>If the oracle recognizes that it has been queried it can respond to the query.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracleId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_...&#39;</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">queryId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;oq_...&#39;</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="c1">// only the account of the oracle can respond to the query</span>
 
-<span class="c1">// using the query instance</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getQueryObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">,</span><span class="w"> </span><span class="nx">queryId</span><span class="p">)</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">query</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span><span class="s1">&#39;{&quot;temperature&quot;: 27.5}&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
-
-<span class="c1">// OR using the aeSdk (instance of AeSdk class) directly by providing the queryId</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">respondToQuery</span><span class="p">(</span><span class="nx">queryId</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{&quot;temperature&quot;: 27.5}&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">respondToQuery</span><span class="p">(</span><span class="nx">queryId</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{&quot;temperature&quot;: 27.5}&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span>
 </code></pre></div>
-<p>Note:</p>
-<ul>
-<li>Of course the oracle itself would either use an API to get the current temperature for a certain city or ideally directly communicate with measuring devices located in that specific city.</li>
-<li>If the AeSdk class is initialized with the oracle's account there is no need to pass the <code>onAccount</code> option as this is done implicitely.</li>
-</ul>
 <h2 id="4-oracle-extend">4. Oracle: extend</h2>
 <p>As mentioned above an Oracle has a certain TTL that can be specified when registering it. You might want to extend the TTL of the oracle before it expires. You can do that as follows:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracleId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_...&#39;</span><span class="p">;</span>
-
-<span class="c1">// extend TTL by additional 500 blocks (based on current expiration height of the oracle)</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// extend TTL by additional 500 blocks (based on current expiration height of the oracle)</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">oracleTtlType</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="nx">oracleTtlValue</span><span class="o">:</span><span class="w"> </span><span class="mf">500</span><span class="w"> </span><span class="p">}</span>
 
-<span class="c1">// using the oracle instance</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getOracleObject</span><span class="p">(</span><span class="nx">oracleId</span><span class="p">)</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">extendedOracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">extendOracle</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span>
-
-<span class="c1">// OR using the aeSdk (instance of AeSdk class) directly</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">extendedOracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">extendOracleTtl</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span>
+<span class="c1">// using the Oracle instance</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span>
 </code></pre></div>
+<h2 id="5-get-the-current-state-from-the-node">5. Get the current state from the node</h2>
+<p>Both Oracle and OracleClient have methods to get their state from the node.</p>
+<p><code>Oracle:getState</code>, <code>OracleClient:getState</code> returns the same value as <code>Node:getOracleByPubkey</code>, but without arguments (it uses the oracle address provided in the constructor).</p>
+<p><code>Oracle:getQuery</code>, <code>OracleClient:getQuery</code> corresponds to <code>Node:getOracleQueryByPubkeyAndQueryId</code>, adding <code>decodedQuery</code>, <code>decodedResponse</code> based on the oracle type.</p>
 <h2 id="example-applications">Example applications</h2>
 <ul>
-<li><a href="https://github.com/aeternity/ae-oracle-pricefeed">ae-oracle-pricefeed</a><ul>
-<li>NodeJS example that registers an oracle, extends it if required and responds to queries automatically.</li>
-</ul>
-</li>
+<li><a href="https://github.com/aeternity/ae-oracle-pricefeed">ae-oracle-pricefeed</a>
+  NodeJS example that registers an oracle, extends it if required and responds to queries automatically.</li>
+<li><a href="https://github.com/superhero-com/tipping-oracle-service">tipping-oracle-service</a>
+  application that registers an oracle to check the presence of an AE address at a specific page</li>
 </ul>
 
 
