@@ -73,6 +73,9 @@ const entryTreesPoi = entry(EntryTag.TreesPoi) as unknown as EntryTreesPoi;
 // TODO: inline after dropping Iris compatibility
 const clientTtl = withDefault(60 * 60, shortUInt);
 // https://github.com/aeternity/protocol/blob/fd17982/AENS.md#update
+/**
+ * Name ttl represented in number of blocks (Max value is 50000 blocks)
+ */
 const nameTtl = withFormatting(
   (value) => {
     const NAME_TTL = 180000;
@@ -116,7 +119,7 @@ export const txSchema = [{
   accountId: address(Encoding.AccountAddress),
   nonce: nonce('accountId'),
   name,
-  nameSalt: uInt,
+  nameSalt: withDefault(0, uInt),
   nameFee,
   fee,
   ttl,

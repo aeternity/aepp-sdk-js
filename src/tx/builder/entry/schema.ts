@@ -127,6 +127,9 @@ export const schemas = [{
   accountId: address(Encoding.AccountAddress),
   nameTtl: shortUInt,
   status: raw,
+  /**
+   * a suggestion as to how long any clients should cache this information
+   */
   clientTtl: shortUInt,
   pointers,
 }, {

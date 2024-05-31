@@ -1,6 +1,5 @@
 import * as chainMethods from './chain';
 import { sendTransaction } from './send-transaction';
-import * as aensMethods from './aens';
 import * as spendMethods from './spend';
 import createDelegationSignature from './contract/delegation-signature';
 import * as contractGaMethods from './contract/ga';
@@ -18,7 +17,6 @@ export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
 const methods = {
   ...chainMethods,
   sendTransaction,
-  ...aensMethods,
   ...spendMethods,
   createDelegationSignature,
   ...contractGaMethods,
@@ -88,7 +86,8 @@ class AeSdkMethods {
 
   // TODO: omit onNode from options, because it is already in context
   async buildTx(options: TxParamsAsync): Promise<Encoded.Transaction> {
-    return buildTxAsync({ ...this.getContext(), ...options });
+    // TODO: remove `any` at the same time as AeSdk class
+    return buildTxAsync({ ...this.getContext() as any, ...options });
   }
 }
 
