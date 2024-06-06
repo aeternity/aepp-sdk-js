@@ -7,6 +7,7 @@ import { getSdk } from '.';
 import {
   commitmentHash, decode, encode, Encoded, Encoding,
   genSalt, AeSdk, Contract, ConsensusProtocolVersion, Oracle, OracleClient, Name,
+  packDelegation, DelegationTag,
 } from '../../src';
 
 describe('Operation delegation', () => {
@@ -32,7 +33,7 @@ describe('Operation delegation', () => {
     let owner: Encoded.AccountAddress;
     let newOwner: Encoded.AccountAddress;
     // TODO: replace with Encoded.Signature after solving https://github.com/aeternity/aepp-calldata-js/issues/240
-    let delegationSignature: Uint8Array;
+    let delegationSignature: Encoded.Signature;
     let contract: Contract<{
       getName: (name: string) => {
         'AENS.Name': [Encoded.AccountAddress, ChainTtl, Map<string, string>];
@@ -102,19 +103,29 @@ contract DelegateTest =
       const commitmentId = commitmentHash(name, salt);
       // TODO: provide more convenient way to create the decoded commitmentId ?
       const commitmentIdDecoded = decode(commitmentId);
-      const preclaimSig = await aeSdk
-        .createDelegationSignature(contractAddress, [], { isOracle: false });
-      const { result } = await contract.signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
+      const preclaimSig = await aeSdk.signDelegation(
+        packDelegation(
+          { tag: DelegationTag.AensPreclaim, accountAddress: aeSdk.address, contractAddress },
+        ),
+      );
+      const { result } = await contract
+        .signedPreclaim(owner, commitmentIdDecoded, decode(preclaimSig));
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
-      // signature for any other name related operations
-      delegationSignature = await aeSdk.createDelegationSignature(contractAddress, [name]);
+      delegationSignature = await aeSdk.signDelegation(
+        packDelegation({
+          tag: DelegationTag.AensName,
+          accountAddress: aeSdk.address,
+          contractAddress,
+          nameId: name,
+        }),
+      );
     });
 
     it('claims', async () => {
       await aeSdk.awaitHeight(1 + await aeSdk.getHeight());
       const { result } = await contract
-        .signedClaim(owner, name, salt, nameFee, delegationSignature);
+        .signedClaim(owner, name, salt, nameFee, decode(delegationSignature));
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
     });
@@ -122,7 +133,7 @@ contract DelegateTest =
     it('updates', async () => {
       const pointee: Pointee = { [`${aens}.OraclePt`]: [newOwner] };
       const { result } = await contract
-        .signedUpdate(owner, name, 'oracle', pointee, delegationSignature);
+        .signedUpdate(owner, name, 'oracle', pointee, decode(delegationSignature));
       assertNotNull(result);
       expect(result.returnType).to.be.equal('ok');
       expect((await aeSdk.api.getNameEntryByName(name)).pointers).to.be.eql([{
@@ -136,7 +147,7 @@ contract DelegateTest =
     it('updates with raw pointer', async () => {
       if (isIris) return;
       const pointee: Pointee = { 'AENSv2.DataPt': [dataPt] };
-      await contract.signedUpdate(owner, name, 'test key', pointee, delegationSignature);
+      await contract.signedUpdate(owner, name, 'test key', pointee, decode(delegationSignature));
       expect((await aeSdk.api.getNameEntryByName(name)).pointers[0]).to.be.eql({
         key: 'test key',
         id: encode(dataPt, Encoding.Bytearray),
@@ -159,18 +170,22 @@ contract DelegateTest =
 
     it('transfers', async () => {
       const { result } = await contract
-        .signedTransfer(owner, newOwner, name, delegationSignature);
+        .signedTransfer(owner, newOwner, name, decode(delegationSignature));
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
     });
 
     it('revokes', async () => {
-      const revokeSig = await aeSdk.createDelegationSignature(
-        contractAddress,
-        [name],
+      const revokeSig = await aeSdk.signDelegation(
+        packDelegation({
+          tag: DelegationTag.AensName,
+          accountAddress: aeSdk.accounts[newOwner].address,
+          contractAddress,
+          nameId: name,
+        }),
         { onAccount: aeSdk.accounts[newOwner] },
       );
-      const { result } = await contract.signedRevoke(newOwner, name, revokeSig);
+      const { result } = await contract.signedRevoke(newOwner, name, decode(revokeSig));
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
       await expect(aeSdk.api.getNameEntryByName(name)).to.be.rejectedWith(Error);
@@ -209,8 +224,15 @@ contract DelegateTest =
     it('claims without preclaim', async () => {
       if (isIris) return;
       const n = randomName(30);
-      const dlgSig = await aeSdk.createDelegationSignature(contractAddress, [n]);
-      const { result } = await contract.signedClaim(aeSdk.address, n, 0, nameFee, dlgSig);
+      const dlgSig = await aeSdk.signDelegation(
+        packDelegation({
+          tag: DelegationTag.AensName,
+          accountAddress: aeSdk.address,
+          contractAddress,
+          nameId: n,
+        }),
+      );
+      const { result } = await contract.signedClaim(aeSdk.address, n, 0, nameFee, decode(dlgSig));
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
     });
@@ -219,7 +241,7 @@ contract DelegateTest =
   describe('Oracle', () => {
     let oracle: OracleClient;
     let queryObject: Awaited<ReturnType<OracleClient['getQuery']>>;
-    let delegationSignature: Uint8Array;
+    let delegationSignature: Encoded.Signature;
     const queryFee = 500000;
     const ttl: ChainTtl = { RelativeTTL: [50n] };
     let contract: Contract<{
@@ -269,10 +291,13 @@ contract DelegateTest =
     });
 
     it('registers', async () => {
-      delegationSignature = await aeSdk
-        .createDelegationSignature(contractAddress, [], { isOracle: true });
+      delegationSignature = await aeSdk.signDelegation(
+        packDelegation(
+          { tag: DelegationTag.Oracle, accountAddress: aeSdk.address, contractAddress },
+        ),
+      );
       const { result } = await contract
-        .signedRegisterOracle(aeSdk.address, delegationSignature, queryFee, ttl);
+        .signedRegisterOracle(aeSdk.address, decode(delegationSignature), queryFee, ttl);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
     });
@@ -280,7 +305,7 @@ contract DelegateTest =
     it('extends', async () => {
       const prevState = await oracle.getState();
       const { result } = await contract
-        .signedExtendOracle(oracle.address, delegationSignature, ttl);
+        .signedExtendOracle(oracle.address, decode(delegationSignature), ttl);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
       const state = await oracle.getState();
@@ -305,21 +330,17 @@ contract DelegateTest =
     it('responds to query', async () => {
       const r = 'Hi!';
       aeSdk.selectAccount(aeSdk.addresses()[1]);
-      const respondSig = await aeSdk
-        .createDelegationSignature(contractAddress, [queryObject.id], { omitAddress: true });
-      const { result } = await contract.respond(oracle.address, queryObject.id, respondSig, r);
+      const respondSig = await aeSdk.signDelegation(
+        packDelegation(
+          { tag: DelegationTag.OracleResponse, contractAddress, queryId: queryObject.id },
+        ),
+      );
+      const { result } = await contract
+        .respond(oracle.address, queryObject.id, decode(respondSig), r);
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
       const queryObject2 = await oracle.getQuery(queryObject.id);
       expect(queryObject2.decodedResponse).to.be.equal(r);
-    });
-
-    it('fails trying to create general delegation as oracle query', async () => {
-      if (!isIris) return;
-      const fakeQueryId = encode(decode(aeSdk.address), Encoding.OracleQueryId);
-      await expect(
-        aeSdk.createDelegationSignature(contractAddress, [fakeQueryId], { omitAddress: true }),
-      ).to.be.rejectedWith('not equal to account address');
     });
   });
 });

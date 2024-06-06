@@ -1,7 +1,6 @@
 import * as chainMethods from './chain';
 import { sendTransaction } from './send-transaction';
 import * as spendMethods from './spend';
-import createDelegationSignature from './contract/delegation-signature';
 import * as contractGaMethods from './contract/ga';
 import { buildTxAsync } from './tx/builder';
 import { mapObject, UnionToIntersection } from './utils/other';
@@ -18,7 +17,6 @@ const methods = {
   ...chainMethods,
   sendTransaction,
   ...spendMethods,
-  createDelegationSignature,
   ...contractGaMethods,
 } as const;
 
