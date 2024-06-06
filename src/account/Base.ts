@@ -3,7 +3,6 @@ import Node from '../Node';
 import CompilerBase from '../contract/compiler/Base';
 import { Int } from '../tx/builder/constants';
 import { AciValue, Domain } from '../utils/typed-data';
-import { NotImplementedError } from '../utils/errors';
 
 interface AuthData {
   fee?: Int;
@@ -61,20 +60,14 @@ export default abstract class AccountBase {
    * @param options - Options
    * @returns Signature
    */
-  // TODO: make abstract in the next major release
-  // eslint-disable-next-line class-methods-use-this
-  async signTypedData(
-    /* eslint-disable @typescript-eslint/no-unused-vars */
+  abstract signTypedData(
     data: Encoded.ContractBytearray,
     aci: AciValue,
     options?: Domain & {
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-  ): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signTypedData method');
-  }
+  ): Promise<Encoded.Signature>;
 
   /**
    * Sign data blob
@@ -101,18 +94,12 @@ export default abstract class AccountBase {
    * @param options - Options
    * @returns Signature
    */
-  // TODO: make abstract in the next major release
-  // eslint-disable-next-line class-methods-use-this
-  async signDelegation(
-    /* eslint-disable @typescript-eslint/no-unused-vars */
+  abstract signDelegation(
     delegation: Encoded.Bytearray,
     options?: {
       networkId?: string;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
     },
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-  ): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signDelegation method');
-  }
+  ): Promise<Encoded.Signature>;
 }
