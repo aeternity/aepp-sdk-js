@@ -18,7 +18,13 @@ export enum DelegationTag {
    * Delegation of an AENS name to a contract
    */
   AensName = 2,
+  /**
+   * Delegation of AENS preclaim to a contract
+   */
   AensPreclaim = 3,
+  /**
+   * Delegation of oracle operations to a contract
+   */
   Oracle = 4,
   /**
    * Delegation of oracle query to a contract

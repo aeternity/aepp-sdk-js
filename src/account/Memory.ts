@@ -9,9 +9,7 @@ import {
 import { concatBuffers } from '../utils/other';
 import { hashTypedData, AciValue } from '../utils/typed-data';
 import { buildTx } from '../tx/builder';
-import { Tag, ConsensusProtocolVersion } from '../tx/builder/constants';
-import { DelegationTag } from '../tx/builder/delegation/schema';
-import { packDelegation } from '../tx/builder/delegation';
+import { Tag } from '../tx/builder/constants';
 
 const secretKeys = new WeakMap<AccountMemory, Uint8Array>();
 
@@ -91,36 +89,6 @@ export default class AccountMemory extends AccountBase {
       name, version, networkId, contractAddress,
     });
     const signature = await this.sign(dHash, options);
-    return encode(signature, Encoding.Signature);
-  }
-
-  override async signDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { networkId, consensusProtocolVersion, isOracle }: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-      isOracle?: boolean;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (isOracle == null) {
-      const protocol = (consensusProtocolVersion != null) ? ConsensusProtocolVersion[consensusProtocolVersion] : 'unknown';
-      console.warn(`AccountMemory:signDelegationToContract: isOracle is not set. By default, sdk would generate an AENS preclaim delegation signature, but it won't be the same as the oracle delegation signature in Ceres (current protocol is ${protocol}).`);
-    }
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: isOracle === true ? DelegationTag.Oracle : DelegationTag.AensPreclaim,
-        accountAddress: this.address,
-        contractAddress,
-      });
-      return this.signDelegation(delegation, { networkId });
-    }
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
-    const payload = concatBuffers([
-      Buffer.from(networkId),
-      decode(this.address),
-      decode(contractAddress),
-    ]);
-    const signature = await this.sign(payload);
     return encode(signature, Encoding.Signature);
   }
 

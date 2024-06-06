@@ -1,14 +1,11 @@
 import AccountBase from './Base';
 import { METHODS } from '../aepp-wallet-communication/schema';
-import { ArgumentError, NotImplementedError, UnsupportedProtocolError } from '../utils/errors';
+import { ArgumentError, UnsupportedProtocolError } from '../utils/errors';
 import {
   Encoded, Encoding, decode, encode,
 } from '../utils/encoder';
 import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
 import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
-import { ConsensusProtocolVersion } from '../tx/builder/constants';
-import { packDelegation } from '../tx/builder/delegation';
-import { DelegationTag } from '../tx/builder/delegation/schema';
 
 /**
  * Account provided by wallet
@@ -75,28 +72,6 @@ export default class AccountRpc extends AccountBase {
       data,
     });
     return signature;
-  }
-
-  override async signDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { consensusProtocolVersion, isOracle }: {
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-      isOracle?: boolean;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (isOracle == null) {
-      const protocol = (consensusProtocolVersion != null) ? ConsensusProtocolVersion[consensusProtocolVersion] : 'unknown';
-      console.warn(`AccountRpc:signDelegationToContract: isOracle is not set. By default, sdk would generate an AENS preclaim delegation signature, but it won't be the same as the oracle delegation signature in Ceres (current protocol is ${protocol}).`);
-    }
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: isOracle === true ? DelegationTag.Oracle : DelegationTag.AensPreclaim,
-        accountAddress: this.address,
-        contractAddress,
-      });
-      return this.signDelegation(delegation);
-    }
-    throw new NotImplementedError('');
   }
 
   override async signDelegation(delegation: Encoded.Bytearray): Promise<Encoded.Signature> {

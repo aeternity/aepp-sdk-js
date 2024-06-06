@@ -78,17 +78,6 @@ class AccountMemoryProtected extends MemoryAccount {
     return super.signTypedData(data, aci, options);
   }
 
-  async signDelegationToContract(
-    contractAddress,
-    { aeppRpcClientId: id, aeppOrigin, ...options },
-  ) {
-    if (id != null) {
-      const opt = { ...options, contractAddress };
-      await genConfirmCallback('sign delegation to contract')(id, opt, aeppOrigin);
-    }
-    return super.signDelegationToContract(contractAddress, options);
-  }
-
   async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
       await genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);

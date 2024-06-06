@@ -1,7 +1,7 @@
 import { Encoded } from '../utils/encoder';
 import Node from '../Node';
 import CompilerBase from '../contract/compiler/Base';
-import { ConsensusProtocolVersion, Int } from '../tx/builder/constants';
+import { Int } from '../tx/builder/constants';
 import { AciValue, Domain } from '../utils/typed-data';
 import { NotImplementedError } from '../utils/errors';
 
@@ -74,32 +74,6 @@ export default abstract class AccountBase {
     /* eslint-enable @typescript-eslint/no-unused-vars */
   ): Promise<Encoded.Signature> {
     throw new NotImplementedError('signTypedData method');
-  }
-
-  /**
-   * Sign delegation of AENS, oracle operations to a contract
-   * @param contractAddress - Address of a contract to delegate permissions to
-   * @param options - Options
-   * @param options.isOracle - Use to generate an oracle delegation signature in Ceres, otherwise an
-   * AENS preclaim delegation signature would be generated
-   * @returns Signature
-   * @deprecated use AccountBase:signDelegation in Ceres
-   */
-  // TODO: make abstract in the next major release
-  // eslint-disable-next-line class-methods-use-this
-  async signDelegationToContract(
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    contractAddress: Encoded.ContractAddress,
-    options?: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-      isOracle?: boolean;
-      aeppOrigin?: string;
-      aeppRpcClientId?: string;
-    },
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-  ): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signDelegationToContract method');
   }
 
   /**
