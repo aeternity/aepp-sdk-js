@@ -310,15 +310,22 @@ This functionality could for example be used to build an AENS marketplace.
 ```js
 const contractAddress = 'ct_asd2ks...'
 // AENS name
-const name = 'example.chain'
+const nameId = 'example.chain'
+const commonParams = {
+  contractAddress,
+  accountAddress: aeSdk.address,
+}
+let delegation
 
 // this signature will allow the contract to perform a pre-claim on your behalf
-const preClaimSig = await aeSdk.signDelegationToContract(contractAddress, { isOracle: false })
+delegation = packDelegation({ tag: DelegationTag.AensPreclaim, ...commonParams })
 
 // this signature will allow the contract to perform
 // any name related transaction for a specific name that you own
-const nameDelegationSig = await aeSdk.signNameDelegationToContract(contractAddress, name)
+delegation = packDelegation({ tag: DelegationTag.AensName, nameId, ...commonParams })
 
 // alternatively, you can generate a delegation signature suitable for every name you own
-const allNamesDelegationSig = await aeSdk.signAllNamesDelegationToContract(contractAddress)
+delegation = packDelegation({ tag: DelegationTag.AensWildcard, ...commonParams })
+
+const delegationSignature = await aeSdk.signDelegation(delegation)
 ```
