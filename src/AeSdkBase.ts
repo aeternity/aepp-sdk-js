@@ -264,26 +264,6 @@ export default class AeSdkBase extends AeSdkMethods {
   }
 
   /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param oracleQueryId - Oracle query id
-   * @param options - Options
-   */
-  async signOracleQueryDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    oracleQueryId: Encoded.OracleQueryId,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signOracleQueryDelegationToContract']>[2] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
-  }
-
-  /**
    * Sign delegation, works only in Ceres
    * @param delegation - Delegation to sign
    * @param options - Options

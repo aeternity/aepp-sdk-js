@@ -217,18 +217,6 @@ export default {
         return super.signAllNamesDelegationToContract(contractAddress, options);
       }
 
-      async signOracleQueryDelegationToContract(
-        contractAddress,
-        oracleQueryId,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress, oracleQueryId };
-          genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
-        }
-        return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
-      }
-
       async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
         if (id != null) {
           genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);

@@ -174,36 +174,6 @@ export default class AccountMemory extends AccountBase {
     return encode(signature, Encoding.Signature);
   }
 
-  override async signOracleQueryDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    oracleQueryId: Encoded.OracleQueryId,
-    { networkId, consensusProtocolVersion }: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.OracleResponse, queryId: oracleQueryId, contractAddress,
-      });
-      return this.signDelegation(delegation, { networkId });
-    }
-    const oracleQueryIdDecoded = decode(oracleQueryId);
-    const addressDecoded = decode(this.address);
-    // TODO: remove after fixing https://github.com/aeternity/aesophia/issues/475
-    if (oracleQueryIdDecoded.compare(addressDecoded) === 0) {
-      throw new ArgumentError('oracleQueryId', 'not equal to account address', oracleQueryId);
-    }
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
-    const payload = concatBuffers([
-      Buffer.from(networkId),
-      oracleQueryIdDecoded,
-      decode(contractAddress),
-    ]);
-    const signature = await this.sign(payload);
-    return encode(signature, Encoding.Signature);
-  }
-
   override async signDelegation(
     delegation: Encoded.Bytearray,
     { networkId }: { networkId?: string } = {},
