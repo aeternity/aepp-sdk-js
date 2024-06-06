@@ -10,6 +10,9 @@ import {
  * @category delegation signature
  */
 export enum DelegationTag {
+  /**
+   * Delegation of all AENS names to a contract
+   */
   AensWildcard = 1,
   AensName = 2,
   AensPreclaim = 3,

@@ -193,7 +193,11 @@ contract DelegateTest =
 
     it('works using wildcard delegation signature', async () => {
       if (isIris) return;
-      const allNamesDelSig = decode(await aeSdk.signAllNamesDelegationToContract(contractAddress));
+      const allNamesDelSig = decode(await aeSdk.signDelegation(
+        packDelegation(
+          { tag: DelegationTag.AensWildcard, accountAddress: aeSdk.address, contractAddress },
+        ),
+      ));
       const n = randomName(30);
 
       const commitmentId = decode(commitmentHash(n, salt));

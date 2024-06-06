@@ -128,29 +128,6 @@ export default abstract class AccountBase {
   }
 
   /**
-   * Sign delegation of all AENS names to a contract (not available in Iris)
-   * @param contractAddress - Address of a contract to delegate permissions to
-   * @param options - Options
-   * @returns Signature
-   * @deprecated use AccountBase:signDelegation in Ceres
-   */
-  // TODO: make abstract in the next major release
-  // eslint-disable-next-line class-methods-use-this
-  async signAllNamesDelegationToContract(
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    contractAddress: Encoded.ContractAddress,
-    options?: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-      aeppOrigin?: string;
-      aeppRpcClientId?: string;
-    },
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-  ): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signAllNamesDelegationToContract method');
-  }
-
-  /**
    * Sign data blob
    * @param data - Data blob to sign
    * @param options - Options

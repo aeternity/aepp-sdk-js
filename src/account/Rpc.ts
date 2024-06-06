@@ -113,19 +113,6 @@ export default class AccountRpc extends AccountBase {
     throw new NotImplementedError('');
   }
 
-  override async signAllNamesDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { consensusProtocolVersion }: { consensusProtocolVersion?: ConsensusProtocolVersion } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.AensWildcard, accountAddress: this.address, contractAddress,
-      });
-      return this.signDelegation(delegation);
-    }
-    throw new NotImplementedError('');
-  }
-
   override async signDelegation(delegation: Encoded.Bytearray): Promise<Encoded.Signature> {
     const { signature } = await this._rpcClient.request(
       METHODS.signDelegation,
