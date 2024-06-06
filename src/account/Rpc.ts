@@ -1,6 +1,6 @@
 import AccountBase from './Base';
 import { METHODS } from '../aepp-wallet-communication/schema';
-import { ArgumentError, UnsupportedProtocolError } from '../utils/errors';
+import { ArgumentError, NotImplementedError, UnsupportedProtocolError } from '../utils/errors';
 import {
   Encoded, Encoding, decode, encode,
 } from '../utils/encoder';
@@ -96,12 +96,7 @@ export default class AccountRpc extends AccountBase {
       });
       return this.signDelegation(delegation);
     }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      isOracle,
-    });
-    return signature;
+    throw new NotImplementedError('');
   }
 
   override async signNameDelegationToContract(
@@ -115,12 +110,7 @@ export default class AccountRpc extends AccountBase {
       });
       return this.signDelegation(delegation);
     }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      name,
-    });
-    return signature;
+    throw new NotImplementedError('');
   }
 
   override async signAllNamesDelegationToContract(
@@ -133,12 +123,7 @@ export default class AccountRpc extends AccountBase {
       });
       return this.signDelegation(delegation);
     }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      allNames: true,
-    });
-    return signature;
+    throw new NotImplementedError('');
   }
 
   override async signOracleQueryDelegationToContract(
@@ -152,12 +137,7 @@ export default class AccountRpc extends AccountBase {
       });
       return this.signDelegation(delegation);
     }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      oracleQueryId,
-    });
-    return signature;
+    throw new NotImplementedError('');
   }
 
   override async signDelegation(delegation: Encoded.Bytearray): Promise<Encoded.Signature> {
