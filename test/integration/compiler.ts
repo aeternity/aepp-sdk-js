@@ -1,19 +1,17 @@
 import { readFile } from 'fs/promises';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { compilerUrl, compilerUrl7 } from '.';
+import { compilerUrl } from '.';
 import inclAci from './contracts/Includes.json';
 import {
-  CompilerBase, CompilerHttpNode, CompilerCli, CompilerCli8, CompilerError, getFileSystem, Encoded,
+  CompilerBase, CompilerHttpNode, CompilerCli, CompilerError, getFileSystem, Encoded,
 } from '../../src';
 
-function testCompiler(compiler: CompilerBase, isAesophia7: boolean): void {
+function testCompiler(compiler: CompilerBase): void {
   const inclSourceCodePath = './test/integration/contracts/Includes.aes';
   let inclSourceCode: string;
   let inclFileSystem: Record<string, string>;
-  const inclBytecode = isAesophia7
-    ? 'cb_+QEGRgOg7BH1sCv+p2IrS0Pn3/i6AfE8lOGUuC71lLPn6mbUm9PAuNm4cv4AWolkAjcCBwcHFBQAAgD+RNZEHwA3ADcAGg6CPwEDP/5Nt4A5AjcCBwcHDAECDAEABAMRAFqJZP6SiyA2ADcBBwcMAwgMAQAEAxFNt4A5/pSgnxIANwF3BwwBAAQDEarAwob+qsDChgI3AXcHPgQAALhgLwYRAFqJZD0uU3VibGlicmFyeS5zdW0RRNZEHxFpbml0EU23gDkxLkxpYnJhcnkuc3VtEZKLIDYRdGVzdBGUoJ8SJWdldExlbmd0aBGqwMKGOS5TdHJpbmcubGVuZ3Rogi8AhTcuNC4xABzDzFw='
-    : 'cb_+QEGRgOg7BH1sCv+p2IrS0Pn3/i6AfE8lOGUuC71lLPn6mbUm9PAuNm4cv4AWolkAjcCBwcHFBQAAgD+RNZEHwA3ADcAGg6CPwEDP/5Nt4A5AjcCBwcHDAECDAEABAMRAFqJZP6SiyA2ADcBBwcMAwgMAQAEAxFNt4A5/pSgnxIANwF3BwwBAAQDEarAwob+qsDChgI3AXcHPgQAALhgLwYRAFqJZD0uU3VibGlicmFyeS5zdW0RRNZEHxFpbml0EU23gDkxLkxpYnJhcnkuc3VtEZKLIDYRdGVzdBGUoJ8SJWdldExlbmd0aBGqwMKGOS5TdHJpbmcubGVuZ3Rogi8AhTguMC4wAIUiDfs=';
+  const inclBytecode = 'cb_+QEGRgOg7BH1sCv+p2IrS0Pn3/i6AfE8lOGUuC71lLPn6mbUm9PAuNm4cv4AWolkAjcCBwcHFBQAAgD+RNZEHwA3ADcAGg6CPwEDP/5Nt4A5AjcCBwcHDAECDAEABAMRAFqJZP6SiyA2ADcBBwcMAwgMAQAEAxFNt4A5/pSgnxIANwF3BwwBAAQDEarAwob+qsDChgI3AXcHPgQAALhgLwYRAFqJZD0uU3VibGlicmFyeS5zdW0RRNZEHxFpbml0EU23gDkxLkxpYnJhcnkuc3VtEZKLIDYRdGVzdBGUoJ8SJWdldExlbmd0aBGqwMKGOS5TdHJpbmcubGVuZ3Rogi8AhTguMC4wAIUiDfs=';
   const testBytecode = 'cb_+GhGA6BgYgXqYB9ctBcQ8mJ0+we5OXhb9PpsSQWP2DhPx9obn8C4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBd3cBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTcuMC4xAMXqWXc=';
 
   const interfaceSourceCodePath = './test/integration/contracts/Interface.aes';
@@ -63,7 +61,7 @@ function testCompiler(compiler: CompilerBase, isAesophia7: boolean): void {
   });
 
   it('returns version', async () => {
-    expect(await compiler.version()).to.be.equal(isAesophia7 ? '7.4.1' : '8.0.0');
+    expect(await compiler.version()).to.be.equal('8.0.0');
   });
 
   it('compiles and generates aci by path', async () => {
@@ -115,10 +113,6 @@ function testCompiler(compiler: CompilerBase, isAesophia7: boolean): void {
         + '    1 / 0\n',
       },
     );
-    if (isAesophia7 && compiler instanceof CompilerHttpNode) {
-      expect(warnings).to.eql([]);
-      return;
-    }
     expect(warnings).to.eql([{
       message: 'The variable `t` is defined but never used.',
       pos: { col: 9, line: 5 },
@@ -157,13 +151,7 @@ function testCompiler(compiler: CompilerBase, isAesophia7: boolean): void {
 }
 
 describe('CompilerHttp', () => {
-  describe('version 7', () => {
-    testCompiler(new CompilerHttpNode(compilerUrl7), true);
-  });
-
-  describe('version 8', () => {
-    testCompiler(new CompilerHttpNode(compilerUrl), false);
-  });
+  testCompiler(new CompilerHttpNode(compilerUrl));
 
   it('throws exception if used invalid compiler url', async () => {
     const c = new CompilerHttpNode('https://compilaer.aepps.com');
@@ -187,13 +175,7 @@ describe('CompilerHttp', () => {
 });
 
 describe('CompilerCli', () => {
-  describe('version 7', () => {
-    testCompiler(new CompilerCli(), true);
-  });
-
-  describe('version 8', () => {
-    testCompiler(new CompilerCli8(), false);
-  });
+  testCompiler(new CompilerCli());
 
   it('throws exception if used invalid compiler path', async () => {
     const c = new CompilerCli('not-existing');

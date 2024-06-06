@@ -39,7 +39,7 @@ export default class CompilerCli extends CompilerBase {
     this.#path = compilerPath;
     if (ignoreVersion !== true) {
       this.#ensureCompatibleVersion = this.version().then((version) => {
-        const versions = [version, '7.2.1', '9.0.0'] as const;
+        const versions = [version, '8.0.0', '9.0.0'] as const;
         if (!semverSatisfies(...versions)) throw new UnsupportedVersionError('compiler', ...versions);
       });
     }

@@ -23,10 +23,3 @@ services:
     # TODO: remove after releasing https://github.com/aeternity/aesophia_http/pull/133
     healthcheck:
       interval: 2s
-
-  compiler-7:
-    image: aeternity/aesophia_http:v7.6.1
-    ports: [3081:3080]
-    # TODO: remove after releasing https://github.com/aeternity/aesophia_http/pull/133
-    healthcheck:
-      interval: 2s

@@ -43,7 +43,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build:assets": "node tooling/fetch-aesophia-cli.mjs && node tooling/fetch-aesophia-cli-8.mjs",
+    "build:assets": "node tooling/fetch-aesophia-cli.mjs",
     "build:types": "tsc && node tooling/downlevel/run.mjs",
     "build:es": "babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
     "build:api:node": "autorest tooling/autorest/node.yaml",
