@@ -260,7 +260,7 @@ export default class Channel {
    * })
    * ```
    */
-  async leave(): Promise<{ channelId: Encoded.Bytearray; signedTx: Encoded.Transaction }> {
+  async leave(): Promise<{ channelId: Encoded.Channel; signedTx: Encoded.Transaction }> {
     return this.enqueueAction(() => {
       notify(this, 'channels.leave');
       return { handler: handlers.awaitingLeave };

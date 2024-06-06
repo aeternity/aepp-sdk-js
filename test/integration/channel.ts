@@ -21,13 +21,11 @@ import {
   Contract,
   Channel,
   buildTx,
+  MemoryAccount,
 } from '../../src';
-import { pause } from '../../src/utils/other';
-import {
-  ChannelOptions, notify, SignTx, SignTxWithTag,
-} from '../../src/channel/internal';
+import { notify, SignTx, SignTxWithTag } from '../../src/channel/internal';
 import { appendSignature } from '../../src/channel/handlers';
-import { assertNotNull, ensureEqual } from '../utils';
+import { assertNotNull, ensureEqual, ensureInstanceOf } from '../utils';
 
 const contractSourceCode = `
 contract Identity =
@@ -51,26 +49,25 @@ async function waitForChannel(channel: Channel): Promise<void> {
 }
 
 (networkId === 'ae_dev' ? describe : describe.skip)('Channel', () => {
-  let aeSdkInitiatior: AeSdk;
-  let aeSdkResponder: AeSdk;
+  let aeSdk: AeSdk;
+  let initiator: MemoryAccount;
+  let responder: MemoryAccount;
   let initiatorCh: Channel;
   let responderCh: Channel;
   let responderShouldRejectUpdate: number | boolean;
-  let existingChannelId: Encoded.Bytearray;
-  let offchainTx: string;
   let contractAddress: Encoded.ContractAddress;
   let callerNonce: number;
   let contract: Contract<{}>;
   const initiatorSign = sinon.spy(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async (tx: Encoded.Transaction, o?: Parameters<SignTx>[1]): Promise<Encoded.Transaction> => (
-      aeSdkInitiatior.signTransaction(tx)
+      initiator.signTransaction(tx, { networkId })
     ),
   );
   const responderSign = sinon.spy(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async (tx: Encoded.Transaction, o?: Parameters<SignTx>[1]): Promise<Encoded.Transaction> => (
-      aeSdkResponder.signTransaction(tx)
+      responder.signTransaction(tx, { networkId })
     ),
   );
   const initiatorSignTag = sinon.spy<SignTxWithTag>(async (_tag, tx: Encoded.Transaction) => (
@@ -90,28 +87,47 @@ async function waitForChannel(channel: Channel): Promise<void> {
     assertNotNull(signedTx);
     return buildTx(signedTx);
   };
-  const sharedParams: Omit<ChannelOptions, 'sign'> = {
+  const sharedParams = {
     url: channelUrl,
-    pushAmount: 3,
-    initiatorAmount: 1e15,
-    responderAmount: 1e15,
+    pushAmount: 1e13,
+    initiatorAmount: 5e14,
+    responderAmount: 5e14,
     channelReserve: 0,
-    ttl: 10000,
-    host: 'localhost',
     port: 3114,
     lockPeriod: 1,
-    statePassword: 'correct horse battery staple',
-    initiatorId: 'ak_',
-    responderId: 'ak_',
-    role: 'initiator',
+    initiatorId: 'ak_' as Encoded.AccountAddress,
+    responderId: 'ak_' as Encoded.AccountAddress,
     minimumDepth: 0,
   };
+  const initiatorParams = {
+    role: 'initiator',
+    host: 'localhost',
+    sign: initiatorSignTag,
+  } as const;
+  const responderParams = {
+    role: 'responder',
+    sign: responderSignTag,
+  } as const;
+
+  async function recreateAccounts(): Promise<void> {
+    initiator = MemoryAccount.generate();
+    responder = MemoryAccount.generate();
+    await aeSdk.spend(3e15, initiator.address);
+    await aeSdk.spend(3e15, responder.address);
+    sharedParams.initiatorId = initiator.address;
+    sharedParams.responderId = responder.address;
+  }
+
+  async function getBalances(): Promise<[string, string]> {
+    const [bi, br] = await Promise.all(
+      [initiator.address, responder.address].map(async (a) => aeSdk.getBalance(a)),
+    );
+    return [bi, br];
+  }
 
   before(async () => {
-    aeSdkInitiatior = await getSdk();
-    aeSdkResponder = await getSdk();
-    sharedParams.initiatorId = aeSdkInitiatior.address;
-    sharedParams.responderId = aeSdkResponder.address;
+    aeSdk = await getSdk();
+    await recreateAccounts();
   });
 
   after(() => {
@@ -133,14 +149,12 @@ async function waitForChannel(channel: Channel): Promise<void> {
   it('can open a channel', async () => {
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
-      sign: initiatorSignTag,
+      ...initiatorParams,
     });
     const initiatorChOpenPromise = waitForChannel(initiatorCh);
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
-      sign: responderSignTag,
+      ...responderParams,
     });
     const responderChOpenPromise = waitForChannel(responderCh);
     await Promise.all([initiatorChOpenPromise, responderChOpenPromise]);
@@ -159,25 +173,31 @@ async function waitForChannel(channel: Channel): Promise<void> {
       'responder_sign',
       sinon.match.string,
     );
-    const expectedTxParams = {
-      initiator: aeSdkInitiatior.address,
-      responder: aeSdkResponder.address,
-      initiatorAmount: sharedParams.initiatorAmount.toString(),
-      responderAmount: sharedParams.responderAmount.toString(),
-      channelReserve: sharedParams?.channelReserve?.toString(),
-      lockPeriod: sharedParams.lockPeriod.toString(),
+    const initiatorTx = unpackTx(initiatorSignTag.firstCall.args[1], Tag.ChannelCreateTx);
+    const responderTx = unpackTx(responderSignTag.firstCall.args[1], Tag.ChannelCreateTx);
+    const expectedParams = {
+      channelReserve: '0',
+      fee: '17680000000000',
+      initiator: initiator.address,
+      initiatorAmount: '500000000000000',
+      initiatorDelegateIds: [],
+      lockPeriod: '1',
+      nonce: 1,
+      responder: responder.address,
+      responderAmount: '500000000000000',
+      responderDelegateIds: [],
+      stateHash: initiatorTx.stateHash,
+      tag: Tag.ChannelCreateTx,
+      ttl: 0,
+      version: 2,
     };
-    const initiatorTx = unpackTx(initiatorSignTag.firstCall.args[1]);
-    const responderTx = unpackTx(responderSignTag.firstCall.args[1]);
-    expect(initiatorTx.tag).to.be.equal(Tag.ChannelCreateTx);
-    initiatorTx.should.eql({ ...initiatorTx, ...expectedTxParams });
-    expect(responderTx.tag).to.be.equal(Tag.ChannelCreateTx);
-    responderTx.should.eql({ ...responderTx, ...expectedTxParams });
+    expect(initiatorTx).to.eql(expectedParams);
+    expect(responderTx).to.eql(expectedParams);
   });
 
   it('emits error on handling incoming messages', async () => {
-    const getError = new Promise<ChannelIncomingMessageError>((resolve) => {
-      function handler(error: ChannelIncomingMessageError): void {
+    const getError = new Promise<Error>((resolve) => {
+      function handler(error: Error): void {
         resolve(error);
         initiatorCh.off('error', handler);
       }
@@ -185,6 +205,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
     notify(initiatorCh, 'not-existing-method');
     const error = await getError;
+    ensureInstanceOf(error, ChannelIncomingMessageError);
     expect(error.incomingMessage.error.message).to.be.equal('Method not found');
     expect(() => { throw error.handlerError; })
       .to.throw(UnknownChannelStateError, 'State Channels FSM entered unknown state');
@@ -196,8 +217,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
     assertNotNull(roundBefore);
     const amount = 1e14;
     const result = await initiatorCh.update(
-      aeSdkInitiatior.address,
-      aeSdkResponder.address,
+      initiator.address,
+      responder.address,
       amount,
       initiatorSign,
     );
@@ -213,8 +234,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
       {
         updates: [{
           amount,
-          from: aeSdkInitiatior.address,
-          to: aeSdkResponder.address,
+          from: initiator.address,
+          to: responder.address,
           op: 'OffChainTransfer',
         }],
       },
@@ -226,8 +247,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
       {
         updates: [{
           amount,
-          from: aeSdkInitiatior.address,
-          to: aeSdkResponder.address,
+          from: initiator.address,
+          to: responder.address,
           op: 'OffChainTransfer',
         }],
       },
@@ -239,8 +260,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
       updates: [
         {
           amount,
-          from: aeSdkInitiatior.address,
-          to: aeSdkResponder.address,
+          from: initiator.address,
+          to: responder.address,
           op: 'OffChainTransfer',
         },
       ],
@@ -252,8 +273,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
     const amount = 1;
     const roundBefore = initiatorCh.round();
     const result = await initiatorCh.update(
-      aeSdkResponder.address,
-      aeSdkInitiatior.address,
+      responder.address,
+      initiator.address,
       amount,
       initiatorSign,
     );
@@ -268,8 +289,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
       {
         updates: [{
           amount,
-          from: aeSdkResponder.address,
-          to: aeSdkInitiatior.address,
+          from: responder.address,
+          to: initiator.address,
           op: 'OffChainTransfer',
         }],
       },
@@ -281,8 +302,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
       {
         updates: [{
           amount,
-          from: aeSdkResponder.address,
-          to: aeSdkInitiatior.address,
+          from: responder.address,
+          to: initiator.address,
           op: 'OffChainTransfer',
         }],
       },
@@ -293,8 +314,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
       updates: [
         {
           amount,
-          from: aeSdkResponder.address,
-          to: aeSdkInitiatior.address,
+          from: responder.address,
+          to: initiator.address,
           op: 'OffChainTransfer',
         },
       ],
@@ -304,8 +325,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
   it('can abort update sign request', async () => {
     const errorCode = 12345;
     const result = await initiatorCh.update(
-      aeSdkInitiatior.address,
-      aeSdkResponder.address,
+      initiator.address,
+      responder.address,
       100,
       async () => Promise.resolve(errorCode),
     );
@@ -315,8 +336,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
   it('can abort update with custom error code', async () => {
     responderShouldRejectUpdate = 1234;
     const result = await initiatorCh.update(
-      aeSdkInitiatior.address,
-      aeSdkResponder.address,
+      initiator.address,
+      responder.address,
       100,
       initiatorSign,
     );
@@ -331,8 +352,8 @@ async function waitForChannel(channel: Channel): Promise<void> {
     responderShouldRejectUpdate = true;
     const meta = 'meta 1';
     await initiatorCh.update(
-      aeSdkInitiatior.address,
-      aeSdkResponder.address,
+      initiator.address,
+      responder.address,
       100,
       initiatorSign,
       [meta],
@@ -350,9 +371,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
   });
 
   it('can get proof of inclusion', async () => {
-    const initiatorAddr = aeSdkInitiatior.address;
-    const responderAddr = aeSdkResponder.address;
-    const params = { accounts: [initiatorAddr, responderAddr] };
+    const params = { accounts: [initiator.address, responder.address] };
     const initiatorPoi = await initiatorCh.poi(params);
     const responderPoi = await responderCh.poi(params);
     expect(initiatorPoi).to.be.eql(responderPoi);
@@ -361,17 +380,15 @@ async function waitForChannel(channel: Channel): Promise<void> {
   });
 
   it('can send a message', async () => {
-    const sender = aeSdkInitiatior.address;
-    const recipient = aeSdkResponder.address;
     const info = 'hello world';
-    initiatorCh.sendMessage(info, recipient);
+    initiatorCh.sendMessage(info, responder.address);
     const message = await new Promise((resolve) => {
       responderCh.on('message', resolve);
     });
     expect(message).to.eql({
       channel_id: initiatorCh.id(),
-      from: sender,
-      to: recipient,
+      from: initiator.address,
+      to: responder.address,
       info,
     });
   });
@@ -405,7 +422,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
         updates: [{
           amount,
           op: 'OffChainWithdrawal',
-          to: aeSdkInitiatior.address,
+          to: initiator.address,
         }],
       },
     );
@@ -417,13 +434,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
         updates: [{
           amount,
           op: 'OffChainWithdrawal',
-          to: aeSdkInitiatior.address,
+          to: initiator.address,
         }],
       },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelWithdrawTx>(tx.tag, Tag.ChannelWithdrawTx);
-    expect(tx.toId).to.be.equal(aeSdkInitiatior.address);
+    expect(tx.toId).to.be.equal(initiator.address);
     expect(tx.amount).to.be.equal(amount.toString());
   });
 
@@ -454,7 +471,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
         updates: [{
           amount,
           op: 'OffChainWithdrawal',
-          to: aeSdkInitiatior.address,
+          to: initiator.address,
         }],
       },
     );
@@ -466,13 +483,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
         updates: [{
           amount,
           op: 'OffChainWithdrawal',
-          to: aeSdkInitiatior.address,
+          to: initiator.address,
         }],
       },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelWithdrawTx>(tx.tag, Tag.ChannelWithdrawTx);
-    expect(tx.toId).to.be.equal(aeSdkInitiatior.address);
+    expect(tx.toId).to.be.equal(initiator.address);
     expect(tx.amount).to.be.equal(amount.toString());
   });
 
@@ -527,7 +544,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
         updates: [{
           amount: amount.toString(),
           op: 'OffChainDeposit',
-          from: aeSdkInitiatior.address,
+          from: initiator.address,
         }],
       },
     );
@@ -539,13 +556,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
         updates: [{
           amount: amount.toString(),
           op: 'OffChainDeposit',
-          from: aeSdkInitiatior.address,
+          from: initiator.address,
         }],
       },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelDepositTx>(tx.tag, Tag.ChannelDepositTx);
-    expect(tx.fromId).to.be.equal(aeSdkInitiatior.address);
+    expect(tx.fromId).to.be.equal(initiator.address);
     expect(tx.amount).to.be.equal(amount.toString());
   });
 
@@ -576,13 +593,13 @@ async function waitForChannel(channel: Channel): Promise<void> {
         updates: [{
           amount: amount.toString(),
           op: 'OffChainDeposit',
-          from: aeSdkInitiatior.address,
+          from: initiator.address,
         }],
       },
     );
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelDepositTx>(tx.tag, Tag.ChannelDepositTx);
-    expect(tx.fromId).to.be.equal(aeSdkInitiatior.address);
+    expect(tx.fromId).to.be.equal(initiator.address);
     expect(tx.amount).to.be.equal(amount.toString());
   });
 
@@ -623,29 +640,28 @@ async function waitForChannel(channel: Channel): Promise<void> {
     sinon.assert.calledWithExactly(initiatorSign, sinon.match.string);
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelCloseMutualTx>(tx.tag, Tag.ChannelCloseMutualTx);
-    expect(tx.fromId).to.be.equal(aeSdkInitiatior.address);
+    expect(tx.fromId).to.be.equal(initiator.address);
     // TODO: check `initiatorAmountFinal` and `responderAmountFinal`
   });
 
+  let existingChannelId: Encoded.Channel;
+  let offchainTx: Encoded.Transaction;
   it('can leave a channel', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
-      sign: initiatorSignTag,
+      ...initiatorParams,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
-      sign: responderSignTag,
+      ...responderParams,
     });
-
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     initiatorCh.round(); // existingChannelRound
     const result = await initiatorCh.leave();
-    result.channelId.should.be.a('string');
-    result.signedTx.should.be.a('string');
+    expect(result.channelId).to.satisfy((t: string) => t.startsWith('ch_'));
+    expect(result.signedTx).to.satisfy((t: string) => t.startsWith('tx_'));
     existingChannelId = result.channelId;
     offchainTx = result.signedTx;
   });
@@ -653,11 +669,10 @@ async function waitForChannel(channel: Channel): Promise<void> {
   it('can reestablish a channel', async () => {
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
-      port: 3002,
+      ...initiatorParams,
+      // @ts-expect-error TODO: use existingChannelId instead existingFsmId
       existingFsmId: existingChannelId,
       offchainTx,
-      sign: initiatorSignTag,
     });
     await waitForChannel(initiatorCh);
     // TODO: why node doesn't return signed_tx when channel is reestablished?
@@ -669,139 +684,130 @@ async function waitForChannel(channel: Channel): Promise<void> {
   it('can solo close a channel', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
+    await recreateAccounts();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
-      port: 3003,
-      sign: initiatorSignTag,
+      ...initiatorParams,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
-      port: 3003,
-      sign: responderSignTag,
+      ...responderParams,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
 
-    const initiatorAddr = aeSdkInitiatior.address;
-    const responderAddr = aeSdkResponder.address;
     const { signedTx } = await initiatorCh.update(
-      initiatorAddr,
-      responderAddr,
+      initiator.address,
+      responder.address,
       1e14,
       initiatorSign,
     );
     assertNotNull(signedTx);
     const poi = await initiatorCh.poi({
-      accounts: [initiatorAddr, responderAddr],
+      accounts: [initiator.address, responder.address],
     });
-    const balances = await initiatorCh.balances([initiatorAddr, responderAddr]);
-    const initiatorBalanceBeforeClose = await aeSdkInitiatior.getBalance(initiatorAddr);
-    const responderBalanceBeforeClose = await aeSdkResponder.getBalance(responderAddr);
-    const closeSoloTx = await aeSdkInitiatior.buildTx({
+    const balances = await initiatorCh.balances([initiator.address, responder.address]);
+    const [initiatorBalanceBeforeClose, responderBalanceBeforeClose] = await getBalances();
+    const closeSoloTx = await aeSdk.buildTx({
       tag: Tag.ChannelCloseSoloTx,
       channelId: await initiatorCh.id(),
-      fromId: initiatorAddr,
+      fromId: initiator.address,
       poi,
       payload: signedTx,
     });
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
-    await aeSdkInitiatior.sendTransaction(closeSoloTx);
-    const settleTx = await aeSdkInitiatior.buildTx({
+    await aeSdk.sendTransaction(closeSoloTx, { onAccount: initiator });
+
+    const settleTx = await aeSdk.buildTx({
       tag: Tag.ChannelSettleTx,
       channelId: await initiatorCh.id(),
-      fromId: initiatorAddr,
-      initiatorAmountFinal: balances[initiatorAddr],
-      responderAmountFinal: balances[responderAddr],
+      fromId: initiator.address,
+      initiatorAmountFinal: balances[initiator.address],
+      responderAmountFinal: balances[responder.address],
     });
     const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
-    await aeSdkInitiatior.sendTransaction(settleTx);
-    const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
-    const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);
+    await aeSdk.sendTransaction(settleTx, { onAccount: initiator });
+
+    const [initiatorBalanceAfterClose, responderBalanceAfterClose] = await getBalances();
     new BigNumber(initiatorBalanceAfterClose)
       .minus(initiatorBalanceBeforeClose)
       .plus(closeSoloTxFee)
       .plus(settleTxFee)
-      .isEqualTo(balances[initiatorAddr])
+      .isEqualTo(balances[initiator.address])
       .should.be.equal(true);
     new BigNumber(responderBalanceAfterClose)
       .minus(responderBalanceBeforeClose)
-      .isEqualTo(balances[responderAddr])
+      .isEqualTo(balances[responder.address])
       .should.be.equal(true);
   });
 
   it('can dispute via slash tx', async () => {
-    const initiatorAddr = aeSdkInitiatior.address;
-    const responderAddr = aeSdkResponder.address;
     initiatorCh.disconnect();
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
+      ...initiatorParams,
       lockPeriod: 2,
-      role: 'initiator',
-      sign: initiatorSignTag,
-      port: 3004,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
+      ...responderParams,
       lockPeriod: 2,
-      role: 'responder',
-      sign: responderSignTag,
-      port: 3004,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
-    const initiatorBalanceBeforeClose = await aeSdkInitiatior.getBalance(initiatorAddr);
-    const responderBalanceBeforeClose = await aeSdkResponder.getBalance(responderAddr);
-    const oldUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, initiatorSign);
+    const [initiatorBalanceBeforeClose, responderBalanceBeforeClose] = await getBalances();
+    const oldUpdate = await initiatorCh
+      .update(initiator.address, responder.address, 100, initiatorSign);
     const oldPoi = await initiatorCh.poi({
-      accounts: [initiatorAddr, responderAddr],
+      accounts: [initiator.address, responder.address],
     });
-    const recentUpdate = await initiatorCh.update(initiatorAddr, responderAddr, 100, initiatorSign);
+    const recentUpdate = await initiatorCh
+      .update(initiator.address, responder.address, 100, initiatorSign);
     const recentPoi = await responderCh.poi({
-      accounts: [initiatorAddr, responderAddr],
+      accounts: [initiator.address, responder.address],
     });
-    const recentBalances = await responderCh.balances([initiatorAddr, responderAddr]);
+    const recentBalances = await responderCh.balances([initiator.address, responder.address]);
     assertNotNull(oldUpdate.signedTx);
-    const closeSoloTx = await aeSdkInitiatior.buildTx({
+    const closeSoloTx = await aeSdk.buildTx({
       tag: Tag.ChannelCloseSoloTx,
       channelId: initiatorCh.id(),
-      fromId: initiatorAddr,
+      fromId: initiator.address,
       poi: oldPoi,
       payload: oldUpdate.signedTx,
     });
     const closeSoloTxFee = unpackTx(closeSoloTx, Tag.ChannelCloseSoloTx).fee;
-    await aeSdkInitiatior.sendTransaction(closeSoloTx);
+    await aeSdk.sendTransaction(closeSoloTx, { onAccount: initiator });
+
     assertNotNull(recentUpdate.signedTx);
-    const slashTx = await aeSdkResponder.buildTx({
+    const slashTx = await aeSdk.buildTx({
       tag: Tag.ChannelSlashTx,
       channelId: responderCh.id(),
-      fromId: responderAddr,
+      fromId: responder.address,
       poi: recentPoi,
       payload: recentUpdate.signedTx,
     });
     const slashTxFee = unpackTx(slashTx, Tag.ChannelSlashTx).fee;
-    await aeSdkResponder.sendTransaction(slashTx);
-    const settleTx = await aeSdkResponder.buildTx({
+    await aeSdk.sendTransaction(slashTx, { onAccount: responder });
+    const settleTx = await aeSdk.buildTx({
       tag: Tag.ChannelSettleTx,
       channelId: responderCh.id(),
-      fromId: responderAddr,
-      initiatorAmountFinal: recentBalances[initiatorAddr],
-      responderAmountFinal: recentBalances[responderAddr],
+      fromId: responder.address,
+      initiatorAmountFinal: recentBalances[initiator.address],
+      responderAmountFinal: recentBalances[responder.address],
     });
     const settleTxFee = unpackTx(settleTx, Tag.ChannelSettleTx).fee;
-    await aeSdkResponder.sendTransaction(settleTx);
-    const initiatorBalanceAfterClose = await aeSdkInitiatior.getBalance(initiatorAddr);
-    const responderBalanceAfterClose = await aeSdkResponder.getBalance(responderAddr);
+    await aeSdk.sendTransaction(settleTx, { onAccount: responder });
+
+    const [initiatorBalanceAfterClose, responderBalanceAfterClose] = await getBalances();
     new BigNumber(initiatorBalanceAfterClose)
       .minus(initiatorBalanceBeforeClose)
       .plus(closeSoloTxFee)
-      .isEqualTo(recentBalances[initiatorAddr])
+      .isEqualTo(recentBalances[initiator.address])
       .should.be.equal(true);
     new BigNumber(responderBalanceAfterClose)
       .minus(responderBalanceBeforeClose)
       .plus(slashTxFee)
       .plus(settleTxFee)
-      .isEqualTo(recentBalances[responderAddr])
+      .isEqualTo(recentBalances[responder.address])
       .should.be.equal(true);
   });
 
@@ -810,20 +816,14 @@ async function waitForChannel(channel: Channel): Promise<void> {
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
-      port: 3005,
-      sign: initiatorSignTag,
+      ...initiatorParams,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
-      port: 3005,
-      sign: responderSignTag,
+      ...responderParams,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
-    contract = await Contract.initialize({
-      ...aeSdkInitiatior.getContext(), sourceCode: contractSourceCode,
-    });
+    contract = await Contract.initialize({ ...aeSdk.getContext(), sourceCode: contractSourceCode });
     const initiatorNewContract = sinon.spy();
     initiatorCh.on('newContract', initiatorNewContract);
     const responderNewContract = sinon.spy();
@@ -934,12 +934,12 @@ async function waitForChannel(channel: Channel): Promise<void> {
 
   it('can get balances', async () => {
     const contractAddr = encode(decode(contractAddress), Encoding.AccountAddress);
-    const addresses = [aeSdkInitiatior.address, aeSdkResponder.address, contractAddr];
+    const addresses = [initiator.address, responder.address, contractAddr];
     const balances = await initiatorCh.balances(addresses);
     balances.should.be.an('object');
     // TODO: use the same type not depending on value after fixing https://github.com/aeternity/aepp-sdk-js/issues/1926
-    balances[aeSdkInitiatior.address].should.be.a('number');
-    balances[aeSdkResponder.address].should.be.a('number');
+    balances[initiator.address].should.be.a('number');
+    balances[responder.address].should.be.a('number');
     balances[contractAddr].should.be.equal(1000);
     expect(balances).to.eql(await responderCh.balances(addresses));
   });
@@ -968,7 +968,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
       abiVersion: AbiVersion.Fate,
     }, initiatorSign);
     const hash = buildTxHash(forceTx.tx);
-    const { callInfo } = await aeSdkInitiatior.api.getTransactionInfoByHash(hash);
+    const { callInfo } = await aeSdk.api.getTransactionInfoByHash(hash);
     assertNotNull(callInfo);
     expect(callInfo.returnType).to.be.equal('ok');
   });
@@ -1017,12 +1017,12 @@ async function waitForChannel(channel: Channel): Promise<void> {
 
   it('can get contract call', async () => {
     const result = await initiatorCh.getContractCall({
-      caller: aeSdkInitiatior.address,
+      caller: initiator.address,
       contract: contractAddress,
       round: callerNonce,
     });
     result.should.eql({
-      callerId: aeSdkInitiatior.address,
+      callerId: initiator.address,
       callerNonce,
       contractId: contractAddress,
       gasPrice: result.gasPrice,
@@ -1044,7 +1044,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
       abiVersion: AbiVersion.Fate,
     });
     result.should.eql({
-      callerId: aeSdkInitiatior.address,
+      callerId: initiator.address,
       callerNonce: result.callerNonce,
       contractId: contractAddress,
       gasPrice: result.gasPrice,
@@ -1061,7 +1061,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
   it('can clean contract calls', async () => {
     await initiatorCh.cleanContractCalls();
     await initiatorCh.getContractCall({
-      caller: aeSdkInitiatior.address,
+      caller: initiator.address,
       contract: contractAddress,
       round: callerNonce,
     }).should.eventually.be.rejected;
@@ -1075,7 +1075,7 @@ async function waitForChannel(channel: Channel): Promise<void> {
         active: true,
         deposit: 1000,
         id: contractAddress,
-        ownerId: aeSdkInitiatior.address,
+        ownerId: initiator.address,
         referrerIds: [],
         vmVersion: VmVersion.Fate,
       },
@@ -1083,37 +1083,35 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
     // TODO: contractState deserialization
   });
-  // TODO fix this
+
   it.skip('can post snapshot solo transaction', async () => {
-    const snapshotSoloTx = await aeSdkInitiatior.buildTx({
+    const snapshotSoloTx = await aeSdk.buildTx({
       tag: Tag.ChannelSnapshotSoloTx,
       channelId: initiatorCh.id(),
-      fromId: aeSdkInitiatior.address,
+      fromId: initiator.address,
       payload: await initiatorSignedTx(),
     });
-    await aeSdkInitiatior.sendTransaction(snapshotSoloTx);
+    // TODO: fix this, error: invalid_at_protocol
+    await aeSdk.sendTransaction(snapshotSoloTx, { onAccount: initiator });
   });
 
+  // https://github.com/aeternity/protocol/blob/d634e7a3f3110657900759b183d0734e61e5803a/node/api/channels_api_usage.md#reestablish
   it('can reconnect', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
-      port: 3006,
-      sign: initiatorSignTag,
+      ...initiatorParams,
     });
-
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
-      port: 3006,
-      sign: responderSignTag,
+      ...responderParams,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
+    expect(await initiatorCh.round()).to.be.equal(1);
     const result = await initiatorCh.update(
-      aeSdkInitiatior.address,
-      aeSdkResponder.address,
+      initiator.address,
+      responder.address,
       100,
       initiatorSign,
     );
@@ -1123,66 +1121,52 @@ async function waitForChannel(channel: Channel): Promise<void> {
     initiatorCh.disconnect();
     const ch = await Channel.initialize({
       ...sharedParams,
-      url: sharedParams.url,
-      host: sharedParams.host,
-      port: 3006,
-      role: 'initiator',
+      ...initiatorParams,
       existingChannelId: channelId,
       existingFsmId: fsmId,
-      sign: responderSignTag,
     });
     await waitForChannel(ch);
-    ch.fsmId().should.equal(fsmId);
-    // TODO: why node doesn't return signed_tx when channel is reestablished?
-    // await new Promise((resolve) => {
-    //   const checkRound = () => {
-    //     ch.round().should.equal(round)
-    //     // TODO: enable line below
-    //     // ch.off('stateChanged', checkRound)
-    //     resolve()
-    //   }
-    //   ch.on('stateChanged', checkRound)
-    // })
-    await ch.state().should.eventually.be.fulfilled;
-    await pause(10 * 1000);
-  }).timeout(80000);
+    expect(ch.fsmId()).to.be.equal(fsmId);
+    expect(await ch.round()).to.be.equal(2);
+    const state = await ch.state();
+    ch.disconnect();
+    assertNotNull(state.signedTx);
+    expect(state.signedTx.encodedTx.tag).to.be.equal(Tag.ChannelOffChainTx);
+  });
 
   it('can post backchannel update', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
     initiatorCh = await Channel.initialize({
       ...sharedParams,
-      role: 'initiator',
-      port: 3007,
-      sign: initiatorSignTag,
+      ...initiatorParams,
     });
     responderCh = await Channel.initialize({
       ...sharedParams,
-      role: 'responder',
-      port: 3007,
-      sign: responderSignTag,
+      ...responderParams,
     });
     await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
+    expect(await responderCh.round()).to.be.equal(1);
     initiatorCh.disconnect();
     const { accepted } = await responderCh.update(
-      aeSdkInitiatior.address,
-      aeSdkResponder.address,
+      initiator.address,
+      responder.address,
       100,
       responderSign,
     );
     expect(accepted).to.equal(false);
+    expect(await responderCh.round()).to.be.equal(1);
     const result = await responderCh.update(
-      aeSdkInitiatior.address,
-      aeSdkResponder.address,
+      initiator.address,
+      responder.address,
       100,
       async (transaction) => (
         appendSignature(await responderSign(transaction), initiatorSign)
       ),
     );
     result.accepted.should.equal(true);
+    expect(await responderCh.round()).to.be.equal(2);
     expect(result.signedTx).to.be.a('string');
-    initiatorCh.disconnect();
-    initiatorCh.disconnect();
   });
 
   describe('throws errors', () => {
@@ -1191,15 +1175,11 @@ async function waitForChannel(channel: Channel): Promise<void> {
       responderCh.disconnect();
       initiatorCh = await Channel.initialize({
         ...sharedParams,
-        role: 'initiator',
-        port: 3008,
-        sign: initiatorSignTag,
+        ...initiatorParams,
       });
       responderCh = await Channel.initialize({
         ...sharedParams,
-        role: 'responder',
-        port: 3008,
-        sign: responderSignTag,
+        ...responderParams,
       });
       await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
     });
@@ -1210,19 +1190,11 @@ async function waitForChannel(channel: Channel): Promise<void> {
     });
 
     async function update(
-      { from, amount }: {
-        from?: Encoded.AccountAddress;
-        amount?: number | BigNumber;
-      },
-    ): Promise<{
-        accepted: boolean;
-        signedTx?: string;
-        errorCode?: number;
-        errorMessage?: string;
-      }> {
+      { from, amount }: { from?: Encoded.AccountAddress; amount?: number },
+    ): ReturnType<typeof initiatorCh.update> {
       return initiatorCh.update(
-        from ?? aeSdkInitiatior.address,
-        aeSdkResponder.address,
+        from ?? initiator.address,
+        responder.address,
         amount ?? 1,
         initiatorSign,
       );

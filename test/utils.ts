@@ -24,6 +24,15 @@ export function ensureEqual<T>(value: any, equalTo: T): asserts value is T {
   expect(value).to.be.equal(equalTo);
 }
 
+type Cls = abstract new (...args: any) => any;
+
+export function ensureInstanceOf<T extends Cls>(
+  value: any,
+  cls: T,
+): asserts value is InstanceType<T> {
+  expect(value).to.be.instanceOf(cls);
+}
+
 export type ChainTtl = { FixedTTL: [bigint] }
 | { RelativeTTL: [bigint] } | { AbsoluteTTL: [bigint] };
 
