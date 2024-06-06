@@ -238,7 +238,8 @@ describe('Aens', () => {
       channel: encode(decode(address), Encoding.Channel),
       contract_pubkey: buildContractId(address, 13),
     };
-    pointersNode = Object.entries(pointers).map(([key, id]) => ({ key, id }));
+    pointersNode = Object.entries(pointers)
+      .map(([key, id]) => ({ key, id, encodedKey: encode(Buffer.from(key), Encoding.Bytearray) }));
   });
 
   it('updates', async () => {
@@ -294,7 +295,11 @@ describe('Aens', () => {
     assertNotNull(updateRes.tx);
     expect(updateRes.tx.pointers).to.be.eql([
       ...pointersNode.filter((pointer) => pointer.key !== 'contract_pubkey'),
-      { key: 'contract_pubkey', id: anotherContract },
+      {
+        key: 'contract_pubkey',
+        id: anotherContract,
+        encodedKey: 'ba_Y29udHJhY3RfcHVia2V5OCcARA==',
+      },
     ]);
   });
 

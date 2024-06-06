@@ -139,6 +139,7 @@ contract DelegateTest =
       expect((await aeSdk.api.getNameEntryByName(name)).pointers).to.be.eql([{
         key: 'oracle',
         id: newOwner.replace('ak', 'ok'),
+        encodedKey: 'ba_b3JhY2xlzgFUsQ==',
       }]);
     });
 
@@ -151,6 +152,7 @@ contract DelegateTest =
       expect((await aeSdk.api.getNameEntryByName(name)).pointers[0]).to.be.eql({
         key: 'test key',
         id: encode(dataPt, Encoding.Bytearray),
+        encodedKey: 'ba_dGVzdCBrZXk//Xo5',
       });
     });
 

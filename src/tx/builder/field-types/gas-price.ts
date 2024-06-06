@@ -4,7 +4,6 @@ import { ArgumentError, IllegalArgumentError } from '../../../utils/errors';
 import { Int, MIN_GAS_PRICE } from '../constants';
 import Node from '../../../Node';
 import { AE_AMOUNT_FORMATS, formatAmount } from '../../../utils/amount-formatter';
-import semverSatisfies from '../../../utils/semver-satisfies';
 
 const gasPriceCache: WeakMap<Node, { time: number; gasPrice: bigint }> = new WeakMap();
 
@@ -13,10 +12,6 @@ export async function getCachedIncreasedGasPrice(node: Node): Promise<bigint> {
   if (cache != null && cache.time > Date.now() - 20 * 1000) {
     return cache.gasPrice;
   }
-
-  // TODO: remove after requiring node@6.13.0
-  const { nodeVersion } = await node._getCachedStatus();
-  if (!semverSatisfies(nodeVersion, '6.13.0')) return 0n;
 
   const { minGasPrice, utilization } = (await node.getRecentGasPrices())[0];
   let gasPrice = utilization < 70 ? 0n : BigInt(

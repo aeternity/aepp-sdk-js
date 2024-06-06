@@ -1,7 +1,7 @@
 services:
   node:
     # TODO: switch to master after merging https://github.com/aeternity/aeternity/pull/4303
-    image: aeternity/aeternity:v7.0.0-rc1-bundle
+    image: aeternity/aeternity:v7.1.0-bundle
     # TODO: remove 3313 port after merging https://github.com/aeternity/aeternity/pull/4303
     ports: [3013:3013, 3113:3113, 3014:3014, 3313:3313]
     # TODO: remove after releasing https://github.com/aeternity/aeternity/pull/4292
