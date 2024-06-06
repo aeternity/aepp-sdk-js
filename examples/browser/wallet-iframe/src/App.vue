@@ -194,18 +194,6 @@ export default {
         return super.signDelegationToContract(contractAddress, options);
       }
 
-      async signNameDelegationToContract(
-        contractAddress,
-        name,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress, name };
-          genConfirmCallback('sign delegation of name to contract')(id, opt, aeppOrigin);
-        }
-        return super.signNameDelegationToContract(contractAddress, name, options);
-      }
-
       async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
         if (id != null) {
           genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);

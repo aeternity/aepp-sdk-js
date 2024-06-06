@@ -7,7 +7,6 @@ import { Encoded } from './utils/encoder';
 import { wrapWithProxy } from './utils/wrap-proxy';
 import CompilerBase from './contract/compiler/Base';
 import AeSdkMethods, { OnAccount, AeSdkMethodsOptions, WrappedOptions } from './AeSdkMethods';
-import { AensName } from './tx/builder/constants';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 
@@ -223,26 +222,6 @@ export default class AeSdkBase extends AeSdkMethods {
       ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
     return this._resolveAccount(onAccount)
       .signDelegationToContract(contractAddress, options);
-  }
-
-  /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param name - AENS name
-   * @param options - Options
-   */
-  async signNameDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    name: AensName,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signNameDelegationToContract']>[2] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signNameDelegationToContract(contractAddress, name, options);
   }
 
   /**

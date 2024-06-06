@@ -9,8 +9,7 @@ import {
 import { concatBuffers } from '../utils/other';
 import { hashTypedData, AciValue } from '../utils/typed-data';
 import { buildTx } from '../tx/builder';
-import { Tag, AensName, ConsensusProtocolVersion } from '../tx/builder/constants';
-import { produceNameId } from '../tx/builder/helpers';
+import { Tag, ConsensusProtocolVersion } from '../tx/builder/constants';
 import { DelegationTag } from '../tx/builder/delegation/schema';
 import { packDelegation } from '../tx/builder/delegation';
 
@@ -119,31 +118,6 @@ export default class AccountMemory extends AccountBase {
     const payload = concatBuffers([
       Buffer.from(networkId),
       decode(this.address),
-      decode(contractAddress),
-    ]);
-    const signature = await this.sign(payload);
-    return encode(signature, Encoding.Signature);
-  }
-
-  override async signNameDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    name: AensName,
-    { networkId, consensusProtocolVersion }: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.AensName, accountAddress: this.address, contractAddress, nameId: name,
-      });
-      return this.signDelegation(delegation, { networkId });
-    }
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
-    const payload = concatBuffers([
-      Buffer.from(networkId),
-      decode(this.address),
-      decode(produceNameId(name)),
       decode(contractAddress),
     ]);
     const signature = await this.sign(payload);

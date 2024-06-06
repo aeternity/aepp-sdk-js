@@ -6,7 +6,7 @@ import {
 } from '../utils/encoder';
 import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
 import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
-import { AensName, ConsensusProtocolVersion } from '../tx/builder/constants';
+import { ConsensusProtocolVersion } from '../tx/builder/constants';
 import { packDelegation } from '../tx/builder/delegation';
 import { DelegationTag } from '../tx/builder/delegation/schema';
 
@@ -93,20 +93,6 @@ export default class AccountRpc extends AccountBase {
         tag: isOracle === true ? DelegationTag.Oracle : DelegationTag.AensPreclaim,
         accountAddress: this.address,
         contractAddress,
-      });
-      return this.signDelegation(delegation);
-    }
-    throw new NotImplementedError('');
-  }
-
-  override async signNameDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    name: AensName,
-    { consensusProtocolVersion }: { consensusProtocolVersion?: ConsensusProtocolVersion } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.AensName, accountAddress: this.address, contractAddress, nameId: name,
       });
       return this.signDelegation(delegation);
     }

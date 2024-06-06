@@ -14,6 +14,9 @@ export enum DelegationTag {
    * Delegation of all AENS names to a contract
    */
   AensWildcard = 1,
+  /**
+   * Delegation of an AENS name to a contract
+   */
   AensName = 2,
   AensPreclaim = 3,
   Oracle = 4,
@@ -53,6 +56,9 @@ export const schemas = [{
   tag: shortUIntConst(DelegationTag.AensName),
   version: shortUIntConst(1, true),
   accountAddress: address(Encoding.AccountAddress),
+  /**
+   * AENS name to manage by a contract
+   */
   nameId,
   contractAddress,
 }, {

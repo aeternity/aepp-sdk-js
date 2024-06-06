@@ -1,7 +1,7 @@
 import { Encoded } from '../utils/encoder';
 import Node from '../Node';
 import CompilerBase from '../contract/compiler/Base';
-import { AensName, ConsensusProtocolVersion, Int } from '../tx/builder/constants';
+import { ConsensusProtocolVersion, Int } from '../tx/builder/constants';
 import { AciValue, Domain } from '../utils/typed-data';
 import { NotImplementedError } from '../utils/errors';
 
@@ -100,31 +100,6 @@ export default abstract class AccountBase {
     /* eslint-enable @typescript-eslint/no-unused-vars */
   ): Promise<Encoded.Signature> {
     throw new NotImplementedError('signDelegationToContract method');
-  }
-
-  /**
-   * Sign delegation of an AENS name to a contract
-   * @param contractAddress - Address of a contract to delegate permissions to
-   * @param name - AENS name to manage by a contract
-   * @param options - Options
-   * @returns Signature
-   * @deprecated use AccountBase:signDelegation in Ceres
-   */
-  // TODO: make abstract in the next major release
-  // eslint-disable-next-line class-methods-use-this
-  async signNameDelegationToContract(
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    contractAddress: Encoded.ContractAddress,
-    name: AensName,
-    options?: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-      aeppOrigin?: string;
-      aeppRpcClientId?: string;
-    },
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-  ): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signNameDelegationToContract method');
   }
 
   /**
