@@ -7,7 +7,7 @@ import {
 } from '../utils';
 import {
   AeSdk, Name, generateKeyPair, buildContractId, computeBidFee, ensureName, produceNameId, Contract,
-  AensPointerContextError, encode, decode, Encoding, ContractMethodsBase, ConsensusProtocolVersion,
+  AensPointerContextError, encode, decode, Encoding, ContractMethodsBase,
   IllegalArgumentError, Tag, unpackTx, buildTxHash,
 } from '../../src';
 
@@ -82,9 +82,6 @@ describe('Aens', () => {
   });
 
   it('claims a long name without preclaim', async () => {
-    const isIris = (await aeSdk.api.getNodeInfo())
-      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
-    if (isIris) return;
     const nameString = randomName(30);
     const n = new Name(nameString, aeSdk.getContext());
     const claimed = await n.claim();
@@ -225,14 +222,11 @@ describe('Aens', () => {
   const address = generateKeyPair().publicKey;
   let pointers: Parameters<Name['update']>[0];
   let pointersNode: Array<{ key: string; id: typeof pointers[string] }>;
-  let isIris: boolean;
 
   before(async () => {
-    isIris = (await aeSdk.api.getNodeInfo())
-      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
     pointers = {
       myKey: address,
-      ...!isIris && { 'my raw key': encode(Buffer.from('my raw value'), Encoding.Bytearray) },
+      'my raw key': encode(Buffer.from('my raw value'), Encoding.Bytearray),
       account_pubkey: address,
       oracle_pubkey: encode(decode(address), Encoding.OracleAddress),
       channel: encode(decode(address), Encoding.Channel),
@@ -313,9 +307,8 @@ describe('Aens', () => {
 
   it('throws error on setting too long raw pointer', async () => {
     const pointersRaw = { raw: encode(Buffer.from('t'.repeat(1025)), Encoding.Bytearray) };
-    await expect(name.update(pointersRaw)).to.be.rejectedWith(isIris
-      ? 'Raw pointers are available only in Ceres, the current protocol is Iris'
-      : 'Raw pointer should be shorter than 1025 bytes, got 1025 bytes instead');
+    await expect(name.update(pointersRaw))
+      .to.be.rejectedWith('Raw pointer should be shorter than 1025 bytes, got 1025 bytes instead');
   });
 
   it('extends name ttl', async () => {

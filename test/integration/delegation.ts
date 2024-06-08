@@ -6,18 +6,15 @@ import {
 import { getSdk } from '.';
 import {
   commitmentHash, decode, encode, Encoded, Encoding,
-  genSalt, AeSdk, Contract, ConsensusProtocolVersion, Oracle, OracleClient, Name,
+  genSalt, AeSdk, Contract, Oracle, OracleClient, Name,
   packDelegation, DelegationTag,
 } from '../../src';
 
 describe('Operation delegation', () => {
   let aeSdk: AeSdk;
-  let isIris: boolean;
 
   before(async () => {
     aeSdk = await getSdk(2);
-    isIris = (await aeSdk.api.getNodeInfo())
-      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
   });
 
   describe('AENS', () => {
@@ -63,35 +60,33 @@ describe('Operation delegation', () => {
       ) => void;
     }>;
     let contractAddress: Encoded.ContractAddress;
-    let aens: string;
 
     before(async () => {
-      aens = isIris ? 'AENS' : 'AENSv2';
       contract = await Contract.initialize({
         ...aeSdk.getContext(),
         sourceCode: `
-@compiler ${isIris ? '>= 7' : '>= 8'}
-@compiler ${isIris ? '< 8' : '< 9'}
+@compiler >= 8
+@compiler < 9
 
 contract DelegateTest =
-  entrypoint getName(name: string): option(${aens}.name) =
-    ${aens}.lookup(name)
+  entrypoint getName(name: string): option(AENSv2.name) =
+    AENSv2.lookup(name)
   stateful payable entrypoint signedPreclaim(addr: address, chash: hash, sign: signature): unit =
-    ${aens}.preclaim(addr, chash, signature = sign)
+    AENSv2.preclaim(addr, chash, signature = sign)
   stateful entrypoint signedClaim(
     addr: address, name: string, salt: int, name_fee: int, sign: signature): unit =
-    ${aens}.claim(addr, name, salt, name_fee, signature = sign)
+    AENSv2.claim(addr, name, salt, name_fee, signature = sign)
   stateful entrypoint signedTransfer(
     owner: address, new_owner: address, name: string, sign: signature): unit =
-    ${aens}.transfer(owner, new_owner, name, signature = sign)
+    AENSv2.transfer(owner, new_owner, name, signature = sign)
   stateful entrypoint signedRevoke(owner: address, name: string, sign: signature): unit =
-    ${aens}.revoke(owner, name, signature = sign)
+    AENSv2.revoke(owner, name, signature = sign)
   stateful entrypoint signedUpdate(
-    owner: address, name: string, key: string, pt: ${aens}.pointee, sig: signature) =
-    switch(${aens}.lookup(name))
+    owner: address, name: string, key: string, pt: AENSv2.pointee, sig: signature) =
+    switch(AENSv2.lookup(name))
       None => ()
-      Some(${aens}.Name(_, _, ptrs)) =>
-        ${aens}.update(owner, name, None, None, Some(ptrs{[key] = pt}), signature = sig)`,
+      Some(AENSv2.Name(_, _, ptrs)) =>
+        AENSv2.update(owner, name, None, None, Some(ptrs{[key] = pt}), signature = sig)`,
       });
       await contract.$deploy([]);
       assertNotNull(contract.$options.address);
@@ -131,7 +126,7 @@ contract DelegateTest =
     });
 
     it('updates', async () => {
-      const pointee: Pointee = { [`${aens}.OraclePt`]: [newOwner] };
+      const pointee: Pointee = { 'AENSv2.OraclePt': [newOwner] };
       const { result } = await contract
         .signedUpdate(owner, name, 'oracle', pointee, decode(delegationSignature));
       assertNotNull(result);
@@ -146,7 +141,6 @@ contract DelegateTest =
     const dataPt = new Uint8Array(Buffer.from('test value'));
 
     it('updates with raw pointer', async () => {
-      if (isIris) return;
       const pointee: Pointee = { 'AENSv2.DataPt': [dataPt] };
       await contract.signedUpdate(owner, name, 'test key', pointee, decode(delegationSignature));
       expect((await aeSdk.api.getNameEntryByName(name)).pointers[0]).to.be.eql({
@@ -157,15 +151,15 @@ contract DelegateTest =
     });
 
     it('gets', async () => {
-      const nameEntry = (await contract.getName(name)).decodedResult[`${aens}.Name`];
+      const nameEntry = (await contract.getName(name)).decodedResult['AENSv2.Name'];
       const ttl = nameEntry[1].FixedTTL[0];
       expect(ttl).to.be.a('bigint');
       expect(nameEntry).to.be.eql([
         owner,
         { FixedTTL: [ttl] },
         new Map([
-          ['oracle', { [`${aens}.OraclePt`]: [newOwner] }],
-          ...isIris ? [] : [['test key', { 'AENSv2.DataPt': [dataPt] }]] as const,
+          ['oracle', { 'AENSv2.OraclePt': [newOwner] }],
+          ['test key', { 'AENSv2.DataPt': [dataPt] }],
         ]),
       ]);
     });
@@ -194,7 +188,6 @@ contract DelegateTest =
     });
 
     it('works using wildcard delegation signature', async () => {
-      if (isIris) return;
       const allNamesDelSig = decode(await aeSdk.signDelegation(
         packDelegation(
           { tag: DelegationTag.AensWildcard, accountAddress: aeSdk.address, contractAddress },
@@ -228,7 +221,6 @@ contract DelegateTest =
     });
 
     it('claims without preclaim', async () => {
-      if (isIris) return;
       const n = randomName(30);
       const dlgSig = await aeSdk.signDelegation(
         packDelegation({

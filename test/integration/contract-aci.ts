@@ -17,7 +17,6 @@ import {
   AE_AMOUNT_FORMATS,
   Tag,
   NoSuchContractFunctionError,
-  ConsensusProtocolVersion,
   InvalidTxError,
   ContractError,
 } from '../../src';
@@ -39,7 +38,7 @@ namespace TestLib =
   function sum(x: int, y: int) = x + y
 `;
 
-const getTestContractSourceCode = (isIris: boolean): string => `
+const testContractSourceCode = `
 namespace Test =
   function double(x: int) = x * 2
 
@@ -89,7 +88,7 @@ contract StateContract =
   entrypoint hashFn(s: hash) = s
   entrypoint signatureFn(s: signature) = s
   entrypoint bytesFn(s: bytes(32)) = s
-  ${isIris ? '' : 'entrypoint bytesAnySizeFn(s: bytes) = s'}
+  entrypoint bytesAnySizeFn(s: bytes) = s
 
   entrypoint bitsFn(s: bits) = s
 
@@ -104,7 +103,7 @@ contract StateContract =
 
   entrypoint chainTtlFn(t: Chain.ttl) = t
 
-  ${isIris ? '' : 'entrypoint aensV2Name(name: AENSv2.name) = name'}
+  entrypoint aensV2Name(name: AENSv2.name) = name
 
   stateful entrypoint recursion(t: string) =
     put(state{value = t})
@@ -188,8 +187,6 @@ interface TestContractApi extends ContractMethodsBase {
 
 describe('Contract instance', () => {
   let aeSdk: AeSdk;
-  let isIris: boolean;
-  let testContractSourceCode: string;
   let testContract: Contract<TestContractApi>;
   let testContractAddress: Encoded.ContractAddress;
   let testContractAci: Aci;
@@ -197,9 +194,6 @@ describe('Contract instance', () => {
 
   before(async () => {
     aeSdk = await getSdk(2);
-    isIris = (await aeSdk.api.getNodeInfo())
-      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
-    testContractSourceCode = getTestContractSourceCode(isIris);
     const res = await aeSdk.compilerApi.compileBySourceCode(testContractSourceCode, fileSystem);
     testContractAci = res.aci;
     testContractBytecode = res.bytecode;
@@ -1134,13 +1128,11 @@ describe('Contract instance', () => {
 
     describe('Bytes any size', () => {
       it('Invalid type', async () => {
-        if (isIris) return;
         await expect(testContract.bytesAnySizeFn({} as any))
           .to.be.rejectedWith('Should be one of: Array, ArrayBuffer, hex string, Number, BigInt; got [object Object] instead');
       });
 
       it('Valid', async () => {
-        if (isIris) return;
         const decoded = Buffer.from('0xdeadbeef', 'hex');
         const { decodedResult: hashAsBuffer } = await testContract.bytesAnySizeFn(decoded);
         const { decodedResult: hashAsHex } = await testContract.bytesAnySizeFn(decoded.toString('hex'));
@@ -1176,13 +1168,11 @@ describe('Contract instance', () => {
 
     describe('AENSv2.name', () => {
       it('Invalid', async () => {
-        if (isIris) return;
         await expect(testContract.aensV2Name({ 'AENSv2.Name': ['test'] } as any))
           .to.be.rejectedWith('"AENSv2.Name" variant constructor expects 3 argument(s) but got 1 instead');
       });
 
       it('Valid', async () => {
-        if (isIris) return;
         const value: AENSv2Name = {
           'AENSv2.Name': [
             'ak_nRqnePWC6yGWBmR4wfN3AvQnqbv2TizxKJdvGXj8p7YZrUZ5J',

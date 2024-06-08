@@ -68,14 +68,10 @@ describe('Node client', () => {
 
   it('throws exception if unsupported protocol', async () => {
     const sandbox = createSandbox();
-    const [name, version, message] = {
-      5: ['Iris', '5', '5. Supported: >= 6 < 7'],
-      6: ['Ceres', '6', '6. Supported: >= 5 < 6'],
-    }[(await node.getNodeInfo()).consensusProtocolVersion];
-    sandbox.stub(ConsensusProtocolVersion, name as any).value(undefined);
-    sandbox.stub(ConsensusProtocolVersion, version as any).value(undefined);
+    sandbox.stub(ConsensusProtocolVersion, 'Ceres' as any).value(undefined);
+    sandbox.stub(ConsensusProtocolVersion, '6' as any).value(undefined);
     await expect(node.getNodeInfo()).to.be
-      .rejectedWith(`Unsupported consensus protocol version ${message}`);
+      .rejectedWith('Unsupported consensus protocol version 6. Supported: >= 5 < 6');
     sandbox.restore();
   });
 

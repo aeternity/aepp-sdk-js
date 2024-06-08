@@ -2,8 +2,7 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, Node, InvalidTxError, ArgumentError, Tag, MemoryAccount, verifyTransaction,
-  ConsensusProtocolVersion, buildTxAsync,
+  AeSdk, Node, InvalidTxError, ArgumentError, Tag, MemoryAccount, verifyTransaction, buildTxAsync,
 } from '../../src';
 
 describe('Verify Transaction', () => {
@@ -98,9 +97,7 @@ describe('Verify Transaction', () => {
   it('verifies nonce of gaAttach transaction', async () => {
     const gaAttach = 'tx_+QEWUAGhAUfN4Ejc4KynKrM1XI1D2AWlqBrTeCVywu9B6hV4rnriAri0+LJGA6BFoqzc6YC/ewZLk3eumqCWL/K7O2Wqy+x14Zbcx4rB0MC4hbhV/kTWRB8ANwA3ABoOgq+CAAEAPwEDP/5s8lcLADcBBxd3AoJ3AAg8AgT7A01Ob3QgaW4gQXV0aCBjb250ZXh0AQP//qsVVmEANwCHAjcANwGXQAECgqovAxFE1kQfEWluaXQRbPJXCyVhdXRob3JpemURqxVWYSVnZXRUeEhhc2iCLwCFOC4wLjAAoGzyVwsKFZm3CCkeUKo9rxPQx/JIS8M33a0kE6N/1KAJgwgAA4ZJUs52OAAAa4Q7msoAhysRRNZEHz/z50Zp';
     const errors = await verifyTransaction(gaAttach, node);
-    const isIris = (await aeSdk.api.getNodeInfo())
-      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
-    expect(errors.find((e) => e.key === 'AccountUsed')).to.eql(isIris ? undefined : {
+    expect(errors.find((e) => e.key === 'AccountUsed')).to.eql({
       message: 'Account ak_Yd9EiaBy8GNXWLkMuH53H9hiCyEuL3RKxN4wYKhN8xDnjKRpb can\'t become generalized because it is already used',
       key: 'AccountUsed',
       checkedKeys: ['nonce'],
