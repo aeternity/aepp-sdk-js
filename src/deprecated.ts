@@ -15,8 +15,3 @@ export class RpcBroadcastError extends RpcError {
     this.name = 'RpcBroadcastError';
   }
 }
-
-/**
- * @deprecated use isAuctionName instead
- */
-export const NAME_BID_MAX_LENGTH = 12; // # this is the max length for a domain to be part of a bid

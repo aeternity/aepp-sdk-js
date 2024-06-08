@@ -112,4 +112,4 @@ export {
   TagNotFoundError, TxNotInChainError, AlreadyConnectedError, NoWalletConnectedError,
   RpcConnectionError,
 } from './utils/errors';
-export { RpcBroadcastError, NAME_BID_MAX_LENGTH } from './deprecated';
+export { RpcBroadcastError } from './deprecated';
