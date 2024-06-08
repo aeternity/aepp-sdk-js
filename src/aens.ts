@@ -9,9 +9,9 @@
 import BigNumber from 'bignumber.js';
 import { genSalt, isAddressValid } from './utils/crypto';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers';
-import { Tag, AensName, ConsensusProtocolVersion } from './tx/builder/constants';
+import { Tag, AensName } from './tx/builder/constants';
 import { Encoded, Encoding } from './utils/encoder';
-import { UnsupportedProtocolError, LogicError } from './utils/errors';
+import { LogicError } from './utils/errors';
 import { getName } from './chain';
 import { sendTransaction, SendTransactionOptions } from './send-transaction';
 import { Optional } from './utils/other';
@@ -125,11 +125,6 @@ export default class Name {
 
     const hasRawPointers = Object.values(allPointers)
       .some((v) => isAddressValid(v, Encoding.Bytearray));
-    const isIris = (await opt.onNode.getNodeInfo())
-      .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
-    if (hasRawPointers && isIris) {
-      throw new UnsupportedProtocolError('Raw pointers are available only in Ceres, the current protocol is Iris');
-    }
 
     const tx = await buildTxAsync({
       _isInternalBuild: true,

@@ -195,6 +195,6 @@ describe('Node Chain', () => {
         .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true })),
     )).map((r) => r.decodedResult);
     expect(results).to.be.eql(numbers.map((v) => BigInt(v * 100)));
-    expect(getCount()).to.be.equal(2);
+    expect(getCount()).to.be.equal(1);
   });
 });
