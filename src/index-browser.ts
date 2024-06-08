@@ -112,4 +112,3 @@ export {
   TagNotFoundError, TxNotInChainError, AlreadyConnectedError, NoWalletConnectedError,
   RpcConnectionError,
 } from './utils/errors';
-export { RpcBroadcastError } from './deprecated';
