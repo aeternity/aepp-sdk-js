@@ -4,7 +4,9 @@ import {
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import BigNumber from 'bignumber.js';
-import { getSdk, networkId, channelUrl } from '.';
+import {
+  getSdk, networkId, channelUrl, timeoutBlock,
+} from '.';
 import {
   unpackTx,
   buildTxHash,
@@ -98,6 +100,7 @@ describe('Channel', () => {
     initiatorId: 'ak_' as Encoded.AccountAddress,
     responderId: 'ak_' as Encoded.AccountAddress,
     minimumDepth: 0,
+    minimumDepthStrategy: 'plain' as const,
   };
   const initiatorParams = {
     role: 'initiator',
@@ -738,7 +741,7 @@ describe('Channel', () => {
       .minus(responderBalanceBeforeClose)
       .isEqualTo(balances[responder.address])
       .should.be.equal(true);
-  });
+  }).timeout(timeoutBlock);
 
   it('can dispute via slash tx', async () => {
     initiatorCh.disconnect();
@@ -809,7 +812,7 @@ describe('Channel', () => {
       .plus(settleTxFee)
       .isEqualTo(recentBalances[responder.address])
       .should.be.equal(true);
-  });
+  }).timeout(timeoutBlock);
 
   it('can create a contract and accept', async () => {
     initiatorCh.disconnect();

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { before, describe, it } from 'mocha';
 import { assertNotNull, InputNumber } from '../utils';
-import { getSdk } from '.';
+import { getSdk, timeoutBlock } from '.';
 import {
   ArgumentError, NodeInvocationError, Encoded, DRY_RUN_ACCOUNT,
   messageToHash, UnexpectedTsError, AeSdk, Contract, ContractMethodsBase, isAddressValid, Encoding,
@@ -210,7 +210,7 @@ describe('Contract', () => {
     await contract.call({ callStatic: true, top: beforeMicroBlockHash });
     await contract.call({ callStatic: true, top: beforeKeyBlockHash });
     await contract.call({ callStatic: true, top: beforeKeyBlockHeight });
-  });
+  }).timeout(timeoutBlock);
 
   it('call contract/deploy with waitMined: false', async () => {
     delete identityContract.$options.address;

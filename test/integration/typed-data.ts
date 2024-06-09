@@ -83,7 +83,7 @@ describe('typed data', () => {
           + '\n  entrypoint getDomain(): domain =' // kind of EIP-5267
           + '\n    { name = Some("Test app"),'
           + '\n      version = Some(2),'
-          + '\n      networkId = Some(Chain.network_id),'
+          + '\n      networkId = Some("ae_dev"),' // better `Chain.network_id`, but would complicate testing
           + '\n      contractAddress = Some(Address.to_contract(Contract.address)) }'
           + '\n'
           + '\n  entrypoint getDomainHash() = Crypto.blake2b(getDomain())'
