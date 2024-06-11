@@ -3,9 +3,10 @@ import shortUInt from './short-u-int';
 import Node from '../../../Node';
 import { ArgumentError } from '../../../utils/errors';
 import { NextNonceStrategy } from '../../../apis/node';
+import { Tag } from '../constants';
 
 export default function genNonceField<SenderKey extends string>(senderKey: SenderKey): {
-  serialize: (value: number) => Buffer;
+  serialize: (value: number, params: { tag: Tag }) => Buffer;
   // TODO: (value: number) => Promise<number> | (value: undefined, ...) => Promise<number>
   prepare: (
     value: number | undefined,
@@ -22,6 +23,13 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
 } {
   return {
     ...shortUInt,
+
+    serialize(value: number, { tag }): Buffer {
+      if (Tag.GaAttachTx === tag && value !== 1) {
+        throw new ArgumentError('nonce', 'equal 1 if GaAttachTx', value);
+      }
+      return shortUInt.serialize(value);
+    },
 
     async prepare(value, params, options) {
       if (value != null) return value;

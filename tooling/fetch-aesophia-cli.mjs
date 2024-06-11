@@ -3,11 +3,11 @@ import { writeFileSync } from 'fs';
 import restoreFile from './restore-file.mjs';
 
 const path = './bin/aesophia_cli';
-const hash = 'ynvJbaxHYRwuEGUWkLGrRiF2G33Dxdly8rgSMLI2wZ82uPC/L0+MqLSeZ5JDSY4X+BEPIjpeQjY9E+0m2IdGxQ==';
+const hash = 'RYAgt3BbPt4UlANdcOff68hca0p1q2dK+H1b5BSMNUl6+zb9JjoJIn2/MlMxJAF0WdpjJKlVTkocXY7pMVIzCg==';
 
 await restoreFile(path, hash, async () => {
   const request = await fetch(
-    'https://github.com/aeternity/aesophia_cli/releases/download/v7.4.1/aesophia_cli',
+    'https://github.com/aeternity/aesophia_cli/releases/download/v8.0.0/aesophia_cli',
   );
   const body = Buffer.from(await request.arrayBuffer());
   writeFileSync(path, body);

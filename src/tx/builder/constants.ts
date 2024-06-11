@@ -55,7 +55,6 @@ export const NAME_BID_RANGES = mapObject({
 }, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]);
 
 export enum ConsensusProtocolVersion {
-  Iris = 5,
   Ceres = 6,
 }
 

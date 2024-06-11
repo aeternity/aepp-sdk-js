@@ -13,6 +13,7 @@ import {
   Contract, ContractMethodsBase,
   MIN_GAS_PRICE,
   Encoded,
+  ArgumentError,
 } from '../../src';
 import { ensureEqual } from '../utils';
 
@@ -59,6 +60,23 @@ describe('Generalized Account', () => {
   it('Fail on make GA on already GA', async () => {
     await aeSdk.createGeneralizedAccount('authorize', [], { sourceCode })
       .should.be.rejectedWith(`Account ${gaAccountAddress} is already GA`);
+  });
+
+  it('fails to build GaAttachTx with non-1 nonce', () => {
+    expect(() => buildTx({
+      tag: Tag.GaAttachTx,
+      version: 1,
+      ownerId: 'ak_Yd9EiaBy8GNXWLkMuH53H9hiCyEuL3RKxN4wYKhN8xDnjKRpb',
+      nonce: 2,
+      code: 'cb_+LJGA6BFoqzc6YC/ewZLk3eumqCWL/K7O2Wqy+x14Zbcx4rB0MC4hbhV/kTWRB8ANwA3ABoOgq+CAAEAPwEDP/5s8lcLADcBBxd3AoJ3AAg8AgT7A01Ob3QgaW4gQXV0aCBjb250ZXh0AQP//qsVVmEANwCHAjcANwGXQAECgqovAxFE1kQfEWluaXQRbPJXCyVhdXRob3JpemURqxVWYSVnZXRUeEhhc2iCLwCFOC4wLjAAdzf5cQ==',
+      authFun: Buffer.from('6cf2570b0a1599b708291e50aa3daf13d0c7f2484bc337ddad2413a37fd4a009', 'hex'),
+      ctVersion: { vmVersion: 8, abiVersion: 3 },
+      fee: '80620000000000',
+      ttl: 0,
+      gasLimit: 107,
+      gasPrice: '1000000000',
+      callData: 'cb_KxFE1kQfP4oEp9E=',
+    })).to.throw(ArgumentError, 'nonce should be equal 1 if GaAttachTx, got 2 instead');
   });
 
   const { publicKey } = generateKeyPair();

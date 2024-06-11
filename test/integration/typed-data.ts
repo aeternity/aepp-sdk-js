@@ -3,8 +3,7 @@ import { expect } from 'chai';
 import canonicalize from 'canonicalize';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import {
-  AeSdk, ConsensusProtocolVersion, Contract, decode, Encoded,
-  hashDomain, hashJson, hashTypedData,
+  AeSdk, Contract, decode, Encoded, hashDomain, hashJson, hashTypedData,
 } from '../../src';
 import { Domain } from '../../src/utils/typed-data';
 import { getSdk } from '.';
@@ -69,8 +68,6 @@ describe('typed data', () => {
     before(async () => {
       aeSdk = await getSdk();
       const typeJson = (canonicalize(recordAci) ?? '').replaceAll('"', '\\"');
-      const isIris = (await aeSdk.api.getNodeInfo())
-        .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
       contract = await Contract.initialize({
         ...aeSdk.getContext(),
         sourceCode: ''
@@ -86,7 +83,7 @@ describe('typed data', () => {
           + '\n  entrypoint getDomain(): domain =' // kind of EIP-5267
           + '\n    { name = Some("Test app"),'
           + '\n      version = Some(2),'
-          + `\n      networkId = Some(${isIris ? '"ae_dev"' : 'Chain.network_id'}),`
+          + '\n      networkId = Some(Chain.network_id),'
           + '\n      contractAddress = Some(Address.to_contract(Contract.address)) }'
           + '\n'
           + '\n  entrypoint getDomainHash() = Crypto.blake2b(getDomain())'

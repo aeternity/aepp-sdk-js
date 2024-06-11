@@ -3,7 +3,6 @@ import { Domain, AciValue } from '../../utils/typed-data';
 import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema';
 import { TransformNodeType } from '../../Node';
 import { SignedTx } from '../../apis/node';
-import { AensName } from '../../tx/builder/constants';
 
 export interface WalletInfo {
   id: string;
@@ -84,17 +83,6 @@ export interface WalletApi {
       domain: Domain;
       aci: AciValue;
       data: Encoded.ContractBytearray;
-      onAccount: Encoded.AccountAddress;
-    },
-  ) => Promise<{ signature: Encoded.Signature }>;
-
-  [METHODS.signDelegationToContract]: (
-    p: {
-      contractAddress: Encoded.ContractAddress;
-      name?: AensName;
-      oracleQueryId?: Encoded.OracleQueryId;
-      allNames?: boolean;
-      isOracle?: boolean;
       onAccount: Encoded.AccountAddress;
     },
   ) => Promise<{ signature: Encoded.Signature }>;

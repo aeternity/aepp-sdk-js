@@ -6,9 +6,7 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import {
-  Tag, AensName, ConsensusProtocolVersion, DRY_RUN_ACCOUNT,
-} from '../tx/builder/constants';
+import { Tag, AensName, DRY_RUN_ACCOUNT } from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
 } from '../tx/builder';
@@ -501,9 +499,7 @@ class Contract<M extends ContractMethodsBase> {
         'contract_pubkey',
         { resolveByNode: true, onNode },
       ) as Encoded.ContractAddress;
-      const isIris = (await onNode.getNodeInfo())
-        .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
-      if (!isIris && isNameValid(address)) name = address;
+      if (isNameValid(address)) name = address;
     }
 
     if (address == null && sourceCode == null && sourceCodePath == null && bytecode == null) {

@@ -9,10 +9,7 @@ import {
 import { concatBuffers } from '../utils/other';
 import { hashTypedData, AciValue } from '../utils/typed-data';
 import { buildTx } from '../tx/builder';
-import { Tag, AensName, ConsensusProtocolVersion } from '../tx/builder/constants';
-import { produceNameId } from '../tx/builder/helpers';
-import { DelegationTag } from '../tx/builder/delegation/schema';
-import { packDelegation } from '../tx/builder/delegation';
+import { Tag } from '../tx/builder/constants';
 
 const secretKeys = new WeakMap<AccountMemory, Uint8Array>();
 
@@ -92,115 +89,6 @@ export default class AccountMemory extends AccountBase {
       name, version, networkId, contractAddress,
     });
     const signature = await this.sign(dHash, options);
-    return encode(signature, Encoding.Signature);
-  }
-
-  override async signDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { networkId, consensusProtocolVersion, isOracle }: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-      isOracle?: boolean;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (isOracle == null) {
-      const protocol = (consensusProtocolVersion != null) ? ConsensusProtocolVersion[consensusProtocolVersion] : 'unknown';
-      console.warn(`AccountMemory:signDelegationToContract: isOracle is not set. By default, sdk would generate an AENS preclaim delegation signature, but it won't be the same as the oracle delegation signature in Ceres (current protocol is ${protocol}).`);
-    }
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: isOracle === true ? DelegationTag.Oracle : DelegationTag.AensPreclaim,
-        accountAddress: this.address,
-        contractAddress,
-      });
-      return this.signDelegation(delegation, { networkId });
-    }
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
-    const payload = concatBuffers([
-      Buffer.from(networkId),
-      decode(this.address),
-      decode(contractAddress),
-    ]);
-    const signature = await this.sign(payload);
-    return encode(signature, Encoding.Signature);
-  }
-
-  override async signNameDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    name: AensName,
-    { networkId, consensusProtocolVersion }: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.AensName, accountAddress: this.address, contractAddress, nameId: name,
-      });
-      return this.signDelegation(delegation, { networkId });
-    }
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
-    const payload = concatBuffers([
-      Buffer.from(networkId),
-      decode(this.address),
-      decode(produceNameId(name)),
-      decode(contractAddress),
-    ]);
-    const signature = await this.sign(payload);
-    return encode(signature, Encoding.Signature);
-  }
-
-  override async signAllNamesDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { networkId, consensusProtocolVersion }: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.AensWildcard, accountAddress: this.address, contractAddress,
-      });
-      return this.signDelegation(delegation, { networkId });
-    }
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
-    const payload = concatBuffers([
-      Buffer.from(networkId),
-      decode(this.address),
-      Buffer.from('AENS'),
-      decode(contractAddress),
-    ]);
-    const signature = await this.sign(payload);
-    return encode(signature, Encoding.Signature);
-  }
-
-  override async signOracleQueryDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    oracleQueryId: Encoded.OracleQueryId,
-    { networkId, consensusProtocolVersion }: {
-      networkId?: string;
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.OracleResponse, queryId: oracleQueryId, contractAddress,
-      });
-      return this.signDelegation(delegation, { networkId });
-    }
-    const oracleQueryIdDecoded = decode(oracleQueryId);
-    const addressDecoded = decode(this.address);
-    // TODO: remove after fixing https://github.com/aeternity/aesophia/issues/475
-    if (oracleQueryIdDecoded.compare(addressDecoded) === 0) {
-      throw new ArgumentError('oracleQueryId', 'not equal to account address', oracleQueryId);
-    }
-    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
-    const payload = concatBuffers([
-      Buffer.from(networkId),
-      oracleQueryIdDecoded,
-      decode(contractAddress),
-    ]);
-    const signature = await this.sign(payload);
     return encode(signature, Encoding.Signature);
   }
 

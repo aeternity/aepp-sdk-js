@@ -33,6 +33,8 @@ import {
   buildTx,
   hashTypedData,
   Contract,
+  packDelegation,
+  DelegationTag,
 } from '../../src';
 import { getBufferToSign } from '../../src/account/Memory';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
@@ -479,8 +481,14 @@ describe('Aepp<->Wallet', () => {
       });
     });
 
-    describe('Sign delegation to contract', () => {
-      const contractAddress = 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh';
+    describe('Sign delegation', () => {
+      const getDelegation = (accountAddress?: Encoded.AccountAddress): Encoded.Bytearray => (
+        packDelegation({
+          tag: DelegationTag.AensPreclaim,
+          contractAddress: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',
+          accountAddress: accountAddress ?? aeSdk.address,
+        })
+      );
 
       it('rejected by wallet', async () => {
         let origin;
@@ -490,19 +498,14 @@ describe('Aepp<->Wallet', () => {
             origin = aeppOrigin;
             throw new RpcRejectedByUserError();
           });
-        sandbox.stub(wallet._resolveAccount(), 'signDelegationToContract')
-          .callsFake((delegation, { aeppOrigin } = {}) => {
-            origin = aeppOrigin;
-            throw new RpcRejectedByUserError();
-          });
-        await expect(aepp.signDelegationToContract(contractAddress, { isOracle: false }))
+        await expect(aepp.signDelegation(getDelegation()))
           .to.be.eventually.rejectedWith('Operation rejected by user').with.property('code', 4);
         expect(origin).to.be.equal('http://origin.test');
         sandbox.restore();
       });
 
       it('works', async () => {
-        const signature = await aepp.signDelegationToContract(contractAddress, { isOracle: false });
+        const signature = await aepp.signDelegation(getDelegation());
         expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
       });
 
@@ -510,17 +513,14 @@ describe('Aepp<->Wallet', () => {
         const sandbox = createSandbox();
         sandbox.stub(wallet._resolveAccount(), 'signDelegation')
           .callsFake(() => { throw new Error('test'); });
-        sandbox.stub(wallet._resolveAccount(), 'signDelegationToContract')
-          .callsFake(() => { throw new Error('test'); });
-        await expect(aepp.signDelegationToContract(contractAddress, { isOracle: false }))
+        await expect(aepp.signDelegation(getDelegation()))
           .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
         sandbox.restore();
       });
 
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
-        const signature = await aepp
-          .signDelegationToContract(contractAddress, { onAccount, isOracle: false });
+        const signature = await aepp.signDelegation(getDelegation(onAccount), { onAccount });
         expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
       });
     });
