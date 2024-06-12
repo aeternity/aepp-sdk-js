@@ -118,7 +118,7 @@ export function generateKeyPairFromSecret(secret: Uint8Array): SignKeyPair {
  */
 export function generateKeyPair(raw: true): { publicKey: Buffer; secretKey: Buffer };
 export function generateKeyPair(raw?: false): {
-  publicKey: Encoded.AccountAddress; secretKey: string;
+  publicKey: Encoded.AccountAddress; secretKey: Encoded.AccountSecretKey;
 };
 export function generateKeyPair(raw = false): {
   publicKey: Encoded.AccountAddress | Buffer;
@@ -136,7 +136,7 @@ export function generateKeyPair(raw = false): {
   }
   return {
     publicKey: encode(publicBuffer, Encoding.AccountAddress),
-    secretKey: secretBuffer.toString('hex'),
+    secretKey: encode(secretBuffer.subarray(0, 32), Encoding.AccountSecretKey),
   };
 }
 

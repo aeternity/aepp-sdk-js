@@ -6,7 +6,7 @@ import {
 } from '../../src';
 
 describe('JWT', () => {
-  const account = new MemoryAccount('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200');
+  const account = new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
   const payload = { test: 'data' };
   const jwt = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJzdWJfandrIjp7ImNydiI6IkVkMjU1MTkiLCJrdHkiOiJPS1AiLCJ4IjoiaEF5WFM1Y1dSM1pGUzZFWjJFN2NUV0JZcU43SksyN2NWNHF5MHd0TVFnQSJ9LCJ0ZXN0IjoiZGF0YSJ9.u9El4b2O2LRhvTTW3g46vk1hx0xXWPkJEaEeEy-rLzLr2yuQlNc7qIdcr_z06BgHx5jyYv2CpUL3hqLpc0RzBA';
   const jwtWithAddress = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiYWtfMjFBMjdVVlZ0M2hEa0JFNUo3cmhocW5INVlOYjRZMWRxbzRQblN5YnJIODVwbldvN0UifQ._munmgMvg9SE6jJaTYd6tBSV7EtqO_YRV4TkZjQfop6W18hm_fAPWNbwNupS8doaOs2corl4Uc26zUq1Jyl6Bg';
