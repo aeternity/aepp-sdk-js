@@ -1,7 +1,7 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { stub } from 'sinon';
-import { getSdk } from '.';
+import { getSdk, timeoutBlock } from '.';
 import {
   generateKeyPair, AeSdk, Tag, MemoryAccount, Encoded, Node, Contract,
 } from '../../src';
@@ -62,7 +62,7 @@ describe('Node Chain', () => {
     const target = await aeSdkWithoutAccount.getHeight() + 1;
     await aeSdkWithoutAccount.awaitHeight(target).should.eventually.be.at.least(target);
     await aeSdkWithoutAccount.getHeight().should.eventually.be.at.least(target);
-  });
+  }).timeout(timeoutBlock);
 
   it('Can verify transaction from broadcast error', async () => {
     const error = await aeSdk
@@ -114,7 +114,7 @@ describe('Node Chain', () => {
     const res = await aeSdk.spend(1000, aeSdk.address, { confirm: 1 });
     assertNotNull(res.blockHeight);
     expect(await aeSdk.getHeight() >= res.blockHeight + 1).to.be.equal(true);
-  });
+  }).timeout(timeoutBlock);
 
   it('doesn\'t make extra requests', async () => {
     let getCount;

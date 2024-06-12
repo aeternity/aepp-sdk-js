@@ -121,3 +121,5 @@ afterEach(async function describeTxError() {
   const { status } = await response.json();
   err.message += ` (node-provided transaction status: ${status})`;
 });
+
+export const timeoutBlock = networkId === 'ae_dev' ? 6_000 : 700_000;

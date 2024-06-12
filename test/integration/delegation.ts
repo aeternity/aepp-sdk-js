@@ -3,7 +3,7 @@ import { before, describe, it } from 'mocha';
 import {
   assertNotNull, randomName, ChainTtl, InputNumber,
 } from '../utils';
-import { getSdk } from '.';
+import { getSdk, timeoutBlock } from '.';
 import {
   commitmentHash, decode, encode, Encoded, Encoding,
   genSalt, AeSdk, Contract, Oracle, OracleClient, Name,
@@ -123,7 +123,7 @@ contract DelegateTest =
         .signedClaim(owner, name, salt, nameFee, decode(delegationSignature));
       assertNotNull(result);
       result.returnType.should.be.equal('ok');
-    });
+    }).timeout(timeoutBlock);
 
     it('updates', async () => {
       const pointee: Pointee = { 'AENSv2.OraclePt': [newOwner] };
@@ -197,7 +197,7 @@ contract DelegateTest =
 
       const commitmentId = decode(commitmentHash(n, salt));
       await contract.signedPreclaim(owner, commitmentId, allNamesDelSig);
-      await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
+      await aeSdk.awaitHeight(1 + await aeSdk.getHeight());
 
       await contract.signedClaim(owner, n, salt, nameFee, allNamesDelSig);
 
@@ -218,7 +218,7 @@ contract DelegateTest =
         .transfer(owner, { onAccount: aeSdk.accounts[newOwner] });
 
       await contract.signedRevoke(owner, n, allNamesDelSig);
-    });
+    }).timeout(timeoutBlock);
 
     it('claims without preclaim', async () => {
       const n = randomName(30);

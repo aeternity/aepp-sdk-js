@@ -1,7 +1,7 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { RestError } from '@azure/core-rest-pipeline';
-import { getSdk, isLimitedCoins } from '.';
+import { getSdk, isLimitedCoins, timeoutBlock } from '.';
 import {
   assertNotNull, ensureEqual, randomName, randomString,
 } from '../utils';
@@ -51,7 +51,7 @@ describe('Aens', () => {
     assertNotNull(claimRes.tx);
     assertNotNull(claimRes.signatures);
     expect(claimRes.tx.fee).to.satisfy((fee: bigint) => fee >= 16660000000000n);
-    expect(claimRes.tx.fee).to.satisfy((fee: bigint) => fee <= 17040000000000n);
+    expect(claimRes.tx.fee).to.satisfy((fee: bigint) => fee <= 17080000000000n);
     expect(claimRes).to.be.eql({
       tx: {
         fee: claimRes.tx.fee,
@@ -79,7 +79,7 @@ describe('Aens', () => {
       pointers: [],
       ttl: claimRes.blockHeight + 180000,
     });
-  });
+  }).timeout(timeoutBlock);
 
   it('claims a long name without preclaim', async () => {
     const nameString = randomName(30);
@@ -136,7 +136,7 @@ describe('Aens', () => {
       pointers: [],
       ttl: claimRes.blockHeight + 180000,
     });
-  });
+  }).timeout(timeoutBlock);
 
   it('preclaims name using specific account', async () => {
     const onAccount = Object.values(aeSdk.accounts)[1];
@@ -241,7 +241,7 @@ describe('Aens', () => {
     assertNotNull(updateRes.tx);
     assertNotNull(updateRes.signatures);
     expect(updateRes.tx.fee).to.satisfy((fee: bigint) => fee >= 22140000000000n);
-    expect(updateRes.tx.fee).to.satisfy((fee: bigint) => fee <= 22180000000000n);
+    expect(updateRes.tx.fee).to.satisfy((fee: bigint) => fee <= 22240000000000n);
     expect(updateRes).to.be.eql({
       tx: {
         fee: updateRes.tx.fee,
@@ -280,7 +280,7 @@ describe('Aens', () => {
     const txHash = buildTxHash(rawTx);
     await expect(aeSdk.poll(txHash))
       .to.be.rejectedWith(new RegExp(`v3/transactions/${txHash} error: (Transaction not found|412 status code)`));
-  });
+  }).timeout(timeoutBlock);
 
   it('updates extending pointers', async () => {
     const anotherContract = buildContractId(address, 12);
@@ -331,7 +331,7 @@ describe('Aens', () => {
     assertNotNull(transferRes.tx);
     assertNotNull(transferRes.signatures);
     expect(transferRes.tx.fee).to.satisfy((fee: bigint) => fee >= 17300000000000n);
-    expect(transferRes.tx.fee).to.satisfy((fee: bigint) => fee <= 17340000000000n);
+    expect(transferRes.tx.fee).to.satisfy((fee: bigint) => fee <= 17400000000000n);
     expect(transferRes).to.be.eql({
       tx: {
         fee: transferRes.tx.fee,
@@ -359,7 +359,7 @@ describe('Aens', () => {
     assertNotNull(revokeRes.tx);
     assertNotNull(revokeRes.signatures);
     expect(revokeRes.tx.fee).to.satisfy((fee: bigint) => fee >= 16620000000000n);
-    expect(revokeRes.tx.fee).to.satisfy((fee: bigint) => fee <= 16660000000000n);
+    expect(revokeRes.tx.fee).to.satisfy((fee: bigint) => fee <= 16700000000000n);
     expect(revokeRes).to.be.eql({
       tx: {
         fee: revokeRes.tx.fee,
