@@ -70,6 +70,15 @@ export function nameToPunycode(maybeName: string): AensName {
   if (/\p{Emoji_Presentation}/u.test(name)) {
     throw new ArgumentError('aens name', 'not containing emoji', maybeName);
   }
+  if (name[2] === '-' && name[3] === '-') {
+    throw new ArgumentError('aens name', 'without "-" char in both the third and fourth positions', maybeName);
+  }
+  if (name[0] === '-') {
+    throw new ArgumentError('aens name', 'starting with no "-" char', maybeName);
+  }
+  if (name.at(-1) === '-') {
+    throw new ArgumentError('aens name', 'ending with no "-" char', maybeName);
+  }
   let punycode;
   try {
     const u = new URL(`http://${name}.${suffix}`);
