@@ -30,5 +30,11 @@ mkdir ../../../docs/examples/browser/wallet-web-extension/
 mv artifacts/wallet-web-extension-v0.1.0-production.zip ../../../docs/examples/browser/wallet-web-extension/packed.zip
 mv dist/report.html ../../../docs/examples/browser/wallet-web-extension/report.html
 
+echo Build example tools
+cd ../tools
+npm i
+npm run build
+mv dist/ ../../../docs/examples/browser/tools
+
 cd ../../..
 perl -i -pe 's/"rem-prepare"/"prepare"/g' package.json

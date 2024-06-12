@@ -74,6 +74,7 @@ nav:
         - examples/node/paying-for-spend-tx.md
       - examples/node/account-generalized.md
     - Browser:
+      - 'SDK tools': examples/browser/tools/index.html
       - 'Aepp example': examples/browser/aepp/index.html
       - 'Iframe wallet example': examples/browser/wallet-iframe/index.html
       - 'Webextension wallet example': examples/browser/wallet-web-extension/packed.zip
