@@ -2,7 +2,9 @@ import nacl from 'tweetnacl';
 import { full as hmac } from 'tweetnacl-auth';
 import { fromString } from 'bip32-path';
 import aesjs from 'aes-js';
-import { sha256hash, encode, Encoding } from './encoder';
+import {
+  sha256hash, encode, Encoding, Encoded,
+} from './encoder';
 import { CryptographyError } from './errors';
 import { concatBuffers } from './other';
 
@@ -58,8 +60,8 @@ interface HDWallet {
 }
 
 interface Account {
-  secretKey: string;
-  publicKey: string;
+  secretKey: string; // TODO: use Encoded.AccountSecretKey instead hex
+  publicKey: Encoded.AccountAddress;
 }
 
 type Dec<N extends number> = [-1, 0, 1, 2, 3, 4][N];
