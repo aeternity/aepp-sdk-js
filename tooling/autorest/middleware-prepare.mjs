@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { spawnSync } from 'child_process';
 // eslint-disable-next-line import/extensions
 import restoreFile from '../restore-file.mjs';
