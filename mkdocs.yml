@@ -73,6 +73,7 @@ nav:
         - examples/node/paying-for-contract-call-tx.md
         - examples/node/paying-for-spend-tx.md
       - examples/node/account-generalized.md
+      - examples/node/dry-run-using-debug-endpoint.md
     - Browser:
       - 'SDK tools': examples/browser/tools/index.html
       - 'Aepp example': examples/browser/aepp/index.html
