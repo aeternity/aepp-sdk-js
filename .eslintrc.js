@@ -113,6 +113,9 @@ module.exports = {
       'import/no-unresolved': 'off',
     },
   }, {
+    files: 'examples/node/**/*',
+    rules: { 'no-restricted-syntax': 'off' },
+  }, {
     files: ['tooling/**/*', 'examples/node/*', '**/*.config.js', '.eslintrc.js'],
     rules: {
       '@typescript-eslint/no-var-requires': 'off',
