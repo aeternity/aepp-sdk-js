@@ -22,7 +22,6 @@ import nameFee from './field-types/name-fee';
 import nameId from './field-types/name-id';
 import nonce from './field-types/nonce';
 import pointers from './field-types/pointers';
-import pointers2 from './field-types/pointers2';
 import queryFee from './field-types/query-fee';
 import raw from './field-types/raw';
 import shortUInt from './field-types/short-u-int';
@@ -70,7 +69,6 @@ interface EntryTreesPoi {
 
 const entryTreesPoi = entry(EntryTag.TreesPoi) as unknown as EntryTreesPoi;
 
-// TODO: inline after dropping Iris compatibility
 const clientTtl = withDefault(60 * 60, shortUInt);
 // https://github.com/aeternity/protocol/blob/fd17982/AENS.md#update
 /**
@@ -130,7 +128,7 @@ export const txSchema = [{
   nonce: nonce('accountId'),
   nameId,
   nameTtl,
-  pointers,
+  pointers: pointers(false),
   clientTtl,
   fee,
   ttl,
@@ -141,7 +139,7 @@ export const txSchema = [{
   nonce: nonce('accountId'),
   nameId,
   nameTtl,
-  pointers: pointers2,
+  pointers: pointers(true),
   clientTtl,
   fee,
   ttl,
