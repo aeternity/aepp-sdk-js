@@ -137,7 +137,7 @@ try {
 }
 
 // using generic error classes
-const {AensError, TransactionError, BaseError } = require('@aeternity/aepp-sdk')
+import { AensError, TransactionError, BaseError } from '@aeternity/aepp-sdk'
 
 try {
   const spendTxResult = await aeSdk.spend(1, "ak_2tv", { onAccount: payerAccount})
