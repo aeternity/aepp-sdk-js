@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 import { RestError } from '@azure/core-rest-pipeline';
-import { FullOperationResponse } from '@azure/core-client';
+import { FullOperationResponse, OperationArguments, OperationSpec } from '@azure/core-client';
 import { url } from '.';
 import {
   AeSdkBase, Node, NodeNotFoundError, MemoryAccount, buildTx, Tag,
@@ -84,6 +84,12 @@ describe('Node client', () => {
       .to.be.rejectedWith(RestError, 'v3/transactions error: Invalid tx (nonce_too_high)');
   });
 
+  it('can\'t change $host', async () => {
+    const n = new Node(url);
+    // @ts-expect-error $host should be readonly
+    n.$host = 'http://example.com';
+  });
+
   it('returns recent gas prices', async () => {
     const example: Awaited<ReturnType<typeof node.getRecentGasPrices>> = [
       { minGasPrice: 0n, minutes: 5, utilization: 0 },
@@ -98,9 +104,20 @@ describe('Node client', () => {
   });
 
   it('doesn\'t remember failed version request', async () => {
-    const n = new Node('https://test.stg.aepps.com');
+    let shouldFail = true;
+    class CustomNode extends Node {
+      override sendOperationRequest = async <T>(
+        args: OperationArguments,
+        spec: OperationSpec,
+      ): Promise<T> => {
+        if (shouldFail) spec = { ...spec, path: `https://test.stg.aepps.com${spec.path}` };
+        return super.sendOperationRequest(args, spec);
+      };
+    }
+
+    const n = new CustomNode(url);
     await expect(n.getTopHeader()).to.be.rejectedWith('v3/status error: 404 status code');
-    n.$host = url;
+    shouldFail = false;
     expect(await n.getTopHeader()).to.be.an('object');
   });
 
