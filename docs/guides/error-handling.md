@@ -67,7 +67,6 @@ BaseError
 ├── CryptographyError
 │   ├── InvalidChecksumError
 │   ├── DerivationError
-│   ├── InvalidPasswordError
 │   ├── MerkleTreeHashMismatchError
 │   ├── MissingNodeInTreeError
 │   ├── UnknownNodeLengthError

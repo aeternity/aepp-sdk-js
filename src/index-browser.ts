@@ -14,8 +14,6 @@ export {
   signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt,
 } from './utils/jwt';
 export type { Jwt } from './utils/jwt';
-export { recover, dump } from './utils/keystore';
-export type { Keystore } from './utils/keystore';
 export { toBytes } from './utils/bytes';
 export {
   buildTx, buildTxAsync, buildTxHash, unpackTx, buildContractIdByContractTx,
@@ -105,7 +103,7 @@ export {
   InactiveContractError, InvalidMethodInvocationError, MissingContractAddressError,
   MissingContractDefError, MissingFunctionNameError, NodeInvocationError,
   NoSuchContractFunctionError, NotPayableFunctionError, MissingEventDefinitionError,
-  AmbiguousEventDefinitionError, InvalidChecksumError, InvalidPasswordError,
+  AmbiguousEventDefinitionError, InvalidChecksumError,
   MerkleTreeHashMismatchError, MissingNodeInTreeError, UnknownNodeLengthError,
   UnknownPathNibbleError, DuplicateNodeError, NodeNotFoundError, DecodeError, PayloadLengthError,
   DryRunError, IllegalBidFeeError, InvalidSignatureError, PrefixNotFoundError, SchemaNotFoundError,
