@@ -18,7 +18,7 @@ describe('Delegation signatures', () => {
   });
 
   it('signs delegation', async () => {
-    const account = new MemoryAccount('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200');
+    const account = new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
     expect(await account.signDelegation(delegation, { networkId: 'ae_test' }))
       .to.be.equal('sg_UHnWENCvSvJPjcwR2rW82btPvDoDqPvDnn8TsXkoQSNoMHEeT1D8YkAwJQQNrALTBdqqFou4X4Q2MoqCXzwnQZTDZvH28');
   });

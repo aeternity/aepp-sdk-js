@@ -1,6 +1,7 @@
+import nacl from 'tweetnacl';
 import AccountBase from './Base';
 import {
-  generateKeyPairFromSecret, sign, generateKeyPair, hash, messageToHash, messagePrefixLength,
+  sign, generateKeyPair, hash, messageToHash, messagePrefixLength,
 } from '../utils/crypto';
 import { ArgumentError, UnexpectedTsError } from '../utils/errors';
 import {
@@ -33,17 +34,11 @@ export default class AccountMemory extends AccountBase {
   /**
    * @param secretKey - Secret key
    */
-  constructor(secretKey: string | Uint8Array) {
+  constructor(secretKey: Encoded.AccountSecretKey) {
     super();
-    secretKey = typeof secretKey === 'string' ? Buffer.from(secretKey, 'hex') : secretKey;
-    if (secretKey.length !== 64) {
-      throw new ArgumentError('secretKey', '64 bytes', secretKey.length);
-    }
-    secretKeys.set(this, secretKey);
-    this.address = encode(
-      generateKeyPairFromSecret(secretKey).publicKey,
-      Encoding.AccountAddress,
-    );
+    const keyPair = nacl.sign.keyPair.fromSeed(decode(secretKey));
+    secretKeys.set(this, keyPair.secretKey);
+    this.address = encode(keyPair.publicKey, Encoding.AccountAddress);
   }
 
   /**

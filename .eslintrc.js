@@ -23,7 +23,7 @@ module.exports = {
   ],
   ignorePatterns: [
     'dist', 'es', 'src/apis', 'docs/api', 'test/environment/ledger/browser', 'types-legacy',
-    'docs/examples', 'site',
+    'docs/examples', 'site', 'examples/browser/tools',
   ],
   rules: {
     'rulesdir/tsdoc-syntax': 'error',

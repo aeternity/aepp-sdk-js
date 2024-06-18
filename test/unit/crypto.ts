@@ -38,6 +38,9 @@ describe('crypto', () => {
       expect(keyPair.publicKey).to.satisfy((b: string) => b.startsWith('ak_'));
       assert.isAtLeast(keyPair.publicKey.length, 51);
       assert.isAtMost(keyPair.publicKey.length, 53);
+      expect(keyPair.secretKey).to.satisfy((b: string) => b.startsWith('sk_'));
+      assert.isAtLeast(keyPair.secretKey.length, 51);
+      assert.isAtMost(keyPair.secretKey.length, 53);
     });
 
     it('Address from secret', () => {

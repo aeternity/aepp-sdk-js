@@ -20,7 +20,7 @@ import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk';
 // The following constants are used in the subsequent code snippets.
 const ACCOUNT_KEYPAIR = {
   publicKey: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
-  secretKey: '9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200',
+  secretKey: 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf',
 };
 const NODE_URL = 'https://testnet.aeternity.io';
 const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2);
