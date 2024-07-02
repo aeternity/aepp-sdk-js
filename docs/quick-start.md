@@ -10,46 +10,42 @@ const {
   AeSdk,
   MemoryAccount,
   Node,
-  CompilerHttp,
-  AE_AMOUNT_FORMATS,
-  generateKeyPair
+  AE_AMOUNT_FORMATS
 } = require('@aeternity/aepp-sdk')
 ```
 
-## 2. Create a Keypair for sender
+## 2. Create a sender account
 
 ```js
-const keypair = generateKeyPair()
-console.log(`Secret key: ${keypair.secretKey}`)
-console.log(`Public key: ${keypair.publicKey}`)
+const sender = MemoryAccount.generate()
+console.log('Sender address:', sender.address)
+console.log('Sender secret key:', sender.secretKey)
 ```
 
 ## 3. Get some _AE_ using the Faucet
-To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just paste sender's publicKey, hit `Top UP` and you'll immediately get some test coins.
+To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just paste sender's address, hit `Top UP` and you'll immediately get some test coins.
 
 ## 4. Interact with the æternity blockchain
 This example shows:
 
-- how to create an instance of the SDK using the `Aesdk` class
+- how to create an instance of the SDK using the `AeSdk` class
 - how to spend (send) 1 AE from the account the SDK instance was initialized with to some other AE address
 
 ```js
 const NODE_URL = 'https://testnet.aeternity.io'
-const COMPILER_URL = 'https://v8.compiler.aepps.com' // required for contract interactions
 // replace <SENDER_SECRET_KEY> with the generated secretKey from step 2
-const senderAccount = new MemoryAccount('<SENDER_SECRET_KEY>');
+const sender = new MemoryAccount('<SENDER_SECRET_KEY>');
 
 (async function () {
   const node = new Node(NODE_URL)
   const aeSdk = new AeSdk({
-    onCompiler: new CompilerHttp(COMPILER_URL),
     nodes: [{ name: 'testnet', instance: node }],
-    accounts: [senderAccount],
+    accounts: [sender],
   })
 
   // spend one AE
-  await aeSdk.spend(1, '<RECIPIENT_PUBLIC_KEY>', {
-    // replace <RECIPIENT_PUBLIC_KEY>, Ideally you use public key from Superhero Wallet you have created before
+  await aeSdk.spend(1, '<RECIPIENT_ADDRESS>', {
+    // replace <RECIPIENT_ADDRESS>, Ideally you use address from Superhero Wallet you have created before
     denomination: AE_AMOUNT_FORMATS.AE
   })
 })()
@@ -60,4 +56,4 @@ Note:
 - You may remove code from Step 2 as this serves only for one-time creation
 - By default the `spend` function expects the amount to be spent in `aettos` (the smallest possible unit)
 - Following the example snippet you would specify `AE` as denomination
-- See [Testnet Explorer](https://explorer.testnet.aeternity.io/) and track your transactions
+- See [Testnet Explorer](https://testnet.aescan.io/) and track your transactions

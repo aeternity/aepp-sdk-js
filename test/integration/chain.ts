@@ -3,14 +3,14 @@ import { expect } from 'chai';
 import { stub } from 'sinon';
 import { getSdk, timeoutBlock } from '.';
 import {
-  generateKeyPair, AeSdk, Tag, MemoryAccount, Encoded, Node, Contract,
+  AeSdk, Tag, MemoryAccount, Encoded, Node, Contract,
 } from '../../src';
 import { assertNotNull, bindRequestCounter } from '../utils';
 
 describe('Node Chain', () => {
   let aeSdk: AeSdk;
   let aeSdkWithoutAccount: AeSdk;
-  const { publicKey } = generateKeyPair();
+  const recipient = MemoryAccount.generate().address;
 
   before(async () => {
     aeSdk = await getSdk();
@@ -66,7 +66,7 @@ describe('Node Chain', () => {
 
   it('Can verify transaction from broadcast error', async () => {
     const error = await aeSdk
-      .spend(0, publicKey, { ttl: 1, absoluteTtl: true, verify: false })
+      .spend(0, recipient, { ttl: 1, absoluteTtl: true, verify: false })
       .catch((e) => e);
     expect(await error.verifyTx()).to.have.lengthOf(1);
   });
@@ -101,7 +101,7 @@ describe('Node Chain', () => {
       tag: Tag.SpendTx,
       amount: 1,
       senderId: aeSdk.address,
-      recipientId: publicKey,
+      recipientId: recipient,
     });
     const signed = await aeSdk.signTransaction(tx);
     const { txHash } = await aeSdk.api.postTransaction({ tx: signed });
@@ -122,19 +122,19 @@ describe('Node Chain', () => {
 
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
-    hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
+    hash = (await aeSdk.spend(100, recipient, { waitMined: false, verify: false })).hash;
     expect(getCount()).to.be.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
-    hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
+    hash = (await aeSdk.spend(100, recipient, { waitMined: false, verify: false })).hash;
     expect(getCount()).to.be.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
-    hash = (await aeSdk.spend(100, publicKey, { waitMined: false })).hash;
+    hash = (await aeSdk.spend(100, recipient, { waitMined: false })).hash;
     expect(getCount()).to.be.equal(6); // nonce, validator(acc, recipient, height, status), post tx
     await aeSdk.poll(hash);
   });

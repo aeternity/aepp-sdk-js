@@ -100,35 +100,6 @@ export function encodeContractAddress(
   return encode(hash(binary), Encoding.ContractAddress);
 }
 
-/**
- * Generate a random ED25519 keypair
- * @param raw - Whether to return raw (binary) keys
- * @returns Key pair
- */
-export function generateKeyPair(raw: true): { publicKey: Buffer; secretKey: Buffer };
-export function generateKeyPair(raw?: false): {
-  publicKey: Encoded.AccountAddress; secretKey: Encoded.AccountSecretKey;
-};
-export function generateKeyPair(raw = false): {
-  publicKey: Encoded.AccountAddress | Buffer;
-  secretKey: string | Buffer;
-} {
-  const keyPair = nacl.sign.keyPair();
-  const publicBuffer = Buffer.from(keyPair.publicKey);
-  const secretBuffer = Buffer.from(keyPair.secretKey);
-
-  if (raw) {
-    return {
-      publicKey: publicBuffer,
-      secretKey: secretBuffer,
-    };
-  }
-  return {
-    publicKey: encode(publicBuffer, Encoding.AccountAddress),
-    secretKey: encode(secretBuffer.subarray(0, 32), Encoding.AccountSecretKey),
-  };
-}
-
 // SIGNATURES
 
 /**

@@ -6,7 +6,7 @@ import {
   assertNotNull, ensureEqual, randomName, randomString,
 } from '../utils';
 import {
-  AeSdk, Name, generateKeyPair, buildContractId, computeBidFee, ensureName, produceNameId, Contract,
+  AeSdk, Name, MemoryAccount, buildContractId, computeBidFee, ensureName, produceNameId, Contract,
   AensPointerContextError, encode, decode, Encoding, ContractMethodsBase,
   IllegalArgumentError, Tag, unpackTx, buildTxHash,
 } from '../../src';
@@ -219,7 +219,7 @@ describe('Aens', () => {
     expect((await contract.getArg(42, { callStatic: false })).decodedResult).to.be.equal(42n);
   });
 
-  const address = generateKeyPair().publicKey;
+  const { address } = MemoryAccount.generate();
   let pointers: Parameters<Name['update']>[0];
   let pointersNode: Array<{ key: string; id: typeof pointers[string] }>;
 

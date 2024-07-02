@@ -1,7 +1,7 @@
 import nacl from 'tweetnacl';
 import AccountBase from './Base';
 import {
-  sign, generateKeyPair, hash, messageToHash, messagePrefixLength,
+  sign, hash, messageToHash, messagePrefixLength,
 } from '../utils/crypto';
 import { ArgumentError } from '../utils/errors';
 import {
@@ -45,7 +45,8 @@ export default class AccountMemory extends AccountBase {
    * Generates a new AccountMemory using a random secret key
    */
   static generate(): AccountMemory {
-    return new AccountMemory(generateKeyPair().secretKey);
+    const secretKey = encode(nacl.randomBytes(32), Encoding.AccountSecretKey);
+    return new AccountMemory(secretKey);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
