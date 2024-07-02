@@ -6,7 +6,7 @@ export {
 } from './chain';
 export { InvalidTxError, sendTransaction } from './send-transaction';
 export {
-  getAddressFromPriv, isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
+  isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
   sign, verify, messageToHash, signMessage, verifyMessage, isValidKeypair,
 } from './utils/crypto';
 export {

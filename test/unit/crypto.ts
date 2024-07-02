@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
 import {
   buildTxHash, decode, Encoded,
-  getAddressFromPriv, verifyMessage, isValidKeypair, isAddressValid, hash, genSalt,
+  verifyMessage, isValidKeypair, isAddressValid, hash, genSalt,
   sign, verify, messageToHash, signMessage, Encoding,
 } from '../../src';
 
@@ -31,10 +31,6 @@ const txRaw = 'tx_+QTlCwH4QrhA4xEWFIGZUVn0NhnYl9TwGX30YJ9/Y6x6LHU6ALfiupJPORvjbi
 const expectedHash = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK';
 
 describe('crypto', () => {
-  it('Address from secret', () => {
-    getAddressFromPriv(privateKeyAsHex).should.be.equal(address);
-  });
-
   describe('isValidKeypair', () => {
     it('verify the generated key pair', () => {
       const keyPair = {

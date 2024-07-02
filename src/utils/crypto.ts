@@ -11,17 +11,6 @@ import {
 import { ArgumentError } from './errors';
 
 /**
- * Generate address from secret key
- * @param secret - Private key as hex string
- * @returns Public key encoded as address
- */
-export function getAddressFromPriv(secret: string | Uint8Array): Encoded.AccountAddress {
-  const secretBuffer = typeof secret === 'string' ? Buffer.from(secret, 'hex') : secret;
-  const keys = nacl.sign.keyPair.fromSecretKey(secretBuffer);
-  return encode(keys.publicKey, Encoding.AccountAddress);
-}
-
-/**
  * Check if address is valid
  * @param maybeAddress - Address to check
  */
