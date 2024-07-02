@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
 import {
   buildTxHash, decode, Encoded,
-  verifyMessage, isValidKeypair, isAddressValid, hash, genSalt,
+  verifyMessage, isAddressValid, hash, genSalt,
   sign, verify, messageToHash, signMessage, Encoding,
 } from '../../src';
 
@@ -31,18 +31,6 @@ const txRaw = 'tx_+QTlCwH4QrhA4xEWFIGZUVn0NhnYl9TwGX30YJ9/Y6x6LHU6ALfiupJPORvjbi
 const expectedHash = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK';
 
 describe('crypto', () => {
-  describe('isValidKeypair', () => {
-    it('verify the generated key pair', () => {
-      const keyPair = {
-        publicKey: Buffer.from('0e89f258c53ef852437a2797fbe59639ace7433729d6955c6b4a143b20e99fdb', 'hex'),
-        secretKey: Buffer.from('94b16b8b36400281bc417c557cbb4a753061ac0557c34ce7b09dc4cf5cd7b9970e89f258c53ef852437a2797fbe59639ace7433729d6955c6b4a143b20e99fdb', 'hex'),
-      };
-      assert.ok(keyPair);
-      const verifyResult = isValidKeypair(keyPair.secretKey, keyPair.publicKey);
-      assert.isTrue(verifyResult);
-    });
-  });
-
   describe('isAddressValid', () => {
     it('rejects invalid encoded data', () => {
       expect(isAddressValid('test')).to.be.equal(false);

@@ -145,21 +145,3 @@ export function verifyMessage(
 ): boolean {
   return verify(messageToHash(message), signature, address);
 }
-
-/**
- * Check key pair for validity
- *
- * Signs a message, and then verifies that signature
- * @param privateKey - Private key to verify
- * @param publicKey - Public key to verify as hex string
- * @returns Valid?
- */
-export function isValidKeypair(
-  privateKey: string | Uint8Array,
-  publicKey: string | Uint8Array,
-): boolean {
-  const message = Buffer.from('TheMessage');
-  const signature = sign(message, privateKey);
-  const publicKeyBuffer = typeof publicKey === 'string' ? Buffer.from(publicKey, 'hex') : publicKey;
-  return verify(message, signature, encode(publicKeyBuffer, Encoding.AccountAddress));
-}
