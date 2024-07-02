@@ -1,4 +1,4 @@
-import nacl, { SignKeyPair } from 'tweetnacl';
+import nacl from 'tweetnacl';
 // js extension is required for mjs build, not importing the whole package to reduce bundle size
 // eslint-disable-next-line import/extensions
 import { blake2b } from 'blakejs/blake2b.js';
@@ -98,17 +98,6 @@ export function encodeContractAddress(
   const publicKey = decode(owner);
   const binary = concatBuffers([publicKey, encodeUnsigned(nonce)]);
   return encode(hash(binary), Encoding.ContractAddress);
-}
-
-// KEY-PAIR HELPERS
-
-/**
- * Generate keyPair from secret key
- * @param secret - secret key
- * @returns Object with Private(privateKey) and Public(publicKey) keys
- */
-export function generateKeyPairFromSecret(secret: Uint8Array): SignKeyPair {
-  return nacl.sign.keyPair.fromSecretKey(secret);
 }
 
 /**
