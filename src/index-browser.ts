@@ -66,6 +66,7 @@ export { default as Node } from './Node';
 export { default as verifyTransaction } from './tx/validator';
 export { default as AccountBase } from './account/Base';
 export { default as MemoryAccount } from './account/Memory';
+export { default as AccountMnemonicFactory } from './account/MnemonicFactory';
 export { default as AccountGeneralized } from './account/Generalized';
 export { default as AccountLedger } from './account/Ledger';
 export { default as AccountLedgerFactory } from './account/LedgerFactory';
