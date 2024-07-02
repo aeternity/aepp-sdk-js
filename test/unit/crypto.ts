@@ -4,14 +4,10 @@ import { assert, expect } from 'chai';
 import {
   buildTxHash, decode, Encoded,
   verifyMessage, isAddressValid, hash, genSalt,
-  sign, verify, messageToHash, signMessage, Encoding,
+  verify, messageToHash, Encoding,
 } from '../../src';
 
-// These keys are fixations for the encryption lifecycle tests and will
-// not be used for signing
-const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8';
-const privateKey = Buffer.from(privateKeyAsHex, 'hex');
-const address: Encoded.AccountAddress = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm';
+const address = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm';
 
 const txBinaryAsArray = [
   248, 76, 12, 1, 160, 35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58,
@@ -60,13 +56,6 @@ describe('crypto', () => {
     });
   });
 
-  describe('sign', () => {
-    it('should produce correct signature', () => {
-      const s = sign(txBinary, privateKey);
-      expect(s).to.eql(signature);
-    });
-  });
-
   describe('verify', () => {
     it('should verify tx with correct signature', () => {
       const result = verify(txBinary, signature, address);
@@ -87,18 +76,6 @@ describe('crypto', () => {
     const longMessageHash = Buffer.from('J9bibOHrlicf0tYQxe1lW69LdDAxETwPmrafKjjQwvs=', 'base64');
 
     it('calculates a hash of a long message', () => expect(messageToHash(longMessage)).to.eql(longMessageHash));
-
-    describe('sign', () => {
-      it('should produce correct signature of message', () => {
-        const s = signMessage(message, privateKey);
-        expect(s).to.eql(messageSignature);
-      });
-
-      it('should produce correct signature of message with non-ASCII chars', () => {
-        const s = signMessage(messageNonASCII, privateKey);
-        expect(s).to.eql(messageNonASCIISignature);
-      });
-    });
 
     describe('verify', () => {
       it('should verify message', () => {

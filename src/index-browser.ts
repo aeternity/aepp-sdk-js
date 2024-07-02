@@ -7,7 +7,7 @@ export {
 export { InvalidTxError, sendTransaction } from './send-transaction';
 export {
   isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
-  sign, verify, messageToHash, signMessage, verifyMessage,
+  verify, messageToHash, verifyMessage,
 } from './utils/crypto';
 export {
   signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt,

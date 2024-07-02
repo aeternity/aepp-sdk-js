@@ -1,8 +1,6 @@
 import nacl from 'tweetnacl';
 import AccountBase from './Base';
-import {
-  sign, hash, messageToHash, messagePrefixLength,
-} from '../utils/crypto';
+import { hash, messageToHash, messagePrefixLength } from '../utils/crypto';
 import { ArgumentError } from '../utils/errors';
 import {
   decode, encode, Encoded, Encoding,
@@ -51,7 +49,7 @@ export default class AccountMemory extends AccountBase {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override async sign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
-    return sign(data, this.#secretKeyDecoded);
+    return nacl.sign.detached(Buffer.from(data), this.#secretKeyDecoded);
   }
 
   override async signTransaction(

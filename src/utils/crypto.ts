@@ -89,18 +89,6 @@ export function encodeContractAddress(
   return encode(hash(binary), Encoding.ContractAddress);
 }
 
-// SIGNATURES
-
-/**
- * Generate signature
- * @param data - Data to sign
- * @param privateKey - Key to sign with
- * @returns Signature
- */
-export function sign(data: string | Uint8Array, privateKey: string | Uint8Array): Uint8Array {
-  return nacl.sign.detached(Buffer.from(data), Buffer.from(privateKey));
-}
-
 /**
  * Verify that signature was signed by public key
  * @param data - Data that was signed
@@ -123,10 +111,6 @@ export const messagePrefixLength = varuintEncode(messagePrefix.length);
 export function messageToHash(message: string): Buffer {
   const msg = Buffer.from(message, 'utf8');
   return hash(concatBuffers([messagePrefixLength, messagePrefix, varuintEncode(msg.length), msg]));
-}
-
-export function signMessage(message: string, privateKey: string | Buffer): Uint8Array {
-  return sign(messageToHash(message), privateKey);
 }
 
 /**
