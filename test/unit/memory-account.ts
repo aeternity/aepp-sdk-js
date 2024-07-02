@@ -14,6 +14,7 @@ describe('MemoryAccount', () => {
   it('Init with secretKey', async () => {
     const acc = new MemoryAccount(secretKey);
     expect(acc.address).to.be.equal('ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E');
+    expect(acc.secretKey).to.be.equal(secretKey);
   });
 
   it('generates', async () => {
