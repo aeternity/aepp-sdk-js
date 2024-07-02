@@ -141,7 +141,7 @@ async function addClient(fixedGasPrice) {
   const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: new Node(nodeUrl) }],
     accounts: [MemoryAccount.generate()],
-    onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+    onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
     _expectedMineRate: 60000,
     _microBlockCycle: 3000,
   });

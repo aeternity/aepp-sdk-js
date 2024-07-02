@@ -14,7 +14,7 @@ const aeSdk = new AeSdk({
   accounts: [
     new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
   ],
-  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+  onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
 });
 
 console.log('Height:', await aeSdk.getHeight());

@@ -24,9 +24,9 @@ CompilerCli is available only in Node.js and requires Erlang installed (`escript
 const compiler = new CompilerCli()
 ```
 
-CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since [compiler.aepps.com](https://v7.compiler.aepps.com/api) is planned to be decommissioned. An example of how to run it using [docker-compose](https://github.com/aeternity/aepp-sdk-js/blob/cd8dd7f76a6323383349b48400af0d69c2cfd88e/docker-compose.yml#L11-L14).
+CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since [compiler.aepps.com](https://v8.compiler.aepps.com/api) is planned to be decommissioned. An example of how to run it using [docker-compose](https://github.com/aeternity/aepp-sdk-js/blob/cd8dd7f76a6323383349b48400af0d69c2cfd88e/docker-compose.yml#L11-L14).
 ```js
-const compiler = new CompilerHttp('https://v7.compiler.aepps.com') // host your own compiler
+const compiler = new CompilerHttp('https://v8.compiler.aepps.com') // host your own compiler
 ```
 
 Both compiler classes implement the [same interface](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html) that can be used to generate bytecode and ACI without a Contract instance.
