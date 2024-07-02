@@ -76,7 +76,6 @@
   ],
   "dependencies": {
     "@aeternity/aepp-calldata": "^1.7.0",
-    "@aeternity/argon2": "^0.0.1",
     "@aeternity/uuid": "^0.0.1",
     "@azure/core-client": "^1.9.2",
     "@azure/core-rest-pipeline": "^1.16.0",
