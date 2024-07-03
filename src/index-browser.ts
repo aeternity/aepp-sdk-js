@@ -41,10 +41,6 @@ export {
   AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos, prefixedAmount,
 } from './utils/amount-formatter';
 export {
-  DerivationError, deriveChild, derivePathFromKey, getMasterKeyFromSeed, derivePathFromSeed,
-  getKeyPair, generateSaveHDWalletFromSeed, getSaveHDWalletAccounts, getHdWalletAccountFromSeed,
-} from './utils/hd-wallet';
-export {
   encode, decode, Encoding, Encoded,
 } from './utils/encoder';
 export { hashTypedData, hashDomain, hashJson } from './utils/typed-data';

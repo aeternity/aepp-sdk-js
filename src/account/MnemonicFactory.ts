@@ -8,7 +8,7 @@ import {
 import { concatBuffers } from '../utils/other';
 import { InternalError } from '../utils/errors';
 
-const ED25519_CURVE = Buffer.from('ed25519 seed');
+export const ED25519_CURVE = Buffer.from('ed25519 seed');
 const HARDENED_OFFSET = 0x80000000;
 
 interface KeyTreeNode {
@@ -16,7 +16,7 @@ interface KeyTreeNode {
   chainCode: Uint8Array;
 }
 
-function deriveKey(message: Uint8Array, key: Uint8Array): KeyTreeNode {
+export function deriveKey(message: Uint8Array, key: Uint8Array): KeyTreeNode {
   const I = hmac(message, key);
   const IL = I.slice(0, 32);
   const IR = I.slice(32);
@@ -26,7 +26,7 @@ function deriveKey(message: Uint8Array, key: Uint8Array): KeyTreeNode {
   };
 }
 
-function derivePathFromKey(key: KeyTreeNode, segments: number[]): KeyTreeNode {
+export function derivePathFromKey(key: KeyTreeNode, segments: readonly number[]): KeyTreeNode {
   return segments.reduce(
     ({ secretKey, chainCode }, segment) => {
       const indexBuffer = Buffer.allocUnsafe(4);
