@@ -22,7 +22,7 @@ module.exports = {
     'rulesdir',
   ],
   ignorePatterns: [
-    'dist', 'es', 'src/apis', 'docs/api', 'test/environment/ledger/browser', 'types-legacy',
+    'dist', 'es', 'src/apis', 'docs/api', 'test/environment/ledger/browser',
     'docs/examples', 'site', 'examples/browser/tools',
   ],
   rules: {
