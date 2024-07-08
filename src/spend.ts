@@ -5,7 +5,9 @@ import { buildTxAsync, BuildTxOptions, unpackTx } from './tx/builder';
 import { ArgumentError } from './utils/errors';
 import { Encoded } from './utils/encoder';
 import { Tag, AensName } from './tx/builder/constants';
-import AccountBase from './account/Base';
+
+// TODO: name verify should not overlap with transaction verify
+type ResolveNameOptions = Omit<Parameters<typeof resolveName>[2], 'onNode' | 'verify'>;
 
 /**
  * Send coins to another account
@@ -37,8 +39,8 @@ export async function spend(
   );
 }
 
-type SpendOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount'>
-& Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendTransactionOptions;
+type SpendOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount' | 'onNode'>
+& ResolveNameOptions & SendTransactionOptions;
 interface SpendOptions extends SpendOptionsType {}
 
 // TODO: Rename to spendFraction
@@ -103,8 +105,8 @@ export async function transferFunds(
   );
 }
 
-type TransferFundsOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount'>
-& Parameters<typeof resolveName>[2] & { onAccount: AccountBase } & SendTransactionOptions;
+type TransferFundsOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount' | 'onNode'>
+& ResolveNameOptions & SendTransactionOptions;
 interface TransferFundsOptions extends TransferFundsOptionsType {}
 
 /**
@@ -131,6 +133,4 @@ export async function payForTransaction(
 }
 
 interface PayForTransactionOptions extends
-  BuildTxOptions<Tag.PayingForTx, 'payerId' | 'tx' | 'onNode'>, SendTransactionOptions {
-  onAccount: AccountBase;
-}
+  BuildTxOptions<Tag.PayingForTx, 'payerId' | 'tx' | 'onNode'>, SendTransactionOptions {}

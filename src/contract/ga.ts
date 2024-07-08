@@ -12,7 +12,6 @@ import {
 } from '../utils/encoder';
 import { ArgumentError, IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
-import AccountBase from '../account/Base';
 import Contract from './Contract';
 import Node from '../Node';
 import { getAccount } from '../chain';
@@ -75,15 +74,13 @@ export async function createGeneralizedAccount(
 }
 
 interface CreateGeneralizedAccountOptions extends
-  BuildTxOptions<Tag.GaAttachTx, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
+  BuildTxOptions<Tag.GaAttachTx, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit' | 'onNode'>,
   SendTransactionOptions,
   Pick<
   Parameters<typeof Contract.initialize>[0],
   'bytecode' | 'aci' | 'sourceCodePath' | 'sourceCode' | 'fileSystem'
   > {
-  onAccount: AccountBase;
   onCompiler: CompilerBase;
-  onNode: Node;
   gasLimit?: number;
 }
 

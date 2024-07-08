@@ -41,9 +41,8 @@ import {
   getAccount, getContract, getContractByteCode, resolveName, txDryRun,
 } from '../chain';
 import { sendTransaction, SendTransactionOptions } from '../send-transaction';
-import AccountBase from '../account/Base';
 import { TxUnpacked } from '../tx/builder/schema.generated';
-import { isAccountNotFoundError } from '../utils/other';
+import { Optional, isAccountNotFoundError } from '../utils/other';
 import { isNameValid, produceNameId } from '../tx/builder/helpers';
 
 type ContractAci = NonNullable<Aci[0]['contract']>;
@@ -306,9 +305,9 @@ class Contract<M extends ContractMethodsBase> {
     params: MethodParameters<M, Fn>,
     options: Partial<BuildTxOptions<Tag.ContractCallTx, 'callerId' | 'contractId' | 'callData'>>
     & Parameters<Contract<M>['$decodeEvents']>[1]
-    & Omit<SendTransactionOptions, 'onAccount' | 'onNode'>
+    & Optional<SendTransactionOptions, 'onAccount' | 'onNode'>
     & Omit<Parameters<typeof txDryRun>[2], 'onNode'>
-    & { onAccount?: AccountBase; onNode?: Node; callStatic?: boolean } = {},
+    & { callStatic?: boolean } = {},
   ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
     const fnAci = this.#getFunctionAci(fn);
