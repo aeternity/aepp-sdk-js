@@ -142,26 +142,24 @@
   ],
   "browserslist": {
     "node": [
-      "node >= 14.19"
+      "node >= 18.19"
     ],
     "browser": [
       "> 1%",
       "last 2 versions",
-      "not dead",
-      "not ie 11"
+      "not dead"
     ],
     "production": [
-      "node >= 14.19",
+      "node >= 18.19",
       "> 1%",
       "last 2 versions",
-      "not dead",
-      "not ie 11"
+      "not dead"
     ]
   },
   "engines": {
-    "node": ">=14.19.0"
+    "node": ">=18.19"
   },
-  "packageManager": "npm@8.19.3",
+  "packageManager": "npm@10.8.1",
   "contributors": [
     "Till Kolter <till.kolter@gmail.com>",
     "Alexander Kahl <ak@sodosopa.io>",
