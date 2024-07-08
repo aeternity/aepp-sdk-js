@@ -1,29 +1,27 @@
-import { Buffer } from 'buffer'
-import { useState } from 'preact/hooks'
-import {
-  generateSaveHDWalletFromSeed, getSaveHDWalletAccounts, encode, Encoding,
-} from '@aeternity/aepp-sdk';
-import { mnemonicToSeedSync, validateMnemonic } from '@scure/bip39';
-import { wordlist } from '@scure/bip39/wordlists/english';
+import { useEffect, useState } from 'preact/hooks'
+import { AccountMnemonicFactory, MemoryAccount } from '@aeternity/aepp-sdk'
+import { validateMnemonic } from '@scure/bip39'
+import { wordlist } from '@scure/bip39/wordlists/english'
 
 export function AccountsByMnemonic() {
   const [mnemonic, setMnemonic] = useState('')
   const [count, setCount] = useState(1)
+  const [accounts, setAccounts] = useState<MemoryAccount[]>([])
 
-  let seed
-  try {
-    seed = mnemonicToSeedSync(mnemonic);
-  } catch (error) {}
-  let accounts
+  useEffect(() => {
+    setAccounts([])
+    const factory = new AccountMnemonicFactory(mnemonic);
+    (async () => {
+      try {
+        setAccounts(await Promise.all(
+          new Array(count).fill(0).map((_, idx) => factory.initialize(idx))
+        ))
+      } catch (error) {}
+    })()
+  }, [mnemonic, count])
+
   let validation = 'invalid'
-  if (seed) {
-    const wallet = generateSaveHDWalletFromSeed(seed, '');
-    accounts = getSaveHDWalletAccounts(wallet, '', count)
-      // TODO: getSaveHDWalletAccounts should return encoded secret keys
-      .map(({ publicKey, secretKey }) => ({
-        publicKey,
-        secretKey: encode(Buffer.from(secretKey, 'hex').subarray(0, 32), Encoding.AccountSecretKey),
-      }));
+  if (accounts.length) {
     validation = (validateMnemonic(mnemonic, wordlist) ? '' : 'not ') + 'in english wordlist'
   }
 
@@ -39,18 +37,18 @@ export function AccountsByMnemonic() {
         />
 
         <div></div>
-        <div class={accounts ? '' : 'error'}>Mnemonic {validation}</div>
+        <div class={accounts.length ? '' : 'error'}>Mnemonic {validation}</div>
 
-        {accounts && accounts.map(({ publicKey, secretKey }, idx) => <>
+        {accounts.map(({ address, secretKey }, idx) => <>
           <div>Account #{idx}</div>
           <div>
-            {publicKey}<br />
+            {address}<br />
             {secretKey}
           </div>
         </>)}
 
         <button
-          disabled={!accounts}
+          disabled={!accounts.length}
           onClick={() => setCount((count) => count + 1)}
         >
           Add account

@@ -6,9 +6,8 @@ export {
 } from './chain';
 export { InvalidTxError, sendTransaction } from './send-transaction';
 export {
-  getAddressFromPriv, isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
-  generateKeyPairFromSecret, generateKeyPair, sign, verify, messageToHash, signMessage,
-  verifyMessage, isValidKeypair,
+  isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
+  verify, messageToHash, verifyMessage,
 } from './utils/crypto';
 export {
   signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt,
@@ -42,10 +41,6 @@ export {
   AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos, prefixedAmount,
 } from './utils/amount-formatter';
 export {
-  DerivationError, deriveChild, derivePathFromKey, getMasterKeyFromSeed, derivePathFromSeed,
-  getKeyPair, generateSaveHDWalletFromSeed, getSaveHDWalletAccounts, getHdWalletAccountFromSeed,
-} from './utils/hd-wallet';
-export {
   encode, decode, Encoding, Encoded,
 } from './utils/encoder';
 export { hashTypedData, hashDomain, hashJson } from './utils/typed-data';
@@ -66,6 +61,7 @@ export { default as Node } from './Node';
 export { default as verifyTransaction } from './tx/validator';
 export { default as AccountBase } from './account/Base';
 export { default as MemoryAccount } from './account/Memory';
+export { default as AccountMnemonicFactory } from './account/MnemonicFactory';
 export { default as AccountGeneralized } from './account/Generalized';
 export { default as AccountLedger } from './account/Ledger';
 export { default as AccountLedgerFactory } from './account/LedgerFactory';

@@ -13,7 +13,7 @@ const store = createStore({
         { name: 'testnet', instance: new Node('https://testnet.aeternity.io') },
         { name: 'mainnet', instance: new Node('https://mainnet.aeternity.io') },
       ],
-      onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+      onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
       async onNetworkChange({ networkId }) {
         const [{ name }] = (await this.getNodesInPool())
           .filter((node) => node.nodeNetworkId === networkId);

@@ -33,7 +33,7 @@ contract Multiplier =
 `;
 const ACCOUNT_SECRET_KEY = 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf';
 const NODE_URL = 'https://testnet.aeternity.io';
-const COMPILER_URL = 'https://v7.compiler.aepps.com';
+const COMPILER_URL = 'https://v8.compiler.aepps.com';
 
 // Note:
 //

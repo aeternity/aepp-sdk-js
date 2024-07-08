@@ -29,7 +29,6 @@
 
 // ## 1. Specify imports
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-// Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 import {
   AeSdk, Contract, CompilerHttp, Node, MemoryAccount, Tag,
 } from '@aeternity/aepp-sdk';
@@ -42,7 +41,7 @@ import {
 // The following constants are used in the subsequent code snippets.
 const PAYER_ACCOUNT_SECRET_KEY = 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf';
 const NODE_URL = 'https://testnet.aeternity.io';
-const COMPILER_URL = 'https://v7.compiler.aepps.com';
+const COMPILER_URL = 'https://v8.compiler.aepps.com';
 const CONTRACT_ADDRESS = 'ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8';
 const CONTRACT_SOURCE_CODE = `
 @compiler >= 6

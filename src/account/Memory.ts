@@ -1,9 +1,7 @@
 import nacl from 'tweetnacl';
 import AccountBase from './Base';
-import {
-  sign, generateKeyPair, hash, messageToHash, messagePrefixLength,
-} from '../utils/crypto';
-import { ArgumentError, UnexpectedTsError } from '../utils/errors';
+import { hash, messageToHash, messagePrefixLength } from '../utils/crypto';
+import { ArgumentError } from '../utils/errors';
 import {
   decode, encode, Encoded, Encoding,
 } from '../utils/encoder';
@@ -11,8 +9,6 @@ import { concatBuffers } from '../utils/other';
 import { hashTypedData, AciValue } from '../utils/typed-data';
 import { buildTx } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
-
-const secretKeys = new WeakMap<AccountMemory, Uint8Array>();
 
 export function getBufferToSign(
   transaction: Encoded.Transaction,
@@ -31,13 +27,15 @@ export function getBufferToSign(
 export default class AccountMemory extends AccountBase {
   override readonly address: Encoded.AccountAddress;
 
+  readonly #secretKeyDecoded: Uint8Array;
+
   /**
    * @param secretKey - Secret key
    */
-  constructor(secretKey: Encoded.AccountSecretKey) {
+  constructor(public readonly secretKey: Encoded.AccountSecretKey) {
     super();
     const keyPair = nacl.sign.keyPair.fromSeed(decode(secretKey));
-    secretKeys.set(this, keyPair.secretKey);
+    this.#secretKeyDecoded = keyPair.secretKey;
     this.address = encode(keyPair.publicKey, Encoding.AccountAddress);
   }
 
@@ -45,14 +43,13 @@ export default class AccountMemory extends AccountBase {
    * Generates a new AccountMemory using a random secret key
    */
   static generate(): AccountMemory {
-    return new AccountMemory(generateKeyPair().secretKey);
+    const secretKey = encode(nacl.randomBytes(32), Encoding.AccountSecretKey);
+    return new AccountMemory(secretKey);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override async sign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
-    const secretKey = secretKeys.get(this);
-    if (secretKey == null) throw new UnexpectedTsError();
-    return sign(data, secretKey);
+    return nacl.sign.detached(Buffer.from(data), this.#secretKeyDecoded);
   }
 
   override async signTransaction(

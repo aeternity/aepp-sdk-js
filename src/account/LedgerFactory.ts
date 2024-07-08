@@ -3,12 +3,12 @@ import AccountLedger, { CLA, GET_ADDRESS, GET_APP_CONFIGURATION } from './Ledger
 import { UnsupportedVersionError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
 import semverSatisfies from '../utils/semver-satisfies';
-import Node from '../Node';
+import AccountBaseFactory from './BaseFactory';
 
 /**
  * A factory class that generates instances of AccountLedger based on provided transport.
  */
-export default class AccountLedgerFactory {
+export default class AccountLedgerFactory extends AccountBaseFactory {
   readonly transport: Transport;
 
   private readonly versionCheckPromise: Promise<void>;
@@ -17,6 +17,7 @@ export default class AccountLedgerFactory {
    * @param transport - Connection to Ledger to use
    */
   constructor(transport: Transport) {
+    super();
     this.transport = transport;
     this.versionCheckPromise = this.getAppConfiguration().then(({ version }) => {
       const args = [version, '0.4.4', '0.5.0'] as const;
@@ -64,23 +65,5 @@ export default class AccountLedgerFactory {
   async initialize(accountIndex: number): Promise<AccountLedger> {
     await this.versionCheckPromise;
     return new AccountLedger(this.transport, accountIndex, await this.getAddress(accountIndex));
-  }
-
-  /**
-   * Discovers accounts on Ledger that already have been used (has any on-chain transactions).
-   * It returns an empty array if none of accounts been used.
-   * If a used account is preceded by an unused account then it would be ignored.
-   * @param node - Instance of Node to get account information from
-   */
-  async discover(node: Node): Promise<AccountLedger[]> {
-    let index = 0;
-    const result = [];
-    let account;
-    do {
-      if (account != null) result.push(account);
-      account = await this.initialize(index);
-      index += 1;
-    } while (await node.getAccountByPubkey(account.address).then(() => true, () => false));
-    return result;
   }
 }

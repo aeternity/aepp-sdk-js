@@ -15,7 +15,6 @@
 
 // ## 1. Specify imports
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-// Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 import {
   AeSdk, Node, MemoryAccount, Tag,
 } from '@aeternity/aepp-sdk';

@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 import {
-  AeSdkWallet, CompilerHttp, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection,
+  AeSdkWallet, CompilerHttp, Node, MemoryAccount, BrowserRuntimeConnection,
   WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
@@ -94,13 +94,12 @@ class AccountMemoryProtected extends MemoryAccount {
   }
 
   static generate() {
-    // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
-    return new AccountMemoryProtected(generateKeyPair().secretKey);
+    return new AccountMemoryProtected(super().secretKey);
   }
 }
 
 const aeSdk = new AeSdkWallet({
-  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+  onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
   nodes: [{
     name: 'testnet',
     instance: new Node('https://testnet.aeternity.io'),

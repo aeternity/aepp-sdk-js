@@ -3,7 +3,6 @@ import { expect } from 'chai';
 import { getSdk } from '.';
 import {
   AeSdk,
-  generateKeyPair,
   genSalt,
   MemoryAccount,
   AccountGeneralized,
@@ -79,28 +78,28 @@ describe('Generalized Account', () => {
     })).to.throw(ArgumentError, 'nonce should be equal 1 if GaAttachTx, got 2 instead');
   });
 
-  const { publicKey } = generateKeyPair();
+  const recipient = MemoryAccount.generate().address;
 
   it('Init MemoryAccount for GA and Spend using GA', async () => {
     aeSdk.removeAccount(gaAccountAddress);
     aeSdk.addAccount(new AccountGeneralized(gaAccountAddress), { select: true });
 
     const callData = authContract._calldata.encode('BlindAuth', 'authorize', [genSalt()]);
-    await aeSdk.spend(10000, publicKey, { authData: { callData } });
-    await aeSdk.spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
-    const balanceAfter = await aeSdk.getBalance(publicKey);
+    await aeSdk.spend(10000, recipient, { authData: { callData } });
+    await aeSdk.spend(10000, recipient, { authData: { sourceCode, args: [genSalt()] } });
+    const balanceAfter = await aeSdk.getBalance(recipient);
     balanceAfter.should.be.equal('20000');
   });
 
   it('throws error if gasLimit exceeds the maximum value', async () => {
     const authData = { sourceCode, args: [genSalt()], gasLimit: 50001 };
-    await expect(aeSdk.spend(10000, publicKey, { authData }))
+    await expect(aeSdk.spend(10000, recipient, { authData }))
       .to.be.rejectedWith('Gas limit 50001 must be less or equal to 50000');
   });
 
   it('buildAuthTxHash generates a proper hash', async () => {
     const { rawTx } = await aeSdk
-      .spend(10000, publicKey, { authData: { sourceCode, args: [genSalt()] } });
+      .spend(10000, recipient, { authData: { sourceCode, args: [genSalt()] } });
 
     expect(new Uint8Array(await aeSdk.buildAuthTxHashByGaMetaTx(rawTx))).to.be
       .eql((await authContract.getTxHash()).decodedResult);
@@ -117,7 +116,7 @@ describe('Generalized Account', () => {
     let spendTx;
     const fee = 1e15;
     const gasPrice = MIN_GAS_PRICE + 1;
-    const { rawTx } = await aeSdk.spend(10000, publicKey, {
+    const { rawTx } = await aeSdk.spend(10000, recipient, {
       authData: async (tx) => {
         spendTx = tx;
         return {
@@ -139,7 +138,7 @@ describe('Generalized Account', () => {
 
   it('fails trying to send GaMeta using basic account', async () => {
     const options = {
-      onAccount: new AccountGeneralized(publicKey),
+      onAccount: new AccountGeneralized(recipient),
       authData: { callData: 'cb_KxFs8lcLG2+HEPb2FOjjZ2DqRd4=' },
     } as const;
     await expect(aeSdk.spend(1, gaAccountAddress, options))

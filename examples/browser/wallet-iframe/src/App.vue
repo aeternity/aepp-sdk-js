@@ -62,7 +62,7 @@
 
 <script>
 import {
-  MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
+  MemoryAccount, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
   RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
@@ -199,8 +199,7 @@ export default {
       }
 
       static generate() {
-        // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
-        return new AccountMemoryProtected(generateKeyPair().secretKey);
+        return new AccountMemoryProtected(super().secretKey);
       }
     }
 
@@ -215,7 +214,7 @@ export default {
         new AccountMemoryProtected('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
         AccountMemoryProtected.generate(),
       ],
-      onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+      onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
       name: 'Wallet Iframe',
       onConnection: (aeppId, params, origin) => {
         if (!confirm(`Client ${params.name} with id ${aeppId} at ${origin} want to connect`)) {
