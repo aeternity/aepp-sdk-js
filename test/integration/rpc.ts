@@ -210,7 +210,7 @@ describe('Aepp<->Wallet', () => {
       let checkPromise;
       wallet.onSubscription = (id, params, origin) => {
         checkPromise = Promise.resolve().then(() => {
-          expect(id.split('-').length).to.be.equal(5);
+          expect(Buffer.from(id, 'base64').length).to.be.equal(8);
           expect(params).to.be.eql({ type: 'subscribe', value: 'connected' });
           expect(origin).to.be.equal('http://origin.test');
         });
@@ -253,7 +253,7 @@ describe('Aepp<->Wallet', () => {
       let checkPromise;
       wallet.onAskAccounts = (id, params, origin) => {
         checkPromise = Promise.resolve().then(() => {
-          expect(id.split('-').length).to.be.equal(5);
+          expect(Buffer.from(id, 'base64').length).to.be.equal(8);
           expect(params).to.be.equal(undefined);
           expect(origin).to.be.equal('http://origin.test');
         });
