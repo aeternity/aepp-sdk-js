@@ -1,4 +1,4 @@
-import { v4 as uuid } from '@aeternity/uuid';
+import nacl from 'tweetnacl';
 import AeSdk from './AeSdk';
 import verifyTransaction from './tx/validator';
 import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
@@ -191,7 +191,7 @@ export default class AeSdkWallet extends AeSdk {
   addRpcClient(clientConnection: BrowserConnection): string {
     // @TODO  detect if aepp has some history based on origin????
     // if yes use this instance for connection
-    const id = uuid();
+    const id = Buffer.from(nacl.randomBytes(8)).toString('base64');
     let disconnectParams: any;
     const client: RpcClientsInfo = {
       id,

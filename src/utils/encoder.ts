@@ -1,4 +1,4 @@
-import { encode as bs58Encode, decode as bs58Decode } from 'bs58';
+import bs58 from 'bs58';
 // js extension is required for mjs build, not importing the whole package to reduce bundle size
 // eslint-disable-next-line import/extensions
 import Sha256 from 'sha.js/sha256.js';
@@ -103,8 +103,8 @@ const base64 = {
 };
 
 const base58 = {
-  encode: (buffer: Uint8Array) => bs58Encode(addChecksum(buffer)),
-  decode: (string: string) => getPayload(Buffer.from(bs58Decode(string))),
+  encode: (buffer: Uint8Array) => bs58.encode(addChecksum(buffer)),
+  decode: (string: string) => getPayload(Buffer.from(bs58.decode(string))),
 };
 
 const parseType = (maybeType: unknown): [Encoding, typeof base64] => {

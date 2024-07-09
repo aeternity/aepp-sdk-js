@@ -4,24 +4,6 @@
   "description": "SDK for the æternity blockchain",
   "main": "dist/aepp-sdk.js",
   "types": "es/index.d.ts",
-  "typesVersions": {
-    "<4.5": {
-      "es/index.d.ts": [
-        "./types-legacy/ts4.2/index.d.ts"
-      ],
-      "es/index-browser.d.ts": [
-        "./types-legacy/ts4.2/index-browser.d.ts"
-      ]
-    },
-    "<4.7": {
-      "es/index.d.ts": [
-        "./types-legacy/ts4.5/index.d.ts"
-      ],
-      "es/index-browser.d.ts": [
-        "./types-legacy/ts4.5/index-browser.d.ts"
-      ]
-    }
-  },
   "module": "es/index.mjs",
   "browser": {
     "es/index.mjs": "./es/index-browser.mjs",
@@ -29,14 +11,10 @@
   },
   "exports": {
     "node": {
-      "types@<4.5": "./types-legacy/ts4.2/index.d.ts",
-      "types@<4.7": "./types-legacy/ts4.5/index.d.ts",
       "types": "./es/index.d.ts",
       "import": "./es/index.mjs",
       "default": "./dist/aepp-sdk.js"
     },
-    "types@<4.5": "./types-legacy/ts4.2/index-browser.d.ts",
-    "types@<4.7": "./types-legacy/ts4.5/index-browser.d.ts",
     "types": "./es/index-browser.d.ts",
     "import": "./es/index-browser.mjs",
     "default": "./dist/aepp-sdk.browser.js"
@@ -44,7 +22,7 @@
   "sideEffects": false,
   "scripts": {
     "build:assets": "node tooling/fetch-aesophia-cli.mjs",
-    "build:types": "tsc && node tooling/downlevel/run.mjs",
+    "build:types": "tsc",
     "build:es": "babel src --config-file ./babel.esm.config.js --out-dir es --extensions .js,.ts --out-file-extension .mjs --source-maps true",
     "build:api:node": "autorest tooling/autorest/node.yaml && node tooling/autorest/postprocessing.mjs node",
     "build:api:compiler": "node tooling/autorest/compiler-prepare.mjs && autorest tooling/autorest/compiler.yaml && node tooling/autorest/postprocessing.mjs compiler",
@@ -76,22 +54,20 @@
   ],
   "dependencies": {
     "@aeternity/aepp-calldata": "^1.7.0",
-    "@aeternity/uuid": "^0.0.1",
     "@azure/core-client": "^1.9.2",
-    "@azure/core-rest-pipeline": "^1.16.0",
+    "@azure/core-rest-pipeline": "^1.16.1",
     "@babel/runtime-corejs3": "^7.24.7",
-    "@ledgerhq/hw-transport": "^6.30.6",
+    "@ledgerhq/hw-transport": "^6.31.0",
     "@scure/bip39": "^1.3.0",
     "@types/json-bigint": "^1.0.4",
-    "@types/node": "~18.15.3",
+    "@types/node": "^20.14.10",
     "@types/sha.js": "^2.4.4",
-    "@types/uuid": "^9.0.8",
     "@types/webextension-polyfill": "^0.10.7",
     "@types/websocket": "^1.0.10",
     "@types/ws": "^8.5.10",
     "bignumber.js": "^9.1.2",
     "blakejs": "^1.2.1",
-    "bs58": "^5.0.0",
+    "bs58": "^6.0.0",
     "buffer": "^6.0.3",
     "canonicalize": "^2.0.0",
     "events": "^3.3.0",
@@ -104,7 +80,7 @@
     "tweetnacl-auth": "^1.0.1",
     "varuint-bitcoin": "^1.1.2",
     "websocket": "^1.0.35",
-    "ws": "^8.17.0"
+    "ws": "^8.18.0"
   },
   "repository": {
     "type": "git",
@@ -120,16 +96,16 @@
     "@babel/register": "^7.24.6",
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
-    "@ledgerhq/hw-transport-mocker": "^6.28.6",
-    "@ledgerhq/hw-transport-node-hid-singleton": "^6.30.6",
-    "@ledgerhq/hw-transport-webusb": "^6.28.6",
+    "@ledgerhq/hw-transport-mocker": "^6.29.0",
+    "@ledgerhq/hw-transport-node-hid-singleton": "^6.31.1",
+    "@ledgerhq/hw-transport-webusb": "^6.29.0",
     "@types/chai": "^4.3.16",
     "@types/chai-as-promised": "^7.1.8",
-    "@types/mocha": "^10.0.6",
+    "@types/mocha": "^10.0.7",
     "@types/node-hid": "^1.3.4",
     "@types/sinon": "^17.0.3",
-    "@typescript-eslint/eslint-plugin": "^7.12.0",
-    "@typescript-eslint/parser": "^7.12.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
     "autorest": "^3.7.1",
     "babel-loader": "^9.1.3",
     "babel-plugin-add-import-extension": "^1.6.0",
@@ -138,7 +114,6 @@
     "babel-plugin-transform-import-meta": "^2.2.1",
     "chai": "^4.4.1",
     "chai-as-promised": "^7.1.2",
-    "downlevel-dts": "github:aeternity/downlevel-dts",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
@@ -146,48 +121,45 @@
     "eslint-plugin-rulesdir": "^0.2.2",
     "eslint-plugin-tsdoc": "^0.3.0",
     "html-webpack-plugin": "^5.6.0",
-    "mocha": "^10.4.0",
-    "nyc": "^15.1.0",
+    "mocha": "^10.6.0",
+    "nyc": "^17.0.0",
     "sinon": "^18.0.0",
     "source-map": "^0.7.4",
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.2",
-    "typedoc": "^0.25.13",
-    "typedoc-plugin-missing-exports": "^2.2.0",
-    "typescript": "^5.4.5",
-    "webpack": "^5.91.0",
+    "typedoc": "^0.26.3",
+    "typedoc-plugin-missing-exports": "^3.0.0",
+    "typescript": "^5.5.3",
+    "webpack": "^5.92.1",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   },
   "files": [
     "dist",
     "bin",
-    "types-legacy",
     "src",
     "es"
   ],
   "browserslist": {
     "node": [
-      "node >= 14.19"
+      "node >= 18.19"
     ],
     "browser": [
       "> 1%",
       "last 2 versions",
-      "not dead",
-      "not ie 11"
+      "not dead"
     ],
     "production": [
-      "node >= 14.19",
+      "node >= 18.19",
       "> 1%",
       "last 2 versions",
-      "not dead",
-      "not ie 11"
+      "not dead"
     ]
   },
   "engines": {
-    "node": ">=14.19.0"
+    "node": ">=18.19"
   },
-  "packageManager": "npm@8.19.3",
+  "packageManager": "npm@10.8.1",
   "contributors": [
     "Till Kolter <till.kolter@gmail.com>",
     "Alexander Kahl <ak@sodosopa.io>",
