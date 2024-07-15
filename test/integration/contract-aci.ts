@@ -19,6 +19,8 @@ import {
   NoSuchContractFunctionError,
   InvalidTxError,
   ContractError,
+  isAddressValid,
+  Encoding,
 } from '../../src';
 import { getSdk } from '.';
 import {
@@ -425,6 +427,75 @@ describe('Contract instance', () => {
     await contract.$deploy([]);
     expect((await contract.soundByDog()).decodedResult).to.be.equal('animal sound: bark');
     expect((await contract.soundByCat()).decodedResult).to.be.equal('animal sound: meow');
+  });
+
+  const intHolderSourceCode = ''
+    + 'contract IntHolder =\n'
+    + '  type state = int\n'
+    + '  entrypoint init(x) = x\n'
+    + '  entrypoint get() = state\n';
+  interface IntHolder extends ContractMethodsBase {
+    init: (name: number) => void;
+    get: () => bigint;
+  }
+
+  it('can create a contract via factory call', async () => {
+    const factory = await Contract.initialize<{
+      new: (value: number) => Encoded.ContractAddress;
+    }>({
+          ...aeSdk.getContext(),
+          sourceCode: ''
+            + `${intHolderSourceCode}`
+            + 'main contract IntHolderFactory =\n'
+            + '  stateful entrypoint new(x : int) : IntHolder =\n'
+            + '    Chain.create(x)\n',
+        });
+    await factory.$deploy([]);
+    const { decodedResult: address, result } = await factory.new(42);
+    expect(isAddressValid(address, Encoding.ContractAddress)).to.be.equal(true);
+    assertNotNull(result);
+    expect(result.gasUsed).to.be.equal(15567);
+
+    const contract = await Contract.initialize<IntHolder>(
+      { ...aeSdk.getContext(), sourceCode: intHolderSourceCode, address },
+    );
+    expect((await contract.get()).decodedResult).to.be.equal(42n);
+  });
+
+  it('can clone a contract via factory call', async () => {
+    const templateAuction = await Contract.initialize<IntHolder>(
+      { ...aeSdk.getContext(), sourceCode: intHolderSourceCode },
+    );
+    const { address: templateAddress } = await templateAuction.$deploy([43]);
+    assertNotNull(templateAddress);
+    expect((await templateAuction.get()).decodedResult).to.be.equal(43n);
+
+    const market = await Contract.initialize<{
+      new: (template: Encoded.ContractAddress, value: number) => Encoded.ContractAddress;
+    }>({
+          ...aeSdk.getContext(),
+          sourceCode: ''
+            + 'payable contract interface IntHolder =\n'
+            + '  entrypoint init : (int) => void\n'
+            + '  entrypoint get : () => int\n'
+            + '\n'
+            + 'main contract IntHolderFactory =\n'
+            + '  stateful entrypoint new(template: IntHolder, value: int) =\n'
+            + '    switch(Chain.clone(ref=template, protected=true, value))\n'
+            + '      None => abort("Bad int holder!")\n'
+            + '      Some(int_holder) =>\n'
+            + '        int_holder\n',
+        });
+    await market.$deploy([]);
+    const { decodedResult: address, result } = await market.new(templateAddress, 44);
+    expect(isAddressValid(address, Encoding.ContractAddress)).to.be.equal(true);
+    assertNotNull(result);
+    expect(result.gasUsed).to.be.equal(10097);
+
+    const auction = await Contract.initialize<IntHolder>(
+      { ...aeSdk.getContext(), sourceCode: intHolderSourceCode, address },
+    );
+    expect((await auction.get()).decodedResult).to.be.equal(44n);
   });
 
   it('accepts matching source code with enabled validation', async () => Contract.initialize({
