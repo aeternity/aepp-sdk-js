@@ -30,6 +30,8 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: npx commitlint --from $BASE --to $HEAD --verbose
       - run: npm run lint
+      - run: npm run docs:examples && npm run docs:api && ./docs/build-assets.sh
+        if: contains(github.event.pull_request.title, 'Release')
       - run: docker compose up -d --wait
       - run: npx nyc npm test
       - run: npx nyc report --reporter=text-lcov > coverage.lcov
