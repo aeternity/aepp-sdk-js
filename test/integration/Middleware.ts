@@ -1,11 +1,11 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import '../index';
-import { _Middleware } from '../../src';
+import { Middleware } from '../../src';
 
 describe('Middleware API', () => {
   // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/1336
-  const middleware = new _Middleware('https://testnet.aeternity.io/mdw/');
+  const middleware = new Middleware('https://testnet.aeternity.io/mdw/');
 
   it('gets status', async () => {
     const res = await middleware.getStatus();

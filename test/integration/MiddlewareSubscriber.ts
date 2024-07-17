@@ -6,13 +6,13 @@ import { spy } from 'sinon';
 import '../index';
 import { assertNotNull } from '../utils';
 import {
-  _MiddlewareSubscriber, _MiddlewareSubscriberError, _MiddlewareSubscriberDisconnected,
+  MiddlewareSubscriber, MiddlewareSubscriberError, MiddlewareSubscriberDisconnected,
   MemoryAccount, AeSdkMethods, Node,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
 describe('MiddlewareSubscriber', () => {
-  let middleware: _MiddlewareSubscriber;
+  let middleware: MiddlewareSubscriber;
   // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/1336
   const account = MemoryAccount.generate();
   const aeSdk = new AeSdkMethods({
@@ -29,11 +29,11 @@ describe('MiddlewareSubscriber', () => {
   });
 
   beforeEach(async () => {
-    middleware = new _MiddlewareSubscriber('wss://testnet.aeternity.io/mdw/websocket');
+    middleware = new MiddlewareSubscriber('wss://testnet.aeternity.io/mdw/websocket');
   });
 
   it('fails to connect to invalid url', async () => {
-    middleware = new _MiddlewareSubscriber('wss://testnet.aeternity.io/mdw/api');
+    middleware = new MiddlewareSubscriber('wss://testnet.aeternity.io/mdw/api');
     const promise = new Promise((resolve, reject) => {
       middleware.subscribeKeyBlocks((payload, error) => {
         if (error != null) reject(error);
@@ -52,12 +52,12 @@ describe('MiddlewareSubscriber', () => {
         else resolve(payload);
       });
     });
-    await expect(promise).to.be.rejectedWith(_MiddlewareSubscriberError, 'invalid target: ak_test');
+    await expect(promise).to.be.rejectedWith(MiddlewareSubscriberError, 'invalid target: ak_test');
     assertNotNull(unsubscribe);
     unsubscribe();
   });
 
-  async function ensureConnected(ms: _MiddlewareSubscriber): Promise<void> {
+  async function ensureConnected(ms: MiddlewareSubscriber): Promise<void> {
     return Promise.race([
       (async () => {
         while (ms.webSocket?.bufferedAmount !== 0) {
@@ -99,7 +99,7 @@ describe('MiddlewareSubscriber', () => {
     });
     expect(handleTx.callCount).to.be.equal(1);
     expect(handleTx.firstCall.args[0]).to.be.equal(undefined);
-    expect(handleTx.firstCall.args[1]).to.be.instanceOf(_MiddlewareSubscriberDisconnected);
+    expect(handleTx.firstCall.args[1]).to.be.instanceOf(MiddlewareSubscriberDisconnected);
     expect(middleware.webSocket).to.be.equal(undefined);
 
     middleware.reconnect();
