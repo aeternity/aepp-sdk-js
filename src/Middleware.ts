@@ -132,7 +132,7 @@ export default class Middleware
       allowInsecureConnection: true,
       additionalPolicies: [
         ...ignoreVersion ? [] : [
-          genVersionCheckPolicy('middleware', getVersion, '1.77.5', '2.0.0'),
+          genVersionCheckPolicy('middleware', getVersion, '1.81.0', '2.0.0'),
         ],
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
