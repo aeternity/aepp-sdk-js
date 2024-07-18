@@ -62,7 +62,7 @@
 
 <script>
 import {
-  MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
+  MemoryAccount, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
   RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
@@ -183,52 +183,6 @@ export default {
         return super.signTypedData(data, aci, options);
       }
 
-      async signDelegationToContract(
-        contractAddress,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress };
-          genConfirmCallback('sign delegation to contract')(id, opt, aeppOrigin);
-        }
-        return super.signDelegationToContract(contractAddress, options);
-      }
-
-      async signNameDelegationToContract(
-        contractAddress,
-        name,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress, name };
-          genConfirmCallback('sign delegation of name to contract')(id, opt, aeppOrigin);
-        }
-        return super.signNameDelegationToContract(contractAddress, name, options);
-      }
-
-      async signAllNamesDelegationToContract(
-        contractAddress,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress };
-          genConfirmCallback('sign delegation of all names to contract')(id, opt, aeppOrigin);
-        }
-        return super.signAllNamesDelegationToContract(contractAddress, options);
-      }
-
-      async signOracleQueryDelegationToContract(
-        contractAddress,
-        oracleQueryId,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress, oracleQueryId };
-          genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
-        }
-        return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
-      }
-
       async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
         if (id != null) {
           genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);
@@ -245,8 +199,7 @@ export default {
       }
 
       static generate() {
-        // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
-        return new AccountMemoryProtected(generateKeyPair().secretKey);
+        return new AccountMemoryProtected(super().secretKey);
       }
     }
 
@@ -256,13 +209,12 @@ export default {
       nodes: [
         { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
         { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
-        { name: 'ae_next', instance: new Node('https://next.aeternity.io') },
       ],
       accounts: [
-        new AccountMemoryProtected('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'),
+        new AccountMemoryProtected('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
         AccountMemoryProtected.generate(),
       ],
-      onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+      onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
       name: 'Wallet Iframe',
       onConnection: (aeppId, params, origin) => {
         if (!confirm(`Client ${params.name} with id ${aeppId} at ${origin} want to connect`)) {

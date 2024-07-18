@@ -6,9 +6,6 @@ import {
 } from '../utils/encoder';
 import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
 import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
-import { AensName, ConsensusProtocolVersion } from '../tx/builder/constants';
-import { packDelegation } from '../tx/builder/delegation';
-import { DelegationTag } from '../tx/builder/delegation/schema';
 
 /**
  * Account provided by wallet
@@ -73,89 +70,6 @@ export default class AccountRpc extends AccountBase {
       },
       aci,
       data,
-    });
-    return signature;
-  }
-
-  override async signDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { consensusProtocolVersion, isOracle }: {
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-      isOracle?: boolean;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (isOracle == null) {
-      const protocol = (consensusProtocolVersion != null) ? ConsensusProtocolVersion[consensusProtocolVersion] : 'unknown';
-      console.warn(`AccountRpc:signDelegationToContract: isOracle is not set. By default, sdk would generate an AENS preclaim delegation signature, but it won't be the same as the oracle delegation signature in Ceres (current protocol is ${protocol}).`);
-    }
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: isOracle === true ? DelegationTag.Oracle : DelegationTag.AensPreclaim,
-        accountAddress: this.address,
-        contractAddress,
-      });
-      return this.signDelegation(delegation);
-    }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      isOracle,
-    });
-    return signature;
-  }
-
-  override async signNameDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    name: AensName,
-    { consensusProtocolVersion }: { consensusProtocolVersion?: ConsensusProtocolVersion } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.AensName, accountAddress: this.address, contractAddress, nameId: name,
-      });
-      return this.signDelegation(delegation);
-    }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      name,
-    });
-    return signature;
-  }
-
-  override async signAllNamesDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { consensusProtocolVersion }: { consensusProtocolVersion?: ConsensusProtocolVersion } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.AensWildcard, accountAddress: this.address, contractAddress,
-      });
-      return this.signDelegation(delegation);
-    }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      allNames: true,
-    });
-    return signature;
-  }
-
-  override async signOracleQueryDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    oracleQueryId: Encoded.OracleQueryId,
-    { consensusProtocolVersion }: { consensusProtocolVersion?: ConsensusProtocolVersion } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.OracleResponse, queryId: oracleQueryId, contractAddress,
-      });
-      return this.signDelegation(delegation);
-    }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      oracleQueryId,
     });
     return signature;
   }

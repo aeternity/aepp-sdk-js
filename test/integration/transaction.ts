@@ -5,7 +5,7 @@ import { getSdk } from './index';
 import {
   AeSdk, Contract, Node,
   commitmentHash, oracleQueryId, decode, encode, Encoded, Encoding,
-  ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS, buildTx, unpackTx, ConsensusProtocolVersion,
+  ORACLE_TTL_TYPES, Tag, AE_AMOUNT_FORMATS, buildTx, unpackTx,
 } from '../../src';
 
 const nonce = 1;
@@ -50,7 +50,7 @@ describe('Transaction', () => {
 
   before(async () => {
     aeSdk = await getSdk(0);
-    contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
+    contract = await Contract.initialize({ ...aeSdk.getContext(), sourceCode: contractSourceCode });
   });
 
   it('build spend tx using denomination amount', async () => {
@@ -197,13 +197,7 @@ describe('Transaction', () => {
     }),
   ], [
     'contract create',
-    async () => {
-      const { consensusProtocolVersion } = await aeSdk.api.getNodeInfo();
-      if (consensusProtocolVersion === ConsensusProtocolVersion.Iris) {
-        return 'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFNy40LjEAgwcAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfP+mk9Ac=';
-      }
-      return 'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFOC4wLjAAgwgAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfP6UPXo4=';
-    },
+    'tx_+LAqAaEBhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABuGr4aEYDoKEijZbj/w2AeiWwAbldusME5pm3ZgPuomnZ3TbUbYgrwLg7nv5E1kQfADcANwAaDoI/AQM//oB4IJIANwEHBwEBAJgvAhFE1kQfEWluaXQRgHggkhlnZXRBcmeCLwCFOC4wLjAAgwgAA4ZHcyzkwAAAAACDTEtAhDuaygCHKxFE1kQfP6UPXo4=',
     async () => aeSdk.buildTx({
       tag: Tag.ContractCreateTx,
       nonce,

@@ -208,15 +208,4 @@ validators.push(
       }];
     }
   },
-  // TODO: move to fee field of tx builder after dropping Iris
-  (tx, { consensusProtocolVersion }) => ((
-    Tag.GaAttachTx === tx.tag
-      && ConsensusProtocolVersion.Ceres === consensusProtocolVersion
-      && tx.nonce !== 1
-  ) ? [{
-      message: `Account ${tx.ownerId} can't become generalized because it is already used`,
-      key: 'AccountUsed',
-      checkedKeys: ['nonce'],
-    }]
-    : []),
 );

@@ -22,8 +22,8 @@ module.exports = {
     'rulesdir',
   ],
   ignorePatterns: [
-    'dist', 'es', 'src/apis', 'docs/api', 'test/environment/ledger/browser', 'types-legacy',
-    'docs/examples', 'site',
+    'dist', 'es', 'src/apis', 'docs/api', 'test/environment/ledger/browser',
+    'docs/examples', 'site', 'examples/browser/tools',
   ],
   rules: {
     'rulesdir/tsdoc-syntax': 'error',
@@ -112,6 +112,9 @@ module.exports = {
       'no-restricted-globals': 'off',
       'import/no-unresolved': 'off',
     },
+  }, {
+    files: 'examples/node/**/*',
+    rules: { 'no-restricted-syntax': 'off' },
   }, {
     files: ['tooling/**/*', 'examples/node/*', '**/*.config.js', '.eslintrc.js'],
     rules: {

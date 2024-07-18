@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { before, describe, it } from 'mocha';
 import { assertNotNull, InputNumber } from '../utils';
-import { getSdk } from '.';
+import { getSdk, timeoutBlock } from '.';
 import {
   ArgumentError, NodeInvocationError, Encoded, DRY_RUN_ACCOUNT,
   messageToHash, UnexpectedTsError, AeSdk, Contract, ContractMethodsBase, isAddressValid, Encoding,
@@ -27,8 +27,9 @@ describe('Contract', () => {
   });
 
   it('deploys precompiled bytecode', async () => {
-    identityContract = await aeSdk
-      .initializeContract({ bytecode, sourceCode: identitySourceCode });
+    identityContract = await Contract.initialize({
+      ...aeSdk.getContext(), bytecode, sourceCode: identitySourceCode,
+    });
     expect(await identityContract.$deploy([])).to.have.property('address');
   });
 
@@ -47,9 +48,10 @@ describe('Contract', () => {
   });
 
   it('Verify signature of 32 bytes in Sophia', async () => {
-    const signContract = await aeSdk.initializeContract<{
+    const signContract = await Contract.initialize<{
       verify: (data: Uint8Array, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
+          ...aeSdk.getContext(),
           sourceCode:
             'contract Sign ='
             + '\n  entrypoint verify (data: bytes(32), pub: address, sig: signature): bool ='
@@ -63,10 +65,11 @@ describe('Contract', () => {
   });
 
   it('Verify message in Sophia', async () => {
-    const signContract = await aeSdk.initializeContract<{
+    const signContract = await Contract.initialize<{
       message_to_hash: (message: string) => Uint8Array;
       verify: (message: string, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
+          ...aeSdk.getContext(),
           sourceCode:
             'include "String.aes"'
             + '\n'
@@ -135,7 +138,8 @@ describe('Contract', () => {
   });
 
   it('throws error on deploy', async () => {
-    const ct = await aeSdk.initializeContract({
+    const ct = await Contract.initialize({
+      ...aeSdk.getContext(),
       sourceCode:
         'contract Foo =\n'
         + '  entrypoint init() = abort("CustomErrorMessage")',
@@ -144,10 +148,11 @@ describe('Contract', () => {
   });
 
   it('throws errors on method call', async () => {
-    const ct = await aeSdk.initializeContract<{
+    const ct = await Contract.initialize<{
       failWithoutMessage: (x: Encoded.AccountAddress) => void;
       failWithMessage: () => void;
     }>({
+          ...aeSdk.getContext(),
           sourceCode:
             'contract Foo =\n'
             + '  payable stateful entrypoint failWithoutMessage(x : address) = Chain.spend(x, 1000000000)\n'
@@ -163,8 +168,8 @@ describe('Contract', () => {
 
   it('Dry-run without accounts', async () => {
     const sdk = await getSdk(0);
-    const contract = await sdk.initializeContract<IdentityContractApi>({
-      sourceCode: identitySourceCode, address: deployed.address,
+    const contract = await Contract.initialize<IdentityContractApi>({
+      ...sdk.getContext(), sourceCode: identitySourceCode, address: deployed.address,
     });
     const { result } = await contract.getArg(42);
     assertNotNull(result);
@@ -172,7 +177,8 @@ describe('Contract', () => {
   });
 
   it('Dry-run at specific height', async () => {
-    const contract = await aeSdk.initializeContract<{ call: () => void }>({
+    const contract = await Contract.initialize<{ call: () => void }>({
+      ...aeSdk.getContext(),
       sourceCode: 'contract Callable =\n'
         + '  record state = { wasCalled: bool }\n'
         + '\n'
@@ -204,7 +210,7 @@ describe('Contract', () => {
     await contract.call({ callStatic: true, top: beforeMicroBlockHash });
     await contract.call({ callStatic: true, top: beforeKeyBlockHash });
     await contract.call({ callStatic: true, top: beforeKeyBlockHeight });
-  });
+  }).timeout(timeoutBlock);
 
   it('call contract/deploy with waitMined: false', async () => {
     delete identityContract.$options.address;
@@ -225,10 +231,11 @@ describe('Contract', () => {
   });
 
   it('initializes contract state', async () => {
-    const contract = await aeSdk.initializeContract<{
+    const contract = await Contract.initialize<{
       init: (a: string) => void;
       retrieve: () => string;
     }>({
+          ...aeSdk.getContext(),
           sourceCode:
             'contract StateContract =\n'
             + '  record state = { value: string }\n'
@@ -250,7 +257,8 @@ describe('Contract', () => {
     let contract: Contract<{ sumNumbers: (x: number, y: number) => bigint }>;
 
     it('Can compiler contract with external deps', async () => {
-      contract = await aeSdk.initializeContract({
+      contract = await Contract.initialize({
+        ...aeSdk.getContext(),
         sourceCode: contractWithLibSourceCode,
         fileSystem: {
           testLib:
@@ -262,8 +270,9 @@ describe('Contract', () => {
     });
 
     it('Throw error when try to compile contract without providing external deps', async () => {
-      await expect(aeSdk.initializeContract({ sourceCode: contractWithLibSourceCode }))
-        .to.be.rejectedWith('Couldn\'t find include file');
+      await expect(
+        Contract.initialize({ ...aeSdk.getContext(), sourceCode: contractWithLibSourceCode }),
+      ).to.be.rejectedWith('Couldn\'t find include file');
     });
 
     it('Can deploy contract with external deps', async () => {

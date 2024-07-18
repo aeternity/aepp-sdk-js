@@ -1,8 +1,10 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
-import { assertNotNull } from '../utils';
-import { AeSdkMethods, AccountBase } from '../../src';
+import { assertNotNull, ensureInstanceOf } from '../utils';
+import {
+  AeSdkMethods, AccountBase, MemoryAccount, Contract,
+} from '../../src';
 
 describe('AeSdkMethods', () => {
   let accounts: AccountBase[];
@@ -26,7 +28,8 @@ describe('AeSdkMethods', () => {
   });
 
   it('created contract remains connected to sdk', async () => {
-    const contract = await aeSdkMethods.initializeContract({
+    const contract = await Contract.initialize({
+      ...aeSdkMethods.getContext(),
       sourceCode: ''
       + 'contract Identity =\n'
       + '  entrypoint getArg(x : int) = x',
@@ -41,9 +44,11 @@ describe('AeSdkMethods', () => {
     const data = JSON.parse(JSON.stringify(options));
     data.onNode._httpClient = '<removed>';
     data.onCompiler.api._httpClient = '<removed>';
+    ensureInstanceOf(options.onAccount, MemoryAccount);
     expect(data).to.eql({
       onAccount: {
         address: options.onAccount.address,
+        secretKey: options.onAccount.secretKey,
       },
       onNode: {
         _requestContentType: 'application/json; charset=utf-8',

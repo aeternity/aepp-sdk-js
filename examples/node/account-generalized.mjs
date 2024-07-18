@@ -18,7 +18,7 @@ import {
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: new Node('https://testnet.aeternity.io') }],
   accounts: [MemoryAccount.generate()],
-  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+  onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
 });
 const { address } = aeSdk;
 

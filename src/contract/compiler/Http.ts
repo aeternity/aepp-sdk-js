@@ -45,7 +45,7 @@ export default class CompilerHttp extends CompilerBase {
     this.api = new CompilerApi(compilerUrl, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        ...ignoreVersion ? [] : [genVersionCheckPolicy('compiler', getVersion, '7.3.0', '9.0.0')],
+        ...ignoreVersion ? [] : [genVersionCheckPolicy('compiler', getVersion, '8.0.0', '9.0.0')],
         genErrorFormatterPolicy((body: GeneralCompilerError | CompilerErrorApi[]) => {
           let message = '';
           if ('reason' in body) {
@@ -73,7 +73,6 @@ export default class CompilerHttp extends CompilerBase {
   ): CompileResult {
     try {
       const cmpOut = await this.api.compileContract({ code: sourceCode, options: { fileSystem } });
-      cmpOut.warnings ??= []; // TODO: remove after requiring http compiler above or equal to 8.0.0
       const warnings = cmpOut.warnings.map(({ type, ...warning }) => warning);
       const res = { ...cmpOut, warnings };
       // TODO: should be fixed when the compiledAci interface gets updated

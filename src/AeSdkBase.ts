@@ -7,7 +7,6 @@ import { Encoded } from './utils/encoder';
 import { wrapWithProxy } from './utils/wrap-proxy';
 import CompilerBase from './contract/compiler/Base';
 import AeSdkMethods, { OnAccount, AeSdkMethodsOptions, WrappedOptions } from './AeSdkMethods';
-import { AensName } from './tx/builder/constants';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 
@@ -205,82 +204,6 @@ export default class AeSdkBase extends AeSdkMethods {
     { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTypedData']>[2] = {},
   ): Promise<Encoded.Signature> {
     return this._resolveAccount(onAccount).signTypedData(data, aci, options);
-  }
-
-  /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param options - Options
-   */
-  async signDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signDelegationToContract']>[1] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signDelegationToContract(contractAddress, options);
-  }
-
-  /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param name - AENS name
-   * @param options - Options
-   */
-  async signNameDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    name: AensName,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signNameDelegationToContract']>[2] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signNameDelegationToContract(contractAddress, name, options);
-  }
-
-  /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param options - Options
-   */
-  async signAllNamesDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signAllNamesDelegationToContract']>[1] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signAllNamesDelegationToContract(contractAddress, options);
-  }
-
-  /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param oracleQueryId - Oracle query id
-   * @param options - Options
-   */
-  async signOracleQueryDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    oracleQueryId: Encoded.OracleQueryId,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signOracleQueryDelegationToContract']>[2] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
   }
 
   /**

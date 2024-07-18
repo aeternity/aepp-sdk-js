@@ -589,16 +589,6 @@ export class InvalidChecksumError extends CryptographyError {
 /**
  * @category exception
  */
-export class InvalidPasswordError extends CryptographyError {
-  constructor() {
-    super('Invalid password or nonce');
-    this.name = 'InvalidPasswordError';
-  }
-}
-
-/**
- * @category exception
- */
 export class MerkleTreeHashMismatchError extends CryptographyError {
   constructor() {
     super('Node hash is not equal to provided one');

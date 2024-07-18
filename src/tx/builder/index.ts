@@ -2,13 +2,14 @@ import {
   decode, encode, Encoded, Encoding,
 } from '../../utils/encoder';
 import { hash } from '../../utils/crypto';
-import { Field } from './field-types';
+import { Field } from './field-types/interface';
 import { txSchema } from './schema';
 import { TxUnpacked, TxParams, TxParamsAsync } from './schema.generated';
 import { Tag } from './constants';
 import { buildContractId } from './helpers';
 import { getSchema as getSchemaCommon, packRecord, unpackRecord } from './common';
 import { ArgumentError } from '../../utils/errors';
+import { packEntry, unpackEntry } from './entry';
 
 /**
  * JavaScript-based Transaction builder
@@ -26,21 +27,7 @@ type TxEncoding = Encoding.Transaction | Encoding.Poi | Encoding.StateTrees
  * @category transaction builder
  * @param params - Transaction params
  */
-export function buildTx(params: TxParams): Encoded.Transaction;
-/**
- * Build node entry with a custom encoding
- * @param params - Entry params
- * @param options - Options
- * @param options.prefix - Output encoding
- */
-export function buildTx<E extends TxEncoding>(
-  params: TxParams,
-  { prefix }: { prefix: E },
-): Encoded.Generic<E>;
-export function buildTx(
-  params: TxParams,
-  { prefix }: { prefix?: TxEncoding } = {},
-): Encoded.Generic<TxEncoding> {
+export function buildTx(params: TxParams): Encoded.Transaction {
   return packRecord(txSchema, Tag, params, {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     unpackTx,
@@ -48,7 +35,8 @@ export function buildTx(
     rebuildTx: (overrideParams: any) => buildTx(
       { ...params, ...overrideParams },
     ),
-  }, prefix ?? Encoding.Transaction);
+    packEntry,
+  }, Encoding.Transaction);
 }
 
 export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
@@ -86,10 +74,7 @@ export function unpackTx<TxType extends Tag>(
   encodedTx: Encoded.Generic<TxEncoding>,
   txType?: TxType,
 ): TxUnpacked & { tag: TxType } {
-  return unpackRecord(txSchema, Tag, encodedTx, txType, {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    unpackTx,
-  }) as any;
+  return unpackRecord(txSchema, Tag, encodedTx, txType, { unpackTx, unpackEntry }) as any;
 }
 
 /**

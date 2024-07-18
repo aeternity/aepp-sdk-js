@@ -21,7 +21,6 @@ import {
   MESSAGE_DIRECTION,
   METHODS,
   RPC_STATUS,
-  generateKeyPair,
   verify,
   NoWalletConnectedError,
   UnAuthorizedAccountError,
@@ -32,6 +31,9 @@ import {
   verifyMessage,
   buildTx,
   hashTypedData,
+  Contract,
+  packDelegation,
+  DelegationTag,
 } from '../../src';
 import { getBufferToSign } from '../../src/account/Memory';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
@@ -95,7 +97,7 @@ describe('Aepp<->Wallet', () => {
   });
 
   describe('New RPC Wallet-AEPP: AEPP node', () => {
-    const keypair = generateKeyPair();
+    const { address } = MemoryAccount.generate();
     let aepp: AeSdkAepp;
     let wallet: AeSdkWallet;
 
@@ -121,7 +123,8 @@ describe('Aepp<->Wallet', () => {
     });
 
     it('aepp can do static calls without connection to wallet', async () => {
-      const contract = await aeSdk.initializeContract({
+      const contract = await Contract.initialize({
+        ...aeSdk.getContext(),
         sourceCode: 'contract Test =\n'
           + '  entrypoint getArg(x : int) = x',
       });
@@ -131,7 +134,8 @@ describe('Aepp<->Wallet', () => {
         nodes: [{ name: 'test', instance: node }],
         onCompiler: new CompilerHttp(compilerUrl),
       });
-      const contractAepp = await aeppSdk.initializeContract<{ getArg: (a: number) => number }>({
+      const contractAepp = await Contract.initialize<{ getArg: (a: number) => number }>({
+        ...aeppSdk.getContext(),
         aci: contract._aci,
         address: contract.$options.address,
       });
@@ -206,7 +210,7 @@ describe('Aepp<->Wallet', () => {
       let checkPromise;
       wallet.onSubscription = (id, params, origin) => {
         checkPromise = Promise.resolve().then(() => {
-          expect(id.split('-').length).to.be.equal(5);
+          expect(Buffer.from(id, 'base64').length).to.be.equal(8);
           expect(params).to.be.eql({ type: 'subscribe', value: 'connected' });
           expect(origin).to.be.equal('http://origin.test');
         });
@@ -225,9 +229,8 @@ describe('Aepp<->Wallet', () => {
     });
 
     it('Try to use `onAccount` for not existent account', () => {
-      const { publicKey } = generateKeyPair();
-      expect(() => { aepp.spend(100, publicKey, { onAccount: publicKey }); })
-        .to.throw(UnAuthorizedAccountError, `You do not have access to account ${publicKey}`);
+      expect(() => { aepp.spend(100, address, { onAccount: address }); })
+        .to.throw(UnAuthorizedAccountError, `You do not have access to account ${address}`);
     });
 
     it('aepp accepts key pairs in onAccount', async () => {
@@ -250,7 +253,7 @@ describe('Aepp<->Wallet', () => {
       let checkPromise;
       wallet.onAskAccounts = (id, params, origin) => {
         checkPromise = Promise.resolve().then(() => {
-          expect(id.split('-').length).to.be.equal(5);
+          expect(Buffer.from(id, 'base64').length).to.be.equal(8);
           expect(params).to.be.equal(undefined);
           expect(origin).to.be.equal('http://origin.test');
         });
@@ -294,8 +297,8 @@ describe('Aepp<->Wallet', () => {
         .callsFake(() => { throw new Error('test'); });
       const tx = await aepp.buildTx({
         tag: Tag.SpendTx,
-        senderId: keypair.publicKey,
-        recipientId: keypair.publicKey,
+        senderId: address,
+        recipientId: address,
         amount: 0,
       });
       await expect(aepp.signTransaction(tx))
@@ -321,14 +324,13 @@ describe('Aepp<->Wallet', () => {
     });
 
     it('Try to sign using unpermited account', async () => {
-      const { publicKey: pub } = generateKeyPair();
       assertNotNull(aepp.rpcClient);
       await expect(aepp.rpcClient.request(METHODS.sign, {
         tx: 'tx_+NkLAfhCuECIIeWttRUiZ32uriBdmM1t+dCg90KuG2ABxOiuXqzpAul6uTWvsyfx3EFJDah6trudrityh+6XSX3mkPEimhgGuJH4jzIBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYgbwW1nTsgAAKEB6bv2BOYRtUYKOzmZ6Xcbb2BBfXPOfFUZ4S9+EnoSJcqIG8FtZ07IAACIAWNFeF2KAAAKAIYSMJzlQADAoDBrIcoop8JfZ4HOD9p3nDTiNthj7jjl+ArdHwEMUrvQgitwOr/v3Q==',
-        onAccount: pub,
+        onAccount: address,
         returnSigned: true,
         networkId,
-      })).to.be.eventually.rejectedWith(`You are not subscribed for account ${pub}`)
+      })).to.be.eventually.rejectedWith(`You are not subscribed for account ${address}`)
         .with.property('code', 11);
     });
 
@@ -476,8 +478,14 @@ describe('Aepp<->Wallet', () => {
       });
     });
 
-    describe('Sign delegation to contract', () => {
-      const contractAddress = 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh';
+    describe('Sign delegation', () => {
+      const getDelegation = (accountAddress?: Encoded.AccountAddress): Encoded.Bytearray => (
+        packDelegation({
+          tag: DelegationTag.AensPreclaim,
+          contractAddress: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',
+          accountAddress: accountAddress ?? aeSdk.address,
+        })
+      );
 
       it('rejected by wallet', async () => {
         let origin;
@@ -487,19 +495,14 @@ describe('Aepp<->Wallet', () => {
             origin = aeppOrigin;
             throw new RpcRejectedByUserError();
           });
-        sandbox.stub(wallet._resolveAccount(), 'signDelegationToContract')
-          .callsFake((delegation, { aeppOrigin } = {}) => {
-            origin = aeppOrigin;
-            throw new RpcRejectedByUserError();
-          });
-        await expect(aepp.signDelegationToContract(contractAddress, { isOracle: false }))
+        await expect(aepp.signDelegation(getDelegation()))
           .to.be.eventually.rejectedWith('Operation rejected by user').with.property('code', 4);
         expect(origin).to.be.equal('http://origin.test');
         sandbox.restore();
       });
 
       it('works', async () => {
-        const signature = await aepp.signDelegationToContract(contractAddress, { isOracle: false });
+        const signature = await aepp.signDelegation(getDelegation());
         expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
       });
 
@@ -507,17 +510,14 @@ describe('Aepp<->Wallet', () => {
         const sandbox = createSandbox();
         sandbox.stub(wallet._resolveAccount(), 'signDelegation')
           .callsFake(() => { throw new Error('test'); });
-        sandbox.stub(wallet._resolveAccount(), 'signDelegationToContract')
-          .callsFake(() => { throw new Error('test'); });
-        await expect(aepp.signDelegationToContract(contractAddress, { isOracle: false }))
+        await expect(aepp.signDelegation(getDelegation()))
           .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
         sandbox.restore();
       });
 
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
-        const signature = await aepp
-          .signDelegationToContract(contractAddress, { onAccount, isOracle: false });
+        const signature = await aepp.signDelegation(getDelegation(onAccount), { onAccount });
         expect(signature).to.satisfy((s: string) => s.startsWith('sg_'));
       });
     });

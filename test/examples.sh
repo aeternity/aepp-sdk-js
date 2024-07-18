@@ -27,6 +27,8 @@ run_node_example contract-interaction.mjs
 run_node_example paying-for-contract-call-tx.mjs
 run_node_example paying-for-spend-tx.mjs
 run_node_example transfer-ae.mjs
+run_node_example dry-run-using-debug-endpoint.mjs
+run_node_example oracle.mjs
 
 # TODO: revisit --ignore-scripts after solving https://github.com/npm/cli/issues/4202
 perl -i -pe 's/"prepare"/"rem-prepare"/g' package.json

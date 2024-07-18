@@ -81,7 +81,7 @@ directive:
 
 version: ^3.7.1
 use-extension:
-  '@autorest/typescript': ^6.0.15
+  '@autorest/typescript': ^6.0.23
   '@autorest/modelerfour': ^4.27.0
 input-file: middleware-openapi.yaml
 output-folder: ../../src/apis/middleware

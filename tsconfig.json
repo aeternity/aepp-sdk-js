@@ -34,12 +34,12 @@
     "excludePrivate": true,
     "githubPages": false,
     "excludeExternals": true,
-    // TODO: enable after merging https://github.com/aeternity/aepp-sdk-js/pull/1962
-    // "treatWarningsAsErrors": true,
+    "treatWarningsAsErrors": true,
     "validation": {
       "invalidLink": true
     },
     "plugin": ["typedoc-plugin-missing-exports"],
+    "highlightLanguages": ["vue"],
     "readme": "none"
   }
 }

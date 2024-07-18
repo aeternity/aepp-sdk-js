@@ -74,7 +74,7 @@ const { Node, AeSdk, MemoryAccount, CompilerHttp, MIN_GAS_PRICE } = Aeternity;
 
 const nodeUrl = 'http://localhost:3013';
 const node = new Node(nodeUrl);
-const genesis = new MemoryAccount('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200');
+const genesis = new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
 const minGasPriceToShow = 1e9 - 10;
 
 async function newFrame() {
@@ -141,7 +141,7 @@ async function addClient(fixedGasPrice) {
   const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: new Node(nodeUrl) }],
     accounts: [MemoryAccount.generate()],
-    onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+    onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
     _expectedMineRate: 60000,
     _microBlockCycle: 3000,
   });

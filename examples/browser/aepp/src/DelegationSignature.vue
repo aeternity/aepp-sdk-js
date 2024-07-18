@@ -49,7 +49,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { DelegationTag } from '@aeternity/aepp-sdk';
+import { DelegationTag, packDelegation } from '@aeternity/aepp-sdk';
 import Value from './components/Value.vue';
 
 export default {
@@ -64,22 +64,29 @@ export default {
   }),
   computed: mapState(['aeSdk']),
   methods: {
-    sign() {
+    getDelegationParams() {
       switch (this.type) {
         case DelegationTag.AensPreclaim:
-          return this.aeSdk.signDelegationToContract(this.contractAddress, { isOracle: false });
+          return { tag: DelegationTag.AensPreclaim };
         case DelegationTag.Oracle:
-          return this.aeSdk.signDelegationToContract(this.contractAddress, { isOracle: true });
+          return { tag: DelegationTag.Oracle };
         case DelegationTag.AensName:
-          return this.aeSdk.signNameDelegationToContract(this.contractAddress, this.name);
+          return { tag: DelegationTag.AensName, nameId: this.name };
         case DelegationTag.AensWildcard:
-          return this.aeSdk.signAllNamesDelegationToContract(this.contractAddress);
+          return { tag: DelegationTag.AensWildcard };
         case DelegationTag.OracleResponse:
-          return this.aeSdk
-            .signOracleQueryDelegationToContract(this.contractAddress, this.oracleQueryId);
+          return { tag: DelegationTag.OracleResponse, queryId: this.oracleQueryId };
         default:
           throw new Error(`Unknown delegation signature type: ${DelegationTag[this.type]}`);
       }
+    },
+    sign() {
+      const delegation = packDelegation({
+        ...this.getDelegationParams(),
+        contractAddress: this.contractAddress,
+        accountAddress: this.aeSdk.address,
+      });
+      return this.aeSdk.signDelegation(delegation);
     },
   },
 };

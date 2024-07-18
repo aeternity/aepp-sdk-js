@@ -6,16 +6,13 @@ export {
 } from './chain';
 export { InvalidTxError, sendTransaction } from './send-transaction';
 export {
-  getAddressFromPriv, isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
-  generateKeyPairFromSecret, generateKeyPair, sign, verify, messageToHash, signMessage,
-  verifyMessage, isValidKeypair,
+  isAddressValid, genSalt, encodeUnsigned, hash, encodeContractAddress,
+  verify, messageToHash, verifyMessage,
 } from './utils/crypto';
 export {
   signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt,
 } from './utils/jwt';
 export type { Jwt } from './utils/jwt';
-export { recover, dump } from './utils/keystore';
-export type { Keystore } from './utils/keystore';
 export { toBytes } from './utils/bytes';
 export {
   buildTx, buildTxAsync, buildTxHash, unpackTx, buildContractIdByContractTx,
@@ -31,9 +28,11 @@ export {
 } from './tx/builder/constants';
 export type { Int, AensName } from './tx/builder/constants';
 // TODO: move to constants
-export { ORACLE_TTL_TYPES, CallReturnType } from './tx/builder/schema';
+export { ORACLE_TTL_TYPES } from './tx/builder/schema';
 export { DelegationTag } from './tx/builder/delegation/schema';
 export { packDelegation, unpackDelegation } from './tx/builder/delegation';
+export { EntryTag, CallReturnType } from './tx/builder/entry/constants';
+export { packEntry, unpackEntry } from './tx/builder/entry';
 export {
   getExecutionCost, getExecutionCostBySignedTx, getExecutionCostUsingNode,
 } from './tx/execution-cost';
@@ -42,22 +41,14 @@ export {
   AE_AMOUNT_FORMATS, formatAmount, toAe, toAettos, prefixedAmount,
 } from './utils/amount-formatter';
 export {
-  DerivationError, deriveChild, derivePathFromKey, getMasterKeyFromSeed, derivePathFromSeed,
-  getKeyPair, generateSaveHDWalletFromSeed, getSaveHDWalletAccounts, getHdWalletAccountFromSeed,
-} from './utils/hd-wallet';
-export {
   encode, decode, Encoding, Encoded,
 } from './utils/encoder';
 export { hashTypedData, hashDomain, hashJson } from './utils/typed-data';
-export {
-  aensRevoke, aensUpdate, aensTransfer, aensQuery, aensClaim, aensPreclaim, aensBid,
-} from './aens';
+export { default as Name } from './aens';
 export { default as Contract } from './contract/Contract';
 export type { ContractMethodsBase } from './contract/Contract';
-export {
-  pollForQueries, pollForQueryResponse, getQueryObject, postQueryToOracle, extendOracleTtl,
-  respondToQuery, getOracleObject, registerOracle,
-} from './oracle';
+export { default as Oracle } from './oracle/Oracle';
+export { default as OracleClient } from './oracle/OracleClient';
 export { spend, transferFunds, payForTransaction } from './spend';
 export { createGeneralizedAccount, buildAuthTxHash, buildAuthTxHashByGaMetaTx } from './contract/ga';
 
@@ -70,6 +61,7 @@ export { default as Node } from './Node';
 export { default as verifyTransaction } from './tx/validator';
 export { default as AccountBase } from './account/Base';
 export { default as MemoryAccount } from './account/Memory';
+export { default as AccountMnemonicFactory } from './account/MnemonicFactory';
 export { default as AccountGeneralized } from './account/Generalized';
 export { default as AccountLedger } from './account/Ledger';
 export { default as AccountLedgerFactory } from './account/LedgerFactory';
@@ -107,15 +99,10 @@ export {
   InactiveContractError, InvalidMethodInvocationError, MissingContractAddressError,
   MissingContractDefError, MissingFunctionNameError, NodeInvocationError,
   NoSuchContractFunctionError, NotPayableFunctionError, MissingEventDefinitionError,
-  AmbiguousEventDefinitionError, InvalidChecksumError, InvalidPasswordError,
+  AmbiguousEventDefinitionError, InvalidChecksumError,
   MerkleTreeHashMismatchError, MissingNodeInTreeError, UnknownNodeLengthError,
   UnknownPathNibbleError, DuplicateNodeError, NodeNotFoundError, DecodeError, PayloadLengthError,
   DryRunError, IllegalBidFeeError, InvalidSignatureError, PrefixNotFoundError, SchemaNotFoundError,
   TagNotFoundError, TxNotInChainError, AlreadyConnectedError, NoWalletConnectedError,
   RpcConnectionError,
 } from './utils/errors';
-export {
-  RpcBroadcastError, NAME_BID_MAX_LENGTH, encodeFateValue, decodeFateValue,
-  NAME_TTL, NAME_MAX_TTL, NAME_MAX_CLIENT_TTL, CLIENT_TTL,
-  ORACLE_TTL, QUERY_TTL, RESPONSE_TTL,
-} from './deprecated';

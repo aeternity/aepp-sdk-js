@@ -3,15 +3,11 @@ import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
 import {
   buildTxHash, decode, Encoded,
-  generateKeyPair, getAddressFromPriv, verifyMessage, isValidKeypair, isAddressValid, hash, genSalt,
-  sign, verify, messageToHash, signMessage, Encoding,
+  verifyMessage, isAddressValid, hash, genSalt,
+  verify, messageToHash, Encoding,
 } from '../../src';
 
-// These keys are fixations for the encryption lifecycle tests and will
-// not be used for signing
-const privateKeyAsHex = '4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8';
-const privateKey = Buffer.from(privateKeyAsHex, 'hex');
-const address: Encoded.AccountAddress = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm';
+const address = 'ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm';
 
 const txBinaryAsArray = [
   248, 76, 12, 1, 160, 35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58,
@@ -31,29 +27,6 @@ const txRaw = 'tx_+QTlCwH4QrhA4xEWFIGZUVn0NhnYl9TwGX30YJ9/Y6x6LHU6ALfiupJPORvjbi
 const expectedHash = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK';
 
 describe('crypto', () => {
-  describe('generateKeyPair', () => {
-    it('generates an account key pair', () => {
-      const keyPair = generateKeyPair();
-      assert.ok(keyPair);
-      expect(keyPair.publicKey).to.satisfy((b: string) => b.startsWith('ak_'));
-      assert.isAtLeast(keyPair.publicKey.length, 51);
-      assert.isAtMost(keyPair.publicKey.length, 53);
-    });
-
-    it('Address from secret', () => {
-      getAddressFromPriv(privateKeyAsHex).should.be.equal(address);
-    });
-  });
-
-  describe('isValidKeypair', () => {
-    it('verify the generated key pair', () => {
-      const keyPair = generateKeyPair(true);
-      assert.ok(keyPair);
-      const verifyResult = isValidKeypair(keyPair.secretKey, keyPair.publicKey);
-      assert.isTrue(verifyResult);
-    });
-  });
-
   describe('isAddressValid', () => {
     it('rejects invalid encoded data', () => {
       expect(isAddressValid('test')).to.be.equal(false);
@@ -83,13 +56,6 @@ describe('crypto', () => {
     });
   });
 
-  describe('sign', () => {
-    it('should produce correct signature', () => {
-      const s = sign(txBinary, privateKey);
-      expect(s).to.eql(signature);
-    });
-  });
-
   describe('verify', () => {
     it('should verify tx with correct signature', () => {
       const result = verify(txBinary, signature, address);
@@ -110,18 +76,6 @@ describe('crypto', () => {
     const longMessageHash = Buffer.from('J9bibOHrlicf0tYQxe1lW69LdDAxETwPmrafKjjQwvs=', 'base64');
 
     it('calculates a hash of a long message', () => expect(messageToHash(longMessage)).to.eql(longMessageHash));
-
-    describe('sign', () => {
-      it('should produce correct signature of message', () => {
-        const s = signMessage(message, privateKey);
-        expect(s).to.eql(messageSignature);
-      });
-
-      it('should produce correct signature of message with non-ASCII chars', () => {
-        const s = signMessage(messageNonASCII, privateKey);
-        expect(s).to.eql(messageNonASCIISignature);
-      });
-    });
 
     describe('verify', () => {
       it('should verify message', () => {

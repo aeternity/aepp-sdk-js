@@ -30,8 +30,8 @@ site
 /src/apis/
 /src/tx/builder/schema.generated.ts
 /src/tx/builder/delegation/schema.generated.ts
+/src/tx/builder/entry/schema.generated.ts
 /tooling/autorest/compiler-swagger.yaml
 /tooling/autorest/middleware-openapi.yaml
 /test/environment/ledger/browser
-/types-legacy
 /bin

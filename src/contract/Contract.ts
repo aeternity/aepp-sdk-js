@@ -6,9 +6,7 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import {
-  Tag, AensName, ConsensusProtocolVersion, DRY_RUN_ACCOUNT,
-} from '../tx/builder/constants';
+import { Tag, AensName, DRY_RUN_ACCOUNT } from '../tx/builder/constants';
 import {
   buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
 } from '../tx/builder';
@@ -43,9 +41,8 @@ import {
   getAccount, getContract, getContractByteCode, resolveName, txDryRun,
 } from '../chain';
 import { sendTransaction, SendTransactionOptions } from '../send-transaction';
-import AccountBase from '../account/Base';
 import { TxUnpacked } from '../tx/builder/schema.generated';
-import { isAccountNotFoundError } from '../utils/other';
+import { Optional, isAccountNotFoundError } from '../utils/other';
 import { isNameValid, produceNameId } from '../tx/builder/helpers';
 
 type ContractAci = NonNullable<Aci[0]['contract']>;
@@ -119,7 +116,7 @@ interface GetCallResultByHashReturnType<M extends ContractMethodsBase, Fn extend
  * @returns JS Contract API
  * @example
  * ```js
- * const contractIns = await aeSdk.initializeContract({ sourceCode })
+ * const contractIns = await Contract.initialize({ ...aeSdk.getContext(), sourceCode })
  * await contractIns.$deploy([321]) or await contractIns.init(321)
  * const callResult = await contractIns.$call('setState', [123])
  * const staticCallResult = await contractIns.$call('setState', [123], { callStatic: true })
@@ -308,9 +305,9 @@ class Contract<M extends ContractMethodsBase> {
     params: MethodParameters<M, Fn>,
     options: Partial<BuildTxOptions<Tag.ContractCallTx, 'callerId' | 'contractId' | 'callData'>>
     & Parameters<Contract<M>['$decodeEvents']>[1]
-    & Omit<SendTransactionOptions, 'onAccount' | 'onNode'>
+    & Optional<SendTransactionOptions, 'onAccount' | 'onNode'>
     & Omit<Parameters<typeof txDryRun>[2], 'onNode'>
-    & { onAccount?: AccountBase; onNode?: Node; callStatic?: boolean } = {},
+    & { callStatic?: boolean } = {},
   ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
     const fnAci = this.#getFunctionAci(fn);
@@ -501,9 +498,7 @@ class Contract<M extends ContractMethodsBase> {
         'contract_pubkey',
         { resolveByNode: true, onNode },
       ) as Encoded.ContractAddress;
-      const isIris = (await onNode.getNodeInfo())
-        .consensusProtocolVersion === ConsensusProtocolVersion.Iris;
-      if (!isIris && isNameValid(address)) name = address;
+      if (isNameValid(address)) name = address;
     }
 
     if (address == null && sourceCode == null && sourceCodePath == null && bytecode == null) {
