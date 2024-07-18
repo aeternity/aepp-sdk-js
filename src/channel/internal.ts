@@ -52,7 +52,7 @@ export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
  */
-export interface ChannelOptions {
+interface CommonChannelOptions {
   existingFsmId?: Encoded.Bytearray;
   /**
    * Channel url (for example: "ws://localhost:3001")
@@ -74,7 +74,7 @@ export interface ChannelOptions {
   /**
    * Initial deposit in favour of the responder by the initiator
    */
-  pushAmount: number;
+  pushAmount: BigNumber | number;
   /**
    * Amount of coins the initiator has committed to the channel
    */
@@ -92,17 +92,9 @@ export interface ChannelOptions {
    */
   ttl?: number;
   /**
-   * Host of the responder's node
-   */
-  host: string;
-  /**
-   * The port of the responders node
+   * The port of the responder's node
    */
   port: number;
-  /**
-   * Participant role
-   */
-  role: 'initiator' | 'responder';
   /**
    * How to calculate minimum depth (default: txfee)
    */
@@ -120,16 +112,16 @@ export interface ChannelOptions {
    */
   gasPrice?: BigNumber | number;
 
-  signedTx?: string;
+  signedTx?: Encoded.Transaction;
   /**
    * Existing channel id (required if reestablishing a channel)
    */
-  existingChannelId?: string;
+  existingChannelId?: Encoded.Channel;
   /**
    * Offchain transaction (required if reestablishing a channel)
    */
-  offChainTx?: string;
-  reconnectTx?: string;
+  offChainTx?: Encoded.Transaction;
+  reconnectTx?: Encoded.Transaction;
   /**
    * The time waiting for a new event to be initiated (default: 600000)
    */
@@ -174,7 +166,6 @@ export interface ChannelOptions {
    * Applicable only for responder (default: timeout_idle's value)
    */
   timeoutAwaitingOpen?: number;
-  statePassword?: string;
   /**
    * Log websocket communication and state changes
    */
@@ -183,8 +174,24 @@ export interface ChannelOptions {
    * Function which verifies and signs transactions
    */
   sign: SignTxWithTag;
-  offchainTx?: string;
+  offchainTx?: Encoded.Transaction;
 }
+
+export type ChannelOptions = CommonChannelOptions & ({
+  /**
+   * Participant role
+   */
+  role: 'initiator';
+  /**
+   * Host of the responder's node
+   */
+  host: string;
+} | {
+  /**
+   * Participant role
+   */
+  role: 'responder';
+});
 
 export interface ChannelHandler extends Function {
   enter?: Function;

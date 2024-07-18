@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.3](https://github.com/aeternity/aepp-sdk-js/compare/v13.3.2...v13.3.3) (2024-07-17)
+
+
+### Bug Fixes
+
+* **account:** improve Account:publicKey type ([0524553](https://github.com/aeternity/aepp-sdk-js/commit/0524553267162be30476b2ccebdd3f2633e9bb73))
+* **aens:** validate minus chars in name as node does ([15063c6](https://github.com/aeternity/aepp-sdk-js/commit/15063c68bbd4f6918648d9f23c069861d39dad98))
+* **aepp:** don't require subscription to request addresses ([8ce976e](https://github.com/aeternity/aepp-sdk-js/commit/8ce976e470fe67487079534671d854ccd7f0d080))
+* **channel:** `channelId` type, more accurate types ([2b064d8](https://github.com/aeternity/aepp-sdk-js/commit/2b064d8a2969f93c33c345e1822aaea5678e5e09))
+* **channel:** accept `host` only if initiator ([cfdfd72](https://github.com/aeternity/aepp-sdk-js/commit/cfdfd725f3753b06d3b458d971c980ac9b0f3596))
+* **channel:** remove `statePassword` unsupported on node side ([74db9bb](https://github.com/aeternity/aepp-sdk-js/commit/74db9bb68df997a10c1f7e4319616bb9b2a5612d))
+* don't allow upgrades `@azure/core-rest-pipeline` ([03058d4](https://github.com/aeternity/aepp-sdk-js/commit/03058d4a26d2573aa5dd33915c86eb6140de42ff))
+* don't allow upgrades `@ledgerhq/hw-transport` to 6.31.0 ([1ef43e6](https://github.com/aeternity/aepp-sdk-js/commit/1ef43e63fd2a75b891d3b13de03db67b6e5fac0d))
+* **wallet:** origin if opened over file:// (cordova) ([4ee44be](https://github.com/aeternity/aepp-sdk-js/commit/4ee44bef2fab01a97771ed46e40f9fee3b343aad))
+
 ### [13.3.2](https://github.com/aeternity/aepp-sdk-js/compare/v13.3.1...v13.3.2) (2024-04-22)
 
 

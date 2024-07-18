@@ -27,6 +27,7 @@ import {
   UnAuthorizedAccountError,
   UnknownRpcClientError,
   UnsubscribedAccountError,
+  RpcInternalError,
   AccountBase,
   verifyMessage,
   buildTx,
@@ -72,8 +73,7 @@ const getConnections = (): { walletWindow: ImplPostMessage; aeppWindow: ImplPost
   return { walletWindow, aeppWindow };
 };
 
-describe('Aepp<->Wallet', function aeppWallet() {
-  this.timeout(8000);
+describe('Aepp<->Wallet', () => {
   const connections = getConnections();
   const connectionFromWalletToAepp = new BrowserWindowMessageConnection({
     self: connections.walletWindow,
@@ -183,7 +183,9 @@ describe('Aepp<->Wallet', function aeppWallet() {
     });
 
     it('Try to ask for address', async () => {
-      await expect(aepp.askAddresses()).to.be.rejectedWith(UnsubscribedAccountError, 'You are not subscribed for an account.');
+      await expect(aepp.askAddresses()).to.be.rejectedWith(RpcInternalError, 'The peer failed to execute your request due to unknown error');
+      wallet.onAskAccounts = () => {};
+      expect(await aepp.askAddresses()).to.be.eql(wallet.addresses());
     });
 
     it('Try to sign and send transaction to wallet without subscription', async () => {
@@ -236,7 +238,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
       expect(aepp.address).to.be.equal(account.address);
     });
 
-    it('Ask for address: subscribed for accounts -> wallet deny', async () => {
+    it('Ask for address: exception in onAskAccounts -> wallet deny', async () => {
       wallet.onAskAccounts = () => {
         throw new RpcRejectedByUserError();
       };
@@ -244,7 +246,7 @@ describe('Aepp<->Wallet', function aeppWallet() {
         .rejectedWith('Operation rejected by user').with.property('code', 4);
     });
 
-    it('Ask for address: subscribed for accounts -> wallet accept', async () => {
+    it('Ask for address: no exception in onAskAccounts -> wallet accept', async () => {
       let checkPromise;
       wallet.onAskAccounts = (id, params, origin) => {
         checkPromise = Promise.resolve().then(() => {
