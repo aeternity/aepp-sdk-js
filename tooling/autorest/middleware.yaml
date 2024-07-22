@@ -11,14 +11,6 @@ directive:
       https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
 
   - from: openapi-document
-    where: $.components.schemas.Activity.properties.payload.oneOf
-    transform: return $.filter((el) => !el.$ref.includes('Aex141TransferEvent'))
-    reason: >
-      Ref '#/components/schemas/Aex141TransferEvent' is not referencing a valid location.
-      components,schemas,Activity,properties,payload,enum,2
-      https://github.com/aeternity/ae_mdw/issues/1344
-
-  - from: openapi-document
     where: $.components.schemas.Activity.properties.payload
     transform: >
       if ($doc.info.title === 'middleware') return $;
@@ -43,44 +35,99 @@ directive:
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
-    where: $.paths./names/search.get.responses.200.content.application/json.schema.allOf[0].properties.data.items.allOf^
-    transform: $.type ??= 'object'
-    reason: >
-      The schema 'get-200-application-json-allOf-properties-itemsItem' with an undefined type and
-      'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected to 'type:object'
-      https://github.com/Azure/autorest/issues/4118
-
-  - from: openapi-document
-    where: $.paths.*.get.parameters.*.schema.oneOf^
+    where: $.paths.*.get.parameters.0.schema.oneOf^
     transform: $.type ??= 'string'
     reason: >
-      The schema 'paths·u0n47u·v2-keyblocks-hash_orkbi·get·parameters·0·schema' with an undefined
+      'paths·1159w94·v3-keyblocks-hash_or_kbi·get·responses·200·content·application-json·schema'
+      'paths·1159w94·v3-keyblocks-hash_or_kbi-microblocks·get·responses·200·content·application-json·schema'
+      The schema <path> with an undefined
       type and 'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected
       to 'type:object'
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
-    where: $.paths.*.get
-    transform: $.operationId = $.operationId.replace(/(_[a-z])/g, (group) => group[1].toUpperCase())
+    where: $.paths['/aex141/{contractId}/transfers'].get.parameters.3.in
+    set: query
     reason: >
-      Otherwise autorest groups operations by 'get' prefix
-      https://github.com/aeternity/ae_mdw/issues/1357
+      Schema violation: must be equal to one of the allowed values
+      (paths > /v3/aex141/{contractId}/transfers > get > parameters > 3 > required)
+      allowedValues: true
+      https://github.com/aeternity/ae_mdw/pull/1844
+
+  - from: openapi-document
+    where: $.paths['/aex141/{contractId}/transfers'].get.parameters.4.in
+    set: query
+    reason: >
+      Schema violation: must be equal to one of the allowed values
+      (paths > /v3/aex141/{contractId}/transfers > get > parameters > 4 > required)
+      allowedValues: true
+      https://github.com/aeternity/ae_mdw/pull/1844
+
+  - from: openapi-document
+    where: $.paths['/dex/{contract_id}/swaps'].get.parameters.1
+    transform: >
+      $.schema = { type: $.type, example: $.example };
+      delete $.type;
+      delete $.example;
+    reason: >
+      Schema violation: must NOT have additional properties
+      (paths > /v3/dex/{contract_id}/swaps > get > parameters > 1)
+      additionalProperty: type
+      https://github.com/aeternity/ae_mdw/pull/1844
+
+  - from: openapi-document
+    where: $.paths['/accounts/{account_id}/dex/swaps'].get.parameters.1
+    transform: >
+      $.schema = { type: $.type, example: $.example };
+      delete $.type;
+      delete $.example;
+    reason: >
+      Schema violation: must NOT have additional properties
+      (paths > /v3/accounts/{account_id}/dex/swaps > get > parameters > 1)
+      additionalProperty: type
+      https://github.com/aeternity/ae_mdw/pull/1844
+
+  - from: openapi-document
+    where: $.components.schemas.NameTx
+    transform: $.type = 'object'
+    reason: >
+      The schema 'NameTx' with an undefined type and declared properties is a bit ambiguous. This
+      has been auto-corrected to 'type:object'
+      https://github.com/aeternity/ae_mdw/pull/1849
+
+  - from: openapi-document
+    where: $.components.schemas.OracleTx
+    transform: $.type = 'object'
+    reason: >
+      The schema 'OracleTx' with an undefined type and declared properties is a bit ambiguous. This
+      has been auto-corrected to 'type:object'
+      https://github.com/aeternity/ae_mdw/pull/1849
+
+  - from: openapi-document
+    where: $.components.schemas.Name.properties.revoke
+    transform: delete $.example
+    reason: >
+      Semantic violation: Sibling values alongside $ref will be ignored. See
+      https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed
+      values (components > schemas > Name > properties > revoke)
+      keys: [ 'example' ]
+      https://github.com/aeternity/ae_mdw/pull/1849
 
   - from: openapi-document
     where: $.servers
     transform: $ = []
-    reason: remove a server with /mdw/v2 url
+    reason: remove a server with /mdw/v3 url
 
   - from: openapi-document
     where: $.paths
     transform: >
       if ($doc.info.title === 'middleware') return $;
-      const apiPrefix = '/v2';
+      const apiPrefix = '/v3';
       Object.keys($).forEach(key => {
         $[apiPrefix + key] = $[key];
         delete $[key];
       });
-    reason: to don't add /v2 prefix to $host parameter
+    reason: to don't add /v3 prefix to $host parameter
 
   - from: openapi-document
     where: $.info.title

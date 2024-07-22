@@ -56,7 +56,7 @@ describe('Middleware API', () => {
         payload: {
           blockHash: 'mh_28wMvNExkFqRSGc2KchZzQWr9QrNiHCFD3sBeMNCM5shK9iqXw',
           blockHeight: 3,
-          encoded_tx: 'tx_+KULAfhCuEDWbZq1WeArvSAaNYZWvXvTwRPiiakFeSJ1XGavpe/A47SNYu6wKSdeChh3IZtTMJIblgbluqE0eCrW0tXfv+4GuF34WyACoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgKkOWJLazQxMHJ0NFpFblBablh5RkoyS292c0lBenptLmNoYWluAIcBxr9SY0AAhg9Vhk+YAAZA2OYv',
+          encodedTx: 'tx_+KULAfhCuEDWbZq1WeArvSAaNYZWvXvTwRPiiakFeSJ1XGavpe/A47SNYu6wKSdeChh3IZtTMJIblgbluqE0eCrW0tXfv+4GuF34WyACoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgKkOWJLazQxMHJ0NFpFblBablh5RkoyS292c0lBenptLmNoYWluAIcBxr9SY0AAhg9Vhk+YAAZA2OYv',
           hash: 'th_Wt9hi3oaWpr5mfR2zJHPJg7bAWkYbPwajoS361NVVHmeQ3Wmx',
           microIndex: 0,
           microTime: 1721213472190,
@@ -84,7 +84,7 @@ describe('Middleware API', () => {
         payload: {
           blockHash: 'mh_Regp5RaGeK2mxpQmifSgbrF4DwXiQNkkt8VjFnkNB4NK5v3St',
           blockHeight: 2,
-          encoded_tx: 'tx_+PcLAfhCuEB+Tq5sUOIMedGLODH48nG1b7KNt4Dre9vyXC3eH2EjFe2EkVGpx4QN/eQU2OLHXJgg1/7uFO5S3pMlI+jqv78FuK/4rSoBoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgG4avhoRgOg2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke3AuDue/kTWRB8ANwA3ABoOgj8BAz/+gHggkgA3AQcHAQEAmC8CEUTWRB8RaW5pdBGAeCCSGWdldEFyZ4IvAIU4LjAuMACDCAADhkdlNJ1oAAUAAEyEO5rKAIcrEUTWRB8/Bmn2yg==',
+          encodedTx: 'tx_+PcLAfhCuEB+Tq5sUOIMedGLODH48nG1b7KNt4Dre9vyXC3eH2EjFe2EkVGpx4QN/eQU2OLHXJgg1/7uFO5S3pMlI+jqv78FuK/4rSoBoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgG4avhoRgOg2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke3AuDue/kTWRB8ANwA3ABoOgj8BAz/+gHggkgA3AQcHAQEAmC8CEUTWRB8RaW5pdBGAeCCSGWdldEFyZ4IvAIU4LjAuMACDCAADhkdlNJ1oAAUAAEyEO5rKAIcrEUTWRB8/Bmn2yg==',
           hash: 'th_2JMR7C1DjrGeZWyyLMkccRLga1Lct8Syy9hcZKD9PEZkN5JvSD',
           microIndex: 0,
           microTime: 1721213472106,
@@ -126,7 +126,7 @@ describe('Middleware API', () => {
         payload: {
           blockHash: 'mh_2Wcpmr8PBEjj7qc78Y1dusvAKsQNuYhgoQNPsx3XdHtphvw8mT',
           blockHeight: 1,
-          encoded_tx: 'tx_+KMLAfhCuEDgjc7zMPb+xRW+pI0L5OqwjI+OBF0ee1zgmlkXsavoYXHZw7vTx6vxaAZxxs4ts/eZhAmqVGg3EmTsRAtccKMDuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgABAGAJs2FDw==',
+          encodedTx: 'tx_+KMLAfhCuEDgjc7zMPb+xRW+pI0L5OqwjI+OBF0ee1zgmlkXsavoYXHZw7vTx6vxaAZxxs4ts/eZhAmqVGg3EmTsRAtccKMDuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgABAGAJs2FDw==',
           hash: 'th_U26TdBBNT56HFXWAb4ktFyWBTuCAnwdajecTL4ss2BhciRviG',
           microIndex: 0,
           microTime: 1721213471890,
