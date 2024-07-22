@@ -46,7 +46,7 @@ describe('Middleware API', () => {
         payload: {
           kind: 'fee_lock_name',
           amount: 3,
-          ref_tx_hash: 'th_Wt9hi3oaWpr5mfR2zJHPJg7bAWkYbPwajoS361NVVHmeQ3Wmx',
+          refTxHash: 'th_Wt9hi3oaWpr5mfR2zJHPJg7bAWkYbPwajoS361NVVHmeQ3Wmx',
         },
         type: 'InternalTransferEvent',
       }, {
@@ -54,12 +54,12 @@ describe('Middleware API', () => {
         blockTime: 1721213472190,
         height: 3,
         payload: {
-          block_hash: 'mh_28wMvNExkFqRSGc2KchZzQWr9QrNiHCFD3sBeMNCM5shK9iqXw',
-          block_height: 3,
+          blockHash: 'mh_28wMvNExkFqRSGc2KchZzQWr9QrNiHCFD3sBeMNCM5shK9iqXw',
+          blockHeight: 3,
           encoded_tx: 'tx_+KULAfhCuEDWbZq1WeArvSAaNYZWvXvTwRPiiakFeSJ1XGavpe/A47SNYu6wKSdeChh3IZtTMJIblgbluqE0eCrW0tXfv+4GuF34WyACoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgKkOWJLazQxMHJ0NFpFblBablh5RkoyS292c0lBenptLmNoYWluAIcBxr9SY0AAhg9Vhk+YAAZA2OYv',
           hash: 'th_Wt9hi3oaWpr5mfR2zJHPJg7bAWkYbPwajoS361NVVHmeQ3Wmx',
-          micro_index: 0,
-          micro_time: 1721213472190,
+          microIndex: 0,
+          microTime: 1721213472190,
           signatures: [
             'sg_V46KfD6DhcDXP3FKnXY3YUps67zWxjrQphen95VFwj9GiMdDAnVuMdgumF2v8Gu3xTMJJB9n56yr5JQrcpW2d7oFfh9Ua',
           ],
@@ -82,12 +82,12 @@ describe('Middleware API', () => {
         blockTime: 1721213472106,
         height: 2,
         payload: {
-          block_hash: 'mh_Regp5RaGeK2mxpQmifSgbrF4DwXiQNkkt8VjFnkNB4NK5v3St',
-          block_height: 2,
+          blockHash: 'mh_Regp5RaGeK2mxpQmifSgbrF4DwXiQNkkt8VjFnkNB4NK5v3St',
+          blockHeight: 2,
           encoded_tx: 'tx_+PcLAfhCuEB+Tq5sUOIMedGLODH48nG1b7KNt4Dre9vyXC3eH2EjFe2EkVGpx4QN/eQU2OLHXJgg1/7uFO5S3pMlI+jqv78FuK/4rSoBoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgG4avhoRgOg2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke3AuDue/kTWRB8ANwA3ABoOgj8BAz/+gHggkgA3AQcHAQEAmC8CEUTWRB8RaW5pdBGAeCCSGWdldEFyZ4IvAIU4LjAuMACDCAADhkdlNJ1oAAUAAEyEO5rKAIcrEUTWRB8/Bmn2yg==',
           hash: 'th_2JMR7C1DjrGeZWyyLMkccRLga1Lct8Syy9hcZKD9PEZkN5JvSD',
-          micro_index: 0,
-          micro_time: 1721213472106,
+          microIndex: 0,
+          microTime: 1721213472106,
           signatures: [
             'sg_HXRkFjgjsFmFLZ1ywBgYj9VouQK1BySqCViALxq3ge69a86aDgd1ESqNXhCLebh7fH6SohTjbLXXxhjPnYXaGJfiX7DQV',
           ],
@@ -124,12 +124,12 @@ describe('Middleware API', () => {
         blockTime: 1721213471890,
         height: 1,
         payload: {
-          block_hash: 'mh_2Wcpmr8PBEjj7qc78Y1dusvAKsQNuYhgoQNPsx3XdHtphvw8mT',
-          block_height: 1,
+          blockHash: 'mh_2Wcpmr8PBEjj7qc78Y1dusvAKsQNuYhgoQNPsx3XdHtphvw8mT',
+          blockHeight: 1,
           encoded_tx: 'tx_+KMLAfhCuEDgjc7zMPb+xRW+pI0L5OqwjI+OBF0ee1zgmlkXsavoYXHZw7vTx6vxaAZxxs4ts/eZhAmqVGg3EmTsRAtccKMDuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgABAGAJs2FDw==',
           hash: 'th_U26TdBBNT56HFXWAb4ktFyWBTuCAnwdajecTL4ss2BhciRviG',
-          micro_index: 0,
-          micro_time: 1721213471890,
+          microIndex: 0,
+          microTime: 1721213471890,
           signatures: [
             'sg_WNvkq9RewEjZDrDLqXMUoyBd8pGzqAuyaDfG3bQAfGx4tF6smTLyYnFWmtY8SrJRnEHbriDUm836DSJSkMjiijLKBsSzo',
           ],
@@ -155,10 +155,10 @@ describe('Middleware API', () => {
       assertNotNull(res.data);
       item.blockHash = res.data[idx].blockHash;
       item.blockTime = res.data[idx].blockTime;
-      ['block_hash', 'micro_time', 'signatures', 'encoded_tx'].forEach((key) => {
+      (['blockHash', 'microTime', 'signatures', 'encodedTx'] as const).forEach((key) => {
         assertNotNull(res.data);
         if (res.data[idx].payload[key] == null) return;
-        item.payload[key] = res.data[idx].payload[key];
+        (item.payload[key] as any) = res.data[idx].payload[key];
       });
     });
     expect(res).to.be.eql(expectedRes);

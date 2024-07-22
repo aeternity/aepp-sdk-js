@@ -20,9 +20,17 @@ directive:
 
   - from: openapi-document
     where: $.components.schemas.Activity.properties.payload
-    transform: delete $.oneOf;
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      const activities = $.oneOf.map(({ $ref }) => $ref.split('/').at(-1))
+        .map(name => $doc.components.schemas[name]);
+      return {
+        "description": "A mix of all activity types.",
+        "type": "object",
+        "properties": Object.assign({}, ...activities.map(a => a.properties)),
+      };
     reason: >
-      Error: modelProperties cannot be null or undefined in the mapper
+      `oneOf` not supported
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
