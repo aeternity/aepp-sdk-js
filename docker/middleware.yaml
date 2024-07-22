@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/aeternity/aeternity/raw/master/apps/aeutils/priv/aeternity_config_schema.json
+
+system:
+  dev_mode: true
+  plugins:
+    - name: aeplugin_dev_mode
+
+http:
+  endpoints:
+    dry-run: true
+
+dev_mode:
+  auto_emit_microblocks: true
+
+chain:
+  persist: false
+  hard_forks:
+    "1": 0
+    "6": 1
+  genesis_accounts:
+    ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E: 10000000000000000000000
+
+# TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/1760
+fork_management:
+  network_id: ae_dev
+
+# TODO remove after solving https://github.com/aeternity/ae_mdw/issues/1760#issuecomment-2102872638
+mining:
+  beneficiary: ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E

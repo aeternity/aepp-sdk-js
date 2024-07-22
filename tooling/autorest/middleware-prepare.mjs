@@ -22,7 +22,7 @@ const name = './tooling/autorest/middleware-openapi.yaml';
 const hash = 'kc8BgsSJdSmzj7y33IOBVT0wlcWy4gsG49fFMVUyZ08Alhee9LhCC98HaCYNIft95ZzFYVwNY+x++acnZMK0gw==';
 
 await restoreFile(name, hash, () => {
-  const version = '1.77.5';
+  const version = '1.81.0';
   const id = run(true, 'docker', 'create', `aeternity/ae_mdw:${version}`);
   const openapi = `/home/aeternity/node/lib/ae_mdw-${version}/priv/static/swagger/swagger_v2.json`;
   run(false, 'docker', 'cp', `${id}:${openapi}`, name);

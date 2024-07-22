@@ -1,39 +1,28 @@
-import {
-  describe, it, before, beforeEach,
-} from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
 import { spy } from 'sinon';
+import WebSocket from 'isomorphic-ws';
 import '../index';
 import { assertNotNull } from '../utils';
+import resetMiddleware from './reset-middleware';
 import {
-  _MiddlewareSubscriber, _MiddlewareSubscriberError, _MiddlewareSubscriberDisconnected,
-  MemoryAccount, AeSdkMethods, Node,
+  MiddlewareSubscriber, MiddlewareSubscriberError, MiddlewareSubscriberDisconnected,
+  MemoryAccount, AeSdkMethods,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
 describe('MiddlewareSubscriber', () => {
-  let middleware: _MiddlewareSubscriber;
-  // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/1336
-  const account = MemoryAccount.generate();
-  const aeSdk = new AeSdkMethods({
-    onNode: new Node('https://testnet.aeternity.io'),
-    onAccount: account,
-  });
-
-  before(async () => {
-    const { status } = await fetch(
-      `https://faucet.aepps.com/account/${account.address}`,
-      { method: 'POST' },
-    );
-    console.assert([200, 425].includes(status), 'Invalid faucet response code', status);
-  });
+  let middleware: MiddlewareSubscriber;
+  let aeSdk: AeSdkMethods;
+  const address = 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E';
 
   beforeEach(async () => {
-    middleware = new _MiddlewareSubscriber('wss://testnet.aeternity.io/mdw/websocket');
+    aeSdk = await resetMiddleware();
+    middleware = new MiddlewareSubscriber('ws://localhost:4001/v2/websocket');
   });
 
   it('fails to connect to invalid url', async () => {
-    middleware = new _MiddlewareSubscriber('wss://testnet.aeternity.io/mdw/api');
+    middleware = new MiddlewareSubscriber('ws://localhost:4000/api');
     const promise = new Promise((resolve, reject) => {
       middleware.subscribeKeyBlocks((payload, error) => {
         if (error != null) reject(error);
@@ -52,23 +41,19 @@ describe('MiddlewareSubscriber', () => {
         else resolve(payload);
       });
     });
-    await expect(promise).to.be.rejectedWith(_MiddlewareSubscriberError, 'invalid target: ak_test');
+    await expect(promise).to.be.rejectedWith(MiddlewareSubscriberError, 'invalid target: ak_test');
     assertNotNull(unsubscribe);
     unsubscribe();
   });
 
-  async function ensureConnected(ms: _MiddlewareSubscriber): Promise<void> {
+  async function ensureConnected(ms: MiddlewareSubscriber): Promise<void> {
     return Promise.race([
       (async () => {
-        while (ms.webSocket?.bufferedAmount !== 0) {
+        while (ms.webSocket?.readyState !== WebSocket.OPEN) {
           await pause(100);
         }
-        await new Promise((resolve) => {
-          assertNotNull(ms.webSocket);
-          ms.webSocket.addEventListener('message', resolve);
-        });
       })(),
-      pause(4000).then(() => { throw new Error('Timeout'); }),
+      pause(500).then(() => { throw new Error('Timeout'); }),
     ]);
   }
 
@@ -76,13 +61,13 @@ describe('MiddlewareSubscriber', () => {
     expect(middleware.webSocket).to.be.equal(undefined);
     let unsubscribe = middleware.subscribeTransactions(() => {});
     await ensureConnected(middleware);
-    expect(middleware.webSocket).to.be.not.equal(undefined);
+    assertNotNull(middleware.webSocket);
     unsubscribe();
     expect(middleware.webSocket).to.be.equal(undefined);
 
     unsubscribe = middleware.subscribeTransactions(() => {});
     await ensureConnected(middleware);
-    expect(middleware.webSocket).to.be.not.equal(undefined);
+    assertNotNull(middleware.webSocket);
     unsubscribe();
     expect(middleware.webSocket).to.be.equal(undefined);
   });
@@ -99,27 +84,26 @@ describe('MiddlewareSubscriber', () => {
     });
     expect(handleTx.callCount).to.be.equal(1);
     expect(handleTx.firstCall.args[0]).to.be.equal(undefined);
-    expect(handleTx.firstCall.args[1]).to.be.instanceOf(_MiddlewareSubscriberDisconnected);
+    expect(handleTx.firstCall.args[1]).to.be.instanceOf(MiddlewareSubscriberDisconnected);
     expect(middleware.webSocket).to.be.equal(undefined);
 
     middleware.reconnect();
     await ensureConnected(middleware);
-    expect(middleware.webSocket).to.not.be.equal(undefined);
+    assertNotNull(middleware.webSocket);
     unsubscribe();
     expect(handleTx.callCount).to.be.equal(1);
   });
 
   async function fetchNodeRaw(path: string): Promise<any> {
-    const response = await fetch(`https://testnet.aeternity.io/v3/${path}`);
+    const response = await fetch(`http://localhost:4013/v3/${path}`);
     if (response.status !== 200) throw new Error(`Unexpected status code: ${response.status}`);
     return response.json();
   }
 
-  // TODO: enable after solving https://github.com/aeternity/ae_mdw/issues/1336
-  it.skip('subscribes for new transactions', async () => {
+  it('subscribes for new transactions', async () => {
     const [{ hash }, transaction] = await Promise.all([
-      aeSdk.spend(1, account.address),
-      new Promise((resolve, reject) => {
+      aeSdk.spend(1, address),
+      new Promise<any>((resolve, reject) => {
         const unsubscribe = middleware.subscribeTransactions((payload, error) => {
           unsubscribe();
           if (error != null) reject(error);
@@ -127,42 +111,78 @@ describe('MiddlewareSubscriber', () => {
         });
       }),
     ]);
-    expect(transaction).to.be.eql(await fetchNodeRaw(`transactions/${hash}`));
-  });
-
-  // TODO: enable after fixing https://github.com/aeternity/ae_mdw/issues/1337
-  it.skip('subscribes for account', async () => {
-    const { hash } = await aeSdk.spend(1, account.address);
-    const transaction = await new Promise((resolve, reject) => {
-      const unsubscribe = middleware.subscribeObject(account.address, (payload, error) => {
-        unsubscribe();
-        if (error != null) reject(error);
-        else resolve(payload);
-      });
+    expect(transaction).to.be.eql({
+      ...await fetchNodeRaw(`transactions/${hash}`),
+      tx_index: transaction.tx_index,
+      micro_index: transaction.micro_index,
+      micro_time: transaction.micro_time,
     });
-    expect(transaction).to.be.eql(await fetchNodeRaw(`transactions/${hash}`));
   });
 
-  // TODO: enable after solving https://github.com/aeternity/ae_mdw/issues/1336
-  it.skip('subscribes for micro block', async () => {
-    const [{ blockHash }, microBlock] = await Promise.all([
-      aeSdk.spend(1, account.address),
-      new Promise((resolve, reject) => {
-        const unsubscribe = middleware.subscribeMicroBlocks((payload, error) => {
+  it('subscribes for account', async () => {
+    const [{ hash }, transaction] = await Promise.all([
+      aeSdk.spend(1, address),
+      new Promise<any>((resolve, reject) => {
+        const unsubscribe = middleware.subscribeObject(address, (payload, error) => {
           unsubscribe();
           if (error != null) reject(error);
           else resolve(payload);
         });
       }),
     ]);
-    expect(microBlock).to.be.eql(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`));
+    expect(transaction).to.be.eql({
+      ...await fetchNodeRaw(`transactions/${hash}`),
+      tx_index: transaction.tx_index,
+      micro_index: transaction.micro_index,
+      micro_time: transaction.micro_time,
+    });
   });
 
-  // TODO: enable after solving https://github.com/aeternity/ae_mdw/issues/1336
-  it.skip('subscribes simultaneously for micro block', async () => {
-    const [{ hash, blockHash }, transaction, microBlock] = await Promise.all([
-      aeSdk.spend(1, account.address),
+  it('subscribes for different accounts', async () => {
+    const account2 = MemoryAccount.generate();
+    const address2 = account2.address;
+    const events1: any[] = [];
+    const events2: any[] = [];
+    const unsubscribe1 = middleware.subscribeObject(address, (payload) => events1.push(payload));
+    const unsubscribe2 = middleware.subscribeObject(address2, (payload) => events2.push(payload));
+    const tx1 = await aeSdk.spend(1e14, address2);
+    const [tx2, tx3] = await Promise.all([
+      aeSdk.spend(1, account2.address, { onAccount: account2 }),
+      aeSdk.spend(1, address),
+    ]);
+    while (events1.length !== 2 || events2.length !== 2) {
+      await pause(0);
+    }
+    unsubscribe1();
+    unsubscribe2();
+    expect(events1.map((ev) => ev.hash)).to.be.eql([tx1.hash, tx3.hash]);
+    expect(events2.map((ev) => ev.hash)).to.be.eql([tx1.hash, tx2.hash]);
+  });
+
+  it('subscribes for micro block', async () => {
+    const height = await aeSdk.getHeight();
+    const [{ blockHash }, microBlock] = await Promise.all([
+      aeSdk.spend(1, address),
       new Promise((resolve, reject) => {
+        const unsubscribe = middleware.subscribeMicroBlocks((payload, error) => {
+          if (payload?.height < height) return;
+          unsubscribe();
+          if (error != null) reject(error);
+          else resolve(payload);
+        });
+      }),
+    ]);
+    expect(microBlock).to.be.eql({
+      ...await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`),
+      transactions_count: 1,
+      micro_block_index: 0,
+    });
+  });
+
+  it('subscribes simultaneously for micro block', async () => {
+    const [{ hash, blockHash }, transaction, microBlock] = await Promise.all([
+      aeSdk.spend(1, address),
+      new Promise<any>((resolve, reject) => {
         const unsubscribe = middleware.subscribeTransactions((payload, error) => {
           expect(middleware.webSocket).to.be.not.equal(undefined);
           unsubscribe();
@@ -178,7 +198,16 @@ describe('MiddlewareSubscriber', () => {
         });
       }),
     ]);
-    expect(transaction).to.be.eql(await fetchNodeRaw(`transactions/${hash}`));
-    expect(microBlock).to.be.eql(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`));
+    expect(transaction).to.be.eql({
+      ...await fetchNodeRaw(`transactions/${hash}`),
+      tx_index: transaction.tx_index,
+      micro_index: transaction.micro_index,
+      micro_time: transaction.micro_time,
+    });
+    expect(microBlock).to.be.eql({
+      ...await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`),
+      transactions_count: 1,
+      micro_block_index: 0,
+    });
   });
 });
