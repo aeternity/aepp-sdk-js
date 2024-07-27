@@ -46,77 +46,16 @@ directive:
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
-    where: $.paths['/aex141/{contractId}/transfers'].get.parameters.3.in
-    set: query
-    reason: >
-      Schema violation: must be equal to one of the allowed values
-      (paths > /v3/aex141/{contractId}/transfers > get > parameters > 3 > required)
-      allowedValues: true
-      https://github.com/aeternity/ae_mdw/pull/1844
-
-  - from: openapi-document
-    where: $.paths['/aex141/{contractId}/transfers'].get.parameters.4.in
-    set: query
-    reason: >
-      Schema violation: must be equal to one of the allowed values
-      (paths > /v3/aex141/{contractId}/transfers > get > parameters > 4 > required)
-      allowedValues: true
-      https://github.com/aeternity/ae_mdw/pull/1844
-
-  - from: openapi-document
-    where: $.paths['/dex/{contract_id}/swaps'].get.parameters.1
-    transform: >
-      $.schema = { type: $.type, example: $.example };
-      delete $.type;
-      delete $.example;
-    reason: >
-      Schema violation: must NOT have additional properties
-      (paths > /v3/dex/{contract_id}/swaps > get > parameters > 1)
-      additionalProperty: type
-      https://github.com/aeternity/ae_mdw/pull/1844
-
-  - from: openapi-document
-    where: $.paths['/accounts/{account_id}/dex/swaps'].get.parameters.1
-    transform: >
-      $.schema = { type: $.type, example: $.example };
-      delete $.type;
-      delete $.example;
-    reason: >
-      Schema violation: must NOT have additional properties
-      (paths > /v3/accounts/{account_id}/dex/swaps > get > parameters > 1)
-      additionalProperty: type
-      https://github.com/aeternity/ae_mdw/pull/1844
-
-  - from: openapi-document
-    where: $.components.schemas.NameTx
-    transform: $.type = 'object'
-    reason: >
-      The schema 'NameTx' with an undefined type and declared properties is a bit ambiguous. This
-      has been auto-corrected to 'type:object'
-      https://github.com/aeternity/ae_mdw/pull/1849
-
-  - from: openapi-document
-    where: $.components.schemas.OracleTx
-    transform: $.type = 'object'
-    reason: >
-      The schema 'OracleTx' with an undefined type and declared properties is a bit ambiguous. This
-      has been auto-corrected to 'type:object'
-      https://github.com/aeternity/ae_mdw/pull/1849
-
-  - from: openapi-document
-    where: $.components.schemas.Name.properties.revoke
-    transform: delete $.example
-    reason: >
-      Semantic violation: Sibling values alongside $ref will be ignored. See
-      https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md for allowed
-      values (components > schemas > Name > properties > revoke)
-      keys: [ 'example' ]
-      https://github.com/aeternity/ae_mdw/pull/1849
-
-  - from: openapi-document
     where: $.servers
     transform: $ = []
     reason: remove a server with /mdw/v3 url
+
+  - from: openapi-document
+    where: $.paths.*.*.parameters[?(@.$ref)]
+    transform: >
+      const relativePath = $.$ref.replace(/^#\//, '').split('/');
+      return relativePath.reduce((o, p) => o[p], $doc);
+    reason: keep parameters in method options instead instance options
 
   - from: openapi-document
     where: $.paths
@@ -138,7 +77,8 @@ version: ^3.7.1
 use-extension:
   '@autorest/typescript': ^6.0.23
   '@autorest/modelerfour': ^4.27.0
-input-file: middleware-openapi.yaml
+# TODO: switch to middleware-openapi.yaml after releasing middleware with https://github.com/aeternity/ae_mdw/pull/1873
+input-file: middleware-openapi-temp.yaml
 output-folder: ../../src/apis/middleware
 source-code-folder-path: .
 generator: typescript

@@ -9,6 +9,10 @@ http:
   endpoints:
     dry-run: true
 
+websocket:
+  channel:
+    listen_address: 0.0.0.0
+
 dev_mode:
   auto_emit_microblocks: true
 

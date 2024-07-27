@@ -114,7 +114,7 @@ directive:
     transform: >
       const relativePath = $.$ref.replace(/^#\//, '').split('/');
       return relativePath.reduce((o, p) => o[p], $doc);
-    reason: remove commonly required parameters from the generated context, probably autorest bug
+    reason: keep parameters in method options instead instance options
 
   - from: openapi-document
     where: $.servers

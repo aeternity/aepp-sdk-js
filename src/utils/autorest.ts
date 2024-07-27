@@ -35,7 +35,8 @@ export const createSerializer = (
       // @ts-expect-error we are extending autorest with BigInt support
       if (mapper.type.name !== 'BigInt' || responseBody == null) {
         if (typeof responseBody === 'string' && responseBody.startsWith(bigIntPrefix)) {
-          throw new InternalError(`BigInt value ${responseBody} handled incorrectly`);
+          console.warn(`AeSdk internal error: BigInt value ${responseBody} handled incorrectly`);
+          responseBody = +responseBody.replace(bigIntPrefix, '');
         }
         return deserialize.call(this, mapper, responseBody, objectName, options);
       }
