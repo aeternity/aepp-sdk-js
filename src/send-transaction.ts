@@ -1,7 +1,7 @@
 import verifyTransaction, { ValidatorResult } from './tx/validator';
 import { ensureError } from './utils/other';
 import { TransactionError } from './utils/errors';
-import Node, { TransformNodeType } from './Node';
+import Node from './Node';
 import { SignedTx } from './apis/node';
 import { Encoded } from './utils/encoder';
 import AccountBase from './account/Base';
@@ -128,7 +128,7 @@ type SendTransactionOptionsType = {
 } & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
 & Parameters<AccountBase['signTransaction']>[1];
 export interface SendTransactionOptions extends SendTransactionOptionsType {}
-interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
+interface SendTransactionReturnType extends Partial<SignedTx> {
   hash: Encoded.TxHash;
   // TODO: use `SignedTx.encodedTx` instead
   rawTx: Encoded.Transaction;

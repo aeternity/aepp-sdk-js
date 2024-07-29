@@ -1,8 +1,87 @@
-import { RestError, PipelineResponse } from '@azure/core-rest-pipeline';
-import { AdditionalPolicyConfig, FullOperationResponse, OperationOptions } from '@azure/core-client';
+import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pipeline';
+import {
+  AdditionalPolicyConfig, FullOperationResponse, OperationOptions,
+  createSerializer as createSerializerOrig,
+} from '@azure/core-client';
 import { pause } from './other';
 import semverSatisfies from './semver-satisfies';
-import { UnsupportedVersionError } from './errors';
+import { InternalError, UnexpectedTsError, UnsupportedVersionError } from './errors';
+
+const bigIntPrefix = '_sdk-big-int-';
+
+export const createSerializer = (
+  ...args: Parameters<typeof createSerializerOrig>
+): ReturnType<typeof createSerializerOrig> => {
+  const serializer = createSerializerOrig(...args);
+  const { serialize, deserialize } = serializer;
+  return Object.assign(serializer, {
+    serialize(
+      ...[mapper, object, objectName, options]: Parameters<typeof serialize>
+    ): ReturnType<typeof serialize> {
+      // @ts-expect-error we are extending autorest with BigInt support
+      if (mapper.type.name !== 'BigInt' || object == null) {
+        return serialize.call(this, mapper, object, objectName, options);
+      }
+      if (typeof object !== 'bigint') {
+        objectName ??= mapper.serializedName;
+        throw new Error(`${objectName} with value ${object} must be of type bigint.`);
+      }
+      return object.toString();
+    },
+
+    deserialize(
+      ...[mapper, responseBody, objectName, options]: Parameters<typeof deserialize>
+    ): ReturnType<typeof deserialize> {
+      // @ts-expect-error we are extending autorest with BigInt support
+      if (mapper.type.name !== 'BigInt' || responseBody == null) {
+        if (typeof responseBody === 'string' && responseBody.startsWith(bigIntPrefix)) {
+          throw new InternalError(`BigInt value ${responseBody} handled incorrectly`);
+        }
+        return deserialize.call(this, mapper, responseBody, objectName, options);
+      }
+      if (typeof responseBody === 'number' && responseBody > Number.MAX_SAFE_INTEGER) {
+        throw new InternalError(`Number ${responseBody} is not accurate to be converted to BigInt`);
+      }
+      return BigInt(responseBody.toString().replace(bigIntPrefix, ''));
+    },
+  });
+};
+
+// 16 === Number.MAX_SAFE_INTEGER.toString().length
+const bigIntPropertyRe = /("\w+":\s*)(\d{16,})(\s*[,}])/m;
+const bigIntArrayItemRe = /([[,]\s*)(\d{16,})\b/m;
+export const parseBigIntPolicy: PipelinePolicy = {
+  name: 'parse-big-int',
+  async sendRequest(request, next) {
+    const response = await next(request);
+    if (response.bodyAsText == null) return response;
+    // TODO: replace with https://caniuse.com/mdn-javascript_builtins_json_parse_reviver_parameter_context_argument when it gets support in FF and Safari
+    response.bodyAsText = response.bodyAsText.replaceAll(
+      new RegExp(bigIntPropertyRe, 'g'),
+      (matched) => {
+        const match = matched.match(bigIntPropertyRe);
+        if (match == null) throw new UnexpectedTsError();
+        const [, name, value, end] = match;
+        return [
+          name,
+          +value > Number.MAX_SAFE_INTEGER ? `"${bigIntPrefix}${value}"` : value,
+          end,
+        ].join('');
+      },
+    );
+    // FIXME: may break strings inside json
+    response.bodyAsText = response.bodyAsText.replaceAll(
+      new RegExp(bigIntArrayItemRe, 'g'),
+      (matched) => {
+        const match = matched.match(bigIntArrayItemRe);
+        if (match == null) throw new UnexpectedTsError();
+        const [, prefix, value] = match;
+        return `${prefix}"${bigIntPrefix}${value}"`;
+      },
+    );
+    return response;
+  },
+};
 
 export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
   const requestQueues = new Map<string, Promise<unknown>>();
@@ -73,7 +152,11 @@ export const genErrorFormatterPolicy = (
       try {
         return await next(request);
       } catch (error) {
-        if (!(error instanceof RestError) || error.request == null) throw error;
+        if (
+          !(error instanceof RestError)
+          || error.request == null
+          || error.message.startsWith('Error ')
+        ) throw error;
         const prefix = `${new URL(error.request.url).pathname.slice(1)} error`;
 
         if (error.response?.bodyAsText == null) {

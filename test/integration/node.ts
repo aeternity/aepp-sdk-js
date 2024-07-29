@@ -84,6 +84,25 @@ describe('Node client', () => {
       .to.be.rejectedWith(RestError, 'v3/transactions error: Invalid tx (nonce_too_high)');
   });
 
+  it('throws clear exceptions if deserializer failed', async () => {
+    node.pipeline.addPolicy({
+      name: 'test',
+      async sendRequest(request, next) {
+        const response = await next(request);
+        response.bodyAsText = '{"difficulty":"_sdk-big-int-1338"}';
+        return response;
+      },
+    }, { phase: 'Deserialize' });
+    try {
+      await expect(node.getStatus()).to.be.rejectedWith(
+        RestError,
+        'Error InternalError: BigInt value _sdk-big-int-1338 handled incorrectly occurred in deserializing the responseBody - {"difficulty":"_sdk-big-int-1338"}',
+      );
+    } finally {
+      node.pipeline.removePolicy({ name: 'test' });
+    }
+  });
+
   it('can\'t change $host', async () => {
     const n = new Node(url);
     // @ts-expect-error $host should be readonly
