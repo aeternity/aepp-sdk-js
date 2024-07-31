@@ -349,9 +349,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-create-a-keypair-for-sender" class="md-nav__link">
+  <a href="#2-create-a-sender-account" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Create a Keypair for sender
+      2. Create a sender account
     </span>
   </a>
   
@@ -1553,9 +1553,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-create-a-keypair-for-sender" class="md-nav__link">
+  <a href="#2-create-a-sender-account" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Create a Keypair for sender
+      2. Create a sender account
     </span>
   </a>
   
@@ -1603,40 +1603,36 @@ For more specific information on setups with Frameworks and TypeScript, please r
 <span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">MemoryAccount</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">Node</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">CompilerHttp</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">AE_AMOUNT_FORMATS</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">generateKeyPair</span>
+<span class="w">  </span><span class="nx">AE_AMOUNT_FORMATS</span>
 <span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="2-create-a-keypair-for-sender">2. Create a Keypair for sender</h2>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">keypair</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">generateKeyPair</span><span class="p">()</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Secret key: </span><span class="si">${</span><span class="nx">keypair</span><span class="p">.</span><span class="nx">secretKey</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Public key: </span><span class="si">${</span><span class="nx">keypair</span><span class="p">.</span><span class="nx">publicKey</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<h2 id="2-create-a-sender-account">2. Create a sender account</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sender</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">.</span><span class="nx">generate</span><span class="p">()</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Sender address:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">sender</span><span class="p">.</span><span class="nx">address</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Sender secret key:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">sender</span><span class="p">.</span><span class="nx">secretKey</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="3-get-some-ae-using-the-faucet">3. Get some <em>AE</em> using the Faucet</h2>
-<p>To receive some <em>AE</em> you can use the <a href="https://faucet.aepps.com/">Faucet</a>. Just paste sender's publicKey, hit <code>Top UP</code> and you'll immediately get some test coins.</p>
+<p>To receive some <em>AE</em> you can use the <a href="https://faucet.aepps.com/">Faucet</a>. Just paste sender's address, hit <code>Top UP</code> and you'll immediately get some test coins.</p>
 <h2 id="4-interact-with-the-ternity-blockchain">4. Interact with the æternity blockchain</h2>
 <p>This example shows:</p>
 <ul>
-<li>how to create an instance of the SDK using the <code>Aesdk</code> class</li>
+<li>how to create an instance of the SDK using the <code>AeSdk</code> class</li>
 <li>how to spend (send) 1 AE from the account the SDK instance was initialized with to some other AE address</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://v7.compiler.aepps.com&#39;</span><span class="w"> </span><span class="c1">// required for contract interactions</span>
 <span class="c1">// replace &lt;SENDER_SECRET_KEY&gt; with the generated secretKey from step 2</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">senderAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;&lt;SENDER_SECRET_KEY&gt;&#39;</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">sender</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;&lt;SENDER_SECRET_KEY&gt;&#39;</span><span class="p">);</span>
 
 <span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">NODE_URL</span><span class="p">)</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
-<span class="w">    </span><span class="nx">onCompiler</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="nx">COMPILER_URL</span><span class="p">),</span>
 <span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">senderAccount</span><span class="p">],</span>
+<span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">sender</span><span class="p">],</span>
 <span class="w">  </span><span class="p">})</span>
 
 <span class="w">  </span><span class="c1">// spend one AE</span>
-<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&lt;RECIPIENT_PUBLIC_KEY&gt;&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">// replace &lt;RECIPIENT_PUBLIC_KEY&gt;, Ideally you use public key from Superhero Wallet you have created before</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&lt;RECIPIENT_ADDRESS&gt;&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// replace &lt;RECIPIENT_ADDRESS&gt;, Ideally you use address from Superhero Wallet you have created before</span>
 <span class="w">    </span><span class="nx">denomination</span><span class="o">:</span><span class="w"> </span><span class="nx">AE_AMOUNT_FORMATS</span><span class="p">.</span><span class="nx">AE</span>
 <span class="w">  </span><span class="p">})</span>
 <span class="p">})()</span>
@@ -1646,7 +1642,7 @@ For more specific information on setups with Frameworks and TypeScript, please r
 <li>You may remove code from Step 2 as this serves only for one-time creation</li>
 <li>By default the <code>spend</code> function expects the amount to be spent in <code>aettos</code> (the smallest possible unit)</li>
 <li>Following the example snippet you would specify <code>AE</code> as denomination</li>
-<li>See <a href="https://explorer.testnet.aeternity.io/">Testnet Explorer</a> and track your transactions</li>
+<li>See <a href="https://testnet.aescan.io/">Testnet Explorer</a> and track your transactions</li>
 </ul>
 
 

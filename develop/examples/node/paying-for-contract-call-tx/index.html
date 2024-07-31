@@ -1712,7 +1712,6 @@ decentralized aepp without having them to buy AE by covering their fees.</p>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>You need to import <code>AeSdk</code>, <code>Node</code> and <code>MemoryAccount</code> classes from the SDK.
-Additionally you import the <code>generateKeyPair</code> utility function to generate a new keypair.
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="p">,</span>
 <span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
@@ -1725,7 +1724,7 @@ Additionally you import the <code>generateKeyPair</code> utility function to gen
 <p>The following constants are used in the subsequent code snippets.
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">PAYER_ACCOUNT_SECRET_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://v7.compiler.aepps.com&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://v8.compiler.aepps.com&#39;</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">CONTRACT_ADDRESS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8&#39;</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE_CODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span>
 <span class="sb">@compiler &gt;= 6</span>
