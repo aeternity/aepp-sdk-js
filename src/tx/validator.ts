@@ -6,7 +6,7 @@ import { Tag, ConsensusProtocolVersion } from './builder/constants';
 import { buildTx, unpackTx } from './builder';
 import { concatBuffers, isAccountNotFoundError } from '../utils/other';
 import { Encoded, Encoding, decode } from '../utils/encoder';
-import Node, { TransformNodeType } from '../Node';
+import Node from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
 import { UnexpectedTsError } from '../utils/errors';
@@ -23,7 +23,7 @@ type Validator = (
   tx: TxUnpacked,
   options: {
     // TODO: remove after fixing node types
-    account: TransformNodeType<Account> & { id: Encoded.AccountAddress };
+    account: Account & { id: Encoded.AccountAddress };
     nodeNetworkId: string;
     parentTxTypes: Tag[];
     node: Node;
@@ -76,9 +76,11 @@ export default async function verifyTransaction(
   transaction: Parameters<typeof unpackTx>[0],
   nodeNotCached: Node,
 ): Promise<ValidatorResult[]> {
+  const pipeline = nodeNotCached.pipeline.clone();
+  pipeline.removePolicy({ name: 'parse-big-int' });
   const node = new Node(nodeNotCached.$host, {
     ignoreVersion: true,
-    pipeline: nodeNotCached.pipeline.clone(),
+    pipeline,
     additionalPolicies: [genAggressiveCacheGetResponsesPolicy()],
   });
   return verifyTransactionInternal(unpackTx(transaction), node, []);

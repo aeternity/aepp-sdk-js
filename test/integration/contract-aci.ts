@@ -806,7 +806,7 @@ describe('Contract instance', () => {
 
     it('throws error if can\'t find event definition', () => {
       const event = eventResultLog[0];
-      event.topics[0] = event.topics[0].toString().replace('0', '1');
+      event.topics[0] = BigInt(event.topics[0].toString().replace('0', '1'));
       expect(() => contract.$decodeEvents([event])).to.throw(
         MissingEventDefinitionError,
         'Can\'t find definition of 7165442193418278913262533136158148486147352807284929017531784742205476270109'
@@ -817,7 +817,7 @@ describe('Contract instance', () => {
 
     it('omits events without definition using omitUnknown option', () => {
       const event = eventResultLog[0];
-      event.topics[0] = event.topics[0].toString().replace('0', '1');
+      event.topics[0] = BigInt(event.topics[0].toString().replace('0', '1'));
       expect(contract.$decodeEvents([event], { omitUnknown: true })).to.be.eql([]);
     });
 
@@ -827,8 +827,8 @@ describe('Contract instance', () => {
         address: remoteContract.$options.address,
         data: 'cb_Xfbg4g==',
         topics: [
-          BigInt(`0x${hash(eventName).toString('hex')}`).toString(),
-          '0',
+          BigInt(`0x${hash(eventName).toString('hex')}`),
+          0n,
         ],
       }];
     };

@@ -71,6 +71,7 @@ describe('AeSdkMethods', () => {
             { policy: { name: 'combine-get-requests' }, options: {} },
             { policy: { name: 'retry-on-failure' }, options: {} },
             { policy: { name: 'error-formatter' }, options: {} },
+            { policy: { name: 'parse-big-int' }, options: { phase: 'Deserialize' } },
           ],
           _orderedPolicies: [
             { name: 'serializationPolicy' },
@@ -83,6 +84,7 @@ describe('AeSdkMethods', () => {
             { name: 'retry-on-failure' },
             { name: 'error-formatter' },
             { name: 'deserializationPolicy' },
+            { name: 'parse-big-int' },
             { name: 'multipartPolicy' },
             { name: 'tracingPolicy' },
             { name: 'redirectPolicy' },
@@ -90,7 +92,6 @@ describe('AeSdkMethods', () => {
           ],
         },
         $host: data.onNode.$host,
-        intAsString: true,
       },
       onCompiler: {
         api: {

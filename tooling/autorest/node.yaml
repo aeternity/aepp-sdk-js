@@ -3,26 +3,18 @@ directive:
   - from: openapi-document
     where: $.components.schemas
     transform: >
+      if ($doc.info.title === 'node') return $;
       ['UInt', 'UInt16', 'UInt32', 'UInt64', 'TxBlockHeight'].forEach(key => {
-        if (!$[key].oneOf) return;
-        $[key] = $[key].oneOf.find(({ type }) => type === 'string');
+        $[key] = $[key].oneOf.find(({ type }) => type === 'integer');
       });
       const { utilization } = $.GasPrices.items.properties;
       Object.assign(utilization, {
         oneOf: undefined,
-        ...(utilization.oneOf ?? []).find(({ type }) => type === 'string'),
+        ...utilization.oneOf.find(({ type }) => type === 'integer'),
       });
     reason:
       fix parsing of big numbers
       remove after fixing https://github.com/aeternity/aeternity/issues/3891
-
-  - from: openapi-document
-    where: $.components.schemas
-    transform: >
-      if ($doc.info.title === 'node') return $;
-      $.ContractCallObject.properties.return_type.enum = ['ok', 'error', 'revert'];
-      $.GAObject.properties.return_type.enum = ['ok', 'error'];
-    reason: add missed enums https://github.com/aeternity/aeternity/pull/3953
 
   - from: openapi-document
     where: $.components.schemas
@@ -108,7 +100,17 @@ directive:
     reason: use more precise form to avoid oneOf
 
   - from: openapi-document
-    where: $.paths.*.*.parameters[?(@.$ref && !@.$ref.includes('intAsString'))]
+    where: $.paths.*.*.parameters
+    transform: return $.filter(({ $ref }) => !$ref?.endsWith('intAsString'))
+    reason: remove intAsString parameter from paths
+
+  - from: openapi-document
+    where: $.components.parameters
+    transform: 'return { ...$, intAsString: undefined }'
+    reason: remove intAsString parameter from components
+
+  - from: openapi-document
+    where: $.paths.*.*.parameters[?(@.$ref)]
     transform: >
       const relativePath = $.$ref.replace(/^#\//, '').split('/');
       return relativePath.reduce((o, p) => o[p], $doc);

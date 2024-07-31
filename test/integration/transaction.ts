@@ -263,7 +263,7 @@ describe('Transaction', () => {
         responseFormat,
         queryFormat,
         queryFee: 12345n,
-        abiVersion: '0',
+        abiVersion: 0,
         ttl: 42,
       }));
       const tx = await aeSdk.buildTx({

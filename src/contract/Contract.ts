@@ -36,7 +36,7 @@ import {
   ContractCallObject as NodeContractCallObject, Event as NodeEvent,
 } from '../apis/node';
 import CompilerBase, { Aci } from './compiler/Base';
-import Node, { TransformNodeType } from '../Node';
+import Node from '../Node';
 import {
   getAccount, getContract, getContractByteCode, resolveName, txDryRun,
 } from '../chain';
@@ -53,7 +53,7 @@ interface Event extends NodeEvent {
   data: Encoded.ContractBytearray;
 }
 
-export interface ContractCallObject extends TransformNodeType<NodeContractCallObject> {
+export interface ContractCallObject extends NodeContractCallObject {
   returnValue: Encoded.ContractBytearray;
   log: Event[];
 }
@@ -441,15 +441,14 @@ class Contract<M extends ContractMethodsBase> {
   ): DecodedEvent[] {
     return events
       .map((event) => {
-        const topics = event.topics.map((t: string | number) => BigInt(t));
         let contractName;
         try {
-          contractName = this.#getContractNameByEvent(event.address, topics[0], opt);
+          contractName = this.#getContractNameByEvent(event.address, event.topics[0], opt);
         } catch (error) {
           if ((omitUnknown ?? false) && error instanceof MissingEventDefinitionError) return null;
           throw error;
         }
-        const decoded = this._calldata.decodeEvent(contractName, event.data, topics);
+        const decoded = this._calldata.decodeEvent(contractName, event.data, event.topics);
         const [name, args] = Object.entries(decoded)[0];
         return {
           name,

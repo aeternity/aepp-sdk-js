@@ -69,7 +69,6 @@ export function addTransactionHandler(cb: TransactionHandler): void {
 }
 
 class NodeHandleTx extends Node {
-  // @ts-expect-error use code generation to create node class?
   override async postTransaction(
     ...args: Parameters<Node['postTransaction']>
   ): ReturnType<Node['postTransaction']> {

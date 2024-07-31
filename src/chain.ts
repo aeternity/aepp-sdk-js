@@ -7,11 +7,8 @@ import {
   AensPointerContextError, DryRunError, InvalidAensNameError,
   TxTimedOutError, TxNotInChainError, InternalError,
 } from './utils/errors';
-import Node, { TransformNodeType } from './Node';
-import {
-  Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
-  Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx,
-} from './apis/node';
+import Node from './Node';
+import { DryRunResult, DryRunResults, SignedTx } from './apis/node';
 import {
   decode, encode, Encoded, Encoding,
 } from './utils/encoder';
@@ -90,7 +87,7 @@ export async function poll(
     blocks = 5, interval, ...options
   }:
   { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
-): Promise<TransformNodeType<SignedTx>> {
+): ReturnType<Node['getTransactionByHash']> {
   interval ??= await _getPollInterval('micro-block', options);
   let max;
   do {
@@ -168,7 +165,7 @@ export async function getAccount(
   address: Encoded.AccountAddress | Encoded.ContractAddress,
   { height, hash, onNode }:
   { height?: number; hash?: Encoded.KeyBlockHash | Encoded.MicroBlockHash; onNode: Node },
-): Promise<TransformNodeType<AccountNode>> {
+): ReturnType<Node['getAccountByPubkey']> {
   if (height != null) return onNode.getAccountByPubkeyAndHeight(address, height);
   if (hash != null) return onNode.getAccountByPubkeyAndHash(address, hash);
   return onNode.getAccountByPubkey(address);
@@ -210,7 +207,7 @@ export async function getBalance(
  */
 export async function getCurrentGeneration(
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<Generation>> {
+): ReturnType<Node['getCurrentGeneration']> {
   return onNode.getCurrentGeneration();
 }
 
@@ -225,7 +222,7 @@ export async function getCurrentGeneration(
 export async function getGeneration(
   hashOrHeight: Encoded.KeyBlockHash | number,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<Generation>> {
+): ReturnType<Node['getGenerationByHash']> {
   if (typeof hashOrHeight === 'number') return onNode.getGenerationByHeight(hashOrHeight);
   return onNode.getGenerationByHash(hashOrHeight);
 }
@@ -241,7 +238,7 @@ export async function getGeneration(
 export async function getMicroBlockTransactions(
   hash: Encoded.MicroBlockHash,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<SignedTx[]>> {
+): Promise<SignedTx[]> {
   return (await onNode.getMicroBlockTransactionsByHash(hash)).transactions;
 }
 
@@ -256,7 +253,7 @@ export async function getMicroBlockTransactions(
 export async function getKeyBlock(
   hashOrHeight: Encoded.KeyBlockHash | number,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<KeyBlock>> {
+): ReturnType<Node['getKeyBlockByHash']> {
   if (typeof hashOrHeight === 'number') return onNode.getKeyBlockByHeight(hashOrHeight);
   return onNode.getKeyBlockByHash(hashOrHeight);
 }
@@ -272,7 +269,7 @@ export async function getKeyBlock(
 export async function getMicroBlockHeader(
   hash: Encoded.MicroBlockHash,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<MicroBlockHeader>> {
+): ReturnType<Node['getMicroBlockHeaderByHash']> {
   return onNode.getMicroBlockHeaderByHash(hash);
 }
 
@@ -335,9 +332,7 @@ export async function txDryRun(
     top, txEvents, combine, onNode,
   }:
   { top?: TxDryRunArguments['top']; txEvents?: boolean; combine?: boolean; onNode: Node },
-): Promise<{
-    txEvents?: TransformNodeType<DryRunResults['txEvents']>;
-  } & TransformNodeType<DryRunResult>> {
+): Promise<{ txEvents?: DryRunResults['txEvents'] } & DryRunResult> {
   const key = combine === true ? [top, txEvents].join() : 'immediate';
   const requests = txDryRunRequests.get(key) ?? [];
   txDryRunRequests.set(key, requests);
@@ -363,7 +358,7 @@ export async function txDryRun(
 export async function getContractByteCode(
   contractId: Encoded.ContractAddress,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<ByteCode>> {
+): ReturnType<Node['getContractCode']> {
   return onNode.getContractCode(contractId);
 }
 
@@ -377,7 +372,7 @@ export async function getContractByteCode(
 export async function getContract(
   contractId: Encoded.ContractAddress,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<ContractObject>> {
+): ReturnType<Node['getContract']> {
   return onNode.getContract(contractId);
 }
 
@@ -391,7 +386,7 @@ export async function getContract(
 export async function getName(
   name: AensName,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<NameEntry>> {
+): ReturnType<Node['getNameEntryByName']> {
   return onNode.getNameEntryByName(name);
 }
 
