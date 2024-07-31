@@ -94,7 +94,7 @@ class AccountMemoryProtected extends MemoryAccount {
   }
 
   static generate() {
-    return new AccountMemoryProtected(super().secretKey);
+    return new AccountMemoryProtected(super.generate().secretKey);
   }
 }
 
