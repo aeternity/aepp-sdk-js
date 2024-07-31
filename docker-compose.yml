@@ -27,7 +27,7 @@ services:
   middleware:
     # TODO: use upstream after solving https://github.com/aeternity/ae_mdw/issues/1758
     image: davidyuk/temp:mdw-dev-mode-1.81.0
-    ports: [4000:4000, 4001:4001, 4013:3013, 4313:3313]
+    ports: [4000:4000, 4001:4001, 4013:3013, 4014:3014, 4313:3313]
     volumes:
       - ./docker/middleware.yaml:/home/aeternity/aeternity.yaml
     stop_grace_period: 0s

@@ -11,18 +11,18 @@ directive:
       https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
 
   - from: openapi-document
-    where: $.components.schemas.Activity.properties.payload.oneOf
-    transform: return $.filter((el) => !el.$ref.includes('Aex141TransferEvent'))
-    reason: >
-      Ref '#/components/schemas/Aex141TransferEvent' is not referencing a valid location.
-      components,schemas,Activity,properties,payload,enum,2
-      https://github.com/aeternity/ae_mdw/issues/1344
-
-  - from: openapi-document
     where: $.components.schemas.Activity.properties.payload
-    transform: delete $.oneOf;
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      const activities = $.oneOf.map(({ $ref }) => $ref.split('/').at(-1))
+        .map(name => $doc.components.schemas[name]);
+      return {
+        "description": "A mix of all activity types.",
+        "type": "object",
+        "properties": Object.assign({}, ...activities.map(a => a.properties)),
+      };
     reason: >
-      Error: modelProperties cannot be null or undefined in the mapper
+      `oneOf` not supported
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
@@ -35,44 +35,38 @@ directive:
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
-    where: $.paths./names/search.get.responses.200.content.application/json.schema.allOf[0].properties.data.items.allOf^
-    transform: $.type ??= 'object'
-    reason: >
-      The schema 'get-200-application-json-allOf-properties-itemsItem' with an undefined type and
-      'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected to 'type:object'
-      https://github.com/Azure/autorest/issues/4118
-
-  - from: openapi-document
-    where: $.paths.*.get.parameters.*.schema.oneOf^
+    where: $.paths.*.get.parameters.0.schema.oneOf^
     transform: $.type ??= 'string'
     reason: >
-      The schema 'paths·u0n47u·v2-keyblocks-hash_orkbi·get·parameters·0·schema' with an undefined
+      'paths·1159w94·v3-keyblocks-hash_or_kbi·get·responses·200·content·application-json·schema'
+      'paths·1159w94·v3-keyblocks-hash_or_kbi-microblocks·get·responses·200·content·application-json·schema'
+      The schema <path> with an undefined
       type and 'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected
       to 'type:object'
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
-    where: $.paths.*.get
-    transform: $.operationId = $.operationId.replace(/(_[a-z])/g, (group) => group[1].toUpperCase())
-    reason: >
-      Otherwise autorest groups operations by 'get' prefix
-      https://github.com/aeternity/ae_mdw/issues/1357
-
-  - from: openapi-document
     where: $.servers
     transform: $ = []
-    reason: remove a server with /mdw/v2 url
+    reason: remove a server with /mdw/v3 url
+
+  - from: openapi-document
+    where: $.paths.*.*.parameters[?(@.$ref)]
+    transform: >
+      const relativePath = $.$ref.replace(/^#\//, '').split('/');
+      return relativePath.reduce((o, p) => o[p], $doc);
+    reason: keep parameters in method options instead instance options
 
   - from: openapi-document
     where: $.paths
     transform: >
       if ($doc.info.title === 'middleware') return $;
-      const apiPrefix = '/v2';
+      const apiPrefix = '/v3';
       Object.keys($).forEach(key => {
         $[apiPrefix + key] = $[key];
         delete $[key];
       });
-    reason: to don't add /v2 prefix to $host parameter
+    reason: to don't add /v3 prefix to $host parameter
 
   - from: openapi-document
     where: $.info.title
@@ -83,7 +77,8 @@ version: ^3.7.1
 use-extension:
   '@autorest/typescript': ^6.0.23
   '@autorest/modelerfour': ^4.27.0
-input-file: middleware-openapi.yaml
+# TODO: switch to middleware-openapi.yaml after releasing middleware with https://github.com/aeternity/ae_mdw/pull/1873
+input-file: middleware-openapi-temp.yaml
 output-folder: ../../src/apis/middleware
 source-code-folder-path: .
 generator: typescript

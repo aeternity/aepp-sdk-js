@@ -89,14 +89,14 @@ describe('Node client', () => {
       name: 'test',
       async sendRequest(request, next) {
         const response = await next(request);
-        response.bodyAsText = '{"difficulty":"_sdk-big-int-1338"}';
+        response.bodyAsText = '[{"min_gas_price":{}}]';
         return response;
       },
     }, { phase: 'Deserialize' });
     try {
-      await expect(node.getStatus()).to.be.rejectedWith(
+      await expect(node.getRecentGasPrices()).to.be.rejectedWith(
         RestError,
-        'Error InternalError: BigInt value _sdk-big-int-1338 handled incorrectly occurred in deserializing the responseBody - {"difficulty":"_sdk-big-int-1338"}',
+        'Error SyntaxError: Cannot convert [object Object] to a BigInt occurred in deserializing the responseBody - [{"min_gas_price":{}}]',
       );
     } finally {
       node.pipeline.removePolicy({ name: 'test' });
