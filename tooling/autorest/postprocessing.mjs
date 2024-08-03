@@ -31,6 +31,14 @@ await Promise.all([
       content = content.replace('coreClient.createSerializer', 'createSerializer');
     }
 
+    if (name === 'middleware') {
+      const operationSpecNames = [
+        ...content
+          .matchAll(/const (\w+OperationSpec): coreClient\.OperationSpec = {/g),
+      ].map(([, nm]) => nm);
+      content = `${content}\nexport const operationSpecs = [\n  ${operationSpecNames.join(',\n  ')},\n] as const;\n`;
+    }
+
     await fs.promises.writeFile(path, content);
   })(),
   ...name === 'node' || name === 'middleware' ? [(async () => {

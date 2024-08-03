@@ -5,6 +5,8 @@ import {
   parseBigIntPolicy, genVersionCheckPolicy, genRetryOnFailurePolicy,
 } from './utils/autorest';
 import { Middleware as MiddlewareApi, MiddlewareOptionalParams, ErrorResponse } from './apis/middleware';
+import { operationSpecs } from './apis/middleware/middleware';
+import { IllegalArgumentError, InternalError } from './utils/errors';
 
 export default class Middleware extends MiddlewareApi {
   /**
@@ -50,5 +52,49 @@ export default class Middleware extends MiddlewareApi {
     this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
     // TODO: use instead our retry policy
     this.pipeline.removePolicy({ name: 'defaultRetryPolicy' });
+  }
+
+  /**
+   * Get a middleware response by path instead of a method name and arguments.
+   * @param pathWithQuery - a path to request starting with `/v3/`
+   */
+  async requestByPath<Response = unknown>(pathWithQuery: string): Promise<Response> {
+    const queryPos = pathWithQuery.indexOf('?');
+    const path = pathWithQuery.slice(0, queryPos === -1 ? pathWithQuery.length : queryPos);
+    const query = pathWithQuery.slice(queryPos === -1 ? pathWithQuery.length : queryPos + 1);
+
+    const operationSpec = operationSpecs.find((os) => {
+      let p = path;
+      if (os.path == null) return false;
+      const groups = os.path.replace(/{\w+}/g, '{param}').split('{param}');
+      while (groups.length > 0) {
+        const part = groups.shift();
+        if (part == null) throw new InternalError(`Unexpected operation spec path: ${os.path}`);
+        if (!p.startsWith(part)) return false;
+        p = p.replace(part, '');
+        if (groups.length > 0) p = p.replace(/^[\w.]+/, '');
+      }
+      return p === '';
+    });
+    if (operationSpec == null) {
+      throw new IllegalArgumentError(`Can't find operation spec corresponding to ${path}`);
+    }
+
+    return this.sendOperationRequest({}, {
+      ...operationSpec,
+      path,
+      urlParameters: operationSpec.urlParameters
+        ?.filter(({ parameterPath }) => parameterPath === '$host'),
+      queryParameters: Array.from(new URLSearchParams(query)).map(([key, value]) => ({
+        parameterPath: ['options', key],
+        mapper: {
+          defaultValue: value.toString(),
+          serializedName: key,
+          type: {
+            name: 'String',
+          },
+        },
+      })),
+    });
   }
 }

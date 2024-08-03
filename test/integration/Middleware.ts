@@ -1,9 +1,10 @@
 import { describe, before, it } from 'mocha';
 import { expect } from 'chai';
 import resetMiddleware, { presetAccount1Address, presetAccount2Address } from './reset-middleware';
-import { Middleware } from '../../src';
+import { IllegalArgumentError, Middleware } from '../../src';
 import { assertNotNull } from '../utils';
 import { pause } from '../../src/utils/other';
+import { Activity } from '../../src/apis/middleware';
 
 function copyFields(
   target: { [key: string]: any },
@@ -846,6 +847,55 @@ describe('Middleware API', () => {
         data: [{ count: 0, endDate, startDate }],
         next: null,
         prev: null,
+      };
+      expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('request by path', () => {
+    it('fails if unknown path', async () => {
+      await expect(middleware.requestByPath('/404')).to.be.rejectedWith(
+        IllegalArgumentError,
+        'Can\'t find operation spec corresponding to /404',
+      );
+    });
+
+    it('gets not paginated data', async () => {
+      const res = await middleware.requestByPath('/v3/status');
+      const expectedRes: typeof res = await middleware.getStatus();
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    interface Activities { data: Activity[]; next: string | null; prev: string | null }
+
+    it('gets first page', async () => {
+      const res = await middleware.requestByPath<Activities>(
+        `/v3/accounts/${presetAccount1Address}/activities`,
+      );
+      const expectedRes: typeof res = await middleware.getAccountActivities(presetAccount1Address);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets first page with query parameters', async () => {
+      const res = await middleware.requestByPath<Activities>(
+        `/v3/accounts/${presetAccount1Address}/activities?limit=1`,
+      );
+      const expectedRes: typeof res = {
+        data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(0, 1),
+        next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
+        prev: null,
+      };
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets second page', async () => {
+      const res = await middleware.requestByPath<Activities>(
+        `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
+      );
+      const expectedRes: typeof res = {
+        data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(1, 2),
+        next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-0&limit=1`,
+        prev: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1&rev=1`,
       };
       expect(res).to.be.eql(expectedRes);
     });
