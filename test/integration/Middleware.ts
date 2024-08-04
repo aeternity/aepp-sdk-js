@@ -1,10 +1,11 @@
 import { describe, before, it } from 'mocha';
 import { expect } from 'chai';
 import resetMiddleware, { presetAccount1Address, presetAccount2Address } from './reset-middleware';
-import { IllegalArgumentError, Middleware } from '../../src';
+import { IllegalArgumentError, Middleware, MiddlewarePageMissed } from '../../src';
 import { assertNotNull } from '../utils';
 import { pause } from '../../src/utils/other';
 import { Activity } from '../../src/apis/middleware';
+import { MiddlewarePage } from '../../src/utils/MiddlewarePage';
 
 function copyFields(
   target: { [key: string]: any },
@@ -61,7 +62,7 @@ describe('Middleware API', () => {
   describe('blocks', () => {
     it('gets key blocks', async () => {
       const res = await middleware.getKeyBlocks({ limit: 15 });
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           beneficiary: 'ak_11111111111111111111111111111111273Yts',
           hash: 'kh_nvmdByyHT8513zwVwxQ1tTsKbgfgdp1LX43jHj3ujb2AvDSh5',
@@ -79,7 +80,7 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       expectedRes.data.unshift(...res.data.slice(0, -1));
       expect(res).to.be.eql(expectedRes);
     });
@@ -111,7 +112,7 @@ describe('Middleware API', () => {
   describe('transactions', () => {
     it('gets account activities', async () => {
       const res = await middleware.getAccountActivities(presetAccount1Address);
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           blockHash: 'mh_f4S91p7y6hojhGhPHwzoXdjvZVWcuaBg759BDUzHDsQmYnC4o',
           blockTime: 1721994542947,
@@ -257,7 +258,7 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       expectedRes.data.forEach((item, idx) => {
         copyFields(item, res.data[idx], ['blockHash', 'blockTime']);
         copyFields(
@@ -271,7 +272,7 @@ describe('Middleware API', () => {
 
     it('gets transactions', async () => {
       const res = await middleware.getTransactions({ limit: 15 });
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           blockHash: 'mh_2nWwtjNCnjUYMqGfgfrt8MsnvRYuY8ZdET31RXTa4jFBdzEKF8',
           blockHeight: 1,
@@ -296,12 +297,13 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       const tx = res.data.at(-1);
       assertNotNull(tx);
-      res.data = [tx];
+      res.data.length = 0;
+      res.data.push(tx);
       copyFields(expectedRes.data[0], res.data[0], ['blockHash', 'microTime']);
-      expect(res.data).to.be.eql(expectedRes.data);
+      expect(res).to.be.eql(expectedRes);
     });
 
     it('gets transactions count', async () => {
@@ -312,7 +314,7 @@ describe('Middleware API', () => {
 
     it('gets transfers', async () => {
       const res = await middleware.getTransfers();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
           amount: 570288700000000000000n,
@@ -324,7 +326,7 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       expectedRes.data.push(...res.data.slice(1));
       copyFields(expectedRes.data[0], res.data[0], ['refTxType']);
       expect(res).to.be.eql(expectedRes);
@@ -334,7 +336,7 @@ describe('Middleware API', () => {
   describe('contracts', () => {
     it('gets contract calls', async () => {
       const res = await middleware.getContractCalls();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           function: 'Chain.spend',
           height: 9,
@@ -357,14 +359,14 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       copyFields(expectedRes.data[0], res.data[0], ['blockHash']);
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets contract logs', async () => {
       const res = await middleware.getContractLogs();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           args: [
             '43',
@@ -386,7 +388,7 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       copyFields(expectedRes.data[0], res.data[0], ['blockHash', 'blockTime']);
       expect(res).to.be.eql(expectedRes);
     });
@@ -423,7 +425,7 @@ describe('Middleware API', () => {
   describe('names', () => {
     it('gets names', async () => {
       const res = await middleware.getNames();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           active: true,
           hash: 'nm_2VSJFCVStB8ZdkLWcyd4adywYoyqYNzMt9Td924Jf8ESi94Nni',
@@ -447,7 +449,7 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       expectedRes.data.push(res.data[1]);
       copyFields(
         expectedRes.data[0],
@@ -465,7 +467,7 @@ describe('Middleware API', () => {
 
     it('gets name claims', async () => {
       const res = await middleware.getNameClaims('123456789012345678901234567801.chain');
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           activeFrom: 5,
           blockHash: 'mh_2MYrB5Qjb4NCYZMVmbqnazacY76gGzNgEjW2VnEKzovDTky8fD',
@@ -485,14 +487,14 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       copyFields(expectedRes.data[0], res.data[0], ['blockHash']);
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets name updates', async () => {
       const res = await middleware.getNameUpdates('123456789012345678901234567801.chain');
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           activeFrom: 5,
           blockHash: 'mh_2G1nKcenAWtgqJywzmAFLXajZESRySnapUmF4JAboyekmwjBxa',
@@ -521,14 +523,14 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       copyFields(expectedRes.data[0], res.data[0], ['blockHash']);
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets account pointees pointers', async () => {
       const res = await middleware.getAccountPointees(presetAccount1Address);
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           active: true,
           blockHash: 'mh_2AVwWGLB7H8McaS1Yr7dfGoepTTVmTXJVFU5TCeDDAxgkyGDAr',
@@ -559,14 +561,14 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       copyFields(expectedRes.data[0], res.data[0], ['blockHash', 'blockTime']);
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets auctions', async () => {
       const res = await middleware.getNamesAuctions();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           activationTime: 1721975996873,
           approximateExpireTime: 1722407457100,
@@ -599,7 +601,7 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       copyFields(
         expectedRes.data[0],
         res.data[0],
@@ -613,7 +615,7 @@ describe('Middleware API', () => {
   describe('oracles', () => {
     it('gets oracles', async () => {
       const res = await middleware.getOracles();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           active: true,
           activeFrom: 10,
@@ -659,7 +661,7 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       copyFields(expectedRes.data[0].register, res.data[0].register, ['blockHash', 'microTime']);
       copyFields(expectedRes.data[0], res.data[0], ['registerTime', 'approximateExpireTime']);
       expect(res).to.be.eql(expectedRes);
@@ -692,7 +694,7 @@ describe('Middleware API', () => {
   describe('channels', () => {
     it('gets channels', async () => {
       const res = await middleware.getChannels();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           active: true,
           amount: 1000000000000000n,
@@ -719,7 +721,7 @@ describe('Middleware API', () => {
         }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       copyFields(expectedRes.data[0], res.data[0], ['lastUpdatedTime']);
       expect(res).to.be.eql(expectedRes);
     });
@@ -762,7 +764,7 @@ describe('Middleware API', () => {
 
     it('gets delta', async () => {
       const res = await middleware.getDeltaStats();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           height: 12,
           auctionsStarted: 0,
@@ -783,14 +785,14 @@ describe('Middleware API', () => {
         }],
         next: '/v3/deltastats?cursor=2&limit=10',
         prev: null,
-      };
+      }, middleware);
       expectedRes.data.push(...res.data.slice(1));
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets total', async () => {
       const res = await middleware.getTotalStats();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           height: 12,
           contracts: 2,
@@ -810,44 +812,47 @@ describe('Middleware API', () => {
         }],
         next: '/v3/totalstats?cursor=2&limit=10',
         prev: null,
-      };
+      }, middleware);
       expectedRes.data.push(...res.data.slice(1));
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets miner', async () => {
       const res = await middleware.getMinerStats();
-      const expectedRes: typeof res = { data: [], next: null, prev: null };
+      const expectedRes: typeof res = new MiddlewarePage(
+        { data: [], next: null, prev: null },
+        middleware,
+      );
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets blocks', async () => {
       const res = await middleware.getBlocksStatistics();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{ count: 24, endDate, startDate }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets transactions', async () => {
       const res = await middleware.getTransactionsStatistics();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{ count: 11, endDate, startDate }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets names', async () => {
       const res = await middleware.getNamesStatistics();
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: [{ count: 0, endDate, startDate }],
         next: null,
         prev: null,
-      };
+      }, middleware);
       expect(res).to.be.eql(expectedRes);
     });
   });
@@ -866,10 +871,8 @@ describe('Middleware API', () => {
       expect(res).to.be.eql(expectedRes);
     });
 
-    interface Activities { data: Activity[]; next: string | null; prev: string | null }
-
     it('gets first page', async () => {
-      const res = await middleware.requestByPath<Activities>(
+      const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
         `/v3/accounts/${presetAccount1Address}/activities`,
       );
       const expectedRes: typeof res = await middleware.getAccountActivities(presetAccount1Address);
@@ -877,27 +880,60 @@ describe('Middleware API', () => {
     });
 
     it('gets first page with query parameters', async () => {
-      const res = await middleware.requestByPath<Activities>(
+      const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
         `/v3/accounts/${presetAccount1Address}/activities?limit=1`,
       );
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(0, 1),
         next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
         prev: null,
-      };
+      }, middleware);
       expect(res).to.be.eql(expectedRes);
     });
 
     it('gets second page', async () => {
-      const res = await middleware.requestByPath<Activities>(
+      const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
         `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
       );
-      const expectedRes: typeof res = {
+      const expectedRes: typeof res = new MiddlewarePage({
         data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(1, 2),
         next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-0&limit=1`,
         prev: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1&rev=1`,
-      };
+      }, middleware);
       expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('pagination', () => {
+    it('nevigates to the next page', async () => {
+      const first = await middleware.getTransactions({ limit: 1 });
+      const res = await first.next();
+      const expectedRes: typeof res = new MiddlewarePage({
+        data: (await middleware.getTransactions()).data.slice(1, 2),
+        next: '/v3/transactions?cursor=8&limit=1',
+        prev: '/v3/transactions?cursor=10&limit=1&rev=1',
+      }, middleware);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('nevigates to the previous page', async () => {
+      const first = await middleware.getTransactions({ limit: 1 });
+      const second = await first.next();
+      const res = await second.prev();
+      expect(res).to.be.eql(first);
+      expect(res.prevPath).to.be.eql(null);
+      const expectedRes: typeof res = new MiddlewarePage({
+        data: (await middleware.getTransactions()).data.slice(0, 1),
+        next: '/v3/transactions?cursor=9&limit=1',
+        prev: null,
+      }, middleware);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('fails to navigate out of page range', async () => {
+      const first = await middleware.getTransactions({ limit: 1 });
+      await expect(first.prev())
+        .to.be.rejectedWith(MiddlewarePageMissed, 'There is no previous page');
     });
   });
 });

@@ -1,4 +1,4 @@
-import { OperationOptions } from '@azure/core-client';
+import { OperationArguments, OperationOptions, OperationSpec } from '@azure/core-client';
 import { userAgentPolicyName, setClientRequestIdPolicyName } from '@azure/core-rest-pipeline';
 import {
   genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
@@ -7,6 +7,7 @@ import {
 import { Middleware as MiddlewareApi, MiddlewareOptionalParams, ErrorResponse } from './apis/middleware';
 import { operationSpecs } from './apis/middleware/middleware';
 import { IllegalArgumentError, InternalError } from './utils/errors';
+import { MiddlewarePage, isMiddlewareRawPage } from './utils/MiddlewarePage';
 
 export default class Middleware extends MiddlewareApi {
   /**
@@ -96,5 +97,14 @@ export default class Middleware extends MiddlewareApi {
         },
       })),
     });
+  }
+
+  override async sendOperationRequest<T>(
+    operationArguments: OperationArguments,
+    operationSpec: OperationSpec,
+  ): Promise<T> {
+    const response = await super.sendOperationRequest(operationArguments, operationSpec);
+    if (!isMiddlewareRawPage(response)) return response as T;
+    return new MiddlewarePage(response, this) as T;
   }
 }
