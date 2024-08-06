@@ -31,6 +31,14 @@ await Promise.all([
       content = content.replace('coreClient.createSerializer', 'createSerializer');
     }
 
+    if (name === 'middleware') {
+      const operationSpecNames = [
+        ...content
+          .matchAll(/const (\w+OperationSpec): coreClient\.OperationSpec = {/g),
+      ].map(([, nm]) => nm);
+      content = `${content}\nexport const operationSpecs = [\n  ${operationSpecNames.join(',\n  ')},\n] as const;\n`;
+    }
+
     await fs.promises.writeFile(path, content);
   })(),
   ...name === 'node' || name === 'middleware' ? [(async () => {
@@ -48,6 +56,32 @@ await Promise.all([
       content = content.replaceAll(/(bytecode\??:) string/g, '$1 `cb_${string}`');
       /* eslint-enable no-template-curly-in-string */
       content = content.replaceAll('topics: number[]', 'topics: bigint[]');
+    }
+
+    if (name === 'middleware') {
+      content = `import { MiddlewarePage } from "../../../utils/MiddlewarePage";\n${content}`;
+      content = content.replace(/export interface PaginatedResponse {.*?}\n\n/gs, '');
+      content = content.replace(
+        /extends PaginatedResponse,(\s+)(\w+) {}/gs,
+        'extends $2,$1PaginatedResponse {}',
+      );
+      const responseRe = /export interface (\w+)\s+extends (\w+),\s+PaginatedResponse {}/s;
+      while (content.match(responseRe)) {
+        const [response, responseTypeName, dataTypeName] = content.match(responseRe);
+        const regExp = new RegExp(
+          String.raw`export interface ${dataTypeName} {\s+data: (\w+)\[\];\s+}\n\n`,
+          's',
+        );
+        const match = content.match(regExp);
+        if (match == null) throw new Error(`Can't find interface ${dataTypeName}`);
+        const [, arrayItemTypeName] = match;
+        content = content.replace(new RegExp(regExp, 'g'), '');
+        content = content.replace(response, '');
+        content = content.replace(responseTypeName, `MiddlewarePage<${arrayItemTypeName}>`);
+      }
+      if (content.includes('PaginatedResponse')) {
+        throw new Error('Not all PaginatedResponse instances removed');
+      }
     }
 
     await fs.promises.writeFile(path, content);

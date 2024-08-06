@@ -48,9 +48,9 @@ export const createSerializer = (
   });
 };
 
-// 16 === Number.MAX_SAFE_INTEGER.toString().length
-const bigIntPropertyRe = /("\w+":\s*)(\d{16,})(\s*[,}])/m;
-const bigIntArrayItemRe = /([[,]\s*)(\d{16,})\b/m;
+const safeLength = Number.MAX_SAFE_INTEGER.toString().length;
+const bigIntPropertyRe = new RegExp(String.raw`("\w+":\s*)(\d{${safeLength},})(\s*[,}])`, 'm');
+const bigIntArrayItemRe = new RegExp(String.raw`([[,]\s*)(\d{${safeLength},})\b`, 'm');
 export const parseBigIntPolicy: PipelinePolicy = {
   name: 'parse-big-int',
   async sendRequest(request, next) {

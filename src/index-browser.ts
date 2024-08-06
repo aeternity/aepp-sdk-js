@@ -72,6 +72,7 @@ export {
   default as MiddlewareSubscriber, MiddlewareSubscriberError, MiddlewareSubscriberDisconnected,
 } from './MiddlewareSubscriber';
 export { default as Middleware } from './Middleware';
+export { MiddlewarePageMissed } from './utils/MiddlewarePage';
 
 export { default as connectionProxy } from './aepp-wallet-communication/connection-proxy';
 export {
