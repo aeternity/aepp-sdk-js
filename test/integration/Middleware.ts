@@ -16,6 +16,7 @@ function copyFields(
     .filter((key) => source[key] != null)
     .forEach((key) => {
       expect(typeof target[key]).to.be.equal(typeof source[key]);
+      expect(target[key]?.constructor).to.be.equal(source[key]?.constructor);
       if (typeof target[key] === 'string' && target[key][2] === '_') {
         expect(target[key].slice(0, 2)).to.be.equal(source[key].slice(0, 2));
       }
@@ -74,7 +75,7 @@ describe('Middleware API', () => {
           prevKeyHash: 'kh_11111111111111111111111111111111273Yts',
           stateHash: 'bs_HwreBuvhDCzAdkL2upX6qhEAkCXirujYP5BXkPDF7NZV76fdR',
           target: 1338,
-          time: 0,
+          time: undefined,
           transactionsCount: 0,
           version: 1,
         }],
@@ -82,6 +83,7 @@ describe('Middleware API', () => {
         prev: null,
       }, middleware);
       expectedRes.data.unshift(...res.data.slice(0, -1));
+      expect(res.data[0].time.getFullYear()).to.be.within(2024, 2030);
       expect(res).to.be.eql(expectedRes);
     });
 
@@ -98,7 +100,7 @@ describe('Middleware API', () => {
         prevHash: 'kh_cKJy5CavGHMCpzmZz5s38Yw2F6Es6t2ED3Rddb7zgakZ5xZwJ',
         prevKeyHash: 'kh_cKJy5CavGHMCpzmZz5s38Yw2F6Es6t2ED3Rddb7zgakZ5xZwJ',
         stateHash: 'bs_2JgJeoSoVCYgmhSimw473A4L6CGFTagQjDFDsSZJQFuemyiZZa',
-        time: 1721957163938,
+        time: new Date(1721957163938),
         transactionsCount: 1,
         version: 6,
         signature: 'sg_DmGnGbbfUNuYgvJyvA927kbqJ9mVDHoKMHYvRQR89LcmAV26WwUvLSdJwdvohnGcr58VRJtzjikEaJ9HuFwduo3jbMr9E',
@@ -115,7 +117,7 @@ describe('Middleware API', () => {
       const expectedRes: typeof res = new MiddlewarePage({
         data: [{
           blockHash: 'mh_f4S91p7y6hojhGhPHwzoXdjvZVWcuaBg759BDUzHDsQmYnC4o',
-          blockTime: 1721994542947,
+          blockTime: new Date(1721994542947),
           height: 11,
           payload: {
             blockHash: 'mh_f4S91p7y6hojhGhPHwzoXdjvZVWcuaBg759BDUzHDsQmYnC4o',
@@ -123,7 +125,7 @@ describe('Middleware API', () => {
             encodedTx: 'tx_+QEQCwH4hLhAfiGhhOZxwmnQvbdccs6QAfNW0eLK/B/Q/mnyRecva/7S5CzZM4CJc2A9/wIe/q6+SvycqfH44siQmJsCIo0rCLhA4jKt6g+45BFsA/1yHuMTtm2gYbocs1HsHQJQgVf84dFmEscGNzih38qBjerWY2Poscr9rKoDE2oCm0+VkrhkA7iG+IQyAqEBZaKlte018CTFZNmmlaD9LKcD19Vo4SqKqkJrvn4KnomHAca/UmNAAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqHAca/UmNAAAABAIYQFHIeoADAwKBsGHHwj5GEh4Gy4HE+O8s2b64SKuVCuBGlgfmEluytjAcR+sQp',
             hash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
             microIndex: 0,
-            microTime: 1721994542947,
+            microTime: new Date(1721994542947),
             signatures: [
               'sg_HW6JCb97ZBcn5hAoiqWNDoYVus1qqK9Ne2Ls1GjriSPzWhWkKX7EZigKbBayLcTmM2LNYpc2vcEBGFzEzsHBsssuLBcqV',
               'sg_WbQJc3RweFShfr3YgFk5Wqin4QRsr9a487tuvXxi4yLHtYEqRXwffVUD2iz5GXAkJEXayyLMmGQpP22beMYNNYnyKrJNW',
@@ -150,7 +152,7 @@ describe('Middleware API', () => {
           type: 'ChannelCreateTxEvent',
         }, {
           blockHash: 'mh_2GzNyPoPZvKavxfvorCc7gwTFs8u6HKzua2z7fcakCxh66JfrU',
-          blockTime: 1721911705246,
+          blockTime: new Date(1721911705246),
           height: 3,
           payload: {
             amount: 3n,
@@ -160,7 +162,7 @@ describe('Middleware API', () => {
           type: 'InternalTransferEvent',
         }, {
           blockHash: 'mh_2GzNyPoPZvKavxfvorCc7gwTFs8u6HKzua2z7fcakCxh66JfrU',
-          blockTime: 1721911705246,
+          blockTime: new Date(1721911705246),
           height: 3,
           payload: {
             blockHash: 'mh_2GzNyPoPZvKavxfvorCc7gwTFs8u6HKzua2z7fcakCxh66JfrU',
@@ -168,7 +170,7 @@ describe('Middleware API', () => {
             encodedTx: 'tx_+KULAfhCuEBXzxuqo82mMkKCtMLjwrBwYa6B1zvwpqUeGT49lce9p0QMPb2tfgcgScxi2N87JfOwRpuI2iOsrP69uMtYfKIIuF34WyACoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgKkMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODAwLmNoYWluAIcBxr9SY0AAhg9Vhk+YAAarXkK8',
             hash: 'th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1',
             microIndex: 0,
-            microTime: 1721911705246,
+            microTime: new Date(1721911705246),
             signatures: [
               'sg_CVJMvQ7TPCbcmEn5GXFY9bh8okNTuE956PiiZaSJ2V9JWKgimmP86L5NUiZpFgeE6Am7QJk7KYwxJMGgFhQSXJJxrhqFJ',
             ],
@@ -188,7 +190,7 @@ describe('Middleware API', () => {
           type: 'NameClaimTxEvent',
         }, {
           blockHash: 'mh_2SiHrRABSj8Hgdt3Dc2ypaKrUkjCTK92pUx1nZKLEAYMVhUu8G',
-          blockTime: 1721911705161,
+          blockTime: new Date(1721911705161),
           height: 2,
           payload: {
             blockHash: 'mh_2SiHrRABSj8Hgdt3Dc2ypaKrUkjCTK92pUx1nZKLEAYMVhUu8G',
@@ -196,7 +198,7 @@ describe('Middleware API', () => {
             encodedTx: 'tx_+PcLAfhCuEB+Tq5sUOIMedGLODH48nG1b7KNt4Dre9vyXC3eH2EjFe2EkVGpx4QN/eQU2OLHXJgg1/7uFO5S3pMlI+jqv78FuK/4rSoBoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgG4avhoRgOg2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke3AuDue/kTWRB8ANwA3ABoOgj8BAz/+gHggkgA3AQcHAQEAmC8CEUTWRB8RaW5pdBGAeCCSGWdldEFyZ4IvAIU4LjAuMACDCAADhkdlNJ1oAAUAAEyEO5rKAIcrEUTWRB8/Bmn2yg==',
             hash: 'th_2JMR7C1DjrGeZWyyLMkccRLga1Lct8Syy9hcZKD9PEZkN5JvSD',
             microIndex: 0,
-            microTime: 1721911705161,
+            microTime: new Date(1721911705161),
             signatures: [
               'sg_HXRkFjgjsFmFLZ1ywBgYj9VouQK1BySqCViALxq3ge69a86aDgd1ESqNXhCLebh7fH6SohTjbLXXxhjPnYXaGJfiX7DQV',
             ],
@@ -230,7 +232,7 @@ describe('Middleware API', () => {
           type: 'ContractCreateTxEvent',
         }, {
           blockHash: 'mh_Q6fJrHYWiaAz8277zX8fgAgyCpmBtioFd1RQdC36oRuCtjz19',
-          blockTime: 1721911704982,
+          blockTime: new Date(1721911704982),
           height: 1,
           payload: {
             blockHash: 'mh_Q6fJrHYWiaAz8277zX8fgAgyCpmBtioFd1RQdC36oRuCtjz19',
@@ -238,7 +240,7 @@ describe('Middleware API', () => {
             encodedTx: 'tx_+KMLAfhCuEDgjc7zMPb+xRW+pI0L5OqwjI+OBF0ee1zgmlkXsavoYXHZw7vTx6vxaAZxxs4ts/eZhAmqVGg3EmTsRAtccKMDuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgABAGAJs2FDw==',
             hash: 'th_U26TdBBNT56HFXWAb4ktFyWBTuCAnwdajecTL4ss2BhciRviG',
             microIndex: 0,
-            microTime: 1721911704982,
+            microTime: new Date(1721911704982),
             signatures: [
               'sg_WNvkq9RewEjZDrDLqXMUoyBd8pGzqAuyaDfG3bQAfGx4tF6smTLyYnFWmtY8SrJRnEHbriDUm836DSJSkMjiijLKBsSzo',
             ],
@@ -279,7 +281,7 @@ describe('Middleware API', () => {
           encodedTx: 'tx_+KMLAfhCuEDgjc7zMPb+xRW+pI0L5OqwjI+OBF0ee1zgmlkXsavoYXHZw7vTx6vxaAZxxs4ts/eZhAmqVGg3EmTsRAtccKMDuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgABAGAJs2FDw==',
           hash: 'th_U26TdBBNT56HFXWAb4ktFyWBTuCAnwdajecTL4ss2BhciRviG',
           microIndex: 0,
-          microTime: 1721973919196,
+          microTime: new Date(1721973919196),
           signatures: [
             'sg_WNvkq9RewEjZDrDLqXMUoyBd8pGzqAuyaDfG3bQAfGx4tF6smTLyYnFWmtY8SrJRnEHbriDUm836DSJSkMjiijLKBsSzo',
           ],
@@ -377,7 +379,7 @@ describe('Middleware API', () => {
           blockHash: 'mh_zmcTZSgZcuQ9fL6h6iNNp3ftFvbQ2FjtgPHg9qEHgbwyqFFpi',
           eventName: null,
           logIdx: 0,
-          blockTime: 1721968249016,
+          blockTime: new Date(1721968249016),
           eventHash: 'KGBGHR0NTNENA10FD9MJS5P39C1LD4T9AUBIPIDL772714A57HH0====',
           callTxHash: 'th_2cNd6j4CtZYaY6F6AWNbYDXZGkaQbaAjjjtBiLATiaiXJ1P812',
           contractTxHash: 'th_giDXk5C5Fmvec2yBDEmSn74ZnKCMJv1Nso6uaSbfTup1xSx2Y',
@@ -430,8 +432,8 @@ describe('Middleware API', () => {
           active: true,
           hash: 'nm_2VSJFCVStB8ZdkLWcyd4adywYoyqYNzMt9Td924Jf8ESi94Nni',
           activeFrom: 3,
-          approximateActivationTime: 1721740187500,
-          approximateExpireTime: 1754140007661,
+          approximateActivationTime: new Date(1721740187500),
+          approximateExpireTime: new Date(1754140007661),
           expireHeight: 180003,
           pointers: {
             account_pubkey: presetAccount1Address,
@@ -535,7 +537,7 @@ describe('Middleware API', () => {
           active: true,
           blockHash: 'mh_2AVwWGLB7H8McaS1Yr7dfGoepTTVmTXJVFU5TCeDDAxgkyGDAr',
           blockHeight: 6,
-          blockTime: 1721994539489,
+          blockTime: new Date(1721994539489),
           key: 'account_pubkey',
           name: '123456789012345678901234567801.chain',
           sourceTxHash: 'th_2U32kq8HH1qxS5rohqVGzC9mF9E3mdcj3pZC6o9kfjCB4t1p8h',
@@ -570,8 +572,8 @@ describe('Middleware API', () => {
       const res = await middleware.getNamesAuctions();
       const expectedRes: typeof res = new MiddlewarePage({
         data: [{
-          activationTime: 1721975996873,
-          approximateExpireTime: 1722407457100,
+          activationTime: new Date(1721975996873),
+          approximateExpireTime: new Date(1722407457100),
           auctionEnd: 2407,
           lastBid: {
             blockHash: 'mh_BoBikwwf68giAEFKNYEh93uNkGu9enzx8cjn2vX7CRTnY5g6T',
@@ -579,7 +581,7 @@ describe('Middleware API', () => {
             encodedTx: 'tx_+IoLAfhCuEA6/CTIyE5UbHQIB8sWFKudzIu8dWfB71IRqDzbp0IUIiIpvPIEg4s/2nZ5aHrh7XxFc2+GqsRkqw8XffUTpxcCuEL4QCACoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQOHMS5jaGFpbgCJHupYdyGHT8AAhg7Xy82AAArCRC+X',
             hash: 'th_C7LscPqF5Nf5QrgZDSVbY92v7rruefN1qHjrHVuk2bdNwZF1e',
             microIndex: 0,
-            microTime: 1721975996873,
+            microTime: new Date(1721975996873),
             signatures: [
               'sg_8iagZbC7qnDeRDNkm1y1LyQCUqgobMKNH1G6Pv7QatFfPyo2oPzy5sUQdojZSY9BK7poupGqfQz2Eo8VnVkCyaaBRN8ks',
             ],
@@ -619,7 +621,7 @@ describe('Middleware API', () => {
         data: [{
           active: true,
           activeFrom: 10,
-          approximateExpireTime: 1722066317304,
+          approximateExpireTime: new Date(1722066317304),
           expireHeight: 510,
           format: {
             query: 'string',
@@ -633,7 +635,7 @@ describe('Middleware API', () => {
             hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
             txHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
             microIndex: 0,
-            microTime: 1721976497295,
+            microTime: new Date(1721976497295),
             signatures: [
               'sg_NaZNFJArMypD4wp4MbJ2cMvG6aWk7PSynP9qVsti1CabtMKSUbPwRUz55Yer7XiNURN6PcycF7NwBANaeJPMCpwKoWM9b',
             ],
@@ -656,7 +658,7 @@ describe('Middleware API', () => {
             },
             encodedTx: 'tx_+IsLAfhCuECk8CD7+rO/nCOX4fF6BylVDytJmDquVV56cv7/Lvsg23evMjX45PwdRDn2x/HGBuduMmUQaOESI+GoNarbsNEIuEP4QRYBoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQaGc3RyaW5nhnN0cmluZwAAggH0hg7x34XgAA0A0ekNLA==',
           },
-          registerTime: 1721976497295,
+          registerTime: new Date(1721976497295),
           registerTxHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
         }],
         next: null,
@@ -673,7 +675,7 @@ describe('Middleware API', () => {
       const expectedRes: typeof res = {
         active: true,
         activeFrom: 10,
-        approximateExpireTime: 1722066317304,
+        approximateExpireTime: new Date(1722066317304),
         expireHeight: 510,
         ...{ extends: [] }, // TODO: rewrite after solving https://github.com/aeternity/ae_mdw/issues/1872
         format: {
@@ -683,7 +685,7 @@ describe('Middleware API', () => {
         oracle: 'ok_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
         queryFee: 0n,
         register: {} as any, // TODO: fix after solving https://github.com/aeternity/ae_mdw/issues/1872
-        registerTime: 1721976497295,
+        registerTime: new Date(1721976497295),
         registerTxHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
       };
       copyFields(expectedRes, res, ['registerTime', 'approximateExpireTime']);
@@ -707,7 +709,7 @@ describe('Middleware API', () => {
           initiator: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
           initiatorAmount: 500000000000000n,
           lastUpdatedHeight: 11,
-          lastUpdatedTime: 1721984829629,
+          lastUpdatedTime: new Date(1721984829629),
           lastUpdatedTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
           lastUpdatedTxType: 'ChannelCreateTx',
           lockPeriod: 1,
@@ -741,7 +743,7 @@ describe('Middleware API', () => {
         initiator: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
         initiatorAmount: 500000000000000n,
         lastUpdatedHeight: 11,
-        lastUpdatedTime: 1721984829629,
+        lastUpdatedTime: new Date(1721984829629),
         lastUpdatedTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
         lastUpdatedTxType: 'ChannelCreateTx',
         lockPeriod: 1,
