@@ -122,6 +122,12 @@ describe('Node client', () => {
     }));
   });
 
+  it('returns time as Date', async () => {
+    const block = await node.getTopHeader();
+    expect(block.time).to.be.instanceOf(Date);
+    expect(block.time.getFullYear()).to.be.within(2024, 2030);
+  });
+
   it('doesn\'t remember failed version request', async () => {
     let shouldFail = true;
     class CustomNode extends Node {
