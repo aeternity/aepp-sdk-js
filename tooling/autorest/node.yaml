@@ -144,6 +144,15 @@ directive:
       https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
 
   - from: openapi-document
+    where: $..properties.time
+    set:
+      type: 'integer'
+      format: 'unixtime'
+    reason: >
+      Convert time as milliseconds to dates
+      https://github.com/aeternity/aeternity/issues/4386
+
+  - from: openapi-document
     where: $.components.schemas
     transform: >
       $.SignedTx.required.push('block_height', 'block_hash', 'hash', 'signatures');

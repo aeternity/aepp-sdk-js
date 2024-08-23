@@ -38,7 +38,11 @@ export const createSerializer = (
           console.warn(`AeSdk internal error: BigInt value ${responseBody} handled incorrectly`);
           responseBody = +responseBody.replace(bigIntPrefix, '');
         }
-        return deserialize.call(this, mapper, responseBody, objectName, options);
+        const result = deserialize.call(this, mapper, responseBody, objectName, options);
+        // TODO: remove after fixing https://github.com/aeternity/ae_mdw/issues/1891
+        // and https://github.com/aeternity/aeternity/issues/4386
+        if (result instanceof Date) return new Date(+result / 1000);
+        return result;
       }
       if (typeof responseBody === 'number' && responseBody > Number.MAX_SAFE_INTEGER) {
         throw new InternalError(`Number ${responseBody} is not accurate to be converted to BigInt`);
