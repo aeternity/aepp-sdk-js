@@ -76,6 +76,51 @@ directive:
     reason: to don't add /v3 prefix to $host parameter
 
   - from: openapi-document
+    where: $..[?(@.$ref && @.deprecated)]
+    transform: delete $.deprecated
+    reason: >
+      warning | IgnoredPropertyNextToRef | Semantic violation: Sibling values alongside $ref will be
+      ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md
+      for allowed values (components > schemas > OracleTx > properties > tx_hash)
+      keys: [ 'deprecated' ]
+
+  - from: openapi-document
+    where: $..[?(@.$ref || @.pattern || @.oneOf)]
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      function resolveRef(ref) {
+        if (typeof ref !== 'string') return;
+        const relativePath = ref.replace(/^#\//, '').split('/');
+        return relativePath.reduce((o, p) => o[p], $doc);
+      }
+      function getType(node) {
+        node = resolveRef(node.$ref) ?? node;
+        if (node.type === 'integer') return 'number';
+        if (node.type !== 'string') return;
+        const { pattern } = node;
+        if (pattern === '^\\w+\\.chain$') return 'name';
+        if (!pattern || pattern.includes('|') || pattern[0] !== '^' || pattern[3] !== '_') return;
+        return pattern.slice(1, 3);
+      }
+      let types = getType($) ?? $.oneOf?.map(getType);
+      if (!Array.isArray(types)) types = [types];
+      types = types.filter(a => a);
+      if (types.some(t => t.length == 2 || t === 'name')) {
+        if (!$.$ref) $.type ??= 'string';
+        $.description = ($.description ?? resolveRef($.$ref)?.description ?? '')
+          + `__sdk__${types.join()}__sdk__`;
+      }
+    reason: Add supported string prefixes to description
+
+  - from: openapi-document
+    where: $.paths.*.*.parameters[?(@.schema)]
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      if ($.schema.description == null) return $;
+      $.description = ($.description ?? '') + ' ' + $.schema.description;
+    reason: Bubble description from schema to parameter, need to handle custom prefixed types
+
+  - from: openapi-document
     where: $.info.title
     set: middleware
     reason: the whole SDK already about aeternity
