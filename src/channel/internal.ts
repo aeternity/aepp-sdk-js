@@ -14,7 +14,6 @@ import {
   ChannelError,
 } from '../utils/errors';
 import { encodeContractAddress } from '../utils/crypto';
-import { buildTx } from '../tx/builder';
 import { ensureError } from '../utils/other';
 
 export interface ChannelEvents {
@@ -53,7 +52,6 @@ export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
  * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
  */
 interface CommonChannelOptions {
-  existingFsmId?: Encoded.Bytearray;
   /**
    * Channel url (for example: "ws://localhost:3001")
    */
@@ -118,10 +116,9 @@ interface CommonChannelOptions {
    */
   existingChannelId?: Encoded.Channel;
   /**
-   * Offchain transaction (required if reestablishing a channel)
+   * Existing FSM id (required if reestablishing a channel)
    */
-  offChainTx?: Encoded.Transaction;
-  reconnectTx?: Encoded.Transaction;
+  existingFsmId?: Encoded.Bytearray;
   /**
    * The time waiting for a new event to be initiated (default: 600000)
    */
@@ -174,7 +171,6 @@ interface CommonChannelOptions {
    * Function which verifies and signs transactions
    */
   sign: SignTxWithTag;
-  offchainTx?: Encoded.Transaction;
 }
 
 export type ChannelOptions = CommonChannelOptions & ({
@@ -439,16 +435,7 @@ export async function initialize(
       onopen: async (event: Event) => {
         resolve();
         changeStatus(channel, 'connected', event);
-        if (channelOptions.reconnectTx != null) {
-          enterState(channel, { handler: openHandler });
-          const { signedTx } = await channel.state();
-          if (signedTx == null) {
-            throw new ChannelError('`signedTx` missed in state while reconnection');
-          }
-          changeState(channel, buildTx(signedTx));
-        } else {
-          enterState(channel, { handler: connectionHandler });
-        }
+        enterState(channel, { handler: connectionHandler });
         ping(channel);
       },
       onclose: (event: ICloseEvent) => {

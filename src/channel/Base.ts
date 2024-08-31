@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { snakeToPascal } from '../utils/string';
-import { buildTx, unpackTx } from '../tx/builder';
+import { unpackTx } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
 import * as handlers from './handlers';
 import {
@@ -249,8 +249,7 @@ export default class Channel {
    * signed state and then terminates.
    *
    * The channel can be reestablished by instantiating another Channel instance
-   * with two extra params: existingChannelId and offchainTx (returned from leave
-   * method as channelId and signedTx respectively).
+   * with two extra params: existingChannelId and existingFsmId.
    *
    * @example
    * ```js
@@ -288,18 +287,6 @@ export default class Channel {
         handler: handlers.awaitingShutdownTx,
         state: { sign },
       };
-    });
-  }
-
-  static async reconnect(options: ChannelOptions, txParams: any): Promise<Channel> {
-    const { sign } = options;
-
-    return Channel.initialize({
-      ...options,
-      reconnectTx: await sign(
-        'reconnect',
-        buildTx({ ...txParams, tag: Tag.ChannelClientReconnectTx }),
-      ),
     });
   }
 }
