@@ -75,7 +75,7 @@ describe('Channel other', () => {
     const [initiatorBalanceBeforeClose, responderBalanceBeforeClose] = await getBalances();
     const closeSoloTx = await aeSdk.buildTx({
       tag: Tag.ChannelCloseSoloTx,
-      channelId: await initiatorCh.id(),
+      channelId: initiatorCh.id(),
       fromId: initiator.address,
       poi,
       payload: signedTx,
@@ -85,7 +85,7 @@ describe('Channel other', () => {
 
     const settleTx = await aeSdk.buildTx({
       tag: Tag.ChannelSettleTx,
-      channelId: await initiatorCh.id(),
+      channelId: initiatorCh.id(),
       fromId: initiator.address,
       initiatorAmountFinal: balances[initiator.address],
       responderAmountFinal: balances[responder.address],
@@ -166,7 +166,7 @@ describe('Channel other', () => {
 
   // https://github.com/aeternity/protocol/blob/d634e7a3f3110657900759b183d0734e61e5803a/node/api/channels_api_usage.md#reestablish
   it('can reconnect', async () => {
-    expect(await initiatorCh.round()).to.be.equal(1);
+    expect(initiatorCh.round()).to.be.equal(1);
     const result = await initiatorCh.update(
       initiator.address,
       responder.address,
@@ -174,7 +174,7 @@ describe('Channel other', () => {
       initiatorSign,
     );
     expect(result.accepted).to.equal(true);
-    const channelId = await initiatorCh.id();
+    const channelId = initiatorCh.id();
     const fsmId = initiatorCh.fsmId();
     initiatorCh.disconnect();
     const ch = await Channel.initialize({
@@ -185,7 +185,7 @@ describe('Channel other', () => {
     });
     await waitForChannel(ch);
     expect(ch.fsmId()).to.be.equal(fsmId);
-    expect(await ch.round()).to.be.equal(2);
+    expect(ch.round()).to.be.equal(2);
     const state = await ch.state();
     ch.disconnect();
     assertNotNull(state.signedTx);
@@ -193,7 +193,7 @@ describe('Channel other', () => {
   });
 
   it('can post backchannel update', async () => {
-    expect(await responderCh.round()).to.be.equal(1);
+    expect(responderCh.round()).to.be.equal(1);
     initiatorCh.disconnect();
     const { accepted } = await responderCh.update(
       initiator.address,
@@ -202,7 +202,7 @@ describe('Channel other', () => {
       responderSign,
     );
     expect(accepted).to.equal(false);
-    expect(await responderCh.round()).to.be.equal(1);
+    expect(responderCh.round()).to.be.equal(1);
     const result = await responderCh.update(
       initiator.address,
       responder.address,
@@ -212,7 +212,7 @@ describe('Channel other', () => {
       ),
     );
     result.accepted.should.equal(true);
-    expect(await responderCh.round()).to.be.equal(2);
+    expect(responderCh.round()).to.be.equal(2);
     expect(result.signedTx).to.be.a('string');
   });
 });
