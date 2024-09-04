@@ -177,13 +177,14 @@ describe('Channel other', () => {
     const channelId = initiatorCh.id();
     const fsmId = initiatorCh.fsmId();
     initiatorCh.disconnect();
+    await waitForChannel(initiatorCh, ['disconnected']);
     const ch = await Channel.initialize({
       ...sharedParams,
       ...initiatorParams,
       existingChannelId: channelId,
       existingFsmId: fsmId,
     });
-    await waitForChannel(ch);
+    await waitForChannel(ch, ['open']);
     expect(ch.fsmId()).to.be.equal(fsmId);
     expect(ch.round()).to.be.equal(2);
     const state = await ch.state();

@@ -594,7 +594,7 @@ describe('Channel', () => {
       existingFsmId: existingChannelId,
       offchainTx,
     });
-    await waitForChannel(initiatorCh);
+    await waitForChannel(initiatorCh, ['open']);
     // TODO: why node doesn't return signed_tx when channel is reestablished?
     // initiatorCh.round().should.equal(existingChannelRound)
     sinon.assert.notCalled(initiatorSignTag);
