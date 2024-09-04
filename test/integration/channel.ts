@@ -572,33 +572,32 @@ describe('Channel', () => {
     // TODO: check `initiatorAmountFinal` and `responderAmountFinal`
   });
 
-  let existingChannelId: Encoded.Channel;
-  let offchainTx: Encoded.Transaction;
   it('can leave a channel', async () => {
     initiatorCh.disconnect();
     responderCh.disconnect();
     [initiatorCh, responderCh] = await initializeChannels(initiatorParams, responderParams);
-    initiatorCh.round(); // existingChannelRound
+    await initiatorCh.update(initiator.address, responder.address, 100, initiatorSign);
     const result = await initiatorCh.leave();
     expect(result.channelId).to.satisfy((t: string) => t.startsWith('ch_'));
     expect(result.signedTx).to.satisfy((t: string) => t.startsWith('tx_'));
-    existingChannelId = result.channelId;
-    offchainTx = result.signedTx;
   });
 
+  // https://github.com/aeternity/protocol/blob/d634e7a3f3110657900759b183d0734e61e5803a/node/api/channels_api_usage.md#reestablish
   it('can reestablish a channel', async () => {
+    expect(initiatorCh.round()).to.be.equal(2);
     initiatorCh = await Channel.initialize({
       ...sharedParams,
       ...initiatorParams,
-      // @ts-expect-error TODO: use existingChannelId instead existingFsmId
-      existingFsmId: existingChannelId,
-      offchainTx,
+      reestablish: true,
+      existingChannelId: initiatorCh.id(),
+      existingFsmId: initiatorCh.fsmId(),
     });
     await waitForChannel(initiatorCh, ['open']);
-    // TODO: why node doesn't return signed_tx when channel is reestablished?
-    // initiatorCh.round().should.equal(existingChannelRound)
+    expect(initiatorCh.round()).to.be.equal(2);
     sinon.assert.notCalled(initiatorSignTag);
     sinon.assert.notCalled(responderSignTag);
+    await initiatorCh.update(initiator.address, responder.address, 100, initiatorSign);
+    expect(initiatorCh.round()).to.be.equal(3);
   });
 
   describe('throws errors', () => {

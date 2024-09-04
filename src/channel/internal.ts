@@ -120,6 +120,11 @@ interface CommonChannelOptions {
    */
   existingFsmId?: Encoded.Bytearray;
   /**
+   * Needs to be provided if reconnecting with calling `leave` before
+   */
+  // TODO: remove after solving https://github.com/aeternity/aeternity/issues/4399
+  reestablish?: boolean;
+  /**
    * The time waiting for a new event to be initiated (default: 600000)
    */
   timeoutIdle?: number;

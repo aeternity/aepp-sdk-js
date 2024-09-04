@@ -20,7 +20,7 @@ import {
   ChannelMessage,
   ChannelEvents,
 } from './internal';
-import { ChannelError } from '../utils/errors';
+import { ChannelError, IllegalArgumentError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
 import { TxUnpacked } from '../tx/builder/schema.generated';
 import { EntryTag } from '../tx/builder/entry/constants';
@@ -108,9 +108,16 @@ export default class Channel {
   }
 
   static async _initialize<T extends Channel>(channel: T, options: ChannelOptions): Promise<T> {
+    const reconnect = (options.existingFsmId ?? options.existingChannelId) != null;
+    if (reconnect && (options.existingFsmId == null || options.existingChannelId == null)) {
+      throw new IllegalArgumentError('`existingChannelId`, `existingFsmId` should be both provided or missed');
+    }
+    const reconnectHandler = handlers[
+      options.reestablish === true ? 'awaitingReestablish' : 'awaitingReconnection'
+    ];
     await initialize(
       channel,
-      options.existingFsmId != null ? handlers.awaitingReconnection : handlers.awaitingConnection,
+      reconnect ? reconnectHandler : handlers.awaitingConnection,
       handlers.channelOpen,
       options,
     );

@@ -164,16 +164,10 @@ describe('Channel other', () => {
       .should.be.equal(true);
   }).timeout(timeoutBlock);
 
-  // https://github.com/aeternity/protocol/blob/d634e7a3f3110657900759b183d0734e61e5803a/node/api/channels_api_usage.md#reestablish
-  it('can reconnect', async () => {
+  it('can reconnect a channel without leave', async () => {
     expect(initiatorCh.round()).to.be.equal(1);
-    const result = await initiatorCh.update(
-      initiator.address,
-      responder.address,
-      100,
-      initiatorSign,
-    );
-    expect(result.accepted).to.equal(true);
+    await initiatorCh.update(initiator.address, responder.address, 100, initiatorSign);
+    expect(initiatorCh.round()).to.be.equal(2);
     const channelId = initiatorCh.id();
     const fsmId = initiatorCh.fsmId();
     initiatorCh.disconnect();
@@ -188,9 +182,11 @@ describe('Channel other', () => {
     expect(ch.fsmId()).to.be.equal(fsmId);
     expect(ch.round()).to.be.equal(2);
     const state = await ch.state();
-    ch.disconnect();
     assertNotNull(state.signedTx);
     expect(state.signedTx.encodedTx.tag).to.be.equal(Tag.ChannelOffChainTx);
+    await ch.update(initiator.address, responder.address, 100, initiatorSign);
+    expect(ch.round()).to.be.equal(3);
+    ch.disconnect();
   });
 
   it('can post backchannel update', async () => {
