@@ -1,7 +1,10 @@
 import { describe, before, it } from 'mocha';
 import { expect } from 'chai';
 import resetMiddleware, { presetAccount1Address, presetAccount2Address } from './reset-middleware';
-import { IllegalArgumentError, Middleware, MiddlewarePageMissed } from '../../src';
+import {
+  Encoding, IllegalArgumentError, isAddressValid, Middleware, MiddlewarePageMissed,
+  UnexpectedTsError,
+} from '../../src';
 import { assertNotNull } from '../utils';
 import { pause } from '../../src/utils/other';
 import { Activity } from '../../src/apis/middleware';
@@ -91,6 +94,7 @@ describe('Middleware API', () => {
       const microBlockHash = (await middleware.getKeyBlocks()).data.reverse()
         .find(({ prevHash }) => prevHash.startsWith('mh_'))?.prevHash;
       assertNotNull(microBlockHash);
+      if (!isAddressValid(microBlockHash, Encoding.MicroBlockHash)) throw new UnexpectedTsError();
       const res = await middleware.getMicroBlock(microBlockHash);
       const expectedRes: typeof res = {
         hash: 'mh_uMZS2rqBQ1ZD9GNTS2n54bRbATbupC2JV32wpj4gs4EGnfnKd',
@@ -829,7 +833,7 @@ describe('Middleware API', () => {
     });
 
     it('gets blocks', async () => {
-      const res = await middleware.getBlocksStatistics();
+      const res = await middleware.getBlocksStats();
       const expectedRes: typeof res = new MiddlewarePage({
         data: [{ count: 24, endDate, startDate }],
         next: null,
@@ -839,7 +843,7 @@ describe('Middleware API', () => {
     });
 
     it('gets transactions', async () => {
-      const res = await middleware.getTransactionsStatistics();
+      const res = await middleware.getTransactionsStats();
       const expectedRes: typeof res = new MiddlewarePage({
         data: [{ count: 11, endDate, startDate }],
         next: null,
@@ -849,7 +853,7 @@ describe('Middleware API', () => {
     });
 
     it('gets names', async () => {
-      const res = await middleware.getNamesStatistics();
+      const res = await middleware.getNamesStats();
       const expectedRes: typeof res = new MiddlewarePage({
         data: [{ count: 0, endDate, startDate }],
         next: null,
