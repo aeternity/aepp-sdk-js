@@ -350,13 +350,6 @@ export const txSchema = [{
   fee,
   nonce: nonce('fromId'),
 }, {
-  tag: shortUIntConst(Tag.ChannelClientReconnectTx),
-  version: shortUIntConst(1, true),
-  channelId: address(Encoding.Channel),
-  round: shortUInt,
-  role: string,
-  pubkey: address(Encoding.AccountAddress),
-}, {
   tag: shortUIntConst(Tag.GaAttachTx),
   version: shortUIntConst(1, true),
   ownerId: address(Encoding.AccountAddress),
