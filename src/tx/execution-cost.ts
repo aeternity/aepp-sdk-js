@@ -69,7 +69,7 @@ export function getExecutionCost(
     if (isInitiator === false) res -= BigInt(params.responderAmountFinal);
   }
   if (
-    ((params.tag === Tag.SpendTx && params.senderId !== params.recipientId)
+    (params.tag === Tag.SpendTx
     || params.tag === Tag.ContractCreateTx || params.tag === Tag.ContractCallTx
     || params.tag === Tag.ChannelDepositTx) && innerTx !== 'fee-payer'
   ) {
