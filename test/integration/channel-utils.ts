@@ -4,19 +4,19 @@ import {
 } from '../../src';
 import { ChannelOptions, SignTxWithTag } from '../../src/channel/internal';
 
-export async function waitForChannel(channel: Channel): Promise<void> {
+export async function waitForChannel(channel: Channel, statuses: string[]): Promise<void> {
   return new Promise((resolve, reject) => {
-    channel.on('statusChanged', (status: string) => {
-      switch (status) {
-        case 'open':
-          resolve();
-          break;
-        case 'disconnected':
-          reject(new Error('Unexpected SC status: disconnected'));
-          break;
-        default:
+    function handler(status: string): void {
+      const expectedStatus = statuses.shift();
+      if (status !== expectedStatus) {
+        reject(new Error(`Expected SC status ${expectedStatus}, got ${status} instead`));
+        channel.off('statusChanged', handler);
+      } else if (statuses.length === 0) {
+        resolve();
+        channel.off('statusChanged', handler);
       }
-    });
+    }
+    channel.on('statusChanged', handler);
   });
 }
 
@@ -46,7 +46,10 @@ export async function initializeChannels(
     ...sharedParams,
     ...responderParams,
   });
-  await Promise.all([waitForChannel(initiatorCh), waitForChannel(responderCh)]);
+  await Promise.all([
+    waitForChannel(initiatorCh, ['accepted', 'signed', 'open']),
+    waitForChannel(responderCh, ['halfSigned', 'open']),
+  ]);
   return [initiatorCh, responderCh];
 }
 
