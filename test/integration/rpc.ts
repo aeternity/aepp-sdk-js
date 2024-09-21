@@ -13,6 +13,7 @@ import {
   CompilerHttp,
   RpcConnectionDenyError,
   RpcRejectedByUserError,
+  RpcNoNetworkById,
   SUBSCRIPTION_TYPES,
   Tag,
   WALLET_TYPE,
@@ -111,6 +112,7 @@ describe('Aepp<->Wallet', () => {
         onConnection: handlerReject,
         onSubscription: handlerReject,
         onAskAccounts: handlerReject,
+        onAskToSelectNetwork: handlerReject,
         onDisconnect() {},
       });
       aepp = new AeSdkAepp({
@@ -522,6 +524,31 @@ describe('Aepp<->Wallet', () => {
       });
     });
 
+    describe('Select network by aepp', () => {
+      it('rejected by user on wallet side', async () => {
+        wallet.onAskToSelectNetwork = () => { throw new RpcRejectedByUserError(); };
+        await expect(aepp.askToSelectNetwork({ networkId: 'ae_test' })).to.be.eventually
+          .rejectedWith('Operation rejected by user').with.property('code', 4);
+        wallet.onAskToSelectNetwork = handlerReject;
+      });
+
+      it('rejected because unknown network id', async () => {
+        wallet.onAskToSelectNetwork = () => { throw new RpcNoNetworkById('test'); };
+        await expect(aepp.askToSelectNetwork({ networkId: 'ae_test' })).to.be.eventually
+          .rejectedWith('Wallet can\'t find a network by id "test"').with.property('code', 13);
+        wallet.onAskToSelectNetwork = handlerReject;
+      });
+
+      it('works', async () => {
+        let args: unknown[] = [];
+        wallet.onAskToSelectNetwork = (...a) => { args = a; };
+        const payload = { nodeUrl: 'http://example.com' };
+        await aepp.askToSelectNetwork(payload);
+        wallet.onAskToSelectNetwork = handlerReject;
+        expect(args.slice(1)).to.be.eql([payload, 'http://origin.test']);
+      });
+    });
+
     it('Sign and broadcast invalid transaction', async () => {
       const tx = await aepp.buildTx({
         tag: Tag.SpendTx,
@@ -650,6 +677,7 @@ describe('Aepp<->Wallet', () => {
         onConnection() {},
         onSubscription: handlerReject,
         onAskAccounts: handlerReject,
+        onAskToSelectNetwork: handlerReject,
         onDisconnect() {},
       });
       aepp = new AeSdkAepp({

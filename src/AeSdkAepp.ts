@@ -4,7 +4,7 @@ import AccountBase from './account/Base';
 import AccountRpc from './account/Rpc';
 import { decode, Encoded } from './utils/encoder';
 import {
-  Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi, Node as NodeRpc,
+  Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi, Node as NodeRpc, NetworkToSelect,
 } from './aepp-wallet-communication/rpc/types';
 import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
 import { METHODS, SUBSCRIPTION_TYPES } from './aepp-wallet-communication/schema';
@@ -165,6 +165,14 @@ export default class AeSdkAepp extends AeSdkBase {
     const result = await this.rpcClient.request(METHODS.subscribeAddress, { type, value });
     this._accounts = result.address;
     return result;
+  }
+
+  /**
+   * Ask wallet to select a network
+   */
+  async askToSelectNetwork(network: NetworkToSelect): Promise<void> {
+    this._ensureConnected();
+    await this.rpcClient.request(METHODS.updateNetwork, network);
   }
 
   _ensureConnected(): asserts this is AeSdkAepp & { rpcClient: NonNullable<AeSdkAepp['rpcClient']> } {

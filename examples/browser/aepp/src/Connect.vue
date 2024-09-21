@@ -60,6 +60,8 @@
     </template>
   </div>
 
+  <SelectNetwork :select="(network) => this.walletConnector.askToSelectNetwork(network)" />
+
   <h2>Ledger Hardware Wallet</h2>
   <div class="group">
     <template v-if="ledgerStatus">
@@ -123,8 +125,10 @@ import {
 } from '@aeternity/aepp-sdk';
 import { mapState } from 'vuex';
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
+import SelectNetwork from './components/SelectNetwork.vue';
 
 export default {
+  components: { SelectNetwork },
   data: () => ({
     connectMethod: 'default',
     walletConnected: false,

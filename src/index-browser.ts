@@ -81,7 +81,7 @@ export {
   MESSAGE_DIRECTION, WALLET_TYPE, SUBSCRIPTION_TYPES, METHODS, RPC_STATUS, RpcError,
   RpcInvalidTransactionError, RpcRejectedByUserError, RpcUnsupportedProtocolError,
   RpcConnectionDenyError, RpcNotAuthorizeError, RpcPermissionDenyError, RpcInternalError,
-  RpcMethodNotFoundError,
+  RpcMethodNotFoundError, RpcNoNetworkById,
 } from './aepp-wallet-communication/schema';
 export { default as walletDetector } from './aepp-wallet-communication/wallet-detector';
 export { default as BrowserRuntimeConnection } from './aepp-wallet-communication/connection/BrowserRuntime';
