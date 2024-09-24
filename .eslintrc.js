@@ -8,13 +8,13 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: ['airbnb-base', 'plugin:@typescript-eslint/recommended'],
+  extends: ['plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 13,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'rulesdir'],
+  plugins: ['@typescript-eslint', 'rulesdir', 'import'],
   ignorePatterns: [
     'dist',
     'es',
@@ -96,6 +96,7 @@ module.exports = {
           },
         ],
         '@typescript-eslint/type-annotation-spacing': 'error',
+        '@typescript-eslint/indent': 'off',
         // TODO: enable rules from below
         '@typescript-eslint/naming-convention': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
