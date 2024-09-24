@@ -3,7 +3,8 @@
 ## Interactions
 
 > "There are two approaches, purist and high-level."
-> _Alexander Kahl._
+
+_Alexander Kahl._
 
 The purist uses the functions generated out of the Swagger
 file. After creating the SDK instance `aeSdk` with the AeSdk class it exposes a mapping of all `operationId`s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction

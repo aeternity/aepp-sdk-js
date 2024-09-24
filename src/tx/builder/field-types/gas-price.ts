@@ -22,11 +22,9 @@ export async function getCachedIncreasedGasPrice(node: Node): Promise<bigint> {
   const maxSafeGasPrice = BigInt(MIN_GAS_PRICE) * 100000n; // max microblock fee is 600ae or 35usd
   if (gasPrice > maxSafeGasPrice) {
     console.warn(
-      [
-        `Estimated gas price ${gasPrice} exceeds the maximum safe value for unknown reason.`,
-        `It will be limited to ${maxSafeGasPrice}.`,
-        'To overcome this restriction provide `gasPrice`/`fee` in options.',
-      ].join(' '),
+      `Estimated gas price ${gasPrice} exceeds the maximum safe value for unknown reason.` +
+        ` It will be limited to ${maxSafeGasPrice}.` +
+        ' To overcome this restriction provide `gasPrice`/`fee` in options.',
     );
     gasPrice = maxSafeGasPrice;
   }

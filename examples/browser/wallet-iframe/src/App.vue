@@ -140,10 +140,8 @@ export default {
     const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
       if (
         !confirm(
-          [
-            `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}`,
+          `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}` +
             Value.methods.valueToString(parameters),
-          ].join('\n'),
         )
       ) {
         throw new RpcRejectedByUserError();

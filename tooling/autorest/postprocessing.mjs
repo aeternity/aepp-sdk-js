@@ -18,32 +18,42 @@ const nodeBigIntPropertyNames = [
 ];
 
 const middlewareBigIntPropertyNames = [
+  // oracles/<id>/responses
   'fee',
-  'amount', // oracles/<id>/responses
-  'queryFee', // oracles/<id>
+  'amount',
+  // oracles/<id>
+  'queryFee',
+  // deltastats
   'blockReward',
   'devReward',
   'lockedInAuctions',
   'burnedInAuctions',
-  'lockedInChannels', // deltastats
+  'lockedInChannels',
+  // totalstats
   'sumBlockReward',
   'sumDevReward',
-  'totalTokenSupply', // totalstats
-  'totalReward', // minerstats
+  'totalTokenSupply',
+  // minerstats
+  'totalReward',
+  // aex9
   'eventSupply',
-  'initialSupply', // aex9
+  'initialSupply',
+  // contracts/{id}
   'deposit',
-  'gasPrice', // contracts/{id}
-  'nameFee', // names
+  'gasPrice',
+  // names
+  'nameFee',
+  // dex/swaps
   'amount0In',
   'amount0Out',
   'amount1In',
   'amount1Out',
   'fromAmount',
-  'toAmount', // dex/swaps
+  'toAmount',
+  // channels
   'channelReserve',
   'initiatorAmount',
-  'responderAmount', // channels
+  'responderAmount',
 ];
 
 function toTsType(types) {

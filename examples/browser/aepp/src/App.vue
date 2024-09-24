@@ -23,7 +23,7 @@
     >
       Delegation signature
     </a>
-    <a href="#" :class="{ active: view === 'Jwt' }" @click="view = 'Jwt'"> JWT </a>
+    <a href="#" :class="{ active: view === 'Jwt' }" @click="view = 'Jwt'">JWT</a>
   </div>
 
   <Component v-if="view" :is="view" />

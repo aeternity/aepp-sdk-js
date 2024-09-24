@@ -3,9 +3,9 @@ plugins:
   - search
   - mkdocs-simple-hooks:
       hooks:
-        on_pre_build: 'docs.hooks:pre_build'
-        on_page_markdown: 'docs.hooks:page_markdown'
-repo_url: 'https://github.com/aeternity/aepp-sdk-js'
+        on_pre_build: docs.hooks:pre_build
+        on_page_markdown: docs.hooks:page_markdown
+repo_url: https://github.com/aeternity/aepp-sdk-js
 edit_uri: ''
 
 extra:
@@ -76,12 +76,12 @@ nav:
           - examples/node/dry-run-using-debug-endpoint.md
           - examples/node/oracle.md
       - Browser:
-          - 'SDK tools': examples/browser/tools/index.html
-          - 'Aepp example': examples/browser/aepp/index.html
-          - 'Iframe wallet example': examples/browser/wallet-iframe/index.html
-          - 'Webextension wallet example': examples/browser/wallet-web-extension/packed.zip
+          - SDK tools: examples/browser/tools/index.html
+          - Aepp example: examples/browser/aepp/index.html
+          - Iframe wallet example: examples/browser/wallet-iframe/index.html
+          - Webextension wallet example: examples/browser/wallet-web-extension/packed.zip
       - tutorials/vuejs/helloworld-blockheight.md
-  - 'API Reference': api/index.html
+  - API Reference: api/index.html
   - compatibility.md
   - Changelog: CHANGELOG.md
   - Migration Guides:

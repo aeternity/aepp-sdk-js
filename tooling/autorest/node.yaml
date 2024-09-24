@@ -145,8 +145,8 @@ directive:
   - from: openapi-document
     where: $..properties.time
     set:
-      type: 'integer'
-      format: 'unixtime'
+      type: integer
+      format: unixtime
     reason: >
       Convert time as milliseconds to dates
       https://github.com/aeternity/aeternity/issues/4386

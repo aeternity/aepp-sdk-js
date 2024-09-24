@@ -108,8 +108,8 @@ const stopHandling = await oracle.handleQueries(
     }
     return '{"error": "Unknown request"}';
   },
-  { interval: 1000 },
-); // polling interval in milliseconds
+  { interval: 1000 }, // polling interval in milliseconds
+);
 
 stopHandling();
 ```
@@ -132,8 +132,8 @@ const stopPolling = await oracle.pollQueries(
   (query) => {
     console.log(query); // log a new query
   },
-  { interval: 1000 },
-); // polling interval in milliseconds
+  { interval: 1000 }, // polling interval in milliseconds
+);
 
 stopPolling();
 ```

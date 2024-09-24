@@ -74,8 +74,8 @@ describe('Delegation signatures', () => {
   });
 
   it('checks packing parameters', () => {
-    // @ts-expect-error AensPreclaim don't have nameId
     expect(() =>
+      // @ts-expect-error AensPreclaim don't have nameId
       packDelegation({ tag: DelegationTag.AensPreclaim, nameId: 'test.chain' }),
     ).to.throw();
     // @ts-expect-error requires contractAddress

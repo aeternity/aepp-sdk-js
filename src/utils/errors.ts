@@ -189,7 +189,7 @@ export class RequestTimedOutError extends BaseError {
  */
 export class TxTimedOutError extends BaseError {
   constructor(blocks: number, th: Encoded.TxHash) {
-    super([`Giving up after ${blocks} blocks mined`, `transaction hash: ${th}`].join(', '));
+    super(`Giving up after ${blocks} blocks mined, transaction hash: ${th}`);
     this.name = 'TxTimedOutError';
   }
 }

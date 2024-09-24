@@ -21,7 +21,7 @@ We provided following two NodeJS examples which you can take a look at:
 
 Note:
 
-- A `PayingForTx` can wrap **_any kind_** of other [transaction type](https://docs.aeternity.com/protocol/consensus/index.html#transactions_1) supported by the protocol as inner transaction.
+- A `PayingForTx` can wrap **any kind** of other [transaction type](https://docs.aeternity.com/protocol/consensus/index.html#transactions_1) supported by the protocol as inner transaction.
 
 ## UseCases
 
