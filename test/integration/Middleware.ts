@@ -383,7 +383,7 @@ describe('Middleware API', () => {
               blockHash: 'mh_zmcTZSgZcuQ9fL6h6iNNp3ftFvbQ2FjtgPHg9qEHgbwyqFFpi',
               localIdx: 0,
               callTxHash: 'th_2cNd6j4CtZYaY6F6AWNbYDXZGkaQbaAjjjtBiLATiaiXJ1P812',
-              contractTxHash: 'th_giDXk5C5Fmvec2yBDEmSn74ZnKCMJv1Nso6uaSbfTup1xSx2Y',
+              contractTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
               internalTx: {
                 amount: 42,
                 fee: 0,
@@ -422,7 +422,7 @@ describe('Middleware API', () => {
               blockTime: new Date(1721968249016),
               eventHash: 'KGBGHR0NTNENA10FD9MJS5P39C1LD4T9AUBIPIDL772714A57HH0====',
               callTxHash: 'th_2cNd6j4CtZYaY6F6AWNbYDXZGkaQbaAjjjtBiLATiaiXJ1P812',
-              contractTxHash: 'th_giDXk5C5Fmvec2yBDEmSn74ZnKCMJv1Nso6uaSbfTup1xSx2Y',
+              contractTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
               microIndex: 0,
               extCallerContractId: null,
               extCallerContractTxHash: null,
@@ -448,7 +448,7 @@ describe('Middleware API', () => {
           abi_version: 3,
           amount: 100,
           call_data: 'cb_KxFE1kQfP4oEp9E=',
-          code: 'cb_+QEcRgOg8gEtln8gPwqlcH3Rv3q+KpWksD0m4iwiqY18jtURGonAuO+4wf5E1kQfADcANwAaDoI/AQM//mWl4A8CNwGHAjcBBzcCdwc3AAg9AAIERjYAAABiL1+fAYEFPg9NJAu8Y6cqlt/F0eAzEdVzQbFz6kWUaMkB2l2DOwABAz9GNgAAAEY2AgACYi4AnwGBpBcI7Bft3XUED2ptPhcjSwNWk6lXlyzJtTnEcJFFPGICAQM//pdbzNwANwFHADcADAOvggECASstdGVzdC1zdHJpbmdWAgMRZaXgDw8Cb4Imz2UNAFQBAz+oLwMRRNZEHxFpbml0EWWl4A8tQ2hhaW4uZXZlbnQRl1vM3BVzcGVuZIIvAIU4LjAuMABElFo5',
+          code: 'cb_+QEcRgOgzPAt3CM1MXJqVKUexArUzQqzhuZqPx4w8pc2S1dcOHXAuO+4wf5E1kQfADcANwAaDoI/AQM//mWl4A8CNwGHAjcBBzcCdwc3AAg9AAIERjYAAABiL1+fAYEFPg9NJAu8Y6cqlt/F0eAzEdVzQbFz6kWUaMkB2l2DOwABAz9GNgAAAEY2AgACYi4AnwGBpBcI7Bft3XUED2ptPhcjSwNWk6lXlyzJtTnEcJFFPGICAQM//pdbzNwANwFHADcADAOvggECASstdGVzdC1zdHJpbmdWAgMRZaXgDw8Cb4Imz2UNAFQBAz+oLwMRRNZEHxFpbml0EWWl4A8tQ2hhaW4uZXZlbnQRl1vM3BVzcGVuZIIvAIU4LjAuMAAyWaKG',
           deposit: 0,
           fee: 82160000000000,
           gas: 76,
@@ -459,7 +459,7 @@ describe('Middleware API', () => {
           vm_version: 8,
         },
         aexnType: null,
-        sourceTxHash: 'th_giDXk5C5Fmvec2yBDEmSn74ZnKCMJv1Nso6uaSbfTup1xSx2Y',
+        sourceTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
         sourceTxType: 'ContractCreateTx',
       };
       copyFields(expectedRes, res, ['blockHash']);

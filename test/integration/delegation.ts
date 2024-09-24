@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { before, describe, it } from 'mocha';
-import { assertNotNull, randomName, ChainTtl, InputNumber } from '../utils';
+import { assertNotNull, randomName, ChainTtl, InputNumber, indent } from '../utils';
 import { getSdk, timeoutBlock } from '.';
 import {
   commitmentHash,
@@ -304,24 +304,24 @@ contract DelegateTest =
     before(async () => {
       contract = await Contract.initialize({
         ...aeSdk.getContext(),
-        sourceCode:
-          'contract DelegateTest =\n' +
-          '  stateful payable entrypoint signedRegisterOracle(\n' +
-          '    acct: address, sign: signature, qfee: int, ttl: Chain.ttl): oracle(string, string) =\n' +
-          '    Oracle.register(acct, qfee, ttl, signature = sign)\n' +
-          '  stateful payable entrypoint signedExtendOracle(\n' +
-          '    o: oracle(string, string), sign: signature, ttl: Chain.ttl): unit =\n' +
-          '    Oracle.extend(o, signature = sign, ttl)\n' +
-          '  payable stateful entrypoint createQuery(\n' +
-          '    o: oracle(string, string), q: string, qfee: int, qttl: Chain.ttl, rttl: Chain.ttl): oracle_query(string, string) =\n' +
-          '    require(qfee =< Call.value, "insufficient value for qfee")\n' +
-          '    require(Oracle.check(o), "oracle not valid")\n' +
-          '    Oracle.query(o, q, qfee, qttl, rttl)\n' +
-          '  entrypoint queryFee(o : oracle(string, int)) : int =\n' +
-          '    Oracle.query_fee(o)\n' +
-          '  stateful entrypoint respond(\n' +
-          '    o: oracle(string, string), q: oracle_query(string, string), sign : signature, r: string) =\n' +
-          '    Oracle.respond(o, q, signature = sign, r)',
+        sourceCode: indent`
+          contract DelegateTest =
+            stateful payable entrypoint signedRegisterOracle(
+              acct: address, sign: signature, qfee: int, ttl: Chain.ttl): oracle(string, string) =
+              Oracle.register(acct, qfee, ttl, signature = sign)
+            stateful payable entrypoint signedExtendOracle(
+              o: oracle(string, string), sign: signature, ttl: Chain.ttl): unit =
+              Oracle.extend(o, signature = sign, ttl)
+            payable stateful entrypoint createQuery(
+              o: oracle(string, string), q: string, qfee: int, qttl: Chain.ttl, rttl: Chain.ttl): oracle_query(string, string) =
+              require(qfee =< Call.value, "insufficient value for qfee")
+              require(Oracle.check(o), "oracle not valid")
+              Oracle.query(o, q, qfee, qttl, rttl)
+            entrypoint queryFee(o : oracle(string, int)) : int =
+              Oracle.query_fee(o)
+            stateful entrypoint respond(
+              o: oracle(string, string), q: oracle_query(string, string), sign : signature, r: string) =
+              Oracle.respond(o, q, signature = sign, r)`,
       });
       await contract.$deploy([]);
       assertNotNull(contract.$options.address);

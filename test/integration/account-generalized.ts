@@ -15,9 +15,10 @@ import {
   Encoded,
   ArgumentError,
 } from '../../src';
-import { ensureEqual } from '../utils';
+import { ensureEqual, indent } from '../utils';
 
-const sourceCode = `contract BlindAuth =
+const sourceCode = `
+contract BlindAuth =
   record state = { txHash: option(hash) }
   entrypoint init() : state = { txHash = None }
 
@@ -172,14 +173,13 @@ describe('Generalized Account', () => {
       setState: (value: number) => void;
     }>({
       ...aeSdk.getContext(),
-      sourceCode:
-        '' +
-        'contract Stateful =\n' +
-        '  record state = { value: int }\n' +
-        '  entrypoint init(_value: int) : state = { value = _value }\n' +
-        '  entrypoint getState(): int = state.value\n' +
-        '  stateful entrypoint setState(_value: int): unit =\n' +
-        '    put(state{ value = _value })',
+      sourceCode: indent`
+        contract Stateful =
+          record state = { value: int }
+          entrypoint init(_value: int) : state = { value = _value }
+          entrypoint getState(): int = state.value
+          stateful entrypoint setState(_value: int): unit =
+            put(state{ value = _value })`,
     });
     await contract.$deploy([42], { authData: { sourceCode, args: [genSalt()] } });
     expect((await contract.getState()).decodedResult).to.be.equal(42);

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { before, describe, it } from 'mocha';
-import { assertNotNull, InputNumber } from '../utils';
+import { assertNotNull, indent, InputNumber } from '../utils';
 import { getSdk, timeoutBlock } from '.';
 import {
   ArgumentError,
@@ -82,29 +82,29 @@ describe('Contract', () => {
       verify: (message: string, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
       ...aeSdk.getContext(),
-      sourceCode:
-        'include "String.aes"' +
-        '\n' +
-        '\ncontract Sign =' +
-        '\n  entrypoint int_to_binary (i: int): string =' +
-        '\n    switch(Char.from_int(i))' +
-        '\n      None => abort("Int is too big")' +
-        '\n      Some(c) => String.from_list([c])' +
-        '\n' +
-        '\n  entrypoint includes (str: string, pat: string): bool =' +
-        '\n    switch(String.contains(str, pat))' +
-        '\n      None => false' +
-        '\n      Some(_) => true' +
-        '\n' +
-        '\n  entrypoint message_to_hash (message: string): hash =' +
-        '\n    let prefix = "aeternity Signed Message:\\n"' +
-        '\n    let prefixBinary = String.concat(int_to_binary(String.length(prefix)), prefix)' +
-        '\n    let messageBinary = String.concat(int_to_binary(String.length(message)), message)' +
-        '\n    Crypto.blake2b(String.concat(prefixBinary, messageBinary))' +
-        '\n' +
-        '\n  entrypoint verify (message: string, pub: address, sig: signature): bool =' +
-        '\n    require(includes(message, "H"), "Invalid message")' +
-        '\n    Crypto.verify_sig(message_to_hash(message), pub, sig)',
+      sourceCode: indent`
+        include "String.aes"
+
+        contract Sign =
+          entrypoint int_to_binary (i: int): string =
+            switch(Char.from_int(i))
+              None => abort("Int is too big")
+              Some(c) => String.from_list([c])
+
+          entrypoint includes (str: string, pat: string): bool =
+            switch(String.contains(str, pat))
+              None => false
+              Some(_) => true
+
+          entrypoint message_to_hash (message: string): hash =
+            let prefix = "aeternity Signed Message:\\n"
+            let prefixBinary = String.concat(int_to_binary(String.length(prefix)), prefix)
+            let messageBinary = String.concat(int_to_binary(String.length(message)), message)
+            Crypto.blake2b(String.concat(prefixBinary, messageBinary))
+
+          entrypoint verify (message: string, pub: address, sig: signature): bool =
+            require(includes(message, "H"), "Invalid message")
+            Crypto.verify_sig(message_to_hash(message), pub, sig)`,
     });
     await signContract.$deploy([]);
 
@@ -156,7 +156,9 @@ describe('Contract', () => {
   it('throws error on deploy', async () => {
     const ct = await Contract.initialize({
       ...aeSdk.getContext(),
-      sourceCode: 'contract Foo =\n' + '  entrypoint init() = abort("CustomErrorMessage")',
+      sourceCode: indent`
+        contract Foo =
+          entrypoint init() = abort("CustomErrorMessage")`,
     });
     await expect(ct.$deploy([])).to.be.rejectedWith(
       NodeInvocationError,
@@ -170,11 +172,11 @@ describe('Contract', () => {
       failWithMessage: () => void;
     }>({
       ...aeSdk.getContext(),
-      sourceCode:
-        'contract Foo =\n' +
-        '  payable stateful entrypoint failWithoutMessage(x : address) = Chain.spend(x, 1000000000)\n' +
-        '  payable stateful entrypoint failWithMessage() =\n' +
-        '    abort("CustomErrorMessage")',
+      sourceCode: indent`
+        contract Foo =
+          payable stateful entrypoint failWithoutMessage(x : address) = Chain.spend(x, 1000000000)
+          payable stateful entrypoint failWithMessage() =
+            abort("CustomErrorMessage")`,
     });
     await ct.$deploy([]);
     await expect(ct.failWithoutMessage(aeSdk.address)).to.be.rejectedWith('Invocation failed');
@@ -198,15 +200,15 @@ describe('Contract', () => {
   it('Dry-run at specific height', async () => {
     const contract = await Contract.initialize<{ call: () => void }>({
       ...aeSdk.getContext(),
-      sourceCode:
-        'contract Callable =\n' +
-        '  record state = { wasCalled: bool }\n' +
-        '\n' +
-        '  entrypoint init() : state = { wasCalled = false }\n' +
-        '\n' +
-        '  stateful entrypoint call() =\n' +
-        '    require(!state.wasCalled, "Already called")\n' +
-        '    put(state{ wasCalled = true })\n',
+      sourceCode: indent`
+        contract Callable =
+          record state = { wasCalled: bool }
+
+          entrypoint init() : state = { wasCalled = false }
+
+          stateful entrypoint call() =
+            require(!state.wasCalled, "Already called")
+            put(state{ wasCalled = true })`,
     });
     await contract.$deploy([]);
     await aeSdk.awaitHeight((await aeSdk.getHeight()) + 1);
@@ -256,11 +258,11 @@ describe('Contract', () => {
       retrieve: () => string;
     }>({
       ...aeSdk.getContext(),
-      sourceCode:
-        'contract StateContract =\n' +
-        '  record state = { value: string }\n' +
-        '  entrypoint init(value) : state = { value = value }\n' +
-        '  entrypoint retrieve() : string = state.value',
+      sourceCode: indent`
+        contract StateContract =
+          record state = { value: string }
+          entrypoint init(value) : state = { value = value }
+          entrypoint retrieve() : string = state.value`,
     });
     const data = 'Hello World!';
     await contract.$deploy([data]);
@@ -268,10 +270,10 @@ describe('Contract', () => {
   });
 
   describe('Namespaces', () => {
-    const contractWithLibSourceCode =
-      'include "testLib"\n' +
-      'contract ContractWithLib =\n' +
-      '  entrypoint sumNumbers(x: int, y: int) : int = TestLib.sum(x, y)';
+    const contractWithLibSourceCode = indent`
+      include "testLib"
+      contract ContractWithLib =
+        entrypoint sumNumbers(x: int, y: int) : int = TestLib.sum(x, y)`;
 
     let contract: Contract<{ sumNumbers: (x: number, y: number) => bigint }>;
 
@@ -280,7 +282,9 @@ describe('Contract', () => {
         ...aeSdk.getContext(),
         sourceCode: contractWithLibSourceCode,
         fileSystem: {
-          testLib: 'namespace TestLib =\n' + '  function sum(x: int, y: int) : int = x + y',
+          testLib: indent`
+            namespace TestLib =
+              function sum(x: int, y: int) : int = x + y`,
         },
       });
       expect(await contract.$compile()).to.satisfy((b: string) => b.startsWith('cb_'));

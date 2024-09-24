@@ -25,7 +25,7 @@ import {
   Encoding,
 } from '../../src';
 import { getSdk } from '.';
-import { assertNotNull, ChainTtl, ensureEqual, InputNumber } from '../utils';
+import { assertNotNull, ChainTtl, ensureEqual, indent, InputNumber } from '../utils';
 import { Aci } from '../../src/contract/compiler/Base';
 import { ContractCallObject } from '../../src/contract/Contract';
 import includesAci from './contracts/Includes.json';
@@ -438,26 +438,25 @@ describe('Contract instance', () => {
       soundByCat: () => string;
     }>({
       ...aeSdk.getContext(),
-      sourceCode:
-        '' +
-        'include "String.aes"\n' +
-        '\n' +
-        'contract interface Animal =\n' +
-        '  entrypoint sound: () => string\n' +
-        '' +
-        'contract Cat: Animal =\n' +
-        '  entrypoint sound() = "meow"\n' +
-        '' +
-        'contract Dog: Animal =\n' +
-        '  entrypoint sound() = "bark"\n' +
-        '' +
-        'main contract Main =\n' +
-        '  entrypoint soundByAnimal(a: Animal): string =\n' +
-        '    String.concat("animal sound: ", a.sound())\n' +
-        '\n' +
-        '  stateful entrypoint soundByDog(): string = soundByAnimal(Chain.create(): Dog)\n' +
-        '\n' +
-        '  stateful entrypoint soundByCat(): string = soundByAnimal(Chain.create(): Cat)\n',
+      sourceCode: indent`
+        include "String.aes"
+
+        contract interface Animal =
+          entrypoint sound: () => string
+
+        contract Cat: Animal =
+          entrypoint sound() = "meow"
+
+        contract Dog: Animal =
+          entrypoint sound() = "bark"
+
+        main contract Main =
+          entrypoint soundByAnimal(a: Animal): string =
+            String.concat("animal sound: ", a.sound())
+
+          stateful entrypoint soundByDog(): string = soundByAnimal(Chain.create(): Dog)
+
+          stateful entrypoint soundByCat(): string = soundByAnimal(Chain.create(): Cat)`,
     });
 
     await contract.$deploy([]);
@@ -465,12 +464,11 @@ describe('Contract instance', () => {
     expect((await contract.soundByCat()).decodedResult).to.be.equal('animal sound: meow');
   });
 
-  const intHolderSourceCode =
-    '' +
-    'contract IntHolder =\n' +
-    '  type state = int\n' +
-    '  entrypoint init(x) = x\n' +
-    '  entrypoint get() = state\n';
+  const intHolderSourceCode = indent`
+    contract IntHolder =
+      type state = int
+      entrypoint init(x) = x
+      entrypoint get() = state`;
   interface IntHolder extends ContractMethodsBase {
     init: (name: number) => void;
     get: () => bigint;
@@ -482,11 +480,12 @@ describe('Contract instance', () => {
     }>({
       ...aeSdk.getContext(),
       sourceCode:
-        '' +
-        `${intHolderSourceCode}` +
-        'main contract IntHolderFactory =\n' +
-        '  stateful entrypoint new(x : int) : IntHolder =\n' +
-        '    Chain.create(x)\n',
+        intHolderSourceCode +
+        '\n' +
+        indent`
+        main contract IntHolderFactory =
+          stateful entrypoint new(x : int) : IntHolder =
+            Chain.create(x)`,
     });
     await factory.$deploy([]);
     const { decodedResult: address, result } = await factory.new(42);
@@ -515,18 +514,17 @@ describe('Contract instance', () => {
       new: (template: Encoded.ContractAddress, value: number) => Encoded.ContractAddress;
     }>({
       ...aeSdk.getContext(),
-      sourceCode:
-        '' +
-        'payable contract interface IntHolder =\n' +
-        '  entrypoint init : (int) => void\n' +
-        '  entrypoint get : () => int\n' +
-        '\n' +
-        'main contract IntHolderFactory =\n' +
-        '  stateful entrypoint new(template: IntHolder, value: int) =\n' +
-        '    switch(Chain.clone(ref=template, protected=true, value))\n' +
-        '      None => abort("Bad int holder!")\n' +
-        '      Some(int_holder) =>\n' +
-        '        int_holder\n',
+      sourceCode: indent`
+        payable contract interface IntHolder =
+          entrypoint init : (int) => void
+          entrypoint get : () => int
+
+        main contract IntHolderFactory =
+          stateful entrypoint new(template: IntHolder, value: int) =
+            switch(Chain.clone(ref=template, protected=true, value))
+              None => abort("Bad int holder!")
+              Some(int_holder) =>
+                int_holder`,
     });
     await market.$deploy([]);
     const { decodedResult: address, result } = await market.new(templateAddress, 44);
@@ -649,11 +647,10 @@ describe('Contract instance', () => {
   it('pays to payable contract', async () => {
     const contract = await Contract.initialize({
       ...aeSdk.getContext(),
-      sourceCode:
-        '' +
-        'payable contract Main =\n' +
-        '  record state = { key: int }\n' +
-        '  entrypoint init() = { key = 0 }\n',
+      sourceCode: indent`
+        payable contract Main =
+          record state = { key: int }
+          entrypoint init() = { key = 0 }`,
     });
     const { address } = await contract.$deploy([]);
     assertNotNull(address);
@@ -808,37 +805,37 @@ describe('Contract instance', () => {
     before(async () => {
       remoteContract = await Contract.initialize({
         ...aeSdk.getContext(),
-        sourceCode:
-          'contract Remote =\n' +
-          '  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int) | DuplicateSameType(int)\n' +
-          '\n' +
-          '  stateful entrypoint emitEvents(duplicate: bool) : unit =\n' +
-          '    Chain.event(RemoteEvent2("test-string", 43))\n' +
-          '    switch(duplicate)\n' +
-          '      true => Chain.event(Duplicate(0))\n' +
-          '      false => ()\n',
+        sourceCode: indent`
+          contract Remote =
+            datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int) | DuplicateSameType(int)
+
+            stateful entrypoint emitEvents(duplicate: bool) : unit =
+              Chain.event(RemoteEvent2("test-string", 43))
+              switch(duplicate)
+                true => Chain.event(Duplicate(0))
+                false => ()`,
       });
       await remoteContract.$deploy([]);
       assertNotNull(remoteContract.$options.address);
       contract = await Contract.initialize({
         ...aeSdk.getContext(),
-        sourceCode:
-          'contract interface RemoteI =\n' +
-          '  datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int) | DuplicateSameType(int)\n' +
-          '  entrypoint emitEvents: (bool) => unit\n' +
-          '\n' +
-          'contract StateContract =\n' +
-          '  datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int) | Duplicate(string) | DuplicateSameType(int)\n' +
-          '  entrypoint init() =\n' +
-          '    Chain.event(TheFirstEvent(42))\n' +
-          '    Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))\n' +
-          '    Chain.event(AnotherEvent2(true, "This is not indexed", 1))\n' +
-          '\n' +
-          '  stateful entrypoint emitEvents(remote: RemoteI, duplicate: bool): unit =\n' +
-          '    Chain.event(TheFirstEvent(42))\n' +
-          '    Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))\n' +
-          '    remote.emitEvents(duplicate)\n' +
-          '    Chain.event(AnotherEvent2(true, "This is not indexed", 1))\n',
+        sourceCode: indent`
+          contract interface RemoteI =
+            datatype event = RemoteEvent1(int) | RemoteEvent2(string, int) | Duplicate(int) | DuplicateSameType(int)
+            entrypoint emitEvents: (bool) => unit
+
+          contract StateContract =
+            datatype event = TheFirstEvent(int) | AnotherEvent(string, address) | AnotherEvent2(bool, string, int) | Duplicate(string) | DuplicateSameType(int)
+            entrypoint init() =
+              Chain.event(TheFirstEvent(42))
+              Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))
+              Chain.event(AnotherEvent2(true, "This is not indexed", 1))
+
+            stateful entrypoint emitEvents(remote: RemoteI, duplicate: bool): unit =
+              Chain.event(TheFirstEvent(42))
+              Chain.event(AnotherEvent("This is not indexed", ak_ptREMvyDbSh1d38t4WgYgac5oLsa2v9xwYFnG7eUWR8Er5cmT))
+              remote.emitEvents(duplicate)
+              Chain.event(AnotherEvent2(true, "This is not indexed", 1))`,
       });
       deployResult = await contract.$deploy([]);
       eventResult = await contract.emitEvents(remoteContract.$options.address, false);
@@ -964,7 +961,9 @@ describe('Contract instance', () => {
     it('calls a contract that emits events with no defined events', async () => {
       const c = await Contract.initialize<{ emitEvents: (f: boolean) => [] }>({
         ...aeSdk.getContext(),
-        sourceCode: 'contract FooContract =\n' + '  entrypoint emitEvents(f: bool) = ()',
+        sourceCode: indent`
+          contract FooContract =
+            entrypoint emitEvents(f: bool) = ()`,
         address: remoteContract.$options.address,
       });
       const result = await c.emitEvents(false, { omitUnknown: true });

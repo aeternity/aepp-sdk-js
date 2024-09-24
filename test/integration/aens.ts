@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { RestError } from '@azure/core-rest-pipeline';
 import { getSdk, isLimitedCoins, timeoutBlock } from '.';
-import { assertNotNull, ensureEqual, randomName, randomString } from '../utils';
+import { assertNotNull, ensureEqual, indent, randomName, randomString } from '../utils';
 import {
   AeSdk,
   Name,
@@ -218,7 +218,9 @@ describe('Aens', () => {
   });
 
   it('calls contract using AENS name', async () => {
-    const sourceCode = 'contract Identity =' + '  entrypoint getArg(x : int) = x';
+    const sourceCode = indent`
+      contract Identity =
+        entrypoint getArg(x : int) = x`;
     interface ContractApi extends ContractMethodsBase {
       getArg: (x: number) => bigint;
     }

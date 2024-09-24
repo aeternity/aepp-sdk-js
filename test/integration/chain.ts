@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { stub } from 'sinon';
 import { getSdk, timeoutBlock } from '.';
 import { AeSdk, Tag, MemoryAccount, Encoded, Node, Contract } from '../../src';
-import { assertNotNull, bindRequestCounter } from '../utils';
+import { assertNotNull, bindRequestCounter, indent } from '../utils';
 
 describe('Node Chain', () => {
   let aeSdk: AeSdk;
@@ -190,7 +190,9 @@ describe('Node Chain', () => {
   it('multiple contract dry-runs calls at one request', async () => {
     const contract = await Contract.initialize<{ foo: (x: number) => bigint }>({
       ...aeSdk.getContext(),
-      sourceCode: 'contract Test =\n' + '  entrypoint foo(x : int) = x * 100',
+      sourceCode: indent`
+        contract Test =
+          entrypoint foo(x : int) = x * 100`,
     });
     await contract.$deploy([]);
     const { result } = await contract.foo(5);

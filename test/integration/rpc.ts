@@ -41,7 +41,7 @@ import { getBufferToSign } from '../../src/account/Memory';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
 import { getSdk, networkId, compilerUrl } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
-import { assertNotNull } from '../utils';
+import { assertNotNull, indent } from '../utils';
 
 const WindowPostMessageFake = (
   name: string,
@@ -130,7 +130,9 @@ describe('Aepp<->Wallet', () => {
     it('aepp can do static calls without connection to wallet', async () => {
       const contract = await Contract.initialize({
         ...aeSdk.getContext(),
-        sourceCode: 'contract Test =\n' + '  entrypoint getArg(x : int) = x',
+        sourceCode: indent`
+          contract Test =
+            entrypoint getArg(x : int) = x`,
       });
       await contract.$deploy([]);
       const aeppSdk = new AeSdkAepp({

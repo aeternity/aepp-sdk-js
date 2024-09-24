@@ -11,7 +11,7 @@ import {
   Encoded,
   Oracle,
 } from '../../src';
-import { ensureInstanceOf } from '../utils';
+import { ensureInstanceOf, indent } from '../utils';
 import { initializeChannels } from './channel-utils';
 
 const aeSdk = new AeSdkMethods({
@@ -32,7 +32,9 @@ async function initData(): Promise<void> {
   const params1 = { ...aeSdk.getContext(), onAccount: presetAccount1 };
   const contract1 = await Contract.initialize({
     ...params1,
-    sourceCode: '' + 'contract Identity =\n' + '  entrypoint getArg(x : int) = x',
+    sourceCode: indent`
+      contract Identity =
+        entrypoint getArg(x : int) = x`,
   });
   await contract1.$deploy([]);
   const name1 = new Name('123456789012345678901234567800.chain', params1);
@@ -52,14 +54,13 @@ async function initData(): Promise<void> {
 
   const contract2 = await Contract.initialize<{ spend: (a: Encoded.AccountAddress) => void }>({
     ...params2,
-    sourceCode:
-      '' +
-      'contract Test =\n' +
-      '  datatype event = Event1(int) | Event2(string, int)\n' +
-      '\n' +
-      '  stateful entrypoint spend(a : address) =\n' +
-      '    Chain.event(Event2("test-string", 43))\n' +
-      '    Chain.spend(a, 42)\n',
+    sourceCode: indent`
+      contract Test =
+        datatype event = Event1(int) | Event2(string, int)
+
+        stateful entrypoint spend(a : address) =
+          Chain.event(Event2("test-string", 43))
+          Chain.spend(a, 42)`,
   });
   await contract2.$deploy([], { amount: 100 });
   await contract2.spend(aeSdk.getContext().onAccount.address);

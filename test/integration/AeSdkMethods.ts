@@ -1,7 +1,7 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
-import { assertNotNull, ensureInstanceOf } from '../utils';
+import { assertNotNull, ensureInstanceOf, indent } from '../utils';
 import { AeSdkMethods, AccountBase, MemoryAccount, Contract } from '../../src';
 
 describe('AeSdkMethods', () => {
@@ -28,7 +28,9 @@ describe('AeSdkMethods', () => {
   it('created contract remains connected to sdk', async () => {
     const contract = await Contract.initialize({
       ...aeSdkMethods.getContext(),
-      sourceCode: '' + 'contract Identity =\n' + '  entrypoint getArg(x : int) = x',
+      sourceCode: indent`
+        contract Identity =
+          entrypoint getArg(x : int) = x`,
     });
     expect(contract.$options.onAccount?.address).to.be.eql(accounts[0].address);
     [, aeSdkMethods._options.onAccount] = accounts;
