@@ -1,7 +1,7 @@
 import browser from 'webextension-polyfill';
 import {
-  AeSdkWallet, CompilerHttp, Node, MemoryAccount, BrowserRuntimeConnection,
-  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
+  AeSdkWallet, CompilerHttp, Node, MemoryAccount, BrowserRuntimeConnection, WALLET_TYPE,
+  RpcConnectionDenyError, RpcRejectedByUserError, RpcNoNetworkById, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 
@@ -100,10 +100,10 @@ class AccountMemoryProtected extends MemoryAccount {
 
 const aeSdk = new AeSdkWallet({
   onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
-  nodes: [{
-    name: 'testnet',
-    instance: new Node('https://testnet.aeternity.io'),
-  }],
+  nodes: [
+    { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
+    { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
+  ],
   accounts: [
     new AccountMemoryProtected('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
     AccountMemoryProtected.generate(),
@@ -126,6 +126,17 @@ const aeSdk = new AeSdkWallet({
   },
   onSubscription: genConfirmCallback('subscription'),
   onAskAccounts: genConfirmCallback('get accounts'),
+  async onAskToSelectNetwork(aeppId, parameters, origin) {
+    await genConfirmCallback('select network')(aeppId, parameters, origin);
+    if (parameters.networkId) {
+      if (!this.pool.has(parameters.networkId)) throw new RpcNoNetworkById(parameters.networkId);
+      await this.selectNode(parameters.networkId);
+    } else {
+      this.pool.delete('by-aepp');
+      this.addNode('by-aepp', new Node(parameters.nodeUrl));
+      await this.selectNode('by-aepp');
+    }
+  },
 });
 // The `ExtensionProvider` uses the first account by default.
 // You can change active account using `selectAccount(address)` function

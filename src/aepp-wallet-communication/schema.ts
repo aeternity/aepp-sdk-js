@@ -198,6 +198,22 @@ rpcErrors.push(RpcInternalError);
 /**
  * @category exception
  */
+export class RpcNoNetworkById extends RpcError {
+  static override code = 13;
+
+  override code = 13;
+
+  constructor(networkId: string) {
+    super(`Wallet can't find a network by id "${networkId}"`);
+    this.data = networkId;
+    this.name = 'RpcNoNetworkById';
+  }
+}
+rpcErrors.push(RpcNoNetworkById);
+
+/**
+ * @category exception
+ */
 export class RpcMethodNotFoundError extends RpcError {
   static override code = -32601;
 

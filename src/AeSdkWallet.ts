@@ -14,6 +14,7 @@ import {
   Accounts,
   AeppApi,
   Network,
+  NetworkToSelect,
   RPC_VERSION,
   WalletApi,
   WalletInfo,
@@ -39,6 +40,10 @@ type OnDisconnect = (
 
 type OnAskAccounts = (
   clientId: string, params: undefined, origin: string
+) => void;
+
+type OnAskToSelectNetwork = (
+  clientId: string, params: NetworkToSelect, origin: string
 ) => void;
 
 interface RpcClientsInfo {
@@ -70,6 +75,8 @@ export default class AeSdkWallet extends AeSdk {
 
   onAskAccounts: OnAskAccounts;
 
+  onAskToSelectNetwork: OnAskToSelectNetwork;
+
   /**
    * @param options - Options
    * @param options.name - Wallet name
@@ -78,6 +85,8 @@ export default class AeSdkWallet extends AeSdk {
    * @param options.onConnection - Call-back function for incoming AEPP connection
    * @param options.onSubscription - Call-back function for incoming AEPP account subscription
    * @param options.onAskAccounts - Call-back function for incoming AEPP get address request
+   * @param options.onAskToSelectNetwork - Call-back function for incoming AEPP select network
+   * request. If the request is fine then this function should change the current network.
    * @param options.onDisconnect - Call-back function for disconnect event
    */
   constructor({
@@ -88,6 +97,7 @@ export default class AeSdkWallet extends AeSdk {
     onSubscription,
     onDisconnect,
     onAskAccounts,
+    onAskToSelectNetwork,
     ...options
   }: {
     id: string;
@@ -97,12 +107,14 @@ export default class AeSdkWallet extends AeSdk {
     onSubscription: OnSubscription;
     onDisconnect: OnDisconnect;
     onAskAccounts: OnAskAccounts;
+    onAskToSelectNetwork: OnAskToSelectNetwork;
   } & ConstructorParameters<typeof AeSdk>[0]) {
     super(options);
     this.onConnection = onConnection;
     this.onSubscription = onSubscription;
     this.onDisconnect = onDisconnect;
     this.onAskAccounts = onAskAccounts;
+    this.onAskToSelectNetwork = onAskToSelectNetwork;
     this.name = name;
     this.id = id;
     this._type = type;
@@ -316,6 +328,11 @@ export default class AeSdkWallet extends AeSdk {
             const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
             const signature = await this.signDelegation(delegation, parameters);
             return { signature };
+          },
+          [METHODS.updateNetwork]: async (params, origin) => {
+            if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
+            await this.onAskToSelectNetwork(id, params, origin);
+            return null;
           },
         },
       ),

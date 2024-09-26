@@ -31,6 +31,8 @@ type Icons = Array<{ src: string; sizes?: string; type?: string; purpose?: strin
 
 export const RPC_VERSION = 1;
 
+export type NetworkToSelect = { networkId: string } | { nodeUrl: string };
+
 export interface WalletApi {
   [METHODS.connect]: (
     p: { name: string; icons?: Icons; version: typeof RPC_VERSION; connectNode: boolean }
@@ -92,6 +94,8 @@ export interface WalletApi {
       onAccount: Encoded.AccountAddress;
     },
   ) => Promise<{ signature: Encoded.Signature }>;
+
+  [METHODS.updateNetwork]: (a: NetworkToSelect) => Promise<null>;
 }
 
 export interface AeppApi {

@@ -64,7 +64,7 @@
 import {
   MemoryAccount, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
-  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
+  RpcConnectionDenyError, RpcRejectedByUserError, RpcNoNetworkById, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import Value from './Value.vue';
@@ -229,6 +229,21 @@ export default {
         console.log('disconnected client', clientId);
         this.clientId = null;
       },
+      onAskToSelectNetwork: async (aeppId, parameters, origin) => {
+        await genConfirmCallback('select network')(aeppId, parameters, origin);
+        if (parameters.networkId) {
+          if (!this.aeSdk.pool.has(parameters.networkId)) {
+            throw new RpcNoNetworkById(parameters.networkId);
+          }
+          await this.aeSdk.selectNode(parameters.networkId);
+          this.nodeName = parameters.networkId;
+        } else {
+          this.aeSdk.pool.delete('by-aepp');
+          this.aeSdk.addNode('by-aepp', new Node(parameters.nodeUrl));
+          await this.aeSdk.selectNode('by-aepp');
+          this.nodeName = 'by-aepp';
+        }
+      }
     });
 
     if (this.runningInFrame) this.shareWalletInfo();

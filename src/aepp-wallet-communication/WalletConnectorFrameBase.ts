@@ -2,7 +2,7 @@ import EventEmitter from 'eventemitter3';
 import AccountRpc from '../account/Rpc';
 import { Encoded } from '../utils/encoder';
 import {
-  Accounts, RPC_VERSION, Network, WalletApi, AeppApi,
+  Accounts, RPC_VERSION, Network, WalletApi, AeppApi, NetworkToSelect,
 } from './rpc/types';
 import RpcClient from './rpc/RpcClient';
 import { METHODS, SUBSCRIPTION_TYPES } from './schema';
@@ -115,5 +115,12 @@ export default abstract class WalletConnectorFrameBase<T extends {}>
     const result = await this.#getRpcClient().request(METHODS.subscribeAddress, { type, value });
     this.#updateAccounts(result.address);
     return this.#accounts;
+  }
+
+  /**
+   * Ask wallet to select a network
+   */
+  async askToSelectNetwork(network: NetworkToSelect): Promise<void> {
+    await this.#getRpcClient().request(METHODS.updateNetwork, network);
   }
 }
