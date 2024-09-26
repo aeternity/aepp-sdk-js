@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-import { AeSdk, Node, generateKeyPair } from '@aeternity/aepp-sdk';
+import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk';
 
 const aeSdk = new AeSdk({
   nodes: [{
@@ -9,7 +9,7 @@ const aeSdk = new AeSdk({
 });
 
 (async () => {
-  const balance = await aeSdk.getBalance(generateKeyPair().publicKey);
+  const balance = await aeSdk.getBalance(MemoryAccount.generate().address);
   if (balance !== '0') console.error('Balance expected to be equal 0');
   else console.log('`instanceof RestError` check works correctly');
 })();

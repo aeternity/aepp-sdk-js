@@ -250,6 +250,16 @@ export class UnsupportedVersionError extends BaseError {
 /**
  * @category exception
  */
+export class LogicError extends BaseError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LogicError';
+  }
+}
+
+/**
+ * @category exception
+ */
 export class InternalError extends BaseError {
   constructor(message: string) {
     super(message);
@@ -573,16 +583,6 @@ export class InvalidChecksumError extends CryptographyError {
   constructor() {
     super('Invalid checksum');
     this.name = 'InvalidChecksumError';
-  }
-}
-
-/**
- * @category exception
- */
-export class InvalidPasswordError extends CryptographyError {
-  constructor() {
-    super('Invalid password or nonce');
-    this.name = 'InvalidPasswordError';
   }
 }
 

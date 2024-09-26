@@ -19,9 +19,9 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
 
   #onDisconnect?: () => void;
 
-  #target?: ImplPostMessage;
+  readonly #target?: ImplPostMessage;
 
-  #self: ImplPostMessage;
+  readonly #self: ImplPostMessage;
 
   /**
    * @param options - Options

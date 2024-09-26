@@ -1,18 +1,15 @@
 import BigNumber from 'bignumber.js';
 import { mapObject } from '../../utils/other';
 
+export const DRY_RUN_ACCOUNT = {
+  pub: 'ak_11111111111111111111111111111111273Yts',
+  amount: 100000000000000000000000000000000000n,
+} as const;
+
 export const MAX_AUTH_FUN_GAS = 50000;
 export type Int = number | string | BigNumber;
-// # AENS
 export type AensName = `${string}.chain`;
-export const NAME_TTL = 180000;
-// # max number of block into the future that the name is going to be available
-// # https://github.com/aeternity/protocol/blob/epoch-v0.22.0/AENS.md#update
-// # https://github.com/aeternity/protocol/blob/44a93d3aab957ca820183c3520b9daf6b0fedff4/AENS.md#aens-entry
-export const NAME_MAX_TTL = 36000;
-export const NAME_MAX_CLIENT_TTL = 84600;
-export const CLIENT_TTL = NAME_MAX_CLIENT_TTL;
-export const MIN_GAS_PRICE = 1e9;
+export const MIN_GAS_PRICE = 1e9; // TODO: don't use number for ae
 // # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
 export const NAME_FEE_MULTIPLIER = 1e14; // 100000000000000
 export const NAME_FEE_BID_INCREMENT = 0.05; // # the increment is in percentage
@@ -58,7 +55,6 @@ export const NAME_BID_RANGES = mapObject({
 }, ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)]);
 
 export enum ConsensusProtocolVersion {
-  Iris = 5,
   Ceres = 6,
 }
 
@@ -74,6 +70,7 @@ export enum VmVersion {
   Fate = 5,
   SophiaImprovementsLima = 6,
   Fate2 = 7,
+  Fate3 = 8,
 }
 
 /**
@@ -94,29 +91,20 @@ export enum AbiVersion {
  */
 // TODO: implement serialisation for commented-out tags
 export enum Tag {
-  Account = 10,
   SignedTx = 11,
   SpendTx = 12,
-  Oracle = 20,
-  // OracleQuery = 21,
   OracleRegisterTx = 22,
   OracleQueryTx = 23,
   OracleResponseTx = 24,
   OracleExtendTx = 25,
-  Name = 30,
-  // NameCommitment = 31,
   NameClaimTx = 32,
   NamePreclaimTx = 33,
   NameUpdateTx = 34,
   NameRevokeTx = 35,
   NameTransferTx = 36,
-  // NameAuction = 37,
-  Contract = 40,
-  ContractCall = 41,
   ContractCreateTx = 42,
   ContractCallTx = 43,
   ChannelCreateTx = 50,
-  // ChannelSetDelegatesTx = 501,
   ChannelDepositTx = 51,
   ChannelWithdrawTx = 52,
   ChannelForceProgressTx = 521,
@@ -125,33 +113,8 @@ export enum Tag {
   ChannelSlashTx = 55,
   ChannelSettleTx = 56,
   ChannelOffChainTx = 57,
-  ChannelOffChainUpdateTransfer = 570,
-  ChannelOffChainUpdateDeposit = 571,
-  ChannelOffChainUpdateWithdraw = 572,
-  ChannelOffChainUpdateCreateContract = 573,
-  ChannelOffChainUpdateCallContract = 574,
-  // ChannelOffChainUpdateMeta = 576,
-  ChannelClientReconnectTx = 575,
-  Channel = 58,
   ChannelSnapshotSoloTx = 59,
-  TreesPoi = 60,
-  // TreesDb = 61,
-  StateTrees = 62,
-  Mtree = 63,
-  MtreeValue = 64,
-  ContractsMtree = 621,
-  CallsMtree = 622,
-  ChannelsMtree = 623,
-  NameserviceMtree = 624,
-  OraclesMtree = 625,
-  AccountsMtree = 626,
-  // CompilerSophia = 70,
   GaAttachTx = 80,
   GaMetaTx = 81,
   PayingForTx = 82,
-  GaMetaTxAuthData = 810,
-  // KeyBlock = 100,
-  // MicroBlock = 101,
-  // LightMicroBlock = 102,
-  // Pof = 200,
 }

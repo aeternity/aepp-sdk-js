@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { snakeToPascal } from '../utils/string';
-import { buildTx, unpackTx } from '../tx/builder';
+import { unpackTx } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
 import * as handlers from './handlers';
 import {
@@ -20,9 +20,12 @@ import {
   ChannelMessage,
   ChannelEvents,
 } from './internal';
-import { ChannelError } from '../utils/errors';
+import { ChannelError, IllegalArgumentError } from '../utils/errors';
 import { Encoded } from '../utils/encoder';
 import { TxUnpacked } from '../tx/builder/schema.generated';
+import { EntryTag } from '../tx/builder/entry/constants';
+import { unpackEntry } from '../tx/builder/entry';
+import { EntUnpacked } from '../tx/builder/entry/schema.generated';
 
 function snakeToPascalObjKeys<Type>(obj: object): Type {
   return Object.entries(obj).reduce((result, [key, val]) => ({
@@ -30,6 +33,8 @@ function snakeToPascalObjKeys<Type>(obj: object): Type {
     [snakeToPascal(key)]: val,
   }), {}) as Type;
 }
+
+let channelCounter = 0;
 
 /**
  * Channel
@@ -81,66 +86,38 @@ export default class Channel {
 
   _options!: ChannelOptions;
 
+  readonly #debugId: number;
+
   _channelId?: Encoded.Channel;
+
+  protected constructor() {
+    channelCounter += 1;
+    this.#debugId = channelCounter;
+  }
+
+  _debug(...args: any[]): void {
+    if (this._options.debug !== true) return;
+    console.debug(`Channel #${this.#debugId}`, ...args);
+  }
 
   /**
    * @param options - Channel params
-   * @param options.url - Channel url (for example: "ws://localhost:3001")
-   * @param options.role - Participant role ("initiator" or "responder")
-   * @param options.initiatorId - Initiator's public key
-   * @param options.responderId - Responder's public key
-   * @param options.pushAmount - Initial deposit in favour of the responder by the initiator
-   * @param options.initiatorAmount - Amount of coins the initiator has committed to
-   * the channel
-   * @param options.responderAmount - Amount of coins the responder has committed to
-   * the channel
-   * @param options.channelReserve - The minimum amount both peers need to maintain
-   * @param options.ttl - Minimum block height to include the channel_create_tx
-   * @param options.host - Host of the responder's node
-   * @param options.port - The port of the responders node
-   * @param options.lockPeriod - Amount of blocks for disputing a solo close
-   * @param options.minimumDepthStrategy - How to calculate minimum depth (default: txfee)
-   * @param options.minimumDepth - The minimum amount of blocks to be mined
-   * @param options.fee - The fee to be used for the channel open transaction
-   * @param options.gasPrice - Used for the fee computation of the channel open transaction
-   * @param options.existingChannelId - Existing channel id (required if reestablishing a
-   * channel)
-   * @param options.offchainTx - Offchain transaction (required if reestablishing
-   * a channel)
-   * @param options.timeoutIdle - The time waiting for a new event to be initiated
-   * (default: 600000)
-   * @param options.timeoutFundingCreate - The time waiting for the initiator to produce
-   * the create channel transaction after the noise session had been established (default: 120000)
-   * @param options.timeoutFundingSign - The time frame the other client has to sign an
-   * off-chain update after our client had initiated and signed it. This applies only for double
-   * signed on-chain intended updates: channel create transaction, deposit, withdrawal and etc.
-   * (default: 120000)
-   * @param options.timeoutFundingLock - The time frame the other client has to confirm an
-   * on-chain transaction reaching maturity (passing minimum depth) after the local node has
-   * detected this. This applies only for double signed on-chain intended updates: channel create
-   * transaction, deposit, withdrawal and etc. (default: 360000)
-   * @param options.timeoutSign - The time frame the client has to return a signed
-   * off-chain update or to decline it. This applies for all off-chain updates (default: 500000)
-   * @param options.timeoutAccept - The time frame the other client has to react to an
-   * event. This applies for all off-chain updates that are not meant to land on-chain, as well as
-   * some special cases: opening a noise connection, mutual closing acknowledgement and
-   * reestablishing an existing channel (default: 120000)
-   * @param options.timeoutInitialized - the time frame the responder has to accept an
-   * incoming noise session. Applicable only for initiator (default: timeout_accept's value)
-   * @param options.timeoutAwaitingOpen - The time frame the initiator has to start an
-   * outgoing noise session to the responder's node. Applicable only for responder (default:
-   * timeout_idle's value)
-   * @param options.debug=false - Log websocket communication
-   * @param options.sign - Function which verifies and signs transactions
    */
   static async initialize(options: ChannelOptions): Promise<Channel> {
     return Channel._initialize(new Channel(), options);
   }
 
   static async _initialize<T extends Channel>(channel: T, options: ChannelOptions): Promise<T> {
+    const reconnect = (options.existingFsmId ?? options.existingChannelId) != null;
+    if (reconnect && (options.existingFsmId == null || options.existingChannelId == null)) {
+      throw new IllegalArgumentError('`existingChannelId`, `existingFsmId` should be both provided or missed');
+    }
+    const reconnectHandler = handlers[
+      options.reestablish === true ? 'awaitingReestablish' : 'awaitingReconnection'
+    ];
     await initialize(
       channel,
-      options.existingFsmId != null ? handlers.awaitingReconnection : handlers.awaitingConnection,
+      reconnect ? reconnectHandler : handlers.awaitingConnection,
       handlers.channelOpen,
       options,
     );
@@ -200,10 +177,10 @@ export default class Channel {
    * Get current state
    */
   async state(): Promise<{
-    calls: TxUnpacked & { tag: Tag.CallsMtree };
+    calls: EntUnpacked & { tag: EntryTag.CallsMtree };
     halfSignedTx?: TxUnpacked & { tag: Tag.SignedTx };
     signedTx?: TxUnpacked & { tag: Tag.SignedTx };
-    trees: TxUnpacked & { tag: Tag.StateTrees };
+    trees: EntUnpacked & { tag: EntryTag.StateTrees };
   }> {
     const res = snakeToPascalObjKeys<{
       calls: Encoded.CallStateTree;
@@ -212,10 +189,10 @@ export default class Channel {
       trees: Encoded.StateTrees;
     }>(await call(this, 'channels.get.offchain_state', {}));
     return {
-      calls: unpackTx(res.calls, Tag.CallsMtree),
+      calls: unpackEntry(res.calls),
       ...res.halfSignedTx !== '' && { halfSignedTx: unpackTx(res.halfSignedTx, Tag.SignedTx) },
       ...res.signedTx !== '' && { signedTx: unpackTx(res.signedTx, Tag.SignedTx) },
-      trees: unpackTx(res.trees, Tag.StateTrees),
+      trees: unpackEntry(res.trees),
     };
   }
 
@@ -279,8 +256,7 @@ export default class Channel {
    * signed state and then terminates.
    *
    * The channel can be reestablished by instantiating another Channel instance
-   * with two extra params: existingChannelId and offchainTx (returned from leave
-   * method as channelId and signedTx respectively).
+   * with two extra params: existingChannelId and existingFsmId.
    *
    * @example
    * ```js
@@ -290,7 +266,7 @@ export default class Channel {
    * })
    * ```
    */
-  async leave(): Promise<{ channelId: Encoded.Bytearray; signedTx: Encoded.Transaction }> {
+  async leave(): Promise<{ channelId: Encoded.Channel; signedTx: Encoded.Transaction }> {
     return this.enqueueAction(() => {
       notify(this, 'channels.leave');
       return { handler: handlers.awaitingLeave };
@@ -318,18 +294,6 @@ export default class Channel {
         handler: handlers.awaitingShutdownTx,
         state: { sign },
       };
-    });
-  }
-
-  static async reconnect(options: ChannelOptions, txParams: any): Promise<Channel> {
-    const { sign } = options;
-
-    return Channel.initialize({
-      ...options,
-      reconnectTx: await sign(
-        'reconnect',
-        buildTx({ ...txParams, tag: Tag.ChannelClientReconnectTx }),
-      ),
     });
   }
 }

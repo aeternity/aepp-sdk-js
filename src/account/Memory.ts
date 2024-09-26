@@ -1,7 +1,6 @@
+import nacl from 'tweetnacl';
 import AccountBase from './Base';
-import {
-  generateKeyPairFromSecret, sign, generateKeyPair, hash, messageToHash,
-} from '../utils/crypto';
+import { hash, messageToHash, messagePrefixLength } from '../utils/crypto';
 import { ArgumentError } from '../utils/errors';
 import {
   decode, encode, Encoded, Encoding,
@@ -10,8 +9,6 @@ import { concatBuffers } from '../utils/other';
 import { hashTypedData, AciValue } from '../utils/typed-data';
 import { buildTx } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
-
-const secretKeys = new WeakMap();
 
 export function getBufferToSign(
   transaction: Encoded.Transaction,
@@ -30,32 +27,29 @@ export function getBufferToSign(
 export default class AccountMemory extends AccountBase {
   override readonly address: Encoded.AccountAddress;
 
+  readonly #secretKeyDecoded: Uint8Array;
+
   /**
    * @param secretKey - Secret key
    */
-  constructor(secretKey: string | Uint8Array) {
+  constructor(public readonly secretKey: Encoded.AccountSecretKey) {
     super();
-    secretKey = typeof secretKey === 'string' ? Buffer.from(secretKey, 'hex') : secretKey;
-    if (secretKey.length !== 64) {
-      throw new ArgumentError('secretKey', '64 bytes', secretKey.length);
-    }
-    secretKeys.set(this, secretKey);
-    this.address = encode(
-      generateKeyPairFromSecret(secretKeys.get(this)).publicKey,
-      Encoding.AccountAddress,
-    );
+    const keyPair = nacl.sign.keyPair.fromSeed(decode(secretKey));
+    this.#secretKeyDecoded = keyPair.secretKey;
+    this.address = encode(keyPair.publicKey, Encoding.AccountAddress);
   }
 
   /**
    * Generates a new AccountMemory using a random secret key
    */
   static generate(): AccountMemory {
-    return new AccountMemory(generateKeyPair().secretKey);
+    const secretKey = encode(nacl.randomBytes(32), Encoding.AccountSecretKey);
+    return new AccountMemory(secretKey);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override async sign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
-    return sign(data, secretKeys.get(this));
+    return nacl.sign.detached(Buffer.from(data), this.#secretKeyDecoded);
   }
 
   override async signTransaction(
@@ -87,6 +81,18 @@ export default class AccountMemory extends AccountBase {
       name, version, networkId, contractAddress,
     });
     const signature = await this.sign(dHash, options);
+    return encode(signature, Encoding.Signature);
+  }
+
+  override async signDelegation(
+    delegation: Encoded.Bytearray,
+    { networkId }: { networkId?: string } = {},
+  ): Promise<Encoded.Signature> {
+    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
+    const payload = concatBuffers([
+      messagePrefixLength, new Uint8Array([1]), Buffer.from(networkId), decode(delegation),
+    ]);
+    const signature = await this.sign(payload);
     return encode(signature, Encoding.Signature);
   }
 }

@@ -27,6 +27,8 @@ run_node_example contract-interaction.mjs
 run_node_example paying-for-contract-call-tx.mjs
 run_node_example paying-for-spend-tx.mjs
 run_node_example transfer-ae.mjs
+run_node_example dry-run-using-debug-endpoint.mjs
+run_node_example oracle.mjs
 
 # TODO: revisit --ignore-scripts after solving https://github.com/npm/cli/issues/4202
 perl -i -pe 's/"prepare"/"rem-prepare"/g' package.json
@@ -34,7 +36,7 @@ perl -i -pe 's/"prepare"/"rem-prepare"/g' package.json
 echo Build vue-cli-4-autorest test
 cd ./test/environment/vue-cli-4-autorest
 npm i
-npm run build
+NODE_OPTIONS=--openssl-legacy-provider npm run build
 cd ../../..
 
 perl -i -pe 's/"rem-prepare"/"prepare"/g' package.json

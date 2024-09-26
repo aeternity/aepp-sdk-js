@@ -1,14 +1,33 @@
-version: '3'
 services:
   node:
-    image: aeternity/aeternity:v6.8.1
-    hostname: node
-    ports: ["3013:3013", "3113:3113", "3014:3014", "3114:3114"]
+    # TODO: switch to master after merging https://github.com/aeternity/aeternity/pull/4303
+    image: aeternity/aeternity:v7.2.0-bundle
+    # TODO: remove 3313 port after merging https://github.com/aeternity/aeternity/pull/4303
+    ports: [3013:3013, 3113:3113, 3014:3014, 3313:3313]
+    # TODO: remove after releasing https://github.com/aeternity/aeternity/pull/4292
+    healthcheck:
+      interval: 2s
     volumes:
-      - ./docker/aeternity_node_mean16.yaml:/home/aeternity/node/aeternity.yaml
-      - ./docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
+      - ./docker/aeternity.yaml:/home/aeternity/node/aeternity.yaml
+    stop_grace_period: 0s
+
+  emitter:
+    build: test/emitter
+    depends_on:
+      node:
+        condition: service_healthy
 
   compiler:
-    image: aeternity/aesophia_http:v7.4.0
-    hostname: compiler
-    ports: ["3080:3080"]
+    image: aeternity/aesophia_http:v8.0.0
+    ports: [3080:3080]
+    # TODO: remove after releasing https://github.com/aeternity/aesophia_http/pull/133
+    healthcheck:
+      interval: 2s
+
+  middleware:
+    # TODO: use upstream after solving https://github.com/aeternity/ae_mdw/issues/1758
+    image: davidyuk/temp:mdw-dev-mode-1.81.0
+    ports: [4000:4000, 4001:4001, 4013:3013, 4014:3014, 4313:3313]
+    volumes:
+      - ./docker/middleware.yaml:/home/aeternity/aeternity.yaml
+    stop_grace_period: 0s

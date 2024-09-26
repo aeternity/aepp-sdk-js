@@ -2,7 +2,7 @@ import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import {
-  AeSdk, Node, InvalidTxError, ArgumentError, Tag, MemoryAccount, verifyTransaction,
+  AeSdk, Node, InvalidTxError, ArgumentError, Tag, MemoryAccount, verifyTransaction, buildTxAsync,
 } from '../../src';
 
 describe('Verify Transaction', () => {
@@ -75,13 +75,21 @@ describe('Verify Transaction', () => {
   });
 
   it('verifies nameFee for nameClaim transaction', async () => {
-    const tx = 'tx_+KILAfhCuEDpKJambBPcIhemdxhFNwweD8QlInCqNQY2EHyCuP/gQZOyute/X1PxlWpbsOqvEwIqOFRIlr3kgXNhSAaIC9wEuFr4WCACoQE0ePUJYiVSDsuUDUOsQUw2XGWtPSLDefg5djhul3bfqgORc29tZUF1Y3Rpb24uY2hhaW6HDwTrMteR15AJQ0VVyE5TcqKSstgfbGV6hg9HjghAAABn0LtV';
-    const errors = await verifyTransaction(tx, node);
-    expect(errors.map(({ key }) => key)).to.include('InsufficientBalance');
+    const nameClaim = await buildTxAsync({
+      tag: Tag.NameClaimTx,
+      accountId: aeSdk.address,
+      name: 'someAuction.chain',
+      nameSalt: 42,
+      nameFee: 1e20,
+      onNode: node,
+    });
+    const nameClaimSigned = await aeSdk.signTransaction(nameClaim);
+    const errors = await verifyTransaction(nameClaimSigned, node);
+    expect(errors.map(({ key }) => key)).to.eql(['InsufficientBalance']);
   });
 
   it('verifies contractId for contractCall transaction', async () => {
-    const contractCall = 'tx_+GIrAaEBSzqoqjLLKO9NzXLgIBsTC+sNe5ronuTV/lr8IBJNlAECoQV/aqb9TshuuhhzeovvJCD/WmSOnqF8RCu4eY8hXYg/DgOGpYctWWAAAACCE4iEO5rKAIgrEYB4IJIbCmfzF0w=';
+    const contractCall = 'tx_+GIrAaEBSzqoqjLLKO9NzXLgIBsTC+sNe5ronuTV/lr8IBJNlAECoQVsu3CPls4zVNRpYBFsOpvTFqgOE181MuyfIhOyaTAbZQOGpYctWWAAAACCE4iEO5rKAIgrEYB4IJIbCjOz7+M=';
     const errors = await verifyTransaction(contractCall, node);
     expect(errors.map(({ key }) => key)).to.include('ContractNotFound');
   });

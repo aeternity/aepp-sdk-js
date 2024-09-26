@@ -3,21 +3,18 @@ directive:
   - from: openapi-document
     where: $.components.schemas
     transform: >
+      if ($doc.info.title === 'node') return $;
       ['UInt', 'UInt16', 'UInt32', 'UInt64', 'TxBlockHeight'].forEach(key => {
-        if (!$[key].oneOf) return;
-        $[key] = $[key].oneOf.find(({ type }) => type === 'string');
+        $[key] = $[key].oneOf.find(({ type }) => type === 'integer');
+      });
+      const { utilization } = $.GasPrices.items.properties;
+      Object.assign(utilization, {
+        oneOf: undefined,
+        ...utilization.oneOf.find(({ type }) => type === 'integer'),
       });
     reason:
       fix parsing of big numbers
       remove after fixing https://github.com/aeternity/aeternity/issues/3891
-
-  - from: openapi-document
-    where: $.components.schemas
-    transform: >
-      if ($doc.info.title === 'node') return $;
-      $.ContractCallObject.properties.return_type.enum = ['ok', 'error', 'revert'];
-      $.GAObject.properties.return_type.enum = ['ok', 'error'];
-    reason: add missed enums https://github.com/aeternity/aeternity/pull/3953
 
   - from: openapi-document
     where: $.components.schemas
@@ -73,7 +70,7 @@ directive:
     where: $.components.schemas.Tx
     transform: >
       if ($doc.info.title === 'node') return $;
-      const base = $.allOf[0];
+      const { discriminator, ...base } = $.allOf[0];
       const transactions = base.properties.type.enum.map(txName => $doc.components.schemas[txName]);
       return {
         ...base,
@@ -103,11 +100,21 @@ directive:
     reason: use more precise form to avoid oneOf
 
   - from: openapi-document
-    where: $.paths.*.*.parameters[?(@.$ref && !@.$ref.includes('intAsString'))]
+    where: $.paths.*.*.parameters
+    transform: return $.filter(({ $ref }) => !$ref?.endsWith('intAsString'))
+    reason: remove intAsString parameter from paths
+
+  - from: openapi-document
+    where: $.components.parameters
+    transform: 'return { ...$, intAsString: undefined }'
+    reason: remove intAsString parameter from components
+
+  - from: openapi-document
+    where: $.paths.*.*.parameters[?(@.$ref)]
     transform: >
       const relativePath = $.$ref.replace(/^#\//, '').split('/');
       return relativePath.reduce((o, p) => o[p], $doc);
-    reason: remove commonly required parameters from the generated context, probably autorest bug
+    reason: keep parameters in method options instead instance options
 
   - from: openapi-document
     where: $.servers
@@ -137,6 +144,15 @@ directive:
       https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
 
   - from: openapi-document
+    where: $..properties.time
+    set:
+      type: 'integer'
+      format: 'unixtime'
+    reason: >
+      Convert time as milliseconds to dates
+      https://github.com/aeternity/aeternity/issues/4386
+
+  - from: openapi-document
     where: $.components.schemas
     transform: >
       $.SignedTx.required.push('block_height', 'block_hash', 'hash', 'signatures');
@@ -150,11 +166,11 @@ directive:
     set: node
     reason: the whole SDK already about aeternity
 
-version: ^3.6.3
+version: ^3.7.1
 use-extension:
-  '@autorest/typescript': ^6.0.2
-  '@autorest/modelerfour': ^4.26.2
-input-file: https://raw.githubusercontent.com/aeternity/aeternity/v6.5.2/apps/aehttp/priv/oas3.yaml
+  '@autorest/typescript': ^6.0.23
+  '@autorest/modelerfour': ^4.27.0
+input-file: https://raw.githubusercontent.com/aeternity/aeternity/v7.1.0/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
 generator: typescript

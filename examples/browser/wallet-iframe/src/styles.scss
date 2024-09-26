@@ -6,7 +6,7 @@ body {
   @extend .bg-gray-300;
 
   #app {
-    @extend .p-4, .flex, .flex-col, .w-full, .h-screen;
+    @extend .p-4, .flex, .flex-col, .w-full, .min-h-screen;
 
     iframe {
       @extend .flex-grow, .mt-4, .bg-white, .border, .border-black, .border-dashed;
@@ -24,6 +24,10 @@ button {
 
 h2 {
   @extend .mt-2, .font-bold, .text-2xl;
+}
+
+input:not([type=radio]):not([type=checkbox]), textarea {
+  @extend .bg-gray-900, .text-white, .p-2, .w-full;
 }
 
 .group {

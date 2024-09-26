@@ -3,15 +3,20 @@ import shortUInt from './short-u-int';
 import Node from '../../../Node';
 import { ArgumentError } from '../../../utils/errors';
 import { NextNonceStrategy } from '../../../apis/node';
+import { Tag } from '../constants';
 
 export default function genNonceField<SenderKey extends string>(senderKey: SenderKey): {
-  serialize: (value: number) => Buffer;
+  serialize: (value: number, params: { tag: Tag }) => Buffer;
   // TODO: (value: number) => Promise<number> | (value: undefined, ...) => Promise<number>
   prepare: (
     value: number | undefined,
     params: {},
     // TODO: replace `string` with AddressEncodings
-    options: { [key in SenderKey]: string } & { strategy?: NextNonceStrategy; onNode?: Node },
+    options: { [key in SenderKey]: string } & {
+      strategy?: NextNonceStrategy;
+      onNode?: Node;
+      _isInternalBuild?: boolean;
+    },
   ) => Promise<number>;
   deserialize: (value: Buffer) => number;
   senderKey: string;
@@ -19,8 +24,17 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
   return {
     ...shortUInt,
 
+    serialize(value: number, { tag }): Buffer {
+      if (Tag.GaAttachTx === tag && value !== 1) {
+        throw new ArgumentError('nonce', 'equal 1 if GaAttachTx', value);
+      }
+      return shortUInt.serialize(value);
+    },
+
     async prepare(value, params, options) {
       if (value != null) return value;
+      // TODO: uncomment the below line
+      // if (options._isInternalBuild === true) return 0;
       const { onNode, strategy } = options;
       const senderId = options[senderKey];
       const requirement = 'provided (or provide `nonce` instead)';

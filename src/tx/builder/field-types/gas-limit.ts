@@ -1,7 +1,7 @@
 import { IllegalArgumentError } from '../../../utils/errors';
-import { MIN_GAS_PRICE, Tag, MAX_AUTH_FUN_GAS } from '../constants';
+import { Tag, MAX_AUTH_FUN_GAS } from '../constants';
 import shortUInt from './short-u-int';
-import { buildFee } from './fee';
+import { buildGas } from './fee';
 import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
 
 function calculateGasLimitMax(
@@ -10,7 +10,7 @@ function calculateGasLimitMax(
   unpackTx: typeof unpackTxType,
   buildTx: typeof buildTxType,
 ): number {
-  return gasMax - +buildFee(rebuildTx(gasMax), unpackTx, buildTx).dividedBy(MIN_GAS_PRICE);
+  return gasMax - +buildGas(rebuildTx(gasMax), unpackTx, buildTx);
 }
 
 export default {
@@ -33,7 +33,7 @@ export default {
 
     const gasLimitMax = tag === Tag.GaMetaTx ? MAX_AUTH_FUN_GAS : calculateGasLimitMax(
       gasMax,
-      (gasLimit) => rebuildTx({ _computingGasLimit: gasLimit, _pickBiggerFee: true }),
+      (gasLimit) => rebuildTx({ _computingGasLimit: gasLimit, _canIncreaseFee: true }),
       unpackTx,
       buildTx,
     );

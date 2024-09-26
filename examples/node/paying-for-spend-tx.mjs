@@ -15,7 +15,6 @@
 
 // ## 1. Specify imports
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-// Additionally you import the `generateKeyPair` utility function to generate a new keypair.
 import {
   AeSdk, Node, MemoryAccount, Tag,
 } from '@aeternity/aepp-sdk';
@@ -26,7 +25,7 @@ import {
 
 // ## 2. Define constants
 // The following constants are used in the subsequent code snippets.
-const PAYER_ACCOUNT_SECRET_KEY = '9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200';
+const PAYER_ACCOUNT_SECRET_KEY = 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf';
 const NODE_URL = 'https://testnet.aeternity.io';
 const AMOUNT = 1;
 

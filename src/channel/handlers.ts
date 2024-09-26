@@ -143,18 +143,40 @@ export function awaitingConnection(
   }
 }
 
+export async function awaitingReestablish(
+  channel: Channel,
+  message: ChannelMessage,
+  state: ChannelState,
+): Promise<ChannelFsm> {
+  if (message.method === 'channels.info' && message.params.data.event === 'fsm_up') {
+    channel._fsmId = message.params.data.fsm_id;
+    return {
+      handler: function awaitingChannelReestablished(
+        _: Channel,
+        message2: ChannelMessage,
+        state2: ChannelState,
+      ): ChannelFsm | undefined {
+        if (
+          message2.method === 'channels.info'
+          && message2.params.data.event === 'channel_reestablished'
+        ) return { handler: awaitingOpenConfirmation };
+        return handleUnexpectedMessage(channel, message2, state2);
+      },
+    };
+  }
+  return handleUnexpectedMessage(channel, message, state);
+}
+
 export async function awaitingReconnection(
   channel: Channel,
   message: ChannelMessage,
   state: ChannelState,
 ): Promise<ChannelFsm> {
-  if (message.method === 'channels.info') {
-    if (message.params.data.event === 'fsm_up') {
-      channel._fsmId = message.params.data.fsm_id;
-      const { signedTx } = await channel.state();
-      changeState(channel, signedTx == null ? '' : buildTx(signedTx));
-      return { handler: channelOpen };
-    }
+  if (message.method === 'channels.info' && message.params.data.event === 'fsm_up') {
+    channel._fsmId = message.params.data.fsm_id;
+    const { signedTx } = await channel.state();
+    changeState(channel, signedTx == null ? '' : buildTx(signedTx));
+    return { handler: channelOpen };
   }
   return handleUnexpectedMessage(channel, message, state);
 }
@@ -220,18 +242,25 @@ export function awaitingOnChainTx(
 function awaitingOpenConfirmation(
   channel: Channel,
   message: ChannelMessage,
+  state: ChannelState,
 ): ChannelFsm | undefined {
   if (message.method === 'channels.info' && message.params.data.event === 'open') {
     channel._channelId = message.params.channel_id;
     return {
-      handler(_: Channel, message2: ChannelMessage): ChannelFsm | undefined {
+      handler: function awaitingChannelsUpdate(
+        _: Channel,
+        message2: ChannelMessage,
+        state2: ChannelState,
+      ): ChannelFsm | undefined {
         if (message2.method === 'channels.update') {
           changeState(channel, message2.params.data.state);
           return { handler: channelOpen };
         }
+        return handleUnexpectedMessage(channel, message2, state2);
       },
     };
   }
+  return handleUnexpectedMessage(channel, message, state);
 }
 
 export async function channelOpen(

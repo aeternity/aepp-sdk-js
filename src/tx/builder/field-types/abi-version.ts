@@ -12,7 +12,7 @@ export default {
   serialize(
     value: AbiVersion | undefined,
     { tag }: { tag: Tag },
-    { consensusProtocolVersion = ConsensusProtocolVersion.Iris }:
+    { consensusProtocolVersion = ConsensusProtocolVersion.Ceres }:
     { consensusProtocolVersion?: ConsensusProtocolVersion },
   ): Buffer {
     const result = value ?? this._getProtocolDetails(consensusProtocolVersion, tag);

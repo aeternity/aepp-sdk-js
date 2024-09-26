@@ -89,7 +89,6 @@ export default class AeSdkAepp extends AeSdkBase {
    * @param options - Options
    * @param options.connectNode - Request wallet to bind node
    * @param options.name - Node name
-   * @param options.select - Select this node as current
    */
   async connectToWallet(
     connection: BrowserConnection,
@@ -148,7 +147,7 @@ export default class AeSdkAepp extends AeSdkBase {
    * @returns Addresses from wallet
    */
   async askAddresses(): Promise<Encoded.AccountAddress[]> {
-    this._ensureAccountAccess();
+    this._ensureConnected();
     return this.rpcClient.request(METHODS.address, undefined);
   }
 

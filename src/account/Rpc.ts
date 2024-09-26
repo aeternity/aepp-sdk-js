@@ -1,7 +1,9 @@
 import AccountBase from './Base';
 import { METHODS } from '../aepp-wallet-communication/schema';
-import { ArgumentError, NotImplementedError, UnsupportedProtocolError } from '../utils/errors';
-import { Encoded } from '../utils/encoder';
+import { ArgumentError, UnsupportedProtocolError } from '../utils/errors';
+import {
+  Encoded, Encoding, decode, encode,
+} from '../utils/encoder';
 import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
 import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
 
@@ -23,9 +25,11 @@ export default class AccountRpc extends AccountBase {
     this.address = address;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async sign(): Promise<Uint8Array> {
-    throw new NotImplementedError('RAW signing using wallet');
+  async sign(dataRaw: string | Uint8Array): Promise<Uint8Array> {
+    const data = encode(Buffer.from(dataRaw), Encoding.Bytearray);
+    const { signature } = await this._rpcClient
+      .request(METHODS.unsafeSign, { onAccount: this.address, data });
+    return decode(signature);
   }
 
   override async signTransaction(
@@ -67,6 +71,14 @@ export default class AccountRpc extends AccountBase {
       aci,
       data,
     });
+    return signature;
+  }
+
+  override async signDelegation(delegation: Encoded.Bytearray): Promise<Encoded.Signature> {
+    const { signature } = await this._rpcClient.request(
+      METHODS.signDelegation,
+      { delegation, onAccount: this.address },
+    );
     return signature;
   }
 }

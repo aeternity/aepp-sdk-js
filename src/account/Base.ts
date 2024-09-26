@@ -55,8 +55,8 @@ export default abstract class AccountBase {
 
   /**
    * Sign typed data
-   * @param type - Type of data to sign
    * @param data - Encoded data to sign
+   * @param aci - Type of data to sign
    * @param options - Options
    * @returns Signature
    */
@@ -75,10 +75,31 @@ export default abstract class AccountBase {
    * @param options - Options
    * @returns Signature
    */
-  abstract sign(data: string | Uint8Array, options?: any): Promise<Uint8Array>;
+  abstract sign(
+    data: string | Uint8Array,
+    options?: {
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+  ): Promise<Uint8Array>;
 
   /**
    * Account address
    */
   readonly address!: Encoded.AccountAddress;
+
+  /**
+   * Sign delegation, works only in Ceres
+   * @param delegation - Delegation to sign
+   * @param options - Options
+   * @returns Signature
+   */
+  abstract signDelegation(
+    delegation: Encoded.Bytearray,
+    options?: {
+      networkId?: string;
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+  ): Promise<Encoded.Signature>;
 }

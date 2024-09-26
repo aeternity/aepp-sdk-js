@@ -1,6 +1,8 @@
 #!/usr/bin/env node
+import {
+  Node, AeSdk, MemoryAccount, Name,
 // eslint-disable-next-line import/extensions
-import { Node, AeSdk, MemoryAccount } from '../../es/index.mjs';
+} from '../../es/index.mjs';
 
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: new Node('https://testnet.aeternity.io') }],
@@ -14,15 +16,15 @@ console.assert(status === 200, 'Invalid faucet response code', status);
 const pauseUntilLoadBalancerGetSynced = () => new Promise((resolve) => {
   setTimeout(resolve, 1000);
 });
-const name = `test-${Math.random().toString(16).slice(2)}.chain`;
+const name = new Name(`test-${Math.random().toString(16).slice(2)}.chain`, aeSdk.getContext());
 const options = { waitMined: false };
 const txHashes = [];
 
-const preclaim = await aeSdk.aensPreclaim(name, options);
+const preclaim = await name.preclaim(options);
 txHashes.push(preclaim.hash);
 
 await pauseUntilLoadBalancerGetSynced();
-const claim = await aeSdk.aensClaim(name, preclaim.salt, options);
+const claim = await name.claim(options);
 txHashes.push(claim.hash);
 
 let res;

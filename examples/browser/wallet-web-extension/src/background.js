@@ -1,8 +1,9 @@
 import browser from 'webextension-polyfill';
 import {
-  AeSdkWallet, CompilerHttp, Node, MemoryAccount, generateKeyPair, BrowserRuntimeConnection,
-  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, decodeFateValue,
+  AeSdkWallet, CompilerHttp, Node, MemoryAccount, BrowserRuntimeConnection,
+  WALLET_TYPE, RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
+import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 
 function stringifyBigint(value) {
   return JSON.stringify(
@@ -67,28 +68,44 @@ class AccountMemoryProtected extends MemoryAccount {
 
   async signTypedData(data, aci, { aeppRpcClientId: id, aeppOrigin, ...options }) {
     if (id != null) {
+      const dataType = new TypeResolver().resolveType(aci);
+      const decodedData = new ContractByteArrayEncoder().decodeWithType(data, dataType);
       const opt = {
-        ...options, aci, data, decodedData: decodeFateValue(data, aci),
+        ...options, aci, data, decodedData,
       };
       await genConfirmCallback('sign typed data')(id, opt, aeppOrigin);
     }
     return super.signTypedData(data, aci, options);
   }
 
+  async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+    if (id != null) {
+      await genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);
+    }
+    return super.sign(data, options);
+  }
+
+  async signDelegation(delegation, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+    if (id != null) {
+      const opt = { ...options, ...unpackDelegation(delegation) };
+      await genConfirmCallback('sign delegation')(id, opt, aeppOrigin);
+    }
+    return super.signDelegation(delegation, options);
+  }
+
   static generate() {
-    // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
-    return new AccountMemoryProtected(generateKeyPair().secretKey);
+    return new AccountMemoryProtected(super.generate().secretKey);
   }
 }
 
 const aeSdk = new AeSdkWallet({
-  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+  onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
   nodes: [{
     name: 'testnet',
     instance: new Node('https://testnet.aeternity.io'),
   }],
   accounts: [
-    new AccountMemoryProtected('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'),
+    new AccountMemoryProtected('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
     AccountMemoryProtected.generate(),
   ],
   id: browser.runtime.id,

@@ -1,0 +1,5033 @@
+components:
+  parameters:
+    DirectionParam:
+      description: Sorts results in forwards or backwards direction
+      in: query
+      name: direction
+      schema:
+        enum:
+        - forward
+        - backward
+        type: string
+    LimitParam:
+      description: Limit paginated resources (max 100)
+      in: query
+      name: limit
+      schema:
+        default: 10
+        maximum: 100
+        minimum: 1
+        type: integer
+    ScopeParam:
+      description: Scopes results in a txi or generation range
+      in: query
+      name: scope
+      schema:
+        pattern: (txi|gen):\d+(-\d+)?
+        type: string
+  schemas:
+    AccountAddress:
+      description: Account address
+      example: ak_psy8tRXPzGxh6975H7K6XQcMFVsdrxJMt7YkzMY8oUTevutzw
+      pattern: ^ak_\w{38,50}$
+      type: string
+    Activity:
+      description: Activity related to an account
+      properties:
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        block_time:
+          description: The time in which the block happened
+          example: 1587577771376
+          type: integer
+        height:
+          description: The block height
+          type: integer
+        payload:
+          oneOf:
+          - $ref: '#/components/schemas/Transaction'
+          - $ref: '#/components/schemas/Aex9TransferEvent'
+          - $ref: '#/components/schemas/Aex141TransferEvent'
+          - $ref: '#/components/schemas/InternalContractCallEvent'
+          - $ref: '#/components/schemas/InternalTransferEvent'
+          type: object
+        type:
+          description: The event type
+          enum:
+          - SpendTxEvent
+          - OracleRegisterTxEvent
+          - OracleExtendTxEvent
+          - OracleQueryTxEvent
+          - OracleResponseTxEvent
+          - NamePreclaimTxEvent
+          - NameClaimTxEvent
+          - NameTransferTxEvent
+          - NameUpdateTxEvent
+          - NameRevokeTxEvent
+          - ContractCreateTxEvent
+          - ContractCallTxEvent
+          - GaAttachTxEvent
+          - GaMetaTxEvent
+          - ChannelCreateTxEvent
+          - ChannelDepositTxEvent
+          - ChannelWithdrawTxEvent
+          - ChannelForceProgressTxEvent
+          - ChannelCloseMutualTxEvent
+          - ChannelCloseSoloTxEvent
+          - ChannelSlashTxEvent
+          - ChannelSettleTxEvent
+          - ChannelSnapshotSoloTxEvent
+          - ChannelSetDelegatesTxEvent
+          - ChannelOffchainTxEvent
+          - ChannelClientReconnectTxEvent
+          - PayingForTxEvent
+          type: string
+      required:
+      - block_hash
+      - block_time
+      - height
+      - type
+      - payload
+      type: object
+    Aex141Response:
+      description: Response Schema for AEX141 contract
+      example:
+        base_url: null
+        block_height: 234208
+        contract_id: ct_2oq4kSd4j1VkkbupueXLdHwYEJdY8Ntzvp1FFkMB1gYyXkYPcV
+        contract_tx_hash: th_2Twp3pJeVuwQ7cMSdPQRfpAUWwdMiwx6coVMpRaNSuzFRnDZF
+        creation_time: 1587577771376
+        extensions:
+        - mintable_templates
+        - mintable_templates_limit
+        - mutable_attributes
+        - burnable
+        invalid: false
+        limits:
+          limit_log_idx: 0
+          limit_tx_hash: th_2Twp3pJeVuwQ7cMSdPQRfpAUWwdMiwx6coVMpRaNSuzFRnDZF
+          template_limit: 100
+          token_limit: null
+        metadata_type: map
+        name: Apes stepping into the Metaverse - (Template Version)
+        nft_owners: 1
+        nfts_amount: 36
+        symbol: ASITM-T
+      properties:
+        base_url:
+          description: Metadata base url
+          type: string
+        block_height:
+          description: Block height of the contract creation
+          type: integer
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+          description: NFT contract id
+        contract_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: Transaction hash of the contract creation
+        creation_time:
+          description: Creation time of the contract
+          type: integer
+        extensions:
+          description: Extensions implemented by the contract
+          items:
+            type: string
+          type: array
+        invalid:
+          description: True if the contract is invalid
+          type: boolean
+        limits:
+          description: Limit for amount of tokens or templates
+          type: object
+      required:
+      - base_url
+      - contract_id
+      - contract_tx_hash
+      - extensions
+      - limits
+      - metadata_type
+      - name
+      - nft_owners
+      - nfts_amount
+      - symbol
+      - invalid
+      - creation_time
+      - block_height
+      title: Aex141Response
+      type: object
+    Aex141TemplateTokensResponse:
+      description: Response Schema for template tokens of a AEX-141 contract
+      example:
+        log_idx: 0
+        owner_id: ak_8Ujt76QfpT1DyYsNZKGPGtMZ2C2MFf7CcnpQvJWNsX6szZkYN
+        token_id: 29
+        tx_hash: th_ZzPmumNtkYCfrGpVGtQP6em9hgkWQqstddB5ynagrJJa7ua9c
+      properties:
+        log_idx:
+          description: Mint event index
+          type: integer
+        owner_id:
+          $ref: '#/components/schemas/AccountAddress'
+          description: Owner wallet address
+        token_id:
+          description: NFT id
+          type: integer
+        tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: Mint transaction hash
+      required:
+      - log_idx
+      - owner_id
+      - token_id
+      - tx_hash
+      title: Aex141TemplatesResponse
+      type: object
+    Aex141TemplatesResponse:
+      description: Response Schema for templates of a AEX-141 contract
+      example:
+        contract_id: ct_2oq4kSd4j1VkkbupueXLdHwYEJdY8Ntzvp1FFkMB1gYyXkYPcV
+        edition:
+          limit: 2
+          limit_log_idx: 0
+          limit_tx_hash: th_KTTTudTgSAZrHJQVwW4AF6XD1ksQbpyHXWfgmL2kSGvNk14CU
+          supply: 1
+          supply_log_idx: 0
+          supply_tx_hash: th_erpNZJTuvRfKPafcRvkJ7ddCu9GBSQoY12QVs5pdCTm6eCDwr
+        log_idx: 0
+        template_id: 1
+        tx_hash: th_ojhH9bD7kGRpgZ6rXob2qi5asBKsYTdbSVaKzGdpfP6wiRxz4
+      properties:
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+          description: NFT contract id
+        edition:
+          description: Template edition details
+          type: object
+        log_idx:
+          description: Log index of the TemplateCreation
+          type: integer
+        template_id:
+          description: Template id of AEX-141 tokens
+          type: integer
+        tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: Transaction hash of the TemplateCreation
+      required:
+      - contract_id
+      - log_idx
+      - template_id
+      - tx_hash
+      title: Aex141TemplatesResponse
+      type: object
+    Aex141TokenResponse:
+      description: Response Schema for owners of AEX-141 tokens
+      example:
+        contract_id: ct_2oq4kSd4j1VkkbupueXLdHwYEJdY8Ntzvp1FFkMB1gYyXkYPcV
+        owner_id: ak_vTGaRAuGXPLhvNexrbzmHJ2MDv9JS2Ky7u2v469o6weaZ2Cgw
+        token_id: 1
+      properties:
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+          description: NFT contract id
+        owner_id:
+          $ref: '#/components/schemas/AccountAddress'
+        token_id:
+          description: Non-fungible token id
+          type: integer
+      required:
+      - contract_id
+      - account_id
+      - token_id
+      title: Aex141OwnedTokenResponse
+      type: object
+    Aex141TransferEvent:
+      description: AEx141 Transfer
+      properties:
+        block_height:
+          example: 653289
+          type: integer
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+        log_idx:
+          example: 0
+          type: integer
+        micro_index:
+          example: 125
+          type: integer
+        micro_time:
+          example: 1662654259282
+          type: integer
+        recipient:
+          $ref: '#/components/schemas/AccountAddress'
+        sender:
+          $ref: '#/components/schemas/AccountAddress'
+        token_id:
+          example: 1
+          type: integer
+        tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+      required:
+      - block_height
+      - contract_id
+      - log_idx
+      - micro_index
+      - micro_time
+      - recipient
+      - sender
+      - token_id
+      - tx_hash
+      type: object
+    Aex9BalanceResponse:
+      description: Response Schema for AEX9 balance responses
+      example:
+        amount: 4.999999999990685e+25
+        block_hash: kh_2QevaXY7ULF5kTLsddwMzzZmBYWPgfaQbg2Y8maZDLKJaPhwDJ
+        contract_id: ct_RDRJC5EySx4TcLtGRWYrXfNgyWzEDzssThJYPd9kdLeS5ECaA
+        decimals: 18
+        height: 351666
+        token_name: BBA
+        token_symbol: BBA
+        tx_hash: th_27V4UmRhyeSuPEDieXVuAdE3v42dDnLzPY6uism1bFhHCPfWKv
+        tx_index: 10848881
+        tx_type: contract_create_tx
+      properties:
+        amount:
+          description: Amount of AEX9 token
+          type: integer
+        block_hash:
+          description: Block hash, indicating a state of a balance for that block
+          type: integer
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+          description: Contract id of AEX9 token
+        decimals:
+          description: Number of decimals of AEX9 token
+          type: integer
+        height:
+          description: Block height, indicating a state of a balance for that block
+            height
+          type: integer
+        token_name:
+          description: Name of AEX9 token
+          type: string
+        token_symbol:
+          description: Symbol of AEX9 token
+          type: string
+        tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: Transaction hash, indicating a state of a balance for that
+            block height
+        tx_index:
+          description: Transaction index, indicating a state of a balance for that
+            block height
+          type: integer
+        tx_type:
+          description: Transaction type, indicating a state of a balance for that
+            block height
+          type: string
+      required:
+      - amount
+      - block_hash
+      - contract_id
+      - decimals
+      - height
+      - token_name
+      - token_symbol
+      - tx_hash
+      - tx_index
+      - tx_type
+      title: Response for AEX-9 account balance
+      type: object
+    Aex9ContractBalanceResponse:
+      description: Response Schema for AEX9 contract balances responses
+      example:
+        account_id: ak_2MHJv6JcdcfpNvu4wRDZXWzq8QSxGbhUfhMLR7vUPzRFYsDFw6
+        amount: 4050000000000
+        block_hash: kh_bkyFuxj3W9yY8Tmuiq3KSCVHaTP3vMzHt4pZ6y1QcQEzyAf5i
+        contract_id: ct_RDRJC5EySx4TcLtGRWYrXfNgyWzEDzssThJYPd9kdLeS5ECaA
+        height: 618127
+        last_log_idx: 1
+        last_tx_hash: th_KTTTudTgSAZrHJQVwW4AF6XD1ksQbpyHXWfgmL2kSGvNk14CU,
+      properties:
+        account_id:
+          $ref: '#/components/schemas/AccountAddress'
+          description: The wallet pubkey
+        amount:
+          description: The balance amount
+          type: integer
+        block_hash:
+          description: The block hash, indicating a state of a balance for that block
+          type: integer
+        contract_id:
+          description: The contract id of given token
+          type: integer
+        height:
+          description: The block height, indicating a state of a balance for that
+            block height
+          type: integer
+        last_log_idx:
+          description: The index of the event log that changed the balance
+          type: integer
+        last_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The hash of the last transaction that changed the balance
+      required:
+      - account_id
+      - amount
+      - block_hash
+      - contract_id
+      - height
+      - last_tx_hash
+      - last_log_idx
+      title: Response for AEX-9 contract balances
+      type: object
+    Aex9Response:
+      description: Response Schema for AEX9 contract
+      example:
+        contract_id: ct_2TZsPKT5wyahqFrzp8YX7DfXQapQ4Qk65yn3sHbifU9Db9hoav
+        contract_tx_hash: th_rbFNrRDpn6finytCEmHAExtBnRxt14yckvuCWRmXxsRpypHxt
+        decimals: 18
+        event_supply: 0
+        extensions:
+        - mintable
+        - burnable
+        holders: 12
+        initial_supply: 1e+28
+        invalid: false
+        name: testnetAE
+        symbol: TTAE
+      properties:
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+          description: Id of the contract of the AEX9 tokens
+        contract_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: Transaction hash of the contract creation
+        decimals:
+          description: The number of decimals for AEX9 token
+          type: integer
+        event_supply:
+          description: Token supply updated on event basis (Mint, Burn, Swap)
+          type: integer
+        extensions:
+          description: Extensions implemented by the contract
+          items:
+            type: string
+          type: array
+        holders:
+          description: Count of accounts having balance (nil when contract is not
+            complaint)
+          type: integer
+        initial_supply:
+          description: Token supply right after contract's creation
+          type: integer
+        invalid:
+          description: True if the contract is invalid
+          type: boolean
+        name:
+          description: Name of AEX9 token
+          type: string
+        symbol:
+          description: Symbol of AEX9 token
+          type: string
+      required:
+      - contract_id
+      - contract_tx_hash
+      - decimals
+      - symbol
+      - name
+      - holders
+      - initial_supply
+      - event_supply
+      - invalid
+      title: Aex9Response
+      type: object
+    Aex9TransferEvent:
+      description: AEx9 Transfer
+      properties:
+        amount:
+          example: 9975080
+          type: integer
+        block_height:
+          example: 534443
+          type: integer
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+        log_idx:
+          example: 0
+          type: integer
+        micro_index:
+          example: 4
+          type: integer
+        micro_time:
+          example: 1640350612991
+          type: integer
+        recipient_id:
+          $ref: '#/components/schemas/AccountAddress'
+        sender_id:
+          $ref: '#/components/schemas/AccountAddress'
+        tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+      required:
+      - amount
+      - block_height
+      - contract_id
+      - log_idx
+      - micro_index
+      - micro_time
+      - recipient_id
+      - sender_id
+      - tx_hash
+      type: object
+    Aex9TransferResponse:
+      description: Response Schema for AEX9 transfer responses
+      example:
+        amount: 2
+        block_height: 234208
+        call_txi: 9564978
+        contract_id: ct_pqfbS94uUpE8reSwgtaAy5odGi7cPRMAxbjMyEzpTGqwTWyn5
+        log_idx: 0
+        micro_time: 1585667337719
+        recipient: ak_29GUBTrWTMb3tRUUgbVX1Bgwi2hyVhB8Q1befNsjLnP46Ub1V8
+        sender: ak_2CMNYSgoEjb1GSVJfWXjZ9NFWwnJ9jySBd6YY7uyr5DxvwctZU
+      properties:
+        amount:
+          description: Transfer amount of AEX9 token
+          type: integer
+        block_height:
+          description: The block height
+          type: integer
+        call_txi:
+          description: AEX9 token transfer index
+          type: integer
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+        log_idx:
+          description: Log index
+          type: integer
+        micro_time:
+          description: The unix timestamp
+          type: integer
+        recipient:
+          $ref: '#/components/schemas/AccountAddress'
+          description: Recipient of AEX9 transfer
+        sender:
+          $ref: '#/components/schemas/AccountAddress'
+          description: Sender of AEX9 transfer
+      required:
+      - contract_id
+      - micro_time
+      - block_height
+      - sender
+      - recipient
+      - log_idx
+      - call_txi
+      - amount
+      title: Response for AEX9 transfers
+      type: object
+    Auction:
+      description: Auction
+      properties:
+        activation_time:
+          example: 1687575562705
+          type: integer
+        approximate_expire_time:
+          example: 1692935617598
+          type: integer
+        auction_end:
+          example: 638002
+          type: integer
+        last_bid:
+          properties:
+            block_hash:
+              $ref: '#/components/schemas/MicroBlockHash'
+            block_height:
+              example: 608242
+              type: integer
+            encoded_tx:
+              $ref: '#/components/schemas/TransactionEncoded'
+            hash:
+              $ref: '#/components/schemas/TransactionHash'
+            micro_index:
+              example: 2
+              type: integer
+            micro_time:
+              example: 1687575562705
+              type: integer
+            signatures:
+              items:
+                $ref: '#/components/schemas/Signature'
+              type: array
+            tx:
+              example:
+                account_id: ak_2JJNMYcnqPaABiSY5omockmv4cCoZefv4XzStAxKe9gM2xYz2r
+                fee: 16540000000000
+                name: 1996.chain
+                name_fee: 134626900000000000000
+                name_id: nm_aJcPv1zMt3gdvxk6CQocaHq48D5vUyZXTqmwv2yXTTmk8fm2c
+                name_salt: 7095609104934055
+                nonce: 225
+                ttl: 818002
+                type: NameClaimTx
+                version: 2
+              type: object
+          required:
+          - block_hash
+          - block_height
+          - encoded_tx
+          - hash
+          - micro_index
+          - micro_time
+          - signatures
+          - tx
+          type: object
+        name:
+          $ref: '#/components/schemas/NameString'
+        name_fee:
+          example: 134626900000000000000
+          type: integer
+      required:
+      - auction_end
+      - activation_time
+      - approximate_expire_time
+      - last_bid
+      - name
+      - name_fee
+      type: object
+    BlockStateHash:
+      description: Blocks state hash
+      example: bs_2Zfo2ALfRkKQxEaUj3HhcUGyMrTqYpDMgr2u15fPanYD1d55kz
+      pattern: ^bs_\w{38,50}$
+      type: string
+    Channel:
+      properties:
+        active:
+          description: Channel is active
+          example: true
+          type: boolean
+        amount:
+          description: Balance currently left in the channel
+          example: 20000000000001
+          type: integer
+        channel:
+          $ref: '#/components/schemas/ChannelId'
+        channel_reserve:
+          description: Minimum amount for sufficient funds
+          example: 500000000000000000
+          type: integer
+        delegate_ids:
+          description: Pubkeys of delegated accounts
+          example:
+            initiator: []
+            responder: []
+          type: object
+        initiator:
+          $ref: '#/components/schemas/AccountAddress'
+          description: Channel initiator pubkey
+        initiator_amount:
+          description: Amount owned by initiator
+          example: 4500000000000000000
+          type: integer
+        last_updated_height:
+          description: The last height in which the channel was updated on chain
+          example: 141956
+          type: integer
+        last_updated_time:
+          description: The block time in which the channel was last updated
+          example: 1587577771376
+          type: integer
+        last_updated_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The hash of the last transaction that updated the channel
+        last_updated_tx_type:
+          description: The transaction type of the last transaction that updated the
+            channel
+          example: ChannelDepositTx
+          type: string
+        lock_period:
+          description: Amount of heights locked after a solo closing
+          example: 10
+          type: integer
+        locked_until:
+          description: Non-inclusive height until which the channel is locked
+          example: 712001
+          type: integer
+        responder:
+          $ref: '#/components/schemas/AccountAddress'
+          description: The channel responder pubkey
+        responder_amount:
+          description: Amount owned by responder
+          example: 4500000000000000000
+          type: integer
+        round:
+          description: Round after last transaction
+          example: 1
+          type: integer
+        solo_round:
+          description: Round of last solo transaction
+          example: 0
+          type: integer
+        state_hash:
+          description: The hash of the current channel state
+          example: st_Wwxms0IVM7PPCHpeOXWeeZZm8h5p/SuqZL7IHIbr3CqtlCL+
+          pattern: ^st_\w+$
+          type: string
+        updates_count:
+          description: The amount of times the channel's been updated by any of the
+            channel transactions
+          example: 2
+          type: integer
+      required:
+      - active
+      - amount
+      - channel
+      - channel_reserve
+      - delegate_ids
+      - initiator
+      - initiator_amount
+      - last_updated_height
+      - last_updated_tx_type
+      - last_updated_time
+      - last_updated_tx_hash
+      - lock_period
+      - locked_until
+      - responder
+      - responder_amount
+      - round
+      - solo_round
+      - state_hash
+      - updates_count
+      type: object
+    ChannelId:
+      description: Channel ID
+      example: ch_22SfHdnhUQBAHpC5euxHG9qjRWGfHsj47sZqSmXk4cTfJp4aUd
+      pattern: ^ch_\w{38,50}$
+      type: string
+    Contract:
+      description: Contract creation info
+      properties:
+        aexn_type:
+          example: aex9
+          nullable: true
+          type: string
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        contract:
+          $ref: '#/components/schemas/ContractAddress'
+        create_tx:
+          example:
+            abi_version: 3
+            amount: 25123
+            call_data: cb_+Q==
+            code: cb_+QrfRgOgbAwsRHU
+            deposit: 0
+            fee: 13276000000000
+            gas: 200000
+            gas_price: 1000000000
+            nonce: 66
+            owner_id: ak_7wqP18AHzyoqymwGaqQp8G2UpzBCggYiq7CZdJiB71VUsLpR4
+            ttl: 0
+            vm_version: 5
+          type: object
+        source_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+        source_tx_type:
+          example: ContractCreateTx
+          type: string
+      required:
+      - aexn_type
+      - block_hash
+      - contract
+      - source_tx_hash
+      - source_tx_type
+      - create_tx
+      type: object
+    ContractAddress:
+      description: Contract address
+      example: ct_2t7TnocFw7oCYSS7g2yGutZMpGEJta6dq2DTX38SmuqmwtN6Ch
+      pattern: ^ct_\w{38,50}$
+      type: string
+    ContractBytearray:
+      description: Contract bytearray
+      example: cb_AAAAAfy4hFE=
+      pattern: ^cb_\w+$
+      type: string
+    ContractCall:
+      description: ContractCall
+      properties:
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        call_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+        contract_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+        function:
+          example: Oracle.query
+          type: string
+        height:
+          example: 608269
+          type: integer
+        internal_tx:
+          example:
+            fee: 0
+            nonce: 0
+            oracle_id: ok_4HGhEdjeRtpsWzfSEJZnBKNmjgHALAifcBUey8EvRAdDfRsqc
+            query: YWtfdVRXZWdwZk42VWpBNHl6OFg0WlZSaTl4S0VZZVhISkRSWmNScnlUc1JIQUZvQnBMYTtodHRwczovL21haWwuZ29vZ2xlLmNvbS9tYWlsL3UvMC8jaW5ib3g=
+            query_fee: 20000000000000
+            query_id: oq_2T4mYmjcyinbfYyHyDq6FfPXHChf5mYPEXgza9vHAukuq2EEHj
+            query_ttl:
+              type: delta
+              value: 20
+            response_ttl:
+              type: delta
+              value: 20
+            sender_id: ak_7wqP18AHzyoqymwGaqQp8G2UpzBCggYiq7CZdJiB71VUsLpR4
+            type: OracleQueryTx
+            version: 1
+          type: object
+        local_idx:
+          example: 0
+          type: integer
+        micro_index:
+          example: 2
+          type: integer
+      required:
+      - block_hash
+      - call_tx_hash
+      - contract_id
+      - contract_tx_hash
+      - function
+      - height
+      - internal_tx
+      - local_idx
+      - micro_index
+      type: object
+    ContractLog:
+      description: ContractLog
+      properties:
+        args:
+          example:
+          - 57632170077998225994387431184384351560267542170559996321319244663568556637966
+          - 70455690283454580784062717387189552611484838031419336802117080415662207780030
+          - 1050376320000000000
+          items:
+            type: string
+          type: array
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        block_time:
+          example: 1615820000000
+          type: integer
+        call_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+        contract_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+        data:
+          example: ''
+          type: string
+        event_hash:
+          example: 48U3JOKTVTI6FVMTK2BLHM8NG72JEBG93VS6MENPSC8E71IM5FNG====
+          type: string
+        event_name:
+          example: Transfer
+          nullable: true
+          type: string
+        ext_caller_contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+          nullable: true
+        ext_caller_contract_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          nullable: true
+        height:
+          example: 609854
+          type: integer
+        log_idx:
+          example: 0
+          type: integer
+        micro_index:
+          example: 15
+          type: integer
+        parent_contract_id:
+          example: null
+          nullable: true
+          type: integer
+      required:
+      - args
+      - block_hash
+      - block_time
+      - call_tx_hash
+      - contract_id
+      - contract_tx_hash
+      - data
+      - event_hash
+      - event_name
+      - ext_caller_contract_id
+      - ext_caller_contract_tx_hash
+      - height
+      - log_idx
+      - micro_index
+      - parent_contract_id
+      type: object
+    DeltaStat:
+      description: DeltaStat
+      example:
+        auctions_started: 0
+        block_reward: 269973000000000000000
+        burned_in_auctions: 0
+        channels_closed: 0
+        channels_opened: 0
+        contracts_created: 0
+        dev_reward: 33027000000000000000
+        height: 121804
+        last_tx_hash: th_2FHxDzpQMRTiRfpYRV3eCcsheHr1sjf9waxk7z6JDTVcgqZRXR
+        locked_in_auctions: 0
+        locked_in_channels: 0
+        names_activated: 0
+        names_expired: 0
+        names_revoked: 0
+        oracles_expired: 0
+        oracles_registered: 0
+      properties:
+        auctions_started:
+          description: The number of auctions started
+          type: integer
+        block_reward:
+          description: The block reward
+          type: integer
+        burned_in_auctions:
+          description: The amount burned in auctions
+          type: integer
+        channels_closed:
+          description: The number of channels closed
+          type: integer
+        channels_opened:
+          description: The number of channels opened
+          type: integer
+        contracts_created:
+          description: The number of contracts created
+          type: integer
+        dev_reward:
+          description: The dev reward
+          type: integer
+        height:
+          description: The generation
+          type: integer
+        last_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The last transaction hash for this height
+        locked_in_auctions:
+          description: The amount locked in auctions
+          type: integer
+        locked_in_channels:
+          description: The amount locked in channels
+          type: integer
+        names_activated:
+          description: The number of names activated
+          type: integer
+        names_expired:
+          description: The number of names expired
+          type: integer
+        names_revoked:
+          description: The number of names revoked
+          type: integer
+        oracles_expired:
+          description: The number of oracles expired
+          type: integer
+        oracles_registered:
+          description: The number of oracles registered
+          type: integer
+      required:
+      - height
+      - auctions_started
+      - block_reward
+      - burned_in_auctions
+      - channels_closed
+      - channels_opened
+      - contracts_created
+      - dev_reward
+      - names_activated
+      - names_expired
+      - names_revoked
+      - oracles_expired
+      - oracles_registered
+      - last_tx_hash
+      - locked_in_auctions
+      - locked_in_channels
+      type: object
+    DexSwap:
+      description: DEX swap
+      properties:
+        action:
+          enum:
+          - SWAP
+          - BUY
+          - SELL
+          example: SWAP
+          type: string
+        amounts:
+          properties:
+            amount0_in:
+              example: 1000050
+              type: integer
+            amount0_out:
+              example: 1000070
+              type: integer
+            amount1_in:
+              example: 1000060
+              type: integer
+            amount1_out:
+              example: 1000080
+              type: integer
+          required:
+          - amount0_in
+          - amount1_in
+          - amount0_out
+          - amount1_out
+          type: object
+        caller:
+          $ref: '#/components/schemas/AccountAddress'
+        from_amount:
+          example: 1000050
+          type: integer
+        from_contract:
+          $ref: '#/components/schemas/ContractAddress'
+        from_decimals:
+          example: 18
+          type: integer
+        from_token:
+          example: TK1
+          type: string
+        height:
+          example: 123456
+          type: integer
+        log_idx:
+          example: 0
+          type: integer
+        micro_time:
+          example: 1629820800000
+          type: integer
+        to_account:
+          $ref: '#/components/schemas/AccountAddress'
+        to_amount:
+          example: 1000060
+          type: integer
+        to_contract:
+          $ref: '#/components/schemas/ContractAddress'
+        to_decimals:
+          example: 18
+          type: integer
+        to_token:
+          example: TK2
+          type: string
+        tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+      required:
+      - amounts
+      - action
+      - caller
+      - from_token
+      - to_token
+      - log_idx
+      - to_account
+      - tx_hash
+      - from_contract
+      - to_contract
+      - from_amount
+      - to_amount
+      - from_decimals
+      - to_decimals
+      - micro_time
+      - height
+      type: object
+    ErrorResponse:
+      description: Error response from the API
+      example:
+        error: 'invalid id: th_2Twp3pJeVuwQ7cMSdPQRfpAUWwdMiwx6coVMpRaNSuzFRnDZF'
+      properties:
+        error:
+          description: The message of the error raised
+          type: string
+      required:
+      - error
+      title: Error response
+      type: object
+    InternalContractCallEvent:
+      description: Contract call made inside of a contract call or contract create
+        transaction
+      properties:
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+          description: The micro block hash in which the transaction happened
+        call_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The contract call transaction hash
+        contract_id:
+          $ref: '#/components/schemas/ContractAddress'
+        contract_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The contract creation transaction hash
+        function:
+          description: The name of the function
+          type: string
+        height:
+          description: The height in which the internal call happened
+          type: integer
+        internal_tx:
+          description: The transaction object
+          type: object
+        micro_index:
+          description: The micro block index
+          type: integer
+      required:
+      - contract_tx_hash
+      - contract_id
+      - function
+      - internal_tx
+      - height
+      - micro_index
+      - block_hash
+      type: object
+    InternalTransferEvent:
+      description: Internal transfer
+      properties:
+        amount:
+          description: The amount of AE tokens
+          type: integer
+        kind:
+          description: The kind of internal transfer
+          enum:
+          - accounts_extra_lima
+          - accounts_fortuna
+          - accounts_genesis
+          - accounts_lima
+          - accounts_minerva
+          - contracts_lima
+          - reward_dev
+          - reward_block
+          - fee_refund_oracle
+          - fee_lock_name
+          - fee_refund_name
+          - fee_spend_name
+          - reward_oracle
+          type: string
+        ref_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The transaction hash of a transaction related to the internal
+            transfer
+      required:
+      - amount
+      - kind
+      - ref_tx_hash
+      type: object
+    KeyBlock:
+      example:
+        beneficiary: ak_2MR38Zf355m6JtP13T3WEcUcSLVLCxjGvjk6zG95S2mfKohcSS
+        beneficiary_reward: 5000000
+        hash: kh_uoTGwc4HPzEW9qmiQR1zmVVdHmzU6YmnVvdFe6HvybJJRj7V6
+        height: 123008
+        info: cb_AAAAAfy4hFE=
+        micro_blocks_count: 2
+        miner: ak_Fqnmm5hRAMaVPWk8wzpodMopZgWghMns4mM7kSV1jgT89p9AV
+        nonce: 9223756548132686000
+        pow:
+        - 12359907
+        - 21243613
+        - 31370838
+        - 34911479
+        - 39070315
+        - 39375528
+        - 45751339
+        - 49864206
+        - 56785423
+        - 70282271
+        - 89781776
+        - 136985196
+        - 140580763
+        - 142415353
+        - 145306210
+        - 148449813
+        - 156037609
+        - 161568067
+        - 170308922
+        - 185345129
+        - 192805579
+        - 214115188
+        - 220339679
+        - 243288723
+        - 258891016
+        - 283001743
+        - 284306909
+        - 286457285
+        - 326405486
+        - 352963232
+        - 377904500
+        - 378120539
+        - 380987399
+        - 388675008
+        - 447958786
+        - 457602498
+        - 465751225
+        - 466823982
+        - 475416389
+        - 491255227
+        - 530197445
+        - 533633643
+        prev_hash: kh_hwin2p8u87mqiK836FixGa1pL9eBkL1Ju37Yi6EUebCgAf8rm
+        prev_key_hash: kh_hwin2p8u87mqiK836FixGa1pL9eBkL1Ju37Yi6EUebCgAf8rm
+        state_hash: bs_9Dg6mTmiJLpbg9dzgjnNFVidQesvZYZG3dEviUCd4oE1hUcna
+        target: 504082055
+        time: 1565548832164
+        transactions_count: 2
+        version: 3
+      properties:
+        beneficiary:
+          $ref: '#/components/schemas/AccountAddress'
+          description: The beneficiary
+        beneficiary_reward:
+          description: The beneficiary reward
+          type: integer
+        hash:
+          $ref: '#/components/schemas/KeyBlockHash'
+        height:
+          description: The block height
+          type: integer
+        info:
+          $ref: '#/components/schemas/ContractBytearray'
+          description: The info
+        micro_blocks_count:
+          description: The number of micro blocks
+          type: integer
+        miner:
+          $ref: '#/components/schemas/AccountAddress'
+          description: The miner public key
+        nonce:
+          description: The nonce
+          type: integer
+        pow:
+          description: The proof of work
+          items:
+            type: integer
+          type: array
+        prev_hash:
+          description: The previous block hash
+          oneOf:
+          - $ref: '#/components/schemas/KeyBlockHash'
+          - $ref: '#/components/schemas/MicroBlockHash'
+        prev_key_hash:
+          $ref: '#/components/schemas/KeyBlockHash'
+          description: The previous key block hash
+        state_hash:
+          $ref: '#/components/schemas/BlockStateHash'
+        target:
+          description: The target
+          type: integer
+        time:
+          description: The time
+          type: integer
+        transactions_count:
+          description: The number of transactions
+          type: integer
+        version:
+          description: The version
+          type: integer
+      required:
+      - beneficiary
+      - hash
+      - height
+      - info
+      - miner
+      - prev_hash
+      - prev_key_hash
+      - state_hash
+      - target
+      - time
+      - version
+      - micro_blocks_count
+      - transactions_count
+      title: Key Block
+      type: object
+    KeyBlockHash:
+      description: Key block hash
+      example: kh_2Zfo2ALfRkKQxEaUj3HhcUGyMrTqYpDMgr2u15fPanYD1d55kz
+      pattern: ^kh_\w{38,50}$
+      type: string
+    MicroBlock:
+      example:
+        hash: mh_JryFr55GwbEbEJivkvHwBPzqbhu6AvpcZqCiBoXzgZdLmNn2K
+        height: 685072
+        micro_block_index: 64
+        pof_hash: no_fraud
+        prev_hash: mh_hH3qADCrnGvuup6JwjtNSacHLd9h3NJzAgr173jS9KUqijfTB
+        prev_key_hash: kh_2rTj3FTZJ6fnuLFDJwAiDQZat2a23Lkp5uZQooxjwXEFhH4Vtw
+        signature: sg_8hhU15cVMbukFj4FbdrFwwYnbzXYPnstu9PDnWZGbfQNpeHcB6tK1F3wvG1MPYySARgDRJYUh3YPJD3HctFwg6Y4rUGSR
+        state_hash: bs_2bNSxvfhsPeAwN3LJU1oZLtUJ6GbeRdJYTEnFLAAazWtwPPqpN
+        time: 1668435898477
+        transactions_count: 1
+        txs_hash: bx_2TAosDwRW2CwxbNiucN8hRfUHQcnJn2u3quDLPE9jAmgX26Qya
+        version: 5
+      properties:
+        hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+          description: The micro block hash
+        height:
+          description: The block height
+          type: integer
+        micro_block_index:
+          description: The index of the micro-block on the micro-block height, starting
+            from 0
+          type: integer
+        pof_hash:
+          description: \"no_fraud\" or api encoded Proof of Fraud hash
+          example: no_fraud
+          pattern: ^no_fraud|bf_\w{38,50}$
+          type: string
+        prev_hash:
+          description: The previous block hash
+          oneOf:
+          - $ref: '#/components/schemas/KeyBlockHash'
+          - $ref: '#/components/schemas/MicroBlockHash'
+        prev_key_hash:
+          $ref: '#/components/schemas/KeyBlockHash'
+          description: The previous key block hash
+        signature:
+          $ref: '#/components/schemas/Signature'
+          description: Micro block signature
+        state_hash:
+          $ref: '#/components/schemas/BlockStateHash'
+        time:
+          description: The time
+          type: integer
+        transactions_count:
+          description: The number of transactions
+          type: integer
+        txs_hash:
+          description: Transactions hash
+          example: bx_2TAosDwRW2CwxbNiucN8hRfUHQcnJn2u3quDLPE9jAmgX26Qya
+          pattern: ^bx_\w{38,50}$
+          type: string
+        version:
+          description: The version
+          type: integer
+      required:
+      - micro_block_index
+      - transactions_count
+      - hash
+      - height
+      - pof_hash
+      - prev_hash
+      - prev_key_hash
+      - state_hash
+      - txs_hash
+      - signature
+      - time
+      - version
+      title: MicroBlock
+      type: object
+    MicroBlockHash:
+      description: Micro block hash
+      example: mh_2Zfo2ALfRkKQxEaUj3HhcUGyMrTqYpDMgr2u15fPanYD1d55kz
+      pattern: ^mh_\w{38,50}$
+      type: string
+    Miner:
+      description: Miner
+      example:
+        miner: ak_2whjDhTTmbN13vU7gAUsRbosBhmycho4h8LqHVqKwyGofDetQ9
+        total_reward: 945000000000000000000
+      properties:
+        miner:
+          $ref: '#/components/schemas/AccountAddress'
+          description: The miner (beneficiary) address
+        total_reward:
+          description: The accumulated reward on the miner (beneficiary) address
+          type: integer
+      required:
+      - miner
+      - total_reward
+      type: object
+    Name:
+      description: Name
+      properties:
+        active:
+          example: true
+          type: boolean
+        active_from:
+          example: 163282
+          type: integer
+        approximate_activation_time:
+          example: 1587577771376
+          type: integer
+        approximate_expire_time:
+          example: 1587577781376
+          type: integer
+        auction:
+          $ref: '#/components/schemas/Auction'
+          nullable: true
+        auction_timeout:
+          example: 1088448
+          type: integer
+        expire_height:
+          example: 362026
+          type: integer
+        hash:
+          $ref: '#/components/schemas/NameHash'
+        name:
+          $ref: '#/components/schemas/NameString'
+        name_fee:
+          example: 134626900000000000000
+          type: integer
+        ownership:
+          properties:
+            current:
+              $ref: '#/components/schemas/AccountAddress'
+            original:
+              $ref: '#/components/schemas/AccountAddress'
+          type: object
+        pointers:
+          additionalProperties: true
+          type: object
+        revoke:
+          $ref: '#/components/schemas/NameTx'
+      required:
+      - active
+      - hash
+      - active_from
+      - approximate_activation_time
+      - approximate_expire_time
+      - expire_height
+      - pointers
+      - auction
+      - auction_timeout
+      - ownership
+      - name
+      - name_fee
+      - revoke
+      type: object
+    NameClaim:
+      description: Name Claim
+      properties:
+        active_from:
+          example: 163282
+          type: integer
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        height:
+          example: 45784
+          type: integer
+        internal_source:
+          type: boolean
+        source_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+        source_tx_type:
+          example: NameClaimTx
+          type: string
+        tx:
+          example:
+            account_id: ak_2JJNMYcnqPaABiSY5omockmv4cCoZefv4XzStAxKe9gM2xYz2r
+            fee: 16540000000000
+            name: 1996.chain
+            name_fee: 134626900000000000000
+            name_salt: 7095609104934055
+            nonce: 225
+            ttl: 818002
+          type: object
+      required:
+      - active_from
+      - source_tx_hash
+      - source_tx_type
+      - block_hash
+      - height
+      - tx
+      type: object
+    NameClaimEvent:
+      description: Name claim
+      properties:
+        tx:
+          description: The claim transaction (internal or not)
+          type: object
+        tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The hash of the transaction (either a name claim or a contract
+            call transaction)
+      required:
+      - tx_hash
+      - tx
+      type: object
+    NameHash:
+      description: AENS name hash
+      example: nm_psy8tRXPzGxh6975H7K6XQcMFVsdrxJMt7YkzMY8oUTevutzw
+      pattern: ^nm_\w{38,50}$
+      type: string
+    NameString:
+      description: AENS name
+      example: trustwallet.chain
+      pattern: ^\w+\.chain$
+      type: string
+    NameTransfer:
+      description: Name Transfer
+      properties:
+        active_from:
+          example: 163282
+          type: integer
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        height:
+          example: 45784
+          type: integer
+        internal_source:
+          type: boolean
+        source_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+        source_tx_type:
+          example: NameTransferTx
+          type: string
+        tx:
+          example:
+            account_id: ak_24jcHLTZQfsou7NvomRJ1hKEnjyNqbYSq2Az7DmyrAyUHPq8uR
+            fee: 30000
+            name_id: nm_en1mSKcVPb9gY8UGxPfABw3JouEGZ4ZvdfcBWetmn6czUuVG1
+            nonce: 18550
+            recipient_id: ak_2WZoa13VKHCamt2zL9Wid8ovmyvTEUzqBjDNGDNwuqwUQJZG4t
+            ttl: 42420
+          type: object
+      required:
+      - active_from
+      - block_hash
+      - height
+      - source_tx_hash
+      - source_tx_type
+      - tx
+      type: object
+    NameTx:
+      example:
+        block_hash: mh_2Nr1oj3Z3D9sYnEDrNk4SXjboT3otCXQafsNukRcRDg25URKrR
+        block_height: 45784
+        hash: th_2FAG7SHx4FkEBwh5dxjd2As3d7xXPZ3AZTQKFxm2sKADYpvDf6
+        micro_index: 2
+        micro_time: 1687575562705
+        signatures:
+        - sg_VXb4ipxdLk5PxfoQ6xUv9ma3GGmmMSARsRbXeWdS8cAGZS5SVdkfJgLskSw7rXzZSikGwha23LzsK7LPrDomkohRZTcb8
+        tx:
+          account_id: ak_X8uq6yXsG9kKrFUChYDrkkxWgNcPnuSsosx7dB1Qt4uC4A4Ao,
+          fee: 16660000000000,
+          name: olcobaxn0tkizccs4k4z3dzqxbbt1o.chain,
+          name_id: nm_6oHMk21c4chkF2A7WQ4bx1HhfaoAEQgXZFgofNTLw4yX7b2ff,
+          nonce: 4,
+          ttl: 2762,
+          type: NameRevokeTx,
+          version: 1
+      nullable: true
+      properties:
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        block_height:
+          type: integer
+        hash:
+          $ref: '#/components/schemas/TransactionHash'
+        micro_index:
+          type: integer
+        micro_time:
+          type: integer
+        signatures:
+          items:
+            $ref: '#/components/schemas/Signature'
+          type: array
+        tx:
+          properties:
+            account_id:
+              $ref: '#/components/schemas/AccountAddress'
+            fee:
+              type: integer
+            name_id:
+              $ref: '#/components/schemas/NameHash'
+            nonce:
+              type: integer
+            ttl:
+              type: integer
+            type:
+              type: string
+            version:
+              type: integer
+          required:
+          - account_id
+          - fee
+          - name_id
+          - nonce
+          - type
+          - version
+          type: object
+      required:
+      - block_hash
+      - block_height
+      - hash
+      - micro_index
+      - micro_time
+      - signatures
+      - tx
+      type: object
+    NameUpdate:
+      description: Name Update
+      properties:
+        active_from:
+          example: 163282
+          type: integer
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        height:
+          example: 45784
+          type: integer
+        internal_source:
+          type: boolean
+        source_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+        source_tx_type:
+          example: NameUpdateTx
+          type: string
+        tx:
+          example:
+            account_id: ak_2CXSVZqVaGuZsmcRs3CN6wb2b9GKtf7Arwej7ahbeAQ1S8qkmM
+            client_ttl: 36000
+            fee: 20000000000000
+            name_id: nm_2tokSd7X5zeYzAr5icomaVLBYC3TGeCypsPjZALcQcxYZb4YdP
+            name_ttl: 50000
+            nonce: 3544
+            pointers:
+            - id: ak_M6MNwGLtMQ4j3m8pzQz9uF38nMfjCCVaiQ8fvTAU6DEsCocD5
+              key: account_pubkey
+            ttl: 60000
+          type: object
+      required:
+      - active_from
+      - block_hash
+      - height
+      - source_tx_hash
+      - source_tx_type
+      - tx
+      type: object
+    NotFoundResponse:
+      description: Resource not found on the API
+      example:
+        error: 'not found: th_2Twp3pJeVuwQ7cMSdPQRfpAUWwdMiwx6coVMpRaNSuzFRnDZF'
+      properties:
+        error:
+          description: The message of the error raised
+          type: string
+      required:
+      - error
+      title: Not found response
+      type: object
+    Oracle:
+      example:
+        active: false
+        active_from: 4660
+        approximate_expire_time: 1587577871376
+        expire_height: 6894
+        format:
+          query: string
+          response: string
+        oracle: ok_R7cQfVN15F5ek1wBSYaMRjW2XbMRKx7VDQQmbtwxspjZQvmPM
+        query_fee: 20000
+        register:
+          block_hash: mh_2JZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+          block_height: 4660
+          encoded_tx: tx_+JELAfhCuEBX6CvfGClpszz2kg4qjUL8BtvNE0JpCtuwBHbZwGfTd6O6cQ9fr723QhuML50EIzZlFafB6UUi1y5S6RpZH2wJuEn4RxYBoQFtrWD1RJ5rxuHksnEXADAPHPT2jRT6uqVIr8X45BNYqgGFcXVlcnmIcmVzcG9uc2UAAIOYloCHBowmEhDKAIMEauEAmOjXSw==
+          hash: th_2JZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+          micro_index: 0
+          micro_time: 1587577771376
+          signatures:
+          - sg_2JZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+          tx:
+            abi_version: 0
+            account_id: ak_2JZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+            fee: 20000
+            nonce: 1
+            oracle_id: ok_R7cQfVN15F5ek1wBSYaMRjW2XbMRKx7VDQQmbtwxspjZQvmPM
+            oracle_ttl:
+              type: delta
+              value: 100
+            query_fee: 20000
+            query_format: query
+            response_format: response
+            ttl: 1587577871376
+            type: OracleRegisterTx
+            version: 1
+          tx_hash: th_2JZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+        register_time: 1587577771376
+        register_tx_hash: th_2JZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+      properties:
+        active:
+          description: The oracle active status
+          type: boolean
+        active_from:
+          description: The block height when the oracle became active
+          type: integer
+        approximate_expire_time:
+          description: The approximate time when the oracle expires
+          type: integer
+        expire_height:
+          description: The block height when the oracle expires
+          type: integer
+        format:
+          description: The oracle's query and response formats
+          example:
+            query: string
+            response: string
+          properties:
+            query:
+              description: The query format
+              type: string
+            response:
+              description: The response format
+              type: string
+          required:
+          - response
+          - query
+          type: object
+        oracle:
+          $ref: '#/components/schemas/OracleAddress'
+        query_fee:
+          description: The query fee
+          type: integer
+        register:
+          $ref: '#/components/schemas/OracleTx'
+        register_time:
+          deprecated: true
+          description: The block time in which the oracle was registered, use `register.micro_time`
+            instead
+          type: integer
+        register_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          deprecated: true
+          description: The transaction hash in which the oracle was registered, use
+            `register.hash` instead
+      required:
+      - register
+      - register_time
+      - register_tx_hash
+      - query_fee
+      - oracle
+      - format
+      - extends
+      - expire_height
+      - approximate_expire_time
+      - active_from
+      - active
+      type: object
+    OracleAddress:
+      description: Oracle address
+      example: ok_2t7TnocFw7oCYSS7g2yGutZMpGEJta6dq2DTX38SmuqmwtN6Ch
+      pattern: ^ok_\w{38,50}$
+      type: string
+    OracleExtend:
+      example:
+        block_hash: mh_j3kociQVYDLkCsxdPVU8J9qPFLxUzrMnoSMuLp38yubDpuTyR
+        height: 961963
+        source_tx_hash: th_NgGUA81Cy2VkwStujdyKQxBW9DTnEVJo3eHh7do3oAn4Zymmu
+        source_tx_type: OracleExtendTx
+        tx:
+          fee: 16132000000000
+          nonce: 4357
+          oracle_id: ok_Gb6cD91w29v8csjAxyyBmfAQmdNo1aUedWkhn9HxqiXeVuGcj
+          oracle_ttl:
+            type: delta
+            value: 500
+          ttl: 0
+      properties:
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+          description: The hash of the block in which it ocurred
+        height:
+          description: The block height
+          type: integer
+        source_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The hash of the transaction in which the extend was done
+        source_tx_type:
+          description: The type of the transaction in which the extend was done, it
+            can be either via a contract call or an extend transaction
+          type: string
+        tx:
+          properties:
+            fee:
+              description: The transaction fee
+              type: integer
+            nonce:
+              description: The nonce
+              type: integer
+            oracle_id:
+              $ref: '#/components/schemas/OracleAddress'
+              description: The oracle ID of this query
+            oracle_ttl:
+              description: Expiration of the oracle
+              properties:
+                type:
+                  enum:
+                  - delta
+                  - block
+                  type: string
+                value:
+                  type: integer
+              required:
+              - type
+              - value
+              type: object
+            ttl:
+              description: Transaction TTL
+              type: integer
+          required:
+          - fee
+          - nonce
+          - oracle_id
+          - oracle_ttl
+          type: object
+      required:
+      - block_hash
+      - height
+      - source_tx_hash
+      - source_tx_type
+      - tx
+      type: object
+    OracleQuery:
+      example:
+        block_hash: mh_211yFeU3yxKgqXAaRyyxrALMDPxxTyYkrs6TwN9hWnxMHQk8Nc
+        block_time: 1595571314482
+        fee: 17199000000000
+        height: 289005
+        nonce: 57
+        oracle_id: ok_qJZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+        query: YmFpeGluIHF1ZXJ5
+        query_fee: 2000000000000000
+        query_id": oq_su6wv4MZsnJfopjAhd1Sx7HuBBtqhdHhahkoTPWk7bg24UWNR
+        query_ttl:
+          type: delta
+          value: 100
+        response:
+          block_hash: mh_GWc3YBsoeCtsKW2FScDPAMz4jmK47Zdba4pPstJFJzREpWr9o
+          block_time: 1595577843373
+          fee: 16939000000000
+          height: 289044
+          nonce: 2
+          oracle_id: ok_qJZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+          query_id: oq_su6wv4MZsnJfopjAhd1Sx7HuBBtqhdHhahkoTPWk7bg24UWNR
+          response: 5oiQ5Yqf5LqGIQ
+          response_ttl:
+            type: delta
+            value: 100
+          source_tx_hash: th_GfXNatujAA2Uj73Cys39z9GzKXGHRiRFK1FCoKfDvhkJNWjpr
+          source_tx_type: OracleRespondTx
+          ttl: 289541
+        response_ttl:
+          type: delta
+          value: 100
+        sender_id: ak_CNcf2oywqbgmVg3FfKdbHQJfB959wrVwqfzSpdWVKZnep7nj4
+        source_tx_hash: th_gsaRRLnysE4pFH1DqY731F6LBEjhdDwnzoDyBnZjBUygoSvpJ
+        source_tx_type: OracleQueryTx
+        ttl: 289505
+      properties:
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+          description: The hash of the block in which it ocurred
+        block_time:
+          description: The time of the block
+          type: integer
+        fee:
+          description: The transaction fee
+          type: integer
+        height:
+          description: The block height
+          type: integer
+        nonce:
+          description: The nonce
+          type: integer
+        oracle_id:
+          $ref: '#/components/schemas/OracleAddress'
+          description: The oracle ID of this query
+        query:
+          description: Base64 encoding of the query
+          type: string
+        query_fee:
+          description: The query fee
+          type: integer
+        query_id:
+          $ref: '#/components/schemas/OracleQueryId'
+        query_ttl:
+          description: Expiration of the query
+          type: object
+        response:
+          $ref: '#/components/schemas/OracleResponse'
+        response_ttl:
+          description: Expiration of the response
+          type: object
+        sender_id:
+          $ref: '#/components/schemas/AccountAddress'
+          description: The creator of the query
+        source_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The hash of the transaction in which the query was created
+        source_tx_type:
+          description: The type of the transaction in which the query was created,
+            it can be either via a contract call or a query transaction
+          type: string
+        ttl:
+          description: Transaction TTL
+          type: integer
+      required:
+      - block_hash
+      - block_time
+      - height
+      - query_id
+      - source_tx_hash
+      - source_tx_type
+      - fee
+      - nonce
+      - oracle_id
+      - query
+      - query_fee
+      - query_ttl
+      - response_ttl
+      - sender_id
+      - ttl
+      type: object
+    OracleQueryId:
+      description: Oracle query ID
+      example: oq_2t7TnocFw7oCYSS7g2yGutZMpGEJta6dq2DTX38SmuqmwtN6Ch
+      pattern: ^oq_\w{38,50}$
+      type: string
+    OracleResponse:
+      example:
+        block_hash: mh_211yFeU3yxKgqXAaRyyxrALMDPxxTyYkrs6TwN9hWnxMHQk8Nc
+        block_time: 1595571314482
+        fee: 17199000000000
+        height: 289005
+        nonce: 57
+        oracle_id: ok_qJZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+        query:
+          block_hash: mh_211yFeU3yxKgqXAaRyyxrALMDPxxTyYkrs6TwN9hWnxMHQk8Nc
+          block_time: 1595571314482
+          fee: 17199000000000
+          height: 289005
+          nonce: 57
+          oracle_id: ok_qJZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+          query: YmFpeGluIHF1ZXJ5
+          query_fee: 2000000000000000
+          query_id: oq_su6wv4MZsnJfopjAhd1Sx7HuBBtqhdHhahkoTPWk7bg24UWNR
+          query_ttl":
+            type: delta
+            value: 100
+          response_ttl":
+            type: delta
+            value: 100
+          sender_id: ak_CNcf2oywqbgmVg3FfKdbHQJfB959wrVwqfzSpdWVKZnep7nj4
+          source_tx_hash: th_gsaRRLnysE4pFH1DqY731F6LBEjhdDwnzoDyBnZjBUygoSvpJ
+          source_tx_type: OracleQueryTx
+          ttl: 289505
+        query_fee: 2000000000000000
+        query_id: oq_su6wv4MZsnJfopjAhd1Sx7HuBBtqhdHhahkoTPWk7bg24UWNR
+        response_ttl:
+          type: delta
+          value: 100
+        source_tx_hash: th_gsaRRLnysE4pFH1DqY731F6LBEjhdDwnzoDyBnZjBUygoSvpJ
+        source_tx_type: OracleRespondTx
+        ttl: 289505
+      properties:
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+          description: The hash of the block in which it ocurred
+        block_time:
+          description: The time of the block
+          type: integer
+        fee:
+          description: The transaction fee
+          type: integer
+        height:
+          description: The block height
+          type: integer
+        nonce:
+          description: The nonce
+          type: integer
+        oracle_id:
+          $ref: '#/components/schemas/OracleAddress'
+          description: The oracle ID of this response
+        query:
+          $ref: '#/components/schemas/OracleResponse'
+        query_id:
+          $ref: '#/components/schemas/OracleQueryId'
+        response:
+          description: Base64 encoding of the response
+          type: string
+        response_ttl:
+          description: Expiration of the response
+          type: object
+        source_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The hash of the transaction in which the response was created
+        source_tx_type:
+          description: The type of the transaction in which the response was created,
+            it can be either via a contract call or a respond transaction
+          type: string
+        ttl:
+          description: Transaction TTL
+          type: integer
+      required:
+      - block_hash
+      - block_time
+      - height
+      - query_id
+      - query
+      - source_tx_hash
+      - source_tx_type
+      - fee
+      - nonce
+      - oracle_id
+      - response
+      - response_ttl
+      - ttl
+      type: object
+    OracleTx:
+      properties:
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        block_height:
+          type: integer
+        encoded_tx:
+          $ref: '#/components/schemas/TransactionEncoded'
+        hash:
+          $ref: '#/components/schemas/TransactionHash'
+        micro_index:
+          type: integer
+        micro_time:
+          type: integer
+        signatures:
+          items:
+            $ref: '#/components/schemas/Signature'
+          type: array
+        tx:
+          properties:
+            abi_version:
+              type: number
+            account_id:
+              $ref: '#/components/schemas/AccountAddress'
+            fee:
+              type: integer
+            nonce:
+              type: integer
+            oracle_id:
+              $ref: '#/components/schemas/OracleAddress'
+            oracle_ttl:
+              description: Expiration of the oracle
+              properties:
+                type:
+                  enum:
+                  - delta
+                  - block
+                  type: string
+                value:
+                  type: integer
+              required:
+              - type
+              - value
+              type: object
+            query_fee:
+              type: number
+            query_format:
+              type: string
+            response_format:
+              type: string
+            ttl:
+              type: integer
+            type:
+              type: string
+            version:
+              type: integer
+          required:
+          - fee
+          - nonce
+          - oracle_id
+          - oracle_ttl
+          - type
+          - version
+          - abi_version
+          - account_id
+          - query_fee
+          - query_format
+          - response_format
+          type: object
+        tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          deprecated: true
+          description: use `hash` instead
+      required:
+      - block_hash
+      - block_height
+      - hash
+      - tx_hash
+      - micro_index
+      - micro_time
+      - signatures
+      - encoded_tx
+      - tx
+      type: object
+    PaginatedResponse:
+      properties:
+        next:
+          example: /blocks?cursor=123
+          nullable: true
+          type: string
+        prev:
+          example: /blocks?cursor=234
+          nullable: true
+          type: string
+      required:
+      - next
+      - prev
+      type: object
+    Pointee:
+      description: Pointee
+      properties:
+        active:
+          example: true
+          type: boolean
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        block_height:
+          example: 45784
+          type: integer
+        block_time:
+          example: 1687575562705
+          type: integer
+        key:
+          $ref: '#/components/schemas/AccountAddress'
+        name:
+          $ref: '#/components/schemas/NameString'
+        source_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+        source_tx_type:
+          example: NameUpdateTx
+          type: string
+        tx:
+          example:
+            account_id: ak_2CXSVZqVaGuZsmcRs3CN6wb2b9GKtf7Arwej7ahbeAQ1S8qkmM
+            client_ttl: 36000
+            fee: 20000000000000
+            name_id: nm_2tokSd7X5zeYzAr5icomaVLBYC3TGeCypsPjZALcQcxYZb4YdP
+            name_ttl: 50000
+            nonce: 3544
+            pointers:
+            - id: ak_M6MNwGLtMQ4j3m8pzQz9uF38nMfjCCVaiQ8fvTAU6DEsCocD5
+              key: account_pubkey
+            ttl: 60000
+          type: object
+      required:
+      - active
+      - name
+      - key
+      - block_hash
+      - tx
+      - source_tx_type
+      - source_tx_hash
+      - block_height
+      - block_time
+      type: object
+    Signature:
+      description: Signature
+      example: sg_8hhU15cVMbukFj4FbdrFwwYnbzXYPnstu9PDnWZGbfQNpeHcB6tK1F3wvG1MPYySARgDRJYUh3YPJD3HctFwg6Y4rUGSR
+      pattern: ^sg_\w+$
+      type: string
+    Stat:
+      description: Stat
+      example:
+        count: 7701
+        end_date: '2024-02-29'
+        start_date: '2024-02-28'
+      properties:
+        count:
+          description: The statistic count
+          type: integer
+        end_date:
+          description: The statistic end date (not taken into account)
+          type: string
+        start_date:
+          description: The statistic start date
+          type: string
+      required:
+      - count
+      - start_date
+      - end_date
+      type: object
+    Stats:
+      description: Stats
+      example:
+        fees_trend: 0
+        last_24hs_average_transaction_fees: 46159816223980.98
+        last_24hs_transactions: 11143
+        max_transactions_per_second: 147.26
+        max_transactions_per_second_block_hash: kh_27UooKSFP8qYaymFiUvhrMfAsCUeTon48s52gfdmF8iruoi6cS
+        miners_count: 228
+        transactions_trend: 0
+      properties:
+        fees_trend:
+          description: The fees trend
+          type: number
+        last_24hs_average_transaction_fees:
+          description: The last 24hs average transaction fees
+          type: number
+        last_24hs_transactions:
+          description: The last 24hs transactions
+          type: integer
+        max_transactions_per_second:
+          description: The max transactions per second
+          type: number
+        max_transactions_per_second_block_hash:
+          $ref: '#/components/schemas/KeyBlockHash'
+          description: The max transactions per second block hash
+        miners_count:
+          description: The number of miners
+          type: integer
+        transactions_trend:
+          description: The transactions trend
+          type: number
+      type: object
+    Status:
+      properties:
+        mdw_async_tasks:
+          properties:
+            long_tasks:
+              example: 1
+              type: integer
+            producer_buffer:
+              example: 2
+              type: integer
+            total_pending:
+              example: 3
+              type: integer
+          required:
+          - long_tasks
+          - producer_buffer
+          - total_pending
+          type: object
+        mdw_gens_per_minute:
+          description: The approximate number of generations synced per minute on
+            middleware
+          example: 54.75
+          type: number
+        mdw_height:
+          description: The top generation up to which the middleware was synced
+          example: 564291
+          type: integer
+        mdw_last_migration:
+          description: The last middleware migration ran
+          example: 20230519120000
+          type: integer
+        mdw_revision:
+          description: The middleware's git revision of the latest commit applied
+          example: 2d3ae3d
+          type: string
+        mdw_synced:
+          description: true if middleware was synced up to the latest node block
+          example: true
+          type: boolean
+        mdw_syncing:
+          description: true if middleware is syncing (i.e. it didn't stop due to an
+            error)
+          example: true
+          type: boolean
+        mdw_tx_index:
+          description: index of the latest synced transaction
+          example: 45208121
+          type: integer
+        mdw_version:
+          description: The middleware's version
+          example: 1.49.0
+          type: string
+        node_height:
+          description: The node generation of the last block synced
+          example: 391040
+          type: integer
+        node_progress:
+          description: The percentage of generations synced on the node
+          example: 98.67
+          type: number
+        node_revision:
+          description: The node's git revision of the latest commit applied
+          example: a42c1b1e84dabdad350005213a2a9334113a6832
+          type: string
+        node_syncing:
+          description: If true, the node is still processing additional blocks to
+            reach the latest one
+          example: true
+          type: boolean
+        node_version:
+          description: The node's version
+          example: 6.8.1
+          type: string
+      required:
+      - mdw_async_tasks
+      - mdw_gens_per_minute
+      - mdw_height
+      - mdw_last_migration
+      - mdw_revision
+      - mdw_synced
+      - mdw_syncing
+      - mdw_tx_index
+      - mdw_version
+      - node_height
+      - node_progress
+      - node_revision
+      - node_syncing
+      - node_version
+      type: object
+    TotalStat:
+      description: TotalStat
+      example:
+        active_auctions: 0
+        active_names: 0
+        active_oracles: 0
+        burned_in_auctions: 0
+        contracts: 0
+        height: 121804
+        inactive_names: 0
+        inactive_oracles: 0
+        last_tx_hash: th_2FHxDzpQMRTiRfpYRV3eCcsheHr1sjf9waxk7z6JDTVcgqZRXR
+        locked_in_auctions: 0
+        locked_in_channels: 0
+        open_channels: 0
+        sum_block_reward: 269973000000000000000
+        sum_dev_reward: 33027000000000000000
+        total_token_supply: 10000000000000000000000000000
+      properties:
+        active_auctions:
+          description: The number of active auctions
+          type: integer
+        active_names:
+          description: The number of active names
+          type: integer
+        active_oracles:
+          description: The number of active oracles
+          type: integer
+        burned_in_auctions:
+          description: The amount burned in auctions
+          type: integer
+        contracts:
+          description: The number of contracts
+          type: integer
+        height:
+          description: The generation
+          type: integer
+        inactive_names:
+          description: The number of inactive names
+          type: integer
+        inactive_oracles:
+          description: The number of inactive oracles
+          type: integer
+        last_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          description: The last transaction hash for this height
+        locked_in_auctions:
+          description: The amount locked in auctions
+          type: integer
+        locked_in_channels:
+          description: The amount locked in channels
+          type: integer
+        open_channels:
+          description: The number of open channels
+          type: integer
+        sum_block_reward:
+          description: The sum of block rewards
+          type: integer
+        sum_dev_reward:
+          description: The sum of dev rewards
+          type: integer
+        total_token_supply:
+          description: The total token supply
+          type: integer
+      required:
+      - height
+      - contracts
+      - locked_in_auctions
+      - burned_in_auctions
+      - locked_in_channels
+      - active_auctions
+      - active_names
+      - inactive_names
+      - active_oracles
+      - inactive_oracles
+      - open_channels
+      - sum_block_reward
+      - sum_dev_reward
+      - total_token_supply
+      - last_tx_hash
+      type: object
+    Transaction:
+      description: Transaction
+      example:
+        block_hash: mh_ufiYLdN8am8fBxMnb6xq2K4MQKo4eFSCF5bgixq4EzKMtDUXP
+        block_height: 1
+        encoded_tx: tx_+IQLAfhCuED6AOECECJDXntSS/dj034AJ20Ed+xE4FrgvlEI8PPBziK1VwEBaT73ZlNOiMCC9u7CEUow8YZefEiJ97ppfd8GuDz4OiABoQH+GsB85Crb3bTZQOTQxfR79trkBfFyAvBtzs5utqqbqkCJdmxzYS50ZXN0e4YTGXGKUACCsztl3yJX
+        hash: th_2FHxDzpQMRTiRfpYRV3eCcsheHr1sjf9waxk7z6JDTVcgqZRXR
+        micro_index: 0
+        micro_time: 1543375246712
+        signatures:
+        - sg_Fipyxq5f3JS9CB3AQVCw1v9skqNBw1cdfe5W3h1t2MkviU19GQckERQZkqkaXWKowdTUvr7B1QbtWdHjJHQcZApwVDdP9
+        tx:
+          amount: 150425
+          fee: 101014
+          nonce: 1
+          payload: ba_NzkwOTIxLTgwMTAxOGSbElc=
+          recipient_id: ak_26dopN3U2zgfJG4Ao4J4ZvLTf5mqr7WAgLAq6WxjxuSapZhQg5
+          sender_id: ak_26dopN3U2zgfJG4Ao4J4ZvLTf5mqr7WAgLAq6WxjxuSapZhQg5
+          ttl: 10000
+          type: SpendTx
+          version: 1
+      properties:
+        block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+        block_height:
+          description: The block height
+          type: integer
+        encoded_tx:
+          $ref: '#/components/schemas/TransactionEncoded'
+        hash:
+          $ref: '#/components/schemas/TransactionHash'
+        micro_index:
+          description: The micro block index
+          type: integer
+        micro_time:
+          description: The unix timestamp
+          type: integer
+        signatures:
+          description: The signatures
+          items:
+            $ref: '#/components/schemas/Signature'
+          type: array
+        tx:
+          description: The transaction
+          type: object
+      required:
+      - block_hash
+      - block_height
+      - encoded_tx
+      - hash
+      - micro_index
+      - micro_time
+      - signatures
+      - tx
+      type: object
+    TransactionEncoded:
+      description: Encoded transaction
+      example: tx_+E8hAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ABoQOvDVCf43V7alNbsUvTarXaCf7rjtWX36YLS4+JTa4jn4YPHaUyOAAAxRZ6Sg==
+      pattern: ^tx_\w+$
+      type: string
+    TransactionHash:
+      description: Transaction hash
+      example: th_2Zfo2ALfRkKQxEaUj3HhcUGyMrTqYpDMgr2u15fPanYD1d55kz
+      pattern: ^th_\w{38,50}$
+      type: string
+    Transfer:
+      properties:
+        account_id:
+          $ref: '#/components/schemas/AccountAddress'
+        amount:
+          example: 9592000000000000000
+          type: integer
+        height:
+          example: 610158
+          type: integer
+        kind:
+          enum:
+          - reward_dev
+          - reward_block
+          type: string
+        ref_block_hash:
+          $ref: '#/components/schemas/MicroBlockHash'
+          nullable: true
+        ref_tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+          nullable: true
+        ref_tx_type:
+          example: ChannelDepositTx
+          nullable: true
+          type: string
+      required:
+      - account_id
+      - amount
+      - height
+      - kind
+      - ref_block_hash
+      - ref_tx_hash
+      - ref_tx_type
+      type: object
+info:
+  description: API for [Aeternity Middleware](https://github.com/aeternity/ae_mdw)
+  title: Aeternity Middleware
+  version: 1.82.1-open-api-fixes
+openapi: 3.0.0
+paths:
+  /accounts/{accountId}/aex141/tokens:
+    get:
+      deprecated: false
+      description: Get tokens owned by an account.
+      operationId: GetAex141OwnedTokens
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: The account id
+        in: path
+        name: accountId
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      - description: Collection contract pubkey
+        in: query
+        name: contract
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Aex141TokenResponse'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated AEX-141 tokens
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /accounts/{accountId}/aex9/balances:
+    get:
+      deprecated: false
+      description: Get all AEX9 balances for an account on the last block.
+      operationId: GetAex9AccountBalances
+      parameters:
+      - description: Account id
+        in: path
+        name: accountId
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Aex9BalanceResponse'
+                      type: array
+                  required:
+                  - data
+                  type: object
+          description: Returns all the balances of an account
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /accounts/{account_id}/dex/swaps:
+    get:
+      deprecated: false
+      description: Get DEX swap tokens
+      operationId: GetAccountDexSwaps
+      parameters:
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: The account id
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/DexSwap'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated list of DEX swaps
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /accounts/{id}/activities:
+    get:
+      deprecated: false
+      description: Get an account activities.
+      operationId: GetAccountActivities
+      parameters:
+      - description: The account address
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      - description: Indicate to filter only activities initiated by the account
+        in: query
+        name: owned_only
+        required: false
+        schema:
+          example: true
+          type: boolean
+      - description: "Filter by activity type. Supported values:\n * `transactions`\
+          \ - Transactions containing the account in any of the transaction fields\n\
+          \ * `aexn` - AExN (aex9 and aex141) activities\n * `aex9` - AEx9 activities\n\
+          \ * `aex141` - AEx141 activities\n * `contract` - Internal and external\
+          \ contract calls\n * `transfers` - Internal (both gen-based and tx-based)\
+          \ transfers\n * `claims` - Name claims related to the name hash\n * `swaps`\
+          \ - Dex swaps related to the name hash\n"
+        in: query
+        name: type
+        required: false
+        schema:
+          enum:
+          - transactions
+          - aexn
+          - aex9
+          - aex141
+          - contract
+          - transfers
+          - claims
+          - swaps
+          type: string
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Activity'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated activities
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /accounts/{id}/names/pointees:
+    get:
+      deprecated: false
+      description: Get account pointees
+      operationId: GetAccountPointees
+      parameters:
+      - description: The account that names point to
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Pointee'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns the name the active and inactive name pointees
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /transactions/count/{id}:
+    get:
+      deprecated: false
+      description: Get transactions count and its type for given aeternity ID.
+      operationId: GetAccountTransactionsCount
+      parameters:
+      - description: The ID of the address/name/oracle/etc
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  channel_close_mutual_tx:
+                    description: The channel close mutual transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel close mutual transaction
+                        type: integer
+                      from_id:
+                        description: The number of times the account was from id in
+                          channel close mutual transaction
+                        type: integer
+                    type: object
+                  channel_close_solo_tx:
+                    description: The channel close solo transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel close solo transaction
+                        type: integer
+                      from_id:
+                        description: The number of times the account was from id in
+                          channel close solo transaction
+                        type: integer
+                    type: object
+                  channel_create_tx:
+                    description: The channel create transactions count
+                    properties:
+                      initiator_id:
+                        description: The number of times the account was initiator
+                          id in channel create transaction
+                        type: integer
+                      responder_id:
+                        description: The number of times the account was responder
+                          id in channel create transaction
+                        type: integer
+                    type: object
+                  channel_deposit_tx:
+                    description: The channel deposit transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel deposit transaction
+                        type: integer
+                      from_id:
+                        description: The number of times the account was from id in
+                          channel deposit transaction
+                        type: integer
+                    type: object
+                  channel_force_progress_tx:
+                    description: The channel force progress transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel force progress transaction
+                        type: integer
+                      from_id:
+                        description: The number of times the account was from id in
+                          channel force progress transaction
+                        type: integer
+                    type: object
+                  channel_offchain_tx:
+                    description: The channel offchain transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel offchain transaction
+                        type: integer
+                    type: object
+                  channel_set_delegates_tx:
+                    description: The channel set delegates transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel set delegates transaction
+                        type: integer
+                      from_id:
+                        description: The number of times the account was from id in
+                          channel set delegates transaction
+                        type: integer
+                    type: object
+                  channel_settle_tx:
+                    description: The channel settle transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel settle transaction
+                        type: integer
+                      from_id:
+                        description: The number of times the account was from id in
+                          channel settle transaction
+                        type: integer
+                    type: object
+                  channel_slash_tx:
+                    description: The channel slash transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel slash transaction
+                        type: integer
+                      from_id:
+                        description: The number of times the account was from id in
+                          channel slash transaction
+                        type: integer
+                    type: object
+                  channel_snapshot_solo_tx:
+                    description: The channel snapshot solo transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel snapshot solo transaction
+                        type: integer
+                      from_id:
+                        description: The number of times the account was from id in
+                          channel snapshot solo transaction
+                        type: integer
+                    type: object
+                  channel_withdraw_tx:
+                    description: The channel withdraw transactions count
+                    properties:
+                      channel_id:
+                        description: The number of times the account was channel id
+                          in channel withdraw transaction
+                        type: integer
+                      to_id:
+                        description: The number of times the account was to id in
+                          channel withdraw transaction
+                        type: integer
+                    type: object
+                  contract_call_tx:
+                    description: The contract call transactions count
+                    properties:
+                      caller_id:
+                        description: The number of times the account was caller id
+                          in contract call transaction
+                        type: integer
+                      contract_id:
+                        description: The number of times the account was contract
+                          id in contract call transaction
+                        type: integer
+                    type: object
+                  contract_create_tx:
+                    description: The contract create transactions count
+                    properties:
+                      owner_id:
+                        description: The number of times the account was owner id
+                          in contract create transaction
+                        type: integer
+                    type: object
+                  ga_attach_tx:
+                    description: The ga attach transactions count
+                    properties:
+                      owner_id:
+                        description: The number of times the account was owner id
+                          in ga attach transaction
+                        type: integer
+                    type: object
+                  ga_meta_tx:
+                    description: The ga meta transactions count
+                    properties:
+                      ga_id:
+                        description: The number of times the account was ga id in
+                          ga meta transaction
+                        type: integer
+                    type: object
+                  name_claim_tx:
+                    description: The name claim transactions count
+                    properties:
+                      account_id:
+                        description: The number of times the account was account id
+                          in name claim transaction
+                        type: integer
+                    type: object
+                  name_preclaim_tx:
+                    description: The name preclaim transactions count
+                    properties:
+                      account_id:
+                        description: The number of times the account was account id
+                          in name preclaim transaction
+                        type: integer
+                      commitment_id:
+                        description: The number of times the account was commitment
+                          id in name preclaim transaction
+                        type: integer
+                    type: object
+                  name_revoke_tx:
+                    description: The name revoke transactions count
+                    properties:
+                      account_id:
+                        description: The number of times the account was account id
+                          in name revoke transaction
+                        type: integer
+                      name_id:
+                        description: The number of times the account was name id in
+                          name revoke transaction
+                        type: integer
+                    type: object
+                  name_transfer_tx:
+                    description: The name transfer transactions count
+                    properties:
+                      account_id:
+                        description: The number of times the account was account id
+                          in name transfer transaction
+                        type: integer
+                      name_id:
+                        description: The number of times the account was name id in
+                          name transfer transaction
+                        type: integer
+                      recipient_id:
+                        description: The number of times the account was recipient
+                          id in name transfer transaction
+                        type: integer
+                    type: object
+                  name_update_tx:
+                    description: The name update transactions count
+                    properties:
+                      account_id:
+                        description: The number of times the account was account id
+                          in name update transaction
+                        type: integer
+                      name_id:
+                        description: The number of times the account was name id in
+                          name update transaction
+                        type: integer
+                    type: object
+                  oracle_extend_tx:
+                    description: The oracle extend transactions count
+                    properties:
+                      oracle_id:
+                        description: The number of times the account was oracle id
+                          in oracle extend transaction
+                        type: integer
+                    type: object
+                  oracle_query_tx:
+                    description: The oracle query transactions count
+                    properties:
+                      oracle_id:
+                        description: The number of times the account was oracle id
+                          in oracle query transaction
+                        type: integer
+                      sender_id:
+                        description: The number of times the account was sender id
+                          in oracle query transaction
+                        type: integer
+                    type: object
+                  oracle_register_tx:
+                    description: The oracle register transactions count
+                    properties:
+                      account_id:
+                        description: The number of times the account was account id
+                          in oracle register transaction
+                        type: integer
+                    type: object
+                  oracle_response_tx:
+                    description: The oracle response transactions count
+                    properties:
+                      oracle_id:
+                        description: The number of times the account was oracle id
+                          in oracle response transaction
+                        type: integer
+                    type: object
+                  paying_for_tx:
+                    description: The paying for transactions count
+                    properties:
+                      payer_id:
+                        description: The number of times the account was payer id
+                          in paying for transaction
+                        type: integer
+                    type: object
+                  spend_tx:
+                    description: The spend transactions count
+                    properties:
+                      recipient_id:
+                        description: The number of times the account was recipient
+                          id in spend transaction
+                        type: integer
+                      sender_id:
+                        description: The number of times the account was sender id
+                          in spend transaction
+                        type: integer
+                    type: object
+                  total:
+                    description: The total transactions count
+                    type: integer
+                required:
+                - total
+                type: object
+          description: Response schema for transactions count by id
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex141:
+    get:
+      deprecated: false
+      description: Get AEX141 contracts sorted by creation time, name or symbol.
+      operationId: GetSortedAex141Contracts
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: meta info field used on sorting
+        in: query
+        name: by
+        required: false
+        schema:
+          enum:
+          - creation
+          - name
+          - symbol
+          type: string
+      - description: Sorts by name or symbol prefix, this is decided by the 'by' field.
+          If it's name, it will sort by name prefix, if it's symbol, it will sort
+          by symbol prefix.
+        in: query
+        name: prefix
+        required: false
+        schema:
+          example: mycolle
+          type: string
+      - description: Gets AEX141 contracts with exact name or symbol, this is decided
+          by the 'by' field. If it's name, it will get contracts with exact name,
+          if it's symbol, it will get contracts with exact symbol.
+        in: query
+        name: exact
+        required: false
+        schema:
+          example: mycollection
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Aex141Response'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated AEX-141 contracts
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex141/{contractId}/templates:
+    get:
+      deprecated: false
+      description: Get templates AEX-141 contract tokens.
+      operationId: GetAex141ContractTemplates
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: The contract id
+        in: path
+        name: contractId
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Aex141TemplatesResponse'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated AEX-141 templates
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex141/{contractId}/templates/{templateId}/tokens:
+    get:
+      deprecated: false
+      description: Get AEX-141 template tokens.
+      operationId: GetAex141TemplateTokens
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: Contract id
+        in: path
+        name: contractId
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      - description: Template id
+        in: path
+        name: templateId
+        required: true
+        schema:
+          example: 8
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Aex141TemplateTokensResponse'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated AEX-141 template tokens
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex141/{contractId}/tokens:
+    get:
+      deprecated: false
+      description: Get owners of tokens of a AEX-141 contract.
+      operationId: GetAex141ContractTokens
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: The contract id
+        in: path
+        name: contractId
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Aex141TokenResponse'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated AEX-141 contracts
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex141/{contractId}/tokens/{tokenId}:
+    get:
+      deprecated: false
+      description: Get owner of a NFT (AEX-141 token).
+      operationId: GetAex141TokenOwner
+      parameters:
+      - description: The contract id
+        in: path
+        name: contractId
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      - description: The nft token id
+        in: path
+        name: tokenId
+        required: true
+        schema:
+          example: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AccountAddress'
+                required:
+                - data
+                type: object
+          description: Owner account of the NFT
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex141/{contractId}/transfers:
+    get:
+      deprecated: false
+      description: Get AEX-141 transfers on a contract.
+      operationId: GetAex141ContractTransfers
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: Contract id
+        in: path
+        name: contractId
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      - description: From account
+        in: query
+        name: from
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      - description: To account
+        in: query
+        name: to
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Aex141TransferEvent'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated AEX-141 transfers
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex141/{id}:
+    get:
+      deprecated: false
+      description: Get AEX141 contract meta-info, extensions, limits and stats.
+      operationId: GetAex141ByContract
+      parameters:
+      - description: The contract id
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aex141Response'
+          description: Returns AEX-141 information by contract id
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex9:
+    get:
+      deprecated: false
+      description: Get AEX9 tokens sorted by creation time, name or symbol.
+      operationId: GetSortedAex9Tokens
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: meta info field used on sorting
+        in: query
+        name: by
+        required: false
+        schema:
+          enum:
+          - creation
+          - name
+          - symbol
+          type: string
+      - description: Sorts by name or symbol prefix, this is decided by the 'by' field.
+          If it's name, it will sort by name prefix, if it's symbol, it will sort
+          by symbol prefix.
+        in: query
+        name: prefix
+        required: false
+        schema:
+          example: AA
+          type: string
+      - description: Gets AEX9 tokens with exact name or symbol, this is decided by
+          the 'by' field. If it's name, it will get tokens with exact name, if it's
+          symbol, it will get tokens with exact symbol.
+        in: query
+        name: exact
+        required: false
+        schema:
+          example: AA
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Aex9Response'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated AEX-9 tokens
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex9/count:
+    get:
+      deprecated: false
+      description: Get AEX9 tokens count.
+      operationId: GetAex9TokensCount
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: integer
+                required:
+                - data
+                type: object
+          description: Returns the number of AEX9 contracts created
+  /aex9/{contractId}/balances:
+    get:
+      deprecated: false
+      description: Get AEX9 balances on a contract.
+      operationId: GetAex9ContractBalances
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: Contract id
+        in: path
+        name: contractId
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      - description: Order by
+        in: query
+        name: by
+        required: false
+        schema:
+          example: amount
+          type: string
+      - description: Block hash
+        in: query
+        name: block_hash
+        required: false
+        schema:
+          $ref: '#/components/schemas/MicroBlockHash'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Aex9ContractBalanceResponse'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated contract balances
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex9/{contractId}/balances/{accountId}:
+    get:
+      deprecated: false
+      description: Get AEX9 balance for an account on a contract.
+      operationId: GetAex9ContractAccountBalance
+      parameters:
+      - description: Contract id
+        in: path
+        name: contractId
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      - description: Account id
+        in: path
+        name: accountId
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      - description: Block hash
+        in: query
+        name: hash
+        required: false
+        schema:
+          $ref: '#/components/schemas/MicroBlockHash'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  account:
+                    $ref: '#/components/schemas/AccountAddress'
+                    description: The account present on a AEX9
+                  amount:
+                    description: The amount of AEX9 token
+                    example: 4050000000000
+                    type: integer
+                  contract:
+                    $ref: '#/components/schemas/ContractAddress'
+                    description: The contract id of given token
+                required:
+                - account
+                - amount
+                - contract
+                type: object
+          description: Returns a the balance of an account on a contract
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex9/{contractId}/balances/{accountId}/history:
+    get:
+      deprecated: false
+      description: Get AEX9 account balance on a contract throughout all heights when
+        changed.
+      operationId: GetAex9ContractAccountBalanceHistory
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: Contract id
+        in: path
+        name: contractId
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      - description: Account id
+        in: path
+        name: accountId
+        required: true
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - properties:
+                    data:
+                      items:
+                        properties:
+                          account:
+                            $ref: '#/components/schemas/AccountAddress'
+                            description: The account present on a AEX9
+                          amount:
+                            description: The amount of AEX9 token
+                            example: 4050000000000
+                            type: integer
+                          contract:
+                            $ref: '#/components/schemas/ContractAddress'
+                            description: The contract id of given token
+                          height:
+                            description: The block height, indicating a state of a
+                              balance for that block height
+                            example: 618127
+                            type: integer
+                        required:
+                        - account
+                        - amount
+                        - contract
+                        - height
+                        type: object
+                      type: array
+                  required:
+                  - data
+                  type: object
+          description: Account balance history on a token contract
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /aex9/{id}:
+    get:
+      deprecated: false
+      description: Get AEX9 creation and meta_info information by contract id.
+      operationId: GetAex9ByContract
+      parameters:
+      - description: The contract id
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aex9Response'
+          description: Returns AEX-9 information by contract id
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /channels:
+    get:
+      deprecated: false
+      description: Get multiple channels.
+      operationId: GetChannels
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: Exclusively filter by active/inactive channels.
+        in: query
+        name: state
+        required: false
+        schema:
+          enum:
+          - active
+          - inactive
+          example: inactive
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Channel'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated channels
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /channels/{id}:
+    get:
+      deprecated: false
+      description: Get a single channel.
+      operationId: GetChannel
+      parameters:
+      - description: The channel
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/ChannelId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+          description: Returns single channel
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /contracts/calls:
+    get:
+      deprecated: false
+      description: Get contract calls.
+      operationId: GetContractCalls
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/ContractCall'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated contracts logs
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /contracts/logs:
+    get:
+      deprecated: false
+      description: Get contract logs.
+      operationId: GetContractLogs
+      parameters:
+      - description: Contract that emitted the logs
+        in: query
+        name: contract_id
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      - description: Name of the event
+        in: query
+        name: event
+        required: false
+        schema:
+          example: Transfer
+          type: string
+      - description: Prefix of the contract called function
+        in: query
+        name: function
+        required: false
+        schema:
+          example: mint
+          type: string
+      - description: Prefix of the contract called function
+        in: query
+        name: function_prefix
+        required: false
+        schema:
+          example: put
+          type: string
+      - description: Data prefix from the contract call
+        in: query
+        name: data
+        required: false
+        schema:
+          example: AB
+          type: string
+      - description: Indicates to format args when event is AEX-N
+        in: query
+        name: aexn-args
+        required: false
+        schema:
+          example: true
+          type: boolean
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/ContractLog'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated contracts logs
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /contracts/{id}:
+    get:
+      deprecated: false
+      description: Gets contract creation info.
+      operationId: GetContract
+      parameters:
+      - description: Contract that emitted the logs
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contract'
+          description: Returns single contract
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /dex/swaps:
+    get:
+      deprecated: false
+      description: Get DEX swap tokens
+      operationId: GetDexSwaps
+      parameters:
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/DexSwap'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated list of DEX swaps
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /dex/{contract_id}/swaps:
+    get:
+      deprecated: false
+      description: Get DEX swap tokens
+      operationId: GetDexSwapsByContractId
+      parameters:
+      - $ref: '#/components/parameters/DirectionParam'
+      - description: The contract id
+        in: path
+        name: contract_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/DexSwap'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated list of DEX swaps
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /key-blocks:
+    get:
+      deprecated: false
+      description: Get multiple key blocks.
+      operationId: GetKeyBlocks
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/KeyBlock'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated key blocks
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /key-blocks/{hash_or_kbi}:
+    get:
+      deprecated: false
+      description: Get a single key block.
+      operationId: GetKeyBlock
+      parameters:
+      - description: The key block encoded hash or key block index
+        in: path
+        name: hash_or_kbi
+        required: true
+        schema:
+          oneOf:
+          - $ref: '#/components/schemas/KeyBlockHash'
+          - example: 123
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyBlock'
+          description: Returns a single key block
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /key-blocks/{hash_or_kbi}/micro-blocks:
+    get:
+      deprecated: false
+      description: Get the key block micro blocks.
+      operationId: GetKeyBlockMicroBlocks
+      parameters:
+      - description: The key block encoded hash or key block index
+        in: path
+        name: hash_or_kbi
+        required: true
+        schema:
+          oneOf:
+          - $ref: '#/components/schemas/KeyBlockHash'
+          - example: 123
+            type: integer
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/MicroBlock'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated micro blocks
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /micro-blocks/{hash}:
+    get:
+      deprecated: false
+      description: Get a micro block
+      operationId: GetMicroBlock
+      parameters:
+      - description: The micro block encoded hash
+        in: path
+        name: hash
+        required: true
+        schema:
+          $ref: '#/components/schemas/MicroBlockHash'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MicroBlock'
+          description: Returns a single micro block
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /micro-blocks/{hash}/transactions:
+    get:
+      deprecated: false
+      description: Get a micro block transactions
+      operationId: GetMicroBlockTransactions
+      parameters:
+      - description: The micro block encoded hash
+        in: path
+        name: hash
+        required: true
+        schema:
+          $ref: '#/components/schemas/MicroBlockHash'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Transaction'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated micro blocks
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /names:
+    get:
+      deprecated: false
+      description: Get multiple names.
+      operationId: GetNames
+      parameters:
+      - description: Sorting by deactivation, activation or name
+        in: query
+        name: by
+        required: false
+        schema:
+          example: activation
+          type: string
+      - description: Account that owns the name
+        in: query
+        name: owned_by
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      - description: Name prefix filter (case insensitive). Requires by=name parameter
+        in: query
+        name: prefix
+        required: false
+        schema:
+          type: string
+      - description: Activation state of the name (active or inactive)
+        in: query
+        name: state
+        required: false
+        schema:
+          example: inactive
+          type: string
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Name'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated names
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /names/auctions:
+    get:
+      deprecated: false
+      description: Get multiple names.
+      operationId: GetNamesAuctions
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Auction'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated active/inactive names and auctions
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /names/auctions/{id}:
+    get:
+      deprecated: false
+      description: Get name auction
+      operationId: GetNameAuction
+      parameters:
+      - description: The name
+        in: path
+        name: id
+        required: true
+        schema:
+          oneOf:
+          - $ref: '#/components/schemas/NameString'
+          - $ref: '#/components/schemas/NameHash'
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auction'
+          description: Returns the name active auction
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /names/auctions/{id}/claims:
+    get:
+      deprecated: false
+      description: Get name auction claims
+      operationId: GetNameAuctionClaims
+      parameters:
+      - description: The name
+        in: path
+        name: id
+        required: true
+        schema:
+          oneOf:
+          - $ref: '#/components/schemas/NameString'
+          - $ref: '#/components/schemas/NameHash'
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/NameClaim'
+                    type: array
+                required:
+                - data
+                type: object
+          description: Returns the name auction claims
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /names/count:
+    get:
+      deprecated: false
+      description: Get the total number of active names.
+      operationId: GetNamesCount
+      parameters:
+      - description: Account that owns the name
+        in: query
+        name: owned_by
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: Total number of names
+                example: 191145
+                type: integer
+          description: Returns the total number of active names
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /names/{id}:
+    get:
+      deprecated: false
+      description: Get a single name.
+      operationId: GetName
+      parameters:
+      - description: The name
+        in: path
+        name: id
+        required: true
+        schema:
+          oneOf:
+          - $ref: '#/components/schemas/NameString'
+          - $ref: '#/components/schemas/NameHash'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Name'
+          description: Returns single name
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /names/{id}/claims:
+    get:
+      deprecated: false
+      description: Get name claims
+      operationId: GetNameClaims
+      parameters:
+      - description: The name or name hash
+        in: path
+        name: id
+        required: true
+        schema:
+          oneOf:
+          - $ref: '#/components/schemas/NameString'
+          - $ref: '#/components/schemas/NameHash'
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/NameClaim'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: The name claims
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /names/{id}/transfers:
+    get:
+      deprecated: false
+      description: Get name transfers
+      operationId: GetNameTransfers
+      parameters:
+      - description: The name or name hash
+        in: path
+        name: id
+        required: true
+        schema:
+          oneOf:
+          - $ref: '#/components/schemas/NameString'
+          - $ref: '#/components/schemas/NameHash'
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/NameTransfer'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: The name transfers
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /names/{id}/updates:
+    get:
+      deprecated: false
+      description: Get name updates
+      operationId: GetNameUpdates
+      parameters:
+      - description: The name or name hash
+        in: path
+        name: id
+        required: true
+        schema:
+          oneOf:
+          - $ref: '#/components/schemas/NameString'
+          - $ref: '#/components/schemas/NameHash'
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/NameUpdate'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: The name updates
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /oracles:
+    get:
+      deprecated: false
+      description: Get multiple oracles.
+      operationId: GetOracles
+      parameters:
+      - description: oracle state (active or inactive)
+        in: query
+        name: state
+        required: false
+        schema:
+          example: active
+          type: string
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Oracle'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated oracles
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /oracles/{id}:
+    get:
+      deprecated: false
+      description: Get a single oracle.
+      operationId: GetOracle
+      parameters:
+      - description: The oracle
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/OracleAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Oracle'
+          description: Returns single oracle
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /oracles/{id}/extends:
+    get:
+      deprecated: false
+      description: Get an oracle's extensions.
+      operationId: GetOracleExtends
+      parameters:
+      - description: The oracle
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/OracleAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/OracleExtend'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated oracle extensions
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /oracles/{id}/queries:
+    get:
+      deprecated: false
+      description: Get an oracle's queries.
+      operationId: GetOracleQueries
+      parameters:
+      - description: The oracle
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/OracleAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/OracleQuery'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated oracle queries
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /oracles/{id}/responses:
+    get:
+      deprecated: false
+      description: Get an oracle's responses.
+      operationId: GetOracleResponses
+      parameters:
+      - description: The oracle
+        in: path
+        name: id
+        required: true
+        schema:
+          $ref: '#/components/schemas/OracleAddress'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/OracleResponse'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated oracle responses
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /stats:
+    get:
+      deprecated: false
+      description: Get stats.
+      operationId: GetStats
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stats'
+          description: Returns paginated stats per generation
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /statistics/blocks:
+    get:
+      deprecated: false
+      description: Get total blocks count stats.
+      operationId: GetBlocksStats
+      parameters:
+      - description: The interval in which to return the stats.
+        in: query
+        name: interval_by
+        required: false
+        schema:
+          enum:
+          - day
+          - week
+          - month
+          example: week
+          type: string
+      - description: The minimum start date in YYYY-MM-DD format.
+        in: query
+        name: min_start_date
+        required: false
+        schema:
+          example: '2023-01-01'
+          type: string
+      - description: The maximum start date in YYYY-MM-DD format.
+        in: query
+        name: max_start_date
+        required: false
+        schema:
+          example: '2024-01-01'
+          type: string
+      - description: The type of block.
+        in: query
+        name: type
+        required: false
+        schema:
+          enum:
+          - key
+          - micro
+          example: micro
+          type: string
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Stat'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated total stats per generation
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /deltastats:
+    get:
+      deprecated: false
+      description: Get delta stats.
+      operationId: GetDeltaStats
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/DeltaStat'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated delta stats per generation
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /minerstats:
+    get:
+      deprecated: false
+      description: Get miners list with total rewards obtained through mining.
+      operationId: GetMinerStats
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Miner'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated total stats per generation
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /statistics/names:
+    get:
+      deprecated: false
+      description: Get total names count stats.
+      operationId: GetNamesStats
+      parameters:
+      - description: The interval in which to return the stats.
+        in: query
+        name: interval_by
+        required: false
+        schema:
+          enum:
+          - day
+          - week
+          - month
+          example: week
+          type: string
+      - description: The minimum start date in YYYY-MM-DD format.
+        in: query
+        name: min_start_date
+        required: false
+        schema:
+          example: '2023-01-01'
+          type: string
+      - description: The maximum start date in YYYY-MM-DD format.
+        in: query
+        name: max_start_date
+        required: false
+        schema:
+          example: '2024-01-01'
+          type: string
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Stat'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated total stats per generation
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /totalstats:
+    get:
+      deprecated: false
+      description: Get total accumulated stats.
+      operationId: GetTotalStats
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/TotalStat'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated total stats per generation
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /statistics/transactions:
+    get:
+      deprecated: false
+      description: Get total transactions count stats.
+      operationId: GetTransactionsStats
+      parameters:
+      - description: The interval in which to return the stats.
+        in: query
+        name: interval_by
+        required: false
+        schema:
+          enum:
+          - day
+          - week
+          - month
+          example: week
+          type: string
+      - description: The minimum start date in YYYY-MM-DD format.
+        in: query
+        name: min_start_date
+        required: false
+        schema:
+          example: '2023-01-01'
+          type: string
+      - description: The maximum start date in YYYY-MM-DD format.
+        in: query
+        name: max_start_date
+        required: false
+        schema:
+          example: '2024-01-01'
+          type: string
+      - description: The type of the transactions
+        in: query
+        name: tx_type
+        required: false
+        schema:
+          example: contract_call
+          type: string
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Stat'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated total stats per generation
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /status:
+    get:
+      description: Gets the current syncing status of both middleware and the node
+      operationId: GetStatus
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+          description: Returns a map of status items
+  /transactions:
+    get:
+      deprecated: false
+      description: Get multiple transactions.
+      operationId: GetTransactions
+      parameters:
+      - description: The transaction type. The query allows providing of multiple
+          type parameters. [More info](https://github.com/aeternity/ae_mdw#types)
+        example: channel_create
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          items:
+            enum:
+            - channel_close_mutual
+            - channel_close_solo
+            - channel_create
+            - channel_deposit
+            - channel_force_progress
+            - channel_offchain
+            - channel_settle
+            - channel_slash
+            - channel_snapshot_solo
+            - channel_withdraw
+            - contract_call
+            - contract_create
+            - ga_attach
+            - ga_meta
+            - name_claim
+            - name_preclaim
+            - name_revoke
+            - name_transfer
+            - name_update
+            - oracle_extend
+            - oracle_query
+            - oracle_register
+            - oracle_response
+            - paying_for
+            - spend
+            type: string
+          type: array
+        style: form
+      - description: The type group. The query allows providing of multiple type group
+          parameters. [More info](https://github.com/aeternity/ae_mdw#types)
+        example: channel
+        explode: true
+        in: query
+        name: type_group
+        required: false
+        schema:
+          items:
+            enum:
+            - channel
+            - contract
+            - ga
+            - name
+            - oracle
+            - paying_for
+            - spend
+            type: string
+          type: array
+        style: form
+      - description: The account ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
+        in: query
+        name: account
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      - description: The contract ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
+        in: query
+        name: contract
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContractAddress'
+      - description: The channel ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
+        in: query
+        name: channel
+        required: false
+        schema:
+          $ref: '#/components/schemas/ChannelId'
+      - description: The oracle ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
+        in: query
+        name: oracle
+        required: false
+        schema:
+          $ref: '#/components/schemas/OracleAddress'
+      - description: The sender ID
+        in: query
+        name: sender_id
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      - description: The recipient ID
+        in: query
+        name: recipient_id
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      - description: Entrypoint of a contract call
+        example: put_listing
+        in: query
+        name: entrypoint
+        required: false
+        schema:
+          type: string
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Transaction'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated transactions
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+  /transactions/count:
+    get:
+      deprecated: false
+      description: Get count of transactions at the latest height.
+      operationId: GetTransactionsCount
+      parameters:
+      - description: Type of a transaction
+        in: query
+        name: tx_type
+        required: false
+        schema:
+          example: contract_call
+          type: string
+      - description: The ID of the address/name/oracle/etc
+        in: query
+        name: id
+        required: false
+        schema:
+          $ref: '#/components/schemas/AccountAddress'
+      - $ref: '#/components/parameters/ScopeParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: The transactions count
+                example: 15479090
+                type: integer
+          description: Returns count of all transactions at the latest height
+  /transactions/{hash}:
+    get:
+      deprecated: false
+      description: Get a single transaction.
+      operationId: GetTransaction
+      parameters:
+      - description: The transaction encoded hash
+        in: path
+        name: hash
+        required: true
+        schema:
+          $ref: '#/components/schemas/TransactionHash'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: Returns single transaction
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+          description: Not Found
+  /transfers:
+    get:
+      deprecated: false
+      description: Get multiple transfers.
+      operationId: GetTransfers
+      parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/ScopeParam'
+      - $ref: '#/components/parameters/DirectionParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - properties:
+                    data:
+                      items:
+                        $ref: '#/components/schemas/Transfer'
+                      type: array
+                  required:
+                  - data
+                  type: object
+                - $ref: '#/components/schemas/PaginatedResponse'
+          description: Returns paginated names
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad request
+servers:
+- description: V3 version path
+  url: /mdw/v3

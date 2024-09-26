@@ -38,6 +38,8 @@
     "validation": {
       "invalidLink": true
     },
+    "plugin": ["typedoc-plugin-missing-exports"],
+    "highlightLanguages": ["vue"],
     "readme": "none"
   }
 }

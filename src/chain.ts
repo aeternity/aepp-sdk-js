@@ -1,92 +1,104 @@
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
-import verifyTransaction, { ValidatorResult } from './tx/validator';
-import { ensureError, isAccountNotFoundError, pause } from './utils/other';
+import { isAccountNotFoundError, pause } from './utils/other';
+import { unwrapProxy } from './utils/wrap-proxy';
 import { isNameValid, produceNameId } from './tx/builder/helpers';
-import { DRY_RUN_ACCOUNT } from './tx/builder/schema';
-import { AensName } from './tx/builder/constants';
+import { AensName, DRY_RUN_ACCOUNT } from './tx/builder/constants';
 import {
-  AensPointerContextError, DryRunError, InvalidAensNameError, TransactionError,
+  AensPointerContextError, DryRunError, InvalidAensNameError,
   TxTimedOutError, TxNotInChainError, InternalError,
 } from './utils/errors';
-import Node, { TransformNodeType } from './Node';
-import {
-  Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
-  Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx,
-} from './apis/node';
+import Node from './Node';
+import { DryRunResult, DryRunResults, SignedTx } from './apis/node';
 import {
   decode, encode, Encoded, Encoding,
 } from './utils/encoder';
-import AccountBase from './account/Base';
-import { buildTxHash } from './tx/builder';
 
 /**
  * @category chain
+ * @param type - Type
+ * @param options - Options
  */
-export function _getPollInterval(
-  type: 'block' | 'microblock', // TODO: rename to 'key-block' | 'micro-block'
-  { _expectedMineRate = 180000, _microBlockCycle = 3000, _maxPollInterval = 5000 }:
-  { _expectedMineRate?: number; _microBlockCycle?: number; _maxPollInterval?: number },
-): number {
-  const base = {
-    block: _expectedMineRate,
-    microblock: _microBlockCycle,
-  }[type];
-  return Math.min(base / 3, _maxPollInterval);
+export async function _getPollInterval(
+  type: 'key-block' | 'micro-block',
+  { _expectedMineRate, _microBlockCycle, onNode }:
+  { _expectedMineRate?: number; _microBlockCycle?: number; onNode: Node },
+): Promise<number> {
+  const getVal = async (
+    t: string,
+    val: number | undefined,
+    devModeDef: number,
+    def: number,
+  ): Promise<number | null> => {
+    if (t !== type) return null;
+    if (val != null) return val;
+    return await onNode?.getNetworkId() === 'ae_dev' ? devModeDef : def;
+  };
+
+  const base = await getVal('key-block', _expectedMineRate, 0, 180000)
+    ?? await getVal('micro-block', _microBlockCycle, 0, 3000)
+    ?? (() => { throw new InternalError(`Unknown type: ${type}`); })();
+  return Math.floor(base / 3);
 }
 
-/**
- * @category exception
- */
-export class InvalidTxError extends TransactionError {
-  validation: ValidatorResult[];
-
-  transaction: Encoded.Transaction;
-
-  constructor(
-    message: string,
-    validation: ValidatorResult[],
-    transaction: Encoded.Transaction,
-  ) {
-    super(message);
-    this.name = 'InvalidTxError';
-    this.validation = validation;
-    this.transaction = transaction;
-  }
-}
+const heightCache: WeakMap<Node, { time: number; height: number }> = new WeakMap();
 
 /**
  * Obtain current height of the chain
  * @category chain
+ * @param options - Options
+ * @param options.cached - Get height from the cache. The lag behind the actual height shouldn't
+ * be more than 1 block. Use if needed to reduce requests count, and approximate value can be used.
+ * For example, for timeout check in transaction status polling.
  * @returns Current chain height
  */
-export async function getHeight({ onNode }: { onNode: Node }): Promise<number> {
-  return (await onNode.getCurrentKeyBlockHeight()).height;
+export async function getHeight(
+  { cached = false, ...options }: {
+    onNode: Node;
+    cached?: boolean;
+  } & Parameters<typeof _getPollInterval>[1],
+): Promise<number> {
+  const onNode = unwrapProxy(options.onNode);
+  if (cached) {
+    const cache = heightCache.get(onNode);
+    if (cache != null && cache.time > Date.now() - await _getPollInterval('key-block', options)) {
+      return cache.height;
+    }
+  }
+  const { height } = await onNode.getCurrentKeyBlockHeight();
+  heightCache.set(onNode, { height, time: Date.now() });
+  return height;
 }
 
 /**
- * Wait for a transaction to be mined
+ * Return transaction details if it is mined, fail otherwise.
+ * If the transaction has ttl specified then would wait till it leaves the mempool.
+ * Otherwise would fail if a specified amount of blocks were mined.
  * @category chain
  * @param th - The hash of transaction to poll
  * @param options - Options
  * @param options.interval - Interval (in ms) at which to poll the chain
- * @param options.blocks - Number of blocks mined after which to fail
+ * @param options.blocks - Number of blocks mined after which to fail if transaction ttl is not set
  * @param options.onNode - Node to use
  * @returns The transaction as it was mined
  */
 export async function poll(
   th: Encoded.TxHash,
   {
-    blocks = 5, interval, onNode, ...options
+    blocks = 5, interval, ...options
   }:
   { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
-): Promise<TransformNodeType<SignedTx>> {
-  interval ??= _getPollInterval('microblock', options);
-  const max = await getHeight({ onNode }) + blocks;
+): ReturnType<Node['getTransactionByHash']> {
+  interval ??= await _getPollInterval('micro-block', options);
+  let max;
   do {
-    const tx = await onNode.getTransactionByHash(th);
+    const tx = await options.onNode.getTransactionByHash(th);
     if (tx.blockHeight !== -1) return tx;
+    if (max == null) {
+      max = tx.tx.ttl !== 0 ? -1
+        : await getHeight({ ...options, cached: true }) + blocks;
+    }
     await pause(interval);
-  } while (await getHeight({ onNode }) < max);
+  } while (max === -1 ? true : await getHeight({ ...options, cached: true }) < max);
   throw new TxTimedOutError(blocks, th);
 }
 
@@ -101,14 +113,14 @@ export async function poll(
  */
 export async function awaitHeight(
   height: number,
-  { interval, onNode, ...options }:
+  { interval, ...options }:
   { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<number> {
-  interval ??= _getPollInterval('block', options);
+  interval ??= Math.min(await _getPollInterval('key-block', options), 5000);
   let currentHeight;
   do {
     if (currentHeight != null) await pause(interval);
-    currentHeight = (await onNode.getCurrentKeyBlockHeight()).height;
+    currentHeight = await getHeight(options);
   } while (currentHeight < height);
   return currentHeight;
 }
@@ -141,97 +153,6 @@ export async function waitForTxConfirm(
 }
 
 /**
- * Signs and submits transaction for mining
- * @category chain
- * @param txUnsigned - Transaction to sign and submit
- * @param options - Options
- * @param options.onNode - Node to use
- * @param options.onAccount - Account to use
- * @param options.verify - Verify transaction before broadcast, throw error if not
- * @param options.waitMined - Ensure that transaction get into block
- * @param options.confirm - Number of micro blocks that should be mined after tx get included
- * @returns Transaction details
- */
-export async function sendTransaction(
-  txUnsigned: Encoded.Transaction,
-  {
-    onNode, onAccount, verify = true, waitMined = true, confirm, innerTx, ...options
-  }:
-  SendTransactionOptions,
-): Promise<SendTransactionReturnType> {
-  const tx = await onAccount.signTransaction(txUnsigned, {
-    ...options,
-    onNode,
-    innerTx,
-    networkId: await onNode.getNetworkId(),
-  });
-
-  if (innerTx === true) return { hash: buildTxHash(tx), rawTx: tx };
-
-  if (verify) {
-    const validation = await verifyTransaction(tx, onNode);
-    if (validation.length > 0) {
-      const message = `Transaction verification errors: ${
-        validation.map((v: { message: string }) => v.message).join(', ')}`;
-      throw new InvalidTxError(message, validation, tx);
-    }
-  }
-
-  try {
-    let __queue;
-    try {
-      __queue = onAccount != null ? `tx-${onAccount.address}` : null;
-    } catch (error) {
-      __queue = null;
-    }
-    const { txHash } = await onNode.postTransaction(
-      { tx },
-      __queue != null ? { requestOptions: { customHeaders: { __queue } } } : {},
-    );
-
-    if (waitMined) {
-      const pollResult = await poll(txHash, { onNode, ...options });
-      const txData = {
-        ...pollResult,
-        hash: pollResult.hash as Encoded.TxHash,
-        rawTx: tx,
-      };
-      // wait for transaction confirmation
-      if (confirm != null && (confirm === true || confirm > 0)) {
-        const c = typeof confirm === 'boolean' ? undefined : confirm;
-        return {
-          ...txData,
-          confirmationHeight: await waitForTxConfirm(txHash, { onNode, confirm: c, ...options }),
-        };
-      }
-      return txData;
-    }
-    return { hash: txHash, rawTx: tx };
-  } catch (error) {
-    ensureError(error);
-    throw Object.assign(error, {
-      rawTx: tx,
-      verifyTx: async () => verifyTransaction(tx, onNode),
-    });
-  }
-}
-
-type SendTransactionOptionsType = {
-  onNode: Node;
-  onAccount: AccountBase;
-  verify?: boolean;
-  waitMined?: boolean;
-  confirm?: boolean | number;
-} & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
-& Parameters<AccountBase['signTransaction']>[1];
-export interface SendTransactionOptions extends SendTransactionOptionsType {}
-interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
-  hash: Encoded.TxHash;
-  rawTx: Encoded.Transaction;
-  confirmationHeight?: number;
-}
-
-/**
  * Get account by account public key
  * @category chain
  * @param address - Account address (public key)
@@ -244,7 +165,7 @@ export async function getAccount(
   address: Encoded.AccountAddress | Encoded.ContractAddress,
   { height, hash, onNode }:
   { height?: number; hash?: Encoded.KeyBlockHash | Encoded.MicroBlockHash; onNode: Node },
-): Promise<TransformNodeType<AccountNode>> {
+): ReturnType<Node['getAccountByPubkey']> {
   if (height != null) return onNode.getAccountByPubkeyAndHeight(address, height);
   if (hash != null) return onNode.getAccountByPubkeyAndHash(address, hash);
   return onNode.getAccountByPubkey(address);
@@ -286,7 +207,7 @@ export async function getBalance(
  */
 export async function getCurrentGeneration(
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<Generation>> {
+): ReturnType<Node['getCurrentGeneration']> {
   return onNode.getCurrentGeneration();
 }
 
@@ -301,7 +222,7 @@ export async function getCurrentGeneration(
 export async function getGeneration(
   hashOrHeight: Encoded.KeyBlockHash | number,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<Generation>> {
+): ReturnType<Node['getGenerationByHash']> {
   if (typeof hashOrHeight === 'number') return onNode.getGenerationByHeight(hashOrHeight);
   return onNode.getGenerationByHash(hashOrHeight);
 }
@@ -317,7 +238,7 @@ export async function getGeneration(
 export async function getMicroBlockTransactions(
   hash: Encoded.MicroBlockHash,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<SignedTx[]>> {
+): Promise<SignedTx[]> {
   return (await onNode.getMicroBlockTransactionsByHash(hash)).transactions;
 }
 
@@ -332,7 +253,7 @@ export async function getMicroBlockTransactions(
 export async function getKeyBlock(
   hashOrHeight: Encoded.KeyBlockHash | number,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<KeyBlock>> {
+): ReturnType<Node['getKeyBlockByHash']> {
   if (typeof hashOrHeight === 'number') return onNode.getKeyBlockByHeight(hashOrHeight);
   return onNode.getKeyBlockByHash(hashOrHeight);
 }
@@ -348,7 +269,7 @@ export async function getKeyBlock(
 export async function getMicroBlockHeader(
   hash: Encoded.MicroBlockHash,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<MicroBlockHeader>> {
+): ReturnType<Node['getMicroBlockHeaderByHash']> {
   return onNode.getMicroBlockHeaderByHash(hash);
 }
 
@@ -411,9 +332,7 @@ export async function txDryRun(
     top, txEvents, combine, onNode,
   }:
   { top?: TxDryRunArguments['top']; txEvents?: boolean; combine?: boolean; onNode: Node },
-): Promise<{
-    txEvents?: TransformNodeType<DryRunResults['txEvents']>;
-  } & TransformNodeType<DryRunResult>> {
+): Promise<{ txEvents?: DryRunResults['txEvents'] } & DryRunResult> {
   const key = combine === true ? [top, txEvents].join() : 'immediate';
   const requests = txDryRunRequests.get(key) ?? [];
   txDryRunRequests.set(key, requests);
@@ -439,7 +358,7 @@ export async function txDryRun(
 export async function getContractByteCode(
   contractId: Encoded.ContractAddress,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<ByteCode>> {
+): ReturnType<Node['getContractCode']> {
   return onNode.getContractCode(contractId);
 }
 
@@ -453,7 +372,7 @@ export async function getContractByteCode(
 export async function getContract(
   contractId: Encoded.ContractAddress,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<ContractObject>> {
+): ReturnType<Node['getContract']> {
   return onNode.getContract(contractId);
 }
 
@@ -467,7 +386,7 @@ export async function getContract(
 export async function getName(
   name: AensName,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<NameEntry>> {
+): ReturnType<Node['getNameEntryByName']> {
   return onNode.getNameEntryByName(name);
 }
 

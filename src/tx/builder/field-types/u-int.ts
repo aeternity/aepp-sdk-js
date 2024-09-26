@@ -5,7 +5,7 @@ import { toBytes } from '../../../utils/bytes';
 
 export default {
   serialize(value: Int): Buffer {
-    if (value < 0) throw new ArgumentError('value', 'greater or equal to 0', value);
+    if (Number(value) < 0) throw new ArgumentError('value', 'greater or equal to 0', value);
     return toBytes(value, true);
   },
 

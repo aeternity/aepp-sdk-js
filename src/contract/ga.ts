@@ -12,17 +12,18 @@ import {
 } from '../utils/encoder';
 import { ArgumentError, IllegalArgumentError } from '../utils/errors';
 import { concatBuffers } from '../utils/other';
-import AccountBase from '../account/Base';
 import Contract from './Contract';
 import Node from '../Node';
-import { sendTransaction, SendTransactionOptions, getAccount } from '../chain';
+import { getAccount } from '../chain';
+import { sendTransaction, SendTransactionOptions } from '../send-transaction';
 import CompilerBase from './compiler/Base';
+import { packEntry } from '../tx/builder/entry';
+import { EntryTag } from '../tx/builder/entry/constants';
 
 /**
  * Convert current account to GA
  * @category contract
  * @param authFnName - Authorization function name
- * @param sourceCode - Auth contract source code
  * @param args - init arguments
  * @param options - Options
  * @returns General Account Object
@@ -49,6 +50,7 @@ export async function createGeneralizedAccount(
   });
 
   const tx = await buildTxAsync({
+    _isInternalBuild: true,
     ...options,
     tag: Tag.GaAttachTx,
     onNode,
@@ -58,10 +60,10 @@ export async function createGeneralizedAccount(
     callData: contract._calldata.encode(contract._name, 'init', args),
     authFun: hash(authFnName),
   });
-  const contractId = buildContractIdByContractTx(tx);
   const { hash: transaction, rawTx } = await sendTransaction(tx, {
     onNode, onAccount, onCompiler, ...options,
   });
+  const contractId = buildContractIdByContractTx(rawTx);
 
   return Object.freeze({
     owner: ownerId,
@@ -72,15 +74,13 @@ export async function createGeneralizedAccount(
 }
 
 interface CreateGeneralizedAccountOptions extends
-  BuildTxOptions<Tag.GaAttachTx, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit'>,
+  BuildTxOptions<Tag.GaAttachTx, 'authFun' | 'callData' | 'code' | 'ownerId' | 'gasLimit' | 'onNode'>,
   SendTransactionOptions,
   Pick<
   Parameters<typeof Contract.initialize>[0],
   'bytecode' | 'aci' | 'sourceCodePath' | 'sourceCode' | 'fileSystem'
   > {
-  onAccount: AccountBase;
   onCompiler: CompilerBase;
-  onNode: Node;
   gasLimit?: number;
 }
 
@@ -103,8 +103,8 @@ export async function buildAuthTxHash(
   if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
     if (fee == null) throw new ArgumentError('fee', 'provided (in Ceres)', fee);
     if (gasPrice == null) throw new ArgumentError('gasPrice', 'provided (in Ceres)', gasPrice);
-    payload = hash(decode(buildTx({
-      tag: Tag.GaMetaTxAuthData,
+    payload = hash(decode(packEntry({
+      tag: EntryTag.GaMetaTxAuthData,
       fee,
       gasPrice,
       txHash: encode(payload, Encoding.TxHash),

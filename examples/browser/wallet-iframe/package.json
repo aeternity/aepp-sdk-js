@@ -7,17 +7,18 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@aeternity/aepp-calldata": "^1.5.1",
     "@aeternity/aepp-sdk": "file:../../..",
     "buffer": "^6.0.3",
-    "core-js": "^3.22.6",
+    "core-js": "^3.32.1",
     "tailwindcss": "^2.2.19",
-    "vue": "^3.2.36"
+    "vue": "^3.3.4"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~5.0.4",
-    "@vue/cli-service": "~5.0.4",
-    "sass": "^1.52.1",
-    "sass-loader": "^13.0.0"
+    "@vue/cli-plugin-babel": "~5.0.8",
+    "@vue/cli-service": "~5.0.8",
+    "sass": "^1.66.1",
+    "sass-loader": "^13.3.2"
   },
   "browserslist": [
     "> 1%",

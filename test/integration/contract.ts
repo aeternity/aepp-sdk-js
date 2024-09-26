@@ -1,20 +1,10 @@
 import { expect } from 'chai';
 import { before, describe, it } from 'mocha';
+import { assertNotNull, InputNumber } from '../utils';
+import { getSdk, timeoutBlock } from '.';
 import {
-  assertNotNull, randomName, ChainTtl, InputNumber,
-} from '../utils';
-import { getSdk } from '.';
-import {
-  IllegalArgumentError,
-  NodeInvocationError,
-  commitmentHash,
-  decode, encode, Encoded, Encoding,
-  DRY_RUN_ACCOUNT,
-  messageToHash,
-  genSalt,
-  UnexpectedTsError,
-  AeSdk,
-  Contract, ContractMethodsBase,
+  ArgumentError, NodeInvocationError, Encoded, DRY_RUN_ACCOUNT,
+  messageToHash, UnexpectedTsError, AeSdk, Contract, ContractMethodsBase, isAddressValid, Encoding,
 } from '../../src';
 
 const identitySourceCode = `
@@ -37,16 +27,17 @@ describe('Contract', () => {
   });
 
   it('deploys precompiled bytecode', async () => {
-    identityContract = await aeSdk
-      .initializeContract({ bytecode, sourceCode: identitySourceCode });
+    identityContract = await Contract.initialize({
+      ...aeSdk.getContext(), bytecode, sourceCode: identitySourceCode,
+    });
     expect(await identityContract.$deploy([])).to.have.property('address');
   });
 
   it('throws exception if deploy deposit is not zero', async () => {
     delete identityContract.$options.address;
     await expect(identityContract.$deploy([], { deposit: 10 })).to.be.rejectedWith(
-      IllegalArgumentError,
-      'Contract deposit is not refundable, so it should be equal 0, got 10 instead',
+      ArgumentError,
+      'deposit should be equal 0 (because is not refundable), got 10 instead',
     );
   });
 
@@ -57,9 +48,10 @@ describe('Contract', () => {
   });
 
   it('Verify signature of 32 bytes in Sophia', async () => {
-    const signContract = await aeSdk.initializeContract<{
+    const signContract = await Contract.initialize<{
       verify: (data: Uint8Array, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
+          ...aeSdk.getContext(),
           sourceCode:
             'contract Sign ='
             + '\n  entrypoint verify (data: bytes(32), pub: address, sig: signature): bool ='
@@ -73,13 +65,13 @@ describe('Contract', () => {
   });
 
   it('Verify message in Sophia', async () => {
-    const signContract = await aeSdk.initializeContract<{
+    const signContract = await Contract.initialize<{
       message_to_hash: (message: string) => Uint8Array;
       verify: (message: string, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
+          ...aeSdk.getContext(),
           sourceCode:
             'include "String.aes"'
-            + '\ninclude "Option.aes"'
             + '\n'
             + '\ncontract Sign ='
             + '\n  entrypoint int_to_binary (i: int): string ='
@@ -90,7 +82,7 @@ describe('Contract', () => {
             + '\n  entrypoint includes (str: string, pat: string): bool ='
             + '\n    switch(String.contains(str, pat))'
             + '\n      None => false'
-            + '\n      Some(c) => true'
+            + '\n      Some(_) => true'
             + '\n'
             + '\n  entrypoint message_to_hash (message: string): hash ='
             + '\n    let prefix = "aeternity Signed Message:\\n"'
@@ -146,7 +138,8 @@ describe('Contract', () => {
   });
 
   it('throws error on deploy', async () => {
-    const ct = await aeSdk.initializeContract({
+    const ct = await Contract.initialize({
+      ...aeSdk.getContext(),
       sourceCode:
         'contract Foo =\n'
         + '  entrypoint init() = abort("CustomErrorMessage")',
@@ -155,10 +148,11 @@ describe('Contract', () => {
   });
 
   it('throws errors on method call', async () => {
-    const ct = await aeSdk.initializeContract<{
+    const ct = await Contract.initialize<{
       failWithoutMessage: (x: Encoded.AccountAddress) => void;
       failWithMessage: () => void;
     }>({
+          ...aeSdk.getContext(),
           sourceCode:
             'contract Foo =\n'
             + '  payable stateful entrypoint failWithoutMessage(x : address) = Chain.spend(x, 1000000000)\n'
@@ -174,8 +168,8 @@ describe('Contract', () => {
 
   it('Dry-run without accounts', async () => {
     const sdk = await getSdk(0);
-    const contract = await sdk.initializeContract<IdentityContractApi>({
-      sourceCode: identitySourceCode, address: deployed.address,
+    const contract = await Contract.initialize<IdentityContractApi>({
+      ...sdk.getContext(), sourceCode: identitySourceCode, address: deployed.address,
     });
     const { result } = await contract.getArg(42);
     assertNotNull(result);
@@ -183,7 +177,8 @@ describe('Contract', () => {
   });
 
   it('Dry-run at specific height', async () => {
-    const contract = await aeSdk.initializeContract<{ call: () => void }>({
+    const contract = await Contract.initialize<{ call: () => void }>({
+      ...aeSdk.getContext(),
       sourceCode: 'contract Callable =\n'
         + '  record state = { wasCalled: bool }\n'
         + '\n'
@@ -199,8 +194,15 @@ describe('Contract', () => {
     await aeSdk.spend(1, aeSdk.address);
     const topHeader = await aeSdk.api.getTopHeader();
     const beforeKeyBlockHash = topHeader.prevKeyHash as Encoded.KeyBlockHash;
-    const beforeMicroBlockHash = topHeader.hash as Encoded.MicroBlockHash;
     expect(beforeKeyBlockHash).to.satisfy((s: string) => s.startsWith('kh_'));
+
+    type BlockHash = Encoded.KeyBlockHash | Encoded.MicroBlockHash;
+    const getMicroBlockHash = async (blockHash: BlockHash): Promise<Encoded.MicroBlockHash> => {
+      if (isAddressValid(blockHash, Encoding.MicroBlockHash)) return blockHash;
+      const hash = (await aeSdk.api.getKeyBlockByHash(blockHash)).prevHash as BlockHash;
+      return getMicroBlockHash(hash);
+    };
+    const beforeMicroBlockHash = await getMicroBlockHash(topHeader.hash as BlockHash);
     expect(beforeMicroBlockHash).to.satisfy((s: string) => s.startsWith('mh_'));
 
     await contract.call();
@@ -208,7 +210,7 @@ describe('Contract', () => {
     await contract.call({ callStatic: true, top: beforeMicroBlockHash });
     await contract.call({ callStatic: true, top: beforeKeyBlockHash });
     await contract.call({ callStatic: true, top: beforeKeyBlockHeight });
-  });
+  }).timeout(timeoutBlock);
 
   it('call contract/deploy with waitMined: false', async () => {
     delete identityContract.$options.address;
@@ -229,10 +231,11 @@ describe('Contract', () => {
   });
 
   it('initializes contract state', async () => {
-    const contract = await aeSdk.initializeContract<{
+    const contract = await Contract.initialize<{
       init: (a: string) => void;
       retrieve: () => string;
     }>({
+          ...aeSdk.getContext(),
           sourceCode:
             'contract StateContract =\n'
             + '  record state = { value: string }\n'
@@ -254,7 +257,8 @@ describe('Contract', () => {
     let contract: Contract<{ sumNumbers: (x: number, y: number) => bigint }>;
 
     it('Can compiler contract with external deps', async () => {
-      contract = await aeSdk.initializeContract({
+      contract = await Contract.initialize({
+        ...aeSdk.getContext(),
         sourceCode: contractWithLibSourceCode,
         fileSystem: {
           testLib:
@@ -266,8 +270,9 @@ describe('Contract', () => {
     });
 
     it('Throw error when try to compile contract without providing external deps', async () => {
-      await expect(aeSdk.initializeContract({ sourceCode: contractWithLibSourceCode }))
-        .to.be.rejectedWith('Couldn\'t find include file');
+      await expect(
+        Contract.initialize({ ...aeSdk.getContext(), sourceCode: contractWithLibSourceCode }),
+      ).to.be.rejectedWith('Couldn\'t find include file');
     });
 
     it('Can deploy contract with external deps', async () => {
@@ -284,225 +289,6 @@ describe('Contract', () => {
         .to.be.equal(3n);
       expect((await contract.sumNumbers(1, 2, { callStatic: true })).decodedResult)
         .to.be.equal(3n);
-    });
-  });
-
-  describe('AENS operation delegation', () => {
-    const name = randomName(15);
-    const salt = genSalt();
-    let owner: Encoded.AccountAddress;
-    let newOwner: Encoded.AccountAddress;
-    let delegationSignature: Uint8Array;
-    let contract: Contract<{
-      getName: (name: string) => {
-        'AENS.Name': [Encoded.AccountAddress, ChainTtl, Map<string, string>];
-      };
-      signedPreclaim: (addr: Encoded.AccountAddress, chash: Uint8Array, sign: Uint8Array) => void;
-      signedClaim: (
-        addr: Encoded.AccountAddress,
-        name: string,
-        salt: InputNumber,
-        name_fee: InputNumber,
-        sign: Uint8Array,
-      ) => void;
-      signedTransfer: (
-        owner: Encoded.AccountAddress,
-        new_owner: Encoded.AccountAddress,
-        name: string,
-        sign: Uint8Array,
-      ) => void;
-      signedRevoke: (owner: Encoded.AccountAddress, name: string, sign: Uint8Array) => void;
-      signedUpdate: (
-        owner: Encoded.AccountAddress,
-        name: string,
-        key: string,
-        pt: { 'AENS.OraclePt': readonly [Encoded.Any] },
-        sign: Uint8Array
-      ) => void;
-    }>;
-    let contractAddress: Encoded.ContractAddress;
-
-    before(async () => {
-      contract = await aeSdk.initializeContract({
-        sourceCode:
-          'contract DelegateTest =\n'
-          + '  entrypoint getName(name: string): option(AENS.name) =\n'
-          + '    AENS.lookup(name)\n'
-          + '  stateful payable entrypoint signedPreclaim(addr: address, chash: hash, sign: signature): unit =\n'
-          + '    AENS.preclaim(addr, chash, signature = sign)\n'
-          + '  stateful entrypoint signedClaim(\n'
-          + '    addr: address, name: string, salt: int, name_fee: int, sign: signature): unit =\n'
-          + '    AENS.claim(addr, name, salt, name_fee, signature = sign)\n'
-          + '  stateful entrypoint signedTransfer(\n'
-          + '    owner: address, new_owner: address, name: string, sign: signature): unit =\n'
-          + '    AENS.transfer(owner, new_owner, name, signature = sign)\n'
-          + '  stateful entrypoint signedRevoke(owner: address, name: string, sign: signature): unit =\n'
-          + '    AENS.revoke(owner, name, signature = sign)\n'
-          + '  stateful entrypoint signedUpdate(\n'
-          + '    owner: address, name: string, key: string, pt: AENS.pointee, sig: signature) =\n'
-          + '    switch(AENS.lookup(name))\n'
-          + '      None => ()\n'
-          + '      Some(AENS.Name(_, _, ptrs)) =>\n'
-          + '        AENS.update(owner, name, None, None, Some(ptrs{[key] = pt}), signature = sig)',
-      });
-      await contract.$deploy([]);
-      assertNotNull(contract.$options.address);
-      contractAddress = contract.$options.address;
-      [owner, newOwner] = aeSdk.addresses();
-    });
-
-    it('preclaims', async () => {
-      const commitmentId = commitmentHash(name, salt);
-      // TODO: provide more convenient way to create the decoded commitmentId ?
-      const commitmentIdDecoded = decode(commitmentId);
-      const preclaimSig = await aeSdk.createDelegationSignature(contractAddress, []);
-      const { result } = await contract.signedPreclaim(owner, commitmentIdDecoded, preclaimSig);
-      assertNotNull(result);
-      result.returnType.should.be.equal('ok');
-      await aeSdk.awaitHeight(2 + await aeSdk.getHeight());
-      // signature for any other name related operations
-      delegationSignature = await aeSdk.createDelegationSignature(contractAddress, [name]);
-    });
-
-    it('claims', async () => {
-      const nameFee = 20e18; // 20 AE
-      const { result } = await contract
-        .signedClaim(owner, name, salt, nameFee, delegationSignature);
-      assertNotNull(result);
-      result.returnType.should.be.equal('ok');
-    });
-
-    it('gets', async () => {
-      const nameEntry = (await contract.getName(name)).decodedResult['AENS.Name'];
-      expect(nameEntry[0]).to.be.equal(owner);
-      expect(nameEntry[1].FixedTTL[0]).to.be.a('bigint');
-      expect(nameEntry[2]).to.be.eql(new Map());
-    });
-
-    it('updates', async () => {
-      const pointee = { 'AENS.OraclePt': [newOwner] as const };
-      const { result } = await contract
-        .signedUpdate(owner, name, 'oracle', pointee, delegationSignature);
-      assertNotNull(result);
-      expect(result.returnType).to.be.equal('ok');
-      expect((await aeSdk.aensQuery(name)).pointers).to.be.eql([{
-        key: 'oracle',
-        id: newOwner.replace('ak', 'ok'),
-      }]);
-    });
-
-    it('transfers', async () => {
-      const { result } = await contract
-        .signedTransfer(owner, newOwner, name, delegationSignature);
-      assertNotNull(result);
-      result.returnType.should.be.equal('ok');
-    });
-
-    it('revokes', async () => {
-      const revokeSig = await aeSdk.createDelegationSignature(
-        contractAddress,
-        [name],
-        { onAccount: aeSdk.accounts[newOwner] },
-      );
-      const { result } = await contract.signedRevoke(newOwner, name, revokeSig);
-      assertNotNull(result);
-      result.returnType.should.be.equal('ok');
-      await expect(aeSdk.aensQuery(name)).to.be.rejectedWith(Error);
-    });
-  });
-
-  describe('Oracle operation delegation', () => {
-    let oracle: Awaited<ReturnType<typeof aeSdk.getOracleObject>>;
-    let oracleId: Encoded.OracleAddress;
-    let queryObject: Awaited<ReturnType<typeof aeSdk.getQueryObject>>;
-    let delegationSignature: Uint8Array;
-    const queryFee = 500000;
-    const ttl: ChainTtl = { RelativeTTL: [50n] };
-    let contract: Contract<{
-      signedRegisterOracle: (
-        addr: Encoded.AccountAddress, sign: Uint8Array, qfee: InputNumber, ttl: ChainTtl,
-      ) => Encoded.OracleAddress;
-      signedExtendOracle: (o: Encoded.OracleAddress, sign: Uint8Array, ttl: ChainTtl) => void;
-      createQuery: (
-        o: Encoded.OracleAddress, q: string, qfee: InputNumber, qttl: ChainTtl, rttl: ChainTtl,
-      ) => Encoded.OracleQueryId;
-      queryFee: (o: Encoded.OracleAddress) => bigint;
-      respond: (
-        o: Encoded.OracleAddress, q: Encoded.OracleQueryId, sign: Uint8Array, r: string,
-      ) => void;
-    }>;
-    let contractAddress: Encoded.ContractAddress;
-
-    before(async () => {
-      contract = await aeSdk.initializeContract({
-        sourceCode:
-          'contract DelegateTest =\n'
-          + '  stateful payable entrypoint signedRegisterOracle(\n'
-          + '    acct: address, sign: signature, qfee: int, ttl: Chain.ttl): oracle(string, string) =\n'
-          + '    Oracle.register(acct, qfee, ttl, signature = sign)\n'
-          + '  stateful payable entrypoint signedExtendOracle(\n'
-          + '    o: oracle(string, string), sign: signature, ttl: Chain.ttl): unit =\n'
-          + '    Oracle.extend(o, signature = sign, ttl)\n'
-          + '  payable stateful entrypoint createQuery(\n'
-          + '    o: oracle(string, string), q: string, qfee: int, qttl: Chain.ttl, rttl: Chain.ttl): oracle_query(string, string) =\n'
-          + '    require(qfee =< Call.value, "insufficient value for qfee")\n'
-          + '    require(Oracle.check(o), "oracle not valid")\n'
-          + '    Oracle.query(o, q, qfee, qttl, rttl)\n'
-          + '  entrypoint queryFee(o : oracle(string, int)) : int =\n'
-          + '    Oracle.query_fee(o)\n'
-          + '  stateful entrypoint respond(\n'
-          + '    o: oracle(string, string), q: oracle_query(string, string), sign : signature, r: string) =\n'
-          + '    Oracle.respond(o, q, signature = sign, r)',
-      });
-      await contract.$deploy([]);
-      assertNotNull(contract.$options.address);
-      contractAddress = contract.$options.address;
-      oracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
-    });
-
-    it('registers', async () => {
-      delegationSignature = await aeSdk.createDelegationSignature(contractAddress, []);
-      const { result } = await contract
-        .signedRegisterOracle(aeSdk.address, delegationSignature, queryFee, ttl);
-      assertNotNull(result);
-      result.returnType.should.be.equal('ok');
-      oracle = await aeSdk.getOracleObject(oracleId);
-      oracle.id.should.be.equal(oracleId);
-    });
-
-    it('extends', async () => {
-      const { result } = await contract.signedExtendOracle(oracleId, delegationSignature, ttl);
-      assertNotNull(result);
-      result.returnType.should.be.equal('ok');
-      const oracleExtended = await aeSdk.getOracleObject(oracleId);
-      oracleExtended.ttl.should.be.equal(oracle.ttl + 50);
-    });
-
-    it('creates query', async () => {
-      const q = 'Hello!';
-      // TODO: don't register an extra oracle after fixing https://github.com/aeternity/aepp-sdk-js/issues/1419
-      oracle = await aeSdk.registerOracle('string', 'int', { queryFee, onAccount: aeSdk.addresses()[1] });
-      const query = await contract
-        .createQuery(oracle.id, q, 1000 + queryFee, ttl, ttl, { amount: 5 * queryFee });
-      assertNotNull(query.result);
-      query.result.returnType.should.be.equal('ok');
-      queryObject = await aeSdk.getQueryObject(oracle.id, query.decodedResult);
-      queryObject.should.be.an('object');
-      queryObject.decodedQuery.should.be.equal(q);
-    });
-
-    it('responds to query', async () => {
-      const r = 'Hi!';
-      // TODO type should be corrected in node api
-      const queryId = queryObject.id as Encoded.OracleQueryId;
-      aeSdk.selectAccount(aeSdk.addresses()[1]);
-      const respondSig = await aeSdk
-        .createDelegationSignature(contractAddress, [queryId], { omitAddress: true });
-      const { result } = await contract.respond(oracle.id, queryId, respondSig, r);
-      assertNotNull(result);
-      result.returnType.should.be.equal('ok');
-      const queryObject2 = await aeSdk.getQueryObject(oracle.id, queryId);
-      queryObject2.decodedResponse.should.be.equal(r);
     });
   });
 });

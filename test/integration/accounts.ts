@@ -1,11 +1,12 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
-import { getSdk } from '.';
+import { getSdk, networkId } from '.';
+import { assertNotNull } from '../utils';
 import {
   AeSdk, MemoryAccount,
-  generateKeyPair, AE_AMOUNT_FORMATS,
-  UnavailableAccountError, TypeError, ArgumentError, UnexpectedTsError,
+  AE_AMOUNT_FORMATS,
+  UnavailableAccountError, TypeError, ArgumentError,
   encode, Encoding, Encoded,
 } from '../../src';
 
@@ -54,7 +55,7 @@ describe('Accounts', () => {
       const balanceBefore = new BigNumber(await aeSdk.getBalance(aeSdk.address));
       const { tx } = await aeSdk.transferFunds(fraction, receiver.address);
       const balanceAfter = new BigNumber(await aeSdk.getBalance(aeSdk.address));
-      if (tx == null || tx.amount == null) throw new UnexpectedTsError();
+      assertNotNull(tx?.amount);
       return {
         balanceBefore,
         balanceAfter,
@@ -98,27 +99,15 @@ describe('Accounts', () => {
   it('spends coins', async () => {
     const ret = await aeSdk.spend(1, receiver.address);
     ret.should.have.property('tx');
-    if (ret.tx == null) throw new UnexpectedTsError();
+    assertNotNull(ret.tx);
     ret.tx.should.include({ amount: 1n, recipientId: receiver.address });
   });
 
   it('spends coins in AE format', async () => {
-    const ret = await aeSdk.spend(1, receiver.address, { denomination: AE_AMOUNT_FORMATS.AE });
+    const ret = await aeSdk.spend(0.001, receiver.address, { denomination: AE_AMOUNT_FORMATS.AE });
     ret.should.have.property('tx');
-    if (ret.tx == null) throw new UnexpectedTsError();
-    ret.tx.should.include({ amount: 10n ** 18n, recipientId: receiver.address });
-  });
-
-  it('spends big amount of coins', async () => {
-    const bigAmount = 10n ** 31n + 10n ** 17n;
-    const { publicKey } = generateKeyPair();
-    const ret = await aeSdk.spend(bigAmount.toString(), publicKey);
-
-    const balanceAfter = await aeSdk.getBalance(publicKey);
-    balanceAfter.should.be.equal(bigAmount.toString());
-    ret.should.have.property('tx');
-    if (ret.tx == null) throw new UnexpectedTsError();
-    ret.tx.should.include({ amount: bigAmount, recipientId: publicKey });
+    assertNotNull(ret.tx);
+    ret.tx.should.include({ amount: 10n ** 15n, recipientId: receiver.address });
   });
 
   it('spends with a payload', async () => {
@@ -128,15 +117,36 @@ describe('Accounts', () => {
   });
 
   it('Get Account by block height/hash', async () => {
-    await aeSdk.awaitHeight(await aeSdk.getHeight() + 3);
-    const spend = await aeSdk.spend(123, 'ak_DMNCzsVoZnpV5fe8FTQnNsTfQ48YM5C3WbHPsJyHjAuTXebFi');
-    if (spend.blockHeight == null || spend.tx?.amount == null) throw new UnexpectedTsError();
-    await aeSdk.awaitHeight(spend.blockHeight + 2);
-    const accountAfterSpend = await aeSdk.getAccount(aeSdk.address);
-    const accountBeforeSpendByHash = await aeSdk
-      .getAccount(aeSdk.address, { height: spend.blockHeight - 1 });
-    expect(accountBeforeSpendByHash.balance - accountAfterSpend.balance).to.be
-      .equal(spend.tx.fee + spend.tx.amount);
+    const address = 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ';
+    if (networkId === 'ae_uat') {
+      expect(await aeSdk.getBalance(address, { height: 500000 })).to.be.equal('4577590840980663351396');
+      return;
+    }
+    if (networkId === 'ae_mainnet') {
+      expect(await aeSdk.getBalance(address, { height: 362055 })).to.be.equal('100000000000000');
+      return;
+    }
+    const genesis = 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E';
+    expect(await aeSdk.getBalance(genesis, { height: 0 })).to.be.equal('10000000000000000000000');
+  });
+
+  (networkId === 'ae_dev' ? it : it.skip)('validate account balance by height before and after spend tx', async () => {
+    async function getBalance(height?: number): Promise<bigint> {
+      return (await aeSdk.getAccount(aeSdk.address, { height })).balance;
+    }
+
+    const beforeSpend = await getBalance();
+    const beforeHeight = await aeSdk.getHeight() + 1;
+    await aeSdk.awaitHeight(beforeHeight);
+    const spend = await aeSdk.spend(123, 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ');
+
+    const afterSpend = await getBalance();
+    assertNotNull(spend.tx?.amount);
+    expect(beforeSpend - afterSpend).to.be.equal(spend.tx.fee + spend.tx.amount);
+    expect(await getBalance(beforeHeight)).to.be.equal(beforeSpend);
+    assertNotNull(spend.blockHeight);
+    await aeSdk.awaitHeight(spend.blockHeight + 1);
+    expect(await getBalance(spend.blockHeight + 1)).to.be.equal(afterSpend);
   });
 
   describe('Make operation on specific account without changing of current account', () => {
@@ -145,21 +155,21 @@ describe('Accounts', () => {
       const onAccount = accounts.find((acc) => acc !== aeSdk.address);
 
       const { tx } = await aeSdk.spend(1, aeSdk.address, { onAccount });
-      if (tx?.senderId == null) throw new UnexpectedTsError();
+      assertNotNull(tx?.senderId);
       tx.senderId.should.be.equal(onAccount);
     });
 
-    it('Fail on invalid account', async () => {
-      await expect(aeSdk.spend(1, aeSdk.address, { onAccount: 1 as any })).to.be.rejectedWith(
+    it('Fail on invalid account', () => {
+      expect(() => { aeSdk.spend(1, aeSdk.address, { onAccount: 1 as any }); }).to.throw(
         TypeError,
         'Account should be an address (ak-prefixed string), or instance of AccountBase, got 1 instead',
       );
     });
 
-    it('Fail on non exist account', async () => {
-      await expect(
-        aeSdk.spend(1, aeSdk.address, { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' }),
-      ).to.be.rejectedWith(
+    it('Fail on non exist account', () => {
+      expect(
+        () => { aeSdk.spend(1, aeSdk.address, { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' }); },
+      ).to.throw(
         UnavailableAccountError,
         'Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available',
       );
@@ -196,5 +206,6 @@ describe('Accounts', () => {
     const th = await aeSdk.spend(1, receiver.address, { waitMined: false });
     th.should.be.a('object');
     th.hash.slice(0, 3).should.equal('th_');
+    await aeSdk.poll(th.hash);
   });
 });

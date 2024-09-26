@@ -30,9 +30,9 @@ These options are common and can be provided to every tx-type:
   - The strategy to obtain next nonce for an account via node API
   - If set to `max`, then the greatest nonce seen in the account or currently in the transaction pool is incremented with 1 and returned.
     If the strategy is set to `continuity`, then transactions in the mempool are checked if there are gaps - missing nonces that prevent transactions with greater nonces to get included
-- `ttl` (default: `0`)
+- `ttl` (default: `0` if `buildTx` used, current height + `3` otherwise)
   - Should be set if you want the transaction to be only valid until a certain block height is reached.
-- `fee` (default: calculated for each tx-type)
+- `fee` (default: calculated for each tx-type, based on network demand)
   - The minimum fee is dependent on the tx-type.
   - You can provide a higher fee to additionally reward the miners.
 - `innerTx` (default: `false`)
@@ -53,7 +53,7 @@ The following options are sepcific for each tx-type.
   - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
 - `gasLimit`
   - Maximum amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
-- `gasPrice` (default: `1e9`)
+- `gasPrice` (default: based on network demand, minimum: `1e9`)
   - To increase chances to get your transaction included quickly you can use a higher gasPrice.
 
 ### NameClaimTx
@@ -62,14 +62,14 @@ The following options are sepcific for each tx-type.
   - For bids in an auction you need to explicitely calculate the required `nameFee` based on the last bid
 
 ### NameUpdateTx
-- `clientTtl` (default: `84600`)
+- `clientTtl` (default: `3600`, one hour)
   - This option is an indicator for indexing tools to know how long (in seconds) they could or should cache the name information.
 - `nameTtl` (default: `180000`)
   - This option tells the protocol the relative TTL based on the current block height.
   - `180000` is the maximum possible value
 
 ### OracleRegisterTx
-- `queryFee` (default: `30000`)
+- `queryFee` (default: `0`)
   - The fee in `aettos` that the oracle requests in order to provide a response.
 - `oracleTtlValue` (default: `500`)
   - The TTL of the oracle that defines its expiration.
@@ -78,7 +78,7 @@ The following options are sepcific for each tx-type.
   - `ORACLE_TTL_TYPES.block`: TTL value treated as absolute block height
 
 ### OracleQueryTx
-- `queryFee` (default: `30000`)
+- `queryFee` (default: `0`)
   - The fee in `aettos` that will be payed to the oracle.
 - `queryTtlValue` (default: `10`)
   - The TTL of the query that defines its expiration. The oracle needs to respond before the `queryTtl` expires.

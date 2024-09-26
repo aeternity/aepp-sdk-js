@@ -1,7 +1,24 @@
 <template>
-  <h2>Wallet Iframe</h2>
+  <input id="toggle-aepp" type="checkbox" />
+  <h2>
+    Wallet Iframe
+    <label for="toggle-aepp" />
+  </h2>
 
   <div class="group">
+    <div>
+      <div>Aepp URL</div>
+      <form
+        novalidate
+        @submit.prevent="navigate"
+      >
+        <input
+          type="url"
+          v-model="nextAeppUrl"
+          @focus="$event.target.select()"
+        >
+      </form>
+    </div>
     <div>
       <div>Address</div>
       <div>{{ address }}</div>
@@ -45,16 +62,18 @@
 
 <script>
 import {
-  MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
+  MemoryAccount, AeSdkWallet, Node, CompilerHttp,
   BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
-  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, decodeFateValue,
+  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
 } from '@aeternity/aepp-sdk';
+import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import Value from './Value.vue';
 
 export default {
   components: { Value },
   data: () => ({
-    aeppUrl: process.env.VUE_APP_AEPP_URL ?? 'http://localhost:9001',
+    nextAeppUrl: process.env.VUE_APP_AEPP_URL ?? `http://${location.hostname}:9001`,
+    aeppUrl: '',
     runningInFrame: window.parent !== window,
     nodeName: '',
     address: '',
@@ -64,6 +83,15 @@ export default {
     stopSharingWalletInfo: null,
   }),
   methods: {
+    navigate() {
+      if (!/^https?:\/\//.test(this.nextAeppUrl) && !this.nextAeppUrl.startsWith('.')) {
+        this.nextAeppUrl = 'http://' + this.nextAeppUrl;
+      }
+      this.aeppUrl = '';
+      this.$nextTick(() => {
+        this.aeppUrl = this.nextAeppUrl;
+      });
+    },
     shareWalletInfo({ interval = 5000, attempts = 5 } = {}) {
       const target = this.runningInFrame ? window.parent : this.$refs.aepp.contentWindow;
       const connection = new BrowserWindowMessageConnection({ target });
@@ -101,9 +129,8 @@ export default {
       this.aeSdk.selectAccount(this.address);
     },
     async switchNode() {
-      this.nodeName = (await this.aeSdk.getNodesInPool())
-        .map(({ name }) => name)
-        .find((name) => name !== this.nodeName);
+      const names = (await this.aeSdk.getNodesInPool()).map(({ name }) => name);
+      this.nodeName = names[(names.indexOf(this.nodeName) + 1) % names.length];
       this.aeSdk.selectNode(this.nodeName);
     },
     updateClientStatus() {
@@ -116,6 +143,8 @@ export default {
     },
   },
   mounted() {
+    this.navigate();
+
     const aeppInfo = {};
     const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
       if (!confirm([
@@ -146,15 +175,31 @@ export default {
 
       async signTypedData(data, aci, { aeppRpcClientId: id, aeppOrigin, ...options }) {
         if (id != null) {
-          const opt = { ...options, aci, decodedData: decodeFateValue(data, aci) };
+          const dataType = new TypeResolver().resolveType(aci);
+          const decodedData = new ContractByteArrayEncoder().decodeWithType(data, dataType);
+          const opt = { ...options, aci, decodedData };
           genConfirmCallback(`sign typed data ${data}`)(id, opt, aeppOrigin);
         }
         return super.signTypedData(data, aci, options);
       }
 
+      async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+        if (id != null) {
+          genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);
+        }
+        return super.sign(data, options);
+      }
+
+      async signDelegation(delegation, { aeppRpcClientId: id, aeppOrigin, ...options }) {
+        if (id != null) {
+          const opt = { ...options, ...unpackDelegation(delegation) };
+          genConfirmCallback('sign delegation')(id, opt, aeppOrigin);
+        }
+        return super.signDelegation(delegation, options);
+      }
+
       static generate() {
-        // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
-        return new AccountMemoryProtected(generateKeyPair().secretKey);
+        return new AccountMemoryProtected(super.generate().secretKey);
       }
     }
 
@@ -166,10 +211,10 @@ export default {
         { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
       ],
       accounts: [
-        new AccountMemoryProtected('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'),
+        new AccountMemoryProtected('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
         AccountMemoryProtected.generate(),
       ],
-      onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+      onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
       name: 'Wallet Iframe',
       onConnection: (aeppId, params, origin) => {
         if (!confirm(`Client ${params.name} with id ${aeppId} at ${origin} want to connect`)) {
@@ -207,3 +252,40 @@ export default {
 </script>
 
 <style lang="scss" src="./styles.scss" />
+
+<style lang="scss" scoped>
+input[id=toggle-aepp] {
+  display: none;
+}
+
+label[for=toggle-aepp]::after {
+  font-size: initial;
+  font-weight: initial;
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+
+@media (max-width: 450px), (max-height: 650px) {
+  input[id=toggle-aepp] {
+    &:checked ~ {
+      h2 label[for=toggle-aepp]::after {
+        content: 'Hide aepp';
+      }
+
+      .group {
+        display: none;
+      }
+    }
+
+    &:not(:checked) ~ {
+      h2 label[for=toggle-aepp]::after {
+        content: 'Show aepp';
+      }
+
+      iframe {
+        display: none;
+      }
+    }
+  }
+}
+</style>

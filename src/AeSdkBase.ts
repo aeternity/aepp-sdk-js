@@ -4,8 +4,9 @@ import {
   CompilerError, DuplicateNodeError, NodeNotFoundError, NotImplementedError, TypeError,
 } from './utils/errors';
 import { Encoded } from './utils/encoder';
+import { wrapWithProxy } from './utils/wrap-proxy';
 import CompilerBase from './contract/compiler/Base';
-import AeSdkMethods, { OnAccount, getValueOrErrorProxy, AeSdkMethodsOptions } from './AeSdkMethods';
+import AeSdkMethods, { OnAccount, AeSdkMethodsOptions, WrappedOptions } from './AeSdkMethods';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 
@@ -20,6 +21,8 @@ export default class AeSdkBase extends AeSdkMethods {
 
   selectedNodeName?: string;
 
+  readonly #wrappedOptions: WrappedOptions;
+
   /**
    * @param options - Options
    * @param options.nodes - Array of nodes
@@ -32,6 +35,12 @@ export default class AeSdkBase extends AeSdkMethods {
     super(options);
 
     nodes.forEach(({ name, instance }, i) => this.addNode(name, instance, i === 0));
+
+    this.#wrappedOptions = {
+      onNode: wrapWithProxy(() => this.api),
+      onCompiler: wrapWithProxy(() => this.compilerApi),
+      onAccount: wrapWithProxy(() => this._resolveAccount()),
+    };
   }
 
   // TODO: consider dropping this getter, because:
@@ -146,6 +155,11 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount().address;
   }
 
+  /**
+   * Sign data blob
+   * @param data - Data to sign
+   * @param options - Options
+   */
   async sign(
     data: string | Uint8Array,
     { onAccount, ...options }: { onAccount?: OnAccount } = {},
@@ -153,6 +167,11 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).sign(data, options);
   }
 
+  /**
+   * Sign encoded transaction
+   * @param tx - Transaction to sign
+   * @param options - Options
+   */
   async signTransaction(
     tx: Encoded.Transaction,
     { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTransaction']>[1] = {},
@@ -161,6 +180,11 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).signTransaction(tx, { networkId, ...options });
   }
 
+  /**
+   * Sign message
+   * @param message - Message to sign
+   * @param options - Options
+   */
   async signMessage(
     message: string,
     { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signMessage']>[1] = {},
@@ -168,6 +192,12 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
 
+  /**
+   * Sign typed data
+   * @param data - Encoded data to sign
+   * @param aci - Type of data to sign
+   * @param options - Options
+   */
   async signTypedData(
     data: Encoded.ContractBytearray,
     aci: Parameters<AccountBase['signTypedData']>[1],
@@ -176,17 +206,33 @@ export default class AeSdkBase extends AeSdkMethods {
     return this._resolveAccount(onAccount).signTypedData(data, aci, options);
   }
 
-  override _getOptions(callOptions: AeSdkMethodsOptions = {}): {
-    onNode: Node;
-    onAccount: AccountBase;
-    onCompiler: CompilerBase;
-  } {
+  /**
+   * Sign delegation, works only in Ceres
+   * @param delegation - Delegation to sign
+   * @param options - Options
+   */
+  async signDelegation(
+    delegation: Encoded.Bytearray,
+    { onAccount, ...options }: { onAccount?: OnAccount }
+    & Parameters<AccountBase['signDelegation']>[1] = {},
+  ): Promise<Encoded.Signature> {
+    options.networkId ??= this.selectedNodeName !== null
+      ? await this.api.getNetworkId() : undefined;
+    return this._resolveAccount(onAccount).signDelegation(delegation, options);
+  }
+
+  /**
+   * The same as AeSdkMethods:getContext, but it would resolve ak_-prefixed address in
+   * `mergeWith.onAccount` to AccountBase.
+   */
+  override getContext(mergeWith: AeSdkMethodsOptions = {}): AeSdkMethodsOptions & WrappedOptions {
     return {
       ...this._options,
-      onNode: getValueOrErrorProxy(() => this.api),
-      onCompiler: getValueOrErrorProxy(() => this.compilerApi),
-      ...callOptions,
-      onAccount: getValueOrErrorProxy(() => this._resolveAccount(callOptions.onAccount)),
+      ...this.#wrappedOptions,
+      ...mergeWith,
+      ...mergeWith.onAccount != null && {
+        onAccount: this._resolveAccount(mergeWith.onAccount),
+      },
     };
   }
 }

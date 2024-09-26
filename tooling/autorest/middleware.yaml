@@ -11,29 +11,18 @@ directive:
       https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
 
   - from: openapi-document
-    where: $.paths.*.get.parameters[?(@.type)]
-    transform: >
-      if ($.schema) throw new Error('Defined both schema and type');
-      $.schema = { type: $.type };
-      delete $.type;
-    reason: >
-      Schema violation: must NOT have additional properties (paths > /aex141 > get > parameters > 2)
-      additionalProperty: type
-      https://github.com/aeternity/ae_mdw/issues/1428
-
-  - from: openapi-document
-    where: $.components.schemas.Activity.properties.payload.oneOf
-    transform: return $.filter((el) => !el.$ref.includes('Aex141TransferEvent'))
-    reason: >
-      Ref '#/components/schemas/Aex141TransferEvent' is not referencing a valid location.
-      components,schemas,Activity,properties,payload,enum,2
-      https://github.com/aeternity/ae_mdw/issues/1344
-
-  - from: openapi-document
     where: $.components.schemas.Activity.properties.payload
-    transform: delete $.oneOf;
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      const activities = $.oneOf.map(({ $ref }) => $ref.split('/').at(-1))
+        .map(name => $doc.components.schemas[name]);
+      return {
+        "description": "A mix of all activity types.",
+        "type": "object",
+        "properties": Object.assign({}, ...activities.map(a => a.properties)),
+      };
     reason: >
-      Error: modelProperties cannot be null or undefined in the mapper
+      `oneOf` not supported
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
@@ -46,71 +35,102 @@ directive:
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
-    where: $.paths./names/search.get.responses.200.content.application/json.schema.allOf[0].properties.data.items.allOf^
-    transform: $.type ??= 'object'
-    reason: >
-      The schema 'get-200-application-json-allOf-properties-itemsItem' with an undefined type and
-      'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected to 'type:object'
-      https://github.com/Azure/autorest/issues/4118
-
-  - from: openapi-document
-    where: $.paths.*.get.parameters.*.schema.oneOf^
+    where: $.paths.*.get.parameters.0.schema.oneOf^
     transform: $.type ??= 'string'
     reason: >
-      The schema 'paths·u0n47u·v2-keyblocks-hash_orkbi·get·parameters·0·schema' with an undefined
+      'paths·1159w94·v3-keyblocks-hash_or_kbi·get·responses·200·content·application-json·schema'
+      'paths·1159w94·v3-keyblocks-hash_or_kbi-microblocks·get·responses·200·content·application-json·schema'
+      The schema <path> with an undefined
       type and 'allOf'/'anyOf'/'oneOf' is a bit ambiguous. This has been auto-corrected
       to 'type:object'
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
-    where: $.paths./contracts/logs.get.parameters
-    transform: return $.filter((param) => param.name !== 'function')
-    reason: https://github.com/Azure/autorest.typescript/issues/1871
-
-  - from: openapi-document
-    where: $.paths.*.get
-    transform: $.operationId = $.operationId.replace(/(_[a-z])/g, (group) => group[1].toUpperCase())
+    where: $..properties[time,micro_time,approximate_activation_time,approximate_expire_time,register_time,block_time,activation_time,creation_time,microtime,last_updated_time]
+    transform: $.format = 'unixtime'
     reason: >
-      Otherwise autorest groups operations by 'get' prefix
-      https://github.com/aeternity/ae_mdw/issues/1357
-
-  - from: openapi-document
-    where: $.paths./aex9/account-balances/{account_id}.get.responses.200.content.application/json.allOf^
-    transform: >
-      $.schema = { allOf: $.allOf };
-      delete $.allOf;
-    reason: >
-      Schema violation: must NOT have additional properties (paths >
-      /v2/aex9/account-balances/{account_id} > get > responses > 200 > content > application/json)
-      additionalProperty: allOf
-      https://github.com/aeternity/ae_mdw/pull/1437
+      Convert time as milliseconds to dates
+      https://github.com/aeternity/ae_mdw/issues/1891
 
   - from: openapi-document
     where: $.servers
     transform: $ = []
-    reason: remove a server with /mdw/v2 url
+    reason: remove a server with /mdw/v3 url
+
+  - from: openapi-document
+    where: $.paths.*.*.parameters[?(@.$ref)]
+    transform: >
+      const relativePath = $.$ref.replace(/^#\//, '').split('/');
+      return relativePath.reduce((o, p) => o[p], $doc);
+    reason: keep parameters in method options instead instance options
 
   - from: openapi-document
     where: $.paths
     transform: >
       if ($doc.info.title === 'middleware') return $;
-      const apiPrefix = '/v2';
+      const apiPrefix = '/v3';
       Object.keys($).forEach(key => {
         $[apiPrefix + key] = $[key];
         delete $[key];
       });
-    reason: to don't add /v2 prefix to $host parameter
+    reason: to don't add /v3 prefix to $host parameter
+
+  - from: openapi-document
+    where: $..[?(@.$ref && @.deprecated)]
+    transform: delete $.deprecated
+    reason: >
+      warning | IgnoredPropertyNextToRef | Semantic violation: Sibling values alongside $ref will be
+      ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md
+      for allowed values (components > schemas > OracleTx > properties > tx_hash)
+      keys: [ 'deprecated' ]
+
+  - from: openapi-document
+    where: $..[?(@.$ref || @.pattern || @.oneOf)]
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      function resolveRef(ref) {
+        if (typeof ref !== 'string') return;
+        const relativePath = ref.replace(/^#\//, '').split('/');
+        return relativePath.reduce((o, p) => o[p], $doc);
+      }
+      function getType(node) {
+        node = resolveRef(node.$ref) ?? node;
+        if (node.type === 'integer') return 'number';
+        if (node.type !== 'string') return;
+        const { pattern } = node;
+        if (pattern === '^\\w+\\.chain$') return 'name';
+        if (!pattern || pattern.includes('|') || pattern[0] !== '^' || pattern[3] !== '_') return;
+        return pattern.slice(1, 3);
+      }
+      let types = getType($) ?? $.oneOf?.map(getType);
+      if (!Array.isArray(types)) types = [types];
+      types = types.filter(a => a);
+      if (types.some(t => t.length == 2 || t === 'name')) {
+        if (!$.$ref) $.type ??= 'string';
+        $.description = ($.description ?? resolveRef($.$ref)?.description ?? '')
+          + `__sdk__${types.join()}__sdk__`;
+      }
+    reason: Add supported string prefixes to description
+
+  - from: openapi-document
+    where: $.paths.*.*.parameters[?(@.schema)]
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      if ($.schema.description == null) return $;
+      $.description = ($.description ?? '') + ' ' + $.schema.description;
+    reason: Bubble description from schema to parameter, need to handle custom prefixed types
 
   - from: openapi-document
     where: $.info.title
     set: middleware
     reason: the whole SDK already about aeternity
 
-version: ^3.6.3
+version: ^3.7.1
 use-extension:
-  '@autorest/typescript': ^6.0.2
-  '@autorest/modelerfour': ^4.26.2
-input-file: middleware-openapi.yaml
+  '@autorest/typescript': ^6.0.23
+  '@autorest/modelerfour': ^4.27.0
+# TODO: switch to middleware-openapi.yaml after releasing middleware with https://github.com/aeternity/ae_mdw/pull/1873
+input-file: middleware-openapi-temp.yaml
 output-folder: ../../src/apis/middleware
 source-code-folder-path: .
 generator: typescript

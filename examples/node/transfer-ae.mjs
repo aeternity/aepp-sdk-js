@@ -20,7 +20,7 @@ import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk';
 // The following constants are used in the subsequent code snippets.
 const ACCOUNT_KEYPAIR = {
   publicKey: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
-  secretKey: '9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200',
+  secretKey: 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf',
 };
 const NODE_URL = 'https://testnet.aeternity.io';
 const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2);
@@ -53,7 +53,7 @@ console.log(`Balance of ${recipient} (before): ${balanceBefore} aettos`);
 // Calling the `spend` function will create, sign and broadcast a `SpendTx` to the network.
 const tx = await aeSdk.spend(amount, recipient);
 console.log('Transaction mined', tx);
-// Alternatively, you can use [transferFunds](https://docs.aeternity.com/aepp-sdk-js/v13.1.0/api/functions/transferFunds.html)
+// Alternatively, you can use [transferFunds](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/functions/transferFunds.html)
 // method to transfer a fraction of your AE to another account.
 
 // ## 6. Get AE balance of recipient (after transfer)

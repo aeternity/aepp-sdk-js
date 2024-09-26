@@ -109,15 +109,14 @@ classes reactive then the app may fail with
 
 AeSdk and Contract classes doesn’t have a state intended to be tracked using reactivity. Therefore
 to solve this issue we suggest to avoid making their instances reactive. One of the ways is to use
-Vue's integrated utilities: [shallowRef], [shallowReactive]. The idea is to make reactive only the
+Vue's integrated utility: [shallowRef]. The idea is to make reactive only the
 root variable, to don't make it reactive in deep. You can find it implementation in the
 [æpp example].
 
 [based on]: https://vuejs.org/guide/extras/reactivity-in-depth.html#how-reactivity-works-in-vue
 [not compatible]: https://github.com/tc39/proposal-class-fields/issues/106
 [shallowRef]: https://vuejs.org/api/reactivity-advanced.html#shallowref
-[shallowReactive]: https://vuejs.org/api/reactivity-advanced.html#shallowreactive
-[æpp example]: ../examples/browser/aepp/
+[æpp example]: https://github.com/aeternity/aepp-sdk-js/tree/71da12b5df56b41f7317d1fb064e44e8ea118d6c/examples/browser/aepp
 
 ## Command Line Interface (CLI)
 If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the [💻 CLI](https://github.com/aeternity/aepp-cli-js) and follow the instructions mentioned there.

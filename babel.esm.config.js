@@ -9,7 +9,7 @@ config.plugins.push(
   ['import-globals', {
     Buffer: { moduleName: 'buffer', exportName: 'Buffer' },
   }],
-  ['transform-default-named-imports'],
+  ['transform-default-named-imports', { exclude: ['@scure/bip39'] }],
 );
 config.plugins = config.plugins.filter((p) => p !== 'babel-plugin-transform-import-meta');
 

@@ -295,6 +295,18 @@ describe('AENS utils', () => {
       expect(() => ensureName('ldiDxa1Yxy1iiTRztYEN4F8nrnfZib3Q1MllPghmst8fjJ1sI3DXzOoAddE2ETxp.chain'))
         .to.throw(ArgumentError, 'aens name should be not too long, got ldiDxa1Yxy1iiTRztYEN4F8nrnfZib3Q1MllPghmst8fjJ1sI3DXzOoAddE2ETxp.chain instead');
     });
+
+    it('fails if name starts or ends with minus', () => {
+      expect(() => ensureName('-test.chain'))
+        .to.throw(ArgumentError, 'aens name should be starting with no "-" char, got -test.chain instead');
+      expect(() => ensureName('test-.chain'))
+        .to.throw(ArgumentError, 'aens name should be ending with no "-" char, got test-.chain instead');
+    });
+
+    it('fails if name has minus at 2, 3 chars', () => {
+      expect(() => ensureName('te--st.chain'))
+        .to.throw(ArgumentError, 'aens name should be without "-" char in both the third and fourth positions, got te--st.chain instead');
+    });
   });
 
   describe('isAuctionName', () => {

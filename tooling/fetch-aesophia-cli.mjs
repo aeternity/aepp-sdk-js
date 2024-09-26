@@ -1,25 +1,14 @@
-import { createHash } from 'crypto';
-import { dirname } from 'path';
-import { writeFileSync, readFileSync, mkdirSync } from 'fs';
+import { writeFileSync } from 'fs';
+// eslint-disable-next-line import/extensions
+import restoreFile from './restore-file.mjs';
 
 const path = './bin/aesophia_cli';
-const hash = 'KSUb0KzzM3zhM2cbHeQRqnBvRR7CHvC5Lb9VFw3RPfmC5FOYuxHvRYYsMWwFbrYg76L9fPv5IypKEZbdGohXgA==';
+const hash = 'RYAgt3BbPt4UlANdcOff68hca0p1q2dK+H1b5BSMNUl6+zb9JjoJIn2/MlMxJAF0WdpjJKlVTkocXY7pMVIzCg==';
 
-function ensureBinaryCorrect() {
-  const buffer = readFileSync(path);
-  const h = createHash('sha512').update(buffer).digest('base64');
-  if (h !== hash) throw new Error('Wrong hash');
-}
-
-try {
-  ensureBinaryCorrect();
-} catch {
-  console.log('Fetching aesophia_cli');
+await restoreFile(path, hash, async () => {
   const request = await fetch(
-    'https://github.com/aeternity/aesophia_cli/releases/download/v7.2.1/aesophia_cli',
+    'https://github.com/aeternity/aesophia_cli/releases/download/v8.0.0/aesophia_cli',
   );
   const body = Buffer.from(await request.arrayBuffer());
-  mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, body);
-  ensureBinaryCorrect();
-}
+});

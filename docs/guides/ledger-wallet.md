@@ -26,7 +26,7 @@ console.log(await account.signTransaction('tx_...')); // 'tx_...' (with signatur
 ```
 The private key for the account would be derived on the Ledger device using the provided index and the mnemonic phrase it was initialized with.
 
-The complete examples of how to use it in nodejs and browser can be found [here](../../test/environment/ledger).
+The complete examples of how to use it in nodejs and browser can be found [here](https://github.com/aeternity/aepp-sdk-js/tree/71da12b5df56b41f7317d1fb064e44e8ea118d6c/test/environment/ledger).
 
 ## Account verification
 To protect from MITM attacks is it recommended to ensure that the accessed account is the account actually available on Ledger. To do so, the app should show to user the address it have access to, the same as Ledger HW should show the address on its screen, and user should ensure that addresses the same. To trigger verification process you need to use `getAddress` method

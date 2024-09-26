@@ -29,10 +29,11 @@ import getTransactionSignerAddress from './transaction-signer';
  * the SDK calculates the overall price of any transaction on its side.
  *
  * @param transaction - Transaction to calculate the cost of
- * @param innerTx - Should be provided if transaction wrapped with Tag.PayingForTx
- * @param gasUsed - Amount of gas actually used to make calculation more accurate
- * @param queryFee - Oracle query fee
- * @param isInitiator - Is transaction signer an initiator of state channel
+ * @param options - Options
+ * @param options.innerTx - Should be provided if transaction wrapped with Tag.PayingForTx
+ * @param options.gasUsed - Amount of gas actually used to make calculation more accurate
+ * @param options.queryFee - Oracle query fee
+ * @param options.isInitiator - Is transaction signer an initiator of state channel
  */
 export function getExecutionCost(
   transaction: Encoded.Transaction,
@@ -122,8 +123,8 @@ export function getExecutionCostBySignedTx(
  * Calculates the cost of signed and not signed transaction execution using node
  * @param transaction - Transaction to calculate the cost of
  * @param node - Node to use
- * @param isMined - Is transaction already mined or not
  * @param options - Options
+ * @param options.isMined - Is transaction already mined or not
  */
 export async function getExecutionCostUsingNode(
   transaction: Encoded.Transaction,

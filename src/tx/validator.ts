@@ -1,12 +1,12 @@
 import { RestError } from '@azure/core-rest-pipeline';
-import { hash, verify } from '../utils/crypto';
+import { hash, isAddressValid, verify } from '../utils/crypto';
 import { TxUnpacked } from './builder/schema.generated';
 import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version';
 import { Tag, ConsensusProtocolVersion } from './builder/constants';
 import { buildTx, unpackTx } from './builder';
 import { concatBuffers, isAccountNotFoundError } from '../utils/other';
-import { Encoded, decode } from '../utils/encoder';
-import Node, { TransformNodeType } from '../Node';
+import { Encoded, Encoding, decode } from '../utils/encoder';
+import Node from '../Node';
 import { Account } from '../apis/node';
 import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
 import { UnexpectedTsError } from '../utils/errors';
@@ -23,7 +23,7 @@ type Validator = (
   tx: TxUnpacked,
   options: {
     // TODO: remove after fixing node types
-    account: TransformNodeType<Account> & { id: Encoded.AccountAddress };
+    account: Account & { id: Encoded.AccountAddress };
     nodeNetworkId: string;
     parentTxTypes: Tag[];
     node: Node;
@@ -48,7 +48,7 @@ async function verifyTransactionInternal(
       })
       // TODO: remove after fixing https://github.com/aeternity/aepp-sdk-js/issues/1537
       .then((acc) => ({ ...acc, id: acc.id as Encoded.AccountAddress })),
-    node.getCurrentKeyBlockHeight(),
+    node.getCurrentKeyBlockHeight(), // TODO: don't request height on each validation, use caching
     node.getNodeInfo(),
   ]);
 
@@ -76,9 +76,11 @@ export default async function verifyTransaction(
   transaction: Parameters<typeof unpackTx>[0],
   nodeNotCached: Node,
 ): Promise<ValidatorResult[]> {
+  const pipeline = nodeNotCached.pipeline.clone();
+  pipeline.removePolicy({ name: 'parse-big-int' });
   const node = new Node(nodeNotCached.$host, {
     ignoreVersion: true,
-    pipeline: nodeNotCached.pipeline.clone(),
+    pipeline,
     additionalPolicies: [genAggressiveCacheGetResponsesPolicy()],
   });
   return verifyTransactionInternal(unpackTx(transaction), node, []);
@@ -115,7 +117,7 @@ validators.push(
   },
   (tx, { height }) => {
     if (!('ttl' in tx)) return [];
-    if (tx.ttl === 0 || tx.ttl >= height) return [];
+    if (tx.ttl === 0 || tx.ttl > height) return [];
     return [{
       message: `TTL ${tx.ttl} is already expired, current height is ${height}`,
       key: 'ExpiredTTL',
@@ -132,6 +134,19 @@ validators.push(
       checkedKeys: ['amount', 'fee', 'nameFee', 'gasLimit', 'gasPrice'],
     }];
   },
+  async (tx, { node }) => {
+    if (tx.tag !== Tag.SpendTx || isAddressValid(tx.recipientId, Encoding.Name)) return [];
+    const recipient = await node.getAccountByPubkey(tx.recipientId).catch((error) => {
+      if (!isAccountNotFoundError(error)) throw error;
+      return null;
+    });
+    if (recipient == null || recipient.payable === true) return [];
+    return [{
+      message: 'Recipient account is not payable',
+      key: 'RecipientAccountNotPayable',
+      checkedKeys: ['recipientId'],
+    }];
+  },
   (tx, { account }) => {
     let message;
     if (tx.tag === Tag.SignedTx && account.kind === 'generalized' && tx.signatures.length !== 0) {
@@ -146,7 +161,7 @@ validators.push(
   // TODO: revert nonce check
   // TODO: ensure nonce valid when paying for own tx
   (tx, { consensusProtocolVersion }) => {
-    const oracleCall = Tag.Oracle === tx.tag || Tag.OracleRegisterTx === tx.tag;
+    const oracleCall = Tag.OracleRegisterTx === tx.tag;
     const contractCreate = Tag.ContractCreateTx === tx.tag || Tag.GaAttachTx === tx.tag;
     const contractCall = Tag.ContractCallTx === tx.tag || Tag.GaMetaTx === tx.tag;
     const type = (oracleCall ? 'oracle-call' : null)
@@ -176,6 +191,8 @@ validators.push(
   },
   async (tx, { node }) => {
     if (Tag.ContractCallTx !== tx.tag) return [];
+    // TODO: remove after solving https://github.com/aeternity/aeternity/issues/3669
+    if (tx.contractId.startsWith('nm_')) return [];
     try {
       const { active } = await node.getContract(tx.contractId);
       if (active) return [];

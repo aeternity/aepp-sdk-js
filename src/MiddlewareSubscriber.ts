@@ -35,7 +35,7 @@ export default class MiddlewareSubscriber {
   readonly [target: string, s: Source, cb: (p?: Object, e?: Error) => void]
   > = [];
 
-  #requestQueue: Array<[isSubscribe: boolean, target: string]> = [];
+  readonly #requestQueue: Array<[isSubscribe: boolean, target: string]> = [];
 
   #webSocket?: WebSocket;
 

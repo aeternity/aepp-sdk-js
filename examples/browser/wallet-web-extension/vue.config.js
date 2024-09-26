@@ -28,8 +28,8 @@ module.exports = {
   configureWebpack: {
     resolve: {
       alias: {
-        '@azure/core-client': '@azure/core-client/dist-esm/src/index.js',
-        '@azure/core-rest-pipeline': '@azure/core-rest-pipeline/dist-esm/src/index.js',
+        '@azure/core-client': '@azure/core-client/dist/browser/index.js',
+        '@azure/core-rest-pipeline': '@azure/core-rest-pipeline/dist/browser/index.js',
       },
     },
   },

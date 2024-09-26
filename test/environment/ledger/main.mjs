@@ -1,5 +1,5 @@
 import {
-  Node, AeSdk, CompilerHttp, AccountLedgerFactory,
+  Node, AeSdk, CompilerHttp, AccountLedgerFactory, Contract,
 // eslint-disable-next-line import/extensions
 } from '../../../es/index.mjs';
 
@@ -17,7 +17,7 @@ export default async function run(transport) {
   const aeSdk = new AeSdk({
     nodes: [{ name: 'testnet', instance: node }],
     accounts: [account],
-    onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+    onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
   });
 
   const { hash } = await aeSdk.spend(1e17, 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E');
@@ -27,7 +27,9 @@ export default async function run(transport) {
 contract Test =
  entrypoint getArg(x : int) = x + 1
 `;
-  const contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
+  const contract = await Contract.initialize({
+    ...aeSdk.getContext(), sourceCode: contractSourceCode,
+  });
   const deployInfo = await contract.$deploy([]);
   console.log('Contract deployed at', deployInfo.address);
 

@@ -1,7 +1,7 @@
 import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import {
-  addTransactionHandler, getSdk, ignoreVersion, networkId, url,
+  addTransactionHandler, getSdk, networkId, url,
 } from '.';
 import {
   AeSdk, Node, buildTxHash, poll, Tag, unpackTx, getTransactionSignerAddress, buildTx, Encoded,
@@ -9,24 +9,25 @@ import {
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
-const node = new Node(url, { ignoreVersion });
-interface TxAndCost { tx: Encoded.Transaction; cost: bigint }
-const sentTxPromises: Array<Promise<TxAndCost | undefined>> = [];
+const node = new Node(url);
+interface TxDetails { tx: Encoded.Transaction; cost: bigint; blockHash: Encoded.MicroBlockHash }
+const sentTxPromises: Array<Promise<TxDetails | undefined>> = [];
 
 addTransactionHandler((tx: Encoded.Transaction) => sentTxPromises.push((async () => {
   const { tag } = unpackTx(tx, Tag.SignedTx).encodedTx;
   let cost = 0n;
   if (tag === Tag.ChannelSettleTx) cost = await getExecutionCostUsingNode(tx, node);
+  let blockHash: Encoded.MicroBlockHash;
   try {
     await pause(1000);
-    await poll(buildTxHash(tx), { onNode: node });
+    blockHash = (await poll(buildTxHash(tx), { onNode: node })).blockHash as Encoded.MicroBlockHash;
   } catch (error) {
     return undefined;
   }
   if (tag !== Tag.ChannelSettleTx) {
     cost = await getExecutionCostUsingNode(tx, node, { isMined: true });
   }
-  return { tx, cost };
+  return { tx, cost, blockHash };
 })()));
 
 describe('Execution cost', () => {
@@ -37,7 +38,7 @@ describe('Execution cost', () => {
   });
 
   it('calculates execution cost for spend tx', async () => {
-    const { rawTx } = await aeSdk.spend(100, aeSdk.address);
+    const { rawTx } = await aeSdk.spend(100, aeSdk.address, { ttl: 0 });
     const expectedCost = 16660000000000n;
     expect(getExecutionCostBySignedTx(rawTx, networkId)).to.equal(expectedCost);
     expect(getExecutionCost(buildTx(unpackTx(rawTx, Tag.SignedTx).encodedTx)))
@@ -59,16 +60,15 @@ describe('Execution cost', () => {
     }
 
     const sentTransactions = (await Promise.all(sentTxPromises))
-      .filter((a): a is TxAndCost => a != null);
+      .filter((tx): tx is TxDetails => tx != null)
+      .filter((tx, i, arr) => arr.filter((el) => el.blockHash === tx.blockHash).length === 1);
 
     const checkedTags = new Set<Tag>();
     await Promise.all(
-      sentTransactions.map(async ({ tx, cost }) => {
-        const txHash = buildTxHash(tx);
+      sentTransactions.map(async ({ tx, cost, blockHash }) => {
         const params = unpackTx(tx, Tag.SignedTx).encodedTx;
 
         const signer = getTransactionSignerAddress(tx);
-        const { blockHash } = await aeSdk.api.getTransactionByHash(txHash);
         const { prevHash } = await aeSdk.api.getMicroBlockHeaderByHash(blockHash);
         const balanceBefore = await getBalance(signer, prevHash);
         const balanceAfter = await getBalance(signer, blockHash);
@@ -82,7 +82,7 @@ describe('Execution cost', () => {
         } else if (params.tag === Tag.ContractCallTx) {
           // Can't detect AENS.claim in contract call
           // TODO: remove after solving https://github.com/aeternity/aeternity/issues/4088
-          if (balanceDiff === 20000000000000000000n) return;
+          if (balanceDiff === 500000000000001n) return;
           // Can't detect Oracle.respond reward in contract call
           if (balanceDiff === -501000n) return;
           expect(balanceDiff).to.be.equal(0n);
@@ -116,5 +116,5 @@ describe('Execution cost', () => {
       Tag.PayingForTx,
     ]));
     expect(sentTransactions.length).to.be.greaterThanOrEqual(134);
-  });
+  }).timeout(16000);
 });

@@ -1,14 +1,13 @@
 import { Encoded } from '../../utils/encoder';
 import { Domain, AciValue } from '../../utils/typed-data';
 import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema';
-import { TransformNodeType } from '../../Node';
 import { SignedTx } from '../../apis/node';
 
 export interface WalletInfo {
   id: string;
   name: string;
   networkId: string;
-  origin: string;
+  origin: string; // TODO: origin needs to be provided by transport
   type: WALLET_TYPE;
 }
 
@@ -45,6 +44,10 @@ export interface WalletApi {
 
   [METHODS.address]: () => Promise<Encoded.AccountAddress[]>;
 
+  [METHODS.unsafeSign]: (
+    p: { data: Encoded.Bytearray; onAccount: Encoded.AccountAddress }
+  ) => Promise<{ signature: Encoded.Signature }>;
+
   [METHODS.sign]: ((
     p: {
       tx: Encoded.Transaction;
@@ -63,7 +66,7 @@ export interface WalletApi {
      * @deprecated this is not a hash at all, will be removed later at the same time
      * as dropping ability to broadcast transaction by wallet
      */
-    transactionHash?: Partial<TransformNodeType<SignedTx>> & {
+    transactionHash?: Partial<SignedTx> & {
       hash: Encoded.TxHash;
       rawTx: Encoded.Transaction;
     };
@@ -79,6 +82,13 @@ export interface WalletApi {
       domain: Domain;
       aci: AciValue;
       data: Encoded.ContractBytearray;
+      onAccount: Encoded.AccountAddress;
+    },
+  ) => Promise<{ signature: Encoded.Signature }>;
+
+  [METHODS.signDelegation]: (
+    p: {
+      delegation: Encoded.Bytearray;
       onAccount: Encoded.AccountAddress;
     },
   ) => Promise<{ signature: Encoded.Signature }>;

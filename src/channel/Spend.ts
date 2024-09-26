@@ -9,9 +9,9 @@ import { ChannelConnectionError } from '../utils/errors';
 import {
   awaitingCompletion, channelOpen, handleUnexpectedMessage, signAndNotify,
 } from './handlers';
-import { unpackTx } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
-import { TxUnpacked } from '../tx/builder/schema.generated';
+import { EntryTag } from '../tx/builder/entry/constants';
+import { EntUnpacked } from '../tx/builder/entry/schema.generated';
+import { unpackEntry } from '../tx/builder/entry';
 
 export default class ChannelSpend extends Channel {
   /**
@@ -120,11 +120,11 @@ export default class ChannelSpend extends Channel {
       accounts: Encoded.AccountAddress[];
       contracts?: Encoded.ContractAddress[];
     },
-  ): Promise<TxUnpacked & { tag: Tag.TreesPoi }> {
-    return unpackTx(
-      (await call(this, 'channels.get.poi', { accounts, contracts })).poi,
-      Tag.TreesPoi,
+  ): Promise<EntUnpacked & { tag: EntryTag.TreesPoi }> {
+    const { poi }: { poi: Encoded.Poi } = (
+      await call(this, 'channels.get.poi', { accounts, contracts })
     );
+    return unpackEntry(poi);
   }
 
   /**
@@ -230,10 +230,6 @@ export default class ChannelSpend extends Channel {
    * @param amount - Amount of coins to withdraw
    * @param sign - Function which verifies and signs withdraw transaction
    * @param callbacks - Callbacks
-   * @param callbacks.onOnChainTx - Called when withdraw transaction has been posted
-   * on chain
-   * @param callbacks.onOwnWithdrawLocked
-   * @param callbacks.onWithdrawLocked
    * @example
    * ```js
    * channel.withdraw(
@@ -305,10 +301,6 @@ export default class ChannelSpend extends Channel {
    * @param amount - Amount of coins to deposit
    * @param sign - Function which verifies and signs deposit transaction
    * @param callbacks - Callbacks
-   * @param callbacks.onOnChainTx - Called when deposit transaction has been posted
-   * on chain
-   * @param callbacks.onOwnDepositLocked
-   * @param callbacks.onDepositLocked
    * @example
    * ```js
    * channel.deposit(

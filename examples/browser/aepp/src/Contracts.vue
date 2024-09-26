@@ -10,7 +10,7 @@
         />
       </div>
     </div>
-    <button @click="createPromise = create()">
+    <button @click="() => { createPromise = create(); }">
       Create
     </button>
     <div v-if="createPromise">
@@ -20,103 +20,99 @@
   </div>
 
   <template v-if="contract">
-    <h2>Compile Contract</h2>
-    <div class="group">
-      <button @click="compilePromise = compile()">
-        Compile
-      </button>
-      <div v-if="compilePromise">
-        <div>Bytecode</div>
-        <Value :value="compilePromise" />
-      </div>
-    </div>
+    <FieldAction
+      title="Compile Contract"
+      action-title="Compile"
+      :action-handler="compile"
+      result-title="Bytecode"
+    />
   </template>
 
   <template v-if="contract">
-    <h2>Deploy Contract</h2>
-    <div class="group">
-      <div>
-        <div>Deploy argument</div>
-        <div>
-          <input
-            v-model="deployArg"
-            placeholder="Deploy argument"
-          >
-        </div>
-      </div>
-      <button @click="deployPromise = deploy()">
-        Deploy
-      </button>
-      <div v-if="deployPromise">
-        <div>Deployed Contract</div>
-        <Value :value="deployPromise" />
-      </div>
-    </div>
+    <FieldAction
+      title="Deploy Contract"
+      arg-title="Deploy argument"
+      arg-placeholder="Deploy argument"
+      arg-default-value="5"
+      action-title="Deploy"
+      :action-handler="deploy"
+      result-title="Deployed Contract"
+    />
   </template>
 
   <template v-if="deployPromise">
-    <h2>Call Contract</h2>
-    <div class="group">
-      <div>
-        <div>Call argument</div>
-        <div>
-          <input
-            v-model="callArg"
-            placeholder="Call argument"
-          >
-        </div>
-      </div>
-      <button @click="callPromise = call()">
-        Call
-      </button>
-      <div v-if="callPromise">
-        <div>Call Result</div>
-        <Value :value="callPromise" />
-      </div>
-    </div>
+    <FieldAction
+      title="Call Contract on chain"
+      arg-title="Call argument"
+      arg-placeholder="Call argument"
+      arg-default-value="7"
+      action-title="Call"
+      :action-handler="callOnChain"
+      result-title="Call Result"
+    />
+
+    <FieldAction
+      title="Call Contract using dry-run (static)"
+      arg-title="Call argument"
+      arg-placeholder="Call argument"
+      arg-default-value="8"
+      action-title="Call"
+      :action-handler="callStatic"
+      result-title="Call Result"
+    />
   </template>
 </template>
 
 <script>
 import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
+import { Contract } from '@aeternity/aepp-sdk';
 import Value from './components/Value.vue';
+import FieldAction from './components/FieldAction.vue';
 
 const contractSourceCode = `
 contract Multiplier =
   record state = { factor: int }
-  entrypoint init(f : int) : state = { factor = f }
-  entrypoint calc(x : int) = x * state.factor
+
+  entrypoint init(f : int) = { factor = f }
+
+  stateful entrypoint setFactor(f : int) =
+    put(state{ factor = f })
+
+  entrypoint multiplyByFactor(x : int) =
+    x * state.factor
 `.trim();
 
 export default {
-  components: { Value },
+  components: { Value, FieldAction },
   data: () => ({
     contractSourceCode,
-    deployArg: 5,
-    callArg: 7,
     createPromise: null,
     contract: null,
-    compilePromise: null,
     deployPromise: null,
-    callPromise: null,
   }),
   computed: mapState(['aeSdk']),
   methods: {
     async create() {
       // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
       this.contract = shallowRef(
-        await this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode }),
+        await Contract.initialize({
+          ...this.aeSdk.getContext(), sourceCode: this.contractSourceCode,
+        }),
       );
     },
     async compile() {
       return this.contract.$compile();
     },
-    async deploy() {
-      return this.contract.$deploy([this.deployArg]);
+    async deploy(arg) {
+      this.deployPromise = this.contract.$deploy([arg]);
+      return this.deployPromise;
     },
-    async call() {
-      return this.contract.calc(this.callArg);
+    async callOnChain(arg) {
+      return this.contract.setFactor(arg);
+    },
+    async callStatic(arg) {
+      return this.contract.multiplyByFactor(arg);
     },
   },
 };

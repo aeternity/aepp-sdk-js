@@ -70,6 +70,15 @@ export function nameToPunycode(maybeName: string): AensName {
   if (/\p{Emoji_Presentation}/u.test(name)) {
     throw new ArgumentError('aens name', 'not containing emoji', maybeName);
   }
+  if (name[2] === '-' && name[3] === '-') {
+    throw new ArgumentError('aens name', 'without "-" char in both the third and fourth positions', maybeName);
+  }
+  if (name[0] === '-') {
+    throw new ArgumentError('aens name', 'starting with no "-" char', maybeName);
+  }
+  if (name.at(-1) === '-') {
+    throw new ArgumentError('aens name', 'ending with no "-" char', maybeName);
+  }
   let punycode;
   try {
     const u = new URL(`http://${name}.${suffix}`);
@@ -136,7 +145,7 @@ export function readInt(buf: Buffer = Buffer.from([])): string {
 /**
  * Ensure that name is valid AENS name, would throw an exception otherwise
  * @category AENS
- * @param name - AENS name
+ * @param maybeName - AENS name
  */
 export function ensureName(maybeName: string): asserts maybeName is AensName {
   nameToPunycode(maybeName);
@@ -145,7 +154,7 @@ export function ensureName(maybeName: string): asserts maybeName is AensName {
 /**
  * Is AENS name valid
  * @category AENS
- * @param name - AENS name
+ * @param maybeName - AENS name
  */
 // TODO: consider renaming to isName
 export function isNameValid(maybeName: string): maybeName is AensName {

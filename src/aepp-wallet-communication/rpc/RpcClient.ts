@@ -40,11 +40,13 @@ export default class RpcClient <
 > {
   connection: BrowserConnection;
 
-  #callbacks = new Map<number, { resolve: (v: any) => void; reject: (e: Error) => void }>();
+  readonly #callbacks = (
+    new Map<number, { resolve: (v: any) => void; reject: (e: Error) => void }>()
+  );
 
   #messageId = 0;
 
-  #methods: WithOrigin<LocalApi>;
+  readonly #methods: WithOrigin<LocalApi>;
 
   constructor(
     connection: BrowserConnection,
