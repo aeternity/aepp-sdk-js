@@ -34,6 +34,67 @@
     >
       Cancel detection
     </button>
+
+    <template v-if="walletConnected">
+      <br>
+      <button @click="getAccounts">
+        Get accounts
+      </button>
+      <button @click="subscribeAccounts('subscribe', 'current')">
+        Subscribe current
+      </button>
+      <button @click="subscribeAccounts('unsubscribe', 'current')">
+        Unsubscribe current
+      </button>
+      <button @click="subscribeAccounts('subscribe', 'connected')">
+        Subscribe connected
+      </button>
+      <button @click="subscribeAccounts('unsubscribe', 'connected')">
+        Unsubscribe connected
+      </button>
+
+      <div>
+        <div>RPC Accounts</div>
+        <div>{{ rpcAccounts.map((account) => account.address.slice(0, 8)).join(', ') }}</div>
+      </div>
+    </template>
+  </div>
+
+  <h2>Ledger Hardware Wallet</h2>
+  <div class="group">
+    <template v-if="ledgerStatus">
+      <div>
+        <div>Connection status</div>
+        <div>{{ ledgerStatus }}</div>
+      </div>
+    </template>
+    <button
+      v-else-if="!ledgerAccountFactory"
+      @click="connectLedger"
+    >
+      Connect
+    </button>
+    <template v-else>
+      <button @click="disconnectLedger">
+        Disconnect
+      </button>
+      <button @click="addLedgerAccount">
+        Add Account
+      </button>
+      <button
+        v-if="ledgerAccounts.length > 1"
+        @click="switchLedgerAccount"
+      >
+        Switch Account
+      </button>
+      <button @click="switchNode">
+        Switch Node
+      </button>
+      <div v-if="ledgerAccounts.length">
+        <div>Ledger Accounts</div>
+        <div>{{ ledgerAccounts.map((account) => account.address.slice(0, 8)).join(', ') }}</div>
+      </div>
+    </template>
   </div>
 
   <div class="group">
@@ -58,8 +119,10 @@
 <script>
 import {
   walletDetector, BrowserWindowMessageConnection, RpcConnectionDenyError, RpcRejectedByUserError,
+  WalletConnectorFrame, AccountLedgerFactory,
 } from '@aeternity/aepp-sdk';
 import { mapState } from 'vuex';
+import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 
 export default {
   data: () => ({
@@ -70,6 +133,10 @@ export default {
     reverseIframeWalletUrl: process.env.VUE_APP_WALLET_URL ?? `http://${location.hostname}:9000`,
     walletInfo: null,
     cancelWalletDetection: null,
+    rpcAccounts: [],
+    ledgerStatus: '',
+    ledgerAccountFactory: null,
+    ledgerAccounts: [],
   }),
   computed: {
     ...mapState(['aeSdk']),
@@ -79,6 +146,54 @@ export default {
     },
   },
   methods: {
+    async connectLedger() {
+      try {
+        this.ledgerStatus = 'Waiting for Ledger response';
+        const transport = await TransportWebUSB.create();
+        this.ledgerAccountFactory = new AccountLedgerFactory(transport);
+      } catch (error) {
+        if (error.name === 'TransportOpenUserCancelled') return;
+        throw error;
+      } finally {
+        this.ledgerStatus = '';
+      }
+    },
+    async disconnectLedger() {
+      this.ledgerAccountFactory = null;
+      this.ledgerAccounts = [];
+      this.$store.commit('setAddress', undefined);
+      if (Object.keys(this.aeSdk.accounts).length) this.aeSdk.removeAccount(this.aeSdk.address);
+    },
+    async addLedgerAccount() {
+      try {
+        this.ledgerStatus = 'Waiting for Ledger response';
+        const idx = this.ledgerAccounts.length;
+        const account = await this.ledgerAccountFactory.initialize(idx);
+        this.ledgerStatus = `Ensure that ${account.address} is displayed on Ledger HW screen`;
+        await this.ledgerAccountFactory.getAddress(idx, true);
+        this.ledgerAccounts.push(account);
+        this.setAccount(this.ledgerAccounts[0]);
+      } catch (error) {
+        if (error.statusCode === 0x6985) return;
+        throw error;
+      } finally {
+        this.ledgerStatus = '';
+      }
+    },
+    switchLedgerAccount() {
+      this.ledgerAccounts.push(this.ledgerAccounts.shift());
+      this.setAccount(this.ledgerAccounts[0]);
+    },
+    async switchNode() {
+      await this.setNode(this.$store.state.networkId === 'ae_mainnet' ? 'ae_uat' : 'ae_mainnet');
+    },
+    async getAccounts() {
+      this.rpcAccounts = await this.walletConnector.getAccounts();
+      if (this.rpcAccounts.length) this.setAccount(this.rpcAccounts[0]);
+    },
+    async subscribeAccounts(type, value) {
+      await this.walletConnector.subscribeAccounts(type, value);
+    },
     async detectWallets() {
       if (this.connectMethod === 'reverse-iframe') {
         this.reverseIframe = document.createElement('iframe');
@@ -93,6 +208,7 @@ export default {
             stopDetection();
             resolve(newWallet.getConnection());
             this.cancelWalletDetection = null;
+            this.walletInfo = newWallet.info;
           }
         });
         this.cancelWalletDetection = () => {
@@ -103,25 +219,43 @@ export default {
         };
       });
     },
+    async setNode(networkId) {
+      const [{ name }] = (await this.aeSdk.getNodesInPool())
+        .filter((node) => node.nodeNetworkId === networkId);
+      this.aeSdk.selectNode(name);
+      this.$store.commit('setNetworkId', networkId);
+    },
+    setAccount(account) {
+      if (Object.keys(this.aeSdk.accounts).length) this.aeSdk.removeAccount(this.aeSdk.address);
+      this.aeSdk.addAccount(account, { select: true });
+      this.$store.commit('setAddress', account.address);
+    },
     async connect() {
       this.walletConnecting = true;
-      this.aeSdk.onDisconnect = () => {
-        this.walletConnected = false;
-        this.walletInfo = null;
-        this.$store.commit('setAddress', undefined);
-        if (this.reverseIframe) this.reverseIframe.remove();
-      };
       try {
         const connection = await this.detectWallets();
         try {
-          this.walletInfo = await this.aeSdk.connectToWallet(connection);
+          this.walletConnector = await WalletConnectorFrame.connect('Simple æpp', connection);
         } catch (error) {
           if (error instanceof RpcConnectionDenyError) connection.disconnect();
           throw error;
         }
+        this.walletConnector.on('disconnect', () => {
+          this.walletConnected = false;
+          this.walletInfo = null;
+          this.rpcAccounts = [];
+          this.$store.commit('setAddress', undefined);
+          if (this.reverseIframe) this.reverseIframe.remove();
+        });
         this.walletConnected = true;
-        const { address: { current } } = await this.aeSdk.subscribeAddress('subscribe', 'connected');
-        this.$store.commit('setAddress', Object.keys(current)[0]);
+
+        this.setNode(this.walletConnector.networkId);
+        this.walletConnector.on('networkIdChange', (networkId) => this.setNode(networkId));
+
+        this.walletConnector.on('accountsChange', (accounts) => {
+          this.rpcAccounts = accounts;
+          if (accounts.length) this.setAccount(accounts[0]);
+        });
       } catch (error) {
         if (
           error.message === 'Wallet detection cancelled'
@@ -134,7 +268,7 @@ export default {
       }
     },
     disconnect() {
-      this.aeSdk.disconnectWallet();
+      this.walletConnector.disconnect();
     },
   },
 };

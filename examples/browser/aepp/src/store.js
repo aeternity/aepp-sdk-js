@@ -1,26 +1,18 @@
 import { shallowRef } from 'vue';
 import { createStore } from 'vuex';
-import { AeSdkAepp, Node, CompilerHttp } from '@aeternity/aepp-sdk';
+import { AeSdk, Node, CompilerHttp } from '@aeternity/aepp-sdk';
 
 const store = createStore({
   state: {
     address: undefined,
     networkId: undefined,
-    // AeSdkAepp instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
-    aeSdk: shallowRef(new AeSdkAepp({
-      name: 'Simple æpp',
+    // AeSdk instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
+    aeSdk: shallowRef(new AeSdk({
       nodes: [
         { name: 'testnet', instance: new Node('https://testnet.aeternity.io') },
         { name: 'mainnet', instance: new Node('https://mainnet.aeternity.io') },
       ],
       onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
-      async onNetworkChange({ networkId }) {
-        const [{ name }] = (await this.getNodesInPool())
-          .filter((node) => node.nodeNetworkId === networkId);
-        this.selectNode(name);
-        store.commit('setNetworkId', networkId);
-      },
-      onAddressChange: ({ current }) => store.commit('setAddress', Object.keys(current)[0]),
     })),
   },
   mutations: {
