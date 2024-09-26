@@ -150,7 +150,7 @@ describe('Node client', () => {
         args: OperationArguments,
         spec: OperationSpec,
       ): Promise<T> => {
-        if (shouldFail) spec = { ...spec, path: `https://test.stg.aepps.com${spec.path}` };
+        if (shouldFail) spec = { ...spec, path: `https://google.com/404${spec.path}` };
         return super.sendOperationRequest(args, spec);
       };
     }
