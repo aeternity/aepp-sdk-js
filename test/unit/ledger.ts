@@ -46,18 +46,18 @@ async function initTransport(s: string, i = false): Promise<void> {
 
 afterEach(async () => {
   if (compareWithRealDevice && !ignoreRealDevice) {
-    expect(recordStore.toString()).to.be.equal(expectedRecordStore);
+    expect(recordStore.toString().trim()).to.be.equal(expectedRecordStore);
   }
   expectedRecordStore = '';
   ignoreRealDevice = false;
 });
 
-describe('Ledger HW', () => {
+describe('Ledger HW', function () {
+  this.timeout(compareWithRealDevice ? 60000 : 300);
+
   describe('factory', () => {
     it('gets app version', async () => {
       await initTransport(indent`
-        => e006000000
-        <= 000004049000
         => e006000000
         <= 000004049000`);
       const factory = new AccountLedgerFactory(transport);
@@ -73,7 +73,7 @@ describe('Ledger HW', () => {
       );
       const factory = new AccountLedgerFactory(transport);
       await expect(factory.getAddress(42)).to.be.rejectedWith(
-        'Unsupported app on ledger version 1.4.4. Supported: >= 0.4.4 < 0.5.0',
+        'Unsupported Aeternity app on Ledger version 1.4.4. Supported: >= 0.4.4 < 0.5.0',
       );
     });
 

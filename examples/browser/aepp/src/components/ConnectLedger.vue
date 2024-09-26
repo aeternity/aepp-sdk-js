@@ -24,9 +24,11 @@ import { mapState } from 'vuex';
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 
 export default {
+  created() {
+    this.accountFactory = null;
+  },
   data: () => ({
     status: '',
-    accountFactory: null,
     accounts: [],
   }),
   computed: mapState(['aeSdk']),
