@@ -3,7 +3,8 @@ import { writeFileSync } from 'fs';
 import restoreFile from './restore-file.mjs';
 
 const path = './bin/aesophia_cli';
-const hash = 'RYAgt3BbPt4UlANdcOff68hca0p1q2dK+H1b5BSMNUl6+zb9JjoJIn2/MlMxJAF0WdpjJKlVTkocXY7pMVIzCg==';
+const hash =
+  'RYAgt3BbPt4UlANdcOff68hca0p1q2dK+H1b5BSMNUl6+zb9JjoJIn2/MlMxJAF0WdpjJKlVTkocXY7pMVIzCg==';
 
 await restoreFile(path, hash, async () => {
   const request = await fetch(

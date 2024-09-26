@@ -2,7 +2,7 @@
 name: Publish develop docs
 on:
   push:
-    branches: ['develop']
+    branches: [develop]
 
 jobs:
   main:

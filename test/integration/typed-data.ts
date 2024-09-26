@@ -2,16 +2,17 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import canonicalize from 'canonicalize';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
-import {
-  AeSdk, Contract, decode, Encoded, hashDomain, hashJson, hashTypedData,
-} from '../../src';
+import { AeSdk, Contract, decode, Encoded, hashDomain, hashJson, hashTypedData } from '../../src';
 import { Domain } from '../../src/utils/typed-data';
 import { getSdk } from '.';
+import { indent } from '../utils';
 
 describe('typed data', () => {
   describe('hashJson', () => {
     it('hashes json', () => {
-      expect(hashJson({ a: 'test', b: 42 }).toString('base64')).to.be.eql('EE0l7gg3Xv9K4szSHhK2g24mx5ck1MJHHVCLJscZyEA=');
+      expect(hashJson({ a: 'test', b: 42 }).toString('base64')).to.be.eql(
+        'EE0l7gg3Xv9K4szSHhK2g24mx5ck1MJHHVCLJscZyEA=',
+      );
     });
 
     it('gets the same hash if keys ordered differently', () => {
@@ -39,8 +40,9 @@ describe('typed data', () => {
 
   describe('hashDomain', () => {
     it('hashes', async () => {
-      expect(hashDomain(domain).toString('base64'))
-        .to.be.equal('9EfEJsyqTDJMZU0m/t4zXxwUj2Md8bJd1txMjeB7F2k=');
+      expect(hashDomain(domain).toString('base64')).to.be.equal(
+        '9EfEJsyqTDJMZU0m/t4zXxwUj2Md8bJd1txMjeB7F2k=',
+      );
     });
   });
 
@@ -70,38 +72,38 @@ describe('typed data', () => {
       const typeJson = (canonicalize(recordAci) ?? '').replaceAll('"', '\\"');
       contract = await Contract.initialize({
         ...aeSdk.getContext(),
-        sourceCode: ''
-          + '\ninclude "String.aes"'
-          + '\ninclude "Option.aes"'
-          + '\n'
-          + '\ncontract VerifyTypedDataSignature ='
-          + '\n  record domain = { name: option(string),'
-          + '\n                    version: option(int),'
-          + '\n                    networkId: option(string),'
-          + '\n                    contractAddress: option(VerifyTypedDataSignature) }'
-          + '\n'
-          + '\n  entrypoint getDomain(): domain =' // kind of EIP-5267
-          + '\n    { name = Some("Test app"),'
-          + '\n      version = Some(2),'
-          + '\n      networkId = Some("ae_dev"),' // better `Chain.network_id`, but would complicate testing
-          + '\n      contractAddress = Some(Address.to_contract(Contract.address)) }'
-          + '\n'
-          + '\n  entrypoint getDomainHash() = Crypto.blake2b(getDomain())'
-          + '\n'
-          + '\n  record typedData = { operation: string, parameter: int }'
-          + '\n'
-          + '\n  entrypoint getTypedData(parameter: int): typedData ='
-          + '\n    { operation = "test", parameter = parameter }'
-          + '\n'
-          + '\n  entrypoint hashTypedData(parameter: int): hash ='
-          + `\n    let typeHash = Crypto.blake2b("${typeJson}")`
-          + '\n    let dataHash = Crypto.blake2b(getTypedData(parameter))'
-          + '\n    let payload = Bytes.concat(getDomainHash(), Bytes.concat(typeHash, dataHash))'
-          + '\n    Crypto.blake2b(Bytes.concat(#1a00, payload))'
-          + '\n'
-          + '\n  entrypoint verify(parameter: int, pub: address, sig: signature): bool ='
-          + '\n    require(parameter > 40 && parameter < 50, "Invalid parameter")'
-          + '\n    Crypto.verify_sig(hashTypedData(parameter), pub, sig)',
+        sourceCode: indent`
+          include "String.aes"
+          include "Option.aes"
+
+          contract VerifyTypedDataSignature =
+            record domain = { name: option(string),
+                              version: option(int),
+                              networkId: option(string),
+                              contractAddress: option(VerifyTypedDataSignature) }
+
+            entrypoint getDomain(): domain = // kind of EIP-5267
+              { name = Some("Test app"),
+                version = Some(2),
+                networkId = Some("ae_dev"), // better \`Chain.network_id\`, but would complicate testing
+                contractAddress = Some(Address.to_contract(Contract.address)) }
+
+            entrypoint getDomainHash() = Crypto.blake2b(getDomain())
+
+            record typedData = { operation: string, parameter: int }
+
+            entrypoint getTypedData(parameter: int): typedData =
+              { operation = "test", parameter = parameter }
+
+            entrypoint hashTypedData(parameter: int): hash =
+              let typeHash = Crypto.blake2b("${typeJson}")
+              let dataHash = Crypto.blake2b(getTypedData(parameter))
+              let payload = Bytes.concat(getDomainHash(), Bytes.concat(typeHash, dataHash))
+              Crypto.blake2b(Bytes.concat(#1a00, payload))
+
+            entrypoint verify(parameter: int, pub: address, sig: signature): bool =
+              require(parameter > 40 && parameter < 50, "Invalid parameter")
+              Crypto.verify_sig(hashTypedData(parameter), pub, sig)`,
       });
       await contract.$deploy([]);
       domain.contractAddress = contract.$options.address;
@@ -119,22 +121,28 @@ describe('typed data', () => {
     const recordType = new TypeResolver().resolveType(recordAci, {});
 
     it('calculates typed data hash', async () => {
-      const data = new ContractByteArrayEncoder()
-        .encodeWithType({ operation: 'test', parameter: 43 }, recordType);
+      const data = new ContractByteArrayEncoder().encodeWithType(
+        { operation: 'test', parameter: 43 },
+        recordType,
+      );
       const typedDataHash = Buffer.from((await contract.hashTypedData(43)).decodedResult);
       expect(typedDataHash).to.be.eql(hashTypedData(data, recordAci, domain));
     });
 
     it('verifies signature', async () => {
-      const data = new ContractByteArrayEncoder()
-        .encodeWithType({ operation: 'test', parameter: 45 }, recordType);
+      const data = new ContractByteArrayEncoder().encodeWithType(
+        { operation: 'test', parameter: 45 },
+        recordType,
+      );
       const signature = await aeSdk.signTypedData(data, recordAci, domain);
       const signatureDecoded = decode(signature);
 
-      expect((await contract.verify(46, aeSdk.address, signatureDecoded)).decodedResult)
-        .to.be.equal(false);
-      expect((await contract.verify(45, aeSdk.address, signatureDecoded)).decodedResult)
-        .to.be.equal(true);
+      expect(
+        (await contract.verify(46, aeSdk.address, signatureDecoded)).decodedResult,
+      ).to.be.equal(false);
+      expect(
+        (await contract.verify(45, aeSdk.address, signatureDecoded)).decodedResult,
+      ).to.be.equal(true);
     });
   });
 });

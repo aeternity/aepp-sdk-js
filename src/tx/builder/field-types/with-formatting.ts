@@ -5,9 +5,9 @@ export default function withFormatting<Input, Output, Binary, Params, Options>(
     deserialize: (value: Binary) => Output;
   },
 ): {
-    serialize: (value: Input | undefined, params: Params, options: Options) => Binary;
-    deserialize: (value: Binary) => Output;
-  } {
+  serialize: (value: Input | undefined, params: Params, options: Options) => Binary;
+  deserialize: (value: Binary) => Output;
+} {
   return {
     ...field,
 

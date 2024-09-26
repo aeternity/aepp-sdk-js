@@ -28,10 +28,13 @@ import { unpackEntry } from '../tx/builder/entry';
 import { EntUnpacked } from '../tx/builder/entry/schema.generated';
 
 function snakeToPascalObjKeys<Type>(obj: object): Type {
-  return Object.entries(obj).reduce((result, [key, val]) => ({
-    ...result,
-    [snakeToPascal(key)]: val,
-  }), {}) as Type;
+  return Object.entries(obj).reduce(
+    (result, [key, val]) => ({
+      ...result,
+      [snakeToPascal(key)]: val,
+    }),
+    {},
+  ) as Type;
 }
 
 let channelCounter = 0;
@@ -110,11 +113,12 @@ export default class Channel {
   static async _initialize<T extends Channel>(channel: T, options: ChannelOptions): Promise<T> {
     const reconnect = (options.existingFsmId ?? options.existingChannelId) != null;
     if (reconnect && (options.existingFsmId == null || options.existingChannelId == null)) {
-      throw new IllegalArgumentError('`existingChannelId`, `existingFsmId` should be both provided or missed');
+      throw new IllegalArgumentError(
+        '`existingChannelId`, `existingFsmId` should be both provided or missed',
+      );
     }
-    const reconnectHandler = handlers[
-      options.reestablish === true ? 'awaitingReestablish' : 'awaitingReconnection'
-    ];
+    const reconnectHandler =
+      handlers[options.reestablish === true ? 'awaitingReestablish' : 'awaitingReconnection'];
     await initialize(
       channel,
       reconnect ? reconnectHandler : handlers.awaitingConnection,
@@ -190,8 +194,8 @@ export default class Channel {
     }>(await call(this, 'channels.get.offchain_state', {}));
     return {
       calls: unpackEntry(res.calls),
-      ...res.halfSignedTx !== '' && { halfSignedTx: unpackTx(res.halfSignedTx, Tag.SignedTx) },
-      ...res.signedTx !== '' && { signedTx: unpackTx(res.signedTx, Tag.SignedTx) },
+      ...(res.halfSignedTx !== '' && { halfSignedTx: unpackTx(res.halfSignedTx, Tag.SignedTx) }),
+      ...(res.signedTx !== '' && { signedTx: unpackTx(res.signedTx, Tag.SignedTx) }),
       trees: unpackEntry(res.trees),
     };
   }
@@ -240,11 +244,7 @@ export default class Channel {
   protected async enqueueAction(
     action: () => { handler: ChannelHandler; state?: Partial<ChannelState> },
   ): Promise<any> {
-    return enqueueAction(
-      this,
-      (channel, state) => state?.handler === handlers.channelOpen,
-      action,
-    );
+    return enqueueAction(this, (channel, state) => state?.handler === handlers.channelOpen, action);
   }
 
   /**

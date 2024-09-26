@@ -1,6 +1,4 @@
-import {
-  decode, encode, Encoded, Encoding,
-} from '../../utils/encoder';
+import { decode, encode, Encoded, Encoding } from '../../utils/encoder';
 import { hash } from '../../utils/crypto';
 import { Field } from './field-types/interface';
 import { txSchema } from './schema';
@@ -19,8 +17,11 @@ export function getSchema(tag: Tag, version?: number): Array<[string, Field]> {
   return getSchemaCommon(txSchema, Tag, tag, version);
 }
 
-type TxEncoding = Encoding.Transaction | Encoding.Poi | Encoding.StateTrees
-| Encoding.CallStateTree;
+type TxEncoding =
+  | Encoding.Transaction
+  | Encoding.Poi
+  | Encoding.StateTrees
+  | Encoding.CallStateTree;
 
 /**
  * Build transaction
@@ -28,19 +29,25 @@ type TxEncoding = Encoding.Transaction | Encoding.Poi | Encoding.StateTrees
  * @param params - Transaction params
  */
 export function buildTx(params: TxParams): Encoded.Transaction {
-  return packRecord(txSchema, Tag, params, {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    unpackTx,
-    buildTx,
-    rebuildTx: (overrideParams: any) => buildTx(
-      { ...params, ...overrideParams },
-    ),
-    packEntry,
-  }, Encoding.Transaction);
+  return packRecord(
+    txSchema,
+    Tag,
+    params,
+    {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      unpackTx,
+      buildTx,
+      rebuildTx: (overrideParams: any) => buildTx({ ...params, ...overrideParams }),
+      packEntry,
+    },
+    Encoding.Transaction,
+  );
 }
 
-export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
-  Omit<TxParamsAsync & { tag: TxType }, 'tag' | OmitFields>;
+export type BuildTxOptions<TxType extends Tag, OmitFields extends string> = Omit<
+  TxParamsAsync & { tag: TxType },
+  'tag' | OmitFields
+>;
 
 // TODO: require onNode because it is the only reason this builder is async [breaking change]
 /**
@@ -51,12 +58,11 @@ export type BuildTxOptions <TxType extends Tag, OmitFields extends string> =
  */
 export async function buildTxAsync(params: TxParamsAsync): Promise<Encoded.Transaction> {
   await Promise.all(
-    getSchema(params.tag, params.version)
-      .map(async ([key, field]) => {
-        if (field.prepare == null) return;
-        // @ts-expect-error the type of `params[key]` can't be determined accurately
-        params[key] = await field.prepare(params[key], params, params);
-      }),
+    getSchema(params.tag, params.version).map(async ([key, field]) => {
+      if (field.prepare == null) return;
+      // @ts-expect-error the type of `params[key]` can't be determined accurately
+      params[key] = await field.prepare(params[key], params, params);
+    }),
   );
 
   // @ts-expect-error after preparation properties should be compatible with sync tx builder
@@ -84,9 +90,7 @@ export function unpackTx<TxType extends Tag>(
  * @returns Transaction hash
  */
 export function buildTxHash(rawTx: Encoded.Transaction | Uint8Array): Encoded.TxHash {
-  const data = typeof rawTx === 'string' && rawTx.startsWith('tx_')
-    ? decode(rawTx)
-    : rawTx;
+  const data = typeof rawTx === 'string' && rawTx.startsWith('tx_') ? decode(rawTx) : rawTx;
   return encode(hash(data), Encoding.TxHash);
 }
 

@@ -20,8 +20,7 @@ const convertValuesToBigNumbers = (value: any): any => {
 };
 
 export default {
-  stringify: (...args: Parameters<typeof JsonBig['stringify']>): string => (
-    jsonBig.stringify(convertValuesToBigNumbers(args[0]), ...args.slice(1))
-  ),
+  stringify: (...args: Parameters<(typeof JsonBig)['stringify']>): string =>
+    jsonBig.stringify(convertValuesToBigNumbers(args[0]), ...args.slice(1)),
   parse: jsonBig.parse,
 };

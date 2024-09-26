@@ -25,7 +25,12 @@ export default abstract class AccountBaseFactory {
       if (account != null) result.push(account);
       account = await this.initialize(index);
       index += 1;
-    } while (await node.getAccountByPubkey(account.address).then(() => true, () => false));
+    } while (
+      await node.getAccountByPubkey(account.address).then(
+        () => true,
+        () => false,
+      )
+    );
     return result;
   }
 }

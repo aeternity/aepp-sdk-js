@@ -2,56 +2,30 @@
   <div class="group">
     <div>
       <label>
-        <input v-model="connectMethod" type="radio" value="default">
+        <input v-model="connectMethod" type="radio" value="default" />
         Iframe or WebExtension
       </label>
     </div>
     <div>
       <label>
-        <input v-model="connectMethod" type="radio" value="reverse-iframe">
+        <input v-model="connectMethod" type="radio" value="reverse-iframe" />
         Reverse iframe
       </label>
-      <div><input v-model="reverseIframeWalletUrl"></div>
+      <div><input v-model="reverseIframeWalletUrl" /></div>
     </div>
 
-    <button
-      v-if="walletConnected"
-      @click="disconnect"
-    >
-      Disconnect
-    </button>
-    <button
-      v-else-if="connectMethod"
-      :disabled="walletConnecting"
-      @click="connect"
-    >
-      Connect
-    </button>
+    <button v-if="walletConnected" @click="disconnect">Disconnect</button>
+    <button v-else-if="connectMethod" :disabled="walletConnecting" @click="connect">Connect</button>
 
-    <button
-      v-if="cancelWalletDetection"
-      @click="cancelWalletDetection"
-    >
-      Cancel detection
-    </button>
+    <button v-if="cancelWalletDetection" @click="cancelWalletDetection">Cancel detection</button>
 
     <template v-if="walletConnected">
-      <br>
-      <button @click="getAccounts">
-        Get accounts
-      </button>
-      <button @click="subscribeAccounts('subscribe', 'current')">
-        Subscribe current
-      </button>
-      <button @click="subscribeAccounts('unsubscribe', 'current')">
-        Unsubscribe current
-      </button>
-      <button @click="subscribeAccounts('subscribe', 'connected')">
-        Subscribe connected
-      </button>
-      <button @click="subscribeAccounts('unsubscribe', 'connected')">
-        Unsubscribe connected
-      </button>
+      <br />
+      <button @click="getAccounts">Get accounts</button>
+      <button @click="subscribeAccounts('subscribe', 'current')">Subscribe current</button>
+      <button @click="subscribeAccounts('unsubscribe', 'current')">Unsubscribe current</button>
+      <button @click="subscribeAccounts('subscribe', 'connected')">Subscribe connected</button>
+      <button @click="subscribeAccounts('unsubscribe', 'connected')">Unsubscribe connected</button>
 
       <div>
         <div>RPC Accounts</div>
@@ -70,28 +44,12 @@
         <div>{{ ledgerStatus }}</div>
       </div>
     </template>
-    <button
-      v-else-if="!ledgerAccountFactory"
-      @click="connectLedger"
-    >
-      Connect
-    </button>
+    <button v-else-if="!ledgerAccountFactory" @click="connectLedger">Connect</button>
     <template v-else>
-      <button @click="disconnectLedger">
-        Disconnect
-      </button>
-      <button @click="addLedgerAccount">
-        Add Account
-      </button>
-      <button
-        v-if="ledgerAccounts.length > 1"
-        @click="switchLedgerAccount"
-      >
-        Switch Account
-      </button>
-      <button @click="switchNode">
-        Switch Node
-      </button>
+      <button @click="disconnectLedger">Disconnect</button>
+      <button @click="addLedgerAccount">Add Account</button>
+      <button v-if="ledgerAccounts.length > 1" @click="switchLedgerAccount">Switch Account</button>
+      <button @click="switchNode">Switch Node</button>
       <div v-if="ledgerAccounts.length">
         <div>Ledger Accounts</div>
         <div>{{ ledgerAccounts.map((account) => account.address.slice(0, 8)).join(', ') }}</div>
@@ -104,10 +62,10 @@
       <div>SDK status</div>
       <div>
         {{
-          (walletConnected && 'Wallet connected')
-          || (cancelWalletDetection && 'Wallet detection')
-          || (walletConnecting && 'Wallet connecting')
-          || 'Ready to connect to wallet'
+          (walletConnected && 'Wallet connected') ||
+          (cancelWalletDetection && 'Wallet detection') ||
+          (walletConnecting && 'Wallet connecting') ||
+          'Ready to connect to wallet'
         }}
       </div>
     </div>
@@ -120,8 +78,12 @@
 
 <script>
 import {
-  walletDetector, BrowserWindowMessageConnection, RpcConnectionDenyError, RpcRejectedByUserError,
-  WalletConnectorFrame, AccountLedgerFactory,
+  walletDetector,
+  BrowserWindowMessageConnection,
+  RpcConnectionDenyError,
+  RpcRejectedByUserError,
+  WalletConnectorFrame,
+  AccountLedgerFactory,
 } from '@aeternity/aepp-sdk';
 import { mapState } from 'vuex';
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
@@ -208,7 +170,11 @@ export default {
       const connection = new BrowserWindowMessageConnection();
       return new Promise((resolve, reject) => {
         const stopDetection = walletDetector(connection, async ({ newWallet }) => {
-          if (confirm(`Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`)) {
+          if (
+            confirm(
+              `Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`,
+            )
+          ) {
             stopDetection();
             resolve(newWallet.getConnection());
             this.cancelWalletDetection = null;
@@ -224,8 +190,9 @@ export default {
       });
     },
     async setNode(networkId) {
-      const [{ name }] = (await this.aeSdk.getNodesInPool())
-        .filter((node) => node.nodeNetworkId === networkId);
+      const [{ name }] = (await this.aeSdk.getNodesInPool()).filter(
+        (node) => node.nodeNetworkId === networkId,
+      );
       this.aeSdk.selectNode(name);
       this.$store.commit('setNetworkId', networkId);
     },
@@ -262,10 +229,11 @@ export default {
         });
       } catch (error) {
         if (
-          error.message === 'Wallet detection cancelled'
-          || error instanceof RpcConnectionDenyError
-          || error instanceof RpcRejectedByUserError
-        ) return;
+          error.message === 'Wallet detection cancelled' ||
+          error instanceof RpcConnectionDenyError ||
+          error instanceof RpcRejectedByUserError
+        )
+          return;
         throw error;
       } finally {
         this.walletConnecting = false;

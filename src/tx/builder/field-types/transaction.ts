@@ -1,10 +1,10 @@
-import {
-  decode, encode, Encoded, Encoding,
-} from '../../../utils/encoder';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder';
 import { Tag } from '../constants';
 import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
 
-export default function genTransactionField<T extends Tag = Tag>(tag?: T): {
+export default function genTransactionField<T extends Tag = Tag>(
+  tag?: T,
+): {
   serialize: (
     // TODO: replace with `TxParams & { tag: T }`,
     //  but fix TS2502 value is referenced directly or indirectly in its own type annotation
@@ -12,7 +12,8 @@ export default function genTransactionField<T extends Tag = Tag>(tag?: T): {
     options: { buildTx: typeof buildTxType },
   ) => Buffer;
   deserialize: (
-    value: Buffer, options: { unpackTx: typeof unpackTxType },
+    value: Buffer,
+    options: { unpackTx: typeof unpackTxType },
     // TODO: replace with `TxUnpacked & { tag: T }`,
     //  TS2577 Return type annotation circularly references itself
   ) => any;
@@ -23,7 +24,7 @@ export default function genTransactionField<T extends Tag = Tag>(tag?: T): {
       if (typeof txParams === 'string' && txParams.startsWith('tx_')) {
         return decode(txParams as Encoded.Transaction);
       }
-      return decode(buildTx({ ...txParams, ...tag != null && { tag } }));
+      return decode(buildTx({ ...txParams, ...(tag != null && { tag }) }));
     },
 
     deserialize(buf, { unpackTx }) {

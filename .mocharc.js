@@ -4,4 +4,4 @@ module.exports = {
   extension: '.js,.ts',
   timeout: process.env.NETWORK ? '30s' : '6s',
   ignore: 'test/environment/**',
-}
+};

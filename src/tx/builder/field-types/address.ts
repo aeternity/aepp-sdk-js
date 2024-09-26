@@ -1,8 +1,6 @@
 import { ArgumentError, PrefixNotFoundError, TagNotFoundError } from '../../../utils/errors';
 import { toBytes } from '../../../utils/bytes';
-import {
-  decode, encode, Encoded, Encoding,
-} from '../../../utils/encoder';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder';
 import { isItemOfArray } from '../../../utils/other';
 
 /**
@@ -20,14 +18,14 @@ export const idTagToEncoding = [
   Encoding.Channel,
 ] as const;
 
-export type AddressEncodings = typeof idTagToEncoding[number];
+export type AddressEncodings = (typeof idTagToEncoding)[number];
 
 export default function genAddressField<Encoding extends AddressEncodings>(
   ...encodings: Encoding[]
 ): {
-    serialize: (value: Encoded.Generic<Encoding>) => Buffer;
-    deserialize: (value: Buffer) => Encoded.Generic<Encoding>;
-  } {
+  serialize: (value: Encoded.Generic<Encoding>) => Buffer;
+  deserialize: (value: Buffer) => Encoded.Generic<Encoding>;
+} {
   return {
     /**
      * Utility function to create and _id type

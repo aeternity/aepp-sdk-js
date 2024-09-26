@@ -10,9 +10,12 @@ export interface MiddlewareRawPage {
 
 export function isMiddlewareRawPage(maybePage: unknown): maybePage is MiddlewareRawPage {
   const testPage = maybePage as MiddlewareRawPage;
-  return testPage?.data != null && Array.isArray(testPage.data)
-    && 'next' in testPage
-    && 'prev' in testPage;
+  return (
+    testPage?.data != null &&
+    Array.isArray(testPage.data) &&
+    'next' in testPage &&
+    'prev' in testPage
+  );
 }
 
 /**

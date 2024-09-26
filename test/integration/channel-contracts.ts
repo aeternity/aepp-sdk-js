@@ -1,12 +1,21 @@
-import {
-  describe, it, before, after, beforeEach, afterEach,
-} from 'mocha';
+import { describe, it, before, after, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { getSdk, networkId } from '.';
 import {
-  buildTxHash, encode, decode, Encoded, Encoding, Tag, AbiVersion, VmVersion, AeSdk, Contract,
-  Channel, buildTx, MemoryAccount,
+  buildTxHash,
+  encode,
+  decode,
+  Encoded,
+  Encoding,
+  Tag,
+  AbiVersion,
+  VmVersion,
+  AeSdk,
+  Contract,
+  Channel,
+  buildTx,
+  MemoryAccount,
 } from '../../src';
 import { SignTxWithTag } from '../../src/channel/internal';
 import { assertNotNull } from '../utils';
@@ -27,12 +36,10 @@ describe('Channel contracts', () => {
   let contractAddress: Encoded.ContractAddress;
   let callerNonce: number;
   let contract: Contract<{}>;
-  const initiatorSign = async (tx: Encoded.Transaction): Promise<Encoded.Transaction> => (
-    initiator.signTransaction(tx, { networkId })
-  );
-  const responderSign = async (tx: Encoded.Transaction): Promise<Encoded.Transaction> => (
-    responder.signTransaction(tx, { networkId })
-  );
+  const initiatorSign = async (tx: Encoded.Transaction): Promise<Encoded.Transaction> =>
+    initiator.signTransaction(tx, { networkId });
+  const responderSign = async (tx: Encoded.Transaction): Promise<Encoded.Transaction> =>
+    responder.signTransaction(tx, { networkId });
   const responderSignTag = sinon.spy<SignTxWithTag>(async (_tag, tx: Encoded.Transaction) => {
     if (typeof responderShouldRejectUpdate === 'number') {
       return responderShouldRejectUpdate as unknown as Encoded.Transaction;
@@ -85,24 +92,26 @@ describe('Channel contracts', () => {
     const roundBefore = initiatorCh.round();
     assertNotNull(roundBefore);
     const callData = contract._calldata.encode('Identity', 'init', []);
-    const result = await initiatorCh.createContract({
-      code: await contract.$compile(),
-      callData,
-      deposit: 1000,
-      vmVersion: VmVersion.Fate,
-      abiVersion: AbiVersion.Fate,
-    }, initiatorSign);
+    const result = await initiatorCh.createContract(
+      {
+        code: await contract.$compile(),
+        callData,
+        deposit: 1000,
+        vmVersion: VmVersion.Fate,
+        abiVersion: AbiVersion.Fate,
+      },
+      initiatorSign,
+    );
     result.should.eql({
-      accepted: true, address: result.address, signedTx: await initiatorSignedTx(),
+      accepted: true,
+      address: result.address,
+      signedTx: await initiatorSignedTx(),
     });
     expect(initiatorCh.round()).to.equal(roundBefore + 1);
     sinon.assert.calledTwice(responderSignTag);
-    sinon.assert.calledWithExactly(
-      responderSignTag,
-      'update_ack',
-      sinon.match.string,
-      {
-        updates: [{
+    sinon.assert.calledWithExactly(responderSignTag, 'update_ack', sinon.match.string, {
+      updates: [
+        {
           abi_version: AbiVersion.Fate,
           call_data: callData,
           code: await contract.$compile(),
@@ -110,9 +119,9 @@ describe('Channel contracts', () => {
           op: 'OffChainNewContract',
           owner: sinon.match.string,
           vm_version: VmVersion.Fate,
-        }],
-      },
-    );
+        },
+      ],
+    });
     async function getContractAddresses(channel: Channel): Promise<Encoded.ContractAddress[]> {
       return Object.keys((await channel.state()).trees.contracts) as Encoded.ContractAddress[];
     }
@@ -124,13 +133,16 @@ describe('Channel contracts', () => {
     expect(await getContractAddresses(responderCh)).to.eql([result.address]);
     contractAddress = result.address;
 
-    await responderCh.createContract({
-      code: await contract.$compile(),
-      callData: contract._calldata.encode('Identity', 'init', []),
-      deposit: 1e14,
-      vmVersion: VmVersion.Fate,
-      abiVersion: AbiVersion.Fate,
-    }, responderSign);
+    await responderCh.createContract(
+      {
+        code: await contract.$compile(),
+        callData: contract._calldata.encode('Identity', 'init', []),
+        deposit: 1e14,
+        vmVersion: VmVersion.Fate,
+        abiVersion: AbiVersion.Fate,
+      },
+      responderSign,
+    );
     const contracts = await getContractAddresses(initiatorCh);
     expect(contracts.length).to.equal(2);
     expect(await getContractAddresses(responderCh)).to.eql(contracts);
@@ -144,13 +156,16 @@ describe('Channel contracts', () => {
   it('can create a contract and reject', async () => {
     responderShouldRejectUpdate = true;
     const roundBefore = initiatorCh.round();
-    const result = await initiatorCh.createContract({
-      code: await contract.$compile(),
-      callData: contract._calldata.encode('Identity', 'init', []),
-      deposit: 1e14,
-      vmVersion: VmVersion.Fate,
-      abiVersion: AbiVersion.Fate,
-    }, initiatorSign);
+    const result = await initiatorCh.createContract(
+      {
+        code: await contract.$compile(),
+        callData: contract._calldata.encode('Identity', 'init', []),
+        deposit: 1e14,
+        vmVersion: VmVersion.Fate,
+        abiVersion: AbiVersion.Fate,
+      },
+      initiatorSign,
+    );
     expect(initiatorCh.round()).to.equal(roundBefore);
     result.should.eql({ ...result, accepted: false });
   });
@@ -172,13 +187,16 @@ describe('Channel contracts', () => {
 
   it('can abort contract with custom error code', async () => {
     responderShouldRejectUpdate = 12345;
-    const result = await initiatorCh.createContract({
-      code: await contract.$compile(),
-      callData: contract._calldata.encode('Identity', 'init', []),
-      deposit: 1e14,
-      vmVersion: VmVersion.Fate,
-      abiVersion: AbiVersion.Fate,
-    }, initiatorSign);
+    const result = await initiatorCh.createContract(
+      {
+        code: await contract.$compile(),
+        callData: contract._calldata.encode('Identity', 'init', []),
+        deposit: 1e14,
+        vmVersion: VmVersion.Fate,
+        abiVersion: AbiVersion.Fate,
+      },
+      initiatorSign,
+    );
     result.should.eql({
       accepted: false,
       errorCode: responderShouldRejectUpdate,
@@ -201,12 +219,15 @@ describe('Channel contracts', () => {
   it('can call a contract and accept', async () => {
     const roundBefore = initiatorCh.round();
     assertNotNull(roundBefore);
-    const result = await initiatorCh.callContract({
-      amount: 0,
-      callData: contract._calldata.encode('Identity', 'getArg', [42]),
-      contract: contractAddress,
-      abiVersion: AbiVersion.Fate,
-    }, initiatorSign);
+    const result = await initiatorCh.callContract(
+      {
+        amount: 0,
+        callData: contract._calldata.encode('Identity', 'getArg', [42]),
+        contract: contractAddress,
+        abiVersion: AbiVersion.Fate,
+      },
+      initiatorSign,
+    );
     result.should.eql({ accepted: true, signedTx: await initiatorSignedTx() });
     const round = initiatorCh.round();
     assertNotNull(round);
@@ -215,12 +236,15 @@ describe('Channel contracts', () => {
   });
 
   it('can call a force progress', async () => {
-    const forceTx = await initiatorCh.forceProgress({
-      amount: 0,
-      callData: contract._calldata.encode('Identity', 'getArg', [42]),
-      contract: contractAddress,
-      abiVersion: AbiVersion.Fate,
-    }, initiatorSign);
+    const forceTx = await initiatorCh.forceProgress(
+      {
+        amount: 0,
+        callData: contract._calldata.encode('Identity', 'getArg', [42]),
+        contract: contractAddress,
+        abiVersion: AbiVersion.Fate,
+      },
+      initiatorSign,
+    );
     const hash = buildTxHash(forceTx.tx);
     const { callInfo } = await aeSdk.api.getTransactionInfoByHash(hash);
     assertNotNull(callInfo);
@@ -230,12 +254,15 @@ describe('Channel contracts', () => {
   it('can call a contract and reject', async () => {
     responderShouldRejectUpdate = true;
     const roundBefore = initiatorCh.round();
-    const result = await initiatorCh.callContract({
-      amount: 0,
-      callData: contract._calldata.encode('Identity', 'getArg', [42]),
-      contract: contractAddress,
-      abiVersion: AbiVersion.Fate,
-    }, initiatorSign);
+    const result = await initiatorCh.callContract(
+      {
+        amount: 0,
+        callData: contract._calldata.encode('Identity', 'getArg', [42]),
+        contract: contractAddress,
+        abiVersion: AbiVersion.Fate,
+      },
+      initiatorSign,
+    );
     expect(initiatorCh.round()).to.equal(roundBefore);
     result.should.eql({ ...result, accepted: false });
   });
@@ -256,12 +283,15 @@ describe('Channel contracts', () => {
 
   it('can abort contract call with custom error code', async () => {
     responderShouldRejectUpdate = 12345;
-    const result = await initiatorCh.callContract({
-      amount: 0,
-      callData: contract._calldata.encode('Identity', 'getArg', [42]),
-      contract: contractAddress,
-      abiVersion: AbiVersion.Fate,
-    }, initiatorSign);
+    const result = await initiatorCh.callContract(
+      {
+        amount: 0,
+        callData: contract._calldata.encode('Identity', 'getArg', [42]),
+        contract: contractAddress,
+        abiVersion: AbiVersion.Fate,
+      },
+      initiatorSign,
+    );
     result.should.eql({
       accepted: false,
       errorCode: responderShouldRejectUpdate,
@@ -287,7 +317,9 @@ describe('Channel contracts', () => {
       returnValue: result.returnValue,
     });
     expect(result.returnType).to.be.equal('ok');
-    expect(contract._calldata.decode('Identity', 'getArg', result.returnValue).toString()).to.be.equal('42');
+    expect(
+      contract._calldata.decode('Identity', 'getArg', result.returnValue).toString(),
+    ).to.be.equal('42');
   });
 
   it('can call a contract using dry-run', async () => {
@@ -309,7 +341,9 @@ describe('Channel contracts', () => {
       returnValue: result.returnValue,
     });
     expect(result.returnType).to.be.equal('ok');
-    expect(contract._calldata.decode('Identity', 'getArg', result.returnValue).toString()).to.be.equal('42');
+    expect(
+      contract._calldata.decode('Identity', 'getArg', result.returnValue).toString(),
+    ).to.be.equal('42');
   });
 
   it('can clean contract calls', async () => {

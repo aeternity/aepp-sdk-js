@@ -25,29 +25,35 @@ function configure(filename, opts = {}) {
     },
     resolve: {
       extensions: ['.ts', '.js'],
-      fallback: isNode ? {} : {
-        buffer: require.resolve('buffer/'),
-        child_process: false,
-        os: false,
-        path: false,
-        'fs/promises': false,
-        url: false,
-      },
+      fallback: isNode
+        ? {}
+        : {
+            buffer: require.resolve('buffer/'),
+            child_process: false,
+            os: false,
+            path: false,
+            'fs/promises': false,
+            url: false,
+          },
     },
     plugins: [
-      ...isNode
+      ...(isNode
         ? []
-        : [new webpack.ProvidePlugin({
-          process: 'process',
-          Buffer: ['buffer', 'Buffer'],
-        })],
-      ...env.REPORT
-        ? [new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          reportFilename: `${filename}.html`,
-          openAnalyzer: false,
-        })]
-        : [],
+        : [
+            new webpack.ProvidePlugin({
+              process: 'process',
+              Buffer: ['buffer', 'Buffer'],
+            }),
+          ]),
+      ...(env.REPORT
+        ? [
+            new BundleAnalyzerPlugin({
+              analyzerMode: 'static',
+              reportFilename: `${filename}.html`,
+              openAnalyzer: false,
+            }),
+          ]
+        : []),
     ],
     output: {
       path: path.resolve(__dirname, 'dist'),

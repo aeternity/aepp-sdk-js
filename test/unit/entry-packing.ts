@@ -1,11 +1,12 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import {
-  decode, encode, Encoding, unpackEntry, EntryTag, packEntry,
-} from '../../src';
+import { decode, encode, Encoding, unpackEntry, EntryTag, packEntry } from '../../src';
 
 const account = {
-  tag: EntryTag.Account, version: 1, nonce: 0, balance: '99999999999999998997',
+  tag: EntryTag.Account,
+  version: 1,
+  nonce: 0,
+  balance: '99999999999999998997',
 } as const;
 const accountEncoded = 'ba_zQoBAIkFa8deLWMP/BW+ZMQO';
 

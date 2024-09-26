@@ -2,13 +2,25 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { RestError } from '@azure/core-rest-pipeline';
 import { getSdk, isLimitedCoins, timeoutBlock } from '.';
+import { assertNotNull, ensureEqual, indent, randomName, randomString } from '../utils';
 import {
-  assertNotNull, ensureEqual, randomName, randomString,
-} from '../utils';
-import {
-  AeSdk, Name, MemoryAccount, buildContractId, computeBidFee, ensureName, produceNameId, Contract,
-  AensPointerContextError, encode, decode, Encoding, ContractMethodsBase,
-  IllegalArgumentError, Tag, unpackTx, buildTxHash,
+  AeSdk,
+  Name,
+  MemoryAccount,
+  buildContractId,
+  computeBidFee,
+  ensureName,
+  produceNameId,
+  Contract,
+  AensPointerContextError,
+  encode,
+  decode,
+  Encoding,
+  ContractMethodsBase,
+  IllegalArgumentError,
+  Tag,
+  unpackTx,
+  buildTxHash,
 } from '../../src';
 
 // TODO: avoid extra `assertNotNull` calls
@@ -177,8 +189,10 @@ describe('Aens', () => {
       signatures: [bidRes.signatures[0]],
       rawTx: bidRes.rawTx,
     });
-    await expect(n.getState())
-      .to.be.rejectedWith(RestError, `v3/names/%C3%A6${n.value.slice(1)} error: Name not found`);
+    await expect(n.getState()).to.be.rejectedWith(
+      RestError,
+      `v3/names/%C3%A6${n.value.slice(1)} error: Name not found`,
+    );
   });
 
   it('queries state from the node', async () => {
@@ -188,20 +202,25 @@ describe('Aens', () => {
 
   it('throws error on querying non-existent name', async () => {
     const n = new Name(randomName(30), aeSdk.getContext());
-    await expect(n.getState())
-      .to.be.rejectedWith(RestError, `v3/names/${n.value} error: Name not found`);
+    await expect(n.getState()).to.be.rejectedWith(
+      RestError,
+      `v3/names/${n.value} error: Name not found`,
+    );
   });
 
   it('fails to spend to name with invalid pointers', async () => {
     const { pointers } = await name.getState();
     pointers.length.should.be.equal(0);
-    await expect(aeSdk.spend(100, name.value))
-      .to.be.rejectedWith(AensPointerContextError, `Name ${name.value} don't have pointers for account_pubkey`);
+    await expect(aeSdk.spend(100, name.value)).to.be.rejectedWith(
+      AensPointerContextError,
+      `Name ${name.value} don't have pointers for account_pubkey`,
+    );
   });
 
   it('calls contract using AENS name', async () => {
-    const sourceCode = 'contract Identity ='
-      + '  entrypoint getArg(x : int) = x';
+    const sourceCode = indent`
+      contract Identity =
+        entrypoint getArg(x : int) = x`;
     interface ContractApi extends ContractMethodsBase {
       getArg: (x: number) => bigint;
     }
@@ -211,7 +230,9 @@ describe('Aens', () => {
     await name.update({ contract_pubkey: contract.$options.address });
 
     const contractName = await Contract.initialize<ContractApi>({
-      ...aeSdk.getContext(), sourceCode, address: name.value,
+      ...aeSdk.getContext(),
+      sourceCode,
+      address: name.value,
     });
     // TODO: should be name id instead
     expect(contractName.$options.address).to.be.equal(contract.$options.address);
@@ -221,7 +242,7 @@ describe('Aens', () => {
 
   const { address } = MemoryAccount.generate();
   let pointers: Parameters<Name['update']>[0];
-  let pointersNode: Array<{ key: string; id: typeof pointers[string] }>;
+  let pointersNode: Array<{ key: string; id: (typeof pointers)[string] }>;
 
   before(async () => {
     pointers = {
@@ -232,8 +253,11 @@ describe('Aens', () => {
       channel: encode(decode(address), Encoding.Channel),
       contract_pubkey: buildContractId(address, 13),
     };
-    pointersNode = Object.entries(pointers)
-      .map(([key, id]) => ({ key, id, encodedKey: encode(Buffer.from(key), Encoding.Bytearray) }));
+    pointersNode = Object.entries(pointers).map(([key, id]) => ({
+      key,
+      id,
+      encodedKey: encode(Buffer.from(key), Encoding.Bytearray),
+    }));
   });
 
   it('updates', async () => {
@@ -270,22 +294,26 @@ describe('Aens', () => {
     await n.claim();
     const onAccount = Object.values(aeSdk.accounts)[1];
     const promise = n.update({}, { onAccount, blocks: 1 });
-    await expect(promise)
-      .to.be.rejectedWith(/(Giving up after 1 blocks mined|Transaction not found)/);
+    await expect(promise).to.be.rejectedWith(
+      /(Giving up after 1 blocks mined|Transaction not found)/,
+    );
 
     const { rawTx } = await promise.catch((e) => e);
     const { encodedTx } = unpackTx(rawTx, Tag.SignedTx);
     ensureEqual(encodedTx.tag, Tag.NameUpdateTx);
     await aeSdk.spend(0, aeSdk.address, { nonce: encodedTx.nonce, onAccount });
     const txHash = buildTxHash(rawTx);
-    await expect(aeSdk.poll(txHash))
-      .to.be.rejectedWith(new RegExp(`v3/transactions/${txHash} error: (Transaction not found|412 status code)`));
+    await expect(aeSdk.poll(txHash)).to.be.rejectedWith(
+      new RegExp(`v3/transactions/${txHash} error: (Transaction not found|412 status code)`),
+    );
   }).timeout(timeoutBlock);
 
   it('updates extending pointers', async () => {
     const anotherContract = buildContractId(address, 12);
-    const updateRes = await name
-      .update({ contract_pubkey: anotherContract }, { extendPointers: true });
+    const updateRes = await name.update(
+      { contract_pubkey: anotherContract },
+      { extendPointers: true },
+    );
     assertNotNull(updateRes.tx);
     expect(updateRes.tx.pointers).to.be.eql([
       ...pointersNode.filter((pointer) => pointer.key !== 'contract_pubkey'),
@@ -301,14 +329,17 @@ describe('Aens', () => {
     const pointers33 = Object.fromEntries(
       new Array(33).fill(undefined).map((v, i) => [`pointer-${i}`, address]),
     );
-    await expect(name.update(pointers33))
-      .to.be.rejectedWith(IllegalArgumentError, 'Expected 32 pointers or less, got 33 instead');
+    await expect(name.update(pointers33)).to.be.rejectedWith(
+      IllegalArgumentError,
+      'Expected 32 pointers or less, got 33 instead',
+    );
   });
 
   it('throws error on setting too long raw pointer', async () => {
     const pointersRaw = { raw: encode(Buffer.from('t'.repeat(1025)), Encoding.Bytearray) };
-    await expect(name.update(pointersRaw))
-      .to.be.rejectedWith('Raw pointer should be shorter than 1025 bytes, got 1025 bytes instead');
+    await expect(name.update(pointersRaw)).to.be.rejectedWith(
+      'Raw pointer should be shorter than 1025 bytes, got 1025 bytes instead',
+    );
   });
 
   it('extends name ttl', async () => {
@@ -377,7 +408,9 @@ describe('Aens', () => {
       signatures: [revokeRes.signatures[0]],
       rawTx: revokeRes.rawTx,
     });
-    await expect(name.getState())
-      .to.be.rejectedWith(RestError, `v3/names/${name.value} error: Name revoked`);
+    await expect(name.getState()).to.be.rejectedWith(
+      RestError,
+      `v3/names/${name.value} error: Name revoked`,
+    );
   });
 });

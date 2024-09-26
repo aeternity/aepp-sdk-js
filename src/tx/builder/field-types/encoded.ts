@@ -1,16 +1,15 @@
-import {
-  decode, encode, Encoded, Encoding,
-} from '../../../utils/encoder';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder';
 import { ArgumentError } from '../../../utils/errors';
 
 export default function genEncodedField<E extends Encoding, Optional extends boolean = false>(
   encoding: E,
   optional?: Optional,
 ): {
-    serialize: Optional extends true
-      ? (value?: Encoded.Generic<E>) => Buffer : (value: Encoded.Generic<E>) => Buffer;
-    deserialize: (value: Buffer) => Encoded.Generic<E>;
-  } {
+  serialize: Optional extends true
+    ? (value?: Encoded.Generic<E>) => Buffer
+    : (value: Encoded.Generic<E>) => Buffer;
+  deserialize: (value: Buffer) => Encoded.Generic<E>;
+} {
   return {
     serialize(encodedData?: Encoded.Generic<E>) {
       if (encodedData == null) {

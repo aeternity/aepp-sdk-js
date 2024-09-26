@@ -62,8 +62,10 @@ const TX_OTHER_GAS = (
     case Tag.OracleExtendTx:
     case Tag.OracleQueryTx:
     case Tag.OracleResponseTx:
-      return txSize * GAS_PER_BYTE
-        + Math.ceil((32000 * relativeTtl) / Math.floor((60 * 24 * 365) / KEY_BLOCK_INTERVAL));
+      return (
+        txSize * GAS_PER_BYTE +
+        Math.ceil((32000 * relativeTtl) / Math.floor((60 * 24 * 365) / KEY_BLOCK_INTERVAL))
+      );
     case Tag.GaMetaTx:
     case Tag.PayingForTx:
       return (txSize - innerTxSize) * GAS_PER_BYTE;
@@ -101,10 +103,13 @@ export function buildGas(
     innerTxSize = decode(buildTx(txObject.tx.encodedTx)).length;
   }
 
-  return TX_BASE_GAS(txObject.tag)
-    + TX_OTHER_GAS(txObject.tag, length, {
-      relativeTtl: getOracleRelativeTtl(txObject), innerTxSize,
-    });
+  return (
+    TX_BASE_GAS(txObject.tag) +
+    TX_OTHER_GAS(txObject.tag, length, {
+      relativeTtl: getOracleRelativeTtl(txObject),
+      innerTxSize,
+    })
+  );
 }
 
 /**
@@ -157,9 +162,7 @@ export default {
 
   serializeAettos(
     _value: string | undefined,
-    {
-      rebuildTx, unpackTx, buildTx, _computingMinFee,
-    }: SerializeAettosParams,
+    { rebuildTx, unpackTx, buildTx, _computingMinFee }: SerializeAettosParams,
     { _canIncreaseFee }: { _canIncreaseFee?: boolean },
   ): string {
     if (_computingMinFee != null) return _computingMinFee.toFixed();
@@ -168,9 +171,10 @@ export default {
       unpackTx,
       buildTx,
     );
-    const value = _value?.startsWith(gasPricePrefix) === true
-      ? minFee.dividedBy(MIN_GAS_PRICE).times(_value.replace(gasPricePrefix, ''))
-      : new BigNumber(_value ?? minFee);
+    const value =
+      _value?.startsWith(gasPricePrefix) === true
+        ? minFee.dividedBy(MIN_GAS_PRICE).times(_value.replace(gasPricePrefix, ''))
+        : new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
       if (_canIncreaseFee === true) return minFee.toFixed();
       throw new IllegalArgumentError(`Fee ${value.toString()} must be bigger than ${minFee}`);

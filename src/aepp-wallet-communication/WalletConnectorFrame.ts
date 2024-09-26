@@ -30,10 +30,7 @@ export default class WalletConnectorFrame extends WalletConnectorFrameBase<Event
    * @param name - Aepp name
    * @param connection - Wallet connection object
    */
-  static async connect(
-    name: string,
-    connection: BrowserConnection,
-  ): Promise<WalletConnectorFrame> {
+  static async connect(name: string, connection: BrowserConnection): Promise<WalletConnectorFrame> {
     const connector = new WalletConnectorFrame();
     await WalletConnectorFrame._connect(name, connection, connector, false);
     return connector;

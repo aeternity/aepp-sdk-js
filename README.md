@@ -16,10 +16,12 @@ JavaScript SDK for the revolutionary [æternity] blockchain, targeting the
 ## Guides & Examples
 
 Introduction
+
 - [Installation](docs/README.md)
 - [Quick Start](docs/quick-start.md)
 
 Usage guides:
+
 - [AENS](docs/guides/aens.md) (æternity naming system)
 - [Contracts](docs/guides/contracts.md)
 - [Contract Events](docs/guides/contract-events.md)
@@ -29,8 +31,8 @@ Usage guides:
 - [Error Handling](docs/guides/error-handling.md)
 - [Low vs High level API](docs/guides/low-vs-high-usage.md)
 - Wallet Interaction
-    - [Connect an æpp to a wallet](docs/guides/connect-aepp-to-wallet.md)
-    - [How to build a wallet](docs/guides/build-wallet.md)
+  - [Connect an æpp to a wallet](docs/guides/connect-aepp-to-wallet.md)
+  - [How to build a wallet](docs/guides/build-wallet.md)
 
 There are also [examples](examples/README.md) that you can directly use and play with.
 

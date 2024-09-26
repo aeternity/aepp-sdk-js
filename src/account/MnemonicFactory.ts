@@ -2,9 +2,7 @@ import { mnemonicToSeed } from '@scure/bip39';
 import { full as hmac } from 'tweetnacl-auth';
 import AccountBaseFactory from './BaseFactory';
 import AccountMemory from './Memory';
-import {
-  encode, Encoding, Encoded, decode,
-} from '../utils/encoder';
+import { encode, Encoding, Encoded, decode } from '../utils/encoder';
 import { concatBuffers } from '../utils/other';
 import { InternalError } from '../utils/errors';
 
@@ -27,15 +25,12 @@ export function deriveKey(message: Uint8Array, key: Uint8Array): KeyTreeNode {
 }
 
 export function derivePathFromKey(key: KeyTreeNode, segments: readonly number[]): KeyTreeNode {
-  return segments.reduce(
-    ({ secretKey, chainCode }, segment) => {
-      const indexBuffer = Buffer.allocUnsafe(4);
-      indexBuffer.writeUInt32BE(segment + HARDENED_OFFSET, 0);
-      const data = concatBuffers([Buffer.alloc(1, 0), secretKey, indexBuffer]);
-      return deriveKey(data, chainCode);
-    },
-    key,
-  );
+  return segments.reduce(({ secretKey, chainCode }, segment) => {
+    const indexBuffer = Buffer.allocUnsafe(4);
+    indexBuffer.writeUInt32BE(segment + HARDENED_OFFSET, 0);
+    const data = concatBuffers([Buffer.alloc(1, 0), secretKey, indexBuffer]);
+    return deriveKey(data, chainCode);
+  }, key);
 }
 
 interface Wallet {
@@ -66,7 +61,10 @@ export default class AccountMnemonicFactory extends AccountBaseFactory {
    */
   async getWallet(): Promise<Wallet> {
     if (this.#wallet != null) return this.#wallet;
-    if (this.#mnemonic == null) throw new InternalError('AccountMnemonicFactory should be initialized with mnemonic or wallet');
+    if (this.#mnemonic == null)
+      throw new InternalError(
+        'AccountMnemonicFactory should be initialized with mnemonic or wallet',
+      );
     const seed = await mnemonicToSeed(this.#mnemonic);
     const masterKey = deriveKey(seed, ED25519_CURVE);
     const walletKey = derivePathFromKey(masterKey, [44, 457]);

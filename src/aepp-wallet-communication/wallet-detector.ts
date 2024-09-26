@@ -8,7 +8,9 @@ interface Wallet {
   info: WalletInfo;
   getConnection: () => BrowserWindowMessageConnection;
 }
-interface Wallets { [key: string]: Wallet }
+interface Wallets {
+  [key: string]: Wallet;
+}
 
 /**
  * A function to detect available wallets
@@ -20,35 +22,43 @@ interface Wallets { [key: string]: Wallet }
 export default (
   connection: BrowserConnection,
   onDetected: ({ wallets, newWallet }: { wallets: Wallets; newWallet: Wallet }) => void,
-): () => void => {
-  if (window == null) throw new UnsupportedPlatformError('Window object not found, you can run wallet detector only in browser');
+): (() => void) => {
+  if (window == null)
+    throw new UnsupportedPlatformError(
+      'Window object not found, you can run wallet detector only in browser',
+    );
   const wallets: Wallets = {};
 
-  connection.connect((
-    { method, params }: { method: string; params: WalletInfo },
-    origin: string,
-    source: Window,
-  ) => {
-    if (method !== METHODS.readyToConnect || wallets[params.id] != null) return;
+  connection.connect(
+    (
+      { method, params }: { method: string; params: WalletInfo },
+      origin: string,
+      source: Window,
+    ) => {
+      if (method !== METHODS.readyToConnect || wallets[params.id] != null) return;
 
-    const wallet = {
-      info: params,
-      getConnection() {
-        return new BrowserWindowMessageConnection({
-          target: source,
-          ...params.type === 'extension' ? {
-            sendDirection: MESSAGE_DIRECTION.to_waellet,
-            receiveDirection: MESSAGE_DIRECTION.to_aepp,
-            ...window.origin !== 'null' && { origin: window.origin },
-          } : {
-            origin: params.origin,
-          },
-        });
-      },
-    };
-    wallets[wallet.info.id] = wallet;
-    onDetected({ wallets, newWallet: wallet });
-  }, () => {});
+      const wallet = {
+        info: params,
+        getConnection() {
+          return new BrowserWindowMessageConnection({
+            target: source,
+            ...(params.type === 'extension'
+              ? {
+                  sendDirection: MESSAGE_DIRECTION.to_waellet,
+                  receiveDirection: MESSAGE_DIRECTION.to_aepp,
+                  ...(window.origin !== 'null' && { origin: window.origin }),
+                }
+              : {
+                  origin: params.origin,
+                }),
+          });
+        },
+      };
+      wallets[wallet.info.id] = wallet;
+      onDetected({ wallets, newWallet: wallet });
+    },
+    () => {},
+  );
 
   return () => connection.disconnect();
 };

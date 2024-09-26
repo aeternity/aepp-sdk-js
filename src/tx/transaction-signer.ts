@@ -20,7 +20,8 @@ export default function getTransactionSignerAddress(
   }
 
   const nonce = getSchema(params.tag, params.version).find(([name]) => name === 'nonce')?.[1];
-  if (nonce == null) throw new TransactionError(`Transaction doesn't have nonce: ${Tag[params.tag]}`);
+  if (nonce == null)
+    throw new TransactionError(`Transaction doesn't have nonce: ${Tag[params.tag]}`);
   if (!('senderKey' in nonce)) throw new UnexpectedTsError();
   const address = params[nonce.senderKey as keyof typeof params] as unknown as string;
   return address.replace(/^ok_/, 'ak_') as Encoded.AccountAddress;

@@ -18,16 +18,11 @@
     "declaration": true,
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/typings"
-    ],
+    "typeRoots": ["./node_modules/@types", "./src/typings"],
     "strict": true,
-    "strictFunctionTypes": false, // see https://github.com/aeternity/aepp-sdk-js/issues/1793
+    "strictFunctionTypes": false // see https://github.com/aeternity/aepp-sdk-js/issues/1793
   },
-  "include": [
-    "src/**/*"
-  ],
+  "include": ["src/**/*"],
   "typedocOptions": {
     "entryPoints": ["src/index.ts"],
     "out": "./docs/api",

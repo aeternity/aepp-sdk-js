@@ -1,8 +1,6 @@
 import { NamePointer as NamePointerString } from '../../../apis/node';
 import { toBytes } from '../../../utils/bytes';
-import {
-  Encoded, Encoding, decode, encode,
-} from '../../../utils/encoder';
+import { Encoded, Encoding, decode, encode } from '../../../utils/encoder';
 import { isAddressValid } from '../../../utils/crypto';
 import { IllegalArgumentError, DecodeError, ArgumentError } from '../../../utils/errors';
 import address, { AddressEncodings, idTagToEncoding } from './address';
@@ -20,7 +18,9 @@ type NamePointerRaw = NamePointerString & {
   id: Encoded.Generic<AddressEncodings | Encoding.Bytearray>;
 };
 
-export default <AllowRaw extends boolean>(allowRaw: AllowRaw): {
+export default <AllowRaw extends boolean>(
+  allowRaw: AllowRaw,
+): {
   serialize: (pointers: Array<AllowRaw extends true ? NamePointerRaw : NamePointer>) => Buffer[][];
   deserialize: (
     pointers: Array<[key: Buffer, id: Buffer]>,
@@ -34,17 +34,23 @@ export default <AllowRaw extends boolean>(allowRaw: AllowRaw): {
    */
   serialize(pointers) {
     if (pointers.length > 32) {
-      throw new IllegalArgumentError(`Expected 32 pointers or less, got ${pointers.length} instead`);
+      throw new IllegalArgumentError(
+        `Expected 32 pointers or less, got ${pointers.length} instead`,
+      );
     }
     return pointers.map(({ key, id }) => {
       let payload;
       if (isAddressValid(id, ...idTagToEncoding)) {
-        payload = [...allowRaw ? [ID_TAG] : [], addressAny.serialize(id)];
+        payload = [...(allowRaw ? [ID_TAG] : []), addressAny.serialize(id)];
       }
       if (isAddressValid(id, Encoding.Bytearray)) {
         const data = decode(id);
         if (data.length > DATA_LENGTH_MAX) {
-          throw new ArgumentError('Raw pointer', `shorter than ${DATA_LENGTH_MAX + 1} bytes`, `${data.length} bytes`);
+          throw new ArgumentError(
+            'Raw pointer',
+            `shorter than ${DATA_LENGTH_MAX + 1} bytes`,
+            `${data.length} bytes`,
+          );
         }
         payload = [DATA_TAG, data];
       }

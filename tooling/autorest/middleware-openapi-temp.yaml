@@ -6,8 +6,8 @@ components:
       name: direction
       schema:
         enum:
-        - forward
-        - backward
+          - forward
+          - backward
         type: string
     LimitParam:
       description: Limit paginated resources (max 100)
@@ -45,49 +45,49 @@ components:
           type: integer
         payload:
           oneOf:
-          - $ref: '#/components/schemas/Transaction'
-          - $ref: '#/components/schemas/Aex9TransferEvent'
-          - $ref: '#/components/schemas/Aex141TransferEvent'
-          - $ref: '#/components/schemas/InternalContractCallEvent'
-          - $ref: '#/components/schemas/InternalTransferEvent'
+            - $ref: '#/components/schemas/Transaction'
+            - $ref: '#/components/schemas/Aex9TransferEvent'
+            - $ref: '#/components/schemas/Aex141TransferEvent'
+            - $ref: '#/components/schemas/InternalContractCallEvent'
+            - $ref: '#/components/schemas/InternalTransferEvent'
           type: object
         type:
           description: The event type
           enum:
-          - SpendTxEvent
-          - OracleRegisterTxEvent
-          - OracleExtendTxEvent
-          - OracleQueryTxEvent
-          - OracleResponseTxEvent
-          - NamePreclaimTxEvent
-          - NameClaimTxEvent
-          - NameTransferTxEvent
-          - NameUpdateTxEvent
-          - NameRevokeTxEvent
-          - ContractCreateTxEvent
-          - ContractCallTxEvent
-          - GaAttachTxEvent
-          - GaMetaTxEvent
-          - ChannelCreateTxEvent
-          - ChannelDepositTxEvent
-          - ChannelWithdrawTxEvent
-          - ChannelForceProgressTxEvent
-          - ChannelCloseMutualTxEvent
-          - ChannelCloseSoloTxEvent
-          - ChannelSlashTxEvent
-          - ChannelSettleTxEvent
-          - ChannelSnapshotSoloTxEvent
-          - ChannelSetDelegatesTxEvent
-          - ChannelOffchainTxEvent
-          - ChannelClientReconnectTxEvent
-          - PayingForTxEvent
+            - SpendTxEvent
+            - OracleRegisterTxEvent
+            - OracleExtendTxEvent
+            - OracleQueryTxEvent
+            - OracleResponseTxEvent
+            - NamePreclaimTxEvent
+            - NameClaimTxEvent
+            - NameTransferTxEvent
+            - NameUpdateTxEvent
+            - NameRevokeTxEvent
+            - ContractCreateTxEvent
+            - ContractCallTxEvent
+            - GaAttachTxEvent
+            - GaMetaTxEvent
+            - ChannelCreateTxEvent
+            - ChannelDepositTxEvent
+            - ChannelWithdrawTxEvent
+            - ChannelForceProgressTxEvent
+            - ChannelCloseMutualTxEvent
+            - ChannelCloseSoloTxEvent
+            - ChannelSlashTxEvent
+            - ChannelSettleTxEvent
+            - ChannelSnapshotSoloTxEvent
+            - ChannelSetDelegatesTxEvent
+            - ChannelOffchainTxEvent
+            - ChannelClientReconnectTxEvent
+            - PayingForTxEvent
           type: string
       required:
-      - block_hash
-      - block_time
-      - height
-      - type
-      - payload
+        - block_hash
+        - block_time
+        - height
+        - type
+        - payload
       type: object
     Aex141Response:
       description: Response Schema for AEX141 contract
@@ -98,10 +98,10 @@ components:
         contract_tx_hash: th_2Twp3pJeVuwQ7cMSdPQRfpAUWwdMiwx6coVMpRaNSuzFRnDZF
         creation_time: 1587577771376
         extensions:
-        - mintable_templates
-        - mintable_templates_limit
-        - mutable_attributes
-        - burnable
+          - mintable_templates
+          - mintable_templates_limit
+          - mutable_attributes
+          - burnable
         invalid: false
         limits:
           limit_log_idx: 0
@@ -141,19 +141,19 @@ components:
           description: Limit for amount of tokens or templates
           type: object
       required:
-      - base_url
-      - contract_id
-      - contract_tx_hash
-      - extensions
-      - limits
-      - metadata_type
-      - name
-      - nft_owners
-      - nfts_amount
-      - symbol
-      - invalid
-      - creation_time
-      - block_height
+        - base_url
+        - contract_id
+        - contract_tx_hash
+        - extensions
+        - limits
+        - metadata_type
+        - name
+        - nft_owners
+        - nfts_amount
+        - symbol
+        - invalid
+        - creation_time
+        - block_height
       title: Aex141Response
       type: object
     Aex141TemplateTokensResponse:
@@ -177,10 +177,10 @@ components:
           $ref: '#/components/schemas/TransactionHash'
           description: Mint transaction hash
       required:
-      - log_idx
-      - owner_id
-      - token_id
-      - tx_hash
+        - log_idx
+        - owner_id
+        - token_id
+        - tx_hash
       title: Aex141TemplatesResponse
       type: object
     Aex141TemplatesResponse:
@@ -214,10 +214,10 @@ components:
           $ref: '#/components/schemas/TransactionHash'
           description: Transaction hash of the TemplateCreation
       required:
-      - contract_id
-      - log_idx
-      - template_id
-      - tx_hash
+        - contract_id
+        - log_idx
+        - template_id
+        - tx_hash
       title: Aex141TemplatesResponse
       type: object
     Aex141TokenResponse:
@@ -236,9 +236,9 @@ components:
           description: Non-fungible token id
           type: integer
       required:
-      - contract_id
-      - account_id
-      - token_id
+        - contract_id
+        - account_id
+        - token_id
       title: Aex141OwnedTokenResponse
       type: object
     Aex141TransferEvent:
@@ -268,15 +268,15 @@ components:
         tx_hash:
           $ref: '#/components/schemas/TransactionHash'
       required:
-      - block_height
-      - contract_id
-      - log_idx
-      - micro_index
-      - micro_time
-      - recipient
-      - sender
-      - token_id
-      - tx_hash
+        - block_height
+        - contract_id
+        - log_idx
+        - micro_index
+        - micro_time
+        - recipient
+        - sender
+        - token_id
+        - tx_hash
       type: object
     Aex9BalanceResponse:
       description: Response Schema for AEX9 balance responses
@@ -327,16 +327,16 @@ components:
             block height
           type: string
       required:
-      - amount
-      - block_hash
-      - contract_id
-      - decimals
-      - height
-      - token_name
-      - token_symbol
-      - tx_hash
-      - tx_index
-      - tx_type
+        - amount
+        - block_hash
+        - contract_id
+        - decimals
+        - height
+        - token_name
+        - token_symbol
+        - tx_hash
+        - tx_index
+        - tx_type
       title: Response for AEX-9 account balance
       type: object
     Aex9ContractBalanceResponse:
@@ -373,13 +373,13 @@ components:
           $ref: '#/components/schemas/TransactionHash'
           description: The hash of the last transaction that changed the balance
       required:
-      - account_id
-      - amount
-      - block_hash
-      - contract_id
-      - height
-      - last_tx_hash
-      - last_log_idx
+        - account_id
+        - amount
+        - block_hash
+        - contract_id
+        - height
+        - last_tx_hash
+        - last_log_idx
       title: Response for AEX-9 contract balances
       type: object
     Aex9Response:
@@ -390,8 +390,8 @@ components:
         decimals: 18
         event_supply: 0
         extensions:
-        - mintable
-        - burnable
+          - mintable
+          - burnable
         holders: 12
         initial_supply: 1e+28
         invalid: false
@@ -432,15 +432,15 @@ components:
           description: Symbol of AEX9 token
           type: string
       required:
-      - contract_id
-      - contract_tx_hash
-      - decimals
-      - symbol
-      - name
-      - holders
-      - initial_supply
-      - event_supply
-      - invalid
+        - contract_id
+        - contract_tx_hash
+        - decimals
+        - symbol
+        - name
+        - holders
+        - initial_supply
+        - event_supply
+        - invalid
       title: Aex9Response
       type: object
     Aex9TransferEvent:
@@ -470,15 +470,15 @@ components:
         tx_hash:
           $ref: '#/components/schemas/TransactionHash'
       required:
-      - amount
-      - block_height
-      - contract_id
-      - log_idx
-      - micro_index
-      - micro_time
-      - recipient_id
-      - sender_id
-      - tx_hash
+        - amount
+        - block_height
+        - contract_id
+        - log_idx
+        - micro_index
+        - micro_time
+        - recipient_id
+        - sender_id
+        - tx_hash
       type: object
     Aex9TransferResponse:
       description: Response Schema for AEX9 transfer responses
@@ -516,14 +516,14 @@ components:
           $ref: '#/components/schemas/AccountAddress'
           description: Sender of AEX9 transfer
       required:
-      - contract_id
-      - micro_time
-      - block_height
-      - sender
-      - recipient
-      - log_idx
-      - call_txi
-      - amount
+        - contract_id
+        - micro_time
+        - block_height
+        - sender
+        - recipient
+        - log_idx
+        - call_txi
+        - amount
       title: Response for AEX9 transfers
       type: object
     Auction:
@@ -573,14 +573,14 @@ components:
                 version: 2
               type: object
           required:
-          - block_hash
-          - block_height
-          - encoded_tx
-          - hash
-          - micro_index
-          - micro_time
-          - signatures
-          - tx
+            - block_hash
+            - block_height
+            - encoded_tx
+            - hash
+            - micro_index
+            - micro_time
+            - signatures
+            - tx
           type: object
         name:
           $ref: '#/components/schemas/NameString'
@@ -588,12 +588,12 @@ components:
           example: 134626900000000000000
           type: integer
       required:
-      - auction_end
-      - activation_time
-      - approximate_expire_time
-      - last_bid
-      - name
-      - name_fee
+        - auction_end
+        - activation_time
+        - approximate_expire_time
+        - last_bid
+        - name
+        - name_fee
       type: object
     BlockStateHash:
       description: Blocks state hash
@@ -679,25 +679,25 @@ components:
           example: 2
           type: integer
       required:
-      - active
-      - amount
-      - channel
-      - channel_reserve
-      - delegate_ids
-      - initiator
-      - initiator_amount
-      - last_updated_height
-      - last_updated_tx_type
-      - last_updated_time
-      - last_updated_tx_hash
-      - lock_period
-      - locked_until
-      - responder
-      - responder_amount
-      - round
-      - solo_round
-      - state_hash
-      - updates_count
+        - active
+        - amount
+        - channel
+        - channel_reserve
+        - delegate_ids
+        - initiator
+        - initiator_amount
+        - last_updated_height
+        - last_updated_tx_type
+        - last_updated_time
+        - last_updated_tx_hash
+        - lock_period
+        - locked_until
+        - responder
+        - responder_amount
+        - round
+        - solo_round
+        - state_hash
+        - updates_count
       type: object
     ChannelId:
       description: Channel ID
@@ -736,12 +736,12 @@ components:
           example: ContractCreateTx
           type: string
       required:
-      - aexn_type
-      - block_hash
-      - contract
-      - source_tx_hash
-      - source_tx_type
-      - create_tx
+        - aexn_type
+        - block_hash
+        - contract
+        - source_tx_hash
+        - source_tx_type
+        - create_tx
       type: object
     ContractAddress:
       description: Contract address
@@ -795,24 +795,24 @@ components:
           example: 2
           type: integer
       required:
-      - block_hash
-      - call_tx_hash
-      - contract_id
-      - contract_tx_hash
-      - function
-      - height
-      - internal_tx
-      - local_idx
-      - micro_index
+        - block_hash
+        - call_tx_hash
+        - contract_id
+        - contract_tx_hash
+        - function
+        - height
+        - internal_tx
+        - local_idx
+        - micro_index
       type: object
     ContractLog:
       description: ContractLog
       properties:
         args:
           example:
-          - 57632170077998225994387431184384351560267542170559996321319244663568556637966
-          - 70455690283454580784062717387189552611484838031419336802117080415662207780030
-          - 1050376320000000000
+            - 57632170077998225994387431184384351560267542170559996321319244663568556637966
+            - 70455690283454580784062717387189552611484838031419336802117080415662207780030
+            - 1050376320000000000
           items:
             type: string
           type: array
@@ -857,21 +857,21 @@ components:
           nullable: true
           type: integer
       required:
-      - args
-      - block_hash
-      - block_time
-      - call_tx_hash
-      - contract_id
-      - contract_tx_hash
-      - data
-      - event_hash
-      - event_name
-      - ext_caller_contract_id
-      - ext_caller_contract_tx_hash
-      - height
-      - log_idx
-      - micro_index
-      - parent_contract_id
+        - args
+        - block_hash
+        - block_time
+        - call_tx_hash
+        - contract_id
+        - contract_tx_hash
+        - data
+        - event_hash
+        - event_name
+        - ext_caller_contract_id
+        - ext_caller_contract_tx_hash
+        - height
+        - log_idx
+        - micro_index
+        - parent_contract_id
       type: object
     DeltaStat:
       description: DeltaStat
@@ -942,31 +942,31 @@ components:
           description: The number of oracles registered
           type: integer
       required:
-      - height
-      - auctions_started
-      - block_reward
-      - burned_in_auctions
-      - channels_closed
-      - channels_opened
-      - contracts_created
-      - dev_reward
-      - names_activated
-      - names_expired
-      - names_revoked
-      - oracles_expired
-      - oracles_registered
-      - last_tx_hash
-      - locked_in_auctions
-      - locked_in_channels
+        - height
+        - auctions_started
+        - block_reward
+        - burned_in_auctions
+        - channels_closed
+        - channels_opened
+        - contracts_created
+        - dev_reward
+        - names_activated
+        - names_expired
+        - names_revoked
+        - oracles_expired
+        - oracles_registered
+        - last_tx_hash
+        - locked_in_auctions
+        - locked_in_channels
       type: object
     DexSwap:
       description: DEX swap
       properties:
         action:
           enum:
-          - SWAP
-          - BUY
-          - SELL
+            - SWAP
+            - BUY
+            - SELL
           example: SWAP
           type: string
         amounts:
@@ -984,10 +984,10 @@ components:
               example: 1000080
               type: integer
           required:
-          - amount0_in
-          - amount1_in
-          - amount0_out
-          - amount1_out
+            - amount0_in
+            - amount1_in
+            - amount0_out
+            - amount1_out
           type: object
         caller:
           $ref: '#/components/schemas/AccountAddress'
@@ -1027,22 +1027,22 @@ components:
         tx_hash:
           $ref: '#/components/schemas/TransactionHash'
       required:
-      - amounts
-      - action
-      - caller
-      - from_token
-      - to_token
-      - log_idx
-      - to_account
-      - tx_hash
-      - from_contract
-      - to_contract
-      - from_amount
-      - to_amount
-      - from_decimals
-      - to_decimals
-      - micro_time
-      - height
+        - amounts
+        - action
+        - caller
+        - from_token
+        - to_token
+        - log_idx
+        - to_account
+        - tx_hash
+        - from_contract
+        - to_contract
+        - from_amount
+        - to_amount
+        - from_decimals
+        - to_decimals
+        - micro_time
+        - height
       type: object
     ErrorResponse:
       description: Error response from the API
@@ -1053,7 +1053,7 @@ components:
           description: The message of the error raised
           type: string
       required:
-      - error
+        - error
       title: Error response
       type: object
     InternalContractCallEvent:
@@ -1084,13 +1084,13 @@ components:
           description: The micro block index
           type: integer
       required:
-      - contract_tx_hash
-      - contract_id
-      - function
-      - internal_tx
-      - height
-      - micro_index
-      - block_hash
+        - contract_tx_hash
+        - contract_id
+        - function
+        - internal_tx
+        - height
+        - micro_index
+        - block_hash
       type: object
     InternalTransferEvent:
       description: Internal transfer
@@ -1101,28 +1101,28 @@ components:
         kind:
           description: The kind of internal transfer
           enum:
-          - accounts_extra_lima
-          - accounts_fortuna
-          - accounts_genesis
-          - accounts_lima
-          - accounts_minerva
-          - contracts_lima
-          - reward_dev
-          - reward_block
-          - fee_refund_oracle
-          - fee_lock_name
-          - fee_refund_name
-          - fee_spend_name
-          - reward_oracle
+            - accounts_extra_lima
+            - accounts_fortuna
+            - accounts_genesis
+            - accounts_lima
+            - accounts_minerva
+            - contracts_lima
+            - reward_dev
+            - reward_block
+            - fee_refund_oracle
+            - fee_lock_name
+            - fee_refund_name
+            - fee_spend_name
+            - reward_oracle
           type: string
         ref_tx_hash:
           $ref: '#/components/schemas/TransactionHash'
           description: The transaction hash of a transaction related to the internal
             transfer
       required:
-      - amount
-      - kind
-      - ref_tx_hash
+        - amount
+        - kind
+        - ref_tx_hash
       type: object
     KeyBlock:
       example:
@@ -1135,48 +1135,48 @@ components:
         miner: ak_Fqnmm5hRAMaVPWk8wzpodMopZgWghMns4mM7kSV1jgT89p9AV
         nonce: 9223756548132686000
         pow:
-        - 12359907
-        - 21243613
-        - 31370838
-        - 34911479
-        - 39070315
-        - 39375528
-        - 45751339
-        - 49864206
-        - 56785423
-        - 70282271
-        - 89781776
-        - 136985196
-        - 140580763
-        - 142415353
-        - 145306210
-        - 148449813
-        - 156037609
-        - 161568067
-        - 170308922
-        - 185345129
-        - 192805579
-        - 214115188
-        - 220339679
-        - 243288723
-        - 258891016
-        - 283001743
-        - 284306909
-        - 286457285
-        - 326405486
-        - 352963232
-        - 377904500
-        - 378120539
-        - 380987399
-        - 388675008
-        - 447958786
-        - 457602498
-        - 465751225
-        - 466823982
-        - 475416389
-        - 491255227
-        - 530197445
-        - 533633643
+          - 12359907
+          - 21243613
+          - 31370838
+          - 34911479
+          - 39070315
+          - 39375528
+          - 45751339
+          - 49864206
+          - 56785423
+          - 70282271
+          - 89781776
+          - 136985196
+          - 140580763
+          - 142415353
+          - 145306210
+          - 148449813
+          - 156037609
+          - 161568067
+          - 170308922
+          - 185345129
+          - 192805579
+          - 214115188
+          - 220339679
+          - 243288723
+          - 258891016
+          - 283001743
+          - 284306909
+          - 286457285
+          - 326405486
+          - 352963232
+          - 377904500
+          - 378120539
+          - 380987399
+          - 388675008
+          - 447958786
+          - 457602498
+          - 465751225
+          - 466823982
+          - 475416389
+          - 491255227
+          - 530197445
+          - 533633643
         prev_hash: kh_hwin2p8u87mqiK836FixGa1pL9eBkL1Ju37Yi6EUebCgAf8rm
         prev_key_hash: kh_hwin2p8u87mqiK836FixGa1pL9eBkL1Ju37Yi6EUebCgAf8rm
         state_hash: bs_9Dg6mTmiJLpbg9dzgjnNFVidQesvZYZG3dEviUCd4oE1hUcna
@@ -1216,8 +1216,8 @@ components:
         prev_hash:
           description: The previous block hash
           oneOf:
-          - $ref: '#/components/schemas/KeyBlockHash'
-          - $ref: '#/components/schemas/MicroBlockHash'
+            - $ref: '#/components/schemas/KeyBlockHash'
+            - $ref: '#/components/schemas/MicroBlockHash'
         prev_key_hash:
           $ref: '#/components/schemas/KeyBlockHash'
           description: The previous key block hash
@@ -1236,19 +1236,19 @@ components:
           description: The version
           type: integer
       required:
-      - beneficiary
-      - hash
-      - height
-      - info
-      - miner
-      - prev_hash
-      - prev_key_hash
-      - state_hash
-      - target
-      - time
-      - version
-      - micro_blocks_count
-      - transactions_count
+        - beneficiary
+        - hash
+        - height
+        - info
+        - miner
+        - prev_hash
+        - prev_key_hash
+        - state_hash
+        - target
+        - time
+        - version
+        - micro_blocks_count
+        - transactions_count
       title: Key Block
       type: object
     KeyBlockHash:
@@ -1289,8 +1289,8 @@ components:
         prev_hash:
           description: The previous block hash
           oneOf:
-          - $ref: '#/components/schemas/KeyBlockHash'
-          - $ref: '#/components/schemas/MicroBlockHash'
+            - $ref: '#/components/schemas/KeyBlockHash'
+            - $ref: '#/components/schemas/MicroBlockHash'
         prev_key_hash:
           $ref: '#/components/schemas/KeyBlockHash'
           description: The previous key block hash
@@ -1314,18 +1314,18 @@ components:
           description: The version
           type: integer
       required:
-      - micro_block_index
-      - transactions_count
-      - hash
-      - height
-      - pof_hash
-      - prev_hash
-      - prev_key_hash
-      - state_hash
-      - txs_hash
-      - signature
-      - time
-      - version
+        - micro_block_index
+        - transactions_count
+        - hash
+        - height
+        - pof_hash
+        - prev_hash
+        - prev_key_hash
+        - state_hash
+        - txs_hash
+        - signature
+        - time
+        - version
       title: MicroBlock
       type: object
     MicroBlockHash:
@@ -1346,8 +1346,8 @@ components:
           description: The accumulated reward on the miner (beneficiary) address
           type: integer
       required:
-      - miner
-      - total_reward
+        - miner
+        - total_reward
       type: object
     Name:
       description: Name
@@ -1393,19 +1393,19 @@ components:
         revoke:
           $ref: '#/components/schemas/NameTx'
       required:
-      - active
-      - hash
-      - active_from
-      - approximate_activation_time
-      - approximate_expire_time
-      - expire_height
-      - pointers
-      - auction
-      - auction_timeout
-      - ownership
-      - name
-      - name_fee
-      - revoke
+        - active
+        - hash
+        - active_from
+        - approximate_activation_time
+        - approximate_expire_time
+        - expire_height
+        - pointers
+        - auction
+        - auction_timeout
+        - ownership
+        - name
+        - name_fee
+        - revoke
       type: object
     NameClaim:
       description: Name Claim
@@ -1436,12 +1436,12 @@ components:
             ttl: 818002
           type: object
       required:
-      - active_from
-      - source_tx_hash
-      - source_tx_type
-      - block_hash
-      - height
-      - tx
+        - active_from
+        - source_tx_hash
+        - source_tx_type
+        - block_hash
+        - height
+        - tx
       type: object
     NameClaimEvent:
       description: Name claim
@@ -1454,8 +1454,8 @@ components:
           description: The hash of the transaction (either a name claim or a contract
             call transaction)
       required:
-      - tx_hash
-      - tx
+        - tx_hash
+        - tx
       type: object
     NameHash:
       description: AENS name hash
@@ -1495,12 +1495,12 @@ components:
             ttl: 42420
           type: object
       required:
-      - active_from
-      - block_hash
-      - height
-      - source_tx_hash
-      - source_tx_type
-      - tx
+        - active_from
+        - block_hash
+        - height
+        - source_tx_hash
+        - source_tx_type
+        - tx
       type: object
     NameTx:
       example:
@@ -1510,7 +1510,7 @@ components:
         micro_index: 2
         micro_time: 1687575562705
         signatures:
-        - sg_VXb4ipxdLk5PxfoQ6xUv9ma3GGmmMSARsRbXeWdS8cAGZS5SVdkfJgLskSw7rXzZSikGwha23LzsK7LPrDomkohRZTcb8
+          - sg_VXb4ipxdLk5PxfoQ6xUv9ma3GGmmMSARsRbXeWdS8cAGZS5SVdkfJgLskSw7rXzZSikGwha23LzsK7LPrDomkohRZTcb8
         tx:
           account_id: ak_X8uq6yXsG9kKrFUChYDrkkxWgNcPnuSsosx7dB1Qt4uC4A4Ao,
           fee: 16660000000000,
@@ -1553,21 +1553,21 @@ components:
             version:
               type: integer
           required:
-          - account_id
-          - fee
-          - name_id
-          - nonce
-          - type
-          - version
+            - account_id
+            - fee
+            - name_id
+            - nonce
+            - type
+            - version
           type: object
       required:
-      - block_hash
-      - block_height
-      - hash
-      - micro_index
-      - micro_time
-      - signatures
-      - tx
+        - block_hash
+        - block_height
+        - hash
+        - micro_index
+        - micro_time
+        - signatures
+        - tx
       type: object
     NameUpdate:
       description: Name Update
@@ -1596,17 +1596,17 @@ components:
             name_ttl: 50000
             nonce: 3544
             pointers:
-            - id: ak_M6MNwGLtMQ4j3m8pzQz9uF38nMfjCCVaiQ8fvTAU6DEsCocD5
-              key: account_pubkey
+              - id: ak_M6MNwGLtMQ4j3m8pzQz9uF38nMfjCCVaiQ8fvTAU6DEsCocD5
+                key: account_pubkey
             ttl: 60000
           type: object
       required:
-      - active_from
-      - block_hash
-      - height
-      - source_tx_hash
-      - source_tx_type
-      - tx
+        - active_from
+        - block_hash
+        - height
+        - source_tx_hash
+        - source_tx_type
+        - tx
       type: object
     NotFoundResponse:
       description: Resource not found on the API
@@ -1617,7 +1617,7 @@ components:
           description: The message of the error raised
           type: string
       required:
-      - error
+        - error
       title: Not found response
       type: object
     Oracle:
@@ -1639,7 +1639,7 @@ components:
           micro_index: 0
           micro_time: 1587577771376
           signatures:
-          - sg_2JZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
+            - sg_2JZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
           tx:
             abi_version: 0
             account_id: ak_2JZPXvWPC7G9kFVEqNjj9NAmwMsQcpRu6E3SSCvCQuwfqpMtN
@@ -1684,8 +1684,8 @@ components:
               description: The response format
               type: string
           required:
-          - response
-          - query
+            - response
+            - query
           type: object
         oracle:
           $ref: '#/components/schemas/OracleAddress'
@@ -1705,17 +1705,17 @@ components:
           description: The transaction hash in which the oracle was registered, use
             `register.hash` instead
       required:
-      - register
-      - register_time
-      - register_tx_hash
-      - query_fee
-      - oracle
-      - format
-      - extends
-      - expire_height
-      - approximate_expire_time
-      - active_from
-      - active
+        - register
+        - register_time
+        - register_tx_hash
+        - query_fee
+        - oracle
+        - format
+        - extends
+        - expire_height
+        - approximate_expire_time
+        - active_from
+        - active
       type: object
     OracleAddress:
       description: Oracle address
@@ -1766,30 +1766,30 @@ components:
               properties:
                 type:
                   enum:
-                  - delta
-                  - block
+                    - delta
+                    - block
                   type: string
                 value:
                   type: integer
               required:
-              - type
-              - value
+                - type
+                - value
               type: object
             ttl:
               description: Transaction TTL
               type: integer
           required:
-          - fee
-          - nonce
-          - oracle_id
-          - oracle_ttl
+            - fee
+            - nonce
+            - oracle_id
+            - oracle_ttl
           type: object
       required:
-      - block_hash
-      - height
-      - source_tx_hash
-      - source_tx_type
-      - tx
+        - block_hash
+        - height
+        - source_tx_hash
+        - source_tx_type
+        - tx
       type: object
     OracleQuery:
       example:
@@ -1876,21 +1876,21 @@ components:
           description: Transaction TTL
           type: integer
       required:
-      - block_hash
-      - block_time
-      - height
-      - query_id
-      - source_tx_hash
-      - source_tx_type
-      - fee
-      - nonce
-      - oracle_id
-      - query
-      - query_fee
-      - query_ttl
-      - response_ttl
-      - sender_id
-      - ttl
+        - block_hash
+        - block_time
+        - height
+        - query_id
+        - source_tx_hash
+        - source_tx_type
+        - fee
+        - nonce
+        - oracle_id
+        - query
+        - query_fee
+        - query_ttl
+        - response_ttl
+        - sender_id
+        - ttl
       type: object
     OracleQueryId:
       description: Oracle query ID
@@ -1973,19 +1973,19 @@ components:
           description: Transaction TTL
           type: integer
       required:
-      - block_hash
-      - block_time
-      - height
-      - query_id
-      - query
-      - source_tx_hash
-      - source_tx_type
-      - fee
-      - nonce
-      - oracle_id
-      - response
-      - response_ttl
-      - ttl
+        - block_hash
+        - block_time
+        - height
+        - query_id
+        - query
+        - source_tx_hash
+        - source_tx_type
+        - fee
+        - nonce
+        - oracle_id
+        - response
+        - response_ttl
+        - ttl
       type: object
     OracleTx:
       properties:
@@ -2022,14 +2022,14 @@ components:
               properties:
                 type:
                   enum:
-                  - delta
-                  - block
+                    - delta
+                    - block
                   type: string
                 value:
                   type: integer
               required:
-              - type
-              - value
+                - type
+                - value
               type: object
             query_fee:
               type: number
@@ -2044,32 +2044,32 @@ components:
             version:
               type: integer
           required:
-          - fee
-          - nonce
-          - oracle_id
-          - oracle_ttl
-          - type
-          - version
-          - abi_version
-          - account_id
-          - query_fee
-          - query_format
-          - response_format
+            - fee
+            - nonce
+            - oracle_id
+            - oracle_ttl
+            - type
+            - version
+            - abi_version
+            - account_id
+            - query_fee
+            - query_format
+            - response_format
           type: object
         tx_hash:
           $ref: '#/components/schemas/TransactionHash'
           deprecated: true
           description: use `hash` instead
       required:
-      - block_hash
-      - block_height
-      - hash
-      - tx_hash
-      - micro_index
-      - micro_time
-      - signatures
-      - encoded_tx
-      - tx
+        - block_hash
+        - block_height
+        - hash
+        - tx_hash
+        - micro_index
+        - micro_time
+        - signatures
+        - encoded_tx
+        - tx
       type: object
     PaginatedResponse:
       properties:
@@ -2082,8 +2082,8 @@ components:
           nullable: true
           type: string
       required:
-      - next
-      - prev
+        - next
+        - prev
       type: object
     Pointee:
       description: Pointee
@@ -2117,20 +2117,20 @@ components:
             name_ttl: 50000
             nonce: 3544
             pointers:
-            - id: ak_M6MNwGLtMQ4j3m8pzQz9uF38nMfjCCVaiQ8fvTAU6DEsCocD5
-              key: account_pubkey
+              - id: ak_M6MNwGLtMQ4j3m8pzQz9uF38nMfjCCVaiQ8fvTAU6DEsCocD5
+                key: account_pubkey
             ttl: 60000
           type: object
       required:
-      - active
-      - name
-      - key
-      - block_hash
-      - tx
-      - source_tx_type
-      - source_tx_hash
-      - block_height
-      - block_time
+        - active
+        - name
+        - key
+        - block_hash
+        - tx
+        - source_tx_type
+        - source_tx_hash
+        - block_height
+        - block_time
       type: object
     Signature:
       description: Signature
@@ -2154,9 +2154,9 @@ components:
           description: The statistic start date
           type: string
       required:
-      - count
-      - start_date
-      - end_date
+        - count
+        - start_date
+        - end_date
       type: object
     Stats:
       description: Stats
@@ -2205,9 +2205,9 @@ components:
               example: 3
               type: integer
           required:
-          - long_tasks
-          - producer_buffer
-          - total_pending
+            - long_tasks
+            - producer_buffer
+            - total_pending
           type: object
         mdw_gens_per_minute:
           description: The approximate number of generations synced per minute on
@@ -2265,20 +2265,20 @@ components:
           example: 6.8.1
           type: string
       required:
-      - mdw_async_tasks
-      - mdw_gens_per_minute
-      - mdw_height
-      - mdw_last_migration
-      - mdw_revision
-      - mdw_synced
-      - mdw_syncing
-      - mdw_tx_index
-      - mdw_version
-      - node_height
-      - node_progress
-      - node_revision
-      - node_syncing
-      - node_version
+        - mdw_async_tasks
+        - mdw_gens_per_minute
+        - mdw_height
+        - mdw_last_migration
+        - mdw_revision
+        - mdw_synced
+        - mdw_syncing
+        - mdw_tx_index
+        - mdw_version
+        - node_height
+        - node_progress
+        - node_revision
+        - node_syncing
+        - node_version
       type: object
     TotalStat:
       description: TotalStat
@@ -2345,21 +2345,21 @@ components:
           description: The total token supply
           type: integer
       required:
-      - height
-      - contracts
-      - locked_in_auctions
-      - burned_in_auctions
-      - locked_in_channels
-      - active_auctions
-      - active_names
-      - inactive_names
-      - active_oracles
-      - inactive_oracles
-      - open_channels
-      - sum_block_reward
-      - sum_dev_reward
-      - total_token_supply
-      - last_tx_hash
+        - height
+        - contracts
+        - locked_in_auctions
+        - burned_in_auctions
+        - locked_in_channels
+        - active_auctions
+        - active_names
+        - inactive_names
+        - active_oracles
+        - inactive_oracles
+        - open_channels
+        - sum_block_reward
+        - sum_dev_reward
+        - total_token_supply
+        - last_tx_hash
       type: object
     Transaction:
       description: Transaction
@@ -2371,7 +2371,7 @@ components:
         micro_index: 0
         micro_time: 1543375246712
         signatures:
-        - sg_Fipyxq5f3JS9CB3AQVCw1v9skqNBw1cdfe5W3h1t2MkviU19GQckERQZkqkaXWKowdTUvr7B1QbtWdHjJHQcZApwVDdP9
+          - sg_Fipyxq5f3JS9CB3AQVCw1v9skqNBw1cdfe5W3h1t2MkviU19GQckERQZkqkaXWKowdTUvr7B1QbtWdHjJHQcZApwVDdP9
         tx:
           amount: 150425
           fee: 101014
@@ -2407,14 +2407,14 @@ components:
           description: The transaction
           type: object
       required:
-      - block_hash
-      - block_height
-      - encoded_tx
-      - hash
-      - micro_index
-      - micro_time
-      - signatures
-      - tx
+        - block_hash
+        - block_height
+        - encoded_tx
+        - hash
+        - micro_index
+        - micro_time
+        - signatures
+        - tx
       type: object
     TransactionEncoded:
       description: Encoded transaction
@@ -2438,8 +2438,8 @@ components:
           type: integer
         kind:
           enum:
-          - reward_dev
-          - reward_block
+            - reward_dev
+            - reward_block
           type: string
         ref_block_hash:
           $ref: '#/components/schemas/MicroBlockHash'
@@ -2452,13 +2452,13 @@ components:
           nullable: true
           type: string
       required:
-      - account_id
-      - amount
-      - height
-      - kind
-      - ref_block_hash
-      - ref_tx_hash
-      - ref_tx_type
+        - account_id
+        - amount
+        - height
+        - kind
+        - ref_block_hash
+        - ref_tx_hash
+        - ref_tx_type
       type: object
 info:
   description: API for [Aeternity Middleware](https://github.com/aeternity/ae_mdw)
@@ -2472,35 +2472,35 @@ paths:
       description: Get tokens owned by an account.
       operationId: GetAex141OwnedTokens
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: The account id
-        in: path
-        name: accountId
-        required: true
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
-      - description: Collection contract pubkey
-        in: query
-        name: contract
-        required: false
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: The account id
+          in: path
+          name: accountId
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+        - description: Collection contract pubkey
+          in: query
+          name: contract
+          required: false
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Aex141TokenResponse'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Aex141TokenResponse'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated AEX-141 tokens
         '400':
           content:
@@ -2514,27 +2514,27 @@ paths:
       description: Get all AEX9 balances for an account on the last block.
       operationId: GetAex9AccountBalances
       parameters:
-      - description: Account id
-        in: path
-        name: accountId
-        required: true
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
+        - description: Account id
+          in: path
+          name: accountId
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/PaginatedResponse'
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Aex9BalanceResponse'
-                      type: array
-                  required:
-                  - data
-                  type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Aex9BalanceResponse'
+                        type: array
+                    required:
+                      - data
+                    type: object
           description: Returns all the balances of an account
         '400':
           content:
@@ -2548,28 +2548,28 @@ paths:
       description: Get DEX swap tokens
       operationId: GetAccountDexSwaps
       parameters:
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: The account id
-        in: path
-        name: account_id
-        required: true
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: The account id
+          in: path
+          name: account_id
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/DexSwap'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/DexSwap'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated list of DEX swaps
         '400':
           content:
@@ -2583,58 +2583,58 @@ paths:
       description: Get an account activities.
       operationId: GetAccountActivities
       parameters:
-      - description: The account address
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
-      - description: Indicate to filter only activities initiated by the account
-        in: query
-        name: owned_only
-        required: false
-        schema:
-          example: true
-          type: boolean
-      - description: "Filter by activity type. Supported values:\n * `transactions`\
-          \ - Transactions containing the account in any of the transaction fields\n\
-          \ * `aexn` - AExN (aex9 and aex141) activities\n * `aex9` - AEx9 activities\n\
-          \ * `aex141` - AEx141 activities\n * `contract` - Internal and external\
-          \ contract calls\n * `transfers` - Internal (both gen-based and tx-based)\
-          \ transfers\n * `claims` - Name claims related to the name hash\n * `swaps`\
-          \ - Dex swaps related to the name hash\n"
-        in: query
-        name: type
-        required: false
-        schema:
-          enum:
-          - transactions
-          - aexn
-          - aex9
-          - aex141
-          - contract
-          - transfers
-          - claims
-          - swaps
-          type: string
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The account address
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+        - description: Indicate to filter only activities initiated by the account
+          in: query
+          name: owned_only
+          required: false
+          schema:
+            example: true
+            type: boolean
+        - description: "Filter by activity type. Supported values:\n * `transactions`\
+            \ - Transactions containing the account in any of the transaction fields\n\
+            \ * `aexn` - AExN (aex9 and aex141) activities\n * `aex9` - AEx9 activities\n\
+            \ * `aex141` - AEx141 activities\n * `contract` - Internal and external\
+            \ contract calls\n * `transfers` - Internal (both gen-based and tx-based)\
+            \ transfers\n * `claims` - Name claims related to the name hash\n * `swaps`\
+            \ - Dex swaps related to the name hash\n"
+          in: query
+          name: type
+          required: false
+          schema:
+            enum:
+              - transactions
+              - aexn
+              - aex9
+              - aex141
+              - contract
+              - transfers
+              - claims
+              - swaps
+            type: string
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Activity'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Activity'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated activities
         '400':
           content:
@@ -2648,27 +2648,27 @@ paths:
       description: Get account pointees
       operationId: GetAccountPointees
       parameters:
-      - description: The account that names point to
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
+        - description: The account that names point to
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Pointee'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Pointee'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns the name the active and inactive name pointees
         '404':
           content:
@@ -2682,12 +2682,12 @@ paths:
       description: Get transactions count and its type for given aeternity ID.
       operationId: GetAccountTransactionsCount
       parameters:
-      - description: The ID of the address/name/oracle/etc
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
+        - description: The ID of the address/name/oracle/etc
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
       responses:
         '200':
           content:
@@ -2978,7 +2978,7 @@ paths:
                     description: The total transactions count
                     type: integer
                 required:
-                - total
+                  - total
                 type: object
           description: Response schema for transactions count by id
         '400':
@@ -2993,51 +2993,51 @@ paths:
       description: Get AEX141 contracts sorted by creation time, name or symbol.
       operationId: GetSortedAex141Contracts
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: meta info field used on sorting
-        in: query
-        name: by
-        required: false
-        schema:
-          enum:
-          - creation
-          - name
-          - symbol
-          type: string
-      - description: Sorts by name or symbol prefix, this is decided by the 'by' field.
-          If it's name, it will sort by name prefix, if it's symbol, it will sort
-          by symbol prefix.
-        in: query
-        name: prefix
-        required: false
-        schema:
-          example: mycolle
-          type: string
-      - description: Gets AEX141 contracts with exact name or symbol, this is decided
-          by the 'by' field. If it's name, it will get contracts with exact name,
-          if it's symbol, it will get contracts with exact symbol.
-        in: query
-        name: exact
-        required: false
-        schema:
-          example: mycollection
-          type: string
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: meta info field used on sorting
+          in: query
+          name: by
+          required: false
+          schema:
+            enum:
+              - creation
+              - name
+              - symbol
+            type: string
+        - description: Sorts by name or symbol prefix, this is decided by the 'by' field.
+            If it's name, it will sort by name prefix, if it's symbol, it will sort
+            by symbol prefix.
+          in: query
+          name: prefix
+          required: false
+          schema:
+            example: mycolle
+            type: string
+        - description: Gets AEX141 contracts with exact name or symbol, this is decided
+            by the 'by' field. If it's name, it will get contracts with exact name,
+            if it's symbol, it will get contracts with exact symbol.
+          in: query
+          name: exact
+          required: false
+          schema:
+            example: mycollection
+            type: string
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Aex141Response'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Aex141Response'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated AEX-141 contracts
         '400':
           content:
@@ -3051,29 +3051,29 @@ paths:
       description: Get templates AEX-141 contract tokens.
       operationId: GetAex141ContractTemplates
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: The contract id
-        in: path
-        name: contractId
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: The contract id
+          in: path
+          name: contractId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Aex141TemplatesResponse'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Aex141TemplatesResponse'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated AEX-141 templates
         '400':
           content:
@@ -3087,36 +3087,36 @@ paths:
       description: Get AEX-141 template tokens.
       operationId: GetAex141TemplateTokens
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: Contract id
-        in: path
-        name: contractId
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
-      - description: Template id
-        in: path
-        name: templateId
-        required: true
-        schema:
-          example: 8
-          type: integer
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: Contract id
+          in: path
+          name: contractId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
+        - description: Template id
+          in: path
+          name: templateId
+          required: true
+          schema:
+            example: 8
+            type: integer
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Aex141TemplateTokensResponse'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Aex141TemplateTokensResponse'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated AEX-141 template tokens
         '400':
           content:
@@ -3130,29 +3130,29 @@ paths:
       description: Get owners of tokens of a AEX-141 contract.
       operationId: GetAex141ContractTokens
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: The contract id
-        in: path
-        name: contractId
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: The contract id
+          in: path
+          name: contractId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Aex141TokenResponse'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Aex141TokenResponse'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated AEX-141 contracts
         '400':
           content:
@@ -3166,19 +3166,19 @@ paths:
       description: Get owner of a NFT (AEX-141 token).
       operationId: GetAex141TokenOwner
       parameters:
-      - description: The contract id
-        in: path
-        name: contractId
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
-      - description: The nft token id
-        in: path
-        name: tokenId
-        required: true
-        schema:
-          example: 1
-          type: integer
+        - description: The contract id
+          in: path
+          name: contractId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
+        - description: The nft token id
+          in: path
+          name: tokenId
+          required: true
+          schema:
+            example: 1
+            type: integer
       responses:
         '200':
           content:
@@ -3188,7 +3188,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/AccountAddress'
                 required:
-                - data
+                  - data
                 type: object
           description: Owner account of the NFT
         '400':
@@ -3203,41 +3203,41 @@ paths:
       description: Get AEX-141 transfers on a contract.
       operationId: GetAex141ContractTransfers
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: Contract id
-        in: path
-        name: contractId
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
-      - description: From account
-        in: query
-        name: from
-        required: false
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
-      - description: To account
-        in: query
-        name: to
-        required: false
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: Contract id
+          in: path
+          name: contractId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
+        - description: From account
+          in: query
+          name: from
+          required: false
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+        - description: To account
+          in: query
+          name: to
+          required: false
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Aex141TransferEvent'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Aex141TransferEvent'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated AEX-141 transfers
         '400':
           content:
@@ -3251,12 +3251,12 @@ paths:
       description: Get AEX141 contract meta-info, extensions, limits and stats.
       operationId: GetAex141ByContract
       parameters:
-      - description: The contract id
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
+        - description: The contract id
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
       responses:
         '200':
           content:
@@ -3276,51 +3276,51 @@ paths:
       description: Get AEX9 tokens sorted by creation time, name or symbol.
       operationId: GetSortedAex9Tokens
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: meta info field used on sorting
-        in: query
-        name: by
-        required: false
-        schema:
-          enum:
-          - creation
-          - name
-          - symbol
-          type: string
-      - description: Sorts by name or symbol prefix, this is decided by the 'by' field.
-          If it's name, it will sort by name prefix, if it's symbol, it will sort
-          by symbol prefix.
-        in: query
-        name: prefix
-        required: false
-        schema:
-          example: AA
-          type: string
-      - description: Gets AEX9 tokens with exact name or symbol, this is decided by
-          the 'by' field. If it's name, it will get tokens with exact name, if it's
-          symbol, it will get tokens with exact symbol.
-        in: query
-        name: exact
-        required: false
-        schema:
-          example: AA
-          type: string
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: meta info field used on sorting
+          in: query
+          name: by
+          required: false
+          schema:
+            enum:
+              - creation
+              - name
+              - symbol
+            type: string
+        - description: Sorts by name or symbol prefix, this is decided by the 'by' field.
+            If it's name, it will sort by name prefix, if it's symbol, it will sort
+            by symbol prefix.
+          in: query
+          name: prefix
+          required: false
+          schema:
+            example: AA
+            type: string
+        - description: Gets AEX9 tokens with exact name or symbol, this is decided by
+            the 'by' field. If it's name, it will get tokens with exact name, if it's
+            symbol, it will get tokens with exact symbol.
+          in: query
+          name: exact
+          required: false
+          schema:
+            example: AA
+            type: string
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Aex9Response'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Aex9Response'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated AEX-9 tokens
         '400':
           content:
@@ -3342,7 +3342,7 @@ paths:
                   data:
                     type: integer
                 required:
-                - data
+                  - data
                 type: object
           description: Returns the number of AEX9 contracts created
   /aex9/{contractId}/balances:
@@ -3351,42 +3351,42 @@ paths:
       description: Get AEX9 balances on a contract.
       operationId: GetAex9ContractBalances
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: Contract id
-        in: path
-        name: contractId
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
-      - description: Order by
-        in: query
-        name: by
-        required: false
-        schema:
-          example: amount
-          type: string
-      - description: Block hash
-        in: query
-        name: block_hash
-        required: false
-        schema:
-          $ref: '#/components/schemas/MicroBlockHash'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: Contract id
+          in: path
+          name: contractId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
+        - description: Order by
+          in: query
+          name: by
+          required: false
+          schema:
+            example: amount
+            type: string
+        - description: Block hash
+          in: query
+          name: block_hash
+          required: false
+          schema:
+            $ref: '#/components/schemas/MicroBlockHash'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Aex9ContractBalanceResponse'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Aex9ContractBalanceResponse'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated contract balances
         '400':
           content:
@@ -3400,24 +3400,24 @@ paths:
       description: Get AEX9 balance for an account on a contract.
       operationId: GetAex9ContractAccountBalance
       parameters:
-      - description: Contract id
-        in: path
-        name: contractId
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
-      - description: Account id
-        in: path
-        name: accountId
-        required: true
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
-      - description: Block hash
-        in: query
-        name: hash
-        required: false
-        schema:
-          $ref: '#/components/schemas/MicroBlockHash'
+        - description: Contract id
+          in: path
+          name: contractId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
+        - description: Account id
+          in: path
+          name: accountId
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+        - description: Block hash
+          in: query
+          name: hash
+          required: false
+          schema:
+            $ref: '#/components/schemas/MicroBlockHash'
       responses:
         '200':
           content:
@@ -3435,9 +3435,9 @@ paths:
                     $ref: '#/components/schemas/ContractAddress'
                     description: The contract id of given token
                 required:
-                - account
-                - amount
-                - contract
+                  - account
+                  - amount
+                  - contract
                 type: object
           description: Returns a the balance of an account on a contract
         '400':
@@ -3453,57 +3453,57 @@ paths:
         changed.
       operationId: GetAex9ContractAccountBalanceHistory
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: Contract id
-        in: path
-        name: contractId
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
-      - description: Account id
-        in: path
-        name: accountId
-        required: true
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: Contract id
+          in: path
+          name: contractId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
+        - description: Account id
+          in: path
+          name: accountId
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/PaginatedResponse'
-                - properties:
-                    data:
-                      items:
-                        properties:
-                          account:
-                            $ref: '#/components/schemas/AccountAddress'
-                            description: The account present on a AEX9
-                          amount:
-                            description: The amount of AEX9 token
-                            example: 4050000000000
-                            type: integer
-                          contract:
-                            $ref: '#/components/schemas/ContractAddress'
-                            description: The contract id of given token
-                          height:
-                            description: The block height, indicating a state of a
-                              balance for that block height
-                            example: 618127
-                            type: integer
-                        required:
-                        - account
-                        - amount
-                        - contract
-                        - height
-                        type: object
-                      type: array
-                  required:
-                  - data
-                  type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          properties:
+                            account:
+                              $ref: '#/components/schemas/AccountAddress'
+                              description: The account present on a AEX9
+                            amount:
+                              description: The amount of AEX9 token
+                              example: 4050000000000
+                              type: integer
+                            contract:
+                              $ref: '#/components/schemas/ContractAddress'
+                              description: The contract id of given token
+                            height:
+                              description: The block height, indicating a state of a
+                                balance for that block height
+                              example: 618127
+                              type: integer
+                          required:
+                            - account
+                            - amount
+                            - contract
+                            - height
+                          type: object
+                        type: array
+                    required:
+                      - data
+                    type: object
           description: Account balance history on a token contract
         '400':
           content:
@@ -3517,12 +3517,12 @@ paths:
       description: Get AEX9 creation and meta_info information by contract id.
       operationId: GetAex9ByContract
       parameters:
-      - description: The contract id
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
+        - description: The contract id
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
       responses:
         '200':
           content:
@@ -3542,34 +3542,34 @@ paths:
       description: Get multiple channels.
       operationId: GetChannels
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: Exclusively filter by active/inactive channels.
-        in: query
-        name: state
-        required: false
-        schema:
-          enum:
-          - active
-          - inactive
-          example: inactive
-          type: string
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: Exclusively filter by active/inactive channels.
+          in: query
+          name: state
+          required: false
+          schema:
+            enum:
+              - active
+              - inactive
+            example: inactive
+            type: string
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Channel'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Channel'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated channels
         '400':
           content:
@@ -3583,12 +3583,12 @@ paths:
       description: Get a single channel.
       operationId: GetChannel
       parameters:
-      - description: The channel
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/ChannelId'
+        - description: The channel
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ChannelId'
       responses:
         '200':
           content:
@@ -3614,24 +3614,24 @@ paths:
       description: Get contract calls.
       operationId: GetContractCalls
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/ContractCall'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/ContractCall'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated contracts logs
         '400':
           content:
@@ -3645,65 +3645,65 @@ paths:
       description: Get contract logs.
       operationId: GetContractLogs
       parameters:
-      - description: Contract that emitted the logs
-        in: query
-        name: contract_id
-        required: false
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
-      - description: Name of the event
-        in: query
-        name: event
-        required: false
-        schema:
-          example: Transfer
-          type: string
-      - description: Prefix of the contract called function
-        in: query
-        name: function
-        required: false
-        schema:
-          example: mint
-          type: string
-      - description: Prefix of the contract called function
-        in: query
-        name: function_prefix
-        required: false
-        schema:
-          example: put
-          type: string
-      - description: Data prefix from the contract call
-        in: query
-        name: data
-        required: false
-        schema:
-          example: AB
-          type: string
-      - description: Indicates to format args when event is AEX-N
-        in: query
-        name: aexn-args
-        required: false
-        schema:
-          example: true
-          type: boolean
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: Contract that emitted the logs
+          in: query
+          name: contract_id
+          required: false
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
+        - description: Name of the event
+          in: query
+          name: event
+          required: false
+          schema:
+            example: Transfer
+            type: string
+        - description: Prefix of the contract called function
+          in: query
+          name: function
+          required: false
+          schema:
+            example: mint
+            type: string
+        - description: Prefix of the contract called function
+          in: query
+          name: function_prefix
+          required: false
+          schema:
+            example: put
+            type: string
+        - description: Data prefix from the contract call
+          in: query
+          name: data
+          required: false
+          schema:
+            example: AB
+            type: string
+        - description: Indicates to format args when event is AEX-N
+          in: query
+          name: aexn-args
+          required: false
+          schema:
+            example: true
+            type: boolean
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/ContractLog'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/ContractLog'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated contracts logs
         '400':
           content:
@@ -3717,12 +3717,12 @@ paths:
       description: Gets contract creation info.
       operationId: GetContract
       parameters:
-      - description: Contract that emitted the logs
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
+        - description: Contract that emitted the logs
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
       responses:
         '200':
           content:
@@ -3748,22 +3748,22 @@ paths:
       description: Get DEX swap tokens
       operationId: GetDexSwaps
       parameters:
-      - $ref: '#/components/parameters/DirectionParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/DexSwap'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/DexSwap'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated list of DEX swaps
         '400':
           content:
@@ -3777,28 +3777,28 @@ paths:
       description: Get DEX swap tokens
       operationId: GetDexSwapsByContractId
       parameters:
-      - $ref: '#/components/parameters/DirectionParam'
-      - description: The contract id
-        in: path
-        name: contract_id
-        required: true
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
+        - $ref: '#/components/parameters/DirectionParam'
+        - description: The contract id
+          in: path
+          name: contract_id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/DexSwap'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/DexSwap'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated list of DEX swaps
         '400':
           content:
@@ -3812,24 +3812,24 @@ paths:
       description: Get multiple key blocks.
       operationId: GetKeyBlocks
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/KeyBlock'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/KeyBlock'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated key blocks
         '400':
           content:
@@ -3843,15 +3843,15 @@ paths:
       description: Get a single key block.
       operationId: GetKeyBlock
       parameters:
-      - description: The key block encoded hash or key block index
-        in: path
-        name: hash_or_kbi
-        required: true
-        schema:
-          oneOf:
-          - $ref: '#/components/schemas/KeyBlockHash'
-          - example: 123
-            type: integer
+        - description: The key block encoded hash or key block index
+          in: path
+          name: hash_or_kbi
+          required: true
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/KeyBlockHash'
+              - example: 123
+                type: integer
       responses:
         '200':
           content:
@@ -3877,33 +3877,33 @@ paths:
       description: Get the key block micro blocks.
       operationId: GetKeyBlockMicroBlocks
       parameters:
-      - description: The key block encoded hash or key block index
-        in: path
-        name: hash_or_kbi
-        required: true
-        schema:
-          oneOf:
-          - $ref: '#/components/schemas/KeyBlockHash'
-          - example: 123
-            type: integer
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The key block encoded hash or key block index
+          in: path
+          name: hash_or_kbi
+          required: true
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/KeyBlockHash'
+              - example: 123
+                type: integer
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/MicroBlock'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/MicroBlock'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated micro blocks
         '400':
           content:
@@ -3917,12 +3917,12 @@ paths:
       description: Get a micro block
       operationId: GetMicroBlock
       parameters:
-      - description: The micro block encoded hash
-        in: path
-        name: hash
-        required: true
-        schema:
-          $ref: '#/components/schemas/MicroBlockHash'
+        - description: The micro block encoded hash
+          in: path
+          name: hash
+          required: true
+          schema:
+            $ref: '#/components/schemas/MicroBlockHash'
       responses:
         '200':
           content:
@@ -3948,27 +3948,27 @@ paths:
       description: Get a micro block transactions
       operationId: GetMicroBlockTransactions
       parameters:
-      - description: The micro block encoded hash
-        in: path
-        name: hash
-        required: true
-        schema:
-          $ref: '#/components/schemas/MicroBlockHash'
+        - description: The micro block encoded hash
+          in: path
+          name: hash
+          required: true
+          schema:
+            $ref: '#/components/schemas/MicroBlockHash'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Transaction'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Transaction'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated micro blocks
         '400':
           content:
@@ -3982,49 +3982,49 @@ paths:
       description: Get multiple names.
       operationId: GetNames
       parameters:
-      - description: Sorting by deactivation, activation or name
-        in: query
-        name: by
-        required: false
-        schema:
-          example: activation
-          type: string
-      - description: Account that owns the name
-        in: query
-        name: owned_by
-        required: false
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
-      - description: Name prefix filter (case insensitive). Requires by=name parameter
-        in: query
-        name: prefix
-        required: false
-        schema:
-          type: string
-      - description: Activation state of the name (active or inactive)
-        in: query
-        name: state
-        required: false
-        schema:
-          example: inactive
-          type: string
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: Sorting by deactivation, activation or name
+          in: query
+          name: by
+          required: false
+          schema:
+            example: activation
+            type: string
+        - description: Account that owns the name
+          in: query
+          name: owned_by
+          required: false
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+        - description: Name prefix filter (case insensitive). Requires by=name parameter
+          in: query
+          name: prefix
+          required: false
+          schema:
+            type: string
+        - description: Activation state of the name (active or inactive)
+          in: query
+          name: state
+          required: false
+          schema:
+            example: inactive
+            type: string
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Name'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Name'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated names
         '400':
           content:
@@ -4038,24 +4038,24 @@ paths:
       description: Get multiple names.
       operationId: GetNamesAuctions
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Auction'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Auction'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated active/inactive names and auctions
         '400':
           content:
@@ -4069,17 +4069,17 @@ paths:
       description: Get name auction
       operationId: GetNameAuction
       parameters:
-      - description: The name
-        in: path
-        name: id
-        required: true
-        schema:
-          oneOf:
-          - $ref: '#/components/schemas/NameString'
-          - $ref: '#/components/schemas/NameHash'
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The name
+          in: path
+          name: id
+          required: true
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/NameString'
+              - $ref: '#/components/schemas/NameHash'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
@@ -4105,17 +4105,17 @@ paths:
       description: Get name auction claims
       operationId: GetNameAuctionClaims
       parameters:
-      - description: The name
-        in: path
-        name: id
-        required: true
-        schema:
-          oneOf:
-          - $ref: '#/components/schemas/NameString'
-          - $ref: '#/components/schemas/NameHash'
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The name
+          in: path
+          name: id
+          required: true
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/NameString'
+              - $ref: '#/components/schemas/NameHash'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
@@ -4127,7 +4127,7 @@ paths:
                       $ref: '#/components/schemas/NameClaim'
                     type: array
                 required:
-                - data
+                  - data
                 type: object
           description: Returns the name auction claims
         '404':
@@ -4142,12 +4142,12 @@ paths:
       description: Get the total number of active names.
       operationId: GetNamesCount
       parameters:
-      - description: Account that owns the name
-        in: query
-        name: owned_by
-        required: false
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
+        - description: Account that owns the name
+          in: query
+          name: owned_by
+          required: false
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
       responses:
         '200':
           content:
@@ -4169,14 +4169,14 @@ paths:
       description: Get a single name.
       operationId: GetName
       parameters:
-      - description: The name
-        in: path
-        name: id
-        required: true
-        schema:
-          oneOf:
-          - $ref: '#/components/schemas/NameString'
-          - $ref: '#/components/schemas/NameHash'
+        - description: The name
+          in: path
+          name: id
+          required: true
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/NameString'
+              - $ref: '#/components/schemas/NameHash'
       responses:
         '200':
           content:
@@ -4202,32 +4202,32 @@ paths:
       description: Get name claims
       operationId: GetNameClaims
       parameters:
-      - description: The name or name hash
-        in: path
-        name: id
-        required: true
-        schema:
-          oneOf:
-          - $ref: '#/components/schemas/NameString'
-          - $ref: '#/components/schemas/NameHash'
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The name or name hash
+          in: path
+          name: id
+          required: true
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/NameString'
+              - $ref: '#/components/schemas/NameHash'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/NameClaim'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/NameClaim'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: The name claims
         '404':
           content:
@@ -4241,32 +4241,32 @@ paths:
       description: Get name transfers
       operationId: GetNameTransfers
       parameters:
-      - description: The name or name hash
-        in: path
-        name: id
-        required: true
-        schema:
-          oneOf:
-          - $ref: '#/components/schemas/NameString'
-          - $ref: '#/components/schemas/NameHash'
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The name or name hash
+          in: path
+          name: id
+          required: true
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/NameString'
+              - $ref: '#/components/schemas/NameHash'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/NameTransfer'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/NameTransfer'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: The name transfers
         '404':
           content:
@@ -4280,32 +4280,32 @@ paths:
       description: Get name updates
       operationId: GetNameUpdates
       parameters:
-      - description: The name or name hash
-        in: path
-        name: id
-        required: true
-        schema:
-          oneOf:
-          - $ref: '#/components/schemas/NameString'
-          - $ref: '#/components/schemas/NameHash'
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The name or name hash
+          in: path
+          name: id
+          required: true
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/NameString'
+              - $ref: '#/components/schemas/NameHash'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/NameUpdate'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/NameUpdate'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: The name updates
         '404':
           content:
@@ -4319,31 +4319,31 @@ paths:
       description: Get multiple oracles.
       operationId: GetOracles
       parameters:
-      - description: oracle state (active or inactive)
-        in: query
-        name: state
-        required: false
-        schema:
-          example: active
-          type: string
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: oracle state (active or inactive)
+          in: query
+          name: state
+          required: false
+          schema:
+            example: active
+            type: string
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Oracle'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Oracle'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated oracles
         '400':
           content:
@@ -4357,12 +4357,12 @@ paths:
       description: Get a single oracle.
       operationId: GetOracle
       parameters:
-      - description: The oracle
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/OracleAddress'
+        - description: The oracle
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/OracleAddress'
       responses:
         '200':
           content:
@@ -4388,27 +4388,27 @@ paths:
       description: Get an oracle's extensions.
       operationId: GetOracleExtends
       parameters:
-      - description: The oracle
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/OracleAddress'
+        - description: The oracle
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/OracleAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/OracleExtend'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/OracleExtend'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated oracle extensions
         '400':
           content:
@@ -4428,27 +4428,27 @@ paths:
       description: Get an oracle's queries.
       operationId: GetOracleQueries
       parameters:
-      - description: The oracle
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/OracleAddress'
+        - description: The oracle
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/OracleAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/OracleQuery'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/OracleQuery'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated oracle queries
         '400':
           content:
@@ -4468,27 +4468,27 @@ paths:
       description: Get an oracle's responses.
       operationId: GetOracleResponses
       parameters:
-      - description: The oracle
-        in: path
-        name: id
-        required: true
-        schema:
-          $ref: '#/components/schemas/OracleAddress'
+        - description: The oracle
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/OracleAddress'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/OracleResponse'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/OracleResponse'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated oracle responses
         '400':
           content:
@@ -4526,58 +4526,58 @@ paths:
       description: Get total blocks count stats.
       operationId: GetBlocksStats
       parameters:
-      - description: The interval in which to return the stats.
-        in: query
-        name: interval_by
-        required: false
-        schema:
-          enum:
-          - day
-          - week
-          - month
-          example: week
-          type: string
-      - description: The minimum start date in YYYY-MM-DD format.
-        in: query
-        name: min_start_date
-        required: false
-        schema:
-          example: '2023-01-01'
-          type: string
-      - description: The maximum start date in YYYY-MM-DD format.
-        in: query
-        name: max_start_date
-        required: false
-        schema:
-          example: '2024-01-01'
-          type: string
-      - description: The type of block.
-        in: query
-        name: type
-        required: false
-        schema:
-          enum:
-          - key
-          - micro
-          example: micro
-          type: string
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The interval in which to return the stats.
+          in: query
+          name: interval_by
+          required: false
+          schema:
+            enum:
+              - day
+              - week
+              - month
+            example: week
+            type: string
+        - description: The minimum start date in YYYY-MM-DD format.
+          in: query
+          name: min_start_date
+          required: false
+          schema:
+            example: '2023-01-01'
+            type: string
+        - description: The maximum start date in YYYY-MM-DD format.
+          in: query
+          name: max_start_date
+          required: false
+          schema:
+            example: '2024-01-01'
+            type: string
+        - description: The type of block.
+          in: query
+          name: type
+          required: false
+          schema:
+            enum:
+              - key
+              - micro
+            example: micro
+            type: string
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Stat'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Stat'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated total stats per generation
         '400':
           content:
@@ -4591,24 +4591,24 @@ paths:
       description: Get delta stats.
       operationId: GetDeltaStats
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/DeltaStat'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/DeltaStat'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated delta stats per generation
         '400':
           content:
@@ -4622,23 +4622,23 @@ paths:
       description: Get miners list with total rewards obtained through mining.
       operationId: GetMinerStats
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Miner'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Miner'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated total stats per generation
         '400':
           content:
@@ -4652,48 +4652,48 @@ paths:
       description: Get total names count stats.
       operationId: GetNamesStats
       parameters:
-      - description: The interval in which to return the stats.
-        in: query
-        name: interval_by
-        required: false
-        schema:
-          enum:
-          - day
-          - week
-          - month
-          example: week
-          type: string
-      - description: The minimum start date in YYYY-MM-DD format.
-        in: query
-        name: min_start_date
-        required: false
-        schema:
-          example: '2023-01-01'
-          type: string
-      - description: The maximum start date in YYYY-MM-DD format.
-        in: query
-        name: max_start_date
-        required: false
-        schema:
-          example: '2024-01-01'
-          type: string
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The interval in which to return the stats.
+          in: query
+          name: interval_by
+          required: false
+          schema:
+            enum:
+              - day
+              - week
+              - month
+            example: week
+            type: string
+        - description: The minimum start date in YYYY-MM-DD format.
+          in: query
+          name: min_start_date
+          required: false
+          schema:
+            example: '2023-01-01'
+            type: string
+        - description: The maximum start date in YYYY-MM-DD format.
+          in: query
+          name: max_start_date
+          required: false
+          schema:
+            example: '2024-01-01'
+            type: string
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Stat'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Stat'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated total stats per generation
         '400':
           content:
@@ -4707,24 +4707,24 @@ paths:
       description: Get total accumulated stats.
       operationId: GetTotalStats
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/TotalStat'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/TotalStat'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated total stats per generation
         '400':
           content:
@@ -4738,55 +4738,55 @@ paths:
       description: Get total transactions count stats.
       operationId: GetTransactionsStats
       parameters:
-      - description: The interval in which to return the stats.
-        in: query
-        name: interval_by
-        required: false
-        schema:
-          enum:
-          - day
-          - week
-          - month
-          example: week
-          type: string
-      - description: The minimum start date in YYYY-MM-DD format.
-        in: query
-        name: min_start_date
-        required: false
-        schema:
-          example: '2023-01-01'
-          type: string
-      - description: The maximum start date in YYYY-MM-DD format.
-        in: query
-        name: max_start_date
-        required: false
-        schema:
-          example: '2024-01-01'
-          type: string
-      - description: The type of the transactions
-        in: query
-        name: tx_type
-        required: false
-        schema:
-          example: contract_call
-          type: string
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - description: The interval in which to return the stats.
+          in: query
+          name: interval_by
+          required: false
+          schema:
+            enum:
+              - day
+              - week
+              - month
+            example: week
+            type: string
+        - description: The minimum start date in YYYY-MM-DD format.
+          in: query
+          name: min_start_date
+          required: false
+          schema:
+            example: '2023-01-01'
+            type: string
+        - description: The maximum start date in YYYY-MM-DD format.
+          in: query
+          name: max_start_date
+          required: false
+          schema:
+            example: '2024-01-01'
+            type: string
+        - description: The type of the transactions
+          in: query
+          name: tx_type
+          required: false
+          schema:
+            example: contract_call
+            type: string
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Stat'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Stat'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated total stats per generation
         '400':
           content:
@@ -4811,125 +4811,125 @@ paths:
       description: Get multiple transactions.
       operationId: GetTransactions
       parameters:
-      - description: The transaction type. The query allows providing of multiple
-          type parameters. [More info](https://github.com/aeternity/ae_mdw#types)
-        example: channel_create
-        explode: true
-        in: query
-        name: type
-        required: false
-        schema:
-          items:
-            enum:
-            - channel_close_mutual
-            - channel_close_solo
-            - channel_create
-            - channel_deposit
-            - channel_force_progress
-            - channel_offchain
-            - channel_settle
-            - channel_slash
-            - channel_snapshot_solo
-            - channel_withdraw
-            - contract_call
-            - contract_create
-            - ga_attach
-            - ga_meta
-            - name_claim
-            - name_preclaim
-            - name_revoke
-            - name_transfer
-            - name_update
-            - oracle_extend
-            - oracle_query
-            - oracle_register
-            - oracle_response
-            - paying_for
-            - spend
+        - description: The transaction type. The query allows providing of multiple
+            type parameters. [More info](https://github.com/aeternity/ae_mdw#types)
+          example: channel_create
+          explode: true
+          in: query
+          name: type
+          required: false
+          schema:
+            items:
+              enum:
+                - channel_close_mutual
+                - channel_close_solo
+                - channel_create
+                - channel_deposit
+                - channel_force_progress
+                - channel_offchain
+                - channel_settle
+                - channel_slash
+                - channel_snapshot_solo
+                - channel_withdraw
+                - contract_call
+                - contract_create
+                - ga_attach
+                - ga_meta
+                - name_claim
+                - name_preclaim
+                - name_revoke
+                - name_transfer
+                - name_update
+                - oracle_extend
+                - oracle_query
+                - oracle_register
+                - oracle_response
+                - paying_for
+                - spend
+              type: string
+            type: array
+          style: form
+        - description: The type group. The query allows providing of multiple type group
+            parameters. [More info](https://github.com/aeternity/ae_mdw#types)
+          example: channel
+          explode: true
+          in: query
+          name: type_group
+          required: false
+          schema:
+            items:
+              enum:
+                - channel
+                - contract
+                - ga
+                - name
+                - oracle
+                - paying_for
+                - spend
+              type: string
+            type: array
+          style: form
+        - description: The account ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
+          in: query
+          name: account
+          required: false
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+        - description: The contract ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
+          in: query
+          name: contract
+          required: false
+          schema:
+            $ref: '#/components/schemas/ContractAddress'
+        - description: The channel ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
+          in: query
+          name: channel
+          required: false
+          schema:
+            $ref: '#/components/schemas/ChannelId'
+        - description: The oracle ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
+          in: query
+          name: oracle
+          required: false
+          schema:
+            $ref: '#/components/schemas/OracleAddress'
+        - description: The sender ID
+          in: query
+          name: sender_id
+          required: false
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+        - description: The recipient ID
+          in: query
+          name: recipient_id
+          required: false
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+        - description: Entrypoint of a contract call
+          example: put_listing
+          in: query
+          name: entrypoint
+          required: false
+          schema:
             type: string
-          type: array
-        style: form
-      - description: The type group. The query allows providing of multiple type group
-          parameters. [More info](https://github.com/aeternity/ae_mdw#types)
-        example: channel
-        explode: true
-        in: query
-        name: type_group
-        required: false
-        schema:
-          items:
-            enum:
-            - channel
-            - contract
-            - ga
-            - name
-            - oracle
-            - paying_for
-            - spend
-            type: string
-          type: array
-        style: form
-      - description: The account ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
-        in: query
-        name: account
-        required: false
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
-      - description: The contract ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
-        in: query
-        name: contract
-        required: false
-        schema:
-          $ref: '#/components/schemas/ContractAddress'
-      - description: The channel ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
-        in: query
-        name: channel
-        required: false
-        schema:
-          $ref: '#/components/schemas/ChannelId'
-      - description: The oracle ID. [More info](https://github.com/aeternity/ae_mdw#generic-ids)
-        in: query
-        name: oracle
-        required: false
-        schema:
-          $ref: '#/components/schemas/OracleAddress'
-      - description: The sender ID
-        in: query
-        name: sender_id
-        required: false
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
-      - description: The recipient ID
-        in: query
-        name: recipient_id
-        required: false
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
-      - description: Entrypoint of a contract call
-        example: put_listing
-        in: query
-        name: entrypoint
-        required: false
-        schema:
-          type: string
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Transaction'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Transaction'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated transactions
         '400':
           content:
@@ -4943,20 +4943,20 @@ paths:
       description: Get count of transactions at the latest height.
       operationId: GetTransactionsCount
       parameters:
-      - description: Type of a transaction
-        in: query
-        name: tx_type
-        required: false
-        schema:
-          example: contract_call
-          type: string
-      - description: The ID of the address/name/oracle/etc
-        in: query
-        name: id
-        required: false
-        schema:
-          $ref: '#/components/schemas/AccountAddress'
-      - $ref: '#/components/parameters/ScopeParam'
+        - description: Type of a transaction
+          in: query
+          name: tx_type
+          required: false
+          schema:
+            example: contract_call
+            type: string
+        - description: The ID of the address/name/oracle/etc
+          in: query
+          name: id
+          required: false
+          schema:
+            $ref: '#/components/schemas/AccountAddress'
+        - $ref: '#/components/parameters/ScopeParam'
       responses:
         '200':
           content:
@@ -4972,12 +4972,12 @@ paths:
       description: Get a single transaction.
       operationId: GetTransaction
       parameters:
-      - description: The transaction encoded hash
-        in: path
-        name: hash
-        required: true
-        schema:
-          $ref: '#/components/schemas/TransactionHash'
+        - description: The transaction encoded hash
+          in: path
+          name: hash
+          required: true
+          schema:
+            $ref: '#/components/schemas/TransactionHash'
       responses:
         '200':
           content:
@@ -5003,24 +5003,24 @@ paths:
       description: Get multiple transfers.
       operationId: GetTransfers
       parameters:
-      - $ref: '#/components/parameters/LimitParam'
-      - $ref: '#/components/parameters/ScopeParam'
-      - $ref: '#/components/parameters/DirectionParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/ScopeParam'
+        - $ref: '#/components/parameters/DirectionParam'
       responses:
         '200':
           content:
             application/json:
               schema:
                 allOf:
-                - properties:
-                    data:
-                      items:
-                        $ref: '#/components/schemas/Transfer'
-                      type: array
-                  required:
-                  - data
-                  type: object
-                - $ref: '#/components/schemas/PaginatedResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/Transfer'
+                        type: array
+                    required:
+                      - data
+                    type: object
+                  - $ref: '#/components/schemas/PaginatedResponse'
           description: Returns paginated names
         '400':
           content:
@@ -5029,5 +5029,5 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Bad request
 servers:
-- description: V3 version path
-  url: /mdw/v3
+  - description: V3 version path
+    url: /mdw/v3

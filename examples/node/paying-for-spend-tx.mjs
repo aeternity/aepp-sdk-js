@@ -15,9 +15,7 @@
 
 // ## 1. Specify imports
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import {
-  AeSdk, Node, MemoryAccount, Tag,
-} from '@aeternity/aepp-sdk';
+import { AeSdk, Node, MemoryAccount, Tag } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -47,11 +45,9 @@ const aeSdk = new AeSdk({
 });
 
 // ## 4. Send 1 `aetto` from payer to new user
-const spendTxResult = await aeSdk.spend(
-  AMOUNT,
-  newUserAccount.address,
-  { onAccount: payerAccount },
-);
+const spendTxResult = await aeSdk.spend(AMOUNT, newUserAccount.address, {
+  onAccount: payerAccount,
+});
 console.log(spendTxResult);
 
 // ## 5. Check balance of new user (before)
@@ -69,10 +65,10 @@ const spendTx = await aeSdk.buildTx({
   recipientId: payerAccount.address,
   amount: AMOUNT,
 });
-const signedSpendTx = await aeSdk.signTransaction(
-  spendTx,
-  { onAccount: newUserAccount, innerTx: true },
-);
+const signedSpendTx = await aeSdk.signTransaction(spendTx, {
+  onAccount: newUserAccount,
+  innerTx: true,
+});
 
 // Note:
 //

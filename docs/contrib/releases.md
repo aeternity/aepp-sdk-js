@@ -47,10 +47,10 @@ string in `package.json`.
 
 Execute `npm run release` to automatically
 
- - bump version number in package.json and package-lock.json (according to
-   [Semantic Versioning])
- - output changes to [CHANGELOG.md]
- - commit package-lock.json and package.json and CHANGELOG.md
+- bump version number in package.json and package-lock.json (according to
+  [Semantic Versioning])
+- output changes to [CHANGELOG.md]
+- commit package-lock.json and package.json and CHANGELOG.md
 
 Next, `git diff` the release, branch a `release/vX.X.X` (where `vX.X.X` is your
 latest release) against `master` and validate that all changes are covered in
@@ -71,7 +71,7 @@ separately.
 ## Merging
 
 Once the integration build has successfully completed (with or without additional
-fixes), *merge* (without squash) the branch into `master`. This allows `master`
+fixes), _merge_ (without squash) the branch into `master`. This allows `master`
 to be comprised of release commits exclusively, so every commit on master corresponds
 to exactly one released (or at least, tagged) version of aepp-sdk, respectively.
 
@@ -81,7 +81,7 @@ Update the local working copy to a local tracking branch of `master` and
 update. Optionally, wait for the CI build to finish and execute a last
 `npm run test` locally.
 
-Important: Because `npm publish` will use the *local files on disk* for
+Important: Because `npm publish` will use the _local files on disk_ for
 releasing, perform a full clean and build in order to release to npmjs.com!
 
 1. Cleanup - run `git clean -ffdx` to completely wipe out your workspace of
@@ -97,8 +97,8 @@ releasing, perform a full clean and build in order to release to npmjs.com!
 tag the release as `next` using the command `npm publish --tag next`.
 
 At this point, the release should already be in npmjs.com. The final step is to
-also tag the release on GitHub and push the tag, *which requires direct write
-access*.
+also tag the release on GitHub and push the tag, _which requires direct write
+access_.
 
 1. `git tag vX.X.X`
 2. `git push tag vX.X.X`

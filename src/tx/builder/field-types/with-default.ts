@@ -5,9 +5,9 @@ export default function withDefault<Input, Output, Binary>(
     deserialize: (value: Binary, params: unknown) => Output;
   },
 ): {
-    serialize: (value: Input | undefined, params: unknown) => Binary;
-    deserialize: (value: Binary, params: unknown) => Output;
-  } {
+  serialize: (value: Input | undefined, params: unknown) => Binary;
+  deserialize: (value: Binary, params: unknown) => Output;
+} {
   return {
     ...field,
 

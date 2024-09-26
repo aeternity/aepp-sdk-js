@@ -40,13 +40,16 @@ interface SignOptions {
   updates?: any[];
   [k: string]: any;
 }
-export type SignTxWithTag = (tag: string, tx: Encoded.Transaction, options?: SignOptions) => (
-  Promise<Encoded.Transaction>
-);
+export type SignTxWithTag = (
+  tag: string,
+  tx: Encoded.Transaction,
+  options?: SignOptions,
+) => Promise<Encoded.Transaction>;
 // TODO: SignTx shouldn't return number or null
-export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
-  Promise<Encoded.Transaction | number | null>
-);
+export type SignTx = (
+  tx: Encoded.Transaction,
+  options?: SignOptions,
+) => Promise<Encoded.Transaction | number | null>;
 
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
@@ -178,21 +181,25 @@ interface CommonChannelOptions {
   sign: SignTxWithTag;
 }
 
-export type ChannelOptions = CommonChannelOptions & ({
-  /**
-   * Participant role
-   */
-  role: 'initiator';
-  /**
-   * Host of the responder's node
-   */
-  host: string;
-} | {
-  /**
-   * Participant role
-   */
-  role: 'responder';
-});
+export type ChannelOptions = CommonChannelOptions &
+  (
+    | {
+        /**
+         * Participant role
+         */
+        role: 'initiator';
+        /**
+         * Host of the responder's node
+         */
+        host: string;
+      }
+    | {
+        /**
+         * Participant role
+         */
+        role: 'responder';
+      }
+  );
 
 export interface ChannelHandler extends Function {
   enter?: Function;
@@ -217,10 +224,12 @@ export interface ChannelState {
 
 export interface ChannelFsm {
   handler: ChannelHandler;
-  state?: ChannelState | {
-    resolve: Function;
-    reject: Function;
-  };
+  state?:
+    | ChannelState
+    | {
+        resolve: Function;
+        reject: Function;
+      };
 }
 
 export interface ChannelMessage {
@@ -235,10 +244,12 @@ export interface ChannelMessage {
 interface ChannelMessageError {
   code: number;
   message: string;
-  data: [{
-    message: string;
-    code: number;
-  }];
+  data: [
+    {
+      message: string;
+      code: number;
+    },
+  ];
   request: ChannelMessage;
 }
 
@@ -269,8 +280,17 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
 }
 
 // TODO: rewrite to enum
-export type ChannelStatus = 'connecting' | 'connected' | 'accepted' | 'halfSigned' | 'signed'
-| 'open' | 'closing' | 'closed' | 'died' | 'disconnected';
+export type ChannelStatus =
+  | 'connecting'
+  | 'connected'
+  | 'accepted'
+  | 'halfSigned'
+  | 'signed'
+  | 'open'
+  | 'closing'
+  | 'closed'
+  | 'died'
+  | 'disconnected';
 
 export function changeStatus(channel: Channel, newStatus: ChannelStatus, debug?: unknown): void {
   channel._debug(newStatus, `(prev. ${channel._status})`, debug ?? '');
@@ -330,9 +350,9 @@ async function handleMessage(channel: Channel, message: ChannelMessage): Promise
   enterState(channel, nextState);
   // TODO: emit message and handler name (?) to move this code to Contract constructor
   if (
-    message?.params?.data?.updates?.[0]?.op === 'OffChainNewContract'
+    message?.params?.data?.updates?.[0]?.op === 'OffChainNewContract' &&
     // if name is channelOpen, the contract was created by other participant
-    && nextState?.handler.name === 'channelOpen'
+    nextState?.handler.name === 'channelOpen'
   ) {
     const round = channel.round();
     if (round == null) throw new UnexpectedTsError('Round is null');
@@ -407,14 +427,15 @@ export async function call(channel: Channel, method: string, params: any): Promi
   return new Promise((resolve, reject) => {
     const id = channel._nextRpcMessageId;
     channel._nextRpcMessageId += 1;
-    channel._rpcCallbacks.set(id, (
-      message: { result: PromiseLike<any>; error?: ChannelMessageError },
-    ) => {
-      if (message.error != null) {
-        const details = message.error.data[0].message ?? '';
-        reject(new ChannelCallError(message.error.message + details));
-      } else resolve(message.result);
-    });
+    channel._rpcCallbacks.set(
+      id,
+      (message: { result: PromiseLike<any>; error?: ChannelMessageError }) => {
+        if (message.error != null) {
+          const details = message.error.data[0].message ?? '';
+          reject(new ChannelCallError(message.error.message + details));
+        } else resolve(message.result);
+      },
+    );
     send(channel, { method, id, params });
   });
 }

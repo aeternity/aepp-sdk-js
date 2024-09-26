@@ -1,9 +1,9 @@
 import { ArgumentError } from '../../../utils/errors';
 import { isItemOfArray } from '../../../utils/other';
 
-export default function genEnumerationField<
-  Enum extends { [key: string]: number | string },
->(enm: Enum): {
+export default function genEnumerationField<Enum extends { [key: string]: number | string }>(
+  enm: Enum,
+): {
   serialize: (value: Enum[keyof Enum]) => Buffer;
   deserialize: (value: Buffer) => Enum[keyof Enum];
 } {

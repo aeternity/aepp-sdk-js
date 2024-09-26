@@ -29,7 +29,8 @@ export default abstract class BrowserConnection {
    * Disconnect
    */
   disconnect(): void {
-    if (!this.isConnected()) throw new NoWalletConnectedError('You dont have connection. Please connect before');
+    if (!this.isConnected())
+      throw new NoWalletConnectedError('You dont have connection. Please connect before');
   }
 
   /**

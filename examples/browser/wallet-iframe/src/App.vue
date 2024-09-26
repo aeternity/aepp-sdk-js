@@ -8,15 +8,8 @@
   <div class="group">
     <div>
       <div>Aepp URL</div>
-      <form
-        novalidate
-        @submit.prevent="navigate"
-      >
-        <input
-          type="url"
-          v-model="nextAeppUrl"
-          @focus="$event.target.select()"
-        >
+      <form novalidate @submit.prevent="navigate">
+        <input type="url" v-model="nextAeppUrl" @focus="$event.target.select()" />
       </form>
     </div>
     <div>
@@ -39,32 +32,30 @@
     <button @click="switchAccount">Switch Account</button>
     <button @click="switchNode">Switch Node</button>
 
-    <button
-      v-if="clientStatus === 'CONNECTED'"
-      @click="disconnect"
-    >
-      Disconnect
-    </button>
-    <button
-      v-else
-      @click="() => (stopSharingWalletInfo ?? shareWalletInfo)()"
-    >
+    <button v-if="clientStatus === 'CONNECTED'" @click="disconnect">Disconnect</button>
+    <button v-else @click="() => (stopSharingWalletInfo ?? shareWalletInfo)()">
       {{ stopSharingWalletInfo ? 'Stop sharing' : 'Share wallet info' }}
     </button>
   </div>
 
-  <iframe
-    v-if="!runningInFrame"
-    ref="aepp"
-    :src="aeppUrl"
-  />
+  <iframe v-if="!runningInFrame" ref="aepp" :src="aeppUrl" />
 </template>
 
 <script>
 import {
-  MemoryAccount, AeSdkWallet, Node, CompilerHttp,
-  BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
-  RpcConnectionDenyError, RpcRejectedByUserError, RpcNoNetworkById, unpackTx, unpackDelegation,
+  MemoryAccount,
+  AeSdkWallet,
+  Node,
+  CompilerHttp,
+  BrowserWindowMessageConnection,
+  METHODS,
+  WALLET_TYPE,
+  RPC_STATUS,
+  RpcConnectionDenyError,
+  RpcRejectedByUserError,
+  RpcNoNetworkById,
+  unpackTx,
+  unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import Value from './Value.vue';
@@ -112,7 +103,7 @@ export default {
           this.aeSdk.removeRpcClient(this.clientId);
         }
         this.stopSharingWalletInfo = null;
-      }
+      };
     },
     disconnect() {
       // TODO: move to removeRpcClient (would be a semi-breaking change)
@@ -147,10 +138,12 @@ export default {
 
     const aeppInfo = {};
     const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
-      if (!confirm([
-        `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}`,
-        Value.methods.valueToString(parameters),
-      ].join('\n'))) {
+      if (
+        !confirm(
+          `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}` +
+            Value.methods.valueToString(parameters),
+        )
+      ) {
         throw new RpcRejectedByUserError();
       }
     };
@@ -243,7 +236,7 @@ export default {
           await this.aeSdk.selectNode('by-aepp');
           this.nodeName = 'by-aepp';
         }
-      }
+      },
     });
 
     if (this.runningInFrame) this.shareWalletInfo();
@@ -261,7 +254,11 @@ export default {
 
     // TODO: replace setInterval with subscription after refactoring
     setInterval(() => this.updateClientStatus(), 1000);
-    this.$watch(({ clientId }) => [clientId], () => this.updateClientStatus(), { immediate: true });
+    this.$watch(
+      ({ clientId }) => [clientId],
+      () => this.updateClientStatus(),
+      { immediate: true },
+    );
   },
 };
 </script>
@@ -269,11 +266,11 @@ export default {
 <style lang="scss" src="./styles.scss" />
 
 <style lang="scss" scoped>
-input[id=toggle-aepp] {
+input[id='toggle-aepp'] {
   display: none;
 }
 
-label[for=toggle-aepp]::after {
+label[for='toggle-aepp']::after {
   font-size: initial;
   font-weight: initial;
   text-decoration: underline dotted;
@@ -281,9 +278,9 @@ label[for=toggle-aepp]::after {
 }
 
 @media (max-width: 450px), (max-height: 650px) {
-  input[id=toggle-aepp] {
+  input[id='toggle-aepp'] {
     &:checked ~ {
-      h2 label[for=toggle-aepp]::after {
+      h2 label[for='toggle-aepp']::after {
         content: 'Hide aepp';
       }
 
@@ -293,7 +290,7 @@ label[for=toggle-aepp]::after {
     }
 
     &:not(:checked) ~ {
-      h2 label[for=toggle-aepp]::after {
+      h2 label[for='toggle-aepp']::after {
         content: 'Show aepp';
       }
 

@@ -1,6 +1,4 @@
-import {
-  after, before, describe, it,
-} from 'mocha';
+import { after, before, describe, it } from 'mocha';
 import { expect } from 'chai';
 import { stub, createSandbox } from 'sinon';
 import {
@@ -18,7 +16,10 @@ import {
   Tag,
   WALLET_TYPE,
   unpackTx,
-  decode, encode, Encoded, Encoding,
+  decode,
+  encode,
+  Encoded,
+  Encoding,
   MESSAGE_DIRECTION,
   METHODS,
   RPC_STATUS,
@@ -40,7 +41,7 @@ import { getBufferToSign } from '../../src/account/Memory';
 import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
 import { getSdk, networkId, compilerUrl } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
-import { assertNotNull } from '../utils';
+import { assertNotNull, indent } from '../utils';
 
 const WindowPostMessageFake = (
   name: string,
@@ -86,7 +87,9 @@ describe('Aepp<->Wallet', () => {
     self: connections.aeppWindow,
     target: connections.walletWindow,
   });
-  const handlerReject = (): void => { throw new Error('test reject'); };
+  const handlerReject = (): void => {
+    throw new Error('test reject');
+  };
   let node: Node;
   let aeSdk: AeSdk;
   let account: AccountBase;
@@ -127,8 +130,9 @@ describe('Aepp<->Wallet', () => {
     it('aepp can do static calls without connection to wallet', async () => {
       const contract = await Contract.initialize({
         ...aeSdk.getContext(),
-        sourceCode: 'contract Test =\n'
-          + '  entrypoint getArg(x : int) = x',
+        sourceCode: indent`
+          contract Test =
+            entrypoint getArg(x : int) = x`,
       });
       await contract.$deploy([]);
       const aeppSdk = new AeSdkAepp({
@@ -145,12 +149,23 @@ describe('Aepp<->Wallet', () => {
     });
 
     it('Fail on not connected', async () => {
-      await Promise.all([
-        aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'current'),
-        aepp.askAddresses(),
-      ].map((promise) => expect(promise).to.be.rejectedWith(NoWalletConnectedError, 'You are not connected to Wallet')));
-      expect(() => aepp.disconnectWallet()).to.throw(NoWalletConnectedError, 'You are not connected to Wallet');
-      expect(() => aepp.address).to.throw(NoWalletConnectedError, 'You are not connected to Wallet');
+      await Promise.all(
+        [aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'current'), aepp.askAddresses()].map(
+          (promise) =>
+            expect(promise).to.be.rejectedWith(
+              NoWalletConnectedError,
+              'You are not connected to Wallet',
+            ),
+        ),
+      );
+      expect(() => aepp.disconnectWallet()).to.throw(
+        NoWalletConnectedError,
+        'You are not connected to Wallet',
+      );
+      expect(() => aepp.address).to.throw(
+        NoWalletConnectedError,
+        'You are not connected to Wallet',
+      );
     });
 
     it('Should receive `announcePresence` message from wallet', async () => {
@@ -171,8 +186,8 @@ describe('Aepp<->Wallet', () => {
       wallet.onConnection = () => {
         throw new RpcConnectionDenyError();
       };
-      await expect(aepp.connectToWallet(connectionFromAeppToWallet)).to.be.eventually
-        .rejectedWith('Wallet deny your connection request')
+      await expect(aepp.connectToWallet(connectionFromAeppToWallet))
+        .to.be.eventually.rejectedWith('Wallet deny your connection request')
         .with.property('code', 9);
     });
 
@@ -185,27 +200,40 @@ describe('Aepp<->Wallet', () => {
     });
 
     it('Try to get address from wallet: not subscribed for account', async () => {
-      expect(() => aepp.address).to.throw(UnsubscribedAccountError, 'You are not subscribed for an account.');
+      expect(() => aepp.address).to.throw(
+        UnsubscribedAccountError,
+        'You are not subscribed for an account.',
+      );
     });
 
     it('Try to ask for address', async () => {
-      await expect(aepp.askAddresses()).to.be.rejectedWith(RpcInternalError, 'The peer failed to execute your request due to unknown error');
+      await expect(aepp.askAddresses()).to.be.rejectedWith(
+        RpcInternalError,
+        'The peer failed to execute your request due to unknown error',
+      );
       wallet.onAskAccounts = () => {};
       expect(await aepp.askAddresses()).to.be.eql(wallet.addresses());
     });
 
     it('Try to sign and send transaction to wallet without subscription', async () => {
       wallet.getAccounts().should.be.an('object');
-      await Promise.all([aepp.signTransaction('tx_asdasd'), aepp.sendTransaction('tx_asdasd')]
-        .map((promise) => expect(promise).to.be.rejectedWith(UnsubscribedAccountError, 'You are not subscribed for an account.')));
+      await Promise.all(
+        [aepp.signTransaction('tx_asdasd'), aepp.sendTransaction('tx_asdasd')].map((promise) =>
+          expect(promise).to.be.rejectedWith(
+            UnsubscribedAccountError,
+            'You are not subscribed for an account.',
+          ),
+        ),
+      );
     });
 
     it('Subscribe to address: wallet reject', async () => {
       wallet.onSubscription = () => {
         throw new RpcRejectedByUserError();
       };
-      await expect(aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected')).to.be.eventually
-        .rejectedWith('Operation rejected by user').with.property('code', 4);
+      await expect(aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected'))
+        .to.be.eventually.rejectedWith('Operation rejected by user')
+        .with.property('code', 4);
     });
 
     it('Subscribe to address: wallet accept', async () => {
@@ -219,7 +247,10 @@ describe('Aepp<->Wallet', () => {
       };
       await aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected');
       await aepp.subscribeAddress(SUBSCRIPTION_TYPES.unsubscribe, 'connected');
-      const subscriptionResponse = await aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected');
+      const subscriptionResponse = await aepp.subscribeAddress(
+        SUBSCRIPTION_TYPES.subscribe,
+        'connected',
+      );
 
       await checkPromise;
       subscriptionResponse.subscription.should.be.an('array');
@@ -231,8 +262,9 @@ describe('Aepp<->Wallet', () => {
     });
 
     it('Try to use `onAccount` for not existent account', () => {
-      expect(() => { aepp.spend(100, address, { onAccount: address }); })
-        .to.throw(UnAuthorizedAccountError, `You do not have access to account ${address}`);
+      expect(() => {
+        aepp.spend(100, address, { onAccount: address });
+      }).to.throw(UnAuthorizedAccountError, `You do not have access to account ${address}`);
     });
 
     it('aepp accepts key pairs in onAccount', async () => {
@@ -247,8 +279,9 @@ describe('Aepp<->Wallet', () => {
       wallet.onAskAccounts = () => {
         throw new RpcRejectedByUserError();
       };
-      await expect(aepp.askAddresses()).to.be.eventually
-        .rejectedWith('Operation rejected by user').with.property('code', 4);
+      await expect(aepp.askAddresses())
+        .to.be.eventually.rejectedWith('Operation rejected by user')
+        .with.property('code', 4);
     });
 
     it('Ask for address: no exception in onAskAccounts -> wallet accept', async () => {
@@ -269,42 +302,46 @@ describe('Aepp<->Wallet', () => {
     it('Not authorize', async () => {
       const clientInfo = Array.from(wallet._clients.entries())[0][1];
       clientInfo.status = RPC_STATUS.DISCONNECTED;
-      await expect(aepp.askAddresses()).to.be.eventually
-        .rejectedWith('You are not connected to the wallet')
+      await expect(aepp.askAddresses())
+        .to.be.eventually.rejectedWith('You are not connected to the wallet')
         .with.property('code', 10);
       clientInfo.status = RPC_STATUS.CONNECTED;
     });
 
     it('Sign transaction: wallet deny', async () => {
       let origin;
-      const s = stub(wallet._resolveAccount(), 'signTransaction')
-        .callsFake((tx, { aeppOrigin }) => {
+      const s = stub(wallet._resolveAccount(), 'signTransaction').callsFake(
+        (tx, { aeppOrigin }) => {
           origin = aeppOrigin;
           throw new RpcRejectedByUserError();
-        });
+        },
+      );
       const tx = await aepp.buildTx({
         tag: Tag.SpendTx,
         senderId: aepp.address,
         recipientId: aepp.address,
         amount: 0,
       });
-      await expect(aepp.signTransaction(tx)).to.be.eventually
-        .rejectedWith('Operation rejected by user').with.property('code', 4);
+      await expect(aepp.signTransaction(tx))
+        .to.be.eventually.rejectedWith('Operation rejected by user')
+        .with.property('code', 4);
       expect(origin).to.be.equal('http://origin.test');
       s.restore();
     });
 
     it('Sign transaction: fails with unknown error', async () => {
-      const s = stub(wallet._resolveAccount(), 'signTransaction')
-        .callsFake(() => { throw new Error('test'); });
+      const s = stub(wallet._resolveAccount(), 'signTransaction').callsFake(() => {
+        throw new Error('test');
+      });
       const tx = await aepp.buildTx({
         tag: Tag.SpendTx,
         senderId: address,
         recipientId: address,
         amount: 0,
       });
-      await expect(aepp.signTransaction(tx))
-        .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
+      await expect(aepp.signTransaction(tx)).to.be.rejectedWith(
+        'The peer failed to execute your request due to unknown error',
+      );
       s.restore();
     });
 
@@ -319,7 +356,10 @@ describe('Aepp<->Wallet', () => {
 
         const signedTx = await aepp.signTransaction(tx, { innerTx });
         const unpackedTx = unpackTx(signedTx, Tag.SignedTx);
-        const { signatures: [signature], encodedTx } = unpackedTx;
+        const {
+          signatures: [signature],
+          encodedTx,
+        } = unpackedTx;
         const txWithNetwork = getBufferToSign(buildTx(encodedTx), networkId, innerTx);
         expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
       });
@@ -327,12 +367,15 @@ describe('Aepp<->Wallet', () => {
 
     it('Try to sign using unpermited account', async () => {
       assertNotNull(aepp.rpcClient);
-      await expect(aepp.rpcClient.request(METHODS.sign, {
-        tx: 'tx_+NkLAfhCuECIIeWttRUiZ32uriBdmM1t+dCg90KuG2ABxOiuXqzpAul6uTWvsyfx3EFJDah6trudrityh+6XSX3mkPEimhgGuJH4jzIBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYgbwW1nTsgAAKEB6bv2BOYRtUYKOzmZ6Xcbb2BBfXPOfFUZ4S9+EnoSJcqIG8FtZ07IAACIAWNFeF2KAAAKAIYSMJzlQADAoDBrIcoop8JfZ4HOD9p3nDTiNthj7jjl+ArdHwEMUrvQgitwOr/v3Q==',
-        onAccount: address,
-        returnSigned: true,
-        networkId,
-      })).to.be.eventually.rejectedWith(`You are not subscribed for account ${address}`)
+      await expect(
+        aepp.rpcClient.request(METHODS.sign, {
+          tx: 'tx_+NkLAfhCuECIIeWttRUiZ32uriBdmM1t+dCg90KuG2ABxOiuXqzpAul6uTWvsyfx3EFJDah6trudrityh+6XSX3mkPEimhgGuJH4jzIBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYgbwW1nTsgAAKEB6bv2BOYRtUYKOzmZ6Xcbb2BBfXPOfFUZ4S9+EnoSJcqIG8FtZ07IAACIAWNFeF2KAAAKAIYSMJzlQADAoDBrIcoop8JfZ4HOD9p3nDTiNthj7jjl+ArdHwEMUrvQgitwOr/v3Q==',
+          onAccount: address,
+          returnSigned: true,
+          networkId,
+        }),
+      )
+        .to.be.eventually.rejectedWith(`You are not subscribed for account ${address}`)
         .with.property('code', 11);
     });
 
@@ -358,7 +401,9 @@ describe('Aepp<->Wallet', () => {
       const res = await aepp.sendTransaction(tx);
       s.restore();
       assertNotNull(res.tx?.payload);
-      decode(res.tx.payload as Encoded.Any).toString().should.be.equal('zerospend2');
+      decode(res.tx.payload as Encoded.Any)
+        .toString()
+        .should.be.equal('zerospend2');
       assertNotNull(res.blockHeight);
       res.blockHeight.should.be.a('number');
     });
@@ -366,13 +411,15 @@ describe('Aepp<->Wallet', () => {
     describe('Sign message', () => {
       it('rejected by wallet', async () => {
         let origin;
-        const s = stub(wallet._resolveAccount(), 'signMessage')
-          .callsFake((message, { aeppOrigin } = {}) => {
+        const s = stub(wallet._resolveAccount(), 'signMessage').callsFake(
+          (message, { aeppOrigin } = {}) => {
             origin = aeppOrigin;
             throw new RpcRejectedByUserError();
-          });
-        await expect(aepp.signMessage('test')).to.be.eventually
-          .rejectedWith('Operation rejected by user').with.property('code', 4);
+          },
+        );
+        await expect(aepp.signMessage('test'))
+          .to.be.eventually.rejectedWith('Operation rejected by user')
+          .with.property('code', 4);
         expect(origin).to.be.equal('http://origin.test');
         s.restore();
       });
@@ -384,10 +431,12 @@ describe('Aepp<->Wallet', () => {
       });
 
       it('fails with unknown error', async () => {
-        const s = stub(wallet._resolveAccount(), 'signMessage')
-          .callsFake(() => { throw new Error('test'); });
-        await expect(aepp.signMessage('test'))
-          .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
+        const s = stub(wallet._resolveAccount(), 'signMessage').callsFake(() => {
+          throw new Error('test');
+        });
+        await expect(aepp.signMessage('test')).to.be.rejectedWith(
+          'The peer failed to execute your request due to unknown error',
+        );
         s.restore();
       });
 
@@ -409,13 +458,15 @@ describe('Aepp<->Wallet', () => {
 
       it('rejected by wallet', async () => {
         let origin;
-        const s = stub(wallet._resolveAccount(), 'signTypedData')
-          .callsFake((data, aci, { aeppOrigin } = {}) => {
+        const s = stub(wallet._resolveAccount(), 'signTypedData').callsFake(
+          (data, aci, { aeppOrigin } = {}) => {
             origin = aeppOrigin;
             throw new RpcRejectedByUserError();
-          });
-        await expect(aepp.signTypedData(recordData, recordAci)).to.be.eventually
-          .rejectedWith('Operation rejected by user').with.property('code', 4);
+          },
+        );
+        await expect(aepp.signTypedData(recordData, recordAci))
+          .to.be.eventually.rejectedWith('Operation rejected by user')
+          .with.property('code', 4);
         expect(origin).to.be.equal('http://origin.test');
         s.restore();
       });
@@ -428,10 +479,12 @@ describe('Aepp<->Wallet', () => {
       });
 
       it('fails with unknown error', async () => {
-        const s = stub(wallet._resolveAccount(), 'signTypedData')
-          .callsFake(() => { throw new Error('test'); });
-        await expect(aepp.signTypedData(recordData, recordAci))
-          .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
+        const s = stub(wallet._resolveAccount(), 'signTypedData').callsFake(() => {
+          throw new Error('test');
+        });
+        await expect(aepp.signTypedData(recordData, recordAci)).to.be.rejectedWith(
+          'The peer failed to execute your request due to unknown error',
+        );
         s.restore();
       });
 
@@ -452,8 +505,9 @@ describe('Aepp<->Wallet', () => {
           origin = aeppOrigin;
           throw new RpcRejectedByUserError();
         });
-        await expect(aepp.sign(rawData)).to.be.eventually
-          .rejectedWith('Operation rejected by user').with.property('code', 4);
+        await expect(aepp.sign(rawData))
+          .to.be.eventually.rejectedWith('Operation rejected by user')
+          .with.property('code', 4);
         expect(origin).to.be.equal('http://origin.test');
         s.restore();
       });
@@ -465,10 +519,13 @@ describe('Aepp<->Wallet', () => {
       });
 
       it('fails with unknown error', async () => {
-        const s = stub(wallet._resolveAccount(), 'sign')
-          .callsFake(() => { throw new Error('test'); });
-        await expect(aepp.sign(rawData)).to.be.eventually
-          .rejectedWith('The peer failed to execute your request due to unknown error')
+        const s = stub(wallet._resolveAccount(), 'sign').callsFake(() => {
+          throw new Error('test');
+        });
+        await expect(aepp.sign(rawData))
+          .to.be.eventually.rejectedWith(
+            'The peer failed to execute your request due to unknown error',
+          )
           .with.property('code', 12);
         s.restore();
       });
@@ -481,24 +538,25 @@ describe('Aepp<->Wallet', () => {
     });
 
     describe('Sign delegation', () => {
-      const getDelegation = (accountAddress?: Encoded.AccountAddress): Encoded.Bytearray => (
+      const getDelegation = (accountAddress?: Encoded.AccountAddress): Encoded.Bytearray =>
         packDelegation({
           tag: DelegationTag.AensPreclaim,
           contractAddress: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',
           accountAddress: accountAddress ?? aeSdk.address,
-        })
-      );
+        });
 
       it('rejected by wallet', async () => {
         let origin;
         const sandbox = createSandbox();
-        sandbox.stub(wallet._resolveAccount(), 'signDelegation')
+        sandbox
+          .stub(wallet._resolveAccount(), 'signDelegation')
           .callsFake((delegation, { aeppOrigin } = {}) => {
             origin = aeppOrigin;
             throw new RpcRejectedByUserError();
           });
         await expect(aepp.signDelegation(getDelegation()))
-          .to.be.eventually.rejectedWith('Operation rejected by user').with.property('code', 4);
+          .to.be.eventually.rejectedWith('Operation rejected by user')
+          .with.property('code', 4);
         expect(origin).to.be.equal('http://origin.test');
         sandbox.restore();
       });
@@ -510,10 +568,12 @@ describe('Aepp<->Wallet', () => {
 
       it('fails with unknown error', async () => {
         const sandbox = createSandbox();
-        sandbox.stub(wallet._resolveAccount(), 'signDelegation')
-          .callsFake(() => { throw new Error('test'); });
-        await expect(aepp.signDelegation(getDelegation()))
-          .to.be.rejectedWith('The peer failed to execute your request due to unknown error');
+        sandbox.stub(wallet._resolveAccount(), 'signDelegation').callsFake(() => {
+          throw new Error('test');
+        });
+        await expect(aepp.signDelegation(getDelegation())).to.be.rejectedWith(
+          'The peer failed to execute your request due to unknown error',
+        );
         sandbox.restore();
       });
 
@@ -526,22 +586,30 @@ describe('Aepp<->Wallet', () => {
 
     describe('Select network by aepp', () => {
       it('rejected by user on wallet side', async () => {
-        wallet.onAskToSelectNetwork = () => { throw new RpcRejectedByUserError(); };
-        await expect(aepp.askToSelectNetwork({ networkId: 'ae_test' })).to.be.eventually
-          .rejectedWith('Operation rejected by user').with.property('code', 4);
+        wallet.onAskToSelectNetwork = () => {
+          throw new RpcRejectedByUserError();
+        };
+        await expect(aepp.askToSelectNetwork({ networkId: 'ae_test' }))
+          .to.be.eventually.rejectedWith('Operation rejected by user')
+          .with.property('code', 4);
         wallet.onAskToSelectNetwork = handlerReject;
       });
 
       it('rejected because unknown network id', async () => {
-        wallet.onAskToSelectNetwork = () => { throw new RpcNoNetworkById('test'); };
-        await expect(aepp.askToSelectNetwork({ networkId: 'ae_test' })).to.be.eventually
-          .rejectedWith('Wallet can\'t find a network by id "test"').with.property('code', 13);
+        wallet.onAskToSelectNetwork = () => {
+          throw new RpcNoNetworkById('test');
+        };
+        await expect(aepp.askToSelectNetwork({ networkId: 'ae_test' }))
+          .to.be.eventually.rejectedWith('Wallet can\'t find a network by id "test"')
+          .with.property('code', 13);
         wallet.onAskToSelectNetwork = handlerReject;
       });
 
       it('works', async () => {
         let args: unknown[] = [];
-        wallet.onAskToSelectNetwork = (...a) => { args = a; };
+        wallet.onAskToSelectNetwork = (...a) => {
+          args = a;
+        };
         const payload = { nodeUrl: 'http://example.com' };
         await aepp.askToSelectNetwork(payload);
         wallet.onAskToSelectNetwork = handlerReject;
@@ -559,8 +627,9 @@ describe('Aepp<->Wallet', () => {
         absoluteTtl: true,
       });
 
-      await expect(aepp.sendTransaction(tx)).to.be
-        .rejectedWith('Transaction verification errors: TTL 1 is already expired, current height is');
+      await expect(aepp.sendTransaction(tx)).to.be.rejectedWith(
+        'Transaction verification errors: TTL 1 is already expired, current height is',
+      );
     });
 
     describe('Subscriptions', () => {
@@ -576,8 +645,7 @@ describe('Aepp<->Wallet', () => {
 
       it('Receive update for wallet select account', async () => {
         assertNotNull(aepp._accounts);
-        const connectedAccount = Object
-          .keys(aepp._accounts.connected)[0] as Encoded.AccountAddress;
+        const connectedAccount = Object.keys(aepp._accounts.connected)[0] as Encoded.AccountAddress;
         const accountsPromise = new Promise<Accounts>((resolve) => {
           aepp.onAddressChange = resolve;
         });
@@ -599,7 +667,15 @@ describe('Aepp<->Wallet', () => {
 
     it('Try to connect unsupported protocol', async () => {
       assertNotNull(aepp.rpcClient);
-      await expect(aepp.rpcClient.request(METHODS.connect, { name: 'test-aepp', version: 2 as 1, connectNode: false })).to.be.eventually.rejectedWith('Unsupported Protocol Version').with.property('code', 5);
+      await expect(
+        aepp.rpcClient.request(METHODS.connect, {
+          name: 'test-aepp',
+          version: 2 as 1,
+          connectNode: false,
+        }),
+      )
+        .to.be.eventually.rejectedWith('Unsupported Protocol Version')
+        .with.property('code', 5);
     });
 
     describe('Disconnect', () => {
@@ -611,12 +687,16 @@ describe('Aepp<->Wallet', () => {
           aepp.onDisconnect = (...args: any) => resolve(args);
         });
         connectionFromWalletToAepp.sendMessage({
-          method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0',
+          method: METHODS.closeConnection,
+          params: { reason: 'bye' },
+          jsonrpc: '2.0',
         });
         const [aeppMessage] = await aeppDisconnect;
         aeppMessage.reason.should.be.equal('bye');
         connectionFromAeppToWallet.sendMessage({
-          method: METHODS.closeConnection, params: { reason: 'bye' }, jsonrpc: '2.0',
+          method: METHODS.closeConnection,
+          params: { reason: 'bye' },
+          jsonrpc: '2.0',
         });
         const [, walletMessage] = await walletDisconnect;
         walletMessage.reason.should.be.equal('bye');
@@ -624,10 +704,12 @@ describe('Aepp<->Wallet', () => {
 
       it('Remove rpc client', async () => {
         wallet.onConnection = () => {};
-        const id = wallet.addRpcClient(new BrowserWindowMessageConnection({
-          self: connections.walletWindow,
-          target: connections.aeppWindow,
-        }));
+        const id = wallet.addRpcClient(
+          new BrowserWindowMessageConnection({
+            self: connections.walletWindow,
+            target: connections.aeppWindow,
+          }),
+        );
         await aepp.connectToWallet(
           new BrowserWindowMessageConnection({
             self: connections.aeppWindow,
@@ -640,7 +722,10 @@ describe('Aepp<->Wallet', () => {
       });
 
       it('Remove rpc client: client not found', () => {
-        expect(() => wallet.removeRpcClient('a1')).to.throw(UnknownRpcClientError, 'RpcClient with id a1 do not exist');
+        expect(() => wallet.removeRpcClient('a1')).to.throw(
+          UnknownRpcClientError,
+          'RpcClient with id a1 do not exist',
+        );
       });
     });
   });
@@ -653,10 +738,13 @@ describe('Aepp<->Wallet', () => {
     it('Send message from content script', async () => {
       connectionFromWalletToAepp.sendDirection = MESSAGE_DIRECTION.to_aepp;
       const ok = await new Promise<boolean>((resolve) => {
-        connectionFromAeppToWallet.connect((msg: any) => {
-          msg.method.should.be.equal('hey');
-          resolve(true);
-        }, () => {});
+        connectionFromAeppToWallet.connect(
+          (msg: any) => {
+            msg.method.should.be.equal('hey');
+            resolve(true);
+          },
+          () => {},
+        );
         connectionFromWalletToAepp.sendMessage({ jsonrpc: '2.0', method: 'hey' });
       });
       ok.should.be.equal(true);
@@ -687,17 +775,20 @@ describe('Aepp<->Wallet', () => {
         onDisconnect() {},
       });
       wallet.addRpcClient(connectionFromWalletToAepp);
-      await aepp.connectToWallet(
-        connectionFromAeppToWallet,
-        { connectNode: true, name: 'wallet-node' },
-      );
+      await aepp.connectToWallet(connectionFromAeppToWallet, {
+        connectNode: true,
+        name: 'wallet-node',
+      });
     });
 
     it('Subscribe to address: wallet accept', async () => {
       wallet.onSubscription = () => {};
       await aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected');
       await aepp.subscribeAddress(SUBSCRIPTION_TYPES.unsubscribe, 'connected');
-      const subscriptionResponse = await aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected');
+      const subscriptionResponse = await aepp.subscribeAddress(
+        SUBSCRIPTION_TYPES.subscribe,
+        'connected',
+      );
       subscriptionResponse.subscription.should.be.an('array');
     });
 
@@ -723,7 +814,9 @@ describe('Aepp<->Wallet', () => {
       const res = await aepp.sendTransaction(tx);
       s.restore();
       assertNotNull(res.tx?.payload);
-      decode(res.tx.payload as Encoded.Any).toString().should.be.equal('zerospend2');
+      decode(res.tx.payload as Encoded.Any)
+        .toString()
+        .should.be.equal('zerospend2');
       assertNotNull(res.blockHeight);
       res.blockHeight.should.be.a('number');
     });

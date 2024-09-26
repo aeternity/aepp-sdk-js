@@ -12,10 +12,10 @@ export default class AeSdk extends AeSdkBase {
   /**
    * @param options - Options
    */
-  constructor(
-    { accounts, ...options }: { accounts?: AccountBase[] }
-    & ConstructorParameters<typeof AeSdkBase>[0] = {},
-  ) {
+  constructor({
+    accounts,
+    ...options
+  }: { accounts?: AccountBase[] } & ConstructorParameters<typeof AeSdkBase>[0] = {}) {
     super(options);
     accounts?.forEach((account, idx) => this.addAccount(account, { select: idx === 0 }));
   }

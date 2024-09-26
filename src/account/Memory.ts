@@ -2,9 +2,7 @@ import nacl from 'tweetnacl';
 import AccountBase from './Base';
 import { hash, messageToHash, messagePrefixLength } from '../utils/crypto';
 import { ArgumentError } from '../utils/errors';
-import {
-  decode, encode, Encoded, Encoding,
-} from '../utils/encoder';
+import { decode, encode, Encoded, Encoding } from '../utils/encoder';
 import { concatBuffers } from '../utils/other';
 import { hashTypedData, AciValue } from '../utils/typed-data';
 import { buildTx } from '../tx/builder';
@@ -74,11 +72,18 @@ export default class AccountMemory extends AccountBase {
     data: Encoded.ContractBytearray,
     aci: AciValue,
     {
-      name, version, networkId, contractAddress, ...options
+      name,
+      version,
+      networkId,
+      contractAddress,
+      ...options
     }: Parameters<AccountBase['signTypedData']>[2] = {},
   ): Promise<Encoded.Signature> {
     const dHash = hashTypedData(data, aci, {
-      name, version, networkId, contractAddress,
+      name,
+      version,
+      networkId,
+      contractAddress,
     });
     const signature = await this.sign(dHash, options);
     return encode(signature, Encoding.Signature);
@@ -90,7 +95,10 @@ export default class AccountMemory extends AccountBase {
   ): Promise<Encoded.Signature> {
     if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
     const payload = concatBuffers([
-      messagePrefixLength, new Uint8Array([1]), Buffer.from(networkId), decode(delegation),
+      messagePrefixLength,
+      new Uint8Array([1]),
+      Buffer.from(networkId),
+      decode(delegation),
     ]);
     const signature = await this.sign(payload);
     return encode(signature, Encoding.Signature);

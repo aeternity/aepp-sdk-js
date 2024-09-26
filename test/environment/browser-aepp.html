@@ -1,68 +1,84 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>SDK test in browser</title>
-</head>
-<body>
-Open developer console
-<script src="../../dist/aepp-sdk.browser-script.js"></script>
-<script type="text/javascript">
-const {
-  Node, AeSdkAepp, CompilerHttp, walletDetector, BrowserWindowMessageConnection, Contract,
-} = Aeternity;
+  <head>
+    <meta charset="UTF-8" />
+    <title>SDK test in browser</title>
+  </head>
+  <body>
+    Open developer console
+    <script src="../../dist/aepp-sdk.browser-script.js"></script>
+    <script type="text/javascript">
+      const {
+        Node,
+        AeSdkAepp,
+        CompilerHttp,
+        walletDetector,
+        BrowserWindowMessageConnection,
+        Contract,
+      } = Aeternity;
 
-const contractSourceCode = `
+      const contractSourceCode = `
 contract Test =
  entrypoint getArg(x : map(string, int)) = x
 `;
-const aeSdk = new AeSdkAepp({
-  name: 'Simple æpp',
-  nodes: [
-    { name: 'testnet', instance: new Node('https://testnet.aeternity.io') },
-    { name: 'mainnet', instance: new Node('https://mainnet.aeternity.io') },
-  ],
-  onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
-  async onNetworkChange({ networkId }) {
-    const [{ name }] = (await this.getNodesInPool())
-      .filter((node) => node.nodeNetworkId === networkId);
-    this.selectNode(name);
-  },
-});
+      const aeSdk = new AeSdkAepp({
+        name: 'Simple æpp',
+        nodes: [
+          { name: 'testnet', instance: new Node('https://testnet.aeternity.io') },
+          { name: 'mainnet', instance: new Node('https://mainnet.aeternity.io') },
+        ],
+        onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
+        async onNetworkChange({ networkId }) {
+          const [{ name }] = (await this.getNodesInPool()).filter(
+            (node) => node.nodeNetworkId === networkId,
+          );
+          this.selectNode(name);
+        },
+      });
 
-async function detectWallets() {
-  const connection = new BrowserWindowMessageConnection();
-  return new Promise((resolve, reject) => {
-    const stopDetection = walletDetector(connection, async ({ newWallet }) => {
-      if (confirm(`Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`)) {
-        stopDetection();
-        resolve(newWallet.getConnection());
+      async function detectWallets() {
+        const connection = new BrowserWindowMessageConnection();
+        return new Promise((resolve, reject) => {
+          const stopDetection = walletDetector(connection, async ({ newWallet }) => {
+            if (
+              confirm(
+                `Do you want to connect to wallet ${newWallet.info.name} with id ${newWallet.info.id}`,
+              )
+            ) {
+              stopDetection();
+              resolve(newWallet.getConnection());
+            }
+          });
+        });
       }
-    });
-  });
-}
 
-(async () => {
-  console.log('Looking for a wallet');
-  const connection = await detectWallets();
-  const walletInfo = await aeSdk.connectToWallet(connection);
-  console.log('Connected to', walletInfo);
-  const { address: { current } } = await aeSdk.subscribeAddress('subscribe', 'connected');
-  console.log('Address from wallet', current);
+      (async () => {
+        console.log('Looking for a wallet');
+        const connection = await detectWallets();
+        const walletInfo = await aeSdk.connectToWallet(connection);
+        console.log('Connected to', walletInfo);
+        const {
+          address: { current },
+        } = await aeSdk.subscribeAddress('subscribe', 'connected');
+        console.log('Address from wallet', current);
 
-  console.log('Height:', await aeSdk.getHeight());
-  console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map);
+        console.log('Height:', await aeSdk.getHeight());
+        console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map);
 
-  const contract = await Contract.initialize({
-    ...aeSdk.getContext(), sourceCode: contractSourceCode,
-  });
-  const deployInfo = await contract.$deploy([]);
-  console.log('Contract deployed at', deployInfo.address);
-  const map = new Map([['foo', 42], ['bar', 43]]);
-  const { decodedResult } = await contract.getArg(map);
-  console.log('Call result', decodedResult);
-  console.log('Instanceof works correctly for returned map', decodedResult instanceof Map);
-})();
-</script>
-</body>
+        const contract = await Contract.initialize({
+          ...aeSdk.getContext(),
+          sourceCode: contractSourceCode,
+        });
+        const deployInfo = await contract.$deploy([]);
+        console.log('Contract deployed at', deployInfo.address);
+        const map = new Map([
+          ['foo', 42],
+          ['bar', 43],
+        ]);
+        const { decodedResult } = await contract.getArg(map);
+        console.log('Call result', decodedResult);
+        console.log('Instanceof works correctly for returned map', decodedResult instanceof Map);
+      })();
+    </script>
+  </body>
 </html>

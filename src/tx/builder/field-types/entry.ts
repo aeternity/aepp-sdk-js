@@ -1,10 +1,10 @@
-import {
-  decode, encode, Encoded, Encoding,
-} from '../../../utils/encoder';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder';
 import { EntryTag } from '../entry/constants';
 import type { unpackEntry as unpackEntryType, packEntry as packEntryType } from '../entry';
 
-export default function genEntryField<T extends EntryTag = EntryTag>(tag?: T): {
+export default function genEntryField<T extends EntryTag = EntryTag>(
+  tag?: T,
+): {
   serialize: (
     // TODO: replace with `TxParams & { tag: T }`,
     //  but fix TS2502 value is referenced directly or indirectly in its own type annotation
@@ -12,7 +12,8 @@ export default function genEntryField<T extends EntryTag = EntryTag>(tag?: T): {
     options: { packEntry: typeof packEntryType },
   ) => Buffer;
   deserialize: (
-    value: Buffer, options: { unpackEntry: typeof unpackEntryType },
+    value: Buffer,
+    options: { unpackEntry: typeof unpackEntryType },
     // TODO: replace with `TxUnpacked & { tag: T }`,
     //  TS2577 Return type annotation circularly references itself
   ) => any;
@@ -23,7 +24,7 @@ export default function genEntryField<T extends EntryTag = EntryTag>(tag?: T): {
       if (typeof txParams === 'string' && txParams.startsWith('tx_')) {
         return decode(txParams as Encoded.Transaction);
       }
-      return decode(packEntry({ ...txParams, ...tag != null && { tag } }));
+      return decode(packEntry({ ...txParams, ...(tag != null && { tag }) }));
     },
 
     deserialize(buf, { unpackEntry }) {

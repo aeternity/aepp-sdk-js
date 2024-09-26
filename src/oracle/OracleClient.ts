@@ -10,9 +10,9 @@ import Node from '../Node';
 import AccountBase from '../account/Base';
 import OracleBase from './OracleBase';
 
-interface OracleClientPostQueryOptions extends
-  Optional<Parameters<typeof sendTransaction>[1], 'onNode' | 'onAccount'>,
-  BuildTxOptions<Tag.OracleQueryTx, 'oracleId' | 'senderId' | 'query'> {}
+interface OracleClientPostQueryOptions
+  extends Optional<Parameters<typeof sendTransaction>[1], 'onNode' | 'onAccount'>,
+    BuildTxOptions<Tag.OracleQueryTx, 'oracleId' | 'senderId' | 'query'> {}
 
 /**
  * @category oracle
@@ -26,7 +26,9 @@ export default class OracleClient extends OracleBase {
    */
   constructor(
     address: Encoded.OracleAddress,
-    public override options: { onAccount: AccountBase; onNode: Node } & Parameters<OracleClient['query']>[1],
+    public override options: { onAccount: AccountBase; onNode: Node } & Parameters<
+      OracleClient['query']
+    >[1],
   ) {
     super(address, options);
   }
@@ -40,9 +42,7 @@ export default class OracleClient extends OracleBase {
   async postQuery(
     query: string,
     options: OracleClientPostQueryOptions = {},
-  ): Promise<
-    Awaited<ReturnType<typeof sendTransaction>> & { queryId: Encoded.OracleQueryId }
-    > {
+  ): Promise<Awaited<ReturnType<typeof sendTransaction>> & { queryId: Encoded.OracleQueryId }> {
     const opt = { ...this.options, ...options };
     const senderId = opt.onAccount.address;
 
@@ -56,7 +56,7 @@ export default class OracleClient extends OracleBase {
     });
     const { nonce } = unpackTx(oracleQueryTx, Tag.OracleQueryTx);
     return {
-      ...await sendTransaction(oracleQueryTx, opt),
+      ...(await sendTransaction(oracleQueryTx, opt)),
       queryId: oracleQueryId(senderId, nonce, this.address),
     };
   }
@@ -73,13 +73,15 @@ export default class OracleClient extends OracleBase {
     options: { interval?: number } & Partial<Parameters<typeof _getPollInterval>[1]> = {},
   ): Promise<string> {
     const opt = { ...this.options, ...options };
-    const interval = opt.interval ?? await _getPollInterval('micro-block', opt);
+    const interval = opt.interval ?? (await _getPollInterval('micro-block', opt));
     let height;
     let ttl;
     let response;
     do {
-      ({ response, ttl } = await opt.onNode
-        .getOracleQueryByPubkeyAndQueryId(this.address, queryId));
+      ({ response, ttl } = await opt.onNode.getOracleQueryByPubkeyAndQueryId(
+        this.address,
+        queryId,
+      ));
       const responseBuffer = decode(response as Encoded.OracleResponse);
       if (responseBuffer.length > 0) return responseBuffer.toString();
       await pause(interval);
@@ -96,8 +98,7 @@ export default class OracleClient extends OracleBase {
    */
   async query(
     query: string,
-    options: OracleClientPostQueryOptions
-    & Parameters<OracleClient['pollForResponse']>[1] = {},
+    options: OracleClientPostQueryOptions & Parameters<OracleClient['pollForResponse']>[1] = {},
   ): Promise<string> {
     const { queryId } = await this.postQuery(query, options);
     return this.pollForResponse(queryId, options);

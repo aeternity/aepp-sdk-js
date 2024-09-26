@@ -4,9 +4,6 @@
     "target": "es2016",
     "moduleResolution": "node",
     "noEmit": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "../../../src/typings"
-    ]
+    "typeRoots": ["./node_modules/@types", "../../../src/typings"]
   }
 }

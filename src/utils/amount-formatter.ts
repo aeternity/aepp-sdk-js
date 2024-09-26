@@ -35,8 +35,10 @@ const DENOMINATION_MAGNITUDE = {
  */
 export const formatAmount = (
   value: string | number | bigint | BigNumber,
-  { denomination = AE_AMOUNT_FORMATS.AETTOS, targetDenomination = AE_AMOUNT_FORMATS.AETTOS }:
-  { denomination?: AE_AMOUNT_FORMATS; targetDenomination?: AE_AMOUNT_FORMATS },
+  {
+    denomination = AE_AMOUNT_FORMATS.AETTOS,
+    targetDenomination = AE_AMOUNT_FORMATS.AETTOS,
+  }: { denomination?: AE_AMOUNT_FORMATS; targetDenomination?: AE_AMOUNT_FORMATS },
 ): string => {
   if (!isBigNumber(value)) throw new ArgumentError('value', 'a number', value);
 
@@ -79,11 +81,13 @@ const prefixes: Prefix[] = [
   { name: 'pico', magnitude: -12 },
 ];
 
-const getNearestPrefix = (exponent: number): Prefix => prefixes.reduce((p, n) => (
-  Math.abs(n.magnitude - exponent) < Math.abs(p.magnitude - exponent) ? n : p));
+const getNearestPrefix = (exponent: number): Prefix =>
+  prefixes.reduce((p, n) =>
+    Math.abs(n.magnitude - exponent) < Math.abs(p.magnitude - exponent) ? n : p,
+  );
 
-const getLowerBoundPrefix = (exponent: number): Prefix => prefixes
-  .find((p) => p.magnitude <= exponent) ?? prefixes[prefixes.length - 1];
+const getLowerBoundPrefix = (exponent: number): Prefix =>
+  prefixes.find((p) => p.magnitude <= exponent) ?? prefixes[prefixes.length - 1];
 
 export const prefixedAmount = (rawValue: string | number | BigNumber): string => {
   const value: BigNumber = new BigNumber(rawValue);

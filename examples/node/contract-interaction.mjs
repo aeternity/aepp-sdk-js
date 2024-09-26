@@ -11,9 +11,7 @@
 // ## 1. Specify imports
 //
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import {
-  AeSdk, Contract, CompilerHttp, Node, MemoryAccount,
-} from '@aeternity/aepp-sdk';
+import { AeSdk, Contract, CompilerHttp, Node, MemoryAccount } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -56,7 +54,8 @@ const aeSdk = new AeSdk({
 // contract in a convenient way.
 console.log(CONTRACT_SOURCE_CODE);
 const contract = await Contract.initialize({
-  ...aeSdk.getOptions(), sourceCode: CONTRACT_SOURCE_CODE,
+  ...aeSdk.getOptions(),
+  sourceCode: CONTRACT_SOURCE_CODE,
 });
 
 // ## 5. Compile the contract

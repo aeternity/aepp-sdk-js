@@ -1,21 +1,15 @@
 import canonicalize from 'canonicalize';
 import AccountBase from '../account/Base';
-import {
-  Encoded, Encoding, decode, encode,
-} from './encoder';
+import { Encoded, Encoding, decode, encode } from './encoder';
 import { verify } from './crypto';
 import { ArgumentError, InvalidSignatureError } from './errors';
 
 // TODO: use Buffer.from(data, 'base64url') after solving https://github.com/feross/buffer/issues/309
-const toBase64Url = (data: Buffer | Uint8Array | string): string => Buffer
-  .from(data)
-  .toString('base64')
-  .replaceAll('/', '_')
-  .replaceAll('+', '-')
-  .replace(/=+$/, '');
+const toBase64Url = (data: Buffer | Uint8Array | string): string =>
+  Buffer.from(data).toString('base64').replaceAll('/', '_').replaceAll('+', '-').replace(/=+$/, '');
 
-const fromBase64Url = (data: string): Buffer => Buffer
-  .from(data.replaceAll('_', '/').replaceAll('-', '+'), 'base64');
+const fromBase64Url = (data: string): Buffer =>
+  Buffer.from(data.replaceAll('_', '/').replaceAll('-', '+'), 'base64');
 
 const objectToBase64Url = (data: any): string => toBase64Url(canonicalize(data) ?? '');
 
@@ -55,7 +49,10 @@ export async function signJwt(originalPayload: any, account: AccountBase): Promi
  * @param address - Address to check signature
  * @category JWT
  */
-export function unpackJwt(jwt: Jwt, address?: Encoded.AccountAddress): {
+export function unpackJwt(
+  jwt: Jwt,
+  address?: Encoded.AccountAddress,
+): {
   /**
    * JWT payload as object
    */
@@ -66,20 +63,22 @@ export function unpackJwt(jwt: Jwt, address?: Encoded.AccountAddress): {
   signer: Encoded.AccountAddress | undefined;
 } {
   const components = jwt.split('.');
-  if (components.length !== 3) throw new ArgumentError('JWT components count', 3, components.length);
+  if (components.length !== 3)
+    throw new ArgumentError('JWT components count', 3, components.length);
   const [h, payloadEncoded, signature] = components;
   if (h !== header) throw new ArgumentError('JWT header', header, h);
   const payload = JSON.parse(fromBase64Url(payloadEncoded).toString());
   const jwk = payload.sub_jwk ?? {};
-  const signer = jwk.x == null || jwk.kty !== 'OKP' || jwk.crv !== 'Ed25519'
-    ? address
-    : encode(fromBase64Url(jwk.x), Encoding.AccountAddress);
+  const signer =
+    jwk.x == null || jwk.kty !== 'OKP' || jwk.crv !== 'Ed25519'
+      ? address
+      : encode(fromBase64Url(jwk.x), Encoding.AccountAddress);
   if (address != null && signer !== address) {
     throw new ArgumentError('address', `${signer} ("sub_jwk")`, address);
   }
   if (
-    signer != null
-    && !verify(Buffer.from(`${h}.${payloadEncoded}`), fromBase64Url(signature), signer)
+    signer != null &&
+    !verify(Buffer.from(`${h}.${payloadEncoded}`), fromBase64Url(signature), signer)
   ) {
     throw new InvalidSignatureError(`JWT is not signed by ${signer}`);
   }

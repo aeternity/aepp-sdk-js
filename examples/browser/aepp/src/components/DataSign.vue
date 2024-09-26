@@ -8,7 +8,7 @@
           :value="dataBuffer.toString()"
           @input="setData($event.target.value)"
           placeholder="Plain text"
-        >
+        />
       </div>
     </div>
     <div>
@@ -18,19 +18,22 @@
           :value="dataBuffer.toString('hex')"
           @input="setData($event.target.value, 'hex')"
           placeholder="hex-encoded data"
-        >
+        />
       </div>
     </div>
     <div>
       <div>Data encoded</div>
       <div>
-        <input
-          v-model="data"
-          placeholder="ba_-encoded data"
-        >
+        <input v-model="data" placeholder="ba_-encoded data" />
       </div>
     </div>
-    <button @click="() => { promise = dataSign(); }">
+    <button
+      @click="
+        () => {
+          promise = dataSign();
+        }
+      "
+    >
       Sign data
     </button>
     <div v-if="promise">

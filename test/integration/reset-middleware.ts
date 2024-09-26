@@ -1,9 +1,17 @@
 import { execSync } from 'child_process';
 import {
-  Node, AeSdkMethods, MemoryAccount, CompilerHttp, Contract, Name, encode, Encoding, Encoded,
+  Node,
+  AeSdkMethods,
+  MemoryAccount,
+  CompilerHttp,
+  Contract,
+  Name,
+  encode,
+  Encoding,
+  Encoded,
   Oracle,
 } from '../../src';
-import { ensureInstanceOf } from '../utils';
+import { ensureInstanceOf, indent } from '../utils';
 import { initializeChannels } from './channel-utils';
 
 const aeSdk = new AeSdkMethods({
@@ -24,9 +32,9 @@ async function initData(): Promise<void> {
   const params1 = { ...aeSdk.getContext(), onAccount: presetAccount1 };
   const contract1 = await Contract.initialize({
     ...params1,
-    sourceCode: ''
-      + 'contract Identity =\n'
-      + '  entrypoint getArg(x : int) = x',
+    sourceCode: indent`
+      contract Identity =
+        entrypoint getArg(x : int) = x`,
   });
   await contract1.$deploy([]);
   const name1 = new Name('123456789012345678901234567800.chain', params1);
@@ -46,13 +54,13 @@ async function initData(): Promise<void> {
 
   const contract2 = await Contract.initialize<{ spend: (a: Encoded.AccountAddress) => void }>({
     ...params2,
-    sourceCode: ''
-      + 'contract Test =\n'
-      + '  datatype event = Event1(int) | Event2(string, int)\n'
-      + '\n'
-      + '  stateful entrypoint spend(a : address) =\n'
-      + '    Chain.event(Event2("test-string", 43))\n'
-      + '    Chain.spend(a, 42)\n',
+    sourceCode: indent`
+      contract Test =
+        datatype event = Event1(int) | Event2(string, int)
+
+        stateful entrypoint spend(a : address) =
+          Chain.event(Event2("test-string", 43))
+          Chain.spend(a, 42)`,
   });
   await contract2.$deploy([], { amount: 100 });
   await contract2.spend(aeSdk.getContext().onAccount.address);
@@ -65,16 +73,19 @@ async function initData(): Promise<void> {
     initiatorId: presetAccount2Address,
     responderId: presetAccount1Address,
   };
-  const [initiatorCh, responderCh] = await initializeChannels({
-    ...commonParams,
-    role: 'initiator',
-    host: 'localhost',
-    sign: async (_tag, tx) => presetAccount2.signTransaction(tx, { networkId: 'ae_dev' }),
-  }, {
-    ...commonParams,
-    role: 'responder',
-    sign: async (_tag, tx) => presetAccount1.signTransaction(tx, { networkId: 'ae_dev' }),
-  });
+  const [initiatorCh, responderCh] = await initializeChannels(
+    {
+      ...commonParams,
+      role: 'initiator',
+      host: 'localhost',
+      sign: async (_tag, tx) => presetAccount2.signTransaction(tx, { networkId: 'ae_dev' }),
+    },
+    {
+      ...commonParams,
+      role: 'responder',
+      sign: async (_tag, tx) => presetAccount1.signTransaction(tx, { networkId: 'ae_dev' }),
+    },
+  );
   initiatorCh.disconnect();
   responderCh.disconnect();
 }
@@ -95,7 +106,7 @@ export default async function prepareMiddleware(): Promise<AeSdkMethods> {
   await (async function rollbackToFirstBlock() {
     const { status } = await fetch('http://localhost:4313/rollback?height=1');
     if (status !== 200) throw new Error(`Unexpected status code: ${status}`);
-  }());
+  })();
 
   return aeSdk;
 }

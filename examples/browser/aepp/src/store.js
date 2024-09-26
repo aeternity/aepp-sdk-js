@@ -7,13 +7,15 @@ const store = createStore({
     address: undefined,
     networkId: undefined,
     // AeSdk instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
-    aeSdk: shallowRef(new AeSdk({
-      nodes: [
-        { name: 'testnet', instance: new Node('https://testnet.aeternity.io') },
-        { name: 'mainnet', instance: new Node('https://mainnet.aeternity.io') },
-      ],
-      onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
-    })),
+    aeSdk: shallowRef(
+      new AeSdk({
+        nodes: [
+          { name: 'testnet', instance: new Node('https://testnet.aeternity.io') },
+          { name: 'mainnet', instance: new Node('https://mainnet.aeternity.io') },
+        ],
+        onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
+      }),
+    ),
   },
   mutations: {
     setAddress(state, address) {

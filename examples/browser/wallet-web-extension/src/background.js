@@ -1,16 +1,21 @@
 import browser from 'webextension-polyfill';
 import {
-  AeSdkWallet, CompilerHttp, Node, MemoryAccount, BrowserRuntimeConnection, WALLET_TYPE,
-  RpcConnectionDenyError, RpcRejectedByUserError, RpcNoNetworkById, unpackTx, unpackDelegation,
+  AeSdkWallet,
+  CompilerHttp,
+  Node,
+  MemoryAccount,
+  BrowserRuntimeConnection,
+  WALLET_TYPE,
+  RpcConnectionDenyError,
+  RpcRejectedByUserError,
+  RpcNoNetworkById,
+  unpackTx,
+  unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 
 function stringifyBigint(value) {
-  return JSON.stringify(
-    value,
-    (k, v) => (typeof v === 'bigint' ? `${v} (as BigInt)` : v),
-    2,
-  );
+  return JSON.stringify(value, (k, v) => (typeof v === 'bigint' ? `${v} (as BigInt)` : v), 2);
 }
 
 let popupCounter = 0;
@@ -71,7 +76,10 @@ class AccountMemoryProtected extends MemoryAccount {
       const dataType = new TypeResolver().resolveType(aci);
       const decodedData = new ContractByteArrayEncoder().decodeWithType(data, dataType);
       const opt = {
-        ...options, aci, data, decodedData,
+        ...options,
+        aci,
+        data,
+        decodedData,
       };
       await genConfirmCallback('sign typed data')(id, opt, aeppOrigin);
     }

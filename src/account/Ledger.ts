@@ -64,8 +64,7 @@ export default class AccountLedger extends AccountBase {
     const toSend = [];
     while (offset !== rawTx.length) {
       const maxChunkSize = offset === 0 ? 150 - headerLength - networkIdBuffer.length : 150;
-      const chunkSize = offset + maxChunkSize > rawTx.length
-        ? rawTx.length - offset : maxChunkSize;
+      const chunkSize = offset + maxChunkSize > rawTx.length ? rawTx.length - offset : maxChunkSize;
       const buffer = Buffer.alloc(
         offset === 0 ? headerLength + networkIdBuffer.length + chunkSize : chunkSize,
       );
@@ -73,12 +72,7 @@ export default class AccountLedger extends AccountBase {
         let bufferOffset = buffer.writeUInt32BE(this.index, 0);
         bufferOffset = buffer.writeUInt32BE(rawTx.length, bufferOffset);
         bufferOffset = buffer.writeUInt8(networkIdBuffer.length, bufferOffset);
-        bufferOffset += networkIdBuffer.copy(
-          buffer,
-          bufferOffset,
-          0,
-          networkIdBuffer.length,
-        );
+        bufferOffset += networkIdBuffer.copy(buffer, bufferOffset, 0, networkIdBuffer.length);
         rawTx.copy(buffer, bufferOffset, 0, 150 - bufferOffset);
       } else {
         rawTx.copy(buffer, 0, offset, offset + chunkSize);
@@ -89,13 +83,7 @@ export default class AccountLedger extends AccountBase {
     const response = await toSend.reduce(
       async (previous, data, i) => {
         await previous;
-        return this.transport.send(
-          CLA,
-          SIGN_TRANSACTION,
-          i === 0 ? 0x00 : 0x80,
-          0x00,
-          data,
-        );
+        return this.transport.send(CLA, SIGN_TRANSACTION, i === 0 ? 0x00 : 0x80, 0x00, data);
       },
       Promise.resolve(Buffer.alloc(0)),
     );
@@ -110,8 +98,8 @@ export default class AccountLedger extends AccountBase {
     const toSend = [];
     while (offset !== message.length) {
       const maxChunkSize = offset === 0 ? 150 - 4 - 4 : 150;
-      const chunkSize = offset + maxChunkSize > message.length
-        ? message.length - offset : maxChunkSize;
+      const chunkSize =
+        offset + maxChunkSize > message.length ? message.length - offset : maxChunkSize;
       const buffer = Buffer.alloc(offset === 0 ? 4 + 4 + chunkSize : chunkSize);
       if (offset === 0) {
         buffer.writeUInt32BE(this.index, 0);
@@ -126,13 +114,7 @@ export default class AccountLedger extends AccountBase {
     const response = await toSend.reduce(
       async (previous, data, i) => {
         await previous;
-        return this.transport.send(
-          CLA,
-          SIGN_PERSONAL_MESSAGE,
-          i === 0 ? 0x00 : 0x80,
-          0x00,
-          data,
-        );
+        return this.transport.send(CLA, SIGN_PERSONAL_MESSAGE, i === 0 ? 0x00 : 0x80, 0x00, data);
       },
       Promise.resolve(Buffer.alloc(0)),
     );

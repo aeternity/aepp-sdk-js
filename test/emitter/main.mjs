@@ -38,7 +38,9 @@ function runInInterval(cb, delay) {
 const cancelMicroBlock = runInInterval(emitMicroBlock, 300);
 const cancelKeyBlock = runInInterval(emitKeyBlock, 1000);
 
-['SIGINT', 'SIGTERM'].forEach((event) => process.on(event, () => {
-  cancelMicroBlock();
-  cancelKeyBlock();
-}));
+['SIGINT', 'SIGTERM'].forEach((event) =>
+  process.on(event, () => {
+    cancelMicroBlock();
+    cancelKeyBlock();
+  }),
+);

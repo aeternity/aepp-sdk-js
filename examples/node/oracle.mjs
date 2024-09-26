@@ -8,9 +8,7 @@ Read more about oracles in the [guide] section.
 [factorial]: https://en.wikipedia.org/wiki/Factorial
 [guide]: ../../guides/oracles.md
 */
-import {
-  Node, AeSdk, MemoryAccount, Oracle, OracleClient,
-} from '@aeternity/aepp-sdk';
+import { Node, AeSdk, MemoryAccount, Oracle, OracleClient } from '@aeternity/aepp-sdk';
 
 // Let's prepare sdk and account for Oracle
 const node = new Node('https://testnet.aeternity.io');
@@ -30,7 +28,7 @@ console.log('Oracle registered');
 // Start listening for queries and handle them
 const stop = oracle.handleQueries((query) => {
   const arg = BigInt(query.decodedQuery);
-  if (arg < 0) return 'argument can\'t be negative';
+  if (arg < 0) return "argument can't be negative";
   let res = 1n;
   for (let i = 2n; i <= arg; i += 1n) {
     res *= i;

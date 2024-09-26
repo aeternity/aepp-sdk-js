@@ -1,9 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import AccountRpc from '../account/Rpc';
 import { Encoded } from '../utils/encoder';
-import {
-  Accounts, RPC_VERSION, Network, WalletApi, AeppApi, NetworkToSelect,
-} from './rpc/types';
+import { Accounts, RPC_VERSION, Network, WalletApi, AeppApi, NetworkToSelect } from './rpc/types';
 import RpcClient from './rpc/RpcClient';
 import { METHODS, SUBSCRIPTION_TYPES } from './schema';
 import { NoWalletConnectedError } from '../utils/errors';
@@ -14,12 +12,14 @@ interface EventsBase {
   disconnect: (p: any) => void;
 }
 
-export default abstract class WalletConnectorFrameBase<T extends {}>
-  extends EventEmitter<EventsBase | T> {
+export default abstract class WalletConnectorFrameBase<T extends {}> extends EventEmitter<
+  EventsBase | T
+> {
   #rpcClient?: RpcClient<WalletApi, AeppApi>;
 
   #getRpcClient(): RpcClient<WalletApi, AeppApi> {
-    if (this.#rpcClient == null) throw new NoWalletConnectedError('You are not connected to Wallet');
+    if (this.#rpcClient == null)
+      throw new NoWalletConnectedError('You are not connected to Wallet');
     return this.#rpcClient;
   }
 
@@ -46,9 +46,9 @@ export default abstract class WalletConnectorFrameBase<T extends {}>
   protected abstract _updateNetwork(params: Network): void;
 
   #updateAccounts(params: Accounts): void {
-    const addresses = [...new Set(
-      [...Object.keys(params.current), ...Object.keys(params.connected)],
-    )] as Encoded.AccountAddress[];
+    const addresses = [
+      ...new Set([...Object.keys(params.current), ...Object.keys(params.connected)]),
+    ] as Encoded.AccountAddress[];
     this.#accounts = addresses.map((address) => new AccountRpc(this.#getRpcClient(), address));
     this.emit('accountsChange', this.#accounts);
   }
@@ -79,8 +79,11 @@ export default abstract class WalletConnectorFrameBase<T extends {}>
       },
     );
     connector.#rpcClient = client;
-    const walletInfo = await connector.#rpcClient
-      .request(METHODS.connect, { name, version: RPC_VERSION, connectNode });
+    const walletInfo = await connector.#rpcClient.request(METHODS.connect, {
+      name,
+      version: RPC_VERSION,
+      connectNode,
+    });
     connector._updateNetwork(walletInfo);
   }
 

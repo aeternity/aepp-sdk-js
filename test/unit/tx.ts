@@ -6,12 +6,28 @@ import BigNumber from 'bignumber.js';
 import { checkOnlyTypes, ensureEqual, randomName } from '../utils';
 import {
   genSalt,
-  decode, encode, Encoding, Encoded,
-  getDefaultPointerKey, commitmentHash, getMinimumNameFee, isNameValid, produceNameId,
+  decode,
+  encode,
+  Encoding,
+  Encoded,
+  getDefaultPointerKey,
+  commitmentHash,
+  getMinimumNameFee,
+  isNameValid,
+  produceNameId,
   toBytes,
-  buildTx, unpackTx, unpackEntry,
-  NAME_BID_RANGES, Tag, EntryTag, AbiVersion, VmVersion,
-  SchemaNotFoundError, ArgumentError, AeSdk, packEntry,
+  buildTx,
+  unpackTx,
+  unpackEntry,
+  NAME_BID_RANGES,
+  Tag,
+  EntryTag,
+  AbiVersion,
+  VmVersion,
+  SchemaNotFoundError,
+  ArgumentError,
+  AeSdk,
+  packEntry,
 } from '../../src';
 
 describe('Tx', () => {
@@ -44,21 +60,22 @@ describe('Tx', () => {
   });
 
   it('Produce name id for `.chain`', () => {
-    produceNameId('asdas.chain').should.be.equal('nm_2DMazuJNrGkQYve9eMttgdteaigeeuBk3fmRYSThJZ2NpX3r8R');
+    produceNameId('asdas.chain').should.be.equal(
+      'nm_2DMazuJNrGkQYve9eMttgdteaigeeuBk3fmRYSThJZ2NpX3r8R',
+    );
   });
 
   describe('getMinimumNameFee', () => {
     it('returns correct name fees', () => {
       for (let i = 1; i <= Object.keys(NAME_BID_RANGES).length; i += 1) {
-        getMinimumNameFee(randomName(i)).toString()
-          .should.be.equal(NAME_BID_RANGES[i].toString());
+        getMinimumNameFee(randomName(i)).toString().should.be.equal(NAME_BID_RANGES[i].toString());
       }
     });
   });
 
   describe('isNameValid', () => {
     it('validates domain', () => isNameValid('asdasdasd.unknown').should.be.equal(false));
-    it('don\'t throws exception', () => isNameValid('asdasdasd.chain').should.be.equal(true));
+    it("don't throws exception", () => isNameValid('asdasdasd.chain').should.be.equal(true));
   });
 
   const payload = Buffer.from([1, 2, 42]);
@@ -67,41 +84,48 @@ describe('Tx', () => {
 
     it('decodes base58check', () => expect(decode('nm_3DZUwMat2')).to.be.eql(payload));
 
-    it('throws if invalid checksum', () => expect(() => decode('ak_23aaaaa'))
-      .to.throw('Invalid checksum'));
+    it('throws if invalid checksum', () =>
+      expect(() => decode('ak_23aaaaa')).to.throw('Invalid checksum'));
 
-    it('throws if invalid size', () => expect(() => decode('ak_An6Ui6sE1F'))
-      .to.throw('Payload should be 32 bytes, got 4 instead'));
+    it('throws if invalid size', () =>
+      expect(() => decode('ak_An6Ui6sE1F')).to.throw('Payload should be 32 bytes, got 4 instead'));
   });
 
   describe('encode', () => {
-    it('encodes base64check', () => expect(encode(payload, Encoding.Bytearray))
-      .to.be.equal('ba_AQIq9Y55kw=='));
+    it('encodes base64check', () =>
+      expect(encode(payload, Encoding.Bytearray)).to.be.equal('ba_AQIq9Y55kw=='));
 
-    it('encodes base58check', () => expect(encode(payload, Encoding.Name))
-      .to.be.equal('nm_3DZUwMat2'));
+    it('encodes base58check', () =>
+      expect(encode(payload, Encoding.Name)).to.be.equal('nm_3DZUwMat2'));
   });
 
   describe('getDefaultPointerKey', () => {
-    it('returns default pointer key for contract', () => expect(
-      getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'),
-    ).to.be.equal('contract_pubkey'));
+    it('returns default pointer key for contract', () =>
+      expect(
+        getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'),
+      ).to.be.equal('contract_pubkey'));
 
-    it('throws error', () => expect(
-      () => getDefaultPointerKey('ba_AQIq9Y55kw==' as Encoded.Channel),
-    ).to.throw('identifier should be prefixed with one of ak_, ok_, ct_, ch_, got ba_AQIq9Y55kw== instead'));
+    it('throws error', () =>
+      expect(() => getDefaultPointerKey('ba_AQIq9Y55kw==' as Encoded.Channel)).to.throw(
+        'identifier should be prefixed with one of ak_, ok_, ct_, ch_, got ba_AQIq9Y55kw== instead',
+      ));
   });
 
   describe('unpackTx', () => {
     it('throws error if invalid transaction version', () => {
       const tx = encode(rlpEncode([10, 99]), Encoding.Bytearray);
-      expect(() => unpackEntry(tx))
-        .to.throw(SchemaNotFoundError, 'Transaction schema not implemented for tag Account (10) version 99');
+      expect(() => unpackEntry(tx)).to.throw(
+        SchemaNotFoundError,
+        'Transaction schema not implemented for tag Account (10) version 99',
+      );
     });
 
     it('fails to unpack tx with more RLP items than in schema', () => {
-      expect(() => unpackTx('tx_+GIMAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg92HvYQAAABhHRlc3SEdGVzdK2Ldck='))
-        .to.throw(ArgumentError, 'RLP length should be 9, got 10 instead');
+      expect(() =>
+        unpackTx(
+          'tx_+GIMAaEB4TK48d23oE5jt/qWR5pUu8UlpTGn8bwM5JISGQMGf7ChAeEyuPHdt6BOY7f6lkeaVLvFJaUxp/G8DOSSEhkDBn+wiBvBbWdOyAAAhg92HvYQAAABhHRlc3SEdGVzdK2Ldck=',
+        ),
+      ).to.throw(ArgumentError, 'RLP length should be 9, got 10 instead');
     });
 
     it('unpacks unknown transaction', () => {
@@ -131,24 +155,35 @@ describe('Tx', () => {
     });
 
     it('unpacks state channel poi', () => {
-      const poi = 'pi_+QS9PAH5Agj5AgWgLTKha2G59WNpjU2qOeEP9n/k6VUZw6lrwd2jn0zjyZb5AeH4dKAtMqFrYbn1Y2mNTao54Q/2f+TpVRnDqWvB3aOfTOPJlvhRgKBy/g6a1aHG5CUcExd2PvF/VDFQoFXDYRynvBxhsviPWoCAgKDmsQ/HT1KkP6IZIZxPre8pPevMUitDJ/wdFSLdSx2GU4CAgICAgICAgICA+HSgcv4OmtWhxuQlHBMXdj7xf1QxUKBVw2Ecp7wcYbL4j1r4UYCAgICAgICAoIEfDDawnsjhRHiZ3cH3w1bwZCU/ComV5UZ35oNfBZQNgICAgKC1oTen+OePzzEwr98V96QpzGPnNdq33nRolIwWZ31TO4CAgPhSoIEfDDawnsjhRHiZ3cH3w1bwZCU/ComV5UZ35oNfBZQN8KAgy4vNCNXy3SL07CeWTpNXmqxcXKgpwiS5xqMVvJqPbI7NCgEAiQVrx14tYxAAA/hLoLWhN6f454/PMTCv3xX3pCnMY+c12rfedGiUjBZnfVM76aAg+T20wFXy2ZOEIKWCVNexp+1QmgXSfwzarLhs8ov8rofGCgEAggPo+FKg5rEPx09SpD+iGSGcT63vKT3rzFIrQyf8HRUi3UsdhlPwoD1xbWafWKm2OCnVvDaJX/R46dFWXDVp0Dio4Am/Aa/Zjs0KAQCJBWvHXi1jD/wV4+KgkuUqD84mdniErJPs5b5pR5faMyeuAuGSpTK0rUbGowvAwPkChvkCg6B2jPRZng8uvSIogeA13/PJ3kppJyDm8hrp5NaP39/v3/kCX/hEoBHlmqYc8k9c2eNzc9JAADb3fErCVaOf2zDNbvn+WTd14hCgcz/+U+Q3icmxZXQLRTSUTLW827c3lKJfOCBYgXAEomP4O6BYJ4U3UbSFRNdKow3ApDqnzTNUNG7kE2T287Q+JQSb4NmFxCCCLwCDwiA/gICAgICAgICAgICAgICA+NWgbusUs5OcObuVt7pByi05w+imTwelvFFKINZcKb9uzA34soCgEeWaphzyT1zZ43Nz0kAANvd8SsJVo5/bMM1u+f5ZN3WAgICAgICAgICAgICAgLiA+H4oAaEBXXFtZp9YqbY4KdW8Nolf9Hjp0VZcNWnQOKjgCb8Br9mDBQADuE74TEYDoOHfv3ueq4IcJKbTzxq+A6KqCONqtFC+IRgBer5iV6BZwKCN/oB4IJIANwEHBwEBAI4vARGAeCCSGWdldEFyZ4IvAIU3LjAuMQCAAcCCA+j4U6BzP/5T5DeJybFldAtFNJRMtbzbtzeUol84IFiBcASiY/Gg+834Gf8ycAnGZdS3wlaPv5tIpbWL68KqCphOqokQveuAgICAgICAgICAgICAgIAA+Gagdoz0WZ4PLr0iKIHgNd/zyd5KaScg5vIa6eTWj9/f79/4Q6EAHfk9tMBV8tmThCClglTXsaftUJoF0n8M2qy4bPKL/K6gbusUs5OcObuVt7pByi05w+imTwelvFFKINZcKb9uzA34RqD7zfgZ/zJwCcZl1LfCVo+/m0iltYvrwqoKmE6qiRC96+SCAACgWCeFN1G0hUTXSqMNwKQ6p80zVDRu5BNk9vO0PiUEm+DAwLP4mdE=';
+      const poi =
+        'pi_+QS9PAH5Agj5AgWgLTKha2G59WNpjU2qOeEP9n/k6VUZw6lrwd2jn0zjyZb5AeH4dKAtMqFrYbn1Y2mNTao54Q/2f+TpVRnDqWvB3aOfTOPJlvhRgKBy/g6a1aHG5CUcExd2PvF/VDFQoFXDYRynvBxhsviPWoCAgKDmsQ/HT1KkP6IZIZxPre8pPevMUitDJ/wdFSLdSx2GU4CAgICAgICAgICA+HSgcv4OmtWhxuQlHBMXdj7xf1QxUKBVw2Ecp7wcYbL4j1r4UYCAgICAgICAoIEfDDawnsjhRHiZ3cH3w1bwZCU/ComV5UZ35oNfBZQNgICAgKC1oTen+OePzzEwr98V96QpzGPnNdq33nRolIwWZ31TO4CAgPhSoIEfDDawnsjhRHiZ3cH3w1bwZCU/ComV5UZ35oNfBZQN8KAgy4vNCNXy3SL07CeWTpNXmqxcXKgpwiS5xqMVvJqPbI7NCgEAiQVrx14tYxAAA/hLoLWhN6f454/PMTCv3xX3pCnMY+c12rfedGiUjBZnfVM76aAg+T20wFXy2ZOEIKWCVNexp+1QmgXSfwzarLhs8ov8rofGCgEAggPo+FKg5rEPx09SpD+iGSGcT63vKT3rzFIrQyf8HRUi3UsdhlPwoD1xbWafWKm2OCnVvDaJX/R46dFWXDVp0Dio4Am/Aa/Zjs0KAQCJBWvHXi1jD/wV4+KgkuUqD84mdniErJPs5b5pR5faMyeuAuGSpTK0rUbGowvAwPkChvkCg6B2jPRZng8uvSIogeA13/PJ3kppJyDm8hrp5NaP39/v3/kCX/hEoBHlmqYc8k9c2eNzc9JAADb3fErCVaOf2zDNbvn+WTd14hCgcz/+U+Q3icmxZXQLRTSUTLW827c3lKJfOCBYgXAEomP4O6BYJ4U3UbSFRNdKow3ApDqnzTNUNG7kE2T287Q+JQSb4NmFxCCCLwCDwiA/gICAgICAgICAgICAgICA+NWgbusUs5OcObuVt7pByi05w+imTwelvFFKINZcKb9uzA34soCgEeWaphzyT1zZ43Nz0kAANvd8SsJVo5/bMM1u+f5ZN3WAgICAgICAgICAgICAgLiA+H4oAaEBXXFtZp9YqbY4KdW8Nolf9Hjp0VZcNWnQOKjgCb8Br9mDBQADuE74TEYDoOHfv3ueq4IcJKbTzxq+A6KqCONqtFC+IRgBer5iV6BZwKCN/oB4IJIANwEHBwEBAI4vARGAeCCSGWdldEFyZ4IvAIU3LjAuMQCAAcCCA+j4U6BzP/5T5DeJybFldAtFNJRMtbzbtzeUol84IFiBcASiY/Gg+834Gf8ycAnGZdS3wlaPv5tIpbWL68KqCphOqokQveuAgICAgICAgICAgICAgIAA+Gagdoz0WZ4PLr0iKIHgNd/zyd5KaScg5vIa6eTWj9/f79/4Q6EAHfk9tMBV8tmThCClglTXsaftUJoF0n8M2qy4bPKL/K6gbusUs5OcObuVt7pByi05w+imTwelvFFKINZcKb9uzA34RqD7zfgZ/zJwCcZl1LfCVo+/m0iltYvrwqoKmE6qiRC96+SCAACgWCeFN1G0hUTXSqMNwKQ6p80zVDRu5BNk9vO0PiUEm+DAwLP4mdE=';
       const unpackedPoi = unpackEntry(poi, EntryTag.TreesPoi);
 
       const address = 'ak_i9svRuk9SJfAponRnCYVnVWN9HVLdBEd8ZdGREJMaUiTn4S4D';
       const account = {
-        tag: EntryTag.Account, version: 1, nonce: 0, balance: '99999999999999998997',
+        tag: EntryTag.Account,
+        version: 1,
+        nonce: 0,
+        balance: '99999999999999998997',
       };
       expect(unpackedPoi.accounts[0].get(address)).to.eql(account);
 
       const addressContract = 'ct_ECdrEy2NJKq3qK3xraPtcDP7vfdi56SQXYAH3bVVSTmpqpYyW';
       const accountContract = {
-        tag: EntryTag.Account, version: 1, nonce: 0, balance: '1000',
+        tag: EntryTag.Account,
+        version: 1,
+        nonce: 0,
+        balance: '1000',
       };
-      expect(unpackedPoi.accounts[0].get(addressContract as Encoded.AccountAddress))
-        .to.eql(accountContract);
+      expect(unpackedPoi.accounts[0].get(addressContract as Encoded.AccountAddress)).to.eql(
+        accountContract,
+      );
       expect(unpackedPoi.accounts[0].toObject()).to.eql({
         ak_BvMjyAXbpHkjzVfG53N6FxF1LwTX2EYwFLfNbk8mcXjp8CXBC: {
-          tag: EntryTag.Account, version: 1, nonce: 0, balance: '100000000000000000003',
+          tag: EntryTag.Account,
+          version: 1,
+          nonce: 0,
+          balance: '100000000000000000003',
         },
         [addressContract.replace('ct_', 'ak_')]: accountContract,
         [address]: account,
@@ -172,37 +207,40 @@ describe('Tx', () => {
     });
 
     it('unpacks state channel calls record', () => {
-      const tx = 'cs_+QFBggJuAbkBOvkBNz8B+QEyuJf4lUABuEBRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhED9reWbZWfYmFIwTrKG6Khrbb7SvfC4T4ll2BtXsX/luE/4TSkCoQFZYYdOS6IFcvCPFPCBUOkebcCW0ZehLaMRA+K9RcniKwICoQVRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhAA9PwDAuJf4lUABuEBRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhADlKPCJlyMdCDQrNsajcRCzQk6M8LSJvbdnJ7Lc4aFjuE/4TSkCoQFZYYdOS6IFcvCPFPCBUOkebcCW0ZehLaMRA+K9RcniKwMDoQVRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhAEOVADAenqUfg==';
+      const tx =
+        'cs_+QFBggJuAbkBOvkBNz8B+QEyuJf4lUABuEBRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhED9reWbZWfYmFIwTrKG6Khrbb7SvfC4T4ll2BtXsX/luE/4TSkCoQFZYYdOS6IFcvCPFPCBUOkebcCW0ZehLaMRA+K9RcniKwICoQVRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhAA9PwDAuJf4lUABuEBRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhADlKPCJlyMdCDQrNsajcRCzQk6M8LSJvbdnJ7Lc4aFjuE/4TSkCoQFZYYdOS6IFcvCPFPCBUOkebcCW0ZehLaMRA+K9RcniKwMDoQVRt/rxUTPwSp8BBMQWR70Ag6kTiNXTDmO2LWStsbEXhAEOVADAenqUfg==';
       const params = {
         tag: EntryTag.CallsMtree,
         version: 1,
         payload: {
-          'ba_Ubf68VEz8EqfAQTEFke9AIOpE4jV0w5jti1krbGxF4RA/a3lm2Vn2JhSME6yhuioa22+0r3wuE+JZdgbV7F/5c9Ms1g=': {
-            callerId: 'ak_gN7nP72rm7D1kuSYWRtL9Sf4pFRoTPKM8wa9JHyneazW8zHm4',
-            callerNonce: 2,
-            contractId: 'ct_czPqotjcUujiXu5DaTeJMbv2WJpqwuhsQFn6edrGVRaoHLifk',
-            gasPrice: '0',
-            gasUsed: 61,
-            height: 2,
-            log: [],
-            returnType: 0,
-            returnValue: 'cb_P4fvHVw=',
-            tag: EntryTag.ContractCall,
-            version: 2,
-          },
-          'ba_Ubf68VEz8EqfAQTEFke9AIOpE4jV0w5jti1krbGxF4QA5SjwiZcjHQg0KzbGo3EQs0JOjPC0ib23Zyey3OGhY+BjbKc=': {
-            callerId: 'ak_gN7nP72rm7D1kuSYWRtL9Sf4pFRoTPKM8wa9JHyneazW8zHm4',
-            callerNonce: 3,
-            contractId: 'ct_czPqotjcUujiXu5DaTeJMbv2WJpqwuhsQFn6edrGVRaoHLifk',
-            gasPrice: '1',
-            gasUsed: 14,
-            height: 3,
-            log: [],
-            returnType: 0,
-            returnValue: 'cb_VNLOFXc=',
-            tag: EntryTag.ContractCall,
-            version: 2,
-          },
+          'ba_Ubf68VEz8EqfAQTEFke9AIOpE4jV0w5jti1krbGxF4RA/a3lm2Vn2JhSME6yhuioa22+0r3wuE+JZdgbV7F/5c9Ms1g=':
+            {
+              callerId: 'ak_gN7nP72rm7D1kuSYWRtL9Sf4pFRoTPKM8wa9JHyneazW8zHm4',
+              callerNonce: 2,
+              contractId: 'ct_czPqotjcUujiXu5DaTeJMbv2WJpqwuhsQFn6edrGVRaoHLifk',
+              gasPrice: '0',
+              gasUsed: 61,
+              height: 2,
+              log: [],
+              returnType: 0,
+              returnValue: 'cb_P4fvHVw=',
+              tag: EntryTag.ContractCall,
+              version: 2,
+            },
+          'ba_Ubf68VEz8EqfAQTEFke9AIOpE4jV0w5jti1krbGxF4QA5SjwiZcjHQg0KzbGo3EQs0JOjPC0ib23Zyey3OGhY+BjbKc=':
+            {
+              callerId: 'ak_gN7nP72rm7D1kuSYWRtL9Sf4pFRoTPKM8wa9JHyneazW8zHm4',
+              callerNonce: 3,
+              contractId: 'ct_czPqotjcUujiXu5DaTeJMbv2WJpqwuhsQFn6edrGVRaoHLifk',
+              gasPrice: '1',
+              gasUsed: 14,
+              height: 3,
+              log: [],
+              returnType: 0,
+              returnValue: 'cb_VNLOFXc=',
+              tag: EntryTag.ContractCall,
+              version: 2,
+            },
         },
       } as const;
       expect(unpackEntry(tx, EntryTag.CallsMtree)).to.be.eql(params);
@@ -222,7 +260,8 @@ describe('Tx', () => {
     });
 
     it('unpacks state trees tx', () => {
-      const tx = 'ss_+QKqPgC5ATb5ATOCAm0BuQEs+QEpPwH5ASSo50ABo/v6skWp8mq1jwV/+iKDkHayfTtp7ytW6d/nZ2QVQ4zhEAABP6rpQAGj+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEQAACCLwCm5UABofv6skWp8mq1jwV/+iKDkHayfTtp7ytW6d/nZ2QVQ4zhEAC4p/ilQAGg+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOG4gPh+KAGhAaJtvnDfkCeML/RLVY1N/6eQNHADrvu4hZoCmMAbCi5SgwUAA7hO+ExGA6Dh3797nquCHCSm088avgOiqgjjarRQviEYAXq+YlegWcCgjf6AeCCSADcBBwcBAQCOLwERgHggkhlnZXRBcmeCLwCFNy4wLjEAgAHAggPouKf4pYICbgG4n/idPwH4mbiX+JVAAbhA+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEHycljzso7F0NwAzM/Oj84MV1Lo7ia3VslsuGHHCI+wrhP+E0pAqEBom2+cN+QJ4wv9EtVjU3/p5A0cAOu+7iFmgKYwBsKLlICAqEF+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEAPT8AwIrJggJvAYTDPwHAismCAnABhMM/AcCKyYICcQGEwz8BwLij+KGCAnIBuJv4mT8B+JWs60ABoPv6skWp8mq1jwV/+iKDkHayfTtp7ytW6d/nZ2QVQ4zhh8YKAQCCA+iz8kABoKJtvnDfkCeML/RLVY1N/6eQNHADrvu4hZoCmMAbCi5Sjs0KAQCJBWvHXi1jD/wVs/JAAaBuFXSR/8BDssKtH01lCLrV/Jd1ImY9KNci1mQqB0RIJY7NCgEAiQVrx14tYxAAA0X2l9c=';
+      const tx =
+        'ss_+QKqPgC5ATb5ATOCAm0BuQEs+QEpPwH5ASSo50ABo/v6skWp8mq1jwV/+iKDkHayfTtp7ytW6d/nZ2QVQ4zhEAABP6rpQAGj+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEQAACCLwCm5UABofv6skWp8mq1jwV/+iKDkHayfTtp7ytW6d/nZ2QVQ4zhEAC4p/ilQAGg+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOG4gPh+KAGhAaJtvnDfkCeML/RLVY1N/6eQNHADrvu4hZoCmMAbCi5SgwUAA7hO+ExGA6Dh3797nquCHCSm088avgOiqgjjarRQviEYAXq+YlegWcCgjf6AeCCSADcBBwcBAQCOLwERgHggkhlnZXRBcmeCLwCFNy4wLjEAgAHAggPouKf4pYICbgG4n/idPwH4mbiX+JVAAbhA+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEHycljzso7F0NwAzM/Oj84MV1Lo7ia3VslsuGHHCI+wrhP+E0pAqEBom2+cN+QJ4wv9EtVjU3/p5A0cAOu+7iFmgKYwBsKLlICAqEF+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEAPT8AwIrJggJvAYTDPwHAismCAnABhMM/AcCKyYICcQGEwz8BwLij+KGCAnIBuJv4mT8B+JWs60ABoPv6skWp8mq1jwV/+iKDkHayfTtp7ytW6d/nZ2QVQ4zhh8YKAQCCA+iz8kABoKJtvnDfkCeML/RLVY1N/6eQNHADrvu4hZoCmMAbCi5Sjs0KAQCJBWvHXi1jD/wVs/JAAaBuFXSR/8BDssKtH01lCLrV/Jd1ImY9KNci1mQqB0RIJY7NCgEAiQVrx14tYxAAA0X2l9c=';
       const params = {
         accounts: {
           ak_2uyUQn1dyzrMxjzhSQgZ2rV1dk2D5BCYpquzzBn6hxoSAo7y1d: {
@@ -245,19 +284,20 @@ describe('Tx', () => {
           },
         },
         calls: {
-          'ba_+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEHycljzso7F0NwAzM/Oj84MV1Lo7ia3VslsuGHHCI+wsMqg1w=': {
-            callerId: 'ak_2EY2KjfhXkpLq2u13YuvDBahi8Yxq5ErNocCeCUAvwHmJjS2aF',
-            callerNonce: 2,
-            contractId: 'ct_2uyUQn1dyzrMxjzhSQgZ2rV1dk2D5BCYpquzzBn6hxoSAo7y1d',
-            gasPrice: '0',
-            gasUsed: 61,
-            height: 2,
-            log: [],
-            returnType: 0,
-            returnValue: 'cb_P4fvHVw=',
-            tag: EntryTag.ContractCall,
-            version: 2,
-          },
+          'ba_+/qyRanyarWPBX/6IoOQdrJ9O2nvK1bp3+dnZBVDjOEHycljzso7F0NwAzM/Oj84MV1Lo7ia3VslsuGHHCI+wsMqg1w=':
+            {
+              callerId: 'ak_2EY2KjfhXkpLq2u13YuvDBahi8Yxq5ErNocCeCUAvwHmJjS2aF',
+              callerNonce: 2,
+              contractId: 'ct_2uyUQn1dyzrMxjzhSQgZ2rV1dk2D5BCYpquzzBn6hxoSAo7y1d',
+              gasPrice: '0',
+              gasUsed: 61,
+              height: 2,
+              log: [],
+              returnType: 0,
+              returnValue: 'cb_P4fvHVw=',
+              tag: EntryTag.ContractCall,
+              version: 2,
+            },
         },
         channels: {},
         contracts: {
@@ -290,7 +330,11 @@ describe('Tx', () => {
   describe('buildTx', () => {
     it('returns value of a proper type', () => {
       const tx: Encoded.Transaction = buildTx({
-        tag: Tag.SpendTx, nonce: 0, amount: 123, senderId: address, recipientId: address,
+        tag: Tag.SpendTx,
+        nonce: 0,
+        amount: 123,
+        senderId: address,
+        recipientId: address,
       });
       expect(tx).to.satisfy((s: string) => s.startsWith('tx_'));
     });
@@ -316,15 +360,20 @@ describe('Tx', () => {
     });
 
     it('unpack and build ChannelCreateTx into the same value', () => {
-      const tx = 'tx_+IgyAqEBNMD0uYWndDrqF2Q8OIUWZ/gEi45vpwfg+cNOEVi9pL+JBWvHXi1jEAAAoQG5mrb34g29bneQLjNaFcH4OwVP0r9m9x6kYxpxiqN7EYkFa8deLWMQAAAAAQCGECcSfcAAwMCgOK3o2rLTFOY30p/4fMgaz3hG5WWTAcWknsu7ceLFmM0CERW42w==';
+      const tx =
+        'tx_+IgyAqEBNMD0uYWndDrqF2Q8OIUWZ/gEi45vpwfg+cNOEVi9pL+JBWvHXi1jEAAAoQG5mrb34g29bneQLjNaFcH4OwVP0r9m9x6kYxpxiqN7EYkFa8deLWMQAAAAAQCGECcSfcAAwMCgOK3o2rLTFOY30p/4fMgaz3hG5WWTAcWknsu7ceLFmM0CERW42w==';
       expect(buildTx(unpackTx(tx))).to.be.equal(tx);
     });
 
     it('checks argument types', () => {
       const spendTxParams = {
-        tag: Tag.SpendTx, nonce: 0, senderId: address, recipientId: address,
+        tag: Tag.SpendTx,
+        nonce: 0,
+        senderId: address,
+        recipientId: address,
       } as const;
-      const spendTx = 'tx_+FEMAaEBXXFtZp9YqbY4KdW8Nolf9Hjp0VZcNWnQOKjgCb8Br9mhAV1xbWafWKm2OCnVvDaJX/R46dFWXDVp0Dio4Am/Aa/ZAIYPJvVhyAAAAIBeys6T';
+      const spendTx =
+        'tx_+FEMAaEBXXFtZp9YqbY4KdW8Nolf9Hjp0VZcNWnQOKjgCb8Br9mhAV1xbWafWKm2OCnVvDaJX/R46dFWXDVp0Dio4Am/Aa/ZAIYPJvVhyAAAAIBeys6T';
       expect(buildTx(spendTxParams)).to.equal(spendTx);
       // @ts-expect-error spend tx don't have balance
       expect(buildTx({ ...spendTxParams, balance: 123 })).to.equal(spendTx);
@@ -349,8 +398,10 @@ describe('Tx', () => {
     });
 
     it('rejects if invalid transaction version', () => {
-      expect(() => buildTx({ tag: Tag.SpendTx, version: 5 } as any))
-        .to.throw(SchemaNotFoundError, 'Transaction schema not implemented for tag SpendTx (12) version 5');
+      expect(() => buildTx({ tag: Tag.SpendTx, version: 5 } as any)).to.throw(
+        SchemaNotFoundError,
+        'Transaction schema not implemented for tag SpendTx (12) version 5',
+      );
     });
   });
 

@@ -18,7 +18,10 @@ export default {
     params: {},
     // TODO: { absoluteTtl: true } | { absoluteTtl: false, onNode: Node }
     {
-      onNode, absoluteTtl, _isInternalBuild, ...options
+      onNode,
+      absoluteTtl,
+      _isInternalBuild,
+      ...options
     }: {
       onNode?: Node;
       absoluteTtl?: boolean;
@@ -27,7 +30,7 @@ export default {
   ) {
     if (absoluteTtl !== true && value !== 0 && (value != null || _isInternalBuild === true)) {
       if (onNode == null) throw new ArgumentError('onNode', 'provided', onNode);
-      value = (value ?? 3) + await getHeight({ ...options, onNode, cached: true });
+      value = (value ?? 3) + (await getHeight({ ...options, onNode, cached: true }));
     }
     return value;
   },

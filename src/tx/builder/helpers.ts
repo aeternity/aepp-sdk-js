@@ -1,8 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { genSalt, hash } from '../../utils/crypto';
-import {
-  decode, encode, Encoded, Encoding,
-} from '../../utils/encoder';
+import { decode, encode, Encoded, Encoding } from '../../utils/encoder';
 import { toBytes } from '../../utils/bytes';
 import { concatBuffers } from '../../utils/other';
 import {
@@ -53,9 +51,7 @@ export function oracleQueryId(
     return concatBuffers([Buffer.alloc(32 - nonceBE.length), nonceBE]);
   }
 
-  const b2bHash = hash(
-    Buffer.from([...decode(senderId), ..._int32(nonce), ...decode(oracleId)]),
-  );
+  const b2bHash = hash(Buffer.from([...decode(senderId), ..._int32(nonce), ...decode(oracleId)]));
   return encode(b2bHash, Encoding.OracleQueryId);
 }
 
@@ -71,7 +67,11 @@ export function nameToPunycode(maybeName: string): AensName {
     throw new ArgumentError('aens name', 'not containing emoji', maybeName);
   }
   if (name[2] === '-' && name[3] === '-') {
-    throw new ArgumentError('aens name', 'without "-" char in both the third and fourth positions', maybeName);
+    throw new ArgumentError(
+      'aens name',
+      'without "-" char in both the third and fourth positions',
+      maybeName,
+    );
   }
   if (name[0] === '-') {
     throw new ArgumentError('aens name', 'starting with no "-" char', maybeName);
@@ -119,15 +119,14 @@ export function produceNameId(name: AensName): Encoded.Name {
  * @param salt - Random number
  * @returns Commitment hash
  */
-export function commitmentHash(
-  name: AensName,
-  salt: number = genSalt(),
-): Encoded.Commitment {
+export function commitmentHash(name: AensName, salt: number = genSalt()): Encoded.Commitment {
   return encode(
-    hash(concatBuffers([
-      Buffer.from(nameToPunycode(name)),
-      Buffer.from(salt.toString(16).padStart(64, '0'), 'hex'),
-    ])),
+    hash(
+      concatBuffers([
+        Buffer.from(nameToPunycode(name)),
+        Buffer.from(salt.toString(16).padStart(64, '0'), 'hex'),
+      ]),
+    ),
     Encoding.Commitment,
   );
 }
@@ -179,8 +178,8 @@ const encodingToPointerKey = [
  * @returns default AENS pointer key
  */
 export function getDefaultPointerKey(
-  identifier: Encoded.Generic<typeof encodingToPointerKey[number][0]>,
-): typeof encodingToPointerKey[number][1] {
+  identifier: Encoded.Generic<(typeof encodingToPointerKey)[number][0]>,
+): (typeof encodingToPointerKey)[number][1] {
   decode(identifier);
   const encoding = identifier.substring(0, 2);
   const result = encodingToPointerKey.find(([e]) => e === encoding)?.[1];
@@ -214,15 +213,20 @@ export function getMinimumNameFee(name: AensName): BigNumber {
  */
 export function computeBidFee(
   name: AensName,
-  { startFee, increment = NAME_FEE_BID_INCREMENT }:
-  { startFee?: number | string | BigNumber; increment?: number } = {},
+  {
+    startFee,
+    increment = NAME_FEE_BID_INCREMENT,
+  }: { startFee?: number | string | BigNumber; increment?: number } = {},
 ): BigNumber {
-  if (!(Number(increment) === increment && increment % 1 !== 0)) throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`);
-  if (increment < NAME_FEE_BID_INCREMENT) throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`);
+  if (!(Number(increment) === increment && increment % 1 !== 0))
+    throw new IllegalBidFeeError(`Increment must be float. Current increment ${increment}`);
+  if (increment < NAME_FEE_BID_INCREMENT)
+    throw new IllegalBidFeeError(`minimum increment percentage is ${NAME_FEE_BID_INCREMENT}`);
   // FIXME: increment should be used somehow here
   return ceil(
-    new BigNumber(startFee ?? getMinimumNameFee(name))
-      .times(new BigNumber(NAME_FEE_BID_INCREMENT).plus(1)),
+    new BigNumber(startFee ?? getMinimumNameFee(name)).times(
+      new BigNumber(NAME_FEE_BID_INCREMENT).plus(1),
+    ),
   );
 }
 
@@ -236,10 +240,11 @@ export function computeBidFee(
  */
 export function computeAuctionEndBlock(name: AensName, claimHeight: number): number {
   const length = nameToPunycode(name).length - AENS_SUFFIX.length;
-  const h = (length <= 4 ? 62 * NAME_BID_TIMEOUT_BLOCKS : null)
-    ?? (length <= 8 ? 31 * NAME_BID_TIMEOUT_BLOCKS : null)
-    ?? (length <= 12 ? NAME_BID_TIMEOUT_BLOCKS : null)
-    ?? 0;
+  const h =
+    (length <= 4 ? 62 * NAME_BID_TIMEOUT_BLOCKS : null) ??
+    (length <= 8 ? 31 * NAME_BID_TIMEOUT_BLOCKS : null) ??
+    (length <= 12 ? NAME_BID_TIMEOUT_BLOCKS : null) ??
+    0;
   return h + claimHeight;
 }
 

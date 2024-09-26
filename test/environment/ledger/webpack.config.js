@@ -9,10 +9,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './browser'),
   },
-  plugins: [
-    new HtmlWebpackPlugin(),
-    new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
-  ],
+  plugins: [new HtmlWebpackPlugin(), new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] })],
   experiments: {
     topLevelAwait: true,
   },

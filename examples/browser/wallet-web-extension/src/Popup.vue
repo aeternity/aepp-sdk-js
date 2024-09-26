@@ -8,12 +8,8 @@
           <div>{{ JSON.stringify(popupParameters, null, 2) }}</div>
         </div>
 
-        <button @click="() => respond(true)">
-          Confirm
-        </button>
-        <button @click="() => respond(false)">
-          Reject
-        </button>
+        <button @click="() => respond(true)">Confirm</button>
+        <button @click="() => respond(false)">Reject</button>
       </div>
     </template>
 
@@ -51,7 +47,7 @@ export default {
       window.close();
     },
   },
-}
+};
 </script>
 
 <style lang="scss" src="./styles.scss" />
