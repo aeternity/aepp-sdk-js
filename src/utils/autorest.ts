@@ -1,6 +1,8 @@
 import { RestError, PipelineResponse, PipelinePolicy } from '@azure/core-rest-pipeline';
 import {
-  AdditionalPolicyConfig, FullOperationResponse, OperationOptions,
+  AdditionalPolicyConfig,
+  FullOperationResponse,
+  OperationOptions,
   createSerializer as createSerializerOrig,
 } from '@azure/core-client';
 import { pause } from './other';
@@ -100,7 +102,10 @@ export const genRequestQueuesPolicy = (): AdditionalPolicyConfig => {
         const getResponse = async (): Promise<PipelineResponse> => next(request);
         if (key == null) return getResponse();
         const req = (requestQueues.get(key) ?? Promise.resolve()).then(getResponse);
-        requestQueues.set(key, req.catch(() => {}));
+        requestQueues.set(
+          key,
+          req.catch(() => {}),
+        );
         return req;
       },
     },
@@ -158,10 +163,11 @@ export const genErrorFormatterPolicy = (
         return await next(request);
       } catch (error) {
         if (
-          !(error instanceof RestError)
-          || error.request == null
-          || error.message.startsWith('Error ')
-        ) throw error;
+          !(error instanceof RestError) ||
+          error.request == null ||
+          error.message.startsWith('Error ')
+        )
+          throw error;
         const prefix = `${new URL(error.request.url).pathname.slice(1)} error`;
 
         if (error.response?.bodyAsText == null) {
@@ -213,7 +219,8 @@ export const genRetryOnFailurePolicy = (
       request.headers.delete('__retry-code');
       const statusesToNotRetry = [200, 400, 403, 410, 500].filter((c) => c !== +retryCode);
 
-      const intervals = new Array(retryCount).fill(0)
+      const intervals = new Array(retryCount)
+        .fill(0)
         .map((_, idx) => ((idx + 1) / retryCount) ** 2);
       const intervalSum = intervals.reduce((a, b) => a + b, 0);
       const intervalsInMs = intervals.map((e) => Math.floor((e / intervalSum) * retryOverallDelay));

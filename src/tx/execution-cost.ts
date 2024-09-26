@@ -38,7 +38,10 @@ import getTransactionSignerAddress from './transaction-signer';
 export function getExecutionCost(
   transaction: Encoded.Transaction,
   {
-    innerTx, gasUsed, queryFee, isInitiator,
+    innerTx,
+    gasUsed,
+    queryFee,
+    isInitiator,
   }: {
     innerTx?: 'fee-payer' | 'freeloader';
     gasUsed?: number;
@@ -48,7 +51,9 @@ export function getExecutionCost(
 ): bigint {
   const params = unpackTx(transaction);
   if (params.tag === Tag.SignedTx) {
-    throw new IllegalArgumentError('Transaction shouldn\'t be a SignedTx, use `getExecutionCostBySignedTx` instead');
+    throw new IllegalArgumentError(
+      "Transaction shouldn't be a SignedTx, use `getExecutionCostBySignedTx` instead",
+    );
   }
 
   let res = 0n;
@@ -69,17 +74,21 @@ export function getExecutionCost(
     if (isInitiator === false) res -= BigInt(params.responderAmountFinal);
   }
   if (
-    (params.tag === Tag.SpendTx
-    || params.tag === Tag.ContractCreateTx || params.tag === Tag.ContractCallTx
-    || params.tag === Tag.ChannelDepositTx) && innerTx !== 'fee-payer'
+    (params.tag === Tag.SpendTx ||
+      params.tag === Tag.ContractCreateTx ||
+      params.tag === Tag.ContractCallTx ||
+      params.tag === Tag.ChannelDepositTx) &&
+    innerTx !== 'fee-payer'
   ) {
     res += BigInt(params.amount);
   }
   if (params.tag === Tag.ContractCreateTx) res += BigInt(params.deposit);
   if (
-    (params.tag === Tag.ContractCreateTx || params.tag === Tag.ContractCallTx
-      || params.tag === Tag.GaAttachTx || params.tag === Tag.GaMetaTx)
-    && innerTx !== 'freeloader'
+    (params.tag === Tag.ContractCreateTx ||
+      params.tag === Tag.ContractCallTx ||
+      params.tag === Tag.GaAttachTx ||
+      params.tag === Tag.GaMetaTx) &&
+    innerTx !== 'freeloader'
   ) {
     res += BigInt(params.gasPrice) * BigInt(gasUsed ?? params.gasLimit);
   }
@@ -110,13 +119,14 @@ export function getExecutionCostBySignedTx(
 
   const tx = buildTx(params.encodedTx);
   const address = getTransactionSignerAddress(tx);
-  const [isInnerTx, isNotInnerTx] = [true, false]
-    .map((f) => verify(getBufferToSign(tx, networkId, f), params.signatures[0], address));
-  if (!isInnerTx && !isNotInnerTx) throw new TransactionError('Can\'t verify signature');
-  return getExecutionCost(
-    buildTx(params.encodedTx),
-    { ...isInnerTx && { innerTx: 'freeloader' }, ...options },
+  const [isInnerTx, isNotInnerTx] = [true, false].map((f) =>
+    verify(getBufferToSign(tx, networkId, f), params.signatures[0], address),
   );
+  if (!isInnerTx && !isNotInnerTx) throw new TransactionError("Can't verify signature");
+  return getExecutionCost(buildTx(params.encodedTx), {
+    ...(isInnerTx && { innerTx: 'freeloader' }),
+    ...options,
+  });
 }
 
 /**
@@ -138,8 +148,9 @@ export async function getExecutionCostUsingNode(
 
   // TODO: set gasUsed for PayingForTx after solving https://github.com/aeternity/aeternity/issues/4087
   if (
-    options.gasUsed == null && txHash !== false
-    && [Tag.ContractCreateTx, Tag.ContractCallTx, Tag.GaAttachTx, Tag.GaMetaTx].includes(params.tag)
+    options.gasUsed == null &&
+    txHash !== false &&
+    [Tag.ContractCreateTx, Tag.ContractCallTx, Tag.GaAttachTx, Tag.GaMetaTx].includes(params.tag)
   ) {
     const { callInfo, gaInfo } = await node.getTransactionInfoByHash(txHash);
     const combinedInfo = callInfo ?? gaInfo;

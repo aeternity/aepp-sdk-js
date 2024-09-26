@@ -29,7 +29,10 @@ import GenerateSpendTx from './components/GenerateSpendTx.vue';
 
 export default {
   components: {
-    FieldAction, SpendCoins, MessageSign, GenerateSpendTx,
+    FieldAction,
+    SpendCoins,
+    MessageSign,
+    GenerateSpendTx,
   },
   computed: mapState(['aeSdk']),
   methods: {

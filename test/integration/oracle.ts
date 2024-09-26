@@ -3,7 +3,15 @@ import { expect } from 'chai';
 import { RestError } from '@azure/core-rest-pipeline';
 import { getSdk, timeoutBlock } from '.';
 import {
-  AeSdk, decode, encode, Encoding, Encoded, ORACLE_TTL_TYPES, Oracle, OracleClient, LogicError,
+  AeSdk,
+  decode,
+  encode,
+  Encoding,
+  Encoded,
+  ORACLE_TTL_TYPES,
+  Oracle,
+  OracleClient,
+  LogicError,
 } from '../../src';
 import { assertNotNull } from '../utils';
 import { pause } from '../../src/utils/other';
@@ -29,11 +37,10 @@ describe('Oracle', () => {
   describe('Oracle', () => {
     it('registers with 5000 TTL', async () => {
       const height = await aeSdk.getHeight();
-      await oracle.register(
-        '{"city": "str"}',
-        '{"tmp": "num"}',
-        { oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 5000 },
-      );
+      await oracle.register('{"city": "str"}', '{"tmp": "num"}', {
+        oracleTtlType: ORACLE_TTL_TYPES.delta,
+        oracleTtlValue: 5000,
+      });
       const oracleState = await oracle.getState();
       const ttl = height + 5000;
       expect(oracleState.ttl).to.be.within(ttl, ttl + 4);
@@ -54,12 +61,15 @@ describe('Oracle', () => {
     ): Promise<string[]> {
       const res: string[] = [];
       return new Promise((resolve) => {
-        const stopPolling = orc.pollQueries((query) => {
-          res.push(query.decodedQuery);
-          if (res.length !== count) return;
-          stopPolling();
-          resolve(res);
-        }, { includeResponded });
+        const stopPolling = orc.pollQueries(
+          (query) => {
+            res.push(query.decodedQuery);
+            if (res.length !== count) return;
+            stopPolling();
+            resolve(res);
+          },
+          { includeResponded },
+        );
       });
     }
 
@@ -67,7 +77,8 @@ describe('Oracle', () => {
 
     it('polls for queries', async () => {
       const pollPromise = pollNQueries(oracle, 3);
-      for (const q of queries) { // eslint-disable-line no-restricted-syntax
+      for (const q of queries) {
+        // eslint-disable-line no-restricted-syntax
         await oracleClient.postQuery(q);
       }
       expect(await pollPromise).to.eql(queries);
@@ -77,8 +88,10 @@ describe('Oracle', () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}');
       await oracle.respondToQuery(queryId, queryResponse);
       expect(await pollNQueries(oracle, 3)).to.have.same.members(queries);
-      expect(await pollNQueries(oracle, 4, true))
-        .to.have.same.members([...queries, '{"city": "Berlin"}']);
+      expect(await pollNQueries(oracle, 4, true)).to.have.same.members([
+        ...queries,
+        '{"city": "Berlin"}',
+      ]);
     });
 
     it('responds to query', async () => {
@@ -86,16 +99,17 @@ describe('Oracle', () => {
       await oracle.respondToQuery(queryId, queryResponse);
 
       const query = await aeSdk.api.getOracleQueryByPubkeyAndQueryId(oracle.address, queryId);
-      expect(decode(query.response as Encoded.OracleResponse).toString())
-        .to.be.equal(queryResponse);
+      expect(decode(query.response as Encoded.OracleResponse).toString()).to.be.equal(
+        queryResponse,
+      );
       const response = await oracleClient.pollForResponse(queryId);
       expect(response).to.be.equal(queryResponse);
     });
 
     it('handles query', async () => {
-      const stop = oracle.handleQueries((queryEntry) => (
-        JSON.stringify({ ...JSON.parse(queryEntry.decodedQuery), response: true })
-      ));
+      const stop = oracle.handleQueries((queryEntry) =>
+        JSON.stringify({ ...JSON.parse(queryEntry.decodedQuery), response: true }),
+      );
       const response = await oracleClient.query('{"test": 42}');
       expect(response).to.be.equal('{"test":42,"response":true}');
       await stop();
@@ -104,8 +118,10 @@ describe('Oracle', () => {
     it('fails to bind two query handles', async () => {
       const stop = oracle.handleQueries(() => 'handle 1');
       try {
-        expect(() => oracle.handleQueries(() => 'handle 2')).to
-          .throw(LogicError, 'Another query handler already running, it needs to be stopped to run a new one');
+        expect(() => oracle.handleQueries(() => 'handle 2')).to.throw(
+          LogicError,
+          'Another query handler already running, it needs to be stopped to run a new one',
+        );
       } finally {
         await stop();
       }
@@ -113,7 +129,8 @@ describe('Oracle', () => {
 
     async function postQueries(qs: string[]): Promise<Array<Promise<string>>> {
       const res: Array<Promise<string>> = [];
-      for (const query of qs) { // eslint-disable-line no-restricted-syntax
+      for (const query of qs) {
+        // eslint-disable-line no-restricted-syntax
         const { queryId } = await oracleClient.postQuery(query);
         res.push(oracleClient.pollForResponse(queryId));
       }
@@ -158,14 +175,16 @@ describe('Oracle', () => {
 
     it('polls for response for query without response', async () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}', { queryTtlValue: 1 });
-      await oracleClient.pollForResponse(queryId)
+      await oracleClient
+        .pollForResponse(queryId)
         .should.be.rejectedWith(/Giving up at height|error: Query not found/);
     }).timeout(timeoutBlock);
 
     it('polls for response for query that is already expired without response', async () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}', { queryTtlValue: 1 });
-      await aeSdk.awaitHeight(await aeSdk.getHeight() + 2);
-      await oracleClient.pollForResponse(queryId)
+      await aeSdk.awaitHeight((await aeSdk.getHeight()) + 2);
+      await oracleClient
+        .pollForResponse(queryId)
         .should.be.rejectedWith(RestError, 'Query not found');
     }).timeout(timeoutBlock * 2);
 
@@ -186,7 +205,9 @@ describe('Oracle', () => {
 
     before(async () => {
       oracleWithFee = new Oracle(aeSdk.accounts[aeSdk.addresses()[2]], aeSdk.getContext());
-      await oracleWithFee.register('{"city": "str"}', '{"tmp": "num"}', { queryFee: queryFee.toString() });
+      await oracleWithFee.register('{"city": "str"}', '{"tmp": "num"}', {
+        queryFee: queryFee.toString(),
+      });
       oracleWithFeeClient = new OracleClient(oracleWithFee.address, aeSdk.getContext());
     });
 
@@ -203,8 +224,9 @@ describe('Oracle', () => {
     });
 
     it('Post Oracle Query with custom query fee', async () => {
-      const query = await oracleWithFeeClient
-        .postQuery('{"city": "Berlin"}', { queryFee: (queryFee + 2000n).toString() });
+      const query = await oracleWithFeeClient.postQuery('{"city": "Berlin"}', {
+        queryFee: (queryFee + 2000n).toString(),
+      });
       assertNotNull(query.tx?.queryFee);
       expect(query.tx.queryFee).to.be.equal(queryFee + 2000n);
     });

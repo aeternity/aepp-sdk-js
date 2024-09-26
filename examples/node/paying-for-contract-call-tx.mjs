@@ -29,9 +29,7 @@
 
 // ## 1. Specify imports
 // You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import {
-  AeSdk, Contract, CompilerHttp, Node, MemoryAccount, Tag,
-} from '@aeternity/aepp-sdk';
+import { AeSdk, Contract, CompilerHttp, Node, MemoryAccount, Tag } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -100,7 +98,9 @@ const aeSdk = new AeSdk({
 //      - The transaction will be signed in a special way that is required for inner transactions.
 //
 const contract = await Contract.initialize({
-  ...aeSdk.getContext(), sourceCode: CONTRACT_SOURCE_CODE, address: CONTRACT_ADDRESS,
+  ...aeSdk.getContext(),
+  sourceCode: CONTRACT_SOURCE_CODE,
+  address: CONTRACT_ADDRESS,
 });
 const calldata = contract._calldata.encode('PayingForTxExample', 'set_last_caller', []);
 const contractCallTx = await aeSdk.buildTx({
@@ -112,10 +112,10 @@ const contractCallTx = await aeSdk.buildTx({
   gasPrice: 1500000000,
   callData: calldata,
 });
-const signedContractCallTx = await aeSdk.signTransaction(
-  contractCallTx,
-  { onAccount: newUserAccount, innerTx: true },
-);
+const signedContractCallTx = await aeSdk.signTransaction(contractCallTx, {
+  onAccount: newUserAccount,
+  innerTx: true,
+});
 
 // ## 5. Create, sign & broadcast the `PayingForTx` as payer
 const payForTx = await aeSdk.payForTransaction(signedContractCallTx, { onAccount: payerAccount });

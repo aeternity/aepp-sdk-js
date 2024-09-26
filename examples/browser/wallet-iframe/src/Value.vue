@@ -35,11 +35,7 @@ export default {
   methods: {
     valueToString(value) {
       if (typeof value !== 'object') return value;
-      return JSON.stringify(
-        value,
-        (k, v) => (typeof v === 'bigint' ? `${v} (as BigInt)` : v),
-        2,
-      );
+      return JSON.stringify(value, (k, v) => (typeof v === 'bigint' ? `${v} (as BigInt)` : v), 2);
     },
   },
 };

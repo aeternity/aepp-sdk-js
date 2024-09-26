@@ -8,7 +8,11 @@
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
 import { Tag, AensName, DRY_RUN_ACCOUNT } from '../tx/builder/constants';
 import {
-  buildContractIdByContractTx, unpackTx, buildTxAsync, BuildTxOptions, buildTxHash,
+  buildContractIdByContractTx,
+  unpackTx,
+  buildTxAsync,
+  BuildTxOptions,
+  buildTxHash,
 } from '../tx/builder';
 import { decode, Encoded } from '../utils/encoder';
 import {
@@ -32,14 +36,10 @@ import {
   ContractError,
 } from '../utils/errors';
 import { hash as calcHash } from '../utils/crypto';
-import {
-  ContractCallObject as NodeContractCallObject, Event as NodeEvent,
-} from '../apis/node';
+import { ContractCallObject as NodeContractCallObject, Event as NodeEvent } from '../apis/node';
 import CompilerBase, { Aci } from './compiler/Base';
 import Node from '../Node';
-import {
-  getAccount, getContract, getContractByteCode, resolveName, txDryRun,
-} from '../chain';
+import { getAccount, getContract, getContractByteCode, resolveName, txDryRun } from '../chain';
 import { sendTransaction, SendTransactionOptions } from '../send-transaction';
 import { TxUnpacked } from '../tx/builder/schema.generated';
 import { Optional, isAccountNotFoundError } from '../utils/other';
@@ -77,27 +77,37 @@ interface SendAndProcessReturnType {
   rawTx: Encoded.Transaction;
 }
 
-export interface ContractMethodsBase { [key: string]: (...args: any[]) => any }
+export interface ContractMethodsBase {
+  [key: string]: (...args: any[]) => any;
+}
 
 type MethodsToContractApi<M extends ContractMethodsBase> = {
-  [Name in keyof M]:
-  M[Name] extends (...args: infer Args) => any
-    ? (...args: [
-      ...Args,
-      ...[] | [Name extends 'init'
-        ? Parameters<Contract<M>['$deploy']>[1] : Parameters<Contract<M>['$call']>[2]],
-    ]) => ReturnType<Contract<M>['$call']>
-    : never
+  [Name in keyof M]: M[Name] extends (...args: infer Args) => any
+    ? (
+        ...args: [
+          ...Args,
+          ...(
+            | []
+            | [
+                Name extends 'init'
+                  ? Parameters<Contract<M>['$deploy']>[1]
+                  : Parameters<Contract<M>['$call']>[2],
+              ]
+          ),
+        ]
+      ) => ReturnType<Contract<M>['$call']>
+    : never;
 };
 
 type ContractWithMethods<M extends ContractMethodsBase> = Contract<M> & MethodsToContractApi<M>;
 
-type MethodNames<M extends ContractMethodsBase> = keyof M & string | 'init';
+type MethodNames<M extends ContractMethodsBase> = (keyof M & string) | 'init';
 
-type MethodParameters<M extends ContractMethodsBase, Fn extends MethodNames<M>> =
-  Fn extends 'init'
-    ? M extends { init: any } ? Parameters<M['init']> : []
-    : Parameters<M[Fn]>;
+type MethodParameters<M extends ContractMethodsBase, Fn extends MethodNames<M>> = Fn extends 'init'
+  ? M extends { init: any }
+    ? Parameters<M['init']>
+    : []
+  : Parameters<M[Fn]>;
 
 interface GetContractNameByEventOptions {
   contractAddressToName?: { [key: Encoded.ContractAddress]: string };
@@ -132,10 +142,13 @@ class Contract<M extends ContractMethodsBase> {
    */
   async $compile(): Promise<Encoded.ContractBytearray> {
     if (this.$options.bytecode != null) return this.$options.bytecode;
-    if (this.$options.onCompiler == null) throw new IllegalArgumentError('Can\'t compile without compiler');
+    if (this.$options.onCompiler == null)
+      throw new IllegalArgumentError("Can't compile without compiler");
     if (this.$options.sourceCode != null) {
-      const { bytecode } = await this.$options.onCompiler
-        .compileBySourceCode(this.$options.sourceCode, this.$options.fileSystem);
+      const { bytecode } = await this.$options.onCompiler.compileBySourceCode(
+        this.$options.sourceCode,
+        this.$options.fileSystem,
+      );
       this.$options.bytecode = bytecode;
     }
     if (this.$options.sourceCodePath != null) {
@@ -143,7 +156,7 @@ class Contract<M extends ContractMethodsBase> {
       this.$options.bytecode = bytecode;
     }
     if (this.$options.bytecode == null) {
-      throw new IllegalArgumentError('Can\'t compile without sourceCode and sourceCodePath');
+      throw new IllegalArgumentError("Can't compile without sourceCode and sourceCodePath");
     }
     return this.$options.bytecode;
   }
@@ -169,7 +182,9 @@ class Contract<M extends ContractMethodsBase> {
       case 'error':
         message = decode(returnValue).toString();
         if (/Expected \d+ arguments, got \d+/.test(message)) {
-          throw new ContractError(`ACI doesn't match called contract. Error provided by node: ${message}`);
+          throw new ContractError(
+            `ACI doesn't match called contract. Error provided by node: ${message}`,
+          );
         }
         break;
       default:
@@ -189,9 +204,8 @@ class Contract<M extends ContractMethodsBase> {
       tx: unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>(txData.rawTx),
       txData,
       rawTx: txData.rawTx,
-      ...txData.blockHeight != null && (
-        await this.$getCallResultByTxHash(txData.hash, fnName, options)
-      ),
+      ...(txData.blockHeight != null &&
+        (await this.$getCallResultByTxHash(txData.hash, fnName, options))),
     };
   }
 
@@ -231,42 +245,44 @@ class Contract<M extends ContractMethodsBase> {
    */
   async $deploy(
     params: MethodParameters<M, 'init'>,
-    options?: Parameters<Contract<M>['$call']>[2]
-    & Partial<BuildTxOptions<Tag.ContractCreateTx, 'ownerId' | 'code' | 'callData'>>,
-  ): Promise<Omit<SendAndProcessReturnType, 'hash'> & {
+    options?: Parameters<Contract<M>['$call']>[2] &
+      Partial<BuildTxOptions<Tag.ContractCreateTx, 'ownerId' | 'code' | 'callData'>>,
+  ): Promise<
+    Omit<SendAndProcessReturnType, 'hash'> & {
       transaction?: Encoded.TxHash;
       owner?: Encoded.AccountAddress;
       address?: Encoded.ContractAddress;
       decodedEvents?: ReturnType<Contract<M>['$decodeEvents']>;
-    }> {
+    }
+  > {
     const { callStatic, ...opt } = { ...this.$options, ...options };
     if (this.$options.bytecode == null) await this.$compile();
     if (callStatic === true) return this.$call('init', params, { ...opt, callStatic });
     if (this.$options.address != null) throw new DuplicateContractError();
 
-    if (opt.onAccount == null) throw new IllegalArgumentError('Can\'t deploy without account');
+    if (opt.onAccount == null) throw new IllegalArgumentError("Can't deploy without account");
     const ownerId = opt.onAccount.address;
-    if (this.$options.bytecode == null) throw new IllegalArgumentError('Can\'t deploy without bytecode');
+    if (this.$options.bytecode == null)
+      throw new IllegalArgumentError("Can't deploy without bytecode");
     const tx = await buildTxAsync({
       _isInternalBuild: true,
       ...opt,
       tag: Tag.ContractCreateTx,
-      gasLimit: opt.gasLimit ?? await this._estimateGas('init', params, opt),
+      gasLimit: opt.gasLimit ?? (await this._estimateGas('init', params, opt)),
       callData: this._calldata.encode(this._name, 'init', params),
       code: this.$options.bytecode,
       ownerId,
     });
-    const { hash, ...other } = await this.#sendAndProcess(
-      tx,
-      'init',
-      { ...opt, onAccount: opt.onAccount },
-    );
+    const { hash, ...other } = await this.#sendAndProcess(tx, 'init', {
+      ...opt,
+      onAccount: opt.onAccount,
+    });
     this.$options.address = buildContractIdByContractTx(other.rawTx);
     return {
       ...other,
-      ...other.result?.log != null && {
+      ...(other.result?.log != null && {
         decodedEvents: this.$decodeEvents(other.result.log, opt),
-      },
+      }),
       owner: ownerId,
       transaction: hash,
       address: this.$options.address,
@@ -279,15 +295,17 @@ class Contract<M extends ContractMethodsBase> {
    * @returns function ACI
    */
   #getFunctionAci(name: string): FunctionAci {
-    const fn = this.#aciContract.functions.find(
-      (f: { name: string }) => f.name === name,
-    );
+    const fn = this.#aciContract.functions.find((f: { name: string }) => f.name === name);
     if (fn != null) {
       return fn;
     }
     if (name === 'init') {
       return {
-        arguments: [], name: 'init', payable: false, returns: 'unit', stateful: true,
+        arguments: [],
+        name: 'init',
+        payable: false,
+        returns: 'unit',
+        stateful: true,
       };
     }
     throw new NoSuchContractFunctionError(name);
@@ -303,11 +321,10 @@ class Contract<M extends ContractMethodsBase> {
   async $call<Fn extends MethodNames<M>>(
     fn: Fn,
     params: MethodParameters<M, Fn>,
-    options: Partial<BuildTxOptions<Tag.ContractCallTx, 'callerId' | 'contractId' | 'callData'>>
-    & Parameters<Contract<M>['$decodeEvents']>[1]
-    & Optional<SendTransactionOptions, 'onAccount' | 'onNode'>
-    & Omit<Parameters<typeof txDryRun>[2], 'onNode'>
-    & { callStatic?: boolean } = {},
+    options: Partial<BuildTxOptions<Tag.ContractCallTx, 'callerId' | 'contractId' | 'callData'>> &
+      Parameters<Contract<M>['$decodeEvents']>[1] &
+      Optional<SendTransactionOptions, 'onAccount' | 'onNode'> &
+      Omit<Parameters<typeof txDryRun>[2], 'onNode'> & { callStatic?: boolean } = {},
   ): Promise<SendAndProcessReturnType & Partial<GetCallResultByHashReturnType<M, Fn>>> {
     const { callStatic, top, ...opt } = { ...this.$options, ...options };
     const fnAci = this.#getFunctionAci(fn);
@@ -317,7 +334,8 @@ class Contract<M extends ContractMethodsBase> {
     const { onNode } = opt;
 
     if (fn == null) throw new MissingFunctionNameError();
-    if (fn === 'init' && callStatic !== true) throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
+    if (fn === 'init' && callStatic !== true)
+      throw new InvalidMethodInvocationError('"init" can be called only via dryRun');
     if (fn !== 'init' && opt.amount != null && Number(opt.amount) > 0 && !fnAci.payable) {
       throw new NotPayableFunctionError(opt.amount, fn);
     }
@@ -327,11 +345,13 @@ class Contract<M extends ContractMethodsBase> {
       if (opt.onAccount == null) throw new InternalError('Use fallback account');
       callerId = opt.onAccount.address;
     } catch (error) {
-      const useFallbackAccount = callStatic === true && (
-        (error instanceof TypeError && error.message === 'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead')
-        || (error instanceof NoWalletConnectedError)
-        || (error instanceof InternalError && error.message === 'Use fallback account')
-      );
+      const useFallbackAccount =
+        callStatic === true &&
+        ((error instanceof TypeError &&
+          error.message ===
+            'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead') ||
+          error instanceof NoWalletConnectedError ||
+          (error instanceof InternalError && error.message === 'Use fallback account'));
       if (!useFallbackAccount) throw error;
       callerId = DRY_RUN_ACCOUNT.pub;
     }
@@ -350,14 +370,22 @@ class Contract<M extends ContractMethodsBase> {
       const txOpt = { ...opt, onNode, callData };
       let tx;
       if (fn === 'init') {
-        if (this.$options.bytecode == null) throw new IllegalArgumentError('Can\'t dry-run "init" without bytecode');
+        if (this.$options.bytecode == null)
+          throw new IllegalArgumentError('Can\'t dry-run "init" without bytecode');
         tx = await buildTxAsync({
-          ...txOpt, tag: Tag.ContractCreateTx, code: this.$options.bytecode, ownerId: callerId,
+          ...txOpt,
+          tag: Tag.ContractCreateTx,
+          code: this.$options.bytecode,
+          ownerId: callerId,
         });
       } else {
-        if (contractId == null) throw new MissingContractAddressError('Can\'t dry-run contract without address');
+        if (contractId == null)
+          throw new MissingContractAddressError("Can't dry-run contract without address");
         tx = await buildTxAsync({
-          ...txOpt, tag: Tag.ContractCallTx, callerId, contractId,
+          ...txOpt,
+          tag: Tag.ContractCallTx,
+          callerId,
+          contractId,
         });
       }
 
@@ -377,18 +405,21 @@ class Contract<M extends ContractMethodsBase> {
       };
     }
 
-    if (top != null) throw new IllegalArgumentError('Can\'t handle `top` option in on-chain contract call');
-    if (contractId == null) throw new MissingContractAddressError('Can\'t call contract without address');
+    if (top != null)
+      throw new IllegalArgumentError("Can't handle `top` option in on-chain contract call");
+    if (contractId == null)
+      throw new MissingContractAddressError("Can't call contract without address");
     const tx = await buildTxAsync({
       _isInternalBuild: true,
       ...opt,
       tag: Tag.ContractCallTx,
-      gasLimit: opt.gasLimit ?? await this._estimateGas(fn, params, opt),
+      gasLimit: opt.gasLimit ?? (await this._estimateGas(fn, params, opt)),
       callerId,
       contractId,
       callData,
     });
-    if (opt.onAccount == null) throw new IllegalArgumentError('Can\'t call contract on chain without account');
+    if (opt.onAccount == null)
+      throw new IllegalArgumentError("Can't call contract on chain without account");
     return this.#sendAndProcess(tx, fn, { ...opt, onAccount: opt.onAccount });
   }
 
@@ -416,16 +447,19 @@ class Contract<M extends ContractMethodsBase> {
       .filter((contract) => contract?.event) as ContractAci[];
     const matchedEvents = contracts
       .map((contract) => [contract.name, contract.event.variant])
-      .map(([name, events]) => events.map((event: {}) => (
-        [name, Object.keys(event)[0], Object.values(event)[0]]
-      )))
+      .map(([name, events]) =>
+        events.map((event: {}) => [name, Object.keys(event)[0], Object.values(event)[0]]),
+      )
       .flat()
       .filter(([, eventName]) => BigInt(`0x${calcHash(eventName).toString('hex')}`) === nameHash)
       .filter(([, , type], idx, arr) => !arr.slice(0, idx).some((el) => isEqual(el[2], type)));
     switch (matchedEvents.length) {
-      case 0: throw new MissingEventDefinitionError(nameHash.toString(), ctAddress);
-      case 1: return matchedEvents[0][0];
-      default: throw new AmbiguousEventDefinitionError(ctAddress, matchedEvents);
+      case 0:
+        throw new MissingEventDefinitionError(nameHash.toString(), ctAddress);
+      case 1:
+        return matchedEvents[0][0];
+      default:
+        throw new AmbiguousEventDefinitionError(ctAddress, matchedEvents);
     }
   }
 
@@ -458,27 +492,26 @@ class Contract<M extends ContractMethodsBase> {
             address: event.address,
           },
         };
-      }).filter((e: DecodedEvent | null): e is DecodedEvent => e != null);
+      })
+      .filter((e: DecodedEvent | null): e is DecodedEvent => e != null);
   }
 
-  static async initialize<M extends ContractMethodsBase>(
-    {
-      onCompiler,
-      onNode,
-      bytecode,
-      aci,
-      address,
-      sourceCodePath,
-      sourceCode,
-      fileSystem,
-      validateBytecode,
-      ...otherOptions
-    }: Omit<ConstructorParameters<typeof Contract>[0], 'aci' | 'address'> & {
-      validateBytecode?: boolean;
-      aci?: Aci;
-      address?: Encoded.ContractAddress | AensName;
-    },
-  ): Promise<ContractWithMethods<M>> {
+  static async initialize<M extends ContractMethodsBase>({
+    onCompiler,
+    onNode,
+    bytecode,
+    aci,
+    address,
+    sourceCodePath,
+    sourceCode,
+    fileSystem,
+    validateBytecode,
+    ...otherOptions
+  }: Omit<ConstructorParameters<typeof Contract>[0], 'aci' | 'address'> & {
+    validateBytecode?: boolean;
+    aci?: Aci;
+    address?: Encoded.ContractAddress | AensName;
+  }): Promise<ContractWithMethods<M>> {
     if (aci == null && onCompiler != null) {
       let res;
       if (sourceCodePath != null) res = await onCompiler.compile(sourceCodePath);
@@ -492,16 +525,15 @@ class Contract<M extends ContractMethodsBase> {
 
     let name;
     if (address != null) {
-      address = await resolveName(
-        address,
-        'contract_pubkey',
-        { resolveByNode: true, onNode },
-      ) as Encoded.ContractAddress;
+      address = (await resolveName(address, 'contract_pubkey', {
+        resolveByNode: true,
+        onNode,
+      })) as Encoded.ContractAddress;
       if (isNameValid(address)) name = address;
     }
 
     if (address == null && sourceCode == null && sourceCodePath == null && bytecode == null) {
-      throw new MissingContractAddressError('Can\'t create instance by ACI without address');
+      throw new MissingContractAddressError("Can't create instance by ACI without address");
     }
 
     if (address != null) {
@@ -510,19 +542,24 @@ class Contract<M extends ContractMethodsBase> {
     }
 
     if (validateBytecode === true) {
-      if (address == null) throw new MissingContractAddressError('Can\'t validate bytecode without contract address');
+      if (address == null)
+        throw new MissingContractAddressError("Can't validate bytecode without contract address");
       const onChanBytecode = (await getContractByteCode(address, { onNode })).bytecode;
       let isValid = false;
       if (bytecode != null) isValid = bytecode === onChanBytecode;
       else if (sourceCode != null) {
-        if (onCompiler == null) throw new IllegalArgumentError('Can\'t validate bytecode without compiler');
+        if (onCompiler == null)
+          throw new IllegalArgumentError("Can't validate bytecode without compiler");
         isValid = await onCompiler.validateBySourceCode(onChanBytecode, sourceCode, fileSystem);
       } else if (sourceCodePath != null) {
-        if (onCompiler == null) throw new IllegalArgumentError('Can\'t validate bytecode without compiler');
+        if (onCompiler == null)
+          throw new IllegalArgumentError("Can't validate bytecode without compiler");
         isValid = await onCompiler.validate(onChanBytecode, sourceCodePath);
       }
       if (!isValid) {
-        throw new BytecodeMismatchError((sourceCode ?? sourceCodePath) != null ? 'source code' : 'bytecode');
+        throw new BytecodeMismatchError(
+          (sourceCode ?? sourceCodePath) != null ? 'source code' : 'bytecode',
+        );
       }
     }
 
@@ -553,7 +590,10 @@ class Contract<M extends ContractMethodsBase> {
   /**
    * @param options - Options
    */
-  constructor({ aci, ...otherOptions }: {
+  constructor({
+    aci,
+    ...otherOptions
+  }: {
     onCompiler?: CompilerBase;
     onNode: Node;
     bytecode?: Encoded.ContractBytearray;
@@ -570,7 +610,9 @@ class Contract<M extends ContractMethodsBase> {
     this._aci = aci;
     const aciLast = aci[aci.length - 1];
     if (aciLast.contract == null) {
-      throw new IllegalArgumentError(`The last 'aci' item should have 'contract' key, got ${Object.keys(aciLast)} keys instead`);
+      throw new IllegalArgumentError(
+        `The last 'aci' item should have 'contract' key, got ${Object.keys(aciLast)} keys instead`,
+      );
     }
     this.#aciContract = aciLast.contract;
     this._name = this.#aciContract.name;
@@ -593,19 +635,21 @@ class Contract<M extends ContractMethodsBase> {
      */
     Object.assign(
       this,
-      Object.fromEntries(this.#aciContract.functions
-        .map(({ name, arguments: aciArgs, stateful }: FunctionAci) => {
+      Object.fromEntries(
+        this.#aciContract.functions.map(({ name, arguments: aciArgs, stateful }: FunctionAci) => {
           const callStatic = name !== 'init' && !stateful;
           return [
             name,
             async (...args: any) => {
               const options = args.length === aciArgs.length + 1 ? args.pop() : {};
-              if (typeof options !== 'object') throw new TypeError(`Options should be an object: ${options}`);
+              if (typeof options !== 'object')
+                throw new TypeError(`Options should be an object: ${options}`);
               if (name === 'init') return this.$deploy(args, { callStatic, ...options });
               return this.$call(name, args, { callStatic, ...options });
             },
           ];
-        })),
+        }),
+      ),
     );
   }
 }
@@ -614,7 +658,7 @@ interface ContractWithMethodsClass {
   new <M extends ContractMethodsBase>(
     options: ConstructorParameters<typeof Contract>[0],
   ): ContractWithMethods<M>;
-  initialize: typeof Contract['initialize'];
+  initialize: (typeof Contract)['initialize'];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare

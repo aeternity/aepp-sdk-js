@@ -31,9 +31,7 @@ export function unpackEntry(
 export function unpackEntry(
   encoded: Encoded.StateTrees,
 ): EntUnpacked & { tag: EntryTag.StateTrees };
-export function unpackEntry(
-  encoded: Encoded.Poi,
-): EntUnpacked & { tag: EntryTag.TreesPoi };
+export function unpackEntry(encoded: Encoded.Poi): EntUnpacked & { tag: EntryTag.TreesPoi };
 /**
  * Unpack entry
  * @category entry builder
@@ -45,10 +43,7 @@ export function unpackEntry<T extends EntryTag>(
   encoded: Encoded.Any,
   expectedTag?: T,
 ): EntUnpacked & { tag: T };
-export function unpackEntry(
-  encoded: Encoded.Any,
-  expectedTag?: EntryTag,
-): EntUnpacked {
+export function unpackEntry(encoded: Encoded.Any, expectedTag?: EntryTag): EntUnpacked {
   expectedTag ??= encodingTag.find(([, enc]) => encoded.startsWith(enc))?.[0];
   return unpackRecord(schemas, EntryTag, encoded, expectedTag, { unpackEntry }) as any;
 }

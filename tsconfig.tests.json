@@ -5,11 +5,6 @@
     "resolveJsonModule": true,
     "noEmit": true
   },
-  "include": [
-    "src/**/*",
-    "test/**/*"
-  ],
-  "exclude": [
-    "test/environment/**/*"
-  ]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["test/environment/**/*"]
 }

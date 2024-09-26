@@ -2,8 +2,12 @@ import { ArgumentError } from '../../../utils/errors';
 import shortUInt from './short-u-int';
 
 export default function genShortUIntConstField<
-  Value extends number, Optional extends boolean = false,
->(constValue: Value, optional?: Optional): {
+  Value extends number,
+  Optional extends boolean = false,
+>(
+  constValue: Value,
+  optional?: Optional,
+): {
   serialize: Optional extends true ? (value?: Value) => Buffer : (value: Value) => Buffer;
   deserialize: (value: Buffer) => Value;
   constValue: Value;

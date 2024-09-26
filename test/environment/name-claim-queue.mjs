@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import {
-  Node, AeSdk, MemoryAccount, Name,
-// eslint-disable-next-line import/extensions
+  Node,
+  AeSdk,
+  MemoryAccount,
+  Name,
+  // eslint-disable-next-line import/extensions
 } from '../../es/index.mjs';
 
 const aeSdk = new AeSdk({
@@ -13,9 +16,10 @@ const { address } = aeSdk;
 const { status } = await fetch(`https://faucet.aepps.com/account/${address}`, { method: 'POST' });
 console.assert(status === 200, 'Invalid faucet response code', status);
 
-const pauseUntilLoadBalancerGetSynced = () => new Promise((resolve) => {
-  setTimeout(resolve, 1000);
-});
+const pauseUntilLoadBalancerGetSynced = () =>
+  new Promise((resolve) => {
+    setTimeout(resolve, 1000);
+  });
 const name = new Name(`test-${Math.random().toString(16).slice(2)}.chain`, aeSdk.getContext());
 const options = { waitMined: false };
 const txHashes = [];

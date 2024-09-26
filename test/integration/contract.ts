@@ -3,8 +3,17 @@ import { before, describe, it } from 'mocha';
 import { assertNotNull, InputNumber } from '../utils';
 import { getSdk, timeoutBlock } from '.';
 import {
-  ArgumentError, NodeInvocationError, Encoded, DRY_RUN_ACCOUNT,
-  messageToHash, UnexpectedTsError, AeSdk, Contract, ContractMethodsBase, isAddressValid, Encoding,
+  ArgumentError,
+  NodeInvocationError,
+  Encoded,
+  DRY_RUN_ACCOUNT,
+  messageToHash,
+  UnexpectedTsError,
+  AeSdk,
+  Contract,
+  ContractMethodsBase,
+  isAddressValid,
+  Encoding,
 } from '../../src';
 
 const identitySourceCode = `
@@ -28,7 +37,9 @@ describe('Contract', () => {
 
   it('deploys precompiled bytecode', async () => {
     identityContract = await Contract.initialize({
-      ...aeSdk.getContext(), bytecode, sourceCode: identitySourceCode,
+      ...aeSdk.getContext(),
+      bytecode,
+      sourceCode: identitySourceCode,
     });
     expect(await identityContract.$deploy([])).to.have.property('address');
   });
@@ -51,17 +62,18 @@ describe('Contract', () => {
     const signContract = await Contract.initialize<{
       verify: (data: Uint8Array, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
-          ...aeSdk.getContext(),
-          sourceCode:
-            'contract Sign ='
-            + '\n  entrypoint verify (data: bytes(32), pub: address, sig: signature): bool ='
-            + '\n    Crypto.verify_sig(data, pub, sig)',
-        });
+      ...aeSdk.getContext(),
+      sourceCode:
+        'contract Sign =' +
+        '\n  entrypoint verify (data: bytes(32), pub: address, sig: signature): bool =' +
+        '\n    Crypto.verify_sig(data, pub, sig)',
+    });
     await signContract.$deploy([]);
     const data = Buffer.from(new Array(32).fill(0).map((_, idx) => idx ** 2));
     const signature = await aeSdk.sign(data);
-    expect((await signContract.verify(data, aeSdk.address, signature)).decodedResult)
-      .to.be.equal(true);
+    expect((await signContract.verify(data, aeSdk.address, signature)).decodedResult).to.be.equal(
+      true,
+    );
   });
 
   it('Verify message in Sophia', async () => {
@@ -69,40 +81,44 @@ describe('Contract', () => {
       message_to_hash: (message: string) => Uint8Array;
       verify: (message: string, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
-          ...aeSdk.getContext(),
-          sourceCode:
-            'include "String.aes"'
-            + '\n'
-            + '\ncontract Sign ='
-            + '\n  entrypoint int_to_binary (i: int): string ='
-            + '\n    switch(Char.from_int(i))'
-            + '\n      None => abort("Int is too big")'
-            + '\n      Some(c) => String.from_list([c])'
-            + '\n'
-            + '\n  entrypoint includes (str: string, pat: string): bool ='
-            + '\n    switch(String.contains(str, pat))'
-            + '\n      None => false'
-            + '\n      Some(_) => true'
-            + '\n'
-            + '\n  entrypoint message_to_hash (message: string): hash ='
-            + '\n    let prefix = "aeternity Signed Message:\\n"'
-            + '\n    let prefixBinary = String.concat(int_to_binary(String.length(prefix)), prefix)'
-            + '\n    let messageBinary = String.concat(int_to_binary(String.length(message)), message)'
-            + '\n    Crypto.blake2b(String.concat(prefixBinary, messageBinary))'
-            + '\n'
-            + '\n  entrypoint verify (message: string, pub: address, sig: signature): bool ='
-            + '\n    require(includes(message, "H"), "Invalid message")'
-            + '\n    Crypto.verify_sig(message_to_hash(message), pub, sig)',
-        });
+      ...aeSdk.getContext(),
+      sourceCode:
+        'include "String.aes"' +
+        '\n' +
+        '\ncontract Sign =' +
+        '\n  entrypoint int_to_binary (i: int): string =' +
+        '\n    switch(Char.from_int(i))' +
+        '\n      None => abort("Int is too big")' +
+        '\n      Some(c) => String.from_list([c])' +
+        '\n' +
+        '\n  entrypoint includes (str: string, pat: string): bool =' +
+        '\n    switch(String.contains(str, pat))' +
+        '\n      None => false' +
+        '\n      Some(_) => true' +
+        '\n' +
+        '\n  entrypoint message_to_hash (message: string): hash =' +
+        '\n    let prefix = "aeternity Signed Message:\\n"' +
+        '\n    let prefixBinary = String.concat(int_to_binary(String.length(prefix)), prefix)' +
+        '\n    let messageBinary = String.concat(int_to_binary(String.length(message)), message)' +
+        '\n    Crypto.blake2b(String.concat(prefixBinary, messageBinary))' +
+        '\n' +
+        '\n  entrypoint verify (message: string, pub: address, sig: signature): bool =' +
+        '\n    require(includes(message, "H"), "Invalid message")' +
+        '\n    Crypto.verify_sig(message_to_hash(message), pub, sig)',
+    });
     await signContract.$deploy([]);
 
-    await Promise.all(['Hello', 'H'.repeat(127)].map(async (message) => {
-      expect((await signContract.message_to_hash(message)).decodedResult)
-        .to.be.eql(messageToHash(message));
-      const signature = await aeSdk.signMessage(message);
-      expect((await signContract.verify(message, aeSdk.address, signature)).decodedResult)
-        .to.be.equal(true);
-    }));
+    await Promise.all(
+      ['Hello', 'H'.repeat(127)].map(async (message) => {
+        expect((await signContract.message_to_hash(message)).decodedResult).to.be.eql(
+          messageToHash(message),
+        );
+        const signature = await aeSdk.signMessage(message);
+        expect(
+          (await signContract.verify(message, aeSdk.address, signature)).decodedResult,
+        ).to.be.equal(true);
+      }),
+    );
   });
 
   it('Deploy and call contract on specific account', async () => {
@@ -140,11 +156,12 @@ describe('Contract', () => {
   it('throws error on deploy', async () => {
     const ct = await Contract.initialize({
       ...aeSdk.getContext(),
-      sourceCode:
-        'contract Foo =\n'
-        + '  entrypoint init() = abort("CustomErrorMessage")',
+      sourceCode: 'contract Foo =\n' + '  entrypoint init() = abort("CustomErrorMessage")',
     });
-    await expect(ct.$deploy([])).to.be.rejectedWith(NodeInvocationError, 'Invocation failed: "CustomErrorMessage"');
+    await expect(ct.$deploy([])).to.be.rejectedWith(
+      NodeInvocationError,
+      'Invocation failed: "CustomErrorMessage"',
+    );
   });
 
   it('throws errors on method call', async () => {
@@ -152,24 +169,26 @@ describe('Contract', () => {
       failWithoutMessage: (x: Encoded.AccountAddress) => void;
       failWithMessage: () => void;
     }>({
-          ...aeSdk.getContext(),
-          sourceCode:
-            'contract Foo =\n'
-            + '  payable stateful entrypoint failWithoutMessage(x : address) = Chain.spend(x, 1000000000)\n'
-            + '  payable stateful entrypoint failWithMessage() =\n'
-            + '    abort("CustomErrorMessage")',
-        });
+      ...aeSdk.getContext(),
+      sourceCode:
+        'contract Foo =\n' +
+        '  payable stateful entrypoint failWithoutMessage(x : address) = Chain.spend(x, 1000000000)\n' +
+        '  payable stateful entrypoint failWithMessage() =\n' +
+        '    abort("CustomErrorMessage")',
+    });
     await ct.$deploy([]);
-    await expect(ct.failWithoutMessage(aeSdk.address))
-      .to.be.rejectedWith('Invocation failed');
-    await expect(ct.failWithMessage())
-      .to.be.rejectedWith('Invocation failed: "CustomErrorMessage"');
+    await expect(ct.failWithoutMessage(aeSdk.address)).to.be.rejectedWith('Invocation failed');
+    await expect(ct.failWithMessage()).to.be.rejectedWith(
+      'Invocation failed: "CustomErrorMessage"',
+    );
   });
 
   it('Dry-run without accounts', async () => {
     const sdk = await getSdk(0);
     const contract = await Contract.initialize<IdentityContractApi>({
-      ...sdk.getContext(), sourceCode: identitySourceCode, address: deployed.address,
+      ...sdk.getContext(),
+      sourceCode: identitySourceCode,
+      address: deployed.address,
     });
     const { result } = await contract.getArg(42);
     assertNotNull(result);
@@ -179,17 +198,18 @@ describe('Contract', () => {
   it('Dry-run at specific height', async () => {
     const contract = await Contract.initialize<{ call: () => void }>({
       ...aeSdk.getContext(),
-      sourceCode: 'contract Callable =\n'
-        + '  record state = { wasCalled: bool }\n'
-        + '\n'
-        + '  entrypoint init() : state = { wasCalled = false }\n'
-        + '\n'
-        + '  stateful entrypoint call() =\n'
-        + '    require(!state.wasCalled, "Already called")\n'
-        + '    put(state{ wasCalled = true })\n',
+      sourceCode:
+        'contract Callable =\n' +
+        '  record state = { wasCalled: bool }\n' +
+        '\n' +
+        '  entrypoint init() : state = { wasCalled = false }\n' +
+        '\n' +
+        '  stateful entrypoint call() =\n' +
+        '    require(!state.wasCalled, "Already called")\n' +
+        '    put(state{ wasCalled = true })\n',
     });
     await contract.$deploy([]);
-    await aeSdk.awaitHeight(await aeSdk.getHeight() + 1);
+    await aeSdk.awaitHeight((await aeSdk.getHeight()) + 1);
     const beforeKeyBlockHeight = await aeSdk.getHeight();
     await aeSdk.spend(1, aeSdk.address);
     const topHeader = await aeSdk.api.getTopHeader();
@@ -235,24 +255,23 @@ describe('Contract', () => {
       init: (a: string) => void;
       retrieve: () => string;
     }>({
-          ...aeSdk.getContext(),
-          sourceCode:
-            'contract StateContract =\n'
-            + '  record state = { value: string }\n'
-            + '  entrypoint init(value) : state = { value = value }\n'
-            + '  entrypoint retrieve() : string = state.value',
-        });
+      ...aeSdk.getContext(),
+      sourceCode:
+        'contract StateContract =\n' +
+        '  record state = { value: string }\n' +
+        '  entrypoint init(value) : state = { value = value }\n' +
+        '  entrypoint retrieve() : string = state.value',
+    });
     const data = 'Hello World!';
     await contract.$deploy([data]);
     expect((await contract.retrieve()).decodedResult).to.be.equal(data);
   });
 
   describe('Namespaces', () => {
-    const contractWithLibSourceCode = (
-      'include "testLib"\n'
-      + 'contract ContractWithLib =\n'
-      + '  entrypoint sumNumbers(x: int, y: int) : int = TestLib.sum(x, y)'
-    );
+    const contractWithLibSourceCode =
+      'include "testLib"\n' +
+      'contract ContractWithLib =\n' +
+      '  entrypoint sumNumbers(x: int, y: int) : int = TestLib.sum(x, y)';
 
     let contract: Contract<{ sumNumbers: (x: number, y: number) => bigint }>;
 
@@ -261,9 +280,7 @@ describe('Contract', () => {
         ...aeSdk.getContext(),
         sourceCode: contractWithLibSourceCode,
         fileSystem: {
-          testLib:
-            'namespace TestLib =\n'
-            + '  function sum(x: int, y: int) : int = x + y',
+          testLib: 'namespace TestLib =\n' + '  function sum(x: int, y: int) : int = x + y',
         },
       });
       expect(await contract.$compile()).to.satisfy((b: string) => b.startsWith('cb_'));
@@ -272,7 +289,7 @@ describe('Contract', () => {
     it('Throw error when try to compile contract without providing external deps', async () => {
       await expect(
         Contract.initialize({ ...aeSdk.getContext(), sourceCode: contractWithLibSourceCode }),
-      ).to.be.rejectedWith('Couldn\'t find include file');
+      ).to.be.rejectedWith("Couldn't find include file");
     });
 
     it('Can deploy contract with external deps', async () => {
@@ -285,10 +302,10 @@ describe('Contract', () => {
     });
 
     it('Can call contract with external deps', async () => {
-      expect((await contract.sumNumbers(1, 2, { callStatic: false })).decodedResult)
-        .to.be.equal(3n);
-      expect((await contract.sumNumbers(1, 2, { callStatic: true })).decodedResult)
-        .to.be.equal(3n);
+      expect((await contract.sumNumbers(1, 2, { callStatic: false })).decodedResult).to.be.equal(
+        3n,
+      );
+      expect((await contract.sumNumbers(1, 2, { callStatic: true })).decodedResult).to.be.equal(3n);
     });
   });
 });

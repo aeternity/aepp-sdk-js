@@ -16,4 +16,4 @@ if (message1 !== message2 || message2 !== 'getaddrinfo ENOTFOUND 404.aeternity.i
   throw new Error('Invalid exception');
 }
 
-console.log('Failure of version check doesn\'t emit unhandled exception');
+console.log("Failure of version check doesn't emit unhandled exception");

@@ -4,13 +4,16 @@
     <div>
       <div>Contract Source Code</div>
       <div>
-        <textarea
-          v-model="contractSourceCode"
-          placeholder="Contact source code"
-        />
+        <textarea v-model="contractSourceCode" placeholder="Contact source code" />
       </div>
     </div>
-    <button @click="() => { createPromise = create(); }">
+    <button
+      @click="
+        () => {
+          createPromise = create();
+        }
+      "
+    >
       Create
     </button>
     <div v-if="createPromise">
@@ -97,7 +100,8 @@ export default {
       // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
       this.contract = shallowRef(
         await Contract.initialize({
-          ...this.aeSdk.getContext(), sourceCode: this.contractSourceCode,
+          ...this.aeSdk.getContext(),
+          sourceCode: this.contractSourceCode,
         }),
       );
     },

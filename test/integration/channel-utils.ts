@@ -1,7 +1,5 @@
 import { channelUrl } from '.';
-import {
-  Encoded, Channel, MemoryAccount, AeSdk,
-} from '../../src';
+import { Encoded, Channel, MemoryAccount, AeSdk } from '../../src';
 import { ChannelOptions, SignTxWithTag } from '../../src/channel/internal';
 
 export async function waitForChannel(channel: Channel, statuses: string[]): Promise<void> {
@@ -35,7 +33,11 @@ export const sharedParams = {
 };
 
 export async function initializeChannels(
-  initiatorParams: { role: 'initiator'; host: string; sign: SignTxWithTag } & Partial<ChannelOptions>,
+  initiatorParams: {
+    role: 'initiator';
+    host: string;
+    sign: SignTxWithTag;
+  } & Partial<ChannelOptions>,
   responderParams: { role: 'responder'; sign: SignTxWithTag } & Partial<ChannelOptions>,
 ): Promise<[Channel, Channel]> {
   const initiatorCh = await Channel.initialize({

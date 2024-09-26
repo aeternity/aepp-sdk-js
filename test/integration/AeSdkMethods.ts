@@ -2,9 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import { assertNotNull, ensureInstanceOf } from '../utils';
-import {
-  AeSdkMethods, AccountBase, MemoryAccount, Contract,
-} from '../../src';
+import { AeSdkMethods, AccountBase, MemoryAccount, Contract } from '../../src';
 
 describe('AeSdkMethods', () => {
   let accounts: AccountBase[];
@@ -30,9 +28,7 @@ describe('AeSdkMethods', () => {
   it('created contract remains connected to sdk', async () => {
     const contract = await Contract.initialize({
       ...aeSdkMethods.getContext(),
-      sourceCode: ''
-      + 'contract Identity =\n'
-      + '  entrypoint getArg(x : int) = x',
+      sourceCode: '' + 'contract Identity =\n' + '  entrypoint getArg(x : int) = x',
     });
     expect(contract.$options.onAccount?.address).to.be.eql(accounts[0].address);
     [, aeSdkMethods._options.onAccount] = accounts;
@@ -59,7 +55,10 @@ describe('AeSdkMethods', () => {
           _policies: [
             { policy: { name: 'proxyPolicy' }, options: {} },
             { policy: { name: 'decompressResponsePolicy' }, options: {} },
-            { policy: { name: 'formDataPolicy' }, options: { beforePolicies: ['multipartPolicy'] } },
+            {
+              policy: { name: 'formDataPolicy' },
+              options: { beforePolicies: ['multipartPolicy'] },
+            },
             { policy: { name: 'multipartPolicy' }, options: { afterPhase: 'Deserialize' } },
             { policy: { name: 'tracingPolicy' }, options: { afterPhase: 'Retry' } },
             { policy: { name: 'redirectPolicy' }, options: { afterPhase: 'Retry' } },
@@ -103,7 +102,10 @@ describe('AeSdkMethods', () => {
             _policies: [
               { policy: { name: 'proxyPolicy' }, options: {} },
               { policy: { name: 'decompressResponsePolicy' }, options: {} },
-              { policy: { name: 'formDataPolicy' }, options: { beforePolicies: ['multipartPolicy'] } },
+              {
+                policy: { name: 'formDataPolicy' },
+                options: { beforePolicies: ['multipartPolicy'] },
+              },
               { policy: { name: 'multipartPolicy' }, options: { afterPhase: 'Deserialize' } },
               { policy: { name: 'defaultRetryPolicy' }, options: { phase: 'Retry' } },
               { policy: { name: 'tracingPolicy' }, options: { afterPhase: 'Retry' } },

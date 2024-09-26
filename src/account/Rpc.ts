@@ -1,9 +1,7 @@
 import AccountBase from './Base';
 import { METHODS } from '../aepp-wallet-communication/schema';
 import { ArgumentError, UnsupportedProtocolError } from '../utils/errors';
-import {
-  Encoded, Encoding, decode, encode,
-} from '../utils/encoder';
+import { Encoded, Encoding, decode, encode } from '../utils/encoder';
 import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
 import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
 
@@ -27,8 +25,10 @@ export default class AccountRpc extends AccountBase {
 
   async sign(dataRaw: string | Uint8Array): Promise<Uint8Array> {
     const data = encode(Buffer.from(dataRaw), Encoding.Bytearray);
-    const { signature } = await this._rpcClient
-      .request(METHODS.unsafeSign, { onAccount: this.address, data });
+    const { signature } = await this._rpcClient.request(METHODS.unsafeSign, {
+      onAccount: this.address,
+      data,
+    });
     return decode(signature);
   }
 
@@ -51,22 +51,25 @@ export default class AccountRpc extends AccountBase {
   }
 
   override async signMessage(message: string): Promise<Uint8Array> {
-    const { signature } = await this._rpcClient
-      .request(METHODS.signMessage, { onAccount: this.address, message });
+    const { signature } = await this._rpcClient.request(METHODS.signMessage, {
+      onAccount: this.address,
+      message,
+    });
     return Buffer.from(signature, 'hex');
   }
 
   override async signTypedData(
     data: Encoded.ContractBytearray,
     aci: Parameters<AccountBase['signTypedData']>[1],
-    {
-      name, version, contractAddress, networkId,
-    }: Parameters<AccountBase['signTypedData']>[2] = {},
+    { name, version, contractAddress, networkId }: Parameters<AccountBase['signTypedData']>[2] = {},
   ): Promise<Encoded.Signature> {
     const { signature } = await this._rpcClient.request(METHODS.signTypedData, {
       onAccount: this.address,
       domain: {
-        name, version, networkId, contractAddress,
+        name,
+        version,
+        networkId,
+        contractAddress,
       },
       aci,
       data,
@@ -75,10 +78,10 @@ export default class AccountRpc extends AccountBase {
   }
 
   override async signDelegation(delegation: Encoded.Bytearray): Promise<Encoded.Signature> {
-    const { signature } = await this._rpcClient.request(
-      METHODS.signDelegation,
-      { delegation, onAccount: this.address },
-    );
+    const { signature } = await this._rpcClient.request(METHODS.signDelegation, {
+      delegation,
+      onAccount: this.address,
+    });
     return signature;
   }
 }

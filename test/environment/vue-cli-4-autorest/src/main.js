@@ -2,10 +2,12 @@
 import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk';
 
 const aeSdk = new AeSdk({
-  nodes: [{
-    name: 'testnet',
-    instance: new Node('https://testnet.aeternity.io'),
-  }],
+  nodes: [
+    {
+      name: 'testnet',
+      instance: new Node('https://testnet.aeternity.io'),
+    },
+  ],
 });
 
 (async () => {

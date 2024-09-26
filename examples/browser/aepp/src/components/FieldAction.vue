@@ -4,13 +4,16 @@
     <div v-if="argTitle">
       <div>{{ argTitle }}</div>
       <div>
-        <input
-          v-model="argValue"
-          :placeholder="argPlaceholder"
-        >
+        <input v-model="argValue" :placeholder="argPlaceholder" />
       </div>
     </div>
-    <button @click="() => { promise = actionHandler(argValue); }">
+    <button
+      @click="
+        () => {
+          promise = actionHandler(argValue);
+        }
+      "
+    >
       {{ actionTitle }}
     </button>
     <div v-if="promise">

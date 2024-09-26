@@ -1,5 +1,8 @@
-export type BinaryData = Buffer | Buffer[] | Buffer[][]
-| Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
+export type BinaryData =
+  | Buffer
+  | Buffer[]
+  | Buffer[][]
+  | Array<[Buffer, Array<[Buffer, Buffer[]]>]>;
 
 export interface Field {
   serialize: (value: any, options: any, parameters: any) => BinaryData;

@@ -39,7 +39,10 @@ import DataSign from './components/DataSign.vue';
 
 export default {
   components: {
-    Value, SpendCoins, MessageSign, DataSign,
+    Value,
+    SpendCoins,
+    MessageSign,
+    DataSign,
   },
   data: () => ({
     balancePromise: null,
@@ -54,7 +57,8 @@ export default {
       ([aeSdk, address]) => {
         this.compilerVersionPromise = aeSdk.compilerApi.version();
         this.balancePromise = address
-          ? aeSdk.getBalance(address) : Promise.reject(new Error('Address not available'));
+          ? aeSdk.getBalance(address)
+          : Promise.reject(new Error('Address not available'));
         this.heightPromise = aeSdk.getHeight();
         this.nodeInfoPromise = aeSdk.getNodeInfo();
       },

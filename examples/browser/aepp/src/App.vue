@@ -4,32 +4,16 @@
   <Connect />
 
   <div class="nav">
-    <a
-      href="#"
-      :class="{ active: view === 'Basic' }"
-      @click="view = 'Basic'"
-    >
+    <a href="#" :class="{ active: view === 'Basic' }" @click="view = 'Basic'">
       Basic functionality
     </a>
-    <a
-      href="#"
-      :class="{ active: view === 'Contracts' }"
-      @click="view = 'Contracts'"
-    >
+    <a href="#" :class="{ active: view === 'Contracts' }" @click="view = 'Contracts'">
       Smart contracts
     </a>
-    <a
-      href="#"
-      :class="{ active: view === 'PayForTx' }"
-      @click="view = 'PayForTx'"
-    >
+    <a href="#" :class="{ active: view === 'PayForTx' }" @click="view = 'PayForTx'">
       Pay for transaction
     </a>
-    <a
-      href="#"
-      :class="{ active: view === 'TypedData' }"
-      @click="view = 'TypedData'"
-    >
+    <a href="#" :class="{ active: view === 'TypedData' }" @click="view = 'TypedData'">
       Typed data
     </a>
     <a
@@ -39,19 +23,10 @@
     >
       Delegation signature
     </a>
-    <a
-      href="#"
-      :class="{ active: view === 'Jwt' }"
-      @click="view = 'Jwt'"
-    >
-      JWT
-    </a>
+    <a href="#" :class="{ active: view === 'Jwt' }" @click="view = 'Jwt'"> JWT </a>
   </div>
 
-  <Component
-    v-if="view"
-    :is="view"
-  />
+  <Component v-if="view" :is="view" />
 </template>
 
 <script>
@@ -65,7 +40,13 @@ import Jwt from './Jwt.vue';
 
 export default {
   components: {
-    Connect, Basic, Contracts, PayForTx, TypedData, DelegationSignature, Jwt,
+    Connect,
+    Basic,
+    Contracts,
+    PayForTx,
+    TypedData,
+    DelegationSignature,
+    Jwt,
   },
   data: () => ({ view: '' }),
 };

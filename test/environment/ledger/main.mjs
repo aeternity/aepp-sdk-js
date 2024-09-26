@@ -1,16 +1,19 @@
 import {
-  Node, AeSdk, CompilerHttp, AccountLedgerFactory, Contract,
-// eslint-disable-next-line import/extensions
+  Node,
+  AeSdk,
+  CompilerHttp,
+  AccountLedgerFactory,
+  Contract,
+  // eslint-disable-next-line import/extensions
 } from '../../../es/index.mjs';
 
 export default async function run(transport) {
   const accountFactory = new AccountLedgerFactory(transport);
 
   const account = await accountFactory.initialize(0);
-  const { status } = await fetch(
-    `https://faucet.aepps.com/account/${account.address}`,
-    { method: 'POST' },
-  );
+  const { status } = await fetch(`https://faucet.aepps.com/account/${account.address}`, {
+    method: 'POST',
+  });
   console.assert([200, 425].includes(status), 'Invalid faucet response code', status);
 
   const node = new Node('https://testnet.aeternity.io');
@@ -28,7 +31,8 @@ contract Test =
  entrypoint getArg(x : int) = x + 1
 `;
   const contract = await Contract.initialize({
-    ...aeSdk.getContext(), sourceCode: contractSourceCode,
+    ...aeSdk.getContext(),
+    sourceCode: contractSourceCode,
   });
   const deployInfo = await contract.$deploy([]);
   console.log('Contract deployed at', deployInfo.address);

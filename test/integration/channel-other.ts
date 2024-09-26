@@ -1,16 +1,15 @@
-import {
-  describe, it, before, beforeEach, afterEach,
-} from 'mocha';
+import { describe, it, before, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk, networkId, timeoutBlock } from '.';
-import {
-  unpackTx, Encoded, Tag, AeSdk, Channel, MemoryAccount,
-} from '../../src';
+import { unpackTx, Encoded, Tag, AeSdk, Channel, MemoryAccount } from '../../src';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull } from '../utils';
 import {
-  waitForChannel, sharedParams, initializeChannels, recreateAccounts,
+  waitForChannel,
+  sharedParams,
+  initializeChannels,
+  recreateAccounts,
 } from './channel-utils';
 
 describe('Channel other', () => {
@@ -19,12 +18,10 @@ describe('Channel other', () => {
   let responder: MemoryAccount;
   let initiatorCh: Channel;
   let responderCh: Channel;
-  const initiatorSign = async (tx: Encoded.Transaction): Promise<Encoded.Transaction> => (
-    initiator.signTransaction(tx, { networkId })
-  );
-  const responderSign = async (tx: Encoded.Transaction): Promise<Encoded.Transaction> => (
-    responder.signTransaction(tx, { networkId })
-  );
+  const initiatorSign = async (tx: Encoded.Transaction): Promise<Encoded.Transaction> =>
+    initiator.signTransaction(tx, { networkId });
+  const responderSign = async (tx: Encoded.Transaction): Promise<Encoded.Transaction> =>
+    responder.signTransaction(tx, { networkId });
   const initiatorParams = {
     role: 'initiator',
     host: 'localhost',
@@ -45,7 +42,9 @@ describe('Channel other', () => {
   before(async () => {
     aeSdk = await getSdk(3);
     await Promise.all(
-      aeSdk.addresses().slice(1)
+      aeSdk
+        .addresses()
+        .slice(1)
         .map(async (onAccount) => aeSdk.transferFunds(1, aeSdk.address, { onAccount })),
     );
   });
@@ -108,13 +107,21 @@ describe('Channel other', () => {
 
   it('can dispute via slash tx', async () => {
     const [initiatorBalanceBeforeClose, responderBalanceBeforeClose] = await getBalances();
-    const oldUpdate = await initiatorCh
-      .update(initiator.address, responder.address, 100, initiatorSign);
+    const oldUpdate = await initiatorCh.update(
+      initiator.address,
+      responder.address,
+      100,
+      initiatorSign,
+    );
     const oldPoi = await initiatorCh.poi({
       accounts: [initiator.address, responder.address],
     });
-    const recentUpdate = await initiatorCh
-      .update(initiator.address, responder.address, 100, initiatorSign);
+    const recentUpdate = await initiatorCh.update(
+      initiator.address,
+      responder.address,
+      100,
+      initiatorSign,
+    );
     const recentPoi = await responderCh.poi({
       accounts: [initiator.address, responder.address],
     });
@@ -204,9 +211,7 @@ describe('Channel other', () => {
       initiator.address,
       responder.address,
       100,
-      async (transaction) => (
-        appendSignature(await responderSign(transaction), initiatorSign)
-      ),
+      async (transaction) => appendSignature(await responderSign(transaction), initiatorSign),
     );
     result.accepted.should.equal(true);
     expect(responderCh.round()).to.be.equal(2);

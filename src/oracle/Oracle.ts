@@ -1,26 +1,24 @@
 import { buildTxAsync, BuildTxOptions } from '../tx/builder';
 import { Tag } from '../tx/builder/constants';
 import { LogicError, UnexpectedTsError } from '../utils/errors';
-import {
-  decode, encode, Encoded, Encoding,
-} from '../utils/encoder';
+import { decode, encode, Encoded, Encoding } from '../utils/encoder';
 import { _getPollInterval } from '../chain';
 import { sendTransaction, SendTransactionOptions } from '../send-transaction';
 import Node from '../Node';
 import AccountBase from '../account/Base';
 import OracleBase, { OracleQuery, decodeQuery } from './OracleBase';
 
-interface OracleRegisterOptions extends
-  BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat'>,
-  Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
+interface OracleRegisterOptions
+  extends BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat'>,
+    Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
-interface OracleExtendTtlOptions extends
-  BuildTxOptions<Tag.OracleExtendTx, 'callerId' | 'oracleId'>,
-  Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
+interface OracleExtendTtlOptions
+  extends BuildTxOptions<Tag.OracleExtendTx, 'callerId' | 'oracleId'>,
+    Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
-interface OracleRespondToQueryOptions extends
-  BuildTxOptions<Tag.OracleResponseTx, 'callerId' | 'oracleId' | 'queryId' | 'response'>,
-  Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
+interface OracleRespondToQueryOptions
+  extends BuildTxOptions<Tag.OracleResponseTx, 'callerId' | 'oracleId' | 'queryId' | 'response'>,
+    Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
 /**
  * @category oracle
@@ -32,8 +30,9 @@ export default class Oracle extends OracleBase {
    */
   constructor(
     public readonly account: AccountBase,
-    public override options: OracleRegisterOptions & OracleExtendTtlOptions &
-    Parameters<Oracle['handleQueries']>[1] & { onNode: Node },
+    public override options: OracleRegisterOptions &
+      OracleExtendTtlOptions &
+      Parameters<Oracle['handleQueries']>[1] & { onNode: Node },
   ) {
     super(encode(decode(account.address), Encoding.OracleAddress), options);
   }
@@ -86,8 +85,9 @@ export default class Oracle extends OracleBase {
    */
   pollQueries(
     onQuery: (query: OracleQuery) => void,
-    options: { interval?: number; includeResponded?: boolean } &
-    Partial<Parameters<typeof _getPollInterval>[1]> = {},
+    options: { interval?: number; includeResponded?: boolean } & Partial<
+      Parameters<typeof _getPollInterval>[1]
+    > = {},
   ): () => void {
     const opt = { ...this.options, ...options };
     const knownQueryIds = new Set();
@@ -108,7 +108,7 @@ export default class Oracle extends OracleBase {
 
     checkNewQueries();
     const idPromise = (async () => {
-      const interval = opt.interval ?? await _getPollInterval('micro-block', opt);
+      const interval = opt.interval ?? (await _getPollInterval('micro-block', opt));
       return setInterval(async () => checkNewQueries(), interval);
     })();
 
@@ -155,30 +155,37 @@ export default class Oracle extends OracleBase {
     options: Parameters<Oracle['pollQueries']>[1] & OracleRespondToQueryOptions = {},
   ): () => void {
     if (this.#handleQueriesPromise != null) {
-      throw new LogicError('Another query handler already running, it needs to be stopped to run a new one');
+      throw new LogicError(
+        'Another query handler already running, it needs to be stopped to run a new one',
+      );
     }
     const opt = { ...this.options, ...options };
 
     let queuePromise = Promise.resolve();
     const handler = async (q: OracleQuery): Promise<void> => {
       const response = await getResponse(q);
-      const respondPromise = queuePromise
-        .then(async () => this.respondToQuery(q.id, response, opt));
-      queuePromise = respondPromise.then(() => {}, () => {});
+      const respondPromise = queuePromise.then(async () =>
+        this.respondToQuery(q.id, response, opt),
+      );
+      queuePromise = respondPromise.then(
+        () => {},
+        () => {},
+      );
       await respondPromise;
     };
 
     this.#handleQueriesPromise = Promise.resolve();
-    const stopPoll = this.pollQueries(
-      async (query: OracleQuery) => {
-        const promise = handler(query);
-        if (this.#handleQueriesPromise == null) throw new UnexpectedTsError();
-        this.#handleQueriesPromise = this.#handleQueriesPromise
-          .then(async () => promise).then(() => {}, () => {});
-        return promise;
-      },
-      opt,
-    );
+    const stopPoll = this.pollQueries(async (query: OracleQuery) => {
+      const promise = handler(query);
+      if (this.#handleQueriesPromise == null) throw new UnexpectedTsError();
+      this.#handleQueriesPromise = this.#handleQueriesPromise
+        .then(async () => promise)
+        .then(
+          () => {},
+          () => {},
+        );
+      return promise;
+    }, opt);
 
     return async () => {
       stopPoll();

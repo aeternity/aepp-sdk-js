@@ -28,19 +28,19 @@ export async function spend(
       ...options,
       tag: Tag.SpendTx,
       senderId: options.onAccount.address,
-      recipientId: await resolveName(
-        recipientIdOrName,
-        'account_pubkey',
-        options,
-      ),
+      recipientId: await resolveName(recipientIdOrName, 'account_pubkey', options),
       amount,
     }),
     options,
   );
 }
 
-type SpendOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount' | 'onNode'>
-& ResolveNameOptions & SendTransactionOptions;
+type SpendOptionsType = BuildTxOptions<
+  Tag.SpendTx,
+  'senderId' | 'recipientId' | 'amount' | 'onNode'
+> &
+  ResolveNameOptions &
+  SendTransactionOptions;
 interface SpendOptions extends SpendOptionsType {}
 
 // TODO: Rename to spendFraction
@@ -69,15 +69,9 @@ export async function transferFunds(
   if (+fraction < 0 || +fraction > 1) {
     throw new ArgumentError('fraction', 'a number between 0 and 1', fraction);
   }
-  const recipientId = await resolveName(
-    recipientIdOrName,
-    'account_pubkey',
-    options,
-  );
+  const recipientId = await resolveName(recipientIdOrName, 'account_pubkey', options);
   const senderId = options.onAccount.address;
-  const balance = new BigNumber(
-    await getBalance.bind(options.onAccount)(senderId, options),
-  );
+  const balance = new BigNumber(await getBalance.bind(options.onAccount)(senderId, options));
   const desiredAmount = balance.times(fraction).integerValue(BigNumber.ROUND_HALF_UP);
   const { fee } = unpackTx(
     await buildTxAsync({
@@ -105,8 +99,12 @@ export async function transferFunds(
   );
 }
 
-type TransferFundsOptionsType = BuildTxOptions<Tag.SpendTx, 'senderId' | 'recipientId' | 'amount' | 'onNode'>
-& ResolveNameOptions & SendTransactionOptions;
+type TransferFundsOptionsType = BuildTxOptions<
+  Tag.SpendTx,
+  'senderId' | 'recipientId' | 'amount' | 'onNode'
+> &
+  ResolveNameOptions &
+  SendTransactionOptions;
 interface TransferFundsOptions extends TransferFundsOptionsType {}
 
 /**
@@ -132,5 +130,6 @@ export async function payForTransaction(
   );
 }
 
-interface PayForTransactionOptions extends
-  BuildTxOptions<Tag.PayingForTx, 'payerId' | 'tx' | 'onNode'>, SendTransactionOptions {}
+interface PayForTransactionOptions
+  extends BuildTxOptions<Tag.PayingForTx, 'payerId' | 'tx' | 'onNode'>,
+    SendTransactionOptions {}

@@ -5,7 +5,7 @@ This guide describes the 4 steps that are necessary to connect your application 
 ## Prerequisites
 
 - Install [Superhero Wallet extension](https://wallet.superhero.com/) for simplicity of example.
-You can build your own wallet in the next example
+  You can build your own wallet in the next example
 
 ## 1. Specify imports and constants
 
@@ -23,10 +23,11 @@ Alternatively, aepp can request wallet to share node url it connected to. If agr
 connect to the wallet's node.
 
 ```js
-await this.aeSdk.connectToWallet(
-  wallet.getConnection(),
-  { connectNode: true, name: 'wallet-node', select: true },
-);
+await this.aeSdk.connectToWallet(wallet.getConnection(), {
+  connectNode: true,
+  name: 'wallet-node',
+  select: true,
+});
 ```
 
 It can be used to

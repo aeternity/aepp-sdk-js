@@ -4,16 +4,17 @@ import Node from '../../../Node';
 
 export default {
   _getProtocolDetails(c: ConsensusProtocolVersion, tag: Tag): AbiVersion {
-    const kind = Tag.ContractCallTx === tag || Tag.GaMetaTx === tag
-      ? 'contract-call' : 'oracle-call';
+    const kind =
+      Tag.ContractCallTx === tag || Tag.GaMetaTx === tag ? 'contract-call' : 'oracle-call';
     return getProtocolDetails(c, kind).abiVersion;
   },
 
   serialize(
     value: AbiVersion | undefined,
     { tag }: { tag: Tag },
-    { consensusProtocolVersion = ConsensusProtocolVersion.Ceres }:
-    { consensusProtocolVersion?: ConsensusProtocolVersion },
+    {
+      consensusProtocolVersion = ConsensusProtocolVersion.Ceres,
+    }: { consensusProtocolVersion?: ConsensusProtocolVersion },
   ): Buffer {
     const result = value ?? this._getProtocolDetails(consensusProtocolVersion, tag);
 

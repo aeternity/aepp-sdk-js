@@ -20,17 +20,17 @@ import Node from './Node';
 import AccountBase from './account/Base';
 import { AddressEncodings } from './tx/builder/field-types/address';
 
-interface NameRevokeOptions extends
-  BuildTxOptions<Tag.NameRevokeTx, 'nameId' | 'accountId'>,
-  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
+interface NameRevokeOptions
+  extends BuildTxOptions<Tag.NameRevokeTx, 'nameId' | 'accountId'>,
+    Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
 interface KeyPointers {
   [key: string]: Encoded.Generic<AddressEncodings | Encoding.Bytearray>;
 }
 
-interface NameUpdateOptions extends
-  BuildTxOptions<Tag.NameUpdateTx, 'nameId' | 'accountId' | 'pointers'>,
-  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {
+interface NameUpdateOptions
+  extends BuildTxOptions<Tag.NameUpdateTx, 'nameId' | 'accountId' | 'pointers'>,
+    Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {
   /**
    * Get the pointers from the node and merge with provided ones. Pointers with the same key will be
    * overwritten.
@@ -38,17 +38,17 @@ interface NameUpdateOptions extends
   extendPointers?: boolean;
 }
 
-interface NameTransferOptions extends
-  BuildTxOptions<Tag.NameTransferTx, 'nameId' | 'accountId' | 'recipientId'>,
-  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
+interface NameTransferOptions
+  extends BuildTxOptions<Tag.NameTransferTx, 'nameId' | 'accountId' | 'recipientId'>,
+    Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
-interface NamePreclaimOptions extends
-  BuildTxOptions<Tag.NamePreclaimTx, 'accountId' | 'commitmentId'>,
-  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
+interface NamePreclaimOptions
+  extends BuildTxOptions<Tag.NamePreclaimTx, 'accountId' | 'commitmentId'>,
+    Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
-interface NameClaimOptions extends
-  BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'nameSalt' | 'name'>,
-  Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
+interface NameClaimOptions
+  extends BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'nameSalt' | 'name'>,
+    Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
 /**
  * @category AENS
@@ -68,8 +68,14 @@ export default class Name {
    */
   constructor(
     public readonly value: AensName,
-    public options: { onNode: Node; onAccount: AccountBase } & Omit<NameRevokeOptions &
-    NameUpdateOptions & NameTransferOptions & NamePreclaimOptions & NameClaimOptions, 'version'>,
+    public options: { onNode: Node; onAccount: AccountBase } & Omit<
+      NameRevokeOptions &
+        NameUpdateOptions &
+        NameTransferOptions &
+        NamePreclaimOptions &
+        NameClaimOptions,
+      'version'
+    >,
   ) {
     this.options = options;
   }
@@ -117,14 +123,16 @@ export default class Name {
   ): ReturnType<typeof sendTransaction> {
     const { extendPointers, ...opt } = { ...this.options, ...options };
     const allPointers = {
-      ...extendPointers === true && Object.fromEntries(
-        (await getName(this.value, opt)).pointers.map(({ key, id }) => [key, id]),
-      ),
+      ...(extendPointers === true &&
+        Object.fromEntries(
+          (await getName(this.value, opt)).pointers.map(({ key, id }) => [key, id]),
+        )),
       ...pointers,
     };
 
-    const hasRawPointers = Object.values(allPointers)
-      .some((v) => isAddressValid(v, Encoding.Bytearray));
+    const hasRawPointers = Object.values(allPointers).some((v) =>
+      isAddressValid(v, Encoding.Bytearray),
+    );
 
     const tx = await buildTxAsync({
       _isInternalBuild: true,
@@ -133,8 +141,9 @@ export default class Name {
       version: hasRawPointers ? 2 : 1,
       nameId: this.value,
       accountId: opt.onAccount.address,
-      pointers: Object.entries(allPointers)
-        .map(([key, id]: [string, Encoded.Generic<AddressEncodings>]) => ({ key, id })),
+      pointers: Object.entries(allPointers).map(
+        ([key, id]: [string, Encoded.Generic<AddressEncodings>]) => ({ key, id }),
+      ),
     });
     return sendTransaction(tx, opt);
   }
@@ -176,10 +185,10 @@ export default class Name {
    * ```
    */
   async getState(options: { onNode?: Node } = {}): Promise<
-  Awaited<ReturnType<Node['getNameEntryByName']>> & {
-    id: Encoded.Name;
-    owner: Encoded.AccountAddress;
-  }
+    Awaited<ReturnType<Node['getNameEntryByName']>> & {
+      id: Encoded.Name;
+      owner: Encoded.AccountAddress;
+    }
   > {
     const onNode = this.options.onNode ?? options.onNode;
     const nameEntry = await onNode.getNameEntryByName(this.value);

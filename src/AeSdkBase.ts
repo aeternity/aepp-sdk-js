@@ -1,7 +1,11 @@
 import Node from './Node';
 import AccountBase from './account/Base';
 import {
-  CompilerError, DuplicateNodeError, NodeNotFoundError, NotImplementedError, TypeError,
+  CompilerError,
+  DuplicateNodeError,
+  NodeNotFoundError,
+  NotImplementedError,
+  TypeError,
 } from './utils/errors';
 import { Encoded } from './utils/encoder';
 import { wrapWithProxy } from './utils/wrap-proxy';
@@ -27,11 +31,12 @@ export default class AeSdkBase extends AeSdkMethods {
    * @param options - Options
    * @param options.nodes - Array of nodes
    */
-  constructor(
-    { nodes = [], ...options }: AeSdkMethodsOptions & {
-      nodes?: Array<{ name: string; instance: Node }>;
-    } = {},
-  ) {
+  constructor({
+    nodes = [],
+    ...options
+  }: AeSdkMethodsOptions & {
+    nodes?: Array<{ name: string; instance: Node }>;
+  } = {}) {
     super(options);
 
     nodes.forEach(({ name, instance }, i) => this.addNode(name, instance, i === 0));
@@ -48,7 +53,7 @@ export default class AeSdkBase extends AeSdkMethods {
   // and user creates its instance by himself
   get compilerApi(): CompilerBase {
     if (this._options.onCompiler == null) {
-      throw new CompilerError('You can\'t use Compiler API. Compiler is not ready!');
+      throw new CompilerError("You can't use Compiler API. Compiler is not ready!");
     }
     return this._options.onCompiler;
   }
@@ -100,7 +105,7 @@ export default class AeSdkBase extends AeSdkMethods {
 
   protected ensureNodeConnected(): asserts this is AeSdkBase & { selectedNodeName: string } {
     if (!this.isNodeConnected()) {
-      throw new NodeNotFoundError('You can\'t use Node API. Node is not connected or not defined!');
+      throw new NodeNotFoundError("You can't use Node API. Node is not connected or not defined!");
     }
   }
 
@@ -115,7 +120,7 @@ export default class AeSdkBase extends AeSdkMethods {
     this.ensureNodeConnected();
     return {
       name: this.selectedNodeName,
-      ...await this.api.getNodeInfo(),
+      ...(await this.api.getNodeInfo()),
     };
   }
 
@@ -128,7 +133,7 @@ export default class AeSdkBase extends AeSdkMethods {
     return Promise.all(
       Array.from(this.pool.entries()).map(async ([name, node]) => ({
         name,
-        ...await node.getNodeInfo(),
+        ...(await node.getNodeInfo()),
       })),
     );
   }
@@ -146,8 +151,8 @@ export default class AeSdkBase extends AeSdkMethods {
     if (typeof account === 'string') throw new NotImplementedError('Address in AccountResolver');
     if (typeof account === 'object') return account;
     throw new TypeError(
-      'Account should be an address (ak-prefixed string), '
-      + `or instance of AccountBase, got ${String(account)} instead`,
+      'Account should be an address (ak-prefixed string), ' +
+        `or instance of AccountBase, got ${String(account)} instead`,
     );
   }
 
@@ -174,7 +179,10 @@ export default class AeSdkBase extends AeSdkMethods {
    */
   async signTransaction(
     tx: Encoded.Transaction,
-    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTransaction']>[1] = {},
+    {
+      onAccount,
+      ...options
+    }: { onAccount?: OnAccount } & Parameters<AccountBase['signTransaction']>[1] = {},
   ): Promise<Encoded.Transaction> {
     const networkId = this.selectedNodeName !== null ? await this.api.getNetworkId() : undefined;
     return this._resolveAccount(onAccount).signTransaction(tx, { networkId, ...options });
@@ -187,7 +195,10 @@ export default class AeSdkBase extends AeSdkMethods {
    */
   async signMessage(
     message: string,
-    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signMessage']>[1] = {},
+    {
+      onAccount,
+      ...options
+    }: { onAccount?: OnAccount } & Parameters<AccountBase['signMessage']>[1] = {},
   ): Promise<Uint8Array> {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
@@ -201,7 +212,10 @@ export default class AeSdkBase extends AeSdkMethods {
   async signTypedData(
     data: Encoded.ContractBytearray,
     aci: Parameters<AccountBase['signTypedData']>[1],
-    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTypedData']>[2] = {},
+    {
+      onAccount,
+      ...options
+    }: { onAccount?: OnAccount } & Parameters<AccountBase['signTypedData']>[2] = {},
   ): Promise<Encoded.Signature> {
     return this._resolveAccount(onAccount).signTypedData(data, aci, options);
   }
@@ -213,11 +227,13 @@ export default class AeSdkBase extends AeSdkMethods {
    */
   async signDelegation(
     delegation: Encoded.Bytearray,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signDelegation']>[1] = {},
+    {
+      onAccount,
+      ...options
+    }: { onAccount?: OnAccount } & Parameters<AccountBase['signDelegation']>[1] = {},
   ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
+    options.networkId ??=
+      this.selectedNodeName !== null ? await this.api.getNetworkId() : undefined;
     return this._resolveAccount(onAccount).signDelegation(delegation, options);
   }
 
@@ -230,9 +246,9 @@ export default class AeSdkBase extends AeSdkMethods {
       ...this._options,
       ...this.#wrappedOptions,
       ...mergeWith,
-      ...mergeWith.onAccount != null && {
+      ...(mergeWith.onAccount != null && {
         onAccount: this._resolveAccount(mergeWith.onAccount),
-      },
+      }),
     };
   }
 }

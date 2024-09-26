@@ -1,10 +1,18 @@
 import { OperationArguments, OperationOptions, OperationSpec } from '@azure/core-client';
 import { userAgentPolicyName, setClientRequestIdPolicyName } from '@azure/core-rest-pipeline';
 import {
-  genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
-  parseBigIntPolicy, genVersionCheckPolicy, genRetryOnFailurePolicy,
+  genRequestQueuesPolicy,
+  genCombineGetRequestsPolicy,
+  genErrorFormatterPolicy,
+  parseBigIntPolicy,
+  genVersionCheckPolicy,
+  genRetryOnFailurePolicy,
 } from './utils/autorest';
-import { Middleware as MiddlewareApi, MiddlewareOptionalParams, ErrorResponse } from './apis/middleware';
+import {
+  Middleware as MiddlewareApi,
+  MiddlewareOptionalParams,
+  ErrorResponse,
+} from './apis/middleware';
 import { operationSpecs } from './apis/middleware/middleware';
 import { IllegalArgumentError, InternalError } from './utils/errors';
 import { MiddlewarePage, isMiddlewareRawPage } from './utils/MiddlewarePage';
@@ -20,7 +28,10 @@ export default class Middleware extends MiddlewareApi {
   constructor(
     url: string,
     {
-      ignoreVersion = false, retryCount = 3, retryOverallDelay = 800, ...options
+      ignoreVersion = false,
+      retryCount = 3,
+      retryOverallDelay = 800,
+      ...options
     }: MiddlewareOptionalParams & {
       ignoreVersion?: boolean;
       retryCount?: number;
@@ -38,9 +49,9 @@ export default class Middleware extends MiddlewareApi {
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        ...ignoreVersion ? [] : [
-          genVersionCheckPolicy('middleware', getVersion, '1.81.0', '2.0.0'),
-        ],
+        ...(ignoreVersion
+          ? []
+          : [genVersionCheckPolicy('middleware', getVersion, '1.81.0', '2.0.0')]),
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
@@ -81,22 +92,26 @@ export default class Middleware extends MiddlewareApi {
       throw new IllegalArgumentError(`Can't find operation spec corresponding to ${path}`);
     }
 
-    return this.sendOperationRequest({}, {
-      ...operationSpec,
-      path,
-      urlParameters: operationSpec.urlParameters
-        ?.filter(({ parameterPath }) => parameterPath === '$host'),
-      queryParameters: Array.from(new URLSearchParams(query)).map(([key, value]) => ({
-        parameterPath: ['options', key],
-        mapper: {
-          defaultValue: value.toString(),
-          serializedName: key,
-          type: {
-            name: 'String',
+    return this.sendOperationRequest(
+      {},
+      {
+        ...operationSpec,
+        path,
+        urlParameters: operationSpec.urlParameters?.filter(
+          ({ parameterPath }) => parameterPath === '$host',
+        ),
+        queryParameters: Array.from(new URLSearchParams(query)).map(([key, value]) => ({
+          parameterPath: ['options', key],
+          mapper: {
+            defaultValue: value.toString(),
+            serializedName: key,
+            type: {
+              name: 'String',
+            },
           },
-        },
-      })),
-    });
+        })),
+      },
+    );
   }
 
   override async sendOperationRequest<T>(

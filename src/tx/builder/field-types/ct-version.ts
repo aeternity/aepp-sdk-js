@@ -8,13 +8,16 @@ import Node from '../../../Node';
 export const ProtocolToVmAbi = {
   [ConsensusProtocolVersion.Ceres]: {
     'contract-create': {
-      vmVersion: [VmVersion.Fate3], abiVersion: [AbiVersion.Fate],
+      vmVersion: [VmVersion.Fate3],
+      abiVersion: [AbiVersion.Fate],
     },
     'contract-call': {
-      vmVersion: [], abiVersion: [AbiVersion.Fate],
+      vmVersion: [],
+      abiVersion: [AbiVersion.Fate],
     },
     'oracle-call': {
-      vmVersion: [], abiVersion: [AbiVersion.NoAbi, AbiVersion.Fate],
+      vmVersion: [],
+      abiVersion: [AbiVersion.NoAbi, AbiVersion.Fate],
     },
   },
 } as const;
@@ -39,8 +42,9 @@ export default {
   serialize(
     value: CtVersion | undefined,
     params: {},
-    { consensusProtocolVersion = ConsensusProtocolVersion.Ceres }:
-    { consensusProtocolVersion?: ConsensusProtocolVersion },
+    {
+      consensusProtocolVersion = ConsensusProtocolVersion.Ceres,
+    }: { consensusProtocolVersion?: ConsensusProtocolVersion },
   ): Buffer {
     value ??= getProtocolDetails(consensusProtocolVersion, 'contract-create');
 

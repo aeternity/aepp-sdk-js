@@ -7,12 +7,14 @@ The whole idea is heavily inspired by [EIP-712](https://eips.ethereum.org/EIPS/e
 `hash` function is `blake2b`.
 
 `domain` is a record containing not required properties:
+
 - `name` as string,
 - `version` as integer,
 - `networkId` as string,
 - `contractAddress` as ct-encoded string.
 
 `aci` is part of a complete contract ACI. It defines a type of data to sign. For example, the ACI
+
 ```json
 {
   "record": [
@@ -21,7 +23,9 @@ The whole idea is heavily inspired by [EIP-712](https://eips.ethereum.org/EIPS/e
   ]
 }
 ```
+
 corresponds to the data
+
 ```json
 { "foo": "test", "bar": 42 }
 ```

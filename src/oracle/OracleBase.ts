@@ -1,7 +1,9 @@
 import { decode, Encoded } from '../utils/encoder';
 import Node from '../Node';
 
-type OracleQueryNode = Awaited<ReturnType<Node['getOracleQueriesByPubkey']>>['oracleQueries'][number];
+type OracleQueryNode = Awaited<
+  ReturnType<Node['getOracleQueriesByPubkey']>
+>['oracleQueries'][number];
 export interface OracleQuery extends OracleQueryNode {
   // TODO: type should be corrected in node api
   id: Encoded.OracleQueryId;

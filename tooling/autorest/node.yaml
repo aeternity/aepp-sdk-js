@@ -12,8 +12,7 @@ directive:
         oneOf: undefined,
         ...utilization.oneOf.find(({ type }) => type === 'integer'),
       });
-    reason:
-      fix parsing of big numbers
+    reason: fix parsing of big numbers
       remove after fixing https://github.com/aeternity/aeternity/issues/3891
 
   - from: openapi-document

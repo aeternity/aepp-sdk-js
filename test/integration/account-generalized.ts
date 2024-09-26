@@ -9,7 +9,8 @@ import {
   Tag,
   unpackTx,
   buildTx,
-  Contract, ContractMethodsBase,
+  Contract,
+  ContractMethodsBase,
   MIN_GAS_PRICE,
   Encoded,
   ArgumentError,
@@ -52,30 +53,38 @@ describe('Generalized Account', () => {
     const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', [], { sourceCode });
     expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.be.equal('generalized');
     authContract = await Contract.initialize({
-      ...aeSdk.getContext(), sourceCode, address: gaContractId,
+      ...aeSdk.getContext(),
+      sourceCode,
+      address: gaContractId,
     });
   });
 
   it('Fail on make GA on already GA', async () => {
-    await aeSdk.createGeneralizedAccount('authorize', [], { sourceCode })
+    await aeSdk
+      .createGeneralizedAccount('authorize', [], { sourceCode })
       .should.be.rejectedWith(`Account ${gaAccountAddress} is already GA`);
   });
 
   it('fails to build GaAttachTx with non-1 nonce', () => {
-    expect(() => buildTx({
-      tag: Tag.GaAttachTx,
-      version: 1,
-      ownerId: 'ak_Yd9EiaBy8GNXWLkMuH53H9hiCyEuL3RKxN4wYKhN8xDnjKRpb',
-      nonce: 2,
-      code: 'cb_+LJGA6BFoqzc6YC/ewZLk3eumqCWL/K7O2Wqy+x14Zbcx4rB0MC4hbhV/kTWRB8ANwA3ABoOgq+CAAEAPwEDP/5s8lcLADcBBxd3AoJ3AAg8AgT7A01Ob3QgaW4gQXV0aCBjb250ZXh0AQP//qsVVmEANwCHAjcANwGXQAECgqovAxFE1kQfEWluaXQRbPJXCyVhdXRob3JpemURqxVWYSVnZXRUeEhhc2iCLwCFOC4wLjAAdzf5cQ==',
-      authFun: Buffer.from('6cf2570b0a1599b708291e50aa3daf13d0c7f2484bc337ddad2413a37fd4a009', 'hex'),
-      ctVersion: { vmVersion: 8, abiVersion: 3 },
-      fee: '80620000000000',
-      ttl: 0,
-      gasLimit: 107,
-      gasPrice: '1000000000',
-      callData: 'cb_KxFE1kQfP4oEp9E=',
-    })).to.throw(ArgumentError, 'nonce should be equal 1 if GaAttachTx, got 2 instead');
+    expect(() =>
+      buildTx({
+        tag: Tag.GaAttachTx,
+        version: 1,
+        ownerId: 'ak_Yd9EiaBy8GNXWLkMuH53H9hiCyEuL3RKxN4wYKhN8xDnjKRpb',
+        nonce: 2,
+        code: 'cb_+LJGA6BFoqzc6YC/ewZLk3eumqCWL/K7O2Wqy+x14Zbcx4rB0MC4hbhV/kTWRB8ANwA3ABoOgq+CAAEAPwEDP/5s8lcLADcBBxd3AoJ3AAg8AgT7A01Ob3QgaW4gQXV0aCBjb250ZXh0AQP//qsVVmEANwCHAjcANwGXQAECgqovAxFE1kQfEWluaXQRbPJXCyVhdXRob3JpemURqxVWYSVnZXRUeEhhc2iCLwCFOC4wLjAAdzf5cQ==',
+        authFun: Buffer.from(
+          '6cf2570b0a1599b708291e50aa3daf13d0c7f2484bc337ddad2413a37fd4a009',
+          'hex',
+        ),
+        ctVersion: { vmVersion: 8, abiVersion: 3 },
+        fee: '80620000000000',
+        ttl: 0,
+        gasLimit: 107,
+        gasPrice: '1000000000',
+        callData: 'cb_KxFE1kQfP4oEp9E=',
+      }),
+    ).to.throw(ArgumentError, 'nonce should be equal 1 if GaAttachTx, got 2 instead');
   });
 
   const recipient = MemoryAccount.generate().address;
@@ -93,23 +102,27 @@ describe('Generalized Account', () => {
 
   it('throws error if gasLimit exceeds the maximum value', async () => {
     const authData = { sourceCode, args: [genSalt()], gasLimit: 50001 };
-    await expect(aeSdk.spend(10000, recipient, { authData }))
-      .to.be.rejectedWith('Gas limit 50001 must be less or equal to 50000');
+    await expect(aeSdk.spend(10000, recipient, { authData })).to.be.rejectedWith(
+      'Gas limit 50001 must be less or equal to 50000',
+    );
   });
 
   it('buildAuthTxHash generates a proper hash', async () => {
-    const { rawTx } = await aeSdk
-      .spend(10000, recipient, { authData: { sourceCode, args: [genSalt()] } });
+    const { rawTx } = await aeSdk.spend(10000, recipient, {
+      authData: { sourceCode, args: [genSalt()] },
+    });
 
-    expect(new Uint8Array(await aeSdk.buildAuthTxHashByGaMetaTx(rawTx))).to.be
-      .eql((await authContract.getTxHash()).decodedResult);
+    expect(new Uint8Array(await aeSdk.buildAuthTxHashByGaMetaTx(rawTx))).to.be.eql(
+      (await authContract.getTxHash()).decodedResult,
+    );
 
     const gaMetaTxParams = unpackTx(rawTx, Tag.SignedTx).encodedTx;
     ensureEqual<Tag.GaMetaTx>(gaMetaTxParams.tag, Tag.GaMetaTx);
     const spendTx = buildTx(gaMetaTxParams.tx.encodedTx);
     const { fee, gasPrice } = gaMetaTxParams;
-    expect(new Uint8Array(await aeSdk.buildAuthTxHash(spendTx, { fee, gasPrice }))).to.be
-      .eql((await authContract.getTxHash()).decodedResult);
+    expect(new Uint8Array(await aeSdk.buildAuthTxHash(spendTx, { fee, gasPrice }))).to.be.eql(
+      (await authContract.getTxHash()).decodedResult,
+    );
   });
 
   it('accepts a function in authData', async () => {
@@ -120,7 +133,10 @@ describe('Generalized Account', () => {
       authData: async (tx) => {
         spendTx = tx;
         return {
-          sourceCode, args: [genSalt()], fee, gasPrice,
+          sourceCode,
+          args: [genSalt()],
+          fee,
+          gasPrice,
         };
       },
     });
@@ -132,8 +148,9 @@ describe('Generalized Account', () => {
   });
 
   it('fails trying to send SignedTx using generalized account', async () => {
-    await expect(aeSdk.spend(1, gaAccountAddress, { onAccount: accountBeforeGa })).to.be
-      .rejectedWith('Generalized account can\'t be used to generate SignedTx with signatures');
+    await expect(
+      aeSdk.spend(1, gaAccountAddress, { onAccount: accountBeforeGa }),
+    ).to.be.rejectedWith("Generalized account can't be used to generate SignedTx with signatures");
   });
 
   it('fails trying to send GaMeta using basic account', async () => {
@@ -141,8 +158,9 @@ describe('Generalized Account', () => {
       onAccount: new AccountGeneralized(recipient),
       authData: { callData: 'cb_KxFs8lcLG2+HEPb2FOjjZ2DqRd4=' },
     } as const;
-    await expect(aeSdk.spend(1, gaAccountAddress, options))
-      .to.be.rejectedWith('Basic account can\'t be used to generate GaMetaTx');
+    await expect(aeSdk.spend(1, gaAccountAddress, options)).to.be.rejectedWith(
+      "Basic account can't be used to generate GaMetaTx",
+    );
   });
 
   // TODO: enable after resolving https://github.com/aeternity/aeternity/issues/4087
@@ -153,15 +171,16 @@ describe('Generalized Account', () => {
       getState: () => number;
       setState: (value: number) => void;
     }>({
-          ...aeSdk.getContext(),
-          sourceCode: ''
-            + 'contract Stateful =\n'
-            + '  record state = { value: int }\n'
-            + '  entrypoint init(_value: int) : state = { value = _value }\n'
-            + '  entrypoint getState(): int = state.value\n'
-            + '  stateful entrypoint setState(_value: int): unit =\n'
-            + '    put(state{ value = _value })',
-        });
+      ...aeSdk.getContext(),
+      sourceCode:
+        '' +
+        'contract Stateful =\n' +
+        '  record state = { value: int }\n' +
+        '  entrypoint init(_value: int) : state = { value = _value }\n' +
+        '  entrypoint getState(): int = state.value\n' +
+        '  stateful entrypoint setState(_value: int): unit =\n' +
+        '    put(state{ value = _value })',
+    });
     await contract.$deploy([42], { authData: { sourceCode, args: [genSalt()] } });
     expect((await contract.getState()).decodedResult).to.be.equal(42);
     await contract.setState(43, { authData: { sourceCode, args: [genSalt()] } });

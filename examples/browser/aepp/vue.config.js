@@ -7,8 +7,6 @@ module.exports = defineConfig({
     port: 9001,
   },
   configureWebpack: {
-    plugins: [
-      new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
-    ],
+    plugins: [new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] })],
   },
 });

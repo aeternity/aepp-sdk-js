@@ -2,9 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 import { getSdk, timeoutBlock } from '.';
-import {
-  AeSdk, Tag, MemoryAccount, Encoded, Node, Contract,
-} from '../../src';
+import { AeSdk, Tag, MemoryAccount, Encoded, Node, Contract } from '../../src';
 import { assertNotNull, bindRequestCounter } from '../utils';
 
 describe('Node Chain', () => {
@@ -52,14 +50,15 @@ describe('Node Chain', () => {
       const heightPromise = aeSdk.getHeight();
       aeSdk.addNode('test-2', new Node('https://test.stg.aepps.com'), true);
       await heightPromise;
-      await expect(aeSdk.getHeight({ cached: true }))
-        .to.be.rejectedWith('v3/status error: 404 status code');
+      await expect(aeSdk.getHeight({ cached: true })).to.be.rejectedWith(
+        'v3/status error: 404 status code',
+      );
       aeSdk.selectNode('test');
     });
   });
 
   it('waits for specified heights', async () => {
-    const target = await aeSdkWithoutAccount.getHeight() + 1;
+    const target = (await aeSdkWithoutAccount.getHeight()) + 1;
     await aeSdkWithoutAccount.awaitHeight(target).should.eventually.be.at.least(target);
     await aeSdkWithoutAccount.getHeight().should.eventually.be.at.least(target);
   }).timeout(timeoutBlock);
@@ -79,8 +78,9 @@ describe('Node Chain', () => {
   it('Get key block', async () => {
     const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration();
     // TODO type should be corrected in node api
-    const keyBlockByHash = await aeSdkWithoutAccount
-      .getKeyBlock(keyBlock.hash as Encoded.KeyBlockHash);
+    const keyBlockByHash = await aeSdkWithoutAccount.getKeyBlock(
+      keyBlock.hash as Encoded.KeyBlockHash,
+    );
     const keyBlockByHeight = await aeSdkWithoutAccount.getKeyBlock(keyBlock.height);
     keyBlockByHash.should.be.an('object');
     keyBlockByHeight.should.be.an('object');
@@ -89,8 +89,9 @@ describe('Node Chain', () => {
   it('Get generation', async () => {
     const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration();
     // TODO type should be corrected in node api
-    const genByHash = await aeSdkWithoutAccount
-      .getGeneration(keyBlock.hash as Encoded.KeyBlockHash);
+    const genByHash = await aeSdkWithoutAccount.getGeneration(
+      keyBlock.hash as Encoded.KeyBlockHash,
+    );
     const genByHeight = await aeSdkWithoutAccount.getGeneration(keyBlock.height);
     genByHash.should.be.an('object');
     genByHeight.should.be.an('object');
@@ -113,10 +114,10 @@ describe('Node Chain', () => {
   it('Wait for transaction confirmation', async () => {
     const res = await aeSdk.spend(1000, aeSdk.address, { confirm: 1 });
     assertNotNull(res.blockHeight);
-    expect(await aeSdk.getHeight() >= res.blockHeight + 1).to.be.equal(true);
+    expect((await aeSdk.getHeight()) >= res.blockHeight + 1).to.be.equal(true);
   }).timeout(timeoutBlock);
 
-  it('doesn\'t make extra requests', async () => {
+  it("doesn't make extra requests", async () => {
     let getCount;
     let hash;
 
@@ -147,11 +148,15 @@ describe('Node Chain', () => {
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     await aeSdk.getHeight({ cached: false });
     const getCount = bindRequestCounter(aeSdk.api);
-    const spends = await Promise.all(accounts.map(async (account, idx) => aeSdk.spend(
-      Math.floor(Math.random() * 1000 + 1e15),
-      account.address,
-      { nonce: nextNonce + idx, verify: false, waitMined: false },
-    )));
+    const spends = await Promise.all(
+      accounts.map(async (account, idx) =>
+        aeSdk.spend(Math.floor(Math.random() * 1000 + 1e15), account.address, {
+          nonce: nextNonce + idx,
+          verify: false,
+          waitMined: false,
+        }),
+      ),
+    );
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
     expect(getCount({ exclude: [txPostRetry] })).to.be.equal(txPostCount);
@@ -164,9 +169,14 @@ describe('Node Chain', () => {
     const s = stub(aeSdkWithoutAccount._options, '_expectedMineRate').value(60_000);
     const getCount = bindRequestCounter(aeSdkWithoutAccount.api);
     const spends = await Promise.all(
-      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e14, aeSdk.address, {
-        nonce: 1, verify: false, onAccount, waitMined: false,
-      })),
+      accounts.map(async (onAccount) =>
+        aeSdkWithoutAccount.spend(1e14, aeSdk.address, {
+          nonce: 1,
+          verify: false,
+          onAccount,
+          waitMined: false,
+        }),
+      ),
     );
     s.restore();
     transactions.push(...spends.map(({ hash }) => hash));
@@ -174,14 +184,13 @@ describe('Node Chain', () => {
     expect(getCount()).to.be.equal(txPostCount);
   });
 
-  it('ensure transactions mined', async () => Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));
+  it('ensure transactions mined', async () =>
+    Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));
 
   it('multiple contract dry-runs calls at one request', async () => {
     const contract = await Contract.initialize<{ foo: (x: number) => bigint }>({
       ...aeSdk.getContext(),
-      sourceCode:
-        'contract Test =\n'
-        + '  entrypoint foo(x : int) = x * 100',
+      sourceCode: 'contract Test =\n' + '  entrypoint foo(x : int) = x * 100',
     });
     await contract.$deploy([]);
     const { result } = await contract.foo(5);
@@ -190,10 +199,13 @@ describe('Node Chain', () => {
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     const getCount = bindRequestCounter(aeSdk.api);
     const numbers = new Array(32).fill(undefined).map((v, idx) => idx * 2);
-    const results = (await Promise.all(
-      numbers.map(async (v, idx) => contract
-        .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true })),
-    )).map((r) => r.decodedResult);
+    const results = (
+      await Promise.all(
+        numbers.map(async (v, idx) =>
+          contract.foo(v, { nonce: nextNonce + idx, gasLimit, combine: true }),
+        ),
+      )
+    ).map((r) => r.decodedResult);
     expect(results).to.be.eql(numbers.map((v) => BigInt(v * 100)));
     expect(getCount()).to.be.equal(1);
   });

@@ -21,16 +21,14 @@ const methods = {
 } as const;
 
 type Decrement<Number extends number> = [-1, 0, 1, 2, 3, 4, 5][Number];
-type GetMethodsOptions <Methods extends { [key: string]: Function }> =
-  {
-    [Name in keyof Methods]:
-    Methods[Name] extends (...args: infer Args) => any
-      ? Args[Decrement<Args['length']>] : never
-  };
+type GetMethodsOptions<Methods extends { [key: string]: Function }> = {
+  [Name in keyof Methods]: Methods[Name] extends (...args: infer Args) => any
+    ? Args[Decrement<Args['length']>]
+    : never;
+};
 type MethodsOptions = GetMethodsOptions<typeof methods>;
 export interface AeSdkMethodsOptions
-  extends Partial<UnionToIntersection<MethodsOptions[keyof MethodsOptions]>> {
-}
+  extends Partial<UnionToIntersection<MethodsOptions[keyof MethodsOptions]>> {}
 
 export interface WrappedOptions {
   onAccount: AccountBase;
@@ -85,42 +83,43 @@ class AeSdkMethods {
   // TODO: omit onNode from options, because it is already in context
   async buildTx(options: TxParamsAsync): Promise<Encoded.Transaction> {
     // TODO: remove `any` at the same time as AeSdk class
-    return buildTxAsync({ ...this.getContext() as any, ...options });
+    return buildTxAsync({ ...(this.getContext() as any), ...options });
   }
 }
 
 type RequiredKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
 }[keyof T];
 
 type OptionalIfNotRequired<T extends [any]> = RequiredKeys<T[0]> extends never ? T | [] : T;
 
 type ReplaceOnAccount<Options> = Options extends { onAccount: any }
   ? Omit<Options, 'onAccount'> & {
-    /**
-     * Make operation on specific account by providing address (to use account from sdk) or instance
-     * of AccountBase (like MemoryAccount)
-     */
-    onAccount: OnAccount;
-  } : Options;
+      /**
+       * Make operation on specific account by providing address (to use account from sdk) or instance
+       * of AccountBase (like MemoryAccount)
+       */
+      onAccount: OnAccount;
+    }
+  : Options;
 
-type MakeOptional<Options> = OptionalIfNotRequired<[
-  Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'> & Partial<ReplaceOnAccount<Options>>,
-]>;
+type MakeOptional<Options> = OptionalIfNotRequired<
+  [Omit<Options, 'onNode' | 'onCompiler' | 'onAccount'> & Partial<ReplaceOnAccount<Options>>]
+>;
 
-type TransformMethods <Methods extends { [key: string]: Function }> =
-  {
-    [Name in keyof Methods]:
-    Methods[Name] extends (...args: [...infer Args, infer Options]) => infer Ret
-      ? (...args: [...Args, ...MakeOptional<Options>]) => Ret
-      : never
-  };
+type TransformMethods<Methods extends { [key: string]: Function }> = {
+  [Name in keyof Methods]: Methods[Name] extends (
+    ...args: [...infer Args, infer Options]
+  ) => infer Ret
+    ? (...args: [...Args, ...MakeOptional<Options>]) => Ret
+    : never;
+};
 
 interface AeSdkMethodsTransformed extends TransformMethods<typeof methods> {}
 
-Object.assign(AeSdkMethods.prototype, mapObject<Function, Function>(
-  methods,
-  ([name, handler]) => [
+Object.assign(
+  AeSdkMethods.prototype,
+  mapObject<Function, Function>(methods, ([name, handler]) => [
     name,
     function methodWrapper(this: AeSdkMethods, ...args: any[]) {
       args.length = handler.length;
@@ -128,8 +127,8 @@ Object.assign(AeSdkMethods.prototype, mapObject<Function, Function>(
       args[args.length - 1] = this.getContext(options);
       return handler(...args);
     },
-  ],
-));
+  ]),
+);
 
 type AeSdkMethodsTyped = AeSdkMethods & AeSdkMethodsTransformed;
 // eslint-disable-next-line @typescript-eslint/no-redeclare

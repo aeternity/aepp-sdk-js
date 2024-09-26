@@ -1,5 +1,7 @@
 import {
-  RestError, userAgentPolicyName, setClientRequestIdPolicyName,
+  RestError,
+  userAgentPolicyName,
+  setClientRequestIdPolicyName,
 } from '@azure/core-rest-pipeline';
 import { OperationOptions } from '@azure/core-client';
 import {
@@ -45,18 +47,21 @@ export default class CompilerHttp extends CompilerBase {
     this.api = new CompilerApi(compilerUrl, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        ...ignoreVersion ? [] : [genVersionCheckPolicy('compiler', getVersion, '8.0.0', '9.0.0')],
+        ...(ignoreVersion ? [] : [genVersionCheckPolicy('compiler', getVersion, '8.0.0', '9.0.0')]),
         genErrorFormatterPolicy((body: GeneralCompilerError | CompilerErrorApi[]) => {
           let message = '';
           if ('reason' in body) {
-            message += ` ${body.reason
-            }${body.parameter != null ? ` in ${body.parameter}` : ''
+            message += ` ${body.reason}${
+              body.parameter != null ? ` in ${body.parameter}` : ''
               // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
             }${body.info != null ? ` (${JSON.stringify(body.info)})` : ''}`;
           }
           if (Array.isArray(body)) {
             message += `\n${body
-              .map((e) => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context != null ? ` (${e.context})` : ''}`)
+              .map(
+                (e) =>
+                  `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context != null ? ` (${e.context})` : ''}`,
+              )
               .join('\n')}`;
           }
           return message;

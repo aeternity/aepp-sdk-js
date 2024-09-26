@@ -4,10 +4,15 @@ import BigNumber from 'bignumber.js';
 import { getSdk, networkId } from '.';
 import { assertNotNull } from '../utils';
 import {
-  AeSdk, MemoryAccount,
+  AeSdk,
+  MemoryAccount,
   AE_AMOUNT_FORMATS,
-  UnavailableAccountError, TypeError, ArgumentError,
-  encode, Encoding, Encoded,
+  UnavailableAccountError,
+  TypeError,
+  ArgumentError,
+  encode,
+  Encoding,
+  Encoded,
 } from '../../src';
 
 describe('Accounts', () => {
@@ -38,15 +43,20 @@ describe('Accounts', () => {
     await aeSdkNoCoins.spend(1, receiver.address).should.be.rejectedWith(Error);
   });
 
-  it('spending negative amount of coins', () => expect(aeSdk.spend(-1, receiver.address))
-    .to.be.rejectedWith(ArgumentError, 'value should be greater or equal to 0, got -1 instead'));
+  it('spending negative amount of coins', () =>
+    expect(aeSdk.spend(-1, receiver.address)).to.be.rejectedWith(
+      ArgumentError,
+      'value should be greater or equal to 0, got -1 instead',
+    ));
 
   it('determines the balance using `balance`', async () => {
     await aeSdk.getBalance(aeSdk.address).should.eventually.be.a('string');
   });
 
   describe('transferFunds', () => {
-    const spend = async (fraction: number): Promise<{
+    const spend = async (
+      fraction: number,
+    ): Promise<{
       balanceBefore: BigNumber;
       balanceAfter: BigNumber;
       amount: BigNumber;
@@ -64,9 +74,13 @@ describe('Accounts', () => {
       };
     };
 
-    it('throws exception if fraction is out of range', () => aeSdk
-      .transferFunds(-1, receiver.address)
-      .should.be.rejectedWith(ArgumentError, 'fraction should be a number between 0 and 1, got -1 instead'));
+    it('throws exception if fraction is out of range', () =>
+      aeSdk
+        .transferFunds(-1, receiver.address)
+        .should.be.rejectedWith(
+          ArgumentError,
+          'fraction should be a number between 0 and 1, got -1 instead',
+        ));
 
     it('spends 0% of balance', async () => {
       const { balanceBefore, balanceAfter, amount } = await spend(0);
@@ -75,17 +89,13 @@ describe('Accounts', () => {
     });
 
     it('spends 68.97% of balance', async () => {
-      const {
-        balanceBefore, balanceAfter, amount, fee,
-      } = await spend(0.6897);
+      const { balanceBefore, balanceAfter, amount, fee } = await spend(0.6897);
       balanceBefore.times(0.6897).integerValue(BigNumber.ROUND_HALF_UP).should.be.eql(amount);
       balanceAfter.plus(amount).plus(fee).should.be.eql(balanceBefore);
     });
 
     it('spends 100% of balance', async () => {
-      const {
-        balanceBefore, balanceAfter, amount, fee,
-      } = await spend(1);
+      const { balanceBefore, balanceAfter, amount, fee } = await spend(1);
       amount.plus(fee).should.be.eql(balanceBefore);
       balanceAfter.isZero().should.be.equal(true);
     });
@@ -119,7 +129,9 @@ describe('Accounts', () => {
   it('Get Account by block height/hash', async () => {
     const address = 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ';
     if (networkId === 'ae_uat') {
-      expect(await aeSdk.getBalance(address, { height: 500000 })).to.be.equal('4577590840980663351396');
+      expect(await aeSdk.getBalance(address, { height: 500000 })).to.be.equal(
+        '4577590840980663351396',
+      );
       return;
     }
     if (networkId === 'ae_mainnet') {
@@ -130,24 +142,27 @@ describe('Accounts', () => {
     expect(await aeSdk.getBalance(genesis, { height: 0 })).to.be.equal('10000000000000000000000');
   });
 
-  (networkId === 'ae_dev' ? it : it.skip)('validate account balance by height before and after spend tx', async () => {
-    async function getBalance(height?: number): Promise<bigint> {
-      return (await aeSdk.getAccount(aeSdk.address, { height })).balance;
-    }
+  (networkId === 'ae_dev' ? it : it.skip)(
+    'validate account balance by height before and after spend tx',
+    async () => {
+      async function getBalance(height?: number): Promise<bigint> {
+        return (await aeSdk.getAccount(aeSdk.address, { height })).balance;
+      }
 
-    const beforeSpend = await getBalance();
-    const beforeHeight = await aeSdk.getHeight() + 1;
-    await aeSdk.awaitHeight(beforeHeight);
-    const spend = await aeSdk.spend(123, 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ');
+      const beforeSpend = await getBalance();
+      const beforeHeight = (await aeSdk.getHeight()) + 1;
+      await aeSdk.awaitHeight(beforeHeight);
+      const spend = await aeSdk.spend(123, 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ');
 
-    const afterSpend = await getBalance();
-    assertNotNull(spend.tx?.amount);
-    expect(beforeSpend - afterSpend).to.be.equal(spend.tx.fee + spend.tx.amount);
-    expect(await getBalance(beforeHeight)).to.be.equal(beforeSpend);
-    assertNotNull(spend.blockHeight);
-    await aeSdk.awaitHeight(spend.blockHeight + 1);
-    expect(await getBalance(spend.blockHeight + 1)).to.be.equal(afterSpend);
-  });
+      const afterSpend = await getBalance();
+      assertNotNull(spend.tx?.amount);
+      expect(beforeSpend - afterSpend).to.be.equal(spend.tx.fee + spend.tx.amount);
+      expect(await getBalance(beforeHeight)).to.be.equal(beforeSpend);
+      assertNotNull(spend.blockHeight);
+      await aeSdk.awaitHeight(spend.blockHeight + 1);
+      expect(await getBalance(spend.blockHeight + 1)).to.be.equal(afterSpend);
+    },
+  );
 
   describe('Make operation on specific account without changing of current account', () => {
     it('Can make spend on specific account', async () => {
@@ -160,16 +175,20 @@ describe('Accounts', () => {
     });
 
     it('Fail on invalid account', () => {
-      expect(() => { aeSdk.spend(1, aeSdk.address, { onAccount: 1 as any }); }).to.throw(
+      expect(() => {
+        aeSdk.spend(1, aeSdk.address, { onAccount: 1 as any });
+      }).to.throw(
         TypeError,
         'Account should be an address (ak-prefixed string), or instance of AccountBase, got 1 instead',
       );
     });
 
     it('Fail on non exist account', () => {
-      expect(
-        () => { aeSdk.spend(1, aeSdk.address, { onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk' }); },
-      ).to.throw(
+      expect(() => {
+        aeSdk.spend(1, aeSdk.address, {
+          onAccount: 'ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk',
+        });
+      }).to.throw(
         UnavailableAccountError,
         'Account for ak_q2HatMwDnwCBpdNtN9oXf5gpD9pGSgFxaa8i2Evcam6gjiggk not available',
       );
@@ -177,11 +196,10 @@ describe('Accounts', () => {
 
     it('Fail on no accounts', async () => {
       const aeSdkWithoutAccount = await getSdk(0);
-      await expect(aeSdkWithoutAccount.spend(1, aeSdk.address))
-        .to.be.rejectedWith(
-          TypeError,
-          'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead',
-        );
+      await expect(aeSdkWithoutAccount.spend(1, aeSdk.address)).to.be.rejectedWith(
+        TypeError,
+        'Account should be an address (ak-prefixed string), or instance of AccountBase, got undefined instead',
+      );
     });
 
     it('Invalid on account options', async () => {

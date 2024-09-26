@@ -3,7 +3,7 @@
 This package is expected to work in these environments:
 
 | Environment                           | Comment                                                                       |
-|---------------------------------------|-------------------------------------------------------------------------------|
+| ------------------------------------- | ----------------------------------------------------------------------------- |
 | nodejs>=18.19                         |                                                                               |
 | Browser using script tag, umd         |                                                                               |
 | webpack@4                             | requires a fix to work with mjs build [webpack-4]                             |

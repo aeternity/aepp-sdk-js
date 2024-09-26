@@ -4,7 +4,14 @@ import AccountBase from './account/Base';
 import AccountRpc from './account/Rpc';
 import { decode, Encoded } from './utils/encoder';
 import {
-  Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi, Node as NodeRpc, NetworkToSelect,
+  Accounts,
+  RPC_VERSION,
+  WalletInfo,
+  Network,
+  WalletApi,
+  AeppApi,
+  Node as NodeRpc,
+  NetworkToSelect,
 } from './aepp-wallet-communication/rpc/types';
 import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
 import { METHODS, SUBSCRIPTION_TYPES } from './aepp-wallet-communication/schema';
@@ -79,7 +86,8 @@ export default class AeSdkAepp extends AeSdkBase {
     if (this._accounts == null) return [];
     const current = Object.keys(this._accounts.current)[0];
     return [
-      ...current != null ? [current] : [], ...Object.keys(this._accounts.connected),
+      ...(current != null ? [current] : []),
+      ...Object.keys(this._accounts.connected),
     ] as Encoded.AccountAddress[];
   }
 
@@ -94,7 +102,8 @@ export default class AeSdkAepp extends AeSdkBase {
     connection: BrowserConnection,
     { connectNode = false, name = 'wallet-node' }: { connectNode?: boolean; name?: string } = {},
   ): Promise<WalletInfo & { node?: NodeRpc }> {
-    if (this.rpcClient != null) throw new AlreadyConnectedError('You are already connected to wallet');
+    if (this.rpcClient != null)
+      throw new AlreadyConnectedError('You are already connected to wallet');
     let disconnectParams: any;
 
     const updateNetwork = (params: Network): void => {
@@ -126,8 +135,11 @@ export default class AeSdkAepp extends AeSdkBase {
         [METHODS.readyToConnect]: () => {},
       },
     );
-    const walletInfo = await client
-      .request(METHODS.connect, { name: this.name, version: RPC_VERSION, connectNode });
+    const walletInfo = await client.request(METHODS.connect, {
+      name: this.name,
+      version: RPC_VERSION,
+      connectNode,
+    });
     updateNetwork(walletInfo);
     this.rpcClient = client;
     return walletInfo;
@@ -175,12 +187,16 @@ export default class AeSdkAepp extends AeSdkBase {
     await this.rpcClient.request(METHODS.updateNetwork, network);
   }
 
-  _ensureConnected(): asserts this is AeSdkAepp & { rpcClient: NonNullable<AeSdkAepp['rpcClient']> } {
+  _ensureConnected(): asserts this is AeSdkAepp & {
+    rpcClient: NonNullable<AeSdkAepp['rpcClient']>;
+  } {
     if (this.rpcClient != null) return;
     throw new NoWalletConnectedError('You are not connected to Wallet');
   }
 
-  _ensureAccountAccess(): asserts this is AeSdkAepp & { rpcClient: NonNullable<AeSdkAepp['rpcClient']> } {
+  _ensureAccountAccess(): asserts this is AeSdkAepp & {
+    rpcClient: NonNullable<AeSdkAepp['rpcClient']>;
+  } {
     this._ensureConnected();
     if (this.addresses().length !== 0) return;
     throw new UnsubscribedAccountError();

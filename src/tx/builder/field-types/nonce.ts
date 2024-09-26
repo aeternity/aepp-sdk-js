@@ -5,7 +5,9 @@ import { ArgumentError } from '../../../utils/errors';
 import { NextNonceStrategy } from '../../../apis/node';
 import { Tag } from '../constants';
 
-export default function genNonceField<SenderKey extends string>(senderKey: SenderKey): {
+export default function genNonceField<SenderKey extends string>(
+  senderKey: SenderKey,
+): {
   serialize: (value: number, params: { tag: Tag }) => Buffer;
   // TODO: (value: number) => Promise<number> | (value: undefined, ...) => Promise<number>
   prepare: (
@@ -41,7 +43,8 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
       if (onNode == null) throw new ArgumentError('onNode', requirement, onNode);
       if (senderId == null) throw new ArgumentError('senderId', requirement, senderId);
       return (
-        await onNode.getAccountNextNonce(senderId.replace(/^ok_/, 'ak_'), { strategy })
+        await onNode
+          .getAccountNextNonce(senderId.replace(/^ok_/, 'ak_'), { strategy })
           .catch((error) => {
             if (!isAccountNotFoundError(error)) throw error;
             return { nextNonce: 1 };

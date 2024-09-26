@@ -1,6 +1,12 @@
 import { after, afterEach } from 'mocha';
 import {
-  AeSdk, CompilerHttpNode, MemoryAccount, Node, Encoded, isAddressValid, Encoding,
+  AeSdk,
+  CompilerHttpNode,
+  MemoryAccount,
+  Node,
+  Encoded,
+  isAddressValid,
+  Encoding,
 } from '../../src';
 import '..';
 
@@ -31,10 +37,9 @@ const configuration = {
     compilerUrl: 'https://v8.compiler.aepps.com',
     getGenesisAccount: async () => {
       const account = MemoryAccount.generate();
-      const { status } = await fetch(
-        `https://faucet.aepps.com/account/${account.address}`,
-        { method: 'POST' },
-      );
+      const { status } = await fetch(`https://faucet.aepps.com/account/${account.address}`, {
+        method: 'POST',
+      });
       console.assert([200, 425].includes(status), 'Invalid faucet response code', status);
       return account;
     },
@@ -48,7 +53,8 @@ const configuration = {
     debugUrl: 'http://localhost:3113',
     channelUrl: 'ws://localhost:3014/channel',
     compilerUrl: 'http://localhost:3080',
-    getGenesisAccount: () => new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
+    getGenesisAccount: () =>
+      new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
     sdkOptions: {
       _expectedMineRate: 1000,
       _microBlockCycle: 300,
@@ -56,9 +62,7 @@ const configuration = {
   },
 }[network ?? ''];
 if (configuration == null) throw new Error(`Unknown network: ${network}`);
-export const {
-  networkId, url, channelUrl, compilerUrl,
-} = configuration;
+export const { networkId, url, channelUrl, compilerUrl } = configuration;
 const { sdkOptions } = configuration;
 
 type TransactionHandler = (tx: Encoded.Transaction) => unknown;
@@ -91,17 +95,16 @@ export async function getSdk(accountCount = 1): Promise<AeSdk> {
 
   const genesisAccount = await genesisAccountPromise;
   for (let i = 0; i < accounts.length; i += 1) {
-    await sdk.spend(
-      isLimitedCoins ? 1e16 : 5e18,
-      accounts[i].address,
-      { onAccount: genesisAccount },
-    );
+    await sdk.spend(isLimitedCoins ? 1e16 : 5e18, accounts[i].address, {
+      onAccount: genesisAccount,
+    });
   }
 
   if (networkId === 'ae_mainnet') {
     after(async () => {
-      const promises = accounts
-        .map(async (onAccount) => sdk.transferFunds(1, genesisAccount.address, { onAccount }));
+      const promises = accounts.map(async (onAccount) =>
+        sdk.transferFunds(1, genesisAccount.address, { onAccount }),
+      );
       await Promise.allSettled(promises);
     });
   }

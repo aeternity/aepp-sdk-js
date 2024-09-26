@@ -3,41 +3,47 @@
   <div class="group">
     <div>
       <div>Contract address</div>
-      <div><input v-model="contractAddress"></div>
+      <div><input v-model="contractAddress" /></div>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.AensPreclaim">
+        <input v-model="type" type="radio" :value="DelegationTag.AensPreclaim" />
         AENS preclaim
       </label>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.Oracle">
+        <input v-model="type" type="radio" :value="DelegationTag.Oracle" />
         Oracle
       </label>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.AensName">
+        <input v-model="type" type="radio" :value="DelegationTag.AensName" />
         AENS name
       </label>
-      <div><input v-model="name"></div>
+      <div><input v-model="name" /></div>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.AensWildcard">
+        <input v-model="type" type="radio" :value="DelegationTag.AensWildcard" />
         All AENS names
       </label>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.OracleResponse">
+        <input v-model="type" type="radio" :value="DelegationTag.OracleResponse" />
         Response to oracle query
       </label>
-      <div><input v-model="oracleQueryId"></div>
+      <div><input v-model="oracleQueryId" /></div>
     </div>
-    <button @click="() => { signPromise = sign(); }">
+    <button
+      @click="
+        () => {
+          signPromise = sign();
+        }
+      "
+    >
       Sign
     </button>
     <div v-if="signPromise">

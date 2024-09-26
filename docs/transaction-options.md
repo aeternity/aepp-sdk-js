@@ -1,14 +1,16 @@
 # Transaction options
+
 For every transaction it is possible to provide an `options` object with one or multiple of the following attributes to the respective function that builds and broadcasts the transaction.
 Some of these are common and can be provided for each transaction type. Others are transaction specific and only relevant for a specific tx-type.
 
 The `options` object can be optionally passed to the respective function behind the last parameter, example:
+
 ```js
-const sender = 'ak_...'
-const recipient = 'ak_...'
-const options = { onAccount: sender, denomination: 'ae' } // optional options object
+const sender = 'ak_...';
+const recipient = 'ak_...';
+const options = { onAccount: sender, denomination: 'ae' }; // optional options object
 // aeSdk is an instance of the AeSdk class
-await aeSdk.spend(1, recipient, options) // amount, recipient and (optional) options
+await aeSdk.spend(1, recipient, options); // amount, recipient and (optional) options
 ```
 
 Note:
@@ -16,6 +18,7 @@ Note:
 - Without the `options` object the sender would be some other account selected in the instance of AeSdk and the recipient would receive `1 aetto` instead of `1 AE`.
 
 ## Common options
+
 These options are common and can be provided to every tx-type:
 
 - `onAccount` (default: the first account defined in the account array of the SDK instance)
@@ -44,9 +47,11 @@ These options are common and can be provided to every tx-type:
   - You can get the tx object that contains the tx-hash immediately by setting to `false` and should implement your own logic to watch for mined transactions.
 
 ## Tx-type specific options
+
 The following options are sepcific for each tx-type.
 
 ### ContractCreateTx & ContractCallTx
+
 - `amount` (default: `0`)
   - To be used for providing `aettos` (or `AE` with respective denomination) to a contract related transaction.
 - `denomination` (default: `aettos`)
@@ -57,11 +62,13 @@ The following options are sepcific for each tx-type.
   - To increase chances to get your transaction included quickly you can use a higher gasPrice.
 
 ### NameClaimTx
+
 - `nameFee` (default: calculated based on the length of the name)
   - The fee in `aettos` that will be payed to claim the name.
   - For bids in an auction you need to explicitely calculate the required `nameFee` based on the last bid
 
 ### NameUpdateTx
+
 - `clientTtl` (default: `3600`, one hour)
   - This option is an indicator for indexing tools to know how long (in seconds) they could or should cache the name information.
 - `nameTtl` (default: `180000`)
@@ -69,6 +76,7 @@ The following options are sepcific for each tx-type.
   - `180000` is the maximum possible value
 
 ### OracleRegisterTx
+
 - `queryFee` (default: `0`)
   - The fee in `aettos` that the oracle requests in order to provide a response.
 - `oracleTtlValue` (default: `500`)
@@ -78,6 +86,7 @@ The following options are sepcific for each tx-type.
   - `ORACLE_TTL_TYPES.block`: TTL value treated as absolute block height
 
 ### OracleQueryTx
+
 - `queryFee` (default: `0`)
   - The fee in `aettos` that will be payed to the oracle.
 - `queryTtlValue` (default: `10`)
@@ -92,9 +101,11 @@ The following options are sepcific for each tx-type.
   - `ORACLE_TTL_TYPES.block`: TTL value treated as absolute block height
 
 ### SpendTx
+
 - `denomination` (default: `aettos`)
   - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
 
 ## How to estimate gas?
+
 - As æpp developer, it is reasonable to estimate the gas consumption for a contract call using the dry-run feature of the node **once** and provide a specific offset (e.g. multiplied by 1.5 or 2) as default in the æpp to ensure that contract calls are mined. Depending on the logic of the contract the gas consumption of a specific contract call can vary and therefore you should monitor the gas consumption and increase the default for the respective contract call accordingly over time.
 - By default, SDK estimates `gasLimit` using dry-run endpoint. This means an extra request that makes contract iterations slower, but it is more developer friendly (support of heavy requests without adjustments, and verbose error messages).

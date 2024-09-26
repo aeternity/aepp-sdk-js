@@ -29,7 +29,7 @@ type Validator = (
     node: Node;
     height: number;
     consensusProtocolVersion: ConsensusProtocolVersion;
-  }
+  },
 ) => ValidatorResult[] | Promise<ValidatorResult[]>;
 
 const validators: Validator[] = [];
@@ -41,7 +41,8 @@ async function verifyTransactionInternal(
 ): Promise<ValidatorResult[]> {
   const address = getTransactionSignerAddress(buildTx(tx));
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
-    node.getAccountByPubkey(address)
+    node
+      .getAccountByPubkey(address)
       .catch((error) => {
         if (!isAccountNotFoundError(error)) throw error;
         return { id: address, balance: 0n, nonce: 0 };
@@ -52,14 +53,20 @@ async function verifyTransactionInternal(
     node.getNodeInfo(),
   ]);
 
-  return (await Promise.all(
-    validators.map(async (v) => v(
-      tx,
-      {
-        node, account, height, consensusProtocolVersion, nodeNetworkId, parentTxTypes,
-      },
-    )),
-  )).flat();
+  return (
+    await Promise.all(
+      validators.map(async (v) =>
+        v(tx, {
+          node,
+          account,
+          height,
+          consensusProtocolVersion,
+          nodeNetworkId,
+          parentTxTypes,
+        }),
+      ),
+    )
+  ).flat();
 }
 
 /**
@@ -92,21 +99,26 @@ validators.push(
     const { encodedTx, signatures } = tx;
     if ((encodedTx ?? signatures) == null) return [];
     if (signatures.length !== 1) return []; // TODO: Support multisignature like in state channels
-    const prefix = Buffer.from([
-      nodeNetworkId,
-      ...parentTxTypes.includes(Tag.PayingForTx) ? ['inner_tx'] : [],
-    ].join('-'));
+    const prefix = Buffer.from(
+      [nodeNetworkId, ...(parentTxTypes.includes(Tag.PayingForTx) ? ['inner_tx'] : [])].join('-'),
+    );
     const txBinary = decode(buildTx(encodedTx));
     const txWithNetworkId = concatBuffers([prefix, txBinary]);
     const txHashWithNetworkId = concatBuffers([prefix, hash(txBinary)]);
-    if (verify(txWithNetworkId, signatures[0], account.id)
-      || verify(txHashWithNetworkId, signatures[0], account.id)) return [];
-    return [{
-      message: 'Signature cannot be verified, please ensure that you transaction have'
-        + ' the correct prefix and the correct private key for the sender address',
-      key: 'InvalidSignature',
-      checkedKeys: ['encodedTx', 'signatures'],
-    }];
+    if (
+      verify(txWithNetworkId, signatures[0], account.id) ||
+      verify(txHashWithNetworkId, signatures[0], account.id)
+    )
+      return [];
+    return [
+      {
+        message:
+          'Signature cannot be verified, please ensure that you transaction have' +
+          ' the correct prefix and the correct private key for the sender address',
+        key: 'InvalidSignature',
+        checkedKeys: ['encodedTx', 'signatures'],
+      },
+    ];
   },
   async (tx, { node, parentTxTypes }) => {
     let nestedTx;
@@ -118,21 +130,25 @@ validators.push(
   (tx, { height }) => {
     if (!('ttl' in tx)) return [];
     if (tx.ttl === 0 || tx.ttl > height) return [];
-    return [{
-      message: `TTL ${tx.ttl} is already expired, current height is ${height}`,
-      key: 'ExpiredTTL',
-      checkedKeys: ['ttl'],
-    }];
+    return [
+      {
+        message: `TTL ${tx.ttl} is already expired, current height is ${height}`,
+        key: 'ExpiredTTL',
+        checkedKeys: ['ttl'],
+      },
+    ];
   },
   async (tx, { account, parentTxTypes, node }) => {
     if (parentTxTypes.length !== 0) return [];
     const cost = await getExecutionCostUsingNode(buildTx(tx), node).catch(() => 0n);
     if (cost <= account.balance) return [];
-    return [{
-      message: `Account balance ${account.balance} is not enough to execute the transaction that costs ${cost}`,
-      key: 'InsufficientBalance',
-      checkedKeys: ['amount', 'fee', 'nameFee', 'gasLimit', 'gasPrice'],
-    }];
+    return [
+      {
+        message: `Account balance ${account.balance} is not enough to execute the transaction that costs ${cost}`,
+        key: 'InsufficientBalance',
+        checkedKeys: ['amount', 'fee', 'nameFee', 'gasLimit', 'gasPrice'],
+      },
+    ];
   },
   async (tx, { node }) => {
     if (tx.tag !== Tag.SpendTx || isAddressValid(tx.recipientId, Encoding.Name)) return [];
@@ -141,19 +157,21 @@ validators.push(
       return null;
     });
     if (recipient == null || recipient.payable === true) return [];
-    return [{
-      message: 'Recipient account is not payable',
-      key: 'RecipientAccountNotPayable',
-      checkedKeys: ['recipientId'],
-    }];
+    return [
+      {
+        message: 'Recipient account is not payable',
+        key: 'RecipientAccountNotPayable',
+        checkedKeys: ['recipientId'],
+      },
+    ];
   },
   (tx, { account }) => {
     let message;
     if (tx.tag === Tag.SignedTx && account.kind === 'generalized' && tx.signatures.length !== 0) {
-      message = 'Generalized account can\'t be used to generate SignedTx with signatures';
+      message = "Generalized account can't be used to generate SignedTx with signatures";
     }
     if (tx.tag === Tag.GaMetaTx && account.kind === 'basic') {
-      message = 'Basic account can\'t be used to generate GaMetaTx';
+      message = "Basic account can't be used to generate GaMetaTx";
     }
     if (message == null) return [];
     return [{ message, key: 'InvalidAccountType', checkedKeys: ['tag'] }];
@@ -164,9 +182,10 @@ validators.push(
     const oracleCall = Tag.OracleRegisterTx === tx.tag;
     const contractCreate = Tag.ContractCreateTx === tx.tag || Tag.GaAttachTx === tx.tag;
     const contractCall = Tag.ContractCallTx === tx.tag || Tag.GaMetaTx === tx.tag;
-    const type = (oracleCall ? 'oracle-call' : null)
-      ?? (contractCreate ? 'contract-create' : null)
-      ?? (contractCall ? 'contract-call' : null);
+    const type =
+      (oracleCall ? 'oracle-call' : null) ??
+      (contractCreate ? 'contract-create' : null) ??
+      (contractCall ? 'contract-call' : null);
     if (type == null) return [];
     const protocol = ProtocolToVmAbi[consensusProtocolVersion][type] as {
       abiVersion: readonly any[];
@@ -178,14 +197,16 @@ validators.push(
     if ('ctVersion' in tx) ctVersion = tx.ctVersion;
     if (ctVersion == null) throw new UnexpectedTsError();
     if (
-      !protocol.abiVersion.includes(ctVersion.abiVersion)
-      || (contractCreate && !protocol.vmVersion.includes(ctVersion.vmVersion))
+      !protocol.abiVersion.includes(ctVersion.abiVersion) ||
+      (contractCreate && !protocol.vmVersion.includes(ctVersion.vmVersion))
     ) {
-      return [{
-        message: `ABI/VM version ${JSON.stringify(ctVersion)} is wrong, supported is: ${JSON.stringify(protocol)}`,
-        key: 'VmAndAbiVersionMismatch',
-        checkedKeys: ['ctVersion', 'abiVersion'],
-      }];
+      return [
+        {
+          message: `ABI/VM version ${JSON.stringify(ctVersion)} is wrong, supported is: ${JSON.stringify(protocol)}`,
+          key: 'VmAndAbiVersionMismatch',
+          checkedKeys: ['ctVersion', 'abiVersion'],
+        },
+      ];
     }
     return [];
   },
@@ -196,18 +217,22 @@ validators.push(
     try {
       const { active } = await node.getContract(tx.contractId);
       if (active) return [];
-      return [{
-        message: `Contract ${tx.contractId} is not active`,
-        key: 'ContractNotActive',
-        checkedKeys: ['contractId'],
-      }];
+      return [
+        {
+          message: `Contract ${tx.contractId} is not active`,
+          key: 'ContractNotActive',
+          checkedKeys: ['contractId'],
+        },
+      ];
     } catch (error) {
       if (!(error instanceof RestError) || error.response?.bodyAsText == null) throw error;
-      return [{
-        message: JSON.parse(error.response.bodyAsText).reason, // TODO: use parsedBody instead
-        key: 'ContractNotFound',
-        checkedKeys: ['contractId'],
-      }];
+      return [
+        {
+          message: JSON.parse(error.response.bodyAsText).reason, // TODO: use parsedBody instead
+          key: 'ContractNotFound',
+          checkedKeys: ['contractId'],
+        },
+      ];
     }
   },
 );

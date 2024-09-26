@@ -1,8 +1,6 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import {
-  Node, Encoded, AccountMnemonicFactory, MemoryAccount,
-} from '../../src';
+import { Node, Encoded, AccountMnemonicFactory, MemoryAccount } from '../../src';
 
 const mnemonic = 'eye quarter chapter suit cruel scrub verify stuff volume control learn dust';
 

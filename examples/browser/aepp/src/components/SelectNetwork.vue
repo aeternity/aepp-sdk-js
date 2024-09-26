@@ -5,19 +5,11 @@
       <div>Select by</div>
       <div>
         <label>
-          <input
-            type="radio"
-            value="networkId"
-            v-model="mode"
-          >
+          <input type="radio" value="networkId" v-model="mode" />
           Network ID
         </label>
         <label>
-          <input
-            type="radio"
-            value="nodeUrl"
-            v-model="mode"
-          >
+          <input type="radio" value="nodeUrl" v-model="mode" />
           Node URL
         </label>
       </div>
@@ -25,13 +17,16 @@
     <div>
       <div>Payload</div>
       <div>
-        <input
-          v-model="payload"
-          placeholder="Network ID or node URL"
-        >
+        <input v-model="payload" placeholder="Network ID or node URL" />
       </div>
     </div>
-    <button @click="() => { promise = selectNetwork(); }">
+    <button
+      @click="
+        () => {
+          promise = selectNetwork();
+        }
+      "
+    >
       Select network
     </button>
     <div v-if="promise">

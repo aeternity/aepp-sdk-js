@@ -17,7 +17,8 @@ import {
   unpackTx,
   verify,
   verifyMessage,
-  decode, Encoded,
+  decode,
+  Encoded,
   hash,
 } from '../../src';
 
@@ -53,55 +54,64 @@ afterEach(async () => {
 describe('Ledger HW', () => {
   describe('factory', () => {
     it('gets app version', async () => {
-      await initTransport('=> e006000000\n'
-        + '<= 000004049000\n'
-        + '=> e006000000\n'
-        + '<= 000004049000\n');
+      await initTransport(
+        '=> e006000000\n' + '<= 000004049000\n' + '=> e006000000\n' + '<= 000004049000\n',
+      );
       const factory = new AccountLedgerFactory(transport);
       expect((await factory.getAppConfiguration()).version).to.be.equal('0.4.4');
     });
 
     it('ensures that app version is compatible', async () => {
-      await initTransport('=> e006000000\n'
-        + '<= 000104049000\n', true);
+      await initTransport('=> e006000000\n' + '<= 000104049000\n', true);
       const factory = new AccountLedgerFactory(transport);
-      await expect(factory.getAddress(42)).to.be
-        .rejectedWith('Unsupported app on ledger version 1.4.4. Supported: >= 0.4.4 < 0.5.0');
+      await expect(factory.getAddress(42)).to.be.rejectedWith(
+        'Unsupported app on ledger version 1.4.4. Supported: >= 0.4.4 < 0.5.0',
+      );
     });
 
     it('gets address', async () => {
-      await initTransport('=> e006000000\n'
-        + '<= 000004049000\n'
-        + '=> e0020000040000002a\n'
-        + '<= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000\n');
+      await initTransport(
+        '=> e006000000\n' +
+          '<= 000004049000\n' +
+          '=> e0020000040000002a\n' +
+          '<= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000\n',
+      );
       const factory = new AccountLedgerFactory(transport);
-      expect(await factory.getAddress(42)).to.be.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
+      expect(await factory.getAddress(42)).to.be.equal(
+        'ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv',
+      );
     });
 
     it('gets address with verification', async () => {
-      await initTransport('=> e006000000\n'
-        + '<= 000004049000\n'
-        + '=> e0020100040000002a\n'
-        + '<= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000\n');
+      await initTransport(
+        '=> e006000000\n' +
+          '<= 000004049000\n' +
+          '=> e0020100040000002a\n' +
+          '<= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000\n',
+      );
       const factory = new AccountLedgerFactory(transport);
-      expect(await factory.getAddress(42, true)).to.be.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
+      expect(await factory.getAddress(42, true)).to.be.equal(
+        'ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv',
+      );
     });
 
     it('gets address with verification rejected', async () => {
-      await initTransport('=> e006000000\n'
-        + '<= 000004049000\n'
-        + '=> e0020100040000002a\n'
-        + '<= 6985\n');
+      await initTransport(
+        '=> e006000000\n' + '<= 000004049000\n' + '=> e0020100040000002a\n' + '<= 6985\n',
+      );
       const factory = new AccountLedgerFactory(transport);
-      await expect(factory.getAddress(42, true)).to.be
-        .rejectedWith('Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)');
+      await expect(factory.getAddress(42, true)).to.be.rejectedWith(
+        'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)',
+      );
     });
 
     it('initializes an account', async () => {
-      await initTransport('=> e006000000\n'
-        + '<= 000004049000\n'
-        + '=> e0020000040000002a\n'
-        + '<= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000\n');
+      await initTransport(
+        '=> e006000000\n' +
+          '<= 000004049000\n' +
+          '=> e0020000040000002a\n' +
+          '<= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000\n',
+      );
       const factory = new AccountLedgerFactory(transport);
       const account = await factory.initialize(42);
       expect(account).to.be.instanceOf(AccountLedger);
@@ -132,14 +142,16 @@ describe('Ledger HW', () => {
     }
 
     it('discovers accounts', async () => {
-      await initTransport('=> e006000000\n'
-        + '<= 000004049000\n'
-        + '=> e00200000400000000\n'
-        + '<= 35616b5f327377684c6b674250656541447856544156434a6e5a4c59354e5a744346694d39334a787345614d754335396575754652519000\n'
-        + '=> e00200000400000001\n'
-        + '<= 34616b5f447a454c4d4b6e53664a63666e43555a32536258555378526d4659744772576d4d754b6943783638594b4c4832366b77639000\n'
-        + '=> e00200000400000002\n'
-        + '<= 35616b5f323174656e74786d5936636356434c793246483577714639655071366a725874575132735973393941543839734d657779329000\n');
+      await initTransport(
+        '=> e006000000\n' +
+          '<= 000004049000\n' +
+          '=> e00200000400000000\n' +
+          '<= 35616b5f327377684c6b674250656541447856544156434a6e5a4c59354e5a744346694d39334a787345614d754335396575754652519000\n' +
+          '=> e00200000400000001\n' +
+          '<= 34616b5f447a454c4d4b6e53664a63666e43555a32536258555378526d4659744772576d4d754b6943783638594b4c4832366b77639000\n' +
+          '=> e00200000400000002\n' +
+          '<= 35616b5f323174656e74786d5936636356434c793246483577714639655071366a725874575132735973393941543839734d657779329000\n',
+      );
       const node = new NodeMock();
       node.addresses.push('ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ');
       node.addresses.push('ak_DzELMKnSfJcfnCUZ2SbXUSxRmFYtGrWmMuKiCx68YKLH26kwc');
@@ -150,10 +162,12 @@ describe('Ledger HW', () => {
     });
 
     it('discovers accounts on unused ledger', async () => {
-      await initTransport('=> e006000000\n'
-        + '<= 000004049000\n'
-        + '=> e00200000400000000\n'
-        + '<= 35616b5f327377684c6b674250656541447856544156434a6e5a4c59354e5a744346694d39334a787345614d754335396575754652519000\n');
+      await initTransport(
+        '=> e006000000\n' +
+          '<= 000004049000\n' +
+          '=> e00200000400000000\n' +
+          '<= 35616b5f327377684c6b674250656541447856544156434a6e5a4c59354e5a744346694d39334a787345614d754335396575754652519000\n',
+      );
       const node = new NodeMock();
       const factory = new AccountLedgerFactory(transport);
       const accounts = await factory.discover(node);
@@ -170,34 +184,49 @@ describe('Ledger HW', () => {
     });
 
     const transaction = buildTx({
-      tag: Tag.SpendTx, senderId: address, recipientId: address, amount: 1.23e18, nonce: 10,
+      tag: Tag.SpendTx,
+      senderId: address,
+      recipientId: address,
+      amount: 1.23e18,
+      nonce: 10,
     });
 
     it('signs transaction', async () => {
-      await initTransport('=> e00400006a000000000000005b0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80\n'
-        + '<= f868f1c6ce9b9f2b3aecbec04c6a7b5c8ae30f5c0e87dbcf17fb99663cc22e41aa6edb5d1ee35678164c83d5bdc8cd8cef308b3ecf96f53f3cbd61732041ec0d9000\n');
+      await initTransport(
+        '=> e00400006a000000000000005b0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80\n' +
+          '<= f868f1c6ce9b9f2b3aecbec04c6a7b5c8ae30f5c0e87dbcf17fb99663cc22e41aa6edb5d1ee35678164c83d5bdc8cd8cef308b3ecf96f53f3cbd61732041ec0d9000\n',
+      );
       const account = new AccountLedger(transport, 0, address);
       const networkId = 'ae_uat';
       const signedTransaction = await account.signTransaction(transaction, { networkId });
       expect(signedTransaction).to.satisfy((t: string) => t.startsWith('tx_'));
-      const { signatures: [signature] } = unpackTx(signedTransaction, Tag.SignedTx);
+      const {
+        signatures: [signature],
+      } = unpackTx(signedTransaction, Tag.SignedTx);
       const hashedTx = Buffer.concat([Buffer.from(networkId), hash(decode(transaction))]);
       expect(verify(hashedTx, signature, address)).to.be.equal(true);
     });
 
     it('signs transaction rejected', async () => {
-      await initTransport('=> e00400006a000000000000005b0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80\n'
-        + '<= 6985\n');
+      await initTransport(
+        '=> e00400006a000000000000005b0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80\n' +
+          '<= 6985\n',
+      );
       const account = new AccountLedger(transport, 0, address);
-      await expect(account.signTransaction(transaction, { networkId: 'ae_uat' })).to.be
-        .rejectedWith('Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)');
+      await expect(
+        account.signTransaction(transaction, { networkId: 'ae_uat' }),
+      ).to.be.rejectedWith(
+        'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)',
+      );
     });
 
     const message = 'test-message,'.repeat(3);
 
     it('signs message', async () => {
-      await initTransport('=> e00800002f0000000000000027746573742d6d6573736167652c746573742d6d6573736167652c746573742d6d6573736167652c\n'
-        + '<= 78397e186058f278835b8e3e866960e4418dc1e9f00b3a2423f57c16021c88720119ebb3373a136112caa1c9ff63870092064659eb2c641dd67767f15c80350c9000\n');
+      await initTransport(
+        '=> e00800002f0000000000000027746573742d6d6573736167652c746573742d6d6573736167652c746573742d6d6573736167652c\n' +
+          '<= 78397e186058f278835b8e3e866960e4418dc1e9f00b3a2423f57c16021c88720119ebb3373a136112caa1c9ff63870092064659eb2c641dd67767f15c80350c9000\n',
+      );
       const account = new AccountLedger(transport, 0, address);
       const signature = await account.signMessage(message);
       expect(signature).to.be.instanceOf(Uint8Array);
@@ -205,11 +234,14 @@ describe('Ledger HW', () => {
     });
 
     it('signs message rejected', async () => {
-      await initTransport('=> e00800002f0000000000000027746573742d6d6573736167652c746573742d6d6573736167652c746573742d6d6573736167652c\n'
-        + '<= 6985\n');
+      await initTransport(
+        '=> e00800002f0000000000000027746573742d6d6573736167652c746573742d6d6573736167652c746573742d6d6573736167652c\n' +
+          '<= 6985\n',
+      );
       const account = new AccountLedger(transport, 0, address);
-      await expect(account.signMessage(message)).to.be
-        .rejectedWith('Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)');
+      await expect(account.signMessage(message)).to.be.rejectedWith(
+        'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)',
+      );
     });
   });
 });

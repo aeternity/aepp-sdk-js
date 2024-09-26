@@ -12,15 +12,18 @@ describe('Bytes', () => {
 
   const testCase = 'test_test-testTest';
 
-  it('converts snake to pascal case', () => snakeToPascal(testCase)
-    .should.be.equal('testTest-testTest'));
+  it('converts snake to pascal case', () =>
+    snakeToPascal(testCase).should.be.equal('testTest-testTest'));
 
-  it('converts pascal to snake case', () => pascalToSnake(testCase)
-    .should.be.equal('test_test-test_test'));
+  it('converts pascal to snake case', () =>
+    pascalToSnake(testCase).should.be.equal('test_test-test_test'));
 
-  it('converts BigNumber to Buffer', () => toBytes(new BigNumber('1000'))
-    .readInt16BE().should.be.equal(1000));
+  it('converts BigNumber to Buffer', () =>
+    toBytes(new BigNumber('1000')).readInt16BE().should.be.equal(1000));
 
-  it('throws error if BigNumber is not integer', () => expect(() => toBytes(new BigNumber('1.5')))
-    .to.throw(TypeError, /Unexpected not integer value:/));
+  it('throws error if BigNumber is not integer', () =>
+    expect(() => toBytes(new BigNumber('1.5'))).to.throw(
+      TypeError,
+      /Unexpected not integer value:/,
+    ));
 });

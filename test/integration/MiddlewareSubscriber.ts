@@ -6,8 +6,11 @@ import '../index';
 import { assertNotNull } from '../utils';
 import resetMiddleware from './reset-middleware';
 import {
-  MiddlewareSubscriber, MiddlewareSubscriberError, MiddlewareSubscriberDisconnected,
-  MemoryAccount, AeSdkMethods,
+  MiddlewareSubscriber,
+  MiddlewareSubscriberError,
+  MiddlewareSubscriberDisconnected,
+  MemoryAccount,
+  AeSdkMethods,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
@@ -53,7 +56,9 @@ describe('MiddlewareSubscriber', () => {
           await pause(100);
         }
       })(),
-      pause(500).then(() => { throw new Error('Timeout'); }),
+      pause(500).then(() => {
+        throw new Error('Timeout');
+      }),
     ]);
   }
 
@@ -112,7 +117,7 @@ describe('MiddlewareSubscriber', () => {
       }),
     ]);
     expect(transaction).to.be.eql({
-      ...await fetchNodeRaw(`transactions/${hash}`),
+      ...(await fetchNodeRaw(`transactions/${hash}`)),
       tx_index: transaction.tx_index,
       micro_index: transaction.micro_index,
       micro_time: transaction.micro_time,
@@ -131,7 +136,7 @@ describe('MiddlewareSubscriber', () => {
       }),
     ]);
     expect(transaction).to.be.eql({
-      ...await fetchNodeRaw(`transactions/${hash}`),
+      ...(await fetchNodeRaw(`transactions/${hash}`)),
       tx_index: transaction.tx_index,
       micro_index: transaction.micro_index,
       micro_time: transaction.micro_time,
@@ -173,7 +178,7 @@ describe('MiddlewareSubscriber', () => {
       }),
     ]);
     expect(microBlock).to.be.eql({
-      ...await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`),
+      ...(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`)),
       transactions_count: 1,
       micro_block_index: 0,
     });
@@ -199,13 +204,13 @@ describe('MiddlewareSubscriber', () => {
       }),
     ]);
     expect(transaction).to.be.eql({
-      ...await fetchNodeRaw(`transactions/${hash}`),
+      ...(await fetchNodeRaw(`transactions/${hash}`)),
       tx_index: transaction.tx_index,
       micro_index: transaction.micro_index,
       micro_time: transaction.micro_time,
     });
     expect(microBlock).to.be.eql({
-      ...await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`),
+      ...(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`)),
       transactions_count: 1,
       micro_block_index: 0,
     });

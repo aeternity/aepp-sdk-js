@@ -12,7 +12,12 @@
 
 // ## 1. Create SDK instance and generate an account
 import {
-  AeSdk, Node, MemoryAccount, AccountGeneralized, CompilerHttp, MIN_GAS_PRICE,
+  AeSdk,
+  Node,
+  MemoryAccount,
+  AccountGeneralized,
+  CompilerHttp,
+  MIN_GAS_PRICE,
 } from '@aeternity/aepp-sdk';
 
 const aeSdk = new AeSdk({

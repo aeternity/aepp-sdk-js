@@ -26,7 +26,8 @@ h2 {
   @extend .mt-2, .font-bold, .text-2xl;
 }
 
-input:not([type=radio]):not([type=checkbox]), textarea {
+input:not([type='radio']):not([type='checkbox']),
+textarea {
   @extend .bg-gray-900, .text-white, .p-2, .w-full;
 }
 

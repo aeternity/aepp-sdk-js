@@ -23,9 +23,7 @@ endpoints. This script shows how to use a debug dry-run in sdk.
 [dryRunTxs]: https://api-docs.aeternity.io/#/internal/DryRunTxs
 */
 
-import {
-  Node, AeSdk, MemoryAccount, CompilerHttp, Contract,
-} from '@aeternity/aepp-sdk';
+import { Node, AeSdk, MemoryAccount, CompilerHttp, Contract } from '@aeternity/aepp-sdk';
 
 /*
 The idea is to extend the base Node class overriding the method that will forward a request
@@ -62,6 +60,9 @@ console.log('Contract deployed at', deployInfo.address);
 // This map is bigger than allowed by the default gas limit
 const map = new Map(new Array(20000).fill().map((_, idx) => [`bar${idx}`, 43]));
 // Sdk needs to know that we have a different gas limit, so `gasMax` is provided.
-const { result: { gasUsed }, tx: { fee } } = await contract.getArg(map, { gasMax: 6e10 });
+const {
+  result: { gasUsed },
+  tx: { fee },
+} = await contract.getArg(map, { gasMax: 6e10 });
 // The call succeeded and the gas used more than 6e6, which means that request forwarding works!
 console.log('Call result', fee, gasUsed);

@@ -1,28 +1,28 @@
-import { useEffect, useState } from 'preact/hooks'
-import { AccountMnemonicFactory, MemoryAccount } from '@aeternity/aepp-sdk'
-import { validateMnemonic } from '@scure/bip39'
-import { wordlist } from '@scure/bip39/wordlists/english'
+import { useEffect, useState } from 'preact/hooks';
+import { AccountMnemonicFactory, MemoryAccount } from '@aeternity/aepp-sdk';
+import { validateMnemonic } from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 
 export function AccountsByMnemonic() {
-  const [mnemonic, setMnemonic] = useState('')
-  const [count, setCount] = useState(1)
-  const [accounts, setAccounts] = useState<MemoryAccount[]>([])
+  const [mnemonic, setMnemonic] = useState('');
+  const [count, setCount] = useState(1);
+  const [accounts, setAccounts] = useState<MemoryAccount[]>([]);
 
   useEffect(() => {
-    setAccounts([])
+    setAccounts([]);
     const factory = new AccountMnemonicFactory(mnemonic);
     (async () => {
       try {
-        setAccounts(await Promise.all(
-          new Array(count).fill(0).map((_, idx) => factory.initialize(idx))
-        ))
+        setAccounts(
+          await Promise.all(new Array(count).fill(0).map((_, idx) => factory.initialize(idx))),
+        );
       } catch (error) {}
-    })()
-  }, [mnemonic, count])
+    })();
+  }, [mnemonic, count]);
 
-  let validation = 'invalid'
+  let validation = 'invalid';
   if (accounts.length) {
-    validation = (validateMnemonic(mnemonic, wordlist) ? '' : 'not ') + 'in english wordlist'
+    validation = (validateMnemonic(mnemonic, wordlist) ? '' : 'not ') + 'in english wordlist';
   }
 
   return (
@@ -39,21 +39,21 @@ export function AccountsByMnemonic() {
         <div></div>
         <div class={accounts.length ? '' : 'error'}>Mnemonic {validation}</div>
 
-        {accounts.map(({ address, secretKey }, idx) => <>
-          <div>Account #{idx}</div>
-          <div>
-            {address}<br />
-            {secretKey}
-          </div>
-        </>)}
+        {accounts.map(({ address, secretKey }, idx) => (
+          <>
+            <div>Account #{idx}</div>
+            <div>
+              {address}
+              <br />
+              {secretKey}
+            </div>
+          </>
+        ))}
 
-        <button
-          disabled={!accounts.length}
-          onClick={() => setCount((count) => count + 1)}
-        >
+        <button disabled={!accounts.length} onClick={() => setCount((count) => count + 1)}>
           Add account
         </button>
       </div>
     </>
-  )
+  );
 }
