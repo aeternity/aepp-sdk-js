@@ -115,6 +115,8 @@ export { default as AccountMnemonicFactory } from './account/MnemonicFactory';
 export { default as AccountGeneralized } from './account/Generalized';
 export { default as AccountLedger } from './account/Ledger';
 export { default as AccountLedgerFactory } from './account/LedgerFactory';
+export { default as AccountMetamask } from './account/Metamask';
+export { default as AccountMetamaskFactory } from './account/MetamaskFactory';
 export { default as CompilerBase } from './contract/compiler/Base';
 export { default as CompilerHttp } from './contract/compiler/Http';
 export { default as Channel } from './channel/Contract';
