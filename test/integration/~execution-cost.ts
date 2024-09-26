@@ -39,7 +39,7 @@ describe('Execution cost', () => {
 
   it('calculates execution cost for spend tx', async () => {
     const { rawTx } = await aeSdk.spend(100, aeSdk.address, { ttl: 0 });
-    const expectedCost = 16660000000000n;
+    const expectedCost = 16660000000000n + 100n;
     expect(getExecutionCostBySignedTx(rawTx, networkId)).to.equal(expectedCost);
     expect(getExecutionCost(buildTx(unpackTx(rawTx, Tag.SignedTx).encodedTx)))
       .to.equal(expectedCost);
@@ -86,6 +86,8 @@ describe('Execution cost', () => {
           // Can't detect Oracle.respond reward in contract call
           if (balanceDiff === -501000n) return;
           expect(balanceDiff).to.be.equal(0n);
+        } else if (params.tag === Tag.SpendTx && params.senderId === params.recipientId) {
+          expect(balanceDiff).to.be.equal(BigInt(-params.amount));
         } else {
           expect(balanceDiff).to.be.equal(0n);
         }
