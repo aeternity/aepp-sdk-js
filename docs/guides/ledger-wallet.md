@@ -6,10 +6,10 @@ This guide explains basic interactions on getting access to aeternity accounts o
 
 Run the code from below you need:
 
-- a Ledger Hardware Wallet like Ledger Nano X, Ledger Nano S
-- to install [Ledger Live](https://www.ledger.com/ledger-live)
-- to install aeternity@0.4.4 or above app from Ledger Live to HW
-- to have Ledger HW connected to computer, unlocked, with aeternity app opened
+- a Ledger Hardware Wallet like Ledger Nano X, Ledger Nano S;
+- to install [Ledger Live](https://www.ledger.com/ledger-live);
+- to install aeternity@0.4.4 or above app from Ledger Live to HW;
+- to have Ledger HW connected to computer, unlocked, with aeternity app opened.
 
 ## Usage
 
@@ -31,7 +31,7 @@ console.log(account.address); // 'ak_2dA...'
 console.log(await account.signTransaction('tx_...')); // 'tx_...' (with signature added)
 ```
 
-The private key for the account would be derived on the Ledger device using the provided index and the mnemonic phrase it was initialized with.
+The private key for the account would be derived on the Ledger device using the provided index and the mnemonic phrase it was initialized with. The private key won't leave the device.
 
 The complete examples of how to use it in nodejs and browser can be found [here](https://github.com/aeternity/aepp-sdk-js/tree/71da12b5df56b41f7317d1fb064e44e8ea118d6c/test/environment/ledger).
 
@@ -69,3 +69,7 @@ const node = new Node('https://testnet.aeternity.io');
 const accounts = await accountFactory.discover(node);
 console.log(accounts[0].address); // 'ak_2dA...'
 ```
+
+## Error handling
+
+If the user rejects a transaction/message signing or address confirmation you will get an exception inherited from TransportStatusError (exposed in '@ledgerhq/hw-transport' package). With the message "Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)". Also, `statusCode` equals 0x6985, and `statusText` equals `CONDITIONS_OF_USE_NOT_SATISFIED`.
