@@ -28,26 +28,24 @@ const compareWithRealDevice = false; // switch to true for manual testing
 // eye quarter chapter suit cruel scrub verify stuff volume control learn dust
 let recordStore: RecordStore;
 let expectedRecordStore = '';
-let ignoreRealDevice = false;
 
-async function initTransport(s: string, i = false): Promise<Transport> {
+async function initTransport(s: string, ignoreRealDevice = false): Promise<Transport> {
   expectedRecordStore = s;
-  ignoreRealDevice = i;
   if (compareWithRealDevice && !ignoreRealDevice) {
     const t = await TransportNodeHid.create();
     recordStore = new RecordStore();
     const TransportRecorder = createTransportRecorder(t, recordStore);
     return new TransportRecorder(t);
   }
-  return openTransportReplayer(RecordStore.fromString(expectedRecordStore));
+  recordStore = RecordStore.fromString(expectedRecordStore);
+  return openTransportReplayer(recordStore);
 }
 
 afterEach(async () => {
-  if (compareWithRealDevice && !ignoreRealDevice) {
+  if (compareWithRealDevice) {
     expect(recordStore.toString().trim()).to.be.equal(expectedRecordStore);
   }
   expectedRecordStore = '';
-  ignoreRealDevice = false;
 });
 
 describe('Ledger HW', function () {
