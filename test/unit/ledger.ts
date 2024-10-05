@@ -26,38 +26,34 @@ import { indent } from '../utils';
 const compareWithRealDevice = false; // switch to true for manual testing
 // ledger should be initialized with mnemonic:
 // eye quarter chapter suit cruel scrub verify stuff volume control learn dust
-let transport: Transport;
 let recordStore: RecordStore;
 let expectedRecordStore = '';
-let ignoreRealDevice = false;
 
-async function initTransport(s: string, i = false): Promise<void> {
+async function initTransport(s: string, ignoreRealDevice = false): Promise<Transport> {
   expectedRecordStore = s;
-  ignoreRealDevice = i;
   if (compareWithRealDevice && !ignoreRealDevice) {
-    transport = await TransportNodeHid.create();
+    const t = await TransportNodeHid.create();
     recordStore = new RecordStore();
-    const TransportRecorder = createTransportRecorder(transport, recordStore);
-    transport = new TransportRecorder(transport);
-  } else {
-    transport = await openTransportReplayer(RecordStore.fromString(expectedRecordStore));
+    const TransportRecorder = createTransportRecorder(t, recordStore);
+    return new TransportRecorder(t);
   }
+  recordStore = RecordStore.fromString(expectedRecordStore);
+  return openTransportReplayer(recordStore);
 }
 
 afterEach(async () => {
-  if (compareWithRealDevice && !ignoreRealDevice) {
-    expect(recordStore.toString()).to.be.equal(expectedRecordStore);
+  if (compareWithRealDevice) {
+    expect(recordStore.toString().trim()).to.be.equal(expectedRecordStore);
   }
   expectedRecordStore = '';
-  ignoreRealDevice = false;
 });
 
-describe('Ledger HW', () => {
+describe('Ledger HW', function () {
+  this.timeout(compareWithRealDevice ? 60000 : 300);
+
   describe('factory', () => {
     it('gets app version', async () => {
-      await initTransport(indent`
-        => e006000000
-        <= 000004049000
+      const transport = await initTransport(indent`
         => e006000000
         <= 000004049000`);
       const factory = new AccountLedgerFactory(transport);
@@ -65,7 +61,7 @@ describe('Ledger HW', () => {
     });
 
     it('ensures that app version is compatible', async () => {
-      await initTransport(
+      const transport = await initTransport(
         indent`
           => e006000000
           <= 000104049000`,
@@ -73,12 +69,12 @@ describe('Ledger HW', () => {
       );
       const factory = new AccountLedgerFactory(transport);
       await expect(factory.getAddress(42)).to.be.rejectedWith(
-        'Unsupported app on ledger version 1.4.4. Supported: >= 0.4.4 < 0.5.0',
+        'Unsupported Aeternity app on Ledger version 1.4.4. Supported: >= 0.4.4 < 0.5.0',
       );
     });
 
     it('gets address', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e006000000
         <= 000004049000
         => e0020000040000002a
@@ -90,7 +86,7 @@ describe('Ledger HW', () => {
     });
 
     it('gets address with verification', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e006000000
         <= 000004049000
         => e0020100040000002a
@@ -102,7 +98,7 @@ describe('Ledger HW', () => {
     });
 
     it('gets address with verification rejected', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e006000000
         <= 000004049000
         => e0020100040000002a
@@ -114,7 +110,7 @@ describe('Ledger HW', () => {
     });
 
     it('initializes an account', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e006000000
         <= 000004049000
         => e0020000040000002a
@@ -149,7 +145,7 @@ describe('Ledger HW', () => {
     }
 
     it('discovers accounts', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e006000000
         <= 000004049000
         => e00200000400000000
@@ -168,7 +164,7 @@ describe('Ledger HW', () => {
     });
 
     it('discovers accounts on unused ledger', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e006000000
         <= 000004049000
         => e00200000400000000
@@ -183,7 +179,7 @@ describe('Ledger HW', () => {
   describe('account', () => {
     const address = 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ';
     it('fails on calling raw signing', async () => {
-      await initTransport('\n');
+      const transport = await initTransport('\n');
       const account = new AccountLedger(transport, 0, address);
       await expect(account.sign()).to.be.rejectedWith('RAW signing using Ledger HW');
     });
@@ -197,7 +193,7 @@ describe('Ledger HW', () => {
     });
 
     it('signs transaction', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e00400006a000000000000005b0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80
         <= f868f1c6ce9b9f2b3aecbec04c6a7b5c8ae30f5c0e87dbcf17fb99663cc22e41aa6edb5d1ee35678164c83d5bdc8cd8cef308b3ecf96f53f3cbd61732041ec0d9000`);
       const account = new AccountLedger(transport, 0, address);
@@ -212,7 +208,7 @@ describe('Ledger HW', () => {
     });
 
     it('signs transaction rejected', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e00400006a000000000000005b0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80
         <= 6985`);
       const account = new AccountLedger(transport, 0, address);
@@ -226,7 +222,7 @@ describe('Ledger HW', () => {
     const message = 'test-message,'.repeat(3);
 
     it('signs message', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e00800002f0000000000000027746573742d6d6573736167652c746573742d6d6573736167652c746573742d6d6573736167652c
         <= 78397e186058f278835b8e3e866960e4418dc1e9f00b3a2423f57c16021c88720119ebb3373a136112caa1c9ff63870092064659eb2c641dd67767f15c80350c9000`);
       const account = new AccountLedger(transport, 0, address);
@@ -236,7 +232,7 @@ describe('Ledger HW', () => {
     });
 
     it('signs message rejected', async () => {
-      await initTransport(indent`
+      const transport = await initTransport(indent`
         => e00800002f0000000000000027746573742d6d6573736167652c746573742d6d6573736167652c746573742d6d6573736167652c
         <= 6985`);
       const account = new AccountLedger(transport, 0, address);

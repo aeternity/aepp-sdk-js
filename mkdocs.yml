@@ -64,6 +64,7 @@ nav:
           - guides/connect-aepp-to-wallet.md
           - guides/build-wallet.md
           - guides/ledger-wallet.md
+          - guides/metamask-snap.md
   - transaction-options.md
   - Examples & Tutorials:
       - NodeJS:

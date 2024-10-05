@@ -15,24 +15,18 @@ export const SIGN_PERSONAL_MESSAGE = 0x08;
  * Ledger wallet account class
  */
 export default class AccountLedger extends AccountBase {
-  readonly transport: Transport;
-
-  override readonly address: Encoded.AccountAddress;
-
-  readonly index: number;
-
   /**
    * @param transport - Connection to Ledger to use
    * @param index - Index of account
    * @param address - Address of account
    */
-  constructor(transport: Transport, index: number, address: Encoded.AccountAddress) {
+  constructor(
+    readonly transport: Transport,
+    readonly index: number,
+    override readonly address: Encoded.AccountAddress,
+  ) {
     super();
-    this.transport = transport;
-    this.index = index;
-    this.address = address;
-    const scrambleKey = 'w0w';
-    transport.decorateAppAPIMethods(this, ['signTransaction', 'signMessage'], scrambleKey);
+    transport.decorateAppAPIMethods(this, ['signTransaction', 'signMessage'], 'w0w');
   }
 
   // eslint-disable-next-line class-methods-use-this

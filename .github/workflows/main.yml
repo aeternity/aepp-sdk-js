@@ -5,9 +5,9 @@ on:
   pull_request:
 jobs:
   main:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - run: sudo apt install erlang
+      - run: sudo apt update && sudo apt install --no-install-recommends erlang
       - uses: actions/checkout@v4
         with:
           fetch-depth: 100

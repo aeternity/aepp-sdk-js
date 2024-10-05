@@ -238,9 +238,10 @@ export class NotImplementedError extends BaseError {
  * @category exception
  */
 export class UnsupportedVersionError extends BaseError {
-  constructor(dependency: string, version: string, geVersion: string, ltVersion: string) {
+  constructor(dependency: string, version: string, geVersion: string, ltVersion?: string) {
     super(
-      `Unsupported ${dependency} version ${version}. Supported: >= ${geVersion} < ${ltVersion}`,
+      `Unsupported ${dependency} version ${version}. Supported: >= ${geVersion}` +
+        (ltVersion == null ? '' : ` < ${ltVersion}`),
     );
     this.name = 'UnsupportedVersionError';
   }

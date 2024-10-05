@@ -34,4 +34,5 @@ site
 /tooling/autorest/compiler-swagger.yaml
 /tooling/autorest/middleware-openapi.yaml
 /test/environment/ledger/browser
+/test/assets
 /bin
