@@ -27,4 +27,5 @@ module.exports = {
     const sdkPath = path.join(__dirname, '..', '..', '..', 'es');
     config.module.rule('mjs').include.add(sdkPath);
   },
+  transpileDependencies: ['@aeternity/aepp-calldata'],
 };
