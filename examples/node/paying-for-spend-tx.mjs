@@ -30,8 +30,8 @@ const AMOUNT = 1;
 // Note:
 //
 //  - The secret key of the account is pre-funded and only used for demonstration purpose
-//      - You can replace it with your own keypair (see
-//        [Create a Keypair](../../quick-start.md#2-create-a-keypair))
+//      - You can replace it with your own
+//        (see [Create an Account](../../quick-start.md#2-create-a-sender-account))
 //      - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 //  - The `AMOUNT` (in `aettos`) will be send to the new user and returned to the payer.
 

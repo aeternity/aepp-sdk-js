@@ -36,8 +36,8 @@ const COMPILER_URL = 'https://v8.compiler.aepps.com';
 // Note:
 //
 //  - The secret key of the account is pre-funded and only used for demonstration purpose
-//      - You should replace it with your own keypair (see
-//        [Create a Keypair](../../quick-start.md#2-create-a-keypair))
+//      - You can replace it with your own
+//        (see [Create an Account](../../quick-start.md#2-create-a-sender-account))
 //  - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 
 // ## 3. Create object instances
