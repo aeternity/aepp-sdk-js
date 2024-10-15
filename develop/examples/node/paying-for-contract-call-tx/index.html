@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1712,9 +1732,7 @@ decentralized aepp without having them to buy AE by covering their fees.</p>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>You need to import <code>AeSdk</code>, <code>Node</code> and <code>MemoryAccount</code> classes from the SDK.
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="p">,</span>
-<span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 </code></pre></div>
 <strong>Note</strong>:</p>
 <ul>
@@ -1790,7 +1808,9 @@ typically use for contract calls.</p>
 </li>
 </ol>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Contract</span><span class="p">.</span><span class="nx">initialize</span><span class="p">({</span>
-<span class="w">  </span><span class="p">...</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(),</span><span class="w"> </span><span class="nx">sourceCode</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE_CODE</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_ADDRESS</span><span class="p">,</span>
+<span class="w">  </span><span class="p">...</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(),</span>
+<span class="w">  </span><span class="nx">sourceCode</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE_CODE</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">address</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_ADDRESS</span><span class="p">,</span>
 <span class="p">});</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">calldata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">_calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;PayingForTxExample&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;set_last_caller&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]);</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">contractCallTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">buildTx</span><span class="p">({</span>
@@ -1802,10 +1822,10 @@ typically use for contract calls.</p>
 <span class="w">  </span><span class="nx">gasPrice</span><span class="o">:</span><span class="w"> </span><span class="mf">1500000000</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">callData</span><span class="o">:</span><span class="w"> </span><span class="nx">calldata</span><span class="p">,</span>
 <span class="p">});</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">signedContractCallTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span>
-<span class="w">  </span><span class="nx">contractCallTx</span><span class="p">,</span>
-<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">innerTx</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span>
-<span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">signedContractCallTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">contractCallTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">innerTx</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="p">});</span>
 </code></pre></div>
 <h2 id="5-create-sign-broadcast-the-payingfortx-as-payer">5. Create, sign &amp; broadcast the <code>PayingForTx</code> as payer</h2>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payForTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">payForTransaction</span><span class="p">(</span><span class="nx">signedContractCallTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="p">});</span>

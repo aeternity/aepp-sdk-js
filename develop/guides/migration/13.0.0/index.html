@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -3786,23 +3806,23 @@
 <p>If you are using <code>connectNode</code> then the current node would always be the same as wallet provides.</p>
 <h2 id="contract">Contract</h2>
 <h4 id="aci-format-used-the-same-as-returned-by-aesophia_cli">ACI format used the same as returned by aesophia_cli</h4>
-<p>aesophia_http old format
+<p>aesophia_http old format</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;encoded_aci&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">co</span><span class="kc">ntra</span><span class="err">c</span><span class="kc">t</span><span class="p">:</span><span class="w"> </span><span class="err">&lt;</span><span class="mi">1</span><span class="err">&gt;</span><span class="w"> </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;external_encoded_aci&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">&lt;</span><span class="mi">2</span><span class="err">&gt;</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-aesophia_cli format
+<p>aesophia_cli format</p>
 <div class="highlight"><pre><span></span><code><span class="p">[</span><span class="err">&lt;</span><span class="mi">2</span><span class="err">&gt;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">co</span><span class="kc">ntra</span><span class="err">c</span><span class="kc">t</span><span class="p">:</span><span class="w"> </span><span class="err">&lt;</span><span class="mi">1</span><span class="err">&gt;</span><span class="w"> </span><span class="p">}]</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="params-argument-in-deploy-and-call-is-required"><code>params</code> argument in <code>$deploy</code> and <code>$call</code> is required</h4>
 <h4 id="contract-methods-accessible-on-the-instance-itself">Contract methods accessible on the instance itself</h4>
-<p>Apply a patch:
+<p>Apply a patch:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-const contract = aeSdk.getContractInstance(&lt;contract args&gt;);</span>
 <span class="gi">+const contract = aeSdk.getContractInstance&lt;{ foo: (a: bigint) =&gt; bigint }&gt;(&lt;contract args&gt;);</span>
 <span class="gd">-await contract.methods.foo(&lt;arguments&gt;);</span>
 <span class="gi">+await contract.foo(&lt;arguments&gt;);</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="contractmethodsnamegetsend-removed"><code>contract.methods.&lt;name&gt;.get,send</code> removed</h4>
 <p>Use <code>callStatic</code> option instead.</p>
 <h4 id="contractbytecodesourcecode-moved-to-contractoptions"><code>contract.bytecode,sourceCode</code> moved to <code>contract.$options</code></h4>
@@ -3819,22 +3839,22 @@ aesophia_cli format
 <h4 id="createaensdelegationsignature-createoracledelegationsignature-removed"><code>createAensDelegationSignature</code>, <code>createOracleDelegationSignature</code> removed</h4>
 <p>Use <code>createDelegationSignature</code> instead.</p>
 <h4 id="use-sourcecode-instead-of-source">use <code>sourceCode</code> instead of <code>source</code></h4>
-<p>It is related to <code>getContractInstance</code> and signing using Generalized accounts. Apply a change:
+<p>It is related to <code>getContractInstance</code> and signing using Generalized accounts. Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-aeSdk.getContractInstance({ source: &lt;contract source code&gt;, ... })</span>
 <span class="gi">+aeSdk.getContractInstance({ sourceCode: &lt;contract source code&gt;, ... })</span>
 <span class="gd">-aeSdk.spend(..., { authData: { source: &lt;contract source code&gt;, args: [...] } })</span>
 <span class="gi">+aeSdk.spend(..., { authData: { sourceCode: &lt;contract source code&gt;, args: [...] } })</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="getcontractinstance-accepts-address-instead-of-contractaddress"><code>getContractInstance</code> accepts <code>address</code> instead of <code>contractAddress</code></h4>
-<p>Apply a change:
+<p>Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-aeSdk.getContractInstance({ contractAddress: &lt;contract address&gt;, ... })</span>
 <span class="gi">+aeSdk.getContractInstance({ address: &lt;contract address&gt;, ... })</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="getcontractinstance-function-replaced-with-contract-class"><code>getContractInstance</code> function replaced with Contract class</h4>
-<p>Apply a patch:
+<p>Apply a patch:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-contract = await getContractInstance(&lt;options&gt;);</span>
 <span class="gi">+contract = await Contract.initialize(&lt;options&gt;);</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="aesdkgetcontractinstance-renamed-to-aesdkinitializecontract"><code>AeSdk.getContractInstance</code> renamed to <code>AeSdk.initializeContract</code></h4>
 <h4 id="preparetxparams-getvmversion-are-not-exported-anymore"><code>prepareTxParams</code>, <code>getVmVersion</code> are not exported anymore</h4>
 <p>Use <code>buildTx</code> instead.</p>
@@ -3844,10 +3864,10 @@ aesophia_cli format
 <h4 id="writeint-function-removed"><code>writeInt</code> function removed</h4>
 <p>Use <code>toBytes</code> util instead.</p>
 <h4 id="returntype-of-contract-call-result-structure-is-a-value-of-callreturntype-enum"><code>returnType</code> of contract call result structure is a value of CallReturnType enum</h4>
-<p>Apply a patch:
+<p>Apply a patch:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-contractCall.returnType === &quot;error&quot;</span>
 <span class="gi">+contractCall.returnType === CallReturnType.Error</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="writeid-readid-functions-removed"><code>writeId</code>, <code>readId</code> functions removed</h4>
 <p>Use transaction builder instead.</p>
 <h4 id="readpointers-buildpointers-functions-removed"><code>readPointers</code>, <code>buildPointers</code> functions removed</h4>
@@ -3870,19 +3890,19 @@ aesophia_cli format
 <p>They are exported as <code>VmVersion</code>, <code>AbiVersion</code>, <code>ConsensusProtocolVersion</code>.</p>
 <h4 id="statehash-of-channel-entry-decoded-as-st_-prefixed-string-instead-of-hex"><code>stateHash</code> of Channel entry decoded as <code>st_</code>-prefixed string instead of hex</h4>
 <h4 id="spendtx-payload-doesnt-accept-arbitrary-strings-anymore">SpendTx <code>payload</code> doesn't accept arbitrary strings anymore</h4>
-<p>Provide a <code>ba_</code>-encoded string instead.
+<p>Provide a <code>ba_</code>-encoded string instead.</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-payload: &#39;test&#39;,</span>
 <span class="gi">+payload: encode(Buffer.from(&#39;test&#39;), Encoding.Bytearray),</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="verifytransaction-doesnt-accept-parent-tx-types-anymore"><code>verifyTransaction</code> doesn't accept parent tx types anymore</h4>
 <h4 id="buildtx-doesnt-accept-excludekeys-option-anymore"><code>buildTx</code> doesn't accept <code>excludeKeys</code> option anymore</h4>
 <p>Consider opening an issue, if you need this functionality.</p>
 <h4 id="use-version-instead-of-vsn-vsn-in-unpacktx-buildtx">Use <code>version</code> instead of <code>VSN</code>, <code>vsn</code> in <code>unpackTx</code>, <code>buildTx</code></h4>
 <h4 id="buildtx-accepts-transaction-type-and-version-in-the-first-argument"><code>buildTx</code> accepts transaction type and version in the first argument</h4>
-<p>Apply a change:
+<p>Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-buildTx({ ... }, Tag.SpendTx, { version: 2 })</span>
 <span class="gi">+buildTx({ ..., tag: Tag.SpendTx, version: 2 })</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="aesdkbuildtx-accepts-tag-in-options">AeSdk.buildTx accepts <code>tag</code> in options</h4>
 <p>Replace <code>aeSdk.buildTx(Tag.SpendTx, { ... })</code> with <code>aeSdk.buildTx({ ..., tag: Tag.SpendTx })</code>.</p>
 <h4 id="sync-buildtx-accepts-denomination-in-the-first-argument">sync <code>buildTx</code> accepts <code>denomination</code> in the first argument</h4>
@@ -3906,14 +3926,14 @@ aesophia_cli format
 <h4 id="key-of-mtreevalue-entry-decoded-as-a-buffer-instead-of-a-hex"><code>key</code> of MtreeValue entry decoded as a buffer instead of a hex</h4>
 <h4 id="txbuilder-accepts-and-returns-poi-field-unpacked-as-treespoi">TxBuilder accepts and returns <code>poi</code> field unpacked as TreesPoi</h4>
 <h4 id="get-method-of-mptree-accepts-and-returns-typed-values"><code>get</code> method of MPTree accepts and returns typed values</h4>
-<p>Apply a change:
+<p>Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-unpackTx(tree.get(decode(&#39;ak_97...&#39;)))</span>
 <span class="gi">+tree.get(&#39;ak_97...&#39;)</span>
-</code></pre></div></p>
+</code></pre></div>
 <h2 id="compiler">Compiler</h2>
 <h4 id="compiler-export-renamed-to-compilerhttp"><code>Compiler</code> export renamed to <code>CompilerHttp</code></h4>
 <h4 id="removed-aesdkcompilerurl-aesdksetcompilerurl">removed AeSdk:compilerUrl, AeSdk:setCompilerUrl</h4>
-<p>A compiler instance needs to be passed explicitly in <code>onCompiler</code> option:
+<p>A compiler instance needs to be passed explicitly in <code>onCompiler</code> option:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-import { AeSdk } from &#39;@aeternity/aepp-sdk&#39;;</span>
 <span class="gi">+import { AeSdk, CompilerHttp } from &#39;@aeternity/aepp-sdk&#39;;</span>
 
@@ -3921,26 +3941,26 @@ const aeSdk = new AeSdk({
 <span class="gd">-  compilerUrl: &lt;compiler url&gt;,</span>
 <span class="gi">+  onCompiler: new CompilerHttp(&lt;compiler url&gt;),</span>
 });
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="methods-of-compilerhttp-moved-to-api-property">Methods of <code>CompilerHttp</code> moved to <code>api</code> property</h4>
-<p>Apply a patch:
+<p>Apply a patch:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-compilerHttp.generateACI({ code: sourceCode });</span>
 <span class="gi">+compilerHttp.api.generateACI({ code: sourceCode });</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="dropped-compatibility-with-aesophia_http-below-711-aesophia_cli-below-701">Dropped compatibility with aesophia_http below 7.1.1, aesophia_cli below 7.0.1</h4>
 <h2 id="account">Account</h2>
 <h4 id="creategeneralizedaccount-accepts-sourcecode-in-options"><code>createGeneralizedAccount</code> accepts <code>sourceCode</code> in options</h4>
-<p>Apply a patch:
+<p>Apply a patch:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-aeSdk.createGeneralizedAccount(&#39;authorize&#39;, sourceCode, [&#39;arg-1&#39;]);</span>
 <span class="gi">+aeSdk.createGeneralizedAccount(&#39;authorize&#39;, [&#39;arg-1&#39;], { sourceCode });</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="createmetatx-removed"><code>createMetaTx</code> removed</h4>
 <p>Use <code>AccountGeneralized.signTransaction</code> instead.</p>
 <h4 id="accountrpc-constructor-accepts-arguments-one-by-one"><code>AccountRpc</code> constructor accepts arguments one by one</h4>
-<p>Apply a change:
+<p>Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-new AccountRpc({ rpcClient: &lt;rpc client&gt;, address: &lt;address&gt; })</span>
 <span class="gi">+new AccountRpc(&lt;rpc client&gt;, &lt;address&gt;)</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="accountmemory-requires-networkid-in-signtransaction"><code>AccountMemory</code> requires <code>networkId</code> in <code>signTransaction</code></h4>
 <h4 id="accountbase-simplified"><code>AccountBase</code> simplified</h4>
 <ul>
@@ -3949,20 +3969,20 @@ const aeSdk = new AeSdk({
 <li><code>signTransaction</code>, <code>signMessage</code> made abstract</li>
 </ul>
 <h4 id="address-in-accountbase-is-a-property"><code>address</code> in <code>AccountBase</code> is a property</h4>
-<p>Apply a change:
+<p>Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-await accountMemory.address(options)</span>
 <span class="gi">+accountMemory.address</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="memoryaccount-accepts-only-secretkey">MemoryAccount accepts only secretKey</h4>
-<p>Apply a change:
+<p>Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-new MemoryAccount({ keypair: { publicKey: &#39;ak_..&#39;, secretKey: &lt;secret key&gt; } })</span>
 <span class="gi">+new MemoryAccount(&lt;secret key&gt;)</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="memoryaccount-is-not-compatible-with-ga">MemoryAccount is not compatible with GA</h4>
-<p>Apply a change:
+<p>Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-new MemoryAccount({ gaId: &lt;address&gt; })</span>
 <span class="gi">+new AccountGeneralized(&lt;address&gt;)</span>
-</code></pre></div></p>
+</code></pre></div>
 <h2 id="node">Node</h2>
 <h4 id="url-property-of-node-removed"><code>url</code> property of <code>Node</code> removed</h4>
 <p>Use autorest's <code>$host</code> property instead.</p>
@@ -3974,21 +3994,21 @@ const aeSdk = new AeSdk({
 <h4 id="aesdkextendoraclettl-aesdkrespondtoquery-doesnt-accept-oracleid">AeSdk:extendOracleTtl, AeSdk:respondToQuery doesn't accept oracleId</h4>
 <p>Remove the first argument.</p>
 <h4 id="onquery-callback-of-pollforqueries-oraclepollqueries-accepts-a-single-query"><code>onQuery</code> callback of <code>pollForQueries</code>, <code>oracle.pollQueries</code> accepts a single query</h4>
-<p>It was accepting an array before. Apply a patch:
+<p>It was accepting an array before. Apply a patch:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-aeSdk.pollForQueries(oracleId, (queries) =&gt; queries.forEach(handleQuery));</span>
 <span class="gi">+aeSdk.pollForQueries(oracleId, handleQuery);</span>
-</code></pre></div></p>
+</code></pre></div>
 <h2 id="chain">Chain</h2>
 <h4 id="send-inlined-into-sendtransaction"><code>send</code> inlined into <code>sendTransaction</code></h4>
 <p>Pass not signed transaction to <code>sendTransaction</code>.
 If you need to post signed transaction use Node:postTransaction.</p>
 <h2 id="aens">AENS</h2>
 <h4 id="height-removed-from-the-output-of-aenspreclaim"><code>height</code> removed from the output of <code>aensPreclaim</code></h4>
-<p>Use <code>blockHeight</code> instead:
+<p>Use <code>blockHeight</code> instead:</p>
 <div class="highlight"><pre><span></span><code>const res = aeSdk.aensPreclaim(&#39;name.chain&#39;);
 -res.height
 +res.blockHeight - 1
-</code></pre></div></p>
+</code></pre></div>
 <h2 id="channel">Channel</h2>
 <h4 id="channelstate-returns-unpacked-entries">Channel:state returns unpacked entries</h4>
 <p>Use <code>buildTx</code> to pack them back if needed.</p>
@@ -3999,10 +4019,10 @@ If you need to post signed transaction use Node:postTransaction.</p>
 <p>Use just <code>await channel.poi(...)</code> instead of <code>unpackTx(await channel.poi(...))</code>.</p>
 <h2 id="other">Other</h2>
 <h4 id="onaccount-doesnt-accept-keypair"><code>onAccount</code> doesn't accept keypair</h4>
-<p>Apply a change:
+<p>Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-aeSdk.&lt;metnod name&gt;(..., { onAccount: &lt;keypair&gt; })</span>
 <span class="gi">+aeSdk.&lt;metnod name&gt;(..., { onAccount: new MemoryAccount(&lt;keypair&gt;.secretKey) })</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="bignumbertobytearray-removed"><code>bigNumberToByteArray</code> removed</h4>
 <p>Use <code>toBytes</code> instead.</p>
 <h4 id="str2buf-function-removed"><code>str2buf</code> function removed</h4>
@@ -4016,17 +4036,17 @@ If you need to post signed transaction use Node:postTransaction.</p>
 <h4 id="rename-umd-export-to-aeternity">rename umd export to <code>Aeternity</code></h4>
 <h4 id="subpaths-imports-of-sdk-are-not-allowed">Subpaths imports of SDK are not allowed</h4>
 <p>SDK does versioning only for the API provided in the root export.
-Replace subpaths imports with imports of the package root.
+Replace subpaths imports with imports of the package root.</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-import MemoryAccount from &#39;@aeternity/aepp-sdk/es/account/Memory.mjs&#39;;</span>
 <span class="gi">+import { MemoryAccount } from &#39;@aeternity/aepp-sdk&#39;;</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="removed-getnetworkid-from-aesdkbase">Removed <code>getNetworkId</code> from <code>AeSdkBase</code></h4>
 <p>Use <code>Node.getNetworkId</code> instead.</p>
 <h4 id="address-a-getter-in-aesdkbase"><code>address</code> a getter in AeSdkBase</h4>
-<p>Apply a change:
+<p>Apply a change:</p>
 <div class="highlight"><pre><span></span><code><span class="gd">-await aeSdk.address()</span>
 <span class="gi">+aeSdk.address</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="addaccount-is-a-sync-function"><code>addAccount</code> is a sync function</h4>
 <h4 id="verifymessage-removed-from-accounts-and-aesdkbase"><code>verifyMessage</code> removed from accounts and AeSdkBase</h4>
 <p>Use <code>verifyMessage</code> exported in the root instead.</p>

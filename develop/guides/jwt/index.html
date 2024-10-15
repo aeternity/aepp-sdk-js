@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -722,6 +721,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1562,57 +1582,57 @@
 
 <h1 id="jwt-usage">JWT usage</h1>
 <h2 id="generating-jwt">Generating JWT</h2>
-<p>Use <code>signJwt</code> to generate a JWT signed by an account provided in arguments.
+<p>Use <code>signJwt</code> to generate a JWT signed by an account provided in arguments.</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">signJwt</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">.</span><span class="nx">generate</span><span class="p">();</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;data&#39;</span><span class="w"> </span><span class="p">};</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">jwt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">signJwt</span><span class="p">(</span><span class="nx">payload</span><span class="p">,</span><span class="w"> </span><span class="nx">account</span><span class="p">);</span>
-</code></pre></div></p>
+</code></pre></div>
 <p>Provide <code>sub_jwk: undefined</code> in payload to omit signer public key added by default.
-Do it to make JWT shorter.
+Do it to make JWT shorter.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">jwt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">signJwt</span><span class="p">({</span><span class="w"> </span><span class="nx">test</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;data&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">sub_jwk</span><span class="o">:</span><span class="w"> </span><span class="kt">undefined</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">account</span><span class="p">);</span>
-</code></pre></div></p>
-<p>Or if you using a different way to encode a signer address.
+</code></pre></div>
+<p>Or if you using a different way to encode a signer address.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">test</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;data&#39;</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">sub_jwk</span><span class="o">:</span><span class="w"> </span><span class="kt">undefined</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">address</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;</span><span class="p">,</span>
-<span class="p">}</span>
+<span class="p">};</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">jwt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">signJwt</span><span class="p">(</span><span class="nx">payload</span><span class="p">,</span><span class="w"> </span><span class="nx">account</span><span class="p">);</span>
-</code></pre></div></p>
+</code></pre></div>
 <h2 id="verifying-jwt">Verifying JWT</h2>
-<p>Let's assume we got a JWT as string. Firstly we need to ensure that it has the right format.
+<p>Let's assume we got a JWT as string. Firstly we need to ensure that it has the right format.</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">isJwt</span><span class="p">,</span><span class="w"> </span><span class="nx">ensureJwt</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isJwt</span><span class="p">(</span><span class="nx">jwt</span><span class="p">))</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;Invalid JWT&#39;</span><span class="p">);</span>
 <span class="c1">// alternatively,</span>
 <span class="nx">ensureJwt</span><span class="p">(</span><span class="nx">jwt</span><span class="p">);</span>
-</code></pre></div></p>
+</code></pre></div>
 <p>After that we can pass JWT to other SDK's methods, for example to get JWT payload and signer address
-in case JWT has the signer public key included in <code>"sub_jwk"</code>.
+in case JWT has the signer public key included in <code>"sub_jwk"</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">unpackJwt</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">payload</span><span class="p">,</span><span class="w"> </span><span class="nx">signer</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">unpackJwt</span><span class="p">(</span><span class="nx">jwt</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">payload</span><span class="p">);</span><span class="w"> </span><span class="c1">// { test: &#39;data&#39;, sub_jwk: { ... } }</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">signer</span><span class="p">);</span><span class="w"> </span><span class="c1">// &#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;</span>
 </code></pre></div>
-<code>unpackJwt</code> will also check the JWT signature in this case.</p>
-<p>Alternatively, if <code>"sub_jwk"</code> is not included then we can provide signer address to <code>unpackJwt</code>.
+<p><code>unpackJwt</code> will also check the JWT signature in this case.</p>
+<p>Alternatively, if <code>"sub_jwk"</code> is not included then we can provide signer address to <code>unpackJwt</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">knownSigner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">payload</span><span class="p">,</span><span class="w"> </span><span class="nx">signer</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">unpackJwt</span><span class="p">(</span><span class="nx">jwt</span><span class="p">,</span><span class="w"> </span><span class="nx">knownSigner</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">payload</span><span class="p">);</span><span class="w"> </span><span class="c1">// { test: &#39;data&#39; }</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">signer</span><span class="p">);</span><span class="w"> </span><span class="c1">// &#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;</span>
-</code></pre></div></p>
+</code></pre></div>
 <p>If we need to a get signer address based on JWT payload then we need to unpack it without checking
-the signature. Don't forget to check signature after that using <code>verifyJwt</code>.
+the signature. Don't forget to check signature after that using <code>verifyJwt</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">verifyJwt</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">payload</span><span class="p">,</span><span class="w"> </span><span class="nx">signer</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">unpackJwt</span><span class="p">(</span><span class="nx">jwt</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">payload</span><span class="p">);</span><span class="w"> </span><span class="c1">// { address: &#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39; }</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">signer</span><span class="p">);</span><span class="w"> </span><span class="c1">// undefined</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">verifyJwt</span><span class="p">(</span><span class="nx">jwt</span><span class="p">,</span><span class="w"> </span><span class="nx">payload</span><span class="p">.</span><span class="nx">address</span><span class="p">))</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;JWT signature is invalid&#39;</span><span class="p">);</span>
-</code></pre></div></p>
+</code></pre></div>
 
 
 

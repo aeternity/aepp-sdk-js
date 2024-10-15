@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -742,6 +741,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1603,7 +1623,7 @@
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
 <li>Install <a href="https://wallet.superhero.com/">Superhero Wallet extension</a> for simplicity of example.
-You can build your own wallet in the next example</li>
+  You can build your own wallet in the next example</li>
 </ul>
 <h2 id="1-specify-imports-and-constants">1. Specify imports and constants</h2>
 <p><div class="highlight"><span class="filename">examples/browser/aepp/src/StoreAeSdkPlugin.js</span><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdkAepp</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
@@ -1657,10 +1677,11 @@ View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b3278
 View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b32781769342e4941c8dacf6ad53/examples/browser/aepp/src/Connect.vue#L66-L85">GitHub</a></p>
 <p>Alternatively, aepp can request wallet to share node url it connected to. If agreed, then aepp can
 connect to the wallet's node.</p>
-<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span>
-<span class="w">  </span><span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">(),</span>
-<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">connectNode</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;wallet-node&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span>
-<span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">connectToWallet</span><span class="p">(</span><span class="nx">wallet</span><span class="p">.</span><span class="nx">getConnection</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">connectNode</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;wallet-node&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">select</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="p">});</span>
 </code></pre></div>
 <p>It can be used to</p>
 <ul>

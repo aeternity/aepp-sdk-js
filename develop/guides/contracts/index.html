@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -896,6 +895,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1914,40 +1934,38 @@
 <p>Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into <a href="https://github.com/aeternity/aepp-sophia-examples">aepp-sophia-examples</a> and start rapid prototyping using <a href="https://studio.aepps.com">AEstudio</a>.</p>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <div class="highlight"><pre><span></span><code><span class="c1">// node.js import</span>
-<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">)</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">);</span>
 <span class="c1">// ES import</span>
-<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 <span class="c1">// additionally you may need to import CompilerCli or CompilerHttp</span>
 </code></pre></div>
 <h2 id="2-setup-compiler">2. Setup compiler</h2>
 <p>Compiler primarily used to generate bytecode to deploy a contract.
 Skip this step if you have a contract bytecode or need to interact with an already deployed contract.
 Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">aesophia_cli</a> and <a href="https://github.com/aeternity/aesophia_http">aesophia_http</a> implemented in <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerCli.html">CompilerCli</a> and <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerHttp.html">CompilerHttp</a> respectively.</p>
-<p>CompilerCli is available only in Node.js and requires Erlang installed (<code>escript</code> available in <code>$PATH</code>), Windows is supported.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerCli</span><span class="p">()</span>
-</code></pre></div></p>
-<p>CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since <a href="https://v8.compiler.aepps.com/api">compiler.aepps.com</a> is planned to be decommissioned. An example of how to run it using <a href="https://github.com/aeternity/aepp-sdk-js/blob/cd8dd7f76a6323383349b48400af0d69c2cfd88e/docker-compose.yml#L11-L14">docker-compose</a>.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="s1">&#39;https://v8.compiler.aepps.com&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1">// host your own compiler</span>
-</code></pre></div></p>
+<p>CompilerCli is available only in Node.js and requires Erlang installed (<code>escript</code> available in <code>$PATH</code>), Windows is supported.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerCli</span><span class="p">();</span>
+</code></pre></div>
+<p>CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since <a href="https://v8.compiler.aepps.com/api">compiler.aepps.com</a> is planned to be decommissioned. An example of how to run it using <a href="https://github.com/aeternity/aepp-sdk-js/blob/cd8dd7f76a6323383349b48400af0d69c2cfd88e/docker-compose.yml#L11-L14">docker-compose</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="s1">&#39;https://v8.compiler.aepps.com&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// host your own compiler</span>
+</code></pre></div>
 <p>Both compiler classes implement the <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html">same interface</a> that can be used to generate bytecode and ACI without a Contract instance.</p>
 <h2 id="3-create-an-instance-of-the-sdk">3. Create an instance of the SDK</h2>
 <p>When creating an instance of the SDK you need to provide an account which will be used to sign transactions like <code>ContractCreateTx</code> and <code>ContractCallTx</code> that will be broadcasted to the network.</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1">// ideally host your own node</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="nx">SECRET_KEY</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// ideally host your own node</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="nx">SECRET_KEY</span><span class="p">);</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
 <span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
 <span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">account</span><span class="p">],</span>
 <span class="w">  </span><span class="nx">onCompiler</span><span class="o">:</span><span class="w"> </span><span class="nx">compiler</span><span class="p">,</span><span class="w"> </span><span class="c1">// remove if step #2 skipped</span>
-<span class="p">})</span>
+<span class="p">});</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
 <li>You can provide multiple accounts to the SDK.</li>
-<li>For each transaction you can choose a specific account to use for signing (by default the first account will be used), see <a href="../../transaction-options/">transaction options</a>.<ul>
+<li>For each transaction you can choose a specific account to use for signing (by default the first account will be used), see <a href="../../transaction-options/">transaction options</a>.</li>
 <li>This is specifically important and useful for writing tests.</li>
-</ul>
-</li>
 </ul>
 <h2 id="4-initialize-the-contract-instance">4. Initialize the contract instance</h2>
 <p>To do so, we need to prepare an options object, which can be done in multiple ways.</p>
@@ -1963,10 +1981,10 @@ Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">
 </code></pre></div></li>
 </ul>
 <h3 id="by-path-to-source-code-available-only-in-nodejs">By path to source code (available only in Node.js)</h3>
-<p>It can be used with both CompilerCli and CompilerHttp. This way contract imports would be handled automatically, with no need to provide <code>fileSystem</code> option.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sourceCodePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;./example.aes&#39;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">sourceCodePath</span><span class="w"> </span><span class="p">}</span>
-</code></pre></div></p>
+<p>It can be used with both CompilerCli and CompilerHttp. This way contract imports would be handled automatically, with no need to provide <code>fileSystem</code> option.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sourceCodePath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;./example.aes&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">sourceCodePath</span><span class="w"> </span><span class="p">};</span>
+</code></pre></div>
 <h3 id="by-aci-and-bytecode">By ACI and bytecode</h3>
 <p>If you pre-compiled the contracts you can also initialize a contract instance by providing ACI and bytecode:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">aci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// ACI of the contract</span>
@@ -1980,13 +1998,13 @@ Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">
 <span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 <h3 id="create-contract-instance">Create contract instance</h3>
-<p>Do it by <code>Contract::initialize</code>.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Contract</span><span class="p">.</span><span class="nx">initialize</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(),</span><span class="w"> </span><span class="p">...</span><span class="nx">options</span><span class="w"> </span><span class="p">})</span>
+<p>Do it by <code>Contract::initialize</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Contract</span><span class="p">.</span><span class="nx">initialize</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(),</span><span class="w"> </span><span class="p">...</span><span class="nx">options</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-<code>AeSdk:getContext</code> is used to get base options to instantiate contracts. These options include the current account, node, and compiler. They are referenced using Proxy class, pointing to the latest values specified in AeSdk. So, if you change the selected node in the AeSdk instance, it will be also changed in bound contract instances.</p>
+<p><code>AeSdk:getContext</code> is used to get base options to instantiate contracts. These options include the current account, node, and compiler. They are referenced using Proxy class, pointing to the latest values specified in AeSdk. So, if you change the selected node in the AeSdk instance, it will be also changed in bound contract instances.</p>
 <h3 id="options">Options</h3>
 <ul>
-<li>Following attributes can be provided via <code>options</code> to <code>Contract::initialize</code>:<ul>
+<li>Following attributes can be provided via <code>options</code> to <code>Contract::initialize</code>:</li>
 <li><code>aci</code> (default: obtained via <code>onCompiler</code>)<ul>
 <li>The Contract ACI.</li>
 </ul>
@@ -2011,13 +2029,11 @@ Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">
 </ul>
 </li>
 </ul>
-</li>
-</ul>
 <h3 id="keep-bytecode-and-aci-for-future-use">Keep bytecode and ACI for future use</h3>
 <p>After the contract is initialized you can persist values of <code>contract._aci</code> and <code>contract.$options.bytecode</code>.
 They can be provided for subsequent contract initializations to don't depend on a compiler.</p>
 <h2 id="5-deploy-the-contract">5. Deploy the contract</h2>
-<p>If you have a Sophia contract source code that looks like this:
+<p>If you have a Sophia contract source code that looks like this:</p>
 <div class="highlight"><pre><span></span><code><span class="k">contract</span><span class="w"> </span><span class="nf">Increment</span><span class="w"> </span><span class="ow">=</span>
 
 <span class="w">    </span><span class="k">record</span><span class="w"> </span><span class="nb">state</span><span class="w"> </span><span class="ow">=</span>
@@ -2031,30 +2047,30 @@ They can be provided for subsequent contract initializations to don't depend on 
 
 <span class="w">    </span><span class="k">entrypoint</span><span class="w"> </span><span class="n">get_count</span><span class="p">()</span><span class="w"> </span><span class="ow">=</span>
 <span class="w">        </span><span class="nb">state</span><span class="p">.</span><span class="n">count</span>
-</code></pre></div></p>
+</code></pre></div>
 <p>The contract can be deployed using the <code>contract</code> in two different ways:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">$deploy</span><span class="p">([</span><span class="mf">1</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">$deploy</span><span class="p">([</span><span class="mf">1</span><span class="p">]);</span>
 <span class="c1">// or</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="mf">1</span><span class="p">);</span>
 
 <span class="c1">// after successful deployment you can look up the transaction and the deploy information</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">)</span><span class="w"> </span><span class="c1">// { owner, transaction, address, result, rawTx }</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// { owner, transaction, address, result, rawTx }</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
 <li>Deployment is only possible if the contract instance was initialized by providing source code or bytecode.</li>
 <li>The <code>init</code> entrypoint is a special function which is only called once for deployment, initializes the contract's state and doesn't require the <code>stateful</code> declaration.</li>
 <li>In Sophia all <code>public functions</code> are called <code>entrypoints</code> and need to be declared as <code>stateful</code>
-if they should produce changes to the state of the smart contract, see <code>increment(value: int)</code>.</li>
+  if they should produce changes to the state of the smart contract, see <code>increment(value: int)</code>.</li>
 </ul>
 <h2 id="6-call-contract-entrypoints">6. Call contract entrypoints</h2>
 <h3 id="a-stateful-entrypoints">a) Stateful entrypoints</h3>
 <p>According to the example above you can call the <code>stateful</code> entrypoint <code>increment</code> by using one of the following lines:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">increment</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span><span class="w"> </span><span class="c1">// recommended</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">increment</span><span class="p">(</span><span class="mf">3</span><span class="p">);</span><span class="w"> </span><span class="c1">// recommended</span>
 <span class="c1">// or</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">increment</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">callStatic</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">increment</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">callStatic</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">});</span>
 <span class="c1">// or</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">$call</span><span class="p">(</span><span class="s1">&#39;increment&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">3</span><span class="p">])</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">$call</span><span class="p">(</span><span class="s1">&#39;increment&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">3</span><span class="p">]);</span>
 </code></pre></div>
 <p>Note:</p>
 <ul>
@@ -2063,9 +2079,9 @@ if they should produce changes to the state of the smart contract, see <code>inc
 </ul>
 <h3 id="b-regular-entrypoints">b) Regular entrypoints</h3>
 <p>The æternity node can expose an API endpoint that allows to execute a <code>dry-run</code> for a transaction. You can make use of that functionality to get the result of entrypoints that don't execute state changes. Following lines show how you can do that using the SDK for the <code>get_count</code> entrypoint of the example above:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">get_count</span><span class="p">()</span><span class="w"> </span><span class="c1">// recommended</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">get_count</span><span class="p">();</span><span class="w"> </span><span class="c1">// recommended</span>
 <span class="c1">// or</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">get_count</span><span class="p">({</span><span class="w"> </span><span class="nx">callStatic</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">get_count</span><span class="p">({</span><span class="w"> </span><span class="nx">callStatic</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span>
 
 <span class="c1">// access the decoded result returned by the execution of the entrypoint</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedResult</span><span class="p">);</span>
@@ -2082,9 +2098,9 @@ if they should produce changes to the state of the smart contract, see <code>inc
 <span class="w">        </span><span class="c1">// further logic ...</span>
 </code></pre></div>
 <p>In order to successfully call the <code>fund_project</code> entrypoint you need to provide at least 50 <code>aettos</code>. You can do this by providing the desired amount of <code>aettos</code> using one of the following lines:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">fund_project</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// recommended</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">fund_project</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="p">});</span><span class="w"> </span><span class="c1">// recommended</span>
 <span class="c1">// or</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">$call</span><span class="p">(</span><span class="s1">&#39;fund_project&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">1</span><span class="p">],</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">$call</span><span class="p">(</span><span class="s1">&#39;fund_project&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">1</span><span class="p">],</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">50</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
 <h2 id="transaction-options">Transaction options</h2>
 <p>As already stated various times in the guide it is possible to provide <a href="../../transaction-options/">transaction options</a> as object to a function of the SDK that builds and potentially broadcasts a transaction. This object can be passed as additional param to each of these functions and overrides the default settings.</p>

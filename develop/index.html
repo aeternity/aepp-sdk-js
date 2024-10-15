@@ -83,11 +83,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../.">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../.">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -820,6 +819,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1767,32 +1787,32 @@
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
 <h3 id="specific-sdk-version">Specific SDK version</h3>
-<p><div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
-...where <code>VERSION</code> is the version number of the SDK you want to use (eg. <code>13.1.0</code>).</p>
+<p>...where <code>VERSION</code> is the version number of the SDK you want to use (eg. <code>13.1.0</code>).</p>
 <h3 id="browser-script-tag">Browser <code>&lt;script&gt;</code> tag</h3>
 <p>The bundle will assign the SDK to a global variable called <code>Aeternity</code> that makes all functionalities of the SDK accessible.</p>
 <p>Usage:</p>
 <div class="highlight"><pre><span></span><code><span class="cp">&lt;!doctype html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-  <span class="cm">&lt;!-- include latest SDK version --&gt;</span>
-  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Aeternity</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span> <span class="p">/&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="cm">&lt;!-- include latest SDK version --&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Aeternity</span><span class="p">;</span>
 
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">)</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
-<span class="w">      </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}]</span>
-<span class="w">    </span><span class="p">})</span>
-<span class="w">    </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getHeight</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">height</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Current Block Height:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">height</span><span class="p">)</span>
-<span class="w">    </span><span class="p">})</span>
-<span class="w">  </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">      </span><span class="p">});</span>
+<span class="w">      </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getHeight</span><span class="p">().</span><span class="nx">then</span><span class="p">((</span><span class="nx">height</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Current Block Height:&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">height</span><span class="p">);</span>
+<span class="w">      </span><span class="p">});</span>
+<span class="w">    </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>
 <h2 id="npm">NPM</h2>
@@ -1800,17 +1820,17 @@
 <div class="highlight"><pre><span></span><code>npm<span class="w"> </span>i<span class="w"> </span>@aeternity/aepp-sdk
 </code></pre></div>
 <h3 id="pre-release">Pre Release</h3>
-<p>To install a <em>Pre-Release</em> (latest <code>beta</code> or <code>alpha</code> version) you have to install the package appending the <code>@next</code> tag reference.
+<p>To install a <em>Pre-Release</em> (latest <code>beta</code> or <code>alpha</code> version) you have to install the package appending the <code>@next</code> tag reference.</p>
 <div class="highlight"><pre><span></span><code>npm<span class="w"> </span>i<span class="w"> </span>@aeternity/aepp-sdk@next
-</code></pre></div></p>
+</code></pre></div>
 <h3 id="specific-github-branch">Specific Github Branch</h3>
-<p>You can also install a version coming from a specific branch. In this case you would install the SDK version of the <code>develop</code> branch.
+<p>You can also install a version coming from a specific branch. In this case you would install the SDK version of the <code>develop</code> branch.</p>
 <div class="highlight"><pre><span></span><code>npm<span class="w"> </span>i<span class="w"> </span>github:aeternity/aepp-sdk-js#develop
-</code></pre></div></p>
+</code></pre></div>
 <h3 id="typescript-projects">TypeScript projects</h3>
 <p>To work properly, sdk requires to enable <code>allowSyntheticDefaultImports</code> flag and register folder
 that contains type definitions for third-party packages sdk depends on.
-This may be done in <code>tsconfig.json</code>:
+This may be done in <code>tsconfig.json</code>:</p>
 <div class="highlight"><pre><span></span><code>{
 <span class="w"> </span> &quot;compilerOptions&quot;: {
 <span class="w"> </span>   ...
@@ -1822,11 +1842,11 @@ This may be done in <code>tsconfig.json</code>:
 <span class="w"> </span> }
 }
 </code></pre></div>
-SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.</p>
+<p>SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.</p>
 <p>Ensure that you have <code>strictFunctionTypes</code> option not enabled (as it is in VS code and <code>ts-node</code> by default), otherwise some of SDK types won't work correctly (see <a href="https://github.com/aeternity/aepp-sdk-js/issues/1793">#1793</a>).</p>
 <h3 id="vue-cli4">Vue CLI@4</h3>
 <p>SDK checks are not working correctly because CLI picks both ESM and CJS versions of <code>autorest</code>
-dependencies. To fix this, you need to specify aliases in <code>vue.config.js</code>.
+dependencies. To fix this, you need to specify aliases in <code>vue.config.js</code>.</p>
 <div class="highlight"><pre><span></span><code>module.exports = {
 <span class="w"> </span> configureWebpack: {
 <span class="w"> </span>   resolve: {
@@ -1837,7 +1857,7 @@ dependencies. To fix this, you need to specify aliases in <code>vue.config.js</c
 <span class="w"> </span>   },
 <span class="w"> </span> },
 };
-</code></pre></div></p>
+</code></pre></div>
 <h3 id="vue3">Vue@3</h3>
 <p>Reactivity in Vue@3 <a href="https://vuejs.org/guide/extras/reactivity-in-depth.html#how-reactivity-works-in-vue">based on</a> Proxy class. Proxy is <a href="https://github.com/tc39/proposal-class-fields/issues/106">not compatible</a> with private fields of ES
 classes. AeSdk and Contract classes uses private fields, so if you make an instance of these
@@ -1847,7 +1867,7 @@ classes reactive then the app may fail with</p>
 </blockquote>
 <p>AeSdk and Contract classes doesn’t have a state intended to be tracked using reactivity. Therefore
 to solve this issue we suggest to avoid making their instances reactive. One of the ways is to use
-Vue's integrated utilities: <a href="https://vuejs.org/api/reactivity-advanced.html#shallowref">shallowRef</a>, <a href="https://vuejs.org/api/reactivity-advanced.html#shallowreactive">shallowReactive</a>. The idea is to make reactive only the
+Vue's integrated utility: <a href="https://vuejs.org/api/reactivity-advanced.html#shallowref">shallowRef</a>. The idea is to make reactive only the
 root variable, to don't make it reactive in deep. You can find it implementation in the
 <a href="https://github.com/aeternity/aepp-sdk-js/tree/71da12b5df56b41f7317d1fb064e44e8ea118d6c/examples/browser/aepp">æpp example</a>.</p>
 <h2 id="command-line-interface-cli">Command Line Interface (CLI)</h2>

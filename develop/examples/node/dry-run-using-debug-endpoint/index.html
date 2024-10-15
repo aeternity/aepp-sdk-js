@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1501,9 +1521,7 @@ configuration;
 endpoints exposed via <a href="https://docs.aeternity.io/en/stable/configuration/">http.endpoints.dry-run</a>. Also, sdk doesn't know anything about debug
 endpoints. This script shows how to use a debug dry-run in sdk.</p>
 <!-- TODO: move accurate links after fixing https://github.com/aeternity/aeternity/issues/4369 -->
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="p">,</span>
-<span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 </code></pre></div>
 <p>The idea is to extend the base Node class overriding the method that will forward a request
 to a debug endpoint in case it is a dry-run.</p>
@@ -1539,7 +1557,10 @@ This map is bigger than allowed by the default gas limit
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Map</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nb">Array</span><span class="p">(</span><span class="mf">20000</span><span class="p">).</span><span class="nx">fill</span><span class="p">().</span><span class="nx">map</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">idx</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">[</span><span class="sb">`bar</span><span class="si">${</span><span class="nx">idx</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="mf">43</span><span class="p">]));</span>
 </code></pre></div>
 Sdk needs to know that we have a different gas limit, so <code>gasMax</code> is provided.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">result</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">gasUsed</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">tx</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">fee</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">getArg</span><span class="p">(</span><span class="nx">map</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">gasMax</span><span class="o">:</span><span class="w"> </span><span class="mf">6e10</span><span class="w"> </span><span class="p">});</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">result</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">gasUsed</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">tx</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">fee</span><span class="w"> </span><span class="p">},</span>
+<span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">getArg</span><span class="p">(</span><span class="nx">map</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">gasMax</span><span class="o">:</span><span class="w"> </span><span class="mf">6e10</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
 The call succeeded and the gas used more than 6e6, which means that request forwarding works!
 <div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Call result&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">fee</span><span class="p">,</span><span class="w"> </span><span class="nx">gasUsed</span><span class="p">);</span>

@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../guides/ledger-wallet/">
+        <link rel="prev" href="../guides/metamask-snap/">
       
       
         <link rel="next" href="../examples/node/transfer-ae/">
@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1699,13 +1719,13 @@
 <h1 id="transaction-options">Transaction options</h1>
 <p>For every transaction it is possible to provide an <code>options</code> object with one or multiple of the following attributes to the respective function that builds and broadcasts the transaction.
 Some of these are common and can be provided for each transaction type. Others are transaction specific and only relevant for a specific tx-type.</p>
-<p>The <code>options</code> object can be optionally passed to the respective function behind the last parameter, example:
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sender</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">recipient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">sender</span><span class="p">,</span><span class="w"> </span><span class="nx">denomination</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ae&#39;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="c1">// optional options object</span>
+<p>The <code>options</code> object can be optionally passed to the respective function behind the last parameter, example:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sender</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">recipient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">sender</span><span class="p">,</span><span class="w"> </span><span class="nx">denomination</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ae&#39;</span><span class="w"> </span><span class="p">};</span><span class="w"> </span><span class="c1">// optional options object</span>
 <span class="c1">// aeSdk is an instance of the AeSdk class</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">)</span><span class="w"> </span><span class="c1">// amount, recipient and (optional) options</span>
-</code></pre></div></p>
+<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">);</span><span class="w"> </span><span class="c1">// amount, recipient and (optional) options</span>
+</code></pre></div>
 <p>Note:</p>
 <ul>
 <li>Without the <code>options</code> object the sender would be some other account selected in the instance of AeSdk and the recipient would receive <code>1 aetto</code> instead of <code>1 AE</code>.</li>

@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1646,7 +1666,12 @@ and this page explains in detail how to:</p>
 </ul>
 <h2 id="1-create-sdk-instance-and-generate-an-account">1. Create SDK instance and generate an account</h2>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">AccountGeneralized</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">MIN_GAS_PRICE</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">Node</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">MemoryAccount</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">AccountGeneralized</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">CompilerHttp</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">MIN_GAS_PRICE</span><span class="p">,</span>
 <span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>

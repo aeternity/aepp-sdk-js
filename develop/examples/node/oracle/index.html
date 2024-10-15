@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1491,9 +1511,7 @@
 <h1 id="register-and-query-oracle">Register and query Oracle</h1>
 <p>Here we will register and query an oracle returning <a href="https://en.wikipedia.org/wiki/Factorial">factorial</a> of a number.
 Read more about oracles in the <a href="../../../guides/oracles/">guide</a> section.</p>
-<p><div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Oracle</span><span class="p">,</span><span class="w"> </span><span class="nx">OracleClient</span><span class="p">,</span>
-<span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<p><div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Oracle</span><span class="p">,</span><span class="w"> </span><span class="nx">OracleClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 </code></pre></div>
 Let's prepare sdk and account for Oracle
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span>
@@ -1513,7 +1531,7 @@ Creating and registering Oracle
 Start listening for queries and handle them
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">handleQueries</span><span class="p">((</span><span class="nx">query</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">arg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">BigInt</span><span class="p">(</span><span class="nx">query</span><span class="p">.</span><span class="nx">decodedQuery</span><span class="p">);</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">arg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="s1">&#39;argument can\&#39;t be negative&#39;</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">arg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="s2">&quot;argument can&#39;t be negative&quot;</span><span class="p">;</span>
 <span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1n</span><span class="p">;</span>
 <span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2n</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="nx">arg</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nx">res</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="nx">i</span><span class="p">;</span>

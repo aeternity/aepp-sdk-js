@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1701,13 +1721,11 @@ low-level access to it's endpoints, when necessary.</p>
 <li>Loose coupling of modules to enable <a href="https://webpack.js.org/guides/tree-shaking/">tree-shaking</a></li>
 <li>Convention over configuration</li>
 <li>"Easy things should be easy, and hard things should be possible." <a href="https://www.amazon.com/gp/feature.html?ie=UTF8&amp;docId=7137">source</a> -- <a href="https://en.wikipedia.org/wiki/Larry_Wall">Larry Wall</a></li>
-<li>Support for<ul>
+<li>Support for</li>
 <li>module access, enabling tree-shaking</li>
 <li>direct use in node scripts through bundling</li>
 <li>direct use in browser <code>&lt;script&gt;</code> tags through bundling</li>
 <li>bundling through webpack</li>
-</ul>
-</li>
 </ul>
 <h2 id="requirements">Requirements</h2>
 <p>aepp-sdk is transpiled to EcmaScript 5 through <a href="https://webpack.js.org/">WebPack</a>, using <a href="https://babeljs.io/">Babel</a> and is expected to work in any sufficiently new version of <a href="https://nodejs.org/en/">Node.js</a> or modern web browser.</p>
@@ -1728,17 +1746,17 @@ npm<span class="w"> </span>run<span class="w"> </span>docs:examples<span class="
 npm<span class="w"> </span>run<span class="w"> </span>build
 </code></pre></div>
 <p><strong>Note</strong>: If you experience errors during the building, you might need to install build tools for your OS.</p>
-<p><strong>Windows: Windows Build Tools</strong>
+<p><strong>Windows: Windows Build Tools</strong></p>
 <div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>windows-build-tools
-</code></pre></div></p>
-<p><strong>Ubuntu / Debian: Build Essential</strong>
+</code></pre></div>
+<p><strong>Ubuntu / Debian: Build Essential</strong></p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
 sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>build-essential
-</code></pre></div></p>
+</code></pre></div>
 <p><strong>Mac</strong></p>
-<p>Download <a href="https://apps.apple.com/de/app/xcode/id497799835?mt=12">Xcode</a> from AppStore, then run
+<p>Download <a href="https://apps.apple.com/de/app/xcode/id497799835?mt=12">Xcode</a> from AppStore, then run</p>
 <div class="highlight"><pre><span></span><code>xcode-select --install
-</code></pre></div></p>
+</code></pre></div>
 <h2 id="generate-bundle-report">Generate bundle report</h2>
 <div class="highlight"><pre><span></span><code>npx<span class="w"> </span>webpack<span class="w"> </span>--env<span class="w"> </span>REPORT
 </code></pre></div>

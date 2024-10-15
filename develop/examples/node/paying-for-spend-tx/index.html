@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1705,9 +1725,7 @@ and this page explains in detail how to:</p>
 </ul>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <p>You need to import <code>AeSdk</code>, <code>Node</code> and <code>MemoryAccount</code> classes from the SDK.
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="p">,</span>
-<span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 </code></pre></div>
 <strong>Note</strong>:</p>
 <ul>
@@ -1739,11 +1757,9 @@ Note:</p>
 <span class="p">});</span>
 </code></pre></div>
 <h2 id="4-send-1-aetto-from-payer-to-new-user">4. Send 1 <code>aetto</code> from payer to new user</h2>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">spendTxResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span>
-<span class="w">  </span><span class="nx">AMOUNT</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
-<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="p">},</span>
-<span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">spendTxResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">AMOUNT</span><span class="p">,</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="p">,</span>
+<span class="p">});</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">spendTxResult</span><span class="p">);</span>
 </code></pre></div>
 <h2 id="5-check-balance-of-new-user-before">5. Check balance of new user (before)</h2>
@@ -1761,10 +1777,10 @@ Note:</p>
 <span class="w">  </span><span class="nx">recipientId</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="nx">AMOUNT</span><span class="p">,</span>
 <span class="p">});</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">signedSpendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span>
-<span class="w">  </span><span class="nx">spendTx</span><span class="p">,</span>
-<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">innerTx</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span>
-<span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">signedSpendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">innerTx</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="p">});</span>
 </code></pre></div>
 Note:</p>
 <ul>

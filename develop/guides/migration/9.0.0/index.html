@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1617,29 +1637,29 @@
 <h1 id="migration-to-900">Migration to 9.0.0</h1>
 <p>This guide describes all breaking changes introduced with <code>v9.0.0</code>.</p>
 <h2 id="drop-waitmined-static-method">drop <code>waitMined</code> static method</h2>
-<p>If you used it like
+<p>If you used it like</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
 <span class="nx">sdk</span><span class="p">.</span><span class="nx">waitMined</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 </code></pre></div>
-then you have to rewrite it using Stamp composition
+<p>then you have to rewrite it using Stamp composition</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">.</span><span class="nx">compose</span><span class="p">({</span>
 <span class="w">  </span><span class="nx">deepProps</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Ae</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">defaults</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">waitMined</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
 <span class="p">})({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
 </code></pre></div>
-or pass it to specific methods, like
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">receiver</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">waitMined</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">})</span>
+<p>or pass it to specific methods, like</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">receiver</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">waitMined</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-or even
+<p>or even</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
 <span class="nx">sdk</span><span class="p">.</span><span class="nx">deepProps</span><span class="p">({</span><span class="w"> </span><span class="nx">Ae</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">defaults</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">waitMined</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">})</span>
-</code></pre></div></p>
-<h2 id="drop-assertedtype-use-decode-instead">drop <code>assertedType</code>, use <code>decode</code> instead</h2>
-<p>If you used it like
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">decodeBase64Check</span><span class="p">(</span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">assertedType</span><span class="p">(</span><span class="s1">&#39;tx_...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tx&#39;</span><span class="p">))</span>
 </code></pre></div>
-then you have to rewrite it using <code>decode</code> method
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;tx_...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tx&#39;</span><span class="p">)</span>
-</code></pre></div></p>
+<h2 id="drop-assertedtype-use-decode-instead">drop <code>assertedType</code>, use <code>decode</code> instead</h2>
+<p>If you used it like</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">decodeBase64Check</span><span class="p">(</span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">assertedType</span><span class="p">(</span><span class="s1">&#39;tx_...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tx&#39;</span><span class="p">));</span>
+</code></pre></div>
+<p>then you have to rewrite it using <code>decode</code> method</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;tx_...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tx&#39;</span><span class="p">);</span>
+</code></pre></div>
 <h2 id="validator-recursive-validator-simplify-schema"><strong>validator:</strong> recursive validator, simplify schema</h2>
 <p>Instead of <code>TransactionValidator</code> stamp use <code>verifyTransaction</code> function. The function accepts
 a transaction, and a Node instance for validation (instead of network id), it doesn't return
@@ -1650,15 +1670,15 @@ now (<code>type</code> field removed).</p>
 <p><code>SCHEMA</code> doesn't contain validation schema anymore. This wasn't supposed to be used by external
 developers.</p>
 <h2 id="simplify-buildtxhash-helper">simplify buildTxHash helper</h2>
-<p>If you used <code>buildHash</code> like
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">buildHash</span><span class="p">(</span><span class="s1">&#39;xx&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">]),</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">raw</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">})</span>
+<p>If you used <code>buildHash</code> like</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">buildHash</span><span class="p">(</span><span class="s1">&#39;xx&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">]),</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">raw</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-then use
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">hash</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">]))</span>
+<p>then use</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">hash</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">]));</span>
 </code></pre></div>
-If you used it with a falsy <code>raw</code> then
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">hash</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">])),</span><span class="w"> </span><span class="s1">&#39;xx&#39;</span><span class="p">)</span>
-</code></pre></div></p>
+<p>If you used it with a falsy <code>raw</code> then</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">hash</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">])),</span><span class="w"> </span><span class="s1">&#39;xx&#39;</span><span class="p">);</span>
+</code></pre></div>
 <p><code>buildTxHash</code> don't have <code>raw</code> switch anymore, it returns <code>th_</code>-encoded string in all cases,
 but it still accepts transactions as a string and as a buffer.</p>
 <h2 id="enable-verification-in-deep-props-instead-of-extra-variable">enable verification in deep props instead of extra variable</h2>

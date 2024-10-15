@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -662,6 +661,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -9003,9 +9023,9 @@
 <p>Please check out <a href="../guides/migration/13.0.0/">migration guide</a>, and release notes for the <a href="#1300-beta0-2023-03-01">beta release</a>.</p>
 <ul>
 <li><strong>aepp:</strong> All wallet provided nodes have the same name
-Specified in <code>name</code> option of <code>connectToWallet</code>.</li>
+  Specified in <code>name</code> option of <code>connectToWallet</code>.</li>
 <li><strong>aepp:</strong> Select option removed from connectToWallet
-If you are using <code>connectNode</code> then the current node would always be the same as wallet provides.</li>
+  If you are using <code>connectNode</code> then the current node would always be the same as wallet provides.</li>
 </ul>
 <h3 id="features_3">Features</h3>
 <ul>
@@ -9302,7 +9322,7 @@ If you are using <code>connectNode</code> then the current node would always be 
 <li><code>unpackTx</code> not accepting transaction as <code>Buffer</code>, only as tx-encoded string</li>
 <li><code>unpackTx</code> doesn't have <code>binary</code> field in result</li>
 <li><strong>encode:</strong> since the prefix is evaluated by the type
-    itself the required prefix parameter is no more accepted</li>
+  itself the required prefix parameter is no more accepted</li>
 <li><code>calculateMinFee</code> returns BigNumber instead of string</li>
 <li>Fee helpers not exported anymore (<code>BASE_GAS</code>, <code>GAS_PER_BYTE</code>, <code>KEY_BLOCK_INTERVAL</code>,
   <code>TX_FEE_BASE_GAS</code>, <code>TX_FEE_OTHER_GAS</code>, <code>calculateFee</code>, <code>DEFAULT_FEE</code>)</li>
@@ -9652,7 +9672,7 @@ If you are using <code>connectNode</code> then the current node would always be 
 <li><strong>semverSatisfies:</strong> ignore build number (<a href="https://github.com/aeternity/aepp-sdk-js/commit/c3cce0a256b9b0af29b30662e4fa7a08bb9ab187">c3cce0a</a>)</li>
 <li><strong>swagger:</strong> detection of empty response (<a href="https://github.com/aeternity/aepp-sdk-js/commit/9bfab026e0ac980b1bb3181f12c5093996c22710">9bfab02</a>)</li>
 <li><strong>contract instance:</strong> remove unnecessary <code>setOptions</code> function (<a href="https://github.com/aeternity/aepp-sdk-js/commit/b88e767c86874f259ff7a1eb1784c368524e7167">b88e767</a>)</li>
-<li><strong>contract instance:</strong> thread all extra options as contract's  (<a href="https://github.com/aeternity/aepp-sdk-js/commit/10fb7bad8f61b973c1be5daec50909d251ec1f90">10fb7ba</a>)</li>
+<li><strong>contract instance:</strong> thread all extra options as contract's (<a href="https://github.com/aeternity/aepp-sdk-js/commit/10fb7bad8f61b973c1be5daec50909d251ec1f90">10fb7ba</a>)</li>
 <li><strong>crypto:</strong> remove unused asymmetric encode/decode functions (<a href="https://github.com/aeternity/aepp-sdk-js/commit/51def34624d57f5cca548481176968dfc8f857d9">51def34</a>)</li>
 <li>drop unnecessary skipArgsConvert option (<a href="https://github.com/aeternity/aepp-sdk-js/commit/6d4a59986d6833866b6828085fad96b364e5d315">6d4a599</a>)</li>
 <li>drop unnecessary skipTransformDecoded option (<a href="https://github.com/aeternity/aepp-sdk-js/commit/bb492396a29d673f02eee7cfec4e114c2fba2f3c">bb49239</a>)</li>
@@ -9715,7 +9735,7 @@ If you are using <code>connectNode</code> then the current node would always be 
 <li>require compiler 6 and above (<a href="https://github.com/aeternity/aepp-sdk-js/commit/f9cef12a7db4b2559519ef7f8380cc9e89630492">f9cef12</a>)</li>
 <li>specify browserlist to better choice of features to transpile (<a href="https://github.com/aeternity/aepp-sdk-js/commit/c2ec71a7690ed2590093c0cbff048599b5ca87bd">c2ec71a</a>)</li>
 <li><strong>contract instance:</strong> remove unnecessary <code>setOptions</code> function (<a href="https://github.com/aeternity/aepp-sdk-js/commit/b88e767c86874f259ff7a1eb1784c368524e7167">b88e767</a>)</li>
-<li><strong>contract instance:</strong> thread all extra options as contract's  (<a href="https://github.com/aeternity/aepp-sdk-js/commit/10fb7bad8f61b973c1be5daec50909d251ec1f90">10fb7ba</a>)</li>
+<li><strong>contract instance:</strong> thread all extra options as contract's (<a href="https://github.com/aeternity/aepp-sdk-js/commit/10fb7bad8f61b973c1be5daec50909d251ec1f90">10fb7ba</a>)</li>
 <li>remove contractEncodeCall as extra wrapper (<a href="https://github.com/aeternity/aepp-sdk-js/commit/a4b303fbcc3b7cc544a2b5b3415d0f4a147b488c">a4b303f</a>)</li>
 <li><strong>transformation:</strong> don't export extra functions (<a href="https://github.com/aeternity/aepp-sdk-js/commit/fa38b40ef56744e2941db198533b3f454b3bf53c">fa38b40</a>)</li>
 <li><strong>transformation:</strong> drop extra wrapper around bindings (<a href="https://github.com/aeternity/aepp-sdk-js/commit/9b70f8ea0ce509a91ec78f0718574b59c0143de0">9b70f8e</a>)</li>
@@ -9728,12 +9748,12 @@ If you are using <code>connectNode</code> then the current node would always be 
 <h2 id="900-2021-09-30"><a href="https://github.com/aeternity/aepp-sdk-js/compare/v8.2.1...v9.0.0">9.0.0</a> (2021-09-30)</h2>
 <h3 id="breaking-changes_6">⚠ BREAKING CHANGES</h3>
 <ul>
-<li>drop following AENS delegation signature methods over the new common <code>createAensDelegationSignature</code>  implementation which accepts an object as param (<a href="https://github.com/aeternity/aepp-sdk-js/commit/456fe00cb8b8eba09ea53800e8713550d0f329cc">456fe00</a>)</li>
+<li>drop following AENS delegation signature methods over the new common <code>createAensDelegationSignature</code> implementation which accepts an object as param (<a href="https://github.com/aeternity/aepp-sdk-js/commit/456fe00cb8b8eba09ea53800e8713550d0f329cc">456fe00</a>)</li>
 <li><code>delegateNamePreclaimSignature</code></li>
 <li><code>delegateNameClaimSignature</code></li>
 <li><code>delegateNameTransferSignature</code></li>
 <li><code>delegateNameRevokeSignature</code></li>
-<li>drop following oracle delegation signature methods over the new common  <code>createOracleDelegationSignature</code> implementation accepts an object param (<a href="https://github.com/aeternity/aepp-sdk-js/commit/88b7bf3aa55b3740c9a64fb4049abcc0fdd3b277">88b7bf3</a>)</li>
+<li>drop following oracle delegation signature methods over the new common <code>createOracleDelegationSignature</code> implementation accepts an object param (<a href="https://github.com/aeternity/aepp-sdk-js/commit/88b7bf3aa55b3740c9a64fb4049abcc0fdd3b277">88b7bf3</a>)</li>
 <li><code>delegateOracleRegisterSignature</code></li>
 <li><code>delegateOracleExtendSignature</code></li>
 <li><code>delegateOracleRespondSignature</code></li>
@@ -10061,7 +10081,7 @@ If you are using <code>connectNode</code> then the current node would always be 
 </ul>
 <h3 id="features_17">Features</h3>
 <ul>
-<li><strong>ACI:</strong> expose events decoding through Contract ACI stamp  (<a href="https://github.com/aeternity/aepp-sdk-js/issues/971">#971</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/4930635">4930635</a>)</li>
+<li><strong>ACI:</strong> expose events decoding through Contract ACI stamp (<a href="https://github.com/aeternity/aepp-sdk-js/issues/971">#971</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/4930635">4930635</a>)</li>
 <li><strong>AEX_2:</strong> Allow to connect without node (<a href="https://github.com/aeternity/aepp-sdk-js/issues/991">#991</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/87b9ef9">87b9ef9</a>)</li>
 <li><strong>AEX_2:</strong> Connect to extension from iframe (<a href="https://github.com/aeternity/aepp-sdk-js/issues/992">#992</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/47179f7">47179f7</a>)</li>
 <li><strong>Build:</strong> Expose <code>ACIHelpers</code> and <code>ACITransformation</code> to bundle (<a href="https://github.com/aeternity/aepp-sdk-js/issues/970">#970</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/8b475e0">8b475e0</a>)</li>
@@ -10090,9 +10110,9 @@ If you are using <code>connectNode</code> then the current node would always be 
 <h3 id="features_18">Features</h3>
 <ul>
 <li><strong>TX:</strong> Introduce new stamp <code>TxObject</code>(<a href="https://github.com/aeternity/aepp-sdk-js/pull/933">#933</a>)
-This stamp give more flexibility on transaction serialization/deserialization process</li>
+  This stamp give more flexibility on transaction serialization/deserialization process</li>
 <li><strong>Keystore:</strong> Allow to store secret as hex or buffer (<a href="https://github.com/aeternity/aepp-sdk-js/pull/939">#939</a>)</li>
-<li><strong>AEX-2:</strong>  Add permission layer for account management (<a href="https://github.com/aeternity/aepp-sdk-js/pull/937">#937</a>)</li>
+<li><strong>AEX-2:</strong> Add permission layer for account management (<a href="https://github.com/aeternity/aepp-sdk-js/pull/937">#937</a>)</li>
 </ul>
 <h2 id="711-2020-02-27"><a href="https://github.com/aeternity/aepp-sdk-js/compare/7.1.0...7.1.1">7.1.1</a> (2020-02-27)</h2>
 <h3 id="bug-fixes_31">Bug Fixes</h3>
@@ -10106,7 +10126,7 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 <li><strong>AEX:</strong> Simplify message id processing (<a href="https://github.com/aeternity/aepp-sdk-js/pull/916">#916</a>). Pass AEEP <code>origin</code> to Wallet callback (<a href="https://github.com/aeternity/aepp-sdk-js/pull/918">#918</a>)</li>
 <li><strong>Node:</strong> Move <code>getNetworkId</code> to helpers (<a href="https://github.com/aeternity/aepp-sdk-js/pull/910">#910</a>)</li>
 <li><strong>ACI:</strong> Minor ACI validation improvement.
- Move decoding of events to builder. Add ability to decode events without ACI</li>
+  Move decoding of events to builder. Add ability to decode events without ACI</li>
 </ul>
 <h3 id="features_19">Features</h3>
 <ul>
@@ -10188,16 +10208,14 @@ This stamp give more flexibility on transaction serialization/deserialization pr
 </ul>
 <h3 id="features_23">Features</h3>
 <ul>
-<li>
-<p><strong>Wallet&lt;-&gt;AEPP:</strong> Add new Wallet&lt;-&gt;Aepp communication API</p>
+<li><strong>Wallet&lt;-&gt;AEPP:</strong> Add new Wallet&lt;-&gt;Aepp communication API</li>
+</ul>
 <blockquote>
 <p>Add two new stamps <code>RpcWallet</code> and <code>RpcAepp</code>
 Example of usage you can find heere: <a href="https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/how-to-build-aepp-using-new-wallet-api.md">Aepp example</a> and <a href="https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/guides/how-to-build-an-wallet-app-or-extension.md">Wallet example</a></p>
 </blockquote>
-</li>
-<li>
-<p><strong>Wallet:</strong> Use <code>postMessage</code> for communication with extension wall… (<a href="https://github.com/aeternity/aepp-sdk-js/issues/815">#815</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/dc7b4c2">dc7b4c2</a>)</p>
-</li>
+<ul>
+<li><strong>Wallet:</strong> Use <code>postMessage</code> for communication with extension wall… (<a href="https://github.com/aeternity/aepp-sdk-js/issues/815">#815</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/dc7b4c2">dc7b4c2</a>)</li>
 <li><strong>CI:</strong> Move to Travis CI (<a href="https://github.com/aeternity/aepp-sdk-js/issues/809">#809</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/2d77f20">2d77f20</a>)</li>
 <li><strong>CI:</strong> enable daily builds on latest node and compiler and enable codecov (<a href="https://github.com/aeternity/aepp-sdk-js/issues/820">#820</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/3c52a1e">3c52a1e</a>)</li>
 <li><strong>ACI:</strong> Add check for contract address validity and existence. Add <code>forceCodeCheck</code> option for bytecode verification skip (<a href="https://github.com/aeternity/aepp-sdk-js/issues/788">#788</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/c0cccc9">c0cccc9</a>)</li>
@@ -10212,9 +10230,13 @@ Example of usage you can find heere: <a href="https://github.com/aeternity/aepp-
 <li><strong>Node:</strong> Change node compatibility range to <code>node &gt;= 5.0.0 &amp;&amp; node &lt; 6.0.0</code></li>
 <li><strong>Compiler:</strong> Drop compiler version to <code>version &gt;= 4.0.0 &amp;&amp; version &lt; 5.0.0</code></li>
 <li><strong>ACI:</strong> Add additional method to RPC communication. Required sdk update on wallet side
-Add <code>getContractByteCode</code> API</li>
-<li><strong>Flavor:</strong> Remove deprecated params:</li>
-<li>remove <code>url</code> and <code>internalUrl</code> instead use <code>nodes: [ { name: 'NODE_NAME', instance: await Node({ url, internalUrl }) } ]</code></li>
+  Add <code>getContractByteCode</code> API</li>
+<li>
+<p><strong>Flavor:</strong> Remove deprecated params:</p>
+</li>
+<li>
+<p>remove <code>url</code> and <code>internalUrl</code> instead use <code>nodes: [ { name: 'NODE_NAME', instance: await Node({ url, internalUrl }) } ]</code></p>
+</li>
 <li>remove <code>keypair</code> params instead use <code>accounts: [MemmoryAccount({ keypair })]</code></li>
 <li>remove <code>setKeypair</code> function from <code>Account</code> stamps</li>
 </ul>
@@ -10299,24 +10321,22 @@ Add <code>getContractByteCode</code> API</li>
 <li><strong>AENS:</strong> Add ability to spend by name (<a href="https://github.com/aeternity/aepp-sdk-js/issues/682">#682</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/0d43804">0d43804</a>)</li>
 <li><strong>AENS:</strong> Add ability to claim contract, oracle, SC (<a href="https://github.com/aeternity/aepp-sdk-js/issues/671">#671</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/49fd0fd">49fd0fd</a>)</li>
 <li><strong>GA:</strong> enbale GA (<a href="https://github.com/aeternity/aepp-sdk-js/issues/692">#692</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/eded912">eded912</a>)</li>
-<li><strong>Lima:</strong> Lima compatibility (<a href="https://github.com/aeternity/aepp-sdk-js/issues/683">#683</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/a88042e">a88042e</a>), closes <a href="https://github.com/aeternity/aepp-sdk-js/issues/632">#632</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/653">#653</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/658">#658</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/660">#660</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/680">#680</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/693">#693</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/687">#687</a><ul>
+<li><strong>Lima:</strong> Lima compatibility (<a href="https://github.com/aeternity/aepp-sdk-js/issues/683">#683</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/a88042e">a88042e</a>), closes <a href="https://github.com/aeternity/aepp-sdk-js/issues/632">#632</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/653">#653</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/658">#658</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/660">#660</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/680">#680</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/693">#693</a> <a href="https://github.com/aeternity/aepp-sdk-js/issues/687">#687</a></li>
 <li>AENS auction support</li>
 <li>compiler 4.0.0 support</li>
 <li>node 5.0.0 support</li>
 <li>SDK use <code>FATE</code> for contract by default</li>
-</ul>
-</li>
 <li><strong>AE</strong>: Add pointers verification for spend by name</li>
 </ul>
 <h3 id="breaking-changes_13">BREAKING CHANGES</h3>
 <ul>
-<li><strong>aci:</strong> Change Sophia option type representation in ACI
-<div class="highlight"><pre><span></span><code><span class="c1">// from</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">optionFn</span><span class="p">(</span><span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">())</span>
-<span class="c1">// to</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">optionFn</span><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="kc">undefined</span><span class="p">)</span>
-</code></pre></div></li>
+<li><strong>aci:</strong> Change Sophia option type representation in ACI</li>
 </ul>
+<div class="highlight"><pre><span></span><code><span class="c1">// from</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">optionFn</span><span class="p">(</span><span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">());</span>
+<span class="c1">// to</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">optionFn</span><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="kc">undefined</span><span class="p">);</span>
+</code></pre></div>
 <h2 id="500-next1-2019-09-10"><a href="https://github.com/aeternity/aepp-sdk-js/compare/4.6.0...4.7.0-next.1">5.0.0-next.1</a> (2019-09-10)</h2>
 <h3 id="bug-fixes_42">Bug Fixes</h3>
 <ul>
@@ -10352,7 +10372,7 @@ Add <code>getContractByteCode</code> API</li>
 <h2 id="451-2019-08-22"><a href="https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.5.1">4.5.1</a> (2019-08-22)</h2>
 <h3 id="refactor_3">Refactor</h3>
 <ul>
-<li><strong>Example</strong>  Add node info to AEPP (<a href="https://github.com/aeternity/aepp-sdk-js/pull/620">#620</a>)</li>
+<li><strong>Example</strong> Add node info to AEPP (<a href="https://github.com/aeternity/aepp-sdk-js/pull/620">#620</a>)</li>
 </ul>
 <h3 id="bug-fixes_44">Bug Fixes</h3>
 <ul>
@@ -10372,8 +10392,9 @@ Add <code>getContractByteCode</code> API</li>
 <li><strong>MemoryAccount:</strong> Add validation of keypair (<a href="https://github.com/aeternity/aepp-sdk-js/issues/594">#594</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20">b8c2b20</a>)</li>
 <li><strong>state channels:</strong> handle BigNumbers with json-bigint (<a href="https://github.com/aeternity/aepp-sdk-js/issues/596">#596</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/14eaa3d">14eaa3d</a>)</li>
 <li><strong>state channels:</strong> send generic messages immediately (<a href="https://github.com/aeternity/aepp-sdk-js/issues/600">#600</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/8ad7583">8ad7583</a>)</li>
-<li><strong>Generalize Account</strong>  Implement Generalized account support (<a href="https://github.com/aeternity/aepp-sdk-js/pull/449">#449</a>)
-    <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">authContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`YOUR_AUTH_CONTRACT`</span>
+<li><strong>Generalize Account</strong> Implement Generalized account support (<a href="https://github.com/aeternity/aepp-sdk-js/pull/449">#449</a>)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">authContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`YOUR_AUTH_CONTRACT`</span>
 
 <span class="c1">// Make current account Generalized</span>
 <span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">createGeneralizeAccount</span><span class="p">(</span><span class="nx">authFnName</span><span class="p">,</span><span class="w"> </span><span class="nx">authContract</span><span class="p">,</span><span class="w"> </span><span class="p">[...</span><span class="nx">authFnArguments</span><span class="p">]</span>
@@ -10387,8 +10408,7 @@ Add <code>getContractByteCode</code> API</li>
 <span class="c1">// or</span>
 <span class="w">    </span><span class="c1">// sdk will prepare callData itself</span>
 <span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">10000</span><span class="p">,</span><span class="w"> </span><span class="nx">receiverPub</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">authData</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">authContract</span><span class="p">,</span><span class="w"> </span><span class="nx">args</span><span class="o">:</span><span class="w"> </span><span class="p">[...</span><span class="nx">authContractArgs</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">})</span>
-</code></pre></div></li>
-</ul>
+</code></pre></div>
 <h2 id="440-2019-08-09"><a href="https://github.com/aeternity/aepp-sdk-js/compare/4.3.0...4.4.0">4.4.0</a> (2019-08-09)</h2>
 <h3 id="bug-fixes_46">Bug Fixes</h3>
 <ul>
@@ -10399,11 +10419,12 @@ Add <code>getContractByteCode</code> API</li>
 <ul>
 <li><strong>Contract:</strong> add ability to use call-static/dry-run without keyPair (<a href="https://github.com/aeternity/aepp-sdk-js/issues/577">#577</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/c38edd9">c38edd9</a>)</li>
 <li><strong>AE:</strong> Add ability to make operation on specific account using <code>onAccount</code> option.
-   <code>Exm: await client.spend(1, receiver, { onAccount: 'PUBLIC_KEY' })
-    Add `onAccount` to `AENS`, `Contract`, `Oracle`.
-    Add tests for using specific account to Contract, ACI, Account.</code></li>
+  <div class="highlight"><pre><span></span><code> Exm: await client.spend(1, receiver, { onAccount: &#39;PUBLIC_KEY&#39; })
+ Add `onAccount` to `AENS`, `Contract`, `Oracle`.
+ Add tests for using specific account to Contract, ACI, Account.
+</code></pre></div></li>
 <li><strong>JSON:</strong>: Add serialization to JSON for bigNumbers</li>
-<li><strong>MemoryAccount:</strong> Add validation of <code>keypair</code>  (<a href="https://github.com/aeternity/aepp-sdk-js/issues/594">#594</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20">b8c2b20</a>)</li>
+<li><strong>MemoryAccount:</strong> Add validation of <code>keypair</code> (<a href="https://github.com/aeternity/aepp-sdk-js/issues/594">#594</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/b8c2b20">b8c2b20</a>)</li>
 <li><strong>State Channels:</strong> persist connection by pinging every 10 seconds (<a href="https://github.com/aeternity/aepp-sdk-js/issues/571">#571</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/a70f919">a70f919</a>)</li>
 </ul>
 <h2 id="430-2019-08-05"><a href="https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...4.3.0">4.3.0</a> (2019-08-05)</h2>
@@ -10462,7 +10483,7 @@ Add <code>getContractByteCode</code> API</li>
 <li><strong>Selector:</strong> If default account <code>address</code> not provided use the first</li>
 <li><strong>ACI:</strong> Handle ACI without init function</li>
 <li><strong>ACI:</strong> Automatically decide to send transaction on-chai or call-static.
-Add <code>options</code> object like last arguments of generate fn under <code>instance.methods</code>
+  Add <code>options</code> object like last arguments of generate fn under <code>instance.methods</code>
   <div class="highlight"><pre><span></span><code>const instance = await client.getContractInstance(source)
 // Deploy contract
 await.contract.init(100, &#39;test&#39;, options)
@@ -10524,11 +10545,11 @@ const result = await instance.call(&#39;sum&#39;, [2, 5], options)
 <ul>
 <li><strong>DOCS</strong> Restructure and rework sdk documentation</li>
 <li><strong>SCM:</strong> This change will make the release not compatible with older version of the node and
-compiler</li>
+  compiler</li>
 <li><strong>ACI:</strong> Change Contract low lvl API:</li>
 <li>change <code>contractDecodeData</code> interface from:<ul>
 <li><code>(type:String, data: String) =&gt; Any</code> to <code>(source: String, fn: String, callValue: String, callResult:String) =&gt; Any</code>.
-(<code>callResult</code> is <code>callType</code> from call result, can be <code>ok</code>, <code>revert</code>, ...)</li>
+  (<code>callResult</code> is <code>callType</code> from call result, can be <code>ok</code>, <code>revert</code>, ...)</li>
 </ul>
 </li>
 </ul>
@@ -10545,24 +10566,24 @@ compiler</li>
 <h3 id="features_37">Features</h3>
 <ul>
 <li><strong>Transaction Builder:</strong> Improve min fee calculation(Reduce the fee) (<a href="https://github.com/aeternity/aepp-sdk-js/pull/424">#424</a>)</li>
-<li><strong>AXIOS:</strong> Add ability to intercept error from axios (<a href="https://github.com/aeternity/aepp-sdk-js/pull/431">#431</a>)<blockquote>
-<p>Added additional param to sdk initialization <code>axiosConfig</code></p>
-</blockquote>
-</li>
+<li><strong>AXIOS:</strong> Add ability to intercept error from axios (<a href="https://github.com/aeternity/aepp-sdk-js/pull/431">#431</a>)</li>
 </ul>
 <blockquote>
-<p>Example: <code>Universal({ axiosConfig: { config: { // axios config object }, errorHandler: (err) =&gt; throw err }})</code>
-* <strong>Transaction Builder:</strong> Implement vm/abi validation for contract/oracle tx based on consensus protocol version. Add custom verification based on transaction type (<a href="https://github.com/aeternity/aepp-sdk-js/pull/425">#425</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/pull/426">#426</a>)</p>
+<p>Added additional param to sdk initialization <code>axiosConfig</code></p>
+<p>Example: <code>Universal({ axiosConfig: { config: { // axios config object }, errorHandler: (err) =&gt; throw err }})</code></p>
 </blockquote>
+<ul>
+<li><strong>Transaction Builder:</strong> Implement vm/abi validation for contract/oracle tx based on consensus protocol version. Add custom verification based on transaction type (<a href="https://github.com/aeternity/aepp-sdk-js/pull/425">#425</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/pull/426">#426</a>)</li>
+</ul>
 <h2 id="330-2019-05-17"><a href="https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.3.0">3.3.0</a> (2019-05-17)</h2>
 <h3 id="bug-fixes_54">Bug Fixes</h3>
 <ul>
 <li><strong>AEP exampe:</strong> Fix contract in AEPP example (<a href="https://github.com/aeternity/aepp-sdk-js/commit/e2fec19">e2fec19</a>)
-fix(AEP exampe): Fix contract in AEPP example</li>
+  fix(AEP exampe): Fix contract in AEPP example</li>
 </ul>
 <h3 id="features_38">Features</h3>
 <ul>
-<li><strong>Consensus:</strong> Add function to get consensus version.  (<a href="https://github.com/aeternity/aepp-sdk-js/issues/413">#413</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/46027cd">46027cd</a>)</li>
+<li><strong>Consensus:</strong> Add function to get consensus version. (<a href="https://github.com/aeternity/aepp-sdk-js/issues/413">#413</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/46027cd">46027cd</a>)</li>
 <li><strong>State Channels:</strong> Make state channels compatible with aeternity 3.0.0 (<a href="https://github.com/aeternity/aepp-sdk-js/issues/415">#415</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/668e7f1">668e7f1</a>)</li>
 <li><strong>Transaction Builder:</strong> Add serializations for transactions introd… (<a href="https://github.com/aeternity/aepp-sdk-js/issues/416">#416</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/fd7b8ce">fd7b8ce</a>)</li>
 </ul>
@@ -10610,7 +10631,7 @@ fix(AEP exampe): Fix contract in AEPP example</li>
 <h3 id="breaking-changes_16">BREAKING CHANGES</h3>
 <ul>
 <li><strong>State Channels:</strong> Endpoint param is removed and no longer defaults to "/channel". This means that
-"/channel" (or other path) must be appendend to url para</li>
+  "/channel" (or other path) must be appendend to url para</li>
 </ul>
 <h2 id="310-2019-04-24"><a href="https://github.com/aeternity/aepp-sdk-js/compare/2.4.0...3.1.0">3.1.0</a> (2019-04-24)</h2>
 <h3 id="bug-fixes_57">Bug Fixes</h3>
@@ -10679,7 +10700,7 @@ fix(AEP exampe): Fix contract in AEPP example</li>
 <li><strong>Contract:</strong> Add Contract Compiler API stamp to <code>es/contract</code> (now using instead contract node API)</li>
 <li><strong>Utils:</strong> Add basic <code>http</code> client stamp (<code>es/utils/http</code>)</li>
 <li><strong>Contract:</strong> ACI stamp (New Contract interface base on contract ACI schema)
-    <div class="highlight"><pre><span></span><code>const contractIns = await client.getContractInstance(contractSourceCode)
+  <div class="highlight"><pre><span></span><code>const contractIns = await client.getContractInstance(contractSourceCode)
 console.log(contract)
  {
    interface: String, // Contract interface source code
@@ -10693,8 +10714,9 @@ console.log(contract)
    call: (fn, params = [], options = { skipArgsConvert: false, skipTransformDecoded: false, callStatic: false } =&gt; CallRersult: Object // Call contract function
  }
 </code></pre></div></li>
-<li><strong>Account:</strong> Extend  <code>Account.address()</code> with <code>accountFormatter</code> now you can do
-    <div class="highlight"><pre><span></span><code>export const ADDRESS_FORMAT = {
+<li><strong>Account:</strong> Extend <code>Account.address()</code> with <code>accountFormatter</code> now you can do</li>
+</ul>
+<div class="highlight"><pre><span></span><code>export const ADDRESS_FORMAT = {
   sophia: 1, // return address like `0xHEX_ADDRESS`
   api: 2, // return address like `ak_9LJ8ne9tks78hTD2Tp571f7w2MJmzQMRsiZxKCkMA2d2Sbrc4`
 }
@@ -10703,7 +10725,8 @@ console.log(contract)
 
 export { ADDRESS_FORMAT } from &#39;es/account&#39;
 await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
-</code></pre></div></li>
+</code></pre></div>
+<ul>
 <li><strong>Channel:</strong> Improve channel rpc usage</li>
 <li><strong>Channel:</strong> Improve channel tests and error handling</li>
 <li><strong>Channel:</strong> Improve state channel params handling</li>
@@ -10721,7 +10744,7 @@ await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
 <ul>
 <li><strong>Contract:</strong> Remove <code>ContractNodeAPI</code> stamp</li>
 <li><strong>Contract:</strong> Change Contract stamp API
-    <div class="highlight"><pre><span></span><code>1) Use Compiler instead of node API for encode/decode call-data and compile.
+  <div class="highlight"><pre><span></span><code>1) Use Compiler instead of node API for encode/decode call-data and compile.
 2) Change Contract interface:
  - contractCallStatic (address, abi = &#39;sophia-address&#39;, name, { top, args = &#39;()&#39;, call, options = {} } = {}) -&gt; (source, address, name, args = [], { top, options = {} } = {}))
  - contractCall (code, abi, address, name, { args = &#39;()&#39;, options = {}, call } = {}) -&gt; (source, address, name, args = [], options = {})
@@ -10987,7 +11010,7 @@ await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
 <ul>
 <li><strong>Rpc</strong> RPC Client improvements</li>
 <li><strong>Rpc</strong> <code>onContract</code> Guard</li>
-<li><strong>CLI</strong>  born</li>
+<li><strong>CLI</strong> born</li>
 <li><strong>CLI</strong> <code>Host</code> parameter became <code>Url</code>. (<code>-u</code> for hostname, <code>-U</code> for internal)</li>
 <li><strong>CLI</strong> New keystore following these specifications: https://www.pivotaltracker.com/n/projects/2124891/stories/155155204</li>
 </ul>
@@ -11004,7 +11027,7 @@ await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
 <h3 id="features_61">Features</h3>
 <ul>
 <li><strong>Node</strong> Full support of <a href="https://github.com/aeternity/aeternity/releases/tag/v0.24.0">Node-0.24.0</a></li>
-<li><strong>CLI</strong>  Develop <code>decode base58</code> address command in <code>crypto</code> module</li>
+<li><strong>CLI</strong> Develop <code>decode base58</code> address command in <code>crypto</code> module</li>
 <li><strong>CLI</strong> Add <code>nonce</code> param to all tx command's</li>
 <li><strong>CLI</strong> Add <code>gas</code> param to <code>deploy</code> and <code>call</code> commands</li>
 <li><strong>Tx</strong> Add ability to create <code>spend</code> transaction natively</li>

@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -731,6 +730,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1581,9 +1601,9 @@
 <h1 id="low-vs-high-level-api">Low vs High level API</h1>
 <h2 id="interactions">Interactions</h2>
 <blockquote>
-<p>"There are two approaches, purist and high-level."
-<em>Alexander Kahl.</em></p>
+<p>"There are two approaches, purist and high-level."</p>
 </blockquote>
+<p><em>Alexander Kahl.</em></p>
 <p>The purist uses the functions generated out of the Swagger
 file. After creating the SDK instance <code>aeSdk</code> with the AeSdk class it exposes a mapping of all <code>operationId</code>s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
 based on its hash you would invoke <code>aeSdk.api.getTransactionByHash('th_...')</code>.</p>
@@ -1593,48 +1613,48 @@ understand the node's operations. Most real-world requirements involves a series
 of chain operations, so the SDK provides abstractions for these.</p>
 <h2 id="recommended-high-level-sdk-usage">(<strong>Recommended</strong>) High-level SDK usage</h2>
 <p>Example spend function, using æternity's SDK abstraction.</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
-<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">init</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1">// ideally host your own node!</span>
+<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">init</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// ideally host your own node!</span>
 
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
 <span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
 <span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;&lt;SECRET_KEY_HERE&gt;&#39;</span><span class="p">)],</span>
-<span class="w">  </span><span class="p">})</span>
+<span class="w">  </span><span class="p">});</span>
 
 <span class="w">  </span><span class="c1">// log transaction info</span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="p">))</span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="p">));</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="low-level-sdk-usage-use-api-endpoints-directly">Low-level SDK usage (use <a href="https://docs.aeternity.com/protocol/node/api">API</a> endpoints directly)</h2>
-<p>Example spend function, using the SDK, talking directly to the <a href="https://docs.aeternity.com/protocol/node/api"><strong>API</strong></a>:
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<p>Example spend function, using the SDK, talking directly to the <a href="https://docs.aeternity.com/protocol/node/api"><strong>API</strong></a>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
-<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">spend</span><span class="w"> </span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1">// ideally host your own node!</span>
+<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// ideally host your own node!</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
 <span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
 <span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;&lt;SECRET_KEY_HERE&gt;&#39;</span><span class="p">)],</span>
-<span class="w">  </span><span class="p">})</span>
+<span class="w">  </span><span class="p">});</span>
 
 <span class="w">  </span><span class="c1">// builds an unsigned SpendTx using integrated transaction builder</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">spendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">buildTx</span><span class="p">(</span><span class="nx">Tag</span><span class="p">.</span><span class="nx">SpendTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nx">senderId</span><span class="o">:</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
 <span class="w">    </span><span class="nx">recipientId</span><span class="o">:</span><span class="w"> </span><span class="nx">recipient</span><span class="p">,</span>
 <span class="w">    </span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="c1">// aettos</span>
-<span class="w">    </span><span class="nx">payload</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;using low-level api is funny&#39;</span>
-<span class="w">  </span><span class="p">})</span>
+<span class="w">    </span><span class="nx">payload</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;using low-level api is funny&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">});</span>
 
 <span class="w">  </span><span class="c1">// sign the encoded transaction</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTx</span><span class="p">)</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTx</span><span class="p">);</span>
 
 <span class="w">  </span><span class="c1">// broadcast the signed tx to the node</span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postTransaction</span><span class="p">({</span><span class="nx">tx</span><span class="o">:</span><span class="w"> </span><span class="nx">signedTx</span><span class="p">}))</span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postTransaction</span><span class="p">({</span><span class="w"> </span><span class="nx">tx</span><span class="o">:</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="p">}));</span>
 <span class="p">}</span>
-</code></pre></div></p>
+</code></pre></div>
 <p>Following functions are available with the low-level API right now:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">);</span>
 <span class="cm">/*</span>
 <span class="cm">{</span>
 <span class="cm">  getTopHeader: [AsyncFunction (anonymous)],</span>

@@ -85,11 +85,10 @@
         
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest version.
-  <a href="../../..">
-    <strong>Click here to go to latest.</strong>
-  </a>
+               You're not viewing the latest version.
+<a href="../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
 
             </div>
             <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
@@ -674,6 +673,27 @@
   
   <span class="md-ellipsis">
     Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
   </span>
   
 
@@ -1496,7 +1516,8 @@ components. Doing manual tests you may conclude that account address length is b
 chars, but it is not correct.</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
-<span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Array</span><span class="p">(</span><span class="mf">10000</span><span class="p">).</span><span class="nx">fill</span><span class="p">()</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Array</span><span class="p">(</span><span class="mf">10000</span><span class="p">)</span>
+<span class="w">  </span><span class="p">.</span><span class="nx">fill</span><span class="p">()</span>
 <span class="w">  </span><span class="p">.</span><span class="nx">map</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">.</span><span class="nx">generate</span><span class="p">().</span><span class="nx">address</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span>
 <span class="w">  </span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">p</span><span class="p">,</span><span class="w"> </span><span class="nx">n</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="nx">p</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nx">n</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">p</span><span class="p">[</span><span class="nx">n</span><span class="p">]</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">}),</span><span class="w"> </span><span class="p">{});</span>
 
@@ -1507,9 +1528,7 @@ depending on generated accounts. So, while the most of addresses have length bet
 chars, there is a ~0.55% chance to get an address of 51 chars.</p>
 <p>Theoretically there can be even shorter addresses if they lucky to be prefixed with a long
 sequence of <code>0</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">,</span><span class="w"> </span><span class="nx">encode</span><span class="p">,</span><span class="w"> </span><span class="nx">decode</span><span class="p">,</span>
-<span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">,</span><span class="w"> </span><span class="nx">encode</span><span class="p">,</span><span class="w"> </span><span class="nx">decode</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">publicKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">decode</span><span class="p">(</span><span class="nx">MemoryAccount</span><span class="p">.</span><span class="nx">generate</span><span class="p">().</span><span class="nx">address</span><span class="p">);</span>
 
