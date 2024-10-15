@@ -103,12 +103,14 @@ export function verify(
 }
 
 const messagePrefix = Buffer.from('aeternity Signed Message:\n', 'utf8');
-export const messagePrefixLength = varuintEncode(messagePrefix.length);
+export const messagePrefixLength = varuintEncode(messagePrefix.length).buffer;
 
 // TODO: consider rename to hashMessage
 export function messageToHash(message: string): Buffer {
   const msg = Buffer.from(message, 'utf8');
-  return hash(concatBuffers([messagePrefixLength, messagePrefix, varuintEncode(msg.length), msg]));
+  return hash(
+    concatBuffers([messagePrefixLength, messagePrefix, varuintEncode(msg.length).buffer, msg]),
+  );
 }
 
 /**
