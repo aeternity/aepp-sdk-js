@@ -16,7 +16,7 @@ export function randomName(length: number = 15): AensName {
   return `${randomString(length)}.chain`;
 }
 
-export function assertNotNull(value: any): asserts value {
+export function assertNotNull<T>(value: T): asserts value is NonNullable<T> {
   expect([undefined, null]).to.not.include(value);
 }
 
