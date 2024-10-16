@@ -147,7 +147,6 @@
   "files": [
     "dist",
     "bin",
-    "src",
     "es"
   ],
   "browserslist": {
