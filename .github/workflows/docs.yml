@@ -1,9 +1,10 @@
-# TODO: combine with docs-release using if
-name: Publish develop docs
+name: Build and publish docs
 on:
+  pull_request:
   push:
     branches: [develop]
-
+  release:
+    types: [released]
 jobs:
   main:
     runs-on: ubuntu-latest
@@ -13,7 +14,10 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: 3.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip3
@@ -27,4 +31,11 @@ jobs:
       - run: pip3 install -r docs/requirements.txt
       - run: git config --global user.email "github-action@users.noreply.github.com"
       - run: git config --global user.name "GitHub Action"
-      - run: mike deploy --push develop
+      - if: github.event_name == 'pull_request'
+        run: mkdocs build
+      - if: github.event_name == 'push'
+        run: mike deploy --push develop
+      - if: github.event_name == 'release'
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+          mike deploy --push --update-aliases $RELEASE_VERSION latest
