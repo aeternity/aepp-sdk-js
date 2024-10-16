@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './browser.mjs',
+  entry: './browser.js',
   mode: 'production',
   target: 'browserslist:browser',
   output: {

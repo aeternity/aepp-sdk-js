@@ -165,7 +165,7 @@ describe('Generalized Account', () => {
   });
 
   // TODO: enable after resolving https://github.com/aeternity/aeternity/issues/4087
-  // TODO: copy to examples/node/account-generalized.mjs
+  // TODO: copy to examples/node/account-generalized.js
   it.skip('deploys and calls contract', async () => {
     const contract = await Contract.initialize<{
       init: (value: number) => void;

@@ -2,7 +2,7 @@
 // # InnerTx: SpendTx
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/paying-for-spend-tx.mjs)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/paying-for-spend-tx.js)
 // and this page explains in detail how to:
 //
 //  - Create and sign a `SpendTx` for an account with the `innerTx` option.
