@@ -1,4 +1,4 @@
-import { w3cwebsocket as W3CWebSocket, ICloseEvent } from 'websocket';
+import { default as websocket, ICloseEvent } from 'websocket';
 import BigNumber from 'bignumber.js';
 import type Channel from './Base';
 import JsonBig from '../utils/json-big';
@@ -15,6 +15,8 @@ import {
 } from '../utils/errors';
 import { encodeContractAddress } from '../utils/crypto';
 import { ensureError } from '../utils/other';
+
+const { w3cwebsocket: W3CWebSocket } = websocket;
 
 export interface ChannelEvents {
   statusChanged: (status: ChannelStatus) => void;

@@ -6,7 +6,7 @@ import {
   CompilerHttp,
   Contract,
   // eslint-disable-next-line import/extensions
-} from '../../es/index.mjs';
+} from '../../es/index.js';
 
 const contractSourceCode = `
 contract Test =

@@ -1,7 +1,7 @@
 module.exports = {
-  require: 'tooling/babel-register.js',
+  'node-option': ['import=tsx'],
   recursive: true,
-  extension: '.js,.ts',
+  extension: '.ts',
   timeout: process.env.NETWORK ? '30s' : '6s',
   ignore: 'test/environment/**',
 };

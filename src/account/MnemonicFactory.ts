@@ -1,5 +1,5 @@
 import { mnemonicToSeed } from '@scure/bip39';
-import { full as hmac } from 'tweetnacl-auth';
+import tweetnaclAuth from 'tweetnacl-auth';
 import AccountBaseFactory from './BaseFactory';
 import AccountMemory from './Memory';
 import { encode, Encoding, Encoded, decode } from '../utils/encoder';
@@ -15,7 +15,7 @@ interface KeyTreeNode {
 }
 
 export function deriveKey(message: Uint8Array, key: Uint8Array): KeyTreeNode {
-  const I = hmac(message, key);
+  const I = tweetnaclAuth.full(message, key);
   const IL = I.slice(0, 32);
   const IR = I.slice(32);
   return {

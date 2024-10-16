@@ -19,7 +19,7 @@ cd ../../..
 
 run_node_example () {
   echo Run $1
-  cat ./examples/node/$1 | sed -e "s|@aeternity/aepp-sdk|./es/index.mjs|" | node --input-type=module
+  cat ./examples/node/$1 | sed -e "s|@aeternity/aepp-sdk|./es/index.js|" | node --input-type=module
 }
 
 run_node_example account-generalized.mjs

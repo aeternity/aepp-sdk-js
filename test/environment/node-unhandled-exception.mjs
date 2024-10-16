@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable import/extensions */
-import { Node, CompilerHttp } from '../../es/index.mjs';
-import { pause } from '../../es/utils/other.mjs';
+import { Node, CompilerHttp } from '../../es/index.js';
+import { pause } from '../../es/utils/other.js';
 /* eslint-enable import/extensions */
 
 const invalidUrl = 'https://404.aeternity.io';

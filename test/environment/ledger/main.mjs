@@ -5,7 +5,7 @@ import {
   AccountLedgerFactory,
   Contract,
   // eslint-disable-next-line import/extensions
-} from '../../../es/index.mjs';
+} from '../../../es/index.js';
 
 export default async function run(transport) {
   const accountFactory = new AccountLedgerFactory(transport);

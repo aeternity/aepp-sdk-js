@@ -1,5 +1,5 @@
 #!/usr/bin/env npx tsx
-import { Node, AeSdk, MemoryAccount, CompilerHttp, Contract } from '../..';
+import { Node, AeSdk, MemoryAccount, CompilerHttp, Contract } from '../../src';
 
 const contractSourceCode = `
 contract Test =
