@@ -7,13 +7,13 @@ In case you're not using any JS bundling/compilation technique, the SDK can also
 ### Latest SDK version
 
 ```html
-<script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
+<script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.cjs"></script>
 ```
 
 ### Specific SDK version
 
 ```html
-<script src="https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.js"></script>
+<script src="https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.cjs"></script>
 ```
 
 ...where `VERSION` is the version number of the SDK you want to use (eg. `13.1.0`).
@@ -32,7 +32,7 @@ Usage:
   </head>
   <body>
     <!-- include latest SDK version -->
-    <script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js"></script>
+    <script src="https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.cjs"></script>
     <script type="text/javascript">
       const { AeSdk, Node } = Aeternity;
 

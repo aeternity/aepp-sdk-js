@@ -71,7 +71,10 @@ function configure(filename, opts = {}) {
 }
 
 module.exports = [
-  configure('aepp-sdk.js', { target: 'browserslist:node' }),
-  configure('aepp-sdk.browser.js', { target: 'browserslist:browser' }),
-  configure('aepp-sdk.browser-script.js', { target: 'browserslist:browser', externals: undefined }),
+  configure('aepp-sdk.cjs', { target: 'browserslist:node' }),
+  configure('aepp-sdk.browser.cjs', { target: 'browserslist:browser' }),
+  configure('aepp-sdk.browser-script.cjs', {
+    target: 'browserslist:browser',
+    externals: undefined,
+  }),
 ];

@@ -6,7 +6,7 @@ const {
   CompilerHttp,
   Contract,
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-} = require('../../dist/aepp-sdk');
+} = require('../../dist/aepp-sdk.cjs');
 
 const contractSourceCode = `
 contract Test =
