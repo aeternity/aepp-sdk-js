@@ -17,7 +17,7 @@ const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
   accounts: [new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
 });
-await aeSdk.spend(1e14, oracleAccount.address);
+await aeSdk.spend(2e14, oracleAccount.address);
 console.log('Spend done');
 
 // Creating and registering Oracle

@@ -54,7 +54,7 @@ const aeSdk = new AeSdk({
 // contract in a convenient way.
 console.log(CONTRACT_SOURCE_CODE);
 const contract = await Contract.initialize({
-  ...aeSdk.getOptions(),
+  ...aeSdk.getContext(),
   sourceCode: CONTRACT_SOURCE_CODE,
 });
 
