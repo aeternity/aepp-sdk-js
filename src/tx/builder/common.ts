@@ -1,8 +1,13 @@
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp';
-import { Field, BinaryData } from './field-types/interface';
-import { ArgumentError, DecodeError, SchemaNotFoundError, InternalError } from '../../utils/errors';
-import { Encoding, Encoded, encode, decode } from '../../utils/encoder';
-import { readInt } from './helpers';
+import { Field, BinaryData } from './field-types/interface.js';
+import {
+  ArgumentError,
+  DecodeError,
+  SchemaNotFoundError,
+  InternalError,
+} from '../../utils/errors.js';
+import { Encoding, Encoded, encode, decode } from '../../utils/encoder.js';
+import { readInt } from './helpers.js';
 
 type Schemas = ReadonlyArray<{
   tag: { constValue: number } & Field;

@@ -1,5 +1,5 @@
-import Node from '../Node';
-import AccountBase from './Base';
+import Node from '../Node.js';
+import AccountBase from './Base.js';
 
 /**
  * A factory class that generates instances of AccountBase by index.

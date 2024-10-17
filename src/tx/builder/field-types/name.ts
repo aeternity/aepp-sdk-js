@@ -1,5 +1,5 @@
-import field from './field';
-import { AensName } from '../constants';
+import field from './field.js';
+import { AensName } from '../constants.js';
 
 export default {
   /**

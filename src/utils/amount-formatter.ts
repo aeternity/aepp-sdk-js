@@ -1,6 +1,6 @@
-import BigNumber from 'bignumber.js';
-import { isBigNumber } from './bignumber';
-import { ArgumentError } from './errors';
+import { BigNumber } from 'bignumber.js';
+import { isBigNumber } from './bignumber.js';
+import { ArgumentError } from './errors.js';
 
 export enum AE_AMOUNT_FORMATS {
   AE = 'ae',

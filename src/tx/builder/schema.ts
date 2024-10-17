@@ -4,38 +4,38 @@
 // # RLP version number
 // # https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 
-import { Tag } from './constants';
-import SchemaTypes from './SchemaTypes';
-import abiVersion from './field-types/abi-version';
-import address, { idTagToEncoding } from './field-types/address';
-import array from './field-types/array';
-import coinAmount from './field-types/coin-amount';
-import ctVersion from './field-types/ct-version';
-import encoded from './field-types/encoded';
-import entry from './field-types/entry';
-import enumeration from './field-types/enumeration';
-import fee from './field-types/fee';
-import gasLimit from './field-types/gas-limit';
-import gasPrice from './field-types/gas-price';
-import name from './field-types/name';
-import nameFee from './field-types/name-fee';
-import nameId from './field-types/name-id';
-import nonce from './field-types/nonce';
-import pointers from './field-types/pointers';
-import queryFee from './field-types/query-fee';
-import raw from './field-types/raw';
-import shortUInt from './field-types/short-u-int';
-import shortUIntConst from './field-types/short-u-int-const';
-import string from './field-types/string';
-import transaction from './field-types/transaction';
-import ttl from './field-types/ttl';
-import uInt from './field-types/u-int';
-import withDefault from './field-types/with-default';
-import withFormatting from './field-types/with-formatting';
-import { Encoded, Encoding } from '../../utils/encoder';
-import { ArgumentError } from '../../utils/errors';
-import { EntryTag } from './entry/constants';
-import { EntParams, EntUnpacked } from './entry/schema.generated';
+import { Tag } from './constants.js';
+import SchemaTypes from './SchemaTypes.js';
+import abiVersion from './field-types/abi-version.js';
+import address, { idTagToEncoding } from './field-types/address.js';
+import array from './field-types/array.js';
+import coinAmount from './field-types/coin-amount.js';
+import ctVersion from './field-types/ct-version.js';
+import encoded from './field-types/encoded.js';
+import entry from './field-types/entry.js';
+import enumeration from './field-types/enumeration.js';
+import fee from './field-types/fee.js';
+import gasLimit from './field-types/gas-limit.js';
+import gasPrice from './field-types/gas-price.js';
+import name from './field-types/name.js';
+import nameFee from './field-types/name-fee.js';
+import nameId from './field-types/name-id.js';
+import nonce from './field-types/nonce.js';
+import pointers from './field-types/pointers.js';
+import queryFee from './field-types/query-fee.js';
+import raw from './field-types/raw.js';
+import shortUInt from './field-types/short-u-int.js';
+import shortUIntConst from './field-types/short-u-int-const.js';
+import string from './field-types/string.js';
+import transaction from './field-types/transaction.js';
+import ttl from './field-types/ttl.js';
+import uInt from './field-types/u-int.js';
+import withDefault from './field-types/with-default.js';
+import withFormatting from './field-types/with-formatting.js';
+import { Encoded, Encoding } from '../../utils/encoder.js';
+import { ArgumentError } from '../../utils/errors.js';
+import { EntryTag } from './entry/constants.js';
+import { EntParams, EntUnpacked } from './entry/schema.generated.js';
 
 export enum ORACLE_TTL_TYPES {
   delta = 0,

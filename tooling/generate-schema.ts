@@ -75,7 +75,7 @@ function generate(
           ),
         ]),
       ),
-      factory.createStringLiteral('./schema'),
+      factory.createStringLiteral('./schema.js'),
       undefined,
     ),
     factory.createImportDeclaration(
@@ -91,7 +91,7 @@ function generate(
           ),
         ]),
       ),
-      factory.createStringLiteral(tagInConstants ? './constants' : './schema'),
+      factory.createStringLiteral(tagInConstants ? './constants.js' : './schema.js'),
       undefined,
     ),
     ...schemas

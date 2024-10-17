@@ -1,7 +1,7 @@
 /**
  * Big Number Helpers
  */
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 
 /**
  * Check if value is BigNumber, Number, BigInt or number string representation

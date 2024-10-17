@@ -1,9 +1,9 @@
-import { isAccountNotFoundError } from '../../../utils/other';
-import shortUInt from './short-u-int';
-import Node from '../../../Node';
-import { ArgumentError } from '../../../utils/errors';
-import { NextNonceStrategy } from '../../../apis/node';
-import { Tag } from '../constants';
+import { isAccountNotFoundError } from '../../../utils/other.js';
+import shortUInt from './short-u-int.js';
+import Node from '../../../Node.js';
+import { ArgumentError } from '../../../utils/errors.js';
+import { NextNonceStrategy } from '../../../apis/node/index.js';
+import { Tag } from '../constants.js';
 
 export default function genNonceField<SenderKey extends string>(
   senderKey: SenderKey,

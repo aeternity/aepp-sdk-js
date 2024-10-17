@@ -1,8 +1,8 @@
-import { Encoded, Encoding } from '../../../utils/encoder';
-import { packRecord, unpackRecord } from '../common';
-import { schemas } from './schema';
-import { EntryTag } from './constants';
-import { EntParams, EntUnpacked } from './schema.generated';
+import { Encoded, Encoding } from '../../../utils/encoder.js';
+import { packRecord, unpackRecord } from '../common.js';
+import { schemas } from './schema.js';
+import { EntryTag } from './constants.js';
+import { EntParams, EntUnpacked } from './schema.generated.js';
 
 const encodingTag = [
   [EntryTag.CallsMtree, Encoding.CallStateTree],

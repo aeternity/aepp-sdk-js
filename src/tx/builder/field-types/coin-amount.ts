@@ -1,6 +1,6 @@
-import uInt from './u-int';
-import { Int } from '../constants';
-import { AE_AMOUNT_FORMATS, formatAmount } from '../../../utils/amount-formatter';
+import uInt from './u-int.js';
+import { Int } from '../constants.js';
+import { AE_AMOUNT_FORMATS, formatAmount } from '../../../utils/amount-formatter.js';
 
 export default {
   ...uInt,

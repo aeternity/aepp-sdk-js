@@ -1,6 +1,6 @@
-import BrowserConnection from './Browser';
-import { MESSAGE_DIRECTION } from '../schema';
-import { InternalError, RpcConnectionError } from '../../utils/errors';
+import BrowserConnection from './Browser.js';
+import { MESSAGE_DIRECTION } from '../schema.js';
+import { InternalError, RpcConnectionError } from '../../utils/errors.js';
 
 export type ImplPostMessage = Pick<
   Window,

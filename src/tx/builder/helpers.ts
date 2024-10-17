@@ -1,17 +1,17 @@
-import BigNumber from 'bignumber.js';
-import { genSalt, hash } from '../../utils/crypto';
-import { decode, encode, Encoded, Encoding } from '../../utils/encoder';
-import { toBytes } from '../../utils/bytes';
-import { concatBuffers } from '../../utils/other';
+import { BigNumber } from 'bignumber.js';
+import { genSalt, hash } from '../../utils/crypto.js';
+import { decode, encode, Encoded, Encoding } from '../../utils/encoder.js';
+import { toBytes } from '../../utils/bytes.js';
+import { concatBuffers } from '../../utils/other.js';
 import {
   AensName,
   NAME_BID_RANGES,
   NAME_BID_TIMEOUT_BLOCKS,
   NAME_FEE_BID_INCREMENT,
   NAME_MAX_LENGTH_FEE,
-} from './constants';
-import { ceil } from '../../utils/bignumber';
-import { ArgumentError, IllegalBidFeeError } from '../../utils/errors';
+} from './constants.js';
+import { ceil } from '../../utils/bignumber.js';
+import { ArgumentError, IllegalBidFeeError } from '../../utils/errors.js';
 
 /**
  * JavaScript-based Transaction builder helper function's

@@ -1,10 +1,10 @@
-import BigNumber from 'bignumber.js';
-import { getBalance, resolveName } from './chain';
-import { sendTransaction, SendTransactionOptions } from './send-transaction';
-import { buildTxAsync, BuildTxOptions, unpackTx } from './tx/builder';
-import { ArgumentError } from './utils/errors';
-import { Encoded } from './utils/encoder';
-import { Tag, AensName } from './tx/builder/constants';
+import { BigNumber } from 'bignumber.js';
+import { getBalance, resolveName } from './chain.js';
+import { sendTransaction, SendTransactionOptions } from './send-transaction.js';
+import { buildTxAsync, BuildTxOptions, unpackTx } from './tx/builder/index.js';
+import { ArgumentError } from './utils/errors.js';
+import { Encoded } from './utils/encoder.js';
+import { Tag, AensName } from './tx/builder/constants.js';
 
 // TODO: name verify should not overlap with transaction verify
 type ResolveNameOptions = Omit<Parameters<typeof resolveName>[2], 'onNode' | 'verify'>;

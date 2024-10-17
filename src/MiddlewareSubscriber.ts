@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import WebSocket from 'isomorphic-ws';
-import { BaseError, UnexpectedTsError, InternalError } from './utils/errors';
-import { Encoded } from './utils/encoder';
+import { BaseError, UnexpectedTsError, InternalError } from './utils/errors.js';
+import { Encoded } from './utils/encoder.js';
 
 interface Message {
   payload: Object;

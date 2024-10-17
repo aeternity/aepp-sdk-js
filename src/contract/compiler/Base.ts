@@ -1,4 +1,4 @@
-import { Encoded } from '../../utils/encoder';
+import { Encoded } from '../../utils/encoder.js';
 
 interface FunctionAci {
   arguments: any[];
