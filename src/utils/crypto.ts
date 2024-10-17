@@ -4,9 +4,9 @@ import nacl from 'tweetnacl';
 import { blake2b } from 'blakejs/blake2b.js';
 import { encode as varuintEncode } from 'varuint-bitcoin';
 
-import { concatBuffers, isItemOfArray } from './other';
-import { decode, encode, Encoded, Encoding } from './encoder';
-import { ArgumentError } from './errors';
+import { concatBuffers, isItemOfArray } from './other.js';
+import { decode, encode, Encoded, Encoding } from './encoder.js';
+import { ArgumentError } from './errors.js';
 
 /**
  * Check if address is valid

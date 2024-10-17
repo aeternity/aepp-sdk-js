@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { NoSerializerFoundError, TypeError } from './errors';
+import { NoSerializerFoundError, TypeError } from './errors.js';
 
 /**
  * Convert string, number, or BigNumber to byte array

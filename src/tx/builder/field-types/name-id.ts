@@ -1,7 +1,7 @@
-import { AensName } from '../constants';
-import { produceNameId, isNameValid } from '../helpers';
-import address from './address';
-import { Encoded, Encoding } from '../../../utils/encoder';
+import { AensName } from '../constants.js';
+import { produceNameId, isNameValid } from '../helpers.js';
+import address from './address.js';
+import { Encoded, Encoding } from '../../../utils/encoder.js';
 
 const addressName = address(Encoding.Name);
 

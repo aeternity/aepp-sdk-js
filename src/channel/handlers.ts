@@ -13,19 +13,19 @@ import {
   SignTx,
   ChannelStatus,
   ChannelEvents,
-} from './internal';
-import { unpackTx, buildTx } from '../tx/builder';
-import { decode, Encoded } from '../utils/encoder';
+} from './internal.js';
+import { unpackTx, buildTx } from '../tx/builder/index.js';
+import { decode, Encoded } from '../utils/encoder.js';
 import {
   IllegalArgumentError,
   InsufficientBalanceError,
   ChannelConnectionError,
   UnexpectedChannelMessageError,
   ChannelError,
-} from '../utils/errors';
-import type Channel from './Base';
-import { Tag } from '../tx/builder/constants';
-import { snakeToPascal } from '../utils/string';
+} from '../utils/errors.js';
+import type Channel from './Base.js';
+import { Tag } from '../tx/builder/constants.js';
+import { snakeToPascal } from '../utils/string.js';
 
 export async function appendSignature(
   tx: Encoded.Transaction,

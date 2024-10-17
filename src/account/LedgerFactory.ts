@@ -1,9 +1,9 @@
 import type Transport from '@ledgerhq/hw-transport';
-import AccountLedger, { CLA, GET_ADDRESS, GET_APP_CONFIGURATION } from './Ledger';
-import { UnsupportedVersionError } from '../utils/errors';
-import { Encoded } from '../utils/encoder';
-import semverSatisfies from '../utils/semver-satisfies';
-import AccountBaseFactory from './BaseFactory';
+import AccountLedger, { CLA, GET_ADDRESS, GET_APP_CONFIGURATION } from './Ledger.js';
+import { UnsupportedVersionError } from '../utils/errors.js';
+import { Encoded } from '../utils/encoder.js';
+import semverSatisfies from '../utils/semver-satisfies.js';
+import AccountBaseFactory from './BaseFactory.js';
 
 interface AppConfiguration {
   version: string;

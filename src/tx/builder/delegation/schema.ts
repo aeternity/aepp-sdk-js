@@ -1,8 +1,8 @@
-import SchemaTypes from '../SchemaTypes';
-import address from '../field-types/address';
-import nameId from '../field-types/name-id';
-import shortUIntConst from '../field-types/short-u-int-const';
-import { Encoded, Encoding, decode, encode } from '../../../utils/encoder';
+import SchemaTypes from '../SchemaTypes.js';
+import address from '../field-types/address.js';
+import nameId from '../field-types/name-id.js';
+import shortUIntConst from '../field-types/short-u-int-const.js';
+import { Encoded, Encoding, decode, encode } from '../../../utils/encoder.js';
 
 /**
  * @category delegation signature

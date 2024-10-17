@@ -1,8 +1,8 @@
-import coinAmount from './coin-amount';
-import { Int } from '../constants';
-import Node from '../../../Node';
-import { Encoded } from '../../../utils/encoder';
-import { ArgumentError } from '../../../utils/errors';
+import coinAmount from './coin-amount.js';
+import { Int } from '../constants.js';
+import Node from '../../../Node.js';
+import { Encoded } from '../../../utils/encoder.js';
+import { ArgumentError } from '../../../utils/errors.js';
 
 /**
  * Oracle query fee

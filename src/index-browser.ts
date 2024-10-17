@@ -16,8 +16,8 @@ export {
   getContract,
   getName,
   resolveName,
-} from './chain';
-export { InvalidTxError, sendTransaction } from './send-transaction';
+} from './chain.js';
+export { InvalidTxError, sendTransaction } from './send-transaction.js';
 export {
   isAddressValid,
   genSalt,
@@ -27,17 +27,17 @@ export {
   verify,
   messageToHash,
   verifyMessage,
-} from './utils/crypto';
-export { signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt } from './utils/jwt';
-export type { Jwt } from './utils/jwt';
-export { toBytes } from './utils/bytes';
+} from './utils/crypto.js';
+export { signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt } from './utils/jwt.js';
+export type { Jwt } from './utils/jwt.js';
+export { toBytes } from './utils/bytes.js';
 export {
   buildTx,
   buildTxAsync,
   buildTxHash,
   unpackTx,
   buildContractIdByContractTx,
-} from './tx/builder';
+} from './tx/builder/index.js';
 export {
   buildContractId,
   oracleQueryId,
@@ -51,7 +51,7 @@ export {
   computeBidFee,
   computeAuctionEndBlock,
   isAuctionName,
-} from './tx/builder/helpers';
+} from './tx/builder/helpers.js';
 export {
   MAX_AUTH_FUN_GAS,
   MIN_GAS_PRICE,
@@ -65,70 +65,70 @@ export {
   AbiVersion,
   Tag,
   DRY_RUN_ACCOUNT,
-} from './tx/builder/constants';
-export type { Int, AensName } from './tx/builder/constants';
+} from './tx/builder/constants.js';
+export type { Int, AensName } from './tx/builder/constants.js';
 // TODO: move to constants
-export { ORACLE_TTL_TYPES } from './tx/builder/schema';
-export { DelegationTag } from './tx/builder/delegation/schema';
-export { packDelegation, unpackDelegation } from './tx/builder/delegation';
-export { EntryTag, CallReturnType } from './tx/builder/entry/constants';
-export { packEntry, unpackEntry } from './tx/builder/entry';
+export { ORACLE_TTL_TYPES } from './tx/builder/schema.js';
+export { DelegationTag } from './tx/builder/delegation/schema.js';
+export { packDelegation, unpackDelegation } from './tx/builder/delegation/index.js';
+export { EntryTag, CallReturnType } from './tx/builder/entry/constants.js';
+export { packEntry, unpackEntry } from './tx/builder/entry/index.js';
 export {
   getExecutionCost,
   getExecutionCostBySignedTx,
   getExecutionCostUsingNode,
-} from './tx/execution-cost';
-export { default as getTransactionSignerAddress } from './tx/transaction-signer';
+} from './tx/execution-cost.js';
+export { default as getTransactionSignerAddress } from './tx/transaction-signer.js';
 export {
   AE_AMOUNT_FORMATS,
   formatAmount,
   toAe,
   toAettos,
   prefixedAmount,
-} from './utils/amount-formatter';
-export { encode, decode, Encoding, Encoded } from './utils/encoder';
-export { hashTypedData, hashDomain, hashJson } from './utils/typed-data';
-export { default as Name } from './aens';
-export { default as Contract } from './contract/Contract';
-export type { ContractMethodsBase } from './contract/Contract';
-export { default as Oracle } from './oracle/Oracle';
-export { default as OracleClient } from './oracle/OracleClient';
-export { spend, transferFunds, payForTransaction } from './spend';
+} from './utils/amount-formatter.js';
+export { encode, decode, Encoding, Encoded } from './utils/encoder.js';
+export { hashTypedData, hashDomain, hashJson } from './utils/typed-data.js';
+export { default as Name } from './aens.js';
+export { default as Contract } from './contract/Contract.js';
+export type { ContractMethodsBase } from './contract/Contract.js';
+export { default as Oracle } from './oracle/Oracle.js';
+export { default as OracleClient } from './oracle/OracleClient.js';
+export { spend, transferFunds, payForTransaction } from './spend.js';
 export {
   createGeneralizedAccount,
   buildAuthTxHash,
   buildAuthTxHashByGaMetaTx,
-} from './contract/ga';
+} from './contract/ga.js';
 
-export { default as AeSdkMethods } from './AeSdkMethods';
-export { default as AeSdkBase } from './AeSdkBase';
-export { default as AeSdk } from './AeSdk';
-export { default as AeSdkAepp } from './AeSdkAepp';
-export { default as WalletConnectorFrame } from './aepp-wallet-communication/WalletConnectorFrame';
-export { default as WalletConnectorFrameWithNode } from './aepp-wallet-communication/WalletConnectorFrameWithNode';
-export { default as AeSdkWallet } from './AeSdkWallet';
-export { default as Node } from './Node';
-export { default as verifyTransaction } from './tx/validator';
-export { default as AccountBase } from './account/Base';
-export { default as MemoryAccount } from './account/Memory';
-export { default as AccountMnemonicFactory } from './account/MnemonicFactory';
-export { default as AccountGeneralized } from './account/Generalized';
-export { default as AccountLedger } from './account/Ledger';
-export { default as AccountLedgerFactory } from './account/LedgerFactory';
-export { default as AccountMetamask } from './account/Metamask';
-export { default as AccountMetamaskFactory } from './account/MetamaskFactory';
-export { default as CompilerBase } from './contract/compiler/Base';
-export { default as CompilerHttp } from './contract/compiler/Http';
-export { default as Channel } from './channel/Contract';
+export { default as AeSdkMethods } from './AeSdkMethods.js';
+export { default as AeSdkBase } from './AeSdkBase.js';
+export { default as AeSdk } from './AeSdk.js';
+export { default as AeSdkAepp } from './AeSdkAepp.js';
+export { default as WalletConnectorFrame } from './aepp-wallet-communication/WalletConnectorFrame.js';
+export { default as WalletConnectorFrameWithNode } from './aepp-wallet-communication/WalletConnectorFrameWithNode.js';
+export { default as AeSdkWallet } from './AeSdkWallet.js';
+export { default as Node } from './Node.js';
+export { default as verifyTransaction } from './tx/validator.js';
+export { default as AccountBase } from './account/Base.js';
+export { default as MemoryAccount } from './account/Memory.js';
+export { default as AccountMnemonicFactory } from './account/MnemonicFactory.js';
+export { default as AccountGeneralized } from './account/Generalized.js';
+export { default as AccountLedger } from './account/Ledger.js';
+export { default as AccountLedgerFactory } from './account/LedgerFactory.js';
+export { default as AccountMetamask } from './account/Metamask.js';
+export { default as AccountMetamaskFactory } from './account/MetamaskFactory.js';
+export { default as CompilerBase } from './contract/compiler/Base.js';
+export { default as CompilerHttp } from './contract/compiler/Http.js';
+export { default as Channel } from './channel/Contract.js';
 export {
   default as MiddlewareSubscriber,
   MiddlewareSubscriberError,
   MiddlewareSubscriberDisconnected,
-} from './MiddlewareSubscriber';
-export { default as Middleware } from './Middleware';
-export { MiddlewarePageMissed } from './utils/MiddlewarePage';
+} from './MiddlewareSubscriber.js';
+export { default as Middleware } from './Middleware.js';
+export { MiddlewarePageMissed } from './utils/MiddlewarePage.js';
 
-export { default as connectionProxy } from './aepp-wallet-communication/connection-proxy';
+export { default as connectionProxy } from './aepp-wallet-communication/connection-proxy.js';
 export {
   MESSAGE_DIRECTION,
   WALLET_TYPE,
@@ -145,10 +145,10 @@ export {
   RpcInternalError,
   RpcMethodNotFoundError,
   RpcNoNetworkById,
-} from './aepp-wallet-communication/schema';
-export { default as walletDetector } from './aepp-wallet-communication/wallet-detector';
-export { default as BrowserRuntimeConnection } from './aepp-wallet-communication/connection/BrowserRuntime';
-export { default as BrowserWindowMessageConnection } from './aepp-wallet-communication/connection/BrowserWindowMessage';
+} from './aepp-wallet-communication/schema.js';
+export { default as walletDetector } from './aepp-wallet-communication/wallet-detector.js';
+export { default as BrowserRuntimeConnection } from './aepp-wallet-communication/connection/BrowserRuntime.js';
+export { default as BrowserWindowMessageConnection } from './aepp-wallet-communication/connection/BrowserWindowMessage.js';
 export {
   BaseError,
   AccountError,
@@ -224,4 +224,4 @@ export {
   AlreadyConnectedError,
   NoWalletConnectedError,
   RpcConnectionError,
-} from './utils/errors';
+} from './utils/errors.js';

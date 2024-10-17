@@ -1,13 +1,13 @@
 import BigNumber from 'bignumber.js';
-import { ArgumentError, IllegalArgumentError } from '../../../utils/errors';
-import { Int, MIN_GAS_PRICE, Tag } from '../constants';
-import uInt from './u-int';
-import coinAmount from './coin-amount';
-import { getCachedIncreasedGasPrice } from './gas-price';
-import { isKeyOfObject } from '../../../utils/other';
-import { decode, Encoded } from '../../../utils/encoder';
-import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
-import Node from '../../../Node';
+import { ArgumentError, IllegalArgumentError } from '../../../utils/errors.js';
+import { Int, MIN_GAS_PRICE, Tag } from '../constants.js';
+import uInt from './u-int.js';
+import coinAmount from './coin-amount.js';
+import { getCachedIncreasedGasPrice } from './gas-price.js';
+import { isKeyOfObject } from '../../../utils/other.js';
+import { decode, Encoded } from '../../../utils/encoder.js';
+import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index.js';
+import Node from '../../../Node.js';
 
 const BASE_GAS = 15000;
 const GAS_PER_BYTE = 20;

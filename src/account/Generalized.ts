@@ -1,15 +1,15 @@
-import AccountBase from './Base';
+import AccountBase from './Base.js';
 import {
   ArgumentError,
   InternalError,
   InvalidAuthDataError,
   NotImplementedError,
-} from '../utils/errors';
-import { decode, Encoded } from '../utils/encoder';
-import { getAccount } from '../chain';
-import Contract from '../contract/Contract';
-import { buildTxAsync, buildTx } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
+} from '../utils/errors.js';
+import { decode, Encoded } from '../utils/encoder.js';
+import { getAccount } from '../chain.js';
+import Contract from '../contract/Contract.js';
+import { buildTxAsync, buildTx } from '../tx/builder/index.js';
+import { Tag } from '../tx/builder/constants.js';
 
 /**
  * Generalized account class

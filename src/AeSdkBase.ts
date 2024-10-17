@@ -1,16 +1,16 @@
-import Node from './Node';
-import AccountBase from './account/Base';
+import Node from './Node.js';
+import AccountBase from './account/Base.js';
 import {
   CompilerError,
   DuplicateNodeError,
   NodeNotFoundError,
   NotImplementedError,
   TypeError,
-} from './utils/errors';
-import { Encoded } from './utils/encoder';
-import { wrapWithProxy } from './utils/wrap-proxy';
-import CompilerBase from './contract/compiler/Base';
-import AeSdkMethods, { OnAccount, AeSdkMethodsOptions, WrappedOptions } from './AeSdkMethods';
+} from './utils/errors.js';
+import { Encoded } from './utils/encoder.js';
+import { wrapWithProxy } from './utils/wrap-proxy.js';
+import CompilerBase from './contract/compiler/Base.js';
+import AeSdkMethods, { OnAccount, AeSdkMethodsOptions, WrappedOptions } from './AeSdkMethods.js';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 

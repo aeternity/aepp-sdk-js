@@ -1,12 +1,12 @@
 import nacl from 'tweetnacl';
-import AccountBase from './Base';
-import { hash, messageToHash, messagePrefixLength } from '../utils/crypto';
-import { ArgumentError } from '../utils/errors';
-import { decode, encode, Encoded, Encoding } from '../utils/encoder';
-import { concatBuffers } from '../utils/other';
-import { hashTypedData, AciValue } from '../utils/typed-data';
-import { buildTx } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
+import AccountBase from './Base.js';
+import { hash, messageToHash, messagePrefixLength } from '../utils/crypto.js';
+import { ArgumentError } from '../utils/errors.js';
+import { decode, encode, Encoded, Encoding } from '../utils/encoder.js';
+import { concatBuffers } from '../utils/other.js';
+import { hashTypedData, AciValue } from '../utils/typed-data.js';
+import { buildTx } from '../tx/builder/index.js';
+import { Tag } from '../tx/builder/constants.js';
 
 export function getBufferToSign(
   transaction: Encoded.Transaction,

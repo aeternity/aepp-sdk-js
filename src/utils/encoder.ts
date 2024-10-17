@@ -2,10 +2,10 @@ import bs58 from 'bs58';
 // js extension is required for mjs build, not importing the whole package to reduce bundle size
 // eslint-disable-next-line import/extensions
 import Sha256 from 'sha.js/sha256.js';
-import { DecodeError, ArgumentError, InvalidChecksumError, PayloadLengthError } from './errors';
-import { concatBuffers, isKeyOfObject } from './other';
-import * as Encoded from './encoder-types';
-import { Encoding } from './encoder-types';
+import { DecodeError, ArgumentError, InvalidChecksumError, PayloadLengthError } from './errors.js';
+import { concatBuffers, isKeyOfObject } from './other.js';
+import * as Encoded from './encoder-types.js';
+import { Encoding } from './encoder-types.js';
 
 export { Encoded, Encoding };
 

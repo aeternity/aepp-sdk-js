@@ -1,7 +1,7 @@
-import shortUInt from './short-u-int';
-import Node from '../../../Node';
-import { ArgumentError } from '../../../utils/errors';
-import { _getPollInterval, getHeight } from '../../../chain';
+import shortUInt from './short-u-int.js';
+import Node from '../../../Node.js';
+import { ArgumentError } from '../../../utils/errors.js';
+import { _getPollInterval, getHeight } from '../../../chain.js';
 
 /**
  * Time to leave

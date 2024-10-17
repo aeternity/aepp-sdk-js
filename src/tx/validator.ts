@@ -1,17 +1,17 @@
 import { RestError } from '@azure/core-rest-pipeline';
-import { hash, isAddressValid, verify } from '../utils/crypto';
-import { TxUnpacked } from './builder/schema.generated';
-import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version';
-import { Tag, ConsensusProtocolVersion } from './builder/constants';
-import { buildTx, unpackTx } from './builder';
-import { concatBuffers, isAccountNotFoundError } from '../utils/other';
-import { Encoded, Encoding, decode } from '../utils/encoder';
-import Node from '../Node';
-import { Account } from '../apis/node';
-import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest';
-import { UnexpectedTsError } from '../utils/errors';
-import getTransactionSignerAddress from './transaction-signer';
-import { getExecutionCostUsingNode } from './execution-cost';
+import { hash, isAddressValid, verify } from '../utils/crypto.js';
+import { TxUnpacked } from './builder/schema.generated.js';
+import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version.js';
+import { Tag, ConsensusProtocolVersion } from './builder/constants.js';
+import { buildTx, unpackTx } from './builder/index.js';
+import { concatBuffers, isAccountNotFoundError } from '../utils/other.js';
+import { Encoded, Encoding, decode } from '../utils/encoder.js';
+import Node from '../Node.js';
+import { Account } from '../apis/node/index.js';
+import { genAggressiveCacheGetResponsesPolicy } from '../utils/autorest.js';
+import { UnexpectedTsError } from '../utils/errors.js';
+import getTransactionSignerAddress from './transaction-signer.js';
+import { getExecutionCostUsingNode } from './execution-cost.js';
 
 export interface ValidatorResult {
   message: string;

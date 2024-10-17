@@ -1,8 +1,8 @@
-import AeSdkBase from './AeSdkBase';
-import { OnAccount } from './AeSdkMethods';
-import AccountBase from './account/Base';
-import AccountRpc from './account/Rpc';
-import { decode, Encoded } from './utils/encoder';
+import AeSdkBase from './AeSdkBase.js';
+import { OnAccount } from './AeSdkMethods.js';
+import AccountBase from './account/Base.js';
+import AccountRpc from './account/Rpc.js';
+import { decode, Encoded } from './utils/encoder.js';
 import {
   Accounts,
   RPC_VERSION,
@@ -12,18 +12,18 @@ import {
   AeppApi,
   Node as NodeRpc,
   NetworkToSelect,
-} from './aepp-wallet-communication/rpc/types';
-import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
-import { METHODS, SUBSCRIPTION_TYPES } from './aepp-wallet-communication/schema';
+} from './aepp-wallet-communication/rpc/types.js';
+import RpcClient from './aepp-wallet-communication/rpc/RpcClient.js';
+import { METHODS, SUBSCRIPTION_TYPES } from './aepp-wallet-communication/schema.js';
 import {
   AlreadyConnectedError,
   NoWalletConnectedError,
   UnsubscribedAccountError,
   UnAuthorizedAccountError,
   RpcConnectionError,
-} from './utils/errors';
-import Node from './Node';
-import BrowserConnection from './aepp-wallet-communication/connection/Browser';
+} from './utils/errors.js';
+import Node from './Node.js';
+import BrowserConnection from './aepp-wallet-communication/connection/Browser.js';
 
 /**
  * RPC handler for AEPP side

@@ -1,7 +1,7 @@
 import type { BaseProvider } from '@metamask/providers';
-import AccountBase from './Base';
-import { Encoded } from '../utils/encoder';
-import { ArgumentError, InternalError, NotImplementedError } from '../utils/errors';
+import AccountBase from './Base.js';
+import { Encoded } from '../utils/encoder.js';
+import { ArgumentError, InternalError, NotImplementedError } from '../utils/errors.js';
 
 export const snapId = 'npm:@aeternity-snap/plugin';
 

@@ -1,7 +1,7 @@
 import nacl from 'tweetnacl';
-import AeSdk from './AeSdk';
-import verifyTransaction from './tx/validator';
-import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
+import AeSdk from './AeSdk.js';
+import verifyTransaction from './tx/validator.js';
+import RpcClient from './aepp-wallet-communication/rpc/RpcClient.js';
 import {
   METHODS,
   RPC_STATUS,
@@ -11,10 +11,10 @@ import {
   RpcNotAuthorizeError,
   RpcPermissionDenyError,
   RpcUnsupportedProtocolError,
-} from './aepp-wallet-communication/schema';
-import { InternalError, UnknownRpcClientError } from './utils/errors';
-import AccountBase from './account/Base';
-import BrowserConnection from './aepp-wallet-communication/connection/Browser';
+} from './aepp-wallet-communication/schema.js';
+import { InternalError, UnknownRpcClientError } from './utils/errors.js';
+import AccountBase from './account/Base.js';
+import BrowserConnection from './aepp-wallet-communication/connection/Browser.js';
 import {
   Accounts,
   AeppApi,
@@ -23,9 +23,9 @@ import {
   RPC_VERSION,
   WalletApi,
   WalletInfo,
-} from './aepp-wallet-communication/rpc/types';
-import { Encoded, Encoding, encode, decode } from './utils/encoder';
-import jsonBig from './utils/json-big';
+} from './aepp-wallet-communication/rpc/types.js';
+import { Encoded, Encoding, encode, decode } from './utils/encoder.js';
+import jsonBig from './utils/json-big.js';
 
 type RpcClientWallet = RpcClient<AeppApi, WalletApi>;
 
