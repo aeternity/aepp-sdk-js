@@ -106,7 +106,6 @@
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
     "@ledgerhq/hw-transport-mocker": "^6.29.4",
-    "@ledgerhq/hw-transport-node-hid-singleton": "^6.31.5",
     "@ledgerhq/hw-transport-webusb": "^6.29.4",
     "@types/chai": "^5.0.0",
     "@types/chai-as-promised": "^8.0.1",
