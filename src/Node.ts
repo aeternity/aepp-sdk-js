@@ -8,10 +8,10 @@ import {
   parseBigIntPolicy,
   genVersionCheckPolicy,
   genRetryOnFailurePolicy,
-} from './utils/autorest';
-import { Node as NodeApi, NodeOptionalParams, ErrorModel } from './apis/node';
-import { UnsupportedVersionError } from './utils/errors';
-import { ConsensusProtocolVersion } from './tx/builder/constants';
+} from './utils/autorest.js';
+import { Node as NodeApi, NodeOptionalParams, ErrorModel } from './apis/node/index.js';
+import { UnsupportedVersionError } from './utils/errors.js';
+import { ConsensusProtocolVersion } from './tx/builder/constants.js';
 
 interface NodeInfo {
   url: string;

@@ -5,9 +5,9 @@ import {
   OperationOptions,
   createSerializer as createSerializerOrig,
 } from '@azure/core-client';
-import { pause } from './other';
-import semverSatisfies from './semver-satisfies';
-import { InternalError, UnexpectedTsError, UnsupportedVersionError } from './errors';
+import { pause } from './other.js';
+import semverSatisfies from './semver-satisfies.js';
+import { InternalError, UnexpectedTsError, UnsupportedVersionError } from './errors.js';
 
 const bigIntPrefix = '_sdk-big-int-';
 

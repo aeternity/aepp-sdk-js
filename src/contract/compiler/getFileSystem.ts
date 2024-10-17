@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import { dirname, resolve, basename } from 'path';
-import { InternalError } from '../../utils/errors';
+import { InternalError } from '../../utils/errors.js';
 
 const defaultIncludes = [
   'List.aes',

@@ -1,6 +1,6 @@
 import { encode as rlpEncode, Input } from 'rlp';
-import { EntryTag } from '../entry/constants';
-import { hash } from '../../../utils/crypto';
+import { EntryTag } from '../entry/constants.js';
+import { hash } from '../../../utils/crypto.js';
 import {
   MerkleTreeHashMismatchError,
   MissingNodeInTreeError,
@@ -8,10 +8,10 @@ import {
   UnexpectedTsError,
   UnknownNodeLengthError,
   InternalError,
-} from '../../../utils/errors';
-import { decode, encode, Encoded, Encoding } from '../../../utils/encoder';
-import type { unpackEntry } from '../entry';
-import type { EntUnpacked } from '../entry/schema.generated';
+} from '../../../utils/errors.js';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder.js';
+import type { unpackEntry } from '../entry/index.js';
+import type { EntUnpacked } from '../entry/schema.generated.js';
 
 enum NodeType {
   Branch,

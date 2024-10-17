@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
-import { Encoded } from '../utils/encoder';
-import { BaseError, InternalError } from '../utils/errors';
+import { Encoded } from '../utils/encoder.js';
+import { BaseError, InternalError } from '../utils/errors.js';
 
 /**
  * @category aepp wallet communication

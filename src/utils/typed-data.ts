@@ -1,8 +1,8 @@
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import canonicalize from 'canonicalize';
-import { Encoded, decode } from './encoder';
-import { hash, messagePrefixLength } from './crypto';
-import { concatBuffers } from './other';
+import { Encoded, decode } from './encoder.js';
+import { hash, messagePrefixLength } from './crypto.js';
+import { concatBuffers } from './other.js';
 
 /**
  * Hashes arbitrary object, can be used to inline the aci hash to contract source code

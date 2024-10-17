@@ -1,5 +1,5 @@
-import { ConsensusProtocolVersion, VmVersion, AbiVersion } from '../constants';
-import Node from '../../../Node';
+import { ConsensusProtocolVersion, VmVersion, AbiVersion } from '../constants.js';
+import Node from '../../../Node.js';
 
 /*
  * First abi/vm by default

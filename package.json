@@ -116,7 +116,6 @@
     "@typescript-eslint/parser": "^7.15.0",
     "autorest": "^3.7.1",
     "babel-loader": "^9.2.1",
-    "babel-plugin-add-import-extension": "^1.6.0",
     "babel-plugin-import-globals": "^2.0.0",
     "babel-plugin-transform-import-meta": "^2.2.1",
     "chai": "^5.1.1",

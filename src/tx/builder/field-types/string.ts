@@ -1,4 +1,4 @@
-import { toBytes } from '../../../utils/bytes';
+import { toBytes } from '../../../utils/bytes.js';
 
 export default {
   serialize(string: string): Buffer {

@@ -1,13 +1,13 @@
-import { decode, encode, Encoded, Encoding } from '../../utils/encoder';
-import { hash } from '../../utils/crypto';
-import { Field } from './field-types/interface';
-import { txSchema } from './schema';
-import { TxUnpacked, TxParams, TxParamsAsync } from './schema.generated';
-import { Tag } from './constants';
-import { buildContractId } from './helpers';
-import { getSchema as getSchemaCommon, packRecord, unpackRecord } from './common';
-import { ArgumentError } from '../../utils/errors';
-import { packEntry, unpackEntry } from './entry';
+import { decode, encode, Encoded, Encoding } from '../../utils/encoder.js';
+import { hash } from '../../utils/crypto.js';
+import { Field } from './field-types/interface.js';
+import { txSchema } from './schema.js';
+import { TxUnpacked, TxParams, TxParamsAsync } from './schema.generated.js';
+import { Tag } from './constants.js';
+import { buildContractId } from './helpers.js';
+import { getSchema as getSchemaCommon, packRecord, unpackRecord } from './common.js';
+import { ArgumentError } from '../../utils/errors.js';
+import { packEntry, unpackEntry } from './entry/index.js';
 
 /**
  * JavaScript-based Transaction builder

@@ -1,7 +1,7 @@
-import { Encoded } from '../../utils/encoder';
-import { Domain, AciValue } from '../../utils/typed-data';
-import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema';
-import { SignedTx } from '../../apis/node';
+import { Encoded } from '../../utils/encoder.js';
+import { Domain, AciValue } from '../../utils/typed-data.js';
+import { METHODS, SUBSCRIPTION_TYPES, WALLET_TYPE } from '../schema.js';
+import { SignedTx } from '../../apis/node/index.js';
 
 export interface WalletInfo {
   id: string;

@@ -1,5 +1,5 @@
-import { ArgumentError } from '../../../utils/errors';
-import { isItemOfArray } from '../../../utils/other';
+import { ArgumentError } from '../../../utils/errors.js';
+import { isItemOfArray } from '../../../utils/other.js';
 
 export default function genEnumerationField<Enum extends { [key: string]: number | string }>(
   enm: Enum,

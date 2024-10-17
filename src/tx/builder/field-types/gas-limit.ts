@@ -1,8 +1,8 @@
-import { IllegalArgumentError } from '../../../utils/errors';
-import { Tag, MAX_AUTH_FUN_GAS } from '../constants';
-import shortUInt from './short-u-int';
-import { buildGas } from './fee';
-import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
+import { IllegalArgumentError } from '../../../utils/errors.js';
+import { Tag, MAX_AUTH_FUN_GAS } from '../constants.js';
+import shortUInt from './short-u-int.js';
+import { buildGas } from './fee.js';
+import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index.js';
 
 function calculateGasLimitMax(
   gasMax: number,

@@ -1,6 +1,6 @@
 import { Runtime } from 'webextension-polyfill';
-import BrowserConnection from './Browser';
-import { UnexpectedTsError } from '../../utils/errors';
+import BrowserConnection from './Browser.js';
+import { UnexpectedTsError } from '../../utils/errors.js';
 
 /**
  * BrowserRuntimeConnection

@@ -1,7 +1,7 @@
-import { ArgumentError, PrefixNotFoundError, TagNotFoundError } from '../../../utils/errors';
-import { toBytes } from '../../../utils/bytes';
-import { decode, encode, Encoded, Encoding } from '../../../utils/encoder';
-import { isItemOfArray } from '../../../utils/other';
+import { ArgumentError, PrefixNotFoundError, TagNotFoundError } from '../../../utils/errors.js';
+import { toBytes } from '../../../utils/bytes.js';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder.js';
+import { isItemOfArray } from '../../../utils/other.js';
 
 /**
  * Map of prefix to ID tag constant

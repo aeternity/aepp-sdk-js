@@ -1,9 +1,9 @@
 import { default as websocket, ICloseEvent } from 'websocket';
 import BigNumber from 'bignumber.js';
-import type Channel from './Base';
-import JsonBig from '../utils/json-big';
-import { pascalToSnake } from '../utils/string';
-import { Encoded } from '../utils/encoder';
+import type Channel from './Base.js';
+import JsonBig from '../utils/json-big.js';
+import { pascalToSnake } from '../utils/string.js';
+import { Encoded } from '../utils/encoder.js';
 import {
   BaseError,
   ChannelCallError,
@@ -12,9 +12,9 @@ import {
   UnknownChannelStateError,
   ChannelIncomingMessageError,
   ChannelError,
-} from '../utils/errors';
-import { encodeContractAddress } from '../utils/crypto';
-import { ensureError } from '../utils/other';
+} from '../utils/errors.js';
+import { encodeContractAddress } from '../utils/crypto.js';
+import { ensureError } from '../utils/other.js';
 
 const { w3cwebsocket: W3CWebSocket } = websocket;
 

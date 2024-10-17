@@ -1,12 +1,12 @@
-import { buildTxAsync, BuildTxOptions } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
-import { LogicError, UnexpectedTsError } from '../utils/errors';
-import { decode, encode, Encoded, Encoding } from '../utils/encoder';
-import { _getPollInterval } from '../chain';
-import { sendTransaction, SendTransactionOptions } from '../send-transaction';
-import Node from '../Node';
-import AccountBase from '../account/Base';
-import OracleBase, { OracleQuery, decodeQuery } from './OracleBase';
+import { buildTxAsync, BuildTxOptions } from '../tx/builder/index.js';
+import { Tag } from '../tx/builder/constants.js';
+import { LogicError, UnexpectedTsError } from '../utils/errors.js';
+import { decode, encode, Encoded, Encoding } from '../utils/encoder.js';
+import { _getPollInterval } from '../chain.js';
+import { sendTransaction, SendTransactionOptions } from '../send-transaction.js';
+import Node from '../Node.js';
+import AccountBase from '../account/Base.js';
+import OracleBase, { OracleQuery, decodeQuery } from './OracleBase.js';
 
 interface OracleRegisterOptions
   extends BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat'>,

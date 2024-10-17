@@ -1,8 +1,8 @@
 import canonicalize from 'canonicalize';
-import AccountBase from '../account/Base';
-import { Encoded, Encoding, decode, encode } from './encoder';
-import { verify } from './crypto';
-import { ArgumentError, InvalidSignatureError } from './errors';
+import AccountBase from '../account/Base.js';
+import { Encoded, Encoding, decode, encode } from './encoder.js';
+import { verify } from './crypto.js';
+import { ArgumentError, InvalidSignatureError } from './errors.js';
 
 // TODO: use Buffer.from(data, 'base64url') after solving https://github.com/feross/buffer/issues/309
 const toBase64Url = (data: Buffer | Uint8Array | string): string =>

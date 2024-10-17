@@ -1,9 +1,9 @@
-import { NamePointer as NamePointerString } from '../../../apis/node';
-import { toBytes } from '../../../utils/bytes';
-import { Encoded, Encoding, decode, encode } from '../../../utils/encoder';
-import { isAddressValid } from '../../../utils/crypto';
-import { IllegalArgumentError, DecodeError, ArgumentError } from '../../../utils/errors';
-import address, { AddressEncodings, idTagToEncoding } from './address';
+import { NamePointer as NamePointerString } from '../../../apis/node/index.js';
+import { toBytes } from '../../../utils/bytes.js';
+import { Encoded, Encoding, decode, encode } from '../../../utils/encoder.js';
+import { isAddressValid } from '../../../utils/crypto.js';
+import { IllegalArgumentError, DecodeError, ArgumentError } from '../../../utils/errors.js';
+import address, { AddressEncodings, idTagToEncoding } from './address.js';
 
 const ID_TAG = Buffer.from([1]);
 const DATA_TAG = Buffer.from([2]);

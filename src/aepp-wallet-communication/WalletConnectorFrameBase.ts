@@ -1,11 +1,18 @@
 import EventEmitter from 'eventemitter3';
-import AccountRpc from '../account/Rpc';
-import { Encoded } from '../utils/encoder';
-import { Accounts, RPC_VERSION, Network, WalletApi, AeppApi, NetworkToSelect } from './rpc/types';
-import RpcClient from './rpc/RpcClient';
-import { METHODS, SUBSCRIPTION_TYPES } from './schema';
-import { NoWalletConnectedError } from '../utils/errors';
-import BrowserConnection from './connection/Browser';
+import AccountRpc from '../account/Rpc.js';
+import { Encoded } from '../utils/encoder.js';
+import {
+  Accounts,
+  RPC_VERSION,
+  Network,
+  WalletApi,
+  AeppApi,
+  NetworkToSelect,
+} from './rpc/types.js';
+import RpcClient from './rpc/RpcClient.js';
+import { METHODS, SUBSCRIPTION_TYPES } from './schema.js';
+import { NoWalletConnectedError } from '../utils/errors.js';
+import BrowserConnection from './connection/Browser.js';
 
 interface EventsBase {
   accountsChange: (accounts: AccountRpc[]) => void;

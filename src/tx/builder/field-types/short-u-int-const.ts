@@ -1,5 +1,5 @@
-import { ArgumentError } from '../../../utils/errors';
-import shortUInt from './short-u-int';
+import { ArgumentError } from '../../../utils/errors.js';
+import shortUInt from './short-u-int.js';
 
 export default function genShortUIntConstField<
   Value extends number,

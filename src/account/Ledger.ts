@@ -1,9 +1,9 @@
 import type Transport from '@ledgerhq/hw-transport';
-import AccountBase from './Base';
-import { ArgumentError, NotImplementedError } from '../utils/errors';
-import { decode, Encoded } from '../utils/encoder';
-import { buildTx } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
+import AccountBase from './Base.js';
+import { ArgumentError, NotImplementedError } from '../utils/errors.js';
+import { decode, Encoded } from '../utils/encoder.js';
+import { buildTx } from '../tx/builder/index.js';
+import { Tag } from '../tx/builder/constants.js';
 
 export const CLA = 0xe0;
 export const GET_ADDRESS = 0x02;

@@ -1,4 +1,4 @@
-import uInt from './u-int';
+import uInt from './u-int.js';
 
 export default {
   serialize(value: number): Buffer {
