@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { mapObject } from '../../utils/other.js';
 
 export const DRY_RUN_ACCOUNT = {

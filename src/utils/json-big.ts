@@ -1,5 +1,5 @@
 import JsonBig from 'json-bigint';
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { mapObject } from './other.js';
 
 const jsonBig = JsonBig({ storeAsString: true });

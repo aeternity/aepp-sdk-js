@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { isBigNumber } from './bignumber.js';
 import { ArgumentError } from './errors.js';
 

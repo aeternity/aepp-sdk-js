@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { snakeToPascal } from '../utils/string.js';
 import { MIN_GAS_PRICE, Tag, AbiVersion, VmVersion } from '../tx/builder/constants.js';
 import {

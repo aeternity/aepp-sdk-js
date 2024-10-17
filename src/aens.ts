@@ -6,7 +6,7 @@
  * repository.
  */
 
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { genSalt, isAddressValid } from './utils/crypto.js';
 import { commitmentHash, isAuctionName } from './tx/builder/helpers.js';
 import { Tag, AensName } from './tx/builder/constants.js';
