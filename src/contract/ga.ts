@@ -2,25 +2,25 @@
  * Generalized Account module - routines to use generalized account
  */
 
-import { ConsensusProtocolVersion, Int, Tag } from '../tx/builder/constants';
+import { ConsensusProtocolVersion, Int, Tag } from '../tx/builder/constants.js';
 import {
   buildContractIdByContractTx,
   buildTx,
   buildTxAsync,
   BuildTxOptions,
   unpackTx,
-} from '../tx/builder';
-import { hash } from '../utils/crypto';
-import { decode, encode, Encoded, Encoding } from '../utils/encoder';
-import { ArgumentError, IllegalArgumentError } from '../utils/errors';
-import { concatBuffers } from '../utils/other';
-import Contract from './Contract';
-import Node from '../Node';
-import { getAccount } from '../chain';
-import { sendTransaction, SendTransactionOptions } from '../send-transaction';
-import CompilerBase from './compiler/Base';
-import { packEntry } from '../tx/builder/entry';
-import { EntryTag } from '../tx/builder/entry/constants';
+} from '../tx/builder/index.js';
+import { hash } from '../utils/crypto.js';
+import { decode, encode, Encoded, Encoding } from '../utils/encoder.js';
+import { ArgumentError, IllegalArgumentError } from '../utils/errors.js';
+import { concatBuffers } from '../utils/other.js';
+import Contract from './Contract.js';
+import Node from '../Node.js';
+import { getAccount } from '../chain.js';
+import { sendTransaction, SendTransactionOptions } from '../send-transaction.js';
+import CompilerBase from './compiler/Base.js';
+import { packEntry } from '../tx/builder/entry/index.js';
+import { EntryTag } from '../tx/builder/entry/constants.js';
 
 /**
  * Convert current account to GA

@@ -1,6 +1,6 @@
-import { EntryTag } from '../entry/constants';
-import { encode, Encoding, Encoded, decode } from '../../../utils/encoder';
-import type { unpackEntry as unpackEntryType, packEntry as packEntryType } from '../entry';
+import { EntryTag } from '../entry/constants.js';
+import { encode, Encoding, Encoded, decode } from '../../../utils/encoder.js';
+import type { unpackEntry as unpackEntryType, packEntry as packEntryType } from '../entry/index.js';
 
 export default function genMapField<E extends Encoding, T extends EntryTag>(
   encoding: E,

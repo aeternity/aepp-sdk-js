@@ -1,8 +1,8 @@
-import BrowserConnection from './connection/Browser';
-import BrowserWindowMessageConnection from './connection/BrowserWindowMessage';
-import { MESSAGE_DIRECTION, METHODS } from './schema';
-import { WalletInfo } from './rpc/types';
-import { UnsupportedPlatformError } from '../utils/errors';
+import BrowserConnection from './connection/Browser.js';
+import BrowserWindowMessageConnection from './connection/BrowserWindowMessage.js';
+import { MESSAGE_DIRECTION, METHODS } from './schema.js';
+import { WalletInfo } from './rpc/types.js';
+import { UnsupportedPlatformError } from '../utils/errors.js';
 
 interface Wallet {
   info: WalletInfo;

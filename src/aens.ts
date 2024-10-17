@@ -7,18 +7,18 @@
  */
 
 import BigNumber from 'bignumber.js';
-import { genSalt, isAddressValid } from './utils/crypto';
-import { commitmentHash, isAuctionName } from './tx/builder/helpers';
-import { Tag, AensName } from './tx/builder/constants';
-import { Encoded, Encoding } from './utils/encoder';
-import { LogicError } from './utils/errors';
-import { getName } from './chain';
-import { sendTransaction, SendTransactionOptions } from './send-transaction';
-import { Optional } from './utils/other';
-import { buildTxAsync, BuildTxOptions } from './tx/builder';
-import Node from './Node';
-import AccountBase from './account/Base';
-import { AddressEncodings } from './tx/builder/field-types/address';
+import { genSalt, isAddressValid } from './utils/crypto.js';
+import { commitmentHash, isAuctionName } from './tx/builder/helpers.js';
+import { Tag, AensName } from './tx/builder/constants.js';
+import { Encoded, Encoding } from './utils/encoder.js';
+import { LogicError } from './utils/errors.js';
+import { getName } from './chain.js';
+import { sendTransaction, SendTransactionOptions } from './send-transaction.js';
+import { Optional } from './utils/other.js';
+import { buildTxAsync, BuildTxOptions } from './tx/builder/index.js';
+import Node from './Node.js';
+import AccountBase from './account/Base.js';
+import { AddressEncodings } from './tx/builder/field-types/address.js';
 
 interface NameRevokeOptions
   extends BuildTxOptions<Tag.NameRevokeTx, 'nameId' | 'accountId'>,

@@ -1,14 +1,14 @@
-import { pause, Optional } from '../utils/other';
-import { oracleQueryId } from '../tx/builder/helpers';
-import { unpackTx, buildTxAsync, BuildTxOptions } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
-import { RequestTimedOutError } from '../utils/errors';
-import { decode, Encoded } from '../utils/encoder';
-import { _getPollInterval, getHeight } from '../chain';
-import { sendTransaction } from '../send-transaction';
-import Node from '../Node';
-import AccountBase from '../account/Base';
-import OracleBase from './OracleBase';
+import { pause, Optional } from '../utils/other.js';
+import { oracleQueryId } from '../tx/builder/helpers.js';
+import { unpackTx, buildTxAsync, BuildTxOptions } from '../tx/builder/index.js';
+import { Tag } from '../tx/builder/constants.js';
+import { RequestTimedOutError } from '../utils/errors.js';
+import { decode, Encoded } from '../utils/encoder.js';
+import { _getPollInterval, getHeight } from '../chain.js';
+import { sendTransaction } from '../send-transaction.js';
+import Node from '../Node.js';
+import AccountBase from '../account/Base.js';
+import OracleBase from './OracleBase.js';
 
 interface OracleClientPostQueryOptions
   extends Optional<Parameters<typeof sendTransaction>[1], 'onNode' | 'onAccount'>,

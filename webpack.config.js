@@ -27,6 +27,7 @@ function configure(filename, opts = {}) {
     },
     resolve: {
       extensions: ['.ts', '.js'],
+      extensionAlias: { '.js': ['.ts', '.js'] },
       fallback: isNode
         ? {}
         : {

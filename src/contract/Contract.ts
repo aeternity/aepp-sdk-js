@@ -6,15 +6,15 @@
  */
 
 import { Encoder as Calldata } from '@aeternity/aepp-calldata';
-import { Tag, AensName, DRY_RUN_ACCOUNT } from '../tx/builder/constants';
+import { Tag, AensName, DRY_RUN_ACCOUNT } from '../tx/builder/constants.js';
 import {
   buildContractIdByContractTx,
   unpackTx,
   buildTxAsync,
   BuildTxOptions,
   buildTxHash,
-} from '../tx/builder';
-import { decode, Encoded } from '../utils/encoder';
+} from '../tx/builder/index.js';
+import { decode, Encoded } from '../utils/encoder.js';
 import {
   MissingContractDefError,
   MissingContractAddressError,
@@ -34,16 +34,19 @@ import {
   InternalError,
   NoWalletConnectedError,
   ContractError,
-} from '../utils/errors';
-import { hash as calcHash } from '../utils/crypto';
-import { ContractCallObject as NodeContractCallObject, Event as NodeEvent } from '../apis/node';
-import CompilerBase, { Aci } from './compiler/Base';
-import Node from '../Node';
-import { getAccount, getContract, getContractByteCode, resolveName, txDryRun } from '../chain';
-import { sendTransaction, SendTransactionOptions } from '../send-transaction';
-import { TxUnpacked } from '../tx/builder/schema.generated';
-import { Optional, isAccountNotFoundError } from '../utils/other';
-import { isNameValid, produceNameId } from '../tx/builder/helpers';
+} from '../utils/errors.js';
+import { hash as calcHash } from '../utils/crypto.js';
+import {
+  ContractCallObject as NodeContractCallObject,
+  Event as NodeEvent,
+} from '../apis/node/index.js';
+import CompilerBase, { Aci } from './compiler/Base.js';
+import Node from '../Node.js';
+import { getAccount, getContract, getContractByteCode, resolveName, txDryRun } from '../chain.js';
+import { sendTransaction, SendTransactionOptions } from '../send-transaction.js';
+import { TxUnpacked } from '../tx/builder/schema.generated.js';
+import { Optional, isAccountNotFoundError } from '../utils/other.js';
+import { isNameValid, produceNameId } from '../tx/builder/helpers.js';
 
 type ContractAci = NonNullable<Aci[0]['contract']>;
 type FunctionAci = ContractAci['functions'][0];

@@ -1,12 +1,12 @@
-import verifyTransaction, { ValidatorResult } from './tx/validator';
-import { ensureError } from './utils/other';
-import { TransactionError } from './utils/errors';
-import Node from './Node';
-import { SignedTx } from './apis/node';
-import { Encoded } from './utils/encoder';
-import AccountBase from './account/Base';
-import { buildTxHash } from './tx/builder';
-import { poll, waitForTxConfirm } from './chain';
+import verifyTransaction, { ValidatorResult } from './tx/validator.js';
+import { ensureError } from './utils/other.js';
+import { TransactionError } from './utils/errors.js';
+import Node from './Node.js';
+import { SignedTx } from './apis/node/index.js';
+import { Encoded } from './utils/encoder.js';
+import AccountBase from './account/Base.js';
+import { buildTxHash } from './tx/builder/index.js';
+import { poll, waitForTxConfirm } from './chain.js';
 
 /**
  * @category exception

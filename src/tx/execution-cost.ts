@@ -1,11 +1,11 @@
-import { Encoded } from '../utils/encoder';
-import { buildTx, buildTxHash, unpackTx } from './builder';
-import { Tag } from './builder/constants';
-import { verify } from '../utils/crypto';
-import { getBufferToSign } from '../account/Memory';
-import { IllegalArgumentError, InternalError, TransactionError } from '../utils/errors';
-import Node from '../Node';
-import getTransactionSignerAddress from './transaction-signer';
+import { Encoded } from '../utils/encoder.js';
+import { buildTx, buildTxHash, unpackTx } from './builder/index.js';
+import { Tag } from './builder/constants.js';
+import { verify } from '../utils/crypto.js';
+import { getBufferToSign } from '../account/Memory.js';
+import { IllegalArgumentError, InternalError, TransactionError } from '../utils/errors.js';
+import Node from '../Node.js';
+import getTransactionSignerAddress from './transaction-signer.js';
 
 /**
  * Calculates the cost of transaction execution

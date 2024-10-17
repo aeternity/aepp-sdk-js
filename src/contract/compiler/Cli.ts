@@ -3,11 +3,11 @@ import { tmpdir } from 'os';
 import { resolve, dirname, basename } from 'path';
 import { mkdir, writeFile, rm } from 'fs/promises';
 import { fileURLToPath } from 'url';
-import CompilerBase, { Aci, CompileResult } from './Base';
-import { Encoded } from '../../utils/encoder';
-import { CompilerError, InternalError, UnsupportedVersionError } from '../../utils/errors';
-import semverSatisfies from '../../utils/semver-satisfies';
-import { ensureError } from '../../utils/other';
+import CompilerBase, { Aci, CompileResult } from './Base.js';
+import { Encoded } from '../../utils/encoder.js';
+import { CompilerError, InternalError, UnsupportedVersionError } from '../../utils/errors.js';
+import semverSatisfies from '../../utils/semver-satisfies.js';
+import { ensureError } from '../../utils/other.js';
 
 export const getPackagePath = (): string => {
   const path = dirname(fileURLToPath(import.meta.url));

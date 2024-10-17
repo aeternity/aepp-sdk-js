@@ -1,5 +1,5 @@
-import { decode, encode, Encoded, Encoding } from '../../../utils/encoder';
-import { ArgumentError } from '../../../utils/errors';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder.js';
+import { ArgumentError } from '../../../utils/errors.js';
 
 export default function genEncodedField<E extends Encoding, Optional extends boolean = false>(
   encoding: E,

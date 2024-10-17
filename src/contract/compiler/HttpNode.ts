@@ -1,8 +1,8 @@
 import { readFile } from 'fs/promises';
-import HttpBrowser from './Http';
-import { Aci, CompileResult } from './Base';
-import { Encoded } from '../../utils/encoder';
-import getFileSystem from './getFileSystem';
+import HttpBrowser from './Http.js';
+import { Aci, CompileResult } from './Base.js';
+import { Encoded } from '../../utils/encoder.js';
+import getFileSystem from './getFileSystem.js';
 
 /**
  * Contract Compiler over HTTP for Nodejs

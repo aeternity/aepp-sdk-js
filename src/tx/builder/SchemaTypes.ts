@@ -1,5 +1,5 @@
-import { Field as OriginalField } from './field-types/interface';
-import { UnionToIntersection } from '../../utils/other';
+import { Field as OriginalField } from './field-types/interface.js';
+import { UnionToIntersection } from '../../utils/other.js';
 
 // TODO: figure out why this override is necessary
 export interface Field extends OriginalField {
