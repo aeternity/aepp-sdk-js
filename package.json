@@ -87,6 +87,7 @@
     "tweetnacl": "^1.0.3",
     "tweetnacl-auth": "^1.0.1",
     "varuint-bitcoin": "^2.0.0",
+    "webextension-polyfill": "^0.12.0",
     "websocket": "^1.0.35",
     "ws": "^8.18.0"
   },
