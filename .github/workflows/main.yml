@@ -14,12 +14,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20.x
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.autorest
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          cache: npm
       - run: npm ci
       - name: Run Commitlint
         if: github.event_name == 'pull_request'
