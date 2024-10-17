@@ -11,6 +11,7 @@
     "vue": "^3.0.0"
   },
   "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.5.19",
     "@vue/cli-service": "~4.5.19",
     "@vue/compiler-sfc": "^3.0.0"
   },

@@ -2,7 +2,7 @@
 // # Compile & Deploy a Sophia Smart Contract
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/contract-interaction.mjs) and this page explains in detail how to:
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/contract-interaction.js) and this page explains in detail how to:
 //
 // - deal with the different phases of compiling Sophia contracts to bytecode
 // - deploy the bytecode to get a callable contract address
@@ -54,7 +54,7 @@ const aeSdk = new AeSdk({
 // contract in a convenient way.
 console.log(CONTRACT_SOURCE_CODE);
 const contract = await Contract.initialize({
-  ...aeSdk.getOptions(),
+  ...aeSdk.getContext(),
   sourceCode: CONTRACT_SOURCE_CODE,
 });
 

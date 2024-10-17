@@ -2,7 +2,7 @@ import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import extractZip from 'extract-zip';
 // eslint-disable-next-line import/extensions
-import restoreFile from './restore-file.mjs';
+import restoreFile from './restore-file.js';
 
 const path = './test/assets/metamask.zip';
 const hash =

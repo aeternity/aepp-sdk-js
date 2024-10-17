@@ -1,6 +1,6 @@
 import { spawnSync } from 'child_process';
 // eslint-disable-next-line import/extensions
-import restoreFile from '../restore-file.mjs';
+import restoreFile from '../restore-file.js';
 
 const run = (getOutput, command, ...args) => {
   const { error, stdout, stderr, status } = spawnSync(command, args, {

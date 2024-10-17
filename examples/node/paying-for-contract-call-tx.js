@@ -2,7 +2,7 @@
 // # InnerTx: ContractCallTx
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/paying-for-contract-call-tx.mjs)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/paying-for-contract-call-tx.js)
 // and this page explains in detail how to:
 //
 //  - Create and sign a `ContractCallTx` with the `innerTx` option for an account that has no

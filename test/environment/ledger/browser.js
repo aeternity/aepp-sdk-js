@@ -1,6 +1,6 @@
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 // eslint-disable-next-line import/extensions
-import run from './main.mjs';
+import run from './main.js';
 
 document.body.innerHTML = `
   Open developer console

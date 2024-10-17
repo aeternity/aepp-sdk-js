@@ -1,5 +1,12 @@
-#!/usr/bin/env npx tsx
-import { Node, AeSdk, MemoryAccount, CompilerHttp, Contract } from '../../src';
+#!/usr/bin/env node
+const {
+  Node,
+  AeSdk,
+  MemoryAccount,
+  CompilerHttp,
+  Contract,
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+} = require('../../dist/aepp-sdk.cjs');
 
 const contractSourceCode = `
 contract Test =
@@ -16,9 +23,10 @@ const aeSdk = new AeSdk({
   console.log('Height:', await aeSdk.getHeight());
   console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map);
 
-  const contract = await Contract.initialize<{
-    getArg: (x: Map<string, number | bigint | string>) => Map<string, bigint>;
-  }>({ ...aeSdk.getContext(), sourceCode: contractSourceCode });
+  const contract = await Contract.initialize({
+    ...aeSdk.getContext(),
+    sourceCode: contractSourceCode,
+  });
   const deployInfo = await contract.$deploy([]);
   console.log('Contract deployed at', deployInfo.address);
   const map = new Map([

@@ -1,6 +1,6 @@
 import { writeFileSync } from 'fs';
 // eslint-disable-next-line import/extensions
-import restoreFile from './restore-file.mjs';
+import restoreFile from './restore-file.js';
 
 const path = './bin/aesophia_cli';
 const hash =
