@@ -15,6 +15,7 @@ const nodeBigIntPropertyNames = [
   'gasPrice',
   'minGasPrice',
   'deposit',
+  'subunitsPerUnit',
 ];
 
 const middlewareBigIntPropertyNames = [
