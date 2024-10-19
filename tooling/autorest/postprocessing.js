@@ -128,7 +128,7 @@ await Promise.all(
         }
 
         if (module === 'middleware') {
-          content = `import { MiddlewarePage } from "../../../utils/MiddlewarePage";\n${content}`;
+          content = `import { MiddlewarePage } from "../../../utils/MiddlewarePage.js";\n${content}`;
           content = content.replace(/export interface PaginatedResponse {.*?}\n\n/gs, '');
           content = content.replace(
             /extends PaginatedResponse,(\s+)(\w+) {}/gs,
