@@ -1,16 +1,11 @@
-import { encode as bs58Encode, decode as bs58Decode } from 'bs58';
+import bs58 from 'bs58';
 // js extension is required for mjs build, not importing the whole package to reduce bundle size
 // eslint-disable-next-line import/extensions
 import Sha256 from 'sha.js/sha256.js';
-import {
-  DecodeError,
-  ArgumentError,
-  InvalidChecksumError,
-  PayloadLengthError,
-} from './errors';
-import { concatBuffers, isKeyOfObject } from './other';
-import * as Encoded from './encoder-types';
-import { Encoding } from './encoder-types';
+import { DecodeError, ArgumentError, InvalidChecksumError, PayloadLengthError } from './errors.js';
+import { concatBuffers, isKeyOfObject } from './other.js';
+import * as Encoded from './encoder-types.js';
+import { Encoding } from './encoder-types.js';
 
 export { Encoded, Encoding };
 
@@ -51,6 +46,7 @@ const base58Types = [
   Encoding.OracleAddress,
   Encoding.OracleQueryId,
   Encoding.AccountAddress,
+  Encoding.AccountSecretKey,
   Encoding.Signature,
   Encoding.Commitment,
   Encoding.PeerPubkey,
@@ -72,6 +68,7 @@ const byteSizeForType = {
   [Encoding.OracleAddress]: 32,
   [Encoding.OracleQueryId]: 32,
   [Encoding.AccountAddress]: 32,
+  [Encoding.AccountSecretKey]: 32,
   [Encoding.Signature]: 64,
   [Encoding.Commitment]: 32,
   [Encoding.PeerPubkey]: 32,
@@ -101,8 +98,8 @@ const base64 = {
 };
 
 const base58 = {
-  encode: (buffer: Uint8Array) => bs58Encode(addChecksum(buffer)),
-  decode: (string: string) => getPayload(Buffer.from(bs58Decode(string))),
+  encode: (buffer: Uint8Array) => bs58.encode(addChecksum(buffer)),
+  decode: (string: string) => getPayload(Buffer.from(bs58.decode(string))),
 };
 
 const parseType = (maybeType: unknown): [Encoding, typeof base64] => {
@@ -110,7 +107,11 @@ const parseType = (maybeType: unknown): [Encoding, typeof base64] => {
   if (base64Type != null) return [base64Type, base64];
   const base58Type = base58Types.find((t) => t === maybeType);
   if (base58Type != null) return [base58Type, base58];
-  throw new ArgumentError('prefix', `one of ${[...base58Types, ...base64Types].join(', ')}`, maybeType);
+  throw new ArgumentError(
+    'prefix',
+    `one of ${[...base58Types, ...base64Types].join(', ')}`,
+    maybeType,
+  );
 };
 
 /**
@@ -135,10 +136,7 @@ export function decode(data: Encoded.Any): Buffer {
  * @param type - Prefix of Transaction
  * @returns Encoded string Base58check or Base64check data
  */
-export function encode<Type extends Encoding>(
-  data: Uint8Array,
-  type: Type,
-): Encoded.Generic<Type> {
+export function encode<Type extends Encoding>(data: Uint8Array, type: Type): Encoded.Generic<Type> {
   const [, encoder] = parseType(type);
   ensureValidLength(data, type);
   return `${type}_${encoder.encode(data)}`;

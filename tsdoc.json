@@ -1,12 +1,15 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
-  "tagDefinitions": [{
-    "tagName": "@category",
-    "syntaxKind": "block"
-  }, {
-    "tagName": "@hidden",
-    "syntaxKind": "block"
-  }],
+  "tagDefinitions": [
+    {
+      "tagName": "@category",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@hidden",
+      "syntaxKind": "block"
+    }
+  ],
   "supportForTags": {
     "@param": true,
     "@returns": true,

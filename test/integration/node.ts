@@ -1,12 +1,10 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { createSandbox } from 'sinon';
+import { stub } from 'sinon';
 import { RestError } from '@azure/core-rest-pipeline';
-import { FullOperationResponse } from '@azure/core-client';
+import { FullOperationResponse, OperationArguments, OperationSpec } from '@azure/core-client';
 import { url } from '.';
-import {
-  AeSdkBase, Node, NodeNotFoundError, ConsensusProtocolVersion, MemoryAccount, buildTx, Tag,
-} from '../../src';
+import { AeSdkBase, Node, NodeNotFoundError, MemoryAccount, buildTx, Tag } from '../../src';
 import { bindRequestCounter } from '../utils';
 
 describe('Node client', () => {
@@ -17,8 +15,9 @@ describe('Node client', () => {
   });
 
   it('wraps endpoints', () => {
-    (['postTransaction', 'getCurrentKeyBlock'] as const)
-      .map((method) => expect(node[method]).to.be.a('function'));
+    (['postTransaction', 'getCurrentKeyBlock'] as const).map((method) =>
+      expect(node[method]).to.be.a('function'),
+    );
   });
 
   it('gets key blocks by height for the first 3 blocks', async () => {
@@ -27,9 +26,10 @@ describe('Node client', () => {
     expect(blocks.map((b) => b.height)).to.eql([1, 2, 3]);
   });
 
-  it('throws clear exceptions when can\'t get transaction by hash', async () => {
-    await expect(node.getTransactionByHash('th_test'))
-      .to.be.rejectedWith('v3/transactions/th_test error: Invalid hash');
+  it("throws clear exceptions when can't get transaction by hash", async () => {
+    await expect(node.getTransactionByHash('th_test')).to.be.rejectedWith(
+      'v3/transactions/th_test error: Invalid hash',
+    );
   });
 
   it('throws clear exceptions when body is empty', async () => {
@@ -45,8 +45,9 @@ describe('Node client', () => {
         }
       },
     });
-    await expect(node.getTransactionByHash('th_test'))
-      .to.be.rejectedWith('v3/transactions/th_test error: 400 status code');
+    await expect(node.getTransactionByHash('th_test')).to.be.rejectedWith(
+      'v3/transactions/th_test error: 400 status code',
+    );
     node.pipeline.removePolicy({ name: 'remove-response-body' });
   });
 
@@ -55,38 +56,70 @@ describe('Node client', () => {
     await expect(n.getStatus()).to.be.rejectedWith('v3/status error: ECONNREFUSED');
   });
 
-  it('retries requests if failed', async () => ([
-    ['ak_test', 1],
-    ['ak_2CxRaRcMUGn9s5UwN36UhdrtZVFUbgG1BSX5tUAyQbCNneUwti', 4],
-  ] as const).reduce(async (prev, [address, requestCount]) => {
-    await prev;
+  it('retries requests if failed', async () =>
+    (
+      [
+        ['ak_test', 1],
+        ['ak_2CxRaRcMUGn9s5UwN36UhdrtZVFUbgG1BSX5tUAyQbCNneUwti', 4],
+      ] as const
+    ).reduce(async (prev, [address, requestCount]) => {
+      await prev;
 
-    const getCount = bindRequestCounter(node);
-    await node.getAccountByPubkey(address).catch(() => {});
-    expect(getCount()).to.be.equal(requestCount);
-  }, Promise.resolve()));
+      const getCount = bindRequestCounter(node);
+      await node.getAccountByPubkey(address).catch(() => {});
+      expect(getCount()).to.be.equal(requestCount);
+    }, Promise.resolve()));
 
   it('throws exception if unsupported protocol', async () => {
-    const sandbox = createSandbox();
-    const [name, version, message] = {
-      5: ['Iris', '5', '5. Supported: >= 6 < 7'],
-      6: ['Ceres', '6', '6. Supported: >= 5 < 6'],
-    }[(await node.getNodeInfo()).consensusProtocolVersion];
-    sandbox.stub(ConsensusProtocolVersion, name as any).value(undefined);
-    sandbox.stub(ConsensusProtocolVersion, version as any).value(undefined);
-    await expect(node.getNodeInfo()).to.be
-      .rejectedWith(`Unsupported consensus protocol version ${message}`);
-    sandbox.restore();
+    const status = await node.getStatus();
+    const s = stub(node, 'getStatus').resolves({ ...status, topBlockHeight: 0 });
+    await expect(node.getNodeInfo()).to.be.rejectedWith(
+      'Unsupported consensus protocol version 1. Supported: >= 6 < 7',
+    );
+    s.restore();
   });
 
   it('throws exception with code', async () => {
     const account = MemoryAccount.generate();
     const spendTx = buildTx({
-      tag: Tag.SpendTx, recipientId: account.address, senderId: account.address, nonce: 1e9,
+      tag: Tag.SpendTx,
+      recipientId: account.address,
+      senderId: account.address,
+      nonce: 1e9,
     });
     const tx = await account.signTransaction(spendTx, { networkId: await node.getNetworkId() });
-    await expect(node.postTransaction({ tx }))
-      .to.be.rejectedWith(RestError, 'v3/transactions error: Invalid tx (nonce_too_high)');
+    await expect(node.postTransaction({ tx })).to.be.rejectedWith(
+      RestError,
+      'v3/transactions error: Invalid tx (nonce_too_high)',
+    );
+  });
+
+  it('throws clear exceptions if deserializer failed', async () => {
+    node.pipeline.addPolicy(
+      {
+        name: 'test',
+        async sendRequest(request, next) {
+          const response = await next(request);
+          response.bodyAsText = '[{"min_gas_price":{}}]';
+          return response;
+        },
+      },
+      { phase: 'Deserialize' },
+    );
+    try {
+      await expect(node.getRecentGasPrices()).to.be.rejectedWith(
+        RestError,
+        'Error SyntaxError: Cannot convert [object Object] to a BigInt occurred in deserializing the responseBody - [{"min_gas_price":{}}]',
+      );
+    } finally {
+      node.pipeline.removePolicy({ name: 'test' });
+    }
+  });
+
+  it("can't change $host", async () => {
+    const n = new Node(url);
+    // @ts-expect-error $host should be readonly
+    n.$host = 'http://example.com';
   });
 
   it('returns recent gas prices', async () => {
@@ -96,24 +129,45 @@ describe('Node client', () => {
     expect(example);
 
     const actual = await node.getRecentGasPrices();
-    expect(actual).to.be.eql([1, 5, 15, 60].map((minutes, idx) => {
-      const { minGasPrice, utilization } = actual[idx];
-      return { minGasPrice, minutes, utilization };
-    }));
+    expect(actual).to.be.eql(
+      [1, 5, 15, 60].map((minutes, idx) => {
+        const { minGasPrice, utilization } = actual[idx];
+        return { minGasPrice, minutes, utilization };
+      }),
+    );
   });
 
-  it('doesn\'t remember failed version request', async () => {
-    const n = new Node('https://test.stg.aepps.com');
+  it('returns time as Date', async () => {
+    const block = await node.getTopHeader();
+    expect(block.time).to.be.instanceOf(Date);
+    expect(block.time.getFullYear()).to.be.within(2024, 2030);
+  });
+
+  it("doesn't remember failed version request", async () => {
+    let shouldFail = true;
+    class CustomNode extends Node {
+      override sendOperationRequest = async <T>(
+        args: OperationArguments,
+        spec: OperationSpec,
+      ): Promise<T> => {
+        if (shouldFail) spec = { ...spec, path: `https://google.com/404${spec.path}` };
+        return super.sendOperationRequest(args, spec);
+      };
+    }
+
+    const n = new CustomNode(url);
     await expect(n.getTopHeader()).to.be.rejectedWith('v3/status error: 404 status code');
-    n.$host = url;
+    shouldFail = false;
     expect(await n.getTopHeader()).to.be.an('object');
   });
 
   describe('Node Pool', () => {
     it('Throw error on using API without node', () => {
       const nodes = new AeSdkBase({});
-      expect(() => nodes.api)
-        .to.throw(NodeNotFoundError, 'You can\'t use Node API. Node is not connected or not defined!');
+      expect(() => nodes.api).to.throw(
+        NodeNotFoundError,
+        "You can't use Node API. Node is not connected or not defined!",
+      );
     });
 
     it('Can change Node', async () => {
@@ -137,14 +191,15 @@ describe('Node client', () => {
           { name: 'second', instance: node },
         ],
       });
-      expect(() => nodes.selectNode('asdasd')).to.throw(NodeNotFoundError, 'Node with name asdasd not in pool');
+      expect(() => nodes.selectNode('asdasd')).to.throw(
+        NodeNotFoundError,
+        'Node with name asdasd not in pool',
+      );
     });
 
     it('Can get list of nodes', async () => {
       const nodes = new AeSdkBase({
-        nodes: [
-          { name: 'first', instance: node },
-        ],
+        nodes: [{ name: 'first', instance: node }],
       });
       const nodesList = await nodes.getNodesInPool();
       nodesList.length.should.be.equal(1);

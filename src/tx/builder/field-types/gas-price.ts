@@ -1,10 +1,9 @@
-import BigNumber from 'bignumber.js';
-import coinAmount from './coin-amount';
-import { ArgumentError, IllegalArgumentError } from '../../../utils/errors';
-import { Int, MIN_GAS_PRICE } from '../constants';
-import Node from '../../../Node';
-import { AE_AMOUNT_FORMATS, formatAmount } from '../../../utils/amount-formatter';
-import semverSatisfies from '../../../utils/semver-satisfies';
+import { BigNumber } from 'bignumber.js';
+import coinAmount from './coin-amount.js';
+import { ArgumentError, IllegalArgumentError } from '../../../utils/errors.js';
+import { Int, MIN_GAS_PRICE } from '../constants.js';
+import Node from '../../../Node.js';
+import { AE_AMOUNT_FORMATS, formatAmount } from '../../../utils/amount-formatter.js';
 
 const gasPriceCache: WeakMap<Node, { time: number; gasPrice: bigint }> = new WeakMap();
 
@@ -14,22 +13,19 @@ export async function getCachedIncreasedGasPrice(node: Node): Promise<bigint> {
     return cache.gasPrice;
   }
 
-  // TODO: remove after requiring node@6.13.0
-  const { nodeVersion } = await node._getCachedStatus();
-  if (!semverSatisfies(nodeVersion, '6.13.0')) return 0n;
-
   const { minGasPrice, utilization } = (await node.getRecentGasPrices())[0];
-  let gasPrice = utilization < 70 ? 0n : BigInt(
-    new BigNumber(minGasPrice.toString()).times(1.01).integerValue().toFixed(),
-  );
+  let gasPrice =
+    utilization < 70
+      ? 0n
+      : BigInt(new BigNumber(minGasPrice.toString()).times(1.01).integerValue().toFixed());
 
   const maxSafeGasPrice = BigInt(MIN_GAS_PRICE) * 100000n; // max microblock fee is 600ae or 35usd
   if (gasPrice > maxSafeGasPrice) {
-    console.warn([
-      `Estimated gas price ${gasPrice} exceeds the maximum safe value for unknown reason.`,
-      `It will be limited to ${maxSafeGasPrice}.`,
-      'To overcome this restriction provide `gasPrice`/`fee` in options.',
-    ].join(' '));
+    console.warn(
+      `Estimated gas price ${gasPrice} exceeds the maximum safe value for unknown reason.` +
+        ` It will be limited to ${maxSafeGasPrice}.` +
+        ' To overcome this restriction provide `gasPrice`/`fee` in options.',
+    );
     gasPrice = maxSafeGasPrice;
   }
 
@@ -44,7 +40,10 @@ export default {
   async prepare(
     value: Int | undefined,
     params: {},
-    { onNode, denomination }: {
+    {
+      onNode,
+      denomination,
+    }: {
       onNode?: Node;
       denomination?: AE_AMOUNT_FORMATS;
     },
@@ -60,7 +59,9 @@ export default {
 
   serializeAettos(value: string | undefined = MIN_GAS_PRICE.toString()): string {
     if (+value < MIN_GAS_PRICE) {
-      throw new IllegalArgumentError(`Gas price ${value.toString()} must be bigger than ${MIN_GAS_PRICE}`);
+      throw new IllegalArgumentError(
+        `Gas price ${value.toString()} must be bigger than ${MIN_GAS_PRICE}`,
+      );
     }
     return value;
   },

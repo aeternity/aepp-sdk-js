@@ -1,15 +1,15 @@
-import AccountBase from './Base';
+import AccountBase from './Base.js';
 import {
   ArgumentError,
   InternalError,
   InvalidAuthDataError,
   NotImplementedError,
-} from '../utils/errors';
-import { decode, Encoded } from '../utils/encoder';
-import { getAccount } from '../chain';
-import Contract from '../contract/Contract';
-import { buildTxAsync, buildTx } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
+} from '../utils/errors.js';
+import { decode, Encoded } from '../utils/encoder.js';
+import { getAccount } from '../chain.js';
+import Contract from '../contract/Contract.js';
+import { buildTxAsync, buildTx } from '../tx/builder/index.js';
+import { Tag } from '../tx/builder/constants.js';
 
 /**
  * Generalized account class
@@ -30,37 +30,17 @@ export default class AccountGeneralized extends AccountBase {
 
   // eslint-disable-next-line class-methods-use-this
   override async sign(): Promise<Uint8Array> {
-    throw new NotImplementedError('Can\'t sign using generalized account');
+    throw new NotImplementedError("Can't sign using generalized account");
   }
 
   // eslint-disable-next-line class-methods-use-this
   override async signMessage(): Promise<Uint8Array> {
-    throw new NotImplementedError('Can\'t sign using generalized account');
+    throw new NotImplementedError("Can't sign using generalized account");
   }
 
   // eslint-disable-next-line class-methods-use-this
   override async signTypedData(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('Can\'t sign using generalized account');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  override async signDelegationToContract(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signing delegation to contract using generalized account');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  override async signNameDelegationToContract(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signing delegation to contract using generalized account');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  override async signAllNamesDelegationToContract(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signing delegation to contract using generalized account');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  override async signOracleQueryDelegationToContract(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signing delegation to contract using generalized account');
+    throw new NotImplementedError("Can't sign using generalized account");
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -75,28 +55,29 @@ export default class AccountGeneralized extends AccountBase {
     if (authData == null || onCompiler == null || onNode == null) {
       throw new ArgumentError('authData, onCompiler, onNode', 'provided', null);
     }
-    const {
-      callData, sourceCode, args, fee, gasLimit, gasPrice,
-    } = typeof authData === 'function' ? await authData(tx) : authData;
+    const { callData, sourceCode, args, fee, gasLimit, gasPrice } =
+      typeof authData === 'function' ? await authData(tx) : authData;
 
-    const authCallData = callData ?? await (async () => {
-      if (this.#authFun == null) {
-        const account = await getAccount(this.address, { onNode });
-        if (account.kind !== 'generalized') {
-          throw new ArgumentError('account kind', 'generalized', account.kind);
+    const authCallData =
+      callData ??
+      (await (async () => {
+        if (this.#authFun == null) {
+          const account = await getAccount(this.address, { onNode });
+          if (account.kind !== 'generalized') {
+            throw new ArgumentError('account kind', 'generalized', account.kind);
+          }
+          this.#authFun = account.authFun;
         }
-        this.#authFun = account.authFun;
-      }
-      if (this.#authFun == null) {
-        throw new InternalError('Account in generalised, but authFun not provided');
-      }
+        if (this.#authFun == null) {
+          throw new InternalError('Account in generalised, but authFun not provided');
+        }
 
-      if (sourceCode == null || args == null) {
-        throw new InvalidAuthDataError('Auth data must contain sourceCode and args or callData.');
-      }
-      const contract = await Contract.initialize({ onCompiler, onNode, sourceCode });
-      return contract._calldata.encode(contract._name, this.#authFun, args);
-    })();
+        if (sourceCode == null || args == null) {
+          throw new InvalidAuthDataError('Auth data must contain sourceCode and args or callData.');
+        }
+        const contract = await Contract.initialize({ onCompiler, onNode, sourceCode });
+        return contract._calldata.encode(contract._name, this.#authFun, args);
+      })());
 
     const gaMetaTx = await buildTxAsync({
       tag: Tag.GaMetaTx,

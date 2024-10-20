@@ -2,9 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
-import {
-  AeSdk, Contract, MemoryAccount, Tag, UnexpectedTsError, Encoded,
-} from '../../src';
+import { AeSdk, Contract, MemoryAccount, Tag, UnexpectedTsError, Encoded } from '../../src';
 import { InputNumber, assertNotNull } from '../utils';
 
 describe('Paying for transaction of another account', () => {
@@ -24,8 +22,10 @@ describe('Paying for transaction of another account', () => {
       recipientId: receiver.address,
       amount: 1e4,
     });
-    const signedSpendTx = await aeSdk
-      .signTransaction(spendTx, { onAccount: sender, innerTx: true });
+    const signedSpendTx = await aeSdk.signTransaction(spendTx, {
+      onAccount: sender,
+      innerTx: true,
+    });
     const payerBalanceBefore = await aeSdk.getBalance(aeSdk.address);
 
     const { tx } = await aeSdk.payForTransaction(signedSpendTx);
@@ -34,7 +34,9 @@ describe('Paying for transaction of another account', () => {
     if (outerFee == null || innerFee == null) throw new UnexpectedTsError();
     expect(await aeSdk.getBalance(aeSdk.address)).to.equal(
       new BigNumber(payerBalanceBefore)
-        .minus(outerFee.toString()).minus(innerFee.toString()).toFixed(),
+        .minus(outerFee.toString())
+        .minus(innerFee.toString())
+        .toFixed(),
     );
     expect(await aeSdk.getBalance(sender.address)).to.equal('0');
     expect(await aeSdk.getBalance(receiver.address)).to.equal('10000');
@@ -64,19 +66,28 @@ describe('Paying for transaction of another account', () => {
       innerTx: true,
       ttl: 0,
     });
-    const contract: TestContract = await aeSdkNotPayingFee.initializeContract({ sourceCode });
+    const contract: TestContract = await Contract.initialize({
+      ...aeSdkNotPayingFee.getContext(),
+      sourceCode,
+    });
     const { rawTx: contractDeployTx, address } = await contract.$deploy([42]);
     assertNotNull(address);
     contractAddress = address;
     await aeSdk.payForTransaction(contractDeployTx);
-    payingContract = await aeSdkNotPayingFee.initializeContract({ sourceCode, address });
+    payingContract = await Contract.initialize({
+      ...aeSdkNotPayingFee.getContext(),
+      sourceCode,
+      address,
+    });
     expect((await payingContract.getValue()).decodedResult).to.be.equal(42n);
   });
 
   it('pays for contract call', async () => {
-    const contract = await aeSdkNotPayingFee.initializeContract(
-      { sourceCode, address: contractAddress },
-    );
+    const contract = await Contract.initialize({
+      ...aeSdkNotPayingFee.getContext(),
+      sourceCode,
+      address: contractAddress,
+    });
     const { rawTx: contractCallTx } = await contract.setValue(43);
     await aeSdk.payForTransaction(contractCallTx);
     expect((await payingContract.getValue()).decodedResult).to.be.equal(43n);

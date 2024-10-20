@@ -4,28 +4,19 @@
     <div>
       <div>Name</div>
       <div>
-        <input
-          :value="domain.name"
-          @input="domain.name = $event.target.value || null"
-        >
+        <input :value="domain.name" @input="domain.name = $event.target.value || null" />
       </div>
     </div>
     <div>
       <div>Version</div>
       <div>
-        <input
-          :value="domain.version"
-          @input="domain.version = $event.target.value || null"
-        >
+        <input :value="domain.version" @input="domain.version = $event.target.value || null" />
       </div>
     </div>
     <div>
       <div>Network id</div>
       <div>
-        <input
-          :value="domain.networkId"
-          @input="domain.networkId = $event.target.value || null"
-        >
+        <input :value="domain.networkId" @input="domain.networkId = $event.target.value || null" />
       </div>
     </div>
     <div>
@@ -34,7 +25,7 @@
         <input
           :value="domain.contractAddress"
           @input="domain.contractAddress = $event.target.value || null"
-        >
+        />
       </div>
     </div>
   </div>
@@ -44,10 +35,7 @@
     <div>
       <div>Type</div>
       <div>
-        <textarea
-          v-model="aci"
-          placeholder="Type as ACI JSON"
-        />
+        <textarea v-model="aci" placeholder="Type as ACI JSON" />
       </div>
     </div>
     <div>
@@ -78,22 +66,22 @@
     <div>
       <div>Signature</div>
       <div>
-        <input
-          v-model="verifySignature"
-          placeholder="sg-encoded"
-        >
+        <input v-model="verifySignature" placeholder="sg-encoded" />
       </div>
     </div>
     <div>
       <div>Signer address</div>
       <div>
-        <input
-          v-model="verifyAddress"
-          placeholder="ak_..."
-        >
+        <input v-model="verifyAddress" placeholder="ak_..." />
       </div>
     </div>
-    <button @click="() => { verifyPromise = verifyTypedData(); }">
+    <button
+      @click="
+        () => {
+          verifyPromise = verifyTypedData();
+        }
+      "
+    >
       Verify
     </button>
     <div v-if="verifyPromise">
@@ -112,7 +100,8 @@ import FieldAction from './components/FieldAction.vue';
 
 export default {
   components: {
-    Value, FieldAction,
+    Value,
+    FieldAction,
   },
   data: () => ({
     domain: {

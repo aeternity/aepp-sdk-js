@@ -1,108 +1,23 @@
-// eslint-disable-next-line max-classes-per-file
-import BigNumber from 'bignumber.js';
 import { OperationArguments, OperationOptions, OperationSpec } from '@azure/core-client';
 import { userAgentPolicyName, setClientRequestIdPolicyName } from '@azure/core-rest-pipeline';
 import {
-  genRequestQueuesPolicy, genCombineGetRequestsPolicy, genErrorFormatterPolicy,
-  genVersionCheckPolicy, genRetryOnFailurePolicy,
-} from './utils/autorest';
-import { Middleware as MiddlewareApi, MiddlewareOptionalParams, ErrorResponse } from './apis/middleware';
-import { mapObject } from './utils/other';
-import { Encoded } from './utils/encoder';
-import { ConsensusProtocolVersion } from './tx/builder/constants';
+  genRequestQueuesPolicy,
+  genCombineGetRequestsPolicy,
+  genErrorFormatterPolicy,
+  parseBigIntPolicy,
+  genVersionCheckPolicy,
+  genRetryOnFailurePolicy,
+} from './utils/autorest.js';
+import {
+  Middleware as MiddlewareApi,
+  MiddlewareOptionalParams,
+  ErrorResponse,
+} from './apis/middleware/index.js';
+import { operationSpecs } from './apis/middleware/middleware.js';
+import { IllegalArgumentError, InternalError } from './utils/errors.js';
+import { MiddlewarePage, isMiddlewareRawPage } from './utils/MiddlewarePage.js';
 
-const bigIntPropertyNames = [] as const;
-
-const numberPropertyNames = [] as const;
-
-class MiddlewareTransformed extends MiddlewareApi {
-  override async sendOperationRequest(
-    operationArguments: OperationArguments,
-    operationSpec: OperationSpec,
-  ): Promise<any> {
-    const args = mapObject(
-      operationArguments,
-      ([key, value]) => [key, this.#encodeArg(value)],
-    ) as OperationArguments;
-    return this.#decodeRes(await super.sendOperationRequest(args, operationSpec));
-  }
-
-  #mapData(data: any, transform: {
-    bigInt: (v: any) => any;
-    number: (v: any) => any;
-  }): unknown {
-    if (Array.isArray(data)) return data.map((d) => this.#mapData(d, transform));
-    if (data != null && typeof data === 'object') {
-      return mapObject(data, ([key, value]) => {
-        if (value == null) return [key, value];
-        if (bigIntPropertyNames.some((k) => k === key)) return [key, transform.bigInt(value)];
-        if (numberPropertyNames.some((k) => k === key)) return [key, transform.number(value)];
-        return [key, this.#mapData(value, transform)];
-      });
-    }
-    return data;
-  }
-
-  #encodeArg(data: any): any {
-    return this.#mapData(data, {
-      bigInt: (value) => {
-        if (value instanceof BigNumber) return value.toFixed();
-        return value.toString();
-      },
-      number: (value) => value.toString(),
-    });
-  }
-
-  #decodeRes(data: any): any {
-    return this.#mapData(data, {
-      bigInt: (value) => BigInt(value),
-      number: (value) => +value,
-    });
-  }
-}
-
-type BigIntPropertyNames = typeof bigIntPropertyNames[number];
-type NumberPropertyNames = typeof numberPropertyNames[number];
-type PreserveOptional<NewType, OrigType> =
-  OrigType extends undefined ? NewType | undefined : NewType;
-export type TransformMiddlewareType<Type> =
-  Type extends (...args: infer Args) => infer Ret
-    ? (...args: TransformMiddlewareType<Args>) => TransformMiddlewareType<Ret>
-    : Type extends [infer Item, ...infer Rest]
-      ? [TransformMiddlewareType<Item>, ...TransformMiddlewareType<Rest>]
-      : Type extends Array<infer Item>
-        ? Array<TransformMiddlewareType<Item>>
-        : Type extends Promise<infer T>
-          ? Promise<TransformMiddlewareType<T>>
-          : Type extends { [P in any]: any }
-            ? {
-              [Property in keyof Type]:
-              Property extends BigIntPropertyNames
-                ? PreserveOptional<bigint, Type[Property]>
-                : Property extends NumberPropertyNames
-                  ? PreserveOptional<number, Type[Property]>
-                  : Property extends 'txHash'
-                    ? PreserveOptional<Encoded.TxHash, Type[Property]>
-                    : Property extends 'bytecode'
-                      ? PreserveOptional<Encoded.ContractBytearray, Type[Property]>
-                      : TransformMiddlewareType<Type[Property]>
-            }
-            : Type;
-type MiddlewareTransformedApi = new (...args: ConstructorParameters<typeof MiddlewareApi>) => {
-  [Name in keyof InstanceType<typeof MiddlewareApi>]:
-  Name extends 'pipeline' | 'sendRequest' | 'sendOperationRequest'
-    ? MiddlewareApi[Name] : TransformMiddlewareType<MiddlewareApi[Name]>
-};
-
-export interface MiddlewareInfo {
-  url: string;
-  nodeNetworkId: string;
-  version: string;
-  consensusProtocolVersion: ConsensusProtocolVersion;
-}
-
-export default class Middleware
-  extends (MiddlewareTransformed as unknown as MiddlewareTransformedApi) {
+export default class Middleware extends MiddlewareApi {
   /**
    * @param url - Url for middleware API
    * @param options - Options
@@ -113,7 +28,10 @@ export default class Middleware
   constructor(
     url: string,
     {
-      ignoreVersion = false, retryCount = 3, retryOverallDelay = 800, ...options
+      ignoreVersion = false,
+      retryCount = 3,
+      retryOverallDelay = 800,
+      ...options
     }: MiddlewareOptionalParams & {
       ignoreVersion?: boolean;
       retryCount?: number;
@@ -131,9 +49,9 @@ export default class Middleware
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        ...ignoreVersion ? [] : [
-          genVersionCheckPolicy('middleware', getVersion, '1.47.0', '2.0.0'),
-        ],
+        ...(ignoreVersion
+          ? []
+          : [genVersionCheckPolicy('middleware', getVersion, '1.81.0', '2.0.0')]),
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
@@ -141,9 +59,67 @@ export default class Middleware
       ],
       ...options,
     });
+    this.pipeline.addPolicy(parseBigIntPolicy, { phase: 'Deserialize' });
     this.pipeline.removePolicy({ name: userAgentPolicyName });
     this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
     // TODO: use instead our retry policy
     this.pipeline.removePolicy({ name: 'defaultRetryPolicy' });
+  }
+
+  /**
+   * Get a middleware response by path instead of a method name and arguments.
+   * @param pathWithQuery - a path to request starting with `/v3/`
+   */
+  async requestByPath<Response = unknown>(pathWithQuery: string): Promise<Response> {
+    const queryPos = pathWithQuery.indexOf('?');
+    const path = pathWithQuery.slice(0, queryPos === -1 ? pathWithQuery.length : queryPos);
+    const query = pathWithQuery.slice(queryPos === -1 ? pathWithQuery.length : queryPos + 1);
+
+    const operationSpec = operationSpecs.find((os) => {
+      let p = path;
+      if (os.path == null) return false;
+      const groups = os.path.replace(/{\w+}/g, '{param}').split('{param}');
+      while (groups.length > 0) {
+        const part = groups.shift();
+        if (part == null) throw new InternalError(`Unexpected operation spec path: ${os.path}`);
+        if (!p.startsWith(part)) return false;
+        p = p.replace(part, '');
+        if (groups.length > 0) p = p.replace(/^[\w.]+/, '');
+      }
+      return p === '';
+    });
+    if (operationSpec == null) {
+      throw new IllegalArgumentError(`Can't find operation spec corresponding to ${path}`);
+    }
+
+    return this.sendOperationRequest(
+      {},
+      {
+        ...operationSpec,
+        path,
+        urlParameters: operationSpec.urlParameters?.filter(
+          ({ parameterPath }) => parameterPath === '$host',
+        ),
+        queryParameters: Array.from(new URLSearchParams(query)).map(([key, value]) => ({
+          parameterPath: ['options', key],
+          mapper: {
+            defaultValue: value.toString(),
+            serializedName: key,
+            type: {
+              name: 'String',
+            },
+          },
+        })),
+      },
+    );
+  }
+
+  override async sendOperationRequest<T>(
+    operationArguments: OperationArguments,
+    operationSpec: OperationSpec,
+  ): Promise<T> {
+    const response = await super.sendOperationRequest(operationArguments, operationSpec);
+    if (!isMiddlewareRawPage(response)) return response as T;
+    return new MiddlewarePage(response, this) as T;
   }
 }

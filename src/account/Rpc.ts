@@ -1,14 +1,9 @@
-import AccountBase from './Base';
-import { METHODS } from '../aepp-wallet-communication/schema';
-import { ArgumentError, UnsupportedProtocolError } from '../utils/errors';
-import {
-  Encoded, Encoding, decode, encode,
-} from '../utils/encoder';
-import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
-import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
-import { AensName, ConsensusProtocolVersion } from '../tx/builder/constants';
-import { packDelegation } from '../tx/builder/delegation';
-import { DelegationTag } from '../tx/builder/delegation/schema';
+import AccountBase from './Base.js';
+import { METHODS } from '../aepp-wallet-communication/schema.js';
+import { ArgumentError, UnsupportedProtocolError } from '../utils/errors.js';
+import { Encoded, Encoding, decode, encode } from '../utils/encoder.js';
+import RpcClient from '../aepp-wallet-communication/rpc/RpcClient.js';
+import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types.js';
 
 /**
  * Account provided by wallet
@@ -30,8 +25,10 @@ export default class AccountRpc extends AccountBase {
 
   async sign(dataRaw: string | Uint8Array): Promise<Uint8Array> {
     const data = encode(Buffer.from(dataRaw), Encoding.Bytearray);
-    const { signature } = await this._rpcClient
-      .request(METHODS.unsafeSign, { onAccount: this.address, data });
+    const { signature } = await this._rpcClient.request(METHODS.unsafeSign, {
+      onAccount: this.address,
+      data,
+    });
     return decode(signature);
   }
 
@@ -54,22 +51,25 @@ export default class AccountRpc extends AccountBase {
   }
 
   override async signMessage(message: string): Promise<Uint8Array> {
-    const { signature } = await this._rpcClient
-      .request(METHODS.signMessage, { onAccount: this.address, message });
+    const { signature } = await this._rpcClient.request(METHODS.signMessage, {
+      onAccount: this.address,
+      message,
+    });
     return Buffer.from(signature, 'hex');
   }
 
   override async signTypedData(
     data: Encoded.ContractBytearray,
     aci: Parameters<AccountBase['signTypedData']>[1],
-    {
-      name, version, contractAddress, networkId,
-    }: Parameters<AccountBase['signTypedData']>[2] = {},
+    { name, version, contractAddress, networkId }: Parameters<AccountBase['signTypedData']>[2] = {},
   ): Promise<Encoded.Signature> {
     const { signature } = await this._rpcClient.request(METHODS.signTypedData, {
       onAccount: this.address,
       domain: {
-        name, version, networkId, contractAddress,
+        name,
+        version,
+        networkId,
+        contractAddress,
       },
       aci,
       data,
@@ -77,94 +77,11 @@ export default class AccountRpc extends AccountBase {
     return signature;
   }
 
-  override async signDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { consensusProtocolVersion, isOracle }: {
-      consensusProtocolVersion?: ConsensusProtocolVersion;
-      isOracle?: boolean;
-    } = {},
-  ): Promise<Encoded.Signature> {
-    if (isOracle == null) {
-      const protocol = (consensusProtocolVersion != null) ? ConsensusProtocolVersion[consensusProtocolVersion] : 'unknown';
-      console.warn(`AccountRpc:signDelegationToContract: isOracle is not set. By default, sdk would generate an AENS preclaim delegation signature, but it won't be the same as the oracle delegation signature in Ceres (current protocol is ${protocol}).`);
-    }
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: isOracle === true ? DelegationTag.Oracle : DelegationTag.AensPreclaim,
-        accountAddress: this.address,
-        contractAddress,
-      });
-      return this.signDelegation(delegation);
-    }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      isOracle,
-    });
-    return signature;
-  }
-
-  override async signNameDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    name: AensName,
-    { consensusProtocolVersion }: { consensusProtocolVersion?: ConsensusProtocolVersion } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.AensName, accountAddress: this.address, contractAddress, nameId: name,
-      });
-      return this.signDelegation(delegation);
-    }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      name,
-    });
-    return signature;
-  }
-
-  override async signAllNamesDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { consensusProtocolVersion }: { consensusProtocolVersion?: ConsensusProtocolVersion } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.AensWildcard, accountAddress: this.address, contractAddress,
-      });
-      return this.signDelegation(delegation);
-    }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      allNames: true,
-    });
-    return signature;
-  }
-
-  override async signOracleQueryDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    oracleQueryId: Encoded.OracleQueryId,
-    { consensusProtocolVersion }: { consensusProtocolVersion?: ConsensusProtocolVersion } = {},
-  ): Promise<Encoded.Signature> {
-    if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-      const delegation = packDelegation({
-        tag: DelegationTag.OracleResponse, queryId: oracleQueryId, contractAddress,
-      });
-      return this.signDelegation(delegation);
-    }
-    const { signature } = await this._rpcClient.request(METHODS.signDelegationToContract, {
-      onAccount: this.address,
-      contractAddress,
-      oracleQueryId,
-    });
-    return signature;
-  }
-
   override async signDelegation(delegation: Encoded.Bytearray): Promise<Encoded.Signature> {
-    const { signature } = await this._rpcClient.request(
-      METHODS.signDelegation,
-      { delegation, onAccount: this.address },
-    );
+    const { signature } = await this._rpcClient.request(METHODS.signDelegation, {
+      delegation,
+      onAccount: this.address,
+    });
     return signature;
   }
 }

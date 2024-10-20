@@ -1,9 +1,9 @@
-import { w3cwebsocket as W3CWebSocket, ICloseEvent } from 'websocket';
-import BigNumber from 'bignumber.js';
-import type Channel from './Base';
-import JsonBig from '../utils/json-big';
-import { pascalToSnake } from '../utils/string';
-import { Encoded } from '../utils/encoder';
+import { default as websocket, ICloseEvent } from 'websocket';
+import { BigNumber } from 'bignumber.js';
+import type Channel from './Base.js';
+import JsonBig from '../utils/json-big.js';
+import { pascalToSnake } from '../utils/string.js';
+import { Encoded } from '../utils/encoder.js';
 import {
   BaseError,
   ChannelCallError,
@@ -12,10 +12,11 @@ import {
   UnknownChannelStateError,
   ChannelIncomingMessageError,
   ChannelError,
-} from '../utils/errors';
-import { encodeContractAddress } from '../utils/crypto';
-import { buildTx } from '../tx/builder';
-import { ensureError } from '../utils/other';
+} from '../utils/errors.js';
+import { encodeContractAddress } from '../utils/crypto.js';
+import { ensureError } from '../utils/other.js';
+
+const { w3cwebsocket: W3CWebSocket } = websocket;
 
 export interface ChannelEvents {
   statusChanged: (status: ChannelStatus) => void;
@@ -41,19 +42,21 @@ interface SignOptions {
   updates?: any[];
   [k: string]: any;
 }
-export type SignTxWithTag = (tag: string, tx: Encoded.Transaction, options?: SignOptions) => (
-  Promise<Encoded.Transaction>
-);
+export type SignTxWithTag = (
+  tag: string,
+  tx: Encoded.Transaction,
+  options?: SignOptions,
+) => Promise<Encoded.Transaction>;
 // TODO: SignTx shouldn't return number or null
-export type SignTx = (tx: Encoded.Transaction, options?: SignOptions) => (
-  Promise<Encoded.Transaction | number | null>
-);
+export type SignTx = (
+  tx: Encoded.Transaction,
+  options?: SignOptions,
+) => Promise<Encoded.Transaction | number | null>;
 
 /**
  * @see {@link https://github.com/aeternity/protocol/blob/6734de2e4c7cce7e5e626caa8305fb535785131d/node/api/channels_api_usage.md#channel-establishing-parameters}
  */
 interface CommonChannelOptions {
-  existingFsmId?: Encoded.Bytearray;
   /**
    * Channel url (for example: "ws://localhost:3001")
    */
@@ -118,10 +121,14 @@ interface CommonChannelOptions {
    */
   existingChannelId?: Encoded.Channel;
   /**
-   * Offchain transaction (required if reestablishing a channel)
+   * Existing FSM id (required if reestablishing a channel)
    */
-  offChainTx?: Encoded.Transaction;
-  reconnectTx?: Encoded.Transaction;
+  existingFsmId?: Encoded.Bytearray;
+  /**
+   * Needs to be provided if reconnecting with calling `leave` before
+   */
+  // TODO: remove after solving https://github.com/aeternity/aeternity/issues/4399
+  reestablish?: boolean;
   /**
    * The time waiting for a new event to be initiated (default: 600000)
    */
@@ -174,24 +181,27 @@ interface CommonChannelOptions {
    * Function which verifies and signs transactions
    */
   sign: SignTxWithTag;
-  offchainTx?: Encoded.Transaction;
 }
 
-export type ChannelOptions = CommonChannelOptions & ({
-  /**
-   * Participant role
-   */
-  role: 'initiator';
-  /**
-   * Host of the responder's node
-   */
-  host: string;
-} | {
-  /**
-   * Participant role
-   */
-  role: 'responder';
-});
+export type ChannelOptions = CommonChannelOptions &
+  (
+    | {
+        /**
+         * Participant role
+         */
+        role: 'initiator';
+        /**
+         * Host of the responder's node
+         */
+        host: string;
+      }
+    | {
+        /**
+         * Participant role
+         */
+        role: 'responder';
+      }
+  );
 
 export interface ChannelHandler extends Function {
   enter?: Function;
@@ -216,10 +226,12 @@ export interface ChannelState {
 
 export interface ChannelFsm {
   handler: ChannelHandler;
-  state?: ChannelState | {
-    resolve: Function;
-    reject: Function;
-  };
+  state?:
+    | ChannelState
+    | {
+        resolve: Function;
+        reject: Function;
+      };
 }
 
 export interface ChannelMessage {
@@ -234,10 +246,12 @@ export interface ChannelMessage {
 interface ChannelMessageError {
   code: number;
   message: string;
-  data: [{
-    message: string;
-    code: number;
-  }];
+  data: [
+    {
+      message: string;
+      code: number;
+    },
+  ];
   request: ChannelMessage;
 }
 
@@ -268,8 +282,17 @@ function enterState(channel: Channel, nextState: ChannelFsm): void {
 }
 
 // TODO: rewrite to enum
-export type ChannelStatus = 'connecting' | 'connected' | 'accepted' | 'halfSigned' | 'signed'
-| 'open' | 'closing' | 'closed' | 'died' | 'disconnected';
+export type ChannelStatus =
+  | 'connecting'
+  | 'connected'
+  | 'accepted'
+  | 'halfSigned'
+  | 'signed'
+  | 'open'
+  | 'closing'
+  | 'closed'
+  | 'died'
+  | 'disconnected';
 
 export function changeStatus(channel: Channel, newStatus: ChannelStatus, debug?: unknown): void {
   channel._debug(newStatus, `(prev. ${channel._status})`, debug ?? '');
@@ -329,9 +352,9 @@ async function handleMessage(channel: Channel, message: ChannelMessage): Promise
   enterState(channel, nextState);
   // TODO: emit message and handler name (?) to move this code to Contract constructor
   if (
-    message?.params?.data?.updates?.[0]?.op === 'OffChainNewContract'
+    message?.params?.data?.updates?.[0]?.op === 'OffChainNewContract' &&
     // if name is channelOpen, the contract was created by other participant
-    && nextState?.handler.name === 'channelOpen'
+    nextState?.handler.name === 'channelOpen'
   ) {
     const round = channel.round();
     if (round == null) throw new UnexpectedTsError('Round is null');
@@ -406,14 +429,15 @@ export async function call(channel: Channel, method: string, params: any): Promi
   return new Promise((resolve, reject) => {
     const id = channel._nextRpcMessageId;
     channel._nextRpcMessageId += 1;
-    channel._rpcCallbacks.set(id, (
-      message: { result: PromiseLike<any>; error?: ChannelMessageError },
-    ) => {
-      if (message.error != null) {
-        const details = message.error.data[0].message ?? '';
-        reject(new ChannelCallError(message.error.message + details));
-      } else resolve(message.result);
-    });
+    channel._rpcCallbacks.set(
+      id,
+      (message: { result: PromiseLike<any>; error?: ChannelMessageError }) => {
+        if (message.error != null) {
+          const details = message.error.data[0].message ?? '';
+          reject(new ChannelCallError(message.error.message + details));
+        } else resolve(message.result);
+      },
+    );
     send(channel, { method, id, params });
   });
 }
@@ -439,16 +463,7 @@ export async function initialize(
       onopen: async (event: Event) => {
         resolve();
         changeStatus(channel, 'connected', event);
-        if (channelOptions.reconnectTx != null) {
-          enterState(channel, { handler: openHandler });
-          const { signedTx } = await channel.state();
-          if (signedTx == null) {
-            throw new ChannelError('`signedTx` missed in state while reconnection');
-          }
-          changeState(channel, buildTx(signedTx));
-        } else {
-          enterState(channel, { handler: connectionHandler });
-        }
+        enterState(channel, { handler: connectionHandler });
         ping(channel);
       },
       onclose: (event: ICloseEvent) => {

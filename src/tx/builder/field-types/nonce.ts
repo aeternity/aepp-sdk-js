@@ -1,11 +1,14 @@
-import { isAccountNotFoundError } from '../../../utils/other';
-import shortUInt from './short-u-int';
-import Node from '../../../Node';
-import { ArgumentError } from '../../../utils/errors';
-import { NextNonceStrategy } from '../../../apis/node';
+import { isAccountNotFoundError } from '../../../utils/other.js';
+import shortUInt from './short-u-int.js';
+import Node from '../../../Node.js';
+import { ArgumentError } from '../../../utils/errors.js';
+import { NextNonceStrategy } from '../../../apis/node/index.js';
+import { Tag } from '../constants.js';
 
-export default function genNonceField<SenderKey extends string>(senderKey: SenderKey): {
-  serialize: (value: number) => Buffer;
+export default function genNonceField<SenderKey extends string>(
+  senderKey: SenderKey,
+): {
+  serialize: (value: number, params: { tag: Tag }) => Buffer;
   // TODO: (value: number) => Promise<number> | (value: undefined, ...) => Promise<number>
   prepare: (
     value: number | undefined,
@@ -23,6 +26,13 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
   return {
     ...shortUInt,
 
+    serialize(value: number, { tag }): Buffer {
+      if (Tag.GaAttachTx === tag && value !== 1) {
+        throw new ArgumentError('nonce', 'equal 1 if GaAttachTx', value);
+      }
+      return shortUInt.serialize(value);
+    },
+
     async prepare(value, params, options) {
       if (value != null) return value;
       // TODO: uncomment the below line
@@ -33,7 +43,8 @@ export default function genNonceField<SenderKey extends string>(senderKey: Sende
       if (onNode == null) throw new ArgumentError('onNode', requirement, onNode);
       if (senderId == null) throw new ArgumentError('senderId', requirement, senderId);
       return (
-        await onNode.getAccountNextNonce(senderId.replace(/^ok_/, 'ak_'), { strategy })
+        await onNode
+          .getAccountNextNonce(senderId.replace(/^ok_/, 'ak_'), { strategy })
           .catch((error) => {
             if (!isAccountNotFoundError(error)) throw error;
             return { nextNonce: 1 };

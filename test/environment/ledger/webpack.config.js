@@ -1,18 +1,15 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+import path from 'path';
+import webpack from 'webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
-module.exports = {
-  entry: './browser.mjs',
+export default {
+  entry: './browser.js',
   mode: 'production',
   target: 'browserslist:browser',
   output: {
-    path: path.resolve(__dirname, './browser'),
+    path: path.resolve(import.meta.dirname, './browser'),
   },
-  plugins: [
-    new HtmlWebpackPlugin(),
-    new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
-  ],
+  plugins: [new HtmlWebpackPlugin(), new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] })],
   experiments: {
     topLevelAwait: true,
   },

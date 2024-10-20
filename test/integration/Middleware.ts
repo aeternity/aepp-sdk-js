@@ -1,11 +1,46 @@
-import { describe, it } from 'mocha';
+import { describe, before, it } from 'mocha';
 import { expect } from 'chai';
-import '../index';
-import { _Middleware } from '../../src';
+import resetMiddleware, { presetAccount1Address, presetAccount2Address } from './reset-middleware';
+import {
+  Encoding,
+  IllegalArgumentError,
+  isAddressValid,
+  Middleware,
+  MiddlewarePageMissed,
+  UnexpectedTsError,
+} from '../../src';
+import { assertNotNull } from '../utils';
+import { pause } from '../../src/utils/other';
+import { Activity } from '../../src/apis/middleware';
+import { MiddlewarePage } from '../../src/utils/MiddlewarePage';
+
+function copyFields(
+  target: { [key: string]: any },
+  source: { [key: string]: any },
+  fields: string[],
+): void {
+  fields
+    .filter((key) => source[key] != null)
+    .forEach((key) => {
+      expect(typeof target[key]).to.be.equal(typeof source[key]);
+      expect(target[key]?.constructor).to.be.equal(source[key]?.constructor);
+      if (typeof target[key] === 'string' && target[key][2] === '_') {
+        expect(target[key].slice(0, 2)).to.be.equal(source[key].slice(0, 2));
+      }
+      target[key] = source[key];
+    });
+}
 
 describe('Middleware API', () => {
-  // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/1336
-  const middleware = new _Middleware('https://testnet.aeternity.io/mdw/');
+  const middleware = new Middleware('http://localhost:4000');
+
+  before(async function init() {
+    this.timeout('12s');
+    await resetMiddleware();
+    while (!(await middleware.getStatus()).mdwSynced) {
+      await pause(200);
+    }
+  });
 
   it('gets status', async () => {
     const res = await middleware.getStatus();
@@ -17,132 +52,1010 @@ describe('Middleware API', () => {
       },
       mdwGensPerMinute: res.mdwGensPerMinute,
       mdwHeight: res.mdwHeight,
-      mdwLastMigration: res.mdwLastMigration,
-      mdwRevision: res.mdwRevision,
+      mdwLastMigration: 20240702122227,
+      mdwRevision: '6252c01f',
       mdwSynced: true,
       mdwSyncing: true,
       mdwTxIndex: res.mdwTxIndex,
-      mdwVersion: res.mdwVersion,
+      mdwVersion: '1.81.0',
       nodeHeight: res.nodeHeight,
       nodeProgress: 100,
-      nodeRevision: res.nodeRevision,
+      nodeRevision: 'b394868693b70a3a7ce5dfec144f718f60e79964',
       nodeSyncing: false,
-      nodeVersion: res.nodeVersion,
+      nodeVersion: '7.1.0',
     };
     expect(res).to.be.eql(expectedRes);
   });
 
-  it('gets account activities', async () => {
-    const res = await middleware.getAccountActivities('ak_DtJrupsqqByQag76NrxAAimmkYJMk7on7z3xktdZpdkmxKQak');
-    const expectedRes: typeof res = {
-      data: [{
-        blockHash: 'mh_LAo6Cg6d8LGDpxJ3se2aGJZbCubDZyC6GonHK58MKiW4a4LWb',
-        blockTime: 1684995426848,
-        height: 779178,
-        payload: {
-          block_hash: 'mh_LAo6Cg6d8LGDpxJ3se2aGJZbCubDZyC6GonHK58MKiW4a4LWb',
-          block_height: 779178,
-          encoded_tx: 'tx_+QEKCwHAuQEE+QEBUQKhAR1BkBtnVYcqjIhl7aOh9hEy9W96OFTeeQreTa3ExE/auG8rEWzyVws7Ap8AoLb4BE1sdD+LZw3SM+libDajr+a976yRMKi9b7k5whrinwEBAFGw3Ke65y52/KhwL5lYHOlRuOIZZy2V190M5H1ywIgN5fAylDfLImUL3WDwC4UAHa6EcyMc3Pl8apaHFuO79AMDhkduhMz4AILDUIQ7msoAuFr4WAsBwLhT+FEMAaEBHUGQG2dVhyqMiGXto6H2ETL1b3o4VN55Ct5NrcTET9qhAUCcLjbyYA3yE1vkfr0zC0M4oNrQ3lNoPHDD6EzUnVzAcIYPJvVhyAAAAIAv4MYN',
-          hash: 'th_YHj5aB6JzHciY5f6jqgtso8u2iY9p6MT9RV96FwXQNS1MpSML',
-          micro_index: 18,
-          micro_time: 1684995426848,
-          tx: {
-            abi_version: 3,
-            auth_data: 'cb_KxFs8lcLOwKfAKC2+ARNbHQ/i2cN0jPpYmw2o6/mve+skTCovW+5OcIa4p8BAQBRsNynuucudvyocC+ZWBzpUbjiGWctldfdDOR9csCIDeXwMpQ3yyJlC91g8AuFAB2uhHMjHNz5fGqWhxbju/QDsvQe5g==',
-            fee: 78540000000000,
-            ga_id: 'ak_DtJrupsqqByQag76NrxAAimmkYJMk7on7z3xktdZpdkmxKQak',
-            gas: 50000,
-            gas_price: 1000000000,
-            gas_used: 8444,
-            return_type: 'ok',
-            tx: {
-              signatures: [],
+  describe('blocks', () => {
+    it('gets key blocks', async () => {
+      const res = await middleware.getKeyBlocks({ limit: 15 });
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              beneficiary: 'ak_11111111111111111111111111111111273Yts',
+              hash: 'kh_nvmdByyHT8513zwVwxQ1tTsKbgfgdp1LX43jHj3ujb2AvDSh5',
+              height: 0,
+              info: 'cb_Xfbg4g==',
+              microBlocksCount: 0,
+              miner: 'ak_11111111111111111111111111111111273Yts',
+              prevHash: 'kh_2CipHmrBcC5LrmnggBrAGuxAf2fPDrAt79asKnadME4nyPRzBL',
+              prevKeyHash: 'kh_11111111111111111111111111111111273Yts',
+              stateHash: 'bs_HwreBuvhDCzAdkL2upX6qhEAkCXirujYP5BXkPDF7NZV76fdR',
+              target: 1338,
+              time: undefined,
+              transactionsCount: 0,
+              version: 1,
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      expectedRes.data.unshift(...res.data.slice(0, -1));
+      expect(res.data[0].time.getFullYear()).to.be.within(2024, 2030);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets micro block', async () => {
+      const microBlockHash = (await middleware.getKeyBlocks()).data
+        .reverse()
+        .find(({ prevHash }) => prevHash.startsWith('mh_'))?.prevHash;
+      assertNotNull(microBlockHash);
+      if (!isAddressValid(microBlockHash, Encoding.MicroBlockHash)) throw new UnexpectedTsError();
+      const res = await middleware.getMicroBlock(microBlockHash);
+      const expectedRes: typeof res = {
+        hash: 'mh_uMZS2rqBQ1ZD9GNTS2n54bRbATbupC2JV32wpj4gs4EGnfnKd',
+        height: 2,
+        microBlockIndex: 0,
+        pofHash: 'no_fraud',
+        prevHash: 'kh_cKJy5CavGHMCpzmZz5s38Yw2F6Es6t2ED3Rddb7zgakZ5xZwJ',
+        prevKeyHash: 'kh_cKJy5CavGHMCpzmZz5s38Yw2F6Es6t2ED3Rddb7zgakZ5xZwJ',
+        stateHash: 'bs_2JgJeoSoVCYgmhSimw473A4L6CGFTagQjDFDsSZJQFuemyiZZa',
+        time: new Date(1721957163938),
+        transactionsCount: 1,
+        version: 6,
+        signature:
+          'sg_DmGnGbbfUNuYgvJyvA927kbqJ9mVDHoKMHYvRQR89LcmAV26WwUvLSdJwdvohnGcr58VRJtzjikEaJ9HuFwduo3jbMr9E',
+        txsHash: 'bx_2i471KqJ5XTLVQJS4x95FyLuwbAcj4SetvemPUs4oV47S9dFb3',
+      };
+      copyFields(expectedRes, res, ['time', 'hash', 'prevHash', 'prevKeyHash', 'signature']);
+      expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('transactions', () => {
+    it('gets account activities', async () => {
+      const res = await middleware.getAccountActivities(presetAccount1Address);
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              blockHash: 'mh_f4S91p7y6hojhGhPHwzoXdjvZVWcuaBg759BDUzHDsQmYnC4o',
+              blockTime: new Date(1721994542947),
+              height: 11,
+              payload: {
+                blockHash: 'mh_f4S91p7y6hojhGhPHwzoXdjvZVWcuaBg759BDUzHDsQmYnC4o',
+                blockHeight: 11,
+                encodedTx:
+                  'tx_+QEQCwH4hLhAfiGhhOZxwmnQvbdccs6QAfNW0eLK/B/Q/mnyRecva/7S5CzZM4CJc2A9/wIe/q6+SvycqfH44siQmJsCIo0rCLhA4jKt6g+45BFsA/1yHuMTtm2gYbocs1HsHQJQgVf84dFmEscGNzih38qBjerWY2Poscr9rKoDE2oCm0+VkrhkA7iG+IQyAqEBZaKlte018CTFZNmmlaD9LKcD19Vo4SqKqkJrvn4KnomHAca/UmNAAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqHAca/UmNAAAABAIYQFHIeoADAwKBsGHHwj5GEh4Gy4HE+O8s2b64SKuVCuBGlgfmEluytjAcR+sQp',
+                hash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
+                microIndex: 0,
+                microTime: new Date(1721994542947),
+                signatures: [
+                  'sg_HW6JCb97ZBcn5hAoiqWNDoYVus1qqK9Ne2Ls1GjriSPzWhWkKX7EZigKbBayLcTmM2LNYpc2vcEBGFzEzsHBsssuLBcqV',
+                  'sg_WbQJc3RweFShfr3YgFk5Wqin4QRsr9a487tuvXxi4yLHtYEqRXwffVUD2iz5GXAkJEXayyLMmGQpP22beMYNNYnyKrJNW',
+                ],
+                tx: {
+                  channel_id: 'ch_2HQRew5QMG8EVPHEWSxEaCQSUF9yRVLaSU4cHJpcG2AZt57Rx2',
+                  channel_reserve: 0,
+                  delegate_ids: {
+                    initiator: [],
+                    responder: [],
+                  },
+                  fee: 17680000000000,
+                  initiator_amount: 500000000000000,
+                  initiator_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                  lock_period: 1,
+                  nonce: 7,
+                  responder_amount: 500000000000000,
+                  responder_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                  state_hash: 'st_bBhx8I+RhIeBsuBxPjvLNm+uEirlQrgRpYH5hJbsrYwznWSz',
+                  type: 'ChannelCreateTx',
+                  version: 2,
+                },
+              },
+              type: 'ChannelCreateTxEvent',
+            },
+            {
+              blockHash: 'mh_2GzNyPoPZvKavxfvorCc7gwTFs8u6HKzua2z7fcakCxh66JfrU',
+              blockTime: new Date(1721911705246),
+              height: 3,
+              payload: {
+                amount: 3n,
+                kind: 'fee_lock_name',
+                refTxHash: 'th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1',
+              },
+              type: 'InternalTransferEvent',
+            },
+            {
+              blockHash: 'mh_2GzNyPoPZvKavxfvorCc7gwTFs8u6HKzua2z7fcakCxh66JfrU',
+              blockTime: new Date(1721911705246),
+              height: 3,
+              payload: {
+                blockHash: 'mh_2GzNyPoPZvKavxfvorCc7gwTFs8u6HKzua2z7fcakCxh66JfrU',
+                blockHeight: 3,
+                encodedTx:
+                  'tx_+KULAfhCuEBXzxuqo82mMkKCtMLjwrBwYa6B1zvwpqUeGT49lce9p0QMPb2tfgcgScxi2N87JfOwRpuI2iOsrP69uMtYfKIIuF34WyACoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgKkMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODAwLmNoYWluAIcBxr9SY0AAhg9Vhk+YAAarXkK8',
+                hash: 'th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1',
+                microIndex: 0,
+                microTime: new Date(1721911705246),
+                signatures: [
+                  'sg_CVJMvQ7TPCbcmEn5GXFY9bh8okNTuE956PiiZaSJ2V9JWKgimmP86L5NUiZpFgeE6Am7QJk7KYwxJMGgFhQSXJJxrhqFJ',
+                ],
+                tx: {
+                  account_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                  fee: 16860000000000,
+                  name: '123456789012345678901234567800.chain',
+                  name_fee: 500000000000000,
+                  name_id: 'nm_ZdygpYcGrRPNJZC1WRLRsEx3KT91zE4Mieg4XNkM6Qvs71NaE',
+                  name_salt: 0,
+                  nonce: 2,
+                  ttl: 6,
+                  type: 'NameClaimTx',
+                  version: 2,
+                },
+              },
+              type: 'NameClaimTxEvent',
+            },
+            {
+              blockHash: 'mh_2SiHrRABSj8Hgdt3Dc2ypaKrUkjCTK92pUx1nZKLEAYMVhUu8G',
+              blockTime: new Date(1721911705161),
+              height: 2,
+              payload: {
+                blockHash: 'mh_2SiHrRABSj8Hgdt3Dc2ypaKrUkjCTK92pUx1nZKLEAYMVhUu8G',
+                blockHeight: 2,
+                encodedTx:
+                  'tx_+PcLAfhCuEB+Tq5sUOIMedGLODH48nG1b7KNt4Dre9vyXC3eH2EjFe2EkVGpx4QN/eQU2OLHXJgg1/7uFO5S3pMlI+jqv78FuK/4rSoBoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgG4avhoRgOg2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke3AuDue/kTWRB8ANwA3ABoOgj8BAz/+gHggkgA3AQcHAQEAmC8CEUTWRB8RaW5pdBGAeCCSGWdldEFyZ4IvAIU4LjAuMACDCAADhkdlNJ1oAAUAAEyEO5rKAIcrEUTWRB8/Bmn2yg==',
+                hash: 'th_2JMR7C1DjrGeZWyyLMkccRLga1Lct8Syy9hcZKD9PEZkN5JvSD',
+                microIndex: 0,
+                microTime: new Date(1721911705161),
+                signatures: [
+                  'sg_HXRkFjgjsFmFLZ1ywBgYj9VouQK1BySqCViALxq3ge69a86aDgd1ESqNXhCLebh7fH6SohTjbLXXxhjPnYXaGJfiX7DQV',
+                ],
+                tx: {
+                  abi_version: 3,
+                  aexn_type: null,
+                  amount: 0,
+                  args: [],
+                  call_data: 'cb_KxFE1kQfP4oEp9E=',
+                  caller_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                  code: 'cb_+GhGA6Daq9LRBkSN10Qb9d5ZbvJWB+/tg8rj5OynWtj8AQ2R7cC4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBBwcBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTguMC4wAHQkH9o=',
+                  compiler_version: '8.0.0',
+                  contract_id: 'ct_2JgVFKjJYUyJDnpJPhspX8C6RS6rFS46r3C1sy15tW9dDmPX2E',
+                  deposit: 0,
+                  fee: 78500000000000,
+                  gas: 76,
+                  gas_price: 1000000000,
+                  gas_used: 61,
+                  log: [],
+                  nonce: 1,
+                  owner_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                  return_type: 'ok',
+                  return_value: 'cb_Xfbg4g==',
+                  source_hash: '2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke0=',
+                  ttl: 5,
+                  type: 'ContractCreateTx',
+                  version: 1,
+                  vm_version: 8,
+                },
+              },
+              type: 'ContractCreateTxEvent',
+            },
+            {
+              blockHash: 'mh_Q6fJrHYWiaAz8277zX8fgAgyCpmBtioFd1RQdC36oRuCtjz19',
+              blockTime: new Date(1721911704982),
+              height: 1,
+              payload: {
+                blockHash: 'mh_Q6fJrHYWiaAz8277zX8fgAgyCpmBtioFd1RQdC36oRuCtjz19',
+                blockHeight: 1,
+                encodedTx:
+                  'tx_+KMLAfhCuEDgjc7zMPb+xRW+pI0L5OqwjI+OBF0ee1zgmlkXsavoYXHZw7vTx6vxaAZxxs4ts/eZhAmqVGg3EmTsRAtccKMDuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgABAGAJs2FDw==',
+                hash: 'th_U26TdBBNT56HFXWAb4ktFyWBTuCAnwdajecTL4ss2BhciRviG',
+                microIndex: 0,
+                microTime: new Date(1721911704982),
+                signatures: [
+                  'sg_WNvkq9RewEjZDrDLqXMUoyBd8pGzqAuyaDfG3bQAfGx4tF6smTLyYnFWmtY8SrJRnEHbriDUm836DSJSkMjiijLKBsSzo',
+                ],
+                tx: {
+                  amount: 1000000000000000000,
+                  fee: 16820000000000,
+                  nonce: 1,
+                  payload: 'ba_Xfbg4g==',
+                  recipient_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                  sender_id: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
+                  ttl: 4,
+                  type: 'SpendTx',
+                  version: 1,
+                },
+              },
+              type: 'SpendTxEvent',
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      expectedRes.data.forEach((item, idx) => {
+        copyFields(item, res.data[idx], ['blockHash', 'blockTime']);
+        copyFields(item.payload, res.data[idx].payload, ['blockHash', 'microTime']);
+      });
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets transactions', async () => {
+      const res = await middleware.getTransactions({ limit: 15 });
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              blockHash: 'mh_2nWwtjNCnjUYMqGfgfrt8MsnvRYuY8ZdET31RXTa4jFBdzEKF8',
+              blockHeight: 1,
+              encodedTx:
+                'tx_+KMLAfhCuEDgjc7zMPb+xRW+pI0L5OqwjI+OBF0ee1zgmlkXsavoYXHZw7vTx6vxaAZxxs4ts/eZhAmqVGg3EmTsRAtccKMDuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgABAGAJs2FDw==',
+              hash: 'th_U26TdBBNT56HFXWAb4ktFyWBTuCAnwdajecTL4ss2BhciRviG',
+              microIndex: 0,
+              microTime: new Date(1721973919196),
+              signatures: [
+                'sg_WNvkq9RewEjZDrDLqXMUoyBd8pGzqAuyaDfG3bQAfGx4tF6smTLyYnFWmtY8SrJRnEHbriDUm836DSJSkMjiijLKBsSzo',
+              ],
               tx: {
-                amount: 112,
-                fee: 16660000000000,
-                nonce: 0,
+                amount: 1000000000000000000,
+                fee: 16820000000000,
+                nonce: 1,
                 payload: 'ba_Xfbg4g==',
-                recipient_id: 'ak_VTNurrhRhJBVK19JfUnEv4qgdZJT7DUghxz3ACEFBNKgw8R3D',
-                sender_id: 'ak_DtJrupsqqByQag76NrxAAimmkYJMk7on7z3xktdZpdkmxKQak',
+                recipient_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                sender_id: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
+                ttl: 4,
                 type: 'SpendTx',
                 version: 1,
               },
             },
-            type: 'GAMetaTx',
-            version: 2,
-          },
-        },
-        type: 'GAMetaTxEvent',
-      }, {
-        blockHash: 'mh_2R1PVwTNP3Jha7oRby9Me3SRBP4R9he6RMH6eCCJGyVBHAzy5f',
-        blockTime: 1684995366595,
-        height: 779178,
-        payload: {
-          block_hash: 'mh_2R1PVwTNP3Jha7oRby9Me3SRBP4R9he6RMH6eCCJGyVBHAzy5f',
-          block_height: 779178,
-          encoded_tx: 'tx_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',
-          hash: 'th_AScnu6AAGHvfewMELKvmc6KH9jaMfzopGpcFFo1HAoS7ne1fD',
-          micro_index: 11,
-          micro_time: 1684995366595,
-          signatures: [
-            'sg_SBD5RkjMkfDM8KGJTgTTgmfXaimac2cGy4x39efXZjrPdr5zVJAmqu8dLiMNoVX1FHTESERRvejAnDVDjxLq6x2gb1SzK',
           ],
-          tx: {
-            abi_version: 3,
-            args: [
-              {
-                type: 'address',
-                value: 'ak_2PahBfbkrmBFfbb4FGEVErP7mChFGPYFb9eGMARU514u5V3K52',
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      const tx = res.data.at(-1);
+      assertNotNull(tx);
+      res.data.length = 0;
+      res.data.push(tx);
+      copyFields(expectedRes.data[0], res.data[0], ['blockHash', 'microTime']);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets transactions count', async () => {
+      const res = await middleware.getTransactionsCount();
+      const expectedRes: typeof res = { body: 10 };
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets transfers', async () => {
+      const res = await middleware.getTransfers();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+              amount: 570288700000000000000n,
+              height: 7,
+              kind: 'fee_spend_name',
+              refBlockHash: 'NameClaimTx',
+              refTxHash: 'th_C7LscPqF5Nf5QrgZDSVbY92v7rruefN1qHjrHVuk2bdNwZF1e',
+              refTxType: 'mh_2MYrB5Qjb4NCYZMVmbqnazacY76gGzNgEjW2VnEKzovDTky8fD',
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      expectedRes.data.push(...res.data.slice(1));
+      copyFields(expectedRes.data[0], res.data[0], ['refTxType']);
+      expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('contracts', () => {
+    it('gets contract calls', async () => {
+      const res = await middleware.getContractCalls();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              function: 'Chain.spend',
+              height: 9,
+              contractId: 'ct_2J7DrZAUV3gMFPt9DJi6uJBBZ3T4eKyKY7xtLot7puu3yP2kQp',
+              blockHash: 'mh_zmcTZSgZcuQ9fL6h6iNNp3ftFvbQ2FjtgPHg9qEHgbwyqFFpi',
+              localIdx: 0,
+              callTxHash: 'th_2cNd6j4CtZYaY6F6AWNbYDXZGkaQbaAjjjtBiLATiaiXJ1P812',
+              contractTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
+              internalTx: {
+                amount: 42,
+                fee: 0,
+                nonce: 0,
+                payload: 'ba_Q2hhaW4uc3BlbmRFa4Tl',
+                recipient_id: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
+                sender_id: 'ak_2J7DrZAUV3gMFPt9DJi6uJBBZ3T4eKyKY7xtLot7puu3yP2kQp',
+                type: 'SpendTx',
+                version: 1,
               },
-            ],
-            auth_fun: '0x6cf2570b0a1599b708291e50aa3daf13d0c7f2484bc337ddad2413a37fd4a009',
-            auth_fun_name: 'authorize',
-            call_data: 'cb_KxFE1kQfG58AoLb4BE1sdD+LZw3SM+libDajr+a976yRMKi9b7k5whrijU9L2Q==',
-            code: 'cb_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',
-            contract_id: 'ct_2TRQYcmvhRrbGrNKXy8uBZX2MQbgHrZmVCEHZBAJkhs24DdeVP',
-            fee: 107820000000000,
-            gas: 597,
-            gas_price: 1000000000,
-            gas_used: 478,
-            nonce: 1,
-            owner_id: 'ak_DtJrupsqqByQag76NrxAAimmkYJMk7on7z3xktdZpdkmxKQak',
-            return_type: 'ok',
-            type: 'GAAttachTx',
-            version: 1,
-            vm_version: 7,
-          },
-        },
-        type: 'GAAttachTxEvent',
-      }, {
-        blockHash: 'mh_25snWYwTkU1xjPCcH592XVNzL894qSpF4yqnt8tABKGEVm6nSz',
-        blockTime: 1684995336526,
-        height: 779178,
-        payload: {
-          block_hash: 'mh_25snWYwTkU1xjPCcH592XVNzL894qSpF4yqnt8tABKGEVm6nSz',
-          block_height: 779178,
-          encoded_tx: 'tx_+K4LAfhCuEBjZgd36W2H8rB5KZzut7wvRnAsjJSD+CEg8Dbm8ivFXmDzKFauG8QJpnm9kmVnNl0xOI7xVsm0brXYTMNuAmUDuGb4ZAwBoQHhMrjx3begTmO3+pZHmlS7xSWlMafxvAzkkhIZAwZ/sKEBHUGQG2dVhyqMiGXto6H2ETL1b3o4VN55Ct5NrcTET9qIRWORgkT0AACGD39vJaAAAIKQmIlGYXVjZXQgVHiaKLKm',
-          hash: 'th_242zV1qXwag6iBH3Pd8zn3DQC37h4uP38CoFjkaTgT19AVKMHo',
-          micro_index: 7,
-          micro_time: 1684995336526,
-          signatures: [
-            'sg_E1Ezn9EMsxTZz7a93Zc5kjXkS1t3WqFbr3X8DqqjdXXfXD9Xy6DZQpjB2rHfcoZ3ySZ1FHh9bzMjfQfdA9mRJJ4yeYdfN',
+              microIndex: 0,
+            },
           ],
-          tx: {
-            amount: 5000000000000000000,
-            fee: 17040000000000,
-            nonce: 37016,
-            payload: 'ba_RmF1Y2V0IFR4tYtyuw==',
-            recipient_id: 'ak_DtJrupsqqByQag76NrxAAimmkYJMk7on7z3xktdZpdkmxKQak',
-            sender_id: 'ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688',
-            type: 'SpendTx',
-            version: 1,
-          },
+          next: null,
+          prev: null,
         },
-        type: 'SpendTxEvent',
-      }],
-      next: null,
-      prev: null,
-    };
-    expect(res).to.be.eql(expectedRes);
+        middleware,
+      );
+      copyFields(expectedRes.data[0], res.data[0], ['blockHash']);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets contract logs', async () => {
+      const res = await middleware.getContractLogs();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              args: ['43'],
+              data: 'test-string',
+              height: 9,
+              contractId: 'ct_2J7DrZAUV3gMFPt9DJi6uJBBZ3T4eKyKY7xtLot7puu3yP2kQp',
+              blockHash: 'mh_zmcTZSgZcuQ9fL6h6iNNp3ftFvbQ2FjtgPHg9qEHgbwyqFFpi',
+              eventName: null,
+              logIdx: 0,
+              blockTime: new Date(1721968249016),
+              eventHash: 'KGBGHR0NTNENA10FD9MJS5P39C1LD4T9AUBIPIDL772714A57HH0====',
+              callTxHash: 'th_2cNd6j4CtZYaY6F6AWNbYDXZGkaQbaAjjjtBiLATiaiXJ1P812',
+              contractTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
+              microIndex: 0,
+              extCallerContractId: null,
+              extCallerContractTxHash: null,
+              parentContractId: null,
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      copyFields(expectedRes.data[0], res.data[0], ['blockHash', 'blockTime']);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets contract', async () => {
+      const { contractId } = (await middleware.getContractCalls()).data[0];
+      const res = await middleware.getContract(contractId);
+      const expectedRes: typeof res = {
+        contract: 'ct_2J7DrZAUV3gMFPt9DJi6uJBBZ3T4eKyKY7xtLot7puu3yP2kQp',
+        blockHash: 'mh_BDHVCb4umyui7j68WoQTNXmUDvPk7bbq9aFTZkTysfjwp81fn',
+        createTx: {
+          abi_version: 3,
+          amount: 100,
+          call_data: 'cb_KxFE1kQfP4oEp9E=',
+          code: 'cb_+QEcRgOgzPAt3CM1MXJqVKUexArUzQqzhuZqPx4w8pc2S1dcOHXAuO+4wf5E1kQfADcANwAaDoI/AQM//mWl4A8CNwGHAjcBBzcCdwc3AAg9AAIERjYAAABiL1+fAYEFPg9NJAu8Y6cqlt/F0eAzEdVzQbFz6kWUaMkB2l2DOwABAz9GNgAAAEY2AgACYi4AnwGBpBcI7Bft3XUED2ptPhcjSwNWk6lXlyzJtTnEcJFFPGICAQM//pdbzNwANwFHADcADAOvggECASstdGVzdC1zdHJpbmdWAgMRZaXgDw8Cb4Imz2UNAFQBAz+oLwMRRNZEHxFpbml0EWWl4A8tQ2hhaW4uZXZlbnQRl1vM3BVzcGVuZIIvAIU4LjAuMAAyWaKG',
+          deposit: 0,
+          fee: 82160000000000,
+          gas: 76,
+          gas_price: 1000000000,
+          nonce: 4,
+          owner_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+          ttl: 11,
+          vm_version: 8,
+        },
+        aexnType: null,
+        sourceTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
+        sourceTxType: 'ContractCreateTx',
+      };
+      copyFields(expectedRes, res, ['blockHash']);
+      expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('names', () => {
+    it('gets names', async () => {
+      const res = await middleware.getNames();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              active: true,
+              hash: 'nm_2VSJFCVStB8ZdkLWcyd4adywYoyqYNzMt9Td924Jf8ESi94Nni',
+              activeFrom: 3,
+              approximateActivationTime: new Date(1721740187500),
+              approximateExpireTime: new Date(1754140007661),
+              expireHeight: 180003,
+              pointers: {
+                account_pubkey: presetAccount1Address,
+                cmF3S2V5: 'ba_wP/uRGujhA==',
+              },
+              auction: null,
+              auctionTimeout: 0,
+              ownership: {
+                current: presetAccount2Address,
+                original: presetAccount2Address,
+              },
+              name: '123456789012345678901234567801.chain',
+              nameFee: 500000000000000n,
+              revoke: null,
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      expectedRes.data.push(res.data[1]);
+      copyFields(expectedRes.data[0], res.data[0], [
+        'activeFrom',
+        'approximateActivationTime',
+        'approximateExpireTime',
+        'expireHeight',
+      ]);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets names count', async () => {
+      const res = await middleware.getNamesCount();
+      const expectedRes: typeof res = { body: 2 };
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets name claims', async () => {
+      const res = await middleware.getNameClaims('123456789012345678901234567801.chain');
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              activeFrom: 5,
+              blockHash: 'mh_2MYrB5Qjb4NCYZMVmbqnazacY76gGzNgEjW2VnEKzovDTky8fD',
+              height: 5,
+              sourceTxHash: 'th_XEwyUgf8BoTdEmcDJcngx3GGCGFeb16XDRfPYHy5zQB4d5kk5',
+              sourceTxType: 'NameClaimTx',
+              tx: {
+                account_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                fee: 16860000000000,
+                name: '123456789012345678901234567801.chain',
+                name_fee: 500000000000000,
+                name_salt: 0,
+                nonce: 1,
+                ttl: 8,
+              },
+              internalSource: false,
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      copyFields(expectedRes.data[0], res.data[0], ['blockHash']);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets name updates', async () => {
+      const res = await middleware.getNameUpdates('123456789012345678901234567801.chain');
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              activeFrom: 5,
+              blockHash: 'mh_2G1nKcenAWtgqJywzmAFLXajZESRySnapUmF4JAboyekmwjBxa',
+              height: 6,
+              sourceTxHash: 'th_2U32kq8HH1qxS5rohqVGzC9mF9E3mdcj3pZC6o9kfjCB4t1p8h',
+              sourceTxType: 'NameUpdateTx',
+              tx: {
+                account_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                client_ttl: 3600,
+                fee: 18080000000000,
+                name_id: 'nm_2VSJFCVStB8ZdkLWcyd4adywYoyqYNzMt9Td924Jf8ESi94Nni',
+                name_ttl: 180000,
+                nonce: 2,
+                pointers: [
+                  {
+                    encoded_key: 'ba_YWNjb3VudF9wdWJrZXn8jckR',
+                    id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                    key: 'account_pubkey',
+                  },
+                  {
+                    encoded_key: 'ba_cmF3S2V56FoL5g==',
+                    id: 'ba_wP/uRGujhA==',
+                    key: 'rawKey',
+                  },
+                ],
+                ttl: 9,
+              },
+              internalSource: false,
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      copyFields(expectedRes.data[0], res.data[0], ['blockHash']);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets account pointees pointers', async () => {
+      const res = await middleware.getAccountPointees(presetAccount1Address);
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              active: true,
+              blockHash: 'mh_2AVwWGLB7H8McaS1Yr7dfGoepTTVmTXJVFU5TCeDDAxgkyGDAr',
+              blockHeight: 6,
+              blockTime: new Date(1721994539489),
+              key: 'account_pubkey',
+              name: '123456789012345678901234567801.chain',
+              sourceTxHash: 'th_2U32kq8HH1qxS5rohqVGzC9mF9E3mdcj3pZC6o9kfjCB4t1p8h',
+              sourceTxType: 'NameUpdateTx',
+              tx: {
+                account_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                client_ttl: 3600,
+                fee: 18080000000000,
+                name_id: 'nm_2VSJFCVStB8ZdkLWcyd4adywYoyqYNzMt9Td924Jf8ESi94Nni',
+                name_ttl: 180000,
+                nonce: 2,
+                pointers: [
+                  {
+                    encoded_key: 'ba_YWNjb3VudF9wdWJrZXn8jckR',
+                    id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                    key: 'account_pubkey',
+                  },
+                  {
+                    encoded_key: 'ba_cmF3S2V56FoL5g==',
+                    id: 'ba_wP/uRGujhA==',
+                    key: 'rawKey',
+                  },
+                ],
+                ttl: 9,
+              },
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      copyFields(expectedRes.data[0], res.data[0], ['blockHash', 'blockTime']);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets auctions', async () => {
+      const res = await middleware.getNamesAuctions();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              activationTime: new Date(1721975996873),
+              approximateExpireTime: new Date(1722407457100),
+              auctionEnd: 2407,
+              lastBid: {
+                blockHash: 'mh_BoBikwwf68giAEFKNYEh93uNkGu9enzx8cjn2vX7CRTnY5g6T',
+                blockHeight: 7,
+                encodedTx:
+                  'tx_+IoLAfhCuEA6/CTIyE5UbHQIB8sWFKudzIu8dWfB71IRqDzbp0IUIiIpvPIEg4s/2nZ5aHrh7XxFc2+GqsRkqw8XffUTpxcCuEL4QCACoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQOHMS5jaGFpbgCJHupYdyGHT8AAhg7Xy82AAArCRC+X',
+                hash: 'th_C7LscPqF5Nf5QrgZDSVbY92v7rruefN1qHjrHVuk2bdNwZF1e',
+                microIndex: 0,
+                microTime: new Date(1721975996873),
+                signatures: [
+                  'sg_8iagZbC7qnDeRDNkm1y1LyQCUqgobMKNH1G6Pv7QatFfPyo2oPzy5sUQdojZSY9BK7poupGqfQz2Eo8VnVkCyaaBRN8ks',
+                ],
+                tx: {
+                  account_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                  fee: 16320000000000,
+                  name: '1.chain',
+                  name_fee: 570288700000000000000,
+                  name_id: 'nm_TcQ86NkLJanH2dz5Rv1Z8s1VQjw6fDQAXW4oYyGQpHjez3j3p',
+                  name_salt: 0,
+                  nonce: 3,
+                  ttl: 182407,
+                  type: 'NameClaimTx',
+                  version: 2,
+                },
+              },
+              name: '1.chain',
+              nameFee: 570288700000000000000n,
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      copyFields(expectedRes.data[0], res.data[0], [
+        'activationTime',
+        'approximateExpireTime',
+        'auctionEnd',
+      ]);
+      copyFields(expectedRes.data[0].lastBid, res.data[0].lastBid, ['blockHash', 'microTime']);
+      expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('oracles', () => {
+    it('gets oracles', async () => {
+      const res = await middleware.getOracles();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              active: true,
+              activeFrom: 10,
+              approximateExpireTime: new Date(1722066317304),
+              expireHeight: 510,
+              format: {
+                query: 'string',
+                response: 'string',
+              },
+              oracle: 'ok_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+              queryFee: 0n,
+              register: {
+                blockHash: 'mh_2g1RkdVUBXLbxxjR7P2zi1429Navw4HKuzvtC3TezFCjQjwmqE',
+                blockHeight: 10,
+                hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+                txHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+                microIndex: 0,
+                microTime: new Date(1721976497295),
+                signatures: [
+                  'sg_NaZNFJArMypD4wp4MbJ2cMvG6aWk7PSynP9qVsti1CabtMKSUbPwRUz55Yer7XiNURN6PcycF7NwBANaeJPMCpwKoWM9b',
+                ],
+                tx: {
+                  fee: 16432000000000n,
+                  nonce: 6,
+                  oracleId: 'ok_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                  oracleTtl: {
+                    type: 'delta',
+                    value: 500,
+                  },
+                  ttl: 13,
+                  type: 'OracleRegisterTx',
+                  version: 1,
+                  abiVersion: 0,
+                  accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                  queryFee: 0n,
+                  queryFormat: 'string',
+                  responseFormat: 'string',
+                },
+                encodedTx:
+                  'tx_+IsLAfhCuECk8CD7+rO/nCOX4fF6BylVDytJmDquVV56cv7/Lvsg23evMjX45PwdRDn2x/HGBuduMmUQaOESI+GoNarbsNEIuEP4QRYBoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQaGc3RyaW5nhnN0cmluZwAAggH0hg7x34XgAA0A0ekNLA==',
+              },
+              registerTime: new Date(1721976497295),
+              registerTxHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      copyFields(expectedRes.data[0].register, res.data[0].register, ['blockHash', 'microTime']);
+      copyFields(expectedRes.data[0], res.data[0], ['registerTime', 'approximateExpireTime']);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets oracle', async () => {
+      const { oracle } = (await middleware.getOracles()).data[0];
+      const res = await middleware.getOracle(oracle);
+      const expectedRes: typeof res = {
+        active: true,
+        activeFrom: 10,
+        approximateExpireTime: new Date(1722066317304),
+        expireHeight: 510,
+        ...{ extends: [] }, // TODO: rewrite after solving https://github.com/aeternity/ae_mdw/issues/1872
+        format: {
+          query: 'string',
+          response: 'string',
+        },
+        oracle: 'ok_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+        queryFee: 0n,
+        register: {} as any, // TODO: fix after solving https://github.com/aeternity/ae_mdw/issues/1872
+        registerTime: new Date(1721976497295),
+        registerTxHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+      };
+      copyFields(expectedRes, res, ['registerTime', 'approximateExpireTime']);
+      expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('channels', () => {
+    it('gets channels', async () => {
+      const res = await middleware.getChannels();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              active: true,
+              amount: 1000000000000000n,
+              channel: 'ch_2HQRew5QMG8EVPHEWSxEaCQSUF9yRVLaSU4cHJpcG2AZt57Rx2',
+              channelReserve: 0n,
+              delegateIds: {
+                initiator: [],
+                responder: [],
+              },
+              initiator: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+              initiatorAmount: 500000000000000n,
+              lastUpdatedHeight: 11,
+              lastUpdatedTime: new Date(1721984829629),
+              lastUpdatedTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
+              lastUpdatedTxType: 'ChannelCreateTx',
+              lockPeriod: 1,
+              lockedUntil: 0,
+              responder: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+              responderAmount: 500000000000000n,
+              round: 1,
+              soloRound: 0,
+              stateHash: 'st_bBhx8I+RhIeBsuBxPjvLNm+uEirlQrgRpYH5hJbsrYwznWSz',
+              updatesCount: 1,
+            },
+          ],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      copyFields(expectedRes.data[0], res.data[0], ['lastUpdatedTime']);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets channel', async () => {
+      const { channel } = (await middleware.getChannels()).data[0];
+      const res = await middleware.getChannel(channel);
+      const expectedRes: typeof res = {
+        active: true,
+        amount: 1000000000000000n,
+        channel: 'ch_2HQRew5QMG8EVPHEWSxEaCQSUF9yRVLaSU4cHJpcG2AZt57Rx2',
+        channelReserve: 0n,
+        delegateIds: {
+          initiator: [],
+          responder: [],
+        },
+        initiator: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+        initiatorAmount: 500000000000000n,
+        lastUpdatedHeight: 11,
+        lastUpdatedTime: new Date(1721984829629),
+        lastUpdatedTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
+        lastUpdatedTxType: 'ChannelCreateTx',
+        lockPeriod: 1,
+        lockedUntil: 0,
+        responder: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+        responderAmount: 500000000000000n,
+        round: 1,
+        soloRound: 0,
+        stateHash: 'st_bBhx8I+RhIeBsuBxPjvLNm+uEirlQrgRpYH5hJbsrYwznWSz',
+        updatesCount: 1,
+      };
+      copyFields(expectedRes, res, ['lastUpdatedTime']);
+      expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('statistics', () => {
+    const startDate = new Date().toISOString().split('T')[0];
+    const endDate = new Date(Date.now() + 24 * 60 * 60_000).toISOString().split('T')[0];
+
+    it('gets delta', async () => {
+      const res = await middleware.getDeltaStats();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              height: 12,
+              auctionsStarted: 0,
+              namesActivated: 0,
+              namesExpired: 0,
+              namesRevoked: 0,
+              oraclesRegistered: 0,
+              oraclesExpired: 0,
+              contractsCreated: 0,
+              blockReward: 0n,
+              devReward: 0n,
+              lockedInAuctions: 0n,
+              burnedInAuctions: 0n,
+              channelsOpened: 0,
+              channelsClosed: 0,
+              lockedInChannels: 0n,
+              lastTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
+            },
+          ],
+          next: '/v3/deltastats?cursor=2&limit=10',
+          prev: null,
+        },
+        middleware,
+      );
+      expectedRes.data.push(...res.data.slice(1));
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets total', async () => {
+      const res = await middleware.getTotalStats();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [
+            {
+              height: 12,
+              contracts: 2,
+              lockedInAuctions: 0n,
+              burnedInAuctions: 6n,
+              lockedInChannels: 1000000000000000n,
+              activeAuctions: 1,
+              activeNames: 2,
+              inactiveNames: 0,
+              activeOracles: 1,
+              inactiveOracles: 0,
+              openChannels: 1,
+              lastTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
+              sumBlockReward: 0n,
+              sumDevReward: 0n,
+              totalTokenSupply: 10000000010000000000000000000000n,
+            },
+          ],
+          next: '/v3/totalstats?cursor=2&limit=10',
+          prev: null,
+        },
+        middleware,
+      );
+      expectedRes.data.push(...res.data.slice(1));
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets miner', async () => {
+      const res = await middleware.getMinerStats();
+      const expectedRes: typeof res = new MiddlewarePage(
+        { data: [], next: null, prev: null },
+        middleware,
+      );
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets blocks', async () => {
+      const res = await middleware.getBlocksStats();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [{ count: 24, endDate, startDate }],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets transactions', async () => {
+      const res = await middleware.getTransactionsStats();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [{ count: 11, endDate, startDate }],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets names', async () => {
+      const res = await middleware.getNamesStats();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: [{ count: 0, endDate, startDate }],
+          next: null,
+          prev: null,
+        },
+        middleware,
+      );
+      expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('request by path', () => {
+    it('fails if unknown path', async () => {
+      await expect(middleware.requestByPath('/404')).to.be.rejectedWith(
+        IllegalArgumentError,
+        "Can't find operation spec corresponding to /404",
+      );
+    });
+
+    it('gets not paginated data', async () => {
+      const res = await middleware.requestByPath('/v3/status');
+      const expectedRes: typeof res = await middleware.getStatus();
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets first page', async () => {
+      const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
+        `/v3/accounts/${presetAccount1Address}/activities`,
+      );
+      const expectedRes: typeof res = await middleware.getAccountActivities(presetAccount1Address);
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets first page with query parameters', async () => {
+      const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
+        `/v3/accounts/${presetAccount1Address}/activities?limit=1`,
+      );
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(0, 1),
+          next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
+          prev: null,
+        },
+        middleware,
+      );
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('gets second page', async () => {
+      const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
+        `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
+      );
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(1, 2),
+          next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-0&limit=1`,
+          prev: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1&rev=1`,
+        },
+        middleware,
+      );
+      expect(res).to.be.eql(expectedRes);
+    });
+  });
+
+  describe('pagination', () => {
+    it('nevigates to the next page', async () => {
+      const first = await middleware.getTransactions({ limit: 1 });
+      const res = await first.next();
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: (await middleware.getTransactions()).data.slice(1, 2),
+          next: '/v3/transactions?cursor=8&limit=1',
+          prev: '/v3/transactions?cursor=10&limit=1&rev=1',
+        },
+        middleware,
+      );
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('nevigates to the previous page', async () => {
+      const first = await middleware.getTransactions({ limit: 1 });
+      const second = await first.next();
+      const res = await second.prev();
+      expect(res).to.be.eql(first);
+      expect(res.prevPath).to.be.eql(null);
+      const expectedRes: typeof res = new MiddlewarePage(
+        {
+          data: (await middleware.getTransactions()).data.slice(0, 1),
+          next: '/v3/transactions?cursor=9&limit=1',
+          prev: null,
+        },
+        middleware,
+      );
+      expect(res).to.be.eql(expectedRes);
+    });
+
+    it('fails to navigate out of page range', async () => {
+      const first = await middleware.getTransactions({ limit: 1 });
+      await expect(first.prev()).to.be.rejectedWith(
+        MiddlewarePageMissed,
+        'There is no previous page',
+      );
+    });
   });
 });

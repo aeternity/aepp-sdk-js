@@ -1,127 +1,140 @@
 <html>
-<head>
-  <title>Node stats</title>
-</head>
-<body>
+  <head>
+    <title>Node stats</title>
+  </head>
+  <body>
+    <table class="charts">
+      <tr>
+        <td>
+          <canvas id="chart-height"></canvas>
+        </td>
+        <td>
+          <canvas id="chart-height-change"></canvas>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <canvas id="chart-blocks-per-frame"></canvas>
+        </td>
+        <td>
+          <canvas id="chart-tx-per-block"></canvas>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <canvas id="chart-difficulty"></canvas>
+        </td>
+        <td></td>
+      </tr>
+    </table>
 
-<table class="charts">
-  <tr>
-    <td>
-      <canvas id="chart-height"></canvas>
-    </td>
-    <td>
-      <canvas id="chart-height-change"></canvas>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <canvas id="chart-blocks-per-frame"></canvas>
-    </td>
-    <td>
-      <canvas id="chart-tx-per-block"></canvas>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <canvas id="chart-difficulty"></canvas>
-    </td>
-    <td>
-    </td>
-  </tr>
-</table>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 4px 0;
+      }
 
-<style>
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 4px 0;
-  }
+      table td {
+        border: 1px solid black;
+        padding: 4px;
+      }
 
-  table td {
-    border: 1px solid black;
-    padding: 4px;
-  }
+      table.charts td {
+        width: 50%;
+      }
+    </style>
 
-  table.charts td {
-    width: 50%;
-  }
-</style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="../../dist/aepp-sdk.browser-script.cjs"></script>
+    <script type="text/javascript">
+      const [
+        chartHeight,
+        chartHeightChange,
+        chartBlocksPerFrame,
+        chartTxPerBlock,
+        chartDifficulty,
+      ] = [
+        'chart-height',
+        'chart-height-change',
+        'chart-blocks-per-frame',
+        'chart-tx-per-block',
+        'chart-difficulty',
+      ].map(
+        (id) =>
+          new Chart(document.getElementById(id), {
+            type: 'line',
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: 'name',
+                  data: [],
+                  pointStyle: false,
+                },
+              ],
+            },
+            options: {
+              animation: false,
+            },
+          }),
+      );
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-<script src="../../dist/aepp-sdk.browser-script.js"></script>
-<script type="text/javascript">
-const [chartHeight, chartHeightChange, chartBlocksPerFrame, chartTxPerBlock, chartDifficulty] = [
-  'chart-height', 'chart-height-change', 'chart-blocks-per-frame', 'chart-tx-per-block', 'chart-difficulty',
-].map((id) => new Chart(document.getElementById(id), {
-  type: 'line',
-  data: {
-    labels: [],
-    datasets: [{
-      label: 'name',
-      data: [],
-      pointStyle: false,
-    }],
-  },
-  options: {
-    animation: false,
-  },
-}));
+      chartHeight.data.datasets[0].label = 'Blockchain height';
+      chartHeightChange.data.datasets[0].label = 'Blockchain height change';
+      chartBlocksPerFrame.data.datasets[0].label = 'Blocks per frame';
+      chartTxPerBlock.data.datasets[0].label = 'Transactions per block';
+      chartDifficulty.data.datasets[0].label = 'Difficulty';
 
-chartHeight.data.datasets[0].label = 'Blockchain height';
-chartHeightChange.data.datasets[0].label = 'Blockchain height change';
-chartBlocksPerFrame.data.datasets[0].label = 'Blocks per frame';
-chartTxPerBlock.data.datasets[0].label = 'Transactions per block';
-chartDifficulty.data.datasets[0].label = 'Difficulty';
+      const { Node, isAddressValid, Encoding } = Aeternity;
 
-const { Node, isAddressValid, Encoding } = Aeternity;
+      const nodeUrl = 'http://localhost:3013';
+      const node = new Node(nodeUrl);
+      let prevHeight;
+      let lastHash;
 
-const nodeUrl = 'http://localhost:3013';
-const node = new Node(nodeUrl);
-let prevHeight;
-let lastHash;
+      function addData(chart, data, label = new Date().toLocaleTimeString()) {
+        chart.data.labels.push(label);
+        chart.data.datasets[0].data.push(data);
+        chart.data.labels.splice(0, chart.data.labels.length - 200);
+        chart.data.datasets[0].data.splice(0, chart.data.datasets[0].data.length - 200);
+        chart.update();
+      }
 
-function addData(chart, data, label = new Date().toLocaleTimeString()) {
-  chart.data.labels.push(label);
-  chart.data.datasets[0].data.push(data);
-  chart.data.labels.splice(0, chart.data.labels.length - 200);
-  chart.data.datasets[0].data.splice(0, chart.data.datasets[0].data.length - 200);
-  chart.update();
-}
+      async function newFrame() {
+        const header = await node.getTopHeader();
+        addData(chartHeight, header.height);
+        addData(chartHeightChange, header.height - prevHeight);
+        prevHeight = header.height;
 
-async function newFrame() {
-  const header = await node.getTopHeader();
-  addData(chartHeight, header.height);
-  addData(chartHeightChange, header.height - prevHeight);
-  prevHeight = header.height;
+        let hash = header.prevHash;
+        let blockCounter = 0;
+        while (hash != lastHash) {
+          blockCounter += 1;
+          const txCount = isAddressValid(hash, Encoding.KeyBlockHash)
+            ? 0
+            : (await node.getMicroBlockTransactionsCountByHash(hash)).count;
+          addData(chartTxPerBlock, txCount, hash.slice(0, 7));
+          hash = isAddressValid(hash, Encoding.KeyBlockHash)
+            ? (await node.getKeyBlockByHash(hash)).prevHash
+            : (await node.getMicroBlockHeaderByHash(hash)).prevHash;
+        }
+        lastHash = header.prevHash;
 
-  let hash = header.prevHash;
-  let blockCounter = 0;
-  while (hash != lastHash) {
-    blockCounter += 1;
-    const txCount = isAddressValid(hash, Encoding.KeyBlockHash)
-      ? 0
-      : (await node.getMicroBlockTransactionsCountByHash(hash)).count;
-    addData(chartTxPerBlock, txCount, hash.slice(0, 7));
-    hash = isAddressValid(hash, Encoding.KeyBlockHash)
-      ? (await node.getKeyBlockByHash(hash)).prevHash
-      : (await node.getMicroBlockHeaderByHash(hash)).prevHash;
-  }
-  lastHash = header.prevHash;
+        addData(chartBlocksPerFrame, blockCounter);
+        addData(chartDifficulty, (await node.getStatus()).difficulty);
+      }
 
-  addData(chartBlocksPerFrame, blockCounter);
-  addData(chartDifficulty, (await node.getStatus()).difficulty);
-}
-
-(async () => {
-  let header;
-  while (!header) {
-    header = await node.getTopHeader().catch(() => {});
-  }
-  lastHash = header.prevHash;
-  prevHeight = header.height;
-  await newFrame();
-  setInterval(newFrame, 1000);
-})();
-</script>
-</body>
+      (async () => {
+        let header;
+        while (!header) {
+          header = await node.getTopHeader().catch(() => {});
+        }
+        lastHash = header.prevHash;
+        prevHeight = header.height;
+        await newFrame();
+        setInterval(newFrame, 1000);
+      })();
+    </script>
+  </body>
 </html>

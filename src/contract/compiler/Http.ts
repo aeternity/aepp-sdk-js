@@ -1,16 +1,18 @@
 import {
-  RestError, userAgentPolicyName, setClientRequestIdPolicyName,
+  RestError,
+  userAgentPolicyName,
+  setClientRequestIdPolicyName,
 } from '@azure/core-rest-pipeline';
 import { OperationOptions } from '@azure/core-client';
 import {
   Compiler as CompilerApi,
   ErrorModel,
   CompilerError as CompilerErrorApi,
-} from '../../apis/compiler';
-import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../../utils/autorest';
-import CompilerBase, { Aci, CompileResult } from './Base';
-import { Encoded } from '../../utils/encoder';
-import { CompilerError, NotImplementedError } from '../../utils/errors';
+} from '../../apis/compiler/index.js';
+import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../../utils/autorest.js';
+import CompilerBase, { Aci, CompileResult } from './Base.js';
+import { Encoded } from '../../utils/encoder.js';
+import { CompilerError, NotImplementedError } from '../../utils/errors.js';
 
 type GeneralCompilerError = ErrorModel & {
   info?: object;
@@ -45,18 +47,21 @@ export default class CompilerHttp extends CompilerBase {
     this.api = new CompilerApi(compilerUrl, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        ...ignoreVersion ? [] : [genVersionCheckPolicy('compiler', getVersion, '7.3.0', '9.0.0')],
+        ...(ignoreVersion ? [] : [genVersionCheckPolicy('compiler', getVersion, '8.0.0', '9.0.0')]),
         genErrorFormatterPolicy((body: GeneralCompilerError | CompilerErrorApi[]) => {
           let message = '';
           if ('reason' in body) {
-            message += ` ${body.reason
-            }${body.parameter != null ? ` in ${body.parameter}` : ''
+            message += ` ${body.reason}${
+              body.parameter != null ? ` in ${body.parameter}` : ''
               // TODO: revising after improving documentation https://github.com/aeternity/aesophia_http/issues/78
             }${body.info != null ? ` (${JSON.stringify(body.info)})` : ''}`;
           }
           if (Array.isArray(body)) {
             message += `\n${body
-              .map((e) => `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context != null ? ` (${e.context})` : ''}`)
+              .map(
+                (e) =>
+                  `${e.type}:${e.pos.line}:${e.pos.col}: ${e.message}${e.context != null ? ` (${e.context})` : ''}`,
+              )
               .join('\n')}`;
           }
           return message;
@@ -73,7 +78,6 @@ export default class CompilerHttp extends CompilerBase {
   ): CompileResult {
     try {
       const cmpOut = await this.api.compileContract({ code: sourceCode, options: { fileSystem } });
-      cmpOut.warnings ??= []; // TODO: remove after requiring http compiler above or equal to 8.0.0
       const warnings = cmpOut.warnings.map(({ type, ...warning }) => warning);
       const res = { ...cmpOut, warnings };
       // TODO: should be fixed when the compiledAci interface gets updated

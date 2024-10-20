@@ -1,8 +1,11 @@
-import BrowserConnection from './Browser';
-import { MESSAGE_DIRECTION } from '../schema';
-import { InternalError, RpcConnectionError } from '../../utils/errors';
+import BrowserConnection from './Browser.js';
+import { MESSAGE_DIRECTION } from '../schema.js';
+import { InternalError, RpcConnectionError } from '../../utils/errors.js';
 
-export type ImplPostMessage = Pick<Window, 'addEventListener' | 'removeEventListener' | 'postMessage'>;
+export type ImplPostMessage = Pick<
+  Window,
+  'addEventListener' | 'removeEventListener' | 'postMessage'
+>;
 
 /**
  * Browser window Post Message connector module
@@ -68,9 +71,10 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
     this.listener = (message: MessageEvent<any>) => {
       // TODO: strict validate origin and source instead of checking message structure
       if (
-        typeof message.data !== 'object'
-        || (message.data.jsonrpc ?? message.data.data?.jsonrpc) !== '2.0'
-      ) return;
+        typeof message.data !== 'object' ||
+        (message.data.jsonrpc ?? message.data.data?.jsonrpc) !== '2.0'
+      )
+        return;
       if (this.origin != null && this.origin !== message.origin) return;
       if (this.#target != null && this.#target !== message.source) return;
       this.receiveMessage(message);
@@ -97,7 +101,7 @@ export default class BrowserWindowMessageConnection extends BrowserConnection {
   }
 
   override sendMessage(msg: any): void {
-    if (this.#target == null) throw new RpcConnectionError('Can\'t send messages without target');
+    if (this.#target == null) throw new RpcConnectionError("Can't send messages without target");
     const message = this.sendDirection != null ? { type: this.sendDirection, data: msg } : msg;
     super.sendMessage(message);
     this.#target.postMessage(message, this.origin ?? '*');

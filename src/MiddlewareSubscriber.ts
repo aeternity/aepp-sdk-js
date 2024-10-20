@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import WebSocket from 'isomorphic-ws';
-import { BaseError, UnexpectedTsError, InternalError } from './utils/errors';
-import { Encoded } from './utils/encoder';
+import { BaseError, UnexpectedTsError, InternalError } from './utils/errors.js';
+import { Encoded } from './utils/encoder.js';
 
 interface Message {
   payload: Object;
@@ -31,9 +31,8 @@ export class MiddlewareSubscriberDisconnected extends MiddlewareSubscriberError 
 }
 
 export default class MiddlewareSubscriber {
-  #subscriptions: Array<
-  readonly [target: string, s: Source, cb: (p?: Object, e?: Error) => void]
-  > = [];
+  #subscriptions: Array<readonly [target: string, s: Source, cb: (p?: Object, e?: Error) => void]> =
+    [];
 
   readonly #requestQueue: Array<[isSubscribe: boolean, target: string]> = [];
 
@@ -55,11 +54,12 @@ export default class MiddlewareSubscriber {
   #sendSubscribe(isSubscribe: boolean, target: string): void {
     if (this.#webSocket == null) return;
     const payload = ['KeyBlocks', 'MicroBlocks', 'Transactions'].includes(target)
-      ? target : 'Object';
+      ? target
+      : 'Object';
     this.#sendMessage({
       op: isSubscribe ? 'Subscribe' : 'Unsubscribe',
       payload,
-      ...payload === 'Object' && { target },
+      ...(payload === 'Object' && { target }),
     });
     this.#requestQueue.push([isSubscribe, target]);
   }
@@ -70,8 +70,7 @@ export default class MiddlewareSubscriber {
       .forEach(([, , cb]) => cb(p, e));
   }
 
-  constructor(readonly url: string) {
-  }
+  constructor(readonly url: string) {}
 
   #disconnect(onlyReset = false): void {
     if (this.#webSocket == null) return;
@@ -116,14 +115,17 @@ export default class MiddlewareSubscriber {
       let error;
       if (typeof message === 'string') error = new MiddlewareSubscriberError(message);
       if (message.includes(target) !== isSubscribe) {
-        error = new InternalError(`Expected ${target} to be${isSubscribe ? '' : ' not'} included into ${message}`);
+        error = new InternalError(
+          `Expected ${target} to be${isSubscribe ? '' : ' not'} included into ${message}`,
+        );
       }
       if (error != null) this.#emit((t) => target === t, undefined, error);
       return;
     }
     this.#emit(
-      (target, source) => (target === message.subscription || target === message.target)
-        && (source === message.source || source === Source.All),
+      (target, source) =>
+        (target === message.subscription || target === message.target) &&
+        (source === message.source || source === Source.All),
       message.payload,
     );
   }
@@ -179,27 +181,45 @@ export default class MiddlewareSubscriber {
   }
 
   subscribeObject(
-    target: Encoded.KeyBlockHash | Encoded.Channel | Encoded.ContractAddress
-    | Encoded.OracleAddress | Encoded.OracleQueryId | Encoded.AccountAddress
-    | Encoded.Name | `${string}.chain`,
+    target:
+      | Encoded.KeyBlockHash
+      | Encoded.Channel
+      | Encoded.ContractAddress
+      | Encoded.OracleAddress
+      | Encoded.OracleQueryId
+      | Encoded.AccountAddress
+      | Encoded.Name
+      | `${string}.chain`,
     cb: (p?: any, e?: Error) => void,
   ): () => void {
     return this.#subscribe(target, Source.Middleware, cb);
   }
 
   subscribeObjectNode(
-    target: Encoded.KeyBlockHash | Encoded.Channel | Encoded.ContractAddress
-    | Encoded.OracleAddress | Encoded.OracleQueryId | Encoded.AccountAddress
-    | Encoded.Name | `${string}.chain`,
+    target:
+      | Encoded.KeyBlockHash
+      | Encoded.Channel
+      | Encoded.ContractAddress
+      | Encoded.OracleAddress
+      | Encoded.OracleQueryId
+      | Encoded.AccountAddress
+      | Encoded.Name
+      | `${string}.chain`,
     cb: (p?: any, e?: Error) => void,
   ): () => void {
     return this.#subscribe(target, Source.Node, cb);
   }
 
   subscribeObjectAll(
-    target: Encoded.KeyBlockHash | Encoded.Channel | Encoded.ContractAddress
-    | Encoded.OracleAddress | Encoded.OracleQueryId | Encoded.AccountAddress
-    | Encoded.Name | `${string}.chain`,
+    target:
+      | Encoded.KeyBlockHash
+      | Encoded.Channel
+      | Encoded.ContractAddress
+      | Encoded.OracleAddress
+      | Encoded.OracleQueryId
+      | Encoded.AccountAddress
+      | Encoded.Name
+      | `${string}.chain`,
     cb: (p?: any, e?: Error) => void,
   ): () => void {
     return this.#subscribe(target, Source.All, cb);

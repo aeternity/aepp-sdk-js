@@ -1,16 +1,13 @@
-import BigNumber from 'bignumber.js';
-import { getMinimumNameFee } from '../helpers';
-import { InsufficientNameFeeError } from '../../../utils/errors';
-import coinAmount from './coin-amount';
-import { AensName, Int } from '../constants';
+import { BigNumber } from 'bignumber.js';
+import { getMinimumNameFee } from '../helpers.js';
+import { InsufficientNameFeeError } from '../../../utils/errors.js';
+import coinAmount from './coin-amount.js';
+import { AensName, Int } from '../constants.js';
 
 export default {
   ...coinAmount,
 
-  serializeAettos(
-    _value: string | undefined,
-    txFields: { name: AensName },
-  ): string {
+  serializeAettos(_value: string | undefined, txFields: { name: AensName }): string {
     const minNameFee = getMinimumNameFee(txFields.name);
     const value = new BigNumber(_value ?? minNameFee);
     if (minNameFee.gt(value)) throw new InsufficientNameFeeError(value, minNameFee);
@@ -24,8 +21,8 @@ export default {
    */
   serialize(
     value: Int | undefined,
-    txFields: { name: AensName } & Parameters<typeof coinAmount['serialize']>[1],
-    parameters: Parameters<typeof coinAmount['serialize']>[2],
+    txFields: { name: AensName } & Parameters<(typeof coinAmount)['serialize']>[1],
+    parameters: Parameters<(typeof coinAmount)['serialize']>[2],
   ): Buffer {
     return coinAmount.serialize.call(this, value, txFields, parameters);
   },

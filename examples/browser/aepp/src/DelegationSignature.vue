@@ -3,41 +3,47 @@
   <div class="group">
     <div>
       <div>Contract address</div>
-      <div><input v-model="contractAddress"></div>
+      <div><input v-model="contractAddress" /></div>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.AensPreclaim">
+        <input v-model="type" type="radio" :value="DelegationTag.AensPreclaim" />
         AENS preclaim
       </label>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.Oracle">
+        <input v-model="type" type="radio" :value="DelegationTag.Oracle" />
         Oracle
       </label>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.AensName">
+        <input v-model="type" type="radio" :value="DelegationTag.AensName" />
         AENS name
       </label>
-      <div><input v-model="name"></div>
+      <div><input v-model="name" /></div>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.AensWildcard">
+        <input v-model="type" type="radio" :value="DelegationTag.AensWildcard" />
         All AENS names
       </label>
     </div>
     <div>
       <label>
-        <input v-model="type" type="radio" :value="DelegationTag.OracleResponse">
+        <input v-model="type" type="radio" :value="DelegationTag.OracleResponse" />
         Response to oracle query
       </label>
-      <div><input v-model="oracleQueryId"></div>
+      <div><input v-model="oracleQueryId" /></div>
     </div>
-    <button @click="() => { signPromise = sign(); }">
+    <button
+      @click="
+        () => {
+          signPromise = sign();
+        }
+      "
+    >
       Sign
     </button>
     <div v-if="signPromise">
@@ -49,7 +55,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { DelegationTag } from '@aeternity/aepp-sdk';
+import { DelegationTag, packDelegation } from '@aeternity/aepp-sdk';
 import Value from './components/Value.vue';
 
 export default {
@@ -64,22 +70,29 @@ export default {
   }),
   computed: mapState(['aeSdk']),
   methods: {
-    sign() {
+    getDelegationParams() {
       switch (this.type) {
         case DelegationTag.AensPreclaim:
-          return this.aeSdk.signDelegationToContract(this.contractAddress, { isOracle: false });
+          return { tag: DelegationTag.AensPreclaim };
         case DelegationTag.Oracle:
-          return this.aeSdk.signDelegationToContract(this.contractAddress, { isOracle: true });
+          return { tag: DelegationTag.Oracle };
         case DelegationTag.AensName:
-          return this.aeSdk.signNameDelegationToContract(this.contractAddress, this.name);
+          return { tag: DelegationTag.AensName, nameId: this.name };
         case DelegationTag.AensWildcard:
-          return this.aeSdk.signAllNamesDelegationToContract(this.contractAddress);
+          return { tag: DelegationTag.AensWildcard };
         case DelegationTag.OracleResponse:
-          return this.aeSdk
-            .signOracleQueryDelegationToContract(this.contractAddress, this.oracleQueryId);
+          return { tag: DelegationTag.OracleResponse, queryId: this.oracleQueryId };
         default:
           throw new Error(`Unknown delegation signature type: ${DelegationTag[this.type]}`);
       }
+    },
+    sign() {
+      const delegation = packDelegation({
+        ...this.getDelegationParams(),
+        contractAddress: this.contractAddress,
+        accountAddress: this.aeSdk.address,
+      });
+      return this.aeSdk.signDelegation(delegation);
     },
   },
 };

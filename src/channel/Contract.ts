@@ -1,32 +1,41 @@
-import BigNumber from 'bignumber.js';
-import { snakeToPascal } from '../utils/string';
-import {
-  MIN_GAS_PRICE, Tag, AbiVersion, VmVersion,
-} from '../tx/builder/constants';
+import { BigNumber } from 'bignumber.js';
+import { snakeToPascal } from '../utils/string.js';
+import { MIN_GAS_PRICE, Tag, AbiVersion, VmVersion } from '../tx/builder/constants.js';
 import {
   signAndNotify,
   awaitingCompletion,
   channelClosed,
   channelOpen,
   handleUnexpectedMessage,
-} from './handlers';
+} from './handlers.js';
 import {
-  notify, call, SignTx, ChannelState, ChannelOptions, ChannelMessage, ChannelFsm, changeState, emit,
-} from './internal';
-import { Encoded } from '../utils/encoder';
-import { ContractCallReturnType } from '../apis/node';
-import { ContractCallObject } from '../contract/Contract';
-import Channel from './Base';
-import ChannelSpend from './Spend';
-import { ChannelError, UnexpectedChannelMessageError } from '../utils/errors';
-import { unpackTx } from '../tx/builder';
-import { encodeContractAddress } from '../utils/crypto';
+  notify,
+  call,
+  SignTx,
+  ChannelState,
+  ChannelOptions,
+  ChannelMessage,
+  ChannelFsm,
+  changeState,
+  emit,
+} from './internal.js';
+import { Encoded } from '../utils/encoder.js';
+import { ContractCallReturnType } from '../apis/node/index.js';
+import { ContractCallObject } from '../contract/Contract.js';
+import Channel from './Base.js';
+import ChannelSpend from './Spend.js';
+import { ChannelError, UnexpectedChannelMessageError } from '../utils/errors.js';
+import { unpackTx } from '../tx/builder/index.js';
+import { encodeContractAddress } from '../utils/crypto.js';
 
 function snakeToPascalObjKeys<Type>(obj: object): Type {
-  return Object.entries(obj).reduce((result, [key, val]) => ({
-    ...result,
-    [snakeToPascal(key)]: val,
-  }), {}) as Type;
+  return Object.entries(obj).reduce(
+    (result, [key, val]) => ({
+      ...result,
+      [snakeToPascal(key)]: val,
+    }),
+    {},
+  ) as Type;
 }
 
 interface CallContractOptions {
@@ -109,7 +118,11 @@ export default class ChannelContract extends ChannelSpend {
    */
   async createContract(
     {
-      code, callData, deposit, vmVersion, abiVersion,
+      code,
+      callData,
+      deposit,
+      vmVersion,
+      abiVersion,
     }: {
       code: Encoded.ContractBytearray;
       callData: Encoded.ContractBytearray;
@@ -119,8 +132,10 @@ export default class ChannelContract extends ChannelSpend {
     },
     sign: SignTx,
   ): Promise<{
-      accepted: boolean; signedTx: Encoded.Transaction; address: Encoded.ContractAddress;
-    }> {
+    accepted: boolean;
+    signedTx: Encoded.Transaction;
+    address: Encoded.ContractAddress;
+  }> {
     return this.enqueueAction(() => {
       notify(this, 'channels.update.new_contract', {
         code,
@@ -138,33 +153,27 @@ export default class ChannelContract extends ChannelSpend {
           if (message.method !== 'channels.sign.update') {
             return handleUnexpectedMessage(this, message, state);
           }
-          await signAndNotify(
-            this,
-            'channels.update',
-            message.params.data,
-            async (tx) => state.sign(tx),
+          await signAndNotify(this, 'channels.update', message.params.data, async (tx) =>
+            state.sign(tx),
           );
           return {
-            handler: (
-              _2: Channel,
-              message2: ChannelMessage,
-              state2: ChannelState,
-            ): ChannelFsm => (
+            handler: (_2: Channel, message2: ChannelMessage, state2: ChannelState): ChannelFsm =>
               awaitingCompletion(this, message2, state2, () => {
                 const params = unpackTx(message2.params.data.state, Tag.SignedTx).encodedTx;
                 if (params.tag !== Tag.ChannelOffChainTx) {
-                  throw new ChannelError(`Tag should be ${Tag[Tag.ChannelOffChainTx]}, got ${Tag[params.tag]} instead`);
+                  throw new ChannelError(
+                    `Tag should be ${Tag[Tag.ChannelOffChainTx]}, got ${Tag[params.tag]} instead`,
+                  );
                 }
-                const addressKey = this._options.role === 'initiator'
-                  ? 'initiatorId' : 'responderId';
+                const addressKey =
+                  this._options.role === 'initiator' ? 'initiatorId' : 'responderId';
                 const owner = this._options[addressKey];
                 changeState(this, message2.params.data.state);
                 const address = encodeContractAddress(owner, params.round);
                 emit(this, 'newContract', address);
                 state2.resolve({ accepted: true, address, signedTx: message2.params.data.state });
                 return { handler: channelOpen };
-              })
-            ),
+              }),
             state,
           };
         },
@@ -208,9 +217,7 @@ export default class ChannelContract extends ChannelSpend {
    * ```
    */
   async callContract(
-    {
-      amount, callData, contract, abiVersion,
-    }: CallContractOptions,
+    { amount, callData, contract, abiVersion }: CallContractOptions,
     sign: SignTx,
   ): Promise<{ accepted: boolean; signedTx: Encoded.Transaction }> {
     return this.enqueueAction(() => {
@@ -229,24 +236,16 @@ export default class ChannelContract extends ChannelSpend {
           if (message.method !== 'channels.sign.update') {
             return handleUnexpectedMessage(this, message, state);
           }
-          await signAndNotify(
-            this,
-            'channels.update',
-            message.params.data,
-            async (tx) => state.sign(tx, { updates: message.params.data.updates }),
+          await signAndNotify(this, 'channels.update', message.params.data, async (tx) =>
+            state.sign(tx, { updates: message.params.data.updates }),
           );
           return {
-            handler: (
-              _2: Channel,
-              message2: ChannelMessage,
-              state2: ChannelState,
-            ): ChannelFsm => (
+            handler: (_2: Channel, message2: ChannelMessage, state2: ChannelState): ChannelFsm =>
               awaitingCompletion(this, message2, state2, () => {
                 changeState(this, message2.params.data.state);
                 state2.resolve({ accepted: true, signedTx: message2.params.data.state });
                 return { handler: channelOpen };
-              })
-            ),
+              }),
             state,
           };
         },
@@ -280,7 +279,12 @@ export default class ChannelContract extends ChannelSpend {
    */
   async forceProgress(
     {
-      amount, callData, contract, abiVersion, gasLimit = 1000000, gasPrice = MIN_GAS_PRICE,
+      amount,
+      callData,
+      contract,
+      abiVersion,
+      gasLimit = 1000000,
+      gasPrice = MIN_GAS_PRICE,
     }: CallContractOptions & {
       gasLimit?: number;
       gasPrice?: number;
@@ -288,10 +292,10 @@ export default class ChannelContract extends ChannelSpend {
     sign: SignTx,
     { onOnChainTx }: Pick<ChannelState, 'onOnChainTx'> = {},
   ): Promise<{
-      accepted: boolean;
-      signedTx: Encoded.Transaction;
-      tx: Encoded.Transaction | Uint8Array;
-    }> {
+    accepted: boolean;
+    signedTx: Encoded.Transaction;
+    tx: Encoded.Transaction | Uint8Array;
+  }> {
     return this.enqueueAction(() => {
       notify(this, 'channels.force_progress', {
         amount,
@@ -317,11 +321,7 @@ export default class ChannelContract extends ChannelSpend {
             async (tx) => state.sign(tx, { updates: message.params.data.updates }),
           );
           return {
-            handler: (
-              _2: Channel,
-              message2: ChannelMessage,
-              state2: ChannelState,
-            ): ChannelFsm => {
+            handler: (_2: Channel, message2: ChannelMessage, state2: ChannelState): ChannelFsm => {
               if (message2.method === 'channels.on_chain_tx') {
                 state2.onOnChainTx?.(message2.params.data.tx);
                 emit(this, 'onChainTx', message2.params.data.tx, {
@@ -366,17 +366,20 @@ export default class ChannelContract extends ChannelSpend {
    * })
    * ```
    */
-  async callContractStatic(
-    {
-      amount, callData, contract, abiVersion,
-    }: CallContractOptions,
-  ): Promise<CallContractResult> {
-    return snakeToPascalObjKeys(await call(this, 'channels.dry_run.call_contract', {
-      amount,
-      call_data: callData,
-      contract_id: contract,
-      abi_version: abiVersion,
-    }));
+  async callContractStatic({
+    amount,
+    callData,
+    contract,
+    abiVersion,
+  }: CallContractOptions): Promise<CallContractResult> {
+    return snakeToPascalObjKeys(
+      await call(this, 'channels.dry_run.call_contract', {
+        amount,
+        call_data: callData,
+        contract_id: contract,
+        abi_version: abiVersion,
+      }),
+    );
   }
 
   /**
@@ -400,13 +403,15 @@ export default class ChannelContract extends ChannelSpend {
    * })
    * ```
    */
-  async getContractCall(
-    { caller, contract, round }: {
-      caller: Encoded.AccountAddress;
-      contract: Encoded.ContractAddress;
-      round: number;
-    },
-  ): Promise<ContractCallObject> {
+  async getContractCall({
+    caller,
+    contract,
+    round,
+  }: {
+    caller: Encoded.AccountAddress;
+    contract: Encoded.ContractAddress;
+    round: number;
+  }): Promise<ContractCallObject> {
     return snakeToPascalObjKeys(
       await call(this, 'channels.get.contract_call', {
         caller_id: caller,

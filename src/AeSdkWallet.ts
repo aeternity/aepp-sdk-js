@@ -1,45 +1,54 @@
-import { v4 as uuid } from '@aeternity/uuid';
-import AeSdk from './AeSdk';
-import verifyTransaction from './tx/validator';
-import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
+import nacl from 'tweetnacl';
+import AeSdk from './AeSdk.js';
+import verifyTransaction from './tx/validator.js';
+import RpcClient from './aepp-wallet-communication/rpc/RpcClient.js';
 import {
-  METHODS, RPC_STATUS, SUBSCRIPTION_TYPES, WALLET_TYPE,
+  METHODS,
+  RPC_STATUS,
+  SUBSCRIPTION_TYPES,
+  WALLET_TYPE,
   RpcInvalidTransactionError,
-  RpcNotAuthorizeError, RpcPermissionDenyError, RpcUnsupportedProtocolError,
-} from './aepp-wallet-communication/schema';
-import { InternalError, UnknownRpcClientError } from './utils/errors';
-import AccountBase from './account/Base';
-import BrowserConnection from './aepp-wallet-communication/connection/Browser';
+  RpcNotAuthorizeError,
+  RpcPermissionDenyError,
+  RpcUnsupportedProtocolError,
+} from './aepp-wallet-communication/schema.js';
+import { InternalError, UnknownRpcClientError } from './utils/errors.js';
+import AccountBase from './account/Base.js';
+import BrowserConnection from './aepp-wallet-communication/connection/Browser.js';
 import {
   Accounts,
   AeppApi,
   Network,
+  NetworkToSelect,
   RPC_VERSION,
   WalletApi,
   WalletInfo,
-} from './aepp-wallet-communication/rpc/types';
-import {
-  Encoded, Encoding, encode, decode,
-} from './utils/encoder';
-import jsonBig from './utils/json-big';
+} from './aepp-wallet-communication/rpc/types.js';
+import { Encoded, Encoding, encode, decode } from './utils/encoder.js';
+import jsonBig from './utils/json-big.js';
 
 type RpcClientWallet = RpcClient<AeppApi, WalletApi>;
 
 type OnConnection = (
-  clientId: string, params: Omit<Parameters<WalletApi[METHODS.connect]>[0], 'version'>, origin: string
+  clientId: string,
+  params: Omit<Parameters<WalletApi[METHODS.connect]>[0], 'version'>,
+  origin: string,
 ) => void;
 
 type OnSubscription = (
-  clientId: string, params: Parameters<WalletApi[METHODS.subscribeAddress]>[0], origin: string
+  clientId: string,
+  params: Parameters<WalletApi[METHODS.subscribeAddress]>[0],
+  origin: string,
 ) => void;
 
 type OnDisconnect = (
-  clientId: string, params: Parameters<WalletApi[METHODS.closeConnection]>[0]
+  clientId: string,
+  params: Parameters<WalletApi[METHODS.closeConnection]>[0],
 ) => void;
 
-type OnAskAccounts = (
-  clientId: string, params: undefined, origin: string
-) => void;
+type OnAskAccounts = (clientId: string, params: undefined, origin: string) => void;
+
+type OnAskToSelectNetwork = (clientId: string, params: NetworkToSelect, origin: string) => void;
 
 interface RpcClientsInfo {
   id: string;
@@ -70,6 +79,8 @@ export default class AeSdkWallet extends AeSdk {
 
   onAskAccounts: OnAskAccounts;
 
+  onAskToSelectNetwork: OnAskToSelectNetwork;
+
   /**
    * @param options - Options
    * @param options.name - Wallet name
@@ -78,6 +89,8 @@ export default class AeSdkWallet extends AeSdk {
    * @param options.onConnection - Call-back function for incoming AEPP connection
    * @param options.onSubscription - Call-back function for incoming AEPP account subscription
    * @param options.onAskAccounts - Call-back function for incoming AEPP get address request
+   * @param options.onAskToSelectNetwork - Call-back function for incoming AEPP select network
+   * request. If the request is fine then this function should change the current network.
    * @param options.onDisconnect - Call-back function for disconnect event
    */
   constructor({
@@ -88,6 +101,7 @@ export default class AeSdkWallet extends AeSdk {
     onSubscription,
     onDisconnect,
     onAskAccounts,
+    onAskToSelectNetwork,
     ...options
   }: {
     id: string;
@@ -97,12 +111,14 @@ export default class AeSdkWallet extends AeSdk {
     onSubscription: OnSubscription;
     onDisconnect: OnDisconnect;
     onAskAccounts: OnAskAccounts;
+    onAskToSelectNetwork: OnAskToSelectNetwork;
   } & ConstructorParameters<typeof AeSdk>[0]) {
     super(options);
     this.onConnection = onConnection;
     this.onSubscription = onSubscription;
     this.onDisconnect = onDisconnect;
     this.onAskAccounts = onAskAccounts;
+    this.onAskToSelectNetwork = onAskToSelectNetwork;
     this.name = name;
     this.id = id;
     this._type = type;
@@ -111,8 +127,8 @@ export default class AeSdkWallet extends AeSdk {
   _getAccountsForClient({ addressSubscription }: RpcClientsInfo): Accounts {
     const { current, connected } = this.getAccounts();
     return {
-      current: addressSubscription.has('current') || addressSubscription.has('connected')
-        ? current : {},
+      current:
+        addressSubscription.has('current') || addressSubscription.has('connected') ? current : {},
       connected: addressSubscription.has('connected') ? connected : {},
     };
   }
@@ -123,8 +139,9 @@ export default class AeSdkWallet extends AeSdk {
       .filter((clientId) => this._isRpcClientConnected(clientId))
       .map((clientId) => this._getClient(clientId))
       .filter((client) => client.addressSubscription.size !== 0)
-      .forEach((client) => client.rpc
-        .notify(METHODS.updateAddress, this._getAccountsForClient(client)));
+      .forEach((client) =>
+        client.rpc.notify(METHODS.updateAddress, this._getAccountsForClient(client)),
+      );
   }
 
   override selectAccount(address: Encoded.AccountAddress): void {
@@ -151,7 +168,7 @@ export default class AeSdkWallet extends AeSdk {
       .forEach((client) => {
         client.rpc.notify(METHODS.updateNetwork, {
           networkId,
-          ...client.connectNode && this._getNode(),
+          ...(client.connectNode && this._getNode()),
         });
       });
   }
@@ -163,8 +180,10 @@ export default class AeSdkWallet extends AeSdk {
   }
 
   _isRpcClientConnected(clientId: string): boolean {
-    return RPC_STATUS.CONNECTED === this._getClient(clientId).status
-      && this._getClient(clientId).rpc.connection.isConnected();
+    return (
+      RPC_STATUS.CONNECTED === this._getClient(clientId).status &&
+      this._getClient(clientId).rpc.connection.isConnected()
+    );
   }
 
   _disconnectRpcClient(clientId: string): void {
@@ -191,7 +210,7 @@ export default class AeSdkWallet extends AeSdk {
   addRpcClient(clientConnection: BrowserConnection): string {
     // @TODO  detect if aepp has some history based on origin????
     // if yes use this instance for connection
-    const id = uuid();
+    const id = Buffer.from(nacl.randomBytes(8)).toString('base64');
     let disconnectParams: any;
     const client: RpcClientsInfo = {
       id,
@@ -211,17 +230,15 @@ export default class AeSdkWallet extends AeSdk {
           },
           // Store client info and prepare two fn for each client `connect` and `denyConnection`
           // which automatically prepare and send response for that client
-          [METHODS.connect]: async ({
-            name, version, icons, connectNode,
-          }, origin) => {
+          [METHODS.connect]: async ({ name, version, icons, connectNode }, origin) => {
             if (version !== RPC_VERSION) throw new RpcUnsupportedProtocolError();
 
             await this.onConnection(id, { name, icons, connectNode }, origin);
             client.status = RPC_STATUS.CONNECTED;
             client.connectNode = connectNode;
             return {
-              ...await this.getWalletInfo(),
-              ...connectNode && this._getNode(),
+              ...(await this.getWalletInfo()),
+              ...(connectNode && this._getNode()),
             };
           },
           [METHODS.subscribeAddress]: async ({ type, value }, origin) => {
@@ -251,9 +268,7 @@ export default class AeSdkWallet extends AeSdk {
             return this.addresses();
           },
           [METHODS.sign]: async (
-            {
-              tx, onAccount = this.address, returnSigned, innerTx,
-            },
+            { tx, onAccount = this.address, returnSigned, innerTx },
             origin,
           ) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
@@ -262,15 +277,20 @@ export default class AeSdkWallet extends AeSdk {
             }
 
             const parameters = {
-              onAccount, aeppOrigin: origin, aeppRpcClientId: id, innerTx,
+              onAccount,
+              aeppOrigin: origin,
+              aeppRpcClientId: id,
+              innerTx,
             };
             if (returnSigned || innerTx === true) {
               return { signedTransaction: await this.signTransaction(tx, parameters) };
             }
             try {
-              return jsonBig.parse(jsonBig.stringify({
-                transactionHash: await this.sendTransaction(tx, { ...parameters, verify: false }),
-              }));
+              return jsonBig.parse(
+                jsonBig.stringify({
+                  transactionHash: await this.sendTransaction(tx, { ...parameters, verify: false }),
+                }),
+              );
             } catch (error) {
               const validation = await verifyTransaction(tx, this.api);
               if (validation.length > 0) throw new RpcInvalidTransactionError(validation);
@@ -288,41 +308,24 @@ export default class AeSdkWallet extends AeSdk {
               signature: Buffer.from(await this.signMessage(message, parameters)).toString('hex'),
             };
           },
-          [METHODS.signTypedData]: async ({
-            domain, aci, data, onAccount = this.address,
-          }, origin) => {
+          [METHODS.signTypedData]: async (
+            { domain, aci, data, onAccount = this.address },
+            origin,
+          ) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
             if (!this.addresses().includes(onAccount)) {
               throw new RpcPermissionDenyError(onAccount);
             }
 
             const parameters = {
-              ...domain, onAccount, aeppOrigin: origin, aeppRpcClientId: id,
+              ...domain,
+              onAccount,
+              aeppOrigin: origin,
+              aeppRpcClientId: id,
             };
             return {
               signature: await this.signTypedData(data, aci, parameters),
             };
-          },
-          [METHODS.signDelegationToContract]: async ({
-            contractAddress, name, oracleQueryId, allNames, onAccount = this.address, isOracle,
-          }, origin) => {
-            if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
-            if (!this.addresses().includes(onAccount)) {
-              throw new RpcPermissionDenyError(onAccount);
-            }
-
-            isOracle ??= false;
-            const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
-            const signature = await (
-              (name == null ? null : this
-                .signNameDelegationToContract(contractAddress, name, parameters))
-              ?? (oracleQueryId == null ? null : this
-                .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, parameters))
-              ?? (allNames !== true ? null : this
-                .signAllNamesDelegationToContract(contractAddress, parameters))
-              ?? this.signDelegationToContract(contractAddress, { ...parameters, isOracle })
-            );
-            return { signature };
           },
           [METHODS.unsafeSign]: async ({ data, onAccount = this.address }, origin) => {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
@@ -337,6 +340,11 @@ export default class AeSdkWallet extends AeSdk {
             const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
             const signature = await this.signDelegation(delegation, parameters);
             return { signature };
+          },
+          [METHODS.updateNetwork]: async (params, origin) => {
+            if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
+            await this.onAskToSelectNetwork(id, params, origin);
+            return null;
           },
         },
       ),

@@ -1,8 +1,8 @@
-import AeSdkBase from './AeSdkBase';
-import { OnAccount } from './AeSdkMethods';
-import AccountBase from './account/Base';
-import { decode, Encoded } from './utils/encoder';
-import { UnavailableAccountError } from './utils/errors';
+import AeSdkBase from './AeSdkBase.js';
+import { OnAccount } from './AeSdkMethods.js';
+import AccountBase from './account/Base.js';
+import { decode, Encoded } from './utils/encoder.js';
+import { UnavailableAccountError } from './utils/errors.js';
 
 export default class AeSdk extends AeSdkBase {
   accounts: { [key: Encoded.AccountAddress]: AccountBase } = {};
@@ -12,10 +12,10 @@ export default class AeSdk extends AeSdkBase {
   /**
    * @param options - Options
    */
-  constructor(
-    { accounts, ...options }: { accounts?: AccountBase[] }
-    & ConstructorParameters<typeof AeSdkBase>[0] = {},
-  ) {
+  constructor({
+    accounts,
+    ...options
+  }: { accounts?: AccountBase[] } & ConstructorParameters<typeof AeSdkBase>[0] = {}) {
     super(options);
     accounts?.forEach((account, idx) => this.addAccount(account, { select: idx === 0 }));
   }

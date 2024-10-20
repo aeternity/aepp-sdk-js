@@ -4,31 +4,31 @@
     <div>
       <div>Recipient address</div>
       <div>
-        <input
-          v-model="spendTo"
-          placeholder="ak_..."
-        >
+        <input v-model="spendTo" placeholder="ak_..." />
       </div>
     </div>
     <div>
       <div>Coins amount</div>
-      <div><input v-model="spendAmount"></div>
+      <div><input v-model="spendAmount" /></div>
     </div>
     <div>
       <div>Payload</div>
-      <div><input v-model="spendPayload"></div>
+      <div><input v-model="spendPayload" /></div>
     </div>
     <div>
       <div>Increment nonce by 1</div>
       <div>
-        <input
-          type="checkbox"
-          v-model="incrementNonce"
-        >
+        <input type="checkbox" v-model="incrementNonce" />
         (only if you want to pay for this transaction yourself)
       </div>
     </div>
-    <button @click="() => { generatePromise = generate(); }">
+    <button
+      @click="
+        () => {
+          generatePromise = generate();
+        }
+      "
+    >
       Generate
     </button>
     <div v-if="generatePromise">
@@ -40,9 +40,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import {
-  encode, Encoding, Tag, unpackTx, buildTx,
-} from '@aeternity/aepp-sdk';
+import { encode, Encoding, Tag, unpackTx, buildTx } from '@aeternity/aepp-sdk';
 import Value from './Value.vue';
 
 export default {

@@ -1,40 +1,57 @@
 import type Transport from '@ledgerhq/hw-transport';
-import AccountLedger, { CLA, GET_ADDRESS, GET_APP_CONFIGURATION } from './Ledger';
-import { UnsupportedVersionError } from '../utils/errors';
-import { Encoded } from '../utils/encoder';
-import semverSatisfies from '../utils/semver-satisfies';
-import Node from '../Node';
+import AccountLedger, { CLA, GET_ADDRESS, GET_APP_CONFIGURATION } from './Ledger.js';
+import { UnsupportedVersionError } from '../utils/errors.js';
+import { Encoded } from '../utils/encoder.js';
+import semverSatisfies from '../utils/semver-satisfies.js';
+import AccountBaseFactory from './BaseFactory.js';
+
+interface AppConfiguration {
+  version: string;
+}
 
 /**
  * A factory class that generates instances of AccountLedger based on provided transport.
  */
-export default class AccountLedgerFactory {
-  readonly transport: Transport;
-
-  private readonly versionCheckPromise: Promise<void>;
-
+export default class AccountLedgerFactory extends AccountBaseFactory {
   /**
    * @param transport - Connection to Ledger to use
    */
-  constructor(transport: Transport) {
-    this.transport = transport;
-    this.versionCheckPromise = this.getAppConfiguration().then(({ version }) => {
-      const args = [version, '0.4.4', '0.5.0'] as const;
-      if (!semverSatisfies(...args)) throw new UnsupportedVersionError('app on ledger', ...args);
-    });
-    const scrambleKey = 'w0w';
-    transport.decorateAppAPIMethods(this, ['getAddress', 'getAppConfiguration'], scrambleKey);
+  constructor(readonly transport: Transport) {
+    super();
+    transport.decorateAppAPIMethods(this, ['getAddress', 'getAppConfiguration'], 'w0w');
   }
 
+  #ensureReadyPromise?: Promise<void>;
+
   /**
-   * @returns the version of app installed on Ledger wallet
+   * It throws an exception if Aeternity app on Ledger has an incompatible version, not opened or
+   * not installed.
    */
-  async getAppConfiguration(): Promise<{ version: string }> {
-    await this.versionCheckPromise;
+  async ensureReady(): Promise<void> {
+    const { version } = await this.#getAppConfiguration();
+    const args = [version, '0.4.4', '0.5.0'] as const;
+    if (!semverSatisfies(...args))
+      throw new UnsupportedVersionError('Aeternity app on Ledger', ...args);
+    this.#ensureReadyPromise = Promise.resolve();
+  }
+
+  async #ensureReady(): Promise<void> {
+    this.#ensureReadyPromise ??= this.ensureReady();
+    return this.#ensureReadyPromise;
+  }
+
+  async #getAppConfiguration(): Promise<AppConfiguration> {
     const response = await this.transport.send(CLA, GET_APP_CONFIGURATION, 0x00, 0x00);
     return {
       version: [response[1], response[2], response[3]].join('.'),
     };
+  }
+
+  /**
+   * @returns the version of Aeternity app installed on Ledger wallet
+   */
+  async getAppConfiguration(): Promise<AppConfiguration> {
+    return this.#getAppConfiguration();
   }
 
   /**
@@ -43,7 +60,7 @@ export default class AccountLedgerFactory {
    * @param verify - Ask user to confirm address by showing it on the device screen
    */
   async getAddress(accountIndex: number, verify = false): Promise<Encoded.AccountAddress> {
-    await this.versionCheckPromise;
+    await this.#ensureReady();
     const buffer = Buffer.alloc(4);
     buffer.writeUInt32BE(accountIndex, 0);
     const response = await this.transport.send(
@@ -62,25 +79,6 @@ export default class AccountLedgerFactory {
    * @param accountIndex - Index of account
    */
   async initialize(accountIndex: number): Promise<AccountLedger> {
-    await this.versionCheckPromise;
     return new AccountLedger(this.transport, accountIndex, await this.getAddress(accountIndex));
-  }
-
-  /**
-   * Discovers accounts on Ledger that already have been used (has any on-chain transactions).
-   * It returns an empty array if none of accounts been used.
-   * If a used account is preceded by an unused account then it would be ignored.
-   * @param node - Instance of Node to get account information from
-   */
-  async discover(node: Node): Promise<AccountLedger[]> {
-    let index = 0;
-    const result = [];
-    let account;
-    do {
-      if (account != null) result.push(account);
-      account = await this.initialize(index);
-      index += 1;
-    } while (await node.getAccountByPubkey(account.address).then(() => true, () => false));
-    return result;
   }
 }

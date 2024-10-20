@@ -1,257 +1,281 @@
 <html>
-<head>
-  <title>Dynamic gas price</title>
-</head>
-<body>
+  <head>
+    <title>Dynamic gas price</title>
+  </head>
+  <body>
+    <table class="charts">
+      <tr>
+        <td>
+          <strong>Gas price</strong>
+          <canvas id="chart-gas-price"></canvas>
+        </td>
+        <td>
+          <strong>Utilization</strong>
+          <canvas id="chart-utilization"></canvas>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>Overall gas</strong>
+          <canvas id="chart-overall-gas"></canvas>
+        </td>
+        <td>
+          <strong>Operation count</strong>
+          <canvas id="chart-operation-count"></canvas>
+        </td>
+      </tr>
+    </table>
 
-<table class="charts">
-  <tr>
-    <td>
-      <strong>Gas price</strong>
-      <canvas id="chart-gas-price"></canvas>
-    </td>
-    <td>
-      <strong>Utilization</strong>
-      <canvas id="chart-utilization"></canvas>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong>Overall gas</strong>
-      <canvas id="chart-overall-gas"></canvas>
-    </td>
-    <td>
-      <strong>Operation count</strong>
-      <canvas id="chart-operation-count"></canvas>
-    </td>
-  </tr>
-</table>
+    <button id="add-client-fixed">Add client with fixed gas price</button>
+    <button id="add-client-dynamic">Add client with dynamic gas price</button>
+    <div id="clients"></div>
 
-<button id="add-client-fixed">Add client with fixed gas price</button>
-<button id="add-client-dynamic">Add client with dynamic gas price</button>
-<div id="clients"></div>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 4px 0;
+      }
 
-<style>
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 4px 0;
-  }
+      table td {
+        border: 1px solid black;
+        padding: 4px;
+      }
 
-  table td {
-    border: 1px solid black;
-    padding: 4px;
-  }
+      table.charts td {
+        width: 50%;
+      }
+    </style>
 
-  table.charts td {
-    width: 50%;
-  }
-</style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="../../dist/aepp-sdk.browser-script.cjs"></script>
+    <script type="text/javascript">
+      const [chartGasPrice, chartUtilization, chartOverallGas, chartOperationCount] = [
+        'chart-gas-price',
+        'chart-utilization',
+        'chart-overall-gas',
+        'chart-operation-count',
+      ].map(
+        (id) =>
+          new Chart(document.getElementById(id), {
+            type: 'line',
+            data: {
+              labels: [],
+              datasets: [],
+            },
+            options: {
+              animation: false,
+            },
+          }),
+      );
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-<script src="../../dist/aepp-sdk.browser-script.js"></script>
-<script type="text/javascript">
-const [chartGasPrice, chartUtilization, chartOverallGas, chartOperationCount] = [
-  'chart-gas-price', 'chart-utilization', 'chart-overall-gas', 'chart-operation-count',
-].map((id) => new Chart(document.getElementById(id), {
-  type: 'line',
-  data: {
-    labels: [],
-    datasets: [],
-  },
-  options: {
-    animation: false,
-  },
-}));
+      chartOverallGas.data.datasets[0] = {
+        label: 'Overall used gas',
+        data: [],
+        pointStyle: false,
+      };
 
-chartOverallGas.data.datasets[0] = {
-  label: 'Overall used gas',
-  data: [],
-  pointStyle: false,
-};
+      const { Node, AeSdk, MemoryAccount, CompilerHttp, MIN_GAS_PRICE } = Aeternity;
 
-const { Node, AeSdk, MemoryAccount, CompilerHttp, MIN_GAS_PRICE } = Aeternity;
+      const nodeUrl = 'http://localhost:3013';
+      const node = new Node(nodeUrl);
+      const genesis = new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
+      const minGasPriceToShow = 1e9 - 10;
 
-const nodeUrl = 'http://localhost:3013';
-const node = new Node(nodeUrl);
-const genesis = new MemoryAccount('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200');
-const minGasPriceToShow = 1e9 - 10;
+      async function newFrame() {
+        (await node.getRecentGasPrices()).forEach(({ minGasPrice, minutes, utilization }) => {
+          chartGasPrice.data.datasets
+            .find(({ label }) => label === `node ${minutes} min`)
+            .data.push(minGasPrice === 0n ? minGasPriceToShow : Number(minGasPrice));
+          chartUtilization.data.datasets
+            .find(({ label }) => label === `node ${minutes} min`)
+            .data.push(utilization);
+        });
+        chartGasPrice.data.labels.push(new Date().toLocaleTimeString());
+        chartUtilization.data.labels.push(new Date().toLocaleTimeString());
+        chartGasPrice.data.datasets
+          .filter(({ label }) => label.includes('client'))
+          .forEach(({ data }) => data.push(minGasPriceToShow));
+        chartGasPrice.update();
+        chartUtilization.update();
 
-async function newFrame() {
-  (await node.getRecentGasPrices()).forEach(({ minGasPrice, minutes, utilization }) => {
-    chartGasPrice.data.datasets
-      .find(({ label }) => label === `node ${minutes} min`)
-      .data.push(minGasPrice === 0n ? minGasPriceToShow : Number(minGasPrice));
-    chartUtilization.data.datasets
-      .find(({ label }) => label === `node ${minutes} min`)
-      .data.push(utilization);
-  });
-  chartGasPrice.data.labels.push(new Date().toLocaleTimeString());
-  chartUtilization.data.labels.push(new Date().toLocaleTimeString());
-  chartGasPrice.data.datasets
-    .filter(({ label }) => label.includes('client'))
-    .forEach(({ data }) => data.push(minGasPriceToShow));
-  chartGasPrice.update();
-  chartUtilization.update();
+        chartOverallGas.data.labels.push(new Date().toLocaleTimeString());
+        chartOverallGas.data.datasets[0].data.push(0);
+        chartOverallGas.update();
 
-  chartOverallGas.data.labels.push(new Date().toLocaleTimeString());
-  chartOverallGas.data.datasets[0].data.push(0);
-  chartOverallGas.update();
+        chartOperationCount.data.labels.push(new Date().toLocaleTimeString());
+        chartOperationCount.data.datasets.forEach(({ data }) => data.push(0));
+        chartOperationCount.update();
+      }
 
-  chartOperationCount.data.labels.push(new Date().toLocaleTimeString());
-  chartOperationCount.data.datasets.forEach(({ data }) => data.push(0));
-  chartOperationCount.update();
-}
+      let clientCounter = 0;
+      const activeClients = {};
 
-let clientCounter = 0;
-const activeClients = {};
-
-function renderClients() {
-  document.getElementById('clients').innerHTML = `
+      function renderClients() {
+        document.getElementById('clients').innerHTML = `
   <table>
     <thead>
       <tr><td>Client idx</td><td>Is fixed gas</td><td>Last message</td><td></td></tr>
     </thead>
-    ${Object.entries(activeClients).map(([idx, { fixedGasPrice, message }]) => `
+    ${Object.entries(activeClients)
+      .map(
+        ([idx, { fixedGasPrice, message }]) => `
       <tr>
         <td>client ${idx}</td>
         <td>${fixedGasPrice}</td>
         <td>${message}</td>
         <td><button data-idx="${idx}">Remove</button></td>
       </tr>
-    `).join('')}
+    `,
+      )
+      .join('')}
   </table>
   `;
-}
+      }
 
-async function updateClient(idx, data) {
-  if (activeClients[idx] == null) return;
-  Object.assign(activeClients[idx], data);
-  renderClients();
-};
+      async function updateClient(idx, data) {
+        if (activeClients[idx] == null) return;
+        Object.assign(activeClients[idx], data);
+        renderClients();
+      }
 
-const contractSourceCode = `
+      const contractSourceCode = `
 contract Test =
   entrypoint factorial(n : int) =
     if (n == 0) 1
     else n * factorial(n - 1)
 `;
 
-async function addClient(fixedGasPrice) {
-  const aeSdk = new AeSdk({
-    nodes: [{ name: 'testnet', instance: new Node(nodeUrl) }],
-    accounts: [MemoryAccount.generate()],
-    onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
-    _expectedMineRate: 60000,
-    _microBlockCycle: 3000,
-  });
-
-  let stop = false;
-  const idx = clientCounter++;
-  activeClients[idx] = {};
-  updateClient(idx, {
-    stop() {
-      stop = true;
-    },
-    fixedGasPrice: !!fixedGasPrice,
-    message: '',
-  });
-
-  const components = [0, 0, 0].map(() => Math.floor(Math.random() * 200));
-  const toColor = (components) => '#' + components.map((c) => c.toString(16).padStart(2, '0')).join('');
-  const colorDark = toColor(components.map((c) => c + 25));
-  const colorLight = toColor(components.map((c) => c + 50));
-
-  chartGasPrice.data.datasets.push({
-    label: `client ${idx}`,
-    borderColor: colorDark,
-    data: new Array(chartGasPrice.data.labels.length).fill(minGasPriceToShow),
-    pointStyle: false,
-  });
-  chartOperationCount.data.datasets.push({
-    label: `client ${idx} mined`,
-    borderColor: colorDark,
-    data: new Array(chartOperationCount.data.labels.length).fill(-1),
-    pointStyle: false,
-  }, {
-    label: `client ${idx} failed`,
-    borderColor: colorLight,
-    data: new Array(chartOperationCount.data.labels.length).fill(-1),
-  });
-  chartOperationCount.update();
-
-  try {
-    await aeSdk.transferFunds(0.01, aeSdk.address, { onAccount: genesis });
-    const contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
-    const deployInfo = await contract.$deploy([]);
-    updateClient(idx, { message: `Contract deployed at ${deployInfo.address}` });
-    while (!stop) {
-      try {
-        const { result: { gasUsed, gasPrice } } = await contract.factorial(1000, {
-          callStatic: false,
-          gasLimit: 2040000,
-          blocks: 15,
-          ttl: await aeSdk.getHeight({ cached: true }) + 5,
-          verify: false,
-          ...fixedGasPrice && { gasPrice: MIN_GAS_PRICE, fee: `_gas-price:${MIN_GAS_PRICE}` },
+      async function addClient(fixedGasPrice) {
+        const aeSdk = new AeSdk({
+          nodes: [{ name: 'testnet', instance: new Node(nodeUrl) }],
+          accounts: [MemoryAccount.generate()],
+          onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
+          _expectedMineRate: 60000,
+          _microBlockCycle: 3000,
         });
 
-        let data;
-        ({ data } = chartOverallGas.data.datasets[0]);
-        data[data.length - 1] += gasUsed;
-        chartOverallGas.update();
+        let stop = false;
+        const idx = clientCounter++;
+        activeClients[idx] = {};
+        updateClient(idx, {
+          stop() {
+            stop = true;
+          },
+          fixedGasPrice: !!fixedGasPrice,
+          message: '',
+        });
 
-        ({ data } = chartGasPrice.data.datasets.find(({ label }) => label === `client ${idx}`));
-        data[data.length - 1] = Number(gasPrice);
-        chartGasPrice.update();
+        const components = [0, 0, 0].map(() => Math.floor(Math.random() * 200));
+        const toColor = (components) =>
+          '#' + components.map((c) => c.toString(16).padStart(2, '0')).join('');
+        const colorDark = toColor(components.map((c) => c + 25));
+        const colorLight = toColor(components.map((c) => c + 50));
 
-        ({ data } = chartOperationCount.data.datasets
-          .find(({ label }) => label === `client ${idx} mined`));
-        data[data.length - 1] += 1;
-      } catch (error) {
-        const { data } = chartOperationCount.data.datasets
-          .find(({ label }) => label === `client ${idx} failed`);
-        data[data.length - 1] += 1;
-        updateClient(idx, { message: error.message });
+        chartGasPrice.data.datasets.push({
+          label: `client ${idx}`,
+          borderColor: colorDark,
+          data: new Array(chartGasPrice.data.labels.length).fill(minGasPriceToShow),
+          pointStyle: false,
+        });
+        chartOperationCount.data.datasets.push(
+          {
+            label: `client ${idx} mined`,
+            borderColor: colorDark,
+            data: new Array(chartOperationCount.data.labels.length).fill(-1),
+            pointStyle: false,
+          },
+          {
+            label: `client ${idx} failed`,
+            borderColor: colorLight,
+            data: new Array(chartOperationCount.data.labels.length).fill(-1),
+          },
+        );
+        chartOperationCount.update();
+
+        try {
+          await aeSdk.transferFunds(0.01, aeSdk.address, { onAccount: genesis });
+          const contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
+          const deployInfo = await contract.$deploy([]);
+          updateClient(idx, { message: `Contract deployed at ${deployInfo.address}` });
+          while (!stop) {
+            try {
+              const {
+                result: { gasUsed, gasPrice },
+              } = await contract.factorial(1000, {
+                callStatic: false,
+                gasLimit: 2040000,
+                blocks: 15,
+                ttl: (await aeSdk.getHeight({ cached: true })) + 5,
+                verify: false,
+                ...(fixedGasPrice && {
+                  gasPrice: MIN_GAS_PRICE,
+                  fee: `_gas-price:${MIN_GAS_PRICE}`,
+                }),
+              });
+
+              let data;
+              ({ data } = chartOverallGas.data.datasets[0]);
+              data[data.length - 1] += gasUsed;
+              chartOverallGas.update();
+
+              ({ data } = chartGasPrice.data.datasets.find(
+                ({ label }) => label === `client ${idx}`,
+              ));
+              data[data.length - 1] = Number(gasPrice);
+              chartGasPrice.update();
+
+              ({ data } = chartOperationCount.data.datasets.find(
+                ({ label }) => label === `client ${idx} mined`,
+              ));
+              data[data.length - 1] += 1;
+            } catch (error) {
+              const { data } = chartOperationCount.data.datasets.find(
+                ({ label }) => label === `client ${idx} failed`,
+              );
+              data[data.length - 1] += 1;
+              updateClient(idx, { message: error.message });
+            }
+            chartOperationCount.update();
+          }
+        } catch (error) {
+          updateClient(idx, { message: error.message });
+        }
       }
-      chartOperationCount.update();
-    }
-  } catch (error) {
-    updateClient(idx, { message: error.message });
-  }
-}
 
-function removeClient(idx) {
-  activeClients[idx].stop();
-  delete activeClients[idx];
-  renderClients();
-}
+      function removeClient(idx) {
+        activeClients[idx].stop();
+        delete activeClients[idx];
+        renderClients();
+      }
 
-document.getElementById('clients').addEventListener('click', (event) => {
-  if (event.target.tagName !== 'BUTTON') return;
-  removeClient(event.target.dataset.idx);
-});
-document.getElementById('add-client-fixed').addEventListener('click', () => addClient(true));
-document.getElementById('add-client-dynamic').addEventListener('click', () => addClient(false));
-renderClients();
+      document.getElementById('clients').addEventListener('click', (event) => {
+        if (event.target.tagName !== 'BUTTON') return;
+        removeClient(event.target.dataset.idx);
+      });
+      document.getElementById('add-client-fixed').addEventListener('click', () => addClient(true));
+      document
+        .getElementById('add-client-dynamic')
+        .addEventListener('click', () => addClient(false));
+      renderClients();
 
-(async () => {
-  (await node.getRecentGasPrices()).forEach(({ minGasPrice, minutes, utilization }) => {
-    chartGasPrice.data.datasets.push({
-      label: `node ${minutes} min`,
-      data: [],
-      pointStyle: false,
-    });
-    chartUtilization.data.datasets.push({
-      label: `node ${minutes} min`,
-      data: [],
-      pointStyle: false,
-    });
-  });
+      (async () => {
+        (await node.getRecentGasPrices()).forEach(({ minGasPrice, minutes, utilization }) => {
+          chartGasPrice.data.datasets.push({
+            label: `node ${minutes} min`,
+            data: [],
+            pointStyle: false,
+          });
+          chartUtilization.data.datasets.push({
+            label: `node ${minutes} min`,
+            data: [],
+            pointStyle: false,
+          });
+        });
 
-  await newFrame();
-  setInterval(newFrame, 10000);
-})();
-</script>
-</body>
+        await newFrame();
+        setInterval(newFrame, 10000);
+      })();
+    </script>
+  </body>
 </html>

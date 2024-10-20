@@ -4,13 +4,16 @@
     <div>
       <div>Contract Source Code</div>
       <div>
-        <textarea
-          v-model="contractSourceCode"
-          placeholder="Contact source code"
-        />
+        <textarea v-model="contractSourceCode" placeholder="Contact source code" />
       </div>
     </div>
-    <button @click="() => { createPromise = create(); }">
+    <button
+      @click="
+        () => {
+          createPromise = create();
+        }
+      "
+    >
       Create
     </button>
     <div v-if="createPromise">
@@ -66,6 +69,7 @@
 <script>
 import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
+import { Contract } from '@aeternity/aepp-sdk';
 import Value from './components/Value.vue';
 import FieldAction from './components/FieldAction.vue';
 
@@ -93,9 +97,12 @@ export default {
   computed: mapState(['aeSdk']),
   methods: {
     async create() {
-      // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
+      // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/docs/README.md#vue3
       this.contract = shallowRef(
-        await this.aeSdk.initializeContract({ sourceCode: this.contractSourceCode }),
+        await Contract.initialize({
+          ...this.aeSdk.getContext(),
+          sourceCode: this.contractSourceCode,
+        }),
       );
     },
     async compile() {

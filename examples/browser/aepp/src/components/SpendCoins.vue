@@ -4,21 +4,24 @@
     <div>
       <div>Recipient address</div>
       <div>
-        <input
-          v-model="spendTo"
-          placeholder="ak_..."
-        >
+        <input v-model="spendTo" placeholder="ak_..." />
       </div>
     </div>
     <div>
       <div>Coins amount</div>
-      <div><input v-model="spendAmount"></div>
+      <div><input v-model="spendAmount" /></div>
     </div>
     <div>
       <div>Payload</div>
-      <div><input v-model="spendPayload"></div>
+      <div><input v-model="spendPayload" /></div>
     </div>
-    <button @click="() => { spendPromise = spend(); }">
+    <button
+      @click="
+        () => {
+          spendPromise = spend();
+        }
+      "
+    >
       Spend
     </button>
     <div v-if="spendPromise">

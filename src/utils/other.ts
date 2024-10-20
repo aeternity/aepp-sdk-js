@@ -1,13 +1,16 @@
 import { RestError } from '@azure/core-rest-pipeline';
 
-export const pause = async (duration: number): Promise<void> => new Promise((resolve) => {
-  setTimeout(resolve, duration);
-});
+export const pause = async (duration: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, duration);
+  });
 
 export const mapObject = <InputV, OutputV>(
   object: { [k: string]: InputV },
   fn: (
-    value: [string, InputV], index: number, array: Array<[string, InputV]>
+    value: [string, InputV],
+    index: number,
+    array: Array<[string, InputV]>,
   ) => [number | string, OutputV],
 ): { [k: string]: OutputV } => Object.fromEntries(Object.entries(object).map(fn));
 
@@ -22,9 +25,11 @@ const isWebpack4Buffer = (() => {
 })();
 
 export const concatBuffers = isWebpack4Buffer
-  ? (list: readonly Uint8Array[], totalLength?: number): Buffer => (
-    Buffer.concat(list.map((el) => Buffer.from(el)), totalLength)
-  )
+  ? (list: readonly Uint8Array[], totalLength?: number): Buffer =>
+      Buffer.concat(
+        list.map((el) => Buffer.from(el)),
+        totalLength,
+      )
   : Buffer.concat;
 
 /**
@@ -49,14 +54,22 @@ export function isItemOfArray<T>(item: any, array: readonly T[]): item is T {
 }
 
 export function isAccountNotFoundError(error: Error): boolean {
-  return error instanceof RestError && error.statusCode === 404
-    && error.message.includes('Account not found');
+  return (
+    error instanceof RestError &&
+    error.statusCode === 404 &&
+    error.message.includes('Account not found')
+  );
 }
 
-// based on https://stackoverflow.com/a/50375286/6176994
-export type UnionToIntersection<Union> =
-  (Union extends any ? (k: Union) => void : never) extends ((k: infer Intersection) => void)
-    ? Intersection : never;
+// based on https://stackoverflow.com/a/50375286
+export type UnionToIntersection<Union> = (Union extends any ? (k: Union) => void : never) extends (
+  k: infer Intersection,
+) => void
+  ? Intersection
+  : never;
+
+// based on https://stackoverflow.com/a/61108377
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 export function ensureError(error: unknown): asserts error is Error {
   if (error instanceof Error) return;

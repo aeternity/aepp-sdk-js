@@ -1,30 +1,39 @@
-import { Tag } from '../constants';
-import { encode, Encoding, decode } from '../../../utils/encoder';
-import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
+import { EntryTag } from '../entry/constants.js';
+import { encode, Encoding, decode } from '../../../utils/encoder.js';
+import type { unpackEntry as unpackEntryType, packEntry as packEntryType } from '../entry/index.js';
 
-type TagWrapping = Tag.AccountsMtree | Tag.CallsMtree | Tag.ChannelsMtree | Tag.ContractsMtree
-| Tag.NameserviceMtree | Tag.OraclesMtree;
+type TagWrapping =
+  | EntryTag.AccountsMtree
+  | EntryTag.CallsMtree
+  | EntryTag.ChannelsMtree
+  | EntryTag.ContractsMtree
+  | EntryTag.NameserviceMtree
+  | EntryTag.OraclesMtree;
 
-export default function genWrappedField<T extends TagWrapping>(tag: T): {
+export default function genWrappedField<T extends TagWrapping>(
+  tag: T,
+): {
   serialize: (
-    // TODO: replace with `(TxParams & { tag: T })['payload']`,
+    // TODO: replace with `(EntParams & { tag: T })['payload']`,
     //  but fix TS2502 value is referenced directly or indirectly in its own type annotation
-    value: any, options: { buildTx: typeof buildTxType }
+    value: any,
+    options: { packEntry: typeof packEntryType },
   ) => Buffer;
   deserialize: (
-    value: Buffer, options: { unpackTx: typeof unpackTxType },
-    // TODO: replace with `(TxUnpacked & { tag: T })['payload']`,
+    value: Buffer,
+    options: { unpackEntry: typeof unpackEntryType },
+    // TODO: replace with `(EntUnpacked & { tag: T })['payload']`,
     //  TS2577 Return type annotation circularly references itself
   ) => any;
   recursiveType: true;
 } {
   return {
-    serialize(payload, { buildTx }) {
-      return decode(buildTx({ tag, payload }));
+    serialize(payload, { packEntry }) {
+      return decode(packEntry({ tag, payload }));
     },
 
-    deserialize(buffer, { unpackTx }) {
-      return unpackTx<TagWrapping>(encode(buffer, Encoding.Transaction), tag).payload;
+    deserialize(buffer, { unpackEntry }) {
+      return unpackEntry<TagWrapping>(encode(buffer, Encoding.Bytearray), tag).payload;
     },
 
     recursiveType: true,

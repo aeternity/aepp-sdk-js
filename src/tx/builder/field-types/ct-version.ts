@@ -1,31 +1,23 @@
-import { ConsensusProtocolVersion, VmVersion, AbiVersion } from '../constants';
-import Node from '../../../Node';
+import { ConsensusProtocolVersion, VmVersion, AbiVersion } from '../constants.js';
+import Node from '../../../Node.js';
 
 /*
  * First abi/vm by default
  * @see {@link https://github.com/aeternity/protocol/blob/71cf111/contracts/contract_vms.md#virtual-machines-on-the-æternity-blockchain}
  */
 export const ProtocolToVmAbi = {
-  [ConsensusProtocolVersion.Iris]: {
-    'contract-create': {
-      vmVersion: [VmVersion.Fate2], abiVersion: [AbiVersion.Fate],
-    },
-    'contract-call': {
-      vmVersion: [], abiVersion: [AbiVersion.Fate, AbiVersion.Sophia],
-    },
-    'oracle-call': {
-      vmVersion: [], abiVersion: [AbiVersion.NoAbi, AbiVersion.Fate],
-    },
-  },
   [ConsensusProtocolVersion.Ceres]: {
     'contract-create': {
-      vmVersion: [VmVersion.Fate3], abiVersion: [AbiVersion.Fate],
+      vmVersion: [VmVersion.Fate3],
+      abiVersion: [AbiVersion.Fate],
     },
     'contract-call': {
-      vmVersion: [], abiVersion: [AbiVersion.Fate],
+      vmVersion: [],
+      abiVersion: [AbiVersion.Fate],
     },
     'oracle-call': {
-      vmVersion: [], abiVersion: [AbiVersion.NoAbi, AbiVersion.Fate],
+      vmVersion: [],
+      abiVersion: [AbiVersion.NoAbi, AbiVersion.Fate],
     },
   },
 } as const;
@@ -50,8 +42,9 @@ export default {
   serialize(
     value: CtVersion | undefined,
     params: {},
-    { consensusProtocolVersion = ConsensusProtocolVersion.Iris }:
-    { consensusProtocolVersion?: ConsensusProtocolVersion },
+    {
+      consensusProtocolVersion = ConsensusProtocolVersion.Ceres,
+    }: { consensusProtocolVersion?: ConsensusProtocolVersion },
   ): Buffer {
     value ??= getProtocolDetails(consensusProtocolVersion, 'contract-create');
 

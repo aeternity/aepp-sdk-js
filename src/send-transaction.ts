@@ -1,12 +1,12 @@
-import verifyTransaction, { ValidatorResult } from './tx/validator';
-import { ensureError } from './utils/other';
-import { TransactionError } from './utils/errors';
-import Node, { TransformNodeType } from './Node';
-import { SignedTx } from './apis/node';
-import { Encoded } from './utils/encoder';
-import AccountBase from './account/Base';
-import { buildTxHash } from './tx/builder';
-import { poll, waitForTxConfirm } from './chain';
+import verifyTransaction, { ValidatorResult } from './tx/validator.js';
+import { ensureError } from './utils/other.js';
+import { TransactionError } from './utils/errors.js';
+import Node from './Node.js';
+import { SignedTx } from './apis/node/index.js';
+import { Encoded } from './utils/encoder.js';
+import AccountBase from './account/Base.js';
+import { buildTxHash } from './tx/builder/index.js';
+import { poll, waitForTxConfirm } from './chain.js';
 
 /**
  * @category exception
@@ -16,11 +16,7 @@ export class InvalidTxError extends TransactionError {
 
   transaction: Encoded.Transaction;
 
-  constructor(
-    message: string,
-    validation: ValidatorResult[],
-    transaction: Encoded.Transaction,
-  ) {
+  constructor(message: string, validation: ValidatorResult[], transaction: Encoded.Transaction) {
     super(message);
     this.name = 'InvalidTxError';
     this.validation = validation;
@@ -38,9 +34,14 @@ export class InvalidTxError extends TransactionError {
 export async function sendTransaction(
   txUnsigned: Encoded.Transaction,
   {
-    onNode, onAccount, verify = true, waitMined = true, confirm, innerTx, ...options
-  }:
-  SendTransactionOptions,
+    onNode,
+    onAccount,
+    verify = true,
+    waitMined = true,
+    confirm,
+    innerTx,
+    ...options
+  }: SendTransactionOptions,
 ): Promise<SendTransactionReturnType> {
   const tx = await onAccount.signTransaction(txUnsigned, {
     ...options,
@@ -54,8 +55,9 @@ export async function sendTransaction(
   if (verify) {
     const validation = await verifyTransaction(tx, onNode);
     if (validation.length > 0) {
-      const message = `Transaction verification errors: ${
-        validation.map((v: { message: string }) => v.message).join(', ')}`;
+      const message = `Transaction verification errors: ${validation
+        .map((v: { message: string }) => v.message)
+        .join(', ')}`;
       throw new InvalidTxError(message, validation, tx);
     }
   }
@@ -67,15 +69,18 @@ export async function sendTransaction(
     } catch (error) {
       __queue = null;
     }
-    const { txHash } = await onNode.postTransaction({ tx }, {
-      requestOptions: {
-        customHeaders: {
-          // TODO: remove __retry-code after fixing https://github.com/aeternity/aeternity/issues/3803
-          '__retry-code': '400',
-          ...__queue != null ? { __queue } : {},
+    const { txHash } = await onNode.postTransaction(
+      { tx },
+      {
+        requestOptions: {
+          customHeaders: {
+            // TODO: remove __retry-code after fixing https://github.com/aeternity/aeternity/issues/3803
+            '__retry-code': '400',
+            ...(__queue != null ? { __queue } : {}),
+          },
         },
       },
-    });
+    );
 
     if (waitMined) {
       const pollResult = await poll(txHash, { onNode, ...options });
@@ -125,10 +130,11 @@ type SendTransactionOptionsType = {
    * Number of micro blocks that should be mined after tx get included
    */
   confirm?: boolean | number;
-} & Parameters<typeof poll>[1] & Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'>
-& Parameters<AccountBase['signTransaction']>[1];
+} & Parameters<typeof poll>[1] &
+  Omit<Parameters<typeof waitForTxConfirm>[1], 'confirm'> &
+  Parameters<AccountBase['signTransaction']>[1];
 export interface SendTransactionOptions extends SendTransactionOptionsType {}
-interface SendTransactionReturnType extends Partial<TransformNodeType<SignedTx>> {
+interface SendTransactionReturnType extends Partial<SignedTx> {
   hash: Encoded.TxHash;
   // TODO: use `SignedTx.encodedTx` instead
   rawTx: Encoded.Transaction;

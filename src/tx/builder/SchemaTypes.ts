@@ -1,5 +1,5 @@
-import { Field as OriginalField } from './field-types';
-import { UnionToIntersection } from '../../utils/other';
+import { Field as OriginalField } from './field-types/interface.js';
+import { UnionToIntersection } from '../../utils/other.js';
 
 // TODO: figure out why this override is necessary
 export interface Field extends OriginalField {
@@ -23,21 +23,23 @@ type TxParamsBySchemaInternalParams<
   SchemaItem,
   SchemaItemValues = SchemaItem[keyof SchemaItem],
 > = UnionToIntersection<
-SchemaItemValues extends Field
-  ? Or<Parameters<SchemaItemValues['serialize']>[2], {}> : never
+  SchemaItemValues extends Field ? Or<Parameters<SchemaItemValues['serialize']>[2], {}> : never
 >;
 
 type PickIsRec<SchemaItem, Recursive extends boolean> = {
-  [Key in keyof SchemaItem
-  as SchemaItem[Key] extends Field & { recursiveType: true }
-    ? (Recursive extends true ? Key : never)
-    : (Recursive extends true ? never : Key)]: SchemaItem[Key];
+  [Key in keyof SchemaItem as SchemaItem[Key] extends Field & { recursiveType: true }
+    ? Recursive extends true
+      ? Key
+      : never
+    : Recursive extends true
+      ? never
+      : Key]: SchemaItem[Key];
 };
 
 type TxParamsBySchema<SchemaItem> = SchemaItem extends Object
   ? TxParamsBySchemaInternal<PickIsRec<SchemaItem, true>> &
-  NullablePartial<TxParamsBySchemaInternal<PickIsRec<SchemaItem, false>>> &
-  TxParamsBySchemaInternalParams<PickIsRec<SchemaItem, false>>
+      NullablePartial<TxParamsBySchemaInternal<PickIsRec<SchemaItem, false>>> &
+      TxParamsBySchemaInternalParams<PickIsRec<SchemaItem, false>>
   : never;
 
 type TxParamsAsyncBySchemaInternal<SchemaItem> = {
@@ -52,15 +54,16 @@ type TxParamsAsyncBySchemaInternalParams<
   SchemaItem,
   SchemaItemValues = SchemaItem[keyof SchemaItem],
 > = UnionToIntersection<
-SchemaItemValues extends Field & { prepare: Function }
-  ? Or<Parameters<SchemaItemValues['prepare']>[2], {}> : {}
+  SchemaItemValues extends Field & { prepare: Function }
+    ? Or<Parameters<SchemaItemValues['prepare']>[2], {}>
+    : {}
 >;
 
 type TxParamsAsyncBySchema<SchemaItem> = SchemaItem extends Object
-  ? TxParamsAsyncBySchemaInternal<PickIsRec<SchemaItem, true>>
-  & NullablePartial<TxParamsAsyncBySchemaInternal<PickIsRec<SchemaItem, false>>>
-  & TxParamsAsyncBySchemaInternalParams<PickIsRec<SchemaItem, false>>
-  & TxParamsBySchemaInternalParams<PickIsRec<SchemaItem, false>>
+  ? TxParamsAsyncBySchemaInternal<PickIsRec<SchemaItem, true>> &
+      NullablePartial<TxParamsAsyncBySchemaInternal<PickIsRec<SchemaItem, false>>> &
+      TxParamsAsyncBySchemaInternalParams<PickIsRec<SchemaItem, false>> &
+      TxParamsBySchemaInternalParams<PickIsRec<SchemaItem, false>>
   : never;
 
 type TxUnpackedBySchema<SchemaItem> = {
@@ -69,10 +72,7 @@ type TxUnpackedBySchema<SchemaItem> = {
     : never;
 };
 
-export default interface SchemaTypes<
-  Schema extends readonly any[],
-  SchemaItems = Schema[number],
-> {
+export default interface SchemaTypes<Schema extends readonly any[], SchemaItems = Schema[number]> {
   TxParams: TxParamsBySchema<SchemaItems>;
   TxParamsAsync: TxParamsAsyncBySchema<SchemaItems>;
   TxUnpacked: TxUnpackedBySchema<SchemaItems>;

@@ -1,34 +1,39 @@
 import { readFile } from 'fs/promises';
 import { dirname, resolve, basename } from 'path';
-import { InternalError } from '../../utils/errors';
+import { InternalError } from '../../utils/errors.js';
 
 const defaultIncludes = [
-  'List.aes', 'Option.aes', 'String.aes',
-  'Func.aes', 'Pair.aes', 'Triple.aes',
-  'BLS12_381.aes', 'Frac.aes', 'Set.aes',
+  'List.aes',
+  'Option.aes',
+  'String.aes',
+  'Func.aes',
+  'Pair.aes',
+  'Triple.aes',
+  'BLS12_381.aes',
+  'Frac.aes',
+  'Set.aes',
   'Bitwise.aes',
 ];
-const includeRegExp = /^include\s*"([\w/.-]+)"/mi;
+const includeRegExp = /^include\s*"([\w/.-]+)"/im;
 const includesRegExp = new RegExp(includeRegExp.source, `${includeRegExp.flags}g`);
 
-async function getFileSystemRec(
-  root: string,
-  relative: string,
-): Promise<Record<string, string>> {
+async function getFileSystemRec(root: string, relative: string): Promise<Record<string, string>> {
   const sourceCode = await readFile(resolve(root, relative), 'utf8');
   const filesystem: Record<string, string> = {};
-  await Promise.all((sourceCode.match(includesRegExp) ?? [])
-    .map((include) => {
-      const m = include.match(includeRegExp);
-      if (m?.length !== 2) throw new InternalError('Unexpected match length');
-      return m[1];
-    })
-    .filter((include) => !defaultIncludes.includes(include))
-    .map(async (include) => {
-      const includePath = resolve(root, include);
-      filesystem[include] = await readFile(includePath, 'utf8');
-      Object.assign(filesystem, await getFileSystemRec(root, include));
-    }));
+  await Promise.all(
+    (sourceCode.match(includesRegExp) ?? [])
+      .map((include) => {
+        const m = include.match(includeRegExp);
+        if (m?.length !== 2) throw new InternalError('Unexpected match length');
+        return m[1];
+      })
+      .filter((include) => !defaultIncludes.includes(include))
+      .map(async (include) => {
+        const includePath = resolve(root, include);
+        filesystem[include] = await readFile(includePath, 'utf8');
+        Object.assign(filesystem, await getFileSystemRec(root, include));
+      }),
+  );
   return filesystem;
 }
 

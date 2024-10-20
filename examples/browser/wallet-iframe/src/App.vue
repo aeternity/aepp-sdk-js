@@ -8,15 +8,8 @@
   <div class="group">
     <div>
       <div>Aepp URL</div>
-      <form
-        novalidate
-        @submit.prevent="navigate"
-      >
-        <input
-          type="url"
-          v-model="nextAeppUrl"
-          @focus="$event.target.select()"
-        >
+      <form novalidate @submit.prevent="navigate">
+        <input type="url" v-model="nextAeppUrl" @focus="$event.target.select()" />
       </form>
     </div>
     <div>
@@ -39,32 +32,30 @@
     <button @click="switchAccount">Switch Account</button>
     <button @click="switchNode">Switch Node</button>
 
-    <button
-      v-if="clientStatus === 'CONNECTED'"
-      @click="disconnect"
-    >
-      Disconnect
-    </button>
-    <button
-      v-else
-      @click="() => (stopSharingWalletInfo ?? shareWalletInfo)()"
-    >
+    <button v-if="clientStatus === 'CONNECTED'" @click="disconnect">Disconnect</button>
+    <button v-else @click="() => (stopSharingWalletInfo ?? shareWalletInfo)()">
       {{ stopSharingWalletInfo ? 'Stop sharing' : 'Share wallet info' }}
     </button>
   </div>
 
-  <iframe
-    v-if="!runningInFrame"
-    ref="aepp"
-    :src="aeppUrl"
-  />
+  <iframe v-if="!runningInFrame" ref="aepp" :src="aeppUrl" />
 </template>
 
 <script>
 import {
-  MemoryAccount, generateKeyPair, AeSdkWallet, Node, CompilerHttp,
-  BrowserWindowMessageConnection, METHODS, WALLET_TYPE, RPC_STATUS,
-  RpcConnectionDenyError, RpcRejectedByUserError, unpackTx, unpackDelegation,
+  MemoryAccount,
+  AeSdkWallet,
+  Node,
+  CompilerHttp,
+  BrowserWindowMessageConnection,
+  METHODS,
+  WALLET_TYPE,
+  RPC_STATUS,
+  RpcConnectionDenyError,
+  RpcRejectedByUserError,
+  RpcNoNetworkById,
+  unpackTx,
+  unpackDelegation,
 } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import Value from './Value.vue';
@@ -112,7 +103,7 @@ export default {
           this.aeSdk.removeRpcClient(this.clientId);
         }
         this.stopSharingWalletInfo = null;
-      }
+      };
     },
     disconnect() {
       // TODO: move to removeRpcClient (would be a semi-breaking change)
@@ -147,10 +138,12 @@ export default {
 
     const aeppInfo = {};
     const genConfirmCallback = (actionName) => (aeppId, parameters, origin) => {
-      if (!confirm([
-        `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}`,
-        Value.methods.valueToString(parameters),
-      ].join('\n'))) {
+      if (
+        !confirm(
+          `Client ${aeppInfo[aeppId].name} with id ${aeppId} at ${origin} want to ${actionName}` +
+            Value.methods.valueToString(parameters),
+        )
+      ) {
         throw new RpcRejectedByUserError();
       }
     };
@@ -183,52 +176,6 @@ export default {
         return super.signTypedData(data, aci, options);
       }
 
-      async signDelegationToContract(
-        contractAddress,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress };
-          genConfirmCallback('sign delegation to contract')(id, opt, aeppOrigin);
-        }
-        return super.signDelegationToContract(contractAddress, options);
-      }
-
-      async signNameDelegationToContract(
-        contractAddress,
-        name,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress, name };
-          genConfirmCallback('sign delegation of name to contract')(id, opt, aeppOrigin);
-        }
-        return super.signNameDelegationToContract(contractAddress, name, options);
-      }
-
-      async signAllNamesDelegationToContract(
-        contractAddress,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress };
-          genConfirmCallback('sign delegation of all names to contract')(id, opt, aeppOrigin);
-        }
-        return super.signAllNamesDelegationToContract(contractAddress, options);
-      }
-
-      async signOracleQueryDelegationToContract(
-        contractAddress,
-        oracleQueryId,
-        { aeppRpcClientId: id, aeppOrigin, ...options },
-      ) {
-        if (id != null) {
-          const opt = { ...options, contractAddress, oracleQueryId };
-          genConfirmCallback('sign delegation of oracle query to contract')(id, opt, aeppOrigin);
-        }
-        return super.signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
-      }
-
       async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
         if (id != null) {
           genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);
@@ -245,8 +192,7 @@ export default {
       }
 
       static generate() {
-        // TODO: can inherit parent method after implementing https://github.com/aeternity/aepp-sdk-js/issues/1672
-        return new AccountMemoryProtected(generateKeyPair().secretKey);
+        return new AccountMemoryProtected(super.generate().secretKey);
       }
     }
 
@@ -256,13 +202,12 @@ export default {
       nodes: [
         { name: 'ae_uat', instance: new Node('https://testnet.aeternity.io') },
         { name: 'ae_mainnet', instance: new Node('https://mainnet.aeternity.io') },
-        { name: 'ae_next', instance: new Node('https://next.aeternity.io') },
       ],
       accounts: [
-        new AccountMemoryProtected('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'),
+        new AccountMemoryProtected('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
         AccountMemoryProtected.generate(),
       ],
-      onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
+      onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
       name: 'Wallet Iframe',
       onConnection: (aeppId, params, origin) => {
         if (!confirm(`Client ${params.name} with id ${aeppId} at ${origin} want to connect`)) {
@@ -276,6 +221,21 @@ export default {
       onDisconnect: (clientId) => {
         console.log('disconnected client', clientId);
         this.clientId = null;
+      },
+      onAskToSelectNetwork: async (aeppId, parameters, origin) => {
+        await genConfirmCallback('select network')(aeppId, parameters, origin);
+        if (parameters.networkId) {
+          if (!this.aeSdk.pool.has(parameters.networkId)) {
+            throw new RpcNoNetworkById(parameters.networkId);
+          }
+          await this.aeSdk.selectNode(parameters.networkId);
+          this.nodeName = parameters.networkId;
+        } else {
+          this.aeSdk.pool.delete('by-aepp');
+          this.aeSdk.addNode('by-aepp', new Node(parameters.nodeUrl));
+          await this.aeSdk.selectNode('by-aepp');
+          this.nodeName = 'by-aepp';
+        }
       },
     });
 
@@ -294,7 +254,11 @@ export default {
 
     // TODO: replace setInterval with subscription after refactoring
     setInterval(() => this.updateClientStatus(), 1000);
-    this.$watch(({ clientId }) => [clientId], () => this.updateClientStatus(), { immediate: true });
+    this.$watch(
+      ({ clientId }) => [clientId],
+      () => this.updateClientStatus(),
+      { immediate: true },
+    );
   },
 };
 </script>
@@ -302,11 +266,11 @@ export default {
 <style lang="scss" src="./styles.scss" />
 
 <style lang="scss" scoped>
-input[id=toggle-aepp] {
+input[id='toggle-aepp'] {
   display: none;
 }
 
-label[for=toggle-aepp]::after {
+label[for='toggle-aepp']::after {
   font-size: initial;
   font-weight: initial;
   text-decoration: underline dotted;
@@ -314,9 +278,9 @@ label[for=toggle-aepp]::after {
 }
 
 @media (max-width: 450px), (max-height: 650px) {
-  input[id=toggle-aepp] {
+  input[id='toggle-aepp'] {
     &:checked ~ {
-      h2 label[for=toggle-aepp]::after {
+      h2 label[for='toggle-aepp']::after {
         content: 'Hide aepp';
       }
 
@@ -326,7 +290,7 @@ label[for=toggle-aepp]::after {
     }
 
     &:not(:checked) ~ {
-      h2 label[for=toggle-aepp]::after {
+      h2 label[for='toggle-aepp']::after {
         content: 'Show aepp';
       }
 

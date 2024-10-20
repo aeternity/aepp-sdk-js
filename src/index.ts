@@ -1,6 +1,5 @@
-export * from './index-browser';
+export * from './index-browser.js';
 
-export { default as CompilerCli } from './contract/compiler/Cli';
-export { default as CompilerCli8 } from './contract/compiler/Cli8';
-export { default as getFileSystem } from './contract/compiler/getFileSystem';
-export { default as CompilerHttpNode } from './contract/compiler/HttpNode';
+export { default as CompilerCli } from './contract/compiler/Cli.js';
+export { default as getFileSystem } from './contract/compiler/getFileSystem.js';
+export { default as CompilerHttpNode } from './contract/compiler/HttpNode.js';

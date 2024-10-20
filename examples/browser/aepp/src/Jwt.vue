@@ -4,22 +4,22 @@
     <div>
       <div>Payload as JSON</div>
       <div>
-        <input
-          :value="payloadAsJson"
-          @input="payloadAsJson = $event.target.value || '{}'"
-        >
+        <input :value="payloadAsJson" @input="payloadAsJson = $event.target.value || '{}'" />
       </div>
     </div>
     <div>
       <div>Include "sub_jwk"</div>
       <div>
-        <input
-          type="checkbox"
-          v-model="includeSubJwk"
-        >
+        <input type="checkbox" v-model="includeSubJwk" />
       </div>
     </div>
-    <button @click="() => { signPromise = sign(); }">
+    <button
+      @click="
+        () => {
+          signPromise = sign();
+        }
+      "
+    >
       Sign
     </button>
     <div v-if="signPromise">
@@ -33,22 +33,22 @@
     <div>
       <div>JWT to unpack</div>
       <div>
-        <input
-          :value="jwt"
-          @input="jwt = $event.target.value || null"
-        >
+        <input :value="jwt" @input="jwt = $event.target.value || null" />
       </div>
     </div>
     <div>
       <div>Signer address</div>
       <div>
-        <input
-          :value="address"
-          @input="address = $event.target.value || null"
-        >
+        <input :value="address" @input="address = $event.target.value || null" />
       </div>
     </div>
-    <button @click="() => { unpackPromise = unpack(); }">
+    <button
+      @click="
+        () => {
+          unpackPromise = unpack();
+        }
+      "
+    >
       Unpack
     </button>
     <div v-if="unpackPromise">

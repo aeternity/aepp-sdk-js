@@ -1,26 +1,34 @@
-import AeSdkBase from './AeSdkBase';
-import { OnAccount } from './AeSdkMethods';
-import AccountBase from './account/Base';
-import AccountRpc from './account/Rpc';
-import { decode, Encoded } from './utils/encoder';
+import AeSdkBase from './AeSdkBase.js';
+import { OnAccount } from './AeSdkMethods.js';
+import AccountBase from './account/Base.js';
+import AccountRpc from './account/Rpc.js';
+import { decode, Encoded } from './utils/encoder.js';
 import {
-  Accounts, RPC_VERSION, WalletInfo, Network, WalletApi, AeppApi, Node as NodeRpc,
-} from './aepp-wallet-communication/rpc/types';
-import RpcClient from './aepp-wallet-communication/rpc/RpcClient';
-import { METHODS, SUBSCRIPTION_TYPES } from './aepp-wallet-communication/schema';
+  Accounts,
+  RPC_VERSION,
+  WalletInfo,
+  Network,
+  WalletApi,
+  AeppApi,
+  Node as NodeRpc,
+  NetworkToSelect,
+} from './aepp-wallet-communication/rpc/types.js';
+import RpcClient from './aepp-wallet-communication/rpc/RpcClient.js';
+import { METHODS, SUBSCRIPTION_TYPES } from './aepp-wallet-communication/schema.js';
 import {
   AlreadyConnectedError,
   NoWalletConnectedError,
   UnsubscribedAccountError,
   UnAuthorizedAccountError,
   RpcConnectionError,
-} from './utils/errors';
-import Node from './Node';
-import BrowserConnection from './aepp-wallet-communication/connection/Browser';
+} from './utils/errors.js';
+import Node from './Node.js';
+import BrowserConnection from './aepp-wallet-communication/connection/Browser.js';
 
 /**
  * RPC handler for AEPP side
  * Contain functionality for wallet interaction and connect it to sdk
+ * @deprecated use WalletConnectorFrame instead
  * @category aepp wallet communication
  */
 export default class AeSdkAepp extends AeSdkBase {
@@ -78,7 +86,8 @@ export default class AeSdkAepp extends AeSdkBase {
     if (this._accounts == null) return [];
     const current = Object.keys(this._accounts.current)[0];
     return [
-      ...current != null ? [current] : [], ...Object.keys(this._accounts.connected),
+      ...(current != null ? [current] : []),
+      ...Object.keys(this._accounts.connected),
     ] as Encoded.AccountAddress[];
   }
 
@@ -93,7 +102,8 @@ export default class AeSdkAepp extends AeSdkBase {
     connection: BrowserConnection,
     { connectNode = false, name = 'wallet-node' }: { connectNode?: boolean; name?: string } = {},
   ): Promise<WalletInfo & { node?: NodeRpc }> {
-    if (this.rpcClient != null) throw new AlreadyConnectedError('You are already connected to wallet');
+    if (this.rpcClient != null)
+      throw new AlreadyConnectedError('You are already connected to wallet');
     let disconnectParams: any;
 
     const updateNetwork = (params: Network): void => {
@@ -125,8 +135,11 @@ export default class AeSdkAepp extends AeSdkBase {
         [METHODS.readyToConnect]: () => {},
       },
     );
-    const walletInfo = await client
-      .request(METHODS.connect, { name: this.name, version: RPC_VERSION, connectNode });
+    const walletInfo = await client.request(METHODS.connect, {
+      name: this.name,
+      version: RPC_VERSION,
+      connectNode,
+    });
     updateNetwork(walletInfo);
     this.rpcClient = client;
     return walletInfo;
@@ -166,12 +179,24 @@ export default class AeSdkAepp extends AeSdkBase {
     return result;
   }
 
-  _ensureConnected(): asserts this is AeSdkAepp & { rpcClient: NonNullable<AeSdkAepp['rpcClient']> } {
+  /**
+   * Ask wallet to select a network
+   */
+  async askToSelectNetwork(network: NetworkToSelect): Promise<void> {
+    this._ensureConnected();
+    await this.rpcClient.request(METHODS.updateNetwork, network);
+  }
+
+  _ensureConnected(): asserts this is AeSdkAepp & {
+    rpcClient: NonNullable<AeSdkAepp['rpcClient']>;
+  } {
     if (this.rpcClient != null) return;
     throw new NoWalletConnectedError('You are not connected to Wallet');
   }
 
-  _ensureAccountAccess(): asserts this is AeSdkAepp & { rpcClient: NonNullable<AeSdkAepp['rpcClient']> } {
+  _ensureAccountAccess(): asserts this is AeSdkAepp & {
+    rpcClient: NonNullable<AeSdkAepp['rpcClient']>;
+  } {
     this._ensureConnected();
     if (this.addresses().length !== 0) return;
     throw new UnsubscribedAccountError();

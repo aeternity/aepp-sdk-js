@@ -18,8 +18,10 @@ describe('Utils', () => {
 
     it('throws error if value undefined', () => {
       const wrapped = wrapWithProxy<{ test: string } | undefined>(() => undefined);
-      expect(() => wrapped.test)
-        .to.throw(ArgumentError, 'wrapped value should be defined, got undefined instead');
+      expect(() => wrapped.test).to.throw(
+        ArgumentError,
+        'wrapped value should be defined, got undefined instead',
+      );
     });
 
     it('can call private method', () => {

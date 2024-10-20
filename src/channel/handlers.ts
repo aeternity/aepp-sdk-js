@@ -13,19 +13,19 @@ import {
   SignTx,
   ChannelStatus,
   ChannelEvents,
-} from './internal';
-import { unpackTx, buildTx } from '../tx/builder';
-import { decode, Encoded } from '../utils/encoder';
+} from './internal.js';
+import { unpackTx, buildTx } from '../tx/builder/index.js';
+import { decode, Encoded } from '../utils/encoder.js';
 import {
   IllegalArgumentError,
   InsufficientBalanceError,
   ChannelConnectionError,
   UnexpectedChannelMessageError,
   ChannelError,
-} from '../utils/errors';
-import type Channel from './Base';
-import { Tag } from '../tx/builder/constants';
-import { snakeToPascal } from '../utils/string';
+} from '../utils/errors.js';
+import type Channel from './Base.js';
+import { Tag } from '../tx/builder/constants.js';
+import { snakeToPascal } from '../utils/string.js';
 
 export async function appendSignature(
   tx: Encoded.Transaction,
@@ -57,7 +57,7 @@ export async function signAndNotify(
   let signedTx;
   if (data.tx != null) signedTx = await signFn(data.tx);
   else if (data.signed_tx != null) signedTx = await appendSignature(data.signed_tx, signFn);
-  else throw new ChannelError('Can\'t find transaction in message');
+  else throw new ChannelError("Can't find transaction in message");
   const isError = typeof signedTx !== 'string';
   const key = data.tx != null ? 'tx' : 'signed_tx';
   notify(channel, method, isError ? { error: signedTx ?? 1 } : { [key]: signedTx });
@@ -69,10 +69,14 @@ export function handleUnexpectedMessage(
   message: ChannelMessage,
   state: ChannelState,
 ): ChannelFsm {
-  state?.reject?.(Object.assign(
-    new UnexpectedChannelMessageError(`Unexpected message received:\n\n${JSON.stringify(message)}`),
-    { wsMessage: message },
-  ));
+  state?.reject?.(
+    Object.assign(
+      new UnexpectedChannelMessageError(
+        `Unexpected message received:\n\n${JSON.stringify(message)}`,
+      ),
+      { wsMessage: message },
+    ),
+  );
   return { handler: channelOpen };
 }
 
@@ -143,18 +147,41 @@ export function awaitingConnection(
   }
 }
 
+export async function awaitingReestablish(
+  channel: Channel,
+  message: ChannelMessage,
+  state: ChannelState,
+): Promise<ChannelFsm> {
+  if (message.method === 'channels.info' && message.params.data.event === 'fsm_up') {
+    channel._fsmId = message.params.data.fsm_id;
+    return {
+      handler: function awaitingChannelReestablished(
+        _: Channel,
+        message2: ChannelMessage,
+        state2: ChannelState,
+      ): ChannelFsm | undefined {
+        if (
+          message2.method === 'channels.info' &&
+          message2.params.data.event === 'channel_reestablished'
+        )
+          return { handler: awaitingOpenConfirmation };
+        return handleUnexpectedMessage(channel, message2, state2);
+      },
+    };
+  }
+  return handleUnexpectedMessage(channel, message, state);
+}
+
 export async function awaitingReconnection(
   channel: Channel,
   message: ChannelMessage,
   state: ChannelState,
 ): Promise<ChannelFsm> {
-  if (message.method === 'channels.info') {
-    if (message.params.data.event === 'fsm_up') {
-      channel._fsmId = message.params.data.fsm_id;
-      const { signedTx } = await channel.state();
-      changeState(channel, signedTx == null ? '' : buildTx(signedTx));
-      return { handler: channelOpen };
-    }
+  if (message.method === 'channels.info' && message.params.data.event === 'fsm_up') {
+    channel._fsmId = message.params.data.fsm_id;
+    const { signedTx } = await channel.state();
+    changeState(channel, signedTx == null ? '' : buildTx(signedTx));
+    return { handler: channelOpen };
   }
   return handleUnexpectedMessage(channel, message, state);
 }
@@ -165,11 +192,8 @@ export async function awaitingChannelCreateTx(
 ): Promise<ChannelFsm | undefined> {
   const tag = channel._options.role === 'initiator' ? 'initiator_sign' : 'responder_sign';
   if (message.method === `channels.sign.${tag}`) {
-    await signAndNotify(
-      channel,
-      `channels.${tag}`,
-      message.params.data,
-      async (tx) => channel._options.sign(tag, tx),
+    await signAndNotify(channel, `channels.${tag}`, message.params.data, async (tx) =>
+      channel._options.sign(tag, tx),
     );
     return { handler: awaitingOnChainTx };
   }
@@ -201,15 +225,17 @@ export function awaitingOnChainTx(
   if (message.method === 'channels.on_chain_tx') {
     const { info } = message.params.data;
     const { role } = channel._options;
-    if ((info === 'funding_signed' && role === 'initiator')
-      || (info === 'funding_created' && role === 'responder')) {
+    if (
+      (info === 'funding_signed' && role === 'initiator') ||
+      (info === 'funding_created' && role === 'responder')
+    ) {
       return { handler: awaitingBlockInclusion };
     }
   }
   if (
-    message.method === 'channels.info'
-    && message.params.data.event === 'funding_signed'
-    && channel._options.role === 'initiator'
+    message.method === 'channels.info' &&
+    message.params.data.event === 'funding_signed' &&
+    channel._options.role === 'initiator'
   ) {
     channel._channelId = message.params.channel_id;
     changeStatus(channel, 'signed');
@@ -220,18 +246,25 @@ export function awaitingOnChainTx(
 function awaitingOpenConfirmation(
   channel: Channel,
   message: ChannelMessage,
+  state: ChannelState,
 ): ChannelFsm | undefined {
   if (message.method === 'channels.info' && message.params.data.event === 'open') {
     channel._channelId = message.params.channel_id;
     return {
-      handler(_: Channel, message2: ChannelMessage): ChannelFsm | undefined {
+      handler: function awaitingChannelsUpdate(
+        _: Channel,
+        message2: ChannelMessage,
+        state2: ChannelState,
+      ): ChannelFsm | undefined {
         if (message2.method === 'channels.update') {
           changeState(channel, message2.params.data.state);
           return { handler: channelOpen };
         }
+        return handleUnexpectedMessage(channel, message2, state2);
       },
     };
   }
+  return handleUnexpectedMessage(channel, message, state);
 }
 
 export async function channelOpen(
@@ -305,11 +338,8 @@ async function awaitingTxSignRequest(
 ): Promise<ChannelFsm> {
   const [, tag] = message.method.match(/^channels\.sign\.([^.]+)$/) ?? [];
   if (tag == null) return handleUnexpectedMessage(channel, message, state);
-  const isError = await signAndNotify(
-    channel,
-    `channels.${tag}`,
-    message.params.data,
-    async (tx) => channel._options.sign(tag, tx, { updates: message.params.data.updates }),
+  const isError = await signAndNotify(channel, `channels.${tag}`, message.params.data, async (tx) =>
+    channel._options.sign(tag, tx, { updates: message.params.data.updates }),
   );
 
   function awaitingUpdateConflict(_: Channel, message2: ChannelMessage): ChannelFsm {
@@ -332,11 +362,8 @@ export async function awaitingShutdownTx(
   if (message.method !== 'channels.sign.shutdown_sign') {
     return handleUnexpectedMessage(channel, message, state);
   }
-  await signAndNotify(
-    channel,
-    'channels.shutdown_sign',
-    message.params.data,
-    async (tx) => state.sign(tx),
+  await signAndNotify(channel, 'channels.shutdown_sign', message.params.data, async (tx) =>
+    state.sign(tx),
   );
   return {
     handler(_: Channel, message2: ChannelMessage): ChannelFsm {

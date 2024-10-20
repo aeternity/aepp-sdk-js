@@ -1,16 +1,14 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { stub } from 'sinon';
-import { getSdk } from '.';
-import {
-  generateKeyPair, AeSdk, Tag, MemoryAccount, Encoded, Node,
-} from '../../src';
-import { assertNotNull, bindRequestCounter } from '../utils';
+import { getSdk, timeoutBlock } from '.';
+import { AeSdk, Tag, MemoryAccount, Encoded, Node, Contract } from '../../src';
+import { assertNotNull, bindRequestCounter, indent } from '../utils';
 
 describe('Node Chain', () => {
   let aeSdk: AeSdk;
   let aeSdkWithoutAccount: AeSdk;
-  const { publicKey } = generateKeyPair();
+  const recipient = MemoryAccount.generate().address;
 
   before(async () => {
     aeSdk = await getSdk();
@@ -50,23 +48,24 @@ describe('Node Chain', () => {
 
     it('uses correct cache key if node changed while doing request', async () => {
       const heightPromise = aeSdk.getHeight();
-      aeSdk.addNode('test-2', new Node('https://test.stg.aepps.com'), true);
+      aeSdk.addNode('test-2', new Node('https://google.com/404'), true);
       await heightPromise;
-      await expect(aeSdk.getHeight({ cached: true }))
-        .to.be.rejectedWith('v3/status error: 404 status code');
+      await expect(aeSdk.getHeight({ cached: true })).to.be.rejectedWith(
+        'v3/status error: 404 status code',
+      );
       aeSdk.selectNode('test');
     });
   });
 
   it('waits for specified heights', async () => {
-    const target = await aeSdkWithoutAccount.getHeight() + 1;
+    const target = (await aeSdkWithoutAccount.getHeight()) + 1;
     await aeSdkWithoutAccount.awaitHeight(target).should.eventually.be.at.least(target);
     await aeSdkWithoutAccount.getHeight().should.eventually.be.at.least(target);
-  });
+  }).timeout(timeoutBlock);
 
   it('Can verify transaction from broadcast error', async () => {
     const error = await aeSdk
-      .spend(0, publicKey, { ttl: 1, absoluteTtl: true, verify: false })
+      .spend(0, recipient, { ttl: 1, absoluteTtl: true, verify: false })
       .catch((e) => e);
     expect(await error.verifyTx()).to.have.lengthOf(1);
   });
@@ -79,8 +78,9 @@ describe('Node Chain', () => {
   it('Get key block', async () => {
     const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration();
     // TODO type should be corrected in node api
-    const keyBlockByHash = await aeSdkWithoutAccount
-      .getKeyBlock(keyBlock.hash as Encoded.KeyBlockHash);
+    const keyBlockByHash = await aeSdkWithoutAccount.getKeyBlock(
+      keyBlock.hash as Encoded.KeyBlockHash,
+    );
     const keyBlockByHeight = await aeSdkWithoutAccount.getKeyBlock(keyBlock.height);
     keyBlockByHash.should.be.an('object');
     keyBlockByHeight.should.be.an('object');
@@ -89,8 +89,9 @@ describe('Node Chain', () => {
   it('Get generation', async () => {
     const { keyBlock } = await aeSdkWithoutAccount.getCurrentGeneration();
     // TODO type should be corrected in node api
-    const genByHash = await aeSdkWithoutAccount
-      .getGeneration(keyBlock.hash as Encoded.KeyBlockHash);
+    const genByHash = await aeSdkWithoutAccount.getGeneration(
+      keyBlock.hash as Encoded.KeyBlockHash,
+    );
     const genByHeight = await aeSdkWithoutAccount.getGeneration(keyBlock.height);
     genByHash.should.be.an('object');
     genByHeight.should.be.an('object');
@@ -101,7 +102,7 @@ describe('Node Chain', () => {
       tag: Tag.SpendTx,
       amount: 1,
       senderId: aeSdk.address,
-      recipientId: publicKey,
+      recipientId: recipient,
     });
     const signed = await aeSdk.signTransaction(tx);
     const { txHash } = await aeSdk.api.postTransaction({ tx: signed });
@@ -113,28 +114,28 @@ describe('Node Chain', () => {
   it('Wait for transaction confirmation', async () => {
     const res = await aeSdk.spend(1000, aeSdk.address, { confirm: 1 });
     assertNotNull(res.blockHeight);
-    expect(await aeSdk.getHeight() >= res.blockHeight + 1).to.be.equal(true);
-  });
+    expect((await aeSdk.getHeight()) >= res.blockHeight + 1).to.be.equal(true);
+  }).timeout(timeoutBlock);
 
-  it('doesn\'t make extra requests', async () => {
+  it("doesn't make extra requests", async () => {
     let getCount;
     let hash;
 
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
-    hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
+    hash = (await aeSdk.spend(100, recipient, { waitMined: false, verify: false })).hash;
     expect(getCount()).to.be.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
-    hash = (await aeSdk.spend(100, publicKey, { waitMined: false, verify: false })).hash;
+    hash = (await aeSdk.spend(100, recipient, { waitMined: false, verify: false })).hash;
     expect(getCount()).to.be.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
-    hash = (await aeSdk.spend(100, publicKey, { waitMined: false })).hash;
+    hash = (await aeSdk.spend(100, recipient, { waitMined: false })).hash;
     expect(getCount()).to.be.equal(6); // nonce, validator(acc, recipient, height, status), post tx
     await aeSdk.poll(hash);
   });
@@ -142,16 +143,20 @@ describe('Node Chain', () => {
   const accounts = new Array(10).fill(undefined).map(() => MemoryAccount.generate());
   const transactions: Encoded.TxHash[] = [];
 
-  const txPostRetry = '/v3/transactions?int-as-string=true&__sdk-retry=';
+  const txPostRetry = '/v3/transactions?__sdk-retry=';
   it('multiple spends from one account', async () => {
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     await aeSdk.getHeight({ cached: false });
     const getCount = bindRequestCounter(aeSdk.api);
-    const spends = await Promise.all(accounts.map(async (account, idx) => aeSdk.spend(
-      Math.floor(Math.random() * 1000 + 1e15),
-      account.address,
-      { nonce: nextNonce + idx, verify: false, waitMined: false },
-    )));
+    const spends = await Promise.all(
+      accounts.map(async (account, idx) =>
+        aeSdk.spend(Math.floor(Math.random() * 1000 + 1e15), account.address, {
+          nonce: nextNonce + idx,
+          verify: false,
+          waitMined: false,
+        }),
+      ),
+    );
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
     expect(getCount({ exclude: [txPostRetry] })).to.be.equal(txPostCount);
@@ -164,9 +169,14 @@ describe('Node Chain', () => {
     const s = stub(aeSdkWithoutAccount._options, '_expectedMineRate').value(60_000);
     const getCount = bindRequestCounter(aeSdkWithoutAccount.api);
     const spends = await Promise.all(
-      accounts.map(async (onAccount) => aeSdkWithoutAccount.spend(1e14, aeSdk.address, {
-        nonce: 1, verify: false, onAccount, waitMined: false,
-      })),
+      accounts.map(async (onAccount) =>
+        aeSdkWithoutAccount.spend(1e14, aeSdk.address, {
+          nonce: 1,
+          verify: false,
+          onAccount,
+          waitMined: false,
+        }),
+      ),
     );
     s.restore();
     transactions.push(...spends.map(({ hash }) => hash));
@@ -174,13 +184,15 @@ describe('Node Chain', () => {
     expect(getCount()).to.be.equal(txPostCount);
   });
 
-  it('ensure transactions mined', async () => Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));
+  it('ensure transactions mined', async () =>
+    Promise.all(transactions.map(async (hash) => aeSdkWithoutAccount.poll(hash))));
 
   it('multiple contract dry-runs calls at one request', async () => {
-    const contract = await aeSdk.initializeContract<{ foo: (x: number) => bigint }>({
-      sourceCode:
-        'contract Test =\n'
-        + '  entrypoint foo(x : int) = x * 100',
+    const contract = await Contract.initialize<{ foo: (x: number) => bigint }>({
+      ...aeSdk.getContext(),
+      sourceCode: indent`
+        contract Test =
+          entrypoint foo(x : int) = x * 100`,
     });
     await contract.$deploy([]);
     const { result } = await contract.foo(5);
@@ -189,11 +201,14 @@ describe('Node Chain', () => {
     const { nextNonce } = await aeSdk.api.getAccountNextNonce(aeSdk.address);
     const getCount = bindRequestCounter(aeSdk.api);
     const numbers = new Array(32).fill(undefined).map((v, idx) => idx * 2);
-    const results = (await Promise.all(
-      numbers.map(async (v, idx) => contract
-        .foo(v, { nonce: nextNonce + idx, gasLimit, combine: true })),
-    )).map((r) => r.decodedResult);
+    const results = (
+      await Promise.all(
+        numbers.map(async (v, idx) =>
+          contract.foo(v, { nonce: nextNonce + idx, gasLimit, combine: true }),
+        ),
+      )
+    ).map((r) => r.decodedResult);
     expect(results).to.be.eql(numbers.map((v) => BigInt(v * 100)));
-    expect(getCount()).to.be.equal(2);
+    expect(getCount()).to.be.equal(1);
   });
 });

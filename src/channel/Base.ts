@@ -1,9 +1,9 @@
 import EventEmitter from 'events';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { snakeToPascal } from '../utils/string';
-import { buildTx, unpackTx } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
-import * as handlers from './handlers';
+import { snakeToPascal } from '../utils/string.js';
+import { unpackTx } from '../tx/builder/index.js';
+import { Tag } from '../tx/builder/constants.js';
+import * as handlers from './handlers.js';
 import {
   initialize,
   enqueueAction,
@@ -19,16 +19,22 @@ import {
   ChannelFsm,
   ChannelMessage,
   ChannelEvents,
-} from './internal';
-import { ChannelError } from '../utils/errors';
-import { Encoded } from '../utils/encoder';
-import { TxUnpacked } from '../tx/builder/schema.generated';
+} from './internal.js';
+import { ChannelError, IllegalArgumentError } from '../utils/errors.js';
+import { Encoded } from '../utils/encoder.js';
+import { TxUnpacked } from '../tx/builder/schema.generated.js';
+import { EntryTag } from '../tx/builder/entry/constants.js';
+import { unpackEntry } from '../tx/builder/entry/index.js';
+import { EntUnpacked } from '../tx/builder/entry/schema.generated.js';
 
 function snakeToPascalObjKeys<Type>(obj: object): Type {
-  return Object.entries(obj).reduce((result, [key, val]) => ({
-    ...result,
-    [snakeToPascal(key)]: val,
-  }), {}) as Type;
+  return Object.entries(obj).reduce(
+    (result, [key, val]) => ({
+      ...result,
+      [snakeToPascal(key)]: val,
+    }),
+    {},
+  ) as Type;
 }
 
 let channelCounter = 0;
@@ -105,9 +111,17 @@ export default class Channel {
   }
 
   static async _initialize<T extends Channel>(channel: T, options: ChannelOptions): Promise<T> {
+    const reconnect = (options.existingFsmId ?? options.existingChannelId) != null;
+    if (reconnect && (options.existingFsmId == null || options.existingChannelId == null)) {
+      throw new IllegalArgumentError(
+        '`existingChannelId`, `existingFsmId` should be both provided or missed',
+      );
+    }
+    const reconnectHandler =
+      handlers[options.reestablish === true ? 'awaitingReestablish' : 'awaitingReconnection'];
     await initialize(
       channel,
-      options.existingFsmId != null ? handlers.awaitingReconnection : handlers.awaitingConnection,
+      reconnect ? reconnectHandler : handlers.awaitingConnection,
       handlers.channelOpen,
       options,
     );
@@ -167,10 +181,10 @@ export default class Channel {
    * Get current state
    */
   async state(): Promise<{
-    calls: TxUnpacked & { tag: Tag.CallsMtree };
+    calls: EntUnpacked & { tag: EntryTag.CallsMtree };
     halfSignedTx?: TxUnpacked & { tag: Tag.SignedTx };
     signedTx?: TxUnpacked & { tag: Tag.SignedTx };
-    trees: TxUnpacked & { tag: Tag.StateTrees };
+    trees: EntUnpacked & { tag: EntryTag.StateTrees };
   }> {
     const res = snakeToPascalObjKeys<{
       calls: Encoded.CallStateTree;
@@ -179,10 +193,10 @@ export default class Channel {
       trees: Encoded.StateTrees;
     }>(await call(this, 'channels.get.offchain_state', {}));
     return {
-      calls: unpackTx(res.calls, Tag.CallsMtree),
-      ...res.halfSignedTx !== '' && { halfSignedTx: unpackTx(res.halfSignedTx, Tag.SignedTx) },
-      ...res.signedTx !== '' && { signedTx: unpackTx(res.signedTx, Tag.SignedTx) },
-      trees: unpackTx(res.trees, Tag.StateTrees),
+      calls: unpackEntry(res.calls),
+      ...(res.halfSignedTx !== '' && { halfSignedTx: unpackTx(res.halfSignedTx, Tag.SignedTx) }),
+      ...(res.signedTx !== '' && { signedTx: unpackTx(res.signedTx, Tag.SignedTx) }),
+      trees: unpackEntry(res.trees),
     };
   }
 
@@ -230,11 +244,7 @@ export default class Channel {
   protected async enqueueAction(
     action: () => { handler: ChannelHandler; state?: Partial<ChannelState> },
   ): Promise<any> {
-    return enqueueAction(
-      this,
-      (channel, state) => state?.handler === handlers.channelOpen,
-      action,
-    );
+    return enqueueAction(this, (channel, state) => state?.handler === handlers.channelOpen, action);
   }
 
   /**
@@ -246,8 +256,7 @@ export default class Channel {
    * signed state and then terminates.
    *
    * The channel can be reestablished by instantiating another Channel instance
-   * with two extra params: existingChannelId and offchainTx (returned from leave
-   * method as channelId and signedTx respectively).
+   * with two extra params: existingChannelId and existingFsmId.
    *
    * @example
    * ```js
@@ -285,18 +294,6 @@ export default class Channel {
         handler: handlers.awaitingShutdownTx,
         state: { sign },
       };
-    });
-  }
-
-  static async reconnect(options: ChannelOptions, txParams: any): Promise<Channel> {
-    const { sign } = options;
-
-    return Channel.initialize({
-      ...options,
-      reconnectTx: await sign(
-        'reconnect',
-        buildTx({ ...txParams, tag: Tag.ChannelClientReconnectTx }),
-      ),
     });
   }
 }

@@ -1,7 +1,7 @@
-import { Encoded } from '../utils/encoder';
-import { buildTx, getSchema, unpackTx } from './builder';
-import { Tag } from './builder/constants';
-import { TransactionError, UnexpectedTsError } from '../utils/errors';
+import { Encoded } from '../utils/encoder.js';
+import { buildTx, getSchema, unpackTx } from './builder/index.js';
+import { Tag } from './builder/constants.js';
+import { TransactionError, UnexpectedTsError } from '../utils/errors.js';
 
 /**
  * Returns account address that signed a transaction
@@ -20,7 +20,8 @@ export default function getTransactionSignerAddress(
   }
 
   const nonce = getSchema(params.tag, params.version).find(([name]) => name === 'nonce')?.[1];
-  if (nonce == null) throw new TransactionError(`Transaction doesn't have nonce: ${Tag[params.tag]}`);
+  if (nonce == null)
+    throw new TransactionError(`Transaction doesn't have nonce: ${Tag[params.tag]}`);
   if (!('senderKey' in nonce)) throw new UnexpectedTsError();
   const address = params[nonce.senderKey as keyof typeof params] as unknown as string;
   return address.replace(/^ok_/, 'ak_') as Encoded.AccountAddress;

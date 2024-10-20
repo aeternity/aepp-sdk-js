@@ -1,17 +1,26 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import {
-  notify, call, SignTx, ChannelState, ChannelMessage, ChannelFsm, changeState,
-} from './internal';
-import { Encoded } from '../utils/encoder';
-import { pause } from '../utils/other';
-import Channel from './Base';
-import { ChannelConnectionError } from '../utils/errors';
+  notify,
+  call,
+  SignTx,
+  ChannelState,
+  ChannelMessage,
+  ChannelFsm,
+  changeState,
+} from './internal.js';
+import { Encoded } from '../utils/encoder.js';
+import { pause } from '../utils/other.js';
+import Channel from './Base.js';
+import { ChannelConnectionError } from '../utils/errors.js';
 import {
-  awaitingCompletion, channelOpen, handleUnexpectedMessage, signAndNotify,
-} from './handlers';
-import { unpackTx } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
-import { TxUnpacked } from '../tx/builder/schema.generated';
+  awaitingCompletion,
+  channelOpen,
+  handleUnexpectedMessage,
+  signAndNotify,
+} from './handlers.js';
+import { EntryTag } from '../tx/builder/entry/constants.js';
+import { EntUnpacked } from '../tx/builder/entry/schema.generated.js';
+import { unpackEntry } from '../tx/builder/entry/index.js';
 
 export default class ChannelSpend extends Channel {
   /**
@@ -50,14 +59,17 @@ export default class ChannelSpend extends Channel {
     sign: SignTx,
     metadata: string[] = [],
   ): Promise<{
-      accepted: boolean;
-      signedTx?: Encoded.Transaction;
-      errorCode?: number;
-      errorMessage?: string;
-    }> {
+    accepted: boolean;
+    signedTx?: Encoded.Transaction;
+    errorCode?: number;
+    errorMessage?: string;
+  }> {
     return this.enqueueAction(() => {
       notify(this, 'channels.update.new', {
-        from, to, amount, meta: metadata,
+        from,
+        to,
+        amount,
+        meta: metadata,
       });
 
       const awaitingOffChainTx = async (
@@ -74,13 +86,12 @@ export default class ChannelSpend extends Channel {
           );
           if (isError) return { handler: awaitingOffChainTx, state };
           return {
-            handler: (_2: Channel, message2: ChannelMessage): ChannelFsm => (
+            handler: (_2: Channel, message2: ChannelMessage): ChannelFsm =>
               awaitingCompletion(this, message2, state, () => {
                 changeState(this, message2.params.data.state);
                 state.resolve({ accepted: true, signedTx: message2.params.data.state });
                 return { handler: channelOpen };
-              })
-            ),
+              }),
             state,
           };
         }
@@ -115,16 +126,18 @@ export default class ChannelSpend extends Channel {
    * }).then(poi => console.log(poi))
    * ```
    */
-  async poi(
-    { accounts, contracts }: {
-      accounts: Encoded.AccountAddress[];
-      contracts?: Encoded.ContractAddress[];
-    },
-  ): Promise<TxUnpacked & { tag: Tag.TreesPoi }> {
-    return unpackTx(
-      (await call(this, 'channels.get.poi', { accounts, contracts })).poi,
-      Tag.TreesPoi,
-    );
+  async poi({
+    accounts,
+    contracts,
+  }: {
+    accounts: Encoded.AccountAddress[];
+    contracts?: Encoded.ContractAddress[];
+  }): Promise<EntUnpacked & { tag: EntryTag.TreesPoi }> {
+    const { poi }: { poi: Encoded.Poi } = await call(this, 'channels.get.poi', {
+      accounts,
+      contracts,
+    });
+    return unpackEntry(poi);
   }
 
   /**
@@ -152,11 +165,12 @@ export default class ChannelSpend extends Channel {
     accounts: Encoded.AccountAddress[],
   ): Promise<{ [key: Encoded.AccountAddress]: string }> {
     return Object.fromEntries(
-      (await call(this, 'channels.get.balances', { accounts }))
-        .map((item: {
-          account: Encoded.AccountAddress;
-          balance: string;
-        }) => [item.account, item.balance]),
+      (await call(this, 'channels.get.balances', { accounts })).map(
+        (item: { account: Encoded.AccountAddress; balance: string }) => [
+          item.account,
+          item.balance,
+        ],
+      ),
     );
   }
 
@@ -175,8 +189,8 @@ export default class ChannelSpend extends Channel {
         return { handler: awaitingActionCompletion, state };
       }
       if (
-        message2.method === 'channels.info'
-        && [`own_${action}_locked`, `${action}_locked`].includes(message2.params.data.event)
+        message2.method === 'channels.info' &&
+        [`own_${action}_locked`, `${action}_locked`].includes(message2.params.data.event)
       ) {
         const Action = action === 'deposit' ? 'Deposit' : 'Withdraw';
         const isOwn: boolean = message2.params.data.event.startsWith('own_');
@@ -191,11 +205,8 @@ export default class ChannelSpend extends Channel {
     };
 
     const { sign } = state;
-    await signAndNotify(
-      this,
-      `channels.${action}_tx`,
-      message.params.data,
-      async (tx) => sign(tx, { updates: message.params.data.updates }),
+    await signAndNotify(this, `channels.${action}_tx`, message.params.data, async (tx) =>
+      sign(tx, { updates: message.params.data.updates }),
     );
     return { handler: awaitingActionCompletion, state };
   }
@@ -248,8 +259,11 @@ export default class ChannelSpend extends Channel {
   async withdraw(
     amount: number | BigNumber,
     sign: SignTx,
-    { onOnChainTx, onOwnWithdrawLocked, onWithdrawLocked }:
-    Pick<ChannelState, 'onOnChainTx' | 'onOwnWithdrawLocked' | 'onWithdrawLocked'> = {},
+    {
+      onOnChainTx,
+      onOwnWithdrawLocked,
+      onWithdrawLocked,
+    }: Pick<ChannelState, 'onOnChainTx' | 'onOwnWithdrawLocked' | 'onWithdrawLocked'> = {},
   ): Promise<{ accepted: boolean; signedTx: Encoded.Transaction }> {
     return this.enqueueAction(() => {
       notify(this, 'channels.withdraw', { amount });
@@ -258,9 +272,7 @@ export default class ChannelSpend extends Channel {
           _: Channel,
           message: ChannelMessage,
           state: ChannelState,
-        ): Promise<ChannelFsm> => (
-          this.awaitingActionTx('withdraw', message, state)
-        ),
+        ): Promise<ChannelFsm> => this.awaitingActionTx('withdraw', message, state),
         state: {
           sign,
           onOnChainTx,
@@ -320,8 +332,11 @@ export default class ChannelSpend extends Channel {
   async deposit(
     amount: number | BigNumber,
     sign: SignTx,
-    { onOnChainTx, onOwnDepositLocked, onDepositLocked }:
-    Pick<ChannelState, 'onOnChainTx' | 'onOwnDepositLocked' | 'onDepositLocked'> = {},
+    {
+      onOnChainTx,
+      onOwnDepositLocked,
+      onDepositLocked,
+    }: Pick<ChannelState, 'onOnChainTx' | 'onOwnDepositLocked' | 'onDepositLocked'> = {},
   ): Promise<{ accepted: boolean; state: ChannelState }> {
     return this.enqueueAction(() => {
       notify(this, 'channels.deposit', { amount });
@@ -330,9 +345,7 @@ export default class ChannelSpend extends Channel {
           _: Channel,
           message: ChannelMessage,
           state: ChannelState,
-        ): Promise<ChannelFsm> => (
-          this.awaitingActionTx('deposit', message, state)
-        ),
+        ): Promise<ChannelFsm> => this.awaitingActionTx('deposit', message, state),
         state: {
           sign,
           onOnChainTx,
@@ -362,10 +375,7 @@ export default class ChannelSpend extends Channel {
    * )
    * ```
    */
-  async sendMessage(
-    message: string | object,
-    recipient: Encoded.AccountAddress,
-  ): Promise<void> {
+  async sendMessage(message: string | object, recipient: Encoded.AccountAddress): Promise<void> {
     const info = typeof message === 'object' ? JSON.stringify(message) : message;
     if (this.status() === 'connecting') {
       await new Promise<void>((resolve) => {

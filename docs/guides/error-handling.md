@@ -1,6 +1,6 @@
 # Error Handling
 
-This guide shows you how to handle errors originating from the SDK. SDK by default exports the following error classes from file [errors.ts](https://github.com/aeternity/aepp-sdk-js/blob/develop/src/utils/errors.ts)
+This guide shows you how to handle errors originating from the SDK. SDK by default exports the following error classes from file [errors.ts](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/errors.ts)
 
 ## Error Hierarchy
 
@@ -66,8 +66,6 @@ BaseError
 │
 ├── CryptographyError
 │   ├── InvalidChecksumError
-│   ├── DerivationError
-│   ├── InvalidPasswordError
 │   ├── MerkleTreeHashMismatchError
 │   ├── MissingNodeInTreeError
 │   ├── UnknownNodeLengthError
@@ -113,40 +111,40 @@ import {
   Node,
   MemoryAccount,
   ArgumentError,
-  InvalidAensNameError
-} from '@aeternity/aepp-sdk'
+  InvalidAensNameError,
+} from '@aeternity/aepp-sdk';
 
 // setup
-const payerAccount = MemoryAccount.generate()
-const newUserAccount = MemoryAccount.generate()
-const node = new Node('https://testnet.aeternity.io')
+const payerAccount = MemoryAccount.generate();
+const newUserAccount = MemoryAccount.generate();
+const node = new Node('https://testnet.aeternity.io');
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
   accounts: [payerAccount, newUserAccount],
-})
+});
 
 // catch exceptions
 try {
-  const spendTxResult = await aeSdk.spend(-1, newUserAccount.address, { onAccount: payerAccount})
+  const spendTxResult = await aeSdk.spend(-1, newUserAccount.address, { onAccount: payerAccount });
 } catch (err) {
   if (err instanceof ArgumentError) {
-    console.log(`Amount specified is not valid, ${err.message}`)
+    console.log(`Amount specified is not valid, ${err.message}`);
   } else if (err instanceof InvalidAensNameError) {
-    console.log(`Address specified is not valid, ${err.message}`)
+    console.log(`Address specified is not valid, ${err.message}`);
   }
 }
 
 // using generic error classes
-const {AensError, TransactionError, BaseError } = require('@aeternity/aepp-sdk')
+import { AensError, TransactionError, BaseError } from '@aeternity/aepp-sdk';
 
 try {
-  const spendTxResult = await aeSdk.spend(1, "ak_2tv", { onAccount: payerAccount})
-} catch(err) {
-  if(err instanceof AensError) {
+  const spendTxResult = await aeSdk.spend(1, 'ak_2tv', { onAccount: payerAccount });
+} catch (err) {
+  if (err instanceof AensError) {
     // address or AENS related errors
-  } else if(err instanceof TransactionError) {
+  } else if (err instanceof TransactionError) {
     // transaction errors
-  } else if(err instanceof BaseError) {
+  } else if (err instanceof BaseError) {
     // match any errors from the SDK
   }
 }

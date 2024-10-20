@@ -1,12 +1,13 @@
 import { decode as rlpDecode, encode as rlpEncode } from 'rlp';
-import { Field, BinaryData } from './field-types';
+import { Field, BinaryData } from './field-types/interface.js';
 import {
-  ArgumentError, DecodeError, SchemaNotFoundError, InternalError,
-} from '../../utils/errors';
-import {
-  Encoding, Encoded, encode, decode,
-} from '../../utils/encoder';
-import { readInt } from './helpers';
+  ArgumentError,
+  DecodeError,
+  SchemaNotFoundError,
+  InternalError,
+} from '../../utils/errors.js';
+import { Encoding, Encoded, encode, decode } from '../../utils/encoder.js';
+import { readInt } from './helpers.js';
 
 type Schemas = ReadonlyArray<{
   tag: { constValue: number } & Field;
@@ -23,7 +24,8 @@ export function getSchema(
   if (subSchemas.length === 0) throw new SchemaNotFoundError(`${Tag[tag]} (${tag})`, 0);
   if (version == null) {
     const defaultSchema = subSchemas.find((schema) => schema.version.constValueOptional);
-    if (defaultSchema == null) throw new InternalError(`Can't find default schema of ${Tag[tag]} (${tag})`);
+    if (defaultSchema == null)
+      throw new InternalError(`Can't find default schema of ${Tag[tag]} (${tag})`);
     version = defaultSchema.version.constValue;
   }
   const schema = subSchemas.find((s) => s.version.constValue === version);
@@ -43,9 +45,9 @@ export function packRecord<E extends Encoding>(
   encoding: E,
 ): Encoded.Generic<E> {
   const schema = getSchema(schemas, Tag, params.tag, params.version);
-  const binary = schema.map(([key, field]) => (
-    field.serialize(params[key], { ...params, ...extraParams }, params)
-  ));
+  const binary = schema.map(([key, field]) =>
+    field.serialize(params[key], { ...params, ...extraParams }, params),
+  );
   return encode(rlpEncode(binary), encoding);
 }
 
@@ -68,7 +70,8 @@ export function unpackRecord(
   }
   return Object.fromEntries(
     schema.map(([name, field], index) => [
-      name, field.deserialize(binary[index] as BinaryData, extraParams),
+      name,
+      field.deserialize(binary[index] as BinaryData, extraParams),
     ]),
   );
 }

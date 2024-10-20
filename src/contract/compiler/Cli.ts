@@ -3,17 +3,17 @@ import { tmpdir } from 'os';
 import { resolve, dirname, basename } from 'path';
 import { mkdir, writeFile, rm } from 'fs/promises';
 import { fileURLToPath } from 'url';
-import CompilerBase, { Aci, CompileResult } from './Base';
-import { Encoded } from '../../utils/encoder';
-import { CompilerError, InternalError, UnsupportedVersionError } from '../../utils/errors';
-import semverSatisfies from '../../utils/semver-satisfies';
-import { ensureError } from '../../utils/other';
+import CompilerBase, { Aci, CompileResult } from './Base.js';
+import { Encoded } from '../../utils/encoder.js';
+import { CompilerError, InternalError, UnsupportedVersionError } from '../../utils/errors.js';
+import semverSatisfies from '../../utils/semver-satisfies.js';
+import { ensureError } from '../../utils/other.js';
 
 export const getPackagePath = (): string => {
   const path = dirname(fileURLToPath(import.meta.url));
   if (basename(path) === 'dist') return resolve(path, '..');
   if (basename(path) === 'compiler') return resolve(path, '../../..');
-  throw new InternalError('Can\'t get package path');
+  throw new InternalError("Can't get package path");
 };
 
 /**
@@ -39,8 +39,9 @@ export default class CompilerCli extends CompilerBase {
     this.#path = compilerPath;
     if (ignoreVersion !== true) {
       this.#ensureCompatibleVersion = this.version().then((version) => {
-        const versions = [version, '7.2.1', '9.0.0'] as const;
-        if (!semverSatisfies(...versions)) throw new UnsupportedVersionError('compiler', ...versions);
+        const versions = [version, '8.0.0', '9.0.0'] as const;
+        if (!semverSatisfies(...versions))
+          throw new UnsupportedVersionError('compiler', ...versions);
       });
     }
   }
@@ -69,12 +70,13 @@ export default class CompilerCli extends CompilerBase {
     await mkdir(path);
     const sourceCodePath = resolve(path, `${randomName()}.aes`);
     await writeFile(sourceCodePath, sourceCode);
-    await Promise.all(Object.entries(fileSystem)
-      .map(async ([name, src]) => {
+    await Promise.all(
+      Object.entries(fileSystem).map(async ([name, src]) => {
         const p = resolve(path, name);
         await mkdir(dirname(p), { recursive: true });
         return writeFile(p, src);
-      }));
+      }),
+    );
     return sourceCodePath;
   }
 
@@ -88,19 +90,22 @@ export default class CompilerCli extends CompilerBase {
       return {
         bytecode: compileRes.stdout.trimEnd() as Encoded.ContractBytearray,
         aci,
-        warnings: compileRes.stderr.split('Warning in ').slice(1).map((warning) => {
-          const reg = /^'(.+)' at line (\d+), col (\d+):\n(.+)$/s;
-          const match = warning.match(reg);
-          if (match == null) throw new InternalError(`Can't parse compiler output: "${warning}"`);
-          return {
-            message: match[4].trimEnd(),
-            pos: {
-              ...match[1] !== path && { file: match[1] },
-              line: +match[2],
-              col: +match[3],
-            },
-          };
-        }),
+        warnings: compileRes.stderr
+          .split('Warning in ')
+          .slice(1)
+          .map((warning) => {
+            const reg = /^'(.+)' at line (\d+), col (\d+):\n(.+)$/s;
+            const match = warning.match(reg);
+            if (match == null) throw new InternalError(`Can't parse compiler output: "${warning}"`);
+            return {
+              message: match[4].trimEnd(),
+              pos: {
+                ...(match[1] !== path && { file: match[1] }),
+                line: +match[2],
+                col: +match[3],
+              },
+            };
+          }),
       };
     } catch (error) {
       ensureError(error);
@@ -167,7 +172,7 @@ export default class CompilerCli extends CompilerBase {
   async version(): Promise<string> {
     const verMessage = await this.#run('--version');
     const ver = verMessage.match(/Sophia compiler version ([\d.]+.*)\n/)?.[1];
-    if (ver == null) throw new CompilerError('Can\'t get compiler version');
+    if (ver == null) throw new CompilerError("Can't get compiler version");
     return ver;
   }
 }

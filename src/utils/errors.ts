@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
-import BigNumber from 'bignumber.js';
-import { AensName, Int } from '../tx/builder/constants';
-import * as Encoded from './encoder-types';
+import { BigNumber } from 'bignumber.js';
+import { AensName, Int } from '../tx/builder/constants.js';
+import * as Encoded from './encoder-types.js';
 
 /**
  * aepp-sdk originated error
@@ -189,10 +189,7 @@ export class RequestTimedOutError extends BaseError {
  */
 export class TxTimedOutError extends BaseError {
   constructor(blocks: number, th: Encoded.TxHash) {
-    super([
-      `Giving up after ${blocks} blocks mined`,
-      `transaction hash: ${th}`,
-    ].join(', '));
+    super(`Giving up after ${blocks} blocks mined, transaction hash: ${th}`);
     this.name = 'TxTimedOutError';
   }
 }
@@ -241,8 +238,11 @@ export class NotImplementedError extends BaseError {
  * @category exception
  */
 export class UnsupportedVersionError extends BaseError {
-  constructor(dependency: string, version: string, geVersion: string, ltVersion: string) {
-    super(`Unsupported ${dependency} version ${version}. Supported: >= ${geVersion} < ${ltVersion}`);
+  constructor(dependency: string, version: string, geVersion: string, ltVersion?: string) {
+    super(
+      `Unsupported ${dependency} version ${version}. Supported: >= ${geVersion}` +
+        (ltVersion == null ? '' : ` < ${ltVersion}`),
+    );
     this.name = 'UnsupportedVersionError';
   }
 }
@@ -302,7 +302,9 @@ export class AensPointerContextError extends AensError {
  */
 export class InsufficientNameFeeError extends AensError {
   constructor(nameFee: BigNumber, minNameFee: BigNumber) {
-    super(`the provided fee ${nameFee.toString()} is not enough to execute the claim, required: ${minNameFee.toString()}`);
+    super(
+      `the provided fee ${nameFee.toString()} is not enough to execute the claim, required: ${minNameFee.toString()}`,
+    );
     this.name = 'InsufficientNameFeeError';
   }
 }
@@ -542,8 +544,8 @@ export class NoSuchContractFunctionError extends ContractError {
 export class NotPayableFunctionError extends ContractError {
   constructor(amount: Int, fn: string) {
     super(
-      `You try to pay "${amount}" to function "${fn}" which is not payable. `
-      + 'Only payable function can accept coins',
+      `You try to pay "${amount}" to function "${fn}" which is not payable. ` +
+        'Only payable function can accept coins',
     );
     this.name = 'NotPayableFunctionError';
   }
@@ -555,8 +557,8 @@ export class NotPayableFunctionError extends ContractError {
 export class MissingEventDefinitionError extends ContractError {
   constructor(eventNameHash: string, eventAddress: Encoded.ContractAddress) {
     super(
-      `Can't find definition of ${eventNameHash} event emitted by ${eventAddress}`
-      + ' (use omitUnknown option to ignore events like this)',
+      `Can't find definition of ${eventNameHash} event emitted by ${eventAddress}` +
+        ' (use omitUnknown option to ignore events like this)',
     );
     this.name = 'MissingEventDefinitionError';
   }
@@ -568,9 +570,9 @@ export class MissingEventDefinitionError extends ContractError {
 export class AmbiguousEventDefinitionError extends ContractError {
   constructor(eventAddress: Encoded.ContractAddress, matchedEvents: Array<[string, string]>) {
     super(
-      `Found multiple definitions of "${matchedEvents[0][1]}" event with different types emitted by`
-      + ` ${eventAddress} in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts`
-      + ' (use contractAddressToName option to specify contract name corresponding to address)',
+      `Found multiple definitions of "${matchedEvents[0][1]}" event with different types emitted by` +
+        ` ${eventAddress} in ${matchedEvents.map(([name]) => `"${name}"`).join(', ')} contracts` +
+        ' (use contractAddressToName option to specify contract name corresponding to address)',
     );
     this.name = 'AmbiguousEventDefinitionError';
   }
@@ -583,16 +585,6 @@ export class InvalidChecksumError extends CryptographyError {
   constructor() {
     super('Invalid checksum');
     this.name = 'InvalidChecksumError';
-  }
-}
-
-/**
- * @category exception
- */
-export class InvalidPasswordError extends CryptographyError {
-  constructor() {
-    super('Invalid password or nonce');
-    this.name = 'InvalidPasswordError';
   }
 }
 

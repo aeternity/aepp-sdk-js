@@ -1,34 +1,51 @@
 import { before, describe, it } from 'mocha';
 import { expect } from 'chai';
+import { addTransactionHandler, getSdk, networkId, url } from '.';
 import {
-  addTransactionHandler, getSdk, networkId, url,
-} from '.';
-import {
-  AeSdk, Node, buildTxHash, poll, Tag, unpackTx, getTransactionSignerAddress, buildTx, Encoded,
-  getExecutionCost, getExecutionCostBySignedTx, getExecutionCostUsingNode,
+  AeSdk,
+  Node,
+  buildTxHash,
+  poll,
+  Tag,
+  unpackTx,
+  getTransactionSignerAddress,
+  buildTx,
+  Encoded,
+  getExecutionCost,
+  getExecutionCostBySignedTx,
+  getExecutionCostUsingNode,
 } from '../../src';
 import { pause } from '../../src/utils/other';
 
 const node = new Node(url);
-interface TxDetails { tx: Encoded.Transaction; cost: bigint; blockHash: Encoded.MicroBlockHash }
+interface TxDetails {
+  tx: Encoded.Transaction;
+  cost: bigint;
+  blockHash: Encoded.MicroBlockHash;
+}
 const sentTxPromises: Array<Promise<TxDetails | undefined>> = [];
 
-addTransactionHandler((tx: Encoded.Transaction) => sentTxPromises.push((async () => {
-  const { tag } = unpackTx(tx, Tag.SignedTx).encodedTx;
-  let cost = 0n;
-  if (tag === Tag.ChannelSettleTx) cost = await getExecutionCostUsingNode(tx, node);
-  let blockHash: Encoded.MicroBlockHash;
-  try {
-    await pause(1000);
-    blockHash = (await poll(buildTxHash(tx), { onNode: node })).blockHash as Encoded.MicroBlockHash;
-  } catch (error) {
-    return undefined;
-  }
-  if (tag !== Tag.ChannelSettleTx) {
-    cost = await getExecutionCostUsingNode(tx, node, { isMined: true });
-  }
-  return { tx, cost, blockHash };
-})()));
+addTransactionHandler((tx: Encoded.Transaction) =>
+  sentTxPromises.push(
+    (async () => {
+      const { tag } = unpackTx(tx, Tag.SignedTx).encodedTx;
+      let cost = 0n;
+      if (tag === Tag.ChannelSettleTx) cost = await getExecutionCostUsingNode(tx, node);
+      let blockHash: Encoded.MicroBlockHash;
+      try {
+        await pause(1000);
+        blockHash = (await poll(buildTxHash(tx), { onNode: node }))
+          .blockHash as Encoded.MicroBlockHash;
+      } catch (error) {
+        return undefined;
+      }
+      if (tag !== Tag.ChannelSettleTx) {
+        cost = await getExecutionCostUsingNode(tx, node, { isMined: true });
+      }
+      return { tx, cost, blockHash };
+    })(),
+  ),
+);
 
 describe('Execution cost', () => {
   let aeSdk: AeSdk;
@@ -39,23 +56,20 @@ describe('Execution cost', () => {
 
   it('calculates execution cost for spend tx', async () => {
     const { rawTx } = await aeSdk.spend(100, aeSdk.address, { ttl: 0 });
-    const expectedCost = 16660000000000n;
+    const expectedCost = 16660000000000n + 100n;
     expect(getExecutionCostBySignedTx(rawTx, networkId)).to.equal(expectedCost);
-    expect(getExecutionCost(buildTx(unpackTx(rawTx, Tag.SignedTx).encodedTx)))
-      .to.equal(expectedCost);
+    expect(getExecutionCost(buildTx(unpackTx(rawTx, Tag.SignedTx).encodedTx))).to.equal(
+      expectedCost,
+    );
     expect(await getExecutionCostUsingNode(rawTx, node)).to.equal(expectedCost);
   });
 
   it('predict balance change for transaction made before in tests', async () => {
-    async function getBalance(
-      address: Encoded.AccountAddress,
-      hash: string,
-    ): Promise<bigint> {
+    async function getBalance(address: Encoded.AccountAddress, hash: string): Promise<bigint> {
       return BigInt(
-        await aeSdk.getBalance(
-          address,
-          { hash: hash as Encoded.KeyBlockHash | Encoded.MicroBlockHash },
-        ),
+        await aeSdk.getBalance(address, {
+          hash: hash as Encoded.KeyBlockHash | Encoded.MicroBlockHash,
+        }),
       );
     }
 
@@ -75,8 +89,8 @@ describe('Execution cost', () => {
         const balanceDiff = balanceBefore - cost - balanceAfter;
 
         if (
-          params.tag === Tag.PayingForTx
-          && [Tag.ContractCreateTx, Tag.ContractCallTx].includes(params.tx.encodedTx.tag)
+          params.tag === Tag.PayingForTx &&
+          [Tag.ContractCreateTx, Tag.ContractCallTx].includes(params.tx.encodedTx.tag)
         ) {
           expect(balanceDiff).to.be.satisfy((b: bigint) => b < 0n);
         } else if (params.tag === Tag.ContractCallTx) {
@@ -86,6 +100,8 @@ describe('Execution cost', () => {
           // Can't detect Oracle.respond reward in contract call
           if (balanceDiff === -501000n) return;
           expect(balanceDiff).to.be.equal(0n);
+        } else if (params.tag === Tag.SpendTx && params.senderId === params.recipientId) {
+          expect(balanceDiff).to.be.equal(BigInt(-params.amount));
         } else {
           expect(balanceDiff).to.be.equal(0n);
         }
@@ -95,26 +111,28 @@ describe('Execution cost', () => {
     );
 
     const formatTags = (arr: Tag[]): string[] => arr.sort((a, b) => a - b).map((t) => Tag[t]);
-    expect(formatTags(Array.from(checkedTags))).to.be.eql(formatTags([
-      Tag.SpendTx,
-      Tag.NamePreclaimTx,
-      Tag.NameClaimTx,
-      Tag.ContractCreateTx,
-      Tag.ContractCallTx,
-      Tag.NameUpdateTx,
-      Tag.NameTransferTx,
-      Tag.NameRevokeTx,
-      Tag.ChannelCloseSoloTx,
-      Tag.ChannelSlashTx,
-      Tag.ChannelSettleTx,
-      Tag.OracleRegisterTx,
-      Tag.OracleExtendTx,
-      Tag.OracleQueryTx,
-      Tag.OracleResponseTx,
-      Tag.GaAttachTx,
-      Tag.GaMetaTx,
-      Tag.PayingForTx,
-    ]));
+    expect(formatTags(Array.from(checkedTags))).to.be.eql(
+      formatTags([
+        Tag.SpendTx,
+        Tag.NamePreclaimTx,
+        Tag.NameClaimTx,
+        Tag.ContractCreateTx,
+        Tag.ContractCallTx,
+        Tag.NameUpdateTx,
+        Tag.NameTransferTx,
+        Tag.NameRevokeTx,
+        Tag.ChannelCloseSoloTx,
+        Tag.ChannelSlashTx,
+        Tag.ChannelSettleTx,
+        Tag.OracleRegisterTx,
+        Tag.OracleExtendTx,
+        Tag.OracleQueryTx,
+        Tag.OracleResponseTx,
+        Tag.GaAttachTx,
+        Tag.GaMetaTx,
+        Tag.PayingForTx,
+      ]),
+    );
     expect(sentTransactions.length).to.be.greaterThanOrEqual(134);
   }).timeout(16000);
 });

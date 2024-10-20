@@ -1,7 +1,7 @@
-import { RpcError, RpcInternalError, RpcMethodNotFoundError } from '../schema';
-import BrowserConnection from '../connection/Browser';
-import { InvalidRpcMessageError, MissingCallbackError } from '../../utils/errors';
-import { ensureError } from '../../utils/other';
+import { RpcError, RpcInternalError, RpcMethodNotFoundError } from '../schema.js';
+import BrowserConnection from '../connection/Browser.js';
+import { InvalidRpcMessageError, MissingCallbackError } from '../../utils/errors.js';
+import { ensureError } from '../../utils/other.js';
 
 interface JsonRpcRequest {
   jsonrpc: '2.0';
@@ -25,7 +25,7 @@ interface JsonRpcResponse {
 type RpcApiHandler = (p?: any) => any | undefined;
 type RpcApi<Api> = { [k in keyof Api]: RpcApiHandler };
 type WithOrigin<Api extends RpcApi<Api>> = {
-  [k in keyof Api]: (p: Parameters<Api[k]>[0], origin: string) => ReturnType<Api[k]>
+  [k in keyof Api]: (p: Parameters<Api[k]>[0], origin: string) => ReturnType<Api[k]>;
 };
 
 /**
@@ -35,14 +35,16 @@ type WithOrigin<Api extends RpcApi<Api>> = {
  * @param onDisconnect - Disconnect callback
  * @param methods - Object containing handlers for each request by name
  */
-export default class RpcClient <
-  RemoteApi extends RpcApi<RemoteApi>, LocalApi extends RpcApi<LocalApi>,
+export default class RpcClient<
+  RemoteApi extends RpcApi<RemoteApi>,
+  LocalApi extends RpcApi<LocalApi>,
 > {
   connection: BrowserConnection;
 
-  readonly #callbacks = (
-    new Map<number, { resolve: (v: any) => void; reject: (e: Error) => void }>()
-  );
+  readonly #callbacks = new Map<
+    number,
+    { resolve: (v: any) => void; reject: (e: Error) => void }
+  >();
 
   #messageId = 0;
 
@@ -94,9 +96,9 @@ export default class RpcClient <
   ): void {
     this.connection.sendMessage({
       jsonrpc: '2.0',
-      ...id != null ? { id } : {},
+      ...(id != null ? { id } : {}),
       method,
-      ...params != null ? { params } : {},
+      ...(params != null ? { params } : {}),
     });
   }
 
@@ -110,7 +112,7 @@ export default class RpcClient <
       jsonrpc: '2.0',
       id,
       method,
-      ...error != null ? { error: error.toJSON() } : { result },
+      ...(error != null ? { error: error.toJSON() } : { result }),
     });
   }
 
@@ -124,7 +126,7 @@ export default class RpcClient <
     name: Name,
     params: Parameters<RemoteApi[Name]>[0],
   ): Promise<ReturnType<RemoteApi[Name]>> {
-    this.#sendRequest(this.#messageId += 1, name, params);
+    this.#sendRequest((this.#messageId += 1), name, params);
     return new Promise((resolve, reject) => {
       this.#callbacks.set(this.#messageId, { resolve, reject });
     });

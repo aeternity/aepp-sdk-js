@@ -1,20 +1,19 @@
-import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
-import { isAccountNotFoundError, pause } from './utils/other';
-import { unwrapProxy } from './utils/wrap-proxy';
-import { isNameValid, produceNameId } from './tx/builder/helpers';
-import { AensName, DRY_RUN_ACCOUNT } from './tx/builder/constants';
+import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter.js';
+import { isAccountNotFoundError, pause } from './utils/other.js';
+import { unwrapProxy } from './utils/wrap-proxy.js';
+import { isNameValid, produceNameId } from './tx/builder/helpers.js';
+import { AensName, DRY_RUN_ACCOUNT } from './tx/builder/constants.js';
 import {
-  AensPointerContextError, DryRunError, InvalidAensNameError,
-  TxTimedOutError, TxNotInChainError, InternalError,
-} from './utils/errors';
-import Node, { TransformNodeType } from './Node';
-import {
-  Account as AccountNode, ByteCode, ContractObject, DryRunResult, DryRunResults,
-  Generation, KeyBlock, MicroBlockHeader, NameEntry, SignedTx,
-} from './apis/node';
-import {
-  decode, encode, Encoded, Encoding,
-} from './utils/encoder';
+  AensPointerContextError,
+  DryRunError,
+  InvalidAensNameError,
+  TxTimedOutError,
+  TxNotInChainError,
+  InternalError,
+} from './utils/errors.js';
+import Node from './Node.js';
+import { DryRunResult, DryRunResults, SignedTx } from './apis/node/index.js';
+import { decode, encode, Encoded, Encoding } from './utils/encoder.js';
 
 /**
  * @category chain
@@ -23,8 +22,11 @@ import {
  */
 export async function _getPollInterval(
   type: 'key-block' | 'micro-block',
-  { _expectedMineRate, _microBlockCycle, onNode }:
-  { _expectedMineRate?: number; _microBlockCycle?: number; onNode: Node },
+  {
+    _expectedMineRate,
+    _microBlockCycle,
+    onNode,
+  }: { _expectedMineRate?: number; _microBlockCycle?: number; onNode: Node },
 ): Promise<number> {
   const getVal = async (
     t: string,
@@ -34,12 +36,15 @@ export async function _getPollInterval(
   ): Promise<number | null> => {
     if (t !== type) return null;
     if (val != null) return val;
-    return await onNode?.getNetworkId() === 'ae_dev' ? devModeDef : def;
+    return (await onNode?.getNetworkId()) === 'ae_dev' ? devModeDef : def;
   };
 
-  const base = await getVal('key-block', _expectedMineRate, 0, 180000)
-    ?? await getVal('micro-block', _microBlockCycle, 0, 3000)
-    ?? (() => { throw new InternalError(`Unknown type: ${type}`); })();
+  const base =
+    (await getVal('key-block', _expectedMineRate, 0, 180000)) ??
+    (await getVal('micro-block', _microBlockCycle, 0, 3000)) ??
+    (() => {
+      throw new InternalError(`Unknown type: ${type}`);
+    })();
   return Math.floor(base / 3);
 }
 
@@ -54,16 +59,17 @@ const heightCache: WeakMap<Node, { time: number; height: number }> = new WeakMap
  * For example, for timeout check in transaction status polling.
  * @returns Current chain height
  */
-export async function getHeight(
-  { cached = false, ...options }: {
-    onNode: Node;
-    cached?: boolean;
-  } & Parameters<typeof _getPollInterval>[1],
-): Promise<number> {
+export async function getHeight({
+  cached = false,
+  ...options
+}: {
+  onNode: Node;
+  cached?: boolean;
+} & Parameters<typeof _getPollInterval>[1]): Promise<number> {
   const onNode = unwrapProxy(options.onNode);
   if (cached) {
     const cache = heightCache.get(onNode);
-    if (cache != null && cache.time > Date.now() - await _getPollInterval('key-block', options)) {
+    if (cache != null && cache.time > Date.now() - (await _getPollInterval('key-block', options))) {
       return cache.height;
     }
   }
@@ -87,21 +93,21 @@ export async function getHeight(
 export async function poll(
   th: Encoded.TxHash,
   {
-    blocks = 5, interval, ...options
-  }:
-  { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
-): Promise<TransformNodeType<SignedTx>> {
+    blocks = 5,
+    interval,
+    ...options
+  }: { blocks?: number; interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
+): ReturnType<Node['getTransactionByHash']> {
   interval ??= await _getPollInterval('micro-block', options);
   let max;
   do {
     const tx = await options.onNode.getTransactionByHash(th);
     if (tx.blockHeight !== -1) return tx;
     if (max == null) {
-      max = tx.tx.ttl !== 0 ? -1
-        : await getHeight({ ...options, cached: true }) + blocks;
+      max = tx.tx.ttl !== 0 ? -1 : (await getHeight({ ...options, cached: true })) + blocks;
     }
     await pause(interval);
-  } while (max === -1 ? true : await getHeight({ ...options, cached: true }) < max);
+  } while (max === -1 ? true : (await getHeight({ ...options, cached: true })) < max);
   throw new TxTimedOutError(blocks, th);
 }
 
@@ -116,8 +122,10 @@ export async function poll(
  */
 export async function awaitHeight(
   height: number,
-  { interval, ...options }:
-  { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
+  {
+    interval,
+    ...options
+  }: { interval?: number; onNode: Node } & Parameters<typeof _getPollInterval>[1],
 ): Promise<number> {
   interval ??= Math.min(await _getPollInterval('key-block', options), 5000);
   let currentHeight;
@@ -139,8 +147,11 @@ export async function awaitHeight(
  */
 export async function waitForTxConfirm(
   txHash: Encoded.TxHash,
-  { confirm = 3, onNode, ...options }:
-  { confirm?: number; onNode: Node } & Parameters<typeof awaitHeight>[1],
+  {
+    confirm = 3,
+    onNode,
+    ...options
+  }: { confirm?: number; onNode: Node } & Parameters<typeof awaitHeight>[1],
 ): Promise<number> {
   const { blockHeight } = await onNode.getTransactionByHash(txHash);
   const height = await awaitHeight(blockHeight + confirm, { onNode, ...options });
@@ -166,9 +177,12 @@ export async function waitForTxConfirm(
  */
 export async function getAccount(
   address: Encoded.AccountAddress | Encoded.ContractAddress,
-  { height, hash, onNode }:
-  { height?: number; hash?: Encoded.KeyBlockHash | Encoded.MicroBlockHash; onNode: Node },
-): Promise<TransformNodeType<AccountNode>> {
+  {
+    height,
+    hash,
+    onNode,
+  }: { height?: number; hash?: Encoded.KeyBlockHash | Encoded.MicroBlockHash; onNode: Node },
+): ReturnType<Node['getAccountByPubkey']> {
   if (height != null) return onNode.getAccountByPubkeyAndHeight(address, height);
   if (hash != null) return onNode.getAccountByPubkeyAndHash(address, hash);
   return onNode.getAccountByPubkey(address);
@@ -186,12 +200,14 @@ export async function getAccount(
  */
 export async function getBalance(
   address: Encoded.AccountAddress | Encoded.ContractAddress | Encoded.OracleAddress,
-  { format = AE_AMOUNT_FORMATS.AETTOS, ...options }:
-  { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1],
+  {
+    format = AE_AMOUNT_FORMATS.AETTOS,
+    ...options
+  }: { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1],
 ): Promise<string> {
   const addr = address.startsWith('ok_')
     ? encode(decode(address), Encoding.AccountAddress)
-    : address as Encoded.AccountAddress | Encoded.ContractAddress;
+    : (address as Encoded.AccountAddress | Encoded.ContractAddress);
 
   const { balance } = await getAccount(addr, options).catch((error) => {
     if (!isAccountNotFoundError(error)) throw error;
@@ -208,9 +224,11 @@ export async function getBalance(
  * @param options.onNode - Node to use
  * @returns Current Generation
  */
-export async function getCurrentGeneration(
-  { onNode }: { onNode: Node },
-): Promise<TransformNodeType<Generation>> {
+export async function getCurrentGeneration({
+  onNode,
+}: {
+  onNode: Node;
+}): ReturnType<Node['getCurrentGeneration']> {
   return onNode.getCurrentGeneration();
 }
 
@@ -225,7 +243,7 @@ export async function getCurrentGeneration(
 export async function getGeneration(
   hashOrHeight: Encoded.KeyBlockHash | number,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<Generation>> {
+): ReturnType<Node['getGenerationByHash']> {
   if (typeof hashOrHeight === 'number') return onNode.getGenerationByHeight(hashOrHeight);
   return onNode.getGenerationByHash(hashOrHeight);
 }
@@ -241,7 +259,7 @@ export async function getGeneration(
 export async function getMicroBlockTransactions(
   hash: Encoded.MicroBlockHash,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<SignedTx[]>> {
+): Promise<SignedTx[]> {
   return (await onNode.getMicroBlockTransactionsByHash(hash)).transactions;
 }
 
@@ -256,7 +274,7 @@ export async function getMicroBlockTransactions(
 export async function getKeyBlock(
   hashOrHeight: Encoded.KeyBlockHash | number,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<KeyBlock>> {
+): ReturnType<Node['getKeyBlockByHash']> {
   if (typeof hashOrHeight === 'number') return onNode.getKeyBlockByHeight(hashOrHeight);
   return onNode.getKeyBlockByHash(hashOrHeight);
 }
@@ -272,7 +290,7 @@ export async function getKeyBlock(
 export async function getMicroBlockHeader(
   hash: Encoded.MicroBlockHash,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<MicroBlockHeader>> {
+): ReturnType<Node['getMicroBlockHeaderByHash']> {
   return onNode.getMicroBlockHeaderByHash(hash);
 }
 
@@ -289,18 +307,20 @@ const txDryRunRequests: Map<string, TxDryRunArguments[] & { timeout?: NodeJS.Tim
 async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
   const rs = txDryRunRequests.get(key);
   txDryRunRequests.delete(key);
-  if (rs == null) throw new InternalError('Can\'t get dry-run request');
+  if (rs == null) throw new InternalError("Can't get dry-run request");
 
   let dryRunRes;
   try {
-    const top = typeof rs[0].top === 'number'
-      ? (await getKeyBlock(rs[0].top, { onNode })).hash : rs[0].top;
+    const top =
+      typeof rs[0].top === 'number' ? (await getKeyBlock(rs[0].top, { onNode })).hash : rs[0].top;
     dryRunRes = await onNode.protectedDryRunTxs({
       top,
       txEvents: rs[0].txEvents,
       txs: rs.map((req) => ({ tx: req.tx })),
-      accounts: Array.from(new Set(rs.map((req) => req.accountAddress)))
-        .map((pubKey) => ({ pubKey, amount: DRY_RUN_ACCOUNT.amount })),
+      accounts: Array.from(new Set(rs.map((req) => req.accountAddress))).map((pubKey) => ({
+        pubKey,
+        amount: DRY_RUN_ACCOUNT.amount,
+      })),
     });
   } catch (error) {
     rs.forEach(({ reject }) => reject(error));
@@ -309,9 +329,7 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
 
   const { results, txEvents } = dryRunRes;
   results.forEach(({ result, reason, ...resultPayload }, idx) => {
-    const {
-      resolve, reject, tx, accountAddress,
-    } = rs[idx];
+    const { resolve, reject, tx, accountAddress } = rs[idx];
     if (result === 'ok') resolve({ ...resultPayload, txEvents });
     else reject(Object.assign(new DryRunError(reason as string), { tx, accountAddress }));
   });
@@ -332,24 +350,31 @@ export async function txDryRun(
   tx: Encoded.Transaction,
   accountAddress: Encoded.AccountAddress,
   {
-    top, txEvents, combine, onNode,
-  }:
-  { top?: TxDryRunArguments['top']; txEvents?: boolean; combine?: boolean; onNode: Node },
-): Promise<{
-    txEvents?: TransformNodeType<DryRunResults['txEvents']>;
-  } & TransformNodeType<DryRunResult>> {
+    top,
+    txEvents,
+    combine,
+    onNode,
+  }: { top?: TxDryRunArguments['top']; txEvents?: boolean; combine?: boolean; onNode: Node },
+): Promise<{ txEvents?: DryRunResults['txEvents'] } & DryRunResult> {
   const key = combine === true ? [top, txEvents].join() : 'immediate';
   const requests = txDryRunRequests.get(key) ?? [];
   txDryRunRequests.set(key, requests);
   return new Promise((resolve, reject) => {
     requests.push({
-      tx, accountAddress, top, txEvents, resolve, reject,
+      tx,
+      accountAddress,
+      top,
+      txEvents,
+      resolve,
+      reject,
     });
     if (combine !== true) {
       void txDryRunHandler(key, onNode);
       return;
     }
-    requests.timeout ??= setTimeout(() => { void txDryRunHandler(key, onNode); });
+    requests.timeout ??= setTimeout(() => {
+      void txDryRunHandler(key, onNode);
+    });
   });
 }
 
@@ -363,7 +388,7 @@ export async function txDryRun(
 export async function getContractByteCode(
   contractId: Encoded.ContractAddress,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<ByteCode>> {
+): ReturnType<Node['getContractCode']> {
   return onNode.getContractCode(contractId);
 }
 
@@ -377,7 +402,7 @@ export async function getContractByteCode(
 export async function getContract(
   contractId: Encoded.ContractAddress,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<ContractObject>> {
+): ReturnType<Node['getContract']> {
   return onNode.getContract(contractId);
 }
 
@@ -391,7 +416,7 @@ export async function getContract(
 export async function getName(
   name: AensName,
   { onNode }: { onNode: Node },
-): Promise<TransformNodeType<NameEntry>> {
+): ReturnType<Node['getNameEntryByName']> {
   return onNode.getNameEntryByName(name);
 }
 
@@ -407,13 +432,14 @@ export async function getName(
  * @param options.onNode - Node to use
  * @returns Address or AENS name hash
  */
-export async function resolveName <
-  Type extends Encoding.AccountAddress | Encoding.ContractAddress,
->(
+export async function resolveName<Type extends Encoding.AccountAddress | Encoding.ContractAddress>(
   nameOrId: AensName | Encoded.Generic<Type>,
   key: string,
-  { verify = true, resolveByNode = false, onNode }:
-  { verify?: boolean; resolveByNode?: boolean; onNode: Node },
+  {
+    verify = true,
+    resolveByNode = false,
+    onNode,
+  }: { verify?: boolean; resolveByNode?: boolean; onNode: Node },
 ): Promise<Encoded.Generic<Type | Encoding.Name>> {
   if (isNameValid(nameOrId)) {
     if (verify || resolveByNode) {

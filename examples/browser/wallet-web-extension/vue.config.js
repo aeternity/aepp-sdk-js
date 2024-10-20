@@ -16,20 +16,9 @@ module.exports = {
         },
         contentScripts: {
           entries: {
-            'content-script': [
-              'src/content-script.js',
-            ],
+            'content-script': ['src/content-script.js'],
           },
         },
-      },
-    },
-  },
-  // required for `instanceof RestError`
-  configureWebpack: {
-    resolve: {
-      alias: {
-        '@azure/core-client': '@azure/core-client/dist-esm/src/index.js',
-        '@azure/core-rest-pipeline': '@azure/core-rest-pipeline/dist-esm/src/index.js',
       },
     },
   },
@@ -38,4 +27,5 @@ module.exports = {
     const sdkPath = path.join(__dirname, '..', '..', '..', 'es');
     config.module.rule('mjs').include.add(sdkPath);
   },
+  transpileDependencies: ['@aeternity/aepp-calldata'],
 };

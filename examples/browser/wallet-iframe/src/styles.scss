@@ -15,7 +15,7 @@ body {
 }
 
 button {
-  @extend .w-40, .p-2, .m-2, .rounded-full, .bg-purple-500, .text-white, .text-xs;
+  @extend .w-44, .p-2, .m-2, .rounded-full, .bg-purple-500, .text-white, .text-xs;
 
   &:disabled {
     @extend .bg-purple-300, .cursor-not-allowed;
@@ -26,7 +26,8 @@ h2 {
   @extend .mt-2, .font-bold, .text-2xl;
 }
 
-input:not([type=radio]):not([type=checkbox]), textarea {
+input:not([type='radio']):not([type='checkbox']),
+textarea {
   @extend .bg-gray-900, .text-white, .p-2, .w-full;
 }
 

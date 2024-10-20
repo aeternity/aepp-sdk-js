@@ -1,7 +1,7 @@
-import shortUInt from './short-u-int';
-import Node from '../../../Node';
-import { ArgumentError } from '../../../utils/errors';
-import { _getPollInterval, getHeight } from '../../../chain';
+import shortUInt from './short-u-int.js';
+import Node from '../../../Node.js';
+import { ArgumentError } from '../../../utils/errors.js';
+import { _getPollInterval, getHeight } from '../../../chain.js';
 
 /**
  * Time to leave
@@ -18,7 +18,10 @@ export default {
     params: {},
     // TODO: { absoluteTtl: true } | { absoluteTtl: false, onNode: Node }
     {
-      onNode, absoluteTtl, _isInternalBuild, ...options
+      onNode,
+      absoluteTtl,
+      _isInternalBuild,
+      ...options
     }: {
       onNode?: Node;
       absoluteTtl?: boolean;
@@ -27,7 +30,7 @@ export default {
   ) {
     if (absoluteTtl !== true && value !== 0 && (value != null || _isInternalBuild === true)) {
       if (onNode == null) throw new ArgumentError('onNode', 'provided', onNode);
-      value = (value ?? 3) + await getHeight({ ...options, onNode, cached: true });
+      value = (value ?? 3) + (await getHeight({ ...options, onNode, cached: true }));
     }
     return value;
   },

@@ -1,33 +1,34 @@
-import {
-  decode, encode, Encoded, Encoding,
-} from '../../../utils/encoder';
-import { Tag } from '../constants';
-import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder.js';
+import { EntryTag } from '../entry/constants.js';
+import type { unpackEntry as unpackEntryType, packEntry as packEntryType } from '../entry/index.js';
 
-export default function genEntryField<T extends Tag = Tag>(tag?: T): {
+export default function genEntryField<T extends EntryTag = EntryTag>(
+  tag?: T,
+): {
   serialize: (
     // TODO: replace with `TxParams & { tag: T }`,
     //  but fix TS2502 value is referenced directly or indirectly in its own type annotation
     value: any,
-    options: { buildTx: typeof buildTxType },
+    options: { packEntry: typeof packEntryType },
   ) => Buffer;
   deserialize: (
-    value: Buffer, options: { unpackTx: typeof unpackTxType },
+    value: Buffer,
+    options: { unpackEntry: typeof unpackEntryType },
     // TODO: replace with `TxUnpacked & { tag: T }`,
     //  TS2577 Return type annotation circularly references itself
   ) => any;
 } {
   return {
-    serialize(txParams, { buildTx }) {
+    serialize(txParams, { packEntry }) {
       if (ArrayBuffer.isView(txParams)) return Buffer.from(txParams as any);
       if (typeof txParams === 'string' && txParams.startsWith('tx_')) {
         return decode(txParams as Encoded.Transaction);
       }
-      return decode(buildTx({ ...txParams, ...tag != null && { tag } }));
+      return decode(packEntry({ ...txParams, ...(tag != null && { tag }) }));
     },
 
-    deserialize(buf, { unpackTx }) {
-      return unpackTx(encode(buf, Encoding.Transaction), tag);
+    deserialize(buf, { unpackEntry }) {
+      return unpackEntry(encode(buf, Encoding.Bytearray), tag);
     },
   };
 }

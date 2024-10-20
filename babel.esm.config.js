@@ -1,16 +1,15 @@
-const config = require('./babel.config');
+import config from './babel.config.js';
 
 config.presets
   .filter((plugin) => Array.isArray(plugin))
   .find(([name]) => name === '@babel/preset-env')[1].modules = false;
 
-config.plugins.push(
-  ['add-import-extension', { extension: 'mjs' }],
-  ['import-globals', {
+config.plugins.push([
+  'import-globals',
+  {
     Buffer: { moduleName: 'buffer', exportName: 'Buffer' },
-  }],
-  ['transform-default-named-imports'],
-);
+  },
+]);
 config.plugins = config.plugins.filter((p) => p !== 'babel-plugin-transform-import-meta');
 
-module.exports = config;
+export default config;

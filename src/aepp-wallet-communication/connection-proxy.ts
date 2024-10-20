@@ -1,4 +1,4 @@
-import BrowserConnection from './connection/Browser';
+import BrowserConnection from './connection/Browser.js';
 
 /**
  * Browser connection proxy
@@ -8,9 +8,15 @@ import BrowserConnection from './connection/Browser';
  * @param con2 - second connection
  * @returns a function to stop proxying
  */
-export default (con1: BrowserConnection, con2: BrowserConnection): () => void => {
-  con1.connect((msg: any) => con2.sendMessage(msg), () => con2.disconnect());
-  con2.connect((msg: any) => con1.sendMessage(msg), () => con1.disconnect());
+export default (con1: BrowserConnection, con2: BrowserConnection): (() => void) => {
+  con1.connect(
+    (msg: any) => con2.sendMessage(msg),
+    () => con2.disconnect(),
+  );
+  con2.connect(
+    (msg: any) => con1.sendMessage(msg),
+    () => con1.disconnect(),
+  );
 
   return () => {
     con1.disconnect();

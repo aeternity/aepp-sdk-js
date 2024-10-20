@@ -1,7 +1,7 @@
-import { readInt } from '../helpers';
-import { Int } from '../constants';
-import { ArgumentError } from '../../../utils/errors';
-import { toBytes } from '../../../utils/bytes';
+import { readInt } from '../helpers.js';
+import { Int } from '../constants.js';
+import { ArgumentError } from '../../../utils/errors.js';
+import { toBytes } from '../../../utils/bytes.js';
 
 export default {
   serialize(value: Int): Buffer {

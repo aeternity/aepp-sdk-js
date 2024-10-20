@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
-import { Encoded } from '../utils/encoder';
-import { BaseError, InternalError } from '../utils/errors';
+import { Encoded } from '../utils/encoder.js';
+import { BaseError, InternalError } from '../utils/errors.js';
 
 /**
  * @category aepp wallet communication
@@ -38,7 +38,6 @@ export const enum METHODS {
   sign = 'transaction.sign',
   signMessage = 'message.sign',
   signTypedData = 'typedData.sign',
-  signDelegationToContract = 'delegationToContract.sign',
   signDelegation = 'delegation.sign',
   subscribeAddress = 'address.subscribe',
   updateNetwork = 'networkId.update',
@@ -195,6 +194,22 @@ export class RpcInternalError extends RpcError {
   }
 }
 rpcErrors.push(RpcInternalError);
+
+/**
+ * @category exception
+ */
+export class RpcNoNetworkById extends RpcError {
+  static override code = 13;
+
+  override code = 13;
+
+  constructor(networkId: string) {
+    super(`Wallet can't find a network by id "${networkId}"`);
+    this.data = networkId;
+    this.name = 'RpcNoNetworkById';
+  }
+}
+rpcErrors.push(RpcNoNetworkById);
 
 /**
  * @category exception

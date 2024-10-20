@@ -17,10 +17,10 @@ It uses the following Javascript technologies and principles:
 - Convention over configuration
 - "Easy things should be easy, and hard things should be possible." [source] -- [Larry Wall]
 - Support for
-    - module access, enabling tree-shaking
-    - direct use in node scripts through bundling
-    - direct use in browser `<script>` tags through bundling
-    - bundling through webpack
+  - module access, enabling tree-shaking
+  - direct use in node scripts through bundling
+  - direct use in browser `<script>` tags through bundling
+  - bundling through webpack
 
 [Node's Swagger file]: https://github.com/aeternity/aeternity/blob/master/config/swagger.yaml
 [JavaScript the Good Parts]: https://github.com/dwyl/Javascript-the-Good-Parts-notes
@@ -46,7 +46,7 @@ aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/
 
 ## Documenting
 
-Apart from documenting features and code, there is also documentation automatically generated using [**TypeDoc**](https://typedoc.org/) for documenting TS files and [a script](https://github.com/aeternity/aepp-sdk-js/blob/master/tooling/docs/examples-to-md.js) for documenting examples and code partials.
+Apart from documenting features and code, there is also documentation automatically generated using [**TypeDoc**](https://typedoc.org/) for documenting TS files and [a script](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/tooling/docs/examples-to-md.js) for documenting examples and code partials.
 
 ```bash
 #generate examples and api documentation
@@ -65,11 +65,13 @@ npm run build
 **Note**: If you experience errors during the building, you might need to install build tools for your OS.
 
 **Windows: Windows Build Tools**
+
 ```bash
 npm install -g windows-build-tools
 ```
 
 **Ubuntu / Debian: Build Essential**
+
 ```bash
 sudo apt-get update
 sudo apt-get install build-essential
@@ -78,6 +80,7 @@ sudo apt-get install build-essential
 **Mac**
 
 Download [Xcode](https://apps.apple.com/de/app/xcode/id497799835?mt=12) from AppStore, then run
+
 ```
 xcode-select --install
 ```
@@ -111,7 +114,6 @@ points defined in `package.json`.
 In order to add a local development version of aepp-sdk to a project, `npm link`[1] can be used.
 
 [1]: https://docs.npmjs.com/cli/link
-
 
 ## Releasing
 

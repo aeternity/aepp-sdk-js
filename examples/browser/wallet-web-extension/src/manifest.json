@@ -3,18 +3,12 @@
   "name": "wallet-web-extension",
   "homepage_url": "http://localhost:8080/",
   "description": "A Vue Browser Extension",
-  "permissions": [
-    "activeTab",
-    "<all_urls>",
-    "*://*/*"
-  ],
+  "permissions": ["activeTab", "<all_urls>", "*://*/*"],
   "icons": {
     "128": "icons/128.png"
   },
   "background": {
-    "scripts": [
-      "js/background.js"
-    ],
+    "scripts": ["js/background.js"],
     "persistent": false
   },
   "browser_action": {
@@ -24,15 +18,11 @@
       "34": "icons/34.png"
     }
   },
-  "content_scripts": [{
-    "matches": [
-      "https://*/*",
-      "http://*/*",
-      "file:///*"
-    ],
-    "js": [
-      "js/content-script.js"
-    ],
-    "all_frames": true
-  }]
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*", "file:///*"],
+      "js": ["js/content-script.js"],
+      "all_frames": true
+    }
+  ]
 }

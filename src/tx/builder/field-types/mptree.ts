@@ -1,6 +1,6 @@
 import { encode as rlpEncode, Input } from 'rlp';
-import { Tag } from '../constants';
-import { hash } from '../../../utils/crypto';
+import { EntryTag } from '../entry/constants.js';
+import { hash } from '../../../utils/crypto.js';
 import {
   MerkleTreeHashMismatchError,
   MissingNodeInTreeError,
@@ -8,12 +8,10 @@ import {
   UnexpectedTsError,
   UnknownNodeLengthError,
   InternalError,
-} from '../../../utils/errors';
-import {
-  decode, encode, Encoded, Encoding,
-} from '../../../utils/encoder';
-import type { unpackTx } from '..';
-import type { TxUnpacked } from '../schema.generated';
+} from '../../../utils/errors.js';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder.js';
+import type { unpackEntry } from '../entry/index.js';
+import type { EntUnpacked } from '../entry/schema.generated.js';
 
 enum NodeType {
   Branch,
@@ -23,7 +21,7 @@ enum NodeType {
 
 type MPTreeBinary = [Buffer, Array<[Buffer, Buffer[]]>];
 
-class MPTree<E extends Encoding, T extends Tag> {
+class MPTree<E extends Encoding, T extends EntryTag> {
   readonly #rootHash: string;
 
   #isComplete = true;
@@ -38,7 +36,7 @@ class MPTree<E extends Encoding, T extends Tag> {
 
   readonly #tag: T;
 
-  readonly #unpackTx: typeof unpackTx;
+  readonly #unpackEntry: typeof unpackEntry;
 
   static #nodeHash(node: Input): string {
     return Buffer.from(hash(rlpEncode(node))).toString('hex');
@@ -48,21 +46,19 @@ class MPTree<E extends Encoding, T extends Tag> {
    * Deserialize Merkle Patricia Tree
    * @param binary - Binary
    * @param tag - Tag to use to decode value
-   * @param unpTx - Implementation of unpackTx use to decode values
+   * @param unpEnt - Implementation of unpackEntry use to decode values
    * @returns Merkle Patricia Tree
    */
-  constructor(binary: MPTreeBinary, encoding: E, tag: T, unpTx: typeof unpackTx) {
+  constructor(binary: MPTreeBinary, encoding: E, tag: T, unpEnt: typeof unpackEntry) {
     this.#encoding = encoding;
     this.#tag = tag;
-    this.#unpackTx = unpTx;
+    this.#unpackEntry = unpEnt;
     this.#rootHash = binary[0].toString('hex');
-    this.#nodes = Object.fromEntries(
-      binary[1].map((node) => [node[0].toString('hex'), node[1]]),
-    );
+    this.#nodes = Object.fromEntries(binary[1].map((node) => [node[0].toString('hex'), node[1]]));
 
     if (this.#nodes[this.#rootHash] == null) {
       if (Object.keys(this.#nodes).length !== 0) {
-        throw new MissingNodeInTreeError('Can\'t find a node by root hash');
+        throw new MissingNodeInTreeError("Can't find a node by root hash");
       }
       this.#isComplete = false;
       return;
@@ -85,7 +81,7 @@ class MPTree<E extends Encoding, T extends Tag> {
           break;
         case NodeType.Extension:
           if (this.#nodes[node[1].toString('hex')] == null) {
-            throw new MissingNodeInTreeError('Can\'t find a node by hash in extension node');
+            throw new MissingNodeInTreeError("Can't find a node by hash in extension node");
           }
           break;
         case NodeType.Leaf:
@@ -105,7 +101,7 @@ class MPTree<E extends Encoding, T extends Tag> {
       case 17:
         return {
           type: NodeType.Branch,
-          ...node[16].length !== 0 && { value: node[16] },
+          ...(node[16].length !== 0 && { value: node[16] }),
         };
       case 2: {
         const nibble = node[0][0] >> 4; // eslint-disable-line no-bitwise
@@ -114,7 +110,7 @@ class MPTree<E extends Encoding, T extends Tag> {
         const slice = [0, 2].includes(nibble) ? 2 : 1;
         return {
           type,
-          ...type === NodeType.Leaf && { value: node[1] },
+          ...(type === NodeType.Leaf && { value: node[1] }),
           path: node[0].toString('hex').slice(slice),
         };
       }
@@ -130,10 +126,7 @@ class MPTree<E extends Encoding, T extends Tag> {
   serialize(): MPTreeBinary {
     return [
       Buffer.from(this.#rootHash, 'hex'),
-      Object.entries(this.#nodes).map(([mptHash, value]) => ([
-        Buffer.from(mptHash, 'hex'),
-        value,
-      ])),
+      Object.entries(this.#nodes).map(([mptHash, value]) => [Buffer.from(mptHash, 'hex'), value]),
     ];
   }
 
@@ -145,11 +138,12 @@ class MPTree<E extends Encoding, T extends Tag> {
   #getRaw(_key: string): Buffer | undefined {
     let searchFrom = this.#rootHash;
     let key = _key;
-    while (true) { // eslint-disable-line no-constant-condition
+    while (true) {
+      // eslint-disable-line no-constant-condition
       const node = this.#nodes[searchFrom];
       if (node == null) {
         if (!this.isComplete) return undefined;
-        throw new InternalError('Can\'t find node in complete tree');
+        throw new InternalError("Can't find node in complete tree");
       }
       const { type, value, path } = MPTree.#parseNode(node);
       switch (type) {
@@ -177,10 +171,10 @@ class MPTree<E extends Encoding, T extends Tag> {
    * @param key - The key of the element to retrieve
    * @returns Value associated to the specified key
    */
-  get(key: Encoded.Generic<E>): TxUnpacked & { tag: T } | undefined {
+  get(key: Encoded.Generic<E>): (EntUnpacked & { tag: T }) | undefined {
     const d = this.#getRaw(decode(key).toString('hex'));
     if (d == null) return d;
-    return this.#unpackTx(encode(d, Encoding.Transaction), this.#tag);
+    return this.#unpackEntry(encode(d, Encoding.Bytearray), this.#tag);
   }
 
   #entriesRaw(): Array<[string, Buffer]> {
@@ -189,7 +183,7 @@ class MPTree<E extends Encoding, T extends Tag> {
       const node = this.#nodes[searchFrom];
       if (node == null) {
         if (!this.isComplete) return;
-        throw new InternalError('Can\'t find node in complete tree');
+        throw new InternalError("Can't find node in complete tree");
       }
       const { type, value, path } = MPTree.#parseNode(node);
       switch (type) {
@@ -216,28 +210,33 @@ class MPTree<E extends Encoding, T extends Tag> {
     return entries;
   }
 
-  toObject(): Record<Encoded.Generic<E>, TxUnpacked & { tag: T }> {
-    return Object.fromEntries(this.#entriesRaw()
-      // TODO: remove after resolving https://github.com/aeternity/aeternity/issues/4066
-      .filter(([k]) => this.#encoding !== Encoding.ContractAddress || k.length !== 66)
-      .map(([k, v]) => [
-        encode(Buffer.from(k, 'hex'), this.#encoding),
-        this.#unpackTx(encode(v, Encoding.Transaction), this.#tag),
-      ])) as Record<Encoded.Generic<E>, TxUnpacked & { tag: T }>;
+  toObject(): Record<Encoded.Generic<E>, EntUnpacked & { tag: T }> {
+    return Object.fromEntries(
+      this.#entriesRaw()
+        // TODO: remove after resolving https://github.com/aeternity/aeternity/issues/4066
+        .filter(([k]) => this.#encoding !== Encoding.ContractAddress || k.length !== 66)
+        .map(([k, v]) => [
+          encode(Buffer.from(k, 'hex'), this.#encoding),
+          this.#unpackEntry(encode(v, Encoding.Bytearray), this.#tag),
+        ]),
+    ) as Record<Encoded.Generic<E>, EntUnpacked & { tag: T }>;
   }
 }
 
-export default function genMPTreeField<E extends Encoding, T extends Tag>(encoding: E, tag: T): {
+export default function genMPTreeField<E extends Encoding, T extends EntryTag>(
+  encoding: E,
+  tag: T,
+): {
   serialize: (value: MPTree<E, T>) => MPTreeBinary;
-  deserialize: (value: MPTreeBinary, o: { unpackTx: typeof unpackTx }) => MPTree<E, T>;
+  deserialize: (value: MPTreeBinary, o: { unpackEntry: typeof unpackEntry }) => MPTree<E, T>;
 } {
   return {
     serialize(value) {
       return value.serialize();
     },
 
-    deserialize(value, { unpackTx }) {
-      return new MPTree(value, encoding, tag, unpackTx);
+    deserialize(value, { unpackEntry }) {
+      return new MPTree(value, encoding, tag, unpackEntry);
     },
   };
 }

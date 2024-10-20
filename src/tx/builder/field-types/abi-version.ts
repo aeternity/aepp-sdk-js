@@ -1,19 +1,20 @@
-import { Tag, ConsensusProtocolVersion, AbiVersion } from '../constants';
-import { getProtocolDetails } from './ct-version';
-import Node from '../../../Node';
+import { Tag, ConsensusProtocolVersion, AbiVersion } from '../constants.js';
+import { getProtocolDetails } from './ct-version.js';
+import Node from '../../../Node.js';
 
 export default {
   _getProtocolDetails(c: ConsensusProtocolVersion, tag: Tag): AbiVersion {
-    const kind = Tag.ContractCallTx === tag || Tag.GaMetaTx === tag
-      ? 'contract-call' : 'oracle-call';
+    const kind =
+      Tag.ContractCallTx === tag || Tag.GaMetaTx === tag ? 'contract-call' : 'oracle-call';
     return getProtocolDetails(c, kind).abiVersion;
   },
 
   serialize(
     value: AbiVersion | undefined,
     { tag }: { tag: Tag },
-    { consensusProtocolVersion = ConsensusProtocolVersion.Iris }:
-    { consensusProtocolVersion?: ConsensusProtocolVersion },
+    {
+      consensusProtocolVersion = ConsensusProtocolVersion.Ceres,
+    }: { consensusProtocolVersion?: ConsensusProtocolVersion },
   ): Buffer {
     const result = value ?? this._getProtocolDetails(consensusProtocolVersion, tag);
 

@@ -3,9 +3,9 @@ plugins:
   - search
   - mkdocs-simple-hooks:
       hooks:
-        on_pre_build: 'docs.hooks:pre_build'
-        on_page_markdown: 'docs.hooks:page_markdown'
-repo_url: 'https://github.com/aeternity/aepp-sdk-js'
+        on_pre_build: docs.hooks:pre_build
+        on_page_markdown: docs.hooks:page_markdown
+repo_url: https://github.com/aeternity/aepp-sdk-js
 edit_uri: ''
 
 extra:
@@ -18,14 +18,14 @@ theme:
   custom_dir: tooling/docs/overrides
   palette:
     - scheme: default
-      media: "(prefers-color-scheme: light)"
+      media: '(prefers-color-scheme: light)'
       primary: pink
       accent: pink
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
     - scheme: slate
-      media: "(prefers-color-scheme: dark)"
+      media: '(prefers-color-scheme: dark)'
       primary: pink
       accent: pink
       toggle:
@@ -49,45 +49,50 @@ nav:
   - README.md
   - quick-start.md
   - Usage Guides:
-    - guides/address-length.md
-    - guides/aens.md
-    - guides/contracts.md
-    - guides/contract-events.md
-    - guides/oracles.md
-    - guides/paying-for-tx.md
-    - guides/batch-requests.md
-    - guides/error-handling.md
-    - guides/low-vs-high-usage.md
-    - guides/typed-data.md
-    - guides/jwt.md
-    - Wallet interaction:
-      - guides/connect-aepp-to-wallet.md
-      - guides/build-wallet.md
-      - guides/ledger-wallet.md
+      - guides/address-length.md
+      - guides/aens.md
+      - guides/contracts.md
+      - guides/contract-events.md
+      - guides/oracles.md
+      - guides/paying-for-tx.md
+      - guides/batch-requests.md
+      - guides/error-handling.md
+      - guides/low-vs-high-usage.md
+      - guides/typed-data.md
+      - guides/jwt.md
+      - Wallet interaction:
+          - guides/connect-aepp-to-wallet.md
+          - guides/build-wallet.md
+          - guides/ledger-wallet.md
+          - guides/metamask-snap.md
   - transaction-options.md
   - Examples & Tutorials:
-    - NodeJS:
-      - examples/node/transfer-ae.md
-      - examples/node/contract-interaction.md
-      - PayingForTx:
-        - examples/node/paying-for-contract-call-tx.md
-        - examples/node/paying-for-spend-tx.md
-      - examples/node/account-generalized.md
-    - Browser:
-      - 'Aepp example': examples/browser/aepp/index.html
-      - 'Iframe wallet example': examples/browser/wallet-iframe/index.html
-      - 'Webextension wallet example': examples/browser/wallet-web-extension/packed.zip
-    - tutorials/vuejs/helloworld-blockheight.md
-  - 'API Reference': api/index.html
+      - NodeJS:
+          - examples/node/transfer-ae.md
+          - examples/node/contract-interaction.md
+          - PayingForTx:
+              - examples/node/paying-for-contract-call-tx.md
+              - examples/node/paying-for-spend-tx.md
+          - examples/node/account-generalized.md
+          - examples/node/dry-run-using-debug-endpoint.md
+          - examples/node/oracle.md
+      - Browser:
+          - SDK tools: examples/browser/tools/index.html
+          - Aepp example: examples/browser/aepp/index.html
+          - Iframe wallet example: examples/browser/wallet-iframe/index.html
+          - Webextension wallet example: examples/browser/wallet-web-extension/packed.zip
+      - tutorials/vuejs/helloworld-blockheight.md
+  - API Reference: api/index.html
   - compatibility.md
   - Changelog: CHANGELOG.md
   - Migration Guides:
-    - guides/migration/13.0.0.md
-    - guides/migration/12.0.0.md
-    - guides/migration/11.0.0.md
-    - guides/migration/10.0.0.md
-    - guides/migration/9.0.0.md
-    - guides/migration/7.0.0.md
+      - guides/migration/14.md
+      - guides/migration/13.md
+      - guides/migration/12.md
+      - guides/migration/11.md
+      - guides/migration/10.md
+      - guides/migration/9.md
+      - guides/migration/7.md
   - Contribute:
-    - contrib/README.md
-    - contrib/releases.md
+      - contrib/README.md
+      - contrib/releases.md

@@ -21,6 +21,7 @@ export enum Encoding {
   OracleQueryId = 'oq',
   OracleResponse = 'or',
   AccountAddress = 'ak',
+  AccountSecretKey = 'sk',
   Signature = 'sg',
   Commitment = 'cm',
   PeerPubkey = 'pp',
@@ -49,6 +50,7 @@ export type OracleQuery = `${Encoding.OracleQuery}_${string}`;
 export type OracleQueryId = `${Encoding.OracleQueryId}_${string}`;
 export type OracleResponse = `${Encoding.OracleResponse}_${string}`;
 export type AccountAddress = `${Encoding.AccountAddress}_${string}`;
+export type AccountSecretKey = `${Encoding.AccountSecretKey}_${string}`;
 export type Signature = `${Encoding.Signature}_${string}`;
 export type Commitment = `${Encoding.Commitment}_${string}`;
 export type PeerPubkey = `${Encoding.PeerPubkey}_${string}`;

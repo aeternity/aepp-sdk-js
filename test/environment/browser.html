@@ -1,40 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>SDK test in browser</title>
-</head>
-<body>
-Open developer console
-<script src="../../dist/aepp-sdk.browser-script.js"></script>
-<script type="text/javascript">
-const { Node, AeSdk, MemoryAccount, CompilerHttp } = Aeternity;
+  <head>
+    <meta charset="UTF-8" />
+    <title>SDK test in browser</title>
+  </head>
+  <body>
+    Open developer console
+    <script src="../../dist/aepp-sdk.browser-script.cjs"></script>
+    <script type="text/javascript">
+      const { Node, AeSdk, MemoryAccount, CompilerHttp, Contract } = Aeternity;
 
-const contractSourceCode = `
+      const contractSourceCode = `
 contract Test =
  entrypoint getArg(x : map(string, int)) = x
 `;
-const node = new Node('https://testnet.aeternity.io');
-const aeSdk = new AeSdk({
-  nodes: [{ name: 'testnet', instance: node }],
-  accounts: [
-    new MemoryAccount('9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'),
-  ],
-  onCompiler: new CompilerHttp('https://v7.compiler.aepps.com'),
-});
+      const node = new Node('https://testnet.aeternity.io');
+      const aeSdk = new AeSdk({
+        nodes: [{ name: 'testnet', instance: node }],
+        accounts: [new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
+        onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
+      });
 
-(async () => {
-  console.log('Height:', await aeSdk.getHeight());
-  console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map);
+      (async () => {
+        console.log('Height:', await aeSdk.getHeight());
+        console.log('Instanceof works correctly for nodes pool', aeSdk.pool instanceof Map);
 
-  const contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
-  const deployInfo = await contract.$deploy([]);
-  console.log('Contract deployed at', deployInfo.address);
-  const map = new Map([['foo', 42], ['bar', 43]]);
-  const { decodedResult } = await contract.getArg(map);
-  console.log('Call result', decodedResult);
-  console.log('Instanceof works correctly for returned map', decodedResult instanceof Map);
-})();
-</script>
-</body>
+        const contract = await Contract.initialize({
+          ...aeSdk.getContext(),
+          sourceCode: contractSourceCode,
+        });
+        const deployInfo = await contract.$deploy([]);
+        console.log('Contract deployed at', deployInfo.address);
+        const map = new Map([
+          ['foo', 42],
+          ['bar', 43],
+        ]);
+        const { decodedResult } = await contract.getArg(map);
+        console.log('Call result', decodedResult);
+        console.log('Instanceof works correctly for returned map', decodedResult instanceof Map);
+      })();
+    </script>
+  </body>
 </html>

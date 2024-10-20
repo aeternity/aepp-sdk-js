@@ -1,6 +1,12 @@
 import { after, afterEach } from 'mocha';
 import {
-  AeSdk, CompilerHttpNode, MemoryAccount, Node, Encoded, ConsensusProtocolVersion,
+  AeSdk,
+  CompilerHttpNode,
+  MemoryAccount,
+  Node,
+  Encoded,
+  isAddressValid,
+  Encoding,
 } from '../../src';
 import '..';
 
@@ -11,11 +17,12 @@ const configuration = {
     networkId: 'ae_mainnet',
     url: 'https://mainnet.aeternity.io',
     channelUrl: 'wss://mainnet.aeternity.io/channel',
-    // TODO: deploy v8 compiler and v7.4.1
-    compilerUrl: 'http://localhost:3080',
-    compilerUrl7: 'http://localhost:3081',
+    compilerUrl: 'https://v8.compiler.aepps.com',
     getGenesisAccount: () => {
       if (process.env.MAINNET_SECRET_KEY == null) throw new Error('MAINNET_SECRET_KEY is not set');
+      if (!isAddressValid(process.env.MAINNET_SECRET_KEY, Encoding.AccountSecretKey)) {
+        throw new Error(`MAINNET_SECRET_KEY is not valid: ${process.env.MAINNET_SECRET_KEY}`);
+      }
       return new MemoryAccount(process.env.MAINNET_SECRET_KEY);
     },
     sdkOptions: {
@@ -27,15 +34,12 @@ const configuration = {
     url: 'https://testnet.aeternity.io',
     debugUrl: 'https://testnet.aeternity.io',
     channelUrl: 'wss://testnet.aeternity.io/channel',
-    // TODO: deploy v8 compiler and v7.4.1
-    compilerUrl: 'http://localhost:3080',
-    compilerUrl7: 'http://localhost:3081',
+    compilerUrl: 'https://v8.compiler.aepps.com',
     getGenesisAccount: async () => {
       const account = MemoryAccount.generate();
-      const { status } = await fetch(
-        `https://faucet.aepps.com/account/${account.address}`,
-        { method: 'POST' },
-      );
+      const { status } = await fetch(`https://faucet.aepps.com/account/${account.address}`, {
+        method: 'POST',
+      });
       console.assert([200, 425].includes(status), 'Invalid faucet response code', status);
       return account;
     },
@@ -49,10 +53,8 @@ const configuration = {
     debugUrl: 'http://localhost:3113',
     channelUrl: 'ws://localhost:3014/channel',
     compilerUrl: 'http://localhost:3080',
-    compilerUrl7: 'http://localhost:3081',
-    getGenesisAccount: () => new MemoryAccount(
-      '9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200',
-    ),
+    getGenesisAccount: () =>
+      new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
     sdkOptions: {
       _expectedMineRate: 1000,
       _microBlockCycle: 300,
@@ -60,9 +62,7 @@ const configuration = {
   },
 }[network ?? ''];
 if (configuration == null) throw new Error(`Unknown network: ${network}`);
-export const {
-  networkId, url, channelUrl, compilerUrl, compilerUrl7,
-} = configuration;
+export const { networkId, url, channelUrl, compilerUrl } = configuration;
 const { sdkOptions } = configuration;
 
 type TransactionHandler = (tx: Encoded.Transaction) => unknown;
@@ -73,7 +73,6 @@ export function addTransactionHandler(cb: TransactionHandler): void {
 }
 
 class NodeHandleTx extends Node {
-  // @ts-expect-error use code generation to create node class?
   override async postTransaction(
     ...args: Parameters<Node['postTransaction']>
   ): ReturnType<Node['postTransaction']> {
@@ -94,24 +93,18 @@ export async function getSdk(accountCount = 1): Promise<AeSdk> {
     ...sdkOptions,
   });
 
-  // TODO: remove after dropping aesophia@7
-  if ((await sdk.api.getNodeInfo()).consensusProtocolVersion === ConsensusProtocolVersion.Iris) {
-    sdk._options.onCompiler = new CompilerHttpNode(compilerUrl7);
-  }
-
   const genesisAccount = await genesisAccountPromise;
   for (let i = 0; i < accounts.length; i += 1) {
-    await sdk.spend(
-      isLimitedCoins ? 1e16 : 5e18,
-      accounts[i].address,
-      { onAccount: genesisAccount },
-    );
+    await sdk.spend(isLimitedCoins ? 1e16 : 5e18, accounts[i].address, {
+      onAccount: genesisAccount,
+    });
   }
 
   if (networkId === 'ae_mainnet') {
     after(async () => {
-      const promises = accounts
-        .map(async (onAccount) => sdk.transferFunds(1, genesisAccount.address, { onAccount }));
+      const promises = accounts.map(async (onAccount) =>
+        sdk.transferFunds(1, genesisAccount.address, { onAccount }),
+      );
       await Promise.allSettled(promises);
     });
   }
@@ -131,3 +124,5 @@ afterEach(async function describeTxError() {
   const { status } = await response.json();
   err.message += ` (node-provided transaction status: ${status})`;
 });
+
+export const timeoutBlock = networkId === 'ae_dev' ? 6_000 : 700_000;

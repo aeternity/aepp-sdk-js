@@ -1,7 +1,7 @@
-import { Encoded, Encoding } from '../../../utils/encoder';
-import { packRecord, unpackRecord } from '../common';
-import { DelegationTag, schemas } from './schema';
-import { DlgParams, DlgUnpacked } from './schema.generated';
+import { Encoded, Encoding } from '../../../utils/encoder.js';
+import { packRecord, unpackRecord } from '../common.js';
+import { DelegationTag, schemas } from './schema.js';
+import { DlgParams, DlgUnpacked } from './schema.generated.js';
 
 /**
  * Pack delegation

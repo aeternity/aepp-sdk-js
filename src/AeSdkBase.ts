@@ -1,13 +1,16 @@
-import Node from './Node';
-import AccountBase from './account/Base';
+import Node from './Node.js';
+import AccountBase from './account/Base.js';
 import {
-  CompilerError, DuplicateNodeError, NodeNotFoundError, NotImplementedError, TypeError,
-} from './utils/errors';
-import { Encoded } from './utils/encoder';
-import { wrapWithProxy } from './utils/wrap-proxy';
-import CompilerBase from './contract/compiler/Base';
-import AeSdkMethods, { OnAccount, AeSdkMethodsOptions, WrappedOptions } from './AeSdkMethods';
-import { AensName } from './tx/builder/constants';
+  CompilerError,
+  DuplicateNodeError,
+  NodeNotFoundError,
+  NotImplementedError,
+  TypeError,
+} from './utils/errors.js';
+import { Encoded } from './utils/encoder.js';
+import { wrapWithProxy } from './utils/wrap-proxy.js';
+import CompilerBase from './contract/compiler/Base.js';
+import AeSdkMethods, { OnAccount, AeSdkMethodsOptions, WrappedOptions } from './AeSdkMethods.js';
 
 type NodeInfo = Awaited<ReturnType<Node['getNodeInfo']>> & { name: string };
 
@@ -28,11 +31,12 @@ export default class AeSdkBase extends AeSdkMethods {
    * @param options - Options
    * @param options.nodes - Array of nodes
    */
-  constructor(
-    { nodes = [], ...options }: AeSdkMethodsOptions & {
-      nodes?: Array<{ name: string; instance: Node }>;
-    } = {},
-  ) {
+  constructor({
+    nodes = [],
+    ...options
+  }: AeSdkMethodsOptions & {
+    nodes?: Array<{ name: string; instance: Node }>;
+  } = {}) {
     super(options);
 
     nodes.forEach(({ name, instance }, i) => this.addNode(name, instance, i === 0));
@@ -49,7 +53,7 @@ export default class AeSdkBase extends AeSdkMethods {
   // and user creates its instance by himself
   get compilerApi(): CompilerBase {
     if (this._options.onCompiler == null) {
-      throw new CompilerError('You can\'t use Compiler API. Compiler is not ready!');
+      throw new CompilerError("You can't use Compiler API. Compiler is not ready!");
     }
     return this._options.onCompiler;
   }
@@ -101,7 +105,7 @@ export default class AeSdkBase extends AeSdkMethods {
 
   protected ensureNodeConnected(): asserts this is AeSdkBase & { selectedNodeName: string } {
     if (!this.isNodeConnected()) {
-      throw new NodeNotFoundError('You can\'t use Node API. Node is not connected or not defined!');
+      throw new NodeNotFoundError("You can't use Node API. Node is not connected or not defined!");
     }
   }
 
@@ -116,7 +120,7 @@ export default class AeSdkBase extends AeSdkMethods {
     this.ensureNodeConnected();
     return {
       name: this.selectedNodeName,
-      ...await this.api.getNodeInfo(),
+      ...(await this.api.getNodeInfo()),
     };
   }
 
@@ -129,7 +133,7 @@ export default class AeSdkBase extends AeSdkMethods {
     return Promise.all(
       Array.from(this.pool.entries()).map(async ([name, node]) => ({
         name,
-        ...await node.getNodeInfo(),
+        ...(await node.getNodeInfo()),
       })),
     );
   }
@@ -147,8 +151,8 @@ export default class AeSdkBase extends AeSdkMethods {
     if (typeof account === 'string') throw new NotImplementedError('Address in AccountResolver');
     if (typeof account === 'object') return account;
     throw new TypeError(
-      'Account should be an address (ak-prefixed string), '
-      + `or instance of AccountBase, got ${String(account)} instead`,
+      'Account should be an address (ak-prefixed string), ' +
+        `or instance of AccountBase, got ${String(account)} instead`,
     );
   }
 
@@ -175,7 +179,10 @@ export default class AeSdkBase extends AeSdkMethods {
    */
   async signTransaction(
     tx: Encoded.Transaction,
-    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTransaction']>[1] = {},
+    {
+      onAccount,
+      ...options
+    }: { onAccount?: OnAccount } & Parameters<AccountBase['signTransaction']>[1] = {},
   ): Promise<Encoded.Transaction> {
     const networkId = this.selectedNodeName !== null ? await this.api.getNetworkId() : undefined;
     return this._resolveAccount(onAccount).signTransaction(tx, { networkId, ...options });
@@ -188,7 +195,10 @@ export default class AeSdkBase extends AeSdkMethods {
    */
   async signMessage(
     message: string,
-    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signMessage']>[1] = {},
+    {
+      onAccount,
+      ...options
+    }: { onAccount?: OnAccount } & Parameters<AccountBase['signMessage']>[1] = {},
   ): Promise<Uint8Array> {
     return this._resolveAccount(onAccount).signMessage(message, options);
   }
@@ -202,85 +212,12 @@ export default class AeSdkBase extends AeSdkMethods {
   async signTypedData(
     data: Encoded.ContractBytearray,
     aci: Parameters<AccountBase['signTypedData']>[1],
-    { onAccount, ...options }: { onAccount?: OnAccount } & Parameters<AccountBase['signTypedData']>[2] = {},
+    {
+      onAccount,
+      ...options
+    }: { onAccount?: OnAccount } & Parameters<AccountBase['signTypedData']>[2] = {},
   ): Promise<Encoded.Signature> {
     return this._resolveAccount(onAccount).signTypedData(data, aci, options);
-  }
-
-  /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param options - Options
-   */
-  async signDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signDelegationToContract']>[1] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signDelegationToContract(contractAddress, options);
-  }
-
-  /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param name - AENS name
-   * @param options - Options
-   */
-  async signNameDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    name: AensName,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signNameDelegationToContract']>[2] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signNameDelegationToContract(contractAddress, name, options);
-  }
-
-  /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param options - Options
-   */
-  async signAllNamesDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signAllNamesDelegationToContract']>[1] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signAllNamesDelegationToContract(contractAddress, options);
-  }
-
-  /**
-   * @deprecated use AeSdkBase:signDelegation in Ceres
-   * @param contractAddress - Contract address
-   * @param oracleQueryId - Oracle query id
-   * @param options - Options
-   */
-  async signOracleQueryDelegationToContract(
-    contractAddress: Encoded.ContractAddress,
-    oracleQueryId: Encoded.OracleQueryId,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signOracleQueryDelegationToContract']>[2] = {},
-  ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
-    options.consensusProtocolVersion ??= this.selectedNodeName !== null
-      ? (await this.api.getNodeInfo()).consensusProtocolVersion : undefined;
-    return this._resolveAccount(onAccount)
-      .signOracleQueryDelegationToContract(contractAddress, oracleQueryId, options);
   }
 
   /**
@@ -290,11 +227,13 @@ export default class AeSdkBase extends AeSdkMethods {
    */
   async signDelegation(
     delegation: Encoded.Bytearray,
-    { onAccount, ...options }: { onAccount?: OnAccount }
-    & Parameters<AccountBase['signDelegation']>[1] = {},
+    {
+      onAccount,
+      ...options
+    }: { onAccount?: OnAccount } & Parameters<AccountBase['signDelegation']>[1] = {},
   ): Promise<Encoded.Signature> {
-    options.networkId ??= this.selectedNodeName !== null
-      ? await this.api.getNetworkId() : undefined;
+    options.networkId ??=
+      this.selectedNodeName !== null ? await this.api.getNetworkId() : undefined;
     return this._resolveAccount(onAccount).signDelegation(delegation, options);
   }
 
@@ -307,9 +246,9 @@ export default class AeSdkBase extends AeSdkMethods {
       ...this._options,
       ...this.#wrappedOptions,
       ...mergeWith,
-      ...mergeWith.onAccount != null && {
+      ...(mergeWith.onAccount != null && {
         onAccount: this._resolveAccount(mergeWith.onAccount),
-      },
+      }),
     };
   }
 }
