@@ -130,7 +130,7 @@ root variable, to don't make it reactive in deep. You can find it implementation
 [based on]: https://vuejs.org/guide/extras/reactivity-in-depth.html#how-reactivity-works-in-vue
 [not compatible]: https://github.com/tc39/proposal-class-fields/issues/106
 [shallowRef]: https://vuejs.org/api/reactivity-advanced.html#shallowref
-[æpp example]: https://github.com/aeternity/aepp-sdk-js/tree/71da12b5df56b41f7317d1fb064e44e8ea118d6c/examples/browser/aepp
+[æpp example]: https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/aepp
 
 ## Command Line Interface (CLI)
 

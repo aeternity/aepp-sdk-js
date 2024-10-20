@@ -37,7 +37,7 @@ console.log(await account.signTransaction('tx_...')); // 'tx_...' (with signatur
 
 The private key for the account would be derived in the MetaMask browser extension using the provided index and the mnemonic phrase it was initialized with. The private key won't leave the extension.
 
-The complete examples of how to use it in browser can be found [here](https://github.com/aeternity/aepp-sdk-js/tree/develop/examples/browser/aepp/src/components/ConnectMetamask.vue).
+The complete examples of how to use it in browser can be found [here](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/aepp/src/components/ConnectMetamask.vue).
 
 ## Account persistence
 

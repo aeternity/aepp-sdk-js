@@ -39,4 +39,4 @@ It can be used to
 Note:
 
 - The steps above are snippets taken from the full implementation of
-  the [Simple æpp](https://github.com/aeternity/aepp-sdk-js/tree/master/examples/browser/aepp)
+  the [Simple æpp](https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b32781769342e4941c8dacf6ad53/examples/browser/aepp)

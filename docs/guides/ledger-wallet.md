@@ -33,7 +33,7 @@ console.log(await account.signTransaction('tx_...')); // 'tx_...' (with signatur
 
 The private key for the account would be derived on the Ledger device using the provided index and the mnemonic phrase it was initialized with. The private key won't leave the device.
 
-The complete examples of how to use it in nodejs and browser can be found [here](https://github.com/aeternity/aepp-sdk-js/tree/71da12b5df56b41f7317d1fb064e44e8ea118d6c/test/environment/ledger).
+The complete examples of how to use it in nodejs and browser can be found [here](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/test/environment/ledger).
 
 ## Account verification
 

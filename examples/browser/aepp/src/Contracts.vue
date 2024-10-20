@@ -97,7 +97,7 @@ export default {
   computed: mapState(['aeSdk']),
   methods: {
     async create() {
-      // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/develop/docs/README.md#vue3
+      // Contract instance can't be in deep reactive https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/docs/README.md#vue3
       this.contract = shallowRef(
         await Contract.initialize({
           ...this.aeSdk.getContext(),

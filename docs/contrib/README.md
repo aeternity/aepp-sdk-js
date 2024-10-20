@@ -46,7 +46,7 @@ aepp-sdk is transpiled to EcmaScript 5 through [WebPack](https://webpack.js.org/
 
 ## Documenting
 
-Apart from documenting features and code, there is also documentation automatically generated using [**TypeDoc**](https://typedoc.org/) for documenting TS files and [a script](https://github.com/aeternity/aepp-sdk-js/blob/master/tooling/docs/examples-to-md.js) for documenting examples and code partials.
+Apart from documenting features and code, there is also documentation automatically generated using [**TypeDoc**](https://typedoc.org/) for documenting TS files and [a script](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/tooling/docs/examples-to-md.js) for documenting examples and code partials.
 
 ```bash
 #generate examples and api documentation

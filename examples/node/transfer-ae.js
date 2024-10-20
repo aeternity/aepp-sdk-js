@@ -2,7 +2,7 @@
 // # Transfer AE
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/master/examples/node/transfer-ae.js)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/node/transfer-ae.js)
 // and this page explains in detail how to:
 //
 //  - initialize an instance of the SDK with a pre-funded account
