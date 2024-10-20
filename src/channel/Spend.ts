@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import {
   notify,
   call,
@@ -7,20 +7,20 @@ import {
   ChannelMessage,
   ChannelFsm,
   changeState,
-} from './internal';
-import { Encoded } from '../utils/encoder';
-import { pause } from '../utils/other';
-import Channel from './Base';
-import { ChannelConnectionError } from '../utils/errors';
+} from './internal.js';
+import { Encoded } from '../utils/encoder.js';
+import { pause } from '../utils/other.js';
+import Channel from './Base.js';
+import { ChannelConnectionError } from '../utils/errors.js';
 import {
   awaitingCompletion,
   channelOpen,
   handleUnexpectedMessage,
   signAndNotify,
-} from './handlers';
-import { EntryTag } from '../tx/builder/entry/constants';
-import { EntUnpacked } from '../tx/builder/entry/schema.generated';
-import { unpackEntry } from '../tx/builder/entry';
+} from './handlers.js';
+import { EntryTag } from '../tx/builder/entry/constants.js';
+import { EntUnpacked } from '../tx/builder/entry/schema.generated.js';
+import { unpackEntry } from '../tx/builder/entry/index.js';
 
 export default class ChannelSpend extends Channel {
   /**

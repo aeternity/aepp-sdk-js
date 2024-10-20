@@ -1,8 +1,8 @@
-import { Network } from './rpc/types';
-import { RpcConnectionError } from '../utils/errors';
-import Node from '../Node';
-import BrowserConnection from './connection/Browser';
-import WalletConnectorFrameBase from './WalletConnectorFrameBase';
+import { Network } from './rpc/types.js';
+import { RpcConnectionError } from '../utils/errors.js';
+import Node from '../Node.js';
+import BrowserConnection from './connection/Browser.js';
+import WalletConnectorFrameBase from './WalletConnectorFrameBase.js';
 
 interface EventsWithNode {
   nodeChange: (node: Node) => void;

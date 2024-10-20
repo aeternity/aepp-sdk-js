@@ -1,15 +1,15 @@
-import * as chainMethods from './chain';
-import { sendTransaction } from './send-transaction';
-import * as spendMethods from './spend';
-import * as contractGaMethods from './contract/ga';
-import { buildTxAsync } from './tx/builder';
-import { mapObject, UnionToIntersection } from './utils/other';
-import { wrapWithProxy } from './utils/wrap-proxy';
-import Node from './Node';
-import { TxParamsAsync } from './tx/builder/schema.generated';
-import AccountBase from './account/Base';
-import { Encoded } from './utils/encoder';
-import CompilerBase from './contract/compiler/Base';
+import * as chainMethods from './chain.js';
+import { sendTransaction } from './send-transaction.js';
+import * as spendMethods from './spend.js';
+import * as contractGaMethods from './contract/ga.js';
+import { buildTxAsync } from './tx/builder/index.js';
+import { mapObject, UnionToIntersection } from './utils/other.js';
+import { wrapWithProxy } from './utils/wrap-proxy.js';
+import Node from './Node.js';
+import { TxParamsAsync } from './tx/builder/schema.generated.js';
+import AccountBase from './account/Base.js';
+import { Encoded } from './utils/encoder.js';
+import CompilerBase from './contract/compiler/Base.js';
 
 export type OnAccount = Encoded.AccountAddress | AccountBase | undefined;
 

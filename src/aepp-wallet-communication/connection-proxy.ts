@@ -1,4 +1,4 @@
-import BrowserConnection from './connection/Browser';
+import BrowserConnection from './connection/Browser.js';
 
 /**
  * Browser connection proxy

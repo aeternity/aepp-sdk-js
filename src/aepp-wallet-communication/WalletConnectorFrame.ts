@@ -1,6 +1,6 @@
-import { Network } from './rpc/types';
-import BrowserConnection from './connection/Browser';
-import WalletConnectorFrameBase from './WalletConnectorFrameBase';
+import { Network } from './rpc/types.js';
+import BrowserConnection from './connection/Browser.js';
+import WalletConnectorFrameBase from './WalletConnectorFrameBase.js';
 
 interface EventsNetworkId {
   networkIdChange: (networkId: string) => void;

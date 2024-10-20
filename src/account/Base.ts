@@ -1,8 +1,8 @@
-import { Encoded } from '../utils/encoder';
-import Node from '../Node';
-import CompilerBase from '../contract/compiler/Base';
-import { Int } from '../tx/builder/constants';
-import { AciValue, Domain } from '../utils/typed-data';
+import { Encoded } from '../utils/encoder.js';
+import Node from '../Node.js';
+import CompilerBase from '../contract/compiler/Base.js';
+import { Int } from '../tx/builder/constants.js';
+import { AciValue, Domain } from '../utils/typed-data.js';
 
 interface AuthData {
   fee?: Int;

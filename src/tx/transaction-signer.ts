@@ -1,7 +1,7 @@
-import { Encoded } from '../utils/encoder';
-import { buildTx, getSchema, unpackTx } from './builder';
-import { Tag } from './builder/constants';
-import { TransactionError, UnexpectedTsError } from '../utils/errors';
+import { Encoded } from '../utils/encoder.js';
+import { buildTx, getSchema, unpackTx } from './builder/index.js';
+import { Tag } from './builder/constants.js';
+import { TransactionError, UnexpectedTsError } from '../utils/errors.js';
 
 /**
  * Returns account address that signed a transaction

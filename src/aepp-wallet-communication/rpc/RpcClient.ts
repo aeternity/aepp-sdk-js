@@ -1,7 +1,7 @@
-import { RpcError, RpcInternalError, RpcMethodNotFoundError } from '../schema';
-import BrowserConnection from '../connection/Browser';
-import { InvalidRpcMessageError, MissingCallbackError } from '../../utils/errors';
-import { ensureError } from '../../utils/other';
+import { RpcError, RpcInternalError, RpcMethodNotFoundError } from '../schema.js';
+import BrowserConnection from '../connection/Browser.js';
+import { InvalidRpcMessageError, MissingCallbackError } from '../../utils/errors.js';
+import { ensureError } from '../../utils/other.js';
 
 interface JsonRpcRequest {
   jsonrpc: '2.0';

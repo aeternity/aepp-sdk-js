@@ -7,15 +7,15 @@ import {
   parseBigIntPolicy,
   genVersionCheckPolicy,
   genRetryOnFailurePolicy,
-} from './utils/autorest';
+} from './utils/autorest.js';
 import {
   Middleware as MiddlewareApi,
   MiddlewareOptionalParams,
   ErrorResponse,
-} from './apis/middleware';
-import { operationSpecs } from './apis/middleware/middleware';
-import { IllegalArgumentError, InternalError } from './utils/errors';
-import { MiddlewarePage, isMiddlewareRawPage } from './utils/MiddlewarePage';
+} from './apis/middleware/index.js';
+import { operationSpecs } from './apis/middleware/middleware.js';
+import { IllegalArgumentError, InternalError } from './utils/errors.js';
+import { MiddlewarePage, isMiddlewareRawPage } from './utils/MiddlewarePage.js';
 
 export default class Middleware extends MiddlewareApi {
   /**

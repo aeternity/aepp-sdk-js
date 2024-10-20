@@ -8,11 +8,11 @@ import {
   Compiler as CompilerApi,
   ErrorModel,
   CompilerError as CompilerErrorApi,
-} from '../../apis/compiler';
-import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../../utils/autorest';
-import CompilerBase, { Aci, CompileResult } from './Base';
-import { Encoded } from '../../utils/encoder';
-import { CompilerError, NotImplementedError } from '../../utils/errors';
+} from '../../apis/compiler/index.js';
+import { genErrorFormatterPolicy, genVersionCheckPolicy } from '../../utils/autorest.js';
+import CompilerBase, { Aci, CompileResult } from './Base.js';
+import { Encoded } from '../../utils/encoder.js';
+import { CompilerError, NotImplementedError } from '../../utils/errors.js';
 
 type GeneralCompilerError = ErrorModel & {
   info?: object;

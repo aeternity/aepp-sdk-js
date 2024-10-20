@@ -1,10 +1,10 @@
 import { mnemonicToSeed } from '@scure/bip39';
 import tweetnaclAuth from 'tweetnacl-auth';
-import AccountBaseFactory from './BaseFactory';
-import AccountMemory from './Memory';
-import { encode, Encoding, Encoded, decode } from '../utils/encoder';
-import { concatBuffers } from '../utils/other';
-import { InternalError } from '../utils/errors';
+import AccountBaseFactory from './BaseFactory.js';
+import AccountMemory from './Memory.js';
+import { encode, Encoding, Encoded, decode } from '../utils/encoder.js';
+import { concatBuffers } from '../utils/other.js';
+import { InternalError } from '../utils/errors.js';
 
 export const ED25519_CURVE = Buffer.from('ed25519 seed');
 const HARDENED_OFFSET = 0x80000000;

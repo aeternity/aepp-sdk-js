@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
-import type Middleware from '../Middleware';
-import { BaseError } from './errors';
+import type Middleware from '../Middleware.js';
+import { BaseError } from './errors.js';
 
 export interface MiddlewareRawPage {
   data: unknown[];

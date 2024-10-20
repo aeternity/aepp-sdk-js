@@ -1,9 +1,9 @@
-import AccountBase from './Base';
-import { METHODS } from '../aepp-wallet-communication/schema';
-import { ArgumentError, UnsupportedProtocolError } from '../utils/errors';
-import { Encoded, Encoding, decode, encode } from '../utils/encoder';
-import RpcClient from '../aepp-wallet-communication/rpc/RpcClient';
-import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types';
+import AccountBase from './Base.js';
+import { METHODS } from '../aepp-wallet-communication/schema.js';
+import { ArgumentError, UnsupportedProtocolError } from '../utils/errors.js';
+import { Encoded, Encoding, decode, encode } from '../utils/encoder.js';
+import RpcClient from '../aepp-wallet-communication/rpc/RpcClient.js';
+import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types.js';
 
 /**
  * Account provided by wallet

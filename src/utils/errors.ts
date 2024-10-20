@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
-import BigNumber from 'bignumber.js';
-import { AensName, Int } from '../tx/builder/constants';
-import * as Encoded from './encoder-types';
+import { BigNumber } from 'bignumber.js';
+import { AensName, Int } from '../tx/builder/constants.js';
+import * as Encoded from './encoder-types.js';
 
 /**
  * aepp-sdk originated error

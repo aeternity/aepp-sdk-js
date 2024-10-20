@@ -1,9 +1,9 @@
 import EventEmitter from 'events';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { snakeToPascal } from '../utils/string';
-import { unpackTx } from '../tx/builder';
-import { Tag } from '../tx/builder/constants';
-import * as handlers from './handlers';
+import { snakeToPascal } from '../utils/string.js';
+import { unpackTx } from '../tx/builder/index.js';
+import { Tag } from '../tx/builder/constants.js';
+import * as handlers from './handlers.js';
 import {
   initialize,
   enqueueAction,
@@ -19,13 +19,13 @@ import {
   ChannelFsm,
   ChannelMessage,
   ChannelEvents,
-} from './internal';
-import { ChannelError, IllegalArgumentError } from '../utils/errors';
-import { Encoded } from '../utils/encoder';
-import { TxUnpacked } from '../tx/builder/schema.generated';
-import { EntryTag } from '../tx/builder/entry/constants';
-import { unpackEntry } from '../tx/builder/entry';
-import { EntUnpacked } from '../tx/builder/entry/schema.generated';
+} from './internal.js';
+import { ChannelError, IllegalArgumentError } from '../utils/errors.js';
+import { Encoded } from '../utils/encoder.js';
+import { TxUnpacked } from '../tx/builder/schema.generated.js';
+import { EntryTag } from '../tx/builder/entry/constants.js';
+import { unpackEntry } from '../tx/builder/entry/index.js';
+import { EntUnpacked } from '../tx/builder/entry/schema.generated.js';
 
 function snakeToPascalObjKeys<Type>(obj: object): Type {
   return Object.entries(obj).reduce(

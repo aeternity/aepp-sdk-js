@@ -1,6 +1,6 @@
-import { decode, encode, Encoded, Encoding } from '../../../utils/encoder';
-import { Tag } from '../constants';
-import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder.js';
+import { Tag } from '../constants.js';
+import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index.js';
 
 export default function genTransactionField<T extends Tag = Tag>(
   tag?: T,

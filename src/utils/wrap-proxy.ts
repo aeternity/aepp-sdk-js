@@ -1,4 +1,4 @@
-import { ArgumentError } from './errors';
+import { ArgumentError } from './errors.js';
 
 export function wrapWithProxy<Value extends object | undefined>(
   valueCb: () => Value,

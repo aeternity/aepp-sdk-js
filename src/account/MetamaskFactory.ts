@@ -1,9 +1,13 @@
 import type { BaseProvider } from '@metamask/providers';
-import { InternalError, UnsupportedPlatformError, UnsupportedVersionError } from '../utils/errors';
-import { Encoded } from '../utils/encoder';
-import semverSatisfies from '../utils/semver-satisfies';
-import AccountBaseFactory from './BaseFactory';
-import AccountMetamask, { invokeSnap, snapId } from './Metamask';
+import {
+  InternalError,
+  UnsupportedPlatformError,
+  UnsupportedVersionError,
+} from '../utils/errors.js';
+import { Encoded } from '../utils/encoder.js';
+import semverSatisfies from '../utils/semver-satisfies.js';
+import AccountBaseFactory from './BaseFactory.js';
+import AccountMetamask, { invokeSnap, snapId } from './Metamask.js';
 
 const snapMinVersion = '0.0.9';
 const snapMaxVersion = '0.1.0';

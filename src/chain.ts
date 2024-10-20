@@ -1,8 +1,8 @@
-import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter';
-import { isAccountNotFoundError, pause } from './utils/other';
-import { unwrapProxy } from './utils/wrap-proxy';
-import { isNameValid, produceNameId } from './tx/builder/helpers';
-import { AensName, DRY_RUN_ACCOUNT } from './tx/builder/constants';
+import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter.js';
+import { isAccountNotFoundError, pause } from './utils/other.js';
+import { unwrapProxy } from './utils/wrap-proxy.js';
+import { isNameValid, produceNameId } from './tx/builder/helpers.js';
+import { AensName, DRY_RUN_ACCOUNT } from './tx/builder/constants.js';
 import {
   AensPointerContextError,
   DryRunError,
@@ -10,10 +10,10 @@ import {
   TxTimedOutError,
   TxNotInChainError,
   InternalError,
-} from './utils/errors';
-import Node from './Node';
-import { DryRunResult, DryRunResults, SignedTx } from './apis/node';
-import { decode, encode, Encoded, Encoding } from './utils/encoder';
+} from './utils/errors.js';
+import Node from './Node.js';
+import { DryRunResult, DryRunResults, SignedTx } from './apis/node/index.js';
+import { decode, encode, Encoded, Encoding } from './utils/encoder.js';
 
 /**
  * @category chain

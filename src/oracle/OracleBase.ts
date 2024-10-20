@@ -1,5 +1,5 @@
-import { decode, Encoded } from '../utils/encoder';
-import Node from '../Node';
+import { decode, Encoded } from '../utils/encoder.js';
+import Node from '../Node.js';
 
 type OracleQueryNode = Awaited<
   ReturnType<Node['getOracleQueriesByPubkey']>

@@ -1,5 +1,5 @@
-import BigNumber from 'bignumber.js';
-import { mapObject } from '../../utils/other';
+import { BigNumber } from 'bignumber.js';
+import { mapObject } from '../../utils/other.js';
 
 export const DRY_RUN_ACCOUNT = {
   pub: 'ak_11111111111111111111111111111111273Yts',

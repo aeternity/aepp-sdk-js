@@ -1,4 +1,4 @@
-import { AlreadyConnectedError, NoWalletConnectedError } from '../../utils/errors';
+import { AlreadyConnectedError, NoWalletConnectedError } from '../../utils/errors.js';
 
 /**
  * Browser connection base interface

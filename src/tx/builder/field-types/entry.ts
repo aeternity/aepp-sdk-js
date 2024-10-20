@@ -1,6 +1,6 @@
-import { decode, encode, Encoded, Encoding } from '../../../utils/encoder';
-import { EntryTag } from '../entry/constants';
-import type { unpackEntry as unpackEntryType, packEntry as packEntryType } from '../entry';
+import { decode, encode, Encoded, Encoding } from '../../../utils/encoder.js';
+import { EntryTag } from '../entry/constants.js';
+import type { unpackEntry as unpackEntryType, packEntry as packEntryType } from '../entry/index.js';
 
 export default function genEntryField<T extends EntryTag = EntryTag>(
   tag?: T,
