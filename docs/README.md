@@ -16,7 +16,7 @@ In case you're not using any JS bundling/compilation technique, the SDK can also
 <script src="https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.cjs"></script>
 ```
 
-...where `VERSION` is the version number of the SDK you want to use (eg. `13.1.0`).
+...where `VERSION` is the version number of the SDK you want to use (eg. `14.0.0`).
 
 ### Browser `<script>` tag
 
@@ -91,9 +91,9 @@ This may be done in `tsconfig.json`:
 }
 ```
 
-SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.
-
 Ensure that you have `strictFunctionTypes` option not enabled (as it is in VS code and `ts-node` by default), otherwise some of SDK types won't work correctly (see [#1793](https://github.com/aeternity/aepp-sdk-js/issues/1793)).
+
+In some environments, TypeScript fails to check types of sdk's dependencies (`@metamask/json-rpc-engine`, `@ledgerhq/hw-transport`), if so you may find [`skipLibCheck`](https://www.typescriptlang.org/tsconfig/#skipLibCheck) useful.
 
 ### Vue CLI@4
 
