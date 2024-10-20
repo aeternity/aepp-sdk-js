@@ -2,6 +2,267 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.3.3...v14.0.0) (2024-10-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* CommonJS bundles have cjs extension instead js
+If you are importing files explicitly from `dist` folder then you need to update the extension
+```diff
+- https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js
++ https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.cjs
+```
+* **aepp:** AeSdkWallet requires `onAskToSelectNetwork` constructor option
+Provide a function throwing `RpcMethodNotFoundError` if you don't want to support network change by
+aepp.
+* **tx-builder:** `ChannelClientReconnectTx` removed
+You couldn't use it because it is not supported on the node side.
+* **node:** Node returns time in KeyBlock and MicroBlockHeader as Date
+Apply a change
+```diff
+-const time = new Date(
+-  (await node.getTopHeader()).time,
+-);
++const time = (await node.getTopHeader()).time;
+```
+* **middleware:** require 1.81.0
+* sdk requires nodejs@18.19 or newer
+* sdk types requires TypeScript@4.8 or newer
+Update TypeScript or disable type checks.
+* **account:** Save HD wallets methods removed
+Namely: `deriveChild`, `derivePathFromKey`, `getMasterKeyFromSeed`,
+`derivePathFromSeed`, `getKeyPair`, `generateSaveHDWalletFromSeed`,
+`getSaveHDWalletAccounts`, `getHdWalletAccountFromSeed`.
+Use AccountMnemonicFactory instead.
+* **account:** `sign`, `signMessage` removed
+Use MemoryAccount:sign, MemoryAccount:signMessage instead.
+* **account:** `isValidKeypair` removed
+Create a MemoryAccount by a secret key and
+compare it's address with an address in the key pair instead.
+* **account:** `getAddressFromPriv` removed
+Use MemoryAccount instead.
+```diff
+- address = getAddressFromPriv(secretKeyOldFormat)
++ address = new MemoryAccount(secretKeyNewFormat).address
+```
+Use SDK tools page to convert secret keys
+https://docs.aeternity.com/aepp-sdk-js/develop/examples/browser/tools/
+* **account:** `generateKeyPair` removed
+Use MemoryAccount::generate instead.
+Optionally add `decode` if you need raw keys.
+Obtain the secret key via MemoryAccount:secretKey.
+* **account:** `generateKeyPairFromSecret` removed
+Use MemoryAccount instead.
+```diff
+- const keyPair = generateKeyPairFromSecret(rawSecretKey)
++ const secretKey = encode(rawSecretKey.subarray(0, 32), Encoding.AccountSecretKey)
++ const account = new MemoryAccount(secretKey)
++ const keyPair = {
++   publicKey: decode(account.address),
++   secretKey: rawSecretKey,
++ }
+```
+* `recover`, `dump` removed (AEX-3 keystore implementation)
+Copy the removed implementation to your project or add a previous sdk as a separate dependency
+```json
+  "dependencies": {
+    "@aeternity/aepp-sdk": "^14.0.0",
+    "@aeternity/aepp-sdk-13": "npm:@aeternity/aepp-sdk@^13.3.2"
+  }
+```
+* **node,compiler,middleware:** $host is readonly in generated APIs
+It is made to don't break caching.
+If you need to change a server URL, create a new server instance instead.
+```diff
+- node.$host = 'http://example.com';
++ node = new Node('http://example.com');
+```
+* **account:** MemoryAccount accepts secret key as sk_-prefixed string
+Convert secret key as hex to new format as
+```js
+const oldSk = '9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b971647764' +
+  '54ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200';
+const newSk = encode(Buffer.from(oldSk, 'hex').subarray(0, 32), Encoding.AccountSecretKey)
+// 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'
+```
+* **account:** `generateKeyPair` returns secretKey encoded as sk_-prefixed string
+* **aepp:** RpcBroadcastError not exported anymore
+Because it is not thrown by wallet as well.
+* `NAME_BID_MAX_LENGTH` not exported anymore
+Use `isAuctionName` function instead.
+* **contract:** `encodeFateValue`, `decodeFateValue` not exported anymore
+Use ContractByteArrayEncoder:encodeWithType, decodeWithType from `@aeternity/aepp-calldata`.
+* Iris is not supported
+Stick to a previous sdk version if it is required.
+* **middleware:** sdk requires middleware@1.77.5 and above
+* **node:** sdk requires aeternity node 7.1.0 and above
+* **account:** AccountBase inheritors required to implement `signTypedData`, `signDelegation`
+You can throw an exception if account operation is not doable.
+* `signDelegationToContract` removed
+Use `signDelegation` instead.
+* `signNameDelegationToContract` removed
+Use `signDelegation` instead.
+* `signAllNamesDelegationToContract` removed
+Use `signDelegation` instead.
+* `signOracleQueryDelegationToContract` removed
+Use `signDelegation` instead.
+* **wallet,aepp:** delegations used in Iris removed from aepp-wallet connection
+Use `signDelegation` api instead.
+* `createDelegationSignature` removed
+Use `packDelegation` and AccountBase::signDelegation instead.
+```diff
+-const dlg = await aeSdk.createDelegationSignature(contractAddress, [name]);
++const dlg = await aeSdk.signDelegation(
++  packDelegation({
++    tag: DelegationTag.AensName,
++    accountAddress: aeSdk.address,
++    contractAddress,
++    nameId: name,
++  }),
++);
+```
+* **compiler:** CompilerCli uses aesophia@8 by default
+* **compiler:** CompilerCli8 removed
+Use CompilerCli instead.
+* **compiler:** CompilerCli and CompilerHttp requires aesophia@8
+* **aens:** aens* methods removed
+Use Name class instead.
+```diff
+-await aeSdk.aensPreclaim('example.chain')
++const name = new Name('example.chain', aeSdk.getContext())
++await name.preclaim()
+```
+Accordingly for other methods:
+```
+aensRevoke => Name:revoke
+aensUpdate => Name:update
+aensTransfer => Name:transfer
+aensQuery => Name:getState
+aensClaim => Name:claim
+aensBid => Name:bid
+```
+* **tx-builder:** `NAME_*TTL`, `CLIENT_TTL` not exported anymore
+These values provided by default in buildTx, if necessary define them as
+```js
+const NAME_TTL = 180000;
+const NAME_MAX_TTL = 36000;
+const NAME_MAX_CLIENT_TTL = 86400;
+const CLIENT_TTL = 86400;
+```
+* **oracle:** `pollQueries` don't return responded queries by default
+Use `includeResponded` option to restore the previous behavior.
+* **oracle:** `pollForQueries` method removed
+Use `Oracle:pollQueries` instead.
+* **oracle:** `extendOracleTtl` method removed
+Use `Oracle:extendTtl` instead.
+* **oracle:** `respondToQuery` method removed
+Use `Oracle:respondToQuery` instead.
+* **oracle:** `getOracleObject` method removed
+Use `Oracle:getState` instead.
+* **oracle:** `registerOracle` method removed
+Use `Oracle:register` instead.
+* **oracle:** `getQueryObject` removed
+Use `Oracle:getQuery`, `OracleClient:getQuery` instead.
+* typescript@4.1 is not supported anymore
+* **oracle:** `postQueryToOracle`, `pollForQueryResponse`  methods removed
+Use `OracleClient:postQuery`, `OracleClient:pollForResponse` instead.
+* **tx-builder:** `ORACLE_TTL`, `QUERY_TTL`, `RESPONSE_TTL` not exported anymore
+These values provided by default in buildTx, if necessary define them as
+```js
+const ORACLE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 500 };
+const QUERY_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
+const RESPONSE_TTL = { type: ORACLE_TTL_TYPES.delta, value: 10 };
+```
+* **tx-builder:** `buildTx`/`unpackTx` works only with transactions
+If you need to work with node's entry use `packEntry`/`unpackEntry`.
+* **tx-builder:** `Tag` include only transactions
+Node entries tags moved to `EntryTag`.
+* **tx-builder:** `buildTx` doesn't accept `prefix` anymore
+Use `decode`/`encode` to convert payload to desired format.
+* **contract:** `AeSdk:initializeContract` removed
+Use `Contract.initialize` instead:
+```diff
+- aeSdk.initializeContract(options)
++ Contract.initialize({ ...aeSdk.getContext(), ...options })
+```
+
+### Features
+
+* **account:** add `ensureReady` method to AccountLedgerFactory ([5047e43](https://github.com/aeternity/aepp-sdk-js/commit/5047e4374afcee6f949b7c6678a15f6de5212d99))
+* **account:** add AccountMetamaskFactory ([e9f9694](https://github.com/aeternity/aepp-sdk-js/commit/e9f96941871fde4570176f136ade02361fb74e1d))
+* **account:** add AccountMnemonicFactory ([c785521](https://github.com/aeternity/aepp-sdk-js/commit/c78552173eaf5217ebaf4ae0d08c9613674dea84))
+* **account:** encode secret key as sk_-prefixed string ([b94e198](https://github.com/aeternity/aepp-sdk-js/commit/b94e198ef1b811bd42a6f7434466884d5333e13c))
+* **account:** expose `secretKey` in MemoryAccount ([d4320e6](https://github.com/aeternity/aepp-sdk-js/commit/d4320e6f3aad37ff0efe12f113a5e6447d31ff07))
+* **aepp:** add api to ask wallet to select network ([9871c91](https://github.com/aeternity/aepp-sdk-js/commit/9871c9194477c793a96e9012cbc2a9868f945d3b))
+* **aepp:** extract class to connect to wallet from AeSdkAepp ([c3570ac](https://github.com/aeternity/aepp-sdk-js/commit/c3570ac2fbe27db8e16b9690b0a4107159bdb20d))
+* **middleware:** add `requestByPath` method ([ee5ac0c](https://github.com/aeternity/aepp-sdk-js/commit/ee5ac0c16387b6b7ce71ffb688eb931e82bd8529))
+* **middleware:** allow navigate to next/prev pages ([b89cf5b](https://github.com/aeternity/aepp-sdk-js/commit/b89cf5b6fcb5590131ace8191dfb278a679df6b6))
+* **middleware:** mark as stable api ([e25b06d](https://github.com/aeternity/aepp-sdk-js/commit/e25b06d05d680a2f176ab5bf016bd7784f665f99))
+* **middleware:** prefixed types provided by OpenApi instead of strings ([0b16a32](https://github.com/aeternity/aepp-sdk-js/commit/0b16a325df96b8f879e5372094ef9ce62beae478))
+* **middleware:** return time as Date instance ([e48ffd1](https://github.com/aeternity/aepp-sdk-js/commit/e48ffd19edaae1165fc220e9b354fbdb17e8e8ee))
+* **middleware:** switch to v3 api ([b0015c0](https://github.com/aeternity/aepp-sdk-js/commit/b0015c04a6594d8152b690788cd077604b91fdc3))
+* **node:** return time as Date instance ([e0e33ea](https://github.com/aeternity/aepp-sdk-js/commit/e0e33ea1d23b41e2a2541bce62d3e54f7502f720))
+* **oracle:** add `includeResponded` option to Oracle:pollQueries ([78a07ab](https://github.com/aeternity/aepp-sdk-js/commit/78a07ab8c38c17d0cebb2a6d7a7ff9ba64bf162d))
+* **oracle:** add Oracle:handleQueries method ([03c77c0](https://github.com/aeternity/aepp-sdk-js/commit/03c77c0ba3c0893cc422fb3dff52f73895cf6aab))
+
+
+### Bug Fixes
+
+* **account:** improve Account:publicKey type ([1652a4b](https://github.com/aeternity/aepp-sdk-js/commit/1652a4ba81bfa4fbe9c0013a9ce6b15e84dc0fa9))
+* **aens:** validate minus chars in name as node does ([329de9e](https://github.com/aeternity/aepp-sdk-js/commit/329de9e8f0b824cea89aaf016a7358223b82b061))
+* **aepp:** don't require subscription to request addresses ([2b247ff](https://github.com/aeternity/aepp-sdk-js/commit/2b247ff2806c22fcff1d8c1cde021b16b049bf0a))
+* **channel:** `channelId` type, more accurate types ([e572fae](https://github.com/aeternity/aepp-sdk-js/commit/e572fae7dff9db471f43a2d7eb7256f37eb7c734))
+* **channel:** accept `host` only if initiator ([a7d4dde](https://github.com/aeternity/aepp-sdk-js/commit/a7d4dde587b3cc25c7a4a7700838d219dd01aae1))
+* **channel:** reestablish flow ([1f4a0c1](https://github.com/aeternity/aepp-sdk-js/commit/1f4a0c1d43d9f37938bade1f9684383df1da260a))
+* **channel:** remove `statePassword` unsupported on node side ([5cec07b](https://github.com/aeternity/aepp-sdk-js/commit/5cec07bca03b8ea2c7400580eb647d0146c76fdf))
+* **channel:** remove unsupported ways to reopen channel by a transaction ([f3746a1](https://github.com/aeternity/aepp-sdk-js/commit/f3746a10c64119ea1e1d64d913678132dc98d6f4))
+* **middleware:** accurate coin amounts ([00a4f3e](https://github.com/aeternity/aepp-sdk-js/commit/00a4f3e7b6a0e84f26a5dee3b18219e358c2938c))
+* **middleware:** word casing in activity types ([f1fbb29](https://github.com/aeternity/aepp-sdk-js/commit/f1fbb29fffd1c6537c83c70559d5c333fda8f66f))
+* **node,compiler,middleware:** mark $host as readonly ([9e47d5c](https://github.com/aeternity/aepp-sdk-js/commit/9e47d5c2aa118890a30d61c7859493c3a995b679))
+* **node:** avoid complex types by code replacements instead generics ([4f531b1](https://github.com/aeternity/aepp-sdk-js/commit/4f531b1e747bd2a467d485eb128cf9de6075785e))
+* **oracle:** emit unhandled rejection instead printing error ([3a57665](https://github.com/aeternity/aepp-sdk-js/commit/3a57665a4f3f57e79089cef8548eba0a93fdea6a))
+* **tx-builder:** count amount in execution cost when spend to yourself ([5153649](https://github.com/aeternity/aepp-sdk-js/commit/515364920942e6eaa242e41d439fc6d6a9eaf89e))
+* **tx-builder:** remove unused `ChannelClientReconnectTx` ([e6e954a](https://github.com/aeternity/aepp-sdk-js/commit/e6e954afb2f89052f295bf8ddd39d48b75142bcc))
+* **wallet:** generate random string instead using external uuid dep ([f8640d4](https://github.com/aeternity/aepp-sdk-js/commit/f8640d4f4e3412d6ca99397edb9e66d295a36a16))
+* **wallet:** origin if opened over file:// (cordova) ([d529f30](https://github.com/aeternity/aepp-sdk-js/commit/d529f304ab26a829598dbde6b0db37f6f7480f42))
+
+
+* **account:** make `signTypedData`, `signDelegation` abstract ([f2c6d1d](https://github.com/aeternity/aepp-sdk-js/commit/f2c6d1d0894406234f728081d69a23620ea88e74))
+* **account:** remove `generateKeyPair` ([18c6789](https://github.com/aeternity/aepp-sdk-js/commit/18c6789425ae654f7b3359d7adc136c33440c4ec))
+* **account:** remove `generateKeyPairFromSecret` ([2cbaa7c](https://github.com/aeternity/aepp-sdk-js/commit/2cbaa7c76e0606d0909ffe0cf7e7f4ae1edc7d72))
+* **account:** remove `getAddressFromPriv` ([9446639](https://github.com/aeternity/aepp-sdk-js/commit/9446639afd17378f881635a884b59cb2bb765ea7))
+* **account:** remove `isValidKeypair` ([512385a](https://github.com/aeternity/aepp-sdk-js/commit/512385a57b0b10dc3c4dfe250324d1f7416f6c78))
+* **account:** remove `sign`, `signMessage` ([30077bc](https://github.com/aeternity/aepp-sdk-js/commit/30077bcd16bd5231e62e2d8fc159ef392bb1e866))
+* **account:** remove save HD wallet functions ([10e7c89](https://github.com/aeternity/aepp-sdk-js/commit/10e7c8945e00053c800edbe34b5ec8e611539ba7))
+* **aens:** replace aens methods with Name class ([956daac](https://github.com/aeternity/aepp-sdk-js/commit/956daacfc27cfdfdb9412b2b81f1784908a24233))
+* **aepp:** remove RpcBroadcastError ([1f0b3bb](https://github.com/aeternity/aepp-sdk-js/commit/1f0b3bbb7edb615b05c014e90fadac1642b8a331))
+* **compiler:** drop aesophia@7 support ([df0e050](https://github.com/aeternity/aepp-sdk-js/commit/df0e050adf5d073ac621ef9928c7e88df67e6878))
+* **contract:** don't depend on Contract in AeSdk ([00b4f86](https://github.com/aeternity/aepp-sdk-js/commit/00b4f864eea8b44631eaeb11df872fc8140f4a96))
+* **contract:** remove `encodeFateValue`, `decodeFateValue` ([c521597](https://github.com/aeternity/aepp-sdk-js/commit/c521597e4ee4243266011d5e23e0fb75a126a404))
+* drop Iris support ([61554b3](https://github.com/aeternity/aepp-sdk-js/commit/61554b32e02a26664df6954871917a9454e6d41f))
+* drop typescript@4.1 support ([4008d12](https://github.com/aeternity/aepp-sdk-js/commit/4008d12f6d29907aa848ca6637cce1c24e996059))
+* **middleware:** require 1.77.5 ([08783fd](https://github.com/aeternity/aepp-sdk-js/commit/08783fd935cb204f807afef3e9fa3fbb1db77b9c))
+* **middleware:** require 1.81.0 ([3243768](https://github.com/aeternity/aepp-sdk-js/commit/32437688ca70b563f041b562f4bea90c46e10467))
+* **node:** require 7.1.0 ([0dd3b49](https://github.com/aeternity/aepp-sdk-js/commit/0dd3b49ed0d603c3abab5d151b2a829beb69adad))
+* **oracle:** add Oracle class ([54ee614](https://github.com/aeternity/aepp-sdk-js/commit/54ee6145dc7bd097e0bc1cb91d2a09c29d278a92))
+* **oracle:** add OracleClient class ([0293fe4](https://github.com/aeternity/aepp-sdk-js/commit/0293fe4689bb6dbdc13901d2b238901ea36e445f))
+* **oracle:** replace `getQueryObject` with OracleBase ([bcab498](https://github.com/aeternity/aepp-sdk-js/commit/bcab4981b509c31d1fa6342f4da33580e4625448))
+* remove `createDelegationSignature` ([651b6ec](https://github.com/aeternity/aepp-sdk-js/commit/651b6ecd9f747754c785fbc01bea25b88df03b02))
+* remove `NAME_BID_MAX_LENGTH` ([83797a4](https://github.com/aeternity/aepp-sdk-js/commit/83797a4a1d778104f86c9ddcc6c04fb29dce6bfe))
+* remove `signAllNamesDelegationToContract` ([60a729d](https://github.com/aeternity/aepp-sdk-js/commit/60a729d98be3262aed7dd4dcca457f85cd886f36))
+* remove `signDelegationToContract` ([cd495a6](https://github.com/aeternity/aepp-sdk-js/commit/cd495a6409bfa3fa2012046da8e83dbf759f6fc0))
+* remove `signNameDelegationToContract` ([9ab8f41](https://github.com/aeternity/aepp-sdk-js/commit/9ab8f410226fca846dbfb5450a4da99940de7115))
+* remove `signOracleQueryDelegationToContract` ([f948492](https://github.com/aeternity/aepp-sdk-js/commit/f94849264541b4dde85011ff696e6e6dc5b6a9d4))
+* remove keystore implementation ([5e64ec9](https://github.com/aeternity/aepp-sdk-js/commit/5e64ec9a22246df80846b715dfe3adca2b28ef4c))
+* rename legacy bundles to cjs ([46cd27b](https://github.com/aeternity/aepp-sdk-js/commit/46cd27b8459de1acad3eed219cadc1705ec4460a))
+* require nodejs@18.19 or newer ([84d868c](https://github.com/aeternity/aepp-sdk-js/commit/84d868c3c82b8f43c163705d88e0eb0594efc55d))
+* **tx-builder:** extract entries into separate builder ([d5fde18](https://github.com/aeternity/aepp-sdk-js/commit/d5fde18a04886d657266f1c1416c708e5a7b65ea))
+* **tx-builder:** remove deprecated constant exports ([2ecf0f4](https://github.com/aeternity/aepp-sdk-js/commit/2ecf0f45de2dcea7a0259b29600fbd17affcbf3a))
+* **tx-builder:** remove deprecated constant exports ([2342aa6](https://github.com/aeternity/aepp-sdk-js/commit/2342aa6d7b379a3db5a48f77fe6f026ad5c9d881))
+* update @types/node, drop TS below 4.8 ([9d36e6c](https://github.com/aeternity/aepp-sdk-js/commit/9d36e6cbce669aca2d4baf294b397a41cdfab93b))
+* **wallet,aepp:** remove `delegationToContract.sign` method ([c4d62b0](https://github.com/aeternity/aepp-sdk-js/commit/c4d62b05825444f8cf90595010ca5d4c38c99777))
+
 ### [13.3.3](https://github.com/aeternity/aepp-sdk-js/compare/v13.3.2...v13.3.3) (2024-07-17)
 
 ### Bug Fixes
