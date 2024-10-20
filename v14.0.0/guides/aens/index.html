@@ -1,0 +1,2152 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../address-length/">
+      
+      
+        <link rel="next" href="../contracts/">
+      
+      
+      <link rel="icon" href="../../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.26">
+    
+    
+      
+        <title>AENS (æternity naming system) - æternity JavaScript SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#aens-ternity-naming-system" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+               You're not viewing the latest version.
+<a href="../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            æternity JavaScript SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              AENS (æternity naming system)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    æternity JavaScript SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quick-start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quick Start
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage Guides
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Usage Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../address-length/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    The range of possible address length
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    AENS (æternity naming system)
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    AENS (æternity naming system)
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-claim-a-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Claim a name
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Claim a name">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pre-claim
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      Claim
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bid-during-an-auction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bid during an auction
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-update-a-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Update a name
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Update a name">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set-pointers-update-ttl" class="md-nav__link">
+    <span class="md-ellipsis">
+      Set pointers &amp; update TTL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extend-ttl-while-keeping-pointers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Extend TTL while keeping pointers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-transfer-ownership-of-a-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Transfer ownership of a name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-revoke-a-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Revoke a name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delegate-signature-to-contract-aens-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Delegate signature to contract (AENS interface)
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contracts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contracts
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contract-events/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contract Events
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oracles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paying-for-tx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PayingForTx (Meta-Transactions)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../batch-requests/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Batch Transactions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Error Handling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../low-vs-high-usage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Low vs High level API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../typed-data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Typed data hashing and signing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jwt/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    JWT usage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Wallet interaction
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_12">
+            <span class="md-nav__icon md-icon"></span>
+            Wallet interaction
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../connect-aepp-to-wallet/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connect an æpp to a wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../build-wallet/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to build a wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ledger-wallet/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ledger Hardware Wallet
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metamask-snap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../transaction-options/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transaction options
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples & Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Examples & Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    NodeJS
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            NodeJS
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/transfer-ae/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transfer AE
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/contract-interaction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Compile &amp; Deploy a Sophia Smart Contract
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_1_3" id="__nav_5_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    PayingForTx
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            PayingForTx
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/paying-for-contract-call-tx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    InnerTx: ContractCallTx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/paying-for-spend-tx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    InnerTx: SpendTx
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/account-generalized/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Create and use Generalized Accounts
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/dry-run-using-debug-endpoint/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dry-run using debug endpoint
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/node/oracle/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Register and query Oracle
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Browser
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Browser
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/browser/tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SDK tools
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/browser/aepp/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Aepp example
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/browser/wallet-iframe/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Iframe wallet example
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/browser/wallet-web-extension/packed.zip" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Webextension wallet example
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/vuejs/helloworld-blockheight/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vue.js HelloWorld
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../compatibility/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Compatibility Table
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Migration Guides
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            Migration Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/14/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 14.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/13/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 13.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/12/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 12.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/11/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 11.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 10.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/9/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 9.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/7/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 7.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Contribute
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Contribute
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contrib/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Development
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contrib/releases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Releases
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-claim-a-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Claim a name
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Claim a name">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pre-claim
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      Claim
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bid-during-an-auction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bid during an auction
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-update-a-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Update a name
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Update a name">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set-pointers-update-ttl" class="md-nav__link">
+    <span class="md-ellipsis">
+      Set pointers &amp; update TTL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extend-ttl-while-keeping-pointers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Extend TTL while keeping pointers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-transfer-ownership-of-a-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Transfer ownership of a name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-revoke-a-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Revoke a name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delegate-signature-to-contract-aens-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Delegate signature to contract (AENS interface)
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="aens-ternity-naming-system">AENS (æternity naming system)</h1>
+<h2 id="introduction">Introduction</h2>
+<p>This guide shows you how to perform all the operations that you need within the lifecycle of <a href="https://docs.aeternity.com/protocol/AENS/">æternity naming system (AENS)</a> using the SDK.</p>
+<p>If you successfully claimed a name it will expire after 180000 key blocks (~375 days). You will need to update your name before it expires!</p>
+<h2 id="1-claim-a-name">1. Claim a name</h2>
+<p>Claiming an AENS name requires you (at least) 2 transactions:</p>
+<ul>
+<li>First you need to perform a <code>pre-claim</code> by providing a <code>commitmentId</code> (hash).</li>
+<li>The <code>commitmentId</code> is calculated with a random <code>salt</code> and the provided name. The SDK automatically generates the random <code>salt</code>, calculates the <code>commitmentId</code> and includes it into the <code>NamePreclaimTx</code>.</li>
+<li>After the <code>NamePreclaimTx</code> transaction has been mined you will be able to perform the actual <code>claim</code> of the name. When performing the actual <code>claim</code> via a <code>NameClaimTx</code> you will, depending on the length of the name:</li>
+<li>immediately become owner of that name</li>
+<li>initiate an auction</li>
+</ul>
+<h3 id="pre-claim">Pre-claim</h3>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Name</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// init the SDK instance with AeSdk class</span>
+
+<span class="c1">// `getContext` is used to bind AeSdk to Name instance</span>
+<span class="c1">// e.g. if you change the node in AeSdk it also would be changed in Name.</span>
+<span class="c1">// Alternatively, you need to provide `onAccount`, `onNode` options.</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Name</span><span class="p">(</span><span class="s1">&#39;testNameForTheGuide.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">())</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">preClaimTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">preclaim</span><span class="p">()</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">preClaimTx</span><span class="p">)</span>
+
+<span class="cm">/*</span>
+<span class="cm">{</span>
+<span class="cm">  blockHash: &#39;mh_2UsggiUaQQmEPjxLnXkXHpm1WawTWqZb1jBx6UzsQNHgirWAwd&#39;,</span>
+<span class="cm">  blockHeight: 449499,</span>
+<span class="cm">  hash: &#39;th_48RktjEutZC8TCubaq9YhjaF1cKLV9D3VRCJyzJLs7oSp4Ry6&#39;,</span>
+<span class="cm">  signatures: [</span>
+<span class="cm">    &#39;sg_Da98k2EKMun1TkE7ytonRypvJwaKg9iBjp8rNcYuodFXqzRqwjQyuFQP5DhxWUpTYRzSTurrNtDmUft8eyTStjCyNqFf8&#39;</span>
+<span class="cm">  ],</span>
+<span class="cm">  tx: {</span>
+<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    commitmentId: &#39;cm_2igvW9egddKh77gDdE8mjotmL8PzE7Tf2Q639Q5stUqWQoEfap&#39;,</span>
+<span class="cm">    fee: 16620000000000n,</span>
+<span class="cm">    nonce: 18,</span>
+<span class="cm">    type: &#39;NamePreclaimTx&#39;,</span>
+<span class="cm">    version: 1</span>
+<span class="cm">  },</span>
+<span class="cm">  rawTx: &#39;tx_+JkLAfhCuEBgFzAL0bPDufmzDq0558vaKtrIyRpNxCYVtkgnJjBrxDpQZHkfbwG+oRuBUAfgfrAKF0lO9mRI1zq0H6bXIq8KuFH4TyEBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhKhA+Jawe/spFaw823K+U59CWx+xD1i34gngUPiAAKJqv/fhg8dpTI4AAAGc20E&#39;,</span>
+<span class="cm">  height: 449499</span>
+<span class="cm">}</span>
+<span class="cm">*/</span>
+</code></pre></div>
+<p>Note:</p>
+<ul>
+<li>After transaction is included, you have <code>300</code> key blocks to broadcast <code>claim</code> transaction with
+  the same <code>salt</code> and it should be signed with the same private key as <code>pre-claim</code>. - As the <code>pre-claim</code> is required to avoid front running it is recommended to wait with the actual <code>claim</code> until at least 1 key block has been mined so that nobody knows which name you aim to claim. - The corresponding <code>claim</code> cannot be included in the same key block anyway. The protocol doesn't allow that.</li>
+<li>You should check if the name is still available before performing a <code>pre-claim</code>. The protocol itself doesn't reject a <code>pre-claim</code> transaction if the name isn't available anymore.</li>
+</ul>
+<h3 id="claim">Claim</h3>
+<p>This example assumes that you did a <code>pre-claim</code> before and kept an instance of Name.</p>
+<p>Depending on the length of the name in punycode the actual <code>claim</code> will result in direct ownership of the AENS name or start an auction:</p>
+<ul>
+<li><code>Name length</code> &gt; 12: ownership of the name is immediately transferred to your account</li>
+<li><code>Name length</code> &lt;= 12: an <code>auction</code> is started</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1">// the minimum `nameFee` will be automatically generated by sdk</span>
+<span class="c1">// in case you want to provide a custom `nameFee` you can so so by providing it in an options object</span>
+<span class="c1">// in case of starting the auction `nameFee` will be the starting bid</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">claimTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">claim</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">claimTx</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm">{</span>
+<span class="cm">  blockHash: &#39;mh_UvtuVNvK7k29G3anF48W4hgUMaFFLc1wKir55FFifgT49Egk&#39;,</span>
+<span class="cm">  blockHeight: 449507,</span>
+<span class="cm">  hash: &#39;th_2sWNusGUf2wuRn7d453wPWTAe8pKVbtNF4DqakvippsxjvF8g1&#39;,</span>
+<span class="cm">  signatures: [</span>
+<span class="cm">    &#39;sg_LYsVj9zUoKFPDiSvFUWG5QaRhnqQ525YA314xMVzRhApYuPnFyMWgAQGpChKHHWyMbykBwVRrmoQtTENTFCaCoMj17CBK&#39;</span>
+<span class="cm">  ],</span>
+<span class="cm">  tx: {</span>
+<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    fee: 16800000000000n,</span>
+<span class="cm">    name: &#39;testNameForTheGuide.chain&#39;,</span>
+<span class="cm">    nameFee: 2865700000000000000n,</span>
+<span class="cm">    nameSalt: 7595805618692717,</span>
+<span class="cm">    nonce: 19,</span>
+<span class="cm">    type: &#39;NameClaimTx&#39;,</span>
+<span class="cm">    version: 2</span>
+<span class="cm">  },</span>
+<span class="cm">  rawTx: &#39;tx_+KILAfhCuECVba2mm3Un3nrN9U+LpuB2wzqDDmAzXwvc+9sVkpkcALzqm14p7kGqyt8pwjGTyKeLM9lp+KgXWF4PHmHz0WAPuFr4WCACoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhOZdGVzdE5hbWVGb3JUaGVHdWlkZS5jaGFpboca/FhPr2JtiCfFAveE1kAAhg9HjghAAADilhgr&#39;</span>
+<span class="cm">}</span>
+<span class="cm">*/</span>
+</code></pre></div>
+<p>Note:</p>
+<ul>
+<li>The <code>nameFee</code> that is required will be correctly calculated automatically for the initial claim.</li>
+<li>It's still possible to pass it as additional param, see <a href="../../transaction-options/#nameclaimtx">transaction options</a>.</li>
+<li>In case the <code>claim</code> triggers an auction the required <code>nameFee</code> is locked by the protocol.</li>
+<li>If you win the auction the <code>nameFee</code> is permanently deducted from your accounts balance and effectively <em>burned</em>.<ul>
+<li>It will be credited to <code>ak_11111111111111111111111111111111273Yts</code> which nobody can access. This reduces the total supply of AE over time.</li>
+</ul>
+</li>
+<li>If somebody else outbids you the provided <code>nameFee</code> is immediately released and returned to your account.</li>
+</ul>
+<h3 id="bid-during-an-auction">Bid during an auction</h3>
+<p>In case there is an auction running for a name you want to claim you need to place a bid.</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">computeBidFee</span><span class="p">,</span><span class="w"> </span><span class="nx">computeAuctionEndBlock</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Name</span><span class="p">(</span><span class="s1">&#39;auctiontest1.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">())</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">startFee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// request from middleware, e.g. https://testnet.aeternity.io/mdw/name/auctiontest1.chain</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">increment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="w"> </span><span class="c1">// 5%, the minimum required increment</span>
+
+<span class="c1">// startFee is OPTIONAL and defaults to minimum calculated fee for the name in general</span>
+<span class="c1">// startFee MUST be at least the nameFee of the last bid</span>
+<span class="c1">// increment is OPTIONAL and defaults to 0.05</span>
+<span class="c1">// `name.value` is a name as string</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">nameFee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">computeBidFee</span><span class="p">(</span><span class="nx">name</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">startFee</span><span class="p">,</span><span class="w"> </span><span class="nx">increment</span><span class="w"> </span><span class="p">})</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">bidTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">bid</span><span class="p">(</span><span class="nx">nameFee</span><span class="p">)</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bidTx</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`BID PLACED AT </span><span class="si">${</span><span class="nx">bidTx</span><span class="p">.</span><span class="nx">blockHeight</span><span class="si">}</span><span class="sb"> WILL END AT </span><span class="si">${</span><span class="nx">computeAuctionEndBlock</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">bidTx</span><span class="p">.</span><span class="nx">blockHeight</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+
+<span class="cm">/*</span>
+<span class="cm">{</span>
+<span class="cm">  blockHash: &#39;mh_Y5LDYPtPWzcop2FCbxnwTSwjWo9d3rYcBBcChCEHfzHo2YZpm&#39;,</span>
+<span class="cm">  blockHeight: 449693,</span>
+<span class="cm">  hash: &#39;th_2nZshewM7FtKSsDEP4zXPsGCe9cdxaFTRrcNjJyE22ktjGidZR&#39;,</span>
+<span class="cm">  signatures: [</span>
+<span class="cm">    &#39;sg_7G49bziWjjZAjayBhFffRyfLbmFczs2foJgXcx1n1Vo7iGELQqggdH4w72MqWbNUbM9Jv2EBJnd2LFjv6LJhqTmvJBWyr&#39;</span>
+<span class="cm">  ],</span>
+<span class="cm">  tx: {</span>
+<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    fee: 16520000000000n,</span>
+<span class="cm">    name: &#39;auctiontest1.chain&#39;,</span>
+<span class="cm">    nameFee: 3159434250000000000n,</span>
+<span class="cm">    nameSalt: 0,</span>
+<span class="cm">    nonce: 24,</span>
+<span class="cm">    type: &#39;NameClaimTx&#39;,</span>
+<span class="cm">    version: 2</span>
+<span class="cm">  },</span>
+<span class="cm">  rawTx: &#39;tx_+JQLAfhCuEAv2HQoyLa7krHpcQAsPpWdP+6PJYzdPSifmwNIgpWZtyrdgVD+IGMzzAqxkOQEDeAwc/Oh+dfXPBZpNslCNFgBuEz4SiACoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhiSYXVjdGlvbnRlc3QxLmNoYWluAIgr2JC2AnPkAIYPBly7UAAAm/NY1g==&#39;</span>
+<span class="cm">}</span>
+<span class="cm">BID PLACED AT 449693 WILL END AT 479453</span>
+<span class="cm">*/</span>
+</code></pre></div>
+<p>Note:</p>
+<ul>
+<li>It is required to provide a <code>nameFee</code> that is at least <code>5%</code> higher than the current bid.</li>
+<li>The node doesn't expose an API to request the <code>nameFee</code> of the last bid. You need to receive that information from the <a href="https://github.com/aeternity/ae_mdw">middleware</a> that you ideally host yourself.</li>
+</ul>
+<h2 id="2-update-a-name">2. Update a name</h2>
+<p>Now that you own your AENS name you might want to update it in order to:</p>
+<ul>
+<li>Set pointers to <code>accounts</code>, <code>oracles</code>, <code>contracts</code>, <code>channels</code>, or store binary data.</li>
+<li>Extend the TTL before it expires.</li>
+<li>By default a name will have a TTL of 180000 key blocks (~375 days). It cannot be extended longer than 180000 key blocks.</li>
+</ul>
+<h3 id="set-pointers-update-ttl">Set pointers &amp; update TTL</h3>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getDefaultPointerKey</span><span class="p">,</span><span class="w"> </span><span class="nx">encode</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">pointers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">account_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">customKey</span><span class="o">:</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="s1">&#39;example data&#39;</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Bytearray</span><span class="p">),</span>
+<span class="w">  </span><span class="p">[</span><span class="nx">getDefaultPointerKey</span><span class="p">(</span><span class="nx">oracle</span><span class="p">)]</span><span class="o">:</span><span class="w"> </span><span class="nx">oracle</span><span class="p">,</span><span class="w"> </span><span class="c1">// the same as `oracle_pubkey: oracle,`</span>
+<span class="w">  </span><span class="nx">contract_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ct_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">channel</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">nameUpdateTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">pointers</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameUpdateTx</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm">{</span>
+<span class="cm">  blockHash: &#39;mh_AiaGtTWBRys7EX5apAidShyCw1kefocuWt49DgLE2fWNCgKvq&#39;,</span>
+<span class="cm">  blockHeight: 449855,</span>
+<span class="cm">  hash: &#39;th_LLef19g2mLWQfG7Ds1XZNGyb3SGvi8PGvk7mJczpD9iToBcqL&#39;,</span>
+<span class="cm">  signatures: [</span>
+<span class="cm">    &#39;sg_Zm7kp1oBnXGnHwdzsim9nTXtrGoV4bWJhcC1nkw9f3eMPibVaYQRoM829iNrPandAfs8TK7ogEkYByxQx11xCAFMpwUBz&#39;</span>
+<span class="cm">  ],</span>
+<span class="cm">  tx: {</span>
+<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    clientTtl: 3600,</span>
+<span class="cm">    fee: 17800000000000n,</span>
+<span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
+<span class="cm">    nameTtl: 180000,</span>
+<span class="cm">    nonce: 27,</span>
+<span class="cm">    pointers: [ [Object] ],</span>
+<span class="cm">    type: &#39;NameUpdateTx&#39;,</span>
+<span class="cm">    version: 1</span>
+<span class="cm">  },</span>
+<span class="cm">  rawTx: &#39;tx_+NQLAfhCuED6aLVAlIfcqczlZ4XzOjG3U23l5+egPFDVEKTSMuL0Zj18jUG6ctJxGGQubNoANFcwQl79T7w0dG4+FV7Qn3AKuIz4iiIBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhuhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbagwK/IPLxjmFjY291bnRfcHVia2V5oQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAoMBSniGEDBirVAAAJ7I9GA=&#39;</span>
+<span class="cm">}</span>
+<span class="cm">*/</span>
+</code></pre></div>
+<p>Note:</p>
+<ul>
+<li>If you provide an empty pointers object and don't set <code>extendPointers</code> to <code>true</code> all of your current pointers will be removed.</li>
+<li>If you provide a non-empty object of pointers to that function while using <code>extendPointers</code> the SDK will merge the existing pointers with those provided.</li>
+<li>In case there already exists an account pointer and you provide an accounts address in the array the old account pointer will be overwritten</li>
+<li>It's also possible to pass additional <a href="../../transaction-options/#nameupdatetx">transaction options</a> here, too.</li>
+</ul>
+<h3 id="extend-ttl-while-keeping-pointers">Extend TTL while keeping pointers</h3>
+<p>In case you want to extend a name using a custom TTL and keep the current pointers you can do this as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">nameUpdateTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">extendTtl</span><span class="p">(</span><span class="mf">100000</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameUpdateTx</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm">{</span>
+<span class="cm">  blockHash: &#39;mh_2mbAuBtyPp7wN6hrcvkYD7LZRSegwZZKYnLcNQkGVGRZ3uVxW6&#39;,</span>
+<span class="cm">  blockHeight: 449860,</span>
+<span class="cm">  hash: &#39;th_2wXE8i5BUFCUPuioKwAuwNysm6RPQo8STf5m91CuT3LTh7q4ko&#39;,</span>
+<span class="cm">  signatures: [</span>
+<span class="cm">    &#39;sg_E69tfR3STWi5Dg6yUHQj5D5waTCEhoFmb1LYWGU2bsCnuLkMgH1KqhRKrCZaatDMyg5szgABDuU1r6ZD5K74qXWW5pMJ&#39;</span>
+<span class="cm">  ],</span>
+<span class="cm">  tx: {</span>
+<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    clientTtl: 100000,</span>
+<span class="cm">    fee: 17800000000000n,</span>
+<span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
+<span class="cm">    nameTtl: 100000,</span>
+<span class="cm">    nonce: 28,</span>
+<span class="cm">    pointers: [ [Object] ],</span>
+<span class="cm">    type: &#39;NameUpdateTx&#39;,</span>
+<span class="cm">    version: 1</span>
+<span class="cm">  },</span>
+<span class="cm">  rawTx: &#39;tx_+NQLAfhCuEABuZTyU+W5xmBpQn5GCJiSpK6fI0pYoMIQ5IqD2bs6pJ+oyU7HDGoSU0Mn6tsfYOn+MVRsxLR6yM1Vyv0c4JQNuIz4iiIBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhyhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbagwGGoPLxjmFjY291bnRfcHVia2V5oQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAoMBhqCGEDBirVAAANKYAm0=&#39;</span>
+<span class="cm">}</span>
+<span class="cm">*/</span>
+</code></pre></div>
+<h2 id="3-transfer-ownership-of-a-name">3. Transfer ownership of a name</h2>
+<p>In some cases you might want to transfer the ownership of a name to another account. Of course this is also possible and you can do that as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">recipient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">nameTransferTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">recipient</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameTransferTx</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm">{</span>
+<span class="cm">  blockHash: &#39;mh_ZuYV5tmJM4PhrfxzXfo9e37uqPcYpCiAoEC2uRcqbUXeMSmLH&#39;,</span>
+<span class="cm">  blockHeight: 449982,</span>
+<span class="cm">  hash: &#39;th_xXqmZxR7WJDe6YTz1GnHWgNjtcZjpTPA5bVuiQstmd8o6Gg7x&#39;,</span>
+<span class="cm">  signatures: [</span>
+<span class="cm">    &#39;sg_72fiMzprywNmFtuf1i1FFfhBBXcPHpHDfi1Uv2bDnYayoCRWe1yyzvwLmhM6cfA3TR6pBF9Kj3iyYm3mrC46rvNCpchyi&#39;</span>
+<span class="cm">  ],</span>
+<span class="cm">  tx: {</span>
+<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    fee: 17300000000000n,</span>
+<span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
+<span class="cm">    nonce: 33,</span>
+<span class="cm">    recipientId: &#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;,</span>
+<span class="cm">    type: &#39;NameTransferTx&#39;,</span>
+<span class="cm">    version: 1</span>
+<span class="cm">  },</span>
+<span class="cm">  rawTx: &#39;tx_+LsLAfhCuEAuFNHG4gniZjJDQtbm5cIfJACkU/NI96mZpwMvdyuxxOYWYxSxUF2NF5oxjmsYLdXWfSrdmgWj40JzZU/TRA4DuHP4cSQBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAiGhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbaoQHVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajO4YPu/hayAAABhgUgg==&#39;</span>
+<span class="cm">}</span>
+<span class="cm">*/</span>
+</code></pre></div>
+<h2 id="4-revoke-a-name">4. Revoke a name</h2>
+<p>In case you want to revoke a name prior to its expiration for whatever reason you can do that as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">nameRevokeTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">revoke</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameRevokeTx</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm">{</span>
+<span class="cm">  blockHash: &#39;mh_2Q5Xqd4vrmwkS98SBkN79k1t9VLNmDX4wk8xnUJYTEvkK3YoH4&#39;,</span>
+<span class="cm">  blockHeight: 450018,</span>
+<span class="cm">  hash: &#39;th_2XhJradAVKN2jR2tgNYdKNWikMc8XunqTdUhRPh2TyhAwMqijJ&#39;,</span>
+<span class="cm">  signatures: [</span>
+<span class="cm">    &#39;sg_Tjbf8SJDQXgBhaYk7AzTTr7d1RF3bDcMp6BMgRoHcHcgBp13HjcMYmZJ8vvqrZ94An9gvQD4NegYrR7eaBLt6jEy99xyM&#39;</span>
+<span class="cm">  ],</span>
+<span class="cm">  tx: {</span>
+<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    fee: 16620000000000,</span>
+<span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
+<span class="cm">    nonce: 34,</span>
+<span class="cm">    type: &#39;NameRevokeTx&#39;,</span>
+<span class="cm">    version: 1</span>
+<span class="cm">  },</span>
+<span class="cm">  rawTx: &#39;tx_+JkLAfhCuEDMWOZac70tEHQ4AHGBIedZepwTvsBjIHk36vhTd5yBepmTemTQcUVrAtbNO3jZVZD4GUOhN+DfXm2lNrpZu+8FuFH4TyMBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAiKhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbahg8dpTI4AAB44bma&#39;</span>
+<span class="cm">}</span>
+<span class="cm">*/</span>
+</code></pre></div>
+<p>Note:</p>
+<ul>
+<li>On revocation the name enters in a <code>revoked</code> state.</li>
+<li>After a timeout of <code>2016</code> key blocks the name will be available for claiming again.</li>
+</ul>
+<h2 id="delegate-signature-to-contract-aens-interface">Delegate signature to contract (AENS interface)</h2>
+<p>It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the <a href="https://docs.aeternity.com/aesophia/latest/sophia_features/#aens-interface">AENS interface</a> and perform AENS related actions on behalf of your account.</p>
+<p>This functionality could for example be used to build an AENS marketplace.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">contractAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ct_asd2ks...&#39;</span><span class="p">;</span>
+<span class="c1">// AENS name</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">nameId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;example.chain&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">commonParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">contractAddress</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">accountAddress</span><span class="o">:</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
+<span class="p">};</span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">delegation</span><span class="p">;</span>
+
+<span class="c1">// this signature will allow the contract to perform a pre-claim on your behalf</span>
+<span class="nx">delegation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">packDelegation</span><span class="p">({</span><span class="w"> </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="nx">DelegationTag</span><span class="p">.</span><span class="nx">AensPreclaim</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">commonParams</span><span class="w"> </span><span class="p">});</span>
+
+<span class="c1">// this signature will allow the contract to perform</span>
+<span class="c1">// any name related transaction for a specific name that you own</span>
+<span class="nx">delegation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">packDelegation</span><span class="p">({</span><span class="w"> </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="nx">DelegationTag</span><span class="p">.</span><span class="nx">AensName</span><span class="p">,</span><span class="w"> </span><span class="nx">nameId</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">commonParams</span><span class="w"> </span><span class="p">});</span>
+
+<span class="c1">// alternatively, you can generate a delegation signature suitable for every name you own</span>
+<span class="nx">delegation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">packDelegation</span><span class="p">({</span><span class="w"> </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="nx">DelegationTag</span><span class="p">.</span><span class="nx">AensWildcard</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">commonParams</span><span class="w"> </span><span class="p">});</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">delegationSignature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signDelegation</span><span class="p">(</span><span class="nx">delegation</span><span class="p">);</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>
