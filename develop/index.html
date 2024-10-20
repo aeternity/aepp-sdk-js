@@ -1409,7 +1409,28 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/migration/13.0.0/" class="md-nav__link">
+      <a href="guides/migration/14/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 14.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/migration/13/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1430,7 +1451,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/migration/12.0.0/" class="md-nav__link">
+      <a href="guides/migration/12/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1451,7 +1472,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/migration/11.0.0/" class="md-nav__link">
+      <a href="guides/migration/11/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1472,7 +1493,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/migration/10.0.0/" class="md-nav__link">
+      <a href="guides/migration/10/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1493,7 +1514,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/migration/9.0.0/" class="md-nav__link">
+      <a href="guides/migration/9/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1514,7 +1535,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/migration/7.0.0/" class="md-nav__link">
+      <a href="guides/migration/7/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1789,7 +1810,7 @@
 <h3 id="specific-sdk-version">Specific SDK version</h3>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.cjs&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
-<p>...where <code>VERSION</code> is the version number of the SDK you want to use (eg. <code>13.1.0</code>).</p>
+<p>...where <code>VERSION</code> is the version number of the SDK you want to use (eg. <code>14.0.0</code>).</p>
 <h3 id="browser-script-tag">Browser <code>&lt;script&gt;</code> tag</h3>
 <p>The bundle will assign the SDK to a global variable called <code>Aeternity</code> that makes all functionalities of the SDK accessible.</p>
 <p>Usage:</p>
@@ -1842,8 +1863,8 @@ This may be done in <code>tsconfig.json</code>:</p>
 <span class="w"> </span> }
 }
 </code></pre></div>
-<p>SDK uses modern features available since typescript@4.7. Though SDK is still compatible with typescript@4.1 and above using types generated separately, but these types are less accurate.</p>
 <p>Ensure that you have <code>strictFunctionTypes</code> option not enabled (as it is in VS code and <code>ts-node</code> by default), otherwise some of SDK types won't work correctly (see <a href="https://github.com/aeternity/aepp-sdk-js/issues/1793">#1793</a>).</p>
+<p>In some environments, TypeScript fails to check types of sdk's dependencies (<code>@metamask/json-rpc-engine</code>, <code>@ledgerhq/hw-transport</code>), if so you may find <a href="https://www.typescriptlang.org/tsconfig/#skipLibCheck"><code>skipLibCheck</code></a> useful.</p>
 <h3 id="vue-cli4">Vue CLI@4</h3>
 <p>SDK checks are not working correctly because CLI picks both ESM and CJS versions of <code>autorest</code>
 dependencies. To fix this, you need to specify aliases in <code>vue.config.js</code>.</p>
@@ -1869,7 +1890,7 @@ classes reactive then the app may fail with</p>
 to solve this issue we suggest to avoid making their instances reactive. One of the ways is to use
 Vue's integrated utility: <a href="https://vuejs.org/api/reactivity-advanced.html#shallowref">shallowRef</a>. The idea is to make reactive only the
 root variable, to don't make it reactive in deep. You can find it implementation in the
-<a href="https://github.com/aeternity/aepp-sdk-js/tree/71da12b5df56b41f7317d1fb064e44e8ea118d6c/examples/browser/aepp">æpp example</a>.</p>
+<a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/aepp">æpp example</a>.</p>
 <h2 id="command-line-interface-cli">Command Line Interface (CLI)</h2>
 <p>If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the <a href="https://github.com/aeternity/aepp-cli-js">💻 CLI</a> and follow the instructions mentioned there.</p>
 

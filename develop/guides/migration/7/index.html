@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../12.0.0/">
+        <link rel="prev" href="../9/">
       
       
-        <link rel="next" href="../10.0.0/">
+        <link rel="next" href="../../../contrib/">
       
       
       <link rel="icon" href="../../../images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Migration to 11.0.0 - æternity JavaScript SDK</title>
+        <title>Migration to 7.0.0 - æternity JavaScript SDK</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#migration-to-1100" class="md-skip">
+        <a href="#migration-to-700" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Migration to 11.0.0
+              Migration to 7.0.0
             
           </span>
         </div>
@@ -1253,7 +1253,28 @@
   
   
     <li class="md-nav__item">
-      <a href="../13.0.0/" class="md-nav__link">
+      <a href="../14/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 14.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1274,11 +1295,74 @@
   
   
     <li class="md-nav__item">
-      <a href="../12.0.0/" class="md-nav__link">
+      <a href="../12/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Migration to 12.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 11.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 10.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 9.0.0
   </span>
   
 
@@ -1308,7 +1392,7 @@
           
   
   <span class="md-ellipsis">
-    Migration to 11.0.0
+    Migration to 7.0.0
   </span>
   
 
@@ -1319,7 +1403,7 @@
         
   
   <span class="md-ellipsis">
-    Migration to 11.0.0
+    Migration to 7.0.0
   </span>
   
 
@@ -1341,90 +1425,108 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#changes-to-decodeevents-method" class="md-nav__link">
+  <a href="#step-1" class="md-nav__link">
     <span class="md-ellipsis">
-      Changes to decodeEvents method
+      Step 1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#removed-allowunsynced-option-of-poll-method-6baa15d" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#after" class="md-nav__link">
     <span class="md-ellipsis">
-      Removed allowUnsynced option of poll method (6baa15d)
+      After
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#transaction-poll-method-now-checks-if-tx-is-in-the-node-pool-690db5b" class="md-nav__link">
-    <span class="md-ellipsis">
-      Transaction poll method now checks if Tx is in the node pool (690db5b)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-default-polling-interval-of-5000-is-replaced-by-a-method-which-calculates-the-default-interval-using-expected-mine-rate-and-micro-block-cycle-d9c6cf9" class="md-nav__link">
+  <a href="#step-2" class="md-nav__link">
     <span class="md-ellipsis">
-      The default polling interval of 5000 is replaced by a method which calculates the default interval using expected mine rate and micro block cycle (d9c6cf9)
+      Step 2
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#following-contract-instance-methods-are-dropped1368" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#after_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Following contract instance methods are dropped(#1368)
+      After
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#the-default-gas-of-25000-limit-has-been-dropped-instead-sdk-attempts-to-estimate-the-gas-using-dry-run-feature-1367" class="md-nav__link">
-    <span class="md-ellipsis">
-      The default gas of 25000 limit has been dropped. Instead, SDK attempts to estimate the gas using dry-run feature (#1367)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-wrappers-around-compilerapi-1363" class="md-nav__link">
+  <a href="#step-3" class="md-nav__link">
     <span class="md-ellipsis">
-      Removed Wrappers around CompilerApi (#1363)
+      Step 3
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#native-build-of-claim-tx-now-accepts-unencoded-name-instead-of-encoded-name-eea92be" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#after_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Native build of claim tx now accepts unencoded name instead of encoded name (eea92be)
+      After
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#removed-forcevalidation-flag-from-aepp-rpc-and-wallet-rpc-stamps-9f958c3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Removed forceValidation flag from aepp-rpc and wallet-rpc stamps. (9f958c3)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#renamed-hd-wallet-methods-f6243ad" class="md-nav__link">
+  <a href="#other-breaking-changes" class="md-nav__link">
     <span class="md-ellipsis">
-      Renamed hd-wallet methods (f6243ad)
+      Other Breaking Changes
     </span>
   </a>
   
@@ -1434,69 +1536,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../10.0.0/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Migration to 10.0.0
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../9.0.0/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Migration to 9.0.0
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../7.0.0/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Migration to 7.0.0
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1620,90 +1659,108 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#changes-to-decodeevents-method" class="md-nav__link">
+  <a href="#step-1" class="md-nav__link">
     <span class="md-ellipsis">
-      Changes to decodeEvents method
+      Step 1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#removed-allowunsynced-option-of-poll-method-6baa15d" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#after" class="md-nav__link">
     <span class="md-ellipsis">
-      Removed allowUnsynced option of poll method (6baa15d)
+      After
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#transaction-poll-method-now-checks-if-tx-is-in-the-node-pool-690db5b" class="md-nav__link">
-    <span class="md-ellipsis">
-      Transaction poll method now checks if Tx is in the node pool (690db5b)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-default-polling-interval-of-5000-is-replaced-by-a-method-which-calculates-the-default-interval-using-expected-mine-rate-and-micro-block-cycle-d9c6cf9" class="md-nav__link">
+  <a href="#step-2" class="md-nav__link">
     <span class="md-ellipsis">
-      The default polling interval of 5000 is replaced by a method which calculates the default interval using expected mine rate and micro block cycle (d9c6cf9)
+      Step 2
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#following-contract-instance-methods-are-dropped1368" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#after_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Following contract instance methods are dropped(#1368)
+      After
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#the-default-gas-of-25000-limit-has-been-dropped-instead-sdk-attempts-to-estimate-the-gas-using-dry-run-feature-1367" class="md-nav__link">
-    <span class="md-ellipsis">
-      The default gas of 25000 limit has been dropped. Instead, SDK attempts to estimate the gas using dry-run feature (#1367)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-wrappers-around-compilerapi-1363" class="md-nav__link">
+  <a href="#step-3" class="md-nav__link">
     <span class="md-ellipsis">
-      Removed Wrappers around CompilerApi (#1363)
+      Step 3
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#native-build-of-claim-tx-now-accepts-unencoded-name-instead-of-encoded-name-eea92be" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#after_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Native build of claim tx now accepts unencoded name instead of encoded name (eea92be)
+      After
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#removed-forcevalidation-flag-from-aepp-rpc-and-wallet-rpc-stamps-9f958c3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Removed forceValidation flag from aepp-rpc and wallet-rpc stamps. (9f958c3)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#renamed-hd-wallet-methods-f6243ad" class="md-nav__link">
+  <a href="#other-breaking-changes" class="md-nav__link">
     <span class="md-ellipsis">
-      Renamed hd-wallet methods (f6243ad)
+      Other Breaking Changes
     </span>
   </a>
   
@@ -1724,224 +1781,55 @@
                   
 
 
-<h1 id="migration-to-1100">Migration to 11.0.0</h1>
-<p>This guide describes all breaking changes introduced with <code>v11.0.0</code>.</p>
-<h2 id="changes-to-decodeevents-method">Changes to <code>decodeEvents</code> method</h2>
-<ul>
-<li>Removed <code>decodeEvents</code> from contract ACI methods (<a href="https://github.com/aeternity/aepp-sdk-js/commit/a84d781ab08473b7af8e6c16491492cb166d6155">a84d781</a>).</li>
-</ul>
-<p>rewrite</p>
-<div class="highlight"><pre><span></span><code><span class="nx">cInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">.</span><span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">log</span><span class="p">);</span>
-</code></pre></div>
-<p>to</p>
-<div class="highlight"><pre><span></span><code><span class="nx">cInstance</span><span class="p">.</span><span class="nx">decodeEvents</span><span class="p">(</span><span class="nx">log</span><span class="p">);</span>
-</code></pre></div>
-<ul>
-<li>
-<p>Removed raw fields from the <code>decodeEvents</code> response (<a href="https://github.com/aeternity/aepp-sdk-js/commit/45bae5f8f0b21d374966a761512ba91bb747c47a">45bae5f</a>) use processed fields for the same.</p>
-</li>
-<li>
-<p>Renamed decoded events response field <code>decoded</code> to <code>args</code></p>
-</li>
-</ul>
-<p>old response</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;this message is not indexed&#39;</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedEvents</span><span class="p">);</span>
-
-<span class="cm">/*</span>
-<span class="cm">[</span>
-<span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;,</span>
-<span class="cm">    data: &#39;cb_dGhpcyBtZXNzYWdlIGlzIG5vdCBpbmRleGVkdWmUpw==&#39;,</span>
-<span class="cm">    topics: [</span>
-<span class="cm">      &#39;101640830366340000167918459210098337687948756568954742276612796897811614700269&#39;,</span>
-<span class="cm">      &#39;39519965516565108473327470053407124751867067078530473195651550649472681599133&#39;</span>
-<span class="cm">    ],</span>
-<span class="cm">    name: &#39;AnotherEvent&#39;,</span>
-<span class="cm">    decoded: [</span>
-<span class="cm">      &#39;fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk&#39;,</span>
-<span class="cm">      &#39;this message is not indexed&#39;</span>
-<span class="cm">    ]</span>
-<span class="cm">  },</span>
-<span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;,</span>
-<span class="cm">    data: &#39;cb_Xfbg4g==&#39;,</span>
-<span class="cm">    topics: [</span>
-<span class="cm">      &#39;59505622142252318624300825714684802559980671551955787864303522023309554554980&#39;,</span>
-<span class="cm">      1337</span>
-<span class="cm">    ],</span>
-<span class="cm">    name: &#39;FirstEvent&#39;,</span>
-<span class="cm">    decoded: [ &#39;1337&#39; ]</span>
-<span class="cm">  }</span>
-<span class="cm">]</span>
-<span class="cm">*/</span>
-</code></pre></div>
-<p>new response</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;this message is not indexed&#39;</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedEvents</span><span class="p">);</span>
-
-<span class="cm">/*</span>
-<span class="cm">[</span>
-<span class="cm">  {</span>
-<span class="cm">    name: &#39;AnotherEvent&#39;,</span>
-<span class="cm">    args: [</span>
-<span class="cm">      &#39;fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk&#39;,</span>
-<span class="cm">      &#39;this message is not indexed&#39;</span>
-<span class="cm">    ],</span>
-<span class="cm">    contract: {</span>
-<span class="cm">      name: &#39;EventEmitter&#39;,</span>
-<span class="cm">      address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;</span>
-<span class="cm">    }</span>
-<span class="cm">  },</span>
-<span class="cm">  {</span>
-<span class="cm">    name: &#39;FirstEvent&#39;,</span>
-<span class="cm">    args: [1337n],</span>
-<span class="cm">    contract: {</span>
-<span class="cm">      name: &#39;EventEmitter&#39;,</span>
-<span class="cm">      address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;</span>
-<span class="cm">    }</span>
-<span class="cm">  }</span>
-<span class="cm">]</span>
-<span class="cm">*/</span>
-</code></pre></div>
-<h2 id="removed-allowunsynced-option-of-poll-method-6baa15d">Removed <code>allowUnsynced</code> option of <code>poll</code> method (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1376/commits/6baa15d3202510ea3d1e31c4a48928de92804a9e">6baa15d</a>)</h2>
-<h2 id="transaction-poll-method-now-checks-if-tx-is-in-the-node-pool-690db5b">Transaction <code>poll</code> method now checks if Tx is in the node pool (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1375/commits/690db5bd2919958edcadca79fd75b5ad96b77c62">690db5b</a>)</h2>
-<h2 id="the-default-polling-interval-of-5000-is-replaced-by-a-method-which-calculates-the-default-interval-using-expected-mine-rate-and-micro-block-cycle-d9c6cf9">The default polling interval of <code>5000</code> is replaced by a method which calculates the default interval using expected mine rate and micro block cycle (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1369/commits/d9c6cf9aae59515f9e9a032e58b45840c6801b50">d9c6cf9</a>)</h2>
-<h2 id="following-contract-instance-methods-are-dropped1368">Following contract instance methods are dropped(<a href="https://github.com/aeternity/aepp-sdk-js/pull/1368">#1368</a>)</h2>
-<ul>
-<li><code>topBlock</code></li>
-<li>use <code>aeSdk.api.getTopHeader()</code> instead</li>
-<li><code>contractCall</code></li>
-<li>replace <code>await aeSdk.contractCall(identityContract, contractId, 'getArg', [42])</code></li>
-<li>with <code>(await aeSdk.getContractInstance({ source, contractAddress: contractId })).methods.getArg(42)</code></li>
-<li><code>contractCompile</code></li>
-<li>replace <code>await aeSdk.contractCompile(CONTRACT_SOURCE)</code></li>
-<li>with <code>(await aeSdk.getContractInstance({ source: CONTRACT_SOURCE })).compile()</code></li>
-<li><code>contractDeploy</code></li>
-<li>replace <code>await aeSdk.contractDeploy(bytecode, identityContract)</code></li>
-<li>with <code>(await aeSdk.getContractInstance({ bytecode, source: identityContract })).deploy()</code></li>
-<li><code>contractCallStatic</code></li>
-<li>replace <code>await aeSdk.contractCallStatic(identityContract, null, 'init', [], { bytecode })</code></li>
-<li>with <code>await contract.deploy([], { callStatic: true })</code></li>
-<li>Removed property <code>createdAt</code> from <code>contract.deploy</code> method response</li>
-<li><code>call/callStatic</code></li>
-<li>removed <code>call</code> and <code>callStatic</code> methods from deploy response</li>
-</ul>
-<p>rewrite</p>
-<div class="highlight"><pre><span></span><code><span class="nx">deployed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">deploy</span><span class="p">([],</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="w"> </span><span class="p">});</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">deployed</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="s1">&#39;getArg&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">deployed</span><span class="p">.</span><span class="nx">callStatic</span><span class="p">(</span><span class="s1">&#39;getArg&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
-</code></pre></div>
-<p>to</p>
-<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">deploy</span><span class="p">();</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">getArg</span><span class="p">(</span><span class="mf">42</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">callStatic</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">});</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">getArg</span><span class="p">(</span><span class="mf">42</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">callStatic</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span>
-</code></pre></div>
-<h2 id="the-default-gas-of-25000-limit-has-been-dropped-instead-sdk-attempts-to-estimate-the-gas-using-dry-run-feature-1367">The default <code>gas</code> of 25000 limit has been dropped. Instead, SDK attempts to estimate the gas using dry-run feature (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1367">#1367</a>)</h2>
-<p>See documentation on <a href="../../../transaction-options/#how-to-estimate-gas">transaction-options.md</a> for detailed explanation.</p>
-<h2 id="removed-wrappers-around-compilerapi-1363">Removed Wrappers around <code>CompilerApi</code> (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1363">#1363</a>)</h2>
-<ul>
-<li>
-<p>Removed <code>getBytecodeCompilerVersion</code> method.</p>
-</li>
-<li>
-<p>Removed <code>encodeCall</code> method from <code>contractCompile</code> response.</p>
-</li>
-<li>
-<p>Removed <code>getCompilerVersion</code> method, use <code>aeSdk. sdk.compilerVersion</code> instead.</p>
-</li>
-<li>
-<p>Removed <code>contractDecodeCallDataByCodeAPI</code> method.</p>
-</li>
-<li>
-<p>Removed <code>contractDecodeCallResultAPI</code> method.</p>
-</li>
-<li>
-<p>Removed <code>getFateAssembler</code> method.</p>
-</li>
-<li>
-<p>Removed <code>compileContractAPI</code> method.</p>
-</li>
-</ul>
-<p>rewrite</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">compileContractAPI</span><span class="p">(</span><span class="nx">identityContract</span><span class="p">);</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">callData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">contractEncodeCallDataAPI</span><span class="p">(</span><span class="nx">identityContract</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;init&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]);</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">initiatorCh</span><span class="p">.</span><span class="nx">createContract</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">code</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">callData</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">deposit</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">vmVersion</span><span class="o">:</span><span class="w"> </span><span class="mf">5</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">abiVersion</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">amount</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">gas</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">gasPrice</span><span class="p">,</span>
+<h1 id="migration-to-700">Migration to 7.0.0</h1>
+<p>This guide describes the process of migrating to SDK version 7.0.0</p>
+<h2 id="step-1">Step 1</h2>
+<p>SDK will not accept <code>url</code>, <code>internalUrl</code> init arguments anymore:</p>
+<h4 id="before">Before</h4>
+<div class="highlight"><pre><span></span><code><span class="nx">Universal</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">url</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">internalUrl</span><span class="p">,</span>
 <span class="p">});</span>
 </code></pre></div>
-<p>to</p>
-<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">contractSource</span><span class="w"> </span><span class="p">});</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">compile</span><span class="p">();</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">createContract</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">code</span><span class="o">:</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">bytecode</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">callData</span><span class="o">:</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;Identity&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;init&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]),</span>
-<span class="w">  </span><span class="nx">deposit</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">vmVersion</span><span class="o">:</span><span class="w"> </span><span class="mf">5</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">abiVersion</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">amount</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">gas</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">gasPrice</span><span class="p">,</span>
+<h4 id="after">After</h4>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">nodeInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="nx">internalUrl</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">Universal</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">nodeInstance</span><span class="w"> </span><span class="p">}],</span>
 <span class="p">});</span>
+</code></pre></div>
+<h2 id="step-2">Step 2</h2>
+<p>Remove deprecated function <code>setKeypair</code><br />
+<code>SDK</code> will not accept <code>keypair</code> init argument anymore:</p>
+<h4 id="before_1">Before</h4>
+<div class="highlight"><pre><span></span><code><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+<h4 id="after_1">After</h4>
+<div class="highlight"><pre><span></span><code><span class="nx">Universal</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">MemoryAccount</span><span class="p">({</span><span class="w"> </span><span class="nx">keypair</span><span class="w"> </span><span class="p">})],</span>
+<span class="p">});</span>
+</code></pre></div>
+<h2 id="step-3">Step 3</h2>
+<p>Change all of <code>AENS</code> method's first argument from <code>nameId</code> to <code>name</code></p>
+<h3 id="before_2">Before</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
 
-<span class="c1">//or</span>
-<span class="nx">bytecode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">compilerApi</span><span class="p">.</span><span class="nx">compileContract</span><span class="p">({</span><span class="w"> </span><span class="nx">code</span><span class="o">:</span><span class="w"> </span><span class="nx">contractSource</span><span class="w"> </span><span class="p">})).</span><span class="nx">bytecode</span><span class="p">;</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
 </code></pre></div>
+<h3 id="after_2">After</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
+
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+</code></pre></div>
+<h2 id="other-breaking-changes">Other Breaking Changes</h2>
 <ul>
-<li>Removed <code>contractEncodeCallDataAPI</code>:</li>
-</ul>
-<p>rewrite</p>
-<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">contractEncodeCallDataAPI</span><span class="p">(</span><span class="nx">contractSource</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;getArg&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;42&#39;</span><span class="p">]);</span>
-</code></pre></div>
-<p>to</p>
-<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdkInitiator</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">contractSource</span><span class="w"> </span><span class="p">});</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">compile</span><span class="p">();</span>
-<span class="nx">contract</span><span class="p">.</span><span class="nx">calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;Identity&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;getArg&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
-</code></pre></div>
-<ul>
-<li>Removed <code>contractGetACI</code>:</li>
-</ul>
-<p>rewrite</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">aci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">contractGetACI</span><span class="p">(</span><span class="nx">contractSource</span><span class="p">);</span>
-</code></pre></div>
-<p>to</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">aci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">compilerApi</span><span class="p">.</span><span class="nx">generateACI</span><span class="p">({</span><span class="w"> </span><span class="nx">code</span><span class="o">:</span><span class="w"> </span><span class="nx">contractSource</span><span class="w"> </span><span class="p">});</span>
-</code></pre></div>
-<ul>
-<li>Removed <code>validateByteCodeAPI</code>:</li>
-</ul>
-<p>rewrite</p>
-<div class="highlight"><pre><span></span><code><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">validateByteCodeAPI</span><span class="p">(</span><span class="nx">bytecode</span><span class="p">,</span><span class="w"> </span><span class="nx">identityContract</span><span class="p">);</span>
-</code></pre></div>
-<p>to</p>
-<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">compilerApi</span><span class="p">.</span><span class="nx">validateByteCode</span><span class="p">({</span><span class="w"> </span><span class="nx">bytecode</span><span class="p">,</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">identityContract</span><span class="w"> </span><span class="p">});</span>
-</code></pre></div>
-<h2 id="native-build-of-claim-tx-now-accepts-unencoded-name-instead-of-encoded-name-eea92be">Native build of claim tx now accepts unencoded <code>name</code> instead of encoded name (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1414/commits/eea92be7432cfc56e781c2234379c8f2c3398e3e">eea92be</a>)</h2>
-<p>rewrite</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;test123test.chain&#39;</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">nameHash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`nm_</span><span class="si">${</span><span class="nx">encodeBase58Check</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">name</span><span class="p">))</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">accountId</span><span class="o">:</span><span class="w"> </span><span class="nx">senderId</span><span class="p">,</span><span class="w"> </span><span class="nx">nonce</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="nx">nameHash</span><span class="p">,</span><span class="w"> </span><span class="nx">nameSalt</span><span class="o">:</span><span class="w"> </span><span class="nx">_salt</span><span class="p">,</span><span class="w"> </span><span class="nx">nameFee</span><span class="w"> </span><span class="p">};</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">txFromAPI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">nameClaimTx</span><span class="p">(</span><span class="nx">params</span><span class="p">);</span>
-</code></pre></div>
-<p>to</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;test123test.chain&#39;</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">accountId</span><span class="o">:</span><span class="w"> </span><span class="nx">senderId</span><span class="p">,</span><span class="w"> </span><span class="nx">nonce</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">nameSalt</span><span class="o">:</span><span class="w"> </span><span class="nx">_salt</span><span class="p">,</span><span class="w"> </span><span class="nx">nameFee</span><span class="w"> </span><span class="p">};</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">txFromAPI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">nameClaimTx</span><span class="p">(</span><span class="nx">params</span><span class="p">);</span>
-</code></pre></div>
-<h2 id="removed-forcevalidation-flag-from-aepp-rpc-and-wallet-rpc-stamps-9f958c3">Removed <code>forceValidation</code> flag from <code>aepp-rpc</code> and <code>wallet-rpc</code> stamps. (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1415/commits/9f958c3549228c990b4c6074b88ed5b45284bf55">9f958c3</a>)</h2>
-<h2 id="renamed-hd-wallet-methods-f6243ad">Renamed <code>hd-wallet</code> methods (<a href="https://github.com/aeternity/aepp-sdk-js/commit/f6243adea2017b5e20c079d51a8e0a469ed9792c">f6243ad</a>)</h2>
-<ul>
-<li>Renamed <code>generateSaveHDWallet</code> to <code>generateSaveHDWalletFromSeed</code></li>
-<li>Renamed <code>getHdWalletAccountFromMnemonic</code> to <code>getHdWalletAccountFromSeed</code></li>
+<li>Add new compiler <code>methods</code> to RPC <code>communication</code> (base-app update required)</li>
+<li>Drop compiler version to <code>version &gt;= 4.0.0 &amp;&amp; version &lt; 5.0.0</code></li>
+<li>Change node compatibility range to <code>node &gt;= 5.0.0 &amp;&amp; node &lt; 6.0.0</code></li>
+<li>Always <code>verify</code> transactions before sending them to the node (can be disabled using the option <code>verify: false</code>)</li>
 </ul>
 
 

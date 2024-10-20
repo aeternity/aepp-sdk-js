@@ -1349,7 +1349,28 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/13.0.0/" class="md-nav__link">
+      <a href="../migration/14/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 14.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/13/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1370,7 +1391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/12.0.0/" class="md-nav__link">
+      <a href="../migration/12/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1391,7 +1412,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/11.0.0/" class="md-nav__link">
+      <a href="../migration/11/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1412,7 +1433,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/10.0.0/" class="md-nav__link">
+      <a href="../migration/10/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1433,7 +1454,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/9.0.0/" class="md-nav__link">
+      <a href="../migration/9/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1454,7 +1475,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/7.0.0/" class="md-nav__link">
+      <a href="../migration/7/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1677,7 +1698,7 @@
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="s1">&#39;tx_...&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// &#39;tx_...&#39; (with signature added)</span>
 </code></pre></div>
 <p>The private key for the account would be derived on the Ledger device using the provided index and the mnemonic phrase it was initialized with. The private key won't leave the device.</p>
-<p>The complete examples of how to use it in nodejs and browser can be found <a href="https://github.com/aeternity/aepp-sdk-js/tree/71da12b5df56b41f7317d1fb064e44e8ea118d6c/test/environment/ledger">here</a>.</p>
+<p>The complete examples of how to use it in nodejs and browser can be found <a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/test/environment/ledger">here</a>.</p>
 <h2 id="account-verification">Account verification</h2>
 <p>To protect from MITM attacks is it recommended to ensure that the accessed account is the account actually available on Ledger. To do so, the app should show to user the address it have access to, the same as Ledger HW should show the address on its screen, and user should ensure that addresses the same. To trigger verification process you need to use <code>getAddress</code> method</p>
 <div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">accountFactory</span><span class="p">.</span><span class="nx">getAddress</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">account</span><span class="w"> </span><span class="nx">index</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>

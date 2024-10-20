@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../10.0.0/">
+        <link rel="prev" href="../11/">
       
       
-        <link rel="next" href="../7.0.0/">
+        <link rel="next" href="../9/">
       
       
       <link rel="icon" href="../../../images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Migration to 9.0.0 - æternity JavaScript SDK</title>
+        <title>Migration to 10.0.0 - æternity JavaScript SDK</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#migration-to-900" class="md-skip">
+        <a href="#migration-to-1000" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Migration to 9.0.0
+              Migration to 10.0.0
             
           </span>
         </div>
@@ -1253,7 +1253,28 @@
   
   
     <li class="md-nav__item">
-      <a href="../13.0.0/" class="md-nav__link">
+      <a href="../14/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 14.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1274,7 +1295,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../12.0.0/" class="md-nav__link">
+      <a href="../12/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1295,32 +1316,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../11.0.0/" class="md-nav__link">
+      <a href="../11/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Migration to 11.0.0
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../10.0.0/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Migration to 10.0.0
   </span>
   
 
@@ -1350,7 +1350,7 @@
           
   
   <span class="md-ellipsis">
-    Migration to 9.0.0
+    Migration to 10.0.0
   </span>
   
 
@@ -1361,7 +1361,7 @@
         
   
   <span class="md-ellipsis">
-    Migration to 9.0.0
+    Migration to 10.0.0
   </span>
   
 
@@ -1383,45 +1383,153 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#drop-waitmined-static-method" class="md-nav__link">
+  <a href="#pollforqueryresponse-returns-response-as-string-1285" class="md-nav__link">
     <span class="md-ellipsis">
-      drop waitMined static method
+      pollForQueryResponse returns response as string (#1285)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#drop-assertedtype-use-decode-instead" class="md-nav__link">
+  <a href="#removed-skipargsconvert-option-of-contract-call-and-deployment-6d4a599" class="md-nav__link">
     <span class="md-ellipsis">
-      drop assertedType, use decode instead
+      removed skipArgsConvert option of contract call and deployment (6d4a599)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#validator-recursive-validator-simplify-schema" class="md-nav__link">
+  <a href="#removed-skiptransformdecoded-option-of-contract-call-and-deployment-bb49239" class="md-nav__link">
     <span class="md-ellipsis">
-      validator: recursive validator, simplify schema
+      removed skipTransformDecoded option of contract call and deployment (bb49239)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#simplify-buildtxhash-helper" class="md-nav__link">
+  <a href="#ak_-addresses-are-not-accepted-as-hashes-bytes-and-signatures-anymore-cbaac62" class="md-nav__link">
     <span class="md-ellipsis">
-      simplify buildTxHash helper
+      ak_ addresses are not accepted as hashes, bytes, and signatures anymore (cbaac62)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#enable-verification-in-deep-props-instead-of-extra-variable" class="md-nav__link">
+  <a href="#removed-contractencodecall-a4b303f" class="md-nav__link">
     <span class="md-ellipsis">
-      enable verification in deep props instead of extra variable
+      removed contractEncodeCall (a4b303f)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-contractdecodedata-5df2285" class="md-nav__link">
+    <span class="md-ellipsis">
+      removed contractDecodeData (5df2285)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-setoptions-on-contract-instance-b88e767" class="md-nav__link">
+    <span class="md-ellipsis">
+      removed setOptions on contract instance (b88e767)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contractcallstatic-contractcall-contractdeploy-are-deprecated-now-c4ec019" class="md-nav__link">
+    <span class="md-ellipsis">
+      contractCallStatic, contractCall, contractDeploy are deprecated now (c4ec019)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dropped-compatibility-with-compiler410-f9cef12" class="md-nav__link">
+    <span class="md-ellipsis">
+      dropped compatibility with compiler@4.1.0 (f9cef12)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#invert-and-rename-forcecodecheck-option-to-validatebytecode-in-getcontractinstance-72122fa" class="md-nav__link">
+    <span class="md-ellipsis">
+      invert and rename forceCodeCheck option to validateBytecode in getContractInstance (72122fa)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-getconsensusprotocolversion-method-75f0447" class="md-nav__link">
+    <span class="md-ellipsis">
+      removed getConsensusProtocolVersion method (75f0447)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#switched-to-aeternityaepp-calldata-package-1313" class="md-nav__link">
+    <span class="md-ellipsis">
+      switched to @aeternity/aepp-calldata package (#1313)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pass-source-in-options-of-sdkgetcontractinstance-5c690d2" class="md-nav__link">
+    <span class="md-ellipsis">
+      pass source in options of sdk.getContractInstance (5c690d2)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-options-of-getcontractinstance-accepted-as-usual-ones-10fb7ba" class="md-nav__link">
+    <span class="md-ellipsis">
+      additional options of getContractInstance accepted as usual ones (10fb7ba)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drop-compatibility-with-es5-1331" class="md-nav__link">
+    <span class="md-ellipsis">
+      drop compatibility with es5 (#1331)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-primitives-for-encryptiondecryption-by-keypairs-1183" class="md-nav__link">
+    <span class="md-ellipsis">
+      removed primitives for encryption/decryption by keypairs (#1183)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aensupdate-accepts-pointers-as-object-f6b8999" class="md-nav__link">
+    <span class="md-ellipsis">
+      aensUpdate accepts pointers as object (f6b8999)
     </span>
   </a>
   
@@ -1443,7 +1551,28 @@
   
   
     <li class="md-nav__item">
-      <a href="../7.0.0/" class="md-nav__link">
+      <a href="../9/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 9.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1575,45 +1704,153 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#drop-waitmined-static-method" class="md-nav__link">
+  <a href="#pollforqueryresponse-returns-response-as-string-1285" class="md-nav__link">
     <span class="md-ellipsis">
-      drop waitMined static method
+      pollForQueryResponse returns response as string (#1285)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#drop-assertedtype-use-decode-instead" class="md-nav__link">
+  <a href="#removed-skipargsconvert-option-of-contract-call-and-deployment-6d4a599" class="md-nav__link">
     <span class="md-ellipsis">
-      drop assertedType, use decode instead
+      removed skipArgsConvert option of contract call and deployment (6d4a599)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#validator-recursive-validator-simplify-schema" class="md-nav__link">
+  <a href="#removed-skiptransformdecoded-option-of-contract-call-and-deployment-bb49239" class="md-nav__link">
     <span class="md-ellipsis">
-      validator: recursive validator, simplify schema
+      removed skipTransformDecoded option of contract call and deployment (bb49239)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#simplify-buildtxhash-helper" class="md-nav__link">
+  <a href="#ak_-addresses-are-not-accepted-as-hashes-bytes-and-signatures-anymore-cbaac62" class="md-nav__link">
     <span class="md-ellipsis">
-      simplify buildTxHash helper
+      ak_ addresses are not accepted as hashes, bytes, and signatures anymore (cbaac62)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#enable-verification-in-deep-props-instead-of-extra-variable" class="md-nav__link">
+  <a href="#removed-contractencodecall-a4b303f" class="md-nav__link">
     <span class="md-ellipsis">
-      enable verification in deep props instead of extra variable
+      removed contractEncodeCall (a4b303f)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-contractdecodedata-5df2285" class="md-nav__link">
+    <span class="md-ellipsis">
+      removed contractDecodeData (5df2285)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-setoptions-on-contract-instance-b88e767" class="md-nav__link">
+    <span class="md-ellipsis">
+      removed setOptions on contract instance (b88e767)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contractcallstatic-contractcall-contractdeploy-are-deprecated-now-c4ec019" class="md-nav__link">
+    <span class="md-ellipsis">
+      contractCallStatic, contractCall, contractDeploy are deprecated now (c4ec019)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dropped-compatibility-with-compiler410-f9cef12" class="md-nav__link">
+    <span class="md-ellipsis">
+      dropped compatibility with compiler@4.1.0 (f9cef12)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#invert-and-rename-forcecodecheck-option-to-validatebytecode-in-getcontractinstance-72122fa" class="md-nav__link">
+    <span class="md-ellipsis">
+      invert and rename forceCodeCheck option to validateBytecode in getContractInstance (72122fa)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-getconsensusprotocolversion-method-75f0447" class="md-nav__link">
+    <span class="md-ellipsis">
+      removed getConsensusProtocolVersion method (75f0447)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#switched-to-aeternityaepp-calldata-package-1313" class="md-nav__link">
+    <span class="md-ellipsis">
+      switched to @aeternity/aepp-calldata package (#1313)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pass-source-in-options-of-sdkgetcontractinstance-5c690d2" class="md-nav__link">
+    <span class="md-ellipsis">
+      pass source in options of sdk.getContractInstance (5c690d2)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-options-of-getcontractinstance-accepted-as-usual-ones-10fb7ba" class="md-nav__link">
+    <span class="md-ellipsis">
+      additional options of getContractInstance accepted as usual ones (10fb7ba)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drop-compatibility-with-es5-1331" class="md-nav__link">
+    <span class="md-ellipsis">
+      drop compatibility with es5 (#1331)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removed-primitives-for-encryptiondecryption-by-keypairs-1183" class="md-nav__link">
+    <span class="md-ellipsis">
+      removed primitives for encryption/decryption by keypairs (#1183)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aensupdate-accepts-pointers-as-object-f6b8999" class="md-nav__link">
+    <span class="md-ellipsis">
+      aensUpdate accepts pointers as object (f6b8999)
     </span>
   </a>
   
@@ -1634,55 +1871,103 @@
                   
 
 
-<h1 id="migration-to-900">Migration to 9.0.0</h1>
-<p>This guide describes all breaking changes introduced with <code>v9.0.0</code>.</p>
-<h2 id="drop-waitmined-static-method">drop <code>waitMined</code> static method</h2>
-<p>If you used it like</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
-<span class="nx">sdk</span><span class="p">.</span><span class="nx">waitMined</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<h1 id="migration-to-1000">Migration to 10.0.0</h1>
+<p>This guide describes all breaking changes introduced with <code>v10.0.0</code>.</p>
+<h3 id="pollforqueryresponse-returns-response-as-string-1285"><code>pollForQueryResponse</code> returns response as string (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1285">#1285</a>)</h3>
+<ul>
+<li>replace <code>oldResult.decode</code> with <code>new Buffer(newResult)</code>.</li>
+<li>replace <code>oldResult.response</code> with <code>TxBuilderHelper.encode(new Buffer(newResult), 'or')</code>.</li>
+</ul>
+<h3 id="removed-skipargsconvert-option-of-contract-call-and-deployment-6d4a599">removed <code>skipArgsConvert</code> option of contract call and deployment (<a href="https://github.com/aeternity/aepp-sdk-js/commit/6d4a59986d6833866b6828085fad96b364e5d315">6d4a599</a>)</h3>
+<p>Convert arguments in intermediate Sophia representation to JavaScript types.
+For example:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">listFn</span><span class="p">(</span><span class="s1">&#39;[1, 2]&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">skipArgsConvert</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-<p>then you have to rewrite it using Stamp composition</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">.</span><span class="nx">compose</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">deepProps</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Ae</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">defaults</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">waitMined</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
-<span class="p">})({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
+<p>rewrite to</p>
+<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">listFn</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">]);</span>
 </code></pre></div>
-<p>or pass it to specific methods, like</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">receiver</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">waitMined</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">});</span>
+<h3 id="removed-skiptransformdecoded-option-of-contract-call-and-deployment-bb49239">removed <code>skipTransformDecoded</code> option of contract call and deployment (<a href="https://github.com/aeternity/aepp-sdk-js/commit/bb492396a29d673f02eee7cfec4e114c2fba2f3c">bb49239</a>)</h3>
+<p>Decoding to JavaScript types is enforced, please use it instead.</p>
+<h3 id="ak_-addresses-are-not-accepted-as-hashes-bytes-and-signatures-anymore-cbaac62">ak_ addresses are not accepted as hashes, bytes, and signatures anymore (<a href="https://github.com/aeternity/aepp-sdk-js/commit/cbaac6263dd1729d64ef3a01c94e10687fed3b0d">cbaac62</a>)</h3>
+<p>Encode addresses as an <code>ak_</code>-prefixed string instead.</p>
+<h3 id="removed-contractencodecall-a4b303f">removed <code>contractEncodeCall</code> (<a href="https://github.com/aeternity/aepp-sdk-js/commit/a4b303fbcc3b7cc544a2b5b3415d0f4a147b488c">a4b303f</a>)</h3>
+<p>Use <code>contractEncodeCallDataAPI</code> instead.</p>
+<h3 id="removed-contractdecodedata-5df2285">removed <code>contractDecodeData</code> (<a href="https://github.com/aeternity/aepp-sdk-js/commit/5df2285a7b5694475554e5154c544e0885bd4b33">5df2285</a>)</h3>
+<p>Use <code>contractDecodeCallResultAPI</code> instead.</p>
+<h3 id="removed-setoptions-on-contract-instance-b88e767">removed <code>setOptions</code> on contract instance (<a href="https://github.com/aeternity/aepp-sdk-js/commit/b88e767c86874f259ff7a1eb1784c368524e7167">b88e767</a>)</h3>
+<p>Pass them through <code>getContractInstance</code> options instead.</p>
+<h3 id="contractcallstatic-contractcall-contractdeploy-are-deprecated-now-c4ec019"><code>contractCallStatic</code>, <code>contractCall</code>, <code>contractDeploy</code> are deprecated now (<a href="https://github.com/aeternity/aepp-sdk-js/commit/c4ec019372f5d5745378e781afb1eb6b2b5acfeb">c4ec019</a>)</h3>
+<p>Use <code>getContractInstance</code> instead. Also, these methods will accept JavaScript-type variables instead of
+Sophia-encoded. For example:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">contractCallStatic</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">methodName</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;42&#39;</span><span class="p">]);</span>
 </code></pre></div>
-<p>or even</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
-<span class="nx">sdk</span><span class="p">.</span><span class="nx">deepProps</span><span class="p">({</span><span class="w"> </span><span class="nx">Ae</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">defaults</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">waitMined</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">})</span>
+<p>should be replaced with</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">contractCallStatic</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">methodName</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
 </code></pre></div>
-<h2 id="drop-assertedtype-use-decode-instead">drop <code>assertedType</code>, use <code>decode</code> instead</h2>
-<p>If you used it like</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">decodeBase64Check</span><span class="p">(</span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">assertedType</span><span class="p">(</span><span class="s1">&#39;tx_...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tx&#39;</span><span class="p">));</span>
+<h3 id="dropped-compatibility-with-compiler410-f9cef12">dropped compatibility with compiler@4.1.0 (<a href="https://github.com/aeternity/aepp-sdk-js/commit/f9cef12a7db4b2559519ef7f8380cc9e89630492">f9cef12</a>)</h3>
+<p>Use compiler 6.0.0 and above.</p>
+<h3 id="invert-and-rename-forcecodecheck-option-to-validatebytecode-in-getcontractinstance-72122fa">invert and rename <code>forceCodeCheck</code> option to <code>validateBytecode</code> in <code>getContractInstance</code> (<a href="https://github.com/aeternity/aepp-sdk-js/commit/72122facdcec9921202b210c387c19509b26e578">72122fa</a>)</h3>
+<p>Use <code>validateBytecode</code> when you need to ensure that the source code/bytecode provided to
+<code>getContractInstance</code> corresponds to the on-chain bytecode.</p>
+<h3 id="removed-getconsensusprotocolversion-method-75f0447">removed <code>getConsensusProtocolVersion</code> method (<a href="https://github.com/aeternity/aepp-sdk-js/commit/75f044792bd2d81eca3a2abc8218e8ca5f167134">75f0447</a>)</h3>
+<p>Use <code>node.consensusProtocolVersion</code> instead.</p>
+<h3 id="switched-to-aeternityaepp-calldata-package-1313">switched to @aeternity/aepp-calldata package (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1313">#1313</a>)</h3>
+<p>Numbers in Sophia are not limited in size. Before they were returned from contract methods as usual
+JavaScript numbers that have limited accuracy. To fix this, we make it return instances of BigInt.</p>
+<p>Variant types are now supported by sdk, so replace <code>"RelativeTTL(50)"</code> with <code>{ RelativeTTL: [50] }</code>.
+As an exception <code>Some(value)</code> is converted to the exact value in JavaScript and <code>None</code> is converted to <code>undefined</code>
+(Sophia's <code>option</code> type).</p>
+<p>Contract methods will accept/return instances of JavaScript's <code>Map</code> as variables of Sophia's <code>map</code>
+type. Objects are not accepted as maps any longer.</p>
+<p>Sophia's <code>hash</code>, <code>signature</code>, <code>bytes</code> types return values as <code>Uint8Array</code> instead of a hex-encoded
+string.</p>
+<p>Check the <a href="https://github.com/aeternity/aepp-calldata-js/blob/master/README.md">documentation</a>
+of calldata package for additional info.</p>
+<p>Use <code>.decodedResult</code> instead of <code>.decode()</code> to get the result of method call.</p>
+<p>Most of the errors thrown by contract iterations will be different due to doing validation using
+calldata package instead of <code>joi</code>.</p>
+<h3 id="pass-source-in-options-of-sdkgetcontractinstance-5c690d2">pass source in options of <code>sdk.getContractInstance</code> (<a href="https://github.com/aeternity/aepp-sdk-js/commit/5c690d2d77a433c8496ab9cda6fd66e52a6b4b23">5c690d2</a>)</h3>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span><span class="nx">contractSource</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">contractAddress</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-<p>then you have to rewrite it using <code>decode</code> method</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;tx_...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tx&#39;</span><span class="p">);</span>
+<p>rewrite to</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">contractSource</span><span class="p">,</span><span class="w"> </span><span class="nx">contractAddress</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-<h2 id="validator-recursive-validator-simplify-schema"><strong>validator:</strong> recursive validator, simplify schema</h2>
-<p>Instead of <code>TransactionValidator</code> stamp use <code>verifyTransaction</code> function. The function accepts
-a transaction, and a Node instance for validation (instead of network id), it doesn't return
-an unpacked transaction anymore, just an array of errors. Each error contains a verbose <code>message</code>
-(<code>msg</code> before), unique <code>key</code> (for easy comparison), <code>checkedKeys</code> array (<code>txKey</code> before). Using
-<code>node</code> instead of <code>networkId</code> allows to ensure transaction validation, so warnings are errors
-now (<code>type</code> field removed).</p>
-<p><code>SCHEMA</code> doesn't contain validation schema anymore. This wasn't supposed to be used by external
-developers.</p>
-<h2 id="simplify-buildtxhash-helper">simplify buildTxHash helper</h2>
-<p>If you used <code>buildHash</code> like</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">buildHash</span><span class="p">(</span><span class="s1">&#39;xx&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">]),</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">raw</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span>
+<p>Contract instance can be generated by ACI and bytecode:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">bytecode</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-<p>then use</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">hash</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">]));</span>
+<p>SDK won't use hosted compiler in this case.</p>
+<p>Also, <code>contract.compiled</code> was renamed to <code>contract.bytecode</code>.</p>
+<h3 id="additional-options-of-getcontractinstance-accepted-as-usual-ones-10fb7ba">additional options of <code>getContractInstance</code> accepted as usual ones (<a href="https://github.com/aeternity/aepp-sdk-js/commit/10fb7bad8f61b973c1be5daec50909d251ec1f90">10fb7ba</a>)</h3>
+<p>For example, replace</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">opt</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ttl</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-<p>If you used it with a falsy <code>raw</code> then</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">TxBuilderHelper</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="nx">Crypto</span><span class="p">.</span><span class="nx">hash</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">])),</span><span class="w"> </span><span class="s1">&#39;xx&#39;</span><span class="p">);</span>
+<p>with</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">ttl</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-<p><code>buildTxHash</code> don't have <code>raw</code> switch anymore, it returns <code>th_</code>-encoded string in all cases,
-but it still accepts transactions as a string and as a buffer.</p>
-<h2 id="enable-verification-in-deep-props-instead-of-extra-variable">enable verification in deep props instead of extra variable</h2>
-<p>If you were passing <code>verifyTx: false</code> to sdk factory then use <code>verify: false</code> instead.</p>
+<h3 id="drop-compatibility-with-es5-1331">drop compatibility with es5 (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1331">#1331</a>)</h3>
+<p>To support old environments, you need to set up transpilation of SDK package while building your
+app. In Webpack it can be done by <a href="https://webpack.js.org/configuration/module/#ruleexclude">excluding</a>
+<code>node_modules</code> folder except for this package in <code>babe-loader</code> rule. In <code>@vue/cli</code> you can use
+<a href="https://cli.vuejs.org/config/#transpiledependencies">transpileDependencies</a> option.</p>
+<h3 id="removed-primitives-for-encryptiondecryption-by-keypairs-1183">removed primitives for encryption/decryption by keypairs (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1183">#1183</a>)</h3>
+<p>Use third-party cryptographic packages instead of <code>Crypto.encryptData</code>, <code>Crypto.decryptData</code>
+methods.</p>
+<h3 id="aensupdate-accepts-pointers-as-object-f6b8999"><code>aensUpdate</code> accepts pointers as object (<a href="https://github.com/aeternity/aepp-sdk-js/commit/f6b8999ac70d10c5455e9a45d8ad65e161d28ca4">f6b8999</a>)</h3>
+<p>For example, replace</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">]);</span>
+</code></pre></div>
+<p>with</p>
+<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">account_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Additionally, <code>getDefaultPointerKey</code> (was named <code>classify</code> before) helper function can be used</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getDefaultPointerKey</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">;</span>
+<span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">getDefaultPointerKey</span><span class="p">(</span><span class="nx">address</span><span class="p">)]</span><span class="o">:</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
 
 
 

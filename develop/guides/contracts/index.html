@@ -1485,7 +1485,28 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/13.0.0/" class="md-nav__link">
+      <a href="../migration/14/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 14.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/13/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1506,7 +1527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/12.0.0/" class="md-nav__link">
+      <a href="../migration/12/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1527,7 +1548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/11.0.0/" class="md-nav__link">
+      <a href="../migration/11/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1548,7 +1569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/10.0.0/" class="md-nav__link">
+      <a href="../migration/10/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1569,7 +1590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/9.0.0/" class="md-nav__link">
+      <a href="../migration/9/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1590,7 +1611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/7.0.0/" class="md-nav__link">
+      <a href="../migration/7/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1946,7 +1967,7 @@ Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">
 <p>CompilerCli is available only in Node.js and requires Erlang installed (<code>escript</code> available in <code>$PATH</code>), Windows is supported.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerCli</span><span class="p">();</span>
 </code></pre></div>
-<p>CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since <a href="https://v8.compiler.aepps.com/api">compiler.aepps.com</a> is planned to be decommissioned. An example of how to run it using <a href="https://github.com/aeternity/aepp-sdk-js/blob/cd8dd7f76a6323383349b48400af0d69c2cfd88e/docker-compose.yml#L11-L14">docker-compose</a>.</p>
+<p>CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since <a href="https://v8.compiler.aepps.com/api">compiler.aepps.com</a> is planned to be decommissioned. An example of how to run it using <a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/docker-compose.yml#L20-L25">docker-compose</a>.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="s1">&#39;https://v8.compiler.aepps.com&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// host your own compiler</span>
 </code></pre></div>
 <p>Both compiler classes implement the <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html">same interface</a> that can be used to generate bytecode and ACI without a Contract instance.</p>

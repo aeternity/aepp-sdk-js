@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../11.0.0/">
+        <link rel="prev" href="../../../CHANGELOG/">
       
       
-        <link rel="next" href="../9.0.0/">
+        <link rel="next" href="../13/">
       
       
       <link rel="icon" href="../../../images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Migration to 10.0.0 - æternity JavaScript SDK</title>
+        <title>Migration to 14.0.0 - æternity JavaScript SDK</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#migration-to-1000" class="md-skip">
+        <a href="#migration-to-1400" class="md-skip">
           Skip to content
         </a>
       
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Migration to 10.0.0
+              Migration to 14.0.0
             
           </span>
         </div>
@@ -1250,69 +1250,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../13.0.0/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Migration to 13.0.0
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../12.0.0/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Migration to 12.0.0
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../11.0.0/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Migration to 11.0.0
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -1329,7 +1266,7 @@
           
   
   <span class="md-ellipsis">
-    Migration to 10.0.0
+    Migration to 14.0.0
   </span>
   
 
@@ -1340,7 +1277,7 @@
         
   
   <span class="md-ellipsis">
-    Migration to 10.0.0
+    Migration to 14.0.0
   </span>
   
 
@@ -1362,155 +1299,434 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pollforqueryresponse-returns-response-as-string-1285" class="md-nav__link">
+  <a href="#updated-sdk-requirements" class="md-nav__link">
     <span class="md-ellipsis">
-      pollForQueryResponse returns response as string (#1285)
+      Updated sdk requirements
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-skipargsconvert-option-of-contract-call-and-deployment-6d4a599" class="md-nav__link">
+  <a href="#iris-is-not-supported" class="md-nav__link">
     <span class="md-ellipsis">
-      removed skipArgsConvert option of contract call and deployment (6d4a599)
+      Iris is not supported
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-skiptransformdecoded-option-of-contract-call-and-deployment-bb49239" class="md-nav__link">
+  <a href="#commonjs-bundles-have-cjs-extension-instead-js" class="md-nav__link">
     <span class="md-ellipsis">
-      removed skipTransformDecoded option of contract call and deployment (bb49239)
+      CommonJS bundles have cjs extension instead js
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ak_-addresses-are-not-accepted-as-hashes-bytes-and-signatures-anymore-cbaac62" class="md-nav__link">
+  <a href="#recover-dump-removed-aex-3-keystore-implementation" class="md-nav__link">
     <span class="md-ellipsis">
-      ak_ addresses are not accepted as hashes, bytes, and signatures anymore (cbaac62)
+      recover, dump removed (AEX-3 keystore implementation)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-contractencodecall-a4b303f" class="md-nav__link">
+  <a href="#host-is-readonly-in-generated-apis" class="md-nav__link">
     <span class="md-ellipsis">
-      removed contractEncodeCall (a4b303f)
+      $host is readonly in generated APIs
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-contractdecodedata-5df2285" class="md-nav__link">
+  <a href="#aepp" class="md-nav__link">
     <span class="md-ellipsis">
-      removed contractDecodeData (5df2285)
+      Aepp
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aepp">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rpcbroadcasterror-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      RpcBroadcastError not exported anymore
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#removed-setoptions-on-contract-instance-b88e767" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#contract-delegations-used-in-iris-removed-from-aepp-wallet-connection" class="md-nav__link">
     <span class="md-ellipsis">
-      removed setOptions on contract instance (b88e767)
+      Contract delegations used in Iris removed from aepp-wallet connection
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#contractcallstatic-contractcall-contractdeploy-are-deprecated-now-c4ec019" class="md-nav__link">
-    <span class="md-ellipsis">
-      contractCallStatic, contractCall, contractDeploy are deprecated now (c4ec019)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dropped-compatibility-with-compiler410-f9cef12" class="md-nav__link">
+  <a href="#wallet" class="md-nav__link">
     <span class="md-ellipsis">
-      dropped compatibility with compiler@4.1.0 (f9cef12)
+      Wallet
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wallet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aesdkwallet-requires-onasktoselectnetwork-constructor-option" class="md-nav__link">
+    <span class="md-ellipsis">
+      AeSdkWallet requires onAskToSelectNetwork constructor option
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#invert-and-rename-forcecodecheck-option-to-validatebytecode-in-getcontractinstance-72122fa" class="md-nav__link">
-    <span class="md-ellipsis">
-      invert and rename forceCodeCheck option to validateBytecode in getContractInstance (72122fa)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-getconsensusprotocolversion-method-75f0447" class="md-nav__link">
+  <a href="#transaction-builder" class="md-nav__link">
     <span class="md-ellipsis">
-      removed getConsensusProtocolVersion method (75f0447)
+      Transaction builder
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transaction builder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#channelclientreconnecttx-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      ChannelClientReconnectTx removed
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#switched-to-aeternityaepp-calldata-package-1313" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#oracle_ttl-query_ttl-response_ttl-not-exported-anymore" class="md-nav__link">
     <span class="md-ellipsis">
-      switched to @aeternity/aepp-calldata package (#1313)
+      ORACLE_TTL, QUERY_TTL, RESPONSE_TTL not exported anymore
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#pass-source-in-options-of-sdkgetcontractinstance-5c690d2" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#buildtxunpacktx-works-only-with-transactions" class="md-nav__link">
     <span class="md-ellipsis">
-      pass source in options of sdk.getContractInstance (5c690d2)
+      buildTx/unpackTx works only with transactions
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#additional-options-of-getcontractinstance-accepted-as-usual-ones-10fb7ba" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#tag-include-only-transactions" class="md-nav__link">
     <span class="md-ellipsis">
-      additional options of getContractInstance accepted as usual ones (10fb7ba)
+      Tag include only transactions
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#drop-compatibility-with-es5-1331" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#buildtx-doesnt-accept-prefix-anymore" class="md-nav__link">
     <span class="md-ellipsis">
-      drop compatibility with es5 (#1331)
+      buildTx doesn't accept prefix anymore
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#removed-primitives-for-encryptiondecryption-by-keypairs-1183" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#name_ttl-client_ttl-not-exported-anymore" class="md-nav__link">
     <span class="md-ellipsis">
-      removed primitives for encryption/decryption by keypairs (#1183)
+      NAME_*TTL, CLIENT_TTL not exported anymore
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#aensupdate-accepts-pointers-as-object-f6b8999" class="md-nav__link">
+  <a href="#node" class="md-nav__link">
     <span class="md-ellipsis">
-      aensUpdate accepts pointers as object (f6b8999)
+      Node
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-returns-time-in-keyblock-and-microblockheader-as-date" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node returns time in KeyBlock and MicroBlockHeader as Date
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account" class="md-nav__link">
+    <span class="md-ellipsis">
+      Account
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Account">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#save-hd-wallets-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Save HD wallets methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-signmessage-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      sign, signMessage removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isvalidkeypair-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      isValidKeypair removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getaddressfrompriv-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      getAddressFromPriv removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generatekeypair-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      generateKeyPair removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generatekeypairfromsecret-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      generateKeyPairFromSecret removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memoryaccount-accepts-secret-key-as-sk_-prefixed-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      MemoryAccount accepts secret key as sk_-prefixed string
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accountbase-inheritors-required-to-implement-signtypeddata-signdelegation" class="md-nav__link">
+    <span class="md-ellipsis">
+      AccountBase inheritors required to implement signTypedData, signDelegation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aens" class="md-nav__link">
+    <span class="md-ellipsis">
+      Aens
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aens-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      aens* methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#name_bid_max_length-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      NAME_BID_MAX_LENGTH not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      Oracle
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Oracle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#oracle-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      oracle methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pollqueries-dont-return-responded-queries-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      pollQueries don't return responded queries by default
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compiler
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compiler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compilercli-uses-aesophia8-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompilerCli uses aesophia@8 by default
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compilercli8-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompilerCli8 removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contract
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#encodefatevalue-decodefatevalue-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      encodeFateValue, decodeFateValue not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aesdkinitializecontract-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      AeSdk:initializeContract removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#createdelegationsignature-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      createDelegationSignature removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-to-sign-specific-delegations-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods to sign specific delegations removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1530,7 +1746,91 @@
   
   
     <li class="md-nav__item">
-      <a href="../9.0.0/" class="md-nav__link">
+      <a href="../13/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 13.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 12.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 11.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 10.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1551,7 +1851,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../7.0.0/" class="md-nav__link">
+      <a href="../7/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1683,155 +1983,434 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pollforqueryresponse-returns-response-as-string-1285" class="md-nav__link">
+  <a href="#updated-sdk-requirements" class="md-nav__link">
     <span class="md-ellipsis">
-      pollForQueryResponse returns response as string (#1285)
+      Updated sdk requirements
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-skipargsconvert-option-of-contract-call-and-deployment-6d4a599" class="md-nav__link">
+  <a href="#iris-is-not-supported" class="md-nav__link">
     <span class="md-ellipsis">
-      removed skipArgsConvert option of contract call and deployment (6d4a599)
+      Iris is not supported
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-skiptransformdecoded-option-of-contract-call-and-deployment-bb49239" class="md-nav__link">
+  <a href="#commonjs-bundles-have-cjs-extension-instead-js" class="md-nav__link">
     <span class="md-ellipsis">
-      removed skipTransformDecoded option of contract call and deployment (bb49239)
+      CommonJS bundles have cjs extension instead js
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ak_-addresses-are-not-accepted-as-hashes-bytes-and-signatures-anymore-cbaac62" class="md-nav__link">
+  <a href="#recover-dump-removed-aex-3-keystore-implementation" class="md-nav__link">
     <span class="md-ellipsis">
-      ak_ addresses are not accepted as hashes, bytes, and signatures anymore (cbaac62)
+      recover, dump removed (AEX-3 keystore implementation)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-contractencodecall-a4b303f" class="md-nav__link">
+  <a href="#host-is-readonly-in-generated-apis" class="md-nav__link">
     <span class="md-ellipsis">
-      removed contractEncodeCall (a4b303f)
+      $host is readonly in generated APIs
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-contractdecodedata-5df2285" class="md-nav__link">
+  <a href="#aepp" class="md-nav__link">
     <span class="md-ellipsis">
-      removed contractDecodeData (5df2285)
+      Aepp
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aepp">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rpcbroadcasterror-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      RpcBroadcastError not exported anymore
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#removed-setoptions-on-contract-instance-b88e767" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#contract-delegations-used-in-iris-removed-from-aepp-wallet-connection" class="md-nav__link">
     <span class="md-ellipsis">
-      removed setOptions on contract instance (b88e767)
+      Contract delegations used in Iris removed from aepp-wallet connection
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#contractcallstatic-contractcall-contractdeploy-are-deprecated-now-c4ec019" class="md-nav__link">
-    <span class="md-ellipsis">
-      contractCallStatic, contractCall, contractDeploy are deprecated now (c4ec019)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dropped-compatibility-with-compiler410-f9cef12" class="md-nav__link">
+  <a href="#wallet" class="md-nav__link">
     <span class="md-ellipsis">
-      dropped compatibility with compiler@4.1.0 (f9cef12)
+      Wallet
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wallet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aesdkwallet-requires-onasktoselectnetwork-constructor-option" class="md-nav__link">
+    <span class="md-ellipsis">
+      AeSdkWallet requires onAskToSelectNetwork constructor option
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#invert-and-rename-forcecodecheck-option-to-validatebytecode-in-getcontractinstance-72122fa" class="md-nav__link">
-    <span class="md-ellipsis">
-      invert and rename forceCodeCheck option to validateBytecode in getContractInstance (72122fa)
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#removed-getconsensusprotocolversion-method-75f0447" class="md-nav__link">
+  <a href="#transaction-builder" class="md-nav__link">
     <span class="md-ellipsis">
-      removed getConsensusProtocolVersion method (75f0447)
+      Transaction builder
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transaction builder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#channelclientreconnecttx-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      ChannelClientReconnectTx removed
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#switched-to-aeternityaepp-calldata-package-1313" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#oracle_ttl-query_ttl-response_ttl-not-exported-anymore" class="md-nav__link">
     <span class="md-ellipsis">
-      switched to @aeternity/aepp-calldata package (#1313)
+      ORACLE_TTL, QUERY_TTL, RESPONSE_TTL not exported anymore
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#pass-source-in-options-of-sdkgetcontractinstance-5c690d2" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#buildtxunpacktx-works-only-with-transactions" class="md-nav__link">
     <span class="md-ellipsis">
-      pass source in options of sdk.getContractInstance (5c690d2)
+      buildTx/unpackTx works only with transactions
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#additional-options-of-getcontractinstance-accepted-as-usual-ones-10fb7ba" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#tag-include-only-transactions" class="md-nav__link">
     <span class="md-ellipsis">
-      additional options of getContractInstance accepted as usual ones (10fb7ba)
+      Tag include only transactions
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#drop-compatibility-with-es5-1331" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#buildtx-doesnt-accept-prefix-anymore" class="md-nav__link">
     <span class="md-ellipsis">
-      drop compatibility with es5 (#1331)
+      buildTx doesn't accept prefix anymore
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#removed-primitives-for-encryptiondecryption-by-keypairs-1183" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#name_ttl-client_ttl-not-exported-anymore" class="md-nav__link">
     <span class="md-ellipsis">
-      removed primitives for encryption/decryption by keypairs (#1183)
+      NAME_*TTL, CLIENT_TTL not exported anymore
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#aensupdate-accepts-pointers-as-object-f6b8999" class="md-nav__link">
+  <a href="#node" class="md-nav__link">
     <span class="md-ellipsis">
-      aensUpdate accepts pointers as object (f6b8999)
+      Node
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-returns-time-in-keyblock-and-microblockheader-as-date" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node returns time in KeyBlock and MicroBlockHeader as Date
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account" class="md-nav__link">
+    <span class="md-ellipsis">
+      Account
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Account">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#save-hd-wallets-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Save HD wallets methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-signmessage-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      sign, signMessage removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isvalidkeypair-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      isValidKeypair removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getaddressfrompriv-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      getAddressFromPriv removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generatekeypair-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      generateKeyPair removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generatekeypairfromsecret-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      generateKeyPairFromSecret removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memoryaccount-accepts-secret-key-as-sk_-prefixed-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      MemoryAccount accepts secret key as sk_-prefixed string
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accountbase-inheritors-required-to-implement-signtypeddata-signdelegation" class="md-nav__link">
+    <span class="md-ellipsis">
+      AccountBase inheritors required to implement signTypedData, signDelegation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aens" class="md-nav__link">
+    <span class="md-ellipsis">
+      Aens
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aens-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      aens* methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#name_bid_max_length-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      NAME_BID_MAX_LENGTH not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      Oracle
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Oracle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#oracle-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      oracle methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pollqueries-dont-return-responded-queries-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      pollQueries don't return responded queries by default
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compiler
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compiler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compilercli-uses-aesophia8-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompilerCli uses aesophia@8 by default
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compilercli8-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompilerCli8 removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contract
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#encodefatevalue-decodefatevalue-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      encodeFateValue, decodeFateValue not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aesdkinitializecontract-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      AeSdk:initializeContract removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#createdelegationsignature-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      createDelegationSignature removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-to-sign-specific-delegations-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods to sign specific delegations removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1850,103 +2429,185 @@
                   
 
 
-<h1 id="migration-to-1000">Migration to 10.0.0</h1>
-<p>This guide describes all breaking changes introduced with <code>v10.0.0</code>.</p>
-<h3 id="pollforqueryresponse-returns-response-as-string-1285"><code>pollForQueryResponse</code> returns response as string (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1285">#1285</a>)</h3>
+<h1 id="migration-to-1400">Migration to 14.0.0</h1>
+<p>This guide describes all breaking changes introduced with <code>v14.0.0</code>.</p>
+<h4 id="updated-sdk-requirements">Updated sdk requirements</h4>
+<p>Minimum supported versions:</p>
 <ul>
-<li>replace <code>oldResult.decode</code> with <code>new Buffer(newResult)</code>.</li>
-<li>replace <code>oldResult.response</code> with <code>TxBuilderHelper.encode(new Buffer(newResult), 'or')</code>.</li>
+<li>nodejs@18.19</li>
+<li>TypeScript@4.8</li>
+<li>aeternity node 7.1.0</li>
+<li>ae_mdw@1.81.0</li>
+<li>aesophia@8</li>
 </ul>
-<h3 id="removed-skipargsconvert-option-of-contract-call-and-deployment-6d4a599">removed <code>skipArgsConvert</code> option of contract call and deployment (<a href="https://github.com/aeternity/aepp-sdk-js/commit/6d4a59986d6833866b6828085fad96b364e5d315">6d4a599</a>)</h3>
-<p>Convert arguments in intermediate Sophia representation to JavaScript types.
-For example:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">listFn</span><span class="p">(</span><span class="s1">&#39;[1, 2]&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">skipArgsConvert</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">});</span>
+<h4 id="iris-is-not-supported">Iris is not supported</h4>
+<p>Stick to a previous sdk version if it is required.</p>
+<h4 id="commonjs-bundles-have-cjs-extension-instead-js">CommonJS bundles have cjs extension instead js</h4>
+<p>If you are importing files explicitly from <code>dist</code> folder then you need to update the extension</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js</span>
+<span class="gi">+ https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.cjs</span>
 </code></pre></div>
-<p>rewrite to</p>
-<div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">listFn</span><span class="p">([</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">]);</span>
+<h4 id="recover-dump-removed-aex-3-keystore-implementation"><code>recover</code>, <code>dump</code> removed (AEX-3 keystore implementation)</h4>
+<p>Copy the removed implementation to your project or add a previous sdk as a separate dependency</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nt">&quot;dependencies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;@aeternity/aepp-sdk&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^14.0.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;@aeternity/aepp-sdk-13&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;npm:@aeternity/aepp-sdk@^13.3.3&quot;</span>
+<span class="w">  </span><span class="p">}</span>
 </code></pre></div>
-<h3 id="removed-skiptransformdecoded-option-of-contract-call-and-deployment-bb49239">removed <code>skipTransformDecoded</code> option of contract call and deployment (<a href="https://github.com/aeternity/aepp-sdk-js/commit/bb492396a29d673f02eee7cfec4e114c2fba2f3c">bb49239</a>)</h3>
-<p>Decoding to JavaScript types is enforced, please use it instead.</p>
-<h3 id="ak_-addresses-are-not-accepted-as-hashes-bytes-and-signatures-anymore-cbaac62">ak_ addresses are not accepted as hashes, bytes, and signatures anymore (<a href="https://github.com/aeternity/aepp-sdk-js/commit/cbaac6263dd1729d64ef3a01c94e10687fed3b0d">cbaac62</a>)</h3>
-<p>Encode addresses as an <code>ak_</code>-prefixed string instead.</p>
-<h3 id="removed-contractencodecall-a4b303f">removed <code>contractEncodeCall</code> (<a href="https://github.com/aeternity/aepp-sdk-js/commit/a4b303fbcc3b7cc544a2b5b3415d0f4a147b488c">a4b303f</a>)</h3>
-<p>Use <code>contractEncodeCallDataAPI</code> instead.</p>
-<h3 id="removed-contractdecodedata-5df2285">removed <code>contractDecodeData</code> (<a href="https://github.com/aeternity/aepp-sdk-js/commit/5df2285a7b5694475554e5154c544e0885bd4b33">5df2285</a>)</h3>
-<p>Use <code>contractDecodeCallResultAPI</code> instead.</p>
-<h3 id="removed-setoptions-on-contract-instance-b88e767">removed <code>setOptions</code> on contract instance (<a href="https://github.com/aeternity/aepp-sdk-js/commit/b88e767c86874f259ff7a1eb1784c368524e7167">b88e767</a>)</h3>
-<p>Pass them through <code>getContractInstance</code> options instead.</p>
-<h3 id="contractcallstatic-contractcall-contractdeploy-are-deprecated-now-c4ec019"><code>contractCallStatic</code>, <code>contractCall</code>, <code>contractDeploy</code> are deprecated now (<a href="https://github.com/aeternity/aepp-sdk-js/commit/c4ec019372f5d5745378e781afb1eb6b2b5acfeb">c4ec019</a>)</h3>
-<p>Use <code>getContractInstance</code> instead. Also, these methods will accept JavaScript-type variables instead of
-Sophia-encoded. For example:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">contractCallStatic</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">methodName</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;42&#39;</span><span class="p">]);</span>
+<h4 id="host-is-readonly-in-generated-apis">$host is readonly in generated APIs</h4>
+<p>It is made to don't break caching.
+If you need to change a server URL, create a new server instance instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- node.$host = &#39;http://example.com&#39;;</span>
+<span class="gi">+ node = new Node(&#39;http://example.com&#39;);</span>
 </code></pre></div>
-<p>should be replaced with</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">contractCallStatic</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">methodName</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
+<h2 id="aepp">Aepp</h2>
+<h4 id="rpcbroadcasterror-not-exported-anymore">RpcBroadcastError not exported anymore</h4>
+<p>Because it is not thrown by wallet as well.</p>
+<h4 id="contract-delegations-used-in-iris-removed-from-aepp-wallet-connection">Contract delegations used in Iris removed from aepp-wallet connection</h4>
+<p>Use <code>signDelegation</code> api instead.</p>
+<h2 id="wallet">Wallet</h2>
+<h4 id="aesdkwallet-requires-onasktoselectnetwork-constructor-option">AeSdkWallet requires <code>onAskToSelectNetwork</code> constructor option</h4>
+<p>Provide a function throwing <code>RpcMethodNotFoundError</code> if you don't want to support network change by
+aepp.</p>
+<h2 id="transaction-builder">Transaction builder</h2>
+<h4 id="channelclientreconnecttx-removed"><code>ChannelClientReconnectTx</code> removed</h4>
+<p>You couldn't use it because it is not supported on the node side.</p>
+<h4 id="oracle_ttl-query_ttl-response_ttl-not-exported-anymore"><code>ORACLE_TTL</code>, <code>QUERY_TTL</code>, <code>RESPONSE_TTL</code> not exported anymore</h4>
+<p>These values provided by default in buildTx, if necessary define them as</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">ORACLE_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">500</span><span class="w"> </span><span class="p">};</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">QUERY_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="p">};</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">RESPONSE_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="p">};</span>
 </code></pre></div>
-<h3 id="dropped-compatibility-with-compiler410-f9cef12">dropped compatibility with compiler@4.1.0 (<a href="https://github.com/aeternity/aepp-sdk-js/commit/f9cef12a7db4b2559519ef7f8380cc9e89630492">f9cef12</a>)</h3>
-<p>Use compiler 6.0.0 and above.</p>
-<h3 id="invert-and-rename-forcecodecheck-option-to-validatebytecode-in-getcontractinstance-72122fa">invert and rename <code>forceCodeCheck</code> option to <code>validateBytecode</code> in <code>getContractInstance</code> (<a href="https://github.com/aeternity/aepp-sdk-js/commit/72122facdcec9921202b210c387c19509b26e578">72122fa</a>)</h3>
-<p>Use <code>validateBytecode</code> when you need to ensure that the source code/bytecode provided to
-<code>getContractInstance</code> corresponds to the on-chain bytecode.</p>
-<h3 id="removed-getconsensusprotocolversion-method-75f0447">removed <code>getConsensusProtocolVersion</code> method (<a href="https://github.com/aeternity/aepp-sdk-js/commit/75f044792bd2d81eca3a2abc8218e8ca5f167134">75f0447</a>)</h3>
-<p>Use <code>node.consensusProtocolVersion</code> instead.</p>
-<h3 id="switched-to-aeternityaepp-calldata-package-1313">switched to @aeternity/aepp-calldata package (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1313">#1313</a>)</h3>
-<p>Numbers in Sophia are not limited in size. Before they were returned from contract methods as usual
-JavaScript numbers that have limited accuracy. To fix this, we make it return instances of BigInt.</p>
-<p>Variant types are now supported by sdk, so replace <code>"RelativeTTL(50)"</code> with <code>{ RelativeTTL: [50] }</code>.
-As an exception <code>Some(value)</code> is converted to the exact value in JavaScript and <code>None</code> is converted to <code>undefined</code>
-(Sophia's <code>option</code> type).</p>
-<p>Contract methods will accept/return instances of JavaScript's <code>Map</code> as variables of Sophia's <code>map</code>
-type. Objects are not accepted as maps any longer.</p>
-<p>Sophia's <code>hash</code>, <code>signature</code>, <code>bytes</code> types return values as <code>Uint8Array</code> instead of a hex-encoded
-string.</p>
-<p>Check the <a href="https://github.com/aeternity/aepp-calldata-js/blob/master/README.md">documentation</a>
-of calldata package for additional info.</p>
-<p>Use <code>.decodedResult</code> instead of <code>.decode()</code> to get the result of method call.</p>
-<p>Most of the errors thrown by contract iterations will be different due to doing validation using
-calldata package instead of <code>joi</code>.</p>
-<h3 id="pass-source-in-options-of-sdkgetcontractinstance-5c690d2">pass source in options of <code>sdk.getContractInstance</code> (<a href="https://github.com/aeternity/aepp-sdk-js/commit/5c690d2d77a433c8496ab9cda6fd66e52a6b4b23">5c690d2</a>)</h3>
-<p>For example:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">(</span><span class="nx">contractSource</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">contractAddress</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="w"> </span><span class="p">});</span>
+<h4 id="buildtxunpacktx-works-only-with-transactions"><code>buildTx</code>/<code>unpackTx</code> works only with transactions</h4>
+<p>If you need to work with node's entry use <code>packEntry</code>/<code>unpackEntry</code>.</p>
+<h4 id="tag-include-only-transactions"><code>Tag</code> include only transactions</h4>
+<p>Node entries tags moved to <code>EntryTag</code>.</p>
+<h4 id="buildtx-doesnt-accept-prefix-anymore"><code>buildTx</code> doesn't accept <code>prefix</code> anymore</h4>
+<p>Use <code>decode</code>/<code>encode</code> to convert payload to desired format.</p>
+<h4 id="name_ttl-client_ttl-not-exported-anymore"><code>NAME_*TTL</code>, <code>CLIENT_TTL</code> not exported anymore</h4>
+<p>These values provided by default in buildTx, if necessary define them as</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">NAME_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">180000</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">NAME_MAX_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">36000</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">NAME_MAX_CLIENT_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">86400</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">CLIENT_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">86400</span><span class="p">;</span>
 </code></pre></div>
-<p>rewrite to</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">contractSource</span><span class="p">,</span><span class="w"> </span><span class="nx">contractAddress</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;...&#39;</span><span class="w"> </span><span class="p">});</span>
+<h2 id="node">Node</h2>
+<h4 id="node-returns-time-in-keyblock-and-microblockheader-as-date">Node returns time in KeyBlock and MicroBlockHeader as Date</h4>
+<p>Apply a change</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-const time = new Date(</span>
+<span class="gd">-  (await node.getTopHeader()).time,</span>
+<span class="gd">-);</span>
+<span class="gi">+const time = (await node.getTopHeader()).time;</span>
 </code></pre></div>
-<p>Contract instance can be generated by ACI and bytecode:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">bytecode</span><span class="w"> </span><span class="p">});</span>
+<h2 id="account">Account</h2>
+<h4 id="save-hd-wallets-methods-removed">Save HD wallets methods removed</h4>
+<p>Namely: <code>deriveChild</code>, <code>derivePathFromKey</code>, <code>getMasterKeyFromSeed</code>,
+<code>derivePathFromSeed</code>, <code>getKeyPair</code>, <code>generateSaveHDWalletFromSeed</code>,
+<code>getSaveHDWalletAccounts</code>, <code>getHdWalletAccountFromSeed</code>.
+Use AccountMnemonicFactory instead.</p>
+<h4 id="sign-signmessage-removed"><code>sign</code>, <code>signMessage</code> removed</h4>
+<p>Use MemoryAccount:sign, MemoryAccount:signMessage instead.</p>
+<h4 id="isvalidkeypair-removed"><code>isValidKeypair</code> removed</h4>
+<p>Create a MemoryAccount by a secret key and
+compare it's address with an address in the key pair instead.</p>
+<h4 id="getaddressfrompriv-removed"><code>getAddressFromPriv</code> removed</h4>
+<p>Use MemoryAccount instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- address = getAddressFromPriv(secretKeyOldFormat)</span>
+<span class="gi">+ address = new MemoryAccount(secretKeyNewFormat).address</span>
 </code></pre></div>
-<p>SDK won't use hosted compiler in this case.</p>
-<p>Also, <code>contract.compiled</code> was renamed to <code>contract.bytecode</code>.</p>
-<h3 id="additional-options-of-getcontractinstance-accepted-as-usual-ones-10fb7ba">additional options of <code>getContractInstance</code> accepted as usual ones (<a href="https://github.com/aeternity/aepp-sdk-js/commit/10fb7bad8f61b973c1be5daec50909d251ec1f90">10fb7ba</a>)</h3>
-<p>For example, replace</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">opt</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ttl</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+<p>Use SDK <a href="https://docs.aeternity.com/aepp-sdk-js/develop/examples/browser/tools/">tools</a> page to convert secret keys.</p>
+<h4 id="generatekeypair-removed"><code>generateKeyPair</code> removed</h4>
+<p>Use MemoryAccount::generate instead.
+Optionally add <code>decode</code> if you need raw keys.
+Obtain the secret key via MemoryAccount:secretKey.</p>
+<h4 id="generatekeypairfromsecret-removed"><code>generateKeyPairFromSecret</code> removed</h4>
+<p>Use MemoryAccount instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- const keyPair = generateKeyPairFromSecret(rawSecretKey)</span>
+<span class="gi">+ const secretKey = encode(rawSecretKey.subarray(0, 32), Encoding.AccountSecretKey)</span>
+<span class="gi">+ const account = new MemoryAccount(secretKey)</span>
+<span class="gi">+ const keyPair = {</span>
+<span class="gi">+   publicKey: decode(account.address),</span>
+<span class="gi">+   secretKey: rawSecretKey,</span>
+<span class="gi">+ }</span>
 </code></pre></div>
-<p>with</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="nx">ttl</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">});</span>
+<h4 id="memoryaccount-accepts-secret-key-as-sk_-prefixed-string">MemoryAccount accepts secret key as sk_-prefixed string</h4>
+<p>Convert secret key as hex to new format as</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oldSk</span><span class="w"> </span><span class="o">=</span>
+<span class="w">  </span><span class="s1">&#39;9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">newSk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">oldSk</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hex&#39;</span><span class="p">).</span><span class="nx">subarray</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">32</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">AccountSecretKey</span><span class="p">);</span>
+<span class="c1">// &#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span>
 </code></pre></div>
-<h3 id="drop-compatibility-with-es5-1331">drop compatibility with es5 (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1331">#1331</a>)</h3>
-<p>To support old environments, you need to set up transpilation of SDK package while building your
-app. In Webpack it can be done by <a href="https://webpack.js.org/configuration/module/#ruleexclude">excluding</a>
-<code>node_modules</code> folder except for this package in <code>babe-loader</code> rule. In <code>@vue/cli</code> you can use
-<a href="https://cli.vuejs.org/config/#transpiledependencies">transpileDependencies</a> option.</p>
-<h3 id="removed-primitives-for-encryptiondecryption-by-keypairs-1183">removed primitives for encryption/decryption by keypairs (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1183">#1183</a>)</h3>
-<p>Use third-party cryptographic packages instead of <code>Crypto.encryptData</code>, <code>Crypto.decryptData</code>
-methods.</p>
-<h3 id="aensupdate-accepts-pointers-as-object-f6b8999"><code>aensUpdate</code> accepts pointers as object (<a href="https://github.com/aeternity/aepp-sdk-js/commit/f6b8999ac70d10c5455e9a45d8ad65e161d28ca4">f6b8999</a>)</h3>
-<p>For example, replace</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">]);</span>
+<p>Use SDK <a href="https://docs.aeternity.com/aepp-sdk-js/develop/examples/browser/tools/">tools</a> page to convert secret keys.</p>
+<h4 id="accountbase-inheritors-required-to-implement-signtypeddata-signdelegation">AccountBase inheritors required to implement <code>signTypedData</code>, <code>signDelegation</code></h4>
+<p>You can throw an exception if the account operation is not doable.</p>
+<h2 id="aens">Aens</h2>
+<h4 id="aens-methods-removed">aens* methods removed</h4>
+<p>Use Name class instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-await aeSdk.aensPreclaim(&#39;example.chain&#39;)</span>
+<span class="gi">+const name = new Name(&#39;example.chain&#39;, aeSdk.getContext())</span>
+<span class="gi">+await name.preclaim()</span>
 </code></pre></div>
-<p>with</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">account_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
-<span class="p">});</span>
+<p>Accordingly for other methods:</p>
+<div class="highlight"><pre><span></span><code>aensRevoke =&gt; Name:revoke
+aensUpdate =&gt; Name:update
+aensTransfer =&gt; Name:transfer
+aensQuery =&gt; Name:getState
+aensClaim =&gt; Name:claim
+aensBid =&gt; Name:bid
 </code></pre></div>
-<p>Additionally, <code>getDefaultPointerKey</code> (was named <code>classify</code> before) helper function can be used</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getDefaultPointerKey</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
-
-<span class="kd">const</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">;</span>
-<span class="nx">sdk</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;test.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">getDefaultPointerKey</span><span class="p">(</span><span class="nx">address</span><span class="p">)]</span><span class="o">:</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="p">});</span>
+<h4 id="name_bid_max_length-not-exported-anymore"><code>NAME_BID_MAX_LENGTH</code> not exported anymore</h4>
+<p>Use <code>isAuctionName</code> function instead.</p>
+<h2 id="oracle">Oracle</h2>
+<h4 id="oracle-methods-removed">oracle methods removed</h4>
+<p>Use Oracle, OracleClient classes instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-aeSdk.pollForQueries(queryHandler)</span>
+<span class="gi">+const oracle = new Oracle(account, aeSdk.getContext());</span>
+<span class="gi">+oracle.pollQueries(queryHandler)</span>
 </code></pre></div>
+<p>Accordingly for other methods:</p>
+<div class="highlight"><pre><span></span><code>extendOracleTtl =&gt; Oracle:extendTtl
+respondToQuery =&gt; Oracle:respondToQuery
+getOracleObject =&gt; Oracle:getState
+registerOracle =&gt; Oracle:register
+getQueryObject =&gt; Oracle:getQuery, OracleClient:getQuery
+postQueryToOracle =&gt; OracleClient:postQuery
+pollForQueryResponse =&gt; OracleClient:pollForResponse
+</code></pre></div>
+<h4 id="pollqueries-dont-return-responded-queries-by-default"><code>pollQueries</code> don't return responded queries by default</h4>
+<p>Use <code>includeResponded</code> option to restore the previous behavior.</p>
+<h2 id="compiler">Compiler</h2>
+<h4 id="compilercli-uses-aesophia8-by-default">CompilerCli uses aesophia@8 by default</h4>
+<h4 id="compilercli8-removed">CompilerCli8 removed</h4>
+<p>Use CompilerCli instead.</p>
+<h2 id="contract">Contract</h2>
+<h4 id="encodefatevalue-decodefatevalue-not-exported-anymore"><code>encodeFateValue</code>, <code>decodeFateValue</code> not exported anymore</h4>
+<p>Use ContractByteArrayEncoder:encodeWithType, decodeWithType from <code>@aeternity/aepp-calldata</code>.</p>
+<h4 id="aesdkinitializecontract-removed"><code>AeSdk:initializeContract</code> removed</h4>
+<p>Use <code>Contract.initialize</code> instead:</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- aeSdk.initializeContract(options)</span>
+<span class="gi">+ Contract.initialize({ ...aeSdk.getContext(), ...options })</span>
+</code></pre></div>
+<h4 id="createdelegationsignature-removed"><code>createDelegationSignature</code> removed</h4>
+<p>Use <code>packDelegation</code> and AccountBase::signDelegation instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-const dlg = await aeSdk.createDelegationSignature(contractAddress, [name]);</span>
+<span class="gi">+const dlg = await aeSdk.signDelegation(</span>
+<span class="gi">+  packDelegation({</span>
+<span class="gi">+    tag: DelegationTag.AensName,</span>
+<span class="gi">+    accountAddress: aeSdk.address,</span>
+<span class="gi">+    contractAddress,</span>
+<span class="gi">+    nameId: name,</span>
+<span class="gi">+  }),</span>
+<span class="gi">+);</span>
+</code></pre></div>
+<h4 id="methods-to-sign-specific-delegations-removed">Methods to sign specific delegations removed</h4>
+<p>Namely:</p>
+<ul>
+<li><code>signDelegationToContract</code>,</li>
+<li><code>signNameDelegationToContract</code>,</li>
+<li><code>signAllNamesDelegationToContract</code>,</li>
+<li><code>signOracleQueryDelegationToContract</code>.</li>
+</ul>
+<p>Use <code>signDelegation</code> instead.</p>
 
 
 

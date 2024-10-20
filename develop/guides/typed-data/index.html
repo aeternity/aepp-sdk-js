@@ -1320,7 +1320,28 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/13.0.0/" class="md-nav__link">
+      <a href="../migration/14/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migration to 14.0.0
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/13/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1341,7 +1362,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/12.0.0/" class="md-nav__link">
+      <a href="../migration/12/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1362,7 +1383,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/11.0.0/" class="md-nav__link">
+      <a href="../migration/11/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1383,7 +1404,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/10.0.0/" class="md-nav__link">
+      <a href="../migration/10/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1404,7 +1425,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/9.0.0/" class="md-nav__link">
+      <a href="../migration/9/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1425,7 +1446,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/7.0.0/" class="md-nav__link">
+      <a href="../migration/7/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1623,16 +1644,16 @@
 <p><code>domain</code> and <code>data</code> are fate-encoded before hashing. <code>aci</code> is prepared for hashing according to <a href="https://tools.ietf.org/html/rfc8785">RFC8785</a>.</p>
 <h2 id="implementation">Implementation</h2>
 <ul>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/0b9ecee8/src/account/Base.ts#L66-L77">AccountBase:signTypedData</a> — calculates signature, supported in MemoryAccount and in aepp-wallet connection;</li>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/0b9ecee8/src/utils/typed-data.ts#L61-L69">hashTypedData</a> — calculates the overall hash of typed data to sign;</li>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/0b9ecee8/src/utils/typed-data.ts#L10-L12">hashJson</a> — deterministic hashing of an arbitrary JS value, used to calculate <code>hash(aci)</code>;</li>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/0b9ecee8/src/utils/typed-data.ts#L40-L59">hashDomain</a> — use for debugging or to prepare the hash value for smart contract.</li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/account/Base.ts#L63-L70">AccountBase:signTypedData</a> — calculates signature, supported in MemoryAccount and in aepp-wallet connection;</li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/typed-data.ts#L82-L96">hashTypedData</a> — calculates the overall hash of typed data to sign;</li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/typed-data.ts#L10-L12">hashJson</a> — deterministic hashing of an arbitrary JS value, used to calculate <code>hash(aci)</code>;</li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/typed-data.ts#L56-L80">hashDomain</a> — use for debugging or to prepare the hash value for smart contract.</li>
 </ul>
 <h2 id="examples">Examples</h2>
 <ul>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/0b9ecee8/examples/browser/aepp/src/TypedData.vue">signing and verifying on aepp side</a></li>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/0b9ecee8/examples/browser/wallet-iframe/src/App.vue#L177-L185">signing confirmation on wallet side</a></li>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/0b9ecee8/test/integration/typed-data.ts#L75-L105">verifying a signature on contract side</a></li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/aepp/src/TypedData.vue">signing and verifying on aepp side</a></li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-iframe/src/App.vue#L169-L177">signing confirmation on wallet side</a></li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/test/integration/typed-data.ts#L76-L106">verifying a signature on contract side</a></li>
 </ul>
 
 
