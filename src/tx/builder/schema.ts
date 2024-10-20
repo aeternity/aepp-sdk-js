@@ -90,7 +90,7 @@ export const txSchema = [
   {
     tag: shortUIntConst(Tag.SignedTx),
     version: shortUIntConst(1, true),
-    signatures: array(raw),
+    signatures: array(raw), // TODO: use sg_ (Encoding.Signature) instead
     encodedTx: transactionAny,
   },
   {
