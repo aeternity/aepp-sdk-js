@@ -116,21 +116,25 @@ module.exports = {
 ### Vue@3
 
 Reactivity in Vue@3 [based on] Proxy class. Proxy is [not compatible] with private fields of ES
-classes. AeSdk and Contract classes uses private fields, so if you make an instance of these
+classes. AeSdk, Contract and MemoryAccount classes uses private fields, so if you make an instance of these
 classes reactive then the app may fail with
 
 > TypeError: attempted to get private field on non-instance
 
 AeSdk and Contract classes doesn’t have a state intended to be tracked using reactivity. Therefore
-to solve this issue we suggest to avoid making their instances reactive. One of the ways is to use
+to solve this issue we suggest to avoid making their instances reactive using
 Vue's integrated utility: [shallowRef]. The idea is to make reactive only the
-root variable, to don't make it reactive in deep. You can find it implementation in the
-[æpp example].
+instance value, to don't make it reactive in deep.
+
+Alternatively, [toRaw] can unwrap the proxy object, returning an unmodified instance and allowing access to its private properties by its methods. It can be useful if you need a reactive array of MemoryAccount.
+
+You can find both approaches used in the [æpp example].
 
 [based on]: https://vuejs.org/guide/extras/reactivity-in-depth.html#how-reactivity-works-in-vue
 [not compatible]: https://github.com/tc39/proposal-class-fields/issues/106
 [shallowRef]: https://vuejs.org/api/reactivity-advanced.html#shallowref
-[æpp example]: https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/aepp
+[toRaw]: https://vuejs.org/api/reactivity-advanced.html#toraw
+[æpp example]: https://github.com/aeternity/aepp-sdk-js/blob/ec3b888c653138d5a369b37604bf916428884170/examples/browser/aepp
 
 ## Command Line Interface (CLI)
 
