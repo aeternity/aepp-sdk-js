@@ -6,6 +6,7 @@
       <button @click="installSnap">Install Aeternity Snap</button>
       <button @click="addAccount">Add Account</button>
       <button v-if="accounts.length > 1" @click="switchAccount">Switch Account</button>
+      <button @click="discoverAccounts">Discover Accounts</button>
       <button @click="switchNode">Switch Node</button>
       <div v-if="accounts.length">
         <div>Accounts</div>
@@ -84,6 +85,12 @@ export default {
     switchAccount() {
       this.accounts.push(this.accounts.shift());
       this.setAccount(this.accounts[0]);
+    },
+    async discoverAccounts() {
+      this.status = 'Discovering accounts';
+      this.accounts = await this.accountFactory.discover(this.aeSdk.api);
+      this.setAccount(this.accounts[0]);
+      this.status = '';
     },
     async switchNode() {
       const networkId = this.$store.state.networkId === 'ae_mainnet' ? 'ae_uat' : 'ae_mainnet';
