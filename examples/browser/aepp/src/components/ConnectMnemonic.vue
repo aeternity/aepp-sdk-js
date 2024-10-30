@@ -1,9 +1,20 @@
 <template>
   <div class="group">
-    <button v-if="!accountFactory" @click="connect">Connect</button>
+    <div v-if="status">
+      <div>Status</div>
+      <div>{{ status }}</div>
+    </div>
+    <template v-else-if="!accountFactory">
+      <div>
+        <div>Mnemonic phrase</div>
+        <div>
+          <input placeholder="cross cat upper state flame ..." v-model="mnemonic" />
+        </div>
+      </div>
+      <button @click="connect">Connect</button>
+    </template>
     <template v-else>
       <button @click="disconnect">Disconnect</button>
-      <button @click="installSnap">Install Aeternity Snap</button>
       <button @click="addAccount">Add Account</button>
       <button v-if="accounts.length > 1" @click="switchAccount">Switch Account</button>
       <button @click="discoverAccounts">Discover Accounts</button>
@@ -13,34 +24,32 @@
         <div>{{ accounts.map((account) => account.address.slice(0, 8)).join(', ') }}</div>
       </div>
     </template>
-    <div v-if="status">
-      <div>Status</div>
-      <Value :value="status" />
-    </div>
   </div>
 </template>
 
 <script>
-import { AccountMetamaskFactory, UnsupportedPlatformError } from '@aeternity/aepp-sdk';
-import { shallowRef } from 'vue';
+import { AccountMnemonicFactory } from '@aeternity/aepp-sdk';
+import { shallowRef, toRaw } from 'vue';
 import { mapState } from 'vuex';
-import Value from './Value.vue';
 
 export default {
-  components: { Value },
   data: () => ({
     status: '',
+    mnemonic: 'eye quarter chapter suit cruel scrub verify stuff volume control learn dust',
     accountFactory: shallowRef(null),
     accounts: [],
   }),
   computed: mapState(['aeSdk']),
   methods: {
-    connect() {
+    async connect() {
       try {
-        this.accountFactory = new AccountMetamaskFactory();
+        this.status = 'Deriving a wallet from mnemonic phrase';
+        this.accountFactory = new AccountMnemonicFactory(this.mnemonic);
+        await this.accountFactory.getWallet();
         this.status = '';
       } catch (error) {
-        if (error instanceof UnsupportedPlatformError) {
+        this.accountFactory = null;
+        if (error.message === 'Invalid mnemonic') {
           this.status = error.message;
           return;
         }
@@ -54,42 +63,22 @@ export default {
       this.$store.commit('setAddress', undefined);
       if (Object.keys(this.aeSdk.accounts).length) this.aeSdk.removeAccount(this.aeSdk.address);
     },
-    async installSnap() {
-      try {
-        this.status = 'Waiting for MetaMask response';
-        this.status = await this.accountFactory.installSnap();
-      } catch (error) {
-        if (error instanceof UnsupportedPlatformError) {
-          this.status = error.message;
-          return;
-        }
-        this.status = '';
-        if (error.code === 4001) return;
-        throw error;
-      }
-    },
     async addAccount() {
-      try {
-        this.status = 'Waiting for MetaMask response';
-        const idx = this.accounts.length;
-        const account = await this.accountFactory.initialize(idx);
-        this.accounts.push(account);
-        this.setAccount(this.accounts[0]);
-      } catch (error) {
-        if (error.code === 4001) return;
-        throw error;
-      } finally {
-        this.status = '';
-      }
+      this.status = 'Deriving an account';
+      const idx = this.accounts.length;
+      const account = await this.accountFactory.initialize(idx);
+      this.accounts.push(account);
+      this.setAccount(toRaw(this.accounts[0]));
+      this.status = '';
     },
     switchAccount() {
       this.accounts.push(this.accounts.shift());
-      this.setAccount(this.accounts[0]);
+      this.setAccount(toRaw(this.accounts[0]));
     },
     async discoverAccounts() {
       this.status = 'Discovering accounts';
       this.accounts = await this.accountFactory.discover(this.aeSdk.api);
-      this.setAccount(this.accounts[0]);
+      this.setAccount(toRaw(this.accounts[0]));
       this.status = '';
     },
     async switchNode() {

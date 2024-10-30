@@ -4,7 +4,7 @@ import AccountBaseFactory from './BaseFactory.js';
 import AccountMemory from './Memory.js';
 import { encode, Encoding, Encoded, decode } from '../utils/encoder.js';
 import { concatBuffers } from '../utils/other.js';
-import { InternalError } from '../utils/errors.js';
+import { UnexpectedTsError } from '../utils/errors.js';
 
 export const ED25519_CURVE = Buffer.from('ed25519 seed');
 const HARDENED_OFFSET = 0x80000000;
@@ -62,7 +62,7 @@ export default class AccountMnemonicFactory extends AccountBaseFactory {
   async getWallet(): Promise<Wallet> {
     if (this.#wallet != null) return this.#wallet;
     if (this.#mnemonic == null)
-      throw new InternalError(
+      throw new UnexpectedTsError(
         'AccountMnemonicFactory should be initialized with mnemonic or wallet',
       );
     const seed = await mnemonicToSeed(this.#mnemonic);
