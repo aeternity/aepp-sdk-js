@@ -1881,16 +1881,17 @@ dependencies. To fix this, you need to specify aliases in <code>vue.config.js</c
 </code></pre></div>
 <h3 id="vue3">Vue@3</h3>
 <p>Reactivity in Vue@3 <a href="https://vuejs.org/guide/extras/reactivity-in-depth.html#how-reactivity-works-in-vue">based on</a> Proxy class. Proxy is <a href="https://github.com/tc39/proposal-class-fields/issues/106">not compatible</a> with private fields of ES
-classes. AeSdk and Contract classes uses private fields, so if you make an instance of these
+classes. AeSdk, Contract and MemoryAccount classes uses private fields, so if you make an instance of these
 classes reactive then the app may fail with</p>
 <blockquote>
 <p>TypeError: attempted to get private field on non-instance</p>
 </blockquote>
 <p>AeSdk and Contract classes doesn’t have a state intended to be tracked using reactivity. Therefore
-to solve this issue we suggest to avoid making their instances reactive. One of the ways is to use
+to solve this issue we suggest to avoid making their instances reactive using
 Vue's integrated utility: <a href="https://vuejs.org/api/reactivity-advanced.html#shallowref">shallowRef</a>. The idea is to make reactive only the
-root variable, to don't make it reactive in deep. You can find it implementation in the
-<a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/aepp">æpp example</a>.</p>
+instance value, to don't make it reactive in deep.</p>
+<p>Alternatively, <a href="https://vuejs.org/api/reactivity-advanced.html#toraw">toRaw</a> can unwrap the proxy object, returning an unmodified instance and allowing access to its private properties by its methods. It can be useful if you need a reactive array of MemoryAccount.</p>
+<p>You can find both approaches used in the <a href="https://github.com/aeternity/aepp-sdk-js/blob/ec3b888c653138d5a369b37604bf916428884170/examples/browser/aepp">æpp example</a>.</p>
 <h2 id="command-line-interface-cli">Command Line Interface (CLI)</h2>
 <p>If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the <a href="https://github.com/aeternity/aepp-cli-js">💻 CLI</a> and follow the instructions mentioned there.</p>
 
