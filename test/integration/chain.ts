@@ -1,7 +1,7 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { stub } from 'sinon';
-import { getSdk, timeoutBlock } from '.';
+import { getSdk, timeoutBlock, url } from '.';
 import { AeSdk, Tag, MemoryAccount, Encoded, Node, Contract } from '../../src';
 import { assertNotNull, bindRequestCounter, indent } from '../utils';
 
@@ -48,7 +48,7 @@ describe('Node Chain', () => {
 
     it('uses correct cache key if node changed while doing request', async () => {
       const heightPromise = aeSdk.getHeight();
-      aeSdk.addNode('test-2', new Node('https://google.com/404'), true);
+      aeSdk.addNode('test-2', new Node(url + '/404'), true);
       await heightPromise;
       await expect(aeSdk.getHeight({ cached: true })).to.be.rejectedWith(
         'v3/status error: 404 status code',
