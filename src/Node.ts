@@ -21,11 +21,13 @@ interface NodeInfo {
 }
 
 export default class Node extends NodeApi {
+  readonly #ignoreVersion: boolean;
+
   /**
    * @param url - Url for node API
    * @param options - Options
-   * @param options.ignoreVersion - Print warning instead of throwing exception if node version
-   * is not supported, use with caution
+   * @param options.ignoreVersion - Print warning instead of throwing exception if node
+   * or consensus protocol version is not supported, use with caution
    * @param options.retryCount - Amount of extra requests to do in case of failure
    * @param options.retryOverallDelay - Time in ms to wait between all retries
    */
@@ -58,6 +60,7 @@ export default class Node extends NodeApi {
       ],
       ...options,
     });
+    this.#ignoreVersion = ignoreVersion;
     this.pipeline.addPolicy(parseBigIntPolicy, { phase: 'Deserialize' });
     this.pipeline.removePolicy({ name: userAgentPolicyName });
     this.pipeline.removePolicy({ name: setClientRequestIdPolicyName });
@@ -114,7 +117,14 @@ export default class Node extends NodeApi {
         .map((el) => +el);
       const geVersion = Math.min(...versions).toString();
       const ltVersion = (Math.max(...versions) + 1).toString();
-      throw new UnsupportedVersionError('consensus protocol', version, geVersion, ltVersion);
+      const error = new UnsupportedVersionError(
+        'consensus protocol',
+        version,
+        geVersion,
+        ltVersion,
+      );
+      if (this.#ignoreVersion) console.warn(error.message);
+      else throw error;
     }
 
     return {
