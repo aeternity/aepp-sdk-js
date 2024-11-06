@@ -21,7 +21,8 @@ export default class Middleware extends MiddlewareApi {
   /**
    * @param url - Url for middleware API
    * @param options - Options
-   * @param options.ignoreVersion - Don't ensure that the middleware is supported
+   * @param options.ignoreVersion - Print warning instead of throwing exception if middleware
+   * is not supported, use with caution
    * @param options.retryCount - Amount of extra requests to do in case of failure
    * @param options.retryOverallDelay - Time in ms to wait between all retries
    */
@@ -49,9 +50,7 @@ export default class Middleware extends MiddlewareApi {
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        ...(ignoreVersion
-          ? []
-          : [genVersionCheckPolicy('middleware', getVersion, '1.81.0', '2.0.0')]),
+        genVersionCheckPolicy('middleware', getVersion, '1.81.0', '2.0.0', ignoreVersion),
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),

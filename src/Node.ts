@@ -24,7 +24,8 @@ export default class Node extends NodeApi {
   /**
    * @param url - Url for node API
    * @param options - Options
-   * @param options.ignoreVersion - Don't ensure that the node is supported
+   * @param options.ignoreVersion - Print warning instead of throwing exception if node version
+   * is not supported, use with caution
    * @param options.retryCount - Amount of extra requests to do in case of failure
    * @param options.retryOverallDelay - Time in ms to wait between all retries
    */
@@ -47,7 +48,7 @@ export default class Node extends NodeApi {
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        ...(ignoreVersion ? [] : [genVersionCheckPolicy('node', getVersion, '7.1.0', '8.0.0')]),
+        genVersionCheckPolicy('node', getVersion, '7.1.0', '8.0.0', ignoreVersion),
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
