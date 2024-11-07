@@ -32,7 +32,8 @@ export default class CompilerHttp extends CompilerBase {
   /**
    * @param compilerUrl - Url for compiler API
    * @param options - Options
-   * @param options.ignoreVersion - Don't check compiler version
+   * @param options.ignoreVersion - Print warning instead of throwing exception if compiler version
+   * is not supported, use with caution
    */
   constructor(compilerUrl: string, { ignoreVersion = false }: { ignoreVersion?: boolean } = {}) {
     super();
@@ -47,7 +48,7 @@ export default class CompilerHttp extends CompilerBase {
     this.api = new CompilerApi(compilerUrl, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        ...(ignoreVersion ? [] : [genVersionCheckPolicy('compiler', getVersion, '8.0.0', '9.0.0')]),
+        genVersionCheckPolicy('compiler', getVersion, '8.0.0', '9.0.0', ignoreVersion),
         genErrorFormatterPolicy((body: GeneralCompilerError | CompilerErrorApi[]) => {
           let message = '';
           if ('reason' in body) {

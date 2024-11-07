@@ -90,6 +90,7 @@ export default async function verifyTransaction(
     pipeline,
     additionalPolicies: [genAggressiveCacheGetResponsesPolicy()],
   });
+  node._getCachedStatus = async () => nodeNotCached._getCachedStatus();
   return verifyTransactionInternal(unpackTx(transaction), node, []);
 }
 
