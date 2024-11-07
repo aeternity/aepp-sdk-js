@@ -205,7 +205,7 @@ export const genVersionCheckPolicy = (
       if (!semverSatisfies(...args)) {
         const error = new UnsupportedVersionError(name, ...args);
         if (ignoreVersion) console.warn(error.message);
-        throw error;
+        else throw error;
       }
       return next(request);
     },
