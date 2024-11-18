@@ -32,7 +32,7 @@
     "build:api:middleware": "autorest tooling/autorest/middleware.yaml && node tooling/autorest/postprocessing.js middleware",
     "build:generate": "tsx tooling/generate-schema.ts",
     "build": "run-p build:api:* build:assets build:generate && run-p build:dist build:es build:types",
-    "docs:examples": "node tooling/docs/examples-to-md.js examples/node/*.js",
+    "docs:examples": "node tooling/docs/examples-to-md.js examples/node/[^_]*.js",
     "docs:api": "typedoc",
     "commitlint": "commitlint --from develop",
     "lint": "run-p lint:*",
