@@ -540,6 +540,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multiple-spends-via-contract-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multiple spends via contract call
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Multiple spends via contract call">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fees-difference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fees difference
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#multiple-contract-static-calls" class="md-nav__link">
     <span class="md-ellipsis">
       Multiple contract static calls
@@ -1596,6 +1620,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multiple-spends-via-contract-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multiple spends via contract call
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Multiple spends via contract call">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fees-difference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fees difference
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#multiple-contract-static-calls" class="md-nav__link">
     <span class="md-ellipsis">
       Multiple contract static calls
@@ -1644,6 +1692,52 @@
 </code></pre></div>
 <p>This way, SDK would make a single request to get info about the sender account and a transaction post request per each item in the <code>spends</code> array.</p>
 <p>Additionally, you may want to set <code>gasPrice</code> and <code>fee</code> to have predictable expenses. By default, SDK sets them based on the current network demand.</p>
+<h2 id="multiple-spends-via-contract-call">Multiple spends via contract call</h2>
+<p>If you need to transfer a fixed AE amount from the same account to more than 24 accounts, it is more efficient to do it via a smart contract.</p>
+<p>Let's define and deploy a contract</p>
+<div class="highlight"><pre><span></span><code>include &quot;List.aes&quot;
+
+contract MultipleSpends =
+  payable stateful entrypoint spend(addresses : list(address), amount: int) =
+    List.foreach(addresses, (address) =&gt; Chain.spend(address, amount))
+</code></pre></div>
+<p>after deployment this contract, it can be called as follows</p>
+<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="nx">addresses</span><span class="p">,</span><span class="w"> </span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="nx">amount</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">addresses</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+<p>Pros of this approach:</p>
+<ul>
+<li>less fees if more than 24 recipients;</li>
+<li>faster to execute because it needs to mine fewer transactions.</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>the amount of recipients in one transaction limited by the maximum gas in a block (about 800 recipients);</li>
+<li>harder to implement.</li>
+</ul>
+<h3 id="fees-difference">Fees difference</h3>
+<p>One spend tx takes approximately 0.0000167ae. The above contract deployment is 0.0000815ae. The base contract call price is 0.000182ae. Adding an address to the list costs about 0.0000058ae. So, it is more efficient to use a contract if you have more than 24 recipients. And more than 17 recipients if you use a pre-deployed contract.</p>
+<table>
+<thead>
+<tr>
+<th>Recipients</th>
+<th>Fee savings for batch spending via contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 000</td>
+<td>0.0107ae</td>
+</tr>
+<tr>
+<td>100 000</td>
+<td>1.07ae</td>
+</tr>
+<tr>
+<td>10 000 000</td>
+<td>107ae</td>
+</tr>
+</tbody>
+</table>
 <h2 id="multiple-contract-static-calls">Multiple contract static calls</h2>
 <p>Basically, the dry-run endpoint of the node is used to run them. Doing requests one by one, like</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span>
