@@ -59,6 +59,7 @@ nav:
       - guides/error-handling.md
       - guides/low-vs-high-usage.md
       - guides/typed-data.md
+      - guides/typescript.md
       - guides/jwt.md
       - Wallet interaction:
           - guides/connect-aepp-to-wallet.md

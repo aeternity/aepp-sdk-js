@@ -6,5 +6,5 @@
     "noEmit": true
   },
   "include": ["src/**/*", "test/**/*"],
-  "exclude": ["test/environment/**/*"]
+  "exclude": ["test/environment/typescript/**/*"]
 }
