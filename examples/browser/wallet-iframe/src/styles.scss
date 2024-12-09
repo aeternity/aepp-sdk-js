@@ -1,6 +1,6 @@
-@import '~tailwindcss/dist/base';
-@import '~tailwindcss/dist/components';
-@import '~tailwindcss/dist/utilities';
+@use '~tailwindcss/dist/base';
+@use '~tailwindcss/dist/components';
+@use '~tailwindcss/dist/utilities';
 
 body {
   @extend .bg-gray-300;
