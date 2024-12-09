@@ -190,8 +190,12 @@ class Contract<M extends ContractMethodsBase> {
       case 'error':
         message = decode(returnValue).toString();
         if (/Expected \d+ arguments, got \d+/.test(message)) {
-          throw new ContractError(
-            `ACI doesn't match called contract. Error provided by node: ${message}`,
+          throw new BytecodeMismatchError('ACI', `. Error provided by node: "${message}".`);
+        }
+        if (/Trying to call undefined function: <<\d+,\d+,\d+,\d+>>/.test(message)) {
+          throw new BytecodeMismatchError(
+            'ACI',
+            `. Error provided by node: "${message}", function name: ${fnName}.`,
           );
         }
         break;

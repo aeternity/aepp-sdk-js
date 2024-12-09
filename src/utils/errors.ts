@@ -449,8 +449,8 @@ export class InvalidAuthDataError extends CompilerError {
  * @category exception
  */
 export class BytecodeMismatchError extends ContractError {
-  constructor(source: 'source code' | 'bytecode') {
-    super(`Contract ${source} do not correspond to the bytecode deployed on the chain`);
+  constructor(source: 'source code' | 'bytecode' | 'ACI', details: string = '') {
+    super(`Contract ${source} do not correspond to the bytecode deployed on the chain` + details);
     this.name = 'BytecodeMismatchError';
   }
 }
