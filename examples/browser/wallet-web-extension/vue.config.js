@@ -26,6 +26,7 @@ module.exports = {
   chainWebpack: (config) => {
     const sdkPath = path.join(__dirname, '..', '..', '..', 'es');
     config.module.rule('mjs').include.add(sdkPath);
+    config.module.rule('js').test(/\.[cm]?jsx?$/);
   },
   transpileDependencies: ['@aeternity/aepp-calldata'],
 };
