@@ -169,7 +169,7 @@ version: ^3.7.1
 use-extension:
   '@autorest/typescript': ^6.0.23
   '@autorest/modelerfour': ^4.27.0
-input-file: https://raw.githubusercontent.com/aeternity/aeternity/v7.1.0/apps/aehttp/priv/oas3.yaml
+input-file: https://raw.githubusercontent.com/aeternity/aeternity/v7.3.0-rc2/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
 generator: typescript
