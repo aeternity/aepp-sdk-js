@@ -4,6 +4,7 @@ import AccountBaseFactory from './BaseFactory.js';
 import AccountMemory from './Memory.js';
 import { encode, Encoding, Encoded, decode } from '../utils/encoder.js';
 import { concatBuffers } from '../utils/other.js';
+import { ArgumentError } from '../utils/errors.js';
 
 export const ED25519_CURVE = Buffer.from('ed25519 seed');
 const HARDENED_OFFSET = 0x80000000;
@@ -41,14 +42,15 @@ interface Wallet {
  * A factory class that generates instances of AccountMemory based on provided mnemonic phrase.
  */
 export default class AccountMnemonicFactory extends AccountBaseFactory {
-  #mnemonicOrWallet: string | Wallet;
+  #mnemonicOrWalletOrSeed: string | Wallet | Uint8Array;
 
   /**
-   * @param mnemonicOrWallet - BIP39-compatible mnemonic phrase or a wallet derived from mnemonic
+   * @param mnemonicOrWalletOrSeed - BIP39-compatible mnemonic phrase or a wallet/seed derived from
+   * mnemonic
    */
-  constructor(mnemonicOrWallet: string | Wallet) {
+  constructor(mnemonicOrWalletOrSeed: string | Wallet | Uint8Array) {
     super();
-    this.#mnemonicOrWallet = mnemonicOrWallet;
+    this.#mnemonicOrWalletOrSeed = mnemonicOrWalletOrSeed;
   }
 
   #getWallet(sync: true): Wallet;
@@ -57,17 +59,23 @@ export default class AccountMnemonicFactory extends AccountBaseFactory {
     const setWalletBySeed = (seed: Uint8Array): Wallet => {
       const masterKey = deriveKey(seed, ED25519_CURVE);
       const walletKey = derivePathFromKey(masterKey, [44, 457]);
-      this.#mnemonicOrWallet = {
+      this.#mnemonicOrWalletOrSeed = {
         secretKey: encode(walletKey.secretKey, Encoding.Bytearray),
         chainCode: encode(walletKey.chainCode, Encoding.Bytearray),
       };
-      return this.#mnemonicOrWallet;
+      return this.#mnemonicOrWalletOrSeed;
     };
 
-    if (typeof this.#mnemonicOrWallet === 'object') return this.#mnemonicOrWallet;
+    if (ArrayBuffer.isView(this.#mnemonicOrWalletOrSeed)) {
+      if (this.#mnemonicOrWalletOrSeed.length !== 64) {
+        throw new ArgumentError('seed length', 64, this.#mnemonicOrWalletOrSeed.length);
+      }
+      return setWalletBySeed(this.#mnemonicOrWalletOrSeed);
+    }
+    if (typeof this.#mnemonicOrWalletOrSeed === 'object') return this.#mnemonicOrWalletOrSeed;
     return sync
-      ? setWalletBySeed(mnemonicToSeedSync(this.#mnemonicOrWallet))
-      : mnemonicToSeed(this.#mnemonicOrWallet).then(setWalletBySeed);
+      ? setWalletBySeed(mnemonicToSeedSync(this.#mnemonicOrWalletOrSeed))
+      : mnemonicToSeed(this.#mnemonicOrWalletOrSeed).then(setWalletBySeed);
   }
 
   /**
