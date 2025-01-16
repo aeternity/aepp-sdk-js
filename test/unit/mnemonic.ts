@@ -10,12 +10,22 @@ const wallet = {
 } as const;
 
 describe('Account mnemonic factory', () => {
-  it('derives wallet', async () => {
+  it('derives wallet by mnemonic', async () => {
     const factory = new AccountMnemonicFactory(mnemonic);
     expect(await factory.getWallet()).to.eql(wallet);
   });
 
-  it('initializes an account', async () => {
+  it('derives wallet by wallet', async () => {
+    const factory = new AccountMnemonicFactory(wallet);
+    expect(await factory.getWallet()).to.eql(wallet);
+  });
+
+  it('derives wallet in sync', async () => {
+    const factory = new AccountMnemonicFactory(mnemonic);
+    expect(factory.getWalletSync()).to.eql(wallet);
+  });
+
+  it('initializes an account by mnemonic', async () => {
     const factory = new AccountMnemonicFactory(mnemonic);
     const account = await factory.initialize(42);
     expect(account).to.be.an.instanceOf(MemoryAccount);
@@ -25,6 +35,14 @@ describe('Account mnemonic factory', () => {
   it('initializes an account by wallet', async () => {
     const factory = new AccountMnemonicFactory(wallet);
     const account = await factory.initialize(42);
+    expect(account).to.be.an.instanceOf(MemoryAccount);
+    expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
+  });
+
+  it('initializes an account in sync', async () => {
+    const factory = new AccountMnemonicFactory(mnemonic);
+    const account = factory.initializeSync(42);
+    expect(account).to.be.an.instanceOf(MemoryAccount);
     expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
   });
 
