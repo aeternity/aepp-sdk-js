@@ -177,7 +177,6 @@ describe('Aens', () => {
         `v3/names/%C3%A6${auction.value.slice(1)} error: Name not found`,
       );
       const auctionDetails = await aeSdk.api.getAuctionEntryByName(auction.value);
-      assertNotNull(auctionDetails.startedAt);
       expect(auctionDetails).to.eql({
         id: produceNameId(auction.value),
         startedAt: auctionDetails.startedAt,
