@@ -50,6 +50,13 @@ interface NameClaimOptions
   extends BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'nameSalt' | 'name'>,
     Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
+class NotAuctionNameError extends LogicError {
+  constructor(name: AensName, action: string) {
+    super(`Can't ${action} because ${name} is not an auction name`);
+    this.name = 'NotAuctionNameError';
+  }
+}
+
 /**
  * @category AENS
  * @example
@@ -182,8 +189,7 @@ export default class Name {
   }
 
   /**
-   * Query the AENS name info from the node
-   * and return the object with info and predefined functions for manipulating name
+   * Query the AENS name info from the node and return the object with info
    * @param options - Options
    * @example
    * ```js
@@ -203,6 +209,31 @@ export default class Name {
       ...nameEntry,
       id: nameEntry.id as Encoded.Name,
       owner: nameEntry.owner as Encoded.AccountAddress,
+    };
+  }
+
+  /**
+   * Query the AENS auction info from the node and return the object with info
+   * @param options - Options
+   * @example
+   * ```js
+   * const auctionEntry = await name.getAuctionState()
+   * console.log(auctionEntry.highestBidder)
+   * ```
+   */
+  async getAuctionState(options: { onNode?: Node } = {}): Promise<
+    Awaited<ReturnType<Node['getAuctionEntryByName']>> & {
+      id: Encoded.Name;
+      highestBidder: Encoded.AccountAddress;
+    }
+  > {
+    if (!isAuctionName(this.value)) throw new NotAuctionNameError(this.value, 'get auction state');
+    const onNode = options.onNode ?? this.options.onNode;
+    const nameEntry = await onNode.getAuctionEntryByName(this.value);
+    return {
+      ...nameEntry,
+      id: nameEntry.id as Encoded.Name,
+      highestBidder: nameEntry.highestBidder as Encoded.AccountAddress,
     };
   }
 
@@ -279,9 +310,7 @@ export default class Name {
     nameFee: number | string | BigNumber,
     options: Omit<NameClaimOptions, 'nameFee'> = {},
   ): ReturnType<typeof sendTransaction> {
-    if (!isAuctionName(this.value)) {
-      throw new LogicError('This is not auction name, so cant make a bid!');
-    }
+    if (!isAuctionName(this.value)) throw new NotAuctionNameError(this.value, 'make a bid');
     const opt = { ...this.options, ...options };
     const tx = await buildTxAsync({
       _isInternalBuild: true,

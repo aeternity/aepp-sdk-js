@@ -176,16 +176,20 @@ describe('Aens', () => {
       await auction.claim();
     });
 
-    it('gets auction details', async () => {
+    it('fails to query name state of auction', async () => {
       await expect(auction.getState()).to.be.rejectedWith(
         RestError,
         `v3/names/%C3%A6${auction.value.slice(1)} error: Name not found`,
       );
-      const auctionDetails = await aeSdk.api.getAuctionEntryByName(auction.value);
-      expect(auctionDetails).to.eql({
+    });
+
+    it('queries auction state from the node', async () => {
+      const state = await auction.getAuctionState();
+      expect(state).to.eql(await aeSdk.api.getAuctionEntryByName(auction.value));
+      expect(state).to.eql({
         id: auction.id,
-        startedAt: auctionDetails.startedAt,
-        endsAt: 480 + auctionDetails.startedAt,
+        startedAt: state.startedAt,
+        endsAt: 480 + state.startedAt,
         highestBidder: aeSdk.address,
         highestBid: 2865700000000000000n,
       });
@@ -222,6 +226,12 @@ describe('Aens', () => {
   it('queries state from the node', async () => {
     const state = await name.getState();
     expect(state).to.eql(await aeSdk.api.getNameEntryByName(name.value));
+    expect(state).to.eql({
+      id: name.id,
+      owner: aeSdk.address,
+      ttl: state.ttl,
+      pointers: [],
+    });
   });
 
   it('throws error on querying non-existent name', async () => {
