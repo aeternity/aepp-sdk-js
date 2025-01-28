@@ -182,7 +182,7 @@ describe('Aens', () => {
         startedAt: auctionDetails.startedAt,
         endsAt: 480 + auctionDetails.startedAt,
         highestBidder: aeSdk.address,
-        highestBid: 2865700000000000000,
+        highestBid: 2865700000000000000n,
       });
     });
 
