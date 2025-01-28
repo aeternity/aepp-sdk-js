@@ -104,21 +104,21 @@ describe('crypto', () => {
 
   it('hashing produces 256 bit blake2b byte buffers', () => {
     const h = hash('foobar');
-    h.should.be.a('Uint8Array');
-    Buffer.from(h)
-      .toString('hex')
-      .should.be.equal('93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47');
+    expect(h).to.be.a('Uint8Array');
+    expect(Buffer.from(h).toString('hex')).to.be.equal(
+      '93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47',
+    );
   });
 
   it('salt produces random sequences every time', () => {
     const salt1 = genSalt();
     const salt2 = genSalt();
-    salt1.should.be.a('Number');
-    salt2.should.be.a('Number');
-    salt1.should.not.be.equal(salt2);
+    expect(salt1).to.be.a('Number');
+    expect(salt2).to.be.a('Number');
+    expect(salt1).to.not.be.equal(salt2);
   });
 
   it('Can produce tx hash', () => {
-    buildTxHash(decode(txRaw)).should.be.equal(expectedHash);
+    expect(buildTxHash(decode(txRaw))).to.be.equal(expectedHash);
   });
 });

@@ -175,17 +175,18 @@ describe('Oracle', () => {
 
     it('polls for response for query without response', async () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}', { queryTtlValue: 1 });
-      await oracleClient
-        .pollForResponse(queryId)
-        .should.be.rejectedWith(/Giving up at height|error: Query not found/);
+      await expect(oracleClient.pollForResponse(queryId)).to.be.rejectedWith(
+        /Giving up at height|error: Query not found/,
+      );
     }).timeout(timeoutBlock);
 
     it('polls for response for query that is already expired without response', async () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}', { queryTtlValue: 1 });
       await aeSdk.awaitHeight((await aeSdk.getHeight()) + 2);
-      await oracleClient
-        .pollForResponse(queryId)
-        .should.be.rejectedWith(RestError, 'Query not found');
+      await expect(oracleClient.pollForResponse(queryId)).to.be.rejectedWith(
+        RestError,
+        'Query not found',
+      );
     }).timeout(timeoutBlock * 2);
 
     it('queries oracle', async () => {

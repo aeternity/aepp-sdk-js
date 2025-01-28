@@ -34,8 +34,8 @@ describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {
     const salt = genSalt();
     const hash = await commitmentHash('foobar.chain', salt);
-    hash.should.be.a('string');
-    hash.should.be.equal(await commitmentHash('foobar.chain', salt));
+    expect(hash).to.be.a('string');
+    expect(hash).to.be.equal(await commitmentHash('foobar.chain', salt));
   });
 
   it('test from big number to bytes', async () => {
@@ -55,12 +55,12 @@ describe('Tx', () => {
     }
 
     data.forEach((n) => {
-      n.toString(10).should.be.equal(bnFromBytes(n));
+      expect(n.toString(10)).to.be.equal(bnFromBytes(n));
     });
   });
 
   it('Produce name id for `.chain`', () => {
-    produceNameId('asdas.chain').should.be.equal(
+    expect(produceNameId('asdas.chain')).to.equal(
       'nm_2DMazuJNrGkQYve9eMttgdteaigeeuBk3fmRYSThJZ2NpX3r8R',
     );
   });
@@ -68,14 +68,14 @@ describe('Tx', () => {
   describe('getMinimumNameFee', () => {
     it('returns correct name fees', () => {
       for (let i = 1; i <= Object.keys(NAME_BID_RANGES).length; i += 1) {
-        getMinimumNameFee(randomName(i)).toString().should.be.equal(NAME_BID_RANGES[i].toString());
+        expect(getMinimumNameFee(randomName(i)).toString()).to.equal(NAME_BID_RANGES[i].toString());
       }
     });
   });
 
   describe('isNameValid', () => {
-    it('validates domain', () => isNameValid('asdasdasd.unknown').should.be.equal(false));
-    it("don't throws exception", () => isNameValid('asdasdasd.chain').should.be.equal(true));
+    it('validates domain', () => expect(isNameValid('asdasdasd.unknown')).to.be.equal(false));
+    it("don't throws exception", () => expect(isNameValid('asdasdasd.chain')).to.be.equal(true));
   });
 
   const payload = Buffer.from([1, 2, 42]);

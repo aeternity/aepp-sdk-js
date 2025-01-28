@@ -78,7 +78,7 @@ describe('Transaction', () => {
       denomination: AE_AMOUNT_FORMATS.AE,
     });
     const spendAettos = await aeSdk.buildTx({ ...params, tag: Tag.SpendTx, amount: 1e18 });
-    spendAe.should.be.equal(spendAettos);
+    expect(spendAe).to.be.equal(spendAettos);
   });
 
   describe('gas price from node', () => {

@@ -141,16 +141,16 @@ describe('Contract', () => {
   it('Call-Static deploy transaction', async () => {
     const { result } = await identityContract.$deploy([], { callStatic: true });
     assertNotNull(result);
-    result.should.have.property('gasUsed');
-    result.should.have.property('returnType');
+    expect(result).to.have.property('gasUsed');
+    expect(result).to.have.property('returnType');
   });
 
   it('Call-Static deploy transaction on specific hash', async () => {
     const hash = (await aeSdk.api.getTopHeader()).hash as Encoded.MicroBlockHash;
     const { result } = await identityContract.$deploy([], { callStatic: true, top: hash });
     assertNotNull(result);
-    result.should.have.property('gasUsed');
-    result.should.have.property('returnType');
+    expect(result).to.have.property('gasUsed');
+    expect(result).to.have.property('returnType');
   });
 
   it('throws error on deploy', async () => {
@@ -194,7 +194,7 @@ describe('Contract', () => {
     });
     const { result } = await contract.getArg(42);
     assertNotNull(result);
-    result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub);
+    expect(result.callerId).to.be.equal(DRY_RUN_ACCOUNT.pub);
   });
 
   it('Dry-run at specific height', async () => {
@@ -240,10 +240,10 @@ describe('Contract', () => {
     assertNotNull(deployInfo.transaction);
     await aeSdk.poll(deployInfo.transaction);
     expect(deployInfo.result).to.be.equal(undefined);
-    deployInfo.txData.should.not.be.equal(undefined);
+    expect(deployInfo.txData).to.not.be.equal(undefined);
     const result = await identityContract.getArg(42, { callStatic: false, waitMined: false });
     expect(result.result).to.be.equal(undefined);
-    result.txData.should.not.be.equal(undefined);
+    expect(result.txData).to.not.be.equal(undefined);
     await aeSdk.poll(result.hash as Encoded.TxHash);
   });
 

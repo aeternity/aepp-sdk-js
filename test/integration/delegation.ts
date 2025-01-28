@@ -119,7 +119,7 @@ contract DelegateTest =
         decode(preclaimSig),
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.be.equal('ok');
       delegationSignature = await aeSdk.signDelegation(
         packDelegation({
           tag: DelegationTag.AensName,
@@ -140,7 +140,7 @@ contract DelegateTest =
         decode(delegationSignature),
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.be.equal('ok');
     }).timeout(timeoutBlock);
 
     it('updates', async () => {
@@ -197,7 +197,7 @@ contract DelegateTest =
         decode(delegationSignature),
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.be.equal('ok');
     });
 
     it('revokes', async () => {
@@ -212,7 +212,7 @@ contract DelegateTest =
       );
       const { result } = await contract.signedRevoke(newOwner, name, decode(revokeSig));
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.be.equal('ok');
       await expect(aeSdk.api.getNameEntryByName(name)).to.be.rejectedWith(Error);
     });
 
@@ -266,7 +266,7 @@ contract DelegateTest =
       );
       const { result } = await contract.signedClaim(aeSdk.address, n, 0, nameFee, decode(dlgSig));
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.be.equal('ok');
     });
   });
 
@@ -347,7 +347,7 @@ contract DelegateTest =
         ttl,
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.be.equal('ok');
     });
 
     it('extends', async () => {
@@ -358,7 +358,7 @@ contract DelegateTest =
         ttl,
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.be.equal('ok');
       const state = await oracle.getState();
       expect(state.ttl).to.be.equal(prevState.ttl + 50);
     });
@@ -374,7 +374,7 @@ contract DelegateTest =
         amount: 5 * queryFee,
       });
       assertNotNull(query.result);
-      query.result.returnType.should.be.equal('ok');
+      expect(query.result.returnType).to.be.equal('ok');
       queryObject = await oracle.getQuery(query.decodedResult);
       expect(queryObject.decodedQuery).to.be.equal(q);
     });
@@ -396,7 +396,7 @@ contract DelegateTest =
         r,
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.be.equal('ok');
       const queryObject2 = await oracle.getQuery(queryObject.id);
       expect(queryObject2.decodedResponse).to.be.equal(r);
     });

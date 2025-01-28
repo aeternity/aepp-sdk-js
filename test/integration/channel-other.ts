@@ -93,16 +93,18 @@ describe('Channel other', () => {
     await aeSdk.sendTransaction(settleTx, { onAccount: initiator });
 
     const [initiatorBalanceAfterClose, responderBalanceAfterClose] = await getBalances();
-    new BigNumber(initiatorBalanceAfterClose)
-      .minus(initiatorBalanceBeforeClose)
-      .plus(closeSoloTxFee)
-      .plus(settleTxFee)
-      .isEqualTo(balances[initiator.address])
-      .should.be.equal(true);
-    new BigNumber(responderBalanceAfterClose)
-      .minus(responderBalanceBeforeClose)
-      .isEqualTo(balances[responder.address])
-      .should.be.equal(true);
+    expect(
+      new BigNumber(initiatorBalanceAfterClose)
+        .minus(initiatorBalanceBeforeClose)
+        .plus(closeSoloTxFee)
+        .plus(settleTxFee)
+        .isEqualTo(balances[initiator.address]),
+    ).to.equal(true);
+    expect(
+      new BigNumber(responderBalanceAfterClose)
+        .minus(responderBalanceBeforeClose)
+        .isEqualTo(balances[responder.address]),
+    ).to.equal(true);
   }).timeout(timeoutBlock);
 
   it('can dispute via slash tx', async () => {
@@ -158,17 +160,19 @@ describe('Channel other', () => {
     await aeSdk.sendTransaction(settleTx, { onAccount: responder });
 
     const [initiatorBalanceAfterClose, responderBalanceAfterClose] = await getBalances();
-    new BigNumber(initiatorBalanceAfterClose)
-      .minus(initiatorBalanceBeforeClose)
-      .plus(closeSoloTxFee)
-      .isEqualTo(recentBalances[initiator.address])
-      .should.be.equal(true);
-    new BigNumber(responderBalanceAfterClose)
-      .minus(responderBalanceBeforeClose)
-      .plus(slashTxFee)
-      .plus(settleTxFee)
-      .isEqualTo(recentBalances[responder.address])
-      .should.be.equal(true);
+    expect(
+      new BigNumber(initiatorBalanceAfterClose)
+        .minus(initiatorBalanceBeforeClose)
+        .plus(closeSoloTxFee)
+        .isEqualTo(recentBalances[initiator.address]),
+    ).to.equal(true);
+    expect(
+      new BigNumber(responderBalanceAfterClose)
+        .minus(responderBalanceBeforeClose)
+        .plus(slashTxFee)
+        .plus(settleTxFee)
+        .isEqualTo(recentBalances[responder.address]),
+    ).to.equal(true);
   }).timeout(timeoutBlock);
 
   it('can reconnect a channel without leave', async () => {
@@ -213,7 +217,7 @@ describe('Channel other', () => {
       100,
       async (transaction) => appendSignature(await responderSign(transaction), initiatorSign),
     );
-    result.accepted.should.equal(true);
+    expect(result.accepted).to.equal(true);
     expect(responderCh.round()).to.be.equal(2);
     expect(result.signedTx).to.be.a('string');
   });

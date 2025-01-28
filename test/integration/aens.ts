@@ -210,7 +210,7 @@ describe('Aens', () => {
 
   it('fails to spend to name with invalid pointers', async () => {
     const { pointers } = await name.getState();
-    pointers.length.should.be.equal(0);
+    expect(pointers).to.have.length(0);
     await expect(aeSdk.spend(100, name.value)).to.be.rejectedWith(
       AensPointerContextError,
       `Name ${name.value} don't have pointers for account_pubkey`,

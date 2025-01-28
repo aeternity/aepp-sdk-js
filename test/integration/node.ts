@@ -178,10 +178,10 @@ describe('Node client', () => {
         ],
       });
       const activeNode = await nodes.getNodeInfo();
-      activeNode.name.should.be.equal('first');
+      expect(activeNode.name).to.be.equal('first');
       nodes.selectNode('second');
       const secondNodeInfo = await nodes.getNodeInfo();
-      secondNodeInfo.name.should.be.equal('second');
+      expect(secondNodeInfo.name).to.be.equal('second');
     });
 
     it('Fail on undefined node', async () => {
@@ -202,7 +202,7 @@ describe('Node client', () => {
         nodes: [{ name: 'first', instance: node }],
       });
       const nodesList = await nodes.getNodesInPool();
-      nodesList.length.should.be.equal(1);
+      expect(nodesList).to.have.length(1);
     });
   });
 });

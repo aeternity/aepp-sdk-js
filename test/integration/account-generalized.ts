@@ -61,9 +61,9 @@ describe('Generalized Account', () => {
   });
 
   it('Fail on make GA on already GA', async () => {
-    await aeSdk
-      .createGeneralizedAccount('authorize', [], { sourceCode })
-      .should.be.rejectedWith(`Account ${gaAccountAddress} is already GA`);
+    await expect(
+      aeSdk.createGeneralizedAccount('authorize', [], { sourceCode }),
+    ).to.be.rejectedWith(`Account ${gaAccountAddress} is already GA`);
   });
 
   it('fails to build GaAttachTx with non-1 nonce', () => {
@@ -98,7 +98,7 @@ describe('Generalized Account', () => {
     await aeSdk.spend(10000, recipient, { authData: { callData } });
     await aeSdk.spend(10000, recipient, { authData: { sourceCode, args: [genSalt()] } });
     const balanceAfter = await aeSdk.getBalance(recipient);
-    balanceAfter.should.be.equal('20000');
+    expect(balanceAfter).to.equal('20000');
   });
 
   it('throws error if gasLimit exceeds the maximum value', async () => {
