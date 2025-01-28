@@ -6,7 +6,7 @@ import { _getPollInterval } from '../chain.js';
 import { sendTransaction, SendTransactionOptions } from '../send-transaction.js';
 import Node from '../Node.js';
 import AccountBase from '../account/Base.js';
-import OracleBase, { OracleQuery, decodeQuery } from './OracleBase.js';
+import OracleBase, { OracleQuery } from './OracleBase.js';
 
 interface OracleRegisterOptions
   extends BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat'>,
@@ -96,10 +96,8 @@ export default class Oracle extends OracleBase {
     const checkNewQueries = async (): Promise<void> => {
       if (isChecking) return;
       isChecking = true;
-      const queries = (await opt.onNode.getOracleQueriesByPubkey(this.address)).oracleQueries ?? [];
-      const filtered = queries
+      const filtered = (await this.getQueries(opt))
         .filter(({ id }) => !knownQueryIds.has(id))
-        .map((query) => decodeQuery(query))
         .filter((query) => options.includeResponded === true || query.decodedResponse === '');
       filtered.forEach((query) => knownQueryIds.add(query.id));
       isChecking = false;
