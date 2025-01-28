@@ -197,7 +197,7 @@ export default class Name {
       owner: Encoded.AccountAddress;
     }
   > {
-    const onNode = this.options.onNode ?? options.onNode;
+    const onNode = options.onNode ?? this.options.onNode;
     const nameEntry = await onNode.getNameEntryByName(this.value);
     return {
       ...nameEntry,
