@@ -59,6 +59,7 @@ describe('Aens', () => {
       blockHash: preclaimRes.blockHash,
       encodedTx: preclaimRes.encodedTx,
       hash: preclaimRes.hash,
+      nameSalt: preclaimRes.nameSalt,
       signatures: [preclaimRes.signatures[0]],
       rawTx: preclaimRes.rawTx,
     });
@@ -96,6 +97,17 @@ describe('Aens', () => {
       pointers: [],
       ttl: claimRes.blockHeight + 180000,
     });
+  }).timeout(timeoutBlock);
+
+  it('claims a name using different Name instances', async () => {
+    const string = randomName(30);
+
+    const name1 = new Name(string, aeSdk.getContext());
+    const { nameSalt } = await name1.preclaim();
+    expect(nameSalt).to.be.a('number');
+
+    const name2 = new Name(string, aeSdk.getContext());
+    await name2.claim({ nameSalt });
   }).timeout(timeoutBlock);
 
   it('claims a long name without preclaim', async () => {

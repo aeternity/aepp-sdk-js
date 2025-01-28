@@ -47,7 +47,7 @@ interface NamePreclaimOptions
     Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
 interface NameClaimOptions
-  extends BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'nameSalt' | 'name'>,
+  extends BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'name'>,
     Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
 class NotAuctionNameError extends LogicError {
@@ -263,10 +263,10 @@ export default class Name {
     const opt = { ...this.options, ...options };
     const tx = await buildTxAsync({
       _isInternalBuild: true,
+      nameSalt: this.#salt,
       ...opt,
       tag: Tag.NameClaimTx,
       accountId: opt.onAccount.address,
-      nameSalt: this.#salt,
       name: this.value,
     });
     return sendTransaction(tx, opt);
@@ -280,19 +280,21 @@ export default class Name {
    * await name.preclaim({ ttl, fee, nonce })
    * ```
    */
-  async preclaim(options: NamePreclaimOptions = {}): ReturnType<typeof sendTransaction> {
+  async preclaim(
+    options: NamePreclaimOptions = {},
+  ): Promise<Awaited<ReturnType<typeof sendTransaction>> & { nameSalt: number }> {
     const opt = { ...this.options, ...options };
-    const salt = genSalt();
+    const nameSalt = genSalt();
     const tx = await buildTxAsync({
       _isInternalBuild: true,
       ...opt,
       tag: Tag.NamePreclaimTx,
       accountId: opt.onAccount.address,
-      commitmentId: commitmentHash(this.value, salt),
+      commitmentId: commitmentHash(this.value, nameSalt),
     });
     const result = await sendTransaction(tx, opt);
-    this.#salt = salt;
-    return result;
+    this.#salt = nameSalt;
+    return { ...result, nameSalt };
   }
 
   /**
