@@ -1,9 +1,11 @@
 import { describe, it, before } from 'mocha';
-import { expect } from 'chai';
+import { expect, should } from 'chai';
 import { stub } from 'sinon';
 import { getSdk, timeoutBlock, url } from '.';
 import { AeSdk, Tag, MemoryAccount, Encoded, Node, Contract } from '../../src';
 import { assertNotNull, bindRequestCounter, indent } from '../utils';
+
+should();
 
 describe('Node Chain', () => {
   let aeSdk: AeSdk;

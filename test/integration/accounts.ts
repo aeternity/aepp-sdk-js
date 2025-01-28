@@ -1,5 +1,5 @@
 import { describe, it, before } from 'mocha';
-import { expect } from 'chai';
+import { expect, should } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk, networkId } from '.';
 import { assertNotNull } from '../utils';
@@ -14,6 +14,8 @@ import {
   Encoding,
   Encoded,
 } from '../../src';
+
+should();
 
 describe('Accounts', () => {
   let aeSdk: AeSdk;

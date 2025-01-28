@@ -1,5 +1,5 @@
 import { after, before, describe, it } from 'mocha';
-import { expect } from 'chai';
+import { expect, should } from 'chai';
 import { stub, createSandbox } from 'sinon';
 import {
   AeSdk,
@@ -42,6 +42,8 @@ import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/
 import { getSdk, networkId, compilerUrl } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
 import { assertNotNull, indent } from '../utils';
+
+should();
 
 const WindowPostMessageFake = (
   name: string,

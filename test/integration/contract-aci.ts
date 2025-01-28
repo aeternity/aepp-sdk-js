@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { expect, should } from 'chai';
 import { before, describe, it } from 'mocha';
 import BigNumber from 'bignumber.js';
 import {
@@ -29,6 +29,8 @@ import { assertNotNull, ChainTtl, ensureEqual, indent, InputNumber } from '../ut
 import { Aci } from '../../src/contract/compiler/Base';
 import { ContractCallObject } from '../../src/contract/Contract';
 import includesAci from './contracts/Includes.json';
+
+should();
 
 const identityContractSourceCode = `
 contract Identity =

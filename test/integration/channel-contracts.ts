@@ -1,5 +1,5 @@
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha';
-import { expect } from 'chai';
+import { expect, should } from 'chai';
 import * as sinon from 'sinon';
 import { getSdk, networkId } from '.';
 import {
@@ -21,6 +21,7 @@ import { SignTxWithTag } from '../../src/channel/internal';
 import { assertNotNull } from '../utils';
 import { initializeChannels, recreateAccounts } from './channel-utils';
 
+should();
 const contractSourceCode = `
 contract Identity =
   entrypoint getArg(x : int) : int = x

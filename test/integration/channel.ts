@@ -1,5 +1,5 @@
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha';
-import { expect } from 'chai';
+import { expect, should } from 'chai';
 import * as sinon from 'sinon';
 import { getSdk, networkId } from '.';
 import {
@@ -24,6 +24,8 @@ import {
   initializeChannels,
   recreateAccounts,
 } from './channel-utils';
+
+should();
 
 describe('Channel', () => {
   let aeSdk: AeSdk;
