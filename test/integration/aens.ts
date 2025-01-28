@@ -158,41 +158,61 @@ describe('Aens', () => {
     expect(preclaimRes.tx.accountId).to.equal(onAccount.address);
   });
 
-  (isLimitedCoins ? it.skip : it)('starts a unicode name auction and makes a bid', async () => {
-    const nameShortString = `æ${randomString(4)}.chain`;
-    ensureName(nameShortString);
-    const n = new Name(nameShortString, aeSdk.getContext());
-    await n.preclaim();
-    await n.claim();
+  (isLimitedCoins ? describe.skip : describe)('Auction', () => {
+    let auction: Name;
 
-    const bidFee = computeBidFee(n.value);
-    const onAccount = Object.values(aeSdk.accounts)[1];
-    const bidRes = await n.bid(bidFee, { onAccount });
-    assertNotNull(bidRes.tx);
-    assertNotNull(bidRes.signatures);
-    expect(bidRes).to.eql({
-      tx: {
-        fee: bidRes.tx.fee,
-        nonce: bidRes.tx.nonce,
-        accountId: onAccount.address,
-        name: nameShortString,
-        nameSalt: 0,
-        nameFee: 3008985000000000000n,
-        version: 2,
-        ttl: bidRes.tx.ttl,
-        type: 'NameClaimTx',
-      },
-      blockHeight: bidRes.blockHeight,
-      blockHash: bidRes.blockHash,
-      encodedTx: bidRes.encodedTx,
-      hash: bidRes.hash,
-      signatures: [bidRes.signatures[0]],
-      rawTx: bidRes.rawTx,
+    before(() => {
+      const nameShortString = `æ${randomString(4)}.chain` as const;
+      auction = new Name(nameShortString, aeSdk.getContext());
     });
-    await expect(n.getState()).to.be.rejectedWith(
-      RestError,
-      `v3/names/%C3%A6${n.value.slice(1)} error: Name not found`,
-    );
+
+    it('starts a unicode name auction', async () => {
+      await auction.preclaim();
+      await auction.claim();
+    });
+
+    it('gets auction details', async () => {
+      await expect(auction.getState()).to.be.rejectedWith(
+        RestError,
+        `v3/names/%C3%A6${auction.value.slice(1)} error: Name not found`,
+      );
+      const auctionDetails = await aeSdk.api.getAuctionEntryByName(auction.value);
+      assertNotNull(auctionDetails.startedAt);
+      expect(auctionDetails).to.eql({
+        id: produceNameId(auction.value),
+        startedAt: auctionDetails.startedAt,
+        endsAt: 480 + auctionDetails.startedAt,
+        highestBidder: aeSdk.address,
+        highestBid: 2865700000000000000,
+      });
+    });
+
+    it('makes a bid', async () => {
+      const bidFee = computeBidFee(auction.value);
+      const onAccount = Object.values(aeSdk.accounts)[1];
+      const bidRes = await auction.bid(bidFee, { onAccount });
+      assertNotNull(bidRes.tx);
+      assertNotNull(bidRes.signatures);
+      expect(bidRes).to.eql({
+        tx: {
+          fee: bidRes.tx.fee,
+          nonce: bidRes.tx.nonce,
+          accountId: onAccount.address,
+          name: auction.value,
+          nameSalt: 0,
+          nameFee: 3008985000000000000n,
+          version: 2,
+          ttl: bidRes.tx.ttl,
+          type: 'NameClaimTx',
+        },
+        blockHeight: bidRes.blockHeight,
+        blockHash: bidRes.blockHash,
+        encodedTx: bidRes.encodedTx,
+        hash: bidRes.hash,
+        signatures: [bidRes.signatures[0]],
+        rawTx: bidRes.rawTx,
+      });
+    });
   });
 
   it('queries state from the node', async () => {
