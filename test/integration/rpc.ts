@@ -147,7 +147,7 @@ describe('Aepp<->Wallet', () => {
         aci: contract._aci,
         address: contract.$options.address,
       });
-      expect((await contractAepp.getArg(42)).decodedResult).to.be.equal(42n);
+      expect((await contractAepp.getArg(42)).decodedResult).to.equal(42n);
     });
 
     it('Fail on not connected', async () => {
@@ -214,7 +214,7 @@ describe('Aepp<->Wallet', () => {
         'The peer failed to execute your request due to unknown error',
       );
       wallet.onAskAccounts = () => {};
-      expect(await aepp.askAddresses()).to.be.eql(wallet.addresses());
+      expect(await aepp.askAddresses()).to.eql(wallet.addresses());
     });
 
     it('Try to sign and send transaction to wallet without subscription', async () => {
@@ -242,9 +242,9 @@ describe('Aepp<->Wallet', () => {
       let checkPromise;
       wallet.onSubscription = (id, params, origin) => {
         checkPromise = Promise.resolve().then(() => {
-          expect(Buffer.from(id, 'base64').length).to.be.equal(8);
-          expect(params).to.be.eql({ type: 'subscribe', value: 'connected' });
-          expect(origin).to.be.equal('http://origin.test');
+          expect(Buffer.from(id, 'base64').length).to.equal(8);
+          expect(params).to.eql({ type: 'subscribe', value: 'connected' });
+          expect(origin).to.equal('http://origin.test');
         });
       };
       await aepp.subscribeAddress(SUBSCRIPTION_TYPES.subscribe, 'connected');
@@ -274,7 +274,7 @@ describe('Aepp<->Wallet', () => {
     });
 
     it('Get address: subscribed for accounts', async () => {
-      expect(aepp.address).to.be.equal(account.address);
+      expect(aepp.address).to.equal(account.address);
     });
 
     it('Ask for address: exception in onAskAccounts -> wallet deny', async () => {
@@ -290,9 +290,9 @@ describe('Aepp<->Wallet', () => {
       let checkPromise;
       wallet.onAskAccounts = (id, params, origin) => {
         checkPromise = Promise.resolve().then(() => {
-          expect(Buffer.from(id, 'base64').length).to.be.equal(8);
-          expect(params).to.be.equal(undefined);
-          expect(origin).to.be.equal('http://origin.test');
+          expect(Buffer.from(id, 'base64').length).to.equal(8);
+          expect(params).to.equal(undefined);
+          expect(origin).to.equal('http://origin.test');
         });
       };
       const addressees = await aepp.askAddresses();
@@ -327,7 +327,7 @@ describe('Aepp<->Wallet', () => {
       await expect(aepp.signTransaction(tx))
         .to.be.eventually.rejectedWith('Operation rejected by user')
         .with.property('code', 4);
-      expect(origin).to.be.equal('http://origin.test');
+      expect(origin).to.equal('http://origin.test');
       s.restore();
     });
 
@@ -363,7 +363,7 @@ describe('Aepp<->Wallet', () => {
           encodedTx,
         } = unpackedTx;
         const txWithNetwork = getBufferToSign(buildTx(encodedTx), networkId, innerTx);
-        expect(verify(txWithNetwork, signature, aepp.address)).to.be.equal(true);
+        expect(verify(txWithNetwork, signature, aepp.address)).to.equal(true);
       });
     });
 
@@ -422,14 +422,14 @@ describe('Aepp<->Wallet', () => {
         await expect(aepp.signMessage('test'))
           .to.be.eventually.rejectedWith('Operation rejected by user')
           .with.property('code', 4);
-        expect(origin).to.be.equal('http://origin.test');
+        expect(origin).to.equal('http://origin.test');
         s.restore();
       });
 
       it('works', async () => {
         const messageSig = await aepp.signMessage('test');
         messageSig.should.be.instanceof(Buffer);
-        expect(verifyMessage('test', messageSig, aepp.address)).to.be.equal(true);
+        expect(verifyMessage('test', messageSig, aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
@@ -445,7 +445,7 @@ describe('Aepp<->Wallet', () => {
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
         const messageSig = await aepp.signMessage('test', { onAccount });
-        expect(verifyMessage('test', messageSig, onAccount)).to.be.equal(true);
+        expect(verifyMessage('test', messageSig, onAccount)).to.equal(true);
       });
     });
 
@@ -469,7 +469,7 @@ describe('Aepp<->Wallet', () => {
         await expect(aepp.signTypedData(recordData, recordAci))
           .to.be.eventually.rejectedWith('Operation rejected by user')
           .with.property('code', 4);
-        expect(origin).to.be.equal('http://origin.test');
+        expect(origin).to.equal('http://origin.test');
         s.restore();
       });
 
@@ -477,7 +477,7 @@ describe('Aepp<->Wallet', () => {
         const messageSig = await aepp.signTypedData(recordData, recordAci);
         expect(messageSig).to.satisfy((s: string) => s.startsWith('sg_'));
         const hash = hashTypedData(recordData, recordAci, {});
-        expect(verify(hash, decode(messageSig), aepp.address)).to.be.equal(true);
+        expect(verify(hash, decode(messageSig), aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
@@ -494,7 +494,7 @@ describe('Aepp<->Wallet', () => {
         const onAccount = wallet.addresses()[1];
         const messageSig = await aepp.signTypedData(recordData, recordAci, { onAccount });
         const hash = hashTypedData(recordData, recordAci, {});
-        expect(verify(hash, decode(messageSig), onAccount)).to.be.equal(true);
+        expect(verify(hash, decode(messageSig), onAccount)).to.equal(true);
       });
     });
 
@@ -510,14 +510,14 @@ describe('Aepp<->Wallet', () => {
         await expect(aepp.sign(rawData))
           .to.be.eventually.rejectedWith('Operation rejected by user')
           .with.property('code', 4);
-        expect(origin).to.be.equal('http://origin.test');
+        expect(origin).to.equal('http://origin.test');
         s.restore();
       });
 
       it('works', async () => {
         const signature = await aepp.sign(rawData);
-        expect(signature).to.be.instanceOf(Buffer);
-        expect(verify(rawData, signature, aepp.address)).to.be.equal(true);
+        expect(signature).to.be.an.instanceOf(Buffer);
+        expect(verify(rawData, signature, aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
@@ -535,7 +535,7 @@ describe('Aepp<->Wallet', () => {
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
         const signature = await aepp.sign(rawData, { onAccount });
-        expect(verify(rawData, signature, onAccount)).to.be.equal(true);
+        expect(verify(rawData, signature, onAccount)).to.equal(true);
       });
     });
 
@@ -559,7 +559,7 @@ describe('Aepp<->Wallet', () => {
         await expect(aepp.signDelegation(getDelegation()))
           .to.be.eventually.rejectedWith('Operation rejected by user')
           .with.property('code', 4);
-        expect(origin).to.be.equal('http://origin.test');
+        expect(origin).to.equal('http://origin.test');
         sandbox.restore();
       });
 
@@ -615,7 +615,7 @@ describe('Aepp<->Wallet', () => {
         const payload = { nodeUrl: 'http://example.com' };
         await aepp.askToSelectNetwork(payload);
         wallet.onAskToSelectNetwork = handlerReject;
-        expect(args.slice(1)).to.be.eql([payload, 'http://origin.test']);
+        expect(args.slice(1)).to.eql([payload, 'http://origin.test']);
       });
     });
 
@@ -653,8 +653,8 @@ describe('Aepp<->Wallet', () => {
         });
         wallet.selectAccount(connectedAccount);
         const { connected, current } = await accountsPromise;
-        expect(current[connectedAccount]).to.be.eql({});
-        expect(Object.keys(connected).includes(connectedAccount)).to.be.equal(false);
+        expect(current[connectedAccount]).to.eql({});
+        expect(Object.keys(connected).includes(connectedAccount)).to.equal(false);
       });
 
       it('Aepp: receive notification for network update', async () => {
@@ -663,7 +663,7 @@ describe('Aepp<->Wallet', () => {
           wallet.addNode('second_node', node, true);
         });
         message.networkId.should.be.equal(networkId);
-        expect(wallet.selectedNodeName).to.be.equal('second_node');
+        expect(wallet.selectedNodeName).to.equal('second_node');
       });
     });
 
@@ -831,7 +831,7 @@ describe('Aepp<->Wallet', () => {
       message.networkId.should.be.equal(networkId);
       assertNotNull(message.node);
       message.node.should.be.an('object');
-      expect(wallet.selectedNodeName).to.be.equal('second_node');
+      expect(wallet.selectedNodeName).to.equal('second_node');
     });
   });
 });

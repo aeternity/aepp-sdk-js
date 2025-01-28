@@ -41,7 +41,7 @@ async function initProvider(
       assertNotNull(expectedRequest);
       if (!('request' in expectedRequest))
         throw new Error(`Expected request, got ${JSON.stringify(expectedRequest)} instead`);
-      expect(actualRequest).to.be.eql(expectedRequest.request);
+      expect(actualRequest).to.eql(expectedRequest.request);
 
       const expectedResponse = messageQueue.shift();
       assertNotNull(expectedResponse);
@@ -58,7 +58,7 @@ async function initProvider(
             (reject: unknown) => ({ reject }),
           );
         }, expectedRequest.request);
-        expect(actualResponse).to.be.eql(expectedResponse);
+        expect(actualResponse).to.eql(expectedResponse);
       }
 
       // eslint-disable-next-line @typescript-eslint/no-throw-literal
@@ -130,13 +130,13 @@ describe('Aeternity Snap for MetaMask', function () {
         },
       ]);
       const factory = new AccountMetamaskFactory(provider);
-      expect(await factory.installSnap()).to.be.eql(snapDetails);
+      expect(await factory.installSnap()).to.eql(snapDetails);
     });
 
     it('gets snap version', async () => {
       const provider = await initProvider([...versionChecks, ...versionChecks.slice(2, 2)]);
       const factory = new AccountMetamaskFactory(provider);
-      expect(await factory.getSnapVersion()).to.be.equal('0.0.9');
+      expect(await factory.getSnapVersion()).to.equal('0.0.9');
     });
 
     it('ensures that snap version is compatible', async () => {
@@ -172,9 +172,9 @@ describe('Aeternity Snap for MetaMask', function () {
       const factory = new AccountMetamaskFactory(provider);
       await instructTester('approve');
       const account = await factory.initialize(42);
-      expect(account).to.be.instanceOf(AccountMetamask);
-      expect(account.address).to.be.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
-      expect(account.index).to.be.equal(42);
+      expect(account).to.be.an.instanceOf(AccountMetamask);
+      expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
+      expect(account.index).to.equal(42);
     });
 
     it('initializes an account rejected', async () => {
@@ -242,7 +242,7 @@ describe('Aeternity Snap for MetaMask', function () {
         signatures: [signature],
       } = unpackTx(signedTransaction, Tag.SignedTx);
       const hashedTx = Buffer.concat([Buffer.from(networkId), hash(decode(transaction))]);
-      expect(verify(hashedTx, signature, address)).to.be.equal(true);
+      expect(verify(hashedTx, signature, address)).to.equal(true);
     });
 
     it('signs transaction rejected', async () => {
@@ -288,8 +288,8 @@ describe('Aeternity Snap for MetaMask', function () {
       const account = new AccountMetamask(provider, 0, address);
       await instructTester('approve');
       const signature = await account.signMessage(message);
-      expect(signature).to.be.instanceOf(Uint8Array);
-      expect(verifyMessage(message, signature, address)).to.be.equal(true);
+      expect(signature).to.be.an.instanceOf(Uint8Array);
+      expect(verifyMessage(message, signature, address)).to.equal(true);
     });
 
     it('signs message rejected', async () => {

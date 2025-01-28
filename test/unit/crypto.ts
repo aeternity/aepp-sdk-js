@@ -37,17 +37,17 @@ const expectedHash = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK';
 describe('crypto', () => {
   describe('isAddressValid', () => {
     it('rejects invalid encoded data', () => {
-      expect(isAddressValid('test')).to.be.equal(false);
-      expect(isAddressValid('th_11111111111111111111111111111111273Yts')).to.be.equal(false);
-      expect(
-        isAddressValid('ak_11111111111111111111111111111111273Yts', Encoding.TxHash),
-      ).to.be.equal(false);
+      expect(isAddressValid('test')).to.equal(false);
+      expect(isAddressValid('th_11111111111111111111111111111111273Yts')).to.equal(false);
+      expect(isAddressValid('ak_11111111111111111111111111111111273Yts', Encoding.TxHash)).to.equal(
+        false,
+      );
     });
 
     it('returns true for a valid address', () => {
       const maybeValue: string = 'ak_11111111111111111111111111111111273Yts';
       const result = isAddressValid(maybeValue);
-      expect(result).to.be.equal(true);
+      expect(result).to.equal(true);
       // @ts-expect-error `result` is not chcked yet
       let value: Encoded.AccountAddress = maybeValue;
       if (result) value = maybeValue;
@@ -57,7 +57,7 @@ describe('crypto', () => {
     it('correctly checks against multiple encodings', () => {
       const maybeValue: string = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK';
       const result = isAddressValid(maybeValue, Encoding.Name, Encoding.TxHash);
-      expect(result).to.be.equal(true);
+      expect(result).to.equal(true);
       // @ts-expect-error `result` is not chcked yet
       let value: Encoded.Name | Encoded.TxHash = maybeValue;
       if (result) value = maybeValue;
@@ -105,7 +105,7 @@ describe('crypto', () => {
   it('hashing produces 256 bit blake2b byte buffers', () => {
     const h = hash('foobar');
     expect(h).to.be.a('Uint8Array');
-    expect(Buffer.from(h).toString('hex')).to.be.equal(
+    expect(Buffer.from(h).toString('hex')).to.equal(
       '93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47',
     );
   });
@@ -119,6 +119,6 @@ describe('crypto', () => {
   });
 
   it('Can produce tx hash', () => {
-    expect(buildTxHash(decode(txRaw))).to.be.equal(expectedHash);
+    expect(buildTxHash(decode(txRaw))).to.equal(expectedHash);
   });
 });

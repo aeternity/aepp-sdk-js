@@ -28,22 +28,22 @@ describe('Node Chain', () => {
         new Array(5).fill(undefined).map(async () => aeSdk.getHeight()),
       );
       expect(heights).to.eql(heights.map(() => heights[0]));
-      expect(getCount()).to.be.equal(1);
+      expect(getCount()).to.equal(1);
     });
 
     it('returns height from cache', async () => {
       const height = await aeSdk.getHeight();
       const getCount = bindRequestCounter(aeSdk.api);
-      expect(await aeSdk.getHeight({ cached: true })).to.be.equal(height);
-      expect(getCount()).to.be.equal(0);
+      expect(await aeSdk.getHeight({ cached: true })).to.equal(height);
+      expect(getCount()).to.equal(0);
     });
 
     it('returns not cached height if network changed', async () => {
       const height = await aeSdk.getHeight();
       aeSdk.addNode('test-2', new Node(`${aeSdk.api.$host}/`), true);
       const getCount = bindRequestCounter(aeSdk.api);
-      expect(await aeSdk.getHeight({ cached: true })).to.be.equal(height);
-      expect(getCount()).to.be.equal(2); // status, height
+      expect(await aeSdk.getHeight({ cached: true })).to.equal(height);
+      expect(getCount()).to.equal(2); // status, height
       aeSdk.selectNode('test');
       aeSdk.pool.delete('test-2');
     });
@@ -116,7 +116,7 @@ describe('Node Chain', () => {
   it('Wait for transaction confirmation', async () => {
     const res = await aeSdk.spend(1000, aeSdk.address, { confirm: 1 });
     assertNotNull(res.blockHeight);
-    expect((await aeSdk.getHeight()) >= res.blockHeight + 1).to.be.equal(true);
+    expect((await aeSdk.getHeight()) >= res.blockHeight + 1).to.equal(true);
   }).timeout(timeoutBlock);
 
   it("doesn't make extra requests", async () => {
@@ -126,19 +126,19 @@ describe('Node Chain', () => {
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, recipient, { waitMined: false, verify: false })).hash;
-    expect(getCount()).to.be.equal(2); // nonce, post tx
+    expect(getCount()).to.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, recipient, { waitMined: false, verify: false })).hash;
-    expect(getCount()).to.be.equal(2); // nonce, post tx
+    expect(getCount()).to.equal(2); // nonce, post tx
     await aeSdk.poll(hash);
 
     await aeSdk.getHeight({ cached: false });
     getCount = bindRequestCounter(aeSdk.api);
     hash = (await aeSdk.spend(100, recipient, { waitMined: false })).hash;
-    expect(getCount()).to.be.equal(6); // nonce, validator(acc, recipient, height, status), post tx
+    expect(getCount()).to.equal(6); // nonce, validator(acc, recipient, height, status), post tx
     await aeSdk.poll(hash);
   });
 
@@ -161,7 +161,7 @@ describe('Node Chain', () => {
     );
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
-    expect(getCount({ exclude: [txPostRetry] })).to.be.equal(txPostCount);
+    expect(getCount({ exclude: [txPostRetry] })).to.equal(txPostCount);
   });
 
   it('multiple spends from different accounts', async () => {
@@ -183,7 +183,7 @@ describe('Node Chain', () => {
     s.restore();
     transactions.push(...spends.map(({ hash }) => hash));
     const txPostCount = accounts.length;
-    expect(getCount()).to.be.equal(txPostCount);
+    expect(getCount()).to.equal(txPostCount);
   });
 
   it('ensure transactions mined', async () =>
@@ -210,7 +210,7 @@ describe('Node Chain', () => {
         ),
       )
     ).map((r) => r.decodedResult);
-    expect(results).to.be.eql(numbers.map((v) => BigInt(v * 100)));
-    expect(getCount()).to.be.equal(1);
+    expect(results).to.eql(numbers.map((v) => BigInt(v * 100)));
+    expect(getCount()).to.equal(1);
   });
 });

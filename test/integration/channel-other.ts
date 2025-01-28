@@ -176,9 +176,9 @@ describe('Channel other', () => {
   }).timeout(timeoutBlock);
 
   it('can reconnect a channel without leave', async () => {
-    expect(initiatorCh.round()).to.be.equal(1);
+    expect(initiatorCh.round()).to.equal(1);
     await initiatorCh.update(initiator.address, responder.address, 100, initiatorSign);
-    expect(initiatorCh.round()).to.be.equal(2);
+    expect(initiatorCh.round()).to.equal(2);
     const channelId = initiatorCh.id();
     const fsmId = initiatorCh.fsmId();
     initiatorCh.disconnect();
@@ -190,18 +190,18 @@ describe('Channel other', () => {
       existingFsmId: fsmId,
     });
     await waitForChannel(ch, ['open']);
-    expect(ch.fsmId()).to.be.equal(fsmId);
-    expect(ch.round()).to.be.equal(2);
+    expect(ch.fsmId()).to.equal(fsmId);
+    expect(ch.round()).to.equal(2);
     const state = await ch.state();
     assertNotNull(state.signedTx);
-    expect(state.signedTx.encodedTx.tag).to.be.equal(Tag.ChannelOffChainTx);
+    expect(state.signedTx.encodedTx.tag).to.equal(Tag.ChannelOffChainTx);
     await ch.update(initiator.address, responder.address, 100, initiatorSign);
-    expect(ch.round()).to.be.equal(3);
+    expect(ch.round()).to.equal(3);
     ch.disconnect();
   });
 
   it('can post backchannel update', async () => {
-    expect(responderCh.round()).to.be.equal(1);
+    expect(responderCh.round()).to.equal(1);
     initiatorCh.disconnect();
     const { accepted } = await responderCh.update(
       initiator.address,
@@ -210,7 +210,7 @@ describe('Channel other', () => {
       responderSign,
     );
     expect(accepted).to.equal(false);
-    expect(responderCh.round()).to.be.equal(1);
+    expect(responderCh.round()).to.equal(1);
     const result = await responderCh.update(
       initiator.address,
       responder.address,
@@ -218,7 +218,7 @@ describe('Channel other', () => {
       async (transaction) => appendSignature(await responderSign(transaction), initiatorSign),
     );
     expect(result.accepted).to.equal(true);
-    expect(responderCh.round()).to.be.equal(2);
+    expect(responderCh.round()).to.equal(2);
     expect(result.signedTx).to.be.a('string');
   });
 });

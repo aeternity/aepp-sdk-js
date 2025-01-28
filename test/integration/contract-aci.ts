@@ -218,12 +218,12 @@ describe('Contract instance', () => {
       gasLimit: 15000,
     });
     delete aeSdk._options.gasPrice;
-    expect(testContract.$options.gasPrice).to.be.equal(100);
+    expect(testContract.$options.gasPrice).to.equal(100);
     delete testContract.$options.gasPrice;
     testContract.should.have.property('$compile');
     testContract.should.have.property('$call');
     testContract.should.have.property('$deploy');
-    expect(testContract.$options.ttl).to.be.equal(0);
+    expect(testContract.$options.ttl).to.equal(0);
     testContract.$options.should.have.property('sourceCode');
     testContract.$options.should.have.property('bytecode');
     assertNotNull(testContract.$options.fileSystem);
@@ -266,12 +266,12 @@ describe('Contract instance', () => {
     });
     expect(deployInfo.address).to.satisfy((b: string) => b.startsWith('ct_'));
     assertNotNull(deployInfo.txData.tx);
-    expect(deployInfo.txData.tx.gas).to.be.equal(16000);
-    expect(deployInfo.txData.tx.amount).to.be.equal(42n);
+    expect(deployInfo.txData.tx.gas).to.equal(16000);
+    expect(deployInfo.txData.tx.amount).to.equal(42n);
     assertNotNull(deployInfo.result);
-    expect(deployInfo.result.gasUsed).to.be.equal(209);
-    expect(deployInfo.result.gasPrice).to.be.equal(1000000000n);
-    expect(deployInfo.txData.tx.deposit).to.be.equal(0n);
+    expect(deployInfo.result.gasUsed).to.equal(209);
+    expect(deployInfo.result.gasPrice).to.equal(1000000000n);
+    expect(deployInfo.txData.tx.deposit).to.equal(0n);
     expect(testContract.$options.bytecode).to.satisfy((b: string) => b.startsWith('cb_'));
     assertNotNull(deployInfo.address);
     testContractAddress = deployInfo.address;
@@ -287,22 +287,22 @@ describe('Contract instance', () => {
 
   it('calls', async () => {
     const res = await testContract.intFn(2);
-    expect(res.decodedResult).to.be.equal(2n);
+    expect(res.decodedResult).to.equal(2n);
     ensureEqual<Tag.ContractCallTx>(res.tx.tag, Tag.ContractCallTx);
-    expect(res.tx.fee).to.be.equal('182000000000000');
+    expect(res.tx.fee).to.equal('182000000000000');
   });
 
   it('calls with fallback account if onAccount is not provided', async () => {
     const account = testContract.$options.onAccount;
     delete testContract.$options.onAccount;
     const res = await testContract.intFn(2);
-    expect(res.decodedResult).to.be.equal(2n);
+    expect(res.decodedResult).to.equal(2n);
     testContract.$options.onAccount = account;
   });
 
   it('calls on chain', async () => {
     const res = await testContract.intFn(2, { callStatic: false });
-    expect(res.decodedResult).to.be.equal(2n);
+    expect(res.decodedResult).to.equal(2n);
     ensureEqual<Tag.SignedTx>(res.tx.tag, Tag.SignedTx);
     ensureEqual<Tag.ContractCallTx>(res.tx.encodedTx.tag, Tag.ContractCallTx);
     expect(res.tx.encodedTx.fee).to.satisfy((fee: string) => +fee >= 182000000000000);
@@ -316,7 +316,7 @@ describe('Contract instance', () => {
     });
     await aeSdk.poll(txHash);
     const { decodedResult } = await testContract.$getCallResultByTxHash(txHash, 'stringFn');
-    expect(decodedResult).to.be.equal('test');
+    expect(decodedResult).to.equal('test');
   });
 
   it('calls with correct nonce if transaction stuck in mempool', async () => {
@@ -328,7 +328,7 @@ describe('Contract instance', () => {
       sdk.getAccount(sdk.address).then((res) => res.nonce),
       sdk.api.getAccountNextNonce(sdk.address).then((res) => res.nextNonce),
     ]);
-    expect(nonce + 2).to.be.equal(nextNonce);
+    expect(nonce + 2).to.equal(nextNonce);
 
     const contract = await Contract.initialize({
       ...sdk.getContext(),
@@ -349,11 +349,11 @@ describe('Contract instance', () => {
     const [address1, address2] = aeSdk.addresses();
     let { result } = await testContract.intFn(2);
     assertNotNull(result);
-    expect(result.callerId).to.be.equal(address1);
+    expect(result.callerId).to.equal(address1);
     aeSdk.selectAccount(address2);
     result = (await testContract.intFn(2)).result;
     assertNotNull(result);
-    expect(result.callerId).to.be.equal(address2);
+    expect(result.callerId).to.equal(address2);
     aeSdk.selectAccount(address1);
   });
 
@@ -407,7 +407,7 @@ describe('Contract instance', () => {
       aci: testContractAci,
       address: testContract.$options.address,
     });
-    expect((await contract.intFn(3)).decodedResult).to.be.equal(3n);
+    expect((await contract.intFn(3)).decodedResult).to.equal(3n);
   });
 
   it("fails if aci doesn't match called contract", async () => {
@@ -431,7 +431,7 @@ describe('Contract instance', () => {
       aci: testContractAci,
     });
     await contract.$deploy(['test', 1]);
-    expect((await contract.intFn(3)).decodedResult).to.be.equal(3n);
+    expect((await contract.intFn(3)).decodedResult).to.equal(3n);
   });
 
   it('supports contract interfaces polymorphism', async () => {
@@ -462,8 +462,8 @@ describe('Contract instance', () => {
     });
 
     await contract.$deploy([]);
-    expect((await contract.soundByDog()).decodedResult).to.be.equal('animal sound: bark');
-    expect((await contract.soundByCat()).decodedResult).to.be.equal('animal sound: meow');
+    expect((await contract.soundByDog()).decodedResult).to.equal('animal sound: bark');
+    expect((await contract.soundByCat()).decodedResult).to.equal('animal sound: meow');
   });
 
   const intHolderSourceCode = indent`
@@ -491,16 +491,16 @@ describe('Contract instance', () => {
     });
     await factory.$deploy([]);
     const { decodedResult: address, result } = await factory.new(42);
-    expect(isAddressValid(address, Encoding.ContractAddress)).to.be.equal(true);
+    expect(isAddressValid(address, Encoding.ContractAddress)).to.equal(true);
     assertNotNull(result);
-    expect(result.gasUsed).to.be.equal(15567);
+    expect(result.gasUsed).to.equal(15567);
 
     const contract = await Contract.initialize<IntHolder>({
       ...aeSdk.getContext(),
       sourceCode: intHolderSourceCode,
       address,
     });
-    expect((await contract.get()).decodedResult).to.be.equal(42n);
+    expect((await contract.get()).decodedResult).to.equal(42n);
   });
 
   it('can clone a contract via factory call', async () => {
@@ -510,7 +510,7 @@ describe('Contract instance', () => {
     });
     const { address: templateAddress } = await templateAuction.$deploy([43]);
     assertNotNull(templateAddress);
-    expect((await templateAuction.get()).decodedResult).to.be.equal(43n);
+    expect((await templateAuction.get()).decodedResult).to.equal(43n);
 
     const market = await Contract.initialize<{
       new: (template: Encoded.ContractAddress, value: number) => Encoded.ContractAddress;
@@ -530,16 +530,16 @@ describe('Contract instance', () => {
     });
     await market.$deploy([]);
     const { decodedResult: address, result } = await market.new(templateAddress, 44);
-    expect(isAddressValid(address, Encoding.ContractAddress)).to.be.equal(true);
+    expect(isAddressValid(address, Encoding.ContractAddress)).to.equal(true);
     assertNotNull(result);
-    expect(result.gasUsed).to.be.equal(10097);
+    expect(result.gasUsed).to.equal(10097);
 
     const auction = await Contract.initialize<IntHolder>({
       ...aeSdk.getContext(),
       sourceCode: intHolderSourceCode,
       address,
     });
-    expect((await auction.get()).decodedResult).to.be.equal(44n);
+    expect((await auction.get()).decodedResult).to.equal(44n);
   });
 
   it('accepts matching source code with enabled validation', async () =>
@@ -593,7 +593,7 @@ describe('Contract instance', () => {
     assertNotNull(result);
     result.should.have.property('gasUsed');
     result.should.have.property('returnType');
-    expect(decodedResult).to.be.equal(undefined);
+    expect(decodedResult).to.equal(undefined);
   });
 
   it('dry-runs init function on specific account', async () => {
@@ -637,7 +637,7 @@ describe('Contract instance', () => {
       InvalidTxError,
       'Transaction verification errors: Recipient account is not payable',
     );
-    expect(error.validation).to.be.eql([
+    expect(error.validation).to.eql([
       {
         message: 'Recipient account is not payable',
         key: 'RecipientAccountNotPayable',
@@ -657,7 +657,7 @@ describe('Contract instance', () => {
     const { address } = await contract.$deploy([]);
     assertNotNull(address);
     await aeSdk.spend(42, address);
-    expect(await aeSdk.getBalance(address)).to.be.equal('42');
+    expect(await aeSdk.getBalance(address)).to.equal('42');
   });
 
   it('calls on specific account', async () => {
@@ -690,7 +690,7 @@ describe('Contract instance', () => {
     expect(contract1._aci).to.be.an('array');
     expect(contract1.$options).to.be.an('object');
     await contract1.$deploy([]);
-    expect((await contract1.getArg(42)).decodedResult).to.be.equal(42n);
+    expect((await contract1.getArg(42)).decodedResult).to.equal(42n);
 
     const contract2 = await TestContract.initialize({
       ...aeSdk.getContext(),
@@ -698,7 +698,7 @@ describe('Contract instance', () => {
     });
     expect(contract2._aci).to.be.an('array');
     expect(contract2.$options).to.be.an('object');
-    expect((await contract2.getArg(42)).decodedResult).to.be.equal(42n);
+    expect((await contract2.getArg(42)).decodedResult).to.equal(42n);
   });
 
   describe('Gas', () => {
@@ -719,8 +719,8 @@ describe('Contract instance', () => {
       } = await contract.$deploy(['test', 42]);
       assertNotNull(tx);
       assertNotNull(result);
-      expect(result.gasUsed).to.be.equal(160);
-      expect(tx.gas).to.be.equal(200);
+      expect(result.gasUsed).to.equal(160);
+      expect(tx.gas).to.equal(200);
     });
 
     it('overrides gas through Contract options for contract deployments', async () => {
@@ -736,8 +736,8 @@ describe('Contract instance', () => {
       } = await ct.$deploy(['test', 42]);
       assertNotNull(tx);
       assertNotNull(result);
-      expect(result.gasUsed).to.be.equal(160);
-      expect(tx.gas).to.be.equal(300);
+      expect(result.gasUsed).to.equal(160);
+      expect(tx.gas).to.equal(300);
     });
 
     it('estimates gas by default for contract calls', async () => {
@@ -747,8 +747,8 @@ describe('Contract instance', () => {
       } = await contract.setKey(2);
       assertNotNull(tx);
       assertNotNull(result);
-      expect(result.gasUsed).to.be.equal(61);
-      expect(tx.gas).to.be.equal(76);
+      expect(result.gasUsed).to.equal(61);
+      expect(tx.gas).to.equal(76);
     });
 
     it('overrides gas through options for contract calls', async () => {
@@ -758,8 +758,8 @@ describe('Contract instance', () => {
       } = await contract.setKey(3, { gasLimit: 100 });
       assertNotNull(tx);
       assertNotNull(result);
-      expect(result.gasUsed).to.be.equal(61);
-      expect(tx.gas).to.be.equal(100);
+      expect(result.gasUsed).to.equal(61);
+      expect(tx.gas).to.equal(100);
     });
 
     it('runs out of gasLimit with correct message', async () => {
@@ -783,7 +783,7 @@ describe('Contract instance', () => {
       const { tx } = await contract.intFn(4);
       ensureEqual<Tag.ContractCallTx>(tx.tag, Tag.ContractCallTx);
       const { gasLimit } = tx;
-      expect(gasLimit).to.be.equal(5817980);
+      expect(gasLimit).to.equal(5817980);
       await expect(contract.intFn(4, { gasLimit: gasLimit + 1 })).to.be.rejectedWith(
         IllegalArgumentError,
         'Gas limit 5817981 must be less or equal to 58',
@@ -846,7 +846,7 @@ describe('Contract instance', () => {
     });
 
     it('decodes events', () => {
-      expect(eventResult.decodedEvents).to.be.eql([
+      expect(eventResult.decodedEvents).to.eql([
         {
           name: 'AnotherEvent2',
           args: [true, 'This is not indexed', 1n],
@@ -886,11 +886,11 @@ describe('Contract instance', () => {
       assertNotNull(eventResult.decodedEvents);
       const events = [...eventResult.decodedEvents];
       events.splice(1, 1);
-      expect(deployResult.decodedEvents).to.be.eql(events);
+      expect(deployResult.decodedEvents).to.eql(events);
     });
 
     it('decodes events using decodeEvents', () => {
-      expect(contract.$decodeEvents(eventResultLog)).to.be.eql(eventResult.decodedEvents);
+      expect(contract.$decodeEvents(eventResultLog)).to.eql(eventResult.decodedEvents);
     });
 
     it("throws error if can't find event definition", () => {
@@ -907,7 +907,7 @@ describe('Contract instance', () => {
     it('omits events without definition using omitUnknown option', () => {
       const event = eventResultLog[0];
       event.topics[0] = BigInt(event.topics[0].toString().replace('0', '1'));
-      expect(contract.$decodeEvents([event], { omitUnknown: true })).to.be.eql([]);
+      expect(contract.$decodeEvents([event], { omitUnknown: true })).to.eql([]);
     });
 
     const getDuplicateLog = (eventName: string): ContractCallObject['log'] => {
@@ -935,7 +935,7 @@ describe('Contract instance', () => {
         contract.$decodeEvents(getDuplicateLog('Duplicate'), {
           contractAddressToName: { [remoteContract.$options.address ?? '']: 'RemoteI' },
         }),
-      ).to.be.eql([
+      ).to.eql([
         {
           name: 'Duplicate',
           args: [0n],
@@ -948,7 +948,7 @@ describe('Contract instance', () => {
     });
 
     it("don't throws error if found multiple event definitions with the same type", () => {
-      expect(contract.$decodeEvents(getDuplicateLog('DuplicateSameType'))).to.be.eql([
+      expect(contract.$decodeEvents(getDuplicateLog('DuplicateSameType'))).to.eql([
         {
           name: 'DuplicateSameType',
           args: [0n],
@@ -969,7 +969,7 @@ describe('Contract instance', () => {
         address: remoteContract.$options.address,
       });
       const result = await c.emitEvents(false, { omitUnknown: true });
-      expect(result.decodedEvents).to.be.eql([]);
+      expect(result.decodedEvents).to.eql([]);
     });
   });
 
@@ -983,7 +983,7 @@ describe('Contract instance', () => {
 
       it('Valid', async () => {
         const { decodedResult } = await testContract.unitFn([]);
-        expect(decodedResult).to.be.eql([]);
+        expect(decodedResult).to.eql([]);
       });
     });
 
@@ -996,18 +996,18 @@ describe('Contract instance', () => {
 
       it('Valid', async () => {
         const { decodedResult } = await testContract.intFn(1);
-        expect(decodedResult).to.be.equal(1n);
+        expect(decodedResult).to.equal(1n);
       });
 
       const unsafeInt = BigInt(`${Number.MAX_SAFE_INTEGER.toString()}0`);
       it('Supports unsafe integer', async () => {
         const { decodedResult } = await testContract.intFn(unsafeInt);
-        expect(decodedResult).to.be.equal(unsafeInt);
+        expect(decodedResult).to.equal(unsafeInt);
       });
 
       it('Supports BigNumber', async () => {
         const { decodedResult } = await testContract.intFn(new BigNumber(unsafeInt.toString()));
-        expect(decodedResult).to.be.equal(unsafeInt);
+        expect(decodedResult).to.equal(unsafeInt);
       });
     });
 
@@ -1209,7 +1209,7 @@ describe('Contract instance', () => {
 
       it('Set None Option Value(Cast from JS value/Convert to JS)', async () => {
         const optionRes = await testContract.intOption(null);
-        expect(optionRes.decodedResult).to.be.equal(undefined);
+        expect(optionRes.decodedResult).to.equal(undefined);
       });
 
       it('Invalid option type', async () => {
@@ -1336,8 +1336,8 @@ describe('Contract instance', () => {
         const { decodedResult: hashAsHex } = await testContract.bytesAnySizeFn(
           decoded.toString('hex'),
         );
-        expect(hashAsBuffer).to.be.eql(decoded);
-        expect(hashAsHex).to.be.eql(decoded);
+        expect(hashAsBuffer).to.eql(decoded);
+        expect(hashAsHex).to.eql(decoded);
       });
     });
 
@@ -1356,7 +1356,7 @@ describe('Contract instance', () => {
               (await testContract.bitsFn(value)).decodedResult,
             ]),
           )
-        ).forEach(([v1, v2]) => expect(v2).to.be.equal(BigInt(v1)));
+        ).forEach(([v1, v2]) => expect(v2).to.equal(BigInt(v1)));
       });
     });
 
@@ -1369,7 +1369,7 @@ describe('Contract instance', () => {
 
       it('Valid', async () => {
         const value: ChainTtl = { FixedTTL: [50n] };
-        expect((await testContract.chainTtlFn(value)).decodedResult).to.be.eql(value);
+        expect((await testContract.chainTtlFn(value)).decodedResult).to.eql(value);
       });
     });
 
@@ -1396,7 +1396,7 @@ describe('Contract instance', () => {
             ]),
           ],
         };
-        expect((await testContract.aensV2Name(value)).decodedResult).to.be.eql(value);
+        expect((await testContract.aensV2Name(value)).decodedResult).to.eql(value);
       });
     });
   });
@@ -1404,16 +1404,14 @@ describe('Contract instance', () => {
   describe('Call contract', () => {
     it('Call contract using using js type arguments', async () => {
       const res = await testContract.listFn([1, 2]);
-      expect(res.decodedResult).to.be.eql([1n, 2n]);
+      expect(res.decodedResult).to.eql([1n, 2n]);
     });
 
     it('Call contract with contract type argument', async () => {
       const result = await testContract.approve(
         'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh',
       );
-      expect(result.decodedResult).to.be.equal(
-        'ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh',
-      );
+      expect(result.decodedResult).to.equal('ct_AUUhhVZ9de4SbeRk8ekos4vZJwMJohwW5X8KQjBMUVduUmoUh');
     });
   });
 });

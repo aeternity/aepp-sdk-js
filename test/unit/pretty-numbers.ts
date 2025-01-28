@@ -6,14 +6,14 @@ import { prefixedAmount } from '../../src';
 const MAGNITUDE = 18;
 describe('prefixedAmount', () => {
   it('removes trailing zeros', () => {
-    expect(prefixedAmount(new BigNumber('1.0000'))).to.be.equal('1');
+    expect(prefixedAmount(new BigNumber('1.0000'))).to.equal('1');
   });
 
   it('displays fees', () => {
-    expect(prefixedAmount(new BigNumber(17120).shiftedBy(-MAGNITUDE))).to.be.equal('0.01712 pico');
+    expect(prefixedAmount(new BigNumber(17120).shiftedBy(-MAGNITUDE))).to.equal('0.01712 pico');
   });
   it('displays balance', () => {
-    expect(prefixedAmount(new BigNumber('89.99999999000924699'))).to.be.equal('90');
+    expect(prefixedAmount(new BigNumber('89.99999999000924699'))).to.equal('90');
   });
 
   it('generates proper values', () => {
@@ -58,6 +58,6 @@ describe('prefixedAmount', () => {
       '123456789 giga',
       '1.23456789 exa',
       '12.3456789 exa',
-    ].forEach((res, idx) => expect(prefixedAmount(t.shiftedBy(idx))).to.be.equal(res));
+    ].forEach((res, idx) => expect(prefixedAmount(t.shiftedBy(idx))).to.equal(res));
   });
 });

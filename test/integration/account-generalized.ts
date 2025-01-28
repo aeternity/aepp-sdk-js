@@ -52,7 +52,7 @@ describe('Generalized Account', () => {
   it('Make account GA', async () => {
     accountBeforeGa = Object.values(aeSdk.accounts)[0] as MemoryAccount;
     const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', [], { sourceCode });
-    expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.be.equal('generalized');
+    expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.equal('generalized');
     authContract = await Contract.initialize({
       ...aeSdk.getContext(),
       sourceCode,
@@ -113,7 +113,7 @@ describe('Generalized Account', () => {
       authData: { sourceCode, args: [genSalt()] },
     });
 
-    expect(new Uint8Array(await aeSdk.buildAuthTxHashByGaMetaTx(rawTx))).to.be.eql(
+    expect(new Uint8Array(await aeSdk.buildAuthTxHashByGaMetaTx(rawTx))).to.eql(
       (await authContract.getTxHash()).decodedResult,
     );
 
@@ -121,7 +121,7 @@ describe('Generalized Account', () => {
     ensureEqual<Tag.GaMetaTx>(gaMetaTxParams.tag, Tag.GaMetaTx);
     const spendTx = buildTx(gaMetaTxParams.tx.encodedTx);
     const { fee, gasPrice } = gaMetaTxParams;
-    expect(new Uint8Array(await aeSdk.buildAuthTxHash(spendTx, { fee, gasPrice }))).to.be.eql(
+    expect(new Uint8Array(await aeSdk.buildAuthTxHash(spendTx, { fee, gasPrice }))).to.eql(
       (await authContract.getTxHash()).decodedResult,
     );
   });
@@ -143,9 +143,9 @@ describe('Generalized Account', () => {
     });
     const txParams = unpackTx(rawTx, Tag.SignedTx);
     ensureEqual<Tag.GaMetaTx>(txParams.encodedTx.tag, Tag.GaMetaTx);
-    expect(buildTx(txParams.encodedTx.tx.encodedTx)).to.be.equal(spendTx);
-    expect(txParams.encodedTx.fee).to.be.equal(fee.toString());
-    expect(txParams.encodedTx.gasPrice).to.be.equal(gasPrice.toString());
+    expect(buildTx(txParams.encodedTx.tx.encodedTx)).to.equal(spendTx);
+    expect(txParams.encodedTx.fee).to.equal(fee.toString());
+    expect(txParams.encodedTx.gasPrice).to.equal(gasPrice.toString());
   });
 
   it('fails trying to send SignedTx using generalized account', async () => {
@@ -182,8 +182,8 @@ describe('Generalized Account', () => {
             put(state{ value = _value })`,
     });
     await contract.$deploy([42], { authData: { sourceCode, args: [genSalt()] } });
-    expect((await contract.getState()).decodedResult).to.be.equal(42);
+    expect((await contract.getState()).decodedResult).to.equal(42);
     await contract.setState(43, { authData: { sourceCode, args: [genSalt()] } });
-    expect((await contract.getState()).decodedResult).to.be.equal(43);
+    expect((await contract.getState()).decodedResult).to.equal(43);
   });
 });

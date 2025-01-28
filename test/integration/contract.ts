@@ -71,7 +71,7 @@ describe('Contract', () => {
     await signContract.$deploy([]);
     const data = Buffer.from(new Array(32).fill(0).map((_, idx) => idx ** 2));
     const signature = await aeSdk.sign(data);
-    expect((await signContract.verify(data, aeSdk.address, signature)).decodedResult).to.be.equal(
+    expect((await signContract.verify(data, aeSdk.address, signature)).decodedResult).to.equal(
       true,
     );
   });
@@ -110,13 +110,13 @@ describe('Contract', () => {
 
     await Promise.all(
       ['Hello', 'H'.repeat(127)].map(async (message) => {
-        expect((await signContract.message_to_hash(message)).decodedResult).to.be.eql(
+        expect((await signContract.message_to_hash(message)).decodedResult).to.eql(
           messageToHash(message),
         );
         const signature = await aeSdk.signMessage(message);
         expect(
           (await signContract.verify(message, aeSdk.address, signature)).decodedResult,
-        ).to.be.equal(true);
+        ).to.equal(true);
       }),
     );
   });
@@ -128,13 +128,13 @@ describe('Contract', () => {
     identityContract.$options.onAccount = onAccount;
     deployed = await identityContract.$deploy([]);
     if (deployed?.result?.callerId == null) throw new UnexpectedTsError();
-    expect(deployed.result.callerId).to.be.equal(onAccount.address);
+    expect(deployed.result.callerId).to.equal(onAccount.address);
     let { result } = await identityContract.getArg(42, { callStatic: true });
     assertNotNull(result);
-    expect(result.callerId).to.be.equal(onAccount.address);
+    expect(result.callerId).to.equal(onAccount.address);
     result = (await identityContract.getArg(42, { callStatic: false })).result;
     assertNotNull(result);
-    expect(result.callerId).to.be.equal(onAccount.address);
+    expect(result.callerId).to.equal(onAccount.address);
     identityContract.$options.onAccount = accountBefore;
   });
 
@@ -194,7 +194,7 @@ describe('Contract', () => {
     });
     const { result } = await contract.getArg(42);
     assertNotNull(result);
-    expect(result.callerId).to.be.equal(DRY_RUN_ACCOUNT.pub);
+    expect(result.callerId).to.equal(DRY_RUN_ACCOUNT.pub);
   });
 
   it('Dry-run at specific height', async () => {
@@ -239,17 +239,17 @@ describe('Contract', () => {
     const deployInfo = await identityContract.$deploy([], { waitMined: false });
     assertNotNull(deployInfo.transaction);
     await aeSdk.poll(deployInfo.transaction);
-    expect(deployInfo.result).to.be.equal(undefined);
+    expect(deployInfo.result).to.equal(undefined);
     expect(deployInfo.txData).to.not.be.equal(undefined);
     const result = await identityContract.getArg(42, { callStatic: false, waitMined: false });
-    expect(result.result).to.be.equal(undefined);
+    expect(result.result).to.equal(undefined);
     expect(result.txData).to.not.be.equal(undefined);
     await aeSdk.poll(result.hash as Encoded.TxHash);
   });
 
   it('calls deployed contracts static', async () => {
     const result = await identityContract.getArg(42, { callStatic: true });
-    expect(result.decodedResult).to.be.equal(42n);
+    expect(result.decodedResult).to.equal(42n);
   });
 
   it('initializes contract state', async () => {
@@ -266,7 +266,7 @@ describe('Contract', () => {
     });
     const data = 'Hello World!';
     await contract.$deploy([data]);
-    expect((await contract.retrieve()).decodedResult).to.be.equal(data);
+    expect((await contract.retrieve()).decodedResult).to.equal(data);
   });
 
   describe('Namespaces', () => {
@@ -306,10 +306,8 @@ describe('Contract', () => {
     });
 
     it('Can call contract with external deps', async () => {
-      expect((await contract.sumNumbers(1, 2, { callStatic: false })).decodedResult).to.be.equal(
-        3n,
-      );
-      expect((await contract.sumNumbers(1, 2, { callStatic: true })).decodedResult).to.be.equal(3n);
+      expect((await contract.sumNumbers(1, 2, { callStatic: false })).decodedResult).to.equal(3n);
+      expect((await contract.sumNumbers(1, 2, { callStatic: true })).decodedResult).to.equal(3n);
     });
   });
 });

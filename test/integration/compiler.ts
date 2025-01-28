@@ -73,7 +73,7 @@ function testCompiler(compiler: CompilerBase): void {
   });
 
   it('returns version', async () => {
-    expect(await compiler.version()).to.be.equal('8.0.0');
+    expect(await compiler.version()).to.equal('8.0.0');
   });
 
   it('compiles and generates aci by path', async () => {
@@ -152,23 +152,23 @@ function testCompiler(compiler: CompilerBase): void {
   });
 
   it('validates bytecode by path', async () => {
-    expect(await compiler.validate(inclBytecode, inclSourceCodePath)).to.be.equal(true);
-    expect(await compiler.validate(testBytecode, inclSourceCodePath)).to.be.equal(false);
+    expect(await compiler.validate(inclBytecode, inclSourceCodePath)).to.equal(true);
+    expect(await compiler.validate(testBytecode, inclSourceCodePath)).to.equal(false);
     const invalidBytecode = `${testBytecode}test` as Encoded.ContractBytearray;
-    expect(await compiler.validate(invalidBytecode, inclSourceCodePath)).to.be.equal(false);
+    expect(await compiler.validate(invalidBytecode, inclSourceCodePath)).to.equal(false);
   });
 
   it('validates bytecode by source code', async () => {
     expect(
       await compiler.validateBySourceCode(inclBytecode, inclSourceCode, inclFileSystem),
-    ).to.be.equal(true);
+    ).to.equal(true);
     expect(
       await compiler.validateBySourceCode(testBytecode, inclSourceCode, inclFileSystem),
-    ).to.be.equal(false);
+    ).to.equal(false);
     const invalidBytecode = `${testBytecode}test` as Encoded.ContractBytearray;
     expect(
       await compiler.validateBySourceCode(invalidBytecode, inclSourceCode, inclFileSystem),
-    ).to.be.equal(false);
+    ).to.equal(false);
   });
 }
 
@@ -184,7 +184,7 @@ describe('CompilerHttp', () => {
 
   describe('getFileSystem', () => {
     it('reads file system', async () => {
-      expect(await getFileSystem('./test/integration/contracts/Includes.aes')).to.be.eql({
+      expect(await getFileSystem('./test/integration/contracts/Includes.aes')).to.eql({
         './lib/Library.aes':
           indent`
           include"lib/Sublibrary.aes"

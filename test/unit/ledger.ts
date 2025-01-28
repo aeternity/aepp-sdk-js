@@ -43,7 +43,7 @@ async function initTransport(s: string, ignoreRealDevice = false): Promise<Trans
 
 afterEach(async () => {
   if (compareWithRealDevice) {
-    expect(recordStore.toString().trim()).to.be.equal(expectedRecordStore);
+    expect(recordStore.toString().trim()).to.equal(expectedRecordStore);
   }
   expectedRecordStore = '';
 });
@@ -57,7 +57,7 @@ describe('Ledger HW', function () {
         => e006000000
         <= 000004049000`);
       const factory = new AccountLedgerFactory(transport);
-      expect((await factory.getAppConfiguration()).version).to.be.equal('0.4.4');
+      expect((await factory.getAppConfiguration()).version).to.equal('0.4.4');
     });
 
     it('ensures that app version is compatible', async () => {
@@ -80,7 +80,7 @@ describe('Ledger HW', function () {
         => e0020000040000002a
         <= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000`);
       const factory = new AccountLedgerFactory(transport);
-      expect(await factory.getAddress(42)).to.be.equal(
+      expect(await factory.getAddress(42)).to.equal(
         'ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv',
       );
     });
@@ -92,7 +92,7 @@ describe('Ledger HW', function () {
         => e0020100040000002a
         <= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000`);
       const factory = new AccountLedgerFactory(transport);
-      expect(await factory.getAddress(42, true)).to.be.equal(
+      expect(await factory.getAddress(42, true)).to.equal(
         'ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv',
       );
     });
@@ -117,9 +117,9 @@ describe('Ledger HW', function () {
         <= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000`);
       const factory = new AccountLedgerFactory(transport);
       const account = await factory.initialize(42);
-      expect(account).to.be.instanceOf(AccountLedger);
-      expect(account.address).to.be.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
-      expect(account.index).to.be.equal(42);
+      expect(account).to.be.an.instanceOf(AccountLedger);
+      expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
+      expect(account.index).to.equal(42);
     });
 
     class NodeMock extends Node {
@@ -159,8 +159,8 @@ describe('Ledger HW', function () {
       node.addresses.push('ak_DzELMKnSfJcfnCUZ2SbXUSxRmFYtGrWmMuKiCx68YKLH26kwc');
       const factory = new AccountLedgerFactory(transport);
       const accounts = await factory.discover(node);
-      expect(accounts.length).to.be.equal(node.addresses.length);
-      expect(accounts.map((a) => a.address)).to.be.eql(node.addresses);
+      expect(accounts.length).to.equal(node.addresses.length);
+      expect(accounts.map((a) => a.address)).to.eql(node.addresses);
     });
 
     it('discovers accounts on unused ledger', async () => {
@@ -172,7 +172,7 @@ describe('Ledger HW', function () {
       const node = new NodeMock();
       const factory = new AccountLedgerFactory(transport);
       const accounts = await factory.discover(node);
-      expect(accounts.length).to.be.equal(0);
+      expect(accounts.length).to.equal(0);
     });
   });
 
@@ -204,7 +204,7 @@ describe('Ledger HW', function () {
         signatures: [signature],
       } = unpackTx(signedTransaction, Tag.SignedTx);
       const hashedTx = Buffer.concat([Buffer.from(networkId), hash(decode(transaction))]);
-      expect(verify(hashedTx, signature, address)).to.be.equal(true);
+      expect(verify(hashedTx, signature, address)).to.equal(true);
     });
 
     it('signs transaction rejected', async () => {
@@ -227,8 +227,8 @@ describe('Ledger HW', function () {
         <= 78397e186058f278835b8e3e866960e4418dc1e9f00b3a2423f57c16021c88720119ebb3373a136112caa1c9ff63870092064659eb2c641dd67767f15c80350c9000`);
       const account = new AccountLedger(transport, 0, address);
       const signature = await account.signMessage(message);
-      expect(signature).to.be.instanceOf(Uint8Array);
-      expect(verifyMessage(message, signature, address)).to.be.equal(true);
+      expect(signature).to.be.an.instanceOf(Uint8Array);
+      expect(verifyMessage(message, signature, address)).to.equal(true);
     });
 
     it('signs message rejected', async () => {

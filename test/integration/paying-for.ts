@@ -79,7 +79,7 @@ describe('Paying for transaction of another account', () => {
       sourceCode,
       address,
     });
-    expect((await payingContract.getValue()).decodedResult).to.be.equal(42n);
+    expect((await payingContract.getValue()).decodedResult).to.equal(42n);
   });
 
   it('pays for contract call', async () => {
@@ -90,6 +90,6 @@ describe('Paying for transaction of another account', () => {
     });
     const { rawTx: contractCallTx } = await contract.setValue(43);
     await aeSdk.payForTransaction(contractCallTx);
-    expect((await payingContract.getValue()).decodedResult).to.be.equal(43n);
+    expect((await payingContract.getValue()).decodedResult).to.equal(43n);
   });
 });
