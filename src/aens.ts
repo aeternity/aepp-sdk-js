@@ -8,7 +8,7 @@
 
 import { BigNumber } from 'bignumber.js';
 import { genSalt, isAddressValid } from './utils/crypto.js';
-import { commitmentHash, isAuctionName } from './tx/builder/helpers.js';
+import { commitmentHash, isAuctionName, produceNameId } from './tx/builder/helpers.js';
 import { Tag, AensName } from './tx/builder/constants.js';
 import { Encoded, Encoding } from './utils/encoder.js';
 import { LogicError } from './utils/errors.js';
@@ -78,6 +78,13 @@ export default class Name {
     >,
   ) {
     this.options = options;
+  }
+
+  /**
+   * Name ID encoded as nm_-prefixed string
+   */
+  get id(): Encoded.Name {
+    return produceNameId(this.value);
   }
 
   /**

@@ -34,6 +34,11 @@ describe('Aens', () => {
     name = new Name(randomName(30), aeSdk.getContext());
   });
 
+  it('gives name id', () => {
+    expect(name.id).to.satisfies((id: string) => id.startsWith(Encoding.Name));
+    expect(name.id).to.equal(produceNameId(name.value));
+  });
+
   it('claims a name', async () => {
     const preclaimRes = await name.preclaim();
     assertNotNull(preclaimRes.tx);
@@ -86,7 +91,7 @@ describe('Aens', () => {
 
     assertNotNull(claimRes.blockHeight);
     expect(await aeSdk.api.getNameEntryByName(name.value)).to.eql({
-      id: produceNameId(name.value),
+      id: name.id,
       owner: aeSdk.address,
       pointers: [],
       ttl: claimRes.blockHeight + 180000,
@@ -143,7 +148,7 @@ describe('Aens', () => {
 
     assertNotNull(claimRes.blockHeight);
     expect(await aeSdk.api.getNameEntryByName(n.value)).to.eql({
-      id: produceNameId(n.value),
+      id: n.id,
       owner: aeSdk.address,
       pointers: [],
       ttl: claimRes.blockHeight + 180000,
@@ -178,7 +183,7 @@ describe('Aens', () => {
       );
       const auctionDetails = await aeSdk.api.getAuctionEntryByName(auction.value);
       expect(auctionDetails).to.eql({
-        id: produceNameId(auction.value),
+        id: auction.id,
         startedAt: auctionDetails.startedAt,
         endsAt: 480 + auctionDetails.startedAt,
         highestBidder: aeSdk.address,
@@ -290,7 +295,7 @@ describe('Aens', () => {
         fee: updateRes.tx.fee,
         nonce: updateRes.tx.nonce,
         accountId: aeSdk.address,
-        nameId: produceNameId(name.value),
+        nameId: name.id,
         nameTtl: 180000,
         pointers: pointersNode,
         clientTtl: 3600,
@@ -372,7 +377,7 @@ describe('Aens', () => {
     const onAccount = Object.values(aeSdk.accounts)[1];
     const spendRes = await aeSdk.spend(100, name.value, { onAccount });
     assertNotNull(spendRes.tx);
-    expect(spendRes.tx.recipientId).to.equal(produceNameId(name.value));
+    expect(spendRes.tx.recipientId).to.equal(name.id);
   });
 
   it('transfers name', async () => {
@@ -387,7 +392,7 @@ describe('Aens', () => {
         fee: transferRes.tx.fee,
         nonce: transferRes.tx.nonce,
         accountId: aeSdk.address,
-        nameId: produceNameId(name.value),
+        nameId: name.id,
         recipientId: recipient,
         version: 1,
         ttl: transferRes.tx.ttl,
@@ -415,7 +420,7 @@ describe('Aens', () => {
         fee: revokeRes.tx.fee,
         nonce: revokeRes.tx.nonce,
         accountId: onAccount.address,
-        nameId: produceNameId(name.value),
+        nameId: name.id,
         version: 1,
         ttl: revokeRes.tx.ttl,
         type: 'NameRevokeTx',
