@@ -23,7 +23,7 @@
   "sideEffects": false,
   "scripts": {
     "build:assets": "node tooling/fetch-aesophia-cli.js",
-    "build:types": "tsc",
+    "build:types": "tsc -p tsconfig.src.json",
     "build:dist": "webpack",
     "build:es": "babel src --config-file ./babel.esm.config.js --out-dir es --extensions .ts --source-maps true",
     "build:api:node": "autorest tooling/autorest/node.yaml && node tooling/autorest/postprocessing.js node",
@@ -38,7 +38,7 @@
     "lint": "run-p lint:*",
     "lint:prettier": "prettier . --check",
     "lint:eslint": "eslint . --ext .ts,.js",
-    "lint:types": "tsc -p tsconfig.tests.json",
+    "lint:types": "tsc",
     "format": "prettier . --write",
     "test": "mocha './test/unit/' './test/integration/'",
     "test:assets": "node tooling/fetch-metamask.js",
