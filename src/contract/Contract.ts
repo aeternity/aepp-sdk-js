@@ -85,7 +85,7 @@ export interface ContractMethodsBase {
 }
 
 type MethodsToContractApi<M extends ContractMethodsBase> = {
-  [Name in keyof M]: M[Name] extends (...args: infer Args) => any
+  [Name in keyof M]: M[Name] extends (...args: infer Args) => infer Ret
     ? (
         ...args: [
           ...Args,
@@ -98,7 +98,12 @@ type MethodsToContractApi<M extends ContractMethodsBase> = {
               ]
           ),
         ]
-      ) => ReturnType<Contract<M>['$call']>
+      ) => Promise<
+        Omit<Awaited<ReturnType<Contract<M>['$call']>>, 'decodedResult'> & {
+          // TODO: accurate would be to add `| undefined` because of `waitMined`, but better to drop `waitMined`
+          decodedResult: Ret;
+        }
+      >
     : never;
 };
 
@@ -207,6 +212,7 @@ class Contract<M extends ContractMethodsBase> {
       tx: unpackTx<Tag.ContractCallTx | Tag.ContractCreateTx>(txData.rawTx),
       txData,
       rawTx: txData.rawTx,
+      // TODO: disallow `waitMined: false` to make `decodedResult` required
       ...(txData.blockHeight != null &&
         (await this.$getCallResultByTxHash(txData.hash, fnName, options))),
     };
