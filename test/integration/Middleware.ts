@@ -52,17 +52,17 @@ describe('Middleware API', () => {
       },
       mdwGensPerMinute: res.mdwGensPerMinute,
       mdwHeight: res.mdwHeight,
-      mdwLastMigration: 20240702122227,
-      mdwRevision: '6252c01f',
+      mdwLastMigration: 20241128134337,
+      mdwRevision: '19cfbd04',
       mdwSynced: true,
       mdwSyncing: true,
       mdwTxIndex: res.mdwTxIndex,
-      mdwVersion: '1.81.0',
+      mdwVersion: '1.97.1',
       nodeHeight: res.nodeHeight,
       nodeProgress: 100,
-      nodeRevision: 'b394868693b70a3a7ce5dfec144f718f60e79964',
+      nodeRevision: '57bc00b760dbb3ccd10be51f447e33cb3a2f56e3',
       nodeSyncing: false,
-      nodeVersion: '7.1.0',
+      nodeVersion: '7.3.0-rc3',
     };
     expect(res).to.eql(expectedRes);
   });
@@ -75,6 +75,10 @@ describe('Middleware API', () => {
           data: [
             {
               beneficiary: 'ak_11111111111111111111111111111111273Yts',
+              ...{
+                beneficiaryReward: 0,
+                flags: 'ba_gAAAAOYyHPU=',
+              },
               hash: 'kh_nvmdByyHT8513zwVwxQ1tTsKbgfgdp1LX43jHj3ujb2AvDSh5',
               height: 0,
               info: 'cb_Xfbg4g==',
@@ -107,6 +111,10 @@ describe('Middleware API', () => {
       if (!isAddressValid(microBlockHash, Encoding.MicroBlockHash)) throw new UnexpectedTsError();
       const res = await middleware.getMicroBlock(microBlockHash);
       const expectedRes: typeof res = {
+        ...{
+          flags: 'ba_AAAAAIy5ASU=',
+          gas: 78500,
+        },
         hash: 'mh_uMZS2rqBQ1ZD9GNTS2n54bRbATbupC2JV32wpj4gs4EGnfnKd',
         height: 2,
         microBlockIndex: 0,
@@ -174,7 +182,7 @@ describe('Middleware API', () => {
               blockTime: new Date(1721911705246),
               height: 3,
               payload: {
-                amount: 3n,
+                amount: 500000000000000n,
                 kind: 'fee_lock_name',
                 refTxHash: 'th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1',
               },
@@ -340,7 +348,7 @@ describe('Middleware API', () => {
 
     it('gets transactions count', async () => {
       const res = await middleware.getTransactionsCount();
-      const expectedRes: typeof res = { body: 10 };
+      const expectedRes: typeof res = { body: 11 };
       expect(res).to.eql(expectedRes);
     });
 
@@ -479,10 +487,19 @@ describe('Middleware API', () => {
               activeFrom: 3,
               approximateActivationTime: new Date(1721740187500),
               approximateExpireTime: new Date(1754140007661),
+              claims_count: 1,
               expireHeight: 180003,
               pointers: {
-                account_pubkey: presetAccount1Address,
-                cmF3S2V5: 'ba_wP/uRGujhA==',
+                '0': {
+                  encoded_key: 'ba_YWNjb3VudF9wdWJrZXn8jckR',
+                  id: presetAccount1Address,
+                  key: 'account_pubkey',
+                },
+                '1': {
+                  encoded_key: 'ba_cmF3S2V56FoL5g==',
+                  id: 'ba_wP/uRGujhA==',
+                  key: 'rawKey',
+                },
               },
               auction: null,
               auctionTimeout: 0,
@@ -647,6 +664,7 @@ describe('Middleware API', () => {
               activationTime: new Date(1721975996873),
               approximateExpireTime: new Date(1722407457100),
               auctionEnd: 2407,
+              claims_count: 1,
               lastBid: {
                 blockHash: 'mh_BoBikwwf68giAEFKNYEh93uNkGu9enzx8cjn2vX7CRTnY5g6T',
                 blockHeight: 7,
@@ -711,7 +729,6 @@ describe('Middleware API', () => {
                 blockHash: 'mh_2g1RkdVUBXLbxxjR7P2zi1429Navw4HKuzvtC3TezFCjQjwmqE',
                 blockHeight: 10,
                 hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
-                txHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
                 microIndex: 0,
                 microTime: new Date(1721976497295),
                 signatures: [
@@ -726,6 +743,7 @@ describe('Middleware API', () => {
                     value: 500,
                   },
                   ttl: 13,
+                  tx_hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
                   type: 'OracleRegisterTx',
                   version: 1,
                   abiVersion: 0,
@@ -759,18 +777,50 @@ describe('Middleware API', () => {
         activeFrom: 10,
         approximateExpireTime: new Date(1722066317304),
         expireHeight: 510,
-        ...{ extends: [] }, // TODO: rewrite after solving https://github.com/aeternity/ae_mdw/issues/1872
         format: {
           query: 'string',
           response: 'string',
         },
         oracle: 'ok_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
         queryFee: 0n,
-        register: {} as any, // TODO: fix after solving https://github.com/aeternity/ae_mdw/issues/1872
+        register: {
+          blockHash: 'mh_25G1JPh8yUNypc8Mbv1H5CSRwLRZ8GMdpYdgcANFj9YBsQNcZ2',
+          blockHeight: 10,
+          encodedTx:
+            'tx_+IsLAfhCuECk8CD7+rO/nCOX4fF6BylVDytJmDquVV56cv7/Lvsg23evMjX45PwdRDn2x/HGBuduMmUQaOESI+GoNarbsNEIuEP4QRYBoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQaGc3RyaW5nhnN0cmluZwAAggH0hg7x34XgAA0A0ekNLA==',
+          hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+          microIndex: 0,
+          microTime: new Date(1722066317304),
+          signatures: [
+            'sg_NaZNFJArMypD4wp4MbJ2cMvG6aWk7PSynP9qVsti1CabtMKSUbPwRUz55Yer7XiNURN6PcycF7NwBANaeJPMCpwKoWM9b',
+          ],
+          txHash: 'th_',
+          tx: {
+            abiVersion: 0,
+            accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+            fee: 16432000000000n,
+            nonce: 6,
+            oracleId: 'ok_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+            oracleTtl: {
+              type: 'delta',
+              value: 500,
+            },
+            queryFee: 0n,
+            queryFormat: 'string',
+            responseFormat: 'string',
+            ttl: 13,
+            ...{ tx_hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP' },
+            type: 'OracleRegisterTx',
+            version: 1,
+          },
+        },
         registerTime: new Date(1721976497295),
         registerTxHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
       };
       copyFields(expectedRes, res, ['registerTime', 'approximateExpireTime']);
+      copyFields(expectedRes.register, res.register, ['blockHash', 'microTime']);
+      // TODO: remove after updating middleware api
+      res.register.txHash = 'th_';
       expect(res).to.eql(expectedRes);
     });
   });
@@ -875,7 +925,7 @@ describe('Middleware API', () => {
               lastTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
             },
           ],
-          next: '/v3/deltastats?cursor=2&limit=10',
+          next: '/v3/stats/delta?cursor=2&limit=10',
           prev: null,
         },
         middleware,
@@ -893,7 +943,7 @@ describe('Middleware API', () => {
               height: 12,
               contracts: 2,
               lockedInAuctions: 0n,
-              burnedInAuctions: 6n,
+              burnedInAuctions: 1000000000000000n,
               lockedInChannels: 1000000000000000n,
               activeAuctions: 1,
               activeNames: 2,
@@ -904,10 +954,10 @@ describe('Middleware API', () => {
               lastTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
               sumBlockReward: 0n,
               sumDevReward: 0n,
-              totalTokenSupply: 10000000010000000000000000000000n,
+              totalTokenSupply: 0n,
             },
           ],
-          next: '/v3/totalstats?cursor=2&limit=10',
+          next: '/v3/stats/total?cursor=2&limit=10',
           prev: null,
         },
         middleware,
@@ -1010,7 +1060,7 @@ describe('Middleware API', () => {
         {
           data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(1, 2),
           next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-0&limit=1`,
-          prev: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1&rev=1`,
+          prev: `/v3/accounts/${presetAccount1Address}/activities?cursor=11-11-0&limit=1&rev=1`,
         },
         middleware,
       );

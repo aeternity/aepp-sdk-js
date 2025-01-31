@@ -179,6 +179,7 @@ describe('MiddlewareSubscriber', () => {
     ]);
     expect(microBlock).to.eql({
       ...(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`)),
+      gas: 16660,
       transactions_count: 1,
       micro_block_index: 0,
     });
@@ -211,6 +212,7 @@ describe('MiddlewareSubscriber', () => {
     });
     expect(microBlock).to.eql({
       ...(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`)),
+      gas: 16660,
       transactions_count: 1,
       micro_block_index: 0,
     });

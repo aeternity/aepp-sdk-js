@@ -4520,7 +4520,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Bad request
-  /statistics/blocks:
+  /stats/blocks:
     get:
       deprecated: false
       description: Get total blocks count stats.
@@ -4585,7 +4585,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Bad request
-  /deltastats:
+  /stats/delta:
     get:
       deprecated: false
       description: Get delta stats.
@@ -4616,7 +4616,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Bad request
-  /minerstats:
+  /stats/miners:
     get:
       deprecated: false
       description: Get miners list with total rewards obtained through mining.
@@ -4646,7 +4646,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Bad request
-  /statistics/names:
+  /stats/names:
     get:
       deprecated: false
       description: Get total names count stats.
@@ -4701,7 +4701,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Bad request
-  /totalstats:
+  /stats/total:
     get:
       deprecated: false
       description: Get total accumulated stats.
@@ -4732,7 +4732,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Bad request
-  /statistics/transactions:
+  /stats/transactions:
     get:
       deprecated: false
       description: Get total transactions count stats.
