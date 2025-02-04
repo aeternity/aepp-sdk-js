@@ -12,7 +12,25 @@ import {
 } from '../../src';
 import { assertNotNull } from '../utils';
 import { pause } from '../../src/utils/other';
-import { Activity } from '../../src/apis/middleware';
+import {
+  Activity,
+  Auction,
+  Channel,
+  ContractCall,
+  ContractLog,
+  DeltaStat,
+  KeyBlockExtended,
+  Miner,
+  Name,
+  NameClaim,
+  NameUpdate,
+  Oracle,
+  Pointee,
+  Stat,
+  TotalStat,
+  Transaction,
+  Transfer,
+} from '../../src/apis/middleware';
 import { MiddlewarePage } from '../../src/utils/MiddlewarePage';
 
 function copyFields(
@@ -71,7 +89,7 @@ describe('Middleware API', () => {
   describe('blocks', () => {
     it('gets key blocks', async () => {
       const res = await middleware.getKeyBlocks({ limit: 15 });
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<KeyBlockExtended>(
         {
           data: [
             {
@@ -135,7 +153,7 @@ describe('Middleware API', () => {
   describe('transactions', () => {
     it('gets account activities', async () => {
       const res = await middleware.getAccountActivities(presetAccount1Address);
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Activity>(
         {
           data: [
             {
@@ -233,29 +251,31 @@ describe('Middleware API', () => {
                 ],
                 tx: {
                   abiVersion: 3,
-                  aexn_type: null,
                   amount: 0n,
-                  args: [],
                   callData: 'cb_KxFE1kQfP4oEp9E=',
                   callerId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
                   code: 'cb_+GhGA6Daq9LRBkSN10Qb9d5ZbvJWB+/tg8rj5OynWtj8AQ2R7cC4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBBwcBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTguMC4wAHQkH9o=',
-                  compiler_version: '8.0.0',
                   contractId: 'ct_2JgVFKjJYUyJDnpJPhspX8C6RS6rFS46r3C1sy15tW9dDmPX2E',
                   deposit: 0n,
                   fee: 78500000000000n,
                   gas: 76,
                   gasPrice: 1000000000n,
-                  gas_used: 61,
-                  log: [],
                   nonce: 1,
                   ownerId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
-                  return_type: 'ok',
-                  return_value: 'cb_Xfbg4g==',
-                  source_hash: '2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke0=',
                   ttl: 5,
                   type: 'ContractCreateTx',
                   version: 1,
                   vmVersion: 8,
+                  ...{
+                    aexn_type: null,
+                    args: [],
+                    compiler_version: '8.0.0',
+                    gas_used: 61,
+                    log: [],
+                    return_type: 'ok',
+                    return_value: 'cb_Xfbg4g==',
+                    source_hash: '2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke0=',
+                  },
                 },
               },
               type: 'ContractCreateTxEvent',
@@ -304,7 +324,7 @@ describe('Middleware API', () => {
 
     it('gets transactions', async () => {
       const res = await middleware.getTransactions({ limit: 15 });
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Transaction>(
         {
           data: [
             {
@@ -352,7 +372,7 @@ describe('Middleware API', () => {
 
     it('gets transfers', async () => {
       const res = await middleware.getTransfers();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Transfer>(
         {
           data: [
             {
@@ -380,7 +400,7 @@ describe('Middleware API', () => {
   describe('contracts', () => {
     it('gets contract calls', async () => {
       const res = await middleware.getContractCalls();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<ContractCall>(
         {
           data: [
             {
@@ -415,7 +435,7 @@ describe('Middleware API', () => {
 
     it('gets contract logs', async () => {
       const res = await middleware.getContractLogs();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<ContractLog>(
         {
           data: [
             {
@@ -477,7 +497,7 @@ describe('Middleware API', () => {
   describe('names', () => {
     it('gets names', async () => {
       const res = await middleware.getNames();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Name>(
         {
           data: [
             {
@@ -534,7 +554,7 @@ describe('Middleware API', () => {
 
     it('gets name claims', async () => {
       const res = await middleware.getNameClaims('123456789012345678901234567801.chain');
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<NameClaim>(
         {
           data: [
             {
@@ -566,7 +586,7 @@ describe('Middleware API', () => {
 
     it('gets name updates', async () => {
       const res = await middleware.getNameUpdates('123456789012345678901234567801.chain');
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<NameUpdate>(
         {
           data: [
             {
@@ -610,7 +630,7 @@ describe('Middleware API', () => {
 
     it('gets account pointees pointers', async () => {
       const res = await middleware.getAccountPointees(presetAccount1Address);
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Pointee>(
         {
           data: [
             {
@@ -656,7 +676,7 @@ describe('Middleware API', () => {
 
     it('gets auctions', async () => {
       const res = await middleware.getNamesAuctions();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Auction>(
         {
           data: [
             {
@@ -710,7 +730,7 @@ describe('Middleware API', () => {
   describe('oracles', () => {
     it('gets oracles', async () => {
       const res = await middleware.getOracles();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Oracle>(
         {
           data: [
             {
@@ -824,7 +844,7 @@ describe('Middleware API', () => {
   describe('channels', () => {
     it('gets channels', async () => {
       const res = await middleware.getChannels();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Channel>(
         {
           data: [
             {
@@ -899,7 +919,7 @@ describe('Middleware API', () => {
 
     it('gets delta', async () => {
       const res = await middleware.getDeltaStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<DeltaStat>(
         {
           data: [
             {
@@ -932,7 +952,7 @@ describe('Middleware API', () => {
 
     it('gets total', async () => {
       const res = await middleware.getTotalStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<TotalStat>(
         {
           data: [
             {
@@ -964,7 +984,7 @@ describe('Middleware API', () => {
 
     it('gets miner', async () => {
       const res = await middleware.getMinerStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Miner>(
         { data: [], next: null, prev: null },
         middleware,
       );
@@ -973,7 +993,7 @@ describe('Middleware API', () => {
 
     it('gets blocks', async () => {
       const res = await middleware.getBlocksStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Stat>(
         {
           data: [{ count: 24, endDate, startDate }],
           next: null,
@@ -986,7 +1006,7 @@ describe('Middleware API', () => {
 
     it('gets transactions', async () => {
       const res = await middleware.getTransactionsStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Stat>(
         {
           data: [{ count: 11, endDate, startDate }],
           next: null,
@@ -999,7 +1019,7 @@ describe('Middleware API', () => {
 
     it('gets names', async () => {
       const res = await middleware.getNamesStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Stat>(
         {
           data: [{ count: 0, endDate, startDate }],
           next: null,
@@ -1037,7 +1057,7 @@ describe('Middleware API', () => {
       const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
         `/v3/accounts/${presetAccount1Address}/activities?limit=1`,
       );
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Activity>(
         {
           data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(0, 1),
           next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
@@ -1052,7 +1072,7 @@ describe('Middleware API', () => {
       const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
         `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
       );
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Activity>(
         {
           data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(1, 2),
           next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-0&limit=1`,
@@ -1068,7 +1088,7 @@ describe('Middleware API', () => {
     it('nevigates to the next page', async () => {
       const first = await middleware.getTransactions({ limit: 1 });
       const res = await first.next();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Transaction>(
         {
           data: (await middleware.getTransactions()).data.slice(1, 2),
           next: '/v3/transactions?cursor=8&limit=1',
@@ -1085,7 +1105,7 @@ describe('Middleware API', () => {
       const res = await second.prev();
       expect(res).to.eql(first);
       expect(res.prevPath).to.eql(null);
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Transaction>(
         {
           data: (await middleware.getTransactions()).data.slice(0, 1),
           next: '/v3/transactions?cursor=9&limit=1',
