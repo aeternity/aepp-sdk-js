@@ -25,7 +25,7 @@ jobs:
       - run: npm run lint
       - run: npm run docs:examples && npm run docs:api && ./docs/build-assets.sh
         if: contains(github.event.pull_request.title, 'Release')
-      - run: docker compose up -d --wait
+      - run: docker compose up -d --wait --quiet-pull
       - run: npx nyc npm test
       - run: npx nyc report --reporter=text-lcov > coverage.lcov
       - uses: codecov/codecov-action@v4

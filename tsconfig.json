@@ -1,35 +1,10 @@
 {
+  "extends": "./tsconfig.src.json",
   "compilerOptions": {
-    "esModuleInterop": true,
-    "emitDeclarationOnly": true,
-    "isolatedModules": true,
-    "outDir": "./es",
-    "noImplicitOverride": true,
-    "module": "es2022",
-    "target": "es2022",
-    "lib": ["es2022", "dom"],
-    "moduleResolution": "node",
-    "preserveConstEnums": true,
-    "declaration": true,
-    "downlevelIteration": true,
-    "allowSyntheticDefaultImports": true,
-    "typeRoots": ["./node_modules/@types", "./src/typings"],
-    "strict": true,
-    "strictFunctionTypes": false // see https://github.com/aeternity/aepp-sdk-js/issues/1793
+    "emitDeclarationOnly": false,
+    "resolveJsonModule": true,
+    "noEmit": true
   },
-  "include": ["src/**/*"],
-  "typedocOptions": {
-    "entryPoints": ["src/index.ts"],
-    "out": "./docs/api",
-    "excludePrivate": true,
-    "githubPages": false,
-    "excludeExternals": true,
-    "treatWarningsAsErrors": true,
-    "validation": {
-      "invalidLink": true
-    },
-    "plugin": ["typedoc-plugin-missing-exports"],
-    "highlightLanguages": ["vue"],
-    "readme": "none"
-  }
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["test/environment/**/*"]
 }
