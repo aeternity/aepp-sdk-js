@@ -338,6 +338,27 @@ describe('Contract instance', () => {
     await contract.intFn(2, { callStatic: true });
   });
 
+  it('fails if incorrect argument type', async () => {
+    // @ts-expect-error tupleFn accepts array instead string
+    await expect(testContract.tupleFn('foo')).to.be.rejectedWith(
+      'Fate tuple must be an Array, got foo instead',
+    );
+    // @ts-expect-error tupleFn accepts array instead string
+    await expect(testContract.$call('tupleFn', ['foo'])).to.be.rejectedWith(
+      'Fate tuple must be an Array, got foo instead',
+    );
+  });
+
+  it('fails if incorrect return value type', async () => {
+    let res: [];
+    // @ts-expect-error intFn returns number instead array
+    res = (await testContract.intFn(42)).decodedResult;
+    expect(res).to.be.equal(42n);
+    // @ts-expect-error intFn returns number instead array
+    res = (await testContract.$call('intFn', [42])).decodedResult;
+    expect(res).to.be.equal(42n);
+  });
+
   it('fails with error if function missed', async () => {
     await expect(testContract.$call('notExisting', [])).to.be.rejectedWith(
       NoSuchContractFunctionError,
@@ -1199,11 +1220,13 @@ describe('Contract instance', () => {
     describe('OPTION', () => {
       it('Set Some Option Value(Cast from JS value/Convert result to JS)', async () => {
         const optionRes = await testContract.intOption(123);
+        assertNotNull(optionRes.decodedResult);
         optionRes.decodedResult.should.be.equal(123n);
       });
 
       it('Set Some Option List Value(Cast from JS value/Convert result to JS)', async () => {
         const optionRes = await testContract.listOption([[1, 'testString']]);
+        assertNotNull(optionRes.decodedResult);
         optionRes.decodedResult.should.be.eql([[1n, 'testString']]);
       });
 

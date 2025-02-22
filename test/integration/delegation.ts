@@ -16,6 +16,7 @@ import {
   Name,
   packDelegation,
   DelegationTag,
+  UnexpectedTsError,
 } from '../../src';
 
 describe('Operation delegation', () => {
@@ -177,6 +178,7 @@ contract DelegateTest =
 
     it('gets', async () => {
       const nameEntry = (await contract.getName(name)).decodedResult['AENSv2.Name'];
+      if (!('FixedTTL' in nameEntry[1])) throw new UnexpectedTsError();
       const ttl = nameEntry[1].FixedTTL[0];
       expect(ttl).to.be.a('bigint');
       expect(nameEntry).to.eql([
@@ -238,6 +240,7 @@ contract DelegateTest =
       await contract.signedUpdate(owner, n, 'oracle', pointee, allNamesDelSig);
 
       const nameEntry = (await contract.getName(n)).decodedResult['AENSv2.Name'];
+      if (!('FixedTTL' in nameEntry[1])) throw new UnexpectedTsError();
       const ttl = nameEntry[1].FixedTTL[0];
       expect(ttl).to.be.a('bigint');
       expect(nameEntry).to.eql([
