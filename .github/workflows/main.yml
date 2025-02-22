@@ -26,11 +26,8 @@ jobs:
       - run: npm run docs:examples && npm run docs:api && ./docs/build-assets.sh
         if: contains(github.event.pull_request.title, 'Release')
       - run: docker compose up -d --wait --quiet-pull
-      - run: npx nyc npm test
-      - run: npx nyc report --reporter=text-lcov > coverage.lcov
-      - uses: codecov/codecov-action@v4
-        with:
-          files: coverage.lcov
+      - run: npx c8 npm test
+      - uses: codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - run: docker compose logs
