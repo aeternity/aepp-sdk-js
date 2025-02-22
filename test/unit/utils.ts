@@ -9,11 +9,11 @@ describe('Utils', () => {
       let t = { test: 'foo' };
       const wrapped = wrapWithProxy(() => t);
       expect(wrapped).to.not.be.equal(t);
-      expect(wrapped.test).to.be.equal('foo');
+      expect(wrapped.test).to.equal('foo');
       t.test = 'bar';
-      expect(wrapped.test).to.be.equal('bar');
+      expect(wrapped.test).to.equal('bar');
       t = { test: 'baz' };
-      expect(wrapped.test).to.be.equal('baz');
+      expect(wrapped.test).to.equal('baz');
     });
 
     it('throws error if value undefined', () => {
@@ -39,7 +39,7 @@ describe('Utils', () => {
 
       const entity = new Entity();
       const wrapped = wrapWithProxy(() => entity);
-      expect(wrapped.foo()).to.be.equal(5);
+      expect(wrapped.foo()).to.equal(5);
     });
   });
 
@@ -48,11 +48,11 @@ describe('Utils', () => {
 
     it('unwraps proxy to value', () => {
       const wrapped = wrapWithProxy(() => t);
-      expect(unwrapProxy(wrapped)).to.be.equal(t);
+      expect(unwrapProxy(wrapped)).to.equal(t);
     });
 
     it('does nothing if not wrapped', () => {
-      expect(unwrapProxy(t)).to.be.equal(t);
+      expect(unwrapProxy(t)).to.equal(t);
     });
   });
 });

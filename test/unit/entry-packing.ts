@@ -24,21 +24,21 @@ const poiEncoded = 'pi_yDwBwMDAwMDA5gE8AQ==';
 describe('Entry', () => {
   describe('packEntry', () => {
     it('packs', () => {
-      expect(packEntry(account)).to.be.equal(accountEncoded);
+      expect(packEntry(account)).to.equal(accountEncoded);
     });
 
     it('packs poi', () => {
-      expect(packEntry(poi)).to.be.equal(poiEncoded);
+      expect(packEntry(poi)).to.equal(poiEncoded);
     });
   });
 
   describe('unpackEntry', () => {
     it('unpacks', () => {
-      expect(unpackEntry(accountEncoded)).to.be.eql({ ...account, version: 1 });
+      expect(unpackEntry(accountEncoded)).to.eql({ ...account, version: 1 });
     });
 
     it('unpacks poi', () => {
-      expect(unpackEntry(poiEncoded)).to.be.eql({ ...poi, version: 1 });
+      expect(unpackEntry(poiEncoded)).to.eql({ ...poi, version: 1 });
     });
 
     it('fails if payload have incorrect encoding', () => {

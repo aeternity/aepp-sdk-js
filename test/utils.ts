@@ -21,7 +21,7 @@ export function assertNotNull<T>(value: T): asserts value is NonNullable<T> {
 }
 
 export function ensureEqual<T>(value: any, equalTo: T): asserts value is T {
-  expect(value).to.be.equal(equalTo);
+  expect(value).to.equal(equalTo);
 }
 
 type Cls = abstract new (...args: any) => any;
@@ -30,7 +30,7 @@ export function ensureInstanceOf<T extends Cls>(
   value: any,
   cls: T,
 ): asserts value is InstanceType<T> {
-  expect(value).to.be.instanceOf(cls);
+  expect(value).to.be.an.instanceOf(cls);
 }
 
 export type ChainTtl =

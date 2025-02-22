@@ -32,9 +32,9 @@ describe('AeSdkMethods', () => {
         contract Identity =
           entrypoint getArg(x : int) = x`,
     });
-    expect(contract.$options.onAccount?.address).to.be.eql(accounts[0].address);
+    expect(contract.$options.onAccount?.address).to.eql(accounts[0].address);
     [, aeSdkMethods._options.onAccount] = accounts;
-    expect(contract.$options.onAccount?.address).to.be.eql(accounts[1].address);
+    expect(contract.$options.onAccount?.address).to.eql(accounts[1].address);
   });
 
   it('converts context to JSON', () => {

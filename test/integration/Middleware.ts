@@ -22,10 +22,10 @@ function copyFields(
   fields
     .filter((key) => source[key] != null)
     .forEach((key) => {
-      expect(typeof target[key]).to.be.equal(typeof source[key]);
-      expect(target[key]?.constructor).to.be.equal(source[key]?.constructor);
+      expect(typeof target[key]).to.equal(typeof source[key]);
+      expect(target[key]?.constructor).to.equal(source[key]?.constructor);
       if (typeof target[key] === 'string' && target[key][2] === '_') {
-        expect(target[key].slice(0, 2)).to.be.equal(source[key].slice(0, 2));
+        expect(target[key].slice(0, 2)).to.equal(source[key].slice(0, 2));
       }
       target[key] = source[key];
     });
@@ -64,7 +64,7 @@ describe('Middleware API', () => {
       nodeSyncing: false,
       nodeVersion: '7.1.0',
     };
-    expect(res).to.be.eql(expectedRes);
+    expect(res).to.eql(expectedRes);
   });
 
   describe('blocks', () => {
@@ -96,7 +96,7 @@ describe('Middleware API', () => {
       );
       expectedRes.data.unshift(...res.data.slice(0, -1));
       expect(res.data[0].time.getFullYear()).to.be.within(2024, 2030);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets micro block', async () => {
@@ -122,7 +122,7 @@ describe('Middleware API', () => {
         txsHash: 'bx_2i471KqJ5XTLVQJS4x95FyLuwbAcj4SetvemPUs4oV47S9dFb3',
       };
       copyFields(expectedRes, res, ['time', 'hash', 'prevHash', 'prevKeyHash', 'signature']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
   });
 
@@ -293,7 +293,7 @@ describe('Middleware API', () => {
         copyFields(item, res.data[idx], ['blockHash', 'blockTime']);
         copyFields(item.payload, res.data[idx].payload, ['blockHash', 'microTime']);
       });
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets transactions', async () => {
@@ -335,13 +335,13 @@ describe('Middleware API', () => {
       res.data.length = 0;
       res.data.push(tx);
       copyFields(expectedRes.data[0], res.data[0], ['blockHash', 'microTime']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets transactions count', async () => {
       const res = await middleware.getTransactionsCount();
       const expectedRes: typeof res = { body: 10 };
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets transfers', async () => {
@@ -366,7 +366,7 @@ describe('Middleware API', () => {
       );
       expectedRes.data.push(...res.data.slice(1));
       copyFields(expectedRes.data[0], res.data[0], ['refTxType']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
   });
 
@@ -403,7 +403,7 @@ describe('Middleware API', () => {
         middleware,
       );
       copyFields(expectedRes.data[0], res.data[0], ['blockHash']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets contract logs', async () => {
@@ -435,7 +435,7 @@ describe('Middleware API', () => {
         middleware,
       );
       copyFields(expectedRes.data[0], res.data[0], ['blockHash', 'blockTime']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets contract', async () => {
@@ -463,7 +463,7 @@ describe('Middleware API', () => {
         sourceTxType: 'ContractCreateTx',
       };
       copyFields(expectedRes, res, ['blockHash']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
   });
 
@@ -507,13 +507,13 @@ describe('Middleware API', () => {
         'approximateExpireTime',
         'expireHeight',
       ]);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets names count', async () => {
       const res = await middleware.getNamesCount();
       const expectedRes: typeof res = { body: 2 };
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets name claims', async () => {
@@ -545,7 +545,7 @@ describe('Middleware API', () => {
         middleware,
       );
       copyFields(expectedRes.data[0], res.data[0], ['blockHash']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets name updates', async () => {
@@ -589,7 +589,7 @@ describe('Middleware API', () => {
         middleware,
       );
       copyFields(expectedRes.data[0], res.data[0], ['blockHash']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets account pointees pointers', async () => {
@@ -635,7 +635,7 @@ describe('Middleware API', () => {
         middleware,
       );
       copyFields(expectedRes.data[0], res.data[0], ['blockHash', 'blockTime']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets auctions', async () => {
@@ -686,7 +686,7 @@ describe('Middleware API', () => {
         'auctionEnd',
       ]);
       copyFields(expectedRes.data[0].lastBid, res.data[0].lastBid, ['blockHash', 'microTime']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
   });
 
@@ -748,7 +748,7 @@ describe('Middleware API', () => {
       );
       copyFields(expectedRes.data[0].register, res.data[0].register, ['blockHash', 'microTime']);
       copyFields(expectedRes.data[0], res.data[0], ['registerTime', 'approximateExpireTime']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets oracle', async () => {
@@ -771,7 +771,7 @@ describe('Middleware API', () => {
         registerTxHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
       };
       copyFields(expectedRes, res, ['registerTime', 'approximateExpireTime']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
   });
 
@@ -812,7 +812,7 @@ describe('Middleware API', () => {
         middleware,
       );
       copyFields(expectedRes.data[0], res.data[0], ['lastUpdatedTime']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets channel', async () => {
@@ -843,7 +843,7 @@ describe('Middleware API', () => {
         updatesCount: 1,
       };
       copyFields(expectedRes, res, ['lastUpdatedTime']);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
   });
 
@@ -881,7 +881,7 @@ describe('Middleware API', () => {
         middleware,
       );
       expectedRes.data.push(...res.data.slice(1));
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets total', async () => {
@@ -913,7 +913,7 @@ describe('Middleware API', () => {
         middleware,
       );
       expectedRes.data.push(...res.data.slice(1));
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets miner', async () => {
@@ -922,7 +922,7 @@ describe('Middleware API', () => {
         { data: [], next: null, prev: null },
         middleware,
       );
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets blocks', async () => {
@@ -935,7 +935,7 @@ describe('Middleware API', () => {
         },
         middleware,
       );
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets transactions', async () => {
@@ -948,7 +948,7 @@ describe('Middleware API', () => {
         },
         middleware,
       );
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets names', async () => {
@@ -961,7 +961,7 @@ describe('Middleware API', () => {
         },
         middleware,
       );
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
   });
 
@@ -976,7 +976,7 @@ describe('Middleware API', () => {
     it('gets not paginated data', async () => {
       const res = await middleware.requestByPath('/v3/status');
       const expectedRes: typeof res = await middleware.getStatus();
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets first page', async () => {
@@ -984,7 +984,7 @@ describe('Middleware API', () => {
         `/v3/accounts/${presetAccount1Address}/activities`,
       );
       const expectedRes: typeof res = await middleware.getAccountActivities(presetAccount1Address);
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets first page with query parameters', async () => {
@@ -999,7 +999,7 @@ describe('Middleware API', () => {
         },
         middleware,
       );
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('gets second page', async () => {
@@ -1014,7 +1014,7 @@ describe('Middleware API', () => {
         },
         middleware,
       );
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
   });
 
@@ -1030,15 +1030,15 @@ describe('Middleware API', () => {
         },
         middleware,
       );
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('nevigates to the previous page', async () => {
       const first = await middleware.getTransactions({ limit: 1 });
       const second = await first.next();
       const res = await second.prev();
-      expect(res).to.be.eql(first);
-      expect(res.prevPath).to.be.eql(null);
+      expect(res).to.eql(first);
+      expect(res.prevPath).to.eql(null);
       const expectedRes: typeof res = new MiddlewarePage(
         {
           data: (await middleware.getTransactions()).data.slice(0, 1),
@@ -1047,7 +1047,7 @@ describe('Middleware API', () => {
         },
         middleware,
       );
-      expect(res).to.be.eql(expectedRes);
+      expect(res).to.eql(expectedRes);
     });
 
     it('fails to navigate out of page range', async () => {

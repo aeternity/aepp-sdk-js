@@ -10,13 +10,13 @@ import { indent } from '../utils';
 describe('typed data', () => {
   describe('hashJson', () => {
     it('hashes json', () => {
-      expect(hashJson({ a: 'test', b: 42 }).toString('base64')).to.be.eql(
+      expect(hashJson({ a: 'test', b: 42 }).toString('base64')).to.eql(
         'EE0l7gg3Xv9K4szSHhK2g24mx5ck1MJHHVCLJscZyEA=',
       );
     });
 
     it('gets the same hash if keys ordered differently', () => {
-      expect(hashJson({ b: 42, a: 'test' })).to.be.eql(hashJson({ a: 'test', b: 42 }));
+      expect(hashJson({ b: 42, a: 'test' })).to.eql(hashJson({ a: 'test', b: 42 }));
     });
   });
 
@@ -40,7 +40,7 @@ describe('typed data', () => {
 
   describe('hashDomain', () => {
     it('hashes', async () => {
-      expect(hashDomain(domain).toString('base64')).to.be.equal(
+      expect(hashDomain(domain).toString('base64')).to.equal(
         '9EfEJsyqTDJMZU0m/t4zXxwUj2Md8bJd1txMjeB7F2k=',
       );
     });
@@ -49,12 +49,12 @@ describe('typed data', () => {
   describe('hashTypedData', () => {
     it('hashes int', async () => {
       const hash = hashTypedData(plainData, plainAci, domain);
-      expect(hash.toString('base64')).to.be.equal('iGXwY/cT39iSJ6xDCVK9E4WLJzSgggWO2HGUBU/8ZrE=');
+      expect(hash.toString('base64')).to.equal('iGXwY/cT39iSJ6xDCVK9E4WLJzSgggWO2HGUBU/8ZrE=');
     });
 
     it('hashes record', async () => {
       const hash = hashTypedData(recordData, recordAci, domain);
-      expect(hash.toString('base64')).to.be.equal('T8b2qGpS0d3vEN99ile+ZNZG4FujxaRnXTgsH+sZj8Q=');
+      expect(hash.toString('base64')).to.equal('T8b2qGpS0d3vEN99ile+ZNZG4FujxaRnXTgsH+sZj8Q=');
     });
   });
 
@@ -110,12 +110,12 @@ describe('typed data', () => {
     });
 
     it('gets domain', async () => {
-      expect((await contract.getDomain()).decodedResult).to.be.eql({ ...domain, version: 2n });
+      expect((await contract.getDomain()).decodedResult).to.eql({ ...domain, version: 2n });
     });
 
     it('calculates domain hash', async () => {
       const domainHash = Buffer.from((await contract.getDomainHash()).decodedResult);
-      expect(domainHash).to.be.eql(hashDomain(domain));
+      expect(domainHash).to.eql(hashDomain(domain));
     });
 
     const recordType = new TypeResolver().resolveType(recordAci, {});
@@ -126,7 +126,7 @@ describe('typed data', () => {
         recordType,
       );
       const typedDataHash = Buffer.from((await contract.hashTypedData(43)).decodedResult);
-      expect(typedDataHash).to.be.eql(hashTypedData(data, recordAci, domain));
+      expect(typedDataHash).to.eql(hashTypedData(data, recordAci, domain));
     });
 
     it('verifies signature', async () => {
@@ -137,12 +137,12 @@ describe('typed data', () => {
       const signature = await aeSdk.signTypedData(data, recordAci, domain);
       const signatureDecoded = decode(signature);
 
-      expect(
-        (await contract.verify(46, aeSdk.address, signatureDecoded)).decodedResult,
-      ).to.be.equal(false);
-      expect(
-        (await contract.verify(45, aeSdk.address, signatureDecoded)).decodedResult,
-      ).to.be.equal(true);
+      expect((await contract.verify(46, aeSdk.address, signatureDecoded)).decodedResult).to.equal(
+        false,
+      );
+      expect((await contract.verify(45, aeSdk.address, signatureDecoded)).decodedResult).to.equal(
+        true,
+      );
     });
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha';
-import { expect } from 'chai';
+import { expect, should } from 'chai';
 import * as sinon from 'sinon';
 import { getSdk, networkId } from '.';
 import {
@@ -24,6 +24,8 @@ import {
   initializeChannels,
   recreateAccounts,
 } from './channel-utils';
+
+should();
 
 describe('Channel', () => {
   let aeSdk: AeSdk;
@@ -133,7 +135,7 @@ describe('Channel', () => {
     notify(initiatorCh, 'not-existing-method');
     const error = await getError;
     ensureInstanceOf(error, ChannelIncomingMessageError);
-    expect(error.incomingMessage.error.message).to.be.equal('Method not found');
+    expect(error.incomingMessage.error.message).to.equal('Method not found');
     expect(() => {
       throw error.handlerError;
     }).to.throw(UnknownChannelStateError, 'State Channels FSM entered unknown state');
@@ -227,7 +229,7 @@ describe('Channel', () => {
       ],
     });
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
-    expect(tx.tag).to.be.equal(Tag.ChannelOffChainTx);
+    expect(tx.tag).to.equal(Tag.ChannelOffChainTx);
     expect(initiatorSign.firstCall.args[1]).to.eql({
       updates: [
         {
@@ -283,8 +285,8 @@ describe('Channel', () => {
     const params = { accounts: [initiator.address, responder.address] };
     const initiatorPoi = await initiatorCh.poi(params);
     const responderPoi = await responderCh.poi(params);
-    expect(initiatorPoi).to.be.eql(responderPoi);
-    expect(initiatorPoi.accounts[0].isEqual(responderPoi.accounts[0])).to.be.equal(true);
+    expect(initiatorPoi).to.eql(responderPoi);
+    expect(initiatorPoi.accounts[0].isEqual(responderPoi.accounts[0])).to.equal(true);
   });
 
   it('can send a message', async () => {
@@ -343,8 +345,8 @@ describe('Channel', () => {
     });
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelWithdrawTx>(tx.tag, Tag.ChannelWithdrawTx);
-    expect(tx.toId).to.be.equal(initiator.address);
-    expect(tx.amount).to.be.equal(amount.toString());
+    expect(tx.toId).to.equal(initiator.address);
+    expect(tx.amount).to.equal(amount.toString());
   });
 
   it('can request a withdraw and reject', async () => {
@@ -387,8 +389,8 @@ describe('Channel', () => {
     });
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelWithdrawTx>(tx.tag, Tag.ChannelWithdrawTx);
-    expect(tx.toId).to.be.equal(initiator.address);
-    expect(tx.amount).to.be.equal(amount.toString());
+    expect(tx.toId).to.equal(initiator.address);
+    expect(tx.amount).to.equal(amount.toString());
   });
 
   it('can abort withdraw sign request', async () => {
@@ -449,8 +451,8 @@ describe('Channel', () => {
     });
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelDepositTx>(tx.tag, Tag.ChannelDepositTx);
-    expect(tx.fromId).to.be.equal(initiator.address);
-    expect(tx.amount).to.be.equal(amount.toString());
+    expect(tx.fromId).to.equal(initiator.address);
+    expect(tx.amount).to.equal(amount.toString());
   });
 
   it('can request a deposit and reject', async () => {
@@ -483,8 +485,8 @@ describe('Channel', () => {
     });
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelDepositTx>(tx.tag, Tag.ChannelDepositTx);
-    expect(tx.fromId).to.be.equal(initiator.address);
-    expect(tx.amount).to.be.equal(amount.toString());
+    expect(tx.fromId).to.equal(initiator.address);
+    expect(tx.amount).to.equal(amount.toString());
   });
 
   it('can abort deposit sign request', async () => {
@@ -518,7 +520,7 @@ describe('Channel', () => {
     sinon.assert.calledWithExactly(initiatorSign, sinon.match.string);
     const tx = unpackTx(initiatorSign.firstCall.args[0]);
     ensureEqual<Tag.ChannelCloseMutualTx>(tx.tag, Tag.ChannelCloseMutualTx);
-    expect(tx.fromId).to.be.equal(initiator.address);
+    expect(tx.fromId).to.equal(initiator.address);
     // TODO: check `initiatorAmountFinal` and `responderAmountFinal`
   });
 
@@ -534,7 +536,7 @@ describe('Channel', () => {
 
   // https://github.com/aeternity/protocol/blob/d634e7a3f3110657900759b183d0734e61e5803a/node/api/channels_api_usage.md#reestablish
   it('can reestablish a channel', async () => {
-    expect(initiatorCh.round()).to.be.equal(2);
+    expect(initiatorCh.round()).to.equal(2);
     initiatorCh = await Channel.initialize({
       ...sharedParams,
       ...initiatorParams,
@@ -543,11 +545,11 @@ describe('Channel', () => {
       existingFsmId: initiatorCh.fsmId(),
     });
     await waitForChannel(initiatorCh, ['open']);
-    expect(initiatorCh.round()).to.be.equal(2);
+    expect(initiatorCh.round()).to.equal(2);
     sinon.assert.notCalled(initiatorSignTag);
     sinon.assert.notCalled(responderSignTag);
     await initiatorCh.update(initiator.address, responder.address, 100, initiatorSign);
-    expect(initiatorCh.round()).to.be.equal(3);
+    expect(initiatorCh.round()).to.equal(3);
   });
 
   describe('throws errors', () => {

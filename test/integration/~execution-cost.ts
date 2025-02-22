@@ -92,18 +92,18 @@ describe('Execution cost', () => {
           params.tag === Tag.PayingForTx &&
           [Tag.ContractCreateTx, Tag.ContractCallTx].includes(params.tx.encodedTx.tag)
         ) {
-          expect(balanceDiff).to.be.satisfy((b: bigint) => b < 0n);
+          expect(balanceDiff).to.satisfy((b: bigint) => b < 0n);
         } else if (params.tag === Tag.ContractCallTx) {
           // Can't detect AENS.claim in contract call
           // TODO: remove after solving https://github.com/aeternity/aeternity/issues/4088
           if (balanceDiff === 500000000000001n) return;
           // Can't detect Oracle.respond reward in contract call
           if (balanceDiff === -501000n) return;
-          expect(balanceDiff).to.be.equal(0n);
+          expect(balanceDiff).to.equal(0n);
         } else if (params.tag === Tag.SpendTx && params.senderId === params.recipientId) {
-          expect(balanceDiff).to.be.equal(BigInt(-params.amount));
+          expect(balanceDiff).to.equal(BigInt(-params.amount));
         } else {
-          expect(balanceDiff).to.be.equal(0n);
+          expect(balanceDiff).to.equal(0n);
         }
 
         checkedTags.add(unpackTx(tx, Tag.SignedTx).encodedTx.tag);
@@ -111,7 +111,7 @@ describe('Execution cost', () => {
     );
 
     const formatTags = (arr: Tag[]): string[] => arr.sort((a, b) => a - b).map((t) => Tag[t]);
-    expect(formatTags(Array.from(checkedTags))).to.be.eql(
+    expect(formatTags(Array.from(checkedTags))).to.eql(
       formatTags([
         Tag.SpendTx,
         Tag.NamePreclaimTx,

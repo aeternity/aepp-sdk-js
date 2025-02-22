@@ -1,5 +1,5 @@
 import { describe, it, before } from 'mocha';
-import { expect } from 'chai';
+import { expect, should } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk, networkId } from '.';
 import { assertNotNull } from '../utils';
@@ -14,6 +14,8 @@ import {
   Encoding,
   Encoded,
 } from '../../src';
+
+should();
 
 describe('Accounts', () => {
   let aeSdk: AeSdk;
@@ -31,7 +33,7 @@ describe('Accounts', () => {
     const account = aeSdk.accounts[address];
     aeSdk.removeAccount(address);
     expect(Object.keys(aeSdk.accounts)).to.have.length(1);
-    expect(aeSdk.selectedAddress).to.be.equal(undefined);
+    expect(aeSdk.selectedAddress).to.equal(undefined);
     aeSdk.addAccount(account, { select: true });
   });
 
@@ -123,23 +125,23 @@ describe('Accounts', () => {
   it('spends with a payload', async () => {
     const payload = encode(Buffer.from([1, 2, 3, 4]), Encoding.Bytearray);
     const { tx } = await aeSdk.spend(1, receiver.address, { payload });
-    expect(tx?.payload).to.be.equal('ba_AQIDBI3kcuI=');
+    expect(tx?.payload).to.equal('ba_AQIDBI3kcuI=');
   });
 
   it('Get Account by block height/hash', async () => {
     const address = 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ';
     if (networkId === 'ae_uat') {
-      expect(await aeSdk.getBalance(address, { height: 500000 })).to.be.equal(
+      expect(await aeSdk.getBalance(address, { height: 500000 })).to.equal(
         '4577590840980663351396',
       );
       return;
     }
     if (networkId === 'ae_mainnet') {
-      expect(await aeSdk.getBalance(address, { height: 362055 })).to.be.equal('100000000000000');
+      expect(await aeSdk.getBalance(address, { height: 362055 })).to.equal('100000000000000');
       return;
     }
     const genesis = 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E';
-    expect(await aeSdk.getBalance(genesis, { height: 0 })).to.be.equal('10000000000000000000000');
+    expect(await aeSdk.getBalance(genesis, { height: 0 })).to.equal('10000000000000000000000');
   });
 
   (networkId === 'ae_dev' ? it : it.skip)(
@@ -156,11 +158,11 @@ describe('Accounts', () => {
 
       const afterSpend = await getBalance();
       assertNotNull(spend.tx?.amount);
-      expect(beforeSpend - afterSpend).to.be.equal(spend.tx.fee + spend.tx.amount);
-      expect(await getBalance(beforeHeight)).to.be.equal(beforeSpend);
+      expect(beforeSpend - afterSpend).to.equal(spend.tx.fee + spend.tx.amount);
+      expect(await getBalance(beforeHeight)).to.equal(beforeSpend);
       assertNotNull(spend.blockHeight);
       await aeSdk.awaitHeight(spend.blockHeight + 1);
-      expect(await getBalance(spend.blockHeight + 1)).to.be.equal(afterSpend);
+      expect(await getBalance(spend.blockHeight + 1)).to.equal(afterSpend);
     },
   );
 
@@ -216,7 +218,7 @@ describe('Accounts', () => {
       const data = 'Hello';
       const signature = await account.sign(data);
       const sigUsingMemoryAccount = await aeSdk.sign(data, { onAccount: account });
-      expect(signature).to.be.eql(sigUsingMemoryAccount);
+      expect(signature).to.eql(sigUsingMemoryAccount);
     });
   });
 

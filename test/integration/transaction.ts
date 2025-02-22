@@ -78,7 +78,7 @@ describe('Transaction', () => {
       denomination: AE_AMOUNT_FORMATS.AE,
     });
     const spendAettos = await aeSdk.buildTx({ ...params, tag: Tag.SpendTx, amount: 1e18 });
-    spendAe.should.be.equal(spendAettos);
+    expect(spendAe).to.equal(spendAettos);
   });
 
   describe('gas price from node', () => {
@@ -105,7 +105,7 @@ describe('Transaction', () => {
         onNode: nodeReplaceRecentGasPrices(1000000023n),
       });
       const { fee } = unpackTx(spendTx, Tag.SpendTx);
-      expect(fee).to.be.equal((16660n * 1010000023n).toString());
+      expect(fee).to.equal((16660n * 1010000023n).toString());
     });
 
     it('uses min gas price if utilization is low', async () => {
@@ -117,7 +117,7 @@ describe('Transaction', () => {
         onNode: nodeReplaceRecentGasPrices(1000000023n, 60),
       });
       const { fee } = unpackTx(spendTx, Tag.SpendTx);
-      expect(fee).to.be.equal((16660n * 1000000000n).toString());
+      expect(fee).to.equal((16660n * 1000000000n).toString());
     });
 
     it('calculates fee in contract call based on gas price', async () => {
@@ -132,8 +132,8 @@ describe('Transaction', () => {
         onNode: nodeReplaceRecentGasPrices(1000000023n),
       });
       const { fee, gasPrice } = unpackTx(spendTx, Tag.ContractCallTx);
-      expect(fee).to.be.equal((182020n * 1010000023n).toString());
-      expect(gasPrice).to.be.equal('1010000023');
+      expect(fee).to.equal((182020n * 1010000023n).toString());
+      expect(gasPrice).to.equal('1010000023');
     });
 
     it('warns if gas price too big', async () => {
@@ -145,13 +145,13 @@ describe('Transaction', () => {
         nonce,
         onNode: nodeReplaceRecentGasPrices(99900000000000n),
       });
-      expect(s.firstCall.args).to.be.eql([
+      expect(s.firstCall.args).to.eql([
         'Estimated gas price 100899000000000 exceeds the maximum safe value for unknown reason. ' +
           'It will be limited to 100000000000000. To overcome this restriction provide `gasPrice`/`fee` in options.',
       ]);
       s.restore();
       const { fee } = unpackTx(spendTx, Tag.SpendTx);
-      expect(fee).to.be.equal((16660n * 100000000000000n).toString());
+      expect(fee).to.equal((16660n * 100000000000000n).toString());
     });
   });
 
@@ -401,8 +401,8 @@ describe('Transaction', () => {
   transactions.forEach(([txName, getExpected, getter]) =>
     it(`build of ${txName} transaction`, async () => {
       const expected = typeof getExpected === 'function' ? await getExpected() : getExpected;
-      expect(await getter()).to.be.equal(expected);
-      expect(buildTx(unpackTx(expected))).to.be.equal(expected);
+      expect(await getter()).to.equal(expected);
+      expect(buildTx(unpackTx(expected))).to.equal(expected);
     }),
   );
 });

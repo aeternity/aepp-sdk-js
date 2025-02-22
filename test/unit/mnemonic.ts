@@ -12,20 +12,20 @@ const wallet = {
 describe('Account mnemonic factory', () => {
   it('derives wallet', async () => {
     const factory = new AccountMnemonicFactory(mnemonic);
-    expect(await factory.getWallet()).to.be.eql(wallet);
+    expect(await factory.getWallet()).to.eql(wallet);
   });
 
   it('initializes an account', async () => {
     const factory = new AccountMnemonicFactory(mnemonic);
     const account = await factory.initialize(42);
-    expect(account).to.be.instanceOf(MemoryAccount);
-    expect(account.address).to.be.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
+    expect(account).to.be.an.instanceOf(MemoryAccount);
+    expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
   });
 
   it('initializes an account by wallet', async () => {
     const factory = new AccountMnemonicFactory(wallet);
     const account = await factory.initialize(42);
-    expect(account.address).to.be.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
+    expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
   });
 
   class NodeMock extends Node {
@@ -56,14 +56,14 @@ describe('Account mnemonic factory', () => {
     node.addresses.push('ak_DzELMKnSfJcfnCUZ2SbXUSxRmFYtGrWmMuKiCx68YKLH26kwc');
     const factory = new AccountMnemonicFactory(mnemonic);
     const accounts = await factory.discover(node);
-    expect(accounts.length).to.be.equal(node.addresses.length);
-    expect(accounts.map((a) => a.address)).to.be.eql(node.addresses);
+    expect(accounts.length).to.equal(node.addresses.length);
+    expect(accounts.map((a) => a.address)).to.eql(node.addresses);
   });
 
   it('discovers accounts on unused mnemonic', async () => {
     const node = new NodeMock();
     const factory = new AccountMnemonicFactory(mnemonic);
     const accounts = await factory.discover(node);
-    expect(accounts.length).to.be.equal(0);
+    expect(accounts.length).to.equal(0);
   });
 });

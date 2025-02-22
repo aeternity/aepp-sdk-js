@@ -33,7 +33,7 @@ describe('MiddlewareSubscriber', () => {
       });
     });
     await expect(promise).to.be.rejectedWith('Unexpected server response: 200');
-    expect(middleware.webSocket).to.be.equal(undefined);
+    expect(middleware.webSocket).to.equal(undefined);
   });
 
   it('fails to subscribe to invalid address', async () => {
@@ -63,18 +63,18 @@ describe('MiddlewareSubscriber', () => {
   }
 
   it('reconnects if subscribed again', async () => {
-    expect(middleware.webSocket).to.be.equal(undefined);
+    expect(middleware.webSocket).to.equal(undefined);
     let unsubscribe = middleware.subscribeTransactions(() => {});
     await ensureConnected(middleware);
     assertNotNull(middleware.webSocket);
     unsubscribe();
-    expect(middleware.webSocket).to.be.equal(undefined);
+    expect(middleware.webSocket).to.equal(undefined);
 
     unsubscribe = middleware.subscribeTransactions(() => {});
     await ensureConnected(middleware);
     assertNotNull(middleware.webSocket);
     unsubscribe();
-    expect(middleware.webSocket).to.be.equal(undefined);
+    expect(middleware.webSocket).to.equal(undefined);
   });
 
   it('can be reconnected', async () => {
@@ -87,16 +87,16 @@ describe('MiddlewareSubscriber', () => {
       assertNotNull(middleware.webSocket);
       middleware.webSocket.addEventListener('close', resolve);
     });
-    expect(handleTx.callCount).to.be.equal(1);
-    expect(handleTx.firstCall.args[0]).to.be.equal(undefined);
-    expect(handleTx.firstCall.args[1]).to.be.instanceOf(MiddlewareSubscriberDisconnected);
-    expect(middleware.webSocket).to.be.equal(undefined);
+    expect(handleTx.callCount).to.equal(1);
+    expect(handleTx.firstCall.args[0]).to.equal(undefined);
+    expect(handleTx.firstCall.args[1]).to.be.an.instanceOf(MiddlewareSubscriberDisconnected);
+    expect(middleware.webSocket).to.equal(undefined);
 
     middleware.reconnect();
     await ensureConnected(middleware);
     assertNotNull(middleware.webSocket);
     unsubscribe();
-    expect(handleTx.callCount).to.be.equal(1);
+    expect(handleTx.callCount).to.equal(1);
   });
 
   async function fetchNodeRaw(path: string): Promise<any> {
@@ -116,7 +116,7 @@ describe('MiddlewareSubscriber', () => {
         });
       }),
     ]);
-    expect(transaction).to.be.eql({
+    expect(transaction).to.eql({
       ...(await fetchNodeRaw(`transactions/${hash}`)),
       tx_index: transaction.tx_index,
       micro_index: transaction.micro_index,
@@ -135,7 +135,7 @@ describe('MiddlewareSubscriber', () => {
         });
       }),
     ]);
-    expect(transaction).to.be.eql({
+    expect(transaction).to.eql({
       ...(await fetchNodeRaw(`transactions/${hash}`)),
       tx_index: transaction.tx_index,
       micro_index: transaction.micro_index,
@@ -160,8 +160,8 @@ describe('MiddlewareSubscriber', () => {
     }
     unsubscribe1();
     unsubscribe2();
-    expect(events1.map((ev) => ev.hash)).to.be.eql([tx1.hash, tx3.hash]);
-    expect(events2.map((ev) => ev.hash)).to.be.eql([tx1.hash, tx2.hash]);
+    expect(events1.map((ev) => ev.hash)).to.eql([tx1.hash, tx3.hash]);
+    expect(events2.map((ev) => ev.hash)).to.eql([tx1.hash, tx2.hash]);
   });
 
   it('subscribes for micro block', async () => {
@@ -177,7 +177,7 @@ describe('MiddlewareSubscriber', () => {
         });
       }),
     ]);
-    expect(microBlock).to.be.eql({
+    expect(microBlock).to.eql({
       ...(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`)),
       transactions_count: 1,
       micro_block_index: 0,
@@ -203,13 +203,13 @@ describe('MiddlewareSubscriber', () => {
         });
       }),
     ]);
-    expect(transaction).to.be.eql({
+    expect(transaction).to.eql({
       ...(await fetchNodeRaw(`transactions/${hash}`)),
       tx_index: transaction.tx_index,
       micro_index: transaction.micro_index,
       micro_time: transaction.micro_time,
     });
-    expect(microBlock).to.be.eql({
+    expect(microBlock).to.eql({
       ...(await fetchNodeRaw(`micro-blocks/hash/${blockHash}/header`)),
       transactions_count: 1,
       micro_block_index: 0,

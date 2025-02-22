@@ -45,30 +45,30 @@ describe('Merkle Patricia Tree', () => {
 
   it('can deserialize', () => {
     const tree = deserialize(binary);
-    expect(tree.isComplete).to.be.equal(true);
+    expect(tree.isComplete).to.equal(true);
   });
 
   it('can be converted to object', () => {
     const tree = deserialize(binary);
-    expect(tree.toObject()).to.be.eql(map);
+    expect(tree.toObject()).to.eql(map);
   });
 
   it('can serialize', () => {
     const tree = deserialize(binary);
-    expect(field.serialize(tree)).to.be.eql(binary);
+    expect(field.serialize(tree)).to.eql(binary);
   });
 
   it('can retrieve values', () => {
     const tree = deserialize(binary);
     Object.entries(map).forEach(([key, value]: [Encoded.AccountAddress, object]) => {
-      expect(tree.get(key)).to.be.eql(value);
+      expect(tree.get(key)).to.eql(value);
     });
   });
 
   it('can check is equal', () => {
     const tree = deserialize(binary);
-    expect(tree.isEqual(deserialize(binary))).to.be.equal(true);
-    expect(tree.isEqual(deserialize(binary2))).to.be.equal(false);
+    expect(tree.isEqual(deserialize(binary))).to.equal(true);
+    expect(tree.isEqual(deserialize(binary2))).to.equal(false);
   });
 
   it('throws exception if payload is invalid', () => {

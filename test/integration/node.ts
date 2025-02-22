@@ -67,7 +67,7 @@ describe('Node client', () => {
 
       const getCount = bindRequestCounter(node);
       await node.getAccountByPubkey(address).catch(() => {});
-      expect(getCount()).to.be.equal(requestCount);
+      expect(getCount()).to.equal(requestCount);
     }, Promise.resolve()));
 
   it('throws exception if unsupported protocol', async () => {
@@ -129,7 +129,7 @@ describe('Node client', () => {
     expect(example);
 
     const actual = await node.getRecentGasPrices();
-    expect(actual).to.be.eql(
+    expect(actual).to.eql(
       [1, 5, 15, 60].map((minutes, idx) => {
         const { minGasPrice, utilization } = actual[idx];
         return { minGasPrice, minutes, utilization };
@@ -139,7 +139,7 @@ describe('Node client', () => {
 
   it('returns time as Date', async () => {
     const block = await node.getTopHeader();
-    expect(block.time).to.be.instanceOf(Date);
+    expect(block.time).to.be.an.instanceOf(Date);
     expect(block.time.getFullYear()).to.be.within(2024, 2030);
   });
 
@@ -178,10 +178,10 @@ describe('Node client', () => {
         ],
       });
       const activeNode = await nodes.getNodeInfo();
-      activeNode.name.should.be.equal('first');
+      expect(activeNode.name).to.equal('first');
       nodes.selectNode('second');
       const secondNodeInfo = await nodes.getNodeInfo();
-      secondNodeInfo.name.should.be.equal('second');
+      expect(secondNodeInfo.name).to.equal('second');
     });
 
     it('Fail on undefined node', async () => {
@@ -202,7 +202,7 @@ describe('Node client', () => {
         nodes: [{ name: 'first', instance: node }],
       });
       const nodesList = await nodes.getNodesInPool();
-      nodesList.length.should.be.equal(1);
+      expect(nodesList).to.have.length(1);
     });
   });
 });

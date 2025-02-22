@@ -374,7 +374,7 @@ describe('AENS utils', () => {
     it('encodes', () => {
       tests.forEach(({ unicodeAsHex, punycode }) => {
         const name = Buffer.from(unicodeAsHex, 'hex').toString();
-        expect(nameToPunycode(name)).to.be.equal(punycode);
+        expect(nameToPunycode(name)).to.equal(punycode);
       });
     });
   });
@@ -446,37 +446,37 @@ describe('AENS utils', () => {
 
   describe('isAuctionName', () => {
     it('checks non-auction name', () => {
-      expect(isAuctionName('1234567890123.chain')).to.be.equal(false);
+      expect(isAuctionName('1234567890123.chain')).to.equal(false);
     });
 
     it('checks auction name', () => {
-      expect(isAuctionName('123456789012.chain')).to.be.equal(true);
+      expect(isAuctionName('123456789012.chain')).to.equal(true);
     });
 
     it('checks non-auction unicode name', () => {
-      expect(isAuctionName('æ23456.chain')).to.be.equal(false);
+      expect(isAuctionName('æ23456.chain')).to.equal(false);
     });
 
     it('checks auction unicode name', () => {
-      expect(isAuctionName('æ2345.chain')).to.be.equal(true);
+      expect(isAuctionName('æ2345.chain')).to.equal(true);
     });
   });
 
   describe('computeAuctionEndBlock', () => {
     it('computes for longest auction', () => {
-      expect(computeAuctionEndBlock('123456789012.chain', 1)).to.be.equal(481);
+      expect(computeAuctionEndBlock('123456789012.chain', 1)).to.equal(481);
     });
 
     it('computes for shortest auction', () => {
-      expect(computeAuctionEndBlock('1.chain', 1)).to.be.equal(29761);
+      expect(computeAuctionEndBlock('1.chain', 1)).to.equal(29761);
     });
 
     it('computes for longest unicode auction', () => {
-      expect(computeAuctionEndBlock('æ2345.chain', 1)).to.be.equal(481);
+      expect(computeAuctionEndBlock('æ2345.chain', 1)).to.equal(481);
     });
 
     it('computes for shortest unicode auction', () => {
-      expect(computeAuctionEndBlock('æ.chain', 1)).to.be.equal(14881);
+      expect(computeAuctionEndBlock('æ.chain', 1)).to.equal(14881);
     });
   });
 });
