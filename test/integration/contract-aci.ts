@@ -20,7 +20,6 @@ import {
   Tag,
   NoSuchContractFunctionError,
   InvalidTxError,
-  ContractError,
   isAddressValid,
   Encoding,
 } from '../../src';
@@ -34,7 +33,7 @@ should();
 
 const identityContractSourceCode = `
 contract Identity =
- entrypoint getArg(x: int) = x
+  entrypoint getArg(x: int) = x
 `;
 
 const libContractSource = `
@@ -359,10 +358,24 @@ describe('Contract instance', () => {
     expect(res).to.be.equal(42n);
   });
 
-  it('fails with error if function missed', async () => {
+  it('fails with error if function missed in aci', async () => {
     await expect(testContract.$call('notExisting', [])).to.be.rejectedWith(
       NoSuchContractFunctionError,
       "Function notExisting doesn't exist in contract",
+    );
+  });
+
+  it('fails with error if function missed in bytecode', async () => {
+    const contract = await Contract.initialize<{ notExistInBytecode: () => 42 }>({
+      ...aeSdk.getContext(),
+      sourceCode: identityContractSourceCode + '\n  entrypoint notExistInBytecode() = 42',
+      address: testContract.$options.address,
+    });
+    await expect(contract.notExistInBytecode()).to.be.rejectedWith(
+      BytecodeMismatchError,
+      'Contract ACI do not correspond to the bytecode deployed on the chain. Error provided' +
+        ' by node: "Trying to call undefined function: <<240,40,94,10>>", function name:' +
+        ' notExistInBytecode.',
     );
   });
 
@@ -440,8 +453,9 @@ describe('Contract instance', () => {
       intFn: (a: InputNumber, b: InputNumber) => bigint;
     }>({ ...aeSdk.getContext(), aci, address: testContract.$options.address });
     await expect(contract.intFn(3, 2)).to.be.rejectedWith(
-      ContractError,
-      "ACI doesn't match called contract. Error provided by node: Expected 1 arguments, got 2",
+      BytecodeMismatchError,
+      'Contract ACI do not correspond to the bytecode deployed on the chain. Error provided' +
+        ' by node: "Expected 1 arguments, got 2"',
     );
   });
 
