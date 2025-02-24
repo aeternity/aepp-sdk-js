@@ -7,7 +7,6 @@ import {
   decode,
   encode,
   Encoding,
-  Encoded,
   ORACLE_TTL_TYPES,
   Oracle,
   OracleClient,
@@ -84,6 +83,33 @@ describe('Oracle', () => {
       expect(await pollPromise).to.eql(queries);
     });
 
+    let query4: Awaited<ReturnType<OracleClient['getQuery']>>;
+    it('gets queries', async () => {
+      const res = await oracle.getQueries();
+      expect(res).to.have.length(3);
+      query4 = res.find((q) => q.decodedQuery.includes('Berlin4'))!;
+      assertNotNull(query4);
+      expect(query4).to.eql({
+        id: query4.id,
+        senderId: oracleClient.options.onAccount.address,
+        senderNonce: 3,
+        oracleId: oracle.address,
+        query: 'ov_eyJjaXR5IjogIkJlcmxpbjQifR/koho=',
+        response: 'or_Xfbg4g==',
+        ttl: query4.ttl,
+        responseTtl: { type: 'delta', value: 10 },
+        fee: 0n,
+        decodedQuery: '{"city": "Berlin4"}',
+        decodedResponse: '',
+      });
+    });
+
+    it('gets query', async () => {
+      expect(await oracle.getQuery(query4.id)).to.eql(query4);
+      const { decodedQuery, decodedResponse, ...q } = query4;
+      expect(q).to.eql(await aeSdk.api.getOracleQueryByPubkeyAndQueryId(oracle.address, query4.id));
+    });
+
     it('can poll for responded queries', async () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}');
       await oracle.respondToQuery(queryId, queryResponse);
@@ -98,8 +124,8 @@ describe('Oracle', () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}');
       await oracle.respondToQuery(queryId, queryResponse);
 
-      const query = await aeSdk.api.getOracleQueryByPubkeyAndQueryId(oracle.address, queryId);
-      expect(decode(query.response as Encoded.OracleResponse).toString()).to.equal(queryResponse);
+      const query = await oracle.getQuery(queryId);
+      expect(query.decodedResponse).to.equal(queryResponse);
       const response = await oracleClient.pollForResponse(queryId);
       expect(response).to.equal(queryResponse);
     });

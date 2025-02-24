@@ -168,7 +168,7 @@ Both Oracle and OracleClient have methods to get their state from the node.
 
 `Oracle:getState`, `OracleClient:getState` returns the same value as `Node:getOracleByPubkey`, but without arguments (it uses the oracle address provided in the constructor).
 
-`Oracle:getQuery`, `OracleClient:getQuery` corresponds to `Node:getOracleQueryByPubkeyAndQueryId`, adding `decodedQuery`, `decodedResponse` based on the oracle type.
+`Oracle:getQuery`, `OracleClient:getQuery` corresponds to `Node:getOracleQueryByPubkeyAndQueryId`, adding `decodedQuery`, `decodedResponse` based on the oracle type. In the same way `Oracle:getQueries`, `OracleClient:getQueries` corresponds to `Node:getOracleQueriesByPubkey`.
 
 ## Example applications
 

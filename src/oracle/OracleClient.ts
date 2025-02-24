@@ -78,10 +78,7 @@ export default class OracleClient extends OracleBase {
     let ttl;
     let response;
     do {
-      ({ response, ttl } = await opt.onNode.getOracleQueryByPubkeyAndQueryId(
-        this.address,
-        queryId,
-      ));
+      ({ response, ttl } = await this.getQuery(queryId, opt));
       const responseBuffer = decode(response as Encoded.OracleResponse);
       if (responseBuffer.length > 0) return responseBuffer.toString();
       await pause(interval);
