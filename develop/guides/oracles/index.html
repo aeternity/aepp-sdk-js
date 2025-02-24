@@ -1946,7 +1946,7 @@
 <h2 id="5-get-the-current-state-from-the-node">5. Get the current state from the node</h2>
 <p>Both Oracle and OracleClient have methods to get their state from the node.</p>
 <p><code>Oracle:getState</code>, <code>OracleClient:getState</code> returns the same value as <code>Node:getOracleByPubkey</code>, but without arguments (it uses the oracle address provided in the constructor).</p>
-<p><code>Oracle:getQuery</code>, <code>OracleClient:getQuery</code> corresponds to <code>Node:getOracleQueryByPubkeyAndQueryId</code>, adding <code>decodedQuery</code>, <code>decodedResponse</code> based on the oracle type.</p>
+<p><code>Oracle:getQuery</code>, <code>OracleClient:getQuery</code> corresponds to <code>Node:getOracleQueryByPubkeyAndQueryId</code>, adding <code>decodedQuery</code>, <code>decodedResponse</code> based on the oracle type. In the same way <code>Oracle:getQueries</code>, <code>OracleClient:getQueries</code> corresponds to <code>Node:getOracleQueriesByPubkey</code>.</p>
 <h2 id="example-applications">Example applications</h2>
 <ul>
 <li><a href="https://github.com/aeternity/ae-oracle-pricefeed">ae-oracle-pricefeed</a>
