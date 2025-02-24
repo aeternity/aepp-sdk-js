@@ -6,6 +6,7 @@ const nodeBigIntPropertyNames = [
   'fee',
   'amount',
   'nameFee',
+  'highestBid',
   'channelAmount',
   'initiatorAmount',
   'responderAmount',
