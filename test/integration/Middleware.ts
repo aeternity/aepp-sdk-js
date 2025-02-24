@@ -2,6 +2,7 @@ import { describe, before, it } from 'mocha';
 import { expect } from 'chai';
 import resetMiddleware, { presetAccount1Address, presetAccount2Address } from './reset-middleware';
 import {
+  Encoded,
   Encoding,
   IllegalArgumentError,
   isAddressValid,
@@ -11,7 +12,25 @@ import {
 } from '../../src';
 import { assertNotNull } from '../utils';
 import { pause } from '../../src/utils/other';
-import { Activity } from '../../src/apis/middleware';
+import {
+  Activity,
+  Auction,
+  Channel,
+  ContractCall,
+  ContractLog,
+  DeltaStat,
+  KeyBlockExtended,
+  Miner,
+  Name,
+  NameClaim,
+  NameUpdate,
+  Oracle,
+  Pointee,
+  Stat,
+  TotalStat,
+  Transaction,
+  Transfer,
+} from '../../src/apis/middleware';
 import { MiddlewarePage } from '../../src/utils/MiddlewarePage';
 
 function copyFields(
@@ -52,17 +71,17 @@ describe('Middleware API', () => {
       },
       mdwGensPerMinute: res.mdwGensPerMinute,
       mdwHeight: res.mdwHeight,
-      mdwLastMigration: 20240702122227,
-      mdwRevision: '6252c01f',
+      mdwLastMigration: 20241128134337,
+      mdwRevision: '381b0128',
       mdwSynced: true,
       mdwSyncing: true,
       mdwTxIndex: res.mdwTxIndex,
-      mdwVersion: '1.81.0',
+      mdwVersion: '1.97.1',
       nodeHeight: res.nodeHeight,
       nodeProgress: 100,
-      nodeRevision: 'b394868693b70a3a7ce5dfec144f718f60e79964',
+      nodeRevision: '57bc00b760dbb3ccd10be51f447e33cb3a2f56e3',
       nodeSyncing: false,
-      nodeVersion: '7.1.0',
+      nodeVersion: '7.3.0-rc3',
     };
     expect(res).to.eql(expectedRes);
   });
@@ -70,11 +89,13 @@ describe('Middleware API', () => {
   describe('blocks', () => {
     it('gets key blocks', async () => {
       const res = await middleware.getKeyBlocks({ limit: 15 });
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<KeyBlockExtended>(
         {
           data: [
             {
               beneficiary: 'ak_11111111111111111111111111111111273Yts',
+              beneficiaryReward: 0,
+              flags: 'ba_gAAAAOYyHPU=',
               hash: 'kh_nvmdByyHT8513zwVwxQ1tTsKbgfgdp1LX43jHj3ujb2AvDSh5',
               height: 0,
               info: 'cb_Xfbg4g==',
@@ -84,7 +105,8 @@ describe('Middleware API', () => {
               prevKeyHash: 'kh_11111111111111111111111111111111273Yts',
               stateHash: 'bs_HwreBuvhDCzAdkL2upX6qhEAkCXirujYP5BXkPDF7NZV76fdR',
               target: 1338,
-              time: undefined,
+              // TODO: remove after solving https://github.com/Azure/autorest.typescript/issues/3043
+              time: undefined as unknown as Date,
               transactionsCount: 0,
               version: 1,
             },
@@ -107,6 +129,8 @@ describe('Middleware API', () => {
       if (!isAddressValid(microBlockHash, Encoding.MicroBlockHash)) throw new UnexpectedTsError();
       const res = await middleware.getMicroBlock(microBlockHash);
       const expectedRes: typeof res = {
+        flags: 'ba_AAAAAIy5ASU=',
+        gas: 78500,
         hash: 'mh_uMZS2rqBQ1ZD9GNTS2n54bRbATbupC2JV32wpj4gs4EGnfnKd',
         height: 2,
         microBlockIndex: 0,
@@ -129,7 +153,7 @@ describe('Middleware API', () => {
   describe('transactions', () => {
     it('gets account activities', async () => {
       const res = await middleware.getAccountActivities(presetAccount1Address);
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Activity>(
         {
           data: [
             {
@@ -149,20 +173,20 @@ describe('Middleware API', () => {
                   'sg_WbQJc3RweFShfr3YgFk5Wqin4QRsr9a487tuvXxi4yLHtYEqRXwffVUD2iz5GXAkJEXayyLMmGQpP22beMYNNYnyKrJNW',
                 ],
                 tx: {
-                  channel_id: 'ch_2HQRew5QMG8EVPHEWSxEaCQSUF9yRVLaSU4cHJpcG2AZt57Rx2',
-                  channel_reserve: 0,
-                  delegate_ids: {
+                  channelId: 'ch_2HQRew5QMG8EVPHEWSxEaCQSUF9yRVLaSU4cHJpcG2AZt57Rx2',
+                  channelReserve: 0n,
+                  delegateIds: {
                     initiator: [],
                     responder: [],
                   },
-                  fee: 17680000000000,
-                  initiator_amount: 500000000000000,
-                  initiator_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
-                  lock_period: 1,
+                  fee: 17680000000000n,
+                  initiatorAmount: 500000000000000n,
+                  initiatorId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                  lockPeriod: 1,
                   nonce: 7,
-                  responder_amount: 500000000000000,
-                  responder_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
-                  state_hash: 'st_bBhx8I+RhIeBsuBxPjvLNm+uEirlQrgRpYH5hJbsrYwznWSz',
+                  responderAmount: 500000000000000n,
+                  responderId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                  stateHash: 'st_bBhx8I+RhIeBsuBxPjvLNm+uEirlQrgRpYH5hJbsrYwznWSz',
                   type: 'ChannelCreateTx',
                   version: 2,
                 },
@@ -174,7 +198,7 @@ describe('Middleware API', () => {
               blockTime: new Date(1721911705246),
               height: 3,
               payload: {
-                amount: 3n,
+                amount: 500000000000000n,
                 kind: 'fee_lock_name',
                 refTxHash: 'th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1',
               },
@@ -196,12 +220,12 @@ describe('Middleware API', () => {
                   'sg_CVJMvQ7TPCbcmEn5GXFY9bh8okNTuE956PiiZaSJ2V9JWKgimmP86L5NUiZpFgeE6Am7QJk7KYwxJMGgFhQSXJJxrhqFJ',
                 ],
                 tx: {
-                  account_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
-                  fee: 16860000000000,
+                  accountId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                  fee: 16860000000000n,
                   name: '123456789012345678901234567800.chain',
-                  name_fee: 500000000000000,
-                  name_id: 'nm_ZdygpYcGrRPNJZC1WRLRsEx3KT91zE4Mieg4XNkM6Qvs71NaE',
-                  name_salt: 0,
+                  nameFee: 500000000000000n,
+                  nameId: 'nm_ZdygpYcGrRPNJZC1WRLRsEx3KT91zE4Mieg4XNkM6Qvs71NaE',
+                  nameSalt: 0,
                   nonce: 2,
                   ttl: 6,
                   type: 'NameClaimTx',
@@ -226,30 +250,32 @@ describe('Middleware API', () => {
                   'sg_HXRkFjgjsFmFLZ1ywBgYj9VouQK1BySqCViALxq3ge69a86aDgd1ESqNXhCLebh7fH6SohTjbLXXxhjPnYXaGJfiX7DQV',
                 ],
                 tx: {
-                  abi_version: 3,
-                  aexn_type: null,
-                  amount: 0,
-                  args: [],
-                  call_data: 'cb_KxFE1kQfP4oEp9E=',
-                  caller_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                  abiVersion: 3,
+                  amount: 0n,
+                  callData: 'cb_KxFE1kQfP4oEp9E=',
+                  callerId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
                   code: 'cb_+GhGA6Daq9LRBkSN10Qb9d5ZbvJWB+/tg8rj5OynWtj8AQ2R7cC4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBBwcBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTguMC4wAHQkH9o=',
-                  compiler_version: '8.0.0',
-                  contract_id: 'ct_2JgVFKjJYUyJDnpJPhspX8C6RS6rFS46r3C1sy15tW9dDmPX2E',
-                  deposit: 0,
-                  fee: 78500000000000,
+                  contractId: 'ct_2JgVFKjJYUyJDnpJPhspX8C6RS6rFS46r3C1sy15tW9dDmPX2E',
+                  deposit: 0n,
+                  fee: 78500000000000n,
                   gas: 76,
-                  gas_price: 1000000000,
-                  gas_used: 61,
-                  log: [],
+                  gasPrice: 1000000000n,
                   nonce: 1,
-                  owner_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
-                  return_type: 'ok',
-                  return_value: 'cb_Xfbg4g==',
-                  source_hash: '2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke0=',
+                  ownerId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
                   ttl: 5,
                   type: 'ContractCreateTx',
                   version: 1,
-                  vm_version: 8,
+                  vmVersion: 8,
+                  ...{
+                    aexn_type: null,
+                    args: [],
+                    compiler_version: '8.0.0',
+                    gas_used: 61,
+                    log: [],
+                    return_type: 'ok',
+                    return_value: 'cb_Xfbg4g==',
+                    source_hash: '2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke0=',
+                  },
                 },
               },
               type: 'ContractCreateTxEvent',
@@ -270,12 +296,12 @@ describe('Middleware API', () => {
                   'sg_WNvkq9RewEjZDrDLqXMUoyBd8pGzqAuyaDfG3bQAfGx4tF6smTLyYnFWmtY8SrJRnEHbriDUm836DSJSkMjiijLKBsSzo',
                 ],
                 tx: {
-                  amount: 1000000000000000000,
-                  fee: 16820000000000,
+                  amount: 1000000000000000000n,
+                  fee: 16820000000000n,
                   nonce: 1,
                   payload: 'ba_Xfbg4g==',
-                  recipient_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
-                  sender_id: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
+                  recipientId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                  senderId: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
                   ttl: 4,
                   type: 'SpendTx',
                   version: 1,
@@ -298,7 +324,7 @@ describe('Middleware API', () => {
 
     it('gets transactions', async () => {
       const res = await middleware.getTransactions({ limit: 15 });
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Transaction>(
         {
           data: [
             {
@@ -313,12 +339,12 @@ describe('Middleware API', () => {
                 'sg_WNvkq9RewEjZDrDLqXMUoyBd8pGzqAuyaDfG3bQAfGx4tF6smTLyYnFWmtY8SrJRnEHbriDUm836DSJSkMjiijLKBsSzo',
               ],
               tx: {
-                amount: 1000000000000000000,
-                fee: 16820000000000,
+                amount: 1000000000000000000n,
+                fee: 16820000000000n,
                 nonce: 1,
                 payload: 'ba_Xfbg4g==',
-                recipient_id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
-                sender_id: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
+                recipientId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
+                senderId: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
                 ttl: 4,
                 type: 'SpendTx',
                 version: 1,
@@ -340,13 +366,13 @@ describe('Middleware API', () => {
 
     it('gets transactions count', async () => {
       const res = await middleware.getTransactionsCount();
-      const expectedRes: typeof res = { body: 10 };
+      const expectedRes: typeof res = { body: 11 };
       expect(res).to.eql(expectedRes);
     });
 
     it('gets transfers', async () => {
       const res = await middleware.getTransfers();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Transfer>(
         {
           data: [
             {
@@ -354,7 +380,8 @@ describe('Middleware API', () => {
               amount: 570288700000000000000n,
               height: 7,
               kind: 'fee_spend_name',
-              refBlockHash: 'NameClaimTx',
+              // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/2079
+              refBlockHash: 'NameClaimTx' as Encoded.MicroBlockHash,
               refTxHash: 'th_C7LscPqF5Nf5QrgZDSVbY92v7rruefN1qHjrHVuk2bdNwZF1e',
               refTxType: 'mh_2MYrB5Qjb4NCYZMVmbqnazacY76gGzNgEjW2VnEKzovDTky8fD',
             },
@@ -373,7 +400,7 @@ describe('Middleware API', () => {
   describe('contracts', () => {
     it('gets contract calls', async () => {
       const res = await middleware.getContractCalls();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<ContractCall>(
         {
           data: [
             {
@@ -408,7 +435,7 @@ describe('Middleware API', () => {
 
     it('gets contract logs', async () => {
       const res = await middleware.getContractLogs();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<ContractLog>(
         {
           data: [
             {
@@ -445,18 +472,18 @@ describe('Middleware API', () => {
         contract: 'ct_2J7DrZAUV3gMFPt9DJi6uJBBZ3T4eKyKY7xtLot7puu3yP2kQp',
         blockHash: 'mh_BDHVCb4umyui7j68WoQTNXmUDvPk7bbq9aFTZkTysfjwp81fn',
         createTx: {
-          abi_version: 3,
-          amount: 100,
-          call_data: 'cb_KxFE1kQfP4oEp9E=',
+          abiVersion: 3,
+          amount: 100n,
+          callData: 'cb_KxFE1kQfP4oEp9E=',
           code: 'cb_+QEcRgOgzPAt3CM1MXJqVKUexArUzQqzhuZqPx4w8pc2S1dcOHXAuO+4wf5E1kQfADcANwAaDoI/AQM//mWl4A8CNwGHAjcBBzcCdwc3AAg9AAIERjYAAABiL1+fAYEFPg9NJAu8Y6cqlt/F0eAzEdVzQbFz6kWUaMkB2l2DOwABAz9GNgAAAEY2AgACYi4AnwGBpBcI7Bft3XUED2ptPhcjSwNWk6lXlyzJtTnEcJFFPGICAQM//pdbzNwANwFHADcADAOvggECASstdGVzdC1zdHJpbmdWAgMRZaXgDw8Cb4Imz2UNAFQBAz+oLwMRRNZEHxFpbml0EWWl4A8tQ2hhaW4uZXZlbnQRl1vM3BVzcGVuZIIvAIU4LjAuMAAyWaKG',
-          deposit: 0,
-          fee: 82160000000000,
+          deposit: 0n,
+          fee: 82160000000000n,
           gas: 76,
-          gas_price: 1000000000,
+          gasPrice: 1000000000n,
           nonce: 4,
-          owner_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+          ownerId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
           ttl: 11,
-          vm_version: 8,
+          vmVersion: 8,
         },
         aexnType: null,
         sourceTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
@@ -470,7 +497,7 @@ describe('Middleware API', () => {
   describe('names', () => {
     it('gets names', async () => {
       const res = await middleware.getNames();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Name>(
         {
           data: [
             {
@@ -479,11 +506,20 @@ describe('Middleware API', () => {
               activeFrom: 3,
               approximateActivationTime: new Date(1721740187500),
               approximateExpireTime: new Date(1754140007661),
+              claimsCount: 1,
               expireHeight: 180003,
-              pointers: {
-                account_pubkey: presetAccount1Address,
-                cmF3S2V5: 'ba_wP/uRGujhA==',
-              },
+              pointers: [
+                {
+                  encodedKey: 'ba_YWNjb3VudF9wdWJrZXn8jckR',
+                  id: presetAccount1Address,
+                  key: 'account_pubkey',
+                },
+                {
+                  encodedKey: 'ba_cmF3S2V56FoL5g==',
+                  id: 'ba_wP/uRGujhA==',
+                  key: 'rawKey',
+                },
+              ],
               auction: null,
               auctionTimeout: 0,
               ownership: {
@@ -518,7 +554,7 @@ describe('Middleware API', () => {
 
     it('gets name claims', async () => {
       const res = await middleware.getNameClaims('123456789012345678901234567801.chain');
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<NameClaim>(
         {
           data: [
             {
@@ -528,11 +564,11 @@ describe('Middleware API', () => {
               sourceTxHash: 'th_XEwyUgf8BoTdEmcDJcngx3GGCGFeb16XDRfPYHy5zQB4d5kk5',
               sourceTxType: 'NameClaimTx',
               tx: {
-                account_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
-                fee: 16860000000000,
+                accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                fee: 16860000000000n,
                 name: '123456789012345678901234567801.chain',
-                name_fee: 500000000000000,
-                name_salt: 0,
+                nameFee: 500000000000000n,
+                nameSalt: 0,
                 nonce: 1,
                 ttl: 8,
               },
@@ -550,7 +586,7 @@ describe('Middleware API', () => {
 
     it('gets name updates', async () => {
       const res = await middleware.getNameUpdates('123456789012345678901234567801.chain');
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<NameUpdate>(
         {
           data: [
             {
@@ -560,20 +596,20 @@ describe('Middleware API', () => {
               sourceTxHash: 'th_2U32kq8HH1qxS5rohqVGzC9mF9E3mdcj3pZC6o9kfjCB4t1p8h',
               sourceTxType: 'NameUpdateTx',
               tx: {
-                account_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
-                client_ttl: 3600,
-                fee: 18080000000000,
-                name_id: 'nm_2VSJFCVStB8ZdkLWcyd4adywYoyqYNzMt9Td924Jf8ESi94Nni',
-                name_ttl: 180000,
+                accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                clientTtl: 3600,
+                fee: 18080000000000n,
+                nameId: 'nm_2VSJFCVStB8ZdkLWcyd4adywYoyqYNzMt9Td924Jf8ESi94Nni',
+                nameTtl: 180000,
                 nonce: 2,
                 pointers: [
                   {
-                    encoded_key: 'ba_YWNjb3VudF9wdWJrZXn8jckR',
+                    encodedKey: 'ba_YWNjb3VudF9wdWJrZXn8jckR',
                     id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
                     key: 'account_pubkey',
                   },
                   {
-                    encoded_key: 'ba_cmF3S2V56FoL5g==',
+                    encodedKey: 'ba_cmF3S2V56FoL5g==',
                     id: 'ba_wP/uRGujhA==',
                     key: 'rawKey',
                   },
@@ -594,7 +630,7 @@ describe('Middleware API', () => {
 
     it('gets account pointees pointers', async () => {
       const res = await middleware.getAccountPointees(presetAccount1Address);
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Pointee>(
         {
           data: [
             {
@@ -607,20 +643,20 @@ describe('Middleware API', () => {
               sourceTxHash: 'th_2U32kq8HH1qxS5rohqVGzC9mF9E3mdcj3pZC6o9kfjCB4t1p8h',
               sourceTxType: 'NameUpdateTx',
               tx: {
-                account_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
-                client_ttl: 3600,
-                fee: 18080000000000,
-                name_id: 'nm_2VSJFCVStB8ZdkLWcyd4adywYoyqYNzMt9Td924Jf8ESi94Nni',
-                name_ttl: 180000,
+                accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                clientTtl: 3600,
+                fee: 18080000000000n,
+                nameId: 'nm_2VSJFCVStB8ZdkLWcyd4adywYoyqYNzMt9Td924Jf8ESi94Nni',
+                nameTtl: 180000,
                 nonce: 2,
                 pointers: [
                   {
-                    encoded_key: 'ba_YWNjb3VudF9wdWJrZXn8jckR',
+                    encodedKey: 'ba_YWNjb3VudF9wdWJrZXn8jckR',
                     id: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
                     key: 'account_pubkey',
                   },
                   {
-                    encoded_key: 'ba_cmF3S2V56FoL5g==',
+                    encodedKey: 'ba_cmF3S2V56FoL5g==',
                     id: 'ba_wP/uRGujhA==',
                     key: 'rawKey',
                   },
@@ -640,13 +676,14 @@ describe('Middleware API', () => {
 
     it('gets auctions', async () => {
       const res = await middleware.getNamesAuctions();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Auction>(
         {
           data: [
             {
               activationTime: new Date(1721975996873),
               approximateExpireTime: new Date(1722407457100),
               auctionEnd: 2407,
+              claimsCount: 1,
               lastBid: {
                 blockHash: 'mh_BoBikwwf68giAEFKNYEh93uNkGu9enzx8cjn2vX7CRTnY5g6T',
                 blockHeight: 7,
@@ -659,12 +696,12 @@ describe('Middleware API', () => {
                   'sg_8iagZbC7qnDeRDNkm1y1LyQCUqgobMKNH1G6Pv7QatFfPyo2oPzy5sUQdojZSY9BK7poupGqfQz2Eo8VnVkCyaaBRN8ks',
                 ],
                 tx: {
-                  account_id: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
-                  fee: 16320000000000,
+                  accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+                  fee: 16320000000000n,
                   name: '1.chain',
-                  name_fee: 570288700000000000000,
-                  name_id: 'nm_TcQ86NkLJanH2dz5Rv1Z8s1VQjw6fDQAXW4oYyGQpHjez3j3p',
-                  name_salt: 0,
+                  nameFee: 570288700000000000000n,
+                  nameId: 'nm_TcQ86NkLJanH2dz5Rv1Z8s1VQjw6fDQAXW4oYyGQpHjez3j3p',
+                  nameSalt: 0,
                   nonce: 3,
                   ttl: 182407,
                   type: 'NameClaimTx',
@@ -693,7 +730,7 @@ describe('Middleware API', () => {
   describe('oracles', () => {
     it('gets oracles', async () => {
       const res = await middleware.getOracles();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Oracle>(
         {
           data: [
             {
@@ -711,7 +748,6 @@ describe('Middleware API', () => {
                 blockHash: 'mh_2g1RkdVUBXLbxxjR7P2zi1429Navw4HKuzvtC3TezFCjQjwmqE',
                 blockHeight: 10,
                 hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
-                txHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
                 microIndex: 0,
                 microTime: new Date(1721976497295),
                 signatures: [
@@ -726,6 +762,7 @@ describe('Middleware API', () => {
                     value: 500,
                   },
                   ttl: 13,
+                  txHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
                   type: 'OracleRegisterTx',
                   version: 1,
                   abiVersion: 0,
@@ -759,18 +796,47 @@ describe('Middleware API', () => {
         activeFrom: 10,
         approximateExpireTime: new Date(1722066317304),
         expireHeight: 510,
-        ...{ extends: [] }, // TODO: rewrite after solving https://github.com/aeternity/ae_mdw/issues/1872
         format: {
           query: 'string',
           response: 'string',
         },
         oracle: 'ok_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
         queryFee: 0n,
-        register: {} as any, // TODO: fix after solving https://github.com/aeternity/ae_mdw/issues/1872
+        register: {
+          blockHash: 'mh_25G1JPh8yUNypc8Mbv1H5CSRwLRZ8GMdpYdgcANFj9YBsQNcZ2',
+          blockHeight: 10,
+          encodedTx:
+            'tx_+IsLAfhCuECk8CD7+rO/nCOX4fF6BylVDytJmDquVV56cv7/Lvsg23evMjX45PwdRDn2x/HGBuduMmUQaOESI+GoNarbsNEIuEP4QRYBoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQaGc3RyaW5nhnN0cmluZwAAggH0hg7x34XgAA0A0ekNLA==',
+          hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+          microIndex: 0,
+          microTime: new Date(1722066317304),
+          signatures: [
+            'sg_NaZNFJArMypD4wp4MbJ2cMvG6aWk7PSynP9qVsti1CabtMKSUbPwRUz55Yer7XiNURN6PcycF7NwBANaeJPMCpwKoWM9b',
+          ],
+          tx: {
+            abiVersion: 0,
+            accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+            fee: 16432000000000n,
+            nonce: 6,
+            oracleId: 'ok_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
+            oracleTtl: {
+              type: 'delta',
+              value: 500,
+            },
+            queryFee: 0n,
+            queryFormat: 'string',
+            responseFormat: 'string',
+            ttl: 13,
+            txHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+            type: 'OracleRegisterTx',
+            version: 1,
+          },
+        },
         registerTime: new Date(1721976497295),
         registerTxHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
       };
       copyFields(expectedRes, res, ['registerTime', 'approximateExpireTime']);
+      copyFields(expectedRes.register, res.register, ['blockHash', 'microTime']);
       expect(res).to.eql(expectedRes);
     });
   });
@@ -778,7 +844,7 @@ describe('Middleware API', () => {
   describe('channels', () => {
     it('gets channels', async () => {
       const res = await middleware.getChannels();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Channel>(
         {
           data: [
             {
@@ -853,7 +919,7 @@ describe('Middleware API', () => {
 
     it('gets delta', async () => {
       const res = await middleware.getDeltaStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<DeltaStat>(
         {
           data: [
             {
@@ -875,7 +941,7 @@ describe('Middleware API', () => {
               lastTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
             },
           ],
-          next: '/v3/deltastats?cursor=2&limit=10',
+          next: '/v3/stats/delta?cursor=2&limit=10',
           prev: null,
         },
         middleware,
@@ -886,14 +952,14 @@ describe('Middleware API', () => {
 
     it('gets total', async () => {
       const res = await middleware.getTotalStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<TotalStat>(
         {
           data: [
             {
               height: 12,
               contracts: 2,
               lockedInAuctions: 0n,
-              burnedInAuctions: 6n,
+              burnedInAuctions: 1000000000000000n,
               lockedInChannels: 1000000000000000n,
               activeAuctions: 1,
               activeNames: 2,
@@ -904,10 +970,10 @@ describe('Middleware API', () => {
               lastTxHash: 'th_26quLwJJ5CezBuXKnm2duH7bgmBGBTkqjL1m9ybroZ9Kndp8h2',
               sumBlockReward: 0n,
               sumDevReward: 0n,
-              totalTokenSupply: 10000000010000000000000000000000n,
+              totalTokenSupply: 0n,
             },
           ],
-          next: '/v3/totalstats?cursor=2&limit=10',
+          next: '/v3/stats/total?cursor=2&limit=10',
           prev: null,
         },
         middleware,
@@ -918,7 +984,7 @@ describe('Middleware API', () => {
 
     it('gets miner', async () => {
       const res = await middleware.getMinerStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Miner>(
         { data: [], next: null, prev: null },
         middleware,
       );
@@ -927,7 +993,7 @@ describe('Middleware API', () => {
 
     it('gets blocks', async () => {
       const res = await middleware.getBlocksStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Stat>(
         {
           data: [{ count: 24, endDate, startDate }],
           next: null,
@@ -940,7 +1006,7 @@ describe('Middleware API', () => {
 
     it('gets transactions', async () => {
       const res = await middleware.getTransactionsStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Stat>(
         {
           data: [{ count: 11, endDate, startDate }],
           next: null,
@@ -953,7 +1019,7 @@ describe('Middleware API', () => {
 
     it('gets names', async () => {
       const res = await middleware.getNamesStats();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Stat>(
         {
           data: [{ count: 0, endDate, startDate }],
           next: null,
@@ -991,7 +1057,7 @@ describe('Middleware API', () => {
       const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
         `/v3/accounts/${presetAccount1Address}/activities?limit=1`,
       );
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Activity>(
         {
           data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(0, 1),
           next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
@@ -1006,11 +1072,11 @@ describe('Middleware API', () => {
       const res = await middleware.requestByPath<MiddlewarePage<Activity>>(
         `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1`,
       );
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Activity>(
         {
           data: (await middleware.getAccountActivities(presetAccount1Address)).data.slice(1, 2),
           next: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-0&limit=1`,
-          prev: `/v3/accounts/${presetAccount1Address}/activities?cursor=3-3-1&limit=1&rev=1`,
+          prev: `/v3/accounts/${presetAccount1Address}/activities?cursor=11-11-0&limit=1&rev=1`,
         },
         middleware,
       );
@@ -1022,7 +1088,7 @@ describe('Middleware API', () => {
     it('nevigates to the next page', async () => {
       const first = await middleware.getTransactions({ limit: 1 });
       const res = await first.next();
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Transaction>(
         {
           data: (await middleware.getTransactions()).data.slice(1, 2),
           next: '/v3/transactions?cursor=8&limit=1',
@@ -1039,7 +1105,7 @@ describe('Middleware API', () => {
       const res = await second.prev();
       expect(res).to.eql(first);
       expect(res.prevPath).to.eql(null);
-      const expectedRes: typeof res = new MiddlewarePage(
+      const expectedRes: typeof res = new MiddlewarePage<Transaction>(
         {
           data: (await middleware.getTransactions()).data.slice(0, 1),
           next: '/v3/transactions?cursor=9&limit=1',

@@ -2,8 +2,8 @@
 import type Middleware from '../Middleware.js';
 import { BaseError } from './errors.js';
 
-export interface MiddlewareRawPage {
-  data: unknown[];
+interface MiddlewareRawPage<T = unknown> {
+  data: T[];
   next: string | null;
   prev: string | null;
 }
@@ -40,8 +40,8 @@ export class MiddlewarePage<Item> {
 
   readonly #middleware: Middleware;
 
-  constructor(rawPage: MiddlewareRawPage, middleware: Middleware) {
-    this.data = rawPage.data as Item[];
+  constructor(rawPage: MiddlewareRawPage<Item>, middleware: Middleware) {
+    this.data = rawPage.data;
     this.nextPath = rawPage.next;
     this.prevPath = rawPage.prev;
     this.#middleware = middleware;
