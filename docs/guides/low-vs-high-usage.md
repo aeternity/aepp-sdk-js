@@ -2,109 +2,37 @@
 
 ## Interactions
 
-> "There are two approaches, purist and high-level."
+`AeSdk` is a general, high-level interface that wraps multiple low-level interfaces. A general interface is preferred for its simplicity and resilience to breaking changes.
 
-_Alexander Kahl._
+But there is also low-level interfaces. It's excellent for additional control, and as a teaching tool to understand the underlying operations. Most real-world requirements involves a series of low-level operations, so the SDK provides abstractions for these.
 
-The purist uses the functions generated out of the Swagger
-file. After creating the SDK instance `aeSdk` with the AeSdk class it exposes a mapping of all `operationId`s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
-based on its hash you would invoke `aeSdk.api.getTransactionByHash('th_...')`.
+### Node API
 
-In this way the SDK is simply a mapping of the raw API calls into
-JavaScript. It's excellent for low-level control, and as a teaching tool to
-understand the node's operations. Most real-world requirements involves a series
-of chain operations, so the SDK provides abstractions for these.
+The aeternity node exposes [a REST API]. This API is described in the [OpenAPI document]. SDK uses this document to generate a TypeScript client. The result client (implemented in [`Node` class]) a basically a mapping of all node endpoints as functions.
 
-## (**Recommended**) High-level SDK usage
+[a REST API]: https://api-docs.aeternity.io/
+[OpenAPI document]: https://mainnet.aeternity.io/api?oas3
+[`Node` class]: https://docs.aeternity.com/aepp-sdk-js/v14.0.0/api/classes/Node.html
 
-Example spend function, using æternity's SDK abstraction.
+So to get a transaction based on its hash you would invoke `node.getTransactionByHash('th_fWEsg152BNYcrqA9jDh9VVpacYojCUb1yu45zUnqhmQ3dAAC6')`. In this way the SDK is simply a mapping of the raw API calls into JavaScript.
 
-```js
-import { MemoryAccount, Node, AeSdk } from '@aeternity/aepp-sdk';
+### Transaction builder
 
-async function init() {
-  const node = new Node('https://testnet.aeternity.io'); // ideally host your own node!
+Any blockchain state change requires signing a transaction. Transaction should be built according to the [protocol]. SDK implements it in [`buildTx`], [`buildTxAsync`], and [`unpackTx`]. [`buildTxAsync`] requires fewer arguments than [`buildTx`], but it expects the node instance provided in arguments.
 
-  const aeSdk = new AeSdk({
-    nodes: [{ name: 'testnet', instance: node }],
-    accounts: [new MemoryAccount('<SECRET_KEY_HERE>')],
-  });
+[protocol]: https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts
+[`buildTx`]: https://docs.aeternity.com/aepp-sdk-js/v14.0.0/api/functions/buildTx.html
+[`buildTxAsync`]: https://docs.aeternity.com/aepp-sdk-js/v14.0.0/api/functions/buildTxAsync.html
+[`unpackTx`]: https://docs.aeternity.com/aepp-sdk-js/v14.0.0/api/functions/unpackTx.html
 
-  // log transaction info
-  console.log(await aeSdk.spend(100, 'ak_...'));
-}
-```
+## High-level SDK usage (preferable)
 
-## Low-level SDK usage (use [API](https://docs.aeternity.com/protocol/node/api) endpoints directly)
+Example spend call, using æternity's SDK abstraction:
 
-Example spend function, using the SDK, talking directly to the [**API**](https://docs.aeternity.com/protocol/node/api):
+https://github.com/aeternity/aepp-sdk-js/blob/cb80689a4aa10c3f3f0f57494c825533bbe6d01e/examples/node/_api-high-level.js#L1-L18
 
-```js
-import { MemoryAccount, Node, AeSdk, Tag } from '@aeternity/aepp-sdk';
+## Low-level SDK usage
 
-async function spend(amount, recipient) {
-  const node = new Node('https://testnet.aeternity.io'); // ideally host your own node!
-  const aeSdk = new AeSdk({
-    nodes: [{ name: 'testnet', instance: node }],
-    accounts: [new MemoryAccount('<SECRET_KEY_HERE>')],
-  });
+The same spend execution, but using low-level SDK functions:
 
-  // builds an unsigned SpendTx using integrated transaction builder
-  const spendTx = await aeSdk.buildTx(Tag.SpendTx, {
-    senderId: aeSdk.address,
-    recipientId: recipient,
-    amount, // aettos
-    payload: 'using low-level api is funny',
-  });
-
-  // sign the encoded transaction
-  const signedTx = await aeSdk.signTransaction(spendTx);
-
-  // broadcast the signed tx to the node
-  console.log(await aeSdk.api.postTransaction({ tx: signedTx }));
-}
-```
-
-Following functions are available with the low-level API right now:
-
-```js
-console.log(aeSdk.api);
-/*
-{
-  getTopHeader: [AsyncFunction (anonymous)],
-  getCurrentKeyBlock: [AsyncFunction (anonymous)],
-  getCurrentKeyBlockHash: [AsyncFunction (anonymous)],
-  getCurrentKeyBlockHeight: [AsyncFunction (anonymous)],
-  getPendingKeyBlock: [AsyncFunction (anonymous)],
-  getKeyBlockByHash: [AsyncFunction (anonymous)],
-  getKeyBlockByHeight: [AsyncFunction (anonymous)],
-  getMicroBlockHeaderByHash: [AsyncFunction (anonymous)],
-  getMicroBlockTransactionsByHash: [AsyncFunction (anonymous)],
-  getMicroBlockTransactionByHashAndIndex: [AsyncFunction (anonymous)],
-  getMicroBlockTransactionsCountByHash: [AsyncFunction (anonymous)],
-  getCurrentGeneration: [AsyncFunction (anonymous)],
-  getGenerationByHash: [AsyncFunction (anonymous)],
-  getGenerationByHeight: [AsyncFunction (anonymous)],
-  getAccountByPubkey: [AsyncFunction (anonymous)],
-  getAccountByPubkeyAndHeight: [AsyncFunction (anonymous)],
-  getAccountByPubkeyAndHash: [AsyncFunction (anonymous)],
-  getPendingAccountTransactionsByPubkey: [AsyncFunction (anonymous)],
-  getAccountNextNonce: [AsyncFunction (anonymous)],
-  protectedDryRunTxs: [AsyncFunction (anonymous)],
-  getTransactionByHash: [AsyncFunction (anonymous)],
-  getTransactionInfoByHash: [AsyncFunction (anonymous)],
-  postTransaction: [AsyncFunction (anonymous)],
-  getContract: [AsyncFunction (anonymous)],
-  getContractCode: [AsyncFunction (anonymous)],
-  getContractPoI: [AsyncFunction (anonymous)],
-  getOracleByPubkey: [AsyncFunction (anonymous)],
-  getOracleQueriesByPubkey: [AsyncFunction (anonymous)],
-  getOracleQueryByPubkeyAndQueryId: [AsyncFunction (anonymous)],
-  getNameEntryByName: [AsyncFunction (anonymous)],
-  getChannelByPubkey: [AsyncFunction (anonymous)],
-  getPeerPubkey: [AsyncFunction (anonymous)],
-  getStatus: [AsyncFunction (anonymous)],
-  getChainEnds: [AsyncFunction (anonymous)]
-}
-*/
-```
+https://github.com/aeternity/aepp-sdk-js/blob/cb80689a4aa10c3f3f0f57494c825533bbe6d01e/examples/node/_api-low-level.js#L1-L19
