@@ -9,10 +9,6 @@
       
       
       
-        <link rel="prev" href="../dry-run-using-debug-endpoint/">
-      
-      
-        <link rel="next" href="../../browser/tools/">
       
       
       <link rel="icon" href="../../../images/favicon.png">
@@ -20,7 +16,7 @@
     
     
       
-        <title>Register and query Oracle - æternity JavaScript SDK</title>
+        <title>api low level - æternity JavaScript SDK</title>
       
     
     
@@ -71,11 +67,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#register-and-query-oracle" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -123,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Register and query Oracle
+               api low level
             
           </span>
         </div>
@@ -730,19 +721,17 @@
       
   
   
-    
   
   
-  
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -756,7 +745,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Examples & Tutorials
@@ -767,19 +756,17 @@
                 
   
   
-    
   
   
-  
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
         
           
           <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
@@ -793,7 +780,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_1">
             <span class="md-nav__icon md-icon"></span>
             NodeJS
@@ -807,11 +794,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../transfer-ae/" class="md-nav__link">
+      <a href="../transfer-ae.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Transfer AE
+    None
   </span>
   
 
@@ -828,11 +815,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../contract-interaction/" class="md-nav__link">
+      <a href="../contract-interaction.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Compile &amp; Deploy a Sophia Smart Contract
+    None
   </span>
   
 
@@ -884,11 +871,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../paying-for-contract-call-tx/" class="md-nav__link">
+      <a href="../paying-for-contract-call-tx.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    InnerTx: ContractCallTx
+    None
   </span>
   
 
@@ -905,11 +892,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../paying-for-spend-tx/" class="md-nav__link">
+      <a href="../paying-for-spend-tx.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    InnerTx: SpendTx
+    None
   </span>
   
 
@@ -934,11 +921,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../account-generalized/" class="md-nav__link">
+      <a href="../account-generalized.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Create and use Generalized Accounts
+    None
   </span>
   
 
@@ -955,11 +942,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../dry-run-using-debug-endpoint/" class="md-nav__link">
+      <a href="../dry-run-using-debug-endpoint.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Dry-run using debug endpoint
+    None
   </span>
   
 
@@ -973,28 +960,18 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../oracle.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Register and query Oracle
+    None
   </span>
   
 
       </a>
-      
     </li>
   
 
@@ -1513,8 +1490,6 @@
   
   
   
-    
-  
   
 </nav>
                   </div>
@@ -1529,47 +1504,27 @@
                   
 
 
-<h1 id="register-and-query-oracle">Register and query Oracle</h1>
-<p>Here we will register and query an oracle returning <a href="https://en.wikipedia.org/wiki/Factorial">factorial</a> of a number.
-Read more about oracles in the <a href="../../../guides/oracles/">guide</a> section.</p>
-<p><div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Oracle</span><span class="p">,</span><span class="w"> </span><span class="nx">OracleClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
-</code></pre></div>
-Let's prepare sdk and account for Oracle
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">oracleAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">.</span><span class="nx">generate</span><span class="p">();</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span><span class="p">)],</span>
+  <h1> api low level</h1>
+
+<p><div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">buildTxAsync</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="p">,</span><span class="w"> </span><span class="nx">encode</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">onNode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// host your node for better decentralization</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span><span class="p">);</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">spendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">buildTxAsync</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="nx">Tag</span><span class="p">.</span><span class="nx">SpendTx</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">senderId</span><span class="o">:</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">recipientId</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="c1">// aettos</span>
+<span class="w">  </span><span class="nx">payload</span><span class="o">:</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="s1">&#39;spend tx payload&#39;</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Bytearray</span><span class="p">),</span>
+<span class="w">  </span><span class="nx">onNode</span><span class="p">,</span>
 <span class="p">});</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">2e14</span><span class="p">,</span><span class="w"> </span><span class="nx">oracleAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Spend done&#39;</span><span class="p">);</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">networkId</span><span class="o">:</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">onNode</span><span class="p">.</span><span class="nx">getNetworkId</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-Creating and registering Oracle
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Oracle</span><span class="p">(</span><span class="nx">oracleAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">());</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s1">&#39;factorial argument&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;factorial value&#39;</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Oracle registered&#39;</span><span class="p">);</span>
-</code></pre></div>
-Start listening for queries and handle them
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">oracle</span><span class="p">.</span><span class="nx">handleQueries</span><span class="p">((</span><span class="nx">query</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">arg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">BigInt</span><span class="p">(</span><span class="nx">query</span><span class="p">.</span><span class="nx">decodedQuery</span><span class="p">);</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">arg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="s2">&quot;argument can&#39;t be negative&quot;</span><span class="p">;</span>
-<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1n</span><span class="p">;</span>
-<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2n</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="nx">arg</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">res</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="nx">i</span><span class="p">;</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
-<span class="p">});</span>
-</code></pre></div>
-Creating an Oracle client, making some queries.
-Assume it is done in a separate script/process/computer.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oracleClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">OracleClient</span><span class="p">(</span><span class="nx">oracle</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">());</span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">el</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">20</span><span class="p">,</span><span class="w"> </span><span class="mf">70</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">5</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">oracleClient</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">el</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`query </span><span class="si">${</span><span class="nx">el</span><span class="si">}</span><span class="sb">, response </span><span class="si">${</span><span class="nx">response</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div>
-We don't need to handle queries anymore, so we can stop the listener.
-<div class="highlight"><pre><span></span><code><span class="nx">stop</span><span class="p">();</span>
+broadcast the signed tx to the node
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">txHash</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">onNode</span><span class="p">.</span><span class="nx">postTransaction</span><span class="p">({</span><span class="w"> </span><span class="nx">tx</span><span class="o">:</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">txHash</span><span class="p">);</span>
 </code></pre></div></p>
 
 

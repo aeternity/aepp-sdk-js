@@ -570,21 +570,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Interactions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node API
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transaction-builder" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transaction builder
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#recommended-high-level-sdk-usage" class="md-nav__link">
+  <a href="#high-level-sdk-usage-preferable" class="md-nav__link">
     <span class="md-ellipsis">
-      (Recommended) High-level SDK usage
+      High-level SDK usage (preferable)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#low-level-sdk-usage-use-api-endpoints-directly" class="md-nav__link">
+  <a href="#low-level-sdk-usage" class="md-nav__link">
     <span class="md-ellipsis">
-      Low-level SDK usage (use API endpoints directly)
+      Low-level SDK usage
     </span>
   </a>
   
@@ -872,11 +896,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/transfer-ae/" class="md-nav__link">
+      <a href="../../examples/node/transfer-ae.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Transfer AE
+    None
   </span>
   
 
@@ -893,11 +917,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/contract-interaction/" class="md-nav__link">
+      <a href="../../examples/node/contract-interaction.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Compile &amp; Deploy a Sophia Smart Contract
+    None
   </span>
   
 
@@ -949,11 +973,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/paying-for-contract-call-tx/" class="md-nav__link">
+      <a href="../../examples/node/paying-for-contract-call-tx.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    InnerTx: ContractCallTx
+    None
   </span>
   
 
@@ -970,11 +994,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/paying-for-spend-tx/" class="md-nav__link">
+      <a href="../../examples/node/paying-for-spend-tx.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    InnerTx: SpendTx
+    None
   </span>
   
 
@@ -999,11 +1023,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/account-generalized/" class="md-nav__link">
+      <a href="../../examples/node/account-generalized.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Create and use Generalized Accounts
+    None
   </span>
   
 
@@ -1020,11 +1044,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/dry-run-using-debug-endpoint/" class="md-nav__link">
+      <a href="../../examples/node/dry-run-using-debug-endpoint.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Dry-run using debug endpoint
+    None
   </span>
   
 
@@ -1041,11 +1065,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/node/oracle/" class="md-nav__link">
+      <a href="../../examples/node/oracle.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Register and query Oracle
+    None
   </span>
   
 
@@ -1584,21 +1608,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Interactions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node API
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transaction-builder" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transaction builder
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#recommended-high-level-sdk-usage" class="md-nav__link">
+  <a href="#high-level-sdk-usage-preferable" class="md-nav__link">
     <span class="md-ellipsis">
-      (Recommended) High-level SDK usage
+      High-level SDK usage (preferable)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#low-level-sdk-usage-use-api-endpoints-directly" class="md-nav__link">
+  <a href="#low-level-sdk-usage" class="md-nav__link">
     <span class="md-ellipsis">
-      Low-level SDK usage (use API endpoints directly)
+      Low-level SDK usage
     </span>
   </a>
   
@@ -1621,100 +1669,58 @@
 
 <h1 id="low-vs-high-level-api">Low vs High level API</h1>
 <h2 id="interactions">Interactions</h2>
-<blockquote>
-<p>"There are two approaches, purist and high-level."</p>
-</blockquote>
-<p><em>Alexander Kahl.</em></p>
-<p>The purist uses the functions generated out of the Swagger
-file. After creating the SDK instance <code>aeSdk</code> with the AeSdk class it exposes a mapping of all <code>operationId</code>s as functions, converted to camelCase (from PascalCase). So e.g. in order to get a transaction
-based on its hash you would invoke <code>aeSdk.api.getTransactionByHash('th_...')</code>.</p>
-<p>In this way the SDK is simply a mapping of the raw API calls into
-JavaScript. It's excellent for low-level control, and as a teaching tool to
-understand the node's operations. Most real-world requirements involves a series
-of chain operations, so the SDK provides abstractions for these.</p>
-<h2 id="recommended-high-level-sdk-usage">(<strong>Recommended</strong>) High-level SDK usage</h2>
-<p>Example spend function, using æternity's SDK abstraction.</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<p><code>AeSdk</code> is a general, high-level interface that wraps multiple low-level interfaces. A general interface is preferred for its simplicity and resilience to breaking changes.</p>
+<p>But there is also low-level interfaces. It's excellent for additional control, and as a teaching tool to understand the underlying operations. Most real-world requirements involves a series of low-level operations, so the SDK provides abstractions for these.</p>
+<h3 id="node-api">Node API</h3>
+<p>The aeternity node exposes <a href="https://api-docs.aeternity.io/">a REST API</a>. This API is described in the <a href="https://mainnet.aeternity.io/api?oas3">OpenAPI document</a>. SDK uses this document to generate a TypeScript client. The result client (implemented in [<code>Node</code> class]) a basically a mapping of all node endpoints as functions.</p>
+<p>So to get a transaction based on its hash you would invoke <code>node.getTransactionByHash('th_fWEsg152BNYcrqA9jDh9VVpacYojCUb1yu45zUnqhmQ3dAAC6')</code>. In this way the SDK is simply a mapping of the raw API calls into JavaScript.</p>
+<h3 id="transaction-builder">Transaction builder</h3>
+<p>Any blockchain state change requires signing a transaction. Transaction should be built according to the <a href="https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts">protocol</a>. SDK implements it in [<code>buildTx</code>], [<code>buildTxAsync</code>], and [<code>unpackTx</code>]. [<code>buildTxAsync</code>] requires fewer arguments than [<code>buildTx</code>], but it expects the node instance provided in arguments.</p>
+<h2 id="high-level-sdk-usage-preferable">High-level SDK usage (preferable)</h2>
+<p>Example spend call, using æternity's SDK abstraction:</p>
+<p><div class="highlight"><span class="filename">examples/node/_api-high-level.js</span><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">encode</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
-<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">init</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// ideally host your own node!</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1">// host your node for better decentralization</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span><span class="p">)],</span>
+<span class="p">});</span>
 
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
-<span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;&lt;SECRET_KEY_HERE&gt;&#39;</span><span class="p">)],</span>
-<span class="w">  </span><span class="p">});</span>
-
-<span class="w">  </span><span class="c1">// log transaction info</span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="p">));</span>
-<span class="p">}</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">transactionInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span>
+<span class="w">  </span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="c1">// aettos</span>
+<span class="w">  </span><span class="s1">&#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">payload</span><span class="o">:</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="s1">&#39;spend tx payload&#39;</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Bytearray</span><span class="p">)</span><span class="w"> </span><span class="p">},</span>
+<span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">transactionInfo</span><span class="p">);</span>
 </code></pre></div>
-<h2 id="low-level-sdk-usage-use-api-endpoints-directly">Low-level SDK usage (use <a href="https://docs.aeternity.com/protocol/node/api">API</a> endpoints directly)</h2>
-<p>Example spend function, using the SDK, talking directly to the <a href="https://docs.aeternity.com/protocol/node/api"><strong>API</strong></a>:</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/cb80689a4aa10c3f3f0f57494c825533bbe6d01e/examples/node/_api-high-level.js#L1-L18">GitHub</a></p>
+<h2 id="low-level-sdk-usage">Low-level SDK usage</h2>
+<p>The same spend execution, but using low-level SDK functions:</p>
+<p><div class="highlight"><span class="filename">examples/node/_api-low-level.js</span><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">buildTxAsync</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="p">,</span><span class="w"> </span><span class="nx">encode</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
-<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">spend</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="nx">recipient</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// ideally host your own node!</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
-<span class="w">    </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">    </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;&lt;SECRET_KEY_HERE&gt;&#39;</span><span class="p">)],</span>
-<span class="w">  </span><span class="p">});</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">onNode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// host your node for better decentralization</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="p">(</span><span class="s1">&#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span><span class="p">);</span>
 
-<span class="w">  </span><span class="c1">// builds an unsigned SpendTx using integrated transaction builder</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">spendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">buildTx</span><span class="p">(</span><span class="nx">Tag</span><span class="p">.</span><span class="nx">SpendTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">senderId</span><span class="o">:</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
-<span class="w">    </span><span class="nx">recipientId</span><span class="o">:</span><span class="w"> </span><span class="nx">recipient</span><span class="p">,</span>
-<span class="w">    </span><span class="nx">amount</span><span class="p">,</span><span class="w"> </span><span class="c1">// aettos</span>
-<span class="w">    </span><span class="nx">payload</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;using low-level api is funny&#39;</span><span class="p">,</span>
-<span class="w">  </span><span class="p">});</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">spendTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">buildTxAsync</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="nx">Tag</span><span class="p">.</span><span class="nx">SpendTx</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">senderId</span><span class="o">:</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">recipientId</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="c1">// aettos</span>
+<span class="w">  </span><span class="nx">payload</span><span class="o">:</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="s1">&#39;spend tx payload&#39;</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Bytearray</span><span class="p">),</span>
+<span class="w">  </span><span class="nx">onNode</span><span class="p">,</span>
+<span class="p">});</span>
 
-<span class="w">  </span><span class="c1">// sign the encoded transaction</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTx</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">spendTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">networkId</span><span class="o">:</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">onNode</span><span class="p">.</span><span class="nx">getNetworkId</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
 
-<span class="w">  </span><span class="c1">// broadcast the signed tx to the node</span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">postTransaction</span><span class="p">({</span><span class="w"> </span><span class="nx">tx</span><span class="o">:</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="p">}));</span>
-<span class="p">}</span>
+<span class="c1">// broadcast the signed tx to the node</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">txHash</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">onNode</span><span class="p">.</span><span class="nx">postTransaction</span><span class="p">({</span><span class="w"> </span><span class="nx">tx</span><span class="o">:</span><span class="w"> </span><span class="nx">signedTx</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">txHash</span><span class="p">);</span>
 </code></pre></div>
-<p>Following functions are available with the low-level API right now:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">api</span><span class="p">);</span>
-<span class="cm">/*</span>
-<span class="cm">{</span>
-<span class="cm">  getTopHeader: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getCurrentKeyBlock: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getCurrentKeyBlockHash: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getCurrentKeyBlockHeight: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getPendingKeyBlock: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getKeyBlockByHash: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getKeyBlockByHeight: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getMicroBlockHeaderByHash: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getMicroBlockTransactionsByHash: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getMicroBlockTransactionByHashAndIndex: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getMicroBlockTransactionsCountByHash: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getCurrentGeneration: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getGenerationByHash: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getGenerationByHeight: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getAccountByPubkey: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getAccountByPubkeyAndHeight: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getAccountByPubkeyAndHash: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getPendingAccountTransactionsByPubkey: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getAccountNextNonce: [AsyncFunction (anonymous)],</span>
-<span class="cm">  protectedDryRunTxs: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getTransactionByHash: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getTransactionInfoByHash: [AsyncFunction (anonymous)],</span>
-<span class="cm">  postTransaction: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getContract: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getContractCode: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getContractPoI: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getOracleByPubkey: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getOracleQueriesByPubkey: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getOracleQueryByPubkeyAndQueryId: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getNameEntryByName: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getChannelByPubkey: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getPeerPubkey: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getStatus: [AsyncFunction (anonymous)],</span>
-<span class="cm">  getChainEnds: [AsyncFunction (anonymous)]</span>
-<span class="cm">}</span>
-<span class="cm">*/</span>
-</code></pre></div>
+View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/cb80689a4aa10c3f3f0f57494c825533bbe6d01e/examples/node/_api-low-level.js#L1-L19">GitHub</a></p>
 
 
 
