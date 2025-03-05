@@ -11,6 +11,7 @@ import AccountMetamask, { invokeSnap, snapId } from './Metamask.js';
 
 const snapMinVersion = '0.0.9';
 const snapMaxVersion = '0.1.0';
+const metamaskVersionPrefix = 'MetaMask/v';
 
 interface SnapDetails {
   blocked: boolean;
@@ -25,42 +26,75 @@ interface SnapDetails {
  * @see {@link https://www.npmjs.com/package/@aeternity-snap/plugin | Aeternity snap}
  */
 export default class AccountMetamaskFactory extends AccountBaseFactory {
-  readonly provider: BaseProvider;
+  // TODO: remove after removing `provider`
+  #provider: BaseProvider | undefined;
+
+  /**
+   * @deprecated this class is not intended to provide raw access to the provider
+   */
+  get provider(): BaseProvider {
+    if (this.#provider == null) throw new UnsupportedPlatformError('Metamask is not detected yet');
+    return this.#provider;
+  }
+
+  async #getMetamaskAsInjected(): Promise<BaseProvider | undefined> {
+    if (!('ethereum' in window) || window.ethereum == null) return;
+    const provider = window.ethereum as BaseProvider;
+    const version = await provider.request<string>({ method: 'web3_clientVersion' });
+    if (version == null) throw new InternalError("Can't get Ethereum Provider version");
+    if (!version.startsWith(metamaskVersionPrefix)) return;
+    return provider;
+  }
+
+  async #getMetamaskOverEip6963(): Promise<BaseProvider | undefined> {
+    setTimeout(() => window.dispatchEvent(new Event('eip6963:requestProvider')));
+    return new Promise<BaseProvider | undefined>((resolve) => {
+      const handler = (
+        event: CustomEvent<{ info: { rdns: string }; provider: BaseProvider }>,
+      ): void => {
+        if (event.detail.info.rdns !== 'io.metamask') return;
+        window.removeEventListener('eip6963:announceProvider', handler);
+        resolve(event.detail.provider);
+      };
+      window.addEventListener('eip6963:announceProvider', handler);
+      setTimeout(() => {
+        window.removeEventListener('eip6963:announceProvider', handler);
+        resolve(undefined);
+      }, 500);
+    });
+  }
+
+  #providerPromise: Promise<BaseProvider> | undefined;
+
+  async #getProvider(): Promise<BaseProvider> {
+    this.#providerPromise ??= (async () => {
+      this.#provider ??=
+        (await this.#getMetamaskAsInjected()) ?? (await this.#getMetamaskOverEip6963());
+      if (this.#provider == null) {
+        throw new UnsupportedPlatformError(
+          "Can't find a Metamask extension as an injected provider and over EIP-6963. Ensure that Metamask is installed or setup a provider.",
+        );
+      }
+      const version = await this.#provider.request<string>({ method: 'web3_clientVersion' });
+      if (version == null) throw new InternalError("Can't get Ethereum Provider version");
+      const args = [version.slice(metamaskVersionPrefix.length), '12.2.4'] as const;
+      if (!semverSatisfies(...args)) throw new UnsupportedVersionError('Metamask', ...args);
+      return this.#provider;
+    })();
+    return this.#providerPromise;
+  }
 
   /**
    * @param provider - Connection to MetaMask to use
    */
   constructor(provider?: BaseProvider) {
     super();
-    if (provider != null) {
-      this.provider = provider;
-      return;
-    }
-    if (window == null) {
+    this.#provider = provider;
+    if (this.#provider == null && window == null) {
       throw new UnsupportedPlatformError(
         'Window object not found, you can run AccountMetamaskFactory only in browser or setup a provider',
       );
     }
-    if (!('ethereum' in window) || window.ethereum == null) {
-      throw new UnsupportedPlatformError(
-        '`ethereum` object not found, you can run AccountMetamaskFactory only with Metamask enabled or setup a provider',
-      );
-    }
-    this.provider = window.ethereum as BaseProvider;
-  }
-
-  /**
-   * It throws an exception if MetaMask has an incompatible version.
-   */
-  async #ensureMetamaskSupported(): Promise<void> {
-    const version = await this.provider.request<string>({ method: 'web3_clientVersion' });
-    if (version == null) throw new InternalError("Can't get Ethereum Provider version");
-    const metamaskPrefix = 'MetaMask/v';
-    if (!version.startsWith(metamaskPrefix)) {
-      throw new UnsupportedPlatformError(`Expected Metamask, got ${version} instead`);
-    }
-    const args = [version.slice(metamaskPrefix.length), '12.2.4'] as const;
-    if (!semverSatisfies(...args)) throw new UnsupportedVersionError('Metamask', ...args);
   }
 
   /**
@@ -68,8 +102,8 @@ export default class AccountMetamaskFactory extends AccountBaseFactory {
    * @deprecated use `requestSnap` instead
    */
   async installSnap(): Promise<SnapDetails> {
-    await this.#ensureMetamaskSupported();
-    const details = (await this.provider.request({
+    const provider = await this.#getProvider();
+    const details = (await provider.request({
       method: 'wallet_requestSnaps',
       params: { [snapId]: { version: snapMinVersion } },
     })) as { [key in typeof snapId]: SnapDetails };
@@ -87,8 +121,8 @@ export default class AccountMetamaskFactory extends AccountBaseFactory {
    * (default: a version range supported by sdk)
    */
   async requestSnap(version = `>=${snapMinVersion} <${snapMaxVersion}`): Promise<SnapDetails> {
-    await this.#ensureMetamaskSupported();
-    const details = (await this.provider.request({
+    const provider = await this.#getProvider();
+    const details = (await provider.request({
       method: 'wallet_requestSnaps',
       params: { [snapId]: { version } },
     })) as { [key in typeof snapId]: SnapDetails };
@@ -111,8 +145,8 @@ export default class AccountMetamaskFactory extends AccountBaseFactory {
    * @returns the version of snap installed in MetaMask
    */
   async getSnapVersion(): Promise<string> {
-    await this.#ensureMetamaskSupported();
-    const snaps = (await this.provider.request({ method: 'wallet_getSnaps' })) as Record<
+    const provider = await this.#getProvider();
+    const snaps = (await provider.request({ method: 'wallet_getSnaps' })) as Record<
       string,
       { version: string }
     >;
@@ -130,12 +164,13 @@ export default class AccountMetamaskFactory extends AccountBaseFactory {
    */
   async initialize(accountIndex: number): Promise<AccountMetamask> {
     await this.requestSnap();
+    const provider = await this.#getProvider();
     const address = await invokeSnap<Encoded.AccountAddress>(
-      this.provider,
+      provider,
       'getPublicKey',
       { derivationPath: [`${accountIndex}'`, "0'", "0'"] },
       'publicKey',
     );
-    return new AccountMetamask(this.provider, accountIndex, address);
+    return new AccountMetamask(provider, accountIndex, address);
   }
 }
