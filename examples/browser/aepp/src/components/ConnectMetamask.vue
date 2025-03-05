@@ -3,7 +3,7 @@
     <button v-if="!accountFactory" @click="connect">Connect</button>
     <template v-else>
       <button @click="disconnect">Disconnect</button>
-      <button @click="installSnap">Install Aeternity Snap</button>
+      <button @click="requestSnap">Request Aeternity Snap</button>
       <button @click="addAccount">Add Account</button>
       <button v-if="accounts.length > 1" @click="switchAccount">Switch Account</button>
       <button @click="discoverAccounts">Discover Accounts</button>
@@ -54,10 +54,10 @@ export default {
       this.$store.commit('setAddress', undefined);
       if (Object.keys(this.aeSdk.accounts).length) this.aeSdk.removeAccount(this.aeSdk.address);
     },
-    async installSnap() {
+    async requestSnap() {
       try {
         this.status = 'Waiting for MetaMask response';
-        this.status = await this.accountFactory.installSnap();
+        this.status = await this.accountFactory.requestSnap();
       } catch (error) {
         if (error instanceof UnsupportedPlatformError) {
           this.status = error.message;
