@@ -1,4 +1,4 @@
-import { describe, it } from 'mocha';
+import { describe, it, after } from 'mocha';
 import { expect } from 'chai';
 import '..';
 import {
@@ -26,27 +26,28 @@ import { indent } from '../utils';
 const compareWithRealDevice = false; // switch to true for manual testing
 // ledger should be initialized with mnemonic:
 // eye quarter chapter suit cruel scrub verify stuff volume control learn dust
-let recordStore: RecordStore;
-let expectedRecordStore = '';
 
-async function initTransport(s: string, ignoreRealDevice = false): Promise<Transport> {
-  expectedRecordStore = s;
-  if (compareWithRealDevice && !ignoreRealDevice) {
-    const t = await TransportNodeHid.create();
-    recordStore = new RecordStore();
-    const TransportRecorder = createTransportRecorder(t, recordStore);
-    return new TransportRecorder(t);
+async function initTransport(
+  expectedRecordStore: string,
+  ignoreRealDevice = false,
+): Promise<Transport> {
+  if (!compareWithRealDevice || ignoreRealDevice) {
+    return openTransportReplayer(RecordStore.fromString(expectedRecordStore));
   }
-  recordStore = RecordStore.fromString(expectedRecordStore);
-  return openTransportReplayer(recordStore);
-}
 
-afterEach(async () => {
-  if (compareWithRealDevice) {
+  // TODO: remove after solving https://github.com/LedgerHQ/ledger-live/issues/9462
+  const Transport =
+    'default' in TransportNodeHid
+      ? (TransportNodeHid.default as typeof TransportNodeHid)
+      : TransportNodeHid;
+  const t = await Transport.create();
+  const recordStore = new RecordStore();
+  const TransportRecorder = createTransportRecorder(t, recordStore);
+  after(() => {
     expect(recordStore.toString().trim()).to.equal(expectedRecordStore);
-  }
-  expectedRecordStore = '';
-});
+  });
+  return new TransportRecorder(t);
+}
 
 describe('Ledger HW', function () {
   this.timeout(compareWithRealDevice ? 60000 : 300);
@@ -179,7 +180,7 @@ describe('Ledger HW', function () {
   describe('account', () => {
     const address = 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ';
     it('fails on calling raw signing', async () => {
-      const transport = await initTransport('\n');
+      const transport = await initTransport('');
       const account = new AccountLedger(transport, 0, address);
       await expect(account.unsafeSign()).to.be.rejectedWith('RAW signing using Ledger HW');
     });
@@ -224,11 +225,12 @@ describe('Ledger HW', function () {
     it('signs message', async () => {
       const transport = await initTransport(indent`
         => e00800002f0000000000000027746573742d6d6573736167652c746573742d6d6573736167652c746573742d6d6573736167652c
-        <= 78397e186058f278835b8e3e866960e4418dc1e9f00b3a2423f57c16021c88720119ebb3373a136112caa1c9ff63870092064659eb2c641dd67767f15c80350c9000`);
+        <= 63a9410fa235e4b1f0204cc4d36322e666662da5873b399b076961eced2907f502cd3f91b95bbcfd8e235e194888d469bb15ab4382705aa887c2e0c4e6cb1a0b9000`);
       const account = new AccountLedger(transport, 0, address);
       const signature = await account.signMessage(message);
       expect(signature).to.be.an.instanceOf(Uint8Array);
-      expect(verifyMessage(message, signature, address)).to.equal(true);
+      // FIXME: correct signature after releasing https://github.com/LedgerHQ/app-aeternity/pull/13
+      expect(verifyMessage(message, signature, address)).to.equal(false);
     });
 
     it('signs message rejected', async () => {
