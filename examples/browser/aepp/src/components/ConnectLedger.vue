@@ -85,6 +85,7 @@ export default {
         transport = await (isBle ? TransportWebBleAndroidFix : TransportWebUsb).create();
         transport.on('disconnect', () => this.reset());
         const factory = new AccountLedgerFactory(transport);
+        factory._enableExperimentalLedgerAppSupport = true;
         await factory.ensureReady();
         this.accountFactory = factory;
         this.status = '';
