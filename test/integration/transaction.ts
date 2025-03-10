@@ -376,7 +376,7 @@ describe('Transaction', () => {
       'tx_+F0YAaEEhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoLpilW+m1a50IepD5pClPlSP54fnFbPvEU5kIgFZExwhjHsndG1wJzogMTAxfQAKhg9fTbS8AADlFWOV',
       async () =>
         aeSdk.buildTx({
-          tag: Tag.OracleResponseTx,
+          tag: Tag.OracleRespondTx,
           nonce,
           oracleId,
           queryId: oracleQueryId(address, nonce, oracleId),
@@ -388,7 +388,7 @@ describe('Transaction', () => {
       'tx_+F0YAaEEhAyXS5cWR3ZFS6EZ2E7cTWBYqN7JK27cV4qy0wtMQgABoLpilW+m1a50IepD5pClPlSP54fnFbPvEU5kIgFZExwhjHsndG1wJzogMTAxfQB7hg9kMWdOAAB6Zd3I',
       async () =>
         aeSdk.buildTx({
-          tag: Tag.OracleResponseTx,
+          tag: Tag.OracleRespondTx,
           nonce,
           oracleId,
           ...responseTtl,
