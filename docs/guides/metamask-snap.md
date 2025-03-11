@@ -19,14 +19,6 @@ import { AccountMetamaskFactory } from '@aeternity/aepp-sdk';
 const accountFactory = new AccountMetamaskFactory();
 ```
 
-The next step is to install Aeternity snap to MetaMask. You can request installation by calling
-
-```js
-await accountFactory.installSnap();
-```
-
-If succeed it means that MetaMask is ready to provide access to accounts. Alternatively, you can call `ensureReady` instead of `installSnap`. The latter won't trigger a snap installation, it would just fall with the exception if not installed.
-
 Using the factory, you can create instances of specific accounts by providing an index
 
 ```js
@@ -69,4 +61,6 @@ console.log(accounts[0].address); // 'ak_2dA...'
 
 ## Error handling
 
-If the user rejects a transaction/message signing or address retrieving you will get an exception as a plain object with property `code` equals 4001, and `message` equals "User rejected the request.".
+If the user rejects an action (snap installation or connection, address retrieving or transaction/message signing) you will get an exception as a plain object with property `code` equals 4001, and `message` equals "User rejected the request.".
+
+If the snap downgrade is requested, the code will be -32602.

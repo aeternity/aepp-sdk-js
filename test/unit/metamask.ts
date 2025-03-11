@@ -107,16 +107,14 @@ describe('Aeternity Snap for MetaMask', function () {
       version: '0.0.9',
     };
 
-    const versionChecks = [
+    const metamaskVersionCheck = [
       { request: { method: 'web3_clientVersion' } },
       { resolve: 'MetaMask/v12.3.1' },
-      { request: { method: 'wallet_getSnaps' } },
-      { resolve: { 'npm:@aeternity-snap/plugin': snapDetails } },
     ];
 
     it('installs snap', async () => {
       const provider = await initProvider([
-        ...versionChecks.slice(0, 2),
+        ...metamaskVersionCheck,
         {
           request: {
             method: 'wallet_requestSnaps',
@@ -133,23 +131,68 @@ describe('Aeternity Snap for MetaMask', function () {
       expect(await factory.installSnap()).to.eql(snapDetails);
     });
 
+    it('requests snap', async () => {
+      const provider = await initProvider([
+        ...metamaskVersionCheck,
+        {
+          request: {
+            method: 'wallet_requestSnaps',
+            params: { 'npm:@aeternity-snap/plugin': { version: '>=0.0.9 <0.1.0' } },
+          },
+        },
+        {
+          resolve: {
+            'npm:@aeternity-snap/plugin': snapDetails,
+          },
+        },
+      ]);
+      const factory = new AccountMetamaskFactory(provider);
+      expect(await factory.requestSnap()).to.eql(snapDetails);
+    });
+
+    const snapVersionCheck = [
+      { request: { method: 'wallet_getSnaps' } },
+      { resolve: { 'npm:@aeternity-snap/plugin': snapDetails } },
+    ];
+
     it('gets snap version', async () => {
-      const provider = await initProvider([...versionChecks, ...versionChecks.slice(2, 2)]);
+      const provider = await initProvider([...metamaskVersionCheck, ...snapVersionCheck]);
       const factory = new AccountMetamaskFactory(provider);
       expect(await factory.getSnapVersion()).to.equal('0.0.9');
     });
 
+    const requestSnaps = [
+      {
+        request: {
+          method: 'wallet_requestSnaps',
+          params: {
+            'npm:@aeternity-snap/plugin': {
+              version: '>=0.0.9 <0.1.0',
+            },
+          },
+        },
+      },
+      { resolve: { 'npm:@aeternity-snap/plugin': snapDetails } },
+    ];
+
     it('ensures that snap version is compatible', async () => {
       const provider = await initProvider(
         [
-          ...versionChecks.slice(0, 3),
-          { resolve: { 'npm:@aeternity-snap/plugin': { ...snapDetails, version: '1.0.0' } } },
+          ...metamaskVersionCheck,
+          requestSnaps[0],
+          {
+            reject: {
+              code: -32602,
+              message:
+                'Snap "npm:@aeternity-snap/plugin@<>" is already installed. Couldn\'t update to a version inside requested "<>" range.',
+            },
+          },
         ],
         true,
       );
       const factory = new AccountMetamaskFactory(provider);
       await expect(factory.initialize(42)).to.be.rejectedWith(
-        'Unsupported Aeternity snap in MetaMask version 1.0.0. Supported: >= 0.0.9 < 0.1.0',
+        'Snap "npm:@aeternity-snap/plugin@<>" is already installed. Couldn\'t update to a version inside requested "<>" range.',
       );
     });
 
@@ -165,7 +208,8 @@ describe('Aeternity Snap for MetaMask', function () {
 
     it('initializes an account', async () => {
       const provider = await initProvider([
-        ...versionChecks,
+        ...metamaskVersionCheck,
+        ...requestSnaps,
         getPublicKeyRequest,
         { resolve: { publicKey: 'ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv' } },
       ]);
@@ -179,7 +223,8 @@ describe('Aeternity Snap for MetaMask', function () {
 
     it('initializes an account rejected', async () => {
       const provider = await initProvider([
-        ...versionChecks,
+        ...metamaskVersionCheck,
+        ...requestSnaps,
         getPublicKeyRequest,
         { reject: { code: 4001, message: 'User rejected the request.' } },
       ]);

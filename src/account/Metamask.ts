@@ -27,6 +27,9 @@ export async function invokeSnap<R>(
  * https://www.npmjs.com/package/\@aeternity-snap/plugin
  */
 export default class AccountMetamask extends AccountBase {
+  /**
+   * @deprecated this class is not intended to provide raw access to the provider
+   */
   readonly provider: BaseProvider;
 
   readonly index: number;
