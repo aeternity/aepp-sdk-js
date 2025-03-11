@@ -1692,10 +1692,6 @@
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">accountFactory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AccountMetamaskFactory</span><span class="p">();</span>
 </code></pre></div>
-<p>The next step is to install Aeternity snap to MetaMask. You can request installation by calling</p>
-<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">accountFactory</span><span class="p">.</span><span class="nx">installSnap</span><span class="p">();</span>
-</code></pre></div>
-<p>If succeed it means that MetaMask is ready to provide access to accounts. Alternatively, you can call <code>ensureReady</code> instead of <code>installSnap</code>. The latter won't trigger a snap installation, it would just fall with the exception if not installed.</p>
 <p>Using the factory, you can create instances of specific accounts by providing an index</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">accountFactory</span><span class="p">.</span><span class="nx">initialize</span><span class="p">(</span><span class="mf">0</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">account</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span><span class="w"> </span><span class="c1">// &#39;ak_2dA...&#39;</span>
@@ -1723,7 +1719,8 @@
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">accounts</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">address</span><span class="p">);</span><span class="w"> </span><span class="c1">// &#39;ak_2dA...&#39;</span>
 </code></pre></div>
 <h2 id="error-handling">Error handling</h2>
-<p>If the user rejects a transaction/message signing or address retrieving you will get an exception as a plain object with property <code>code</code> equals 4001, and <code>message</code> equals "User rejected the request.".</p>
+<p>If the user rejects an action (snap installation or connection, address retrieving or transaction/message signing) you will get an exception as a plain object with property <code>code</code> equals 4001, and <code>message</code> equals "User rejected the request.".</p>
+<p>If the snap downgrade is requested, the code will be -32602.</p>
 
 
 
