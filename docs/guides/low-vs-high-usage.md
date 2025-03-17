@@ -12,7 +12,7 @@ The aeternity node exposes [a REST API]. This API is described in the [OpenAPI d
 
 [a REST API]: https://api-docs.aeternity.io/
 [OpenAPI document]: https://mainnet.aeternity.io/api?oas3
-[`Node` class]: https://docs.aeternity.com/aepp-sdk-js/v14.0.0/api/classes/Node.html
+[`Node` class]: https://sdk.aeternity.io/v14.0.0/api/classes/Node.html
 
 So to get a transaction based on its hash you would invoke `node.getTransactionByHash('th_fWEsg152BNYcrqA9jDh9VVpacYojCUb1yu45zUnqhmQ3dAAC6')`. In this way the SDK is simply a mapping of the raw API calls into JavaScript.
 
@@ -21,9 +21,9 @@ So to get a transaction based on its hash you would invoke `node.getTransactionB
 Any blockchain state change requires signing a transaction. Transaction should be built according to the [protocol]. SDK implements it in [`buildTx`], [`buildTxAsync`], and [`unpackTx`]. [`buildTxAsync`] requires fewer arguments than [`buildTx`], but it expects the node instance provided in arguments.
 
 [protocol]: https://github.com/aeternity/protocol/blob/c007deeac4a01e401238412801ac7084ac72d60e/serializations.md#accounts-version-1-basic-accounts
-[`buildTx`]: https://docs.aeternity.com/aepp-sdk-js/v14.0.0/api/functions/buildTx.html
-[`buildTxAsync`]: https://docs.aeternity.com/aepp-sdk-js/v14.0.0/api/functions/buildTxAsync.html
-[`unpackTx`]: https://docs.aeternity.com/aepp-sdk-js/v14.0.0/api/functions/unpackTx.html
+[`buildTx`]: https://sdk.aeternity.io/v14.0.0/api/functions/buildTx.html
+[`buildTxAsync`]: https://sdk.aeternity.io/v14.0.0/api/functions/buildTxAsync.html
+[`unpackTx`]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackTx.html
 
 ## High-level SDK usage (preferable)
 

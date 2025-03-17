@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This guide shows you how to perform all the operations that you need within the lifecycle of [æternity naming system (AENS)](https://docs.aeternity.com/protocol/AENS/) using the SDK.
+This guide shows you how to perform all the operations that you need within the lifecycle of [æternity naming system (AENS)](https://docs.aeternity.com/developer-documentation/protocol/aens) using the SDK.
 
 If you successfully claimed a name it will expire after 180000 key blocks (~375 days). You will need to update your name before it expires!
 
@@ -313,7 +313,7 @@ Note:
 
 ## Delegate signature to contract (AENS interface)
 
-It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the [AENS interface](https://docs.aeternity.com/aesophia/latest/sophia_features/#aens-interface) and perform AENS related actions on behalf of your account.
+It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the [AENS interface](https://docs.aeternity.com/developer-documentation/aesophia/docs/sophia_features#aens-interface) and perform AENS related actions on behalf of your account.
 
 This functionality could for example be used to build an AENS marketplace.
 
