@@ -7,7 +7,8 @@
     <button v-else-if="!accountFactory" @click="connect">Connect</button>
     <template v-else>
       <button @click="disconnect">Disconnect</button>
-      <button @click="addAccount">Add Account</button>
+      <button @click="() => addAccount(true)">Add Account</button>
+      <button @click="() => addAccount(false)">Add Account no Confirm</button>
       <button v-if="accounts.length > 1" @click="switchAccount">Switch Account</button>
       <button @click="discoverAccounts">Discover Accounts</button>
       <button @click="switchNode">Switch Node</button>
@@ -52,13 +53,15 @@ export default {
       this.$store.commit('setAddress', undefined);
       if (Object.keys(this.aeSdk.accounts).length) this.aeSdk.removeAccount(this.aeSdk.address);
     },
-    async addAccount() {
+    async addAccount(confirm) {
       try {
         this.status = 'Waiting for Ledger response';
         const idx = this.accounts.length;
         const account = await this.accountFactory.initialize(idx);
-        this.status = `Ensure that ${account.address} is displayed on Ledger HW screen`;
-        await this.accountFactory.getAddress(idx, true);
+        if (confirm) {
+          this.status = `Ensure that ${account.address} is displayed on Ledger HW screen`;
+          await this.accountFactory.getAddress(idx, true);
+        }
         this.accounts.push(account);
         this.setAccount(this.accounts[0]);
       } catch (error) {
