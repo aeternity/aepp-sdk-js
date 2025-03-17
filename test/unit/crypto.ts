@@ -1,7 +1,7 @@
 import '..';
 import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
-import { encode as varuintEncode } from 'varuint-bitcoin';
+import { encodeVarUInt } from '../../src/utils/crypto';
 import {
   buildTxHash,
   decode,
@@ -47,7 +47,7 @@ describe('crypto', () => {
       ] as const
     ).forEach(([name, value, expected]) => {
       it(`encodes ${name}`, () => {
-        expect(varuintEncode(value).buffer).to.eql(Buffer.from(expected, 'hex'));
+        expect(encodeVarUInt(value)).to.eql(Buffer.from(expected, 'hex'));
       });
     }));
 
