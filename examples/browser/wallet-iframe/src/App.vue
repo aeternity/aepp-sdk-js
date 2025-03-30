@@ -46,7 +46,6 @@ import {
   MemoryAccount,
   AeSdkWallet,
   Node,
-  CompilerHttp,
   BrowserWindowMessageConnection,
   METHODS,
   WALLET_TYPE,
@@ -207,7 +206,6 @@ export default {
         new AccountMemoryProtected('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
         AccountMemoryProtected.generate(),
       ],
-      onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
       name: 'Wallet Iframe',
       onConnection: (aeppId, params, origin) => {
         if (!confirm(`Client ${params.name} with id ${aeppId} at ${origin} want to connect`)) {

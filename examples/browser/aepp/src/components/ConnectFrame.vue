@@ -34,7 +34,10 @@
     </template>
   </div>
 
-  <SelectNetwork :select="(network) => this.walletConnector.askToSelectNetwork(network)" />
+  <SelectNetwork
+    v-if="walletConnected"
+    :select="(network) => this.walletConnector.askToSelectNetwork(network)"
+  />
 
   <div class="group">
     <div>

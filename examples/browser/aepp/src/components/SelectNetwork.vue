@@ -37,7 +37,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import Value from './Value.vue';
 
 export default {
