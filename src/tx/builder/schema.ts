@@ -244,7 +244,7 @@ export const txSchema = [
     ttl,
   },
   {
-    tag: shortUIntConst(Tag.OracleResponseTx),
+    tag: shortUIntConst(Tag.OracleRespondTx),
     version: shortUIntConst(1, true),
     oracleId: address(Encoding.OracleAddress),
     nonce: nonce('oracleId'),

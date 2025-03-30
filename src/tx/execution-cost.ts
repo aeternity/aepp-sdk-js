@@ -66,7 +66,7 @@ export function getExecutionCost(
   if (params.tag === Tag.OracleQueryTx) {
     res += BigInt(params.queryFee);
   }
-  if (params.tag === Tag.OracleResponseTx) {
+  if (params.tag === Tag.OracleRespondTx) {
     res -= BigInt(queryFee ?? 0);
   }
   if (params.tag === Tag.ChannelSettleTx) {
@@ -160,7 +160,7 @@ export async function getExecutionCostUsingNode(
     options.gasUsed = combinedInfo.gasUsed;
   }
 
-  if (options.queryFee == null && Tag.OracleResponseTx === params.tag) {
+  if (options.queryFee == null && Tag.OracleRespondTx === params.tag) {
     options.queryFee = (await node.getOracleByPubkey(params.oracleId)).queryFee.toString();
   }
 

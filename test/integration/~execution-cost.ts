@@ -127,7 +127,7 @@ describe('Execution cost', () => {
         Tag.OracleRegisterTx,
         Tag.OracleExtendTx,
         Tag.OracleQueryTx,
-        Tag.OracleResponseTx,
+        Tag.OracleRespondTx,
         Tag.GaAttachTx,
         Tag.GaMetaTx,
         Tag.PayingForTx,

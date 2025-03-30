@@ -17,7 +17,7 @@ interface OracleExtendTtlOptions
     Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
 interface OracleRespondToQueryOptions
-  extends BuildTxOptions<Tag.OracleResponseTx, 'callerId' | 'oracleId' | 'queryId' | 'response'>,
+  extends BuildTxOptions<Tag.OracleRespondTx, 'callerId' | 'oracleId' | 'queryId' | 'response'>,
     Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
 /**
@@ -131,7 +131,7 @@ export default class Oracle extends OracleBase {
     const oracleRespondTx = await buildTxAsync({
       _isInternalBuild: true,
       ...opt,
-      tag: Tag.OracleResponseTx,
+      tag: Tag.OracleRespondTx,
       oracleId: this.address,
       queryId,
       response,

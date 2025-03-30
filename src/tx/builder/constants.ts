@@ -98,7 +98,12 @@ export enum Tag {
   SpendTx = 12,
   OracleRegisterTx = 22,
   OracleQueryTx = 23,
+  /**
+   * @deprecated use `OracleRespondTx` instead
+   */
   OracleResponseTx = 24,
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-enum-values
+  OracleRespondTx = 24,
   OracleExtendTx = 25,
   NameClaimTx = 32,
   NamePreclaimTx = 33,
