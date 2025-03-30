@@ -1,6 +1,7 @@
 import '..';
 import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
+import { encodeVarUInt } from '../../src/utils/crypto';
 import {
   buildTxHash,
   decode,
@@ -35,6 +36,21 @@ const txRaw =
 const expectedHash = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK';
 
 describe('crypto', () => {
+  describe('encodeVarUInt', () =>
+    (
+      [
+        ['1 byte', 42, '2A'],
+        ['2 bytes', 59886, 'fdeee9'],
+        ['4 bytes', 526697443, 'fee3c3641f'],
+        ['7 bytes', 3236795759157736, 'ffe8616f3dd97f0b00'],
+        ['MAX_SAFE_INTEGER', Number.MAX_SAFE_INTEGER, 'ffffffffffffff1f00'],
+      ] as const
+    ).forEach(([name, value, expected]) => {
+      it(`encodes ${name}`, () => {
+        expect(encodeVarUInt(value)).to.eql(Buffer.from(expected, 'hex'));
+      });
+    }));
+
   describe('isAddressValid', () => {
     it('rejects invalid encoded data', () => {
       expect(isAddressValid('test')).to.equal(false);

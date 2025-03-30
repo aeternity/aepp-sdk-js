@@ -2,7 +2,6 @@ import nacl from 'tweetnacl';
 // js extension is required for mjs build, not importing the whole package to reduce bundle size
 // eslint-disable-next-line import/extensions
 import { blake2b } from 'blakejs/blake2b.js';
-import { encode as varuintEncode } from 'varuint-bitcoin';
 
 import { concatBuffers, isItemOfArray } from './other.js';
 import { decode, encode, Encoded, Encoding } from './encoder.js';
@@ -102,15 +101,29 @@ export function verify(
   return nacl.sign.detached.verify(data, signature, decode(address));
 }
 
+export function encodeVarUInt(value: number): Buffer {
+  if (value < 0xfd) {
+    return Buffer.from([value]);
+  }
+  if (value <= 0xffff) {
+    return concatBuffers([Buffer.from([0xfd]), Buffer.from(new Uint16Array([value]).buffer)]);
+  }
+  if (value <= 0xffffffff) {
+    return concatBuffers([Buffer.from([0xfe]), Buffer.from(new Uint32Array([value]).buffer)]);
+  }
+  return concatBuffers([
+    Buffer.from([0xff]),
+    Buffer.from(new BigUint64Array([BigInt(value)]).buffer),
+  ]);
+}
+
 const messagePrefix = Buffer.from('aeternity Signed Message:\n', 'utf8');
-export const messagePrefixLength = varuintEncode(messagePrefix.length).buffer;
+export const messagePrefixLength = encodeVarUInt(messagePrefix.length);
 
 // TODO: consider rename to hashMessage
 export function messageToHash(message: string): Buffer {
   const msg = Buffer.from(message, 'utf8');
-  return hash(
-    concatBuffers([messagePrefixLength, messagePrefix, varuintEncode(msg.length).buffer, msg]),
-  );
+  return hash(concatBuffers([messagePrefixLength, messagePrefix, encodeVarUInt(msg.length), msg]));
 }
 
 /**
