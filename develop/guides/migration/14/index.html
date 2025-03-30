@@ -2536,7 +2536,7 @@ compare it's address with an address in the key pair instead.</p>
 <div class="highlight"><pre><span></span><code><span class="gd">- address = getAddressFromPriv(secretKeyOldFormat)</span>
 <span class="gi">+ address = new MemoryAccount(secretKeyNewFormat).address</span>
 </code></pre></div>
-<p>Use SDK <a href="https://docs.aeternity.com/aepp-sdk-js/develop/examples/browser/tools/">tools</a> page to convert secret keys.</p>
+<p>Use SDK <a href="https://sdk.aeternity.io/v14.0.0/examples/browser/tools/">tools</a> page to convert secret keys.</p>
 <h4 id="generatekeypair-removed"><code>generateKeyPair</code> removed</h4>
 <p>Use MemoryAccount::generate instead.
 Optionally add <code>decode</code> if you need raw keys.
@@ -2558,7 +2558,7 @@ Obtain the secret key via MemoryAccount:secretKey.</p>
 <span class="kd">const</span><span class="w"> </span><span class="nx">newSk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">oldSk</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hex&#39;</span><span class="p">).</span><span class="nx">subarray</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">32</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">AccountSecretKey</span><span class="p">);</span>
 <span class="c1">// &#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span>
 </code></pre></div>
-<p>Use SDK <a href="https://docs.aeternity.com/aepp-sdk-js/develop/examples/browser/tools/">tools</a> page to convert secret keys.</p>
+<p>Use SDK <a href="https://sdk.aeternity.io/v14.0.0/examples/browser/tools/">tools</a> page to convert secret keys.</p>
 <h4 id="accountbase-inheritors-required-to-implement-signtypeddata-signdelegation">AccountBase inheritors required to implement <code>signTypedData</code>, <code>signDelegation</code></h4>
 <p>You can throw an exception if the account operation is not doable.</p>
 <h2 id="aens">Aens</h2>

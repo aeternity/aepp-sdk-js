@@ -1846,7 +1846,7 @@
 
 <h1 id="oracles">Oracles</h1>
 <h2 id="introduction">Introduction</h2>
-<p>This guide shows you how to perform all the operations that you need within the lifecycle of <a href="https://docs.aeternity.com/protocol/oracles">oracles</a> using the SDK.</p>
+<p>This guide shows you how to perform all the operations that you need within the lifecycle of <a href="https://docs.aeternity.com/developer-documentation/protocol/oracles">oracles</a> using the SDK.</p>
 <h2 id="1-oracle-register">1. Oracle: register</h2>
 <p>Let's register an oracle that responds with the temperature of the city that is included in the query.</p>
 <p>Firstly, you need to create an instance of <code>Oracle</code> class. This class requires an account that would be used to sign operations on behalf of the oracle. So one account can host only one oracle, and this oracle address would be the same as the corresponding account address except for a different prefix (<code>ok_</code> instead of <code>ak_</code>). This means that it's not possible to manage multiple oracles using the same account.</p>

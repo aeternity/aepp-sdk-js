@@ -1972,7 +1972,7 @@
 
 <h1 id="contracts">Contracts</h1>
 <h2 id="introduction">Introduction</h2>
-<p>The smart contract language of the æternity blockchain is <a href="https://docs.aeternity.com/aesophia">Sophia</a>. It is a functional language in the ML family, strongly typed and has restricted mutable state.</p>
+<p>The smart contract language of the æternity blockchain is <a href="https://docs.aeternity.com/developer-documentation/aesophia">Sophia</a>. It is a functional language in the ML family, strongly typed and has restricted mutable state.</p>
 <p>Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into <a href="https://github.com/aeternity/aepp-sophia-examples">aepp-sophia-examples</a> and start rapid prototyping using <a href="https://studio.aepps.com">AEstudio</a>.</p>
 <h2 id="1-specify-imports">1. Specify imports</h2>
 <div class="highlight"><pre><span></span><code><span class="c1">// node.js import</span>
@@ -1984,14 +1984,14 @@
 <h2 id="2-setup-compiler">2. Setup compiler</h2>
 <p>Compiler primarily used to generate bytecode to deploy a contract.
 Skip this step if you have a contract bytecode or need to interact with an already deployed contract.
-Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">aesophia_cli</a> and <a href="https://github.com/aeternity/aesophia_http">aesophia_http</a> implemented in <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerCli.html">CompilerCli</a> and <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerHttp.html">CompilerHttp</a> respectively.</p>
+Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">aesophia_cli</a> and <a href="https://github.com/aeternity/aesophia_http">aesophia_http</a> implemented in <a href="https://sdk.aeternity.io/v14.0.0/api/classes/CompilerCli.html">CompilerCli</a> and <a href="https://sdk.aeternity.io/v14.0.0/api/classes/CompilerHttp.html">CompilerHttp</a> respectively.</p>
 <p>CompilerCli is available only in Node.js and requires Erlang installed (<code>escript</code> available in <code>$PATH</code>), Windows is supported.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerCli</span><span class="p">();</span>
 </code></pre></div>
 <p>CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since <a href="https://v8.compiler.aepps.com/api">compiler.aepps.com</a> is planned to be decommissioned. An example of how to run it using <a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/docker-compose.yml#L20-L25">docker-compose</a>.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">compiler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="s1">&#39;https://v8.compiler.aepps.com&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// host your own compiler</span>
 </code></pre></div>
-<p>Both compiler classes implement the <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html">same interface</a> that can be used to generate bytecode and ACI without a Contract instance.</p>
+<p>Both compiler classes implement the <a href="https://sdk.aeternity.io/v14.0.0/api/classes/CompilerBase.html">same interface</a> that can be used to generate bytecode and ACI without a Contract instance.</p>
 <h2 id="3-create-an-instance-of-the-sdk">3. Create an instance of the SDK</h2>
 <p>When creating an instance of the SDK you need to provide an account which will be used to sign transactions like <code>ContractCreateTx</code> and <code>ContractCallTx</code> that will be broadcasted to the network.</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// ideally host your own node</span>
@@ -2017,7 +2017,7 @@ Out-of-the-box SDK supports <a href="https://github.com/aeternity/aesophia_cli">
 </code></pre></div>
 <p>Note:</p>
 <ul>
-<li>If your contract includes external dependencies which are not part of the <a href="https://docs.aeternity.com/aesophia/latest/sophia_stdlib">standard library</a> you should initialize the contract using:
+<li>If your contract includes external dependencies which are not part of the <a href="https://docs.aeternity.com/developer-documentation/aesophia/docs/sophia_stdlib">standard library</a> you should initialize the contract using:
   <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// key-value map with name of the include as key and source code of the include as value</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">sourceCode</span><span class="p">,</span><span class="w"> </span><span class="nx">fileSystem</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div></li>
@@ -2151,11 +2151,11 @@ They can be provided for subsequent contract initializations to don't depend on 
 The conversion between JS and Sophia values is handled by aepp-calldata library.
 Refer to <a href="https://www.npmjs.com/package/@aeternity/aepp-calldata#data-types">its documentation</a> to find the right type to use.</p>
 <h2 id="generate-file-system-object-in-nodejs">Generate file system object in Node.js</h2>
-<p>To do so you can use <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/functions/getFileSystem.html">getFileSystem</a> function.
+<p>To do so you can use <a href="https://sdk.aeternity.io/v14.0.0/api/functions/getFileSystem.html">getFileSystem</a> function.
 In most cases, you don't need to do it explicitly. Prefer to use <code>sourceCodePath</code> instead <code>sourceCode</code> in
-<a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/_internal_.Contract.html#initialize">Contract::initialize</a>,
-and <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html#compile">compile</a>
-instead <a href="https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html#compileBySourceCode">compileBySourceCode</a> in CompilerBase.</p>
+<a href="https://sdk.aeternity.io/v14.0.0/api/classes/_internal_.Contract.html#initialize">Contract::initialize</a>,
+and <a href="https://sdk.aeternity.io/v14.0.0/api/classes/CompilerBase.html#compile">compile</a>
+instead <a href="https://sdk.aeternity.io/v14.0.0/api/classes/CompilerBase.html#compileBySourceCode">compileBySourceCode</a> in CompilerBase.</p>
 
 
 
