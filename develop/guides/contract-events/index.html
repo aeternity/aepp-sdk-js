@@ -1623,7 +1623,7 @@
 
 
 <h1 id="contract-events">Contract Events</h1>
-<p>The Sophia language also provides you the possibility to emit <a href="https://docs.aeternity.com/aesophia/latest/sophia_features/#events">Events</a> in your functions.
+<p>The Sophia language also provides you the possibility to emit <a href="https://docs.aeternity.com/aeternity-developer-tools/protocol/core-protocol-components/smart-contracts/smart-contract-languages/markdown/in-depth-overview#events">Events</a> in your functions.
 On this page you will learn how to access and decode the event log of a specific transaction.</p>
 <h2 id="eventemitter-contract">EventEmitter contract</h2>
 <p>This example contract that emits events will be used in the following examples:</p>
@@ -1638,7 +1638,7 @@ On this page you will learn how to access and decode the event log of a specific
 <span class="w">        </span><span class="nc">Chain</span><span class="p">.</span><span class="n">event</span><span class="p">(</span><span class="nf">AnotherEvent</span><span class="p">(</span><span class="nc">Call</span><span class="p">.</span><span class="n">caller</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">))</span>
 </code></pre></div>
 <h2 id="decode-events-using-aci">Decode events using ACI</h2>
-<p>When initializing a contract instance using the source code and providing the <a href="https://docs.aeternity.com/aesophia/latest/aeso_aci/">ACI</a>
+<p>When initializing a contract instance using the source code and providing the <a href="https://github.com/aeternity/aesophia/blob/master/docs/aeso_aci.md">ACI</a>
 or obtaining it via http compiler (default) you will be able to access the <code>emitEvents</code> entrypoint of the Sophia contract above as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;this message is not indexed&#39;</span><span class="p">);</span>
