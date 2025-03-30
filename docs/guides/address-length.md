@@ -80,5 +80,5 @@ Running the above code you would get output like
 Therefore the minimum address length is 41 chars. All these addresses valid, for example
 `ak_11111111111111111111111111111111273Yts` [used] to collect AENS name fees.
 
-[isAddressValid]: https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/functions/isAddressValid.html
+[isAddressValid]: https://sdk.aeternity.io/v14.0.0/api/functions/isAddressValid.html
 [used]: https://mainnet.aeternity.io/v3/accounts/ak_11111111111111111111111111111111273Yts

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This guide shows you how to perform all the operations that you need within the lifecycle of [oracles](https://docs.aeternity.com/protocol/oracles) using the SDK.
+This guide shows you how to perform all the operations that you need within the lifecycle of [oracles](https://docs.aeternity.com/developer-documentation/protocol/oracles) using the SDK.
 
 ## 1. Oracle: register
 

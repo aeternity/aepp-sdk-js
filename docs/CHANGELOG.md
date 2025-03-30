@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
-Please check out the [migration guide](./guides/migration/14.md) and a [tool](https://docs.aeternity.com/aepp-sdk-js/develop/examples/browser/tools/) to convert to convert secret keys.
+Please check out the [migration guide](./guides/migration/14.md) and a [tool](https://sdk.aeternity.io/v14.0.0/examples/browser/tools/) to convert to convert secret keys.
 
 - CommonJS bundles have cjs extension instead js
 - **aepp:** AeSdkWallet requires `onAskToSelectNetwork` constructor option

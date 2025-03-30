@@ -16,12 +16,12 @@ You can then collect the signed inner transaction, wrap it into a `PayingForTx` 
 
 We provided following two NodeJS examples which you can take a look at:
 
-- [InnerTx: ContractCallTx](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/examples/node/paying-for-contract-call-tx/)
-- [InnerTx: SpendTx](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/examples/node/paying-for-spend-tx/)
+- [InnerTx: ContractCallTx](https://sdk.aeternity.io/v14.0.0/examples/node/paying-for-contract-call-tx/)
+- [InnerTx: SpendTx](https://sdk.aeternity.io/v14.0.0/examples/node/paying-for-spend-tx/)
 
 Note:
 
-- A `PayingForTx` can wrap **any kind** of other [transaction type](https://docs.aeternity.com/protocol/consensus/index.html#transactions_1) supported by the protocol as inner transaction.
+- A `PayingForTx` can wrap **any kind** of other [transaction type](https://docs.aeternity.com/developer-documentation/protocol/consensus#transactions-1) supported by the protocol as inner transaction.
 
 ## UseCases
 

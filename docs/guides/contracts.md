@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The smart contract language of the æternity blockchain is [Sophia](https://docs.aeternity.com/aesophia). It is a functional language in the ML family, strongly typed and has restricted mutable state.
+The smart contract language of the æternity blockchain is [Sophia](https://docs.aeternity.com/developer-documentation/aesophia). It is a functional language in the ML family, strongly typed and has restricted mutable state.
 
 Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into [aepp-sophia-examples](https://github.com/aeternity/aepp-sophia-examples) and start rapid prototyping using [AEstudio](https://studio.aepps.com).
 
@@ -20,7 +20,7 @@ import { AeSdk, MemoryAccount, Node } from '@aeternity/aepp-sdk';
 
 Compiler primarily used to generate bytecode to deploy a contract.
 Skip this step if you have a contract bytecode or need to interact with an already deployed contract.
-Out-of-the-box SDK supports [aesophia_cli](https://github.com/aeternity/aesophia_cli) and [aesophia_http](https://github.com/aeternity/aesophia_http) implemented in [CompilerCli](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerCli.html) and [CompilerHttp](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerHttp.html) respectively.
+Out-of-the-box SDK supports [aesophia_cli](https://github.com/aeternity/aesophia_cli) and [aesophia_http](https://github.com/aeternity/aesophia_http) implemented in [CompilerCli](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerCli.html) and [CompilerHttp](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerHttp.html) respectively.
 
 CompilerCli is available only in Node.js and requires Erlang installed (`escript` available in `$PATH`), Windows is supported.
 
@@ -34,7 +34,7 @@ CompilerHttp requires a hosted compiler service. Preferable to host your own com
 const compiler = new CompilerHttp('https://v8.compiler.aepps.com'); // host your own compiler
 ```
 
-Both compiler classes implement the [same interface](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html) that can be used to generate bytecode and ACI without a Contract instance.
+Both compiler classes implement the [same interface](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerBase.html) that can be used to generate bytecode and ACI without a Contract instance.
 
 ## 3. Create an instance of the SDK
 
@@ -70,7 +70,7 @@ const options = { sourceCode }
 
 Note:
 
-- If your contract includes external dependencies which are not part of the [standard library](https://docs.aeternity.com/aesophia/latest/sophia_stdlib) you should initialize the contract using:
+- If your contract includes external dependencies which are not part of the [standard library](https://docs.aeternity.com/developer-documentation/aesophia/docs/sophia_stdlib) you should initialize the contract using:
   ```js
   const fileSystem = ... // key-value map with name of the include as key and source code of the include as value
   const options = { sourceCode, fileSystem }
@@ -242,8 +242,8 @@ Refer to [its documentation](https://www.npmjs.com/package/@aeternity/aepp-calld
 
 ## Generate file system object in Node.js
 
-To do so you can use [getFileSystem](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/functions/getFileSystem.html) function.
+To do so you can use [getFileSystem](https://sdk.aeternity.io/v14.0.0/api/functions/getFileSystem.html) function.
 In most cases, you don't need to do it explicitly. Prefer to use `sourceCodePath` instead `sourceCode` in
-[Contract::initialize](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/_internal_.Contract.html#initialize),
-and [compile](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html#compile)
-instead [compileBySourceCode](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/classes/CompilerBase.html#compileBySourceCode) in CompilerBase.
+[Contract::initialize](https://sdk.aeternity.io/v14.0.0/api/classes/_internal_.Contract.html#initialize),
+and [compile](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerBase.html#compile)
+instead [compileBySourceCode](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerBase.html#compileBySourceCode) in CompilerBase.
