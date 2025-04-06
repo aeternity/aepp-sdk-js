@@ -23,7 +23,14 @@ export default class AccountRpc extends AccountBase {
     this.address = address;
   }
 
+  /**
+   * @deprecated Use `unsafeSign` method instead
+   */
   async sign(dataRaw: string | Uint8Array): Promise<Uint8Array> {
+    return this.unsafeSign(dataRaw);
+  }
+
+  async unsafeSign(dataRaw: string | Uint8Array): Promise<Uint8Array> {
     const data = encode(Buffer.from(dataRaw), Encoding.Bytearray);
     const { signature } = await this._rpcClient.request(METHODS.unsafeSign, {
       onAccount: this.address,

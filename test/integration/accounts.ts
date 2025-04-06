@@ -206,7 +206,7 @@ describe('Accounts', () => {
 
     it('Invalid on account options', async () => {
       await expect(
-        aeSdk.sign('tx_Aasdasd', { onAccount: 123 as unknown as Encoded.AccountAddress }),
+        aeSdk.unsafeSign('tx_Aasdasd', { onAccount: 123 as unknown as Encoded.AccountAddress }),
       ).to.be.rejectedWith(
         TypeError,
         'Account should be an address (ak-prefixed string), or instance of AccountBase, got 123 instead',
@@ -216,8 +216,8 @@ describe('Accounts', () => {
     it('Make operation on account using MemoryAccount', async () => {
       const account = MemoryAccount.generate();
       const data = 'Hello';
-      const signature = await account.sign(data);
-      const sigUsingMemoryAccount = await aeSdk.sign(data, { onAccount: account });
+      const signature = await account.unsafeSign(data);
+      const sigUsingMemoryAccount = await aeSdk.unsafeSign(data, { onAccount: account });
       expect(signature).to.eql(sigUsingMemoryAccount);
     });
   });

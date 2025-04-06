@@ -1329,7 +1329,7 @@ describe('Contract instance', () => {
       });
 
       it('Valid', async () => {
-        const fakeSignature = Buffer.from(await aeSdk.sign(decode(aeSdk.address)));
+        const fakeSignature = Buffer.from(await aeSdk.unsafeSign(decode(aeSdk.address)));
         const hashAsBuffer = await testContract.signatureFn(fakeSignature);
         const hashAsHex = await testContract.signatureFn(fakeSignature.toString('hex'));
         hashAsBuffer.decodedResult.should.be.eql(fakeSignature);

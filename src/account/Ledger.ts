@@ -29,8 +29,16 @@ export default class AccountLedger extends AccountBase {
     transport.decorateAppAPIMethods(this, ['signTransaction', 'signMessage'], 'w0w');
   }
 
+  /**
+   * @deprecated Use `unsafeSign` method instead
+   */
   // eslint-disable-next-line class-methods-use-this
   override async sign(): Promise<Uint8Array> {
+    return this.unsafeSign();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  override async unsafeSign(): Promise<Uint8Array> {
     throw new NotImplementedError('RAW signing using Ledger HW');
   }
 

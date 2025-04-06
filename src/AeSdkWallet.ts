@@ -331,7 +331,10 @@ export default class AeSdkWallet extends AeSdk {
             if (!this._isRpcClientConnected(id)) throw new RpcNotAuthorizeError();
             if (!this.addresses().includes(onAccount)) throw new RpcPermissionDenyError(onAccount);
             const parameters = { onAccount, aeppOrigin: origin, aeppRpcClientId: id };
-            const signature = encode(await this.sign(decode(data), parameters), Encoding.Signature);
+            const signature = encode(
+              await this.unsafeSign(decode(data), parameters),
+              Encoding.Signature,
+            );
             return { signature };
           },
           [METHODS.signDelegation]: async ({ delegation, onAccount = this.address }, origin) => {

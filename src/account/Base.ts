@@ -74,8 +74,23 @@ export default abstract class AccountBase {
    * @param data - Data blob to sign
    * @param options - Options
    * @returns Signature
+   * @deprecated Use `unsafeSign` method instead
    */
   abstract sign(
+    data: string | Uint8Array,
+    options?: {
+      aeppOrigin?: string;
+      aeppRpcClientId?: string;
+    },
+  ): Promise<Uint8Array>;
+
+  /**
+   * Sign data blob
+   * @param data - Data blob to sign
+   * @param options - Options
+   * @returns Signature
+   */
+  abstract unsafeSign(
     data: string | Uint8Array,
     options?: {
       aeppOrigin?: string;
