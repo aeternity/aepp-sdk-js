@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { AccountMnemonicFactory, MemoryAccount } from '@aeternity/aepp-sdk';
-import { validateMnemonic } from '@scure/bip39';
+import { validateMnemonic, generateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 
 export function AccountsByMnemonic() {
@@ -39,6 +39,14 @@ export function AccountsByMnemonic() {
         <div></div>
         <div class={accounts.length ? '' : 'error'}>Mnemonic {validation}</div>
 
+        <div></div>
+        <div>
+          <button disabled={!accounts.length} onClick={() => setCount((count) => count + 1)}>
+            Add account
+          </button>
+          <button onClick={() => setMnemonic(generateMnemonic(wordlist))}>Generate mnemonic</button>
+        </div>
+
         {accounts.map(({ address, secretKey }, idx) => (
           <>
             <div>Account #{idx}</div>
@@ -49,10 +57,6 @@ export function AccountsByMnemonic() {
             </div>
           </>
         ))}
-
-        <button disabled={!accounts.length} onClick={() => setCount((count) => count + 1)}>
-          Add account
-        </button>
       </div>
     </>
   );

@@ -43,15 +43,20 @@ export function ConvertSk() {
           onInput={(event) => setSecretKey(event.currentTarget.value)}
         />
 
+        <div>Address</div>
+        <div class={address ? '' : 'error'}>{address || "Can't parse secret key"}</div>
+
+        <div></div>
+        <button onClick={() => setSecretKey(MemoryAccount.generate().secretKey)}>
+          Generate account
+        </button>
+
         {secretKeyOtherFormat && (
           <>
             <div>{secretKeyOtherFormat}</div>
             <div>{secretKeyOtherValue}</div>
           </>
         )}
-
-        <div>Address</div>
-        <div class={address ? '' : 'error'}>{address || "Can't parse secret key"}</div>
       </div>
     </>
   );
