@@ -164,12 +164,25 @@ export default class AeSdkBase extends AeSdkMethods {
    * Sign data blob
    * @param data - Data to sign
    * @param options - Options
+   * @deprecated Use `unsafeSign` method instead
    */
   async sign(
     data: string | Uint8Array,
+    options: { onAccount?: OnAccount } = {},
+  ): Promise<Uint8Array> {
+    return this.unsafeSign(data, options);
+  }
+
+  /**
+   * Sign data blob
+   * @param data - Data to sign
+   * @param options - Options
+   */
+  async unsafeSign(
+    data: string | Uint8Array,
     { onAccount, ...options }: { onAccount?: OnAccount } = {},
   ): Promise<Uint8Array> {
-    return this._resolveAccount(onAccount).sign(data, options);
+    return this._resolveAccount(onAccount).unsafeSign(data, options);
   }
 
   /**

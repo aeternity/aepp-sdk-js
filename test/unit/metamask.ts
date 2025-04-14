@@ -239,7 +239,7 @@ describe('Aeternity Snap for MetaMask', function () {
     it('fails on calling raw signing', async () => {
       const provider = await initProvider([]);
       const account = new AccountMetamask(provider, 0, address);
-      await expect(account.sign()).to.be.rejectedWith('RAW signing using MetaMask');
+      await expect(account.unsafeSign()).to.be.rejectedWith('RAW signing using MetaMask');
     });
 
     const transaction = buildTx({

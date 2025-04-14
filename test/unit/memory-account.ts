@@ -27,7 +27,7 @@ describe('MemoryAccount', () => {
   it('Sign raw data', async () => {
     const data = Buffer.from(new Array(10).fill(0).map((_, idx) => idx));
     const account = new MemoryAccount(secretKey);
-    const signature = await account.sign(data);
+    const signature = await account.unsafeSign(data);
     expect(signature).to.eql(
       Uint8Array.from([
         113, 154, 121, 195, 164, 141, 153, 234, 196, 82, 120, 31, 198, 179, 208, 138, 88, 63, 98,

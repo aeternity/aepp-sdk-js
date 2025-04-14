@@ -181,7 +181,7 @@ describe('Ledger HW', function () {
     it('fails on calling raw signing', async () => {
       const transport = await initTransport('\n');
       const account = new AccountLedger(transport, 0, address);
-      await expect(account.sign()).to.be.rejectedWith('RAW signing using Ledger HW');
+      await expect(account.unsafeSign()).to.be.rejectedWith('RAW signing using Ledger HW');
     });
 
     const transaction = buildTx({

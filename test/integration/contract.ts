@@ -70,7 +70,7 @@ describe('Contract', () => {
     });
     await signContract.$deploy([]);
     const data = Buffer.from(new Array(32).fill(0).map((_, idx) => idx ** 2));
-    const signature = await aeSdk.sign(data);
+    const signature = await aeSdk.unsafeSign(data);
     expect((await signContract.verify(data, aeSdk.address, signature)).decodedResult).to.equal(
       true,
     );

@@ -86,11 +86,11 @@ class AccountMemoryProtected extends MemoryAccount {
     return super.signTypedData(data, aci, options);
   }
 
-  async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+  async unsafeSign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
       await genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);
     }
-    return super.sign(data, options);
+    return super.unsafeSign(data, options);
   }
 
   async signDelegation(delegation, { aeppRpcClientId: id, aeppOrigin, ...options }) {

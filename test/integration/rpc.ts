@@ -503,11 +503,13 @@ describe('Aepp<->Wallet', () => {
 
       it('rejected by wallet', async () => {
         let origin;
-        const s = stub(wallet._resolveAccount(), 'sign').callsFake((data, { aeppOrigin } = {}) => {
-          origin = aeppOrigin;
-          throw new RpcRejectedByUserError();
-        });
-        await expect(aepp.sign(rawData))
+        const s = stub(wallet._resolveAccount(), 'unsafeSign').callsFake(
+          (data, { aeppOrigin } = {}) => {
+            origin = aeppOrigin;
+            throw new RpcRejectedByUserError();
+          },
+        );
+        await expect(aepp.unsafeSign(rawData))
           .to.be.eventually.rejectedWith('Operation rejected by user')
           .with.property('code', 4);
         expect(origin).to.equal('http://origin.test');
@@ -515,16 +517,16 @@ describe('Aepp<->Wallet', () => {
       });
 
       it('works', async () => {
-        const signature = await aepp.sign(rawData);
+        const signature = await aepp.unsafeSign(rawData);
         expect(signature).to.be.an.instanceOf(Buffer);
         expect(verify(rawData, signature, aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
-        const s = stub(wallet._resolveAccount(), 'sign').callsFake(() => {
+        const s = stub(wallet._resolveAccount(), 'unsafeSign').callsFake(() => {
           throw new Error('test');
         });
-        await expect(aepp.sign(rawData))
+        await expect(aepp.unsafeSign(rawData))
           .to.be.eventually.rejectedWith(
             'The peer failed to execute your request due to unknown error',
           )
@@ -534,7 +536,7 @@ describe('Aepp<->Wallet', () => {
 
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
-        const signature = await aepp.sign(rawData, { onAccount });
+        const signature = await aepp.unsafeSign(rawData, { onAccount });
         expect(verify(rawData, signature, onAccount)).to.equal(true);
       });
     });

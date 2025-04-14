@@ -39,7 +39,7 @@ export async function signJwt(originalPayload: any, account: AccountBase): Promi
   }
   if (payload.sub_jwk === undefined) delete payload.sub_jwk;
   const body = `${header}.${objectToBase64Url(payload)}` as const;
-  const signature = await account.sign(body);
+  const signature = await account.unsafeSign(body);
   return `${body}.${toBase64Url(signature)}`;
 }
 
