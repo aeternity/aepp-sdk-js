@@ -133,12 +133,13 @@ export function commitmentHash(name: AensName, salt: number = genSalt()): Encode
 
 /**
  * Utility function to convert bytes to int
- * @category transaction builder
- * @param buf - Value
+ * @category utils
+ * @param buffer - Value
  * @returns Buffer Buffer from number(BigEndian)
+ * @deprecated use `BigInt('0x' + <buffer>.toString('hex')).toString()` instead
  */
-export function readInt(buf: Buffer = Buffer.from([])): string {
-  return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10);
+export function readInt(buffer: Uint8Array = Buffer.from([])): string {
+  return BigInt('0x' + Buffer.from(buffer).toString('hex')).toString();
 }
 
 /**

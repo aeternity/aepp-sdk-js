@@ -6,6 +6,8 @@ import { NoSerializerFoundError, TypeError } from './errors.js';
  * @param val - value to convert
  * @param big - enables force conversion to BigNumber
  * @returns Buffer
+ * @category utils
+ * @deprecated use `Buffer.from(<string>)` or `Buffer.from(<number>.toString(16), 'hex')` instead
  */
 // eslint-disable-next-line import/prefer-default-export
 export function toBytes(val?: null | string | number | BigNumber, big = false): Buffer {

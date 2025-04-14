@@ -7,6 +7,9 @@ export const DRY_RUN_ACCOUNT = {
 } as const;
 
 export const MAX_AUTH_FUN_GAS = 50000;
+/**
+ * @category utils
+ */
 export type Int = number | string | BigNumber;
 export type AensName = `${string}.chain`;
 export const MIN_GAS_PRICE = 1e9; // TODO: don't use number for ae

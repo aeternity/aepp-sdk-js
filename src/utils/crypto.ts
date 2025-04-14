@@ -10,6 +10,7 @@ import { ArgumentError } from './errors.js';
 /**
  * Check if address is valid
  * @param maybeAddress - Address to check
+ * @category utils
  */
 export function isAddressValid(maybeAddress: string): maybeAddress is Encoded.AccountAddress;
 /**
@@ -42,6 +43,7 @@ export function isAddressValid(maybeEncoded: string, ...encodings: Encoding[]): 
 /**
  * Generate a random salt (positive integer)
  * @returns random salt
+ * @category utils
  */
 export function genSalt(): number {
   const [random] = new BigUint64Array(nacl.randomBytes(8).buffer);
@@ -53,17 +55,21 @@ export function genSalt(): number {
  * representation in a binary digit representation
  * @param value - Value to encode
  * @returns Encoded number
+ * @category utils
+ * @deprecated This function is out of the sdk scope. Copy implementation from sdk if necessary.
  */
 export function encodeUnsigned(value: number): Buffer {
   const binary = Buffer.allocUnsafe(4);
   binary.writeUInt32BE(value);
-  return binary.slice(binary.findIndex((i) => i !== 0));
+  return binary.subarray(binary.findIndex((i) => i !== 0));
 }
 
 /**
  * Calculate 256bits Blake2b hash of `input`
  * @param input - Data to hash
  * @returns Hash
+ * @category utils
+ * @deprecated use "blakejs" package directly
  */
 export function hash(input: string | Uint8Array): Buffer {
   return Buffer.from(blake2b(input, undefined, 32)); // 256 bits
@@ -75,7 +81,9 @@ export function hash(input: string | Uint8Array): Buffer {
  * @param signature - Signature of data
  * @param address - Address to verify against
  * @returns is data was signed by address
+ * @category utils
  */
+// TODO: rename to `verifySignature`
 export function verify(
   data: Uint8Array,
   signature: Uint8Array,
@@ -103,6 +111,12 @@ export function encodeVarUInt(value: number): Buffer {
 const messagePrefix = Buffer.from('aeternity Signed Message:\n', 'utf8');
 export const messagePrefixLength = encodeVarUInt(messagePrefix.length);
 
+/**
+ * Hash message
+ * @param message - Message to hash
+ * @returns Hash of message
+ * @category utils
+ */
 // TODO: consider rename to hashMessage
 export function messageToHash(message: string): Buffer {
   const msg = Buffer.from(message, 'utf8');
@@ -115,6 +129,7 @@ export function messageToHash(message: string): Buffer {
  * @param signature - Signature of message
  * @param address - Address to verify against
  * @returns is data was signed by address
+ * @category utils
  */
 // TODO: deprecate in favour of `verify(messageToHash(message), ...`, also the name is confusing
 // it should contain "signature"

@@ -34,6 +34,7 @@ import getTransactionSignerAddress from './transaction-signer.js';
  * @param options.gasUsed - Amount of gas actually used to make calculation more accurate
  * @param options.queryFee - Oracle query fee
  * @param options.isInitiator - Is transaction signer an initiator of state channel
+ * @category utils
  */
 export function getExecutionCost(
   transaction: Encoded.Transaction,
@@ -106,6 +107,7 @@ export function getExecutionCost(
  * @param transaction - Transaction to calculate the cost of
  * @param networkId - Network id used to sign the transaction
  * @param options - Options
+ * @category utils
  */
 export function getExecutionCostBySignedTx(
   transaction: Encoded.Transaction,
@@ -135,6 +137,7 @@ export function getExecutionCostBySignedTx(
  * @param node - Node to use
  * @param options - Options
  * @param options.isMined - Is transaction already mined or not
+ * @category utils
  */
 export async function getExecutionCostUsingNode(
   transaction: Encoded.Transaction,
