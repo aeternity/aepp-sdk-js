@@ -4,7 +4,7 @@ import nacl from 'tweetnacl';
 import { blake2b } from 'blakejs/blake2b.js';
 
 import { concatBuffers, isItemOfArray } from './other.js';
-import { decode, encode, Encoded, Encoding } from './encoder.js';
+import { decode, Encoded, Encoding } from './encoder.js';
 import { ArgumentError } from './errors.js';
 
 /**
@@ -67,23 +67,6 @@ export function encodeUnsigned(value: number): Buffer {
  */
 export function hash(input: string | Uint8Array): Buffer {
   return Buffer.from(blake2b(input, undefined, 32)); // 256 bits
-}
-
-// Todo Duplicated in tx builder. remove
-/**
- * Compute contract address
- * @category contract
- * @param owner - Address of contract owner
- * @param nonce - Round when contract was created
- * @returns Contract address
- */
-export function encodeContractAddress(
-  owner: Encoded.AccountAddress,
-  nonce: number,
-): Encoded.ContractAddress {
-  const publicKey = decode(owner);
-  const binary = concatBuffers([publicKey, encodeUnsigned(nonce)]);
-  return encode(hash(binary), Encoding.ContractAddress);
 }
 
 /**

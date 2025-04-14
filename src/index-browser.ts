@@ -23,7 +23,6 @@ export {
   genSalt,
   encodeUnsigned,
   hash,
-  encodeContractAddress,
   verify,
   messageToHash,
   verifyMessage,
@@ -52,6 +51,11 @@ export {
   computeAuctionEndBlock,
   isAuctionName,
 } from './tx/builder/helpers.js';
+/**
+ * @category contract
+ * @deprecated use {@link buildContractId} instead
+ */
+export { buildContractId as encodeContractAddress } from './tx/builder/helpers.js';
 export {
   MAX_AUTH_FUN_GAS,
   MIN_GAS_PRICE,

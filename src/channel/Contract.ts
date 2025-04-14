@@ -26,7 +26,7 @@ import Channel from './Base.js';
 import ChannelSpend from './Spend.js';
 import { ChannelError, UnexpectedChannelMessageError } from '../utils/errors.js';
 import { unpackTx } from '../tx/builder/index.js';
-import { encodeContractAddress } from '../utils/crypto.js';
+import { buildContractId } from '../tx/builder/helpers.js';
 
 function snakeToPascalObjKeys<Type>(obj: object): Type {
   return Object.entries(obj).reduce(
@@ -169,7 +169,7 @@ export default class ChannelContract extends ChannelSpend {
                   this._options.role === 'initiator' ? 'initiatorId' : 'responderId';
                 const owner = this._options[addressKey];
                 changeState(this, message2.params.data.state);
-                const address = encodeContractAddress(owner, params.round);
+                const address = buildContractId(owner, params.round);
                 emit(this, 'newContract', address);
                 state2.resolve({ accepted: true, address, signedTx: message2.params.data.state });
                 return { handler: channelOpen };

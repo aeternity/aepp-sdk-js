@@ -18,17 +18,17 @@ import { ArgumentError, IllegalBidFeeError } from '../../utils/errors.js';
  */
 
 /**
- * Build a contract public key
+ * Build a contract address
  * @category contract
- * @param ownerId - The public key of the owner account
- * @param nonce - the nonce of the transaction
- * @returns Contract public key
+ * @param owner - Address of contract owner
+ * @param nonce - Nonce of ContractCreateTx or state channel round when contract was created
+ * @returns Contract address
  */
 export function buildContractId(
-  ownerId: Encoded.AccountAddress,
+  owner: Encoded.AccountAddress,
   nonce: number | BigNumber,
 ): Encoded.ContractAddress {
-  const ownerIdAndNonce = Buffer.from([...decode(ownerId), ...toBytes(nonce)]);
+  const ownerIdAndNonce = Buffer.from([...decode(owner), ...toBytes(nonce)]);
   const b2bHash = hash(ownerIdAndNonce);
   return encode(b2bHash, Encoding.ContractAddress);
 }
