@@ -24,7 +24,7 @@ export {
   encodeUnsigned,
   hash,
   verifySignature,
-  messageToHash,
+  hashMessage,
   verifyMessage,
 } from './utils/crypto.js';
 /**
@@ -32,6 +32,11 @@ export {
  * @deprecated use {@link verifySignature} instead
  */
 export { verifySignature as verify } from './utils/crypto.js';
+/**
+ * @deprecated use {@link hashMessage} instead
+ * @category utils
+ */
+export { hashMessage as messageToHash } from './utils/crypto.js';
 export { signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt } from './utils/jwt.js';
 export type { Jwt } from './utils/jwt.js';
 export { toBytes } from './utils/bytes.js';

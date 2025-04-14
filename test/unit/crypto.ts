@@ -11,7 +11,7 @@ import {
   hash,
   genSalt,
   verifySignature,
-  messageToHash,
+  hashMessage,
   Encoding,
 } from '../../src';
 
@@ -103,7 +103,7 @@ describe('crypto', () => {
     const longMessageHash = Buffer.from('J9bibOHrlicf0tYQxe1lW69LdDAxETwPmrafKjjQwvs=', 'base64');
 
     it('calculates a hash of a long message', () =>
-      expect(messageToHash(longMessage)).to.eql(longMessageHash));
+      expect(hashMessage(longMessage)).to.eql(longMessageHash));
 
     describe('verify', () => {
       it('should verify message', () => {

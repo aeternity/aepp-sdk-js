@@ -116,8 +116,7 @@ export const messagePrefixLength = encodeVarUInt(messagePrefix.length);
  * @returns Hash of message
  * @category utils
  */
-// TODO: consider rename to hashMessage
-export function messageToHash(message: string): Buffer {
+export function hashMessage(message: string): Buffer {
   const msg = Buffer.from(message, 'utf8');
   return hash(concatBuffers([messagePrefixLength, messagePrefix, encodeVarUInt(msg.length), msg]));
 }
@@ -130,12 +129,12 @@ export function messageToHash(message: string): Buffer {
  * @returns is data was signed by address
  * @category utils
  */
-// TODO: deprecate in favour of `verify(messageToHash(message), ...`, also the name is confusing
+// TODO: deprecate in favour of `verify(hashMessage(message), ...`, also the name is confusing
 // it should contain "signature"
 export function verifyMessage(
   message: string,
   signature: Uint8Array,
   address: Encoded.AccountAddress,
 ): boolean {
-  return verifySignature(messageToHash(message), signature, address);
+  return verifySignature(hashMessage(message), signature, address);
 }

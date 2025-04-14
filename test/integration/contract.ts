@@ -7,7 +7,7 @@ import {
   NodeInvocationError,
   Encoded,
   DRY_RUN_ACCOUNT,
-  messageToHash,
+  hashMessage,
   UnexpectedTsError,
   AeSdk,
   Contract,
@@ -78,7 +78,7 @@ describe('Contract', () => {
 
   it('Verify message in Sophia', async () => {
     const signContract = await Contract.initialize<{
-      message_to_hash: (message: string) => Uint8Array;
+      hash_message: (message: string) => Uint8Array;
       verify: (message: string, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
       ...aeSdk.getContext(),
@@ -96,7 +96,7 @@ describe('Contract', () => {
               None => false
               Some(_) => true
 
-          entrypoint message_to_hash (message: string): hash =
+          entrypoint hash_message (message: string): hash =
             let prefix = "aeternity Signed Message:\\n"
             let prefixBinary = String.concat(int_to_binary(String.length(prefix)), prefix)
             let messageBinary = String.concat(int_to_binary(String.length(message)), message)
@@ -104,14 +104,14 @@ describe('Contract', () => {
 
           entrypoint verify (message: string, pub: address, sig: signature): bool =
             require(includes(message, "H"), "Invalid message")
-            Crypto.verify_sig(message_to_hash(message), pub, sig)`,
+            Crypto.verify_sig(hash_message(message), pub, sig)`,
     });
     await signContract.$deploy([]);
 
     await Promise.all(
       ['Hello', 'H'.repeat(127)].map(async (message) => {
-        expect((await signContract.message_to_hash(message)).decodedResult).to.eql(
-          messageToHash(message),
+        expect((await signContract.hash_message(message)).decodedResult).to.eql(
+          hashMessage(message),
         );
         const signature = await aeSdk.signMessage(message);
         expect(
