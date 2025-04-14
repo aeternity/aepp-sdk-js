@@ -8,14 +8,23 @@ import Node from '../Node.js';
 import AccountBase from '../account/Base.js';
 import OracleBase, { OracleQuery } from './OracleBase.js';
 
+/**
+ * @category oracle
+ */
 interface OracleRegisterOptions
   extends BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat'>,
     Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
+/**
+ * @category oracle
+ */
 interface OracleExtendTtlOptions
   extends BuildTxOptions<Tag.OracleExtendTx, 'callerId' | 'oracleId'>,
     Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
+/**
+ * @category oracle
+ */
 interface OracleRespondToQueryOptions
   extends BuildTxOptions<Tag.OracleRespondTx, 'callerId' | 'oracleId' | 'queryId' | 'response'>,
     Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}

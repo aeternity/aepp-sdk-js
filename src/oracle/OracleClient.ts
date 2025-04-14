@@ -10,6 +10,9 @@ import Node from '../Node.js';
 import AccountBase from '../account/Base.js';
 import OracleBase from './OracleBase.js';
 
+/**
+ * @category oracle
+ */
 interface OracleClientPostQueryOptions
   extends Optional<Parameters<typeof sendTransaction>[1], 'onNode' | 'onAccount'>,
     BuildTxOptions<Tag.OracleQueryTx, 'oracleId' | 'senderId' | 'query'> {}

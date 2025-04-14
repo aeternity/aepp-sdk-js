@@ -1,7 +1,14 @@
 import { decode, Encoded } from '../utils/encoder.js';
 import Node from '../Node.js';
 
+/**
+ * @category oracle
+ */
 type OracleQueryNode = Awaited<ReturnType<Node['getOracleQueryByPubkeyAndQueryId']>>;
+
+/**
+ * @category oracle
+ */
 export interface OracleQuery extends OracleQueryNode {
   // TODO: type should be corrected in node api
   id: Encoded.OracleQueryId;
@@ -21,6 +28,7 @@ function decodeQuery(queryEntry: OracleQueryNode): OracleQuery {
 /**
  * This class is needed because `getOracleQuery` would return different values depending on the
  * oracle type.
+ * @category oracle
  */
 export default class OracleBase {
   /**
