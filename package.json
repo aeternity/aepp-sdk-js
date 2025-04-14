@@ -2,6 +2,7 @@
   "name": "@aeternity/aepp-sdk",
   "version": "14.0.0",
   "description": "SDK for the æternity blockchain",
+  "homepage": "https://sdk.aeternity.io/",
   "main": "dist/aepp-sdk.cjs",
   "types": "es/index.d.ts",
   "module": "es/index.js",
