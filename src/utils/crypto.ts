@@ -76,15 +76,14 @@ export function hash(input: string | Uint8Array): Buffer {
 }
 
 /**
- * Verify that signature was signed by public key
+ * Verify that data was signed by account
  * @param data - Data that was signed
  * @param signature - Signature of data
- * @param address - Address to verify against
- * @returns is data was signed by address
+ * @param address - Address of account to verify against
+ * @returns is data was signed by account
  * @category utils
  */
-// TODO: rename to `verifySignature`
-export function verify(
+export function verifySignature(
   data: Uint8Array,
   signature: Uint8Array,
   address: Encoded.AccountAddress,
@@ -138,5 +137,5 @@ export function verifyMessage(
   signature: Uint8Array,
   address: Encoded.AccountAddress,
 ): boolean {
-  return verify(messageToHash(message), signature, address);
+  return verifySignature(messageToHash(message), signature, address);
 }

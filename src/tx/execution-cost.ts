@@ -1,7 +1,7 @@
 import { Encoded } from '../utils/encoder.js';
 import { buildTx, buildTxHash, unpackTx } from './builder/index.js';
 import { Tag } from './builder/constants.js';
-import { verify } from '../utils/crypto.js';
+import { verifySignature } from '../utils/crypto.js';
 import { getBufferToSign } from '../account/Memory.js';
 import { IllegalArgumentError, InternalError, TransactionError } from '../utils/errors.js';
 import Node from '../Node.js';
@@ -122,7 +122,7 @@ export function getExecutionCostBySignedTx(
   const tx = buildTx(params.encodedTx);
   const address = getTransactionSignerAddress(tx);
   const [isInnerTx, isNotInnerTx] = [true, false].map((f) =>
-    verify(getBufferToSign(tx, networkId, f), params.signatures[0], address),
+    verifySignature(getBufferToSign(tx, networkId, f), params.signatures[0], address),
   );
   if (!isInnerTx && !isNotInnerTx) throw new TransactionError("Can't verify signature");
   return getExecutionCost(buildTx(params.encodedTx), {

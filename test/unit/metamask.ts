@@ -9,7 +9,7 @@ import {
   buildTx,
   Tag,
   unpackTx,
-  verify,
+  verifySignature,
   verifyMessage,
   decode,
   hash,
@@ -287,7 +287,7 @@ describe('Aeternity Snap for MetaMask', function () {
         signatures: [signature],
       } = unpackTx(signedTransaction, Tag.SignedTx);
       const hashedTx = Buffer.concat([Buffer.from(networkId), hash(decode(transaction))]);
-      expect(verify(hashedTx, signature, address)).to.equal(true);
+      expect(verifySignature(hashedTx, signature, address)).to.equal(true);
     });
 
     it('signs transaction rejected', async () => {

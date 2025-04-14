@@ -1,5 +1,5 @@
 import { RestError } from '@azure/core-rest-pipeline';
-import { hash, isAddressValid, verify } from '../utils/crypto.js';
+import { hash, isAddressValid, verifySignature } from '../utils/crypto.js';
 import { TxUnpacked } from './builder/schema.generated.js';
 import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version.js';
 import { Tag, ConsensusProtocolVersion } from './builder/constants.js';
@@ -107,8 +107,8 @@ validators.push(
     const txWithNetworkId = concatBuffers([prefix, txBinary]);
     const txHashWithNetworkId = concatBuffers([prefix, hash(txBinary)]);
     if (
-      verify(txWithNetworkId, signatures[0], account.id) ||
-      verify(txHashWithNetworkId, signatures[0], account.id)
+      verifySignature(txWithNetworkId, signatures[0], account.id) ||
+      verifySignature(txHashWithNetworkId, signatures[0], account.id)
     )
       return [];
     return [

@@ -23,7 +23,7 @@ import {
   MESSAGE_DIRECTION,
   METHODS,
   RPC_STATUS,
-  verify,
+  verifySignature,
   NoWalletConnectedError,
   UnAuthorizedAccountError,
   UnknownRpcClientError,
@@ -363,7 +363,7 @@ describe('Aepp<->Wallet', () => {
           encodedTx,
         } = unpackedTx;
         const txWithNetwork = getBufferToSign(buildTx(encodedTx), networkId, innerTx);
-        expect(verify(txWithNetwork, signature, aepp.address)).to.equal(true);
+        expect(verifySignature(txWithNetwork, signature, aepp.address)).to.equal(true);
       });
     });
 
@@ -477,7 +477,7 @@ describe('Aepp<->Wallet', () => {
         const messageSig = await aepp.signTypedData(recordData, recordAci);
         expect(messageSig).to.satisfy((s: string) => s.startsWith('sg_'));
         const hash = hashTypedData(recordData, recordAci, {});
-        expect(verify(hash, decode(messageSig), aepp.address)).to.equal(true);
+        expect(verifySignature(hash, decode(messageSig), aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
@@ -494,7 +494,7 @@ describe('Aepp<->Wallet', () => {
         const onAccount = wallet.addresses()[1];
         const messageSig = await aepp.signTypedData(recordData, recordAci, { onAccount });
         const hash = hashTypedData(recordData, recordAci, {});
-        expect(verify(hash, decode(messageSig), onAccount)).to.equal(true);
+        expect(verifySignature(hash, decode(messageSig), onAccount)).to.equal(true);
       });
     });
 
@@ -519,7 +519,7 @@ describe('Aepp<->Wallet', () => {
       it('works', async () => {
         const signature = await aepp.unsafeSign(rawData);
         expect(signature).to.be.an.instanceOf(Buffer);
-        expect(verify(rawData, signature, aepp.address)).to.equal(true);
+        expect(verifySignature(rawData, signature, aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
@@ -537,7 +537,7 @@ describe('Aepp<->Wallet', () => {
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
         const signature = await aepp.unsafeSign(rawData, { onAccount });
-        expect(verify(rawData, signature, onAccount)).to.equal(true);
+        expect(verifySignature(rawData, signature, onAccount)).to.equal(true);
       });
     });
 

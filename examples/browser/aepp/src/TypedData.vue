@@ -93,7 +93,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { hashTypedData, verify, decode } from '@aeternity/aepp-sdk';
+import { hashTypedData, verifySignature, decode } from '@aeternity/aepp-sdk';
 import { TypeResolver, ContractByteArrayEncoder } from '@aeternity/aepp-calldata';
 import Value from './components/Value.vue';
 import FieldAction from './components/FieldAction.vue';
@@ -148,7 +148,7 @@ export default {
       return this.aeSdk.signTypedData(this.dataEncoded, this.aciParsed, this.domain);
     },
     async verifyTypedData() {
-      return verify(this.hash, decode(this.verifySignature), this.verifyAddress);
+      return verifySignature(this.hash, decode(this.verifySignature), this.verifyAddress);
     },
   },
 };

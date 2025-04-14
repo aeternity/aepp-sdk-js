@@ -1,7 +1,7 @@
 import '..';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { MemoryAccount, verifyMessage, InvalidChecksumError, verify } from '../../src';
+import { MemoryAccount, verifyMessage, InvalidChecksumError, verifySignature } from '../../src';
 
 const secretKey = 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf';
 
@@ -36,7 +36,7 @@ describe('MemoryAccount', () => {
         249, 219, 99, 74, 255, 5,
       ]),
     );
-    expect(verify(data, signature, account.address)).to.equal(true);
+    expect(verifySignature(data, signature, account.address)).to.equal(true);
   });
 
   it('Sign message', async () => {

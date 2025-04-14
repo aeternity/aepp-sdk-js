@@ -23,10 +23,15 @@ export {
   genSalt,
   encodeUnsigned,
   hash,
-  verify,
+  verifySignature,
   messageToHash,
   verifyMessage,
 } from './utils/crypto.js';
+/**
+ * @category utils
+ * @deprecated use {@link verifySignature} instead
+ */
+export { verifySignature as verify } from './utils/crypto.js';
 export { signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt } from './utils/jwt.js';
 export type { Jwt } from './utils/jwt.js';
 export { toBytes } from './utils/bytes.js';

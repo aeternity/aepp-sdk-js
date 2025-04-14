@@ -10,7 +10,7 @@ import {
   isAddressValid,
   hash,
   genSalt,
-  verify,
+  verifySignature,
   messageToHash,
   Encoding,
 } from '../../src';
@@ -83,7 +83,7 @@ describe('crypto', () => {
 
   describe('verify', () => {
     it('should verify tx with correct signature', () => {
-      const result = verify(txBinary, signature, address);
+      const result = verifySignature(txBinary, signature, address);
       assert.isTrue(result);
     });
   });

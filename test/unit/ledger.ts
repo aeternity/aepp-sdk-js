@@ -16,7 +16,7 @@ import {
   Node,
   Tag,
   unpackTx,
-  verify,
+  verifySignature,
   verifyMessage,
   decode,
   Encoded,
@@ -224,7 +224,7 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
         signatures: [signature],
       } = unpackTx(signedTransaction, Tag.SignedTx);
       const hashedTx = Buffer.concat([Buffer.from(networkId), hash(decode(transaction))]);
-      expect(verify(hashedTx, signature, address)).to.equal(true);
+      expect(verifySignature(hashedTx, signature, address)).to.equal(true);
     });
 
     it('signs transaction rejected', async () => {
