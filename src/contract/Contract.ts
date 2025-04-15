@@ -46,7 +46,7 @@ import { getAccount, getContract, getContractByteCode, resolveName, txDryRun } f
 import { sendTransaction, SendTransactionOptions } from '../send-transaction.js';
 import { TxUnpacked } from '../tx/builder/schema.generated.js';
 import { Optional, isAccountNotFoundError } from '../utils/other.js';
-import { isNameValid, produceNameId } from '../tx/builder/helpers.js';
+import { isName, produceNameId } from '../tx/builder/helpers.js';
 
 type ContractAci = NonNullable<Aci[0]['contract']>;
 type FunctionAci = ContractAci['functions'][0];
@@ -548,7 +548,7 @@ class Contract<M extends ContractMethodsBase> {
         resolveByNode: true,
         onNode,
       })) as Encoded.ContractAddress;
-      if (isNameValid(address)) name = address;
+      if (isName(address)) name = address;
     }
 
     if (address == null && sourceCode == null && sourceCodePath == null && bytecode == null) {

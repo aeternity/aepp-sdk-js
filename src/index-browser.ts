@@ -53,7 +53,7 @@ export {
   produceNameId,
   commitmentHash,
   readInt,
-  isNameValid,
+  isName,
   ensureName,
   getDefaultPointerKey,
   getMinimumNameFee,
@@ -66,6 +66,11 @@ export {
  * @deprecated use {@link buildContractId} instead
  */
 export { buildContractId as encodeContractAddress } from './tx/builder/helpers.js';
+/**
+ * @category AENS
+ * @deprecated use {@link isName} instead
+ */
+export { isName as isNameValid } from './tx/builder/helpers.js';
 export {
   MAX_AUTH_FUN_GAS,
   MIN_GAS_PRICE,

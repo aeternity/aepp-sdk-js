@@ -1,7 +1,7 @@
 import { AE_AMOUNT_FORMATS, formatAmount } from './utils/amount-formatter.js';
 import { isAccountNotFoundError, pause } from './utils/other.js';
 import { unwrapProxy } from './utils/wrap-proxy.js';
-import { isNameValid, produceNameId } from './tx/builder/helpers.js';
+import { isName, produceNameId } from './tx/builder/helpers.js';
 import { AensName, DRY_RUN_ACCOUNT } from './tx/builder/constants.js';
 import {
   AensPointerContextError,
@@ -442,7 +442,7 @@ export async function resolveName<Type extends Encoding.AccountAddress | Encodin
     onNode,
   }: { verify?: boolean; resolveByNode?: boolean; onNode: Node },
 ): Promise<Encoded.Generic<Type | Encoding.Name>> {
-  if (isNameValid(nameOrId)) {
+  if (isName(nameOrId)) {
     if (verify || resolveByNode) {
       const name = await onNode.getNameEntryByName(nameOrId);
       const pointer = name.pointers.find((p) => p.key === key);

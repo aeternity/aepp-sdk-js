@@ -159,8 +159,7 @@ export function ensureName(maybeName: string): asserts maybeName is AensName {
  * @category AENS
  * @param maybeName - AENS name
  */
-// TODO: consider renaming to isName
-export function isNameValid(maybeName: string): maybeName is AensName {
+export function isName(maybeName: string): maybeName is AensName {
   try {
     ensureName(maybeName);
     return true;

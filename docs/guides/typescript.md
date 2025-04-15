@@ -176,14 +176,14 @@ isAddressValid(address, Encoding.Transaction);
 
 ### AENS name validation
 
-The similar way [`isNameValid`] can be used
+The similar way [`isName`] can be used
 
 ```ts
-import { isNameValid } from '@aeternity/aepp-sdk';
+import { isName } from '@aeternity/aepp-sdk';
 
-console.log(isNameValid('name.chain')); // true
-console.log(isNameValid('мир.chain')); // true
-console.log(isNameValid('🙂.chain')); // false
+console.log(isName('name.chain')); // true
+console.log(isName('мир.chain')); // true
+console.log(isName('🙂.chain')); // false
 ```
 
 If you don't need to handle invalid names specially then you can use [`ensureName`]:
@@ -198,7 +198,7 @@ const name = new Name(nameAsString, options);
 
 Doing this way, [`ensureName`] will throw an exception if `nameAsString` is not a proper AENS name. TypeScript will handle `nameAsString` as `${string}.chain` in lines below [`ensureName`] invocation.
 
-[`isNameValid`]: https://sdk.aeternity.io/v14.0.0/api/functions/isNameValid.html
+[`isName`]: https://sdk.aeternity.io/v14.1.0/api/functions/isName.html
 [`ensureName`]: https://sdk.aeternity.io/v14.0.0/api/functions/ensureName.html
 
 ## Check types of contract methods
