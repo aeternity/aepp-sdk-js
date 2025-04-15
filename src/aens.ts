@@ -12,7 +12,6 @@ import { commitmentHash, isAuctionName, produceNameId } from './tx/builder/helpe
 import { Tag, AensName } from './tx/builder/constants.js';
 import { Encoded, Encoding } from './utils/encoder.js';
 import { LogicError } from './utils/errors.js';
-import { getName } from './chain.js';
 import { sendTransaction, SendTransactionOptions } from './send-transaction.js';
 import { Optional } from './utils/other.js';
 import { buildTxAsync, BuildTxOptions } from './tx/builder/index.js';
@@ -139,7 +138,10 @@ export default class Name {
     const allPointers = {
       ...(extendPointers === true &&
         Object.fromEntries(
-          (await getName(this.value, opt)).pointers.map(({ key, id }) => [key, id]),
+          (await opt.onNode.getNameEntryByName(this.value)).pointers.map(({ key, id }) => [
+            key,
+            id,
+          ]),
         )),
       ...pointers,
     };

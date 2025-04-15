@@ -80,6 +80,9 @@ interface SendAndProcessReturnType {
   rawTx: Encoded.Transaction;
 }
 
+/**
+ * @category contract
+ */
 export interface ContractMethodsBase {
   [key: string]: (...args: any[]) => any;
 }
@@ -107,6 +110,9 @@ type MethodsToContractApi<M extends ContractMethodsBase> = {
     : never;
 };
 
+/**
+ * @category contract
+ */
 type ContractWithMethods<M extends ContractMethodsBase> = Contract<M> & MethodsToContractApi<M>;
 
 type MethodNames<M extends ContractMethodsBase> = (keyof M & string) | 'init';
@@ -674,6 +680,9 @@ interface ContractWithMethodsClass {
   initialize: (typeof Contract)['initialize'];
 }
 
+/**
+ * @category contract
+ */
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 const ContractWithMethods: ContractWithMethodsClass = Contract as any;
 

@@ -1,6 +1,9 @@
 import { BigNumber } from 'bignumber.js';
 import { mapObject } from '../../utils/other.js';
 
+/**
+ * @category transaction builder
+ */
 export const DRY_RUN_ACCOUNT = {
   pub: 'ak_11111111111111111111111111111111273Yts',
   amount: 100000000000000000000000000000000000n,
@@ -11,18 +14,45 @@ export const MAX_AUTH_FUN_GAS = 50000;
  * @category utils
  */
 export type Int = number | string | BigNumber;
+/**
+ * @category AENS
+ */
 export type AensName = `${string}.chain`;
+/**
+ * @category transaction builder
+ */
 export const MIN_GAS_PRICE = 1e9; // TODO: don't use number for ae
-// # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67
-export const NAME_FEE_MULTIPLIER = 1e14; // 100000000000000
-export const NAME_FEE_BID_INCREMENT = 0.05; // # the increment is in percentage
-// # see https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272
-export const NAME_BID_TIMEOUT_BLOCKS = 480; // # ~1 day
-// # this is the max length for a domain that requires a base fee to be paid
+/**
+ * @category AENS
+ * @see {@link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L67}
+ * @deprecated use {@link getMinimumNameFee} instead
+ */
+export const NAME_FEE_MULTIPLIER = 1e14;
+/**
+ * The next bid should be at least 5% bigger than the previous one
+ * @category AENS
+ * @deprecated use {@link computeBidFee} instead
+ */
+export const NAME_FEE_BID_INCREMENT = 0.05;
+/**
+ * Approximately 1 day
+ * @category AENS
+ * @see {@link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L272}
+ * @deprecated use {@link computeAuctionEndBlock} instead
+ */
+export const NAME_BID_TIMEOUT_BLOCKS = 480;
+/**
+ * This is the max length for a domain that requires a base fee to be paid
+ * @category AENS
+ * @deprecated use {@link getMinimumNameFee} instead
+ */
 export const NAME_MAX_LENGTH_FEE = 31;
-// # https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290
-// # https://github.com/aeternity/protocol/blob/master/AENS.md#protocol-fees-and-protection-times
-// # bid ranges:
+/**
+ * @category AENS
+ * @see {@link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L290}
+ * @see {@link https://github.com/aeternity/protocol/blob/master/AENS.md#protocol-fees-and-protection-times}
+ * @deprecated use {@link getMinimumNameFee} instead
+ */
 export const NAME_BID_RANGES = mapObject(
   {
     31: 3,
@@ -60,12 +90,15 @@ export const NAME_BID_RANGES = mapObject(
   ([key, value]) => [key, new BigNumber(value).times(NAME_FEE_MULTIPLIER)],
 );
 
+/**
+ * @category chain
+ */
 export enum ConsensusProtocolVersion {
   Ceres = 6,
 }
 
 /**
- * @category transaction builder
+ * @category contract
  * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
  */
 export enum VmVersion {
@@ -80,7 +113,7 @@ export enum VmVersion {
 }
 
 /**
- * @category transaction builder
+ * @category contract
  * @see {@link https://github.com/aeternity/protocol/blob/0f6dee3d9d1e8e2469816798f5c7587a6c918f94/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain}
  */
 export enum AbiVersion {

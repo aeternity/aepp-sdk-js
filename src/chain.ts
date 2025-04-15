@@ -412,6 +412,7 @@ export async function getContract(
  * @param name - AENS name
  * @param options - Options
  * @param options.onNode - Node to use
+ * @deprecated Use {@link Node.getNameEntryByName} or {@link Name.getState} instead
  */
 export async function getName(
   name: AensName,

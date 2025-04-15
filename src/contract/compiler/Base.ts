@@ -34,6 +34,7 @@ export type CompileResult = Promise<{
 
 /**
  * A base class for all compiler implementations
+ * @category contract
  */
 export default abstract class CompilerBase {
   /**

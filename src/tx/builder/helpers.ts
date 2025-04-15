@@ -33,6 +33,7 @@ export function buildContractId(
   return encode(b2bHash, Encoding.ContractAddress);
 }
 
+// TODO: add `build` prefix the same as others
 /**
  * Build a oracle query id
  * @category oracle
@@ -101,6 +102,7 @@ export function nameToPunycode(maybeName: string): AensName {
   return punycode as AensName;
 }
 
+// TODO: replace `produce` with `build` the same as others
 /**
  * Encode an AENS name
  * @category AENS
@@ -111,6 +113,7 @@ export function produceNameId(name: AensName): Encoded.Name {
   return encode(hash(nameToPunycode(name)), Encoding.Name);
 }
 
+// TODO: add `build` the same as others
 /**
  * Generate the commitment hash by hashing the salt and
  * name, base 58 encoding the result and prepending 'cm_'
