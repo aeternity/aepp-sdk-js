@@ -3,6 +3,7 @@ import AccountBase from './Base.js';
 
 /**
  * A factory class that generates instances of AccountBase by index.
+ * @category account
  */
 export default abstract class AccountBaseFactory {
   /**

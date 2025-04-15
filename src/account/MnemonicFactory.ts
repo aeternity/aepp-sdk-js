@@ -40,6 +40,7 @@ interface Wallet {
 
 /**
  * A factory class that generates instances of AccountMemory based on provided mnemonic phrase.
+ * @category account
  */
 export default class AccountMnemonicFactory extends AccountBaseFactory {
   #mnemonicOrWalletOrSeed: string | Wallet | Uint8Array;

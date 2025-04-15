@@ -21,6 +21,7 @@ export function getBufferToSign(
 
 /**
  * In-memory account class
+ * @category account
  */
 export default class AccountMemory extends AccountBase {
   override readonly address: Encoded.AccountAddress;

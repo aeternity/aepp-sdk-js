@@ -124,6 +124,11 @@ export { default as AeSdkWallet } from './AeSdkWallet.js';
 export { default as Node } from './Node.js';
 export { default as verifyTransaction } from './tx/validator.js';
 export { default as AccountBase } from './account/Base.js';
+export { default as AccountMemory } from './account/Memory.js';
+/**
+ * @deprecated Use {@link AccountMemory} instead
+ * @category account
+ */
 export { default as MemoryAccount } from './account/Memory.js';
 export { default as AccountMnemonicFactory } from './account/MnemonicFactory.js';
 export { default as AccountGeneralized } from './account/Generalized.js';

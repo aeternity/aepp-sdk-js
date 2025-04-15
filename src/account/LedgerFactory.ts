@@ -11,6 +11,7 @@ interface AppConfiguration {
 
 /**
  * A factory class that generates instances of AccountLedger based on provided transport.
+ * @category account
  */
 export default class AccountLedgerFactory extends AccountBaseFactory {
   /**
