@@ -77,6 +77,9 @@ interface Contract {
   vmVersion: VmVersion;
 }
 
+/**
+ * @category state channel
+ */
 export default class ChannelContract extends ChannelSpend {
   static override async initialize(options: ChannelOptions): Promise<ChannelContract> {
     return Channel._initialize(new ChannelContract(), options);
