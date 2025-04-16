@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { encode, decode, Encoding, MemoryAccount } from '../../src';
+import { encode, decode, Encoding, AccountMemory } from '../../src';
 import { deriveKey, derivePathFromKey, ED25519_CURVE } from '../../src/account/MnemonicFactory';
 import { concatBuffers } from '../../src/utils/other';
 
@@ -255,7 +255,7 @@ describe('hd wallet', () => {
             const { secretKey, chainCode } = derivePathFromKey(masterKey, test.path);
             expect(chainCode).to.eql(test.chain);
             expect(secretKey).to.eql(test.prv);
-            const { address } = new MemoryAccount(encode(secretKey, Encoding.AccountSecretKey));
+            const { address } = new AccountMemory(encode(secretKey, Encoding.AccountSecretKey));
             expect(concatBuffers([Buffer.alloc(1, 0), decode(address)])).to.eql(test.pub);
           }),
         ));

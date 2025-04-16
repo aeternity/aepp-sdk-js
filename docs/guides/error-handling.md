@@ -109,14 +109,14 @@ BaseError
 import {
   AeSdk,
   Node,
-  MemoryAccount,
+  AccountMemory,
   ArgumentError,
   InvalidAensNameError,
 } from '@aeternity/aepp-sdk';
 
 // setup
-const payerAccount = MemoryAccount.generate();
-const newUserAccount = MemoryAccount.generate();
+const payerAccount = AccountMemory.generate();
+const newUserAccount = AccountMemory.generate();
 const node = new Node('https://testnet.aeternity.io');
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

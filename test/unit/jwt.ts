@@ -6,13 +6,13 @@ import {
   verifyJwt,
   isJwt,
   ensureJwt,
-  MemoryAccount,
+  AccountMemory,
   ArgumentError,
   InvalidSignatureError,
 } from '../../src';
 
 describe('JWT', () => {
-  const account = new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
+  const account = new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
   const payload = { test: 'data' };
   const jwt =
     'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJzdWJfandrIjp7ImNydiI6IkVkMjU1MTkiLCJrdHkiOiJPS1AiLCJ4IjoiaEF5WFM1Y1dSM1pGUzZFWjJFN2NUV0JZcU43SksyN2NWNHF5MHd0TVFnQSJ9LCJ0ZXN0IjoiZGF0YSJ9.u9El4b2O2LRhvTTW3g46vk1hx0xXWPkJEaEeEy-rLzLr2yuQlNc7qIdcr_z06BgHx5jyYv2CpUL3hqLpc0RzBA';
@@ -69,7 +69,7 @@ describe('JWT', () => {
     });
 
     it('fails if address not the same as in "sub_jwk"', () => {
-      const { address } = MemoryAccount.generate();
+      const { address } = AccountMemory.generate();
       expect(() => unpackJwt(jwt, address)).to.throw(
         ArgumentError,
         `address should be ${account.address} ("sub_jwk"), got ${address} instead`,
@@ -96,7 +96,7 @@ describe('JWT', () => {
     });
 
     it('fails if wrong signature', () => {
-      const { address } = MemoryAccount.generate();
+      const { address } = AccountMemory.generate();
       expect(() => unpackJwt(jwtShortest, address)).to.throw(
         InvalidSignatureError,
         `JWT is not signed by ${address}`,
@@ -112,7 +112,7 @@ describe('JWT', () => {
     });
 
     it('returns false if address not the same as in "sub_jwk"', () => {
-      expect(verifyJwt(jwt, MemoryAccount.generate().address)).to.equal(false);
+      expect(verifyJwt(jwt, AccountMemory.generate().address)).to.equal(false);
     });
 
     it('returns false if address not provided', () => {

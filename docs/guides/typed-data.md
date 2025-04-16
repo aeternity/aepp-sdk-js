@@ -34,7 +34,7 @@ corresponds to the data
 
 ## Implementation
 
-- [AccountBase:signTypedData](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/account/Base.ts#L63-L70) — calculates signature, supported in MemoryAccount and in aepp-wallet connection;
+- [AccountBase:signTypedData](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/account/Base.ts#L63-L70) — calculates signature, supported in AccountMemory and in aepp-wallet connection;
 - [hashTypedData](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/typed-data.ts#L82-L96) — calculates the overall hash of typed data to sign;
 - [hashJson](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/typed-data.ts#L10-L12) — deterministic hashing of an arbitrary JS value, used to calculate `hash(aci)`;
 - [hashDomain](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/typed-data.ts#L56-L80) — use for debugging or to prepare the hash value for smart contract.

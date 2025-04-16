@@ -6,7 +6,7 @@ import {
   AeSdkAepp,
   AeSdkWallet,
   BrowserWindowMessageConnection,
-  MemoryAccount,
+  AccountMemory,
   Node,
   CompilerHttp,
   RpcConnectionDenyError,
@@ -103,14 +103,14 @@ describe('Aepp<->Wallet', () => {
   });
 
   describe('New RPC Wallet-AEPP: AEPP node', () => {
-    const { address } = MemoryAccount.generate();
+    const { address } = AccountMemory.generate();
     let aepp: AeSdkAepp;
     let wallet: AeSdkWallet;
 
     before(async () => {
       wallet = new AeSdkWallet({
         nodes: [{ name: 'local', instance: node }],
-        accounts: [account, MemoryAccount.generate()],
+        accounts: [account, AccountMemory.generate()],
         id: 'test',
         type: WALLET_TYPE.window,
         name: 'Wallet',
@@ -391,7 +391,7 @@ describe('Aepp<->Wallet', () => {
           amount: 0,
           payload: encode(Buffer.from('zerospend2'), Encoding.Bytearray),
         });
-        return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
+        return AccountMemory.prototype.signTransaction.call(acc, txReplace, options);
       });
       const tx = await aepp.buildTx({
         tag: Tag.SpendTx,
@@ -643,7 +643,7 @@ describe('Aepp<->Wallet', () => {
         const accountsPromise = new Promise<Accounts>((resolve) => {
           aepp.onAddressChange = resolve;
         });
-        wallet.addAccount(MemoryAccount.generate());
+        wallet.addAccount(AccountMemory.generate());
         expect(Object.keys((await accountsPromise).connected).length).to.equal(connectedLength + 1);
       });
 
@@ -806,7 +806,7 @@ describe('Aepp<->Wallet', () => {
           amount: 0,
           payload: encode(Buffer.from('zerospend2'), Encoding.Bytearray),
         });
-        return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
+        return AccountMemory.prototype.signTransaction.call(acc, txReplace, options);
       });
       const tx = await aepp.buildTx({
         tag: Tag.SpendTx,

@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { Node, Encoded, AccountMnemonicFactory, MemoryAccount } from '../../src';
+import { Node, Encoded, AccountMnemonicFactory, AccountMemory } from '../../src';
 
 const mnemonic = 'eye quarter chapter suit cruel scrub verify stuff volume control learn dust';
 
@@ -40,28 +40,28 @@ describe('Account mnemonic factory', () => {
   it('initializes an account by mnemonic', async () => {
     const factory = new AccountMnemonicFactory(mnemonic);
     const account = await factory.initialize(42);
-    expect(account).to.be.an.instanceOf(MemoryAccount);
+    expect(account).to.be.an.instanceOf(AccountMemory);
     expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
   });
 
   it('initializes an account by seed', async () => {
     const factory = new AccountMnemonicFactory(seed);
     const account = await factory.initialize(42);
-    expect(account).to.be.an.instanceOf(MemoryAccount);
+    expect(account).to.be.an.instanceOf(AccountMemory);
     expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
   });
 
   it('initializes an account by wallet', async () => {
     const factory = new AccountMnemonicFactory(wallet);
     const account = await factory.initialize(42);
-    expect(account).to.be.an.instanceOf(MemoryAccount);
+    expect(account).to.be.an.instanceOf(AccountMemory);
     expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
   });
 
   it('initializes an account in sync', async () => {
     const factory = new AccountMnemonicFactory(mnemonic);
     const account = factory.initializeSync(42);
-    expect(account).to.be.an.instanceOf(MemoryAccount);
+    expect(account).to.be.an.instanceOf(AccountMemory);
     expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
   });
 

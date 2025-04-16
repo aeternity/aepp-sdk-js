@@ -2,7 +2,7 @@ import { execSync } from 'child_process';
 import {
   Node,
   AeSdkMethods,
-  MemoryAccount,
+  AccountMemory,
   CompilerHttp,
   Contract,
   Name,
@@ -15,13 +15,13 @@ import { ensureInstanceOf, indent } from '../utils';
 import { initializeChannels } from './channel-utils';
 
 const aeSdk = new AeSdkMethods({
-  onAccount: new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
+  onAccount: new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
   onNode: new Node('http://localhost:4013'),
   onCompiler: new CompilerHttp('http://localhost:3080'),
 });
 
-const presetAccount1 = new MemoryAccount('sk_2bmJRanV8TmJzts8SYvBhR2kAd5pceVLczT5Sr8phybZYk4DRD');
-const presetAccount2 = new MemoryAccount('sk_26HRDPXtYizxiU45f1Hcp7QauRhg5A7T7QGK2HnFbcgNfKinpy');
+const presetAccount1 = new AccountMemory('sk_2bmJRanV8TmJzts8SYvBhR2kAd5pceVLczT5Sr8phybZYk4DRD');
+const presetAccount2 = new AccountMemory('sk_26HRDPXtYizxiU45f1Hcp7QauRhg5A7T7QGK2HnFbcgNfKinpy');
 
 export const presetAccount1Address = presetAccount1.address;
 export const presetAccount2Address = presetAccount2.address;

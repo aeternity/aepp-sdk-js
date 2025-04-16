@@ -5,7 +5,7 @@ import { getSdk, networkId } from '.';
 import { assertNotNull } from '../utils';
 import {
   AeSdk,
-  MemoryAccount,
+  AccountMemory,
   AE_AMOUNT_FORMATS,
   UnavailableAccountError,
   TypeError,
@@ -20,12 +20,12 @@ should();
 describe('Accounts', () => {
   let aeSdk: AeSdk;
   let aeSdkNoCoins: AeSdk;
-  const receiver = MemoryAccount.generate();
+  const receiver = AccountMemory.generate();
 
   before(async () => {
     aeSdk = await getSdk(2);
     aeSdkNoCoins = await getSdk(0);
-    aeSdkNoCoins.addAccount(MemoryAccount.generate(), { select: true });
+    aeSdkNoCoins.addAccount(AccountMemory.generate(), { select: true });
   });
 
   it('removes account', async () => {
@@ -213,8 +213,8 @@ describe('Accounts', () => {
       );
     });
 
-    it('Make operation on account using MemoryAccount', async () => {
-      const account = MemoryAccount.generate();
+    it('Make operation on account using AccountMemory', async () => {
+      const account = AccountMemory.generate();
       const data = 'Hello';
       const signature = await account.unsafeSign(data);
       const sigUsingMemoryAccount = await aeSdk.unsafeSign(data, { onAccount: account });

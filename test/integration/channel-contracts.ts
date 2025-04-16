@@ -15,7 +15,7 @@ import {
   Contract,
   Channel,
   buildTx,
-  MemoryAccount,
+  AccountMemory,
 } from '../../src';
 import { SignTxWithTag } from '../../src/channel/internal';
 import { assertNotNull } from '../utils';
@@ -29,8 +29,8 @@ contract Identity =
 
 describe('Channel contracts', () => {
   let aeSdk: AeSdk;
-  let initiator: MemoryAccount;
-  let responder: MemoryAccount;
+  let initiator: AccountMemory;
+  let responder: AccountMemory;
   let initiatorCh: Channel;
   let responderCh: Channel;
   let responderShouldRejectUpdate: number | boolean;

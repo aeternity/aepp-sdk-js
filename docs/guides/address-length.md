@@ -10,11 +10,11 @@ components. Doing manual tests you may conclude that account address length is b
 chars, but it is not correct.
 
 ```js
-import { MemoryAccount } from '@aeternity/aepp-sdk';
+import { AccountMemory } from '@aeternity/aepp-sdk';
 
 const result = new Array(10000)
   .fill()
-  .map(() => MemoryAccount.generate().address.length)
+  .map(() => AccountMemory.generate().address.length)
   .reduce((p, n) => ({ ...p, [n]: (p[n] ?? 0) + 1 }), {});
 
 console.log(result);
@@ -28,9 +28,9 @@ Theoretically there can be even shorter addresses if they lucky to be prefixed w
 sequence of `0`.
 
 ```js
-import { MemoryAccount, Encoding, encode, decode } from '@aeternity/aepp-sdk';
+import { AccountMemory, Encoding, encode, decode } from '@aeternity/aepp-sdk';
 
-const publicKey = decode(MemoryAccount.generate().address);
+const publicKey = decode(AccountMemory.generate().address);
 
 for (let i = -1; i < publicKey.length; i += 1) {
   if (i >= 0) publicKey[i] = 0;

@@ -2,7 +2,7 @@ import { after, afterEach } from 'mocha';
 import {
   AeSdk,
   CompilerHttpNode,
-  MemoryAccount,
+  AccountMemory,
   Node,
   Encoded,
   isEncoded,
@@ -23,7 +23,7 @@ const configuration = {
       if (!isEncoded(process.env.MAINNET_SECRET_KEY, Encoding.AccountSecretKey)) {
         throw new Error(`MAINNET_SECRET_KEY is not valid: ${process.env.MAINNET_SECRET_KEY}`);
       }
-      return new MemoryAccount(process.env.MAINNET_SECRET_KEY);
+      return new AccountMemory(process.env.MAINNET_SECRET_KEY);
     },
     sdkOptions: {
       blocks: 2,
@@ -36,7 +36,7 @@ const configuration = {
     channelUrl: 'wss://testnet.aeternity.io/channel',
     compilerUrl: 'https://v8.compiler.aepps.com',
     getGenesisAccount: async () => {
-      const account = MemoryAccount.generate();
+      const account = AccountMemory.generate();
       const { status } = await fetch(`https://faucet.aepps.com/account/${account.address}`, {
         method: 'POST',
       });
@@ -54,7 +54,7 @@ const configuration = {
     channelUrl: 'ws://localhost:3014/channel',
     compilerUrl: 'http://localhost:3080',
     getGenesisAccount: () =>
-      new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
+      new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'),
     sdkOptions: {
       _expectedMineRate: 1000,
       _microBlockCycle: 300,
@@ -85,7 +85,7 @@ const genesisAccountPromise = configuration.getGenesisAccount();
 export const isLimitedCoins = network != null;
 
 export async function getSdk(accountCount = 1): Promise<AeSdk> {
-  const accounts = new Array(accountCount).fill(null).map(() => MemoryAccount.generate());
+  const accounts = new Array(accountCount).fill(null).map(() => AccountMemory.generate());
   const sdk = new AeSdk({
     onCompiler: new CompilerHttpNode(compilerUrl),
     nodes: [{ name: 'test', instance: new NodeHandleTx(url) }],

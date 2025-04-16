@@ -116,7 +116,7 @@ module.exports = {
 ### Vue@3
 
 Reactivity in Vue@3 [based on] Proxy class. Proxy is [not compatible] with private fields of ES
-classes. AeSdk, Contract and MemoryAccount classes uses private fields, so if you make an instance of these
+classes. AeSdk, Contract and AccountMemory classes uses private fields, so if you make an instance of these
 classes reactive then the app may fail with
 
 > TypeError: attempted to get private field on non-instance
@@ -126,7 +126,7 @@ to solve this issue we suggest to avoid making their instances reactive using
 Vue's integrated utility: [shallowRef]. The idea is to make reactive only the
 instance value, to don't make it reactive in deep.
 
-Alternatively, [toRaw] can unwrap the proxy object, returning an unmodified instance and allowing access to its private properties by its methods. It can be useful if you need a reactive array of MemoryAccount.
+Alternatively, [toRaw] can unwrap the proxy object, returning an unmodified instance and allowing access to its private properties by its methods. It can be useful if you need a reactive array of AccountMemory.
 
 You can find both approaches used in the [æpp example].
 

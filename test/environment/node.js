@@ -2,7 +2,7 @@
 import {
   Node,
   AeSdk,
-  MemoryAccount,
+  AccountMemory,
   CompilerHttp,
   Contract,
   // eslint-disable-next-line import/extensions
@@ -15,7 +15,7 @@ contract Test =
 const node = new Node('https://testnet.aeternity.io');
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
-  accounts: [new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
+  accounts: [new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
   onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
 });
 

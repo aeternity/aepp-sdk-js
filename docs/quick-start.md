@@ -8,13 +8,13 @@ For more specific information on setups with Frameworks and TypeScript, please r
 For the following snippets in the guide you need to specify multiple imports.
 
 ```js
-const { AeSdk, MemoryAccount, Node, AE_AMOUNT_FORMATS } = require('@aeternity/aepp-sdk');
+const { AeSdk, AccountMemory, Node, AE_AMOUNT_FORMATS } = require('@aeternity/aepp-sdk');
 ```
 
 ## 2. Create a sender account
 
 ```js
-const sender = MemoryAccount.generate();
+const sender = AccountMemory.generate();
 console.log('Sender address:', sender.address);
 console.log('Sender secret key:', sender.secretKey);
 ```
@@ -33,7 +33,7 @@ This example shows:
 ```js
 const NODE_URL = 'https://testnet.aeternity.io';
 // replace <SENDER_SECRET_KEY> with the generated secretKey from step 2
-const sender = new MemoryAccount('<SENDER_SECRET_KEY>');
+const sender = new AccountMemory('<SENDER_SECRET_KEY>');
 
 (async function () {
   const node = new Node(NODE_URL);

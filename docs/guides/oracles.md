@@ -16,7 +16,7 @@ import { AeSdk, Oracle } from '@aeternity/aepp-sdk'
 // init an instance of the SDK using the AeSdk class
 const aeSdk = new AeSdk({ ... })
 // it should be an instance of AccountBase with non-zero balance
-const oracleAccount = new MemoryAccount(...)
+const oracleAccount = new AccountMemory(...)
 
 const oracle = new Oracle(oracleAccount, aeSdk.getContext())
 ```

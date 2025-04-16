@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect, should } from 'chai';
 import { stub } from 'sinon';
 import { getSdk, timeoutBlock, url } from '.';
-import { AeSdk, Tag, MemoryAccount, Encoded, Node, Contract } from '../../src';
+import { AeSdk, Tag, AccountMemory, Encoded, Node, Contract } from '../../src';
 import { assertNotNull, bindRequestCounter, indent } from '../utils';
 
 should();
@@ -10,7 +10,7 @@ should();
 describe('Node Chain', () => {
   let aeSdk: AeSdk;
   let aeSdkWithoutAccount: AeSdk;
-  const recipient = MemoryAccount.generate().address;
+  const recipient = AccountMemory.generate().address;
 
   before(async () => {
     aeSdk = await getSdk();
@@ -142,7 +142,7 @@ describe('Node Chain', () => {
     await aeSdk.poll(hash);
   });
 
-  const accounts = new Array(10).fill(undefined).map(() => MemoryAccount.generate());
+  const accounts = new Array(10).fill(undefined).map(() => AccountMemory.generate());
   const transactions: Encoded.TxHash[] = [];
 
   const txPostRetry = '/v3/transactions?__sdk-retry=';

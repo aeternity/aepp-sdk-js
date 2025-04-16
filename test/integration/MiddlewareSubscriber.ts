@@ -9,7 +9,7 @@ import {
   MiddlewareSubscriber,
   MiddlewareSubscriberError,
   MiddlewareSubscriberDisconnected,
-  MemoryAccount,
+  AccountMemory,
   AeSdkMethods,
 } from '../../src';
 import { pause } from '../../src/utils/other';
@@ -144,7 +144,7 @@ describe('MiddlewareSubscriber', () => {
   });
 
   it('subscribes for different accounts', async () => {
-    const account2 = MemoryAccount.generate();
+    const account2 = AccountMemory.generate();
     const address2 = account2.address;
     const events1: any[] = [];
     const events2: any[] = [];

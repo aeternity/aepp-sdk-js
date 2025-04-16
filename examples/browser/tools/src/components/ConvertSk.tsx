@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { useState } from 'preact/hooks';
-import { isEncoded, Encoding, Encoded, decode, encode, MemoryAccount } from '@aeternity/aepp-sdk';
+import { isEncoded, Encoding, Encoded, decode, encode, AccountMemory } from '@aeternity/aepp-sdk';
 
 function parseSecretKey(secretKey: string): Encoded.AccountSecretKey | undefined {
   if (isEncoded(secretKey, Encoding.AccountSecretKey)) return secretKey;
@@ -16,7 +16,7 @@ export function ConvertSk() {
   let secretKeyOtherFormat;
   let secretKeyOtherValue;
   if (secretKey) {
-    address = new MemoryAccount(secretKey).address;
+    address = new AccountMemory(secretKey).address;
     [secretKeyOtherFormat, secretKeyOtherValue] = isEncoded(secretKeyRaw, Encoding.AccountSecretKey)
       ? ['Secret key in hex', Buffer.concat([decode(secretKey), decode(address)]).toString('hex')]
       : ['sk_-prefixed secret key', secretKey];
@@ -37,7 +37,7 @@ export function ConvertSk() {
         <div class={address ? '' : 'error'}>{address || "Can't parse secret key"}</div>
 
         <div></div>
-        <button onClick={() => setSecretKey(MemoryAccount.generate().secretKey)}>
+        <button onClick={() => setSecretKey(AccountMemory.generate().secretKey)}>
           Generate account
         </button>
 

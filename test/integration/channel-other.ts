@@ -2,7 +2,7 @@ import { describe, it, before, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk, networkId, timeoutBlock } from '.';
-import { unpackTx, Encoded, Tag, AeSdk, Channel, MemoryAccount } from '../../src';
+import { unpackTx, Encoded, Tag, AeSdk, Channel, AccountMemory } from '../../src';
 import { appendSignature } from '../../src/channel/handlers';
 import { assertNotNull } from '../utils';
 import {
@@ -14,8 +14,8 @@ import {
 
 describe('Channel other', () => {
   let aeSdk: AeSdk;
-  let initiator: MemoryAccount;
-  let responder: MemoryAccount;
+  let initiator: AccountMemory;
+  let responder: AccountMemory;
   let initiatorCh: Channel;
   let responderCh: Channel;
   const initiatorSign = async (tx: Encoded.Transaction): Promise<Encoded.Transaction> =>
