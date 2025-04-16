@@ -11,12 +11,14 @@ import { ArgumentError } from './errors.js';
  * Check if address is valid
  * @param maybeAddress - Address to check
  * @category utils
+ * @deprecated Use {@link isEncoded} instead
  */
 export function isAddressValid(maybeAddress: string): maybeAddress is Encoded.AccountAddress;
 /**
  * Check if data is encoded in one of provided encodings
  * @param maybeEncoded - Data to check
  * @param encodings - Rest parameters with encodings to check against
+ * @deprecated Use {@link isEncoded} instead
  */
 export function isAddressValid<E extends Encoding>(
   maybeEncoded: string,
@@ -34,6 +36,57 @@ export function isAddressValid(maybeEncoded: string, ...encodings: Encoding[]): 
         encoding,
       );
     }
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Check if data is encoded in any encoding
+ * @param maybeEncoded - Data to check
+ * @category utils
+ */
+export function ensureEncoded(maybeEncoded: string): asserts maybeEncoded is Encoded.Any;
+/**
+ * Check if data is encoded in one of provided encodings
+ * @param maybeEncoded - Data to check
+ * @param encodings - Rest parameters with encodings to check against
+ */
+export function ensureEncoded<E extends Encoding>(
+  maybeEncoded: string,
+  ...encodings: E[]
+): asserts maybeEncoded is Encoded.Generic<E>;
+export function ensureEncoded(maybeEncoded: string, ...encodings: Encoding[]): void {
+  decode(maybeEncoded as Encoded.Any);
+  if (encodings.length === 0) return;
+  const encoding = maybeEncoded.split('_')[0];
+  if (isItemOfArray(encoding, encodings)) return;
+  throw new ArgumentError(
+    'Encoded string type',
+    encodings.length > 1 ? `one of ${encodings.join(', ')}` : encodings[0],
+    encoding,
+  );
+}
+
+/**
+ * Check if data is encoded in any encoding
+ * @param maybeEncoded - Data to check
+ * @category utils
+ */
+export function isEncoded(maybeEncoded: string): maybeEncoded is Encoded.Any;
+/**
+ * Check if data is encoded in one of provided encodings
+ * @param maybeEncoded - Data to check
+ * @param encodings - Rest parameters with encodings to check against
+ */
+export function isEncoded<E extends Encoding>(
+  maybeEncoded: string,
+  ...encodings: E[]
+): maybeEncoded is Encoded.Generic<E>;
+export function isEncoded(maybeEncoded: string, ...encodings: Encoding[]): boolean {
+  try {
+    ensureEncoded(maybeEncoded, ...encodings);
     return true;
   } catch (error) {
     return false;

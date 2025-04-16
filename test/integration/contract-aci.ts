@@ -20,7 +20,7 @@ import {
   Tag,
   NoSuchContractFunctionError,
   InvalidTxError,
-  isAddressValid,
+  isEncoded,
   Encoding,
 } from '../../src';
 import { getSdk } from '.';
@@ -526,7 +526,7 @@ describe('Contract instance', () => {
     });
     await factory.$deploy([]);
     const { decodedResult: address, result } = await factory.new(42);
-    expect(isAddressValid(address, Encoding.ContractAddress)).to.equal(true);
+    expect(isEncoded(address, Encoding.ContractAddress)).to.equal(true);
     assertNotNull(result);
     expect(result.gasUsed).to.equal(15567);
 
@@ -565,7 +565,7 @@ describe('Contract instance', () => {
     });
     await market.$deploy([]);
     const { decodedResult: address, result } = await market.new(templateAddress, 44);
-    expect(isAddressValid(address, Encoding.ContractAddress)).to.equal(true);
+    expect(isEncoded(address, Encoding.ContractAddress)).to.equal(true);
     assertNotNull(result);
     expect(result.gasUsed).to.equal(10097);
 

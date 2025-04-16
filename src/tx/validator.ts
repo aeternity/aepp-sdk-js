@@ -1,5 +1,5 @@
 import { RestError } from '@azure/core-rest-pipeline';
-import { hash, isAddressValid, verifySignature } from '../utils/crypto.js';
+import { hash, isEncoded, verifySignature } from '../utils/crypto.js';
 import { TxUnpacked } from './builder/schema.generated.js';
 import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version.js';
 import { Tag, ConsensusProtocolVersion } from './builder/constants.js';
@@ -152,7 +152,7 @@ validators.push(
     ];
   },
   async (tx, { node }) => {
-    if (tx.tag !== Tag.SpendTx || isAddressValid(tx.recipientId, Encoding.Name)) return [];
+    if (tx.tag !== Tag.SpendTx || isEncoded(tx.recipientId, Encoding.Name)) return [];
     const recipient = await node.getAccountByPubkey(tx.recipientId).catch((error) => {
       if (!isAccountNotFoundError(error)) throw error;
       return null;

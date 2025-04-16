@@ -5,7 +5,7 @@ base58 it depends on the exact data to encode, e.g. it is shorter if encoded dat
 leading zeroes.
 
 Building an aepp you may need to know the range of possible address lengths to validate an
-user-provided addresses (though better to use [isAddressValid]) or for designs of address-related
+user-provided addresses (though better to use [isEncoded]) or for designs of address-related
 components. Doing manual tests you may conclude that account address length is between 52 and 53
 chars, but it is not correct.
 
@@ -80,5 +80,5 @@ Running the above code you would get output like
 Therefore the minimum address length is 41 chars. All these addresses valid, for example
 `ak_11111111111111111111111111111111273Yts` [used] to collect AENS name fees.
 
-[isAddressValid]: https://sdk.aeternity.io/v14.0.0/api/functions/isAddressValid.html
+[isEncoded]: https://sdk.aeternity.io/v14.1.0/api/functions/isEncoded.html
 [used]: https://mainnet.aeternity.io/v3/accounts/ak_11111111111111111111111111111111273Yts

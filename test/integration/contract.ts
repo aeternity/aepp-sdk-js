@@ -12,7 +12,7 @@ import {
   AeSdk,
   Contract,
   ContractMethodsBase,
-  isAddressValid,
+  isEncoded,
   Encoding,
 } from '../../src';
 
@@ -220,7 +220,7 @@ describe('Contract', () => {
 
     type BlockHash = Encoded.KeyBlockHash | Encoded.MicroBlockHash;
     const getMicroBlockHash = async (blockHash: BlockHash): Promise<Encoded.MicroBlockHash> => {
-      if (isAddressValid(blockHash, Encoding.MicroBlockHash)) return blockHash;
+      if (isEncoded(blockHash, Encoding.MicroBlockHash)) return blockHash;
       const hash = (await aeSdk.api.getKeyBlockByHash(blockHash)).prevHash as BlockHash;
       return getMicroBlockHash(hash);
     };

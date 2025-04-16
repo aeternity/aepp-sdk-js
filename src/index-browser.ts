@@ -20,6 +20,8 @@ export {
 export { InvalidTxError, sendTransaction } from './send-transaction.js';
 export {
   isAddressValid,
+  ensureEncoded,
+  isEncoded,
   genSalt,
   encodeUnsigned,
   hash,

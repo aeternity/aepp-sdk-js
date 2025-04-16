@@ -7,7 +7,7 @@
  */
 
 import { BigNumber } from 'bignumber.js';
-import { genSalt, isAddressValid } from './utils/crypto.js';
+import { genSalt, isEncoded } from './utils/crypto.js';
 import { commitmentHash, isAuctionName, produceNameId } from './tx/builder/helpers.js';
 import { Tag, AensName } from './tx/builder/constants.js';
 import { Encoded, Encoding } from './utils/encoder.js';
@@ -146,9 +146,7 @@ export default class Name {
       ...pointers,
     };
 
-    const hasRawPointers = Object.values(allPointers).some((v) =>
-      isAddressValid(v, Encoding.Bytearray),
-    );
+    const hasRawPointers = Object.values(allPointers).some((v) => isEncoded(v, Encoding.Bytearray));
 
     const tx = await buildTxAsync({
       _isInternalBuild: true,

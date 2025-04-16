@@ -5,7 +5,7 @@ import {
   MemoryAccount,
   Node,
   Encoded,
-  isAddressValid,
+  isEncoded,
   Encoding,
 } from '../../src';
 import '..';
@@ -20,7 +20,7 @@ const configuration = {
     compilerUrl: 'https://v8.compiler.aepps.com',
     getGenesisAccount: () => {
       if (process.env.MAINNET_SECRET_KEY == null) throw new Error('MAINNET_SECRET_KEY is not set');
-      if (!isAddressValid(process.env.MAINNET_SECRET_KEY, Encoding.AccountSecretKey)) {
+      if (!isEncoded(process.env.MAINNET_SECRET_KEY, Encoding.AccountSecretKey)) {
         throw new Error(`MAINNET_SECRET_KEY is not valid: ${process.env.MAINNET_SECRET_KEY}`);
       }
       return new MemoryAccount(process.env.MAINNET_SECRET_KEY);

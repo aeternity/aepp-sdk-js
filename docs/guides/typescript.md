@@ -144,9 +144,9 @@ The problem is that TypeScript won't check if `address` is an `ak_`-encoded stri
 A more accurate solution would be to check the `address` in advance, providing user feedback if it is incorrect. For example:
 
 ```ts
-import { isAddressValid } from '@aeternity/aepp-sdk';
+import { isEncoded, Encoding } from '@aeternity/aepp-sdk';
 
-if (!isAddressValid(address)) {
+if (!isEncoded(address, Encoding.AccountAddress)) {
   alert('The address is not valid');
   return;
 }
@@ -154,25 +154,25 @@ if (!isAddressValid(address)) {
 await aeSdk.spend(100, address);
 ```
 
-Please note that this method doesn't require explicit casting `string` to [`Encoded.AccountAddress`] because [`isAddressValid`] implicitly marks `address` as `ak_${string}` in case it returns `true`.
+Please note that this method doesn't require explicit casting `string` to [`Encoded.AccountAddress`] because [`isEncoded`] implicitly marks `address` as `ak_${string}` in case it returns `true`.
 
-Additionally, you can use [`isAddressValid`] to validate data against other address types:
+Additionally, you can use [`isEncoded`] to validate data against other address types:
 
 ```ts
 import { Encoding } from '@aeternity/aepp-sdk';
 
-isAddressValid(address, Encoding.ContractAddress, Encoding.OracleAddress);
+isEncoded(address, Encoding.ContractAddress, Encoding.OracleAddress);
 ```
 
 Or encoding types in general:
 
 ```ts
-isAddressValid(address, Encoding.Transaction);
+isEncoded(address, Encoding.Transaction);
 ```
 
 [`spend`]: https://sdk.aeternity.io/v14.0.0/api/functions/spend.html
 [`Encoded.AccountAddress`]: https://sdk.aeternity.io/v14.0.0/api/types/Encoded.AccountAddress.html
-[`isAddressValid`]: https://sdk.aeternity.io/v14.0.0/api/functions/isAddressValid.html
+[`isEncoded`]: https://sdk.aeternity.io/v14.0.0/api/functions/isEncoded.html
 
 ### AENS name validation
 
