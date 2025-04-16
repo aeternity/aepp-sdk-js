@@ -13,7 +13,7 @@ import { Tag } from '../tx/builder/constants.js';
 
 /**
  * Generalized account class
- * @category account
+ * @category account generalized
  */
 export default class AccountGeneralized extends AccountBase {
   override readonly address: Encoded.AccountAddress;

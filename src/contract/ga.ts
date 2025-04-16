@@ -24,7 +24,7 @@ import { EntryTag } from '../tx/builder/entry/constants.js';
 
 /**
  * Convert current account to GA
- * @category contract
+ * @category account generalized
  * @param authFnName - Authorization function name
  * @param args - init arguments
  * @param options - Options
@@ -111,7 +111,7 @@ interface CreateGeneralizedAccountOptions
 
 /**
  * Build a transaction hash the same as `Auth.tx_hash` by GaMetaTx payload
- * @category contract
+ * @category account generalized
  * @param transaction - tx-encoded transaction
  * @param options - Options
  * @param options.fee - GaMetaTx fee, required in Ceres
@@ -144,7 +144,7 @@ export async function buildAuthTxHash(
 
 /**
  * Build a transaction hash the same as `Auth.tx_hash` by GaMetaTx
- * @category contract
+ * @category account generalized
  * @param transaction - tx-encoded signed GaMeta transaction
  * @param options - Options
  * @param options.onNode - Node to use

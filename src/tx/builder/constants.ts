@@ -9,6 +9,10 @@ export const DRY_RUN_ACCOUNT = {
   amount: 100000000000000000000000000000000000n,
 } as const;
 
+/**
+ * @category account generalized
+ * @deprecated transaction builder will ensure that gas doesn't exceed the maximum value by itself
+ */
 export const MAX_AUTH_FUN_GAS = 50000;
 /**
  * @category utils
