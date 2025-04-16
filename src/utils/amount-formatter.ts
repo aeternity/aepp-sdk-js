@@ -3,6 +3,7 @@ import { isBigNumber } from './bignumber.js';
 import { ArgumentError } from './errors.js';
 
 /**
+ * @deprecated no replacement implemented yet
  * @category utils
  */
 export enum AE_AMOUNT_FORMATS {
@@ -30,6 +31,7 @@ const DENOMINATION_MAGNITUDE = {
 
 /**
  * Convert amount from one to other denomination
+ * @deprecated no replacement implemented yet
  * @category utils
  * @param value - amount to convert
  * @param options - options
@@ -53,6 +55,7 @@ export const formatAmount = (
 
 /**
  * Convert amount to AE
+ * @deprecated no replacement implemented yet
  * @category utils
  * @param value - amount to convert
  * @param options - options
@@ -65,6 +68,7 @@ export const toAe = (
 
 /**
  * Convert amount to aettos
+ * @deprecated no replacement implemented yet
  * @category utils
  * @param value - amount to convert
  * @param options - options
@@ -96,6 +100,7 @@ const getLowerBoundPrefix = (exponent: number): Prefix =>
   prefixes.find((p) => p.magnitude <= exponent) ?? prefixes[prefixes.length - 1];
 
 /**
+ * @deprecated no replacement implemented yet
  * @category utils
  */
 export const prefixedAmount = (rawValue: string | number | BigNumber): string => {

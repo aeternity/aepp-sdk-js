@@ -45,6 +45,9 @@ export default {
       denomination,
     }: {
       onNode?: Node;
+      /**
+       * @deprecated no replacement implemented yet
+       */
       denomination?: AE_AMOUNT_FORMATS;
     },
   ): Promise<Int | undefined> {

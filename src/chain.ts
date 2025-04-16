@@ -201,6 +201,9 @@ export async function getAccount(
 export async function getBalance(
   address: Encoded.AccountAddress | Encoded.ContractAddress | Encoded.OracleAddress,
   {
+    /**
+     * @deprecated no replacement implemented yet
+     */
     format = AE_AMOUNT_FORMATS.AETTOS,
     ...options
   }: { format?: AE_AMOUNT_FORMATS } & Parameters<typeof getAccount>[1],
