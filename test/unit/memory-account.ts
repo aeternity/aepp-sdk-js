@@ -1,7 +1,12 @@
 import '..';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { MemoryAccount, verifyMessage, InvalidChecksumError, verifySignature } from '../../src';
+import {
+  MemoryAccount,
+  verifyMessageSignature,
+  InvalidChecksumError,
+  verifySignature,
+} from '../../src';
 
 const secretKey = 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf';
 
@@ -51,7 +56,7 @@ describe('MemoryAccount', () => {
         110, 74, 51, 47, 0,
       ]),
     );
-    expect(verifyMessage(message, signature, account.address)).to.equal(true);
+    expect(verifyMessageSignature(message, signature, account.address)).to.equal(true);
   });
 
   it('Sign message message with non-ASCII chars', async () => {
@@ -66,6 +71,6 @@ describe('MemoryAccount', () => {
         183, 197, 251, 3,
       ]),
     );
-    expect(verifyMessage(message, signature, account.address)).to.equal(true);
+    expect(verifyMessageSignature(message, signature, account.address)).to.equal(true);
   });
 });

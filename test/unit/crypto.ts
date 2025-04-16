@@ -6,7 +6,7 @@ import {
   buildTxHash,
   decode,
   Encoded,
-  verifyMessage,
+  verifyMessageSignature,
   isAddressValid,
   hash,
   genSalt,
@@ -107,12 +107,12 @@ describe('crypto', () => {
 
     describe('verify', () => {
       it('should verify message', () => {
-        const result = verifyMessage(message, messageSignature, address);
+        const result = verifyMessageSignature(message, messageSignature, address);
         assert.isTrue(result);
       });
 
       it('should verify message with non-ASCII chars', () => {
-        const result = verifyMessage(messageNonASCII, messageNonASCIISignature, address);
+        const result = verifyMessageSignature(messageNonASCII, messageNonASCIISignature, address);
         assert.isTrue(result);
       });
     });

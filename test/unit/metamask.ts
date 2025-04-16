@@ -10,7 +10,7 @@ import {
   Tag,
   unpackTx,
   verifySignature,
-  verifyMessage,
+  verifyMessageSignature,
   decode,
   hash,
 } from '../../src';
@@ -334,7 +334,7 @@ describe('Aeternity Snap for MetaMask', function () {
       await instructTester('approve');
       const signature = await account.signMessage(message);
       expect(signature).to.be.an.instanceOf(Uint8Array);
-      expect(verifyMessage(message, signature, address)).to.equal(true);
+      expect(verifyMessageSignature(message, signature, address)).to.equal(true);
     });
 
     it('signs message rejected', async () => {

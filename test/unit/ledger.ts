@@ -17,7 +17,7 @@ import {
   Tag,
   unpackTx,
   verifySignature,
-  verifyMessage,
+  verifyMessageSignature,
   decode,
   Encoded,
   hash,
@@ -249,7 +249,7 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
       const signature = await account.signMessage(message);
       expect(signature).to.be.an.instanceOf(Uint8Array);
       // FIXME: correct signature after releasing https://github.com/LedgerHQ/app-aeternity/pull/13
-      expect(verifyMessage(message, signature, address)).to.equal(isNewApp);
+      expect(verifyMessageSignature(message, signature, address)).to.equal(isNewApp);
     });
 
     it('signs message rejected', async () => {

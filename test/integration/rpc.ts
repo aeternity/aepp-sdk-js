@@ -30,7 +30,7 @@ import {
   UnsubscribedAccountError,
   RpcInternalError,
   AccountBase,
-  verifyMessage,
+  verifyMessageSignature,
   buildTx,
   hashTypedData,
   Contract,
@@ -429,7 +429,7 @@ describe('Aepp<->Wallet', () => {
       it('works', async () => {
         const messageSig = await aepp.signMessage('test');
         messageSig.should.be.instanceof(Buffer);
-        expect(verifyMessage('test', messageSig, aepp.address)).to.equal(true);
+        expect(verifyMessageSignature('test', messageSig, aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
@@ -445,7 +445,7 @@ describe('Aepp<->Wallet', () => {
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
         const messageSig = await aepp.signMessage('test', { onAccount });
-        expect(verifyMessage('test', messageSig, onAccount)).to.equal(true);
+        expect(verifyMessageSignature('test', messageSig, onAccount)).to.equal(true);
       });
     });
 

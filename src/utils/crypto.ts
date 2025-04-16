@@ -129,9 +129,7 @@ export function hashMessage(message: string): Buffer {
  * @returns is data was signed by address
  * @category utils
  */
-// TODO: deprecate in favour of `verify(hashMessage(message), ...`, also the name is confusing
-// it should contain "signature"
-export function verifyMessage(
+export function verifyMessageSignature(
   message: string,
   signature: Uint8Array,
   address: Encoded.AccountAddress,
