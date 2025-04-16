@@ -220,6 +220,11 @@ export const genRetryOnFailurePolicy = (
   policy: {
     name: 'retry-on-failure',
     async sendRequest(request, next) {
+      if (request.headers.get('__no-retry') != null) {
+        request.headers.delete('__no-retry');
+        return next(request);
+      }
+
       const retryCode = request.headers.get('__retry-code') ?? NaN;
       request.headers.delete('__retry-code');
       const statusesToNotRetry = [200, 400, 403, 410, 500].filter((c) => c !== +retryCode);
