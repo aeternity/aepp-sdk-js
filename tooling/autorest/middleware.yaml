@@ -46,6 +46,11 @@ directive:
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
+    where: $..[?(@.enum)]
+    transform: '$["x-ms-enum"] = { modelAsString: false }'
+    reason: thread enums as union of constants instead of arbitrary strings
+
+  - from: openapi-document
     where: $..properties[time,micro_time,approximate_activation_time,approximate_expire_time,register_time,block_time,activation_time,creation_time,microtime,last_updated_time]
     set:
       type: integer
