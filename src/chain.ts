@@ -15,12 +15,7 @@ import Node from './Node.js';
 import { DryRunResult, DryRunResults, SignedTx } from './apis/node/index.js';
 import { decode, encode, Encoded, Encoding } from './utils/encoder.js';
 
-/**
- * @category chain
- * @param type - Type
- * @param options - Options
- */
-export async function _getPollInterval(
+async function getEventInterval(
   type: 'key-block' | 'micro-block',
   {
     _expectedMineRate,
@@ -28,24 +23,27 @@ export async function _getPollInterval(
     onNode,
   }: { _expectedMineRate?: number; _microBlockCycle?: number; onNode: Node },
 ): Promise<number> {
-  const getVal = async (
-    t: string,
-    val: number | undefined,
-    devModeDef: number,
-    def: number,
-  ): Promise<number | null> => {
-    if (t !== type) return null;
-    if (val != null) return val;
-    return (await onNode?.getNetworkId()) === 'ae_dev' ? devModeDef : def;
-  };
+  if (_expectedMineRate != null && type === 'key-block') return _expectedMineRate;
+  if (_microBlockCycle != null && type === 'micro-block') return _microBlockCycle;
 
-  const base =
-    (await getVal('key-block', _expectedMineRate, 0, 180000)) ??
-    (await getVal('micro-block', _microBlockCycle, 0, 3000)) ??
-    (() => {
-      throw new InternalError(`Unknown type: ${type}`);
-    })();
-  return Math.floor(base / 3);
+  const networkId = await onNode.getNetworkId();
+  if (networkId === 'ae_dev') return 0;
+  if (!['ae_mainnet', 'ae_uat'].includes(networkId) && (await onNode._isHyperchain())) return 3000;
+
+  if (type === 'key-block') return 180000;
+  else return 3000;
+}
+
+/**
+ * @category chain
+ * @param type - Type
+ * @param options - Options
+ */
+export async function _getPollInterval(
+  type: Parameters<typeof getEventInterval>[0],
+  options: Parameters<typeof getEventInterval>[1],
+): Promise<number> {
+  return Math.floor((await getEventInterval(type, options)) / 3);
 }
 
 const heightCache: WeakMap<Node, { time: number; height: number }> = new WeakMap();
