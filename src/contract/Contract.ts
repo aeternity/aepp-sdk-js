@@ -42,7 +42,7 @@ import {
 } from '../apis/node/index.js';
 import CompilerBase, { Aci } from './compiler/Base.js';
 import Node from '../Node.js';
-import { getAccount, getContract, getContractByteCode, resolveName, txDryRun } from '../chain.js';
+import { getAccount, resolveName, txDryRun } from '../chain.js';
 import { sendTransaction, SendTransactionOptions } from '../send-transaction.js';
 import { TxUnpacked } from '../tx/builder/schema.generated.js';
 import { Optional, isAccountNotFoundError } from '../utils/other.js';
@@ -556,14 +556,14 @@ class Contract<M extends ContractMethodsBase> {
     }
 
     if (address != null) {
-      const contract = await getContract(address, { onNode });
+      const contract = await onNode.getContract(address);
       if (contract.active == null) throw new InactiveContractError(address);
     }
 
     if (validateBytecode === true) {
       if (address == null)
         throw new MissingContractAddressError("Can't validate bytecode without contract address");
-      const onChanBytecode = (await getContractByteCode(address, { onNode })).bytecode;
+      const onChanBytecode = (await onNode.getContractCode(address)).bytecode;
       let isValid = false;
       if (bytecode != null) isValid = bytecode === onChanBytecode;
       else if (sourceCode != null) {

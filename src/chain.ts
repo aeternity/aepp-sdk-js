@@ -223,6 +223,7 @@ export async function getBalance(
  * @param options - Options
  * @param options.onNode - Node to use
  * @returns Current Generation
+ * @deprecated Use {@link Node.getCurrentGeneration} instead
  */
 export async function getCurrentGeneration({
   onNode,
@@ -239,6 +240,7 @@ export async function getCurrentGeneration({
  * @param options - Options
  * @param options.onNode - Node to use
  * @returns Generation
+ * @deprecated Use {@link Node.getGenerationByHash} or {@link Node.getGenerationByHeight} instead
  */
 export async function getGeneration(
   hashOrHeight: Encoded.KeyBlockHash | number,
@@ -255,6 +257,7 @@ export async function getGeneration(
  * @param options - Options
  * @param options.onNode - Node to use
  * @returns Transactions
+ * @deprecated Use {@link Node.getMicroBlockTransactionsByHash} instead
  */
 export async function getMicroBlockTransactions(
   hash: Encoded.MicroBlockHash,
@@ -270,6 +273,7 @@ export async function getMicroBlockTransactions(
  * @param options - Options
  * @param options.onNode - Node to use
  * @returns Key Block
+ * @deprecated Use {@link Node.getKeyBlockByHeight} or {@link Node.getKeyBlockByHash} instead
  */
 export async function getKeyBlock(
   hashOrHeight: Encoded.KeyBlockHash | number,
@@ -286,6 +290,7 @@ export async function getKeyBlock(
  * @param options - Options
  * @param options.onNode - Node to use
  * @returns Micro block header
+ * @deprecated Use {@link Node.getMicroBlockHeaderByHash} instead
  */
 export async function getMicroBlockHeader(
   hash: Encoded.MicroBlockHash,
@@ -312,7 +317,9 @@ async function txDryRunHandler(key: string, onNode: Node): Promise<void> {
   let dryRunRes;
   try {
     const top =
-      typeof rs[0].top === 'number' ? (await getKeyBlock(rs[0].top, { onNode })).hash : rs[0].top;
+      typeof rs[0].top === 'number'
+        ? (await onNode.getKeyBlockByHeight(rs[0].top)).hash
+        : rs[0].top;
     dryRunRes = await onNode.protectedDryRunTxs({
       top,
       txEvents: rs[0].txEvents,
@@ -384,6 +391,7 @@ export async function txDryRun(
  * @param contractId - Contract address
  * @param options - Options
  * @param options.onNode - Node to use
+ * @deprecated Use {@link Node.getContractCode} instead
  */
 export async function getContractByteCode(
   contractId: Encoded.ContractAddress,
@@ -398,6 +406,7 @@ export async function getContractByteCode(
  * @param contractId - Contract address
  * @param options - Options
  * @param options.onNode - Node to use
+ * @deprecated Use {@link Node.getContract} instead
  */
 export async function getContract(
   contractId: Encoded.ContractAddress,
