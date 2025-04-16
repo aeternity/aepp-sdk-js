@@ -6,7 +6,6 @@ import { concatBuffers } from '../../utils/other.js';
 import {
   AensName,
   NAME_BID_RANGES,
-  NAME_BID_TIMEOUT_BLOCKS,
   NAME_FEE_BID_INCREMENT,
   NAME_MAX_LENGTH_FEE,
 } from './constants.js';
@@ -234,20 +233,22 @@ export function computeBidFee(
 }
 
 /**
- * Compute auction end height
+ * Compute approximate auction end height.
+ *
+ * From Ceres, each time a new (successful!) bid is made for a name the auction is extended for up
+ * to 120 key-blocks/generations. I.e. after the bid there is always at least 120 generations to
+ * make a higher bid.
+ *
  * @category AENS
  * @param name - Name to compute auction end for
  * @param claimHeight - Auction starting height
- * @see {@link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273}
+ * @see {@link https://github.com/aeternity/protocol/blob/cfb19ce/AENS.md#from-ceres-protocol-upgrade}
  * @returns Auction end height
  */
 export function computeAuctionEndBlock(name: AensName, claimHeight: number): number {
   const length = nameToPunycode(name).length - AENS_SUFFIX.length;
   const h =
-    (length <= 4 ? 62 * NAME_BID_TIMEOUT_BLOCKS : null) ??
-    (length <= 8 ? 31 * NAME_BID_TIMEOUT_BLOCKS : null) ??
-    (length <= 12 ? NAME_BID_TIMEOUT_BLOCKS : null) ??
-    0;
+    (length <= 4 ? 2400 : null) ?? (length <= 8 ? 960 : null) ?? (length <= 12 ? 480 : null) ?? 0;
   return h + claimHeight;
 }
 
