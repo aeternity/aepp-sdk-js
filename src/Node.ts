@@ -91,6 +91,22 @@ export default class Node extends NodeApi {
     return promise;
   }
 
+  #isHyperchainPromise?: Promise<boolean>;
+
+  async _isHyperchain(): Promise<boolean> {
+    if (this.#isHyperchainPromise != null) return this.#isHyperchainPromise;
+    this.#isHyperchainPromise = this.getHyperchainContractPubkeys({
+      requestOptions: { customHeaders: { '__no-retry': 'true' } },
+    }).then(
+      () => true,
+      (error) => {
+        if (error.message !== 'v3/hyperchain/contracts error: 404 status code') throw error;
+        return false;
+      },
+    );
+    return this.#isHyperchainPromise;
+  }
+
   /**
    * Returns network ID provided by node.
    * This method won't do extra requests on subsequent calls.

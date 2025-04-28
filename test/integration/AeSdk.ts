@@ -1,6 +1,7 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { getSdk, networkId } from '.';
+import { getSdk } from '.';
+import { Node } from '../../src';
 
 describe('AeSdk', () => {
   describe('_getPollInterval', () => {
@@ -12,13 +13,50 @@ describe('AeSdk', () => {
       expect(await aeSdk._getPollInterval('micro-block')).to.equal(100);
     });
 
-    it('returns correct value', async () => {
-      const aeSdk = await getSdk(0);
-      delete aeSdk._options._expectedMineRate;
-      delete aeSdk._options._microBlockCycle;
-      const [kb, mb] = networkId === 'ae_dev' ? [0, 0] : [60000, 1000];
-      expect(await aeSdk._getPollInterval('key-block')).to.equal(kb);
-      expect(await aeSdk._getPollInterval('micro-block')).to.equal(mb);
-    });
+    (
+      [
+        [
+          'devnet',
+          0,
+          0,
+          (node: Node) => (node.getNetworkId = async () => Promise.resolve('ae_dev')),
+        ],
+        [
+          'hyperchains',
+          1000,
+          1000,
+          (node: Node) => {
+            node.getNetworkId = async () => Promise.resolve('ae_random');
+            node._isHyperchain = async () => Promise.resolve(true);
+          },
+        ],
+        [
+          'mainnet',
+          60000,
+          1000,
+          (node: Node) => {
+            node.getNetworkId = async () => Promise.resolve('ae_mainnet');
+            node._isHyperchain = () => {
+              throw new Error("Shouldn't be called");
+            };
+          },
+        ],
+        [
+          'default case',
+          60000,
+          1000,
+          (node: Node) => (node.getNetworkId = async () => Promise.resolve('ae_random')),
+        ],
+      ] as const
+    ).forEach(([name, kb, mb, cb]) =>
+      it(`handles ${name}`, async () => {
+        const aeSdk = await getSdk(0);
+        cb(aeSdk.api);
+        delete aeSdk._options._expectedMineRate;
+        delete aeSdk._options._microBlockCycle;
+        expect(await aeSdk._getPollInterval('key-block')).to.equal(kb);
+        expect(await aeSdk._getPollInterval('micro-block')).to.equal(mb);
+      }),
+    );
   });
 });
