@@ -9,21 +9,25 @@
       
       
       
+        <link rel="prev" href="../account-generalized/">
       
       
-      <link rel="icon" href="../images/favicon.png">
+        <link rel="next" href="../oracle/">
+      
+      
+      <link rel="icon" href="../../../images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
     
     
       
-        <title>InnerTx: ContractCallTx - æternity JavaScript SDK</title>
+        <title>Dry-run using debug endpoint - æternity JavaScript SDK</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.2afb09e1.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2afb09e1.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -42,7 +46,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -68,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#innertx-contractcalltx" class="md-skip">
+        <a href="#dry-run-using-debug-endpoint" class="md-skip">
           Skip to content
         </a>
       
@@ -82,12 +86,12 @@
           <aside class="md-banner md-banner--warning">
             <div class="md-banner__inner md-grid md-typeset">
                You're not viewing the latest version.
-<a href="../..">
+<a href="../../../..">
   <strong>Click here to go to latest.</strong>
 </a>
 
             </div>
-            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL(".."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../.."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
           </aside>
         
       </div>
@@ -99,7 +103,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+    <a href="../../.." title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -119,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              InnerTx: ContractCallTx
+              Dry-run using debug endpoint
             
           </span>
         </div>
@@ -242,7 +246,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+    <a href="../../.." title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -272,7 +276,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -294,7 +298,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quick-start/" class="md-nav__link">
+      <a href="../../../quick-start/" class="md-nav__link">
         
   
   
@@ -354,7 +358,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/address-length/" class="md-nav__link">
+      <a href="../../../guides/address-length/" class="md-nav__link">
         
   
   
@@ -377,7 +381,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/aens/" class="md-nav__link">
+      <a href="../../../guides/aens/" class="md-nav__link">
         
   
   
@@ -400,7 +404,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/contracts/" class="md-nav__link">
+      <a href="../../../guides/contracts/" class="md-nav__link">
         
   
   
@@ -423,7 +427,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/contract-events/" class="md-nav__link">
+      <a href="../../../guides/contract-events/" class="md-nav__link">
         
   
   
@@ -446,7 +450,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/oracles/" class="md-nav__link">
+      <a href="../../../guides/oracles/" class="md-nav__link">
         
   
   
@@ -469,7 +473,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/paying-for-tx/" class="md-nav__link">
+      <a href="../../../guides/paying-for-tx/" class="md-nav__link">
         
   
   
@@ -492,7 +496,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/batch-requests/" class="md-nav__link">
+      <a href="../../../guides/batch-requests/" class="md-nav__link">
         
   
   
@@ -515,7 +519,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/error-handling/" class="md-nav__link">
+      <a href="../../../guides/error-handling/" class="md-nav__link">
         
   
   
@@ -538,7 +542,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/low-vs-high-usage/" class="md-nav__link">
+      <a href="../../../guides/low-vs-high-usage/" class="md-nav__link">
         
   
   
@@ -561,7 +565,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/typed-data/" class="md-nav__link">
+      <a href="../../../guides/typed-data/" class="md-nav__link">
         
   
   
@@ -584,7 +588,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/typescript/" class="md-nav__link">
+      <a href="../../../guides/typescript/" class="md-nav__link">
         
   
   
@@ -607,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/jwt/" class="md-nav__link">
+      <a href="../../../guides/jwt/" class="md-nav__link">
         
   
   
@@ -668,7 +672,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/connect-aepp-to-wallet/" class="md-nav__link">
+      <a href="../../../guides/connect-aepp-to-wallet/" class="md-nav__link">
         
   
   
@@ -691,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/build-wallet/" class="md-nav__link">
+      <a href="../../../guides/build-wallet/" class="md-nav__link">
         
   
   
@@ -714,7 +718,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/ledger-wallet/" class="md-nav__link">
+      <a href="../../../guides/ledger-wallet/" class="md-nav__link">
         
   
   
@@ -737,7 +741,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/metamask-snap/" class="md-nav__link">
+      <a href="../../../guides/metamask-snap/" class="md-nav__link">
         
   
   
@@ -775,7 +779,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../transaction-options/" class="md-nav__link">
+      <a href="../../../transaction-options/" class="md-nav__link">
         
   
   
@@ -794,18 +798,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -821,7 +827,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Examples & Tutorials
@@ -832,18 +838,20 @@
                 
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" checked>
         
           
           <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
@@ -859,7 +867,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5_1">
             <span class="md-nav__icon md-icon"></span>
             NodeJS
@@ -873,12 +881,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/node/transfer-ae.md" class="md-nav__link">
+      <a href="../transfer-ae/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    Transfer AE
     
   </span>
   
@@ -896,12 +904,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/node/contract-interaction.md" class="md-nav__link">
+      <a href="../contract-interaction/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    Compile &amp; Deploy a Sophia Smart Contract
     
   </span>
   
@@ -957,12 +965,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/node/paying-for-contract-call-tx.md" class="md-nav__link">
+      <a href="../paying-for-contract-call-tx/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    InnerTx: ContractCallTx
     
   </span>
   
@@ -980,12 +988,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/node/paying-for-spend-tx.md" class="md-nav__link">
+      <a href="../paying-for-spend-tx/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    InnerTx: SpendTx
     
   </span>
   
@@ -1011,12 +1019,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/node/account-generalized.md" class="md-nav__link">
+      <a href="../account-generalized/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    Create and use Generalized Accounts
     
   </span>
   
@@ -1031,20 +1039,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../examples/node/dry-run-using-debug-endpoint.md" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
-    None
+    Dry-run using debug endpoint
     
   </span>
   
 
       </a>
+      
     </li>
   
 
@@ -1057,12 +1075,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/node/oracle.md" class="md-nav__link">
+      <a href="../oracle/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    Register and query Oracle
     
   </span>
   
@@ -1126,7 +1144,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/browser/tools/" class="md-nav__link">
+      <a href="../../browser/tools/" class="md-nav__link">
         
   
   
@@ -1149,7 +1167,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/browser/aepp/" class="md-nav__link">
+      <a href="../../browser/aepp/" class="md-nav__link">
         
   
   
@@ -1172,7 +1190,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/browser/wallet-iframe/" class="md-nav__link">
+      <a href="../../browser/wallet-iframe/" class="md-nav__link">
         
   
   
@@ -1195,7 +1213,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/browser/wallet-web-extension/packed.zip" class="md-nav__link">
+      <a href="../../browser/wallet-web-extension/packed.zip" class="md-nav__link">
         
   
   
@@ -1226,7 +1244,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/vuejs/helloworld-blockheight/" class="md-nav__link">
+      <a href="../../../tutorials/vuejs/helloworld-blockheight/" class="md-nav__link">
         
   
   
@@ -1256,7 +1274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../../../api/" class="md-nav__link">
         
   
   
@@ -1278,7 +1296,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../compatibility/" class="md-nav__link">
+      <a href="../../../compatibility/" class="md-nav__link">
         
   
   
@@ -1300,7 +1318,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHANGELOG/" class="md-nav__link">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
         
   
   
@@ -1360,7 +1378,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/migration/14/" class="md-nav__link">
+      <a href="../../../guides/migration/14/" class="md-nav__link">
         
   
   
@@ -1383,7 +1401,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/migration/13/" class="md-nav__link">
+      <a href="../../../guides/migration/13/" class="md-nav__link">
         
   
   
@@ -1406,7 +1424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/migration/12/" class="md-nav__link">
+      <a href="../../../guides/migration/12/" class="md-nav__link">
         
   
   
@@ -1429,7 +1447,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/migration/11/" class="md-nav__link">
+      <a href="../../../guides/migration/11/" class="md-nav__link">
         
   
   
@@ -1452,7 +1470,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/migration/10/" class="md-nav__link">
+      <a href="../../../guides/migration/10/" class="md-nav__link">
         
   
   
@@ -1475,7 +1493,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/migration/9/" class="md-nav__link">
+      <a href="../../../guides/migration/9/" class="md-nav__link">
         
   
   
@@ -1498,7 +1516,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/migration/7/" class="md-nav__link">
+      <a href="../../../guides/migration/7/" class="md-nav__link">
         
   
   
@@ -1566,7 +1584,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../contrib/" class="md-nav__link">
+      <a href="../../../contrib/" class="md-nav__link">
         
   
   
@@ -1589,7 +1607,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../contrib/releases/" class="md-nav__link">
+      <a href="../../../contrib/releases/" class="md-nav__link">
         
   
   
@@ -1632,92 +1650,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
-    <span class="md-ellipsis">
-      Introduction
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Introduction">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#usecases" class="md-nav__link">
-    <span class="md-ellipsis">
-      UseCases
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#1-specify-imports" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. Specify imports
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-define-constants" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. Define constants
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-create-object-instances" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. Create object instances
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-create-and-sign-contractcalltx-on-behalf-of-new-user" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Create and sign ContractCallTx on behalf of new user
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-create-sign-broadcast-the-payingfortx-as-payer" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. Create, sign &amp; broadcast the PayingForTx as payer
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-check-that-last-caller-is-the-new-user" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. Check that last caller is the new user
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1732,146 +1664,63 @@
 
 
 
-<h1 id="innertx-contractcalltx">InnerTx: ContractCallTx</h1>
-<h2 id="introduction">Introduction</h2>
-<p>The whole script is <a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/node/paying-for-contract-call-tx.js">located in the repository</a>
-and this page explains in detail how to:</p>
-<ul>
-<li>Create and sign a <code>ContractCallTx</code> with the <code>innerTx</code> option for an account that has no
-   balance.</li>
-<li>Wrap the signed <code>ContractCallTx</code> in a <code>PayingForTx</code> using an account with balance to pay the
-   fees of the inner transaction.</li>
-</ul>
-<p>Note:</p>
-<ul>
-<li>This can be done for <strong><em>any</em></strong> transaction type!</li>
-</ul>
-<h3 id="usecases">UseCases</h3>
-<p>This functionality allows <strong>every service</strong> to let their users interact with their
-decentralized aepp without having them to buy AE by covering their fees.</p>
-<p>Examples:</p>
-<ul>
-<li>Game developers that want to quickly onboard new users.</li>
-<li>Governance æpps that want people to vote on important proposals without having them to pay
-   anything.</li>
-<li>Custodians that want to offer an additional services to cover the transaction fees of their
-   clients.</li>
-<li>... many more!</li>
-</ul>
-<h2 id="1-specify-imports">1. Specify imports</h2>
-<p>You need to import <code>AeSdk</code>, <code>Node</code> and <code>AccountMemory</code> classes from the SDK.
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AccountMemory</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<h1 id="dry-run-using-debug-endpoint">Dry-run using debug endpoint</h1>
+<p>By default, sdk uses <a href="https://api-docs.aeternity.io/#/external/ProtectedDryRunTxs">protectedDryRunTxs</a> endpoint limited to 6e6 gas by default.
+It means if you try to dry-run a very big transaction (including intensive computations, or
+returning much data) it may be rejected with <code>Invocation failed: "Out of gas"</code> error.</p>
+<p>Ways to overcome this:
+- split transactions into multiple smaller transactions;
+- increase a gas limit for protected dry-runs by setting <a href="https://docs.aeternity.io/en/stable/configuration/">http.external.gas_limit</a> in aenode
+configuration;
+- use <a href="https://api-docs.aeternity.io/#/internal/DryRunTxs">dryRunTxs</a> debug endpoint with the same api as a protected one.</p>
+<p>The last options would work only for self-hosted nodes or testnet.aeternity.io which have debug
+endpoints exposed via <a href="https://docs.aeternity.io/en/stable/configuration/">http.endpoints.dry-run</a>. Also, sdk doesn't know anything about debug
+endpoints. This script shows how to use a debug dry-run in sdk.</p>
+<!-- TODO: move accurate links after fixing https://github.com/aeternity/aeternity/issues/4369 -->
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">AccountMemory</span><span class="p">,</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">,</span><span class="w"> </span><span class="nx">Contract</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 </code></pre></div>
-<strong>Note</strong>:</p>
-<ul>
-<li>You need to have the SDK installed via <code>npm i @aetenity/aepp-sdk -g</code> to run that example code.</li>
-</ul>
-<h2 id="2-define-constants">2. Define constants</h2>
-<p>The following constants are used in the subsequent code snippets.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">PAYER_ACCOUNT_SECRET_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">COMPILER_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://v8.compiler.aepps.com&#39;</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">CONTRACT_ADDRESS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ct_iy86kak8GGt4U5VjDFNQf1a9qjbyxKpmGVNe3UuKwnmcM6LW8&#39;</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE_CODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span>
-<span class="sb">@compiler &gt;= 6</span>
-
-<span class="sb">contract PayingForTxExample =</span>
-
-<span class="sb">    record state = { last_caller: option(address) }</span>
-
-<span class="sb">    entrypoint init() =</span>
-<span class="sb">        { last_caller = None }</span>
-
-<span class="sb">    stateful entrypoint set_last_caller() =</span>
-<span class="sb">        put(state{last_caller = Some(Call.caller)})</span>
-
-<span class="sb">    entrypoint get_last_caller() : option(address) =</span>
-<span class="sb">        state.last_caller</span>
+<p>The idea is to extend the base Node class overriding the method that will forward a request
+to a debug endpoint in case it is a dry-run.</p>
+<p><div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nx">CustomNode</span><span class="w"> </span><span class="k">extends</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">sendOperationRequest</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span><span class="w"> </span><span class="nx">spec</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">spec</span><span class="p">.</span><span class="nx">path</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;/v3/dry-run&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">spec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">...</span><span class="nx">spec</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">path</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://testnet.aeternity.io/v3/debug/transactions/dry-run&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="p">};</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">super</span><span class="p">.</span><span class="nx">sendOperationRequest</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span><span class="w"> </span><span class="nx">spec</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+Let's set up an sdk and contract to test this.
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span>
+<span class="sb">contract Test =</span>
+<span class="sb"> entrypoint getArg(x : map(string, int)) = x</span>
 <span class="sb">`</span><span class="p">;</span>
-</code></pre></div>
-Note:</p>
-<ul>
-<li>The secret key of the account is pre-funded and only used for demonstration purpose<ul>
-<li>You can replace it with your own
-   (see <a href="../../quick-start.md#2-create-a-sender-account">Create an Account</a>)</li>
-<li>In case the account runs out of funds you can always request AE using the <a href="https://faucet.aepps.com/">Faucet</a></li>
-</ul>
-</li>
-<li>The contract is already deployed at the defined address.</li>
-<li>The <code>NEW_USER_KEYPAIR</code> is used to call the contract. The <code>PayingForTx</code> allows the new user to
-   perform a contract call without having any funds.</li>
-</ul>
-<h2 id="3-create-object-instances">3. Create object instances</h2>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AccountMemory</span><span class="p">(</span><span class="nx">PAYER_ACCOUNT_SECRET_KEY</span><span class="p">);</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">AccountMemory</span><span class="p">.</span><span class="nx">generate</span><span class="p">();</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="nx">NODE_URL</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CustomNode</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
 <span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
-<span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">payerAccount</span><span class="p">,</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">],</span>
-<span class="w">  </span><span class="nx">onCompiler</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="nx">COMPILER_URL</span><span class="p">),</span>
+<span class="w">  </span><span class="nx">accounts</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="ow">new</span><span class="w"> </span><span class="nx">AccountMemory</span><span class="p">(</span><span class="s1">&#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span><span class="p">)],</span>
+<span class="w">  </span><span class="nx">onCompiler</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompilerHttp</span><span class="p">(</span><span class="s1">&#39;https://v8.compiler.aepps.com&#39;</span><span class="p">),</span>
 <span class="p">});</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Contract</span><span class="p">.</span><span class="nx">initialize</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(),</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="p">});</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">deployInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">$deploy</span><span class="p">([]);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Contract deployed at&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">deployInfo</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span>
 </code></pre></div>
-<h2 id="4-create-and-sign-contractcalltx-on-behalf-of-new-user">4. Create and sign <code>ContractCallTx</code> on behalf of new user</h2>
-<p>Currently there is no high-level API available that allows you to create and sign the
-<code>ContractCallTx</code> by invoking the generated contract method on the contract instance that you
-typically use for contract calls.</p>
-<p>Following 4 steps need to be done:</p>
-<ol>
-<li>Initialize a contract instance by the source code and the contract address.</li>
-<li>Create calldata by calling the <code>encode</code> function providing the contract name, the name of
-    the <code>entrypoint</code> to call as well as the required params.<ul>
-<li>The <code>entrypoint</code> with the name <code>set_latest_caller</code> doesn't require any params so you
-   can provide an empty array</li>
-</ul>
-</li>
-<li>Create the <code>ContractCreateTx</code> by providing all required params.<ul>
-<li>You could omit <code>amount</code>, <code>gasLimit</code> and <code>gasPrice</code> if you choose to stick to the default
-   values (see
-   <a href="../../transaction-options.md#contractcreatetx-contractcalltx">transaction options</a>)</li>
-</ul>
-</li>
-<li>Sign the transaction by providing <code>innerTx: true</code> as transaction option.<ul>
-<li>The transaction will be signed in a special way that is required for inner transactions.</li>
-</ul>
-</li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Contract</span><span class="p">.</span><span class="nx">initialize</span><span class="p">({</span>
-<span class="w">  </span><span class="p">...</span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(),</span>
-<span class="w">  </span><span class="nx">sourceCode</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_SOURCE_CODE</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">address</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_ADDRESS</span><span class="p">,</span>
-<span class="p">});</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">calldata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">_calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;PayingForTxExample&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;set_last_caller&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]);</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">contractCallTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">buildTx</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="nx">Tag</span><span class="p">.</span><span class="nx">ContractCallTx</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">callerId</span><span class="o">:</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">contractId</span><span class="o">:</span><span class="w"> </span><span class="nx">CONTRACT_ADDRESS</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">gasLimit</span><span class="o">:</span><span class="w"> </span><span class="mf">1000000</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">gasPrice</span><span class="o">:</span><span class="w"> </span><span class="mf">1500000000</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">callData</span><span class="o">:</span><span class="w"> </span><span class="nx">calldata</span><span class="p">,</span>
-<span class="p">});</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">signedContractCallTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">contractCallTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">newUserAccount</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">innerTx</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="p">});</span>
+This map is bigger than allowed by the default gas limit
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Map</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nb">Array</span><span class="p">(</span><span class="mf">20000</span><span class="p">).</span><span class="nx">fill</span><span class="p">().</span><span class="nx">map</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">idx</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">[</span><span class="sb">`bar</span><span class="si">${</span><span class="nx">idx</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="mf">43</span><span class="p">]));</span>
 </code></pre></div>
-<h2 id="5-create-sign-broadcast-the-payingfortx-as-payer">5. Create, sign &amp; broadcast the <code>PayingForTx</code> as payer</h2>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">payForTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">payForTransaction</span><span class="p">(</span><span class="nx">signedContractCallTx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="o">:</span><span class="w"> </span><span class="nx">payerAccount</span><span class="w"> </span><span class="p">});</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">payForTx</span><span class="p">);</span>
+Sdk needs to know that we have a different gas limit, so <code>gasMax</code> is provided.
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">result</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">gasUsed</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">tx</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">fee</span><span class="w"> </span><span class="p">},</span>
+<span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">getArg</span><span class="p">(</span><span class="nx">map</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">gasMax</span><span class="o">:</span><span class="w"> </span><span class="mf">6e10</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
-<h2 id="6-check-that-last-caller-is-the-new-user">6. Check that last caller is the new user</h2>
-<p>Contract instance allows interacting with the contract in a convenient way.
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">dryRunTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">get_last_caller</span><span class="p">();</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`New user: </span><span class="si">${</span><span class="nx">newUserAccount</span><span class="p">.</span><span class="nx">address</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Last caller:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">dryRunTx</span><span class="p">.</span><span class="nx">decodedResult</span><span class="p">);</span>
-</code></pre></div>
-Note:</p>
-<ul>
-<li>Last caller should now be the address of the new user.</li>
-<li>For regular (non-stateful) entrypoints the SDK automatically performs a dry-run which
-   allows to perform read-only calls for free, see
-   <a href="../../guides/contracts.md#b-regular-entrypoints">Contract guide</a>.</li>
-</ul>
+The call succeeded and the gas used more than 6e6, which means that request forwarding works!
+<div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Call result&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">fee</span><span class="p">,</span><span class="w"> </span><span class="nx">gasUsed</span><span class="p">);</span>
+</code></pre></div></p>
 
 
 
@@ -1922,10 +1771,10 @@ Note:</p>
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.c8b220af.min.js"></script>
       
     
   </body>
