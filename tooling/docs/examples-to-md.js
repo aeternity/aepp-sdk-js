@@ -55,7 +55,7 @@ await Promise.all(
       .map(({ type, content }) => (type === 'code' ? `\`\`\`js\n${content}\n\`\`\`` : content))
       .join('\n');
 
-    const fileParsedPath = path.parse(path.resolve(process.cwd(), 'docs', fileName));
+    const fileParsedPath = path.parse(path.resolve(process.cwd(), 'docs', directory, fileName));
     await fs.mkdir(fileParsedPath.dir, { recursive: true });
 
     const outputFilePath = path.format({ ...fileParsedPath, base: undefined, ext: '.md' });
