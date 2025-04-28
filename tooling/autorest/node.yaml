@@ -150,7 +150,7 @@ directive:
 
 version: ^3.7.1
 use-extension:
-  '@autorest/typescript': ^6.0.23
+  '@autorest/typescript': ^6.0.39
   '@autorest/modelerfour': ^4.27.0
 input-file: https://raw.githubusercontent.com/aeternity/aeternity/v7.3.0-rc5/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
