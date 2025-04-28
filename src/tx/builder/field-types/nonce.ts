@@ -2,7 +2,7 @@ import { isAccountNotFoundError } from '../../../utils/other.js';
 import shortUInt from './short-u-int.js';
 import Node from '../../../Node.js';
 import { ArgumentError } from '../../../utils/errors.js';
-import { NextNonceStrategy } from '../../../apis/node/index.js';
+import { Enum1 as NextNonceStrategy } from '../../../apis/node/index.js';
 import { Tag } from '../constants.js';
 
 export default function genNonceField<SenderKey extends string>(

@@ -20,7 +20,7 @@ import {
   emit,
 } from './internal.js';
 import { Encoded } from '../utils/encoder.js';
-import { ContractCallReturnType } from '../apis/node/index.js';
+import { ContractCallObjectReturnType } from '../apis/node/index.js';
 import { ContractCallObject } from '../contract/Contract.js';
 import Channel from './Base.js';
 import ChannelSpend from './Spend.js';
@@ -64,7 +64,7 @@ interface CallContractResult extends CallContractOptions {
   height?: number;
   callerNonce?: number;
   log?: any;
-  returnType?: ContractCallReturnType;
+  returnType?: ContractCallObjectReturnType;
 }
 
 interface Contract {

@@ -14,6 +14,7 @@ import { assertNotNull } from '../utils';
 import { pause } from '../../src/utils/other';
 import {
   Activity,
+  ActivityType,
   Auction,
   Channel,
   ContractCall,
@@ -30,6 +31,7 @@ import {
   TotalStat,
   Transaction,
   Transfer,
+  TransferKind,
 } from '../../src/apis/middleware';
 import { MiddlewarePage } from '../../src/utils/MiddlewarePage';
 
@@ -202,7 +204,8 @@ describe('Middleware API', () => {
                 kind: 'fee_lock_name',
                 refTxHash: 'th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1',
               },
-              type: 'InternalTransferEvent',
+              // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/2137
+              type: 'InternalTransferEvent' as ActivityType,
             },
             {
               blockHash: 'mh_2GzNyPoPZvKavxfvorCc7gwTFs8u6HKzua2z7fcakCxh66JfrU',
@@ -379,7 +382,8 @@ describe('Middleware API', () => {
               accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
               amount: 570288700000000000000n,
               height: 7,
-              kind: 'fee_spend_name',
+              // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/2136
+              kind: 'fee_spend_name' as TransferKind,
               // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/2079
               refBlockHash: 'NameClaimTx' as Encoded.MicroBlockHash,
               refTxHash: 'th_C7LscPqF5Nf5QrgZDSVbY92v7rruefN1qHjrHVuk2bdNwZF1e',
