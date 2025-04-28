@@ -30,6 +30,9 @@ export class MiddlewareSubscriberDisconnected extends MiddlewareSubscriberError 
   }
 }
 
+/**
+ * @category middleware
+ */
 export default class MiddlewareSubscriber {
   #subscriptions: Array<readonly [target: string, s: Source, cb: (p?: Object, e?: Error) => void]> =
     [];

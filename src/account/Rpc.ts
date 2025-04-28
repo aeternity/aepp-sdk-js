@@ -11,6 +11,7 @@ import { AeppApi, WalletApi } from '../aepp-wallet-communication/rpc/types.js';
  * @param params.rpcClient - RpcClient instance
  * @param params.address - RPC account address
  * @returns AccountRpc instance
+ * @category account
  */
 export default class AccountRpc extends AccountBase {
   _rpcClient: RpcClient<WalletApi, AeppApi>;

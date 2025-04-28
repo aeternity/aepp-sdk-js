@@ -7,7 +7,7 @@ import {
   InvalidTxError,
   ArgumentError,
   Tag,
-  MemoryAccount,
+  AccountMemory,
   verifyTransaction,
   buildTxAsync,
 } from '../../src';
@@ -39,7 +39,7 @@ describe('Verify Transaction', () => {
       ttl: 2,
       absoluteTtl: true,
     });
-    const signedTx = await aeSdk.signTransaction(spendTx, { onAccount: MemoryAccount.generate() });
+    const signedTx = await aeSdk.signTransaction(spendTx, { onAccount: AccountMemory.generate() });
     const errors = await verifyTransaction(signedTx, node);
     expect(errors.map(({ key }) => key)).to.eql(['InvalidSignature', 'ExpiredTTL']);
   });

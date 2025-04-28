@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import { useState } from 'preact/hooks';
 import { JSX } from 'preact/jsx-runtime';
-import { unpackTx, buildTx, Tag, isAddressValid, Encoding } from '@aeternity/aepp-sdk';
+import { unpackTx, buildTx, Tag, isEncoded, Encoding } from '@aeternity/aepp-sdk';
 
 export function TransactionPacker() {
   const [packError, setPackError] = useState('');
@@ -10,7 +10,7 @@ export function TransactionPacker() {
 
   let params: ReturnType<typeof unpackTx> | undefined;
   try {
-    if (isAddressValid(transaction, Encoding.Transaction)) {
+    if (isEncoded(transaction, Encoding.Transaction)) {
       params = unpackTx(transaction);
       setUnpackError('');
     } else setUnpackError(transaction ? 'Invalid encoding' : 'No transaction');

@@ -9,8 +9,8 @@ import {
   buildTx,
   Tag,
   unpackTx,
-  verify,
-  verifyMessage,
+  verifySignature,
+  verifyMessageSignature,
   decode,
   hash,
 } from '../../src';
@@ -287,7 +287,7 @@ describe('Aeternity Snap for MetaMask', function () {
         signatures: [signature],
       } = unpackTx(signedTransaction, Tag.SignedTx);
       const hashedTx = Buffer.concat([Buffer.from(networkId), hash(decode(transaction))]);
-      expect(verify(hashedTx, signature, address)).to.equal(true);
+      expect(verifySignature(hashedTx, signature, address)).to.equal(true);
     });
 
     it('signs transaction rejected', async () => {
@@ -334,7 +334,7 @@ describe('Aeternity Snap for MetaMask', function () {
       await instructTester('approve');
       const signature = await account.signMessage(message);
       expect(signature).to.be.an.instanceOf(Uint8Array);
-      expect(verifyMessage(message, signature, address)).to.equal(true);
+      expect(verifyMessageSignature(message, signature, address)).to.equal(true);
     });
 
     it('signs message rejected', async () => {

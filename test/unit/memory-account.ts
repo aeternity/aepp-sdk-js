@@ -1,32 +1,37 @@
 import '..';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { MemoryAccount, verifyMessage, InvalidChecksumError, verify } from '../../src';
+import {
+  AccountMemory,
+  verifyMessageSignature,
+  InvalidChecksumError,
+  verifySignature,
+} from '../../src';
 
 const secretKey = 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf';
 
-describe('MemoryAccount', () => {
+describe('AccountMemory', () => {
   it('fails on invalid secret key', async () => {
-    expect(() => new MemoryAccount('ak_test' as any)).to.throw(
+    expect(() => new AccountMemory('ak_test' as any)).to.throw(
       InvalidChecksumError,
       'Invalid checksum',
     );
   });
 
   it('Init with secretKey', async () => {
-    const acc = new MemoryAccount(secretKey);
+    const acc = new AccountMemory(secretKey);
     expect(acc.address).to.equal('ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E');
     expect(acc.secretKey).to.equal(secretKey);
   });
 
   it('generates', async () => {
-    const acc = MemoryAccount.generate();
+    const acc = AccountMemory.generate();
     expect(acc.address).to.satisfy((a: string) => a.startsWith('ak_'));
   });
 
   it('Sign raw data', async () => {
     const data = Buffer.from(new Array(10).fill(0).map((_, idx) => idx));
-    const account = new MemoryAccount(secretKey);
+    const account = new AccountMemory(secretKey);
     const signature = await account.unsafeSign(data);
     expect(signature).to.eql(
       Uint8Array.from([
@@ -36,12 +41,12 @@ describe('MemoryAccount', () => {
         249, 219, 99, 74, 255, 5,
       ]),
     );
-    expect(verify(data, signature, account.address)).to.equal(true);
+    expect(verifySignature(data, signature, account.address)).to.equal(true);
   });
 
   it('Sign message', async () => {
     const message = 'test';
-    const account = new MemoryAccount(secretKey);
+    const account = new AccountMemory(secretKey);
     const signature = await account.signMessage(message);
     expect(signature).to.eql(
       Uint8Array.from([
@@ -51,12 +56,12 @@ describe('MemoryAccount', () => {
         110, 74, 51, 47, 0,
       ]),
     );
-    expect(verifyMessage(message, signature, account.address)).to.equal(true);
+    expect(verifyMessageSignature(message, signature, account.address)).to.equal(true);
   });
 
   it('Sign message message with non-ASCII chars', async () => {
     const message = 'tæst';
-    const account = new MemoryAccount(secretKey);
+    const account = new AccountMemory(secretKey);
     const signature = await account.signMessage(message);
     expect(signature).to.eql(
       Uint8Array.from([
@@ -66,6 +71,6 @@ describe('MemoryAccount', () => {
         183, 197, 251, 3,
       ]),
     );
-    expect(verifyMessage(message, signature, account.address)).to.equal(true);
+    expect(verifyMessageSignature(message, signature, account.address)).to.equal(true);
   });
 });

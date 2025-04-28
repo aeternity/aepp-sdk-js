@@ -14,7 +14,7 @@ import {
   AeSdk,
   Channel,
   buildTx,
-  MemoryAccount,
+  AccountMemory,
 } from '../../src';
 import { notify, SignTx, SignTxWithTag } from '../../src/channel/internal';
 import { assertNotNull, ensureEqual, ensureInstanceOf } from '../utils';
@@ -29,8 +29,8 @@ should();
 
 describe('Channel', () => {
   let aeSdk: AeSdk;
-  let initiator: MemoryAccount;
-  let responder: MemoryAccount;
+  let initiator: AccountMemory;
+  let responder: AccountMemory;
   let initiatorCh: Channel;
   let responderCh: Channel;
   let responderShouldRejectUpdate: number | boolean;

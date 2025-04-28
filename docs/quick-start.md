@@ -8,13 +8,13 @@ For more specific information on setups with Frameworks and TypeScript, please r
 For the following snippets in the guide you need to specify multiple imports.
 
 ```js
-const { AeSdk, MemoryAccount, Node, AE_AMOUNT_FORMATS } = require('@aeternity/aepp-sdk');
+const { AeSdk, AccountMemory, Node } = require('@aeternity/aepp-sdk');
 ```
 
 ## 2. Create a sender account
 
 ```js
-const sender = MemoryAccount.generate();
+const sender = AccountMemory.generate();
 console.log('Sender address:', sender.address);
 console.log('Sender secret key:', sender.secretKey);
 ```
@@ -28,12 +28,12 @@ To receive some _AE_ you can use the [Faucet](https://faucet.aepps.com/). Just p
 This example shows:
 
 - how to create an instance of the SDK using the `AeSdk` class
-- how to spend (send) 1 AE from the account the SDK instance was initialized with to some other AE address
+- how to spend (send) 1 _AE_ from the account the SDK instance was initialized with to some other AE address
 
 ```js
 const NODE_URL = 'https://testnet.aeternity.io';
 // replace <SENDER_SECRET_KEY> with the generated secretKey from step 2
-const sender = new MemoryAccount('<SENDER_SECRET_KEY>');
+const sender = new AccountMemory('<SENDER_SECRET_KEY>');
 
 (async function () {
   const node = new Node(NODE_URL);
@@ -43,16 +43,13 @@ const sender = new MemoryAccount('<SENDER_SECRET_KEY>');
   });
 
   // spend one AE
-  await aeSdk.spend(1, '<RECIPIENT_ADDRESS>', {
-    // replace <RECIPIENT_ADDRESS>, Ideally you use address from Superhero Wallet you have created before
-    denomination: AE_AMOUNT_FORMATS.AE,
-  });
+  await aeSdk.spend(1e18, '<RECIPIENT_ADDRESS>');
+  // replace <RECIPIENT_ADDRESS>, Ideally you use address from Superhero Wallet you have created before
 })();
 ```
 
 Note:
 
 - You may remove code from Step 2 as this serves only for one-time creation
-- By default the `spend` function expects the amount to be spent in `aettos` (the smallest possible unit)
-- Following the example snippet you would specify `AE` as denomination
+- The `spend` function expects the amount to be spent in `aettos` (the smallest possible unit, 1 _AE_ equal to 1 000 000 000 000 000 000 `aettos`)
 - See [Testnet Explorer](https://testnet.aescan.io/) and track your transactions

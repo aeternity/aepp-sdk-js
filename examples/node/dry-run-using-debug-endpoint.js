@@ -23,7 +23,7 @@ endpoints. This script shows how to use a debug dry-run in sdk.
 [dryRunTxs]: https://api-docs.aeternity.io/#/internal/DryRunTxs
 */
 
-import { Node, AeSdk, MemoryAccount, CompilerHttp, Contract } from '@aeternity/aepp-sdk';
+import { Node, AeSdk, AccountMemory, CompilerHttp, Contract } from '@aeternity/aepp-sdk';
 
 /*
 The idea is to extend the base Node class overriding the method that will forward a request
@@ -49,7 +49,7 @@ contract Test =
 const node = new CustomNode('https://testnet.aeternity.io');
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
-  accounts: [new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
+  accounts: [new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
   onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
 });
 

@@ -1,4 +1,4 @@
-import { AeSdk, Node, MemoryAccount, encode, Encoding } from '@aeternity/aepp-sdk';
+import { AeSdk, Node, AccountMemory, encode, Encoding } from '@aeternity/aepp-sdk';
 
 const aeSdk = new AeSdk({
   nodes: [
@@ -7,7 +7,7 @@ const aeSdk = new AeSdk({
       instance: new Node('https://testnet.aeternity.io'), // host your node for better decentralization
     },
   ],
-  accounts: [new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
+  accounts: [new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
 });
 
 const transactionInfo = await aeSdk.spend(

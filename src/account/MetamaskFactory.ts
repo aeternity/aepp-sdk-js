@@ -24,6 +24,7 @@ interface SnapDetails {
 /**
  * A factory class that generates instances of AccountMetamask.
  * @see {@link https://www.npmjs.com/package/@aeternity-snap/plugin | Aeternity snap}
+ * @category account
  */
 export default class AccountMetamaskFactory extends AccountBaseFactory {
   // TODO: remove after removing `provider`

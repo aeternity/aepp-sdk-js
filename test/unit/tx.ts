@@ -13,7 +13,7 @@ import {
   getDefaultPointerKey,
   commitmentHash,
   getMinimumNameFee,
-  isNameValid,
+  isName,
   produceNameId,
   toBytes,
   buildTx,
@@ -73,9 +73,9 @@ describe('Tx', () => {
     });
   });
 
-  describe('isNameValid', () => {
-    it('validates domain', () => expect(isNameValid('asdasdasd.unknown')).to.equal(false));
-    it("don't throws exception", () => expect(isNameValid('asdasdasd.chain')).to.equal(true));
+  describe('isName', () => {
+    it('validates domain', () => expect(isName('asdasdasd.unknown')).to.equal(false));
+    it("don't throws exception", () => expect(isName('asdasdasd.chain')).to.equal(true));
   });
 
   const payload = Buffer.from([1, 2, 42]);

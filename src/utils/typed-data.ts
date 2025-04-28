@@ -6,6 +6,7 @@ import { concatBuffers } from './other.js';
 
 /**
  * Hashes arbitrary object, can be used to inline the aci hash to contract source code
+ * @category typed data signing
  */
 export function hashJson(data: unknown): Buffer {
   return hash(canonicalize(data) ?? '');
@@ -52,6 +53,7 @@ export interface Domain {
 
 /**
  * Hashes domain object, can be used to inline domain hash to contract source code
+ * @category typed data signing
  */
 export function hashDomain(domain: Domain): Buffer {
   const domainAci = {
@@ -79,6 +81,9 @@ export function hashDomain(domain: Domain): Buffer {
   return hash(decode(fateValue));
 }
 
+/**
+ * @category typed data signing
+ */
 export function hashTypedData(
   data: Encoded.ContractBytearray,
   aci: AciValue,

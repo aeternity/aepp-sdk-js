@@ -5,7 +5,7 @@ import {
   Encoded,
   Encoding,
   IllegalArgumentError,
-  isAddressValid,
+  isEncoded,
   Middleware,
   MiddlewarePageMissed,
   UnexpectedTsError,
@@ -128,7 +128,7 @@ describe('Middleware API', () => {
         .reverse()
         .find(({ prevHash }) => prevHash.startsWith('mh_'))?.prevHash;
       assertNotNull(microBlockHash);
-      if (!isAddressValid(microBlockHash, Encoding.MicroBlockHash)) throw new UnexpectedTsError();
+      if (!isEncoded(microBlockHash, Encoding.MicroBlockHash)) throw new UnexpectedTsError();
       const res = await middleware.getMicroBlock(microBlockHash);
       const expectedRes: typeof res = {
         flags: 'ba_AAAAAIy5ASU=',

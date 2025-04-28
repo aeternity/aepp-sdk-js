@@ -25,6 +25,7 @@ export async function invokeSnap<R>(
 /**
  * Account connected to Aeternity Snap for MetaMask
  * https://www.npmjs.com/package/\@aeternity-snap/plugin
+ * @category account
  */
 export default class AccountMetamask extends AccountBase {
   /**

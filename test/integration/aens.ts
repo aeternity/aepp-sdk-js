@@ -6,7 +6,7 @@ import { assertNotNull, ensureEqual, indent, randomName, randomString } from '..
 import {
   AeSdk,
   Name,
-  MemoryAccount,
+  AccountMemory,
   buildContractId,
   computeBidFee,
   ensureName,
@@ -286,7 +286,7 @@ describe('Aens', () => {
     expect((await contract.getArg(42, { callStatic: false })).decodedResult).to.equal(42n);
   });
 
-  const { address } = MemoryAccount.generate();
+  const { address } = AccountMemory.generate();
   let pointers: Parameters<Name['update']>[0];
   let pointersNode: Array<{ key: string; id: (typeof pointers)[string] }>;
 

@@ -17,6 +17,9 @@ import { operationSpecs } from './apis/middleware/middleware.js';
 import { IllegalArgumentError, InternalError } from './utils/errors.js';
 import { MiddlewarePage, isMiddlewareRawPage } from './utils/MiddlewarePage.js';
 
+/**
+ * @category middleware
+ */
 export default class Middleware extends MiddlewareApi {
   /**
    * @param url - Url for middleware API

@@ -20,6 +20,9 @@ interface NodeInfo {
   consensusProtocolVersion: ConsensusProtocolVersion;
 }
 
+/**
+ * @category chain
+ */
 export default class Node extends NodeApi {
   readonly #ignoreVersion: boolean;
 

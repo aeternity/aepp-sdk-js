@@ -4,7 +4,7 @@ import { getSdk } from '.';
 import {
   AeSdk,
   genSalt,
-  MemoryAccount,
+  AccountMemory,
   AccountGeneralized,
   Tag,
   unpackTx,
@@ -40,7 +40,7 @@ interface ContractApi extends ContractMethodsBase {
 
 describe('Generalized Account', () => {
   let aeSdk: AeSdk;
-  let accountBeforeGa: MemoryAccount;
+  let accountBeforeGa: AccountMemory;
   let gaAccountAddress: Encoded.AccountAddress;
   let authContract: Contract<ContractApi>;
 
@@ -50,7 +50,7 @@ describe('Generalized Account', () => {
   });
 
   it('Make account GA', async () => {
-    accountBeforeGa = Object.values(aeSdk.accounts)[0] as MemoryAccount;
+    accountBeforeGa = Object.values(aeSdk.accounts)[0] as AccountMemory;
     const { gaContractId } = await aeSdk.createGeneralizedAccount('authorize', [], { sourceCode });
     expect((await aeSdk.getAccount(gaAccountAddress)).kind).to.equal('generalized');
     authContract = await Contract.initialize({
@@ -88,9 +88,9 @@ describe('Generalized Account', () => {
     ).to.throw(ArgumentError, 'nonce should be equal 1 if GaAttachTx, got 2 instead');
   });
 
-  const recipient = MemoryAccount.generate().address;
+  const recipient = AccountMemory.generate().address;
 
-  it('Init MemoryAccount for GA and Spend using GA', async () => {
+  it('Init AccountMemory for GA and Spend using GA', async () => {
     aeSdk.removeAccount(gaAccountAddress);
     aeSdk.addAccount(new AccountGeneralized(gaAccountAddress), { select: true });
 

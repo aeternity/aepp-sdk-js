@@ -97,7 +97,7 @@ type ReplaceOnAccount<Options> = Options extends { onAccount: any }
   ? Omit<Options, 'onAccount'> & {
       /**
        * Make operation on specific account by providing address (to use account from sdk) or instance
-       * of AccountBase (like MemoryAccount)
+       * of AccountBase (like AccountMemory)
        */
       onAccount: OnAccount;
     }

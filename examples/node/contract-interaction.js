@@ -10,8 +10,8 @@
 
 // ## 1. Specify imports
 //
-// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import { AeSdk, Contract, CompilerHttp, Node, MemoryAccount } from '@aeternity/aepp-sdk';
+// You need to import `AeSdk`, `Node` and `AccountMemory` classes from the SDK.
+import { AeSdk, Contract, CompilerHttp, Node, AccountMemory } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -41,7 +41,7 @@ const COMPILER_URL = 'https://v8.compiler.aepps.com';
 //  - In case the account runs out of funds you can always request AE using the [Faucet](https://faucet.aepps.com/)
 
 // ## 3. Create object instances
-const account = new MemoryAccount(ACCOUNT_SECRET_KEY);
+const account = new AccountMemory(ACCOUNT_SECRET_KEY);
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
@@ -68,7 +68,7 @@ console.log(`Obtained bytecode ${bytecode}`);
 
 // ## 6. Deploy the contract
 // Invoking `$deploy` on the contract instance will result in the `CreateContractTx`
-// being created, signed (using the _secretKey_ of the previously defined `MemoryAccount`) and
+// being created, signed (using the _secretKey_ of the previously defined `AccountMemory`) and
 // broadcasted to the network. It will be picked up by the miners and written to the chain.
 
 const deployInfo = await contract.$deploy([5]);

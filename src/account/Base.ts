@@ -16,6 +16,7 @@ interface AuthData {
 /**
  * Account is one of the three basic building blocks of an
  * {@link AeSdk} and provides access to a signing key pair.
+ * @category account
  */
 export default abstract class AccountBase {
   /**

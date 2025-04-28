@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import { assertNotNull, ensureInstanceOf, indent } from '../utils';
-import { AeSdkMethods, AccountBase, MemoryAccount, Contract } from '../../src';
+import { AeSdkMethods, AccountBase, AccountMemory, Contract } from '../../src';
 
 describe('AeSdkMethods', () => {
   let accounts: AccountBase[];
@@ -42,7 +42,7 @@ describe('AeSdkMethods', () => {
     const data = JSON.parse(JSON.stringify(options));
     data.onNode._httpClient = '<removed>';
     data.onCompiler.api._httpClient = '<removed>';
-    ensureInstanceOf(options.onAccount, MemoryAccount);
+    ensureInstanceOf(options.onAccount, AccountMemory);
     expect(data).to.eql({
       onAccount: {
         address: options.onAccount.address,

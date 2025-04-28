@@ -86,7 +86,7 @@
       chartTxPerBlock.data.datasets[0].label = 'Transactions per block';
       chartDifficulty.data.datasets[0].label = 'Difficulty';
 
-      const { Node, isAddressValid, Encoding } = Aeternity;
+      const { Node, isEncoded, Encoding } = Aeternity;
 
       const nodeUrl = 'http://localhost:3013';
       const node = new Node(nodeUrl);
@@ -111,11 +111,11 @@
         let blockCounter = 0;
         while (hash != lastHash) {
           blockCounter += 1;
-          const txCount = isAddressValid(hash, Encoding.KeyBlockHash)
+          const txCount = isEncoded(hash, Encoding.KeyBlockHash)
             ? 0
             : (await node.getMicroBlockTransactionsCountByHash(hash)).count;
           addData(chartTxPerBlock, txCount, hash.slice(0, 7));
-          hash = isAddressValid(hash, Encoding.KeyBlockHash)
+          hash = isEncoded(hash, Encoding.KeyBlockHash)
             ? (await node.getKeyBlockByHash(hash)).prevHash
             : (await node.getMicroBlockHeaderByHash(hash)).prevHash;
         }

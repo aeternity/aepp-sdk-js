@@ -13,6 +13,7 @@ export const SIGN_PERSONAL_MESSAGE = 0x08;
 
 /**
  * Ledger wallet account class
+ * @category account
  */
 export default class AccountLedger extends AccountBase {
   /**
