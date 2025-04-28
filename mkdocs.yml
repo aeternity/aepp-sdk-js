@@ -8,6 +8,14 @@ plugins:
 repo_url: https://github.com/aeternity/aepp-sdk-js
 edit_uri: ''
 
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+strict: true
+
 extra:
   version:
     provider: mike
