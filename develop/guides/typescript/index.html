@@ -1916,31 +1916,31 @@
 </code></pre></div>
 <p>The problem is that TypeScript won't check if <code>address</code> is an <code>ak_</code>-encoded string, and the [<code>spend</code>] method will fail in this case.
 A more accurate solution would be to check the <code>address</code> in advance, providing user feedback if it is incorrect. For example:</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">isAddressValid</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">isEncoded</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isAddressValid</span><span class="p">(</span><span class="nx">address</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isEncoded</span><span class="p">(</span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">AccountAddress</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;The address is not valid&#39;</span><span class="p">);</span>
 <span class="w">  </span><span class="k">return</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="p">);</span>
 </code></pre></div>
-<p>Please note that this method doesn't require explicit casting <code>string</code> to [<code>Encoded.AccountAddress</code>] because [<code>isAddressValid</code>] implicitly marks <code>address</code> as <code>ak_${string}</code> in case it returns <code>true</code>.</p>
-<p>Additionally, you can use [<code>isAddressValid</code>] to validate data against other address types:</p>
+<p>Please note that this method doesn't require explicit casting <code>string</code> to [<code>Encoded.AccountAddress</code>] because [<code>isEncoded</code>] implicitly marks <code>address</code> as <code>ak_${string}</code> in case it returns <code>true</code>.</p>
+<p>Additionally, you can use [<code>isEncoded</code>] to validate data against other address types:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
-<span class="nx">isAddressValid</span><span class="p">(</span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">ContractAddress</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">OracleAddress</span><span class="p">);</span>
+<span class="nx">isEncoded</span><span class="p">(</span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">ContractAddress</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">OracleAddress</span><span class="p">);</span>
 </code></pre></div>
 <p>Or encoding types in general:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">isAddressValid</span><span class="p">(</span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="nx">isEncoded</span><span class="p">(</span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">);</span>
 </code></pre></div>
 <h3 id="aens-name-validation">AENS name validation</h3>
-<p>The similar way [<code>isNameValid</code>] can be used</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">isNameValid</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<p>The similar way [<code>isName</code>] can be used</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">isName</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isNameValid</span><span class="p">(</span><span class="s1">&#39;name.chain&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// true</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isNameValid</span><span class="p">(</span><span class="s1">&#39;мир.chain&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// true</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isNameValid</span><span class="p">(</span><span class="s1">&#39;🙂.chain&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isName</span><span class="p">(</span><span class="s1">&#39;name.chain&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// true</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isName</span><span class="p">(</span><span class="s1">&#39;мир.chain&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// true</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isName</span><span class="p">(</span><span class="s1">&#39;🙂.chain&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// false</span>
 </code></pre></div>
 <p>If you don't need to handle invalid names specially then you can use [<code>ensureName</code>]:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ensureName</span><span class="p">,</span><span class="w"> </span><span class="nx">Name</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
