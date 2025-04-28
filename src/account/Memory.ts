@@ -1,6 +1,6 @@
 import nacl from 'tweetnacl';
 import AccountBase from './Base.js';
-import { hash, messageToHash, messagePrefixLength } from '../utils/crypto.js';
+import { hash, hashMessage, messagePrefixLength } from '../utils/crypto.js';
 import { ArgumentError } from '../utils/errors.js';
 import { decode, encode, Encoded, Encoding } from '../utils/encoder.js';
 import { concatBuffers } from '../utils/other.js';
@@ -21,6 +21,7 @@ export function getBufferToSign(
 
 /**
  * In-memory account class
+ * @category account
  */
 export default class AccountMemory extends AccountBase {
   override readonly address: Encoded.AccountAddress;
@@ -73,7 +74,7 @@ export default class AccountMemory extends AccountBase {
   }
 
   override async signMessage(message: string, options?: any): Promise<Uint8Array> {
-    return this.unsafeSign(messageToHash(message), options);
+    return this.unsafeSign(hashMessage(message), options);
   }
 
   override async signTypedData(

@@ -41,6 +41,7 @@ async function getFileSystemRec(root: string, relative: string): Promise<Record<
  * Reads all files included in the provided contract
  * Available only in Node.js
  * @param path - a path to the main contract source code
+ * @category contract
  */
 export default async function getFileSystem(path: string): Promise<Record<string, string>> {
   return getFileSystemRec(dirname(path), basename(path));

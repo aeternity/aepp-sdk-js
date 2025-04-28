@@ -119,6 +119,7 @@ const parseType = (maybeType: unknown): [Encoding, typeof base64] => {
  * @param data - An Base58/64check encoded and prefixed string
  * (ex tx_..., sg_..., ak_....)
  * @returns Decoded data
+ * @category utils
  */
 export function decode(data: Encoded.Any): Buffer {
   const [prefix, encodedPayload, extra] = data.split('_');
@@ -135,6 +136,7 @@ export function decode(data: Encoded.Any): Buffer {
  * @param data - An decoded data
  * @param type - Prefix of Transaction
  * @returns Encoded string Base58check or Base64check data
+ * @category utils
  */
 export function encode<Type extends Encoding>(data: Uint8Array, type: Type): Encoded.Generic<Type> {
   const [, encoder] = parseType(type);

@@ -16,8 +16,8 @@ import {
   Node,
   Tag,
   unpackTx,
-  verify,
-  verifyMessage,
+  verifySignature,
+  verifyMessageSignature,
   decode,
   Encoded,
   hash,
@@ -224,7 +224,7 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
         signatures: [signature],
       } = unpackTx(signedTransaction, Tag.SignedTx);
       const hashedTx = Buffer.concat([Buffer.from(networkId), hash(decode(transaction))]);
-      expect(verify(hashedTx, signature, address)).to.equal(true);
+      expect(verifySignature(hashedTx, signature, address)).to.equal(true);
     });
 
     it('signs transaction rejected', async () => {
@@ -249,7 +249,7 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
       const signature = await account.signMessage(message);
       expect(signature).to.be.an.instanceOf(Uint8Array);
       // FIXME: correct signature after releasing https://github.com/LedgerHQ/app-aeternity/pull/13
-      expect(verifyMessage(message, signature, address)).to.equal(isNewApp);
+      expect(verifyMessageSignature(message, signature, address)).to.equal(isNewApp);
     });
 
     it('signs message rejected', async () => {

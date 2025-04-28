@@ -28,8 +28,8 @@
 //  - ... many more!
 
 // ## 1. Specify imports
-// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import { AeSdk, Contract, CompilerHttp, Node, MemoryAccount, Tag } from '@aeternity/aepp-sdk';
+// You need to import `AeSdk`, `Node` and `AccountMemory` classes from the SDK.
+import { AeSdk, Contract, CompilerHttp, Node, AccountMemory, Tag } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -69,8 +69,8 @@ contract PayingForTxExample =
 //    perform a contract call without having any funds.
 
 // ## 3. Create object instances
-const payerAccount = new MemoryAccount(PAYER_ACCOUNT_SECRET_KEY);
-const newUserAccount = MemoryAccount.generate();
+const payerAccount = new AccountMemory(PAYER_ACCOUNT_SECRET_KEY);
+const newUserAccount = AccountMemory.generate();
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

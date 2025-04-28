@@ -10,9 +10,9 @@ Before interacting with contracts using the SDK you should get familiar with Sop
 
 ```js
 // node.js import
-const { AeSdk, MemoryAccount, Node } = require('@aeternity/aepp-sdk');
+const { AeSdk, AccountMemory, Node } = require('@aeternity/aepp-sdk');
 // ES import
-import { AeSdk, MemoryAccount, Node } from '@aeternity/aepp-sdk';
+import { AeSdk, AccountMemory, Node } from '@aeternity/aepp-sdk';
 // additionally you may need to import CompilerCli or CompilerHttp
 ```
 
@@ -42,7 +42,7 @@ When creating an instance of the SDK you need to provide an account which will b
 
 ```js
 const node = new Node('https://testnet.aeternity.io'); // ideally host your own node
-const account = new MemoryAccount(SECRET_KEY);
+const account = new AccountMemory(SECRET_KEY);
 
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

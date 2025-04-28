@@ -42,11 +42,11 @@ import {
 } from '../apis/node/index.js';
 import CompilerBase, { Aci } from './compiler/Base.js';
 import Node from '../Node.js';
-import { getAccount, getContract, getContractByteCode, resolveName, txDryRun } from '../chain.js';
+import { getAccount, resolveName, txDryRun } from '../chain.js';
 import { sendTransaction, SendTransactionOptions } from '../send-transaction.js';
 import { TxUnpacked } from '../tx/builder/schema.generated.js';
 import { Optional, isAccountNotFoundError } from '../utils/other.js';
-import { isNameValid, produceNameId } from '../tx/builder/helpers.js';
+import { isName, produceNameId } from '../tx/builder/helpers.js';
 
 type ContractAci = NonNullable<Aci[0]['contract']>;
 type FunctionAci = ContractAci['functions'][0];
@@ -80,6 +80,9 @@ interface SendAndProcessReturnType {
   rawTx: Encoded.Transaction;
 }
 
+/**
+ * @category contract
+ */
 export interface ContractMethodsBase {
   [key: string]: (...args: any[]) => any;
 }
@@ -107,6 +110,9 @@ type MethodsToContractApi<M extends ContractMethodsBase> = {
     : never;
 };
 
+/**
+ * @category contract
+ */
 type ContractWithMethods<M extends ContractMethodsBase> = Contract<M> & MethodsToContractApi<M>;
 
 type MethodNames<M extends ContractMethodsBase> = (keyof M & string) | 'init';
@@ -542,7 +548,7 @@ class Contract<M extends ContractMethodsBase> {
         resolveByNode: true,
         onNode,
       })) as Encoded.ContractAddress;
-      if (isNameValid(address)) name = address;
+      if (isName(address)) name = address;
     }
 
     if (address == null && sourceCode == null && sourceCodePath == null && bytecode == null) {
@@ -550,14 +556,14 @@ class Contract<M extends ContractMethodsBase> {
     }
 
     if (address != null) {
-      const contract = await getContract(address, { onNode });
+      const contract = await onNode.getContract(address);
       if (contract.active == null) throw new InactiveContractError(address);
     }
 
     if (validateBytecode === true) {
       if (address == null)
         throw new MissingContractAddressError("Can't validate bytecode without contract address");
-      const onChanBytecode = (await getContractByteCode(address, { onNode })).bytecode;
+      const onChanBytecode = (await onNode.getContractCode(address)).bytecode;
       let isValid = false;
       if (bytecode != null) isValid = bytecode === onChanBytecode;
       else if (sourceCode != null) {
@@ -674,6 +680,9 @@ interface ContractWithMethodsClass {
   initialize: (typeof Contract)['initialize'];
 }
 
+/**
+ * @category contract
+ */
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 const ContractWithMethods: ContractWithMethodsClass = Contract as any;
 

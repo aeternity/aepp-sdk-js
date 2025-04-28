@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'preact/hooks';
-import { AccountMnemonicFactory, MemoryAccount } from '@aeternity/aepp-sdk';
+import { AccountMnemonicFactory, AccountMemory } from '@aeternity/aepp-sdk';
 import { validateMnemonic, generateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 
 export function AccountsByMnemonic() {
   const [mnemonic, setMnemonic] = useState('');
   const [count, setCount] = useState(1);
-  const [accounts, setAccounts] = useState<MemoryAccount[]>([]);
+  const [accounts, setAccounts] = useState<AccountMemory[]>([]);
 
   useEffect(() => {
     setAccounts([]);

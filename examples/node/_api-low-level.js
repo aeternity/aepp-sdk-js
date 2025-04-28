@@ -1,7 +1,7 @@
-import { Node, MemoryAccount, buildTxAsync, Tag, encode, Encoding } from '@aeternity/aepp-sdk';
+import { Node, AccountMemory, buildTxAsync, Tag, encode, Encoding } from '@aeternity/aepp-sdk';
 
 const onNode = new Node('https://testnet.aeternity.io'); // host your node for better decentralization
-const account = new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
+const account = new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
 
 const spendTx = await buildTxAsync({
   tag: Tag.SpendTx,

@@ -6,12 +6,12 @@ import {
   buildTxHash,
   decode,
   Encoded,
-  verifyMessage,
-  isAddressValid,
+  verifyMessageSignature,
+  isEncoded,
   hash,
   genSalt,
-  verify,
-  messageToHash,
+  verifySignature,
+  hashMessage,
   Encoding,
 } from '../../src';
 
@@ -51,20 +51,22 @@ describe('crypto', () => {
       });
     }));
 
-  describe('isAddressValid', () => {
+  describe('isEncoded', () => {
     it('rejects invalid encoded data', () => {
-      expect(isAddressValid('test')).to.equal(false);
-      expect(isAddressValid('th_11111111111111111111111111111111273Yts')).to.equal(false);
-      expect(isAddressValid('ak_11111111111111111111111111111111273Yts', Encoding.TxHash)).to.equal(
+      expect(isEncoded('test')).to.equal(false);
+      expect(
+        isEncoded('th_11111111111111111111111111111111273Yts', Encoding.AccountAddress),
+      ).to.equal(false);
+      expect(isEncoded('ak_11111111111111111111111111111111273Yts', Encoding.TxHash)).to.equal(
         false,
       );
     });
 
     it('returns true for a valid address', () => {
       const maybeValue: string = 'ak_11111111111111111111111111111111273Yts';
-      const result = isAddressValid(maybeValue);
+      const result = isEncoded(maybeValue, Encoding.AccountAddress);
       expect(result).to.equal(true);
-      // @ts-expect-error `result` is not chcked yet
+      // @ts-expect-error `result` is not checked yet
       let value: Encoded.AccountAddress = maybeValue;
       if (result) value = maybeValue;
       expect(value);
@@ -72,9 +74,9 @@ describe('crypto', () => {
 
     it('correctly checks against multiple encodings', () => {
       const maybeValue: string = 'th_HZMNgTvEiyKeATpauJjjeWwZcyHapKG8bDgy2S1sCUEUQnbwK';
-      const result = isAddressValid(maybeValue, Encoding.Name, Encoding.TxHash);
+      const result = isEncoded(maybeValue, Encoding.Name, Encoding.TxHash);
       expect(result).to.equal(true);
-      // @ts-expect-error `result` is not chcked yet
+      // @ts-expect-error `result` is not checked yet
       let value: Encoded.Name | Encoded.TxHash = maybeValue;
       if (result) value = maybeValue;
       expect(value);
@@ -83,7 +85,7 @@ describe('crypto', () => {
 
   describe('verify', () => {
     it('should verify tx with correct signature', () => {
-      const result = verify(txBinary, signature, address);
+      const result = verifySignature(txBinary, signature, address);
       assert.isTrue(result);
     });
   });
@@ -103,16 +105,16 @@ describe('crypto', () => {
     const longMessageHash = Buffer.from('J9bibOHrlicf0tYQxe1lW69LdDAxETwPmrafKjjQwvs=', 'base64');
 
     it('calculates a hash of a long message', () =>
-      expect(messageToHash(longMessage)).to.eql(longMessageHash));
+      expect(hashMessage(longMessage)).to.eql(longMessageHash));
 
     describe('verify', () => {
       it('should verify message', () => {
-        const result = verifyMessage(message, messageSignature, address);
+        const result = verifyMessageSignature(message, messageSignature, address);
         assert.isTrue(result);
       });
 
       it('should verify message with non-ASCII chars', () => {
-        const result = verifyMessage(messageNonASCII, messageNonASCIISignature, address);
+        const result = verifyMessageSignature(messageNonASCII, messageNonASCIISignature, address);
         assert.isTrue(result);
       });
     });

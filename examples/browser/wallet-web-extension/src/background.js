@@ -3,7 +3,7 @@ import {
   AeSdkWallet,
   CompilerHttp,
   Node,
-  MemoryAccount,
+  AccountMemory,
   BrowserRuntimeConnection,
   WALLET_TYPE,
   RpcConnectionDenyError,
@@ -53,7 +53,7 @@ const genConfirmCallback = (action) => async (aeppId, parameters, aeppOrigin) =>
   if (!isConfirmed) throw new RpcRejectedByUserError();
 };
 
-class AccountMemoryProtected extends MemoryAccount {
+class AccountMemoryProtected extends AccountMemory {
   async signTransaction(transaction, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
       const opt = { ...options, transaction, unpackedTx: unpackTx(transaction) };

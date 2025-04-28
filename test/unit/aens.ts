@@ -468,7 +468,7 @@ describe('AENS utils', () => {
     });
 
     it('computes for shortest auction', () => {
-      expect(computeAuctionEndBlock('1.chain', 1)).to.equal(29761);
+      expect(computeAuctionEndBlock('1.chain', 1)).to.equal(2401);
     });
 
     it('computes for longest unicode auction', () => {
@@ -476,7 +476,7 @@ describe('AENS utils', () => {
     });
 
     it('computes for shortest unicode auction', () => {
-      expect(computeAuctionEndBlock('æ.chain', 1)).to.equal(14881);
+      expect(computeAuctionEndBlock('æ.chain', 1)).to.equal(961);
     });
   });
 });

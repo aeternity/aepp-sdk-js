@@ -1,5 +1,5 @@
 import { channelUrl } from '.';
-import { Encoded, Channel, MemoryAccount, AeSdk } from '../../src';
+import { Encoded, Channel, AccountMemory, AeSdk } from '../../src';
 import { ChannelOptions, SignTxWithTag } from '../../src/channel/internal';
 
 export async function waitForChannel(channel: Channel, statuses: string[]): Promise<void> {
@@ -55,9 +55,9 @@ export async function initializeChannels(
   return [initiatorCh, responderCh];
 }
 
-export async function recreateAccounts(aeSdk: AeSdk): Promise<[MemoryAccount, MemoryAccount]> {
-  const initiator = MemoryAccount.generate();
-  const responder = MemoryAccount.generate();
+export async function recreateAccounts(aeSdk: AeSdk): Promise<[AccountMemory, AccountMemory]> {
+  const initiator = AccountMemory.generate();
+  const responder = AccountMemory.generate();
   await aeSdk.spend(3e15, initiator.address);
   await aeSdk.spend(3e15, responder.address);
   sharedParams.initiatorId = initiator.address;

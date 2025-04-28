@@ -75,11 +75,11 @@
         pointStyle: false,
       };
 
-      const { Node, AeSdk, MemoryAccount, CompilerHttp, MIN_GAS_PRICE } = Aeternity;
+      const { Node, AeSdk, AccountMemory, CompilerHttp, MIN_GAS_PRICE } = Aeternity;
 
       const nodeUrl = 'http://localhost:3013';
       const node = new Node(nodeUrl);
-      const genesis = new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
+      const genesis = new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
       const minGasPriceToShow = 1e9 - 10;
 
       async function newFrame() {
@@ -149,7 +149,7 @@ contract Test =
       async function addClient(fixedGasPrice) {
         const aeSdk = new AeSdk({
           nodes: [{ name: 'testnet', instance: new Node(nodeUrl) }],
-          accounts: [MemoryAccount.generate()],
+          accounts: [AccountMemory.generate()],
           onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
           _expectedMineRate: 60000,
           _microBlockCycle: 3000,

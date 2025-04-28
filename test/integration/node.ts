@@ -4,7 +4,7 @@ import { stub } from 'sinon';
 import { RestError } from '@azure/core-rest-pipeline';
 import { FullOperationResponse, OperationArguments, OperationSpec } from '@azure/core-client';
 import { url } from '.';
-import { AeSdkBase, Node, NodeNotFoundError, MemoryAccount, buildTx, Tag } from '../../src';
+import { AeSdkBase, Node, NodeNotFoundError, AccountMemory, buildTx, Tag } from '../../src';
 import { bindRequestCounter } from '../utils';
 
 describe('Node client', () => {
@@ -80,7 +80,7 @@ describe('Node client', () => {
   });
 
   it('throws exception with code', async () => {
-    const account = MemoryAccount.generate();
+    const account = AccountMemory.generate();
     const spendTx = buildTx({
       tag: Tag.SpendTx,
       recipientId: account.address,

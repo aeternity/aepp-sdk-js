@@ -9,8 +9,8 @@
 //  - transfer AE to another account
 
 // ## 1. Specify imports
-// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk';
+// You need to import `AeSdk`, `Node` and `AccountMemory` classes from the SDK.
+import { AeSdk, Node, AccountMemory } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -37,7 +37,7 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 //        e.g. `node transfer-ae.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb`
 
 // ## 3. Create object instances
-const account = new MemoryAccount(ACCOUNT_KEYPAIR.secretKey);
+const account = new AccountMemory(ACCOUNT_KEYPAIR.secretKey);
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

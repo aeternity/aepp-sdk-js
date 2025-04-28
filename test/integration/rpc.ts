@@ -6,7 +6,7 @@ import {
   AeSdkAepp,
   AeSdkWallet,
   BrowserWindowMessageConnection,
-  MemoryAccount,
+  AccountMemory,
   Node,
   CompilerHttp,
   RpcConnectionDenyError,
@@ -23,14 +23,14 @@ import {
   MESSAGE_DIRECTION,
   METHODS,
   RPC_STATUS,
-  verify,
+  verifySignature,
   NoWalletConnectedError,
   UnAuthorizedAccountError,
   UnknownRpcClientError,
   UnsubscribedAccountError,
   RpcInternalError,
   AccountBase,
-  verifyMessage,
+  verifyMessageSignature,
   buildTx,
   hashTypedData,
   Contract,
@@ -103,14 +103,14 @@ describe('Aepp<->Wallet', () => {
   });
 
   describe('New RPC Wallet-AEPP: AEPP node', () => {
-    const { address } = MemoryAccount.generate();
+    const { address } = AccountMemory.generate();
     let aepp: AeSdkAepp;
     let wallet: AeSdkWallet;
 
     before(async () => {
       wallet = new AeSdkWallet({
         nodes: [{ name: 'local', instance: node }],
-        accounts: [account, MemoryAccount.generate()],
+        accounts: [account, AccountMemory.generate()],
         id: 'test',
         type: WALLET_TYPE.window,
         name: 'Wallet',
@@ -363,7 +363,7 @@ describe('Aepp<->Wallet', () => {
           encodedTx,
         } = unpackedTx;
         const txWithNetwork = getBufferToSign(buildTx(encodedTx), networkId, innerTx);
-        expect(verify(txWithNetwork, signature, aepp.address)).to.equal(true);
+        expect(verifySignature(txWithNetwork, signature, aepp.address)).to.equal(true);
       });
     });
 
@@ -391,7 +391,7 @@ describe('Aepp<->Wallet', () => {
           amount: 0,
           payload: encode(Buffer.from('zerospend2'), Encoding.Bytearray),
         });
-        return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
+        return AccountMemory.prototype.signTransaction.call(acc, txReplace, options);
       });
       const tx = await aepp.buildTx({
         tag: Tag.SpendTx,
@@ -429,7 +429,7 @@ describe('Aepp<->Wallet', () => {
       it('works', async () => {
         const messageSig = await aepp.signMessage('test');
         messageSig.should.be.instanceof(Buffer);
-        expect(verifyMessage('test', messageSig, aepp.address)).to.equal(true);
+        expect(verifyMessageSignature('test', messageSig, aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
@@ -445,7 +445,7 @@ describe('Aepp<->Wallet', () => {
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
         const messageSig = await aepp.signMessage('test', { onAccount });
-        expect(verifyMessage('test', messageSig, onAccount)).to.equal(true);
+        expect(verifyMessageSignature('test', messageSig, onAccount)).to.equal(true);
       });
     });
 
@@ -477,7 +477,7 @@ describe('Aepp<->Wallet', () => {
         const messageSig = await aepp.signTypedData(recordData, recordAci);
         expect(messageSig).to.satisfy((s: string) => s.startsWith('sg_'));
         const hash = hashTypedData(recordData, recordAci, {});
-        expect(verify(hash, decode(messageSig), aepp.address)).to.equal(true);
+        expect(verifySignature(hash, decode(messageSig), aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
@@ -494,7 +494,7 @@ describe('Aepp<->Wallet', () => {
         const onAccount = wallet.addresses()[1];
         const messageSig = await aepp.signTypedData(recordData, recordAci, { onAccount });
         const hash = hashTypedData(recordData, recordAci, {});
-        expect(verify(hash, decode(messageSig), onAccount)).to.equal(true);
+        expect(verifySignature(hash, decode(messageSig), onAccount)).to.equal(true);
       });
     });
 
@@ -519,7 +519,7 @@ describe('Aepp<->Wallet', () => {
       it('works', async () => {
         const signature = await aepp.unsafeSign(rawData);
         expect(signature).to.be.an.instanceOf(Buffer);
-        expect(verify(rawData, signature, aepp.address)).to.equal(true);
+        expect(verifySignature(rawData, signature, aepp.address)).to.equal(true);
       });
 
       it('fails with unknown error', async () => {
@@ -537,7 +537,7 @@ describe('Aepp<->Wallet', () => {
       it('signs using specific account', async () => {
         const onAccount = wallet.addresses()[1];
         const signature = await aepp.unsafeSign(rawData, { onAccount });
-        expect(verify(rawData, signature, onAccount)).to.equal(true);
+        expect(verifySignature(rawData, signature, onAccount)).to.equal(true);
       });
     });
 
@@ -643,7 +643,7 @@ describe('Aepp<->Wallet', () => {
         const accountsPromise = new Promise<Accounts>((resolve) => {
           aepp.onAddressChange = resolve;
         });
-        wallet.addAccount(MemoryAccount.generate());
+        wallet.addAccount(AccountMemory.generate());
         expect(Object.keys((await accountsPromise).connected).length).to.equal(connectedLength + 1);
       });
 
@@ -806,7 +806,7 @@ describe('Aepp<->Wallet', () => {
           amount: 0,
           payload: encode(Buffer.from('zerospend2'), Encoding.Bytearray),
         });
-        return MemoryAccount.prototype.signTransaction.call(acc, txReplace, options);
+        return AccountMemory.prototype.signTransaction.call(acc, txReplace, options);
       });
       const tx = await aepp.buildTx({
         tag: Tag.SpendTx,

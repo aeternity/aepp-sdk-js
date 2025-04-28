@@ -14,7 +14,7 @@
 import {
   AeSdk,
   Node,
-  MemoryAccount,
+  AccountMemory,
   AccountGeneralized,
   CompilerHttp,
   MIN_GAS_PRICE,
@@ -22,7 +22,7 @@ import {
 
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: new Node('https://testnet.aeternity.io') }],
-  accounts: [MemoryAccount.generate()],
+  accounts: [AccountMemory.generate()],
   onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
 });
 const { address } = aeSdk;
@@ -54,7 +54,7 @@ console.log(await aeSdk.getAccount(address));
 
 // ## 4. Switch SDK instance to AccountGeneralized
 // After making the account generalized, the node would stop accepting transactions signed using
-// the private key of that account. So, we need to replace the instance of MemoryAccount with
+// the private key of that account. So, we need to replace the instance of AccountMemory with
 // AccountGeneralized.
 aeSdk.removeAccount(address);
 aeSdk.addAccount(new AccountGeneralized(address), { select: true });

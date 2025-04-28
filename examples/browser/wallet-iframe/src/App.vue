@@ -43,7 +43,7 @@
 
 <script>
 import {
-  MemoryAccount,
+  AccountMemory,
   AeSdkWallet,
   Node,
   BrowserWindowMessageConnection,
@@ -147,7 +147,7 @@ export default {
       }
     };
 
-    class AccountMemoryProtected extends MemoryAccount {
+    class AccountMemoryProtected extends AccountMemory {
       async signTransaction(tx, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
         if (id != null) {
           const opt = { ...options, unpackedTx: unpackTx(tx) };
