@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs/promises';
 
 function splitCodeIntoBlocks(_text) {
   const content = [];
@@ -34,25 +34,32 @@ function splitCodeIntoBlocks(_text) {
   return content;
 }
 
-process.argv.slice(2).forEach((fileName) => {
-  const inputFilePath = path.resolve(process.cwd(), fileName);
-  const text = fs.readFileSync(inputFilePath).toString();
+const directory = process.argv[2];
+const files = (await fs.readdir(directory))
+  .filter((file) => file.endsWith('.js'))
+  .filter((file) => !file.startsWith('_'));
 
-  const textMd = splitCodeIntoBlocks(text)
-    .map(({ type, content }) => ({
-      type,
-      content: type === 'code' ? content.replace(/^\n+|\n+$/g, '') : content.replace(/^ /, ''),
-    }))
-    .filter(({ type, content }) => type !== 'code' || content)
-    .filter(({ content }) => !content.includes('License'))
-    .filter(({ content }) => !content.includes('#!/'))
-    .map(({ type, content }) => (type === 'code' ? `\`\`\`js\n${content}\n\`\`\`` : content))
-    .join('\n');
+await Promise.all(
+  files.map(async (fileName) => {
+    const inputFilePath = path.resolve(process.cwd(), directory, fileName);
+    const text = await fs.readFile(inputFilePath, 'utf8');
 
-  const fileParsedPath = path.parse(path.resolve(process.cwd(), 'docs', fileName));
-  fs.mkdirSync(fileParsedPath.dir, { recursive: true });
+    const textMd = splitCodeIntoBlocks(text)
+      .map(({ type, content }) => ({
+        type,
+        content: type === 'code' ? content.replace(/^\n+|\n+$/g, '') : content.replace(/^ /, ''),
+      }))
+      .filter(({ type, content }) => type !== 'code' || content)
+      .filter(({ content }) => !content.includes('License'))
+      .filter(({ content }) => !content.includes('#!/'))
+      .map(({ type, content }) => (type === 'code' ? `\`\`\`js\n${content}\n\`\`\`` : content))
+      .join('\n');
 
-  const outputFilePath = path.format({ ...fileParsedPath, base: undefined, ext: '.md' });
-  fs.writeFileSync(outputFilePath, Buffer.from(textMd));
-  console.log(`${inputFilePath} -> ${outputFilePath}`);
-});
+    const fileParsedPath = path.parse(path.resolve(process.cwd(), 'docs', fileName));
+    await fs.mkdir(fileParsedPath.dir, { recursive: true });
+
+    const outputFilePath = path.format({ ...fileParsedPath, base: undefined, ext: '.md' });
+    await fs.writeFile(outputFilePath, Buffer.from(textMd));
+    console.log(`${inputFilePath} -> ${outputFilePath}`);
+  }),
+);
