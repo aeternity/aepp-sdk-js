@@ -1793,7 +1793,7 @@
 <h2 id="webextension-wallet">WebExtension wallet</h2>
 <p>The full implementation of this example can be found here:</p>
 <ul>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-web-extension">WebExtension Wallet Example</a></li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/wallet-web-extension">WebExtension Wallet Example</a></li>
 </ul>
 <p>Note:</p>
 <ul>
@@ -1832,7 +1832,7 @@
 <span class="w">  </span><span class="nx">connectionProxy</span><span class="p">(</span><span class="nx">pageConnection</span><span class="p">,</span><span class="w"> </span><span class="nx">extConnection</span><span class="p">);</span>
 <span class="p">})();</span>
 </code></pre></div>
-View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-web-extension/src/content-script.js#L1-L30">GitHub</a></p>
+View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/wallet-web-extension/src/content-script.js#L1-L30">GitHub</a></p>
 <h3 id="2-initialize-aesdkwallet-class">2. Initialize <code>AeSdkWallet</code> class</h3>
 <p>Then you need to initialize <code>AeSdkWallet</code> class in your extension and subscribe for new <code>runtime</code> connections.
 After the connection is established you can share the wallet details with the application.</p>
@@ -1841,7 +1841,7 @@ After the connection is established you can share the wallet details with the ap
 <span class="w">  </span><span class="nx">AeSdkWallet</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">CompilerHttp</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">Node</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">MemoryAccount</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">AccountMemory</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">BrowserRuntimeConnection</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">WALLET_TYPE</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">RpcConnectionDenyError</span><span class="p">,</span>
@@ -1891,7 +1891,7 @@ After the connection is established you can share the wallet details with the ap
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isConfirmed</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">RpcRejectedByUserError</span><span class="p">();</span>
 <span class="p">};</span>
 
-<span class="kd">class</span><span class="w"> </span><span class="nx">AccountMemoryProtected</span><span class="w"> </span><span class="k">extends</span><span class="w"> </span><span class="nx">MemoryAccount</span><span class="w"> </span><span class="p">{</span>
+<span class="kd">class</span><span class="w"> </span><span class="nx">AccountMemoryProtected</span><span class="w"> </span><span class="k">extends</span><span class="w"> </span><span class="nx">AccountMemory</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">signTransaction</span><span class="p">(</span><span class="nx">transaction</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">aeppRpcClientId</span><span class="o">:</span><span class="w"> </span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">aeppOrigin</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">options</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{})</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">opt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">options</span><span class="p">,</span><span class="w"> </span><span class="nx">transaction</span><span class="p">,</span><span class="w"> </span><span class="nx">unpackedTx</span><span class="o">:</span><span class="w"> </span><span class="nx">unpackTx</span><span class="p">(</span><span class="nx">transaction</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
@@ -1924,11 +1924,11 @@ After the connection is established you can share the wallet details with the ap
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">super</span><span class="p">.</span><span class="nx">signTypedData</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span><span class="w"> </span><span class="nx">aci</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">);</span>
 <span class="w">  </span><span class="p">}</span>
 
-<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">sign</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">aeppRpcClientId</span><span class="o">:</span><span class="w"> </span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">aeppOrigin</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">options</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">unsafeSign</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">aeppRpcClientId</span><span class="o">:</span><span class="w"> </span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">aeppOrigin</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">options</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{})</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="k">await</span><span class="w"> </span><span class="nx">genConfirmCallback</span><span class="p">(</span><span class="sb">`sign raw data </span><span class="si">${</span><span class="nx">data</span><span class="si">}</span><span class="sb">`</span><span class="p">)(</span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">,</span><span class="w"> </span><span class="nx">aeppOrigin</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">super</span><span class="p">.</span><span class="nx">sign</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">super</span><span class="p">.</span><span class="nx">unsafeSign</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">);</span>
 <span class="w">  </span><span class="p">}</span>
 
 <span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">signDelegation</span><span class="p">(</span><span class="nx">delegation</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">aeppRpcClientId</span><span class="o">:</span><span class="w"> </span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">aeppOrigin</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">options</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
@@ -2000,12 +2000,12 @@ After the connection is established you can share the wallet details with the ap
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Wallet initialized!&#39;</span><span class="p">);</span>
 </code></pre></div>
-View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-web-extension/src/background.js#L1-L163">GitHub</a></p>
+View at <a href="https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/wallet-web-extension/src/background.js#L1-L163">GitHub</a></p>
 <h2 id="iframe-based-wallet">iFrame-based Wallet</h2>
 <p>The <strong>iFrame-based</strong> approach works similar to the <strong>WebExtension</strong> approach except that the <code>connectionProxy</code> in between isn't needed.</p>
 <p>You can take a look into the implementation of the following example to see how it works:</p>
 <ul>
-<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-iframe">iFrame-based Wallet Example</a></li>
+<li><a href="https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/wallet-iframe">iFrame-based Wallet Example</a></li>
 </ul>
 
 

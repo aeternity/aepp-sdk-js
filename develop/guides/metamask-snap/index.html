@@ -1814,7 +1814,7 @@
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">account</span><span class="p">.</span><span class="nx">signTransaction</span><span class="p">(</span><span class="s1">&#39;tx_...&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// &#39;tx_...&#39; (with signature added)</span>
 </code></pre></div>
 <p>The private key for the account would be derived in the MetaMask browser extension using the provided index and the mnemonic phrase it was initialized with. The private key won't leave the extension.</p>
-<p>The complete examples of how to use it in browser can be found <a href="https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/aepp/src/components/ConnectMetamask.vue">here</a>.</p>
+<p>The complete examples of how to use it in browser can be found <a href="https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/aepp/src/components/ConnectMetamask.vue">here</a>.</p>
 <h2 id="account-persistence">Account persistence</h2>
 <p>Account can be persisted and restored by saving values of <code>index</code>, <code>address</code> properties</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AccountMetamask</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>

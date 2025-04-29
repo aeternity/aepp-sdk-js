@@ -1947,7 +1947,7 @@
 <h3 id="specific-sdk-version">Specific SDK version</h3>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.cjs&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
-<p>...where <code>VERSION</code> is the version number of the SDK you want to use (eg. <code>14.0.0</code>).</p>
+<p>...where <code>VERSION</code> is the version number of the SDK you want to use (eg. <code>14.1.0</code>).</p>
 <h3 id="browser-script-tag">Browser <code>&lt;script&gt;</code> tag</h3>
 <p>The bundle will assign the SDK to a global variable called <code>Aeternity</code> that makes all functionalities of the SDK accessible.</p>
 <p>Usage:</p>
@@ -2028,7 +2028,7 @@ to solve this issue we suggest to avoid making their instances reactive using
 Vue's integrated utility: <a href="https://vuejs.org/api/reactivity-advanced.html#shallowref">shallowRef</a>. The idea is to make reactive only the
 instance value, to don't make it reactive in deep.</p>
 <p>Alternatively, <a href="https://vuejs.org/api/reactivity-advanced.html#toraw">toRaw</a> can unwrap the proxy object, returning an unmodified instance and allowing access to its private properties by its methods. It can be useful if you need a reactive array of AccountMemory.</p>
-<p>You can find both approaches used in the <a href="https://github.com/aeternity/aepp-sdk-js/blob/ec3b888c653138d5a369b37604bf916428884170/examples/browser/aepp">æpp example</a>.</p>
+<p>You can find both approaches used in the <a href="https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/aepp">æpp example</a>.</p>
 <h2 id="command-line-interface-cli">Command Line Interface (CLI)</h2>
 <p>If you don't need to include specific functionality into your application and just want to use or play around with features the SDK provides you can make use of the <a href="https://github.com/aeternity/aepp-cli-js">💻 CLI</a> and follow the instructions mentioned there.</p>
 
