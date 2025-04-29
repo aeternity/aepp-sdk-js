@@ -59,7 +59,7 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/aepp-calldata": "^1.8.0",
+    "@aeternity/aepp-calldata": "^1.9.1",
     "@azure/core-client": "^1.9.3",
     "@azure/core-rest-pipeline": "^1.19.1",
     "@babel/runtime-corejs3": "^7.27.0",
