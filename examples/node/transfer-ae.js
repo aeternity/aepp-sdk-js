@@ -2,7 +2,7 @@
 // # Transfer AE
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/node/transfer-ae.js)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/node/transfer-ae.js)
 // and this page explains in detail how to:
 //
 //  - initialize an instance of the SDK with a pre-funded account
@@ -53,7 +53,7 @@ console.log(`Balance of ${recipient} (before): ${balanceBefore} aettos`);
 // Calling the `spend` function will create, sign and broadcast a `SpendTx` to the network.
 const tx = await aeSdk.spend(amount, recipient);
 console.log('Transaction mined', tx);
-// Alternatively, you can use [transferFunds](https://sdk.aeternity.io/v14.0.0/api/functions/transferFunds.html)
+// Alternatively, you can use [transferFunds](https://sdk.aeternity.io/v14.1.0/api/functions/transferFunds.html)
 // method to transfer a fraction of your AE to another account.
 
 // ## 6. Get AE balance of recipient (after transfer)

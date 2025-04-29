@@ -43,7 +43,7 @@ Usage guides:
 
 There are also [examples](examples/README.md) that you can directly use and play with.
 
-### [API Reference](https://sdk.aeternity.io/v14.0.0/api/)
+### [API Reference](https://sdk.aeternity.io/v14.1.0/api/)
 
 ## CLI - Command Line Interface
 

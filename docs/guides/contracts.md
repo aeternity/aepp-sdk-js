@@ -20,7 +20,7 @@ import { AeSdk, AccountMemory, Node } from '@aeternity/aepp-sdk';
 
 Compiler primarily used to generate bytecode to deploy a contract.
 Skip this step if you have a contract bytecode or need to interact with an already deployed contract.
-Out-of-the-box SDK supports [aesophia_cli](https://github.com/aeternity/aesophia_cli) and [aesophia_http](https://github.com/aeternity/aesophia_http) implemented in [CompilerCli](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerCli.html) and [CompilerHttp](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerHttp.html) respectively.
+Out-of-the-box SDK supports [aesophia_cli](https://github.com/aeternity/aesophia_cli) and [aesophia_http](https://github.com/aeternity/aesophia_http) implemented in [CompilerCli](https://sdk.aeternity.io/v14.1.0/api/classes/CompilerCli.html) and [CompilerHttp](https://sdk.aeternity.io/v14.1.0/api/classes/CompilerHttp.html) respectively.
 
 CompilerCli is available only in Node.js and requires Erlang installed (`escript` available in `$PATH`), Windows is supported.
 
@@ -28,13 +28,13 @@ CompilerCli is available only in Node.js and requires Erlang installed (`escript
 const compiler = new CompilerCli();
 ```
 
-CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since [compiler.aepps.com](https://v8.compiler.aepps.com/api) is planned to be decommissioned. An example of how to run it using [docker-compose](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/docker-compose.yml#L20-L25).
+CompilerHttp requires a hosted compiler service. Preferable to host your own compiler service since [compiler.aepps.com](https://v8.compiler.aepps.com/api) is planned to be decommissioned. An example of how to run it using [docker-compose](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/docker-compose.yml#L20-L25).
 
 ```js
 const compiler = new CompilerHttp('https://v8.compiler.aepps.com'); // host your own compiler
 ```
 
-Both compiler classes implement the [same interface](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerBase.html) that can be used to generate bytecode and ACI without a Contract instance.
+Both compiler classes implement the [same interface](https://sdk.aeternity.io/v14.1.0/api/classes/CompilerBase.html) that can be used to generate bytecode and ACI without a Contract instance.
 
 ## 3. Create an instance of the SDK
 
@@ -242,8 +242,8 @@ Refer to [its documentation](https://www.npmjs.com/package/@aeternity/aepp-calld
 
 ## Generate file system object in Node.js
 
-To do so you can use [getFileSystem](https://sdk.aeternity.io/v14.0.0/api/functions/getFileSystem.html) function.
+To do so you can use [getFileSystem](https://sdk.aeternity.io/v14.1.0/api/functions/getFileSystem.html) function.
 In most cases, you don't need to do it explicitly. Prefer to use `sourceCodePath` instead `sourceCode` in
-[Contract::initialize](https://sdk.aeternity.io/v14.0.0/api/classes/_internal_.Contract.html#initialize),
-and [compile](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerBase.html#compile)
-instead [compileBySourceCode](https://sdk.aeternity.io/v14.0.0/api/classes/CompilerBase.html#compileBySourceCode) in CompilerBase.
+[Contract::initialize](https://sdk.aeternity.io/v14.1.0/api/classes/_internal_.Contract.html#initialize),
+and [compile](https://sdk.aeternity.io/v14.1.0/api/classes/CompilerBase.html#compile)
+instead [compileBySourceCode](https://sdk.aeternity.io/v14.1.0/api/classes/CompilerBase.html#compileBySourceCode) in CompilerBase.

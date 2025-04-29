@@ -2,7 +2,7 @@
 // # Create and use Generalized Accounts
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/node/account-generalized.js)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/node/account-generalized.js)
 // and this page explains in detail how to:
 //
 //  - initialize an instance of the SDK with a random account,

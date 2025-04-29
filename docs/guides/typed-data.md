@@ -34,13 +34,13 @@ corresponds to the data
 
 ## Implementation
 
-- [AccountBase:signTypedData](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/account/Base.ts#L63-L70) — calculates signature, supported in AccountMemory and in aepp-wallet connection;
-- [hashTypedData](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/typed-data.ts#L82-L96) — calculates the overall hash of typed data to sign;
-- [hashJson](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/typed-data.ts#L10-L12) — deterministic hashing of an arbitrary JS value, used to calculate `hash(aci)`;
-- [hashDomain](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/typed-data.ts#L56-L80) — use for debugging or to prepare the hash value for smart contract.
+- [AccountBase:signTypedData](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/src/account/Base.ts#L64-L71) — calculates signature, supported in AccountMemory and in aepp-wallet connection;
+- [hashTypedData](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/src/utils/typed-data.ts#L87-L101) — calculates the overall hash of typed data to sign;
+- [hashJson](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/src/utils/typed-data.ts#L11-L13) — deterministic hashing of an arbitrary JS value, used to calculate `hash(aci)`;
+- [hashDomain](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/src/utils/typed-data.ts#L58-L82) — use for debugging or to prepare the hash value for smart contract.
 
 ## Examples
 
-- [signing and verifying on aepp side](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/aepp/src/TypedData.vue)
-- [signing confirmation on wallet side](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-iframe/src/App.vue#L169-L177)
-- [verifying a signature on contract side](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/test/integration/typed-data.ts#L76-L106)
+- [signing and verifying on aepp side](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/aepp/src/TypedData.vue)
+- [signing confirmation on wallet side](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/wallet-iframe/src/App.vue#L168-L176)
+- [verifying a signature on contract side](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/test/integration/typed-data.ts#L76-L106)

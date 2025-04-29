@@ -9,6 +9,8 @@ This guide describes the 4 steps that are necessary to connect your application 
 
 ## 1. Specify imports and constants
 
+<!-- deprecated approach, needs to be fully updated -->
+
 https://github.com/aeternity/aepp-sdk-js/blob/f60d1b8a1124b32781769342e4941c8dacf6ad53/examples/browser/aepp/src/StoreAeSdkPlugin.js#L1-L5
 
 ## 2. Initialize the `AeSdkAepp` class

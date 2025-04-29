@@ -6,7 +6,7 @@ This guide shows how to build either an **WebExtension Wallet** or a **iFrame-ba
 
 The full implementation of this example can be found here:
 
-- [WebExtension Wallet Example](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-web-extension)
+- [WebExtension Wallet Example](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/wallet-web-extension)
 
 Note:
 
@@ -16,14 +16,14 @@ Note:
 
 First you need to create a bridge between your extension and the page. This can be done as follows:
 
-https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-web-extension/src/content-script.js#L1-L30
+https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/wallet-web-extension/src/content-script.js#L1-L30
 
 ### 2. Initialize `AeSdkWallet` class
 
 Then you need to initialize `AeSdkWallet` class in your extension and subscribe for new `runtime` connections.
 After the connection is established you can share the wallet details with the application.
 
-https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-web-extension/src/background.js#L1-L163
+https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/wallet-web-extension/src/background.js#L1-L163
 
 ## iFrame-based Wallet
 
@@ -31,4 +31,4 @@ The **iFrame-based** approach works similar to the **WebExtension** approach exc
 
 You can take a look into the implementation of the following example to see how it works:
 
-- [iFrame-based Wallet Example](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/browser/wallet-iframe)
+- [iFrame-based Wallet Example](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/wallet-iframe)

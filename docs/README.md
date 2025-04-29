@@ -16,7 +16,7 @@ In case you're not using any JS bundling/compilation technique, the SDK can also
 <script src="https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.cjs"></script>
 ```
 
-...where `VERSION` is the version number of the SDK you want to use (eg. `14.0.0`).
+...where `VERSION` is the version number of the SDK you want to use (eg. `14.1.0`).
 
 ### Browser `<script>` tag
 
@@ -134,7 +134,7 @@ You can find both approaches used in the [æpp example].
 [not compatible]: https://github.com/tc39/proposal-class-fields/issues/106
 [shallowRef]: https://vuejs.org/api/reactivity-advanced.html#shallowref
 [toRaw]: https://vuejs.org/api/reactivity-advanced.html#toraw
-[æpp example]: https://github.com/aeternity/aepp-sdk-js/blob/ec3b888c653138d5a369b37604bf916428884170/examples/browser/aepp
+[æpp example]: https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/browser/aepp
 
 ## Command Line Interface (CLI)
 

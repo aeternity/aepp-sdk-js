@@ -85,7 +85,7 @@ const gaAuthData = {
 
 In the last case, `txHash`'s type will be exactly `"th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1"`, making it compatible with [`packEntry`][packEntry].
 
-[packEntry]: https://sdk.aeternity.io/v14.0.0/api/functions/packEntry.html
+[packEntry]: https://sdk.aeternity.io/v14.1.0/api/functions/packEntry.html
 
 ## Narrow the union type returned by [`unpackTx`][unpackTx], [`unpackDelegation`][unpackDelegation], and [`unpackEntry`][unpackEntry]
 
@@ -127,10 +127,10 @@ const tx = unpackTx<Tag.SpendTx>(encodedTx);
 The problem is that JavaScript won't check if the transaction is a SpendTx, so provide `Tag.SpendTx` as the second argument instead (as the above).
 
 [union]: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types
-[unpackTx]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackTx.html
-[unpackDelegation]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackDelegation.html
-[unpackEntry]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackEntry.html
-[all supported transaction]: https://sdk.aeternity.io/v14.0.0/api/types/_internal_.TxUnpacked.html
+[unpackTx]: https://sdk.aeternity.io/v14.1.0/api/functions/unpackTx.html
+[unpackDelegation]: https://sdk.aeternity.io/v14.1.0/api/functions/unpackDelegation.html
+[unpackEntry]: https://sdk.aeternity.io/v14.1.0/api/functions/unpackEntry.html
+[all supported transaction]: https://sdk.aeternity.io/v14.1.0/api/types/_internal_.TxUnpacked.html
 
 ## Functions to assert types of user-provided data
 
@@ -170,9 +170,9 @@ Or encoding types in general:
 isEncoded(address, Encoding.Transaction);
 ```
 
-[spend]: https://sdk.aeternity.io/v14.0.0/api/functions/spend.html
-[Encoded.AccountAddress]: https://sdk.aeternity.io/v14.0.0/api/types/Encoded.AccountAddress.html
-[isEncoded]: https://sdk.aeternity.io/v14.0.0/api/functions/isEncoded.html
+[spend]: https://sdk.aeternity.io/v14.1.0/api/functions/spend.html
+[Encoded.AccountAddress]: https://sdk.aeternity.io/v14.1.0/api/types/Encoded.AccountAddress.html
+[isEncoded]: https://sdk.aeternity.io/v14.1.0/api/functions/isEncoded.html
 
 ### AENS name validation
 
@@ -199,7 +199,7 @@ const name = new Name(nameAsString, options);
 Doing this way, [`ensureName`][ensureName] will throw an exception if `nameAsString` is not a proper AENS name. TypeScript will handle `nameAsString` as `${string}.chain` in lines below [`ensureName`][ensureName] invocation.
 
 [isName]: https://sdk.aeternity.io/v14.1.0/api/functions/isName.html
-[ensureName]: https://sdk.aeternity.io/v14.0.0/api/functions/ensureName.html
+[ensureName]: https://sdk.aeternity.io/v14.1.0/api/functions/ensureName.html
 
 ## Check types of contract methods
 
@@ -259,5 +259,5 @@ const contract = await Contract.initialize<FooContract>({
 It is theoretically possible to generate a contract interface by ACI. But unfortunately, it is [not supported] currently.
 
 [not supported]: https://github.com/aeternity/aepp-calldata-js/issues/97
-[Contract]: https://sdk.aeternity.io/v14.0.0/api/types/Contract.html
-[ContractMethodsBase]: https://sdk.aeternity.io/v14.0.0/api/interfaces/ContractMethodsBase.html
+[Contract]: https://sdk.aeternity.io/v14.1.0/api/types/Contract.html
+[ContractMethodsBase]: https://sdk.aeternity.io/v14.1.0/api/interfaces/ContractMethodsBase.html

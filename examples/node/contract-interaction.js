@@ -2,7 +2,7 @@
 // # Compile & Deploy a Sophia Smart Contract
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/node/contract-interaction.js) and this page explains in detail how to:
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/node/contract-interaction.js) and this page explains in detail how to:
 //
 // - deal with the different phases of compiling Sophia contracts to bytecode
 // - deploy the bytecode to get a callable contract address
