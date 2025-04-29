@@ -660,7 +660,7 @@
         <li class="md-nav__item">
   <a href="#narrow-the-union-type-returned-by-unpacktx-unpackdelegation-and-unpackentry" class="md-nav__link">
     <span class="md-ellipsis">
-      Narrow the union type returned by [unpackTx], [unpackDelegation], and [unpackEntry]
+      Narrow the union type returned by unpackTx, unpackDelegation, and unpackEntry
     </span>
   </a>
   
@@ -1767,7 +1767,7 @@
         <li class="md-nav__item">
   <a href="#narrow-the-union-type-returned-by-unpacktx-unpackdelegation-and-unpackentry" class="md-nav__link">
     <span class="md-ellipsis">
-      Narrow the union type returned by [unpackTx], [unpackDelegation], and [unpackEntry]
+      Narrow the union type returned by unpackTx, unpackDelegation, and unpackEntry
     </span>
   </a>
   
@@ -1826,7 +1826,7 @@
 <p>This guide explains handling the edge cases that can occur while using aeternity SDK in a TypeScript project.</p>
 <p>Firstly, ensure you've set up TypeScript according to the <a href="../../#typescript-projects">installation guide</a>.</p>
 <h2 id="extract-types-of-methods-exposed-by-sdk">Extract types of methods exposed by SDK</h2>
-<p>SDK doesn't expose types separately to reduce the number of exports and simplify tracking of breaking changes. But you may need these types to prepare parameters or to hold the return value. In such cases, it is advised to use TypeScript-provided generics [<code>Parameters</code>] and [<code>ReturnType</code>]. For example,</p>
+<p>SDK doesn't expose types separately to reduce the number of exports and simplify tracking of breaking changes. But you may need these types to prepare parameters or to hold the return value. In such cases, it is advised to use TypeScript-provided generics <a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#parameterstype"><code>Parameters</code></a> and <a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype"><code>ReturnType</code></a>. For example,</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">walletDetector</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kr">type</span><span class="w"> </span><span class="nx">WDCallback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Parameters</span><span class="o">&lt;</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">walletDetector</span><span class="o">&gt;</span><span class="p">[</span><span class="mf">1</span><span class="p">];</span>
@@ -1838,7 +1838,7 @@
 <span class="w">  </span><span class="nx">stop</span><span class="p">();</span>
 <span class="p">});</span>
 </code></pre></div>
-<p>The same for [<code>ReturnType</code>]:</p>
+<p>The same for <a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype"><code>ReturnType</code></a>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">unpackDelegation</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kr">type</span><span class="w"> </span><span class="nx">DlgUnpacked</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ReturnType</span><span class="o">&lt;</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">unpackDelegation</span><span class="o">&gt;</span><span class="p">;</span>
@@ -1860,7 +1860,7 @@
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">gaAuthDataPacked</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">packEntry</span><span class="p">(</span><span class="nx">gaAuthData</span><span class="p">);</span>
 </code></pre></div>
-<p>The problem in this case, is that TypeScript will generalize the type of <code>unpackedEntry.txHash</code> to <code>string</code> instead of <code>th_${string}</code> making it incompatible with arguments of [<code>packEntry</code>]. To fix this you may define <code>gaAuthData</code>'s type explicitly, like:</p>
+<p>The problem in this case, is that TypeScript will generalize the type of <code>unpackedEntry.txHash</code> to <code>string</code> instead of <code>th_${string}</code> making it incompatible with arguments of <a href="https://sdk.aeternity.io/v14.0.0/api/functions/packEntry.html"><code>packEntry</code></a>. To fix this you may define <code>gaAuthData</code>'s type explicitly, like:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Tag</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoded</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">interface</span><span class="w"> </span><span class="nx">GaAuthData</span><span class="w"> </span><span class="p">{</span>
@@ -1882,9 +1882,9 @@
 <span class="w">  </span><span class="nx">txHash</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1&#39;</span><span class="p">,</span>
 <span class="p">}</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="kd">const</span><span class="p">;</span>
 </code></pre></div>
-<p>In the last case, <code>txHash</code>'s type will be exactly <code>"th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1"</code>, making it compatible with [<code>packEntry</code>].</p>
-<h2 id="narrow-the-union-type-returned-by-unpacktx-unpackdelegation-and-unpackentry">Narrow the union type returned by [<code>unpackTx</code>], [<code>unpackDelegation</code>], and [<code>unpackEntry</code>]</h2>
-<p>Some sdk methods return a <a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types">union</a> of multiple types. For example, [<code>unpackTx</code>] returns a union of <a href="https://sdk.aeternity.io/v14.0.0/api/types/_internal_.TxUnpacked.html">all supported transaction</a> fields. To work correctly you need to narrow this type to a specific transaction before accessing its fields. For example,</p>
+<p>In the last case, <code>txHash</code>'s type will be exactly <code>"th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1"</code>, making it compatible with <a href="https://sdk.aeternity.io/v14.0.0/api/functions/packEntry.html"><code>packEntry</code></a>.</p>
+<h2 id="narrow-the-union-type-returned-by-unpacktx-unpackdelegation-and-unpackentry">Narrow the union type returned by <a href="https://sdk.aeternity.io/v14.0.0/api/functions/unpackTx.html"><code>unpackTx</code></a>, <a href="https://sdk.aeternity.io/v14.0.0/api/functions/unpackDelegation.html"><code>unpackDelegation</code></a>, and <a href="https://sdk.aeternity.io/v14.0.0/api/functions/unpackEntry.html"><code>unpackEntry</code></a></h2>
+<p>Some sdk methods return a <a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types">union</a> of multiple types. For example, <a href="https://sdk.aeternity.io/v14.0.0/api/functions/unpackTx.html"><code>unpackTx</code></a> returns a union of <a href="https://sdk.aeternity.io/v14.0.0/api/types/_internal_.TxUnpacked.html">all supported transaction</a> fields. To work correctly you need to narrow this type to a specific transaction before accessing its fields. For example,</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">unpackTx</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">encodedTx</span><span class="w"> </span><span class="o">=</span>
@@ -1902,19 +1902,19 @@
 <blockquote>
 <p>Property 'amount' does not exist on type 'TxUnpackedSignedTx1 &amp; { tag: Tag; }'.</p>
 </blockquote>
-<p>The above check is also implemented in [<code>unpackTx</code>] itself, instead of checking the <code>tx.tag</code> you can provide Tag in the second argument:</p>
+<p>The above check is also implemented in <a href="https://sdk.aeternity.io/v14.0.0/api/functions/unpackTx.html"><code>unpackTx</code></a> itself, instead of checking the <code>tx.tag</code> you can provide Tag in the second argument:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">unpackTx</span><span class="p">(</span><span class="nx">encodedTx</span><span class="p">,</span><span class="w"> </span><span class="nx">Tag</span><span class="p">.</span><span class="nx">SpendTx</span><span class="p">);</span>
 </code></pre></div>
 <p>But if you need to get SpendTx properties inside a SignedTx you still need to use the above <code>tag</code> check.</p>
-<p>You may find that [<code>unpackTx</code>] is a generic function so that it can be executed as</p>
+<p>You may find that <a href="https://sdk.aeternity.io/v14.0.0/api/functions/unpackTx.html"><code>unpackTx</code></a> is a generic function so that it can be executed as</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">unpackTx</span><span class="o">&lt;</span><span class="nx">Tag</span><span class="p">.</span><span class="nx">SpendTx</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">encodedTx</span><span class="p">);</span>
 </code></pre></div>
 <p>The problem is that JavaScript won't check if the transaction is a SpendTx, so provide <code>Tag.SpendTx</code> as the second argument instead (as the above).</p>
 <h2 id="functions-to-assert-types-of-user-provided-data">Functions to assert types of user-provided data</h2>
-<p>Let's assume we need to receive an address from the user to send some coins to it. The user enters an address in a text box, we can get it as a string. [<code>spend</code>] method accepts the address as [<code>Encoded.AccountAddress</code>], it won't accept a general string. We can overcome this restriction by adding a type assertion, like:</p>
+<p>Let's assume we need to receive an address from the user to send some coins to it. The user enters an address in a text box, we can get it as a string. <a href="https://sdk.aeternity.io/v14.0.0/api/functions/spend.html"><code>spend</code></a> method accepts the address as <a href="https://sdk.aeternity.io/v14.0.0/api/types/Encoded.AccountAddress.html"><code>Encoded.AccountAddress</code></a>, it won't accept a general string. We can overcome this restriction by adding a type assertion, like:</p>
 <div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">Encoded</span><span class="p">.</span><span class="nx">AccountAddress</span><span class="p">);</span>
 </code></pre></div>
-<p>The problem is that TypeScript won't check if <code>address</code> is an <code>ak_</code>-encoded string, and the [<code>spend</code>] method will fail in this case.
+<p>The problem is that TypeScript won't check if <code>address</code> is an <code>ak_</code>-encoded string, and the <a href="https://sdk.aeternity.io/v14.0.0/api/functions/spend.html"><code>spend</code></a> method will fail in this case.
 A more accurate solution would be to check the <code>address</code> in advance, providing user feedback if it is incorrect. For example:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">isEncoded</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
@@ -1925,8 +1925,8 @@ A more accurate solution would be to check the <code>address</code> in advance, 
 
 <span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="nx">address</span><span class="p">);</span>
 </code></pre></div>
-<p>Please note that this method doesn't require explicit casting <code>string</code> to [<code>Encoded.AccountAddress</code>] because [<code>isEncoded</code>] implicitly marks <code>address</code> as <code>ak_${string}</code> in case it returns <code>true</code>.</p>
-<p>Additionally, you can use [<code>isEncoded</code>] to validate data against other address types:</p>
+<p>Please note that this method doesn't require explicit casting <code>string</code> to <a href="https://sdk.aeternity.io/v14.0.0/api/types/Encoded.AccountAddress.html"><code>Encoded.AccountAddress</code></a> because <a href="https://sdk.aeternity.io/v14.0.0/api/functions/isEncoded.html"><code>isEncoded</code></a> implicitly marks <code>address</code> as <code>ak_${string}</code> in case it returns <code>true</code>.</p>
+<p>Additionally, you can use <a href="https://sdk.aeternity.io/v14.0.0/api/functions/isEncoded.html"><code>isEncoded</code></a> to validate data against other address types:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="nx">isEncoded</span><span class="p">(</span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">ContractAddress</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">OracleAddress</span><span class="p">);</span>
@@ -1935,23 +1935,23 @@ A more accurate solution would be to check the <code>address</code> in advance, 
 <div class="highlight"><pre><span></span><code><span class="nx">isEncoded</span><span class="p">(</span><span class="nx">address</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">);</span>
 </code></pre></div>
 <h3 id="aens-name-validation">AENS name validation</h3>
-<p>The similar way [<code>isName</code>] can be used</p>
+<p>The similar way <a href="https://sdk.aeternity.io/v14.1.0/api/functions/isName.html"><code>isName</code></a> can be used</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">isName</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isName</span><span class="p">(</span><span class="s1">&#39;name.chain&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// true</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isName</span><span class="p">(</span><span class="s1">&#39;мир.chain&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// true</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isName</span><span class="p">(</span><span class="s1">&#39;🙂.chain&#39;</span><span class="p">));</span><span class="w"> </span><span class="c1">// false</span>
 </code></pre></div>
-<p>If you don't need to handle invalid names specially then you can use [<code>ensureName</code>]:</p>
+<p>If you don't need to handle invalid names specially then you can use <a href="https://sdk.aeternity.io/v14.0.0/api/functions/ensureName.html"><code>ensureName</code></a>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ensureName</span><span class="p">,</span><span class="w"> </span><span class="nx">Name</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">nameAsString</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">readName</span><span class="p">();</span>
 <span class="nx">ensureName</span><span class="p">(</span><span class="nx">nameAsString</span><span class="p">);</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Name</span><span class="p">(</span><span class="nx">nameAsString</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">);</span>
 </code></pre></div>
-<p>Doing this way, [<code>ensureName</code>] will throw an exception if <code>nameAsString</code> is not a proper AENS name. TypeScript will handle <code>nameAsString</code> as <code>${string}.chain</code> in lines below [<code>ensureName</code>] invocation.</p>
+<p>Doing this way, <a href="https://sdk.aeternity.io/v14.0.0/api/functions/ensureName.html"><code>ensureName</code></a> will throw an exception if <code>nameAsString</code> is not a proper AENS name. TypeScript will handle <code>nameAsString</code> as <code>${string}.chain</code> in lines below <a href="https://sdk.aeternity.io/v14.0.0/api/functions/ensureName.html"><code>ensureName</code></a> invocation.</p>
 <h2 id="check-types-of-contract-methods">Check types of contract methods</h2>
-<p>By default, it is allowed to call any method of the [<code>Contract</code>] instance. You can enable type-checking by providing a contract interface in a generic parameter of [<code>Contract</code>]. For example:</p>
+<p>By default, it is allowed to call any method of the <a href="https://sdk.aeternity.io/v14.0.0/api/types/Contract.html"><code>Contract</code></a> instance. You can enable type-checking by providing a contract interface in a generic parameter of <a href="https://sdk.aeternity.io/v14.0.0/api/types/Contract.html"><code>Contract</code></a>. For example:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Contract</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">sourceCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span>
@@ -1984,7 +1984,7 @@ A more accurate solution would be to check the <code>address</code> in advance, 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">((</span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">bar</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nb">Map</span><span class="p">([[</span><span class="s1">&#39;test&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">10n</span><span class="p">]]))).</span><span class="nx">decodedResult</span><span class="p">);</span><span class="w"> </span><span class="c1">// Map(1) { &#39;test&#39; =&gt; 10n }</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">((</span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">baz</span><span class="p">({</span><span class="w"> </span><span class="nx">FirstName</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;Nikita&#39;</span><span class="p">]</span><span class="w"> </span><span class="p">})).</span><span class="nx">decodedResult</span><span class="p">);</span><span class="w"> </span><span class="c1">// 6</span>
 </code></pre></div>
-<p>If you need to define the contract interface separately then extend [<code>ContractMethodsBase</code>]:</p>
+<p>If you need to define the contract interface separately then extend <a href="https://sdk.aeternity.io/v14.0.0/api/interfaces/ContractMethodsBase.html"><code>ContractMethodsBase</code></a>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ContractMethodsBase</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
 
 <span class="kd">interface</span><span class="w"> </span><span class="nx">FooContract</span><span class="w"> </span><span class="k">extends</span><span class="w"> </span><span class="nx">ContractMethodsBase</span><span class="w"> </span><span class="p">{</span>
