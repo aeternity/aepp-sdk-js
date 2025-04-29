@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file. See [standa
 - **account:** detect MetaMask over EIP-6963 ([9e74b53](https://github.com/aeternity/aepp-sdk-js/commit/9e74b53918385c0aff93976c73336781288b37ce))
 - **account:** experimental support of Ledger app v1.0.0 ([0116d74](https://github.com/aeternity/aepp-sdk-js/commit/0116d74fbcda28b1fcb5012dd44ff883dcf6971c))
 - **account:** init AccountMnemonicFactory by seed ([fe74643](https://github.com/aeternity/aepp-sdk-js/commit/fe74643fb925768669fae8db28dfbcd68fbd2722))
+- **account:** add `unsafeSign`, deprecate `sign` ([b0288cc](https://github.com/aeternity/aepp-sdk-js/commit/b0288cc4dec47e1b3bdaf68a653fc001b2a823ab))
 - add `ensureEncoded`, `isEncoded`; deprecate `isAddressValid` ([5a11dc3](https://github.com/aeternity/aepp-sdk-js/commit/5a11dc34b0e8b577a937ed79b6ede1d4e3b412c8))
 - add `hashMessage`, deprecate `messageToHash` ([5306e6b](https://github.com/aeternity/aepp-sdk-js/commit/5306e6bedec3b7fe1a5f9ddb47695e4d99ca9705))
 - add `verifyMessageSignature`, deprecate `verifyMessage` ([f862b67](https://github.com/aeternity/aepp-sdk-js/commit/f862b67ccd55457a256ff7da3db5a087725ca89e))
@@ -22,11 +23,10 @@ All notable changes to this project will be documented in this file. See [standa
 - **node:** ignore consensus protocol version if `ignoreVersion` set ([e2f83d6](https://github.com/aeternity/aepp-sdk-js/commit/e2f83d6630f09f8eb1a9835d666b1d1781285cb0))
 - **node:** warn if incompatible version when `ignoreVersion` set ([2d6c59d](https://github.com/aeternity/aepp-sdk-js/commit/2d6c59de151a9c77b83b7c66ca15846fcd0f05c0))
 - **oracle:** add `getQueries` to OracleBase ([0af61da](https://github.com/aeternity/aepp-sdk-js/commit/0af61da9c2a229aa6459881f601aa5479b39fe84))
-- show function name along its hash if missed in bytecode ([2727713](https://github.com/aeternity/aepp-sdk-js/commit/2727713e2d56297ee017b8898b50281a731c6d00))
+- **contract:** show function name along its hash if missed in bytecode ([2727713](https://github.com/aeternity/aepp-sdk-js/commit/2727713e2d56297ee017b8898b50281a731c6d00))
 
 ### Bug Fixes
 
-- **account:** add `unsafeSign`, deprecate `sign` ([b0288cc](https://github.com/aeternity/aepp-sdk-js/commit/b0288cc4dec47e1b3bdaf68a653fc001b2a823ab))
 - **account:** implicitly connect to Aeternity snap, clean up flow ([e347d25](https://github.com/aeternity/aepp-sdk-js/commit/e347d2512678342850057335da32b249d3ff7bf0))
 - **aens:** `computeAuctionEndBlock` returns value according to Ceres ([3b2f20c](https://github.com/aeternity/aepp-sdk-js/commit/3b2f20c98416639f33a8c95e63794e05888882c6))
 - **aens:** handle `highestBid` as BigInt in auction details ([847bfa6](https://github.com/aeternity/aepp-sdk-js/commit/847bfa63de5a3b8a66525b46ab54ed1e64bd43f5))
