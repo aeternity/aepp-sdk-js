@@ -4,7 +4,7 @@ set -e
 # TODO: revisit --ignore-scripts after solving https://github.com/npm/cli/issues/4202
 perl -i -pe 's/"prepare"/"rem-prepare"/g' ../../../package.json
 
-for i in 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5
+for i in 4.8 4.9 5.0 5.1 5.2 5.3 5.4 5.5 5.6 5.7 5.8
 do
   echo "Try typescript@$i"
   npm i "typescript@$i" -D --no-audit
