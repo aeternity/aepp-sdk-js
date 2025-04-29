@@ -1,0 +1,2805 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../../CHANGELOG/">
+      
+      
+        <link rel="next" href="../13/">
+      
+      
+      <link rel="icon" href="../../../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
+    
+    
+      
+        <title>Migration to 14.0.0 - æternity JavaScript SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2afb09e1.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#migration-to-1400" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+               You're not viewing the latest version.
+<a href="../../../..">
+  <strong>Click here to go to latest.</strong>
+</a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../.."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="æternity JavaScript SDK" class="md-header__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            æternity JavaScript SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Migration to 14.0.0
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="æternity JavaScript SDK" class="md-nav__button md-logo" aria-label="æternity JavaScript SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    æternity JavaScript SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aeternity/aepp-sdk-js" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick Start
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Usage Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Usage Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../address-length/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    The range of possible address length
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../aens/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AENS (æternity naming system)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contracts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contracts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contract-events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contract Events
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../oracles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Oracles
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../paying-for-tx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    PayingForTx (Meta-Transactions)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../batch-requests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Batch Transactions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../error-handling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Error Handling
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../low-vs-high-usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Low vs High level API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typed-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Typed data hashing and signing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typescript/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage with TypeScript
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jwt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    JWT usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_13" id="__nav_3_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Wallet interaction
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_13">
+            <span class="md-nav__icon md-icon"></span>
+            Wallet interaction
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../connect-aepp-to-wallet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Connect an æpp to a wallet
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../build-wallet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to build a wallet
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ledger-wallet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Ledger Hardware Wallet
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metamask-snap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Aeternity snap for MetaMask
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../transaction-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transaction options
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Examples & Tutorials
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Examples & Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    NodeJS
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            NodeJS
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/transfer-ae/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transfer AE
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/contract-interaction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compile &amp; Deploy a Sophia Smart Contract
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_1_3" id="__nav_5_1_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    PayingForTx
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            PayingForTx
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/paying-for-contract-call-tx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    InnerTx: ContractCallTx
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/paying-for-spend-tx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    InnerTx: SpendTx
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/account-generalized/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Create and use Generalized Accounts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/dry-run-using-debug-endpoint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dry-run using debug endpoint
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/node/oracle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Register and query Oracle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Browser
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Browser
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/browser/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SDK tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/browser/aepp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Aepp example
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/browser/wallet-iframe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Iframe wallet example
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/browser/wallet-web-extension/packed.zip" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Webextension wallet example
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/vuejs/helloworld-blockheight/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Vue.js HelloWorld
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../compatibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compatibility Table
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Migration Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            Migration Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Migration to 14.0.0
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Migration to 14.0.0
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#updated-sdk-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updated sdk requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iris-is-not-supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      Iris is not supported
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commonjs-bundles-have-cjs-extension-instead-js" class="md-nav__link">
+    <span class="md-ellipsis">
+      CommonJS bundles have cjs extension instead js
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recover-dump-removed-aex-3-keystore-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      recover, dump removed (AEX-3 keystore implementation)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#host-is-readonly-in-generated-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      $host is readonly in generated APIs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aepp" class="md-nav__link">
+    <span class="md-ellipsis">
+      Aepp
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aepp">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rpcbroadcasterror-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      RpcBroadcastError not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contract-delegations-used-in-iris-removed-from-aepp-wallet-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contract delegations used in Iris removed from aepp-wallet connection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wallet" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wallet
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wallet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aesdkwallet-requires-onasktoselectnetwork-constructor-option" class="md-nav__link">
+    <span class="md-ellipsis">
+      AeSdkWallet requires onAskToSelectNetwork constructor option
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-builder" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transaction builder
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transaction builder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#channelclientreconnecttx-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      ChannelClientReconnectTx removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oracle_ttl-query_ttl-response_ttl-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      ORACLE_TTL, QUERY_TTL, RESPONSE_TTL not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buildtxunpacktx-works-only-with-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      buildTx/unpackTx works only with transactions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tag-include-only-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tag include only transactions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buildtx-doesnt-accept-prefix-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      buildTx doesn't accept prefix anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#name_ttl-client_ttl-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      NAME_*TTL, CLIENT_TTL not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#node" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-returns-time-in-keyblock-and-microblockheader-as-date" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node returns time in KeyBlock and MicroBlockHeader as Date
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account" class="md-nav__link">
+    <span class="md-ellipsis">
+      Account
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Account">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#save-hd-wallets-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Save HD wallets methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-signmessage-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      sign, signMessage removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isvalidkeypair-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      isValidKeypair removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getaddressfrompriv-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      getAddressFromPriv removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generatekeypair-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      generateKeyPair removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generatekeypairfromsecret-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      generateKeyPairFromSecret removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memoryaccount-accepts-secret-key-as-sk_-prefixed-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      MemoryAccount accepts secret key as sk_-prefixed string
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accountbase-inheritors-required-to-implement-signtypeddata-signdelegation" class="md-nav__link">
+    <span class="md-ellipsis">
+      AccountBase inheritors required to implement signTypedData, signDelegation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aens" class="md-nav__link">
+    <span class="md-ellipsis">
+      Aens
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aens-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      aens* methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#name_bid_max_length-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      NAME_BID_MAX_LENGTH not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      Oracle
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Oracle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#oracle-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      oracle methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pollqueries-dont-return-responded-queries-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      pollQueries don't return responded queries by default
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compiler
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compiler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compilercli-uses-aesophia8-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompilerCli uses aesophia@8 by default
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compilercli8-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompilerCli8 removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contract
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#encodefatevalue-decodefatevalue-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      encodeFateValue, decodeFateValue not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aesdkinitializecontract-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      AeSdk:initializeContract removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#createdelegationsignature-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      createDelegationSignature removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-to-sign-specific-delegations-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods to sign specific delegations removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Migration to 13.0.0
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Migration to 12.0.0
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Migration to 11.0.0
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Migration to 10.0.0
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Migration to 9.0.0
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Migration to 7.0.0
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Contribute
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Contribute
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contrib/releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Releases
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#updated-sdk-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updated sdk requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iris-is-not-supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      Iris is not supported
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commonjs-bundles-have-cjs-extension-instead-js" class="md-nav__link">
+    <span class="md-ellipsis">
+      CommonJS bundles have cjs extension instead js
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recover-dump-removed-aex-3-keystore-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      recover, dump removed (AEX-3 keystore implementation)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#host-is-readonly-in-generated-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      $host is readonly in generated APIs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aepp" class="md-nav__link">
+    <span class="md-ellipsis">
+      Aepp
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aepp">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rpcbroadcasterror-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      RpcBroadcastError not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contract-delegations-used-in-iris-removed-from-aepp-wallet-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contract delegations used in Iris removed from aepp-wallet connection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wallet" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wallet
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wallet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aesdkwallet-requires-onasktoselectnetwork-constructor-option" class="md-nav__link">
+    <span class="md-ellipsis">
+      AeSdkWallet requires onAskToSelectNetwork constructor option
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transaction-builder" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transaction builder
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transaction builder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#channelclientreconnecttx-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      ChannelClientReconnectTx removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oracle_ttl-query_ttl-response_ttl-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      ORACLE_TTL, QUERY_TTL, RESPONSE_TTL not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buildtxunpacktx-works-only-with-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      buildTx/unpackTx works only with transactions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tag-include-only-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tag include only transactions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buildtx-doesnt-accept-prefix-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      buildTx doesn't accept prefix anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#name_ttl-client_ttl-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      NAME_*TTL, CLIENT_TTL not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#node" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-returns-time-in-keyblock-and-microblockheader-as-date" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node returns time in KeyBlock and MicroBlockHeader as Date
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account" class="md-nav__link">
+    <span class="md-ellipsis">
+      Account
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Account">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#save-hd-wallets-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Save HD wallets methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-signmessage-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      sign, signMessage removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isvalidkeypair-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      isValidKeypair removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getaddressfrompriv-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      getAddressFromPriv removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generatekeypair-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      generateKeyPair removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generatekeypairfromsecret-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      generateKeyPairFromSecret removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memoryaccount-accepts-secret-key-as-sk_-prefixed-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      MemoryAccount accepts secret key as sk_-prefixed string
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accountbase-inheritors-required-to-implement-signtypeddata-signdelegation" class="md-nav__link">
+    <span class="md-ellipsis">
+      AccountBase inheritors required to implement signTypedData, signDelegation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aens" class="md-nav__link">
+    <span class="md-ellipsis">
+      Aens
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aens">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aens-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      aens* methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#name_bid_max_length-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      NAME_BID_MAX_LENGTH not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      Oracle
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Oracle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#oracle-methods-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      oracle methods removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pollqueries-dont-return-responded-queries-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      pollQueries don't return responded queries by default
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compiler
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compiler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compilercli-uses-aesophia8-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompilerCli uses aesophia@8 by default
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compilercli8-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompilerCli8 removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contract
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#encodefatevalue-decodefatevalue-not-exported-anymore" class="md-nav__link">
+    <span class="md-ellipsis">
+      encodeFateValue, decodeFateValue not exported anymore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aesdkinitializecontract-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      AeSdk:initializeContract removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#createdelegationsignature-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      createDelegationSignature removed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods-to-sign-specific-delegations-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods to sign specific delegations removed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="migration-to-1400">Migration to 14.0.0</h1>
+<p>This guide describes all breaking changes introduced with <code>v14.0.0</code>.</p>
+<h4 id="updated-sdk-requirements">Updated sdk requirements</h4>
+<p>Minimum supported versions:</p>
+<ul>
+<li>nodejs@18.19</li>
+<li>TypeScript@4.8</li>
+<li>aeternity node 7.1.0</li>
+<li>ae_mdw@1.81.0</li>
+<li>aesophia@8</li>
+</ul>
+<h4 id="iris-is-not-supported">Iris is not supported</h4>
+<p>Stick to a previous sdk version if it is required.</p>
+<h4 id="commonjs-bundles-have-cjs-extension-instead-js">CommonJS bundles have cjs extension instead js</h4>
+<p>If you are importing files explicitly from <code>dist</code> folder then you need to update the extension</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.js</span>
+<span class="gi">+ https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.cjs</span>
+</code></pre></div>
+<h4 id="recover-dump-removed-aex-3-keystore-implementation"><code>recover</code>, <code>dump</code> removed (AEX-3 keystore implementation)</h4>
+<p>Copy the removed implementation to your project or add a previous sdk as a separate dependency</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nt">&quot;dependencies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;@aeternity/aepp-sdk&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^14.0.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;@aeternity/aepp-sdk-13&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;npm:@aeternity/aepp-sdk@^13.3.3&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div>
+<h4 id="host-is-readonly-in-generated-apis">$host is readonly in generated APIs</h4>
+<p>It is made to don't break caching.
+If you need to change a server URL, create a new server instance instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- node.$host = &#39;http://example.com&#39;;</span>
+<span class="gi">+ node = new Node(&#39;http://example.com&#39;);</span>
+</code></pre></div>
+<h2 id="aepp">Aepp</h2>
+<h4 id="rpcbroadcasterror-not-exported-anymore">RpcBroadcastError not exported anymore</h4>
+<p>Because it is not thrown by wallet as well.</p>
+<h4 id="contract-delegations-used-in-iris-removed-from-aepp-wallet-connection">Contract delegations used in Iris removed from aepp-wallet connection</h4>
+<p>Use <code>signDelegation</code> api instead.</p>
+<h2 id="wallet">Wallet</h2>
+<h4 id="aesdkwallet-requires-onasktoselectnetwork-constructor-option">AeSdkWallet requires <code>onAskToSelectNetwork</code> constructor option</h4>
+<p>Provide a function throwing <code>RpcMethodNotFoundError</code> if you don't want to support network change by
+aepp.</p>
+<h2 id="transaction-builder">Transaction builder</h2>
+<h4 id="channelclientreconnecttx-removed"><code>ChannelClientReconnectTx</code> removed</h4>
+<p>You couldn't use it because it is not supported on the node side.</p>
+<h4 id="oracle_ttl-query_ttl-response_ttl-not-exported-anymore"><code>ORACLE_TTL</code>, <code>QUERY_TTL</code>, <code>RESPONSE_TTL</code> not exported anymore</h4>
+<p>These values provided by default in buildTx, if necessary define them as</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">ORACLE_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">500</span><span class="w"> </span><span class="p">};</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">QUERY_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="p">};</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">RESPONSE_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="nx">ORACLE_TTL_TYPES</span><span class="p">.</span><span class="nx">delta</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="p">};</span>
+</code></pre></div>
+<h4 id="buildtxunpacktx-works-only-with-transactions"><code>buildTx</code>/<code>unpackTx</code> works only with transactions</h4>
+<p>If you need to work with node's entry use <code>packEntry</code>/<code>unpackEntry</code>.</p>
+<h4 id="tag-include-only-transactions"><code>Tag</code> include only transactions</h4>
+<p>Node entries tags moved to <code>EntryTag</code>.</p>
+<h4 id="buildtx-doesnt-accept-prefix-anymore"><code>buildTx</code> doesn't accept <code>prefix</code> anymore</h4>
+<p>Use <code>decode</code>/<code>encode</code> to convert payload to desired format.</p>
+<h4 id="name_ttl-client_ttl-not-exported-anymore"><code>NAME_*TTL</code>, <code>CLIENT_TTL</code> not exported anymore</h4>
+<p>These values provided by default in buildTx, if necessary define them as</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">NAME_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">180000</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">NAME_MAX_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">36000</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">NAME_MAX_CLIENT_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">86400</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">CLIENT_TTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">86400</span><span class="p">;</span>
+</code></pre></div>
+<h2 id="node">Node</h2>
+<h4 id="node-returns-time-in-keyblock-and-microblockheader-as-date">Node returns time in KeyBlock and MicroBlockHeader as Date</h4>
+<p>Apply a change</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-const time = new Date(</span>
+<span class="gd">-  (await node.getTopHeader()).time,</span>
+<span class="gd">-);</span>
+<span class="gi">+const time = (await node.getTopHeader()).time;</span>
+</code></pre></div>
+<h2 id="account">Account</h2>
+<h4 id="save-hd-wallets-methods-removed">Save HD wallets methods removed</h4>
+<p>Namely: <code>deriveChild</code>, <code>derivePathFromKey</code>, <code>getMasterKeyFromSeed</code>,
+<code>derivePathFromSeed</code>, <code>getKeyPair</code>, <code>generateSaveHDWalletFromSeed</code>,
+<code>getSaveHDWalletAccounts</code>, <code>getHdWalletAccountFromSeed</code>.
+Use AccountMnemonicFactory instead.</p>
+<h4 id="sign-signmessage-removed"><code>sign</code>, <code>signMessage</code> removed</h4>
+<p>Use MemoryAccount:sign, MemoryAccount:signMessage instead.</p>
+<h4 id="isvalidkeypair-removed"><code>isValidKeypair</code> removed</h4>
+<p>Create a MemoryAccount by a secret key and
+compare it's address with an address in the key pair instead.</p>
+<h4 id="getaddressfrompriv-removed"><code>getAddressFromPriv</code> removed</h4>
+<p>Use MemoryAccount instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- address = getAddressFromPriv(secretKeyOldFormat)</span>
+<span class="gi">+ address = new MemoryAccount(secretKeyNewFormat).address</span>
+</code></pre></div>
+<p>Use SDK <a href="https://sdk.aeternity.io/v14.1.0/examples/browser/tools/">tools</a> page to convert secret keys.</p>
+<h4 id="generatekeypair-removed"><code>generateKeyPair</code> removed</h4>
+<p>Use MemoryAccount::generate instead.
+Optionally add <code>decode</code> if you need raw keys.
+Obtain the secret key via MemoryAccount:secretKey.</p>
+<h4 id="generatekeypairfromsecret-removed"><code>generateKeyPairFromSecret</code> removed</h4>
+<p>Use MemoryAccount instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- const keyPair = generateKeyPairFromSecret(rawSecretKey)</span>
+<span class="gi">+ const secretKey = encode(rawSecretKey.subarray(0, 32), Encoding.AccountSecretKey)</span>
+<span class="gi">+ const account = new MemoryAccount(secretKey)</span>
+<span class="gi">+ const keyPair = {</span>
+<span class="gi">+   publicKey: decode(account.address),</span>
+<span class="gi">+   secretKey: rawSecretKey,</span>
+<span class="gi">+ }</span>
+</code></pre></div>
+<h4 id="memoryaccount-accepts-secret-key-as-sk_-prefixed-string">MemoryAccount accepts secret key as sk_-prefixed string</h4>
+<p>Convert secret key as hex to new format as</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oldSk</span><span class="w"> </span><span class="o">=</span>
+<span class="w">  </span><span class="s1">&#39;9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">newSk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">oldSk</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hex&#39;</span><span class="p">).</span><span class="nx">subarray</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">32</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">AccountSecretKey</span><span class="p">);</span>
+<span class="c1">// &#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span>
+</code></pre></div>
+<p>Use SDK <a href="https://sdk.aeternity.io/v14.1.0/examples/browser/tools/">tools</a> page to convert secret keys.</p>
+<h4 id="accountbase-inheritors-required-to-implement-signtypeddata-signdelegation">AccountBase inheritors required to implement <code>signTypedData</code>, <code>signDelegation</code></h4>
+<p>You can throw an exception if the account operation is not doable.</p>
+<h2 id="aens">Aens</h2>
+<h4 id="aens-methods-removed">aens* methods removed</h4>
+<p>Use Name class instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-await aeSdk.aensPreclaim(&#39;example.chain&#39;)</span>
+<span class="gi">+const name = new Name(&#39;example.chain&#39;, aeSdk.getContext())</span>
+<span class="gi">+await name.preclaim()</span>
+</code></pre></div>
+<p>Accordingly for other methods:</p>
+<div class="highlight"><pre><span></span><code>aensRevoke =&gt; Name:revoke
+aensUpdate =&gt; Name:update
+aensTransfer =&gt; Name:transfer
+aensQuery =&gt; Name:getState
+aensClaim =&gt; Name:claim
+aensBid =&gt; Name:bid
+</code></pre></div>
+<h4 id="name_bid_max_length-not-exported-anymore"><code>NAME_BID_MAX_LENGTH</code> not exported anymore</h4>
+<p>Use <code>isAuctionName</code> function instead.</p>
+<h2 id="oracle">Oracle</h2>
+<h4 id="oracle-methods-removed">oracle methods removed</h4>
+<p>Use Oracle, OracleClient classes instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-aeSdk.pollForQueries(queryHandler)</span>
+<span class="gi">+const oracle = new Oracle(account, aeSdk.getContext());</span>
+<span class="gi">+oracle.pollQueries(queryHandler)</span>
+</code></pre></div>
+<p>Accordingly for other methods:</p>
+<div class="highlight"><pre><span></span><code>extendOracleTtl =&gt; Oracle:extendTtl
+respondToQuery =&gt; Oracle:respondToQuery
+getOracleObject =&gt; Oracle:getState
+registerOracle =&gt; Oracle:register
+getQueryObject =&gt; Oracle:getQuery, OracleClient:getQuery
+postQueryToOracle =&gt; OracleClient:postQuery
+pollForQueryResponse =&gt; OracleClient:pollForResponse
+</code></pre></div>
+<h4 id="pollqueries-dont-return-responded-queries-by-default"><code>pollQueries</code> don't return responded queries by default</h4>
+<p>Use <code>includeResponded</code> option to restore the previous behavior.</p>
+<h2 id="compiler">Compiler</h2>
+<h4 id="compilercli-uses-aesophia8-by-default">CompilerCli uses aesophia@8 by default</h4>
+<h4 id="compilercli8-removed">CompilerCli8 removed</h4>
+<p>Use CompilerCli instead.</p>
+<h2 id="contract">Contract</h2>
+<h4 id="encodefatevalue-decodefatevalue-not-exported-anymore"><code>encodeFateValue</code>, <code>decodeFateValue</code> not exported anymore</h4>
+<p>Use ContractByteArrayEncoder:encodeWithType, decodeWithType from <code>@aeternity/aepp-calldata</code>.</p>
+<h4 id="aesdkinitializecontract-removed"><code>AeSdk:initializeContract</code> removed</h4>
+<p>Use <code>Contract.initialize</code> instead:</p>
+<div class="highlight"><pre><span></span><code><span class="gd">- aeSdk.initializeContract(options)</span>
+<span class="gi">+ Contract.initialize({ ...aeSdk.getContext(), ...options })</span>
+</code></pre></div>
+<h4 id="createdelegationsignature-removed"><code>createDelegationSignature</code> removed</h4>
+<p>Use <code>packDelegation</code> and AccountBase::signDelegation instead.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-const dlg = await aeSdk.createDelegationSignature(contractAddress, [name]);</span>
+<span class="gi">+const dlg = await aeSdk.signDelegation(</span>
+<span class="gi">+  packDelegation({</span>
+<span class="gi">+    tag: DelegationTag.AensName,</span>
+<span class="gi">+    accountAddress: aeSdk.address,</span>
+<span class="gi">+    contractAddress,</span>
+<span class="gi">+    nameId: name,</span>
+<span class="gi">+  }),</span>
+<span class="gi">+);</span>
+</code></pre></div>
+<h4 id="methods-to-sign-specific-delegations-removed">Methods to sign specific delegations removed</h4>
+<p>Namely:</p>
+<ul>
+<li><code>signDelegationToContract</code>,</li>
+<li><code>signNameDelegationToContract</code>,</li>
+<li><code>signAllNamesDelegationToContract</code>,</li>
+<li><code>signOracleQueryDelegationToContract</code>.</li>
+</ul>
+<p>Use <code>signDelegation</code> instead.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
