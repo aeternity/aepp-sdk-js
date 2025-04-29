@@ -1,6 +1,6 @@
 import nacl from 'tweetnacl';
 import AccountBase from './Base.js';
-import { hash, messageToHash, messagePrefixLength } from '../utils/crypto.js';
+import { hash, hashMessage, messagePrefixLength } from '../utils/crypto.js';
 import { ArgumentError } from '../utils/errors.js';
 import { decode, encode, Encoded, Encoding } from '../utils/encoder.js';
 import { concatBuffers } from '../utils/other.js';
@@ -21,6 +21,7 @@ export function getBufferToSign(
 
 /**
  * In-memory account class
+ * @category account
  */
 export default class AccountMemory extends AccountBase {
   override readonly address: Encoded.AccountAddress;
@@ -45,8 +46,16 @@ export default class AccountMemory extends AccountBase {
     return new AccountMemory(secretKey);
   }
 
+  /**
+   * @deprecated Use `unsafeSign` method instead
+   */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override async sign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
+    return this.unsafeSign(data, options);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  override async unsafeSign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
     return nacl.sign.detached(Buffer.from(data), this.#secretKeyDecoded);
   }
 
@@ -60,12 +69,12 @@ export default class AccountMemory extends AccountBase {
     const rlpBinaryTx = decode(transaction);
     const txWithNetworkId = getBufferToSign(transaction, networkId, innerTx === true);
 
-    const signatures = [await this.sign(txWithNetworkId, options)];
+    const signatures = [await this.unsafeSign(txWithNetworkId, options)];
     return buildTx({ tag: Tag.SignedTx, encodedTx: rlpBinaryTx, signatures });
   }
 
   override async signMessage(message: string, options?: any): Promise<Uint8Array> {
-    return this.sign(messageToHash(message), options);
+    return this.unsafeSign(hashMessage(message), options);
   }
 
   override async signTypedData(
@@ -85,7 +94,7 @@ export default class AccountMemory extends AccountBase {
       networkId,
       contractAddress,
     });
-    const signature = await this.sign(dHash, options);
+    const signature = await this.unsafeSign(dHash, options);
     return encode(signature, Encoding.Signature);
   }
 
@@ -100,7 +109,7 @@ export default class AccountMemory extends AccountBase {
       Buffer.from(networkId),
       decode(delegation),
     ]);
-    const signature = await this.sign(payload);
+    const signature = await this.unsafeSign(payload);
     return encode(signature, Encoding.Signature);
   }
 }

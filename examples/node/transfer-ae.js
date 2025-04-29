@@ -2,15 +2,15 @@
 // # Transfer AE
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/node/transfer-ae.js)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/node/transfer-ae.js)
 // and this page explains in detail how to:
 //
 //  - initialize an instance of the SDK with a pre-funded account
 //  - transfer AE to another account
 
 // ## 1. Specify imports
-// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import { AeSdk, Node, MemoryAccount } from '@aeternity/aepp-sdk';
+// You need to import `AeSdk`, `Node` and `AccountMemory` classes from the SDK.
+import { AeSdk, Node, AccountMemory } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -37,7 +37,7 @@ const [amount = 1, recipient = ACCOUNT_KEYPAIR.publicKey] = process.argv.slice(2
 //        e.g. `node transfer-ae.js 3 ak_6D2uyunJaERXfgbsc94G8vrp79nZrbtorL7VCRXk3sWiFK5jb`
 
 // ## 3. Create object instances
-const account = new MemoryAccount(ACCOUNT_KEYPAIR.secretKey);
+const account = new AccountMemory(ACCOUNT_KEYPAIR.secretKey);
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
@@ -53,7 +53,7 @@ console.log(`Balance of ${recipient} (before): ${balanceBefore} aettos`);
 // Calling the `spend` function will create, sign and broadcast a `SpendTx` to the network.
 const tx = await aeSdk.spend(amount, recipient);
 console.log('Transaction mined', tx);
-// Alternatively, you can use [transferFunds](https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/functions/transferFunds.html)
+// Alternatively, you can use [transferFunds](https://sdk.aeternity.io/v14.1.0/api/functions/transferFunds.html)
 // method to transfer a fraction of your AE to another account.
 
 // ## 6. Get AE balance of recipient (after transfer)

@@ -13,7 +13,7 @@ import {
   getDefaultPointerKey,
   commitmentHash,
   getMinimumNameFee,
-  isNameValid,
+  isName,
   produceNameId,
   toBytes,
   buildTx,
@@ -34,8 +34,8 @@ describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {
     const salt = genSalt();
     const hash = await commitmentHash('foobar.chain', salt);
-    hash.should.be.a('string');
-    hash.should.be.equal(await commitmentHash('foobar.chain', salt));
+    expect(hash).to.be.a('string');
+    expect(hash).to.equal(await commitmentHash('foobar.chain', salt));
   });
 
   it('test from big number to bytes', async () => {
@@ -55,12 +55,12 @@ describe('Tx', () => {
     }
 
     data.forEach((n) => {
-      n.toString(10).should.be.equal(bnFromBytes(n));
+      expect(n.toString(10)).to.equal(bnFromBytes(n));
     });
   });
 
   it('Produce name id for `.chain`', () => {
-    produceNameId('asdas.chain').should.be.equal(
+    expect(produceNameId('asdas.chain')).to.equal(
       'nm_2DMazuJNrGkQYve9eMttgdteaigeeuBk3fmRYSThJZ2NpX3r8R',
     );
   });
@@ -68,21 +68,21 @@ describe('Tx', () => {
   describe('getMinimumNameFee', () => {
     it('returns correct name fees', () => {
       for (let i = 1; i <= Object.keys(NAME_BID_RANGES).length; i += 1) {
-        getMinimumNameFee(randomName(i)).toString().should.be.equal(NAME_BID_RANGES[i].toString());
+        expect(getMinimumNameFee(randomName(i)).toString()).to.equal(NAME_BID_RANGES[i].toString());
       }
     });
   });
 
-  describe('isNameValid', () => {
-    it('validates domain', () => isNameValid('asdasdasd.unknown').should.be.equal(false));
-    it("don't throws exception", () => isNameValid('asdasdasd.chain').should.be.equal(true));
+  describe('isName', () => {
+    it('validates domain', () => expect(isName('asdasdasd.unknown')).to.equal(false));
+    it("don't throws exception", () => expect(isName('asdasdasd.chain')).to.equal(true));
   });
 
   const payload = Buffer.from([1, 2, 42]);
   describe('decode', () => {
-    it('decodes base64check', () => expect(decode('ba_AQIq9Y55kw==')).to.be.eql(payload));
+    it('decodes base64check', () => expect(decode('ba_AQIq9Y55kw==')).to.eql(payload));
 
-    it('decodes base58check', () => expect(decode('nm_3DZUwMat2')).to.be.eql(payload));
+    it('decodes base58check', () => expect(decode('nm_3DZUwMat2')).to.eql(payload));
 
     it('throws if invalid checksum', () =>
       expect(() => decode('ak_23aaaaa')).to.throw('Invalid checksum'));
@@ -93,17 +93,17 @@ describe('Tx', () => {
 
   describe('encode', () => {
     it('encodes base64check', () =>
-      expect(encode(payload, Encoding.Bytearray)).to.be.equal('ba_AQIq9Y55kw=='));
+      expect(encode(payload, Encoding.Bytearray)).to.equal('ba_AQIq9Y55kw=='));
 
     it('encodes base58check', () =>
-      expect(encode(payload, Encoding.Name)).to.be.equal('nm_3DZUwMat2'));
+      expect(encode(payload, Encoding.Name)).to.equal('nm_3DZUwMat2'));
   });
 
   describe('getDefaultPointerKey', () => {
     it('returns default pointer key for contract', () =>
       expect(
         getDefaultPointerKey('ct_2dATVcZ9KJU5a8hdsVtTv21pYiGWiPbmVcU1Pz72FFqpk9pSRR'),
-      ).to.be.equal('contract_pubkey'));
+      ).to.equal('contract_pubkey'));
 
     it('throws error', () =>
       expect(() => getDefaultPointerKey('ba_AQIq9Y55kw==' as Encoded.Channel)).to.throw(
@@ -243,8 +243,8 @@ describe('Tx', () => {
             },
         },
       } as const;
-      expect(unpackEntry(tx, EntryTag.CallsMtree)).to.be.eql(params);
-      expect(packEntry(params)).to.be.equal(tx);
+      expect(unpackEntry(tx, EntryTag.CallsMtree)).to.eql(params);
+      expect(packEntry(params)).to.equal(tx);
     });
 
     it('unpacks state channel signed tx', () => {
@@ -254,9 +254,9 @@ describe('Tx', () => {
       );
       expect(signatures).to.have.lengthOf(2);
       ensureEqual<Tag.ChannelOffChainTx>(encodedTx.tag, Tag.ChannelOffChainTx);
-      expect(encodedTx.channelId).to.be.satisfy((s: string) => s.startsWith('ch_'));
-      expect(encodedTx.round).to.be.equal(3);
-      expect(encodedTx.stateHash).to.be.satisfy((s: string) => s.startsWith('st_'));
+      expect(encodedTx.channelId).to.satisfy((s: string) => s.startsWith('ch_'));
+      expect(encodedTx.round).to.equal(3);
+      expect(encodedTx.stateHash).to.satisfy((s: string) => s.startsWith('st_'));
     });
 
     it('unpacks state trees tx', () => {
@@ -321,7 +321,7 @@ describe('Tx', () => {
         tag: EntryTag.StateTrees,
         version: 0,
       } as const;
-      expect(unpackEntry(tx, EntryTag.StateTrees)).to.be.eql(params);
+      expect(unpackEntry(tx, EntryTag.StateTrees)).to.eql(params);
     });
   });
 
@@ -356,13 +356,13 @@ describe('Tx', () => {
         callData: 'cb_KxFE1kQfP4oEp9E=',
       } as const;
       const tx = buildTx(txParams);
-      expect(unpackTx(tx, Tag.ContractCreateTx).fee).to.be.equal('78500000000000');
+      expect(unpackTx(tx, Tag.ContractCreateTx).fee).to.equal('78500000000000');
     });
 
     it('unpack and build ChannelCreateTx into the same value', () => {
       const tx =
         'tx_+IgyAqEBNMD0uYWndDrqF2Q8OIUWZ/gEi45vpwfg+cNOEVi9pL+JBWvHXi1jEAAAoQG5mrb34g29bneQLjNaFcH4OwVP0r9m9x6kYxpxiqN7EYkFa8deLWMQAAAAAQCGECcSfcAAwMCgOK3o2rLTFOY30p/4fMgaz3hG5WWTAcWknsu7ceLFmM0CERW42w==';
-      expect(buildTx(unpackTx(tx))).to.be.equal(tx);
+      expect(buildTx(unpackTx(tx))).to.equal(tx);
     });
 
     it('checks argument types', () => {

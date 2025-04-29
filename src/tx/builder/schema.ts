@@ -37,6 +37,9 @@ import { ArgumentError } from '../../utils/errors.js';
 import { EntryTag } from './entry/constants.js';
 import { EntParams, EntUnpacked } from './entry/schema.generated.js';
 
+/**
+ * @category oracle
+ */
 export enum ORACLE_TTL_TYPES {
   delta = 0,
   block = 1,
@@ -244,7 +247,7 @@ export const txSchema = [
     ttl,
   },
   {
-    tag: shortUIntConst(Tag.OracleResponseTx),
+    tag: shortUIntConst(Tag.OracleRespondTx),
     version: shortUIntConst(1, true),
     oracleId: address(Encoding.OracleAddress),
     nonce: nonce('oracleId'),

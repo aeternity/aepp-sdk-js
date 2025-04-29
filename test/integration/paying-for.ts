@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import BigNumber from 'bignumber.js';
 import { getSdk } from '.';
-import { AeSdk, Contract, MemoryAccount, Tag, UnexpectedTsError, Encoded } from '../../src';
+import { AeSdk, Contract, AccountMemory, Tag, UnexpectedTsError, Encoded } from '../../src';
 import { InputNumber, assertNotNull } from '../utils';
 
 describe('Paying for transaction of another account', () => {
@@ -13,8 +13,8 @@ describe('Paying for transaction of another account', () => {
   });
 
   it('pays for spend transaction', async () => {
-    const sender = MemoryAccount.generate();
-    const receiver = MemoryAccount.generate();
+    const sender = AccountMemory.generate();
+    const receiver = AccountMemory.generate();
     await aeSdk.spend(1e4, sender.address);
     const spendTx = await aeSdk.buildTx({
       tag: Tag.SpendTx,
@@ -60,7 +60,7 @@ describe('Paying for transaction of another account', () => {
 
   it('pays for contract deployment', async () => {
     aeSdkNotPayingFee = await getSdk(0);
-    aeSdkNotPayingFee.addAccount(MemoryAccount.generate(), { select: true });
+    aeSdkNotPayingFee.addAccount(AccountMemory.generate(), { select: true });
     Object.assign(aeSdkNotPayingFee._options, {
       waitMined: false,
       innerTx: true,
@@ -79,7 +79,7 @@ describe('Paying for transaction of another account', () => {
       sourceCode,
       address,
     });
-    expect((await payingContract.getValue()).decodedResult).to.be.equal(42n);
+    expect((await payingContract.getValue()).decodedResult).to.equal(42n);
   });
 
   it('pays for contract call', async () => {
@@ -90,6 +90,6 @@ describe('Paying for transaction of another account', () => {
     });
     const { rawTx: contractCallTx } = await contract.setValue(43);
     await aeSdk.payForTransaction(contractCallTx);
-    expect((await payingContract.getValue()).decodedResult).to.be.equal(43n);
+    expect((await payingContract.getValue()).decodedResult).to.equal(43n);
   });
 });

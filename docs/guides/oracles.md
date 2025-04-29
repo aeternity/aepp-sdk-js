@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This guide shows you how to perform all the operations that you need within the lifecycle of [oracles](https://docs.aeternity.com/protocol/oracles) using the SDK.
+This guide shows you how to perform all the operations that you need within the lifecycle of [oracles](https://docs.aeternity.com/developer-documentation/protocol/oracles) using the SDK.
 
 ## 1. Oracle: register
 
@@ -16,7 +16,7 @@ import { AeSdk, Oracle } from '@aeternity/aepp-sdk'
 // init an instance of the SDK using the AeSdk class
 const aeSdk = new AeSdk({ ... })
 // it should be an instance of AccountBase with non-zero balance
-const oracleAccount = new MemoryAccount(...)
+const oracleAccount = new AccountMemory(...)
 
 const oracle = new Oracle(oracleAccount, aeSdk.getContext())
 ```
@@ -168,7 +168,7 @@ Both Oracle and OracleClient have methods to get their state from the node.
 
 `Oracle:getState`, `OracleClient:getState` returns the same value as `Node:getOracleByPubkey`, but without arguments (it uses the oracle address provided in the constructor).
 
-`Oracle:getQuery`, `OracleClient:getQuery` corresponds to `Node:getOracleQueryByPubkeyAndQueryId`, adding `decodedQuery`, `decodedResponse` based on the oracle type.
+`Oracle:getQuery`, `OracleClient:getQuery` corresponds to `Node:getOracleQueryByPubkeyAndQueryId`, adding `decodedQuery`, `decodedResponse` based on the oracle type. In the same way `Oracle:getQueries`, `OracleClient:getQueries` corresponds to `Node:getOracleQueriesByPubkey`.
 
 ## Example applications
 

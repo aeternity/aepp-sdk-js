@@ -1,7 +1,7 @@
 import canonicalize from 'canonicalize';
 import AccountBase from '../account/Base.js';
 import { Encoded, Encoding, decode, encode } from './encoder.js';
-import { verify } from './crypto.js';
+import { verifySignature } from './crypto.js';
 import { ArgumentError, InvalidSignatureError } from './errors.js';
 
 // TODO: use Buffer.from(data, 'base64url') after solving https://github.com/feross/buffer/issues/309
@@ -39,7 +39,7 @@ export async function signJwt(originalPayload: any, account: AccountBase): Promi
   }
   if (payload.sub_jwk === undefined) delete payload.sub_jwk;
   const body = `${header}.${objectToBase64Url(payload)}` as const;
-  const signature = await account.sign(body);
+  const signature = await account.unsafeSign(body);
   return `${body}.${toBase64Url(signature)}`;
 }
 
@@ -78,7 +78,7 @@ export function unpackJwt(
   }
   if (
     signer != null &&
-    !verify(Buffer.from(`${h}.${payloadEncoded}`), fromBase64Url(signature), signer)
+    !verifySignature(Buffer.from(`${h}.${payloadEncoded}`), fromBase64Url(signature), signer)
   ) {
     throw new InvalidSignatureError(`JWT is not signed by ${signer}`);
   }

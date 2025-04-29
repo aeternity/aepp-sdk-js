@@ -1,4 +1,4 @@
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import { genSalt, hash } from '../../utils/crypto.js';
 import { decode, encode, Encoded, Encoding } from '../../utils/encoder.js';
 import { toBytes } from '../../utils/bytes.js';
@@ -6,7 +6,6 @@ import { concatBuffers } from '../../utils/other.js';
 import {
   AensName,
   NAME_BID_RANGES,
-  NAME_BID_TIMEOUT_BLOCKS,
   NAME_FEE_BID_INCREMENT,
   NAME_MAX_LENGTH_FEE,
 } from './constants.js';
@@ -18,21 +17,22 @@ import { ArgumentError, IllegalBidFeeError } from '../../utils/errors.js';
  */
 
 /**
- * Build a contract public key
+ * Build a contract address
  * @category contract
- * @param ownerId - The public key of the owner account
- * @param nonce - the nonce of the transaction
- * @returns Contract public key
+ * @param owner - Address of contract owner
+ * @param nonce - Nonce of ContractCreateTx or state channel round when contract was created
+ * @returns Contract address
  */
 export function buildContractId(
-  ownerId: Encoded.AccountAddress,
+  owner: Encoded.AccountAddress,
   nonce: number | BigNumber,
 ): Encoded.ContractAddress {
-  const ownerIdAndNonce = Buffer.from([...decode(ownerId), ...toBytes(nonce)]);
+  const ownerIdAndNonce = Buffer.from([...decode(owner), ...toBytes(nonce)]);
   const b2bHash = hash(ownerIdAndNonce);
   return encode(b2bHash, Encoding.ContractAddress);
 }
 
+// TODO: add `build` prefix the same as others
 /**
  * Build a oracle query id
  * @category oracle
@@ -101,6 +101,7 @@ export function nameToPunycode(maybeName: string): AensName {
   return punycode as AensName;
 }
 
+// TODO: replace `produce` with `build` the same as others
 /**
  * Encode an AENS name
  * @category AENS
@@ -111,6 +112,7 @@ export function produceNameId(name: AensName): Encoded.Name {
   return encode(hash(nameToPunycode(name)), Encoding.Name);
 }
 
+// TODO: add `build` the same as others
 /**
  * Generate the commitment hash by hashing the salt and
  * name, base 58 encoding the result and prepending 'cm_'
@@ -133,12 +135,13 @@ export function commitmentHash(name: AensName, salt: number = genSalt()): Encode
 
 /**
  * Utility function to convert bytes to int
- * @category transaction builder
- * @param buf - Value
+ * @category utils
+ * @param buffer - Value
  * @returns Buffer Buffer from number(BigEndian)
+ * @deprecated use `BigInt('0x' + <buffer>.toString('hex')).toString()` instead
  */
-export function readInt(buf: Buffer = Buffer.from([])): string {
-  return new BigNumber(Buffer.from(buf).toString('hex'), 16).toString(10);
+export function readInt(buffer: Uint8Array = Buffer.from([])): string {
+  return BigInt('0x' + Buffer.from(buffer).toString('hex')).toString();
 }
 
 /**
@@ -155,8 +158,7 @@ export function ensureName(maybeName: string): asserts maybeName is AensName {
  * @category AENS
  * @param maybeName - AENS name
  */
-// TODO: consider renaming to isName
-export function isNameValid(maybeName: string): maybeName is AensName {
+export function isName(maybeName: string): maybeName is AensName {
   try {
     ensureName(maybeName);
     return true;
@@ -231,20 +233,22 @@ export function computeBidFee(
 }
 
 /**
- * Compute auction end height
+ * Compute approximate auction end height.
+ *
+ * From Ceres, each time a new (successful!) bid is made for a name the auction is extended for up
+ * to 120 key-blocks/generations. I.e. after the bid there is always at least 120 generations to
+ * make a higher bid.
+ *
  * @category AENS
  * @param name - Name to compute auction end for
  * @param claimHeight - Auction starting height
- * @see {@link https://github.com/aeternity/aeternity/blob/72e440b8731422e335f879a31ecbbee7ac23a1cf/apps/aecore/src/aec_governance.erl#L273}
+ * @see {@link https://github.com/aeternity/protocol/blob/cfb19ce/AENS.md#from-ceres-protocol-upgrade}
  * @returns Auction end height
  */
 export function computeAuctionEndBlock(name: AensName, claimHeight: number): number {
   const length = nameToPunycode(name).length - AENS_SUFFIX.length;
   const h =
-    (length <= 4 ? 62 * NAME_BID_TIMEOUT_BLOCKS : null) ??
-    (length <= 8 ? 31 * NAME_BID_TIMEOUT_BLOCKS : null) ??
-    (length <= 12 ? NAME_BID_TIMEOUT_BLOCKS : null) ??
-    0;
+    (length <= 4 ? 2400 : null) ?? (length <= 8 ? 960 : null) ?? (length <= 12 ? 480 : null) ?? 0;
   return h + claimHeight;
 }
 

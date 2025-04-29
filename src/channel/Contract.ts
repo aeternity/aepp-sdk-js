@@ -1,4 +1,4 @@
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import { snakeToPascal } from '../utils/string.js';
 import { MIN_GAS_PRICE, Tag, AbiVersion, VmVersion } from '../tx/builder/constants.js';
 import {
@@ -20,13 +20,13 @@ import {
   emit,
 } from './internal.js';
 import { Encoded } from '../utils/encoder.js';
-import { ContractCallReturnType } from '../apis/node/index.js';
+import { ContractCallObjectReturnType } from '../apis/node/index.js';
 import { ContractCallObject } from '../contract/Contract.js';
 import Channel from './Base.js';
 import ChannelSpend from './Spend.js';
 import { ChannelError, UnexpectedChannelMessageError } from '../utils/errors.js';
 import { unpackTx } from '../tx/builder/index.js';
-import { encodeContractAddress } from '../utils/crypto.js';
+import { buildContractId } from '../tx/builder/helpers.js';
 
 function snakeToPascalObjKeys<Type>(obj: object): Type {
   return Object.entries(obj).reduce(
@@ -64,7 +64,7 @@ interface CallContractResult extends CallContractOptions {
   height?: number;
   callerNonce?: number;
   log?: any;
-  returnType?: ContractCallReturnType;
+  returnType?: ContractCallObjectReturnType;
 }
 
 interface Contract {
@@ -77,6 +77,9 @@ interface Contract {
   vmVersion: VmVersion;
 }
 
+/**
+ * @category state channel
+ */
 export default class ChannelContract extends ChannelSpend {
   static override async initialize(options: ChannelOptions): Promise<ChannelContract> {
     return Channel._initialize(new ChannelContract(), options);
@@ -169,7 +172,7 @@ export default class ChannelContract extends ChannelSpend {
                   this._options.role === 'initiator' ? 'initiatorId' : 'responderId';
                 const owner = this._options[addressKey];
                 changeState(this, message2.params.data.state);
-                const address = encodeContractAddress(owner, params.round);
+                const address = buildContractId(owner, params.round);
                 emit(this, 'newContract', address);
                 state2.resolve({ accepted: true, address, signedTx: message2.params.data.state });
                 return { handler: channelOpen };

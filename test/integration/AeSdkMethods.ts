@@ -2,7 +2,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getSdk } from '.';
 import { assertNotNull, ensureInstanceOf, indent } from '../utils';
-import { AeSdkMethods, AccountBase, MemoryAccount, Contract } from '../../src';
+import { AeSdkMethods, AccountBase, AccountMemory, Contract } from '../../src';
 
 describe('AeSdkMethods', () => {
   let accounts: AccountBase[];
@@ -32,9 +32,9 @@ describe('AeSdkMethods', () => {
         contract Identity =
           entrypoint getArg(x : int) = x`,
     });
-    expect(contract.$options.onAccount?.address).to.be.eql(accounts[0].address);
+    expect(contract.$options.onAccount?.address).to.eql(accounts[0].address);
     [, aeSdkMethods._options.onAccount] = accounts;
-    expect(contract.$options.onAccount?.address).to.be.eql(accounts[1].address);
+    expect(contract.$options.onAccount?.address).to.eql(accounts[1].address);
   });
 
   it('converts context to JSON', () => {
@@ -42,7 +42,7 @@ describe('AeSdkMethods', () => {
     const data = JSON.parse(JSON.stringify(options));
     data.onNode._httpClient = '<removed>';
     data.onCompiler.api._httpClient = '<removed>';
-    ensureInstanceOf(options.onAccount, MemoryAccount);
+    ensureInstanceOf(options.onAccount, AccountMemory);
     expect(data).to.eql({
       onAccount: {
         address: options.onAccount.address,

@@ -16,6 +16,7 @@ import {
   Name,
   packDelegation,
   DelegationTag,
+  UnexpectedTsError,
 } from '../../src';
 
 describe('Operation delegation', () => {
@@ -119,7 +120,7 @@ contract DelegateTest =
         decode(preclaimSig),
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.equal('ok');
       delegationSignature = await aeSdk.signDelegation(
         packDelegation({
           tag: DelegationTag.AensName,
@@ -140,7 +141,7 @@ contract DelegateTest =
         decode(delegationSignature),
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.equal('ok');
     }).timeout(timeoutBlock);
 
     it('updates', async () => {
@@ -153,8 +154,8 @@ contract DelegateTest =
         decode(delegationSignature),
       );
       assertNotNull(result);
-      expect(result.returnType).to.be.equal('ok');
-      expect((await aeSdk.api.getNameEntryByName(name)).pointers).to.be.eql([
+      expect(result.returnType).to.equal('ok');
+      expect((await aeSdk.api.getNameEntryByName(name)).pointers).to.eql([
         {
           key: 'oracle',
           id: newOwner.replace('ak', 'ok'),
@@ -168,7 +169,7 @@ contract DelegateTest =
     it('updates with raw pointer', async () => {
       const pointee: Pointee = { 'AENSv2.DataPt': [dataPt] };
       await contract.signedUpdate(owner, name, 'test key', pointee, decode(delegationSignature));
-      expect((await aeSdk.api.getNameEntryByName(name)).pointers[0]).to.be.eql({
+      expect((await aeSdk.api.getNameEntryByName(name)).pointers[0]).to.eql({
         key: 'test key',
         id: encode(dataPt, Encoding.Bytearray),
         encodedKey: 'ba_dGVzdCBrZXk//Xo5',
@@ -177,9 +178,10 @@ contract DelegateTest =
 
     it('gets', async () => {
       const nameEntry = (await contract.getName(name)).decodedResult['AENSv2.Name'];
+      if (!('FixedTTL' in nameEntry[1])) throw new UnexpectedTsError();
       const ttl = nameEntry[1].FixedTTL[0];
       expect(ttl).to.be.a('bigint');
-      expect(nameEntry).to.be.eql([
+      expect(nameEntry).to.eql([
         owner,
         { FixedTTL: [ttl] },
         new Map([
@@ -197,7 +199,7 @@ contract DelegateTest =
         decode(delegationSignature),
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.equal('ok');
     });
 
     it('revokes', async () => {
@@ -212,7 +214,7 @@ contract DelegateTest =
       );
       const { result } = await contract.signedRevoke(newOwner, name, decode(revokeSig));
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.equal('ok');
       await expect(aeSdk.api.getNameEntryByName(name)).to.be.rejectedWith(Error);
     });
 
@@ -238,9 +240,10 @@ contract DelegateTest =
       await contract.signedUpdate(owner, n, 'oracle', pointee, allNamesDelSig);
 
       const nameEntry = (await contract.getName(n)).decodedResult['AENSv2.Name'];
+      if (!('FixedTTL' in nameEntry[1])) throw new UnexpectedTsError();
       const ttl = nameEntry[1].FixedTTL[0];
       expect(ttl).to.be.a('bigint');
-      expect(nameEntry).to.be.eql([
+      expect(nameEntry).to.eql([
         owner,
         { FixedTTL: [ttl] },
         new Map([['oracle', { 'AENSv2.OraclePt': [newOwner] }]]),
@@ -266,7 +269,7 @@ contract DelegateTest =
       );
       const { result } = await contract.signedClaim(aeSdk.address, n, 0, nameFee, decode(dlgSig));
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.equal('ok');
     });
   });
 
@@ -347,7 +350,7 @@ contract DelegateTest =
         ttl,
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.equal('ok');
     });
 
     it('extends', async () => {
@@ -358,9 +361,9 @@ contract DelegateTest =
         ttl,
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.equal('ok');
       const state = await oracle.getState();
-      expect(state.ttl).to.be.equal(prevState.ttl + 50);
+      expect(state.ttl).to.equal(prevState.ttl + 50);
     });
 
     it('creates query', async () => {
@@ -374,9 +377,9 @@ contract DelegateTest =
         amount: 5 * queryFee,
       });
       assertNotNull(query.result);
-      query.result.returnType.should.be.equal('ok');
+      expect(query.result.returnType).to.equal('ok');
       queryObject = await oracle.getQuery(query.decodedResult);
-      expect(queryObject.decodedQuery).to.be.equal(q);
+      expect(queryObject.decodedQuery).to.equal(q);
     });
 
     it('responds to query', async () => {
@@ -396,9 +399,9 @@ contract DelegateTest =
         r,
       );
       assertNotNull(result);
-      result.returnType.should.be.equal('ok');
+      expect(result.returnType).to.equal('ok');
       const queryObject2 = await oracle.getQuery(queryObject.id);
-      expect(queryObject2.decodedResponse).to.be.equal(r);
+      expect(queryObject2.decodedResponse).to.equal(r);
     });
   });
 });

@@ -16,26 +16,9 @@ directive:
       remove after fixing https://github.com/aeternity/aeternity/issues/3891
 
   - from: openapi-document
-    where: $.components.schemas
-    transform: >
-      if ($doc.info.title === 'node') return $;
-      $.Account.properties.kind['x-ms-enum'] = { name: 'AccountKind' };
-      $.Tx.allOf[0].properties.type['x-ms-enum'] = { name: 'TxType' };
-      $.TTL.properties.type['x-ms-enum'] = { name: 'TTLType' };
-      $.RelativeTTL.properties.type['x-ms-enum'] = { name: 'RelativeTTLType' };
-      $.ContractCallObject.properties.return_type['x-ms-enum'] = { name: 'ContractCallReturnType' };
-      $.GAObject.properties.return_type['x-ms-enum'] = { name: 'GAReturnType' };
-    reason: thread schemas enums as constants instead of strings
-
-  - from: openapi-document
-    where: $.paths
-    transform: >
-      if ($doc.info.title === 'node') return $;
-      $['/accounts/{pubkey}/next-nonce'].get.parameters.find(p => p.name === 'strategy')
-        .schema['x-ms-enum'] = { name: 'NextNonceStrategy' };
-      $['/oracles/{pubkey}/queries'].get.parameters.find(p => p.name === 'type')
-        .schema['x-ms-enum'] = { name: 'OracleQueryType' };
-    reason: thread paths enums as constants instead of strings
+    where: $..[?(@.enum)]
+    transform: '$["x-ms-enum"] = { modelAsString: false }'
+    reason: thread enums as union of constants instead of arbitrary strings
 
   - from: openapi-document
     where: $.paths
@@ -167,9 +150,9 @@ directive:
 
 version: ^3.7.1
 use-extension:
-  '@autorest/typescript': ^6.0.23
+  '@autorest/typescript': ^6.0.39
   '@autorest/modelerfour': ^4.27.0
-input-file: https://raw.githubusercontent.com/aeternity/aeternity/v7.1.0/apps/aehttp/priv/oas3.yaml
+input-file: https://raw.githubusercontent.com/aeternity/aeternity/v7.3.0-rc5/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
 generator: typescript

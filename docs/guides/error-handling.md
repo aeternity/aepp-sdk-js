@@ -1,6 +1,6 @@
 # Error Handling
 
-This guide shows you how to handle errors originating from the SDK. SDK by default exports the following error classes from file [errors.ts](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/src/utils/errors.ts)
+This guide shows you how to handle errors originating from the SDK. SDK by default exports the following error classes from file [errors.ts](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/src/utils/errors.ts)
 
 ## Error Hierarchy
 
@@ -109,14 +109,14 @@ BaseError
 import {
   AeSdk,
   Node,
-  MemoryAccount,
+  AccountMemory,
   ArgumentError,
   InvalidAensNameError,
 } from '@aeternity/aepp-sdk';
 
 // setup
-const payerAccount = MemoryAccount.generate();
-const newUserAccount = MemoryAccount.generate();
+const payerAccount = AccountMemory.generate();
+const newUserAccount = AccountMemory.generate();
 const node = new Node('https://testnet.aeternity.io');
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

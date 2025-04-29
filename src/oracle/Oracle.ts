@@ -6,18 +6,27 @@ import { _getPollInterval } from '../chain.js';
 import { sendTransaction, SendTransactionOptions } from '../send-transaction.js';
 import Node from '../Node.js';
 import AccountBase from '../account/Base.js';
-import OracleBase, { OracleQuery, decodeQuery } from './OracleBase.js';
+import OracleBase, { OracleQuery } from './OracleBase.js';
 
+/**
+ * @category oracle
+ */
 interface OracleRegisterOptions
   extends BuildTxOptions<Tag.OracleRegisterTx, 'accountId' | 'queryFormat' | 'responseFormat'>,
     Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
+/**
+ * @category oracle
+ */
 interface OracleExtendTtlOptions
   extends BuildTxOptions<Tag.OracleExtendTx, 'callerId' | 'oracleId'>,
     Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
+/**
+ * @category oracle
+ */
 interface OracleRespondToQueryOptions
-  extends BuildTxOptions<Tag.OracleResponseTx, 'callerId' | 'oracleId' | 'queryId' | 'response'>,
+  extends BuildTxOptions<Tag.OracleRespondTx, 'callerId' | 'oracleId' | 'queryId' | 'response'>,
     Omit<SendTransactionOptions, 'onNode' | 'onAccount'> {}
 
 /**
@@ -96,10 +105,8 @@ export default class Oracle extends OracleBase {
     const checkNewQueries = async (): Promise<void> => {
       if (isChecking) return;
       isChecking = true;
-      const queries = (await opt.onNode.getOracleQueriesByPubkey(this.address)).oracleQueries ?? [];
-      const filtered = queries
+      const filtered = (await this.getQueries(opt))
         .filter(({ id }) => !knownQueryIds.has(id))
-        .map((query) => decodeQuery(query))
         .filter((query) => options.includeResponded === true || query.decodedResponse === '');
       filtered.forEach((query) => knownQueryIds.add(query.id));
       isChecking = false;
@@ -133,7 +140,7 @@ export default class Oracle extends OracleBase {
     const oracleRespondTx = await buildTxAsync({
       _isInternalBuild: true,
       ...opt,
-      tag: Tag.OracleResponseTx,
+      tag: Tag.OracleRespondTx,
       oracleId: this.address,
       queryId,
       response,

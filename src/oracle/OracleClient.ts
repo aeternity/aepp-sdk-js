@@ -10,6 +10,9 @@ import Node from '../Node.js';
 import AccountBase from '../account/Base.js';
 import OracleBase from './OracleBase.js';
 
+/**
+ * @category oracle
+ */
 interface OracleClientPostQueryOptions
   extends Optional<Parameters<typeof sendTransaction>[1], 'onNode' | 'onAccount'>,
     BuildTxOptions<Tag.OracleQueryTx, 'oracleId' | 'senderId' | 'query'> {}
@@ -78,10 +81,7 @@ export default class OracleClient extends OracleBase {
     let ttl;
     let response;
     do {
-      ({ response, ttl } = await opt.onNode.getOracleQueryByPubkeyAndQueryId(
-        this.address,
-        queryId,
-      ));
+      ({ response, ttl } = await this.getQuery(queryId, opt));
       const responseBuffer = decode(response as Encoded.OracleResponse);
       if (responseBuffer.length > 0) return responseBuffer.toString();
       await pause(interval);

@@ -8,14 +8,14 @@ Read more about oracles in the [guide] section.
 [factorial]: https://en.wikipedia.org/wiki/Factorial
 [guide]: ../../guides/oracles.md
 */
-import { Node, AeSdk, MemoryAccount, Oracle, OracleClient } from '@aeternity/aepp-sdk';
+import { Node, AeSdk, AccountMemory, Oracle, OracleClient } from '@aeternity/aepp-sdk';
 
 // Let's prepare sdk and account for Oracle
 const node = new Node('https://testnet.aeternity.io');
-const oracleAccount = MemoryAccount.generate();
+const oracleAccount = AccountMemory.generate();
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
-  accounts: [new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
+  accounts: [new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
 });
 await aeSdk.spend(2e14, oracleAccount.address);
 console.log('Spend done');

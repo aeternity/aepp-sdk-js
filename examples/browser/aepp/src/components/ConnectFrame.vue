@@ -34,7 +34,10 @@
     </template>
   </div>
 
-  <SelectNetwork :select="(network) => this.walletConnector.askToSelectNetwork(network)" />
+  <SelectNetwork
+    v-if="walletConnected"
+    :select="(network) => this.walletConnector.askToSelectNetwork(network)"
+  />
 
   <div class="group">
     <div>
@@ -63,6 +66,7 @@ import {
   RpcRejectedByUserError,
   WalletConnectorFrame,
 } from '@aeternity/aepp-sdk';
+import { toRaw } from 'vue';
 import { mapState } from 'vuex';
 import SelectNetwork from './SelectNetwork.vue';
 
@@ -131,7 +135,7 @@ export default {
     },
     setAccount(account) {
       if (Object.keys(this.aeSdk.accounts).length) this.aeSdk.removeAccount(this.aeSdk.address);
-      this.aeSdk.addAccount(account, { select: true });
+      this.aeSdk.addAccount(toRaw(account), { select: true });
       this.$store.commit('setAddress', account.address);
     },
     async connect() {

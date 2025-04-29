@@ -5,16 +5,16 @@ base58 it depends on the exact data to encode, e.g. it is shorter if encoded dat
 leading zeroes.
 
 Building an aepp you may need to know the range of possible address lengths to validate an
-user-provided addresses (though better to use [isAddressValid]) or for designs of address-related
+user-provided addresses (though better to use [isEncoded]) or for designs of address-related
 components. Doing manual tests you may conclude that account address length is between 52 and 53
 chars, but it is not correct.
 
 ```js
-import { MemoryAccount } from '@aeternity/aepp-sdk';
+import { AccountMemory } from '@aeternity/aepp-sdk';
 
 const result = new Array(10000)
   .fill()
-  .map(() => MemoryAccount.generate().address.length)
+  .map(() => AccountMemory.generate().address.length)
   .reduce((p, n) => ({ ...p, [n]: (p[n] ?? 0) + 1 }), {});
 
 console.log(result);
@@ -28,9 +28,9 @@ Theoretically there can be even shorter addresses if they lucky to be prefixed w
 sequence of `0`.
 
 ```js
-import { MemoryAccount, Encoding, encode, decode } from '@aeternity/aepp-sdk';
+import { AccountMemory, Encoding, encode, decode } from '@aeternity/aepp-sdk';
 
-const publicKey = decode(MemoryAccount.generate().address);
+const publicKey = decode(AccountMemory.generate().address);
 
 for (let i = -1; i < publicKey.length; i += 1) {
   if (i >= 0) publicKey[i] = 0;
@@ -80,5 +80,5 @@ Running the above code you would get output like
 Therefore the minimum address length is 41 chars. All these addresses valid, for example
 `ak_11111111111111111111111111111111273Yts` [used] to collect AENS name fees.
 
-[isAddressValid]: https://docs.aeternity.com/aepp-sdk-js/v13.2.2/api/functions/isAddressValid.html
+[isEncoded]: https://sdk.aeternity.io/v14.1.0/api/functions/isEncoded.html
 [used]: https://mainnet.aeternity.io/v3/accounts/ak_11111111111111111111111111111111273Yts

@@ -1,4 +1,4 @@
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import { ArgumentError, IllegalArgumentError } from '../../../utils/errors.js';
 import { Int, MIN_GAS_PRICE, Tag } from '../constants.js';
 import uInt from './u-int.js';
@@ -48,7 +48,7 @@ const TX_BASE_GAS = (txType: Tag): number => {
  * @returns The other gas
  * @example
  * ```js
- * TX_OTHER_GAS(Tag.OracleResponseTx, 10, { relativeTtl: 12, innerTxSize: 0 })
+ * TX_OTHER_GAS(Tag.OracleRespondTx, 10, { relativeTtl: 12, innerTxSize: 0 })
  *  => 10 * 20 + Math.ceil(32000 * 12 / Math.floor(60 * 24 * 365 / 3))
  * ```
  */
@@ -61,7 +61,7 @@ const TX_OTHER_GAS = (
     case Tag.OracleRegisterTx:
     case Tag.OracleExtendTx:
     case Tag.OracleQueryTx:
-    case Tag.OracleResponseTx:
+    case Tag.OracleRespondTx:
       return (
         txSize * GAS_PER_BYTE +
         Math.ceil((32000 * relativeTtl) / Math.floor((60 * 24 * 365) / KEY_BLOCK_INTERVAL))
@@ -79,7 +79,7 @@ function getOracleRelativeTtl(params: any): number {
     [Tag.OracleRegisterTx]: 'oracleTtlValue',
     [Tag.OracleExtendTx]: 'oracleTtlValue',
     [Tag.OracleQueryTx]: 'queryTtlValue',
-    [Tag.OracleResponseTx]: 'responseTtlValue',
+    [Tag.OracleRespondTx]: 'responseTtlValue',
   } as const;
 
   const { tag } = params;

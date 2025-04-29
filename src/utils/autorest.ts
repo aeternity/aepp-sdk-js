@@ -191,6 +191,7 @@ export const genVersionCheckPolicy = (
   versionCb: (options: OperationOptions) => Promise<string>,
   geVersion: string,
   ltVersion: string,
+  ignoreVersion: boolean,
 ): AdditionalPolicyConfig => ({
   policy: {
     name: 'version-check',
@@ -201,7 +202,11 @@ export const genVersionCheckPolicy = (
       }
       const options = { requestOptions: { customHeaders: { '__version-check': 'true' } } };
       const args = [await versionCb(options), geVersion, ltVersion] as const;
-      if (!semverSatisfies(...args)) throw new UnsupportedVersionError(name, ...args);
+      if (!semverSatisfies(...args)) {
+        const error = new UnsupportedVersionError(name, ...args);
+        if (ignoreVersion) console.warn(error.message);
+        else throw error;
+      }
       return next(request);
     },
   },
@@ -215,6 +220,11 @@ export const genRetryOnFailurePolicy = (
   policy: {
     name: 'retry-on-failure',
     async sendRequest(request, next) {
+      if (request.headers.get('__no-retry') != null) {
+        request.headers.delete('__no-retry');
+        return next(request);
+      }
+
       const retryCode = request.headers.get('__retry-code') ?? NaN;
       request.headers.delete('__retry-code');
       const statusesToNotRetry = [200, 400, 403, 410, 500].filter((c) => c !== +retryCode);

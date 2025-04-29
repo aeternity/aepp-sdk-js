@@ -2,7 +2,7 @@
 // # InnerTx: SpendTx
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/node/paying-for-spend-tx.js)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/node/paying-for-spend-tx.js)
 // and this page explains in detail how to:
 //
 //  - Create and sign a `SpendTx` for an account with the `innerTx` option.
@@ -14,8 +14,8 @@
 //  - This can be done for ***any*** transaction type!
 
 // ## 1. Specify imports
-// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import { AeSdk, Node, MemoryAccount, Tag } from '@aeternity/aepp-sdk';
+// You need to import `AeSdk`, `Node` and `AccountMemory` classes from the SDK.
+import { AeSdk, Node, AccountMemory, Tag } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -36,8 +36,8 @@ const AMOUNT = 1;
 //  - The `AMOUNT` (in `aettos`) will be send to the new user and returned to the payer.
 
 // ## 3. Create object instances
-const payerAccount = new MemoryAccount(PAYER_ACCOUNT_SECRET_KEY);
-const newUserAccount = MemoryAccount.generate();
+const payerAccount = new AccountMemory(PAYER_ACCOUNT_SECRET_KEY);
+const newUserAccount = AccountMemory.generate();
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

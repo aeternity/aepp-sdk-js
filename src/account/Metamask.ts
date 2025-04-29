@@ -25,8 +25,12 @@ export async function invokeSnap<R>(
 /**
  * Account connected to Aeternity Snap for MetaMask
  * https://www.npmjs.com/package/\@aeternity-snap/plugin
+ * @category account
  */
 export default class AccountMetamask extends AccountBase {
+  /**
+   * @deprecated this class is not intended to provide raw access to the provider
+   */
   readonly provider: BaseProvider;
 
   readonly index: number;
@@ -43,8 +47,16 @@ export default class AccountMetamask extends AccountBase {
     this.address = address;
   }
 
+  /**
+   * @deprecated Use `unsafeSign` method instead
+   */
   // eslint-disable-next-line class-methods-use-this
   override async sign(): Promise<Uint8Array> {
+    return this.unsafeSign();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  override async unsafeSign(): Promise<Uint8Array> {
     throw new NotImplementedError('RAW signing using MetaMask');
   }
 

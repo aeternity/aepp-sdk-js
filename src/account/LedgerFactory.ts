@@ -11,6 +11,7 @@ interface AppConfiguration {
 
 /**
  * A factory class that generates instances of AccountLedger based on provided transport.
+ * @category account
  */
 export default class AccountLedgerFactory extends AccountBaseFactory {
   /**
@@ -23,15 +24,22 @@ export default class AccountLedgerFactory extends AccountBaseFactory {
 
   #ensureReadyPromise?: Promise<void>;
 
+  // TODO: remove after release Ledger app v1.0.0
+  _enableExperimentalLedgerAppSupport = false;
+
   /**
    * It throws an exception if Aeternity app on Ledger has an incompatible version, not opened or
    * not installed.
    */
   async ensureReady(): Promise<void> {
     const { version } = await this.#getAppConfiguration();
-    const args = [version, '0.4.4', '0.5.0'] as const;
-    if (!semverSatisfies(...args))
-      throw new UnsupportedVersionError('Aeternity app on Ledger', ...args);
+    const oldApp = [version, '0.4.4', '0.5.0'] as const;
+    const newApp = [version, '1.0.0', '2.0.0'] as const;
+    if (
+      !semverSatisfies(...oldApp) &&
+      (!this._enableExperimentalLedgerAppSupport || !semverSatisfies(...newApp))
+    )
+      throw new UnsupportedVersionError('Aeternity app on Ledger', ...oldApp);
     this.#ensureReadyPromise = Promise.resolve();
   }
 
@@ -41,9 +49,10 @@ export default class AccountLedgerFactory extends AccountBaseFactory {
   }
 
   async #getAppConfiguration(): Promise<AppConfiguration> {
-    const response = await this.transport.send(CLA, GET_APP_CONFIGURATION, 0x00, 0x00);
+    let response = await this.transport.send(CLA, GET_APP_CONFIGURATION, 0x00, 0x00);
+    if (response.length === 6) response = response.subarray(1);
     return {
-      version: [response[1], response[2], response[3]].join('.'),
+      version: [response[0], response[1], response[2]].join('.'),
     };
   }
 

@@ -1,10 +1,10 @@
-import { mnemonicToSeed } from '@scure/bip39';
+import { mnemonicToSeed, mnemonicToSeedSync } from '@scure/bip39';
 import tweetnaclAuth from 'tweetnacl-auth';
 import AccountBaseFactory from './BaseFactory.js';
 import AccountMemory from './Memory.js';
 import { encode, Encoding, Encoded, decode } from '../utils/encoder.js';
 import { concatBuffers } from '../utils/other.js';
-import { InternalError } from '../utils/errors.js';
+import { ArgumentError } from '../utils/errors.js';
 
 export const ED25519_CURVE = Buffer.from('ed25519 seed');
 const HARDENED_OFFSET = 0x80000000;
@@ -40,19 +40,43 @@ interface Wallet {
 
 /**
  * A factory class that generates instances of AccountMemory based on provided mnemonic phrase.
+ * @category account
  */
 export default class AccountMnemonicFactory extends AccountBaseFactory {
-  readonly #mnemonic: string | undefined;
-
-  #wallet: Wallet | undefined;
+  #mnemonicOrWalletOrSeed: string | Wallet | Uint8Array;
 
   /**
-   * @param mnemonicOrWallet - BIP39-compatible mnemonic phrase or a wallet derived from mnemonic
+   * @param mnemonicOrWalletOrSeed - BIP39-compatible mnemonic phrase or a wallet/seed derived from
+   * mnemonic
    */
-  constructor(mnemonicOrWallet: string | Wallet) {
+  constructor(mnemonicOrWalletOrSeed: string | Wallet | Uint8Array) {
     super();
-    if (typeof mnemonicOrWallet === 'string') this.#mnemonic = mnemonicOrWallet;
-    else this.#wallet = mnemonicOrWallet;
+    this.#mnemonicOrWalletOrSeed = mnemonicOrWalletOrSeed;
+  }
+
+  #getWallet(sync: true): Wallet;
+  #getWallet(sync: false): Wallet | Promise<Wallet>;
+  #getWallet(sync: boolean): Wallet | Promise<Wallet> {
+    const setWalletBySeed = (seed: Uint8Array): Wallet => {
+      const masterKey = deriveKey(seed, ED25519_CURVE);
+      const walletKey = derivePathFromKey(masterKey, [44, 457]);
+      this.#mnemonicOrWalletOrSeed = {
+        secretKey: encode(walletKey.secretKey, Encoding.Bytearray),
+        chainCode: encode(walletKey.chainCode, Encoding.Bytearray),
+      };
+      return this.#mnemonicOrWalletOrSeed;
+    };
+
+    if (ArrayBuffer.isView(this.#mnemonicOrWalletOrSeed)) {
+      if (this.#mnemonicOrWalletOrSeed.length !== 64) {
+        throw new ArgumentError('seed length', 64, this.#mnemonicOrWalletOrSeed.length);
+      }
+      return setWalletBySeed(this.#mnemonicOrWalletOrSeed);
+    }
+    if (typeof this.#mnemonicOrWalletOrSeed === 'object') return this.#mnemonicOrWalletOrSeed;
+    return sync
+      ? setWalletBySeed(mnemonicToSeedSync(this.#mnemonicOrWalletOrSeed))
+      : mnemonicToSeed(this.#mnemonicOrWalletOrSeed).then(setWalletBySeed);
   }
 
   /**
@@ -60,29 +84,23 @@ export default class AccountMnemonicFactory extends AccountBaseFactory {
    * In comparison with mnemonic, the wallet can be used to derive aeternity accounts only.
    */
   async getWallet(): Promise<Wallet> {
-    if (this.#wallet != null) return this.#wallet;
-    if (this.#mnemonic == null)
-      throw new InternalError(
-        'AccountMnemonicFactory should be initialized with mnemonic or wallet',
-      );
-    const seed = await mnemonicToSeed(this.#mnemonic);
-    const masterKey = deriveKey(seed, ED25519_CURVE);
-    const walletKey = derivePathFromKey(masterKey, [44, 457]);
-    this.#wallet = {
-      secretKey: encode(walletKey.secretKey, Encoding.Bytearray),
-      chainCode: encode(walletKey.chainCode, Encoding.Bytearray),
-    };
-    return this.#wallet;
+    return this.#getWallet(false);
   }
 
-  async #getAccountSecretKey(accountIndex: number): Promise<Encoded.AccountSecretKey> {
-    const wallet = await this.getWallet();
+  /**
+   * The same as `getWallet` but synchronous.
+   */
+  getWalletSync(): Wallet {
+    return this.#getWallet(true);
+  }
+
+  #getAccountByWallet(accountIndex: number, wallet: Wallet): AccountMemory {
     const walletKey = {
       secretKey: decode(wallet.secretKey),
       chainCode: decode(wallet.chainCode),
     };
     const raw = derivePathFromKey(walletKey, [accountIndex, 0, 0]).secretKey;
-    return encode(raw, Encoding.AccountSecretKey);
+    return new AccountMemory(encode(raw, Encoding.AccountSecretKey));
   }
 
   /**
@@ -90,6 +108,15 @@ export default class AccountMnemonicFactory extends AccountBaseFactory {
    * @param accountIndex - Index of account
    */
   async initialize(accountIndex: number): Promise<AccountMemory> {
-    return new AccountMemory(await this.#getAccountSecretKey(accountIndex));
+    const wallet = await this.getWallet();
+    return this.#getAccountByWallet(accountIndex, wallet);
+  }
+
+  /**
+   * The same as `initialize` but synchronous.
+   */
+  initializeSync(accountIndex: number): AccountMemory {
+    const wallet = this.getWalletSync();
+    return this.#getAccountByWallet(accountIndex, wallet);
   }
 }

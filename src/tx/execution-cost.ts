@@ -1,7 +1,7 @@
 import { Encoded } from '../utils/encoder.js';
 import { buildTx, buildTxHash, unpackTx } from './builder/index.js';
 import { Tag } from './builder/constants.js';
-import { verify } from '../utils/crypto.js';
+import { verifySignature } from '../utils/crypto.js';
 import { getBufferToSign } from '../account/Memory.js';
 import { IllegalArgumentError, InternalError, TransactionError } from '../utils/errors.js';
 import Node from '../Node.js';
@@ -34,6 +34,7 @@ import getTransactionSignerAddress from './transaction-signer.js';
  * @param options.gasUsed - Amount of gas actually used to make calculation more accurate
  * @param options.queryFee - Oracle query fee
  * @param options.isInitiator - Is transaction signer an initiator of state channel
+ * @category utils
  */
 export function getExecutionCost(
   transaction: Encoded.Transaction,
@@ -66,7 +67,7 @@ export function getExecutionCost(
   if (params.tag === Tag.OracleQueryTx) {
     res += BigInt(params.queryFee);
   }
-  if (params.tag === Tag.OracleResponseTx) {
+  if (params.tag === Tag.OracleRespondTx) {
     res -= BigInt(queryFee ?? 0);
   }
   if (params.tag === Tag.ChannelSettleTx) {
@@ -106,6 +107,7 @@ export function getExecutionCost(
  * @param transaction - Transaction to calculate the cost of
  * @param networkId - Network id used to sign the transaction
  * @param options - Options
+ * @category utils
  */
 export function getExecutionCostBySignedTx(
   transaction: Encoded.Transaction,
@@ -120,7 +122,7 @@ export function getExecutionCostBySignedTx(
   const tx = buildTx(params.encodedTx);
   const address = getTransactionSignerAddress(tx);
   const [isInnerTx, isNotInnerTx] = [true, false].map((f) =>
-    verify(getBufferToSign(tx, networkId, f), params.signatures[0], address),
+    verifySignature(getBufferToSign(tx, networkId, f), params.signatures[0], address),
   );
   if (!isInnerTx && !isNotInnerTx) throw new TransactionError("Can't verify signature");
   return getExecutionCost(buildTx(params.encodedTx), {
@@ -135,6 +137,7 @@ export function getExecutionCostBySignedTx(
  * @param node - Node to use
  * @param options - Options
  * @param options.isMined - Is transaction already mined or not
+ * @category utils
  */
 export async function getExecutionCostUsingNode(
   transaction: Encoded.Transaction,
@@ -160,7 +163,7 @@ export async function getExecutionCostUsingNode(
     options.gasUsed = combinedInfo.gasUsed;
   }
 
-  if (options.queryFee == null && Tag.OracleResponseTx === params.tag) {
+  if (options.queryFee == null && Tag.OracleRespondTx === params.tag) {
     options.queryFee = (await node.getOracleByPubkey(params.oracleId)).queryFee.toString();
   }
 

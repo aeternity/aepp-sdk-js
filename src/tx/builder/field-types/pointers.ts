@@ -1,7 +1,7 @@
 import { NamePointer as NamePointerString } from '../../../apis/node/index.js';
 import { toBytes } from '../../../utils/bytes.js';
 import { Encoded, Encoding, decode, encode } from '../../../utils/encoder.js';
-import { isAddressValid } from '../../../utils/crypto.js';
+import { isEncoded } from '../../../utils/crypto.js';
 import { IllegalArgumentError, DecodeError, ArgumentError } from '../../../utils/errors.js';
 import address, { AddressEncodings, idTagToEncoding } from './address.js';
 
@@ -40,10 +40,10 @@ export default <AllowRaw extends boolean>(
     }
     return pointers.map(({ key, id }) => {
       let payload;
-      if (isAddressValid(id, ...idTagToEncoding)) {
+      if (isEncoded(id, ...idTagToEncoding)) {
         payload = [...(allowRaw ? [ID_TAG] : []), addressAny.serialize(id)];
       }
-      if (isAddressValid(id, Encoding.Bytearray)) {
+      if (isEncoded(id, Encoding.Bytearray)) {
         const data = decode(id);
         if (data.length > DATA_LENGTH_MAX) {
           throw new ArgumentError(

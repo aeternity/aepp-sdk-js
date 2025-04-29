@@ -29,6 +29,8 @@ run_node_example paying-for-spend-tx.js
 run_node_example transfer-ae.js
 run_node_example dry-run-using-debug-endpoint.js
 run_node_example oracle.js
+run_node_example _api-high-level.js
+run_node_example _api-low-level.js
 
 # TODO: revisit --ignore-scripts after solving https://github.com/npm/cli/issues/4202
 perl -i -pe 's/"prepare"/"rem-prepare"/g' package.json

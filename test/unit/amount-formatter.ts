@@ -15,7 +15,7 @@ describe('Amount Formatter', () => {
         [1, AE_AMOUNT_FORMATS.AETTOS, '1'],
       ] as const
     ).forEach(([v, denomination, e]) => {
-      expect(toAettos(v, { denomination })).to.be.equal(e);
+      expect(toAettos(v, { denomination })).to.equal(e);
     });
   });
 
@@ -29,7 +29,7 @@ describe('Amount Formatter', () => {
         [1, AE_AMOUNT_FORMATS.AE, 1],
       ] as const
     ).forEach(([v, denomination, e]) => {
-      expect(toAe(v, { denomination })).to.be.equal(e.toString(10));
+      expect(toAe(v, { denomination })).to.equal(e.toString(10));
     });
   });
 
@@ -67,7 +67,7 @@ describe('Amount Formatter', () => {
         [1, AE_AMOUNT_FORMATS.NANO_AE, AE_AMOUNT_FORMATS.FEMTO_AE, new BigNumber(1000000)],
       ] as const
     ).forEach(([v, denomination, targetDenomination, e]) => {
-      expect(formatAmount(v, { denomination, targetDenomination })).to.be.equal(e.toString(10));
+      expect(formatAmount(v, { denomination, targetDenomination })).to.equal(e.toString(10));
     });
   });
 });

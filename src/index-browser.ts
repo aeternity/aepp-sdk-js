@@ -20,14 +20,30 @@ export {
 export { InvalidTxError, sendTransaction } from './send-transaction.js';
 export {
   isAddressValid,
+  ensureEncoded,
+  isEncoded,
   genSalt,
   encodeUnsigned,
   hash,
-  encodeContractAddress,
-  verify,
-  messageToHash,
-  verifyMessage,
+  verifySignature,
+  hashMessage,
+  verifyMessageSignature,
 } from './utils/crypto.js';
+/**
+ * @category utils
+ * @deprecated use {@link verifySignature} instead
+ */
+export { verifySignature as verify } from './utils/crypto.js';
+/**
+ * @deprecated use {@link hashMessage} instead
+ * @category utils
+ */
+export { hashMessage as messageToHash } from './utils/crypto.js';
+/**
+ * @deprecated use {@link verifyMessageSignature} instead
+ * @category utils
+ */
+export { verifyMessageSignature as verifyMessage } from './utils/crypto.js';
 export { signJwt, unpackJwt, verifyJwt, isJwt, ensureJwt } from './utils/jwt.js';
 export type { Jwt } from './utils/jwt.js';
 export { toBytes } from './utils/bytes.js';
@@ -44,7 +60,7 @@ export {
   produceNameId,
   commitmentHash,
   readInt,
-  isNameValid,
+  isName,
   ensureName,
   getDefaultPointerKey,
   getMinimumNameFee,
@@ -52,6 +68,16 @@ export {
   computeAuctionEndBlock,
   isAuctionName,
 } from './tx/builder/helpers.js';
+/**
+ * @category contract
+ * @deprecated use {@link buildContractId} instead
+ */
+export { buildContractId as encodeContractAddress } from './tx/builder/helpers.js';
+/**
+ * @category AENS
+ * @deprecated use {@link isName} instead
+ */
+export { isName as isNameValid } from './tx/builder/helpers.js';
 export {
   MAX_AUTH_FUN_GAS,
   MIN_GAS_PRICE,
@@ -110,6 +136,11 @@ export { default as AeSdkWallet } from './AeSdkWallet.js';
 export { default as Node } from './Node.js';
 export { default as verifyTransaction } from './tx/validator.js';
 export { default as AccountBase } from './account/Base.js';
+export { default as AccountMemory } from './account/Memory.js';
+/**
+ * @deprecated Use {@link AccountMemory} instead
+ * @category account
+ */
 export { default as MemoryAccount } from './account/Memory.js';
 export { default as AccountMnemonicFactory } from './account/MnemonicFactory.js';
 export { default as AccountGeneralized } from './account/Generalized.js';

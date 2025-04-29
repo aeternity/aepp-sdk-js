@@ -72,7 +72,7 @@ export default {
       this.data = encode(Buffer.from(data, type), Encoding.Bytearray);
     },
     dataSign() {
-      return this.aeSdk.sign(decode(this.data || emptyData));
+      return this.aeSdk.unsafeSign(decode(this.data || emptyData));
     },
   },
 };

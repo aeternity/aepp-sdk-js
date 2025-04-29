@@ -2,11 +2,48 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v14.0.0...v14.1.0) (2025-04-29)
+
+### Features
+
+- **account:** add sync versions of AccountMnemonicFactory methods ([1d60eac](https://github.com/aeternity/aepp-sdk-js/commit/1d60eac5206cbd283003f58a8ab1e397a3e03cf1))
+- **account:** detect MetaMask over EIP-6963 ([9e74b53](https://github.com/aeternity/aepp-sdk-js/commit/9e74b53918385c0aff93976c73336781288b37ce))
+- **account:** experimental support of Ledger app v1.0.0 ([0116d74](https://github.com/aeternity/aepp-sdk-js/commit/0116d74fbcda28b1fcb5012dd44ff883dcf6971c))
+- **account:** init AccountMnemonicFactory by seed ([fe74643](https://github.com/aeternity/aepp-sdk-js/commit/fe74643fb925768669fae8db28dfbcd68fbd2722))
+- **account:** add `unsafeSign`, deprecate `sign` ([b0288cc](https://github.com/aeternity/aepp-sdk-js/commit/b0288cc4dec47e1b3bdaf68a653fc001b2a823ab))
+- add `ensureEncoded`, `isEncoded`; deprecate `isAddressValid` ([5a11dc3](https://github.com/aeternity/aepp-sdk-js/commit/5a11dc34b0e8b577a937ed79b6ede1d4e3b412c8))
+- add `hashMessage`, deprecate `messageToHash` ([5306e6b](https://github.com/aeternity/aepp-sdk-js/commit/5306e6bedec3b7fe1a5f9ddb47695e4d99ca9705))
+- add `verifyMessageSignature`, deprecate `verifyMessage` ([f862b67](https://github.com/aeternity/aepp-sdk-js/commit/f862b67ccd55457a256ff7da3db5a087725ca89e))
+- add `verifySignature`, deprecate `verify` ([a4a0232](https://github.com/aeternity/aepp-sdk-js/commit/a4a02329ea485eae39c7b176a5653e1a1df1b520))
+- **aens:** add `getAuctionState` to Name ([4150890](https://github.com/aeternity/aepp-sdk-js/commit/4150890bb177e371a417d903fff9dbcdb4ba3a97))
+- **aens:** add `id` getter to Name ([8700534](https://github.com/aeternity/aepp-sdk-js/commit/8700534d629053760fd44d4029fefd28cd9e7d5f))
+- **aens:** add `isName`, deprecate `isNameValid` ([88c242a](https://github.com/aeternity/aepp-sdk-js/commit/88c242ab73a01043827abdb4a82ac491a8379052))
+- **aens:** allow to pass salt between Name while claiming ([c8dc8cc](https://github.com/aeternity/aepp-sdk-js/commit/c8dc8ccce578b8b887574216696cee35ed665ebe))
+- **node:** add Hyperchain endpoints ([05fcdfd](https://github.com/aeternity/aepp-sdk-js/commit/05fcdfd0fec517d96b4b55d2993d6aaeeccead58))
+- **node:** ignore consensus protocol version if `ignoreVersion` set ([e2f83d6](https://github.com/aeternity/aepp-sdk-js/commit/e2f83d6630f09f8eb1a9835d666b1d1781285cb0))
+- **node:** warn if incompatible version when `ignoreVersion` set ([2d6c59d](https://github.com/aeternity/aepp-sdk-js/commit/2d6c59de151a9c77b83b7c66ca15846fcd0f05c0))
+- **oracle:** add `getQueries` to OracleBase ([0af61da](https://github.com/aeternity/aepp-sdk-js/commit/0af61da9c2a229aa6459881f601aa5479b39fe84))
+- **contract:** show function name along its hash if missed in bytecode ([2727713](https://github.com/aeternity/aepp-sdk-js/commit/2727713e2d56297ee017b8898b50281a731c6d00))
+
+### Bug Fixes
+
+- **account:** implicitly connect to Aeternity snap, clean up flow ([e347d25](https://github.com/aeternity/aepp-sdk-js/commit/e347d2512678342850057335da32b249d3ff7bf0))
+- **aens:** `computeAuctionEndBlock` returns value according to Ceres ([3b2f20c](https://github.com/aeternity/aepp-sdk-js/commit/3b2f20c98416639f33a8c95e63794e05888882c6))
+- **aens:** handle `highestBid` as BigInt in auction details ([847bfa6](https://github.com/aeternity/aepp-sdk-js/commit/847bfa63de5a3b8a66525b46ab54ed1e64bd43f5))
+- **aens:** make `getState`'s options override instance options ([2e0d672](https://github.com/aeternity/aepp-sdk-js/commit/2e0d672c790cd40b15c2ffcc0e6e504c1cfb023a))
+- **aens:** mark `started_at` as required in auction details ([fba1012](https://github.com/aeternity/aepp-sdk-js/commit/fba1012cd493f2855dbbeb453cc183adddf1ce10))
+- **chain:** set correct poll interval on hyperchain ([0454c62](https://github.com/aeternity/aepp-sdk-js/commit/0454c62a50677ab7ec044266450e3fb96dd284e8))
+- **contract:** type checking of contract call return value ([4c8926b](https://github.com/aeternity/aepp-sdk-js/commit/4c8926b6c4b72cc6fca8608162ebe71dd7bc7ec7))
+- **middleware:** generate api based on 1.97.1 ([359c17a](https://github.com/aeternity/aepp-sdk-js/commit/359c17a9afd6741e25b8c838e4d8605e98e2a2b4))
+- **node,middleware:** more strict enum handling ([d3c5f0f](https://github.com/aeternity/aepp-sdk-js/commit/d3c5f0f2190a9dd1f1386c7a8910e99663066263))
+- **tx-builder:** replace OracleResponseTx with OracleRespondTx ([19ec9b3](https://github.com/aeternity/aepp-sdk-js/commit/19ec9b366b5d2308eceb61cc43651440d136bb1e))
+- **wallet:** don't require `debug` flag in BrowserRuntimeConnection ([997db99](https://github.com/aeternity/aepp-sdk-js/commit/997db993dc2b2b2d6e7c381b25a50a0e733a58d9))
+
 ## [14.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v13.3.3...v14.0.0) (2024-10-20)
 
 ### ⚠ BREAKING CHANGES
 
-Please check out the [migration guide](./guides/migration/14.md) and a [tool](https://docs.aeternity.com/aepp-sdk-js/develop/examples/browser/tools/) to convert to convert secret keys.
+Please check out the [migration guide](./guides/migration/14.md) and a [tool](https://sdk.aeternity.io/v14.0.0/examples/browser/tools/) to convert to convert secret keys.
 
 - CommonJS bundles have cjs extension instead js
 - **aepp:** AeSdkWallet requires `onAskToSelectNetwork` constructor option

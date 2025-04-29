@@ -7,7 +7,6 @@ import {
   decode,
   encode,
   Encoding,
-  Encoded,
   ORACLE_TTL_TYPES,
   Oracle,
   OracleClient,
@@ -26,12 +25,12 @@ describe('Oracle', () => {
     aeSdk = await getSdk(3);
     const expectedOracleId = encode(decode(aeSdk.address), Encoding.OracleAddress);
     oracle = new Oracle(aeSdk.accounts[aeSdk.address], aeSdk.getContext());
-    expect(oracle.address).to.be.equal(expectedOracleId);
+    expect(oracle.address).to.equal(expectedOracleId);
     oracleClient = new OracleClient(oracle.address, {
       ...aeSdk.getContext(),
       onAccount: aeSdk.accounts[aeSdk.addresses()[1]],
     });
-    expect(oracleClient.address).to.be.equal(expectedOracleId);
+    expect(oracleClient.address).to.equal(expectedOracleId);
   });
 
   describe('Oracle', () => {
@@ -44,14 +43,14 @@ describe('Oracle', () => {
       const oracleState = await oracle.getState();
       const ttl = height + 5000;
       expect(oracleState.ttl).to.be.within(ttl, ttl + 4);
-      expect(oracleState.id).to.be.equal(oracle.address);
+      expect(oracleState.id).to.equal(oracle.address);
     });
 
     it('extends TTL', async () => {
       const { ttl: ttlBefore } = await oracle.getState();
       await oracle.extendTtl({ oracleTtlType: ORACLE_TTL_TYPES.delta, oracleTtlValue: 7450 });
       const { ttl } = await oracle.getState();
-      expect(ttl).to.be.equal(ttlBefore + 7450);
+      expect(ttl).to.equal(ttlBefore + 7450);
     });
 
     async function pollNQueries(
@@ -84,6 +83,33 @@ describe('Oracle', () => {
       expect(await pollPromise).to.eql(queries);
     });
 
+    let query4: Awaited<ReturnType<OracleClient['getQuery']>>;
+    it('gets queries', async () => {
+      const res = await oracle.getQueries();
+      expect(res).to.have.length(3);
+      query4 = res.find((q) => q.decodedQuery.includes('Berlin4'))!;
+      assertNotNull(query4);
+      expect(query4).to.eql({
+        id: query4.id,
+        senderId: oracleClient.options.onAccount.address,
+        senderNonce: 3,
+        oracleId: oracle.address,
+        query: 'ov_eyJjaXR5IjogIkJlcmxpbjQifR/koho=',
+        response: 'or_Xfbg4g==',
+        ttl: query4.ttl,
+        responseTtl: { type: 'delta', value: 10 },
+        fee: 0n,
+        decodedQuery: '{"city": "Berlin4"}',
+        decodedResponse: '',
+      });
+    });
+
+    it('gets query', async () => {
+      expect(await oracle.getQuery(query4.id)).to.eql(query4);
+      const { decodedQuery, decodedResponse, ...q } = query4;
+      expect(q).to.eql(await aeSdk.api.getOracleQueryByPubkeyAndQueryId(oracle.address, query4.id));
+    });
+
     it('can poll for responded queries', async () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}');
       await oracle.respondToQuery(queryId, queryResponse);
@@ -98,12 +124,10 @@ describe('Oracle', () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}');
       await oracle.respondToQuery(queryId, queryResponse);
 
-      const query = await aeSdk.api.getOracleQueryByPubkeyAndQueryId(oracle.address, queryId);
-      expect(decode(query.response as Encoded.OracleResponse).toString()).to.be.equal(
-        queryResponse,
-      );
+      const query = await oracle.getQuery(queryId);
+      expect(query.decodedResponse).to.equal(queryResponse);
       const response = await oracleClient.pollForResponse(queryId);
-      expect(response).to.be.equal(queryResponse);
+      expect(response).to.equal(queryResponse);
     });
 
     it('handles query', async () => {
@@ -111,7 +135,7 @@ describe('Oracle', () => {
         JSON.stringify({ ...JSON.parse(queryEntry.decodedQuery), response: true }),
       );
       const response = await oracleClient.query('{"test": 42}');
-      expect(response).to.be.equal('{"test":42,"response":true}');
+      expect(response).to.equal('{"test":42,"response":true}');
       await stop();
     });
 
@@ -142,7 +166,7 @@ describe('Oracle', () => {
       const stop = oracle.handleQueries(({ decodedQuery }) => `response to ${decodedQuery}`);
       try {
         const res = await Promise.all(responsePromises);
-        expect(res).to.be.eql(['response to foo', 'response to bar']);
+        expect(res).to.eql(['response to foo', 'response to bar']);
       } finally {
         await stop();
       }
@@ -159,7 +183,7 @@ describe('Oracle', () => {
         await Promise.all(
           responsePromises.map(async (promise) => promise.then((r) => res.push(r))),
         );
-        expect(res).to.be.eql(['250', '400', '500']);
+        expect(res).to.eql(['250', '400', '500']);
       } finally {
         await stop();
       }
@@ -170,22 +194,23 @@ describe('Oracle', () => {
     it('posts query', async () => {
       const query = await oracleClient.postQuery('{"city": "Berlin"}');
       assertNotNull(query.tx?.query);
-      expect(query.tx.query).to.be.equal('{"city": "Berlin"}');
+      expect(query.tx.query).to.equal('{"city": "Berlin"}');
     });
 
     it('polls for response for query without response', async () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}', { queryTtlValue: 1 });
-      await oracleClient
-        .pollForResponse(queryId)
-        .should.be.rejectedWith(/Giving up at height|error: Query not found/);
+      await expect(oracleClient.pollForResponse(queryId)).to.be.rejectedWith(
+        /Giving up at height|error: Query not found/,
+      );
     }).timeout(timeoutBlock);
 
     it('polls for response for query that is already expired without response', async () => {
       const { queryId } = await oracleClient.postQuery('{"city": "Berlin"}', { queryTtlValue: 1 });
       await aeSdk.awaitHeight((await aeSdk.getHeight()) + 2);
-      await oracleClient
-        .pollForResponse(queryId)
-        .should.be.rejectedWith(RestError, 'Query not found');
+      await expect(oracleClient.pollForResponse(queryId)).to.be.rejectedWith(
+        RestError,
+        'Query not found',
+      );
     }).timeout(timeoutBlock * 2);
 
     it('queries oracle', async () => {
@@ -194,7 +219,7 @@ describe('Oracle', () => {
       });
       const response = await oracleClient.query('{"city": "Berlin"}');
       stopPolling();
-      expect(response).to.be.equal(queryResponse);
+      expect(response).to.equal(queryResponse);
     });
   });
 
@@ -214,13 +239,13 @@ describe('Oracle', () => {
     it('Post Oracle Query without query fee', async () => {
       const query = await oracleClient.postQuery('{"city": "Berlin"}');
       assertNotNull(query.tx?.queryFee);
-      expect(query.tx.queryFee).to.be.equal(0n);
+      expect(query.tx.queryFee).to.equal(0n);
     });
 
     it('Post Oracle Query with registered query fee', async () => {
       const query = await oracleWithFeeClient.postQuery('{"city": "Berlin"}');
       assertNotNull(query.tx?.queryFee);
-      expect(query.tx.queryFee).to.be.equal(queryFee);
+      expect(query.tx.queryFee).to.equal(queryFee);
     });
 
     it('Post Oracle Query with custom query fee', async () => {
@@ -228,7 +253,7 @@ describe('Oracle', () => {
         queryFee: (queryFee + 2000n).toString(),
       });
       assertNotNull(query.tx?.queryFee);
-      expect(query.tx.queryFee).to.be.equal(queryFee + 2000n);
+      expect(query.tx.queryFee).to.equal(queryFee + 2000n);
     });
   });
 });

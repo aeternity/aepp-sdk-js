@@ -46,8 +46,15 @@ directive:
       https://github.com/Azure/autorest/issues/4118
 
   - from: openapi-document
+    where: $..[?(@.enum)]
+    transform: '$["x-ms-enum"] = { modelAsString: false }'
+    reason: thread enums as union of constants instead of arbitrary strings
+
+  - from: openapi-document
     where: $..properties[time,micro_time,approximate_activation_time,approximate_expire_time,register_time,block_time,activation_time,creation_time,microtime,last_updated_time]
-    transform: $.format = 'unixtime'
+    set:
+      type: integer
+      format: unixtime
     reason: >
       Convert time as milliseconds to dates
       https://github.com/aeternity/ae_mdw/issues/1891
@@ -76,6 +83,49 @@ directive:
     reason: to don't add /v3 prefix to $host parameter
 
   - from: openapi-document
+    where: $.components.schemas
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      ['UInt', 'UInt16', 'UInt32', 'UInt64', 'TxBlockHeight'].forEach(key => {
+        $[key] = $[key].oneOf.find(({ type }) => type === 'integer');
+      });
+    reason: fix parsing of big numbers
+      remove after fixing https://github.com/aeternity/aeternity/issues/3891
+
+  - from: openapi-document
+    where: $.components.schemas.Delegates
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      return $.oneOf[1];
+    reason: use more precise form to avoid oneOf
+
+  - from: openapi-document
+    where: $.components.schemas.Tx
+    transform: >
+      if ($doc.info.title === 'middleware') return $;
+      const { discriminator, ...base } = $.allOf[0];
+      const transactions = base.properties.type.enum.map(txName => $doc.components.schemas[txName]);
+      return {
+        ...base,
+        "description": "A mix of all transaction types.",
+        "properties": Object.assign({}, ...transactions.map(tx => tx.properties), base.properties),
+        "required": Object.entries(
+          transactions
+            .map(tx => tx.required)
+            .reduce(
+              (acc, req) => {
+                req.forEach(r => acc[r] = (acc[r] ?? 0) + 1);
+                return acc;
+              },
+              {}
+            )
+        )
+          .filter(([, count]) => count === transactions.length)
+          .map(([required]) => required)
+          .concat(base.required)
+      };
+
+  - from: openapi-document
     where: $..[?(@.$ref && @.deprecated)]
     transform: delete $.deprecated
     reason: >
@@ -83,6 +133,15 @@ directive:
       ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md
       for allowed values (components > schemas > OracleTx > properties > tx_hash)
       keys: [ 'deprecated' ]
+
+  - from: openapi-document
+    where: $..[?(@.$ref && @.example)]
+    transform: delete $.example
+    reason: >
+      warning | IgnoredPropertyNextToRef | Semantic violation: Sibling values alongside $ref will be
+      ignored. See https://github.com/Azure/autorest/blob/main/docs/openapi/howto/$ref-siblings.md
+      for allowed values (components > schemas > Auction > properties > last_bid > properties > tx)
+      keys: [ 'example' ]
 
   - from: openapi-document
     where: $..[?(@.$ref || @.pattern || @.oneOf)]
@@ -127,10 +186,9 @@ directive:
 
 version: ^3.7.1
 use-extension:
-  '@autorest/typescript': ^6.0.23
+  '@autorest/typescript': ^6.0.39
   '@autorest/modelerfour': ^4.27.0
-# TODO: switch to middleware-openapi.yaml after releasing middleware with https://github.com/aeternity/ae_mdw/pull/1873
-input-file: middleware-openapi-temp.yaml
+input-file: middleware-openapi.yaml
 output-folder: ../../src/apis/middleware
 source-code-folder-path: .
 generator: typescript

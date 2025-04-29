@@ -20,6 +20,7 @@ module.exports = {
     'es',
     'src/apis',
     'docs/api',
+    'test/assets',
     'test/environment/ledger/browser',
     'docs/examples',
     'site',

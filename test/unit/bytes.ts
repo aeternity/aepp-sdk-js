@@ -7,19 +7,19 @@ import { snakeToPascal, pascalToSnake } from '../../src/utils/string';
 
 describe('Bytes', () => {
   it('toBytes: converts null to empty array', () => {
-    toBytes(null).should.be.eql(Buffer.from([]));
+    expect(toBytes(null)).to.eql(Buffer.from([]));
   });
 
   const testCase = 'test_test-testTest';
 
   it('converts snake to pascal case', () =>
-    snakeToPascal(testCase).should.be.equal('testTest-testTest'));
+    expect(snakeToPascal(testCase)).to.equal('testTest-testTest'));
 
   it('converts pascal to snake case', () =>
-    pascalToSnake(testCase).should.be.equal('test_test-test_test'));
+    expect(pascalToSnake(testCase)).to.equal('test_test-test_test'));
 
   it('converts BigNumber to Buffer', () =>
-    toBytes(new BigNumber('1000')).readInt16BE().should.be.equal(1000));
+    expect(toBytes(new BigNumber('1000')).readInt16BE()).to.equal(1000));
 
   it('throws error if BigNumber is not integer', () =>
     expect(() => toBytes(new BigNumber('1.5'))).to.throw(

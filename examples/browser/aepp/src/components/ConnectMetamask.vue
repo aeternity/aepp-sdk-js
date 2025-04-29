@@ -3,9 +3,10 @@
     <button v-if="!accountFactory" @click="connect">Connect</button>
     <template v-else>
       <button @click="disconnect">Disconnect</button>
-      <button @click="installSnap">Install Aeternity Snap</button>
+      <button @click="requestSnap">Request Aeternity Snap</button>
       <button @click="addAccount">Add Account</button>
       <button v-if="accounts.length > 1" @click="switchAccount">Switch Account</button>
+      <button @click="discoverAccounts">Discover Accounts</button>
       <button @click="switchNode">Switch Node</button>
       <div v-if="accounts.length">
         <div>Accounts</div>
@@ -21,23 +22,21 @@
 
 <script>
 import { AccountMetamaskFactory, UnsupportedPlatformError } from '@aeternity/aepp-sdk';
+import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
 import Value from './Value.vue';
 
 export default {
   components: { Value },
-  created() {
-    this.accountFactory = null;
-  },
   data: () => ({
     status: '',
+    accountFactory: shallowRef(null),
     accounts: [],
   }),
   computed: mapState(['aeSdk']),
   methods: {
     connect() {
       try {
-        this.status = 'Waiting for MetaMask response';
         this.accountFactory = new AccountMetamaskFactory();
         this.status = '';
       } catch (error) {
@@ -55,10 +54,10 @@ export default {
       this.$store.commit('setAddress', undefined);
       if (Object.keys(this.aeSdk.accounts).length) this.aeSdk.removeAccount(this.aeSdk.address);
     },
-    async installSnap() {
+    async requestSnap() {
       try {
         this.status = 'Waiting for MetaMask response';
-        this.status = await this.accountFactory.installSnap();
+        this.status = await this.accountFactory.requestSnap();
       } catch (error) {
         if (error instanceof UnsupportedPlatformError) {
           this.status = error.message;
@@ -86,6 +85,12 @@ export default {
     switchAccount() {
       this.accounts.push(this.accounts.shift());
       this.setAccount(this.accounts[0]);
+    },
+    async discoverAccounts() {
+      this.status = 'Discovering accounts';
+      this.accounts = await this.accountFactory.discover(this.aeSdk.api);
+      this.setAccount(this.accounts[0]);
+      this.status = '';
     },
     async switchNode() {
       const networkId = this.$store.state.networkId === 'ae_mainnet' ? 'ae_uat' : 'ae_mainnet';

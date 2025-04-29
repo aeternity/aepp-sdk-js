@@ -6,13 +6,12 @@
  * repository.
  */
 
-import { BigNumber } from 'bignumber.js';
-import { genSalt, isAddressValid } from './utils/crypto.js';
-import { commitmentHash, isAuctionName } from './tx/builder/helpers.js';
+import BigNumber from 'bignumber.js';
+import { genSalt, isEncoded } from './utils/crypto.js';
+import { commitmentHash, isAuctionName, produceNameId } from './tx/builder/helpers.js';
 import { Tag, AensName } from './tx/builder/constants.js';
 import { Encoded, Encoding } from './utils/encoder.js';
 import { LogicError } from './utils/errors.js';
-import { getName } from './chain.js';
 import { sendTransaction, SendTransactionOptions } from './send-transaction.js';
 import { Optional } from './utils/other.js';
 import { buildTxAsync, BuildTxOptions } from './tx/builder/index.js';
@@ -47,8 +46,15 @@ interface NamePreclaimOptions
     Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
 
 interface NameClaimOptions
-  extends BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'nameSalt' | 'name'>,
+  extends BuildTxOptions<Tag.NameClaimTx, 'accountId' | 'name'>,
     Optional<SendTransactionOptions, 'onAccount' | 'onNode'> {}
+
+class NotAuctionNameError extends LogicError {
+  constructor(name: AensName, action: string) {
+    super(`Can't ${action} because ${name} is not an auction name`);
+    this.name = 'NotAuctionNameError';
+  }
+}
 
 /**
  * @category AENS
@@ -78,6 +84,13 @@ export default class Name {
     >,
   ) {
     this.options = options;
+  }
+
+  /**
+   * Name ID encoded as nm_-prefixed string
+   */
+  get id(): Encoded.Name {
+    return produceNameId(this.value);
   }
 
   /**
@@ -125,14 +138,15 @@ export default class Name {
     const allPointers = {
       ...(extendPointers === true &&
         Object.fromEntries(
-          (await getName(this.value, opt)).pointers.map(({ key, id }) => [key, id]),
+          (await opt.onNode.getNameEntryByName(this.value)).pointers.map(({ key, id }) => [
+            key,
+            id,
+          ]),
         )),
       ...pointers,
     };
 
-    const hasRawPointers = Object.values(allPointers).some((v) =>
-      isAddressValid(v, Encoding.Bytearray),
-    );
+    const hasRawPointers = Object.values(allPointers).some((v) => isEncoded(v, Encoding.Bytearray));
 
     const tx = await buildTxAsync({
       _isInternalBuild: true,
@@ -175,8 +189,7 @@ export default class Name {
   }
 
   /**
-   * Query the AENS name info from the node
-   * and return the object with info and predefined functions for manipulating name
+   * Query the AENS name info from the node and return the object with info
    * @param options - Options
    * @example
    * ```js
@@ -190,12 +203,37 @@ export default class Name {
       owner: Encoded.AccountAddress;
     }
   > {
-    const onNode = this.options.onNode ?? options.onNode;
+    const onNode = options.onNode ?? this.options.onNode;
     const nameEntry = await onNode.getNameEntryByName(this.value);
     return {
       ...nameEntry,
       id: nameEntry.id as Encoded.Name,
       owner: nameEntry.owner as Encoded.AccountAddress,
+    };
+  }
+
+  /**
+   * Query the AENS auction info from the node and return the object with info
+   * @param options - Options
+   * @example
+   * ```js
+   * const auctionEntry = await name.getAuctionState()
+   * console.log(auctionEntry.highestBidder)
+   * ```
+   */
+  async getAuctionState(options: { onNode?: Node } = {}): Promise<
+    Awaited<ReturnType<Node['getAuctionEntryByName']>> & {
+      id: Encoded.Name;
+      highestBidder: Encoded.AccountAddress;
+    }
+  > {
+    if (!isAuctionName(this.value)) throw new NotAuctionNameError(this.value, 'get auction state');
+    const onNode = options.onNode ?? this.options.onNode;
+    const nameEntry = await onNode.getAuctionEntryByName(this.value);
+    return {
+      ...nameEntry,
+      id: nameEntry.id as Encoded.Name,
+      highestBidder: nameEntry.highestBidder as Encoded.AccountAddress,
     };
   }
 
@@ -225,10 +263,10 @@ export default class Name {
     const opt = { ...this.options, ...options };
     const tx = await buildTxAsync({
       _isInternalBuild: true,
+      nameSalt: this.#salt,
       ...opt,
       tag: Tag.NameClaimTx,
       accountId: opt.onAccount.address,
-      nameSalt: this.#salt,
       name: this.value,
     });
     return sendTransaction(tx, opt);
@@ -242,19 +280,21 @@ export default class Name {
    * await name.preclaim({ ttl, fee, nonce })
    * ```
    */
-  async preclaim(options: NamePreclaimOptions = {}): ReturnType<typeof sendTransaction> {
+  async preclaim(
+    options: NamePreclaimOptions = {},
+  ): Promise<Awaited<ReturnType<typeof sendTransaction>> & { nameSalt: number }> {
     const opt = { ...this.options, ...options };
-    const salt = genSalt();
+    const nameSalt = genSalt();
     const tx = await buildTxAsync({
       _isInternalBuild: true,
       ...opt,
       tag: Tag.NamePreclaimTx,
       accountId: opt.onAccount.address,
-      commitmentId: commitmentHash(this.value, salt),
+      commitmentId: commitmentHash(this.value, nameSalt),
     });
     const result = await sendTransaction(tx, opt);
-    this.#salt = salt;
-    return result;
+    this.#salt = nameSalt;
+    return { ...result, nameSalt };
   }
 
   /**
@@ -272,9 +312,7 @@ export default class Name {
     nameFee: number | string | BigNumber,
     options: Omit<NameClaimOptions, 'nameFee'> = {},
   ): ReturnType<typeof sendTransaction> {
-    if (!isAuctionName(this.value)) {
-      throw new LogicError('This is not auction name, so cant make a bid!');
-    }
+    if (!isAuctionName(this.value)) throw new NotAuctionNameError(this.value, 'make a bid');
     const opt = { ...this.options, ...options };
     const tx = await buildTxAsync({
       _isInternalBuild: true,

@@ -1,5 +1,5 @@
 #!/usr/bin/env npx tsx
-import { Node, AeSdk, MemoryAccount, CompilerHttp, Contract } from '../../src';
+import { Node, AeSdk, AccountMemory, CompilerHttp, Contract } from '../../src';
 
 const contractSourceCode = `
 contract Test =
@@ -8,7 +8,7 @@ contract Test =
 const node = new Node('https://testnet.aeternity.io');
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],
-  accounts: [new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
+  accounts: [new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf')],
   onCompiler: new CompilerHttp('https://v8.compiler.aepps.com'),
 });
 

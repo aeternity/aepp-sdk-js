@@ -2,7 +2,7 @@
 // # InnerTx: ContractCallTx
 //
 // ## Introduction
-// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/568c291b92c030011ca9e68169f328be6ff79488/examples/node/paying-for-contract-call-tx.js)
+// The whole script is [located in the repository](https://github.com/aeternity/aepp-sdk-js/blob/1cd128798018d98bdd41eff9104442b44b385d46/examples/node/paying-for-contract-call-tx.js)
 // and this page explains in detail how to:
 //
 //  - Create and sign a `ContractCallTx` with the `innerTx` option for an account that has no
@@ -28,8 +28,8 @@
 //  - ... many more!
 
 // ## 1. Specify imports
-// You need to import `AeSdk`, `Node` and `MemoryAccount` classes from the SDK.
-import { AeSdk, Contract, CompilerHttp, Node, MemoryAccount, Tag } from '@aeternity/aepp-sdk';
+// You need to import `AeSdk`, `Node` and `AccountMemory` classes from the SDK.
+import { AeSdk, Contract, CompilerHttp, Node, AccountMemory, Tag } from '@aeternity/aepp-sdk';
 
 // **Note**:
 //
@@ -69,8 +69,8 @@ contract PayingForTxExample =
 //    perform a contract call without having any funds.
 
 // ## 3. Create object instances
-const payerAccount = new MemoryAccount(PAYER_ACCOUNT_SECRET_KEY);
-const newUserAccount = MemoryAccount.generate();
+const payerAccount = new AccountMemory(PAYER_ACCOUNT_SECRET_KEY);
+const newUserAccount = AccountMemory.generate();
 const node = new Node(NODE_URL);
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: node }],

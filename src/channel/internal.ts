@@ -1,5 +1,5 @@
 import { default as websocket, ICloseEvent } from 'websocket';
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import type Channel from './Base.js';
 import JsonBig from '../utils/json-big.js';
 import { pascalToSnake } from '../utils/string.js';
@@ -13,7 +13,7 @@ import {
   ChannelIncomingMessageError,
   ChannelError,
 } from '../utils/errors.js';
-import { encodeContractAddress } from '../utils/crypto.js';
+import { buildContractId } from '../tx/builder/helpers.js';
 import { ensureError } from '../utils/other.js';
 
 const { w3cwebsocket: W3CWebSocket } = websocket;
@@ -359,7 +359,7 @@ async function handleMessage(channel: Channel, message: ChannelMessage): Promise
     const round = channel.round();
     if (round == null) throw new UnexpectedTsError('Round is null');
     const owner = message?.params?.data?.updates?.[0]?.owner;
-    emit(channel, 'newContract', encodeContractAddress(owner, round + 1));
+    emit(channel, 'newContract', buildContractId(owner, round + 1));
   }
 }
 

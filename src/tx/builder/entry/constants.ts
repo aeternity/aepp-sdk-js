@@ -1,3 +1,6 @@
+/**
+ * @category contract
+ */
 export enum CallReturnType {
   Ok = 0,
   Error = 1,
@@ -5,7 +8,7 @@ export enum CallReturnType {
 }
 
 /**
- * @category entry building
+ * @category entry builder
  */
 export enum EntryTag {
   Account = 10,

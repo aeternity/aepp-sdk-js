@@ -2,14 +2,14 @@
 import {
   Node,
   AeSdk,
-  MemoryAccount,
+  AccountMemory,
   Name,
   // eslint-disable-next-line import/extensions
 } from '../../es/index.js';
 
 const aeSdk = new AeSdk({
   nodes: [{ name: 'testnet', instance: new Node('https://testnet.aeternity.io') }],
-  accounts: [MemoryAccount.generate()],
+  accounts: [AccountMemory.generate()],
 });
 
 const { address } = aeSdk;

@@ -13,6 +13,7 @@ import { Tag } from '../tx/builder/constants.js';
 
 /**
  * Generalized account class
+ * @category account generalized
  */
 export default class AccountGeneralized extends AccountBase {
   override readonly address: Encoded.AccountAddress;
@@ -28,8 +29,16 @@ export default class AccountGeneralized extends AccountBase {
     this.address = address;
   }
 
+  /**
+   * @deprecated Use `unsafeSign` method instead
+   */
   // eslint-disable-next-line class-methods-use-this
   override async sign(): Promise<Uint8Array> {
+    return this.unsafeSign();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  override async unsafeSign(): Promise<Uint8Array> {
     throw new NotImplementedError("Can't sign using generalized account");
   }
 

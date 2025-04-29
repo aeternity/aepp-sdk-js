@@ -8,6 +8,14 @@ plugins:
 repo_url: https://github.com/aeternity/aepp-sdk-js
 edit_uri: ''
 
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+strict: true
+
 extra:
   version:
     provider: mike
@@ -59,6 +67,7 @@ nav:
       - guides/error-handling.md
       - guides/low-vs-high-usage.md
       - guides/typed-data.md
+      - guides/typescript.md
       - guides/jwt.md
       - Wallet interaction:
           - guides/connect-aepp-to-wallet.md

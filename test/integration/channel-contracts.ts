@@ -1,5 +1,5 @@
 import { describe, it, before, after, beforeEach, afterEach } from 'mocha';
-import { expect } from 'chai';
+import { expect, should } from 'chai';
 import * as sinon from 'sinon';
 import { getSdk, networkId } from '.';
 import {
@@ -15,12 +15,13 @@ import {
   Contract,
   Channel,
   buildTx,
-  MemoryAccount,
+  AccountMemory,
 } from '../../src';
 import { SignTxWithTag } from '../../src/channel/internal';
 import { assertNotNull } from '../utils';
 import { initializeChannels, recreateAccounts } from './channel-utils';
 
+should();
 const contractSourceCode = `
 contract Identity =
   entrypoint getArg(x : int) : int = x
@@ -28,8 +29,8 @@ contract Identity =
 
 describe('Channel contracts', () => {
   let aeSdk: AeSdk;
-  let initiator: MemoryAccount;
-  let responder: MemoryAccount;
+  let initiator: AccountMemory;
+  let responder: AccountMemory;
   let initiatorCh: Channel;
   let responderCh: Channel;
   let responderShouldRejectUpdate: number | boolean;
@@ -248,7 +249,7 @@ describe('Channel contracts', () => {
     const hash = buildTxHash(forceTx.tx);
     const { callInfo } = await aeSdk.api.getTransactionInfoByHash(hash);
     assertNotNull(callInfo);
-    expect(callInfo.returnType).to.be.equal('ok');
+    expect(callInfo.returnType).to.equal('ok');
   });
 
   it('can call a contract and reject', async () => {
@@ -316,10 +317,10 @@ describe('Channel contracts', () => {
       returnType: 'ok',
       returnValue: result.returnValue,
     });
-    expect(result.returnType).to.be.equal('ok');
-    expect(
-      contract._calldata.decode('Identity', 'getArg', result.returnValue).toString(),
-    ).to.be.equal('42');
+    expect(result.returnType).to.equal('ok');
+    expect(contract._calldata.decode('Identity', 'getArg', result.returnValue).toString()).to.equal(
+      '42',
+    );
   });
 
   it('can call a contract using dry-run', async () => {
@@ -340,10 +341,10 @@ describe('Channel contracts', () => {
       returnType: 'ok',
       returnValue: result.returnValue,
     });
-    expect(result.returnType).to.be.equal('ok');
-    expect(
-      contract._calldata.decode('Identity', 'getArg', result.returnValue).toString(),
-    ).to.be.equal('42');
+    expect(result.returnType).to.equal('ok');
+    expect(contract._calldata.decode('Identity', 'getArg', result.returnValue).toString()).to.equal(
+      '42',
+    );
   });
 
   it('can clean contract calls', async () => {

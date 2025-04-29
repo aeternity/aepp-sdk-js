@@ -7,7 +7,6 @@ import {
   InternalError,
 } from '../../utils/errors.js';
 import { Encoding, Encoded, encode, decode } from '../../utils/encoder.js';
-import { readInt } from './helpers.js';
 
 type Schemas = ReadonlyArray<{
   tag: { constValue: number } & Field;
@@ -59,8 +58,11 @@ export function unpackRecord(
   extraParams: { [k: string]: unknown },
 ): unknown {
   const binary = rlpDecode(decode(encodedRecord));
-  const tag = +readInt(binary[0] as Buffer);
-  const version = +readInt(binary[1] as Buffer);
+  if (!ArrayBuffer.isView(binary[0]) || !ArrayBuffer.isView(binary[1])) {
+    throw new DecodeError("Can't parse tag or version in provided RLP");
+  }
+  const tag = Buffer.from(binary[0]).readUintBE(0, binary[0].length);
+  const version = Buffer.from(binary[1]).readUintBE(0, binary[1].length);
   const schema = getSchema(schemas, Tag, tag, version);
   if (expectedTag != null && expectedTag !== tag) {
     throw new DecodeError(`Expected ${Tag[expectedTag]} tag, got ${Tag[tag]} instead`);

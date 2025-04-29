@@ -3,7 +3,7 @@ import {
   AeSdkWallet,
   CompilerHttp,
   Node,
-  MemoryAccount,
+  AccountMemory,
   BrowserRuntimeConnection,
   WALLET_TYPE,
   RpcConnectionDenyError,
@@ -53,7 +53,7 @@ const genConfirmCallback = (action) => async (aeppId, parameters, aeppOrigin) =>
   if (!isConfirmed) throw new RpcRejectedByUserError();
 };
 
-class AccountMemoryProtected extends MemoryAccount {
+class AccountMemoryProtected extends AccountMemory {
   async signTransaction(transaction, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
       const opt = { ...options, transaction, unpackedTx: unpackTx(transaction) };
@@ -86,11 +86,11 @@ class AccountMemoryProtected extends MemoryAccount {
     return super.signTypedData(data, aci, options);
   }
 
-  async sign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
+  async unsafeSign(data, { aeppRpcClientId: id, aeppOrigin, ...options } = {}) {
     if (id != null) {
       await genConfirmCallback(`sign raw data ${data}`)(id, options, aeppOrigin);
     }
-    return super.sign(data, options);
+    return super.unsafeSign(data, options);
   }
 
   async signDelegation(delegation, { aeppRpcClientId: id, aeppOrigin, ...options }) {

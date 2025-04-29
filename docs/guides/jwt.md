@@ -5,9 +5,9 @@
 Use `signJwt` to generate a JWT signed by an account provided in arguments.
 
 ```ts
-import { MemoryAccount, signJwt } from '@aeternity/aepp-sdk';
+import { AccountMemory, signJwt } from '@aeternity/aepp-sdk';
 
-const account = MemoryAccount.generate();
+const account = AccountMemory.generate();
 const payload = { test: 'data' };
 const jwt = await signJwt(payload, account);
 ```

@@ -1,5 +1,5 @@
 /**
- * @category transaction builder
+ * @category utils
  * @see {@link https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md}
  * @see {@link https://github.com/aeternity/aeserialization/blob/eb68fe331bd476910394966b7f5ede7a74d37e35/src/aeser_api_encoder.erl#L205-L230}
  */

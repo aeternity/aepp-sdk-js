@@ -24,26 +24,28 @@ export const getPackagePath = (): string => {
 export default class CompilerCli extends CompilerBase {
   readonly #path: string;
 
-  readonly #ensureCompatibleVersion = Promise.resolve();
+  readonly #ensureCompatibleVersion;
 
   /**
    * @param compilerPath - A path to aesophia_cli binary, by default uses the integrated one
    * @param options - Options
-   * @param options.ignoreVersion - Don't ensure that the compiler is supported
+   * @param options.ignoreVersion - Print warning instead of throwing exception if compiler version
+   * is not supported, use with caution
    */
   constructor(
     compilerPath = resolve(getPackagePath(), './bin/aesophia_cli'),
-    { ignoreVersion }: { ignoreVersion?: boolean } = {},
+    { ignoreVersion = false }: { ignoreVersion?: boolean } = {},
   ) {
     super();
     this.#path = compilerPath;
-    if (ignoreVersion !== true) {
-      this.#ensureCompatibleVersion = this.version().then((version) => {
-        const versions = [version, '8.0.0', '9.0.0'] as const;
-        if (!semverSatisfies(...versions))
-          throw new UnsupportedVersionError('compiler', ...versions);
-      });
-    }
+    this.#ensureCompatibleVersion = this.version().then((version) => {
+      const versions = [version, '8.0.0', '9.0.0'] as const;
+      if (!semverSatisfies(...versions)) {
+        const error = new UnsupportedVersionError('compiler', ...versions);
+        if (ignoreVersion) console.warn(error.message);
+        else throw error;
+      }
+    });
   }
 
   async #runWithStderr(...parameters: string[]): Promise<{ stderr: string; stdout: string }> {

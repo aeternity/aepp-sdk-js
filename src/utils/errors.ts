@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import { AensName, Int } from '../tx/builder/constants.js';
 import * as Encoded from './encoder-types.js';
 
@@ -449,8 +449,8 @@ export class InvalidAuthDataError extends CompilerError {
  * @category exception
  */
 export class BytecodeMismatchError extends ContractError {
-  constructor(source: 'source code' | 'bytecode') {
-    super(`Contract ${source} do not correspond to the bytecode deployed on the chain`);
+  constructor(source: 'source code' | 'bytecode' | 'ACI', details: string = '') {
+    super(`Contract ${source} do not correspond to the bytecode deployed on the chain` + details);
     this.name = 'BytecodeMismatchError';
   }
 }

@@ -1,6 +1,6 @@
 # Contract Events
 
-The Sophia language also provides you the possibility to emit [Events](https://docs.aeternity.com/aesophia/latest/sophia_features/#events) in your functions.
+The Sophia language also provides you the possibility to emit [Events](https://docs.aeternity.com/developer-documentation/aesophia/docs/sophia_features#events) in your functions.
 On this page you will learn how to access and decode the event log of a specific transaction.
 
 ## EventEmitter contract
@@ -21,7 +21,7 @@ contract EventEmitter =
 
 ## Decode events using ACI
 
-When initializing a contract instance using the source code and providing the [ACI](https://docs.aeternity.com/aesophia/latest/aeso_aci/)
+When initializing a contract instance using the source code and providing the [ACI](https://docs.aeternity.com/developer-documentation/aesophia/docs/aeso_aci)
 or obtaining it via http compiler (default) you will be able to access the `emitEvents` entrypoint of the Sophia contract above as follows:
 
 ```js

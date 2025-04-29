@@ -7,12 +7,12 @@ import {
   NodeInvocationError,
   Encoded,
   DRY_RUN_ACCOUNT,
-  messageToHash,
+  hashMessage,
   UnexpectedTsError,
   AeSdk,
   Contract,
   ContractMethodsBase,
-  isAddressValid,
+  isEncoded,
   Encoding,
 } from '../../src';
 
@@ -27,7 +27,6 @@ interface IdentityContractApi extends ContractMethodsBase {
 
 describe('Contract', () => {
   let aeSdk: AeSdk;
-  let bytecode: Encoded.ContractBytearray;
   let identityContract: Contract<IdentityContractApi>;
   let deployed: Awaited<ReturnType<Contract<{}>['$deploy']>>;
 
@@ -36,10 +35,11 @@ describe('Contract', () => {
   });
 
   it('deploys precompiled bytecode', async () => {
+    const { aci, bytecode } = await aeSdk.compilerApi.compileBySourceCode(identitySourceCode);
     identityContract = await Contract.initialize({
       ...aeSdk.getContext(),
+      aci,
       bytecode,
-      sourceCode: identitySourceCode,
     });
     expect(await identityContract.$deploy([])).to.have.property('address');
   });
@@ -70,15 +70,15 @@ describe('Contract', () => {
     });
     await signContract.$deploy([]);
     const data = Buffer.from(new Array(32).fill(0).map((_, idx) => idx ** 2));
-    const signature = await aeSdk.sign(data);
-    expect((await signContract.verify(data, aeSdk.address, signature)).decodedResult).to.be.equal(
+    const signature = await aeSdk.unsafeSign(data);
+    expect((await signContract.verify(data, aeSdk.address, signature)).decodedResult).to.equal(
       true,
     );
   });
 
   it('Verify message in Sophia', async () => {
     const signContract = await Contract.initialize<{
-      message_to_hash: (message: string) => Uint8Array;
+      hash_message: (message: string) => Uint8Array;
       verify: (message: string, pub: Encoded.AccountAddress, sig: Uint8Array) => boolean;
     }>({
       ...aeSdk.getContext(),
@@ -96,7 +96,7 @@ describe('Contract', () => {
               None => false
               Some(_) => true
 
-          entrypoint message_to_hash (message: string): hash =
+          entrypoint hash_message (message: string): hash =
             let prefix = "aeternity Signed Message:\\n"
             let prefixBinary = String.concat(int_to_binary(String.length(prefix)), prefix)
             let messageBinary = String.concat(int_to_binary(String.length(message)), message)
@@ -104,19 +104,19 @@ describe('Contract', () => {
 
           entrypoint verify (message: string, pub: address, sig: signature): bool =
             require(includes(message, "H"), "Invalid message")
-            Crypto.verify_sig(message_to_hash(message), pub, sig)`,
+            Crypto.verify_sig(hash_message(message), pub, sig)`,
     });
     await signContract.$deploy([]);
 
     await Promise.all(
       ['Hello', 'H'.repeat(127)].map(async (message) => {
-        expect((await signContract.message_to_hash(message)).decodedResult).to.be.eql(
-          messageToHash(message),
+        expect((await signContract.hash_message(message)).decodedResult).to.eql(
+          hashMessage(message),
         );
         const signature = await aeSdk.signMessage(message);
         expect(
           (await signContract.verify(message, aeSdk.address, signature)).decodedResult,
-        ).to.be.equal(true);
+        ).to.equal(true);
       }),
     );
   });
@@ -128,29 +128,29 @@ describe('Contract', () => {
     identityContract.$options.onAccount = onAccount;
     deployed = await identityContract.$deploy([]);
     if (deployed?.result?.callerId == null) throw new UnexpectedTsError();
-    expect(deployed.result.callerId).to.be.equal(onAccount.address);
+    expect(deployed.result.callerId).to.equal(onAccount.address);
     let { result } = await identityContract.getArg(42, { callStatic: true });
     assertNotNull(result);
-    expect(result.callerId).to.be.equal(onAccount.address);
+    expect(result.callerId).to.equal(onAccount.address);
     result = (await identityContract.getArg(42, { callStatic: false })).result;
     assertNotNull(result);
-    expect(result.callerId).to.be.equal(onAccount.address);
+    expect(result.callerId).to.equal(onAccount.address);
     identityContract.$options.onAccount = accountBefore;
   });
 
   it('Call-Static deploy transaction', async () => {
     const { result } = await identityContract.$deploy([], { callStatic: true });
     assertNotNull(result);
-    result.should.have.property('gasUsed');
-    result.should.have.property('returnType');
+    expect(result).to.have.property('gasUsed');
+    expect(result).to.have.property('returnType');
   });
 
   it('Call-Static deploy transaction on specific hash', async () => {
     const hash = (await aeSdk.api.getTopHeader()).hash as Encoded.MicroBlockHash;
     const { result } = await identityContract.$deploy([], { callStatic: true, top: hash });
     assertNotNull(result);
-    result.should.have.property('gasUsed');
-    result.should.have.property('returnType');
+    expect(result).to.have.property('gasUsed');
+    expect(result).to.have.property('returnType');
   });
 
   it('throws error on deploy', async () => {
@@ -194,7 +194,7 @@ describe('Contract', () => {
     });
     const { result } = await contract.getArg(42);
     assertNotNull(result);
-    result.callerId.should.be.equal(DRY_RUN_ACCOUNT.pub);
+    expect(result.callerId).to.equal(DRY_RUN_ACCOUNT.pub);
   });
 
   it('Dry-run at specific height', async () => {
@@ -220,7 +220,7 @@ describe('Contract', () => {
 
     type BlockHash = Encoded.KeyBlockHash | Encoded.MicroBlockHash;
     const getMicroBlockHash = async (blockHash: BlockHash): Promise<Encoded.MicroBlockHash> => {
-      if (isAddressValid(blockHash, Encoding.MicroBlockHash)) return blockHash;
+      if (isEncoded(blockHash, Encoding.MicroBlockHash)) return blockHash;
       const hash = (await aeSdk.api.getKeyBlockByHash(blockHash)).prevHash as BlockHash;
       return getMicroBlockHash(hash);
     };
@@ -239,17 +239,17 @@ describe('Contract', () => {
     const deployInfo = await identityContract.$deploy([], { waitMined: false });
     assertNotNull(deployInfo.transaction);
     await aeSdk.poll(deployInfo.transaction);
-    expect(deployInfo.result).to.be.equal(undefined);
-    deployInfo.txData.should.not.be.equal(undefined);
+    expect(deployInfo.result).to.equal(undefined);
+    expect(deployInfo.txData).to.not.be.equal(undefined);
     const result = await identityContract.getArg(42, { callStatic: false, waitMined: false });
-    expect(result.result).to.be.equal(undefined);
-    result.txData.should.not.be.equal(undefined);
+    expect(result.result).to.equal(undefined);
+    expect(result.txData).to.not.be.equal(undefined);
     await aeSdk.poll(result.hash as Encoded.TxHash);
   });
 
   it('calls deployed contracts static', async () => {
     const result = await identityContract.getArg(42, { callStatic: true });
-    expect(result.decodedResult).to.be.equal(42n);
+    expect(result.decodedResult).to.equal(42n);
   });
 
   it('initializes contract state', async () => {
@@ -266,7 +266,7 @@ describe('Contract', () => {
     });
     const data = 'Hello World!';
     await contract.$deploy([data]);
-    expect((await contract.retrieve()).decodedResult).to.be.equal(data);
+    expect((await contract.retrieve()).decodedResult).to.equal(data);
   });
 
   describe('Namespaces', () => {
@@ -306,10 +306,8 @@ describe('Contract', () => {
     });
 
     it('Can call contract with external deps', async () => {
-      expect((await contract.sumNumbers(1, 2, { callStatic: false })).decodedResult).to.be.equal(
-        3n,
-      );
-      expect((await contract.sumNumbers(1, 2, { callStatic: true })).decodedResult).to.be.equal(3n);
+      expect((await contract.sumNumbers(1, 2, { callStatic: false })).decodedResult).to.equal(3n);
+      expect((await contract.sumNumbers(1, 2, { callStatic: true })).decodedResult).to.equal(3n);
     });
   });
 });

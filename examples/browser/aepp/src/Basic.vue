@@ -56,9 +56,7 @@ export default {
       ({ aeSdk, address, networkId }) => [aeSdk, address, networkId],
       ([aeSdk, address]) => {
         this.compilerVersionPromise = aeSdk.compilerApi.version();
-        this.balancePromise = address
-          ? aeSdk.getBalance(address)
-          : Promise.reject(new Error('Address not available'));
+        this.balancePromise = address ? aeSdk.getBalance(address) : Promise.resolve(NaN);
         this.heightPromise = aeSdk.getHeight();
         this.nodeInfoPromise = aeSdk.getNodeInfo();
       },

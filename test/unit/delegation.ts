@@ -5,7 +5,7 @@ import {
   DelegationTag,
   packDelegation,
   unpackDelegation,
-  MemoryAccount,
+  AccountMemory,
   DecodeError,
 } from '../../src';
 
@@ -24,8 +24,8 @@ describe('Delegation signatures', () => {
   });
 
   it('signs delegation', async () => {
-    const account = new MemoryAccount('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
-    expect(await account.signDelegation(delegation, { networkId: 'ae_test' })).to.be.equal(
+    const account = new AccountMemory('sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf');
+    expect(await account.signDelegation(delegation, { networkId: 'ae_test' })).to.equal(
       'sg_UHnWENCvSvJPjcwR2rW82btPvDoDqPvDnn8TsXkoQSNoMHEeT1D8YkAwJQQNrALTBdqqFou4X4Q2MoqCXzwnQZTDZvH28',
     );
   });

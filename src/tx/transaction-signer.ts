@@ -6,6 +6,7 @@ import { TransactionError, UnexpectedTsError } from '../utils/errors.js';
 /**
  * Returns account address that signed a transaction
  * @param transaction - transaction to get a signer of
+ * @category utils
  */
 export default function getTransactionSignerAddress(
   transaction: Encoded.Transaction,

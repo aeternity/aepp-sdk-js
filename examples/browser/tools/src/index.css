@@ -1,9 +1,10 @@
 :root {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-    Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol,
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue,
+    Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol,
     Noto Color Emoji;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New,
-    monospace;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
 }
 
 body {
@@ -13,8 +14,8 @@ body {
 }
 
 button {
-  display: block;
   width: 10rem;
+  margin: 0 0.5rem 0.5rem 0;
   padding: 0.5rem;
   border: none;
   border-radius: 9999px;
@@ -22,6 +23,7 @@ button {
   color: #fff;
   font-size: 0.75rem;
   line-height: 1rem;
+  font-family: var(--font-mono);
 
   &:disabled {
     cursor: not-allowed;
@@ -35,6 +37,7 @@ h2 {
   font-size: 1.5rem;
 }
 
+select,
 input,
 textarea {
   background: #111827;

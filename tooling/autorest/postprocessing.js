@@ -6,6 +6,7 @@ const nodeBigIntPropertyNames = [
   'fee',
   'amount',
   'nameFee',
+  'highestBid',
   'channelAmount',
   'initiatorAmount',
   'responderAmount',
@@ -79,10 +80,6 @@ await Promise.all(
       if (error.code === 'ENOENT') return;
       throw error;
     }
-
-    // TODO: remove after solving https://github.com/Azure/autorest.typescript/issues/1955
-    content = content.replaceAll(/ from "\.(.*)\/models";/g, ' from ".$1/models/index";');
-    content = content.replaceAll(/ from "\.(.+)";/g, ' from ".$1.js";');
 
     if (name === module) {
       content = content.replace(/ {2}\$host: string;/, '  readonly $host: string;');

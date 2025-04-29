@@ -6,7 +6,7 @@ import { assertNotNull, ensureEqual, indent, randomName, randomString } from '..
 import {
   AeSdk,
   Name,
-  MemoryAccount,
+  AccountMemory,
   buildContractId,
   computeBidFee,
   ensureName,
@@ -34,13 +34,18 @@ describe('Aens', () => {
     name = new Name(randomName(30), aeSdk.getContext());
   });
 
+  it('gives name id', () => {
+    expect(name.id).to.satisfies((id: string) => id.startsWith(Encoding.Name));
+    expect(name.id).to.equal(produceNameId(name.value));
+  });
+
   it('claims a name', async () => {
     const preclaimRes = await name.preclaim();
     assertNotNull(preclaimRes.tx);
     assertNotNull(preclaimRes.signatures);
     expect(preclaimRes.tx.fee).to.satisfy((fee: bigint) => fee >= 16620000000000n);
     expect(preclaimRes.tx.fee).to.satisfy((fee: bigint) => fee < 16860000000000n);
-    expect(preclaimRes).to.be.eql({
+    expect(preclaimRes).to.eql({
       tx: {
         fee: preclaimRes.tx.fee,
         nonce: preclaimRes.tx.nonce,
@@ -54,6 +59,7 @@ describe('Aens', () => {
       blockHash: preclaimRes.blockHash,
       encodedTx: preclaimRes.encodedTx,
       hash: preclaimRes.hash,
+      nameSalt: preclaimRes.nameSalt,
       signatures: [preclaimRes.signatures[0]],
       rawTx: preclaimRes.rawTx,
     });
@@ -64,7 +70,7 @@ describe('Aens', () => {
     assertNotNull(claimRes.signatures);
     expect(claimRes.tx.fee).to.satisfy((fee: bigint) => fee >= 16660000000000n);
     expect(claimRes.tx.fee).to.satisfy((fee: bigint) => fee <= 17080000000000n);
-    expect(claimRes).to.be.eql({
+    expect(claimRes).to.eql({
       tx: {
         fee: claimRes.tx.fee,
         nonce: claimRes.tx.nonce,
@@ -85,12 +91,23 @@ describe('Aens', () => {
     });
 
     assertNotNull(claimRes.blockHeight);
-    expect(await aeSdk.api.getNameEntryByName(name.value)).to.be.eql({
-      id: produceNameId(name.value),
+    expect(await aeSdk.api.getNameEntryByName(name.value)).to.eql({
+      id: name.id,
       owner: aeSdk.address,
       pointers: [],
       ttl: claimRes.blockHeight + 180000,
     });
+  }).timeout(timeoutBlock);
+
+  it('claims a name using different Name instances', async () => {
+    const string = randomName(30);
+
+    const name1 = new Name(string, aeSdk.getContext());
+    const { nameSalt } = await name1.preclaim();
+    expect(nameSalt).to.be.a('number');
+
+    const name2 = new Name(string, aeSdk.getContext());
+    await name2.claim({ nameSalt });
   }).timeout(timeoutBlock);
 
   it('claims a long name without preclaim', async () => {
@@ -102,7 +119,7 @@ describe('Aens', () => {
     assertNotNull(claimed.signatures);
     expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee >= 16860000000000n);
     expect(claimed.tx.fee).to.satisfy((fee: bigint) => fee < 17000000000000n);
-    expect(claimed).to.be.eql({
+    expect(claimed).to.eql({
       tx: {
         fee: claimed.tx.fee,
         nonce: claimed.tx.nonce,
@@ -138,12 +155,12 @@ describe('Aens', () => {
     assertNotNull(claimRes.tx);
     expect(claimRes.tx.fee).to.satisfy((fee: bigint) => fee >= 16940000000000n);
     expect(claimRes.tx.fee).to.satisfy((fee: bigint) => fee < 17100000000000n);
-    expect(claimRes.tx.name).to.be.equal(n.value);
-    expect(claimRes.tx.nameFee).to.be.equal(300000000000000n);
+    expect(claimRes.tx.name).to.equal(n.value);
+    expect(claimRes.tx.nameFee).to.equal(300000000000000n);
 
     assertNotNull(claimRes.blockHeight);
-    expect(await aeSdk.api.getNameEntryByName(n.value)).to.be.eql({
-      id: produceNameId(n.value),
+    expect(await aeSdk.api.getNameEntryByName(n.value)).to.eql({
+      id: n.id,
       owner: aeSdk.address,
       pointers: [],
       ttl: claimRes.blockHeight + 180000,
@@ -155,49 +172,78 @@ describe('Aens', () => {
     const n = new Name(randomName(30), aeSdk.getContext());
     const preclaimRes = await n.preclaim({ onAccount });
     assertNotNull(preclaimRes.tx);
-    expect(preclaimRes.tx.accountId).to.be.equal(onAccount.address);
+    expect(preclaimRes.tx.accountId).to.equal(onAccount.address);
   });
 
-  (isLimitedCoins ? it.skip : it)('starts a unicode name auction and makes a bid', async () => {
-    const nameShortString = `æ${randomString(4)}.chain`;
-    ensureName(nameShortString);
-    const n = new Name(nameShortString, aeSdk.getContext());
-    await n.preclaim();
-    await n.claim();
+  (isLimitedCoins ? describe.skip : describe)('Auction', () => {
+    let auction: Name;
 
-    const bidFee = computeBidFee(n.value);
-    const onAccount = Object.values(aeSdk.accounts)[1];
-    const bidRes = await n.bid(bidFee, { onAccount });
-    assertNotNull(bidRes.tx);
-    assertNotNull(bidRes.signatures);
-    expect(bidRes).to.be.eql({
-      tx: {
-        fee: bidRes.tx.fee,
-        nonce: bidRes.tx.nonce,
-        accountId: onAccount.address,
-        name: nameShortString,
-        nameSalt: 0,
-        nameFee: 3008985000000000000n,
-        version: 2,
-        ttl: bidRes.tx.ttl,
-        type: 'NameClaimTx',
-      },
-      blockHeight: bidRes.blockHeight,
-      blockHash: bidRes.blockHash,
-      encodedTx: bidRes.encodedTx,
-      hash: bidRes.hash,
-      signatures: [bidRes.signatures[0]],
-      rawTx: bidRes.rawTx,
+    before(() => {
+      const nameShortString = `æ${randomString(4)}.chain` as const;
+      auction = new Name(nameShortString, aeSdk.getContext());
     });
-    await expect(n.getState()).to.be.rejectedWith(
-      RestError,
-      `v3/names/%C3%A6${n.value.slice(1)} error: Name not found`,
-    );
+
+    it('starts a unicode name auction', async () => {
+      await auction.preclaim();
+      await auction.claim();
+    });
+
+    it('fails to query name state of auction', async () => {
+      await expect(auction.getState()).to.be.rejectedWith(
+        RestError,
+        `v3/names/%C3%A6${auction.value.slice(1)} error: Name not found`,
+      );
+    });
+
+    it('queries auction state from the node', async () => {
+      const state = await auction.getAuctionState();
+      expect(state).to.eql(await aeSdk.api.getAuctionEntryByName(auction.value));
+      expect(state).to.eql({
+        id: auction.id,
+        startedAt: state.startedAt,
+        endsAt: 480 + state.startedAt,
+        highestBidder: aeSdk.address,
+        highestBid: 2865700000000000000n,
+      });
+    });
+
+    it('makes a bid', async () => {
+      const bidFee = computeBidFee(auction.value);
+      const onAccount = Object.values(aeSdk.accounts)[1];
+      const bidRes = await auction.bid(bidFee, { onAccount });
+      assertNotNull(bidRes.tx);
+      assertNotNull(bidRes.signatures);
+      expect(bidRes).to.eql({
+        tx: {
+          fee: bidRes.tx.fee,
+          nonce: bidRes.tx.nonce,
+          accountId: onAccount.address,
+          name: auction.value,
+          nameSalt: 0,
+          nameFee: 3008985000000000000n,
+          version: 2,
+          ttl: bidRes.tx.ttl,
+          type: 'NameClaimTx',
+        },
+        blockHeight: bidRes.blockHeight,
+        blockHash: bidRes.blockHash,
+        encodedTx: bidRes.encodedTx,
+        hash: bidRes.hash,
+        signatures: [bidRes.signatures[0]],
+        rawTx: bidRes.rawTx,
+      });
+    });
   });
 
   it('queries state from the node', async () => {
     const state = await name.getState();
-    expect(state).to.be.eql(await aeSdk.api.getNameEntryByName(name.value));
+    expect(state).to.eql(await aeSdk.api.getNameEntryByName(name.value));
+    expect(state).to.eql({
+      id: name.id,
+      owner: aeSdk.address,
+      ttl: state.ttl,
+      pointers: [],
+    });
   });
 
   it('throws error on querying non-existent name', async () => {
@@ -210,7 +256,7 @@ describe('Aens', () => {
 
   it('fails to spend to name with invalid pointers', async () => {
     const { pointers } = await name.getState();
-    pointers.length.should.be.equal(0);
+    expect(pointers).to.have.length(0);
     await expect(aeSdk.spend(100, name.value)).to.be.rejectedWith(
       AensPointerContextError,
       `Name ${name.value} don't have pointers for account_pubkey`,
@@ -235,12 +281,12 @@ describe('Aens', () => {
       address: name.value,
     });
     // TODO: should be name id instead
-    expect(contractName.$options.address).to.be.equal(contract.$options.address);
-    expect((await contract.getArg(42, { callStatic: true })).decodedResult).to.be.equal(42n);
-    expect((await contract.getArg(42, { callStatic: false })).decodedResult).to.be.equal(42n);
+    expect(contractName.$options.address).to.equal(contract.$options.address);
+    expect((await contract.getArg(42, { callStatic: true })).decodedResult).to.equal(42n);
+    expect((await contract.getArg(42, { callStatic: false })).decodedResult).to.equal(42n);
   });
 
-  const { address } = MemoryAccount.generate();
+  const { address } = AccountMemory.generate();
   let pointers: Parameters<Name['update']>[0];
   let pointersNode: Array<{ key: string; id: (typeof pointers)[string] }>;
 
@@ -266,12 +312,12 @@ describe('Aens', () => {
     assertNotNull(updateRes.signatures);
     expect(updateRes.tx.fee).to.satisfy((fee: bigint) => fee >= 22140000000000n);
     expect(updateRes.tx.fee).to.satisfy((fee: bigint) => fee <= 22240000000000n);
-    expect(updateRes).to.be.eql({
+    expect(updateRes).to.eql({
       tx: {
         fee: updateRes.tx.fee,
         nonce: updateRes.tx.nonce,
         accountId: aeSdk.address,
-        nameId: produceNameId(name.value),
+        nameId: name.id,
         nameTtl: 180000,
         pointers: pointersNode,
         clientTtl: 3600,
@@ -315,7 +361,7 @@ describe('Aens', () => {
       { extendPointers: true },
     );
     assertNotNull(updateRes.tx);
-    expect(updateRes.tx.pointers).to.be.eql([
+    expect(updateRes.tx.pointers).to.eql([
       ...pointersNode.filter((pointer) => pointer.key !== 'contract_pubkey'),
       {
         key: 'contract_pubkey',
@@ -346,14 +392,14 @@ describe('Aens', () => {
     const extendRes = await name.extendTtl(10000);
     assertNotNull(extendRes.blockHeight);
     const { ttl } = await name.getState();
-    expect(ttl).to.be.equal(extendRes.blockHeight + 10000);
+    expect(ttl).to.equal(extendRes.blockHeight + 10000);
   });
 
   it('spends by name', async () => {
     const onAccount = Object.values(aeSdk.accounts)[1];
     const spendRes = await aeSdk.spend(100, name.value, { onAccount });
     assertNotNull(spendRes.tx);
-    expect(spendRes.tx.recipientId).to.be.equal(produceNameId(name.value));
+    expect(spendRes.tx.recipientId).to.equal(name.id);
   });
 
   it('transfers name', async () => {
@@ -363,12 +409,12 @@ describe('Aens', () => {
     assertNotNull(transferRes.signatures);
     expect(transferRes.tx.fee).to.satisfy((fee: bigint) => fee >= 17300000000000n);
     expect(transferRes.tx.fee).to.satisfy((fee: bigint) => fee <= 17400000000000n);
-    expect(transferRes).to.be.eql({
+    expect(transferRes).to.eql({
       tx: {
         fee: transferRes.tx.fee,
         nonce: transferRes.tx.nonce,
         accountId: aeSdk.address,
-        nameId: produceNameId(name.value),
+        nameId: name.id,
         recipientId: recipient,
         version: 1,
         ttl: transferRes.tx.ttl,
@@ -391,12 +437,12 @@ describe('Aens', () => {
     assertNotNull(revokeRes.signatures);
     expect(revokeRes.tx.fee).to.satisfy((fee: bigint) => fee >= 16620000000000n);
     expect(revokeRes.tx.fee).to.satisfy((fee: bigint) => fee <= 16700000000000n);
-    expect(revokeRes).to.be.eql({
+    expect(revokeRes).to.eql({
       tx: {
         fee: revokeRes.tx.fee,
         nonce: revokeRes.tx.nonce,
         accountId: onAccount.address,
-        nameId: produceNameId(name.value),
+        nameId: name.id,
         version: 1,
         ttl: revokeRes.tx.ttl,
         type: 'NameRevokeTx',
