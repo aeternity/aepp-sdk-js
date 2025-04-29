@@ -1,4 +1,4 @@
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import { ArgumentError, IllegalArgumentError } from '../../../utils/errors.js';
 import { Int, MIN_GAS_PRICE, Tag } from '../constants.js';
 import uInt from './u-int.js';
