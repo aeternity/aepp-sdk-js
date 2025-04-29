@@ -1,4 +1,4 @@
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import { genSalt, hash } from '../../utils/crypto.js';
 import { decode, encode, Encoded, Encoding } from '../../utils/encoder.js';
 import { toBytes } from '../../utils/bytes.js';

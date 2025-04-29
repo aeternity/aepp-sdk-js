@@ -1059,15 +1059,17 @@ describe('Contract instance', () => {
     });
 
     describe('STRING', () => {
-      it('Accepts array as joined string', async () => {
+      it('Accepts array as buffer', async () => {
         const arr = [1, 2, 3];
         const { decodedResult } = await testContract.stringFn(arr as any);
-        decodedResult.should.be.equal(arr.join(','));
+        decodedResult.should.be.equal(Buffer.from(arr).toString());
       });
 
-      it('Accepts number as string', async () => {
-        const { decodedResult } = await testContract.stringFn(123 as any);
-        decodedResult.should.be.equal('123');
+      it('Does not accepts number', async () => {
+        await expect(testContract.stringFn(123 as any)).to.be.rejectedWith(
+          TypeError,
+          'data is not iterable',
+        );
       });
 
       it('Valid', async () => {

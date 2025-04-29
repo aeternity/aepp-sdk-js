@@ -1,4 +1,4 @@
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import { getMinimumNameFee } from '../helpers.js';
 import { InsufficientNameFeeError } from '../../../utils/errors.js';
 import coinAmount from './coin-amount.js';

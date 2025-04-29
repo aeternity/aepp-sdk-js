@@ -1,5 +1,5 @@
 import { default as websocket, ICloseEvent } from 'websocket';
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import type Channel from './Base.js';
 import JsonBig from '../utils/json-big.js';
 import { pascalToSnake } from '../utils/string.js';

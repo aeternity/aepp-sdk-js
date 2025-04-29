@@ -1,4 +1,4 @@
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import { getBalance, resolveName } from './chain.js';
 import { sendTransaction, SendTransactionOptions } from './send-transaction.js';
 import { buildTxAsync, BuildTxOptions, unpackTx } from './tx/builder/index.js';

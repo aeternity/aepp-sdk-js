@@ -27,7 +27,6 @@ interface IdentityContractApi extends ContractMethodsBase {
 
 describe('Contract', () => {
   let aeSdk: AeSdk;
-  let bytecode: Encoded.ContractBytearray;
   let identityContract: Contract<IdentityContractApi>;
   let deployed: Awaited<ReturnType<Contract<{}>['$deploy']>>;
 
@@ -36,10 +35,11 @@ describe('Contract', () => {
   });
 
   it('deploys precompiled bytecode', async () => {
+    const { aci, bytecode } = await aeSdk.compilerApi.compileBySourceCode(identitySourceCode);
     identityContract = await Contract.initialize({
       ...aeSdk.getContext(),
+      aci,
       bytecode,
-      sourceCode: identitySourceCode,
     });
     expect(await identityContract.$deploy([])).to.have.property('address');
   });
