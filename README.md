@@ -27,14 +27,23 @@ Usage guides:
 - [Contract Events](docs/guides/contract-events.md)
 - [Oracles](docs/guides/oracles.md)
 - [PayingForTx](docs/guides/paying-for-tx.md) (Meta-Transactions)
-- [Batch Transactions](docs/guides//batch-requests.md)
+- [Batch Transactions](docs/guides/batch-requests.md)
 - [Error Handling](docs/guides/error-handling.md)
 - [Low vs High level API](docs/guides/low-vs-high-usage.md)
+- [Typed data hashing and signing](docs/guides/typed-data.md)
+- [Usage with TypeScript](docs/guides/typescript.md)
+- [JWT usage](docs/guides/jwt.md)
+- [Transaction options](docs/transaction-options.md)
+- [Range of possible address length](docs/guides/address-length.md)
 - Wallet Interaction
   - [Connect an æpp to a wallet](docs/guides/connect-aepp-to-wallet.md)
   - [How to build a wallet](docs/guides/build-wallet.md)
+  - [Ledger Hardware Wallet](docs/guides/ledger-wallet.md)
+  - [Aeternity snap for MetaMask](docs/guides/metamask-snap.md)
 
 There are also [examples](examples/README.md) that you can directly use and play with.
+
+### [API Reference](https://sdk.aeternity.io/v14.0.0/api/)
 
 ## CLI - Command Line Interface
 

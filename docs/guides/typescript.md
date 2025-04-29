@@ -8,7 +8,7 @@ Firstly, ensure you've set up TypeScript according to the [installation guide].
 
 ## Extract types of methods exposed by SDK
 
-SDK doesn't expose types separately to reduce the number of exports and simplify tracking of breaking changes. But you may need these types to prepare parameters or to hold the return value. In such cases, it is advised to use TypeScript-provided generics [`Parameters`] and [`ReturnType`]. For example,
+SDK doesn't expose types separately to reduce the number of exports and simplify tracking of breaking changes. But you may need these types to prepare parameters or to hold the return value. In such cases, it is advised to use TypeScript-provided generics [`Parameters`][Parameters] and [`ReturnType`][ReturnType]. For example,
 
 ```ts
 import { walletDetector } from '@aeternity/aepp-sdk';
@@ -23,7 +23,7 @@ const stop = walletDetector(connection, ({ newWallet }) => {
 });
 ```
 
-The same for [`ReturnType`]:
+The same for [`ReturnType`][ReturnType]:
 
 ```ts
 import { unpackDelegation } from '@aeternity/aepp-sdk';
@@ -36,8 +36,8 @@ delegation = unpackDelegation(
 );
 ```
 
-[`Parameters`]: https://www.typescriptlang.org/docs/handbook/utility-types.html#parameterstype
-[`ReturnType`]: https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype
+[Parameters]: https://www.typescriptlang.org/docs/handbook/utility-types.html#parameterstype
+[ReturnType]: https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype
 
 ## Initialize parameters with specific types
 
@@ -55,7 +55,7 @@ const gaAuthData = {
 const gaAuthDataPacked = packEntry(gaAuthData);
 ```
 
-The problem in this case, is that TypeScript will generalize the type of `unpackedEntry.txHash` to `string` instead of `th_${string}` making it incompatible with arguments of [`packEntry`]. To fix this you may define `gaAuthData`'s type explicitly, like:
+The problem in this case, is that TypeScript will generalize the type of `unpackedEntry.txHash` to `string` instead of `th_${string}` making it incompatible with arguments of [`packEntry`][packEntry]. To fix this you may define `gaAuthData`'s type explicitly, like:
 
 ```ts
 import { Tag, Encoded } from '@aeternity/aepp-sdk';
@@ -83,13 +83,13 @@ const gaAuthData = {
 } as const;
 ```
 
-In the last case, `txHash`'s type will be exactly `"th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1"`, making it compatible with [`packEntry`].
+In the last case, `txHash`'s type will be exactly `"th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1"`, making it compatible with [`packEntry`][packEntry].
 
-[`packEntry`]: https://sdk.aeternity.io/v14.0.0/api/functions/packEntry.html
+[packEntry]: https://sdk.aeternity.io/v14.0.0/api/functions/packEntry.html
 
-## Narrow the union type returned by [`unpackTx`], [`unpackDelegation`], and [`unpackEntry`]
+## Narrow the union type returned by [`unpackTx`][unpackTx], [`unpackDelegation`][unpackDelegation], and [`unpackEntry`][unpackEntry]
 
-Some sdk methods return a [union] of multiple types. For example, [`unpackTx`] returns a union of [all supported transaction] fields. To work correctly you need to narrow this type to a specific transaction before accessing its fields. For example,
+Some sdk methods return a [union] of multiple types. For example, [`unpackTx`][unpackTx] returns a union of [all supported transaction] fields. To work correctly you need to narrow this type to a specific transaction before accessing its fields. For example,
 
 ```ts
 import { unpackTx, Tag } from '@aeternity/aepp-sdk';
@@ -110,7 +110,7 @@ Without checking the `tx.tag` TypeScript will fail with
 
 > Property 'amount' does not exist on type 'TxUnpackedSignedTx1 & { tag: Tag; }'.
 
-The above check is also implemented in [`unpackTx`] itself, instead of checking the `tx.tag` you can provide Tag in the second argument:
+The above check is also implemented in [`unpackTx`][unpackTx] itself, instead of checking the `tx.tag` you can provide Tag in the second argument:
 
 ```ts
 const tx = unpackTx(encodedTx, Tag.SpendTx);
@@ -118,7 +118,7 @@ const tx = unpackTx(encodedTx, Tag.SpendTx);
 
 But if you need to get SpendTx properties inside a SignedTx you still need to use the above `tag` check.
 
-You may find that [`unpackTx`] is a generic function so that it can be executed as
+You may find that [`unpackTx`][unpackTx] is a generic function so that it can be executed as
 
 ```ts
 const tx = unpackTx<Tag.SpendTx>(encodedTx);
@@ -127,20 +127,20 @@ const tx = unpackTx<Tag.SpendTx>(encodedTx);
 The problem is that JavaScript won't check if the transaction is a SpendTx, so provide `Tag.SpendTx` as the second argument instead (as the above).
 
 [union]: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types
-[`unpackTx`]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackTx.html
-[`unpackDelegation`]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackDelegation.html
-[`unpackEntry`]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackEntry.html
+[unpackTx]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackTx.html
+[unpackDelegation]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackDelegation.html
+[unpackEntry]: https://sdk.aeternity.io/v14.0.0/api/functions/unpackEntry.html
 [all supported transaction]: https://sdk.aeternity.io/v14.0.0/api/types/_internal_.TxUnpacked.html
 
 ## Functions to assert types of user-provided data
 
-Let's assume we need to receive an address from the user to send some coins to it. The user enters an address in a text box, we can get it as a string. [`spend`] method accepts the address as [`Encoded.AccountAddress`], it won't accept a general string. We can overcome this restriction by adding a type assertion, like:
+Let's assume we need to receive an address from the user to send some coins to it. The user enters an address in a text box, we can get it as a string. [`spend`][spend] method accepts the address as [`Encoded.AccountAddress`][Encoded.AccountAddress], it won't accept a general string. We can overcome this restriction by adding a type assertion, like:
 
 ```ts
 await aeSdk.spend(100, address as Encoded.AccountAddress);
 ```
 
-The problem is that TypeScript won't check if `address` is an `ak_`-encoded string, and the [`spend`] method will fail in this case.
+The problem is that TypeScript won't check if `address` is an `ak_`-encoded string, and the [`spend`][spend] method will fail in this case.
 A more accurate solution would be to check the `address` in advance, providing user feedback if it is incorrect. For example:
 
 ```ts
@@ -154,9 +154,9 @@ if (!isEncoded(address, Encoding.AccountAddress)) {
 await aeSdk.spend(100, address);
 ```
 
-Please note that this method doesn't require explicit casting `string` to [`Encoded.AccountAddress`] because [`isEncoded`] implicitly marks `address` as `ak_${string}` in case it returns `true`.
+Please note that this method doesn't require explicit casting `string` to [`Encoded.AccountAddress`][Encoded.AccountAddress] because [`isEncoded`][isEncoded] implicitly marks `address` as `ak_${string}` in case it returns `true`.
 
-Additionally, you can use [`isEncoded`] to validate data against other address types:
+Additionally, you can use [`isEncoded`][isEncoded] to validate data against other address types:
 
 ```ts
 import { Encoding } from '@aeternity/aepp-sdk';
@@ -170,13 +170,13 @@ Or encoding types in general:
 isEncoded(address, Encoding.Transaction);
 ```
 
-[`spend`]: https://sdk.aeternity.io/v14.0.0/api/functions/spend.html
-[`Encoded.AccountAddress`]: https://sdk.aeternity.io/v14.0.0/api/types/Encoded.AccountAddress.html
-[`isEncoded`]: https://sdk.aeternity.io/v14.0.0/api/functions/isEncoded.html
+[spend]: https://sdk.aeternity.io/v14.0.0/api/functions/spend.html
+[Encoded.AccountAddress]: https://sdk.aeternity.io/v14.0.0/api/types/Encoded.AccountAddress.html
+[isEncoded]: https://sdk.aeternity.io/v14.0.0/api/functions/isEncoded.html
 
 ### AENS name validation
 
-The similar way [`isName`] can be used
+The similar way [`isName`][isName] can be used
 
 ```ts
 import { isName } from '@aeternity/aepp-sdk';
@@ -186,7 +186,7 @@ console.log(isName('мир.chain')); // true
 console.log(isName('🙂.chain')); // false
 ```
 
-If you don't need to handle invalid names specially then you can use [`ensureName`]:
+If you don't need to handle invalid names specially then you can use [`ensureName`][ensureName]:
 
 ```ts
 import { ensureName, Name } from '@aeternity/aepp-sdk';
@@ -196,14 +196,14 @@ ensureName(nameAsString);
 const name = new Name(nameAsString, options);
 ```
 
-Doing this way, [`ensureName`] will throw an exception if `nameAsString` is not a proper AENS name. TypeScript will handle `nameAsString` as `${string}.chain` in lines below [`ensureName`] invocation.
+Doing this way, [`ensureName`][ensureName] will throw an exception if `nameAsString` is not a proper AENS name. TypeScript will handle `nameAsString` as `${string}.chain` in lines below [`ensureName`][ensureName] invocation.
 
-[`isName`]: https://sdk.aeternity.io/v14.1.0/api/functions/isName.html
-[`ensureName`]: https://sdk.aeternity.io/v14.0.0/api/functions/ensureName.html
+[isName]: https://sdk.aeternity.io/v14.1.0/api/functions/isName.html
+[ensureName]: https://sdk.aeternity.io/v14.0.0/api/functions/ensureName.html
 
 ## Check types of contract methods
 
-By default, it is allowed to call any method of the [`Contract`] instance. You can enable type-checking by providing a contract interface in a generic parameter of [`Contract`]. For example:
+By default, it is allowed to call any method of the [`Contract`][Contract] instance. You can enable type-checking by providing a contract interface in a generic parameter of [`Contract`][Contract]. For example:
 
 ```ts
 import { Contract } from '@aeternity/aepp-sdk';
@@ -239,7 +239,7 @@ console.log((await contract.bar(new Map([['test', 10n]]))).decodedResult); // Ma
 console.log((await contract.baz({ FirstName: ['Nikita'] })).decodedResult); // 6
 ```
 
-If you need to define the contract interface separately then extend [`ContractMethodsBase`]:
+If you need to define the contract interface separately then extend [`ContractMethodsBase`][ContractMethodsBase]:
 
 ```ts
 import { ContractMethodsBase } from '@aeternity/aepp-sdk';
@@ -259,5 +259,5 @@ const contract = await Contract.initialize<FooContract>({
 It is theoretically possible to generate a contract interface by ACI. But unfortunately, it is [not supported] currently.
 
 [not supported]: https://github.com/aeternity/aepp-calldata-js/issues/97
-[`Contract`]: https://sdk.aeternity.io/v14.0.0/api/types/Contract.html
-[`ContractMethodsBase`]: https://sdk.aeternity.io/v14.0.0/api/interfaces/ContractMethodsBase.html
+[Contract]: https://sdk.aeternity.io/v14.0.0/api/types/Contract.html
+[ContractMethodsBase]: https://sdk.aeternity.io/v14.0.0/api/interfaces/ContractMethodsBase.html
