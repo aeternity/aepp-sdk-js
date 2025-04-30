@@ -244,7 +244,7 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
     it('signs message', async () => {
       const transport = await initTransport(indent`
         => e00800002f0000000000000027746573742d6d6573736167652c746573742d6d6573736167652c746573742d6d6573736167652c
-        <= ${isNewApp ? '78397e186058f278835b8e3e866960e4418dc1e9f00b3a2423f57c16021c88720119ebb3373a136112caa1c9ff63870092064659eb2c641dd67767f15c80350c9000' : '63a9410fa235e4b1f0204cc4d36322e666662da5873b399b076961eced2907f502cd3f91b95bbcfd8e235e194888d469bb15ab4382705aa887c2e0c4e6cb1a0b9000'}`);
+        <= ${isNewApp ? '78397e186058f278835b8e3e866960e4418dc1e9f00b3a2423f57c16021c88720119ebb3373a136112caa1c9ff63870092064659eb2c641dd67767f15c80350c9000' : 'f370b3b9d2e0b28d9a4a5f387cacab6fd47cf9fb74b5b4dde76e431cc770eaa392e645b9098945a3d85711a44763bbc5e00da49486d41be69e33ac186589700a9000'}`);
       const account = new AccountLedger(transport, 0, address);
       const signature = await account.signMessage(message);
       expect(signature).to.be.an.instanceOf(Uint8Array);
