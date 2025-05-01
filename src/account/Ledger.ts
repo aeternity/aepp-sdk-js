@@ -10,6 +10,7 @@ export const GET_ADDRESS = 0x02;
 export const SIGN_TRANSACTION = 0x04;
 export const GET_APP_CONFIGURATION = 0x06;
 export const SIGN_PERSONAL_MESSAGE = 0x08;
+export const SIGN_DATA = 0x0a;
 
 /**
  * Ledger wallet account class
@@ -39,14 +40,40 @@ export default class AccountLedger extends AccountBase {
   /**
    * @deprecated Use `unsafeSign` method instead
    */
-  // eslint-disable-next-line class-methods-use-this
-  override async sign(): Promise<Uint8Array> {
-    return this.unsafeSign();
+  override async sign(dataOrString: string | Uint8Array, options?: any): Promise<Uint8Array> {
+    return this.unsafeSign(dataOrString, options);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  override async unsafeSign(): Promise<Uint8Array> {
-    throw new NotImplementedError('RAW signing using Ledger HW');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  override async unsafeSign(dataOrString: string | Uint8Array, options?: any): Promise<Uint8Array> {
+    this._ensureNewApp();
+    const payload = Buffer.from(dataOrString);
+    let offset = 0;
+    const headerLength = 4 + 4;
+    const toSend = [];
+    while (offset !== payload.length) {
+      const maxChunkSize = offset === 0 ? 150 - headerLength : 150;
+      const chunkSize =
+        offset + maxChunkSize > payload.length ? payload.length - offset : maxChunkSize;
+      const buffer = Buffer.alloc(offset === 0 ? headerLength + chunkSize : chunkSize);
+      if (offset === 0) {
+        let bufferOffset = buffer.writeUInt32BE(this.index, 0);
+        bufferOffset = buffer.writeUInt32BE(payload.length, bufferOffset);
+        payload.copy(buffer, bufferOffset, 0, 150 - bufferOffset);
+      } else {
+        payload.copy(buffer, 0, offset, offset + chunkSize);
+      }
+      toSend.push(buffer);
+      offset += chunkSize;
+    }
+    const response = await toSend.reduce(
+      async (previous, data, i) => {
+        await previous;
+        return this.transport.send(CLA, SIGN_DATA, i === 0 ? 0x00 : 0x80, 0x00, data);
+      },
+      Promise.resolve(Buffer.alloc(0)),
+    );
+    return response.subarray(0, 64);
   }
 
   // eslint-disable-next-line class-methods-use-this

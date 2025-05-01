@@ -210,10 +210,35 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
     const address = 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ';
     const unsupportedVersion = 'Unsupported ledger app version 0.4.4. Supported: >= 1.0.0 < 2.0.0';
 
-    it('fails on calling raw signing', async () => {
-      const transport = await initTransport('');
+    const rawData = Buffer.from('deadbeef', 'hex');
+
+    it('signs raw data', async () => {
+      const transport = await initTransport(
+        !isNewApp
+          ? ''
+          : indent`
+        => e00a00000c0000000000000004deadbeef
+        <= 86599a8bf7475f878a437b09b3a881e172d5ddfc7fb29d28d5f567e9dc75834c5b3ef3aedf13a4a329058ba993ec68290166cac603f80aaee1c207e524ba75059000`,
+      );
       const account = new AccountLedger(transport, 0, address);
-      await expect(account.unsafeSign()).to.be.rejectedWith('RAW signing using Ledger HW');
+      const signaturePromise = account.unsafeSign(rawData);
+      if (!isNewApp) {
+        await expect(signaturePromise).to.be.rejectedWith(unsupportedVersion);
+        return;
+      }
+      const signature = await signaturePromise;
+      expect(verifySignature(rawData, signature, address)).to.equal(true);
+    });
+
+    it('signs raw data rejected', async () => {
+      if (!isNewApp) return;
+      const transport = await initTransport(indent`
+        => e00a00000c0000000000000004deadbeef
+        <= 6985`);
+      const account = new AccountLedger(transport, 0, address);
+      await expect(account.unsafeSign(rawData)).to.be.rejectedWith(
+        'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)',
+      );
     });
 
     const transaction = buildTx({
