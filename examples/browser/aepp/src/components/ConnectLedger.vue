@@ -1,8 +1,11 @@
 <template>
   <div class="group">
     <template v-if="!accountFactory">
-      <button :disabled="!isUsbSupported" @click="() => connect(false)">Connect over USB</button>
-      <button :disabled="!isBleSupported" @click="() => connect(true)">Connect over BLE</button>
+      <button :disabled="!isUsbSupported" @click="() => connect('usb')">Connect over USB</button>
+      <button :disabled="!isHidSupported" @click="() => connect('hid')">
+        Connect over USB HID
+      </button>
+      <button :disabled="!isBleSupported" @click="() => connect('ble')">Connect over BLE</button>
     </template>
     <template v-else>
       <div>
@@ -33,6 +36,7 @@
 import { AccountLedgerFactory } from '@aeternity/aepp-sdk';
 import { mapState } from 'vuex';
 import TransportWebUsb from '@ledgerhq/hw-transport-webusb';
+import TransportWebHid from '@ledgerhq/hw-transport-webhid';
 import TransportWebBle from '@ledgerhq/hw-transport-web-ble';
 import { listen } from '@ledgerhq/logs';
 
@@ -74,15 +78,20 @@ export default {
     status: '',
     accounts: [],
     isUsbSupported: false,
+    isHidSupported: false,
     isBleSupported: false,
   }),
   computed: mapState(['aeSdk']),
   methods: {
-    async connect(isBle) {
+    async connect(name) {
       let transport;
       try {
         this.status = 'Waiting for Ledger response';
-        transport = await (isBle ? TransportWebBleAndroidFix : TransportWebUsb).create();
+        transport = await {
+          usb: TransportWebUsb,
+          hid: TransportWebHid,
+          ble: TransportWebBleAndroidFix,
+        }[name].create();
         transport.on('disconnect', () => this.reset());
         const factory = new AccountLedgerFactory(transport);
         factory._enableExperimentalLedgerAppSupport = true;
@@ -165,6 +174,7 @@ export default {
   },
   async mounted() {
     this.isUsbSupported = await TransportWebUsb.isSupported();
+    this.isHidSupported = await TransportWebHid.isSupported();
     this.isBleSupported = await TransportWebBle.isSupported();
     this.unsubscribeLedgerLog = listen(({ type, id, date, message }) => {
       console.log(type, id, date.toLocaleTimeString(), message);
