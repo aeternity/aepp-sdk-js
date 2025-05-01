@@ -10,6 +10,7 @@
     "@aeternity/aepp-calldata": "^1.5.1",
     "@aeternity/aepp-sdk": "file:../../..",
     "@ledgerhq/hw-transport-web-ble": "^6.29.4",
+    "@ledgerhq/hw-transport-webhid": "^6.29.4",
     "@ledgerhq/hw-transport-webusb": "^6.29.4",
     "buffer": "^6.0.3",
     "core-js": "^3.32.1",
