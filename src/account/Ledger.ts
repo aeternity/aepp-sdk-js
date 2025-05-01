@@ -1,9 +1,12 @@
 import type Transport from '@ledgerhq/hw-transport';
 import AccountBase from './Base.js';
-import { ArgumentError, NotImplementedError, UnsupportedVersionError } from '../utils/errors.js';
-import { decode, Encoded } from '../utils/encoder.js';
+import { ArgumentError, UnsupportedVersionError } from '../utils/errors.js';
+import { decode, encode, Encoded, Encoding } from '../utils/encoder.js';
 import { buildTx } from '../tx/builder/index.js';
 import { Tag } from '../tx/builder/constants.js';
+import { AciValue, hashTypedData } from '../utils/typed-data.js';
+import { concatBuffers } from '../utils/other.js';
+import { messagePrefixLength } from '../utils/crypto.js';
 
 export const CLA = 0xe0;
 export const GET_ADDRESS = 0x02;
@@ -76,14 +79,42 @@ export default class AccountLedger extends AccountBase {
     return response.subarray(0, 64);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  override async signTypedData(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('Typed data signing using Ledger HW');
+  override async signTypedData(
+    data: Encoded.ContractBytearray,
+    aci: AciValue,
+    {
+      name,
+      version,
+      networkId,
+      contractAddress,
+      ...options
+    }: Parameters<AccountBase['signTypedData']>[2] = {},
+  ): Promise<Encoded.Signature> {
+    this._ensureNewApp();
+    const dHash = hashTypedData(data, aci, {
+      name,
+      version,
+      networkId,
+      contractAddress,
+    });
+    const signature = await this.unsafeSign(dHash, options);
+    return encode(signature, Encoding.Signature);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  override async signDelegation(): Promise<Encoded.Signature> {
-    throw new NotImplementedError('signing delegation using Ledger HW');
+  override async signDelegation(
+    delegation: Encoded.Bytearray,
+    { networkId }: { networkId?: string } = {},
+  ): Promise<Encoded.Signature> {
+    if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
+    this._ensureNewApp();
+    const payload = concatBuffers([
+      messagePrefixLength,
+      new Uint8Array([1]),
+      Buffer.from(networkId),
+      decode(delegation),
+    ]);
+    const signature = await this.unsafeSign(payload);
+    return encode(signature, Encoding.Signature);
   }
 
   override async signTransaction(

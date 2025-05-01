@@ -23,6 +23,8 @@ import {
   hash,
 } from '../../src';
 import { indent } from '../utils';
+import { Domain } from '../../src/utils/typed-data';
+import { ContractByteArrayEncoder, TypeResolver } from '@aeternity/aepp-calldata';
 
 const compareWithRealDevice = false; // switch to true for manual testing
 // ledger should be initialized with mnemonic:
@@ -322,6 +324,87 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
         <= 6985`);
       const account = new AccountLedger(transport, 0, address);
       await expect(account.signMessage(message)).to.be.rejectedWith(
+        'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)',
+      );
+    });
+
+    const delegation =
+      'ba_+EYDAaEBXXFtZp9YqbY4KdW8Nolf9Hjp0VZcNWnQOKjgCb8Br9mhBV1xbWafWKm2OCnVvDaJX/R46dFWXDVp0Dio4Am/Aa/Z2vgCEQ==';
+
+    it('signs delegation', async () => {
+      const transport = await initTransport(
+        !isNewApp
+          ? ''
+          : indent`
+        => e00a00005900000000000000511a0161655f74657374f8460301a1015d716d669f58a9b63829d5bc36895ff478e9d1565c3569d038a8e009bf01afd9a1055d716d669f58a9b63829d5bc36895ff478e9d1565c3569d038a8e009bf01afd9
+        <= a863fa5a8187095f6b4d74185014e10042c59485b05d8204aef8d14be5d42663930ce6958724ab0ad0082d71e26744dbdde35ea5f2092e194d480693c026e4059000`,
+      );
+      const account = new AccountLedger(transport, 0, address);
+      const signaturePromise = account.signDelegation(delegation, { networkId: 'ae_test' });
+      if (!isNewApp) {
+        await expect(signaturePromise).to.be.rejectedWith(unsupportedVersion);
+        return;
+      }
+      expect(await signaturePromise).to.equal(
+        'sg_P2krNnpBeYjJauMSeAp8Pg5rPnb9bQchz3pF3wkPRHzsaNYVutAP9kCZS9qpB6xsT69SnUsJb2kqk1SerzNSvQcZAAiNg',
+      );
+    });
+
+    it('signs delegation rejected', async () => {
+      if (!isNewApp) return;
+      const transport = await initTransport(indent`
+        => e00a00005900000000000000511a0161655f74657374f8460301a1015d716d669f58a9b63829d5bc36895ff478e9d1565c3569d038a8e009bf01afd9a1055d716d669f58a9b63829d5bc36895ff478e9d1565c3569d038a8e009bf01afd9
+        <= 6985`);
+      const account = new AccountLedger(transport, 0, address);
+      await expect(account.signDelegation(delegation, { networkId: 'ae_test' })).to.be.rejectedWith(
+        'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)',
+      );
+    });
+
+    const recordAci = {
+      record: [
+        { name: 'operation', type: 'string' },
+        { name: 'parameter', type: 'int' },
+      ],
+    } as const;
+    const domain: Domain = {
+      name: 'Test app',
+      version: 2,
+      networkId: 'ae_dev',
+      contractAddress: 'ct_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
+    };
+    const recordType = new TypeResolver().resolveType(recordAci, {});
+    const typedData = new ContractByteArrayEncoder().encodeWithType(
+      { operation: 'test', parameter: 45 },
+      recordType,
+    );
+
+    it('signs typed data', async () => {
+      const transport = await initTransport(
+        !isNewApp
+          ? ''
+          : indent`
+        => e00a0000280000000000000020992b3e27cc77f0cb6eef990f3cfeb84191bffe95a3e4013a962c1aa0561d1a48
+        <= b2846e392b43988d2386d1e6a0d1215449c185ee9b41e2aa4be3dbe4ca92c214737169dc9f142d102657dcb77d682291e1f574c689f231b3d139879d0fa0c50c9000`,
+      );
+      const account = new AccountLedger(transport, 0, address);
+      const signaturePromise = account.signTypedData(typedData, recordAci, domain);
+      if (!isNewApp) {
+        await expect(signaturePromise).to.be.rejectedWith(unsupportedVersion);
+        return;
+      }
+      expect(await signaturePromise).to.equal(
+        'sg_QMbiL9aYPDZWgYe8zqoaYwXJ7LhWqD187SFi7n9rhgSS4zXYVS2Fr4YARTRRR86wm19BHsNUYDakMKLvQ4JfLmfTVi5Wb',
+      );
+    });
+
+    it('signs typed data rejected', async () => {
+      if (!isNewApp) return;
+      const transport = await initTransport(indent`
+        => e00a0000280000000000000020992b3e27cc77f0cb6eef990f3cfeb84191bffe95a3e4013a962c1aa0561d1a48
+        <= 6985`);
+      const account = new AccountLedger(transport, 0, address);
+      await expect(account.signTypedData(typedData, recordAci, domain)).to.be.rejectedWith(
         'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)',
       );
     });
