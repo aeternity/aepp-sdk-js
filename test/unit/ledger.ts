@@ -10,7 +10,7 @@ import {
 import type Transport from '@ledgerhq/hw-transport';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-singleton';
 import {
-  AccountLedger,
+  AccountLedger as AccountLedgerOriginal,
   AccountLedgerFactory as AccountLedgerFactoryOriginal,
   buildTx,
   Node,
@@ -28,30 +28,33 @@ const compareWithRealDevice = false; // switch to true for manual testing
 // ledger should be initialized with mnemonic:
 // eye quarter chapter suit cruel scrub verify stuff volume control learn dust
 
-async function initTransport(
-  expectedRecordStore: string,
-  ignoreRealDevice = false,
-): Promise<Transport> {
-  if (!compareWithRealDevice || ignoreRealDevice) {
-    return openTransportReplayer(RecordStore.fromString(expectedRecordStore));
-  }
-
-  // TODO: remove after solving https://github.com/LedgerHQ/ledger-live/issues/9462
-  const Transport =
-    'default' in TransportNodeHid
-      ? (TransportNodeHid.default as typeof TransportNodeHid)
-      : TransportNodeHid;
-  const t = await Transport.create();
-  const recordStore = new RecordStore();
-  const TransportRecorder = createTransportRecorder(t, recordStore);
-  after(() => {
-    expect(recordStore.toString().trim()).to.equal(expectedRecordStore);
-  });
-  return new TransportRecorder(t);
-}
-
 function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
   this.timeout(compareWithRealDevice ? 60000 : 300);
+
+  async function initTransport(
+    expectedRecordStore: string,
+    ignoreRealDevice = false,
+  ): Promise<Transport> {
+    // TODO: remove after fixing https://github.com/aeternity/ledger-app/issues/42
+    if (compareWithRealDevice && isNewApp)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!compareWithRealDevice || ignoreRealDevice) {
+      return openTransportReplayer(RecordStore.fromString(expectedRecordStore));
+    }
+
+    // TODO: remove after solving https://github.com/LedgerHQ/ledger-live/issues/9462
+    const Transport =
+      'default' in TransportNodeHid
+        ? (TransportNodeHid.default as typeof TransportNodeHid)
+        : TransportNodeHid;
+    const t = await Transport.create();
+    const recordStore = new RecordStore();
+    const TransportRecorder = createTransportRecorder(t, recordStore);
+    after(() => {
+      expect(recordStore.toString().trim()).to.equal(expectedRecordStore);
+    });
+    return new TransportRecorder(t);
+  }
 
   before(async () => {
     if (!compareWithRealDevice) return;
@@ -67,6 +70,13 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
     constructor(transport: Transport) {
       super(transport);
       this._enableExperimentalLedgerAppSupport = isNewApp;
+    }
+  }
+
+  class AccountLedger extends AccountLedgerOriginal {
+    constructor(...args: ConstructorParameters<typeof AccountLedgerOriginal>) {
+      super(...args);
+      this._isNewApp = isNewApp;
     }
   }
 
@@ -137,7 +147,7 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
         <= 35616b5f3248746565756a614a7a75744b65465a69416d59547a636167536f5245725358704246563137397859677154347465616b769000`);
       const factory = new AccountLedgerFactory(transport);
       const account = await factory.initialize(42);
-      expect(account).to.be.an.instanceOf(AccountLedger);
+      expect(account).to.be.an.instanceOf(AccountLedgerOriginal);
       expect(account.address).to.equal('ak_2HteeujaJzutKeFZiAmYTzcagSoRErSXpBFV179xYgqT4teakv');
       expect(account.index).to.equal(42);
     });
@@ -198,6 +208,8 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
 
   describe('account', () => {
     const address = 'ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ';
+    const unsupportedVersion = 'Unsupported ledger app version 0.4.4. Supported: >= 1.0.0 < 2.0.0';
+
     it('fails on calling raw signing', async () => {
       const transport = await initTransport('');
       const account = new AccountLedger(transport, 0, address);
@@ -211,10 +223,12 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
       amount: 1.23e18,
       nonce: 10,
     });
+    const genSignTxRequest = (innerTx = false): string =>
+      `e00400006${isNewApp ? 'b' : 'a'}000000000000005b${isNewApp ? (innerTx ? '01' : '00') : ''}0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80`;
 
     it('signs transaction', async () => {
       const transport = await initTransport(indent`
-        => e00400006a000000000000005b0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80
+        => ${genSignTxRequest()}
         <= f868f1c6ce9b9f2b3aecbec04c6a7b5c8ae30f5c0e87dbcf17fb99663cc22e41aa6edb5d1ee35678164c83d5bdc8cd8cef308b3ecf96f53f3cbd61732041ec0d9000`);
       const account = new AccountLedger(transport, 0, address);
       const networkId = 'ae_uat';
@@ -229,7 +243,7 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
 
     it('signs transaction rejected', async () => {
       const transport = await initTransport(indent`
-        => e00400006a000000000000005b0661655f756174f8590c01a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037a101f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037881111d67bb1bb0000860f4c36200800000a80
+        => ${genSignTxRequest()}
         <= 6985`);
       const account = new AccountLedger(transport, 0, address);
       await expect(
@@ -237,6 +251,31 @@ function genLedgerTests(this: Mocha.Suite, isNewApp = false): void {
       ).to.be.rejectedWith(
         'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)',
       );
+    });
+
+    it('signs transaction as inner', async () => {
+      const transport = await initTransport(
+        !isNewApp
+          ? ''
+          : indent`
+        => ${genSignTxRequest(true)}
+        <= e50f2485a2460d64335b725f05b14cc16db65e357f90b888b99586ac37ea3cba9f88d75dde330cda3c9deb05e0867c98d3e184c1db3b5c3e45daab8169a6c40d9000`,
+      );
+      const account = new AccountLedger(transport, 0, address);
+      const networkId = 'ae_uat';
+      const signedPromise = account.signTransaction(transaction, { networkId, innerTx: true });
+      if (!isNewApp) {
+        await expect(signedPromise).to.be.rejectedWith(unsupportedVersion);
+        return;
+      }
+      const {
+        signatures: [signature],
+      } = unpackTx(await signedPromise, Tag.SignedTx);
+      const hashedTx = Buffer.concat([
+        Buffer.from(networkId + '-inner_tx'),
+        hash(decode(transaction)),
+      ]);
+      expect(verifySignature(hashedTx, signature, address)).to.equal(true);
     });
 
     const message = 'test-message,'.repeat(3);

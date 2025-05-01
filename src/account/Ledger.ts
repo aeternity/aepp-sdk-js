@@ -1,6 +1,6 @@
 import type Transport from '@ledgerhq/hw-transport';
 import AccountBase from './Base.js';
-import { ArgumentError, NotImplementedError } from '../utils/errors.js';
+import { ArgumentError, NotImplementedError, UnsupportedVersionError } from '../utils/errors.js';
 import { decode, Encoded } from '../utils/encoder.js';
 import { buildTx } from '../tx/builder/index.js';
 import { Tag } from '../tx/builder/constants.js';
@@ -30,6 +30,12 @@ export default class AccountLedger extends AccountBase {
     transport.decorateAppAPIMethods(this, ['signTransaction', 'signMessage'], 'w0w');
   }
 
+  _isNewApp = false;
+
+  _ensureNewApp(): void {
+    if (!this._isNewApp) throw new UnsupportedVersionError('ledger app', '0.4.4', '1.0.0', '2.0.0');
+  }
+
   /**
    * @deprecated Use `unsafeSign` method instead
    */
@@ -57,12 +63,13 @@ export default class AccountLedger extends AccountBase {
     tx: Encoded.Transaction,
     { innerTx, networkId }: { innerTx?: boolean; networkId?: string } = {},
   ): Promise<Encoded.Transaction> {
-    if (innerTx != null) throw new NotImplementedError('innerTx option in AccountLedger');
+    if (innerTx === true) this._ensureNewApp();
+    innerTx ??= false;
     if (networkId == null) throw new ArgumentError('networkId', 'provided', networkId);
 
     const rawTx = decode(tx);
     let offset = 0;
-    const headerLength = 4 + 1 + 4;
+    const headerLength = 4 + (this._isNewApp ? 1 : 0) + 1 + 4;
     const networkIdBuffer = Buffer.from(networkId);
     const toSend = [];
     while (offset !== rawTx.length) {
@@ -74,6 +81,7 @@ export default class AccountLedger extends AccountBase {
       if (offset === 0) {
         let bufferOffset = buffer.writeUInt32BE(this.index, 0);
         bufferOffset = buffer.writeUInt32BE(rawTx.length, bufferOffset);
+        if (this._isNewApp) bufferOffset = buffer.writeUInt8(innerTx ? 1 : 0, bufferOffset);
         bufferOffset = buffer.writeUInt8(networkIdBuffer.length, bufferOffset);
         bufferOffset += networkIdBuffer.copy(buffer, bufferOffset, 0, networkIdBuffer.length);
         rawTx.copy(buffer, bufferOffset, 0, 150 - bufferOffset);
