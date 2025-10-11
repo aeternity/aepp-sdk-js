@@ -251,7 +251,12 @@ export default class Name {
   }
 
   /**
-   * Claim a previously preclaimed registration. This can only be done after the preclaim step
+   * Claim a name.
+   *
+   * Since the Ceres protocol upgrade, it is possible to claim a name without preclaiming it.
+   * If you preclaim, wait for at least 1 key block to be mined before exposing a name in the
+   * NameClaimTx to ensure that nobody can front-run the claim.
+   *
    * @param options - options
    * @returns mined transaction details
    * @example
@@ -273,7 +278,10 @@ export default class Name {
   }
 
   /**
-   * Preclaim a name. Sends a hash of the name and a random salt to the node
+   * Preclaim a name. This sends a commitment hash (derived from the name and a random salt) to
+   * the node. Preclaiming was required to claim a name before the Ceres protocol upgrade.
+   * After the upgrade, preclaiming is optional but still available for added security if you
+   * want to claim a non-auction name.
    * @param options - Options
    * @example
    * ```js
