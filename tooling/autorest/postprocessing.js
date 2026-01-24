@@ -132,9 +132,14 @@ await Promise.all(
             /extends PaginatedResponse,(\s+)(\w+) {}/gs,
             'extends $2,$1PaginatedResponse {}',
           );
-          const responseRe = /export interface (\w+)\s+extends (\w+),\s+PaginatedResponse {}/s;
-          while (content.match(responseRe)) {
-            const [response, responseTypeName, dataTypeName] = content.match(responseRe);
+          const responseRe = /export interface (\w+)\s+extends\s+(\w+),\s+PaginatedResponse {}/s;
+          const responseReReversed =
+            /export interface (\w+)\s+extends\s+PaginatedResponse,\s+(\w+) {}/s;
+          let matchedResponse;
+          while (
+            (matchedResponse = content.match(responseRe) ?? content.match(responseReReversed))
+          ) {
+            const [response, responseTypeName, dataTypeName] = matchedResponse;
             const regExp = new RegExp(
               String.raw`export interface ${dataTypeName} {\s+data: (\w+)\[\];\s+}\n\n`,
               's',
