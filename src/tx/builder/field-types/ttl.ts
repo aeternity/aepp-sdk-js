@@ -3,6 +3,10 @@ import Node from '../../../Node.js';
 import { ArgumentError } from '../../../utils/errors.js';
 import { _getPollInterval, getHeight } from '../../../chain.js';
 
+// TODO: restore after the mainnet mining issue is solved, was used via `_isInternalBuild` flag
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const DEFAULT_INTERNAL_RELATIVE_TTL = 3;
+
 /**
  * Time to leave
  */
@@ -20,17 +24,15 @@ export default {
     {
       onNode,
       absoluteTtl,
-      _isInternalBuild,
       ...options
     }: {
       onNode?: Node;
       absoluteTtl?: boolean;
-      _isInternalBuild?: boolean;
     } & Omit<Parameters<typeof _getPollInterval>[1], 'onNode'>,
   ) {
-    if (absoluteTtl !== true && value !== 0 && (value != null || _isInternalBuild === true)) {
+    if (absoluteTtl !== true && value !== 0 && value != null) {
       if (onNode == null) throw new ArgumentError('onNode', 'provided', onNode);
-      value = (value ?? 3) + (await getHeight({ ...options, onNode, cached: true }));
+      value += await getHeight({ ...options, onNode, cached: true });
     }
     return value;
   },
