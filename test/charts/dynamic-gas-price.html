@@ -75,7 +75,7 @@
         pointStyle: false,
       };
 
-      const { Node, AeSdk, AccountMemory, CompilerHttp, MIN_GAS_PRICE } = Aeternity;
+      const { Node, AeSdk, Contract, AccountMemory, CompilerHttp, MIN_GAS_PRICE } = Aeternity;
 
       const nodeUrl = 'http://localhost:3013';
       const node = new Node(nodeUrl);
@@ -195,7 +195,10 @@ contract Test =
 
         try {
           await aeSdk.transferFunds(0.01, aeSdk.address, { onAccount: genesis });
-          const contract = await aeSdk.initializeContract({ sourceCode: contractSourceCode });
+          const contract = await Contract.initialize({
+            ...aeSdk.getContext(),
+            sourceCode: contractSourceCode,
+          });
           const deployInfo = await contract.$deploy([]);
           updateClient(idx, { message: `Contract deployed at ${deployInfo.address}` });
           while (!stop) {
