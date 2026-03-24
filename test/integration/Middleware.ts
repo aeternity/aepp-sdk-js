@@ -145,7 +145,7 @@ describe('Middleware API', () => {
         version: 6,
         signature:
           'sg_DmGnGbbfUNuYgvJyvA927kbqJ9mVDHoKMHYvRQR89LcmAV26WwUvLSdJwdvohnGcr58VRJtzjikEaJ9HuFwduo3jbMr9E',
-        txsHash: 'bx_2i471KqJ5XTLVQJS4x95FyLuwbAcj4SetvemPUs4oV47S9dFb3',
+        txsHash: 'bx_KhywrSEagHJRRC1HJ4te5WYvdBPg8NRU3TJ9u8JvU3KdGHgcq',
       };
       copyFields(expectedRes, res, ['time', 'hash', 'prevHash', 'prevKeyHash', 'signature']);
       expect(res).to.eql(expectedRes);
@@ -202,7 +202,7 @@ describe('Middleware API', () => {
               payload: {
                 amount: 500000000000000n,
                 kind: 'fee_lock_name',
-                refTxHash: 'th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1',
+                refTxHash: 'th_ZgQ2KkzwyhiDARKZ6RrWYxQTcxuj3jY7FuqsBe1ZcEk752uT2',
               },
               // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/2137
               type: 'InternalTransferEvent' as ActivityType,
@@ -215,12 +215,12 @@ describe('Middleware API', () => {
                 blockHash: 'mh_2GzNyPoPZvKavxfvorCc7gwTFs8u6HKzua2z7fcakCxh66JfrU',
                 blockHeight: 3,
                 encodedTx:
-                  'tx_+KULAfhCuEBXzxuqo82mMkKCtMLjwrBwYa6B1zvwpqUeGT49lce9p0QMPb2tfgcgScxi2N87JfOwRpuI2iOsrP69uMtYfKIIuF34WyACoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgKkMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODAwLmNoYWluAIcBxr9SY0AAhg9Vhk+YAAarXkK8',
-                hash: 'th_2CKnN6EorvNiwwqRjSzXLrPLiHmcwo4Ny22dwCrSYRoD6MVGK1',
+                  'tx_+KULAfhCuEANxP0GcwVH9Q//WKEcBTe7Y+wnN82pqC08PnefojwxIntVXo1q0hjJocifM0bJVSseFrziKbwotzcrH0544/UJuF34WyACoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgKkMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODAwLmNoYWluAIcBxr9SY0AAhg9Vhk+YAACs7eE0',
+                hash: 'th_ZgQ2KkzwyhiDARKZ6RrWYxQTcxuj3jY7FuqsBe1ZcEk752uT2',
                 microIndex: 0,
                 microTime: new Date(1721911705246),
                 signatures: [
-                  'sg_CVJMvQ7TPCbcmEn5GXFY9bh8okNTuE956PiiZaSJ2V9JWKgimmP86L5NUiZpFgeE6Am7QJk7KYwxJMGgFhQSXJJxrhqFJ',
+                  'sg_2oV3iWDHFkTfsCZJZydpF9QwqQX9koKX637zNfAkaTaC9byXmxF2KtfZHXCM2pt7hzDa7N3qKYX4jb39X58B8GvSN5MbC',
                 ],
                 tx: {
                   accountId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
@@ -230,7 +230,6 @@ describe('Middleware API', () => {
                   nameId: 'nm_ZdygpYcGrRPNJZC1WRLRsEx3KT91zE4Mieg4XNkM6Qvs71NaE',
                   nameSalt: 0,
                   nonce: 2,
-                  ttl: 6,
                   type: 'NameClaimTx',
                   version: 2,
                 },
@@ -245,12 +244,12 @@ describe('Middleware API', () => {
                 blockHash: 'mh_2SiHrRABSj8Hgdt3Dc2ypaKrUkjCTK92pUx1nZKLEAYMVhUu8G',
                 blockHeight: 2,
                 encodedTx:
-                  'tx_+PcLAfhCuEB+Tq5sUOIMedGLODH48nG1b7KNt4Dre9vyXC3eH2EjFe2EkVGpx4QN/eQU2OLHXJgg1/7uFO5S3pMlI+jqv78FuK/4rSoBoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgG4avhoRgOg2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke3AuDue/kTWRB8ANwA3ABoOgj8BAz/+gHggkgA3AQcHAQEAmC8CEUTWRB8RaW5pdBGAeCCSGWdldEFyZ4IvAIU4LjAuMACDCAADhkdlNJ1oAAUAAEyEO5rKAIcrEUTWRB8/Bmn2yg==',
-                hash: 'th_2JMR7C1DjrGeZWyyLMkccRLga1Lct8Syy9hcZKD9PEZkN5JvSD',
+                  'tx_+PcLAfhCuEBmlaw64Hflt9AKp4EspRufqRqO8MgtCpH8vi/6Rqt8mBuR6WVDbYaawDKr1FvaAvjqyHdFwCcVQrmx1Jp5zZUEuK/4rSoBoQGlDe8oTWOIBGKIUgMgu3jBZWwwfAJEB/vhPQUWEAbEqgG4avhoRgOg2qvS0QZEjddEG/XeWW7yVgfv7YPK4+Tsp1rY/AENke3AuDue/kTWRB8ANwA3ABoOgj8BAz/+gHggkgA3AQcHAQEAmC8CEUTWRB8RaW5pdBGAeCCSGWdldEFyZ4IvAIU4LjAuMACDCAADhkdlNJ1oAAAAAEyEO5rKAIcrEUTWRB8/vuG/Pw==',
+                hash: 'th_UcgJe24ZQ3qyBwQoYFP6w31ZA9MZ8BaaKtTnM7cpg4xRVXgft',
                 microIndex: 0,
                 microTime: new Date(1721911705161),
                 signatures: [
-                  'sg_HXRkFjgjsFmFLZ1ywBgYj9VouQK1BySqCViALxq3ge69a86aDgd1ESqNXhCLebh7fH6SohTjbLXXxhjPnYXaGJfiX7DQV',
+                  'sg_ERRE263WdFMdhEGgMN6Cv6g7URF69s5NoftPs9vS4YgSxd9BCrjt1wtggZm2ncKFpT28t4LjcXHhFEabNZxz9eF77vi3z',
                 ],
                 tx: {
                   abiVersion: 3,
@@ -265,7 +264,6 @@ describe('Middleware API', () => {
                   gasPrice: 1000000000n,
                   nonce: 1,
                   ownerId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
-                  ttl: 5,
                   type: 'ContractCreateTx',
                   version: 1,
                   vmVersion: 8,
@@ -291,12 +289,12 @@ describe('Middleware API', () => {
                 blockHash: 'mh_Q6fJrHYWiaAz8277zX8fgAgyCpmBtioFd1RQdC36oRuCtjz19',
                 blockHeight: 1,
                 encodedTx:
-                  'tx_+KMLAfhCuEDgjc7zMPb+xRW+pI0L5OqwjI+OBF0ee1zgmlkXsavoYXHZw7vTx6vxaAZxxs4ts/eZhAmqVGg3EmTsRAtccKMDuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgABAGAJs2FDw==',
-                hash: 'th_U26TdBBNT56HFXWAb4ktFyWBTuCAnwdajecTL4ss2BhciRviG',
+                  'tx_+KMLAfhCuECH3NJsqQ133GoiERkVwaLN/VXho9IXtI7Z3utdE432yolrMKhCuGnOKPWGNZj34dTVB0/DsGg8kodNTGAQNtAHuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgAAAGA6CvCzg==',
+                hash: 'th_217y1Y34jtYgviJ4BDn98onDdXZNAv64Ydes8qPnAiG7d5fFCf',
                 microIndex: 0,
                 microTime: new Date(1721911704982),
                 signatures: [
-                  'sg_WNvkq9RewEjZDrDLqXMUoyBd8pGzqAuyaDfG3bQAfGx4tF6smTLyYnFWmtY8SrJRnEHbriDUm836DSJSkMjiijLKBsSzo',
+                  'sg_Jmw5BoLGqhGPGsrqkLtFHnS28pvsrTVAEk3X3LEDmKwiHeHh8pkTYYA4mnvzQfyaBKrdKWfo4Smx7yx6XgyNnPzPrSN9g',
                 ],
                 tx: {
                   amount: 1000000000000000000n,
@@ -305,7 +303,6 @@ describe('Middleware API', () => {
                   payload: 'ba_Xfbg4g==',
                   recipientId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
                   senderId: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
-                  ttl: 4,
                   type: 'SpendTx',
                   version: 1,
                 },
@@ -334,12 +331,12 @@ describe('Middleware API', () => {
               blockHash: 'mh_2nWwtjNCnjUYMqGfgfrt8MsnvRYuY8ZdET31RXTa4jFBdzEKF8',
               blockHeight: 1,
               encodedTx:
-                'tx_+KMLAfhCuEDgjc7zMPb+xRW+pI0L5OqwjI+OBF0ee1zgmlkXsavoYXHZw7vTx6vxaAZxxs4ts/eZhAmqVGg3EmTsRAtccKMDuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgABAGAJs2FDw==',
-              hash: 'th_U26TdBBNT56HFXWAb4ktFyWBTuCAnwdajecTL4ss2BhciRviG',
+                'tx_+KMLAfhCuECH3NJsqQ133GoiERkVwaLN/VXho9IXtI7Z3utdE432yolrMKhCuGnOKPWGNZj34dTVB0/DsGg8kodNTGAQNtAHuFv4WQwBoQGEDJdLlxZHdkVLoRnYTtxNYFio3skrbtxXirLTC0xCAKEBpQ3vKE1jiARiiFIDILt4wWVsMHwCRAf74T0FFhAGxKqIDeC2s6dkAACGD0w2IAgAAAGA6CvCzg==',
+              hash: 'th_217y1Y34jtYgviJ4BDn98onDdXZNAv64Ydes8qPnAiG7d5fFCf',
               microIndex: 0,
               microTime: new Date(1721973919196),
               signatures: [
-                'sg_WNvkq9RewEjZDrDLqXMUoyBd8pGzqAuyaDfG3bQAfGx4tF6smTLyYnFWmtY8SrJRnEHbriDUm836DSJSkMjiijLKBsSzo',
+                'sg_Jmw5BoLGqhGPGsrqkLtFHnS28pvsrTVAEk3X3LEDmKwiHeHh8pkTYYA4mnvzQfyaBKrdKWfo4Smx7yx6XgyNnPzPrSN9g',
               ],
               tx: {
                 amount: 1000000000000000000n,
@@ -348,7 +345,6 @@ describe('Middleware API', () => {
                 payload: 'ba_Xfbg4g==',
                 recipientId: 'ak_2Fh6StA76AKdy8qsGdkEfkQyVmAYc2XE1irWRnDgXKhmBLKoXg',
                 senderId: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',
-                ttl: 4,
                 type: 'SpendTx',
                 version: 1,
               },
@@ -386,7 +382,7 @@ describe('Middleware API', () => {
               kind: 'fee_spend_name' as TransferKind,
               // TODO: remove after solving https://github.com/aeternity/ae_mdw/issues/2079
               refBlockHash: 'NameClaimTx' as Encoded.MicroBlockHash,
-              refTxHash: 'th_C7LscPqF5Nf5QrgZDSVbY92v7rruefN1qHjrHVuk2bdNwZF1e',
+              refTxHash: 'th_Dxxed4NPLkCJ5FyKiACjQRCqyBFqpQud4zQhCh9hdFxmjwkaU',
               refTxType: 'mh_2MYrB5Qjb4NCYZMVmbqnazacY76gGzNgEjW2VnEKzovDTky8fD',
             },
           ],
@@ -413,8 +409,8 @@ describe('Middleware API', () => {
               contractId: 'ct_2J7DrZAUV3gMFPt9DJi6uJBBZ3T4eKyKY7xtLot7puu3yP2kQp',
               blockHash: 'mh_zmcTZSgZcuQ9fL6h6iNNp3ftFvbQ2FjtgPHg9qEHgbwyqFFpi',
               localIdx: 0,
-              callTxHash: 'th_2cNd6j4CtZYaY6F6AWNbYDXZGkaQbaAjjjtBiLATiaiXJ1P812',
-              contractTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
+              callTxHash: 'th_2C3aETT8YVEhYbM2RNYPhwNvzVQXnVMAhLUnwpXX9SSMNctid4',
+              contractTxHash: 'th_2sgAawm6Q9oc2smr3TXSXqN3F859p3FYm83cnnqmEW3GpVyPxY',
               internalTx: {
                 amount: 42,
                 fee: 0,
@@ -452,8 +448,8 @@ describe('Middleware API', () => {
               logIdx: 0,
               blockTime: new Date(1721968249016),
               eventHash: 'KGBGHR0NTNENA10FD9MJS5P39C1LD4T9AUBIPIDL772714A57HH0====',
-              callTxHash: 'th_2cNd6j4CtZYaY6F6AWNbYDXZGkaQbaAjjjtBiLATiaiXJ1P812',
-              contractTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
+              callTxHash: 'th_2C3aETT8YVEhYbM2RNYPhwNvzVQXnVMAhLUnwpXX9SSMNctid4',
+              contractTxHash: 'th_2sgAawm6Q9oc2smr3TXSXqN3F859p3FYm83cnnqmEW3GpVyPxY',
               microIndex: 0,
               extCallerContractId: null,
               extCallerContractTxHash: null,
@@ -486,11 +482,11 @@ describe('Middleware API', () => {
           gasPrice: 1000000000n,
           nonce: 4,
           ownerId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
-          ttl: 11,
+          ttl: 0,
           vmVersion: 8,
         },
         aexnType: null,
-        sourceTxHash: 'th_2TzSqAuvAAEVFpucVgEALitxyJSJCBsR3RbxpSzPhbYbaasXBb',
+        sourceTxHash: 'th_2sgAawm6Q9oc2smr3TXSXqN3F859p3FYm83cnnqmEW3GpVyPxY',
         sourceTxType: 'ContractCreateTx',
       };
       copyFields(expectedRes, res, ['blockHash']);
@@ -565,7 +561,7 @@ describe('Middleware API', () => {
               activeFrom: 5,
               blockHash: 'mh_2MYrB5Qjb4NCYZMVmbqnazacY76gGzNgEjW2VnEKzovDTky8fD',
               height: 5,
-              sourceTxHash: 'th_XEwyUgf8BoTdEmcDJcngx3GGCGFeb16XDRfPYHy5zQB4d5kk5',
+              sourceTxHash: 'th_LBgDH89wn49nBk5N2pYwWUkvaj1aJhHWrt3BZYZPpFgYKa2E9',
               sourceTxType: 'NameClaimTx',
               tx: {
                 accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
@@ -574,7 +570,7 @@ describe('Middleware API', () => {
                 nameFee: 500000000000000n,
                 nameSalt: 0,
                 nonce: 1,
-                ttl: 8,
+                ttl: 0,
               },
               internalSource: false,
             },
@@ -597,7 +593,7 @@ describe('Middleware API', () => {
               activeFrom: 5,
               blockHash: 'mh_2G1nKcenAWtgqJywzmAFLXajZESRySnapUmF4JAboyekmwjBxa',
               height: 6,
-              sourceTxHash: 'th_2U32kq8HH1qxS5rohqVGzC9mF9E3mdcj3pZC6o9kfjCB4t1p8h',
+              sourceTxHash: 'th_2kgw98mftkwEvLj8cS1yPSEiR193Z69si9RukasyBaczXH2Awa',
               sourceTxType: 'NameUpdateTx',
               tx: {
                 accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
@@ -618,7 +614,7 @@ describe('Middleware API', () => {
                     key: 'rawKey',
                   },
                 ],
-                ttl: 9,
+                ttl: 0,
               },
               internalSource: false,
             },
@@ -644,7 +640,7 @@ describe('Middleware API', () => {
               blockTime: new Date(1721994539489),
               key: 'account_pubkey',
               name: '123456789012345678901234567801.chain',
-              sourceTxHash: 'th_2U32kq8HH1qxS5rohqVGzC9mF9E3mdcj3pZC6o9kfjCB4t1p8h',
+              sourceTxHash: 'th_2kgw98mftkwEvLj8cS1yPSEiR193Z69si9RukasyBaczXH2Awa',
               sourceTxType: 'NameUpdateTx',
               tx: {
                 accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
@@ -665,7 +661,7 @@ describe('Middleware API', () => {
                     key: 'rawKey',
                   },
                 ],
-                ttl: 9,
+                ttl: 0,
               },
             },
           ],
@@ -692,12 +688,12 @@ describe('Middleware API', () => {
                 blockHash: 'mh_BoBikwwf68giAEFKNYEh93uNkGu9enzx8cjn2vX7CRTnY5g6T',
                 blockHeight: 7,
                 encodedTx:
-                  'tx_+IoLAfhCuEA6/CTIyE5UbHQIB8sWFKudzIu8dWfB71IRqDzbp0IUIiIpvPIEg4s/2nZ5aHrh7XxFc2+GqsRkqw8XffUTpxcCuEL4QCACoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQOHMS5jaGFpbgCJHupYdyGHT8AAhg7Xy82AAArCRC+X',
-                hash: 'th_C7LscPqF5Nf5QrgZDSVbY92v7rruefN1qHjrHVuk2bdNwZF1e',
+                  'tx_+IoLAfhCuEDQ0Une2Yj8uuw5EB4fnjtla5UHJXckgw1KDzB2t4nJiTxJKHhhUrZxrMCEIxjUu0nvX1UgxNRmz3nQNA9XwMIPuEL4QCACoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQOHMS5jaGFpbgCJHupYdyGHT8AAhg7Xy82AAADBgAXt',
+                hash: 'th_Dxxed4NPLkCJ5FyKiACjQRCqyBFqpQud4zQhCh9hdFxmjwkaU',
                 microIndex: 0,
                 microTime: new Date(1721975996873),
                 signatures: [
-                  'sg_8iagZbC7qnDeRDNkm1y1LyQCUqgobMKNH1G6Pv7QatFfPyo2oPzy5sUQdojZSY9BK7poupGqfQz2Eo8VnVkCyaaBRN8ks',
+                  'sg_UKX47peLn9ZEynFWdtqwQnAxe1fX73WzauCqjxZJBMywG9hF4KMBRTFQY12AcwCymff8sZY1dbFzvWmRvzk5XDc18p7ni',
                 ],
                 tx: {
                   accountId: 'ak_mm92WC5DaSxLfWouNABCU9Uo1bDMFEXgbbnWU8n8o9u1e3qQp',
@@ -751,11 +747,11 @@ describe('Middleware API', () => {
               register: {
                 blockHash: 'mh_2g1RkdVUBXLbxxjR7P2zi1429Navw4HKuzvtC3TezFCjQjwmqE',
                 blockHeight: 10,
-                hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+                hash: 'th_2svBrtm7CrzQy8pCJ35U5Fn1npL3ajC5q2v9WVKrKNHteAGQNi',
                 microIndex: 0,
                 microTime: new Date(1721976497295),
                 signatures: [
-                  'sg_NaZNFJArMypD4wp4MbJ2cMvG6aWk7PSynP9qVsti1CabtMKSUbPwRUz55Yer7XiNURN6PcycF7NwBANaeJPMCpwKoWM9b',
+                  'sg_QevBUdFqefojL3M8hD7STRvBJfnH9UfvzFyMdcSKE8oAueFQhRF7ReAkfmBaNQcrWejr6KusPZzfQUrF5arHcrQokjukJ',
                 ],
                 tx: {
                   fee: 16432000000000n,
@@ -765,8 +761,7 @@ describe('Middleware API', () => {
                     type: 'delta',
                     value: 500,
                   },
-                  ttl: 13,
-                  txHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+                  txHash: 'th_2svBrtm7CrzQy8pCJ35U5Fn1npL3ajC5q2v9WVKrKNHteAGQNi',
                   type: 'OracleRegisterTx',
                   version: 1,
                   abiVersion: 0,
@@ -776,10 +771,10 @@ describe('Middleware API', () => {
                   responseFormat: 'string',
                 },
                 encodedTx:
-                  'tx_+IsLAfhCuECk8CD7+rO/nCOX4fF6BylVDytJmDquVV56cv7/Lvsg23evMjX45PwdRDn2x/HGBuduMmUQaOESI+GoNarbsNEIuEP4QRYBoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQaGc3RyaW5nhnN0cmluZwAAggH0hg7x34XgAA0A0ekNLA==',
+                  'tx_+IsLAfhCuEC0zLTOGmvoszWBKCGQldnyHeM9ORLBGuAL1wPcqIJKJ0tJn/2A+n6OG6G/7C+cG+Cnb0dRqu8PZqUMXa8KWosKuEP4QRYBoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQaGc3RyaW5nhnN0cmluZwAAggH0hg7x34XgAAAAOGMoIQ==',
               },
               registerTime: new Date(1721976497295),
-              registerTxHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+              registerTxHash: 'th_2svBrtm7CrzQy8pCJ35U5Fn1npL3ajC5q2v9WVKrKNHteAGQNi',
             },
           ],
           next: null,
@@ -810,12 +805,12 @@ describe('Middleware API', () => {
           blockHash: 'mh_25G1JPh8yUNypc8Mbv1H5CSRwLRZ8GMdpYdgcANFj9YBsQNcZ2',
           blockHeight: 10,
           encodedTx:
-            'tx_+IsLAfhCuECk8CD7+rO/nCOX4fF6BylVDytJmDquVV56cv7/Lvsg23evMjX45PwdRDn2x/HGBuduMmUQaOESI+GoNarbsNEIuEP4QRYBoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQaGc3RyaW5nhnN0cmluZwAAggH0hg7x34XgAA0A0ekNLA==',
-          hash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+            'tx_+IsLAfhCuEC0zLTOGmvoszWBKCGQldnyHeM9ORLBGuAL1wPcqIJKJ0tJn/2A+n6OG6G/7C+cG+Cnb0dRqu8PZqUMXa8KWosKuEP4QRYBoQFloqW17TXwJMVk2aaVoP0spwPX1WjhKoqqQmu+fgqeiQaGc3RyaW5nhnN0cmluZwAAggH0hg7x34XgAAAAOGMoIQ==',
+          hash: 'th_2svBrtm7CrzQy8pCJ35U5Fn1npL3ajC5q2v9WVKrKNHteAGQNi',
           microIndex: 0,
           microTime: new Date(1722066317304),
           signatures: [
-            'sg_NaZNFJArMypD4wp4MbJ2cMvG6aWk7PSynP9qVsti1CabtMKSUbPwRUz55Yer7XiNURN6PcycF7NwBANaeJPMCpwKoWM9b',
+            'sg_QevBUdFqefojL3M8hD7STRvBJfnH9UfvzFyMdcSKE8oAueFQhRF7ReAkfmBaNQcrWejr6KusPZzfQUrF5arHcrQokjukJ',
           ],
           tx: {
             abiVersion: 0,
@@ -830,14 +825,13 @@ describe('Middleware API', () => {
             queryFee: 0n,
             queryFormat: 'string',
             responseFormat: 'string',
-            ttl: 13,
-            txHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+            txHash: 'th_2svBrtm7CrzQy8pCJ35U5Fn1npL3ajC5q2v9WVKrKNHteAGQNi',
             type: 'OracleRegisterTx',
             version: 1,
           },
         },
         registerTime: new Date(1721976497295),
-        registerTxHash: 'th_299u2zPGuFDJPpmYM6ZpRaAiCnRViGwW4aph12Hz9Qr1Cc7tPP',
+        registerTxHash: 'th_2svBrtm7CrzQy8pCJ35U5Fn1npL3ajC5q2v9WVKrKNHteAGQNi',
       };
       copyFields(expectedRes, res, ['registerTime', 'approximateExpireTime']);
       copyFields(expectedRes.register, res.register, ['blockHash', 'microTime']);
