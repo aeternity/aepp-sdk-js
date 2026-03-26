@@ -11,14 +11,19 @@
 
 <script>
 import { mapState } from 'vuex';
+import { verifyMessage } from '@aeternity/aepp-sdk';
 import FieldAction from './FieldAction.vue';
 
 export default {
   components: { FieldAction },
   computed: mapState(['aeSdk']),
   methods: {
-    messageSign(messageToSign) {
-      return this.aeSdk.signMessage(messageToSign);
+    async messageSign(message) {
+      const signature = await this.aeSdk.signMessage(message);
+      if (!verifyMessage(message, signature, this.aeSdk.address)) {
+        throw new Error('Invalid message signature returned by account');
+      }
+      return signature;
     },
   },
 };

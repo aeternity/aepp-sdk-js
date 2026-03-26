@@ -1,11 +1,16 @@
 import { execFile } from 'child_process';
 import { tmpdir } from 'os';
-import { resolve, dirname, basename } from 'path';
+import { resolve, dirname, basename, relative, isAbsolute } from 'path';
 import { mkdir, writeFile, rm } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import CompilerBase, { Aci, CompileResult } from './Base.js';
 import { Encoded } from '../../utils/encoder.js';
-import { CompilerError, InternalError, UnsupportedVersionError } from '../../utils/errors.js';
+import {
+  CompilerError,
+  IllegalArgumentError,
+  InternalError,
+  UnsupportedVersionError,
+} from '../../utils/errors.js';
 import semverSatisfies from '../../utils/semver-satisfies.js';
 import { ensureError } from '../../utils/other.js';
 
@@ -75,6 +80,10 @@ export default class CompilerCli extends CompilerBase {
     await Promise.all(
       Object.entries(fileSystem).map(async ([name, src]) => {
         const p = resolve(path, name);
+        const rel = relative(path, p);
+        if (isAbsolute(rel) || rel.startsWith('..')) {
+          throw new IllegalArgumentError(`Path "${name}" is outside of the temp directory`);
+        }
         await mkdir(dirname(p), { recursive: true });
         return writeFile(p, src);
       }),

@@ -12,6 +12,7 @@
         <div>Accounts</div>
         <div>{{ accounts.map((account) => account.address.slice(0, 8)).join(', ') }}</div>
       </div>
+      <p v-else>Press Add Account to connect an account</p>
     </template>
     <div v-if="status">
       <div>Status</div>

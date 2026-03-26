@@ -46,7 +46,7 @@
 <script>
 import { mapState } from 'vuex';
 import { Buffer } from 'buffer';
-import { decode, encode, Encoding } from '@aeternity/aepp-sdk';
+import { decode, encode, Encoding, verify } from '@aeternity/aepp-sdk';
 import Value from './Value.vue';
 
 const emptyData = encode(Buffer.from([]), Encoding.Bytearray);
@@ -71,8 +71,13 @@ export default {
     setData(data, type) {
       this.data = encode(Buffer.from(data, type), Encoding.Bytearray);
     },
-    dataSign() {
-      return this.aeSdk.unsafeSign(decode(this.data || emptyData));
+    async dataSign() {
+      const data = decode(this.data || emptyData);
+      const signature = await this.aeSdk.unsafeSign(data);
+      if (!verify(data, signature, this.aeSdk.address)) {
+        throw new Error('Invalid signature returned by account');
+      }
+      return signature;
     },
   },
 };

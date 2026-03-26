@@ -62,3 +62,7 @@ textarea {
 .error {
   @extend .text-purple-700;
 }
+
+p {
+  @extend .p-2;
+}
