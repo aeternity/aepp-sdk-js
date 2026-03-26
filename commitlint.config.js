@@ -23,5 +23,8 @@ export default {
       ],
     ],
   },
-  ignores: [(message) => /^Bumps \[.+]\(.+\) from .+ to .+\.$/m.test(message)],
+  ignores: [
+    (message) =>
+      /(^Bumps \[.+]\(.+\) from .+ to .+\.$|Signed-off-by: dependabot\[bot\])/m.test(message),
+  ],
 };

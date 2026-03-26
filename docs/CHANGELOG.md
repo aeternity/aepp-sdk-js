@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [14.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v14.1.0...v14.1.1) (2026-03-26)
+
+### Bug Fixes
+
+- **compiler:** disallow writing files outside of the temp directory ([2a3988e](https://github.com/aeternity/aepp-sdk-js/commit/2a3988e9f704278a0eb2d2ee78400cc377e2f409))
+- set default TTL to 0 (no TTL) ([921f0c1](https://github.com/aeternity/aepp-sdk-js/commit/921f0c1a9875cbb2bc39c751e28e7aeb25be202c))
+
 ## [14.1.0](https://github.com/aeternity/aepp-sdk-js/compare/v14.0.0...v14.1.0) (2025-04-29)
 
 ### Features
