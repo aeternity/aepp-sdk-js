@@ -53,7 +53,7 @@ export default class Node extends NodeApi {
     super(url, {
       allowInsecureConnection: true,
       additionalPolicies: [
-        genVersionCheckPolicy('node', getVersion, '7.1.0', '8.0.0', ignoreVersion),
+        genVersionCheckPolicy('node', getVersion, '7.1.0', '9.0.0', ignoreVersion),
         genRequestQueuesPolicy(),
         genCombineGetRequestsPolicy(),
         genRetryOnFailurePolicy(retryCount, retryOverallDelay),
