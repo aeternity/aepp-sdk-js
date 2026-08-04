@@ -38,49 +38,14 @@ import {
   DelegationTag,
 } from '../../src';
 import { getBufferToSign } from '../../src/account/Memory';
-import { ImplPostMessage } from '../../src/aepp-wallet-communication/connection/BrowserWindowMessage';
 import { getSdk, networkId, compilerUrl } from '.';
 import { Accounts, Network } from '../../src/aepp-wallet-communication/rpc/types';
-import { assertNotNull, indent } from '../utils';
+import { assertNotNull, getFakeWindows, indent } from '../utils';
 
 should();
 
-const WindowPostMessageFake = (
-  name: string,
-): ImplPostMessage & { name: string; messages: any[] } => {
-  let listener: (event: any) => void;
-  return {
-    name,
-    messages: [],
-    addEventListener(onEvent: string, _listener: typeof listener) {
-      listener = _listener;
-    },
-    removeEventListener() {
-      return () => null;
-    },
-    postMessage(source: any, msg: any) {
-      this.messages.push(msg);
-      setTimeout(() => {
-        if (typeof listener === 'function') {
-          listener({ data: msg, origin: 'http://origin.test', source });
-        }
-      });
-    },
-  };
-};
-
-const getConnections = (): { walletWindow: ImplPostMessage; aeppWindow: ImplPostMessage } => {
-  // @ts-expect-error workaround for tests
-  global.window = { location: { origin: '//test' } };
-  const walletWindow = WindowPostMessageFake('wallet');
-  const aeppWindow = WindowPostMessageFake('aepp');
-  walletWindow.postMessage = walletWindow.postMessage.bind(walletWindow, aeppWindow);
-  aeppWindow.postMessage = aeppWindow.postMessage.bind(aeppWindow, walletWindow);
-  return { walletWindow, aeppWindow };
-};
-
 describe('Aepp<->Wallet', () => {
-  const connections = getConnections();
+  const connections = getFakeWindows();
   const connectionFromWalletToAepp = new BrowserWindowMessageConnection({
     self: connections.walletWindow,
     target: connections.aeppWindow,
