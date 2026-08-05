@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { expect } from 'chai';
 import { AensName, Node } from '../src';
+import { ImplPostMessage } from '../src/aepp-wallet-communication/connection/BrowserWindowMessage';
 
 export function randomString(len: number): string {
   const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -70,6 +71,51 @@ export function bindRequestCounter(
     getRequestUrls()
       .filter((url) => !exclude.some((p) => url.includes(p)))
       .filter((url) => filter.length === 0 || filter.some((p) => url.includes(p))).length;
+}
+
+export type WindowFake = ImplPostMessage;
+
+/**
+ * `AeSdkWallet` reads `window.location.origin`, so tests need a window global. Assigned once
+ * because it is shared process-wide state.
+ */
+function ensureWindowGlobal(): void {
+  if ('window' in global) return;
+  // @ts-expect-error workaround for tests
+  global.window = { location: { origin: '//test' } };
+}
+
+function windowPostMessageFake(): WindowFake {
+  const listeners: Array<(event: any) => void> = [];
+  return {
+    addEventListener(onEvent: string, listener: (event: any) => void) {
+      if (onEvent === 'message') listeners.push(listener);
+    },
+    removeEventListener(onEvent: string, listener: (event: any) => void) {
+      const index = listeners.indexOf(listener);
+      if (index !== -1) listeners.splice(index, 1);
+    },
+    postMessage(source: any, msg: any) {
+      setTimeout(() => {
+        // copied because a listener may disconnect its connection while being notified
+        [...listeners].forEach((listener) =>
+          listener({ data: msg, origin: 'http://origin.test', source }),
+        );
+      });
+    },
+  };
+}
+
+/**
+ * A pair of fake windows wired to each other, as an aepp page and a wallet would be.
+ */
+export function getFakeWindows(): { walletWindow: WindowFake; aeppWindow: WindowFake } {
+  ensureWindowGlobal();
+  const walletWindow = windowPostMessageFake();
+  const aeppWindow = windowPostMessageFake();
+  walletWindow.postMessage = walletWindow.postMessage.bind(walletWindow, aeppWindow);
+  aeppWindow.postMessage = aeppWindow.postMessage.bind(aeppWindow, walletWindow);
+  return { walletWindow, aeppWindow };
 }
 
 export function indent(strings: TemplateStringsArray, ...values: unknown[]): string {
