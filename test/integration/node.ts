@@ -74,7 +74,7 @@ describe('Node client', () => {
     const status = await node.getStatus();
     const s = stub(node, 'getStatus').resolves({ ...status, topBlockHeight: 0 });
     await expect(node.getNodeInfo()).to.be.rejectedWith(
-      'Unsupported consensus protocol version 1. Supported: >= 6 < 7',
+      'Unsupported consensus protocol version 1. Supported: >= 6 < 8',
     );
     s.restore();
   });
