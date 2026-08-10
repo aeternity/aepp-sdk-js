@@ -52,8 +52,25 @@ directive:
     where: $.components.schemas.Tx
     transform: >
       if ($doc.info.title === 'node') return $;
+      const resolve = schema => {
+        if (schema.$ref != null) {
+          const relativePath = schema.$ref.replace(/^#\//, '').split('/');
+          return resolve(relativePath.reduce((o, p) => o[p], $doc));
+        }
+        if (schema.allOf != null) {
+          return schema.allOf.map(resolve).reduce(
+            (acc, member) => ({
+              properties: { ...acc.properties, ...member.properties },
+              required: [...new Set([...acc.required, ...member.required])],
+            }),
+            { properties: {}, required: [] }
+          );
+        }
+        return { properties: schema.properties ?? {}, required: schema.required ?? [] };
+      };
       const { discriminator, ...base } = $.allOf[0];
-      const transactions = base.properties.type.enum.map(txName => $doc.components.schemas[txName]);
+      const transactions = base.properties.type.enum
+        .map(txName => resolve($doc.components.schemas[txName]));
       return {
         ...base,
         "description": "A mix of all transaction types.",
@@ -73,6 +90,18 @@ directive:
           .map(([required]) => required)
           .concat(base.required)
       };
+    reason: >
+      generate a single interface covering every transaction type instead of a
+      polymorphic base with 25 siblings
+
+      not a temporary workaround: autorest can't express the oneOf/anyOf this schema is
+      built on, and https://github.com/Azure/autorest/issues/4118 asking for that support
+      was closed as not planned
+
+      the member schemas are resolved through $ref and allOf before merging because since
+      https://github.com/aeternity/aeternity/pull/4557 SpendTx is
+      "allOf: [{ $ref: SpendTxInput }, { required: [nonce] }]" and so carries neither own
+      properties nor an own required list
 
   - from: openapi-document
     where: $.components.schemas.Delegates
@@ -84,19 +113,26 @@ directive:
   - from: openapi-document
     where: $.paths.*.*.parameters
     transform: return $.filter(({ $ref }) => !$ref?.endsWith('intAsString'))
-    reason: remove intAsString parameter from paths
+    reason: >
+      remove intAsString parameter from paths
 
-  - from: openapi-document
-    where: $.components.parameters
-    transform: 'return { ...$, intAsString: undefined }'
-    reason: remove intAsString parameter from components
+      needs to run before the directive below inlining $ref parameters: that one addresses
+      the entries of $.paths.*.*.parameters by index, so leaving these in place makes
+      codegen fail with "Trying to retrieve item '1' from sequence with '1' items (index
+      out of bounds)"
+
+      dropping intAsString from $.components.parameters as well isn't necessary, autorest
+      doesn't emit component parameters nothing refers to
 
   - from: openapi-document
     where: $.paths.*.*.parameters[?(@.$ref)]
     transform: >
       const relativePath = $.$ref.replace(/^#\//, '').split('/');
       return relativePath.reduce((o, p) => o[p], $doc);
-    reason: keep parameters in method options instead instance options
+    reason: >
+      keep parameters in method options instead instance options
+
+      needs to run after the directive above removing intAsString, see the note there
 
   - from: openapi-document
     where: $.servers
@@ -137,11 +173,15 @@ directive:
   - from: openapi-document
     where: $.components.schemas
     transform: >
+      if ($doc.info.title === 'node') return $;
       $.SignedTx.required.push('block_height', 'block_hash', 'hash', 'signatures');
       $.SignedTxs.required = ['transactions'];
     reason: >
       marks additional fields as required
       remove after fixing https://github.com/aeternity/aeternity/issues/3892
+
+      the title guard keeps this idempotent, the directive set is applied twice and push
+      would otherwise append the same four names a second time
 
   - from: openapi-document
     where: $.info.title
