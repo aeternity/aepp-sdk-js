@@ -51,9 +51,15 @@ describe('Node client', () => {
     node.pipeline.removePolicy({ name: 'remove-response-body' });
   });
 
-  it('throws clear exceptions if ECONNREFUSED', async () => {
-    const n = new Node('http://localhost:60148', { retryCount: 0 });
-    await expect(n.getStatus()).to.be.rejectedWith('v3/status error: ECONNREFUSED');
+  // `localhost` may resolve to a single address or to both `::1` and `127.0.0.1`. In the
+  // second case Node races them and rejects with an `AggregateError` that has an empty
+  // message, in the first with a plain `Error` that has a message of its own. Both are the
+  // same failure and must be reported the same way, so check the literal address too.
+  ['http://localhost:60148', 'http://127.0.0.1:60148'].forEach((nodeUrl) => {
+    it(`throws clear exceptions if ECONNREFUSED (${nodeUrl})`, async () => {
+      const n = new Node(nodeUrl, { retryCount: 0 });
+      await expect(n.getStatus()).to.be.rejectedWith('v3/status error: ECONNREFUSED');
+    });
   });
 
   it('retries requests if failed', async () =>

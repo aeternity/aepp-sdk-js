@@ -171,7 +171,18 @@ export const genErrorFormatterPolicy = (
         const prefix = `${new URL(error.request.url).pathname.slice(1)} error`;
 
         if (error.response?.bodyAsText == null) {
-          if (error.message === '') error.message = `${prefix}: ${error.code}`;
+          // A transport-level failure (connection refused, DNS, TLS) arrives with no
+          // response at all and with the platform error code on `code`. Node reports the
+          // same failure in two shapes: as an `AggregateError` with an empty message when
+          // it raced several addresses (happy eyeballs, enabled by default since Node 20
+          // and used whenever the host name resolves to more than one address), and as a
+          // plain `Error` carrying a message of its own otherwise. Lead with the code in
+          // both cases so the message doesn't depend on how the host name resolves, and
+          // keep what the platform said, because it names the address that failed.
+          if (error.response == null && error.code != null) {
+            const details = error.message === '' ? '' : ` (${error.message})`;
+            error.message = `${prefix}: ${error.code}${details}`;
+          } else if (error.message === '') error.message = `${prefix}: ${error.code}`;
           throw error;
         }
 
