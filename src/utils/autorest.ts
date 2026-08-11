@@ -9,7 +9,13 @@ import { pause } from './other.js';
 import semverSatisfies from './semver-satisfies.js';
 import { InternalError, UnexpectedTsError, UnsupportedVersionError } from './errors.js';
 
-const bigIntPrefix = '_sdk-big-int-';
+/**
+ * Marks a JSON number too big for `Number` while the body is still text, so that
+ * {@link createSerializer} can turn it into a BigInt after `JSON.parse` would have rounded it.
+ * Exported because a field that no mapper covers keeps the prefix and has to be unwrapped by
+ * whoever reads it.
+ */
+export const bigIntPrefix = '_sdk-big-int-';
 
 export const createSerializer = (
   ...args: Parameters<typeof createSerializerOrig>
