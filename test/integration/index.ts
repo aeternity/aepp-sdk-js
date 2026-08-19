@@ -1,4 +1,4 @@
-import { after, afterEach } from 'mocha';
+import { after, afterEach, before } from 'mocha';
 import {
   AeSdk,
   CompilerHttpNode,
@@ -49,8 +49,8 @@ const configuration = {
   },
   '': {
     networkId: 'ae_dev',
-    url: 'http://localhost:3013',
-    debugUrl: 'http://localhost:3113',
+    url: process.env.AE_DEVNET_URL ?? 'http://localhost:3013',
+    debugUrl: process.env.AE_DEVNET_DEBUG_URL ?? 'http://localhost:3113',
     channelUrl: 'ws://localhost:3014/channel',
     compilerUrl: 'http://localhost:3080',
     getGenesisAccount: () =>
@@ -64,6 +64,34 @@ const configuration = {
 if (configuration == null) throw new Error(`Unknown network: ${network}`);
 export const { networkId, url, channelUrl, compilerUrl } = configuration;
 const { sdkOptions } = configuration;
+
+let chainCheck: Promise<void> | undefined;
+
+// A reachable node is not the expected node: 3013 may answer for any chain, including mainnet.
+async function assertExpectedChain(): Promise<void> {
+  const statusUrl = `${url}/v3/status`;
+  let actual;
+  try {
+    const response = await fetch(statusUrl);
+    if (!response.ok) throw new Error(`responded with ${response.status}`);
+    actual = (await response.json()).network_id;
+  } catch (error) {
+    throw new Error(`Can't read ${statusUrl}: ${error instanceof Error ? error.message : error}`);
+  }
+  if (actual !== networkId) {
+    throw new Error(
+      `Refusing to run against ${url}: it is "${actual}", expected "${networkId}".` +
+        ' Point AE_DEVNET_URL at the intended node, or set NETWORK to the intended network.',
+    );
+  }
+}
+
+async function ensureExpectedChain(): Promise<void> {
+  chainCheck ??= assertExpectedChain();
+  return chainCheck;
+}
+
+before(ensureExpectedChain);
 
 type TransactionHandler = (tx: Encoded.Transaction) => unknown;
 const transactionHandlers: TransactionHandler[] = [];
@@ -85,6 +113,7 @@ const genesisAccountPromise = configuration.getGenesisAccount();
 export const isLimitedCoins = network != null;
 
 export async function getSdk(accountCount = 1): Promise<AeSdk> {
+  await ensureExpectedChain();
   const accounts = new Array(accountCount).fill(null).map(() => AccountMemory.generate());
   const sdk = new AeSdk({
     onCompiler: new CompilerHttpNode(compilerUrl),
