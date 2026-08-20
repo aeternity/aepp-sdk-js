@@ -3,7 +3,11 @@
 system:
   dev_mode: true
   plugins:
-    # TODO: remove after merging https://github.com/aeternity/aeternity/pull/4303
+    # TODO: remove once the node's built-in aedevmode emitter starts its own timers —
+    # test/emitter drives emit_mb/emit_kb over this plugin's HTTP API on port 3313
+    # instead. https://github.com/aeternity/aeternity/pull/4303 proposed that fix and was
+    # closed without merging on 2024-04-10; as of 2026-08-20 the change is not on master
+    # either.
     - name: aeplugin_dev_mode
 
 http:
