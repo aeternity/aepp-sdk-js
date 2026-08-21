@@ -1904,61 +1904,61 @@
 </ul>
 <p>old response</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;this message is not indexed&#39;</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="s1">'this message is not indexed'</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedEvents</span><span class="p">);</span>
 
 <span class="cm">/*</span>
 <span class="cm">[</span>
 <span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;,</span>
-<span class="cm">    data: &#39;cb_dGhpcyBtZXNzYWdlIGlzIG5vdCBpbmRleGVkdWmUpw==&#39;,</span>
+<span class="cm">    address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',</span>
+<span class="cm">    data: 'cb_dGhpcyBtZXNzYWdlIGlzIG5vdCBpbmRleGVkdWmUpw==',</span>
 <span class="cm">    topics: [</span>
-<span class="cm">      &#39;101640830366340000167918459210098337687948756568954742276612796897811614700269&#39;,</span>
-<span class="cm">      &#39;39519965516565108473327470053407124751867067078530473195651550649472681599133&#39;</span>
+<span class="cm">      '101640830366340000167918459210098337687948756568954742276612796897811614700269',</span>
+<span class="cm">      '39519965516565108473327470053407124751867067078530473195651550649472681599133'</span>
 <span class="cm">    ],</span>
-<span class="cm">    name: &#39;AnotherEvent&#39;,</span>
+<span class="cm">    name: 'AnotherEvent',</span>
 <span class="cm">    decoded: [</span>
-<span class="cm">      &#39;fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk&#39;,</span>
-<span class="cm">      &#39;this message is not indexed&#39;</span>
+<span class="cm">      'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',</span>
+<span class="cm">      'this message is not indexed'</span>
 <span class="cm">    ]</span>
 <span class="cm">  },</span>
 <span class="cm">  {</span>
-<span class="cm">    address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;,</span>
-<span class="cm">    data: &#39;cb_Xfbg4g==&#39;,</span>
+<span class="cm">    address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh',</span>
+<span class="cm">    data: 'cb_Xfbg4g==',</span>
 <span class="cm">    topics: [</span>
-<span class="cm">      &#39;59505622142252318624300825714684802559980671551955787864303522023309554554980&#39;,</span>
+<span class="cm">      '59505622142252318624300825714684802559980671551955787864303522023309554554980',</span>
 <span class="cm">      1337</span>
 <span class="cm">    ],</span>
-<span class="cm">    name: &#39;FirstEvent&#39;,</span>
-<span class="cm">    decoded: [ &#39;1337&#39; ]</span>
+<span class="cm">    name: 'FirstEvent',</span>
+<span class="cm">    decoded: [ '1337' ]</span>
 <span class="cm">  }</span>
 <span class="cm">]</span>
 <span class="cm">*/</span>
 </code></pre></div>
 <p>new response</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// events emitted by contract calls are automatically decoded</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;this message is not indexed&#39;</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contractInstance</span><span class="p">.</span><span class="nx">methods</span><span class="p">.</span><span class="nx">emitEvents</span><span class="p">(</span><span class="mf">1337</span><span class="p">,</span><span class="w"> </span><span class="s1">'this message is not indexed'</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">decodedEvents</span><span class="p">);</span>
 
 <span class="cm">/*</span>
 <span class="cm">[</span>
 <span class="cm">  {</span>
-<span class="cm">    name: &#39;AnotherEvent&#39;,</span>
+<span class="cm">    name: 'AnotherEvent',</span>
 <span class="cm">    args: [</span>
-<span class="cm">      &#39;fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk&#39;,</span>
-<span class="cm">      &#39;this message is not indexed&#39;</span>
+<span class="cm">      'fUq2NesPXcYZ1CcqBcGC3StpdnQw3iVxMA3YSeCNAwfN4myQk',</span>
+<span class="cm">      'this message is not indexed'</span>
 <span class="cm">    ],</span>
 <span class="cm">    contract: {</span>
-<span class="cm">      name: &#39;EventEmitter&#39;,</span>
-<span class="cm">      address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;</span>
+<span class="cm">      name: 'EventEmitter',</span>
+<span class="cm">      address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh'</span>
 <span class="cm">    }</span>
 <span class="cm">  },</span>
 <span class="cm">  {</span>
-<span class="cm">    name: &#39;FirstEvent&#39;,</span>
+<span class="cm">    name: 'FirstEvent',</span>
 <span class="cm">    args: [1337n],</span>
 <span class="cm">    contract: {</span>
-<span class="cm">      name: &#39;EventEmitter&#39;,</span>
-<span class="cm">      address: &#39;ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh&#39;</span>
+<span class="cm">      name: 'EventEmitter',</span>
+<span class="cm">      address: 'ct_6y3N9KqQb74QsvR9NrESyhWeLNiA9aJgJ7ua8CvsTuGot6uzh'</span>
 <span class="cm">    }</span>
 <span class="cm">  }</span>
 <span class="cm">]</span>
@@ -1989,8 +1989,8 @@
 </ul>
 <p>rewrite</p>
 <div class="highlight"><pre><span></span><code><span class="nx">deployed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">deploy</span><span class="p">([],</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">onAccount</span><span class="w"> </span><span class="p">});</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">deployed</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="s1">&#39;getArg&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">deployed</span><span class="p">.</span><span class="nx">callStatic</span><span class="p">(</span><span class="s1">&#39;getArg&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">deployed</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="s1">'getArg'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">deployed</span><span class="p">.</span><span class="nx">callStatic</span><span class="p">(</span><span class="s1">'getArg'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
 </code></pre></div>
 <p>to</p>
 <div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">deploy</span><span class="p">();</span>
@@ -2025,7 +2025,7 @@
 </ul>
 <p>rewrite</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">compileContractAPI</span><span class="p">(</span><span class="nx">identityContract</span><span class="p">);</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">callData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">contractEncodeCallDataAPI</span><span class="p">(</span><span class="nx">identityContract</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;init&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">callData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">contractEncodeCallDataAPI</span><span class="p">(</span><span class="nx">identityContract</span><span class="p">,</span><span class="w"> </span><span class="s1">'init'</span><span class="p">,</span><span class="w"> </span><span class="p">[]);</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">initiatorCh</span><span class="p">.</span><span class="nx">createContract</span><span class="p">({</span>
 <span class="w">  </span><span class="nx">code</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">callData</span><span class="p">,</span>
@@ -2042,7 +2042,7 @@
 <span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">compile</span><span class="p">();</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">createContract</span><span class="p">({</span>
 <span class="w">  </span><span class="nx">code</span><span class="o">:</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">bytecode</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">callData</span><span class="o">:</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;Identity&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;init&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]),</span>
+<span class="w">  </span><span class="nx">callData</span><span class="o">:</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">'Identity'</span><span class="p">,</span><span class="w"> </span><span class="s1">'init'</span><span class="p">,</span><span class="w"> </span><span class="p">[]),</span>
 <span class="w">  </span><span class="nx">deposit</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">vmVersion</span><span class="o">:</span><span class="w"> </span><span class="mf">5</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">abiVersion</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="p">,</span>
@@ -2058,12 +2058,12 @@
 <li>Removed <code>contractEncodeCallDataAPI</code>:</li>
 </ul>
 <p>rewrite</p>
-<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">contractEncodeCallDataAPI</span><span class="p">(</span><span class="nx">contractSource</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;getArg&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;42&#39;</span><span class="p">]);</span>
+<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">contractEncodeCallDataAPI</span><span class="p">(</span><span class="nx">contractSource</span><span class="p">,</span><span class="w"> </span><span class="s1">'getArg'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">'42'</span><span class="p">]);</span>
 </code></pre></div>
 <p>to</p>
 <div class="highlight"><pre><span></span><code><span class="nx">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdkInitiator</span><span class="p">.</span><span class="nx">getContractInstance</span><span class="p">({</span><span class="w"> </span><span class="nx">source</span><span class="o">:</span><span class="w"> </span><span class="nx">contractSource</span><span class="w"> </span><span class="p">});</span>
 <span class="k">await</span><span class="w"> </span><span class="nx">contract</span><span class="p">.</span><span class="nx">compile</span><span class="p">();</span>
-<span class="nx">contract</span><span class="p">.</span><span class="nx">calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;Identity&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;getArg&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
+<span class="nx">contract</span><span class="p">.</span><span class="nx">calldata</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="s1">'Identity'</span><span class="p">,</span><span class="w"> </span><span class="s1">'getArg'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">42</span><span class="p">]);</span>
 </code></pre></div>
 <ul>
 <li>Removed <code>contractGetACI</code>:</li>
@@ -2085,13 +2085,13 @@
 </code></pre></div>
 <h2 id="native-build-of-claim-tx-now-accepts-unencoded-name-instead-of-encoded-name-eea92be">Native build of claim tx now accepts unencoded <code>name</code> instead of encoded name (<a href="https://github.com/aeternity/aepp-sdk-js/pull/1414/commits/eea92be7432cfc56e781c2234379c8f2c3398e3e">eea92be</a>)</h2>
 <p>rewrite</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;test123test.chain&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'test123test.chain'</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">nameHash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`nm_</span><span class="si">${</span><span class="nx">encodeBase58Check</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">name</span><span class="p">))</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">accountId</span><span class="o">:</span><span class="w"> </span><span class="nx">senderId</span><span class="p">,</span><span class="w"> </span><span class="nx">nonce</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="nx">nameHash</span><span class="p">,</span><span class="w"> </span><span class="nx">nameSalt</span><span class="o">:</span><span class="w"> </span><span class="nx">_salt</span><span class="p">,</span><span class="w"> </span><span class="nx">nameFee</span><span class="w"> </span><span class="p">};</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">txFromAPI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">nameClaimTx</span><span class="p">(</span><span class="nx">params</span><span class="p">);</span>
 </code></pre></div>
 <p>to</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;test123test.chain&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'test123test.chain'</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">accountId</span><span class="o">:</span><span class="w"> </span><span class="nx">senderId</span><span class="p">,</span><span class="w"> </span><span class="nx">nonce</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">nameSalt</span><span class="o">:</span><span class="w"> </span><span class="nx">_salt</span><span class="p">,</span><span class="w"> </span><span class="nx">nameFee</span><span class="w"> </span><span class="p">};</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">txFromAPI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">nameClaimTx</span><span class="p">(</span><span class="nx">params</span><span class="p">);</span>
 </code></pre></div>

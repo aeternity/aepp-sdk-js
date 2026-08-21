@@ -1942,32 +1942,32 @@
 <h2 id="direct-script-include-via-cdn">Direct <code>&lt;script&gt;</code> include via CDN</h2>
 <p>In case you're not using any JS bundling/compilation technique, the SDK can also be loaded with the traditional <code>&lt;script&gt;</code> tag, as follows:</p>
 <h3 id="latest-sdk-version">Latest SDK version</h3>
-<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.cjs&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.cjs"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
 <h3 id="specific-sdk-version">Specific SDK version</h3>
-<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.cjs&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"https://unpkg.com/@aeternity/aepp-sdk@VERSION/dist/aepp-sdk.browser-script.cjs"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
 <p>...where <code>VERSION</code> is the version number of the SDK you want to use (eg. <code>14.1.0</code>).</p>
 <h3 id="browser-script-tag">Browser <code>&lt;script&gt;</code> tag</h3>
 <p>The bundle will assign the SDK to a global variable called <code>Aeternity</code> that makes all functionalities of the SDK accessible.</p>
 <p>Usage:</p>
 <div class="highlight"><pre><span></span><code><span class="cp">&lt;!doctype html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">"en"</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">"utf-8"</span> <span class="p">/&gt;</span>
   <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
     <span class="cm">&lt;!-- include latest SDK version --&gt;</span>
-    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.cjs&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"https://unpkg.com/@aeternity/aepp-sdk/dist/aepp-sdk.browser-script.cjs"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">"text/javascript"</span><span class="p">&gt;</span>
 <span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Node</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Aeternity</span><span class="p">;</span>
 
-<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">&#39;https://testnet.aeternity.io&#39;</span><span class="p">);</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Node</span><span class="p">(</span><span class="s1">'https://testnet.aeternity.io'</span><span class="p">);</span>
 <span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span>
-<span class="w">        </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">        </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'testnet'</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">node</span><span class="w"> </span><span class="p">}],</span>
 <span class="w">      </span><span class="p">});</span>
 <span class="w">      </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getHeight</span><span class="p">().</span><span class="nx">then</span><span class="p">((</span><span class="nx">height</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Current Block Height:&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">height</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Current Block Height:'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">height</span><span class="p">);</span>
 <span class="w">      </span><span class="p">});</span>
 <span class="w">    </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
@@ -1990,13 +1990,13 @@
 that contains type definitions for third-party packages sdk depends on.
 This may be done in <code>tsconfig.json</code>:</p>
 <div class="highlight"><pre><span></span><code>{
-<span class="w"> </span> &quot;compilerOptions&quot;: {
+<span class="w"> </span> "compilerOptions": {
 <span class="w"> </span>   ...
-<span class="gi">+   &quot;typeRoots&quot;: [</span>
-<span class="gi">+     &quot;node_modules/@types&quot;,</span>
-<span class="gi">+     &quot;node_modules/@aeternity/aepp-sdk/src/typings&quot;</span>
+<span class="gi">+   "typeRoots": [</span>
+<span class="gi">+     "node_modules/@types",</span>
+<span class="gi">+     "node_modules/@aeternity/aepp-sdk/src/typings"</span>
 <span class="gi">+   ],</span>
-<span class="gi">+   &quot;allowSyntheticDefaultImports&quot;: true</span>
+<span class="gi">+   "allowSyntheticDefaultImports": true</span>
 <span class="w"> </span> }
 }
 </code></pre></div>
@@ -2009,8 +2009,8 @@ dependencies. To fix this, you need to specify aliases in <code>vue.config.js</c
 <span class="w"> </span> configureWebpack: {
 <span class="w"> </span>   resolve: {
 <span class="w"> </span>     alias: {
-<span class="gi">+       &#39;@azure/core-client&#39;: &#39;@azure/core-client/dist-esm/src/index.js&#39;,</span>
-<span class="gi">+       &#39;@azure/core-rest-pipeline&#39;: &#39;@azure/core-rest-pipeline/dist-esm/src/index.js&#39;,</span>
+<span class="gi">+       '@azure/core-client': '@azure/core-client/dist-esm/src/index.js',</span>
+<span class="gi">+       '@azure/core-rest-pipeline': '@azure/core-rest-pipeline/dist-esm/src/index.js',</span>
 <span class="w"> </span>     },
 <span class="w"> </span>   },
 <span class="w"> </span> },

@@ -1938,35 +1938,35 @@
 <li>initiate an auction</li>
 </ul>
 <h3 id="pre-claim">Pre-claim</h3>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Name</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">,</span><span class="w"> </span><span class="nx">Name</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@aeternity/aepp-sdk'</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">aeSdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AeSdk</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="c1">// init the SDK instance with AeSdk class</span>
 
 <span class="c1">// `getContext` is used to bind AeSdk to Name instance</span>
 <span class="c1">// e.g. if you change the node in AeSdk it also would be changed in Name.</span>
 <span class="c1">// Alternatively, you need to provide `onAccount`, `onNode` options.</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Name</span><span class="p">(</span><span class="s1">&#39;testNameForTheGuide.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">())</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Name</span><span class="p">(</span><span class="s1">'testNameForTheGuide.chain'</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">())</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">preClaimTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">preclaim</span><span class="p">()</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">preClaimTx</span><span class="p">)</span>
 
 <span class="cm">/*</span>
 <span class="cm">{</span>
-<span class="cm">  blockHash: &#39;mh_2UsggiUaQQmEPjxLnXkXHpm1WawTWqZb1jBx6UzsQNHgirWAwd&#39;,</span>
+<span class="cm">  blockHash: 'mh_2UsggiUaQQmEPjxLnXkXHpm1WawTWqZb1jBx6UzsQNHgirWAwd',</span>
 <span class="cm">  blockHeight: 449499,</span>
-<span class="cm">  hash: &#39;th_48RktjEutZC8TCubaq9YhjaF1cKLV9D3VRCJyzJLs7oSp4Ry6&#39;,</span>
+<span class="cm">  hash: 'th_48RktjEutZC8TCubaq9YhjaF1cKLV9D3VRCJyzJLs7oSp4Ry6',</span>
 <span class="cm">  signatures: [</span>
-<span class="cm">    &#39;sg_Da98k2EKMun1TkE7ytonRypvJwaKg9iBjp8rNcYuodFXqzRqwjQyuFQP5DhxWUpTYRzSTurrNtDmUft8eyTStjCyNqFf8&#39;</span>
+<span class="cm">    'sg_Da98k2EKMun1TkE7ytonRypvJwaKg9iBjp8rNcYuodFXqzRqwjQyuFQP5DhxWUpTYRzSTurrNtDmUft8eyTStjCyNqFf8'</span>
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
-<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
-<span class="cm">    commitmentId: &#39;cm_2igvW9egddKh77gDdE8mjotmL8PzE7Tf2Q639Q5stUqWQoEfap&#39;,</span>
+<span class="cm">    accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',</span>
+<span class="cm">    commitmentId: 'cm_2igvW9egddKh77gDdE8mjotmL8PzE7Tf2Q639Q5stUqWQoEfap',</span>
 <span class="cm">    fee: 16620000000000n,</span>
 <span class="cm">    nonce: 18,</span>
-<span class="cm">    type: &#39;NamePreclaimTx&#39;,</span>
+<span class="cm">    type: 'NamePreclaimTx',</span>
 <span class="cm">    version: 1</span>
 <span class="cm">  },</span>
-<span class="cm">  rawTx: &#39;tx_+JkLAfhCuEBgFzAL0bPDufmzDq0558vaKtrIyRpNxCYVtkgnJjBrxDpQZHkfbwG+oRuBUAfgfrAKF0lO9mRI1zq0H6bXIq8KuFH4TyEBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhKhA+Jawe/spFaw823K+U59CWx+xD1i34gngUPiAAKJqv/fhg8dpTI4AAAGc20E&#39;,</span>
+<span class="cm">  rawTx: 'tx_+JkLAfhCuEBgFzAL0bPDufmzDq0558vaKtrIyRpNxCYVtkgnJjBrxDpQZHkfbwG+oRuBUAfgfrAKF0lO9mRI1zq0H6bXIq8KuFH4TyEBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhKhA+Jawe/spFaw823K+U59CWx+xD1i34gngUPiAAKJqv/fhg8dpTI4AAAGc20E',</span>
 <span class="cm">  height: 449499</span>
 <span class="cm">}</span>
 <span class="cm">*/</span>
@@ -1992,23 +1992,23 @@
 
 <span class="cm">/*</span>
 <span class="cm">{</span>
-<span class="cm">  blockHash: &#39;mh_UvtuVNvK7k29G3anF48W4hgUMaFFLc1wKir55FFifgT49Egk&#39;,</span>
+<span class="cm">  blockHash: 'mh_UvtuVNvK7k29G3anF48W4hgUMaFFLc1wKir55FFifgT49Egk',</span>
 <span class="cm">  blockHeight: 449507,</span>
-<span class="cm">  hash: &#39;th_2sWNusGUf2wuRn7d453wPWTAe8pKVbtNF4DqakvippsxjvF8g1&#39;,</span>
+<span class="cm">  hash: 'th_2sWNusGUf2wuRn7d453wPWTAe8pKVbtNF4DqakvippsxjvF8g1',</span>
 <span class="cm">  signatures: [</span>
-<span class="cm">    &#39;sg_LYsVj9zUoKFPDiSvFUWG5QaRhnqQ525YA314xMVzRhApYuPnFyMWgAQGpChKHHWyMbykBwVRrmoQtTENTFCaCoMj17CBK&#39;</span>
+<span class="cm">    'sg_LYsVj9zUoKFPDiSvFUWG5QaRhnqQ525YA314xMVzRhApYuPnFyMWgAQGpChKHHWyMbykBwVRrmoQtTENTFCaCoMj17CBK'</span>
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
-<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',</span>
 <span class="cm">    fee: 16800000000000n,</span>
-<span class="cm">    name: &#39;testNameForTheGuide.chain&#39;,</span>
+<span class="cm">    name: 'testNameForTheGuide.chain',</span>
 <span class="cm">    nameFee: 2865700000000000000n,</span>
 <span class="cm">    nameSalt: 7595805618692717,</span>
 <span class="cm">    nonce: 19,</span>
-<span class="cm">    type: &#39;NameClaimTx&#39;,</span>
+<span class="cm">    type: 'NameClaimTx',</span>
 <span class="cm">    version: 2</span>
 <span class="cm">  },</span>
-<span class="cm">  rawTx: &#39;tx_+KILAfhCuECVba2mm3Un3nrN9U+LpuB2wzqDDmAzXwvc+9sVkpkcALzqm14p7kGqyt8pwjGTyKeLM9lp+KgXWF4PHmHz0WAPuFr4WCACoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhOZdGVzdE5hbWVGb3JUaGVHdWlkZS5jaGFpboca/FhPr2JtiCfFAveE1kAAhg9HjghAAADilhgr&#39;</span>
+<span class="cm">  rawTx: 'tx_+KILAfhCuECVba2mm3Un3nrN9U+LpuB2wzqDDmAzXwvc+9sVkpkcALzqm14p7kGqyt8pwjGTyKeLM9lp+KgXWF4PHmHz0WAPuFr4WCACoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhOZdGVzdE5hbWVGb3JUaGVHdWlkZS5jaGFpboca/FhPr2JtiCfFAveE1kAAhg9HjghAAADilhgr'</span>
 <span class="cm">}</span>
 <span class="cm">*/</span>
 </code></pre></div>
@@ -2025,9 +2025,9 @@
 </ul>
 <h3 id="bid-during-an-auction">Bid during an auction</h3>
 <p>In case there is an auction running for a name you want to claim you need to place a bid.</p>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">computeBidFee</span><span class="p">,</span><span class="w"> </span><span class="nx">computeAuctionEndBlock</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">computeBidFee</span><span class="p">,</span><span class="w"> </span><span class="nx">computeAuctionEndBlock</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@aeternity/aepp-sdk'</span>
 
-<span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Name</span><span class="p">(</span><span class="s1">&#39;auctiontest1.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">())</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Name</span><span class="p">(</span><span class="s1">'auctiontest1.chain'</span><span class="p">,</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">getContext</span><span class="p">())</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">startFee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// request from middleware, e.g. https://testnet.aeternity.io/mdw/name/auctiontest1.chain</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">increment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="w"> </span><span class="c1">// 5%, the minimum required increment</span>
@@ -2044,23 +2044,23 @@
 
 <span class="cm">/*</span>
 <span class="cm">{</span>
-<span class="cm">  blockHash: &#39;mh_Y5LDYPtPWzcop2FCbxnwTSwjWo9d3rYcBBcChCEHfzHo2YZpm&#39;,</span>
+<span class="cm">  blockHash: 'mh_Y5LDYPtPWzcop2FCbxnwTSwjWo9d3rYcBBcChCEHfzHo2YZpm',</span>
 <span class="cm">  blockHeight: 449693,</span>
-<span class="cm">  hash: &#39;th_2nZshewM7FtKSsDEP4zXPsGCe9cdxaFTRrcNjJyE22ktjGidZR&#39;,</span>
+<span class="cm">  hash: 'th_2nZshewM7FtKSsDEP4zXPsGCe9cdxaFTRrcNjJyE22ktjGidZR',</span>
 <span class="cm">  signatures: [</span>
-<span class="cm">    &#39;sg_7G49bziWjjZAjayBhFffRyfLbmFczs2foJgXcx1n1Vo7iGELQqggdH4w72MqWbNUbM9Jv2EBJnd2LFjv6LJhqTmvJBWyr&#39;</span>
+<span class="cm">    'sg_7G49bziWjjZAjayBhFffRyfLbmFczs2foJgXcx1n1Vo7iGELQqggdH4w72MqWbNUbM9Jv2EBJnd2LFjv6LJhqTmvJBWyr'</span>
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
-<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',</span>
 <span class="cm">    fee: 16520000000000n,</span>
-<span class="cm">    name: &#39;auctiontest1.chain&#39;,</span>
+<span class="cm">    name: 'auctiontest1.chain',</span>
 <span class="cm">    nameFee: 3159434250000000000n,</span>
 <span class="cm">    nameSalt: 0,</span>
 <span class="cm">    nonce: 24,</span>
-<span class="cm">    type: &#39;NameClaimTx&#39;,</span>
+<span class="cm">    type: 'NameClaimTx',</span>
 <span class="cm">    version: 2</span>
 <span class="cm">  },</span>
-<span class="cm">  rawTx: &#39;tx_+JQLAfhCuEAv2HQoyLa7krHpcQAsPpWdP+6PJYzdPSifmwNIgpWZtyrdgVD+IGMzzAqxkOQEDeAwc/Oh+dfXPBZpNslCNFgBuEz4SiACoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhiSYXVjdGlvbnRlc3QxLmNoYWluAIgr2JC2AnPkAIYPBly7UAAAm/NY1g==&#39;</span>
+<span class="cm">  rawTx: 'tx_+JQLAfhCuEAv2HQoyLa7krHpcQAsPpWdP+6PJYzdPSifmwNIgpWZtyrdgVD+IGMzzAqxkOQEDeAwc/Oh+dfXPBZpNslCNFgBuEz4SiACoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhiSYXVjdGlvbnRlc3QxLmNoYWluAIgr2JC2AnPkAIYPBly7UAAAm/NY1g=='</span>
 <span class="cm">}</span>
 <span class="cm">BID PLACED AT 449693 WILL END AT 479453</span>
 <span class="cm">*/</span>
@@ -2078,15 +2078,15 @@
 <li>By default a name will have a TTL of 180000 key blocks (~375 days). It cannot be extended longer than 180000 key blocks.</li>
 </ul>
 <h3 id="set-pointers-update-ttl">Set pointers &amp; update TTL</h3>
-<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getDefaultPointerKey</span><span class="p">,</span><span class="w"> </span><span class="nx">encode</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@aeternity/aepp-sdk&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getDefaultPointerKey</span><span class="p">,</span><span class="w"> </span><span class="nx">encode</span><span class="p">,</span><span class="w"> </span><span class="nx">Encoding</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@aeternity/aepp-sdk'</span><span class="p">;</span>
 
-<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ok_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">oracle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'ok_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk'</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">pointers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">account_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">customKey</span><span class="o">:</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="s1">&#39;example data&#39;</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Bytearray</span><span class="p">),</span>
+<span class="w">  </span><span class="nx">account_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk'</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">customKey</span><span class="o">:</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="s1">'example data'</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">Bytearray</span><span class="p">),</span>
 <span class="w">  </span><span class="p">[</span><span class="nx">getDefaultPointerKey</span><span class="p">(</span><span class="nx">oracle</span><span class="p">)]</span><span class="o">:</span><span class="w"> </span><span class="nx">oracle</span><span class="p">,</span><span class="w"> </span><span class="c1">// the same as `oracle_pubkey: oracle,`</span>
-<span class="w">  </span><span class="nx">contract_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ct_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">channel</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">contract_pubkey</span><span class="o">:</span><span class="w"> </span><span class="s1">'ct_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk'</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">channel</span><span class="o">:</span><span class="w"> </span><span class="s1">'ch_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk'</span><span class="p">,</span>
 <span class="p">};</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">nameUpdateTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">pointers</span><span class="p">);</span>
@@ -2094,24 +2094,24 @@
 
 <span class="cm">/*</span>
 <span class="cm">{</span>
-<span class="cm">  blockHash: &#39;mh_AiaGtTWBRys7EX5apAidShyCw1kefocuWt49DgLE2fWNCgKvq&#39;,</span>
+<span class="cm">  blockHash: 'mh_AiaGtTWBRys7EX5apAidShyCw1kefocuWt49DgLE2fWNCgKvq',</span>
 <span class="cm">  blockHeight: 449855,</span>
-<span class="cm">  hash: &#39;th_LLef19g2mLWQfG7Ds1XZNGyb3SGvi8PGvk7mJczpD9iToBcqL&#39;,</span>
+<span class="cm">  hash: 'th_LLef19g2mLWQfG7Ds1XZNGyb3SGvi8PGvk7mJczpD9iToBcqL',</span>
 <span class="cm">  signatures: [</span>
-<span class="cm">    &#39;sg_Zm7kp1oBnXGnHwdzsim9nTXtrGoV4bWJhcC1nkw9f3eMPibVaYQRoM829iNrPandAfs8TK7ogEkYByxQx11xCAFMpwUBz&#39;</span>
+<span class="cm">    'sg_Zm7kp1oBnXGnHwdzsim9nTXtrGoV4bWJhcC1nkw9f3eMPibVaYQRoM829iNrPandAfs8TK7ogEkYByxQx11xCAFMpwUBz'</span>
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
-<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',</span>
 <span class="cm">    clientTtl: 3600,</span>
 <span class="cm">    fee: 17800000000000n,</span>
-<span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
+<span class="cm">    nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',</span>
 <span class="cm">    nameTtl: 180000,</span>
 <span class="cm">    nonce: 27,</span>
 <span class="cm">    pointers: [ [Object] ],</span>
-<span class="cm">    type: &#39;NameUpdateTx&#39;,</span>
+<span class="cm">    type: 'NameUpdateTx',</span>
 <span class="cm">    version: 1</span>
 <span class="cm">  },</span>
-<span class="cm">  rawTx: &#39;tx_+NQLAfhCuED6aLVAlIfcqczlZ4XzOjG3U23l5+egPFDVEKTSMuL0Zj18jUG6ctJxGGQubNoANFcwQl79T7w0dG4+FV7Qn3AKuIz4iiIBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhuhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbagwK/IPLxjmFjY291bnRfcHVia2V5oQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAoMBSniGEDBirVAAAJ7I9GA=&#39;</span>
+<span class="cm">  rawTx: 'tx_+NQLAfhCuED6aLVAlIfcqczlZ4XzOjG3U23l5+egPFDVEKTSMuL0Zj18jUG6ctJxGGQubNoANFcwQl79T7w0dG4+FV7Qn3AKuIz4iiIBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhuhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbagwK/IPLxjmFjY291bnRfcHVia2V5oQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAoMBSniGEDBirVAAAJ7I9GA='</span>
 <span class="cm">}</span>
 <span class="cm">*/</span>
 </code></pre></div>
@@ -2129,51 +2129,51 @@
 
 <span class="cm">/*</span>
 <span class="cm">{</span>
-<span class="cm">  blockHash: &#39;mh_2mbAuBtyPp7wN6hrcvkYD7LZRSegwZZKYnLcNQkGVGRZ3uVxW6&#39;,</span>
+<span class="cm">  blockHash: 'mh_2mbAuBtyPp7wN6hrcvkYD7LZRSegwZZKYnLcNQkGVGRZ3uVxW6',</span>
 <span class="cm">  blockHeight: 449860,</span>
-<span class="cm">  hash: &#39;th_2wXE8i5BUFCUPuioKwAuwNysm6RPQo8STf5m91CuT3LTh7q4ko&#39;,</span>
+<span class="cm">  hash: 'th_2wXE8i5BUFCUPuioKwAuwNysm6RPQo8STf5m91CuT3LTh7q4ko',</span>
 <span class="cm">  signatures: [</span>
-<span class="cm">    &#39;sg_E69tfR3STWi5Dg6yUHQj5D5waTCEhoFmb1LYWGU2bsCnuLkMgH1KqhRKrCZaatDMyg5szgABDuU1r6ZD5K74qXWW5pMJ&#39;</span>
+<span class="cm">    'sg_E69tfR3STWi5Dg6yUHQj5D5waTCEhoFmb1LYWGU2bsCnuLkMgH1KqhRKrCZaatDMyg5szgABDuU1r6ZD5K74qXWW5pMJ'</span>
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
-<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',</span>
 <span class="cm">    clientTtl: 100000,</span>
 <span class="cm">    fee: 17800000000000n,</span>
-<span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
+<span class="cm">    nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',</span>
 <span class="cm">    nameTtl: 100000,</span>
 <span class="cm">    nonce: 28,</span>
 <span class="cm">    pointers: [ [Object] ],</span>
-<span class="cm">    type: &#39;NameUpdateTx&#39;,</span>
+<span class="cm">    type: 'NameUpdateTx',</span>
 <span class="cm">    version: 1</span>
 <span class="cm">  },</span>
-<span class="cm">  rawTx: &#39;tx_+NQLAfhCuEABuZTyU+W5xmBpQn5GCJiSpK6fI0pYoMIQ5IqD2bs6pJ+oyU7HDGoSU0Mn6tsfYOn+MVRsxLR6yM1Vyv0c4JQNuIz4iiIBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhyhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbagwGGoPLxjmFjY291bnRfcHVia2V5oQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAoMBhqCGEDBirVAAANKYAm0=&#39;</span>
+<span class="cm">  rawTx: 'tx_+NQLAfhCuEABuZTyU+W5xmBpQn5GCJiSpK6fI0pYoMIQ5IqD2bs6pJ+oyU7HDGoSU0Mn6tsfYOn+MVRsxLR6yM1Vyv0c4JQNuIz4iiIBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAhyhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbagwGGoPLxjmFjY291bnRfcHVia2V5oQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAoMBhqCGEDBirVAAANKYAm0='</span>
 <span class="cm">}</span>
 <span class="cm">*/</span>
 </code></pre></div>
 <h2 id="3-transfer-ownership-of-a-name">3. Transfer ownership of a name</h2>
 <p>In some cases you might want to transfer the ownership of a name to another account. Of course this is also possible and you can do that as follows:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">recipient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ak_...&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">recipient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'ak_...'</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">nameTransferTx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">name</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">recipient</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">nameTransferTx</span><span class="p">);</span>
 
 <span class="cm">/*</span>
 <span class="cm">{</span>
-<span class="cm">  blockHash: &#39;mh_ZuYV5tmJM4PhrfxzXfo9e37uqPcYpCiAoEC2uRcqbUXeMSmLH&#39;,</span>
+<span class="cm">  blockHash: 'mh_ZuYV5tmJM4PhrfxzXfo9e37uqPcYpCiAoEC2uRcqbUXeMSmLH',</span>
 <span class="cm">  blockHeight: 449982,</span>
-<span class="cm">  hash: &#39;th_xXqmZxR7WJDe6YTz1GnHWgNjtcZjpTPA5bVuiQstmd8o6Gg7x&#39;,</span>
+<span class="cm">  hash: 'th_xXqmZxR7WJDe6YTz1GnHWgNjtcZjpTPA5bVuiQstmd8o6Gg7x',</span>
 <span class="cm">  signatures: [</span>
-<span class="cm">    &#39;sg_72fiMzprywNmFtuf1i1FFfhBBXcPHpHDfi1Uv2bDnYayoCRWe1yyzvwLmhM6cfA3TR6pBF9Kj3iyYm3mrC46rvNCpchyi&#39;</span>
+<span class="cm">    'sg_72fiMzprywNmFtuf1i1FFfhBBXcPHpHDfi1Uv2bDnYayoCRWe1yyzvwLmhM6cfA3TR6pBF9Kj3iyYm3mrC46rvNCpchyi'</span>
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
-<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',</span>
 <span class="cm">    fee: 17300000000000n,</span>
-<span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
+<span class="cm">    nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',</span>
 <span class="cm">    nonce: 33,</span>
-<span class="cm">    recipientId: &#39;ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E&#39;,</span>
-<span class="cm">    type: &#39;NameTransferTx&#39;,</span>
+<span class="cm">    recipientId: 'ak_21A27UVVt3hDkBE5J7rhhqnH5YNb4Y1dqo4PnSybrH85pnWo7E',</span>
+<span class="cm">    type: 'NameTransferTx',</span>
 <span class="cm">    version: 1</span>
 <span class="cm">  },</span>
-<span class="cm">  rawTx: &#39;tx_+LsLAfhCuEAuFNHG4gniZjJDQtbm5cIfJACkU/NI96mZpwMvdyuxxOYWYxSxUF2NF5oxjmsYLdXWfSrdmgWj40JzZU/TRA4DuHP4cSQBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAiGhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbaoQHVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajO4YPu/hayAAABhgUgg==&#39;</span>
+<span class="cm">  rawTx: 'tx_+LsLAfhCuEAuFNHG4gniZjJDQtbm5cIfJACkU/NI96mZpwMvdyuxxOYWYxSxUF2NF5oxjmsYLdXWfSrdmgWj40JzZU/TRA4DuHP4cSQBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAiGhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbaoQHVzwhADpiCIvJutLAsj4kHdFdGchGm5tlV7bcHScajO4YPu/hayAAABhgUgg=='</span>
 <span class="cm">}</span>
 <span class="cm">*/</span>
 </code></pre></div>
@@ -2184,21 +2184,21 @@
 
 <span class="cm">/*</span>
 <span class="cm">{</span>
-<span class="cm">  blockHash: &#39;mh_2Q5Xqd4vrmwkS98SBkN79k1t9VLNmDX4wk8xnUJYTEvkK3YoH4&#39;,</span>
+<span class="cm">  blockHash: 'mh_2Q5Xqd4vrmwkS98SBkN79k1t9VLNmDX4wk8xnUJYTEvkK3YoH4',</span>
 <span class="cm">  blockHeight: 450018,</span>
-<span class="cm">  hash: &#39;th_2XhJradAVKN2jR2tgNYdKNWikMc8XunqTdUhRPh2TyhAwMqijJ&#39;,</span>
+<span class="cm">  hash: 'th_2XhJradAVKN2jR2tgNYdKNWikMc8XunqTdUhRPh2TyhAwMqijJ',</span>
 <span class="cm">  signatures: [</span>
-<span class="cm">    &#39;sg_Tjbf8SJDQXgBhaYk7AzTTr7d1RF3bDcMp6BMgRoHcHcgBp13HjcMYmZJ8vvqrZ94An9gvQD4NegYrR7eaBLt6jEy99xyM&#39;</span>
+<span class="cm">    'sg_Tjbf8SJDQXgBhaYk7AzTTr7d1RF3bDcMp6BMgRoHcHcgBp13HjcMYmZJ8vvqrZ94An9gvQD4NegYrR7eaBLt6jEy99xyM'</span>
 <span class="cm">  ],</span>
 <span class="cm">  tx: {</span>
-<span class="cm">    accountId: &#39;ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk&#39;,</span>
+<span class="cm">    accountId: 'ak_2519mBsgjJEVEFoRgno1ryDsn3BEaCZGRbXPEjThWYLX9MTpmk',</span>
 <span class="cm">    fee: 16620000000000,</span>
-<span class="cm">    nameId: &#39;nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5&#39;,</span>
+<span class="cm">    nameId: 'nm_1Cz5HGY8PMWZxNrM6s51CtsJZDU3DDT1LdmpEipa3DRghyGz5',</span>
 <span class="cm">    nonce: 34,</span>
-<span class="cm">    type: &#39;NameRevokeTx&#39;,</span>
+<span class="cm">    type: 'NameRevokeTx',</span>
 <span class="cm">    version: 1</span>
 <span class="cm">  },</span>
-<span class="cm">  rawTx: &#39;tx_+JkLAfhCuEDMWOZac70tEHQ4AHGBIedZepwTvsBjIHk36vhTd5yBepmTemTQcUVrAtbNO3jZVZD4GUOhN+DfXm2lNrpZu+8FuFH4TyMBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAiKhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbahg8dpTI4AAB44bma&#39;</span>
+<span class="cm">  rawTx: 'tx_+JkLAfhCuEDMWOZac70tEHQ4AHGBIedZepwTvsBjIHk36vhTd5yBepmTemTQcUVrAtbNO3jZVZD4GUOhN+DfXm2lNrpZu+8FuFH4TyMBoQGMyNToF1flcYDSVsPl5DZ9ZY3FJWRpDRQYD32quWBEAiKhAgB4Gsn+dalOdWvHXJd+3LBBiO9HsZoHIF2/aQ4n/bbahg8dpTI4AAB44bma'</span>
 <span class="cm">}</span>
 <span class="cm">*/</span>
 </code></pre></div>
@@ -2210,9 +2210,9 @@
 <h2 id="delegate-signature-to-contract-aens-interface">Delegate signature to contract (AENS interface)</h2>
 <p>It is possible to authorize a Sophia contract to manage an AENS name on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the <a href="https://docs.aeternity.com/developer-documentation/aesophia/docs/sophia_features#aens-interface">AENS interface</a> and perform AENS related actions on behalf of your account.</p>
 <p>This functionality could for example be used to build an AENS marketplace.</p>
-<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">contractAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ct_asd2ks...&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">contractAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'ct_asd2ks...'</span><span class="p">;</span>
 <span class="c1">// AENS name</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">nameId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;example.chain&#39;</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">nameId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'example.chain'</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">commonParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">contractAddress</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">accountAddress</span><span class="o">:</span><span class="w"> </span><span class="nx">aeSdk</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span>

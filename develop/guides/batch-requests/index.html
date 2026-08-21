@@ -1832,7 +1832,7 @@
 <h2 id="multiple-spends-via-contract-call">Multiple spends via contract call</h2>
 <p>If you need to transfer a fixed AE amount from the same account to more than 24 accounts, it is more efficient to do it via a smart contract.</p>
 <p>Let's define and deploy a contract</p>
-<div class="highlight"><pre><span></span><code>include &quot;List.aes&quot;
+<div class="highlight"><pre><span></span><code>include "List.aes"
 
 contract MultipleSpends =
   payable stateful entrypoint spend(addresses : list(address), amount: int) =

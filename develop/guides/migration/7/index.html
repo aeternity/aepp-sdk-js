@@ -1931,7 +1931,7 @@
 <h4 id="after">After</h4>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">nodeInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">Node</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="nx">internalUrl</span><span class="w"> </span><span class="p">});</span>
 <span class="nx">Universal</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;testnet&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">nodeInstance</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">  </span><span class="nx">nodes</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'testnet'</span><span class="p">,</span><span class="w"> </span><span class="nx">instance</span><span class="o">:</span><span class="w"> </span><span class="nx">nodeInstance</span><span class="w"> </span><span class="p">}],</span>
 <span class="p">});</span>
 </code></pre></div>
 <h2 id="step-2">Step 2</h2>
@@ -1950,16 +1950,16 @@
 <h3 id="before_2">Before</h3>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
 
-<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">&#39;cm_ad1wdsa...&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">'cm_ad1wdsa...'</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">'cm_ad1wdsa...'</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">'cm_ad1wdsa...'</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
 </code></pre></div>
 <h3 id="after_2">After</h3>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Universal</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">})</span>
 
-<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
-<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">&#39;testname.chain&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensUpdate</span><span class="p">(</span><span class="s1">'testname.chain'</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensTransfer</span><span class="p">(</span><span class="s1">'testname.chain'</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">aensRevoke</span><span class="p">(</span><span class="s1">'testname.chain'</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
 </code></pre></div>
 <h2 id="other-breaking-changes">Other Breaking Changes</h2>
 <ul>

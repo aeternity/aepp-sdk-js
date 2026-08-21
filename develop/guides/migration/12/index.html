@@ -3586,8 +3586,8 @@
 <h4 id="universal-rpcaepp-rpcwallet-ae-stamps-are-removed"><code>Universal</code>, <code>RpcAepp</code>, <code>RpcWallet</code>, <code>Ae</code> stamps are removed</h4>
 <p>Use <code>AeSdk</code>, <code>AeSdkAepp</code>, <code>AeSdkWallet</code>, <code>AeSdbBase</code> accordingly.
 For example:</p>
-<div class="highlight"><pre><span></span><code><span class="gd">-import { Universal } from &#39;@aeternity/aepp-sdk&#39;</span>
-<span class="gi">+import { AeSdk } from &#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="gd">-import { Universal } from '@aeternity/aepp-sdk'</span>
+<span class="gi">+import { AeSdk } from '@aeternity/aepp-sdk'</span>
 
 <span class="gd">-const aeSdk = await Universal(options)</span>
 <span class="gi">+const aeSdk = new AeSdk(options)</span>
@@ -3601,8 +3601,8 @@ Avoid the above error by not making instances of these classes reactive.</p>
 <h4 id="all-combined-exports-are-inlined-requireaeternityaepp-sdkgeneratekeypair">all combined exports are inlined (<code>require('@aeternity/aepp-sdk').generateKeyPair()</code>)</h4>
 <p>Import the needed utils directly instead of importing a wrapper object firstly.
 For example:</p>
-<div class="highlight"><pre><span></span><code><span class="gd">-import { Crypto } from &#39;@aeternity/aepp-sdk&#39;</span>
-<span class="gi">+import { generateKeyPair } from &#39;@aeternity/aepp-sdk&#39;</span>
+<div class="highlight"><pre><span></span><code><span class="gd">-import { Crypto } from '@aeternity/aepp-sdk'</span>
+<span class="gi">+import { generateKeyPair } from '@aeternity/aepp-sdk'</span>
 
 <span class="gd">-console.log(Crypto.generateKeyPair())</span>
 <span class="gi">+console.log(generateKeyPair())</span>
@@ -3615,7 +3615,7 @@ For example:</p>
 <h2 id="node-and-compiler">Node and Compiler</h2>
 <h4 id="node-compiler-previously-contractcompilerhttp-are-classes-instead-of-a-stamps"><code>Node</code>, <code>Compiler</code> (previously <code>ContractCompilerHttp</code>) are classes instead of a stamps</h4>
 <p>For example:</p>
-<div class="highlight"><pre><span></span><code>import { Node } from &#39;@aeternity/aepp-sdk&#39;
+<div class="highlight"><pre><span></span><code>import { Node } from '@aeternity/aepp-sdk'
 
 <span class="gd">-const node = await Node({ url, ignoreVersion: false })</span>
 <span class="gi">+const node = new Node(url, { ignoreVersion: false })</span>
@@ -3658,8 +3658,8 @@ instead.</p>
 <h4 id="encode-since-the-prefix-is-evaluated-by-the-type-itself-the-required-prefix-parameter"><strong>encode:</strong> since the prefix is evaluated by the type itself the required prefix parameter</h4>
 <p>is no more accepted
 For example:</p>
-<div class="highlight"><pre><span></span><code><span class="gd">-decode(&#39;cb_DA6sWJo=&#39;, &#39;cb&#39;)</span>
-<span class="gi">+decode(&#39;cb_DA6sWJo=&#39;)</span>
+<div class="highlight"><pre><span></span><code><span class="gd">-decode('cb_DA6sWJo=', 'cb')</span>
+<span class="gi">+decode('cb_DA6sWJo=')</span>
 </code></pre></div>
 <h4 id="calculateminfee-returns-bignumber-instead-of-string"><code>calculateMinFee</code> returns BigNumber instead of string</h4>
 <h4 id="fee-helpers-not-exported-anymore-base_gas-gas_per_byte-key_block_interval">Fee helpers not exported anymore (<code>BASE_GAS</code>, <code>GAS_PER_BYTE</code>, <code>KEY_BLOCK_INTERVAL</code>,</h4>

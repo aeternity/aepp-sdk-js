@@ -10935,7 +10935,7 @@ Example of usage you can find heere: <a href="https://github.com/aeternity/aepp-
 <span class="c1">// Make spend transaction using GA</span>
 <span class="c1">// One Way</span>
 <span class="w">    </span><span class="c1">// encoded call data for auth contract</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">callData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;cb_...&#39;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">callData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'cb_...'</span>
 <span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">spend</span><span class="p">(</span><span class="mf">10000</span><span class="p">,</span><span class="w"> </span><span class="nx">receiverPub</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">authData</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">callData</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">})</span>
 
 <span class="c1">// or</span>
@@ -10952,7 +10952,7 @@ Example of usage you can find heere: <a href="https://github.com/aeternity/aepp-
 <ul>
 <li><strong>Contract:</strong> add ability to use call-static/dry-run without keyPair (<a href="https://github.com/aeternity/aepp-sdk-js/issues/577">#577</a>) (<a href="https://github.com/aeternity/aepp-sdk-js/commit/c38edd9">c38edd9</a>)</li>
 <li><strong>AE:</strong> Add ability to make operation on specific account using <code>onAccount</code> option.
-  <div class="highlight"><pre><span></span><code> Exm: await client.spend(1, receiver, { onAccount: &#39;PUBLIC_KEY&#39; })
+  <div class="highlight"><pre><span></span><code> Exm: await client.spend(1, receiver, { onAccount: 'PUBLIC_KEY' })
  Add `onAccount` to `AENS`, `Contract`, `Oracle`.
  Add tests for using specific account to Contract, ACI, Account.
 </code></pre></div></li>
@@ -11019,11 +11019,11 @@ Example of usage you can find heere: <a href="https://github.com/aeternity/aepp-
   Add <code>options</code> object like last arguments of generate fn under <code>instance.methods</code>
   <div class="highlight"><pre><span></span><code>const instance = await client.getContractInstance(source)
 // Deploy contract
-await.contract.init(100, &#39;test&#39;, options)
+await.contract.init(100, 'test', options)
 //or
-await.contract.deploy([100, &#39;test&#39;], options)
+await.contract.deploy([100, 'test'], options)
 // Call function
-const result = await instance.call(&#39;sum&#39;, [2, 5], options)
+const result = await instance.call('sum', [2, 5], options)
 //
   // Automatically decide to send tx on-chain or call-static(dry-run) base on if function stateful or not
   const result = await instance.methods.sum(2, 5, options)
@@ -11256,7 +11256,7 @@ console.log(contract)
 
 //
 
-export { ADDRESS_FORMAT } from &#39;es/account&#39;
+export { ADDRESS_FORMAT } from 'es/account'
 await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
 </code></pre></div>
 <ul>
@@ -11279,10 +11279,10 @@ await account.address(format: ADDRESS_FORMAT) // default ADDRESS_FORMAT.api
 <li><strong>Contract:</strong> Change Contract stamp API
   <div class="highlight"><pre><span></span><code>1) Use Compiler instead of node API for encode/decode call-data and compile.
 2) Change Contract interface:
- - contractCallStatic (address, abi = &#39;sophia-address&#39;, name, { top, args = &#39;()&#39;, call, options = {} } = {}) -&gt; (source, address, name, args = [], { top, options = {} } = {}))
- - contractCall (code, abi, address, name, { args = &#39;()&#39;, options = {}, call } = {}) -&gt; (source, address, name, args = [], options = {})
- - contractDeploy (code, abi, { initState = &#39;()&#39;, options = {} } = {}) -&gt; (code, source, initState = [], options = {})
- - contractEncodeCall (code, abi, name, args, call) -&gt; (source, name, args) // &#39;source&#39; is -&gt; Contract source code or ACI interface source
+ - contractCallStatic (address, abi = 'sophia-address', name, { top, args = '()', call, options = {} } = {}) -&gt; (source, address, name, args = [], { top, options = {} } = {}))
+ - contractCall (code, abi, address, name, { args = '()', options = {}, call } = {}) -&gt; (source, address, name, args = [], options = {})
+ - contractDeploy (code, abi, { initState = '()', options = {} } = {}) -&gt; (code, source, initState = [], options = {})
+ - contractEncodeCall (code, abi, name, args, call) -&gt; (source, name, args) // 'source' is -&gt; Contract source code or ACI interface source
 </code></pre></div></li>
 </ul>
 <h2 id="232-2019-03-04"><a href="https://github.com/aeternity/aepp-sdk-js/compare/2.3.1...2.3.2">2.3.2</a> (2019-03-04)</h2>

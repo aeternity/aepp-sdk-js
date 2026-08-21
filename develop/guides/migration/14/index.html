@@ -2586,16 +2586,16 @@
 </code></pre></div>
 <h4 id="recover-dump-removed-aex-3-keystore-implementation"><code>recover</code>, <code>dump</code> removed (AEX-3 keystore implementation)</h4>
 <p>Copy the removed implementation to your project or add a previous sdk as a separate dependency</p>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nt">&quot;dependencies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;@aeternity/aepp-sdk&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^14.0.0&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;@aeternity/aepp-sdk-13&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;npm:@aeternity/aepp-sdk@^13.3.3&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nt">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"@aeternity/aepp-sdk"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^14.0.0"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"@aeternity/aepp-sdk-13"</span><span class="p">:</span><span class="w"> </span><span class="s2">"npm:@aeternity/aepp-sdk@^13.3.3"</span>
 <span class="w">  </span><span class="p">}</span>
 </code></pre></div>
 <h4 id="host-is-readonly-in-generated-apis">$host is readonly in generated APIs</h4>
 <p>It is made to don't break caching.
 If you need to change a server URL, create a new server instance instead.</p>
-<div class="highlight"><pre><span></span><code><span class="gd">- node.$host = &#39;http://example.com&#39;;</span>
-<span class="gi">+ node = new Node(&#39;http://example.com&#39;);</span>
+<div class="highlight"><pre><span></span><code><span class="gd">- node.$host = 'http://example.com';</span>
+<span class="gi">+ node = new Node('http://example.com');</span>
 </code></pre></div>
 <h2 id="aepp">Aepp</h2>
 <h4 id="rpcbroadcasterror-not-exported-anymore">RpcBroadcastError not exported anymore</h4>
@@ -2670,9 +2670,9 @@ Obtain the secret key via MemoryAccount:secretKey.</p>
 <h4 id="memoryaccount-accepts-secret-key-as-sk_-prefixed-string">MemoryAccount accepts secret key as sk_-prefixed string</h4>
 <p>Convert secret key as hex to new format as</p>
 <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">oldSk</span><span class="w"> </span><span class="o">=</span>
-<span class="w">  </span><span class="s1">&#39;9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200&#39;</span><span class="p">;</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">newSk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">oldSk</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hex&#39;</span><span class="p">).</span><span class="nx">subarray</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">32</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">AccountSecretKey</span><span class="p">);</span>
-<span class="c1">// &#39;sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf&#39;</span>
+<span class="w">  </span><span class="s1">'9ebd7beda0c79af72a42ece3821a56eff16359b6df376cf049aee995565f022f840c974b97164776454ba119d84edc4d6058a8dec92b6edc578ab2d30b4c4200'</span><span class="p">;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">newSk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">encode</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">oldSk</span><span class="p">,</span><span class="w"> </span><span class="s1">'hex'</span><span class="p">).</span><span class="nx">subarray</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">32</span><span class="p">),</span><span class="w"> </span><span class="nx">Encoding</span><span class="p">.</span><span class="nx">AccountSecretKey</span><span class="p">);</span>
+<span class="c1">// 'sk_2CuofqWZHrABCrM7GY95YSQn8PyFvKQadnvFnpwhjUnDCFAWmf'</span>
 </code></pre></div>
 <p>Use SDK <a href="https://sdk.aeternity.io/v14.1.0/examples/browser/tools/">tools</a> page to convert secret keys.</p>
 <h4 id="accountbase-inheritors-required-to-implement-signtypeddata-signdelegation">AccountBase inheritors required to implement <code>signTypedData</code>, <code>signDelegation</code></h4>
@@ -2680,8 +2680,8 @@ Obtain the secret key via MemoryAccount:secretKey.</p>
 <h2 id="aens">Aens</h2>
 <h4 id="aens-methods-removed">aens* methods removed</h4>
 <p>Use Name class instead.</p>
-<div class="highlight"><pre><span></span><code><span class="gd">-await aeSdk.aensPreclaim(&#39;example.chain&#39;)</span>
-<span class="gi">+const name = new Name(&#39;example.chain&#39;, aeSdk.getContext())</span>
+<div class="highlight"><pre><span></span><code><span class="gd">-await aeSdk.aensPreclaim('example.chain')</span>
+<span class="gi">+const name = new Name('example.chain', aeSdk.getContext())</span>
 <span class="gi">+await name.preclaim()</span>
 </code></pre></div>
 <p>Accordingly for other methods:</p>
