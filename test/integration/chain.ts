@@ -211,6 +211,6 @@ describe('Node Chain', () => {
       )
     ).map((r) => r.decodedResult);
     expect(results).to.eql(numbers.map((v) => BigInt(v * 100)));
-    expect(getCount()).to.equal(1);
+    expect(getCount()).to.equal(2);
   });
 });

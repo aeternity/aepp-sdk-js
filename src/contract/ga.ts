@@ -2,7 +2,7 @@
  * Generalized Account module - routines to use generalized account
  */
 
-import { ConsensusProtocolVersion, Int, Tag } from '../tx/builder/constants.js';
+import { Int, Tag } from '../tx/builder/constants.js';
 import {
   buildContractIdByContractTx,
   buildTx,
@@ -123,22 +123,20 @@ export async function buildAuthTxHash(
   transaction: Encoded.Transaction,
   { fee, gasPrice, onNode }: { fee?: Int; gasPrice?: Int; onNode: Node },
 ): Promise<Buffer> {
-  const { nodeNetworkId, consensusProtocolVersion } = await onNode.getNodeInfo();
+  const { nodeNetworkId } = await onNode.getNodeInfo();
   let payload = hash(concatBuffers([Buffer.from(nodeNetworkId), decode(transaction)]));
-  if (consensusProtocolVersion === ConsensusProtocolVersion.Ceres) {
-    if (fee == null) throw new ArgumentError('fee', 'provided (in Ceres)', fee);
-    if (gasPrice == null) throw new ArgumentError('gasPrice', 'provided (in Ceres)', gasPrice);
-    payload = hash(
-      decode(
-        packEntry({
-          tag: EntryTag.GaMetaTxAuthData,
-          fee,
-          gasPrice,
-          txHash: encode(payload, Encoding.TxHash),
-        }),
-      ),
-    );
-  }
+  if (fee == null) throw new ArgumentError('fee', 'provided (in Ceres)', fee);
+  if (gasPrice == null) throw new ArgumentError('gasPrice', 'provided (in Ceres)', gasPrice);
+  payload = hash(
+    decode(
+      packEntry({
+        tag: EntryTag.GaMetaTxAuthData,
+        fee,
+        gasPrice,
+        txHash: encode(payload, Encoding.TxHash),
+      }),
+    ),
+  );
   return payload;
 }
 
