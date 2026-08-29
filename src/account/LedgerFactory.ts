@@ -27,18 +27,19 @@ export default class AccountLedgerFactory extends AccountBaseFactory {
   // TODO: remove after release Ledger app v1.0.0
   _enableExperimentalLedgerAppSupport = false;
 
+  _isNewApp = false;
+
   /**
    * It throws an exception if Aeternity app on Ledger has an incompatible version, not opened or
    * not installed.
    */
+  // TODO: this check also in AccountLedger
   async ensureReady(): Promise<void> {
     const { version } = await this.#getAppConfiguration();
     const oldApp = [version, '0.4.4', '0.5.0'] as const;
     const newApp = [version, '1.0.0', '2.0.0'] as const;
-    if (
-      !semverSatisfies(...oldApp) &&
-      (!this._enableExperimentalLedgerAppSupport || !semverSatisfies(...newApp))
-    )
+    this._isNewApp = this._enableExperimentalLedgerAppSupport && semverSatisfies(...newApp);
+    if (!semverSatisfies(...oldApp) && !this._isNewApp)
       throw new UnsupportedVersionError('Aeternity app on Ledger', ...oldApp);
     this.#ensureReadyPromise = Promise.resolve();
   }
@@ -88,6 +89,12 @@ export default class AccountLedgerFactory extends AccountBaseFactory {
    * @param accountIndex - Index of account
    */
   async initialize(accountIndex: number): Promise<AccountLedger> {
-    return new AccountLedger(this.transport, accountIndex, await this.getAddress(accountIndex));
+    const account = new AccountLedger(
+      this.transport,
+      accountIndex,
+      await this.getAddress(accountIndex),
+    );
+    account._isNewApp = this._isNewApp;
+    return account;
   }
 }
