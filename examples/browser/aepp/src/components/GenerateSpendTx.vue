@@ -40,7 +40,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { encode, Encoding, Tag, unpackTx, buildTx } from '@aeternity/aepp-sdk';
+import { encode, Encoding, Tag, unpackTx, rebuildUnpackedTx } from '@aeternity/aepp-sdk';
 import Value from './Value.vue';
 
 export default {
@@ -65,7 +65,10 @@ export default {
       if (this.incrementNonce) {
         const spendTxParams = unpackTx(spendTx);
         spendTxParams.nonce += 1;
-        spendTx = buildTx(spendTxParams);
+        // this transaction is already built and priced, only its nonce changes — `buildTx` would
+        // price it again against the parameters of the SDK release and reject its fee on a
+        // network running a lower minimum gas price
+        spendTx = rebuildUnpackedTx(spendTxParams);
       }
       return spendTx;
     },

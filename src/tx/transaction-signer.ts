@@ -1,5 +1,5 @@
 import { Encoded } from '../utils/encoder.js';
-import { buildTx, getSchema, unpackTx } from './builder/index.js';
+import { getSchema, rebuildUnpackedTx, unpackTx } from './builder/index.js';
 import { Tag } from './builder/constants.js';
 import { TransactionError, UnexpectedTsError } from '../utils/errors.js';
 
@@ -14,7 +14,7 @@ export default function getTransactionSignerAddress(
   const params = unpackTx(transaction);
   switch (params.tag) {
     case Tag.SignedTx:
-      return getTransactionSignerAddress(buildTx(params.encodedTx));
+      return getTransactionSignerAddress(rebuildUnpackedTx(params.encodedTx));
     case Tag.GaMetaTx:
       return params.gaId;
     default:

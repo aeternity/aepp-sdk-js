@@ -9,6 +9,7 @@ import {
   Tag,
   unpackTx,
   buildTx,
+  rebuildUnpackedTx,
   Contract,
   ContractMethodsBase,
   MIN_GAS_PRICE,
@@ -119,7 +120,7 @@ describe('Generalized Account', () => {
 
     const gaMetaTxParams = unpackTx(rawTx, Tag.SignedTx).encodedTx;
     ensureEqual<Tag.GaMetaTx>(gaMetaTxParams.tag, Tag.GaMetaTx);
-    const spendTx = buildTx(gaMetaTxParams.tx.encodedTx);
+    const spendTx = rebuildUnpackedTx(gaMetaTxParams.tx.encodedTx);
     const { fee, gasPrice } = gaMetaTxParams;
     expect(new Uint8Array(await aeSdk.buildAuthTxHash(spendTx, { fee, gasPrice }))).to.eql(
       (await authContract.getTxHash()).decodedResult,
@@ -143,7 +144,7 @@ describe('Generalized Account', () => {
     });
     const txParams = unpackTx(rawTx, Tag.SignedTx);
     ensureEqual<Tag.GaMetaTx>(txParams.encodedTx.tag, Tag.GaMetaTx);
-    expect(buildTx(txParams.encodedTx.tx.encodedTx)).to.equal(spendTx);
+    expect(rebuildUnpackedTx(txParams.encodedTx.tx.encodedTx)).to.equal(spendTx);
     expect(txParams.encodedTx.fee).to.equal(fee.toString());
     expect(txParams.encodedTx.gasPrice).to.equal(gasPrice.toString());
   });

@@ -1,10 +1,18 @@
 import { Buffer } from 'buffer';
 import { useState } from 'preact/hooks';
 import { JSX } from 'preact/jsx-runtime';
-import { unpackTx, buildTx, Tag, isEncoded, Encoding } from '@aeternity/aepp-sdk';
+import {
+  unpackTx,
+  rebuildUnpackedTx,
+  buildTx,
+  Tag,
+  isEncoded,
+  Encoding,
+} from '@aeternity/aepp-sdk';
 
 export function TransactionPacker() {
   const [packError, setPackError] = useState('');
+  const [packWarning, setPackWarning] = useState('');
   const [unpackError, setUnpackError] = useState('');
   const [transaction, setTransaction] = useState('');
 
@@ -26,10 +34,24 @@ export function TransactionPacker() {
         if (idx < path.length - 1) return pr[name];
         pr[name] = value;
       }, newParams);
-      setTransaction(buildTx(newParams));
+      // this transaction already exists, and may come from a network running other consensus
+      // parameters than the ones of the SDK release — `buildTx` would price it as if it were new
+      // and refuse a fee or a gas price below the minimum this build knows
+      setTransaction(rebuildUnpackedTx(newParams));
       setPackError('');
+      // the values are edited, so the checks are worth surfacing — as a notice, not a failure
+      try {
+        buildTx(newParams as Parameters<typeof buildTx>[0]);
+        setPackWarning('');
+      } catch (error) {
+        setPackWarning(
+          `${String(error)} — packed anyway, this is the minimum of the SDK release and the ` +
+            'network this transaction belongs to may run another one',
+        );
+      }
     } catch (error) {
       setPackError(String(error));
+      setPackWarning('');
     }
   }
 
@@ -116,6 +138,13 @@ export function TransactionPacker() {
           <>
             <div>Pack error</div>
             <div class="error">{packError}</div>
+          </>
+        )}
+
+        {packWarning && (
+          <>
+            <div>Pack warning</div>
+            <div class="error">{packWarning}</div>
           </>
         )}
 

@@ -32,6 +32,7 @@ import ttl from './field-types/ttl.js';
 import uInt from './field-types/u-int.js';
 import withDefault from './field-types/with-default.js';
 import withFormatting from './field-types/with-formatting.js';
+import { serializeAsIsParam, SerializeAsIsParams } from './field-types/interface.js';
 import { Encoded, Encoding } from '../../utils/encoder.js';
 import { ArgumentError } from '../../utils/errors.js';
 import { EntryTag } from './entry/constants.js';
@@ -79,9 +80,12 @@ const clientTtl = withDefault(60 * 60, shortUInt);
 /**
  * Name ttl represented in number of blocks (Max value is 50000 blocks)
  */
-const nameTtl = withFormatting((value) => {
+const nameTtl = withFormatting((value, params: SerializeAsIsParams) => {
   const NAME_TTL = 180000;
   value ??= NAME_TTL;
+  // SDK-release limit, node reports it as `nameClaimMaxExpiration` — skipped on re-serialization,
+  // see `serializeAsIsParam`
+  if (params[serializeAsIsParam] === true) return value;
   if (value >= 1 && value <= NAME_TTL) return value;
   throw new ArgumentError('nameTtl', `a number between 1 and ${NAME_TTL} blocks`, value);
 }, shortUInt);

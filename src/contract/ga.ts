@@ -5,11 +5,15 @@
 import { Int, Tag } from '../tx/builder/constants.js';
 import {
   buildContractIdByContractTx,
-  buildTx,
+  rebuildUnpackedTx,
   buildTxAsync,
   BuildTxOptions,
   unpackTx,
 } from '../tx/builder/index.js';
+import {
+  getCachedProtocolParameters,
+  ProtocolParametersOption,
+} from '../tx/builder/protocol-parameters.js';
 import { hash } from '../utils/crypto.js';
 import { decode, encode, Encoded, Encoding } from '../utils/encoder.js';
 import { ArgumentError, IllegalArgumentError } from '../utils/errors.js';
@@ -21,6 +25,7 @@ import { sendTransaction, SendTransactionOptions } from '../send-transaction.js'
 import CompilerBase from './compiler/Base.js';
 import { packEntry } from '../tx/builder/entry/index.js';
 import { EntryTag } from '../tx/builder/entry/constants.js';
+import { serializeAsIsParam, SerializeAsIsParams } from '../tx/builder/field-types/interface.js';
 
 /**
  * Convert current account to GA
@@ -109,6 +114,45 @@ interface CreateGeneralizedAccountOptions
   gasLimit?: number;
 }
 
+// the symbol isn't exported, so only `buildAuthTxHashByGaMetaTx` can set it — kept off the public
+// `buildAuthTxHash` signature rather than advertising an option its callers can't provide
+async function buildAuthTxHashInternal(
+  transaction: Encoded.Transaction,
+  {
+    fee,
+    gasPrice,
+    onNode,
+    protocolParameters,
+    ...options
+  }: Parameters<typeof buildAuthTxHash>[1] & SerializeAsIsParams,
+): Promise<Buffer> {
+  const { nodeNetworkId } = await onNode.getNodeInfo();
+  let payload = hash(concatBuffers([Buffer.from(nodeNetworkId), decode(transaction)]));
+  if (fee == null) throw new ArgumentError('fee', 'provided (in Ceres)', fee);
+  if (gasPrice == null) throw new ArgumentError('gasPrice', 'provided (in Ceres)', gasPrice);
+  // the entry checks `gasPrice` against the consensus minimum the same way a transaction does,
+  // so it needs the same parameters — without them a `gasPrice` correct for the network this
+  // node runs is rejected whenever that network runs a lower minimum than the SDK release.
+  // Not requested at all when there is nothing to check, so that re-deriving the hash of an
+  // existing transaction needs no round trip and works on a transaction of another network
+  payload = hash(
+    decode(
+      packEntry({
+        tag: EntryTag.GaMetaTxAuthData,
+        fee,
+        gasPrice,
+        txHash: encode(payload, Encoding.TxHash),
+        ...(options[serializeAsIsParam] === true
+          ? { [serializeAsIsParam]: true }
+          : {
+              protocolParameters: protocolParameters ?? (await getCachedProtocolParameters(onNode)),
+            }),
+      }),
+    ),
+  );
+  return payload;
+}
+
 /**
  * Build a transaction hash the same as `Auth.tx_hash` by GaMetaTx payload
  * @category account generalized
@@ -117,27 +161,20 @@ interface CreateGeneralizedAccountOptions
  * @param options.fee - GaMetaTx fee, required in Ceres
  * @param options.gasPrice - GaMetaTx gasPrice, required in Ceres
  * @param options.onNode - Node to use
+ * @param options.protocolParameters - Consensus parameters the `gasPrice` belongs to, requested
+ * from node if not provided
  * @returns Transaction hash
  */
 export async function buildAuthTxHash(
   transaction: Encoded.Transaction,
-  { fee, gasPrice, onNode }: { fee?: Int; gasPrice?: Int; onNode: Node },
+  {
+    fee,
+    gasPrice,
+    onNode,
+    protocolParameters,
+  }: { fee?: Int; gasPrice?: Int; onNode: Node } & ProtocolParametersOption,
 ): Promise<Buffer> {
-  const { nodeNetworkId } = await onNode.getNodeInfo();
-  let payload = hash(concatBuffers([Buffer.from(nodeNetworkId), decode(transaction)]));
-  if (fee == null) throw new ArgumentError('fee', 'provided (in Ceres)', fee);
-  if (gasPrice == null) throw new ArgumentError('gasPrice', 'provided (in Ceres)', gasPrice);
-  payload = hash(
-    decode(
-      packEntry({
-        tag: EntryTag.GaMetaTxAuthData,
-        fee,
-        gasPrice,
-        txHash: encode(payload, Encoding.TxHash),
-      }),
-    ),
-  );
-  return payload;
+  return buildAuthTxHashInternal(transaction, { fee, gasPrice, onNode, protocolParameters });
 }
 
 /**
@@ -156,9 +193,12 @@ export async function buildAuthTxHashByGaMetaTx(
   if (txParams.encodedTx.tag !== Tag.GaMetaTx) {
     throw new ArgumentError('transaction', 'to include GaMetaTx', Tag[txParams.encodedTx.tag]);
   }
-  return buildAuthTxHash(buildTx(txParams.encodedTx.tx.encodedTx), {
+  return buildAuthTxHashInternal(rebuildUnpackedTx(txParams.encodedTx.tx.encodedTx), {
     fee: txParams.encodedTx.fee,
     gasPrice: txParams.encodedTx.gasPrice,
     onNode,
+    // the `gasPrice` of a transaction that already exists, never checked and no parameters
+    // requested for it — see `serializeAsIsParam`
+    [serializeAsIsParam]: true,
   });
 }

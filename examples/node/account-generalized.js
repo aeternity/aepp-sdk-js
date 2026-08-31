@@ -17,7 +17,7 @@ import {
   AccountMemory,
   AccountGeneralized,
   CompilerHttp,
-  MIN_GAS_PRICE,
+  getCachedProtocolParameters,
 } from '@aeternity/aepp-sdk';
 
 const aeSdk = new AeSdk({
@@ -80,7 +80,9 @@ console.log('balance after', await aeSdk.getBalance(address));
 await aeSdk.spend(2e18, recipient, {
   async authData(transaction) {
     const fee = 10n ** 14n;
-    const gasPrice = MIN_GAS_PRICE;
+    // the consensus minimum this node runs, it is not the same on every network. The request is
+    // cached per node instance, so asking for it here doesn't cost a round trip per transaction
+    const { minGasPrice: gasPrice } = await getCachedProtocolParameters(aeSdk.api);
     const authTxHash = await aeSdk.buildAuthTxHash(transaction, { fee, gasPrice });
     console.log('Auth.tx_hash', authTxHash.toString('hex'));
     authData.args[1] += 1;
