@@ -4,6 +4,7 @@ import { Encoded, Encoding, decode, encode } from '../../../utils/encoder.js';
 import { isEncoded } from '../../../utils/crypto.js';
 import { IllegalArgumentError, DecodeError, ArgumentError } from '../../../utils/errors.js';
 import address, { AddressEncodings, idTagToEncoding } from './address.js';
+import { serializeAsIsParam, SerializeAsIsParams } from './interface.js';
 
 const ID_TAG = Buffer.from([1]);
 const DATA_TAG = Buffer.from([2]);
@@ -21,7 +22,10 @@ type NamePointerRaw = NamePointerString & {
 export default <AllowRaw extends boolean>(
   allowRaw: AllowRaw,
 ): {
-  serialize: (pointers: Array<AllowRaw extends true ? NamePointerRaw : NamePointer>) => Buffer[][];
+  serialize: (
+    pointers: Array<AllowRaw extends true ? NamePointerRaw : NamePointer>,
+    params: SerializeAsIsParams,
+  ) => Buffer[][];
   deserialize: (
     pointers: Array<[key: Buffer, id: Buffer]>,
   ) => Array<AllowRaw extends true ? NamePointerRaw : NamePointer>;
@@ -30,10 +34,13 @@ export default <AllowRaw extends boolean>(
    * Helper function to build pointers for name update TX
    * @param pointers - Array of pointers
    * `([ { key: 'account_pubkey', id: 'ak_32klj5j23k23j5423l434l2j3423'} ])`
+   * @param params - Transaction params
    * @returns Serialized pointers array
    */
-  serialize(pointers) {
-    if (pointers.length > 32) {
+  serialize(pointers, params) {
+    // SDK-release limit, node reports it as `namePointersMaxCount` (omitted on a protocol that
+    // imposes no limit) — skipped on re-serialization, see `serializeAsIsParam`
+    if (params[serializeAsIsParam] !== true && pointers.length > 32) {
       throw new IllegalArgumentError(
         `Expected 32 pointers or less, got ${pointers.length} instead`,
       );

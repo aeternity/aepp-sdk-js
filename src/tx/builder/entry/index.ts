@@ -3,6 +3,7 @@ import { packRecord, unpackRecord } from '../common.js';
 import { schemas } from './schema.js';
 import { EntryTag } from './constants.js';
 import { EntParams, EntUnpacked } from './schema.generated.js';
+import { checkParametersUsable, ProtocolParametersOption } from '../protocol-parameters.js';
 
 const encodingTag = [
   [EntryTag.CallsMtree, Encoding.CallStateTree],
@@ -21,6 +22,9 @@ export function packEntry(params: EntParams & { tag: EntryTag.TreesPoi }): Encod
  */
 export function packEntry(params: EntParams): Encoded.Any;
 export function packEntry(params: EntParams): Encoded.Any {
+  // `GaMetaTxAuthData` holds a `gasPrice` priced by them, see the note in `buildTx`
+  const { protocolParameters } = params as ProtocolParametersOption;
+  if (protocolParameters != null) checkParametersUsable(protocolParameters);
   const encoding = encodingTag.find(([tag]) => tag === params.tag)?.[1] ?? Encoding.Bytearray;
   return packRecord(schemas, EntryTag, params, { packEntry }, encoding);
 }

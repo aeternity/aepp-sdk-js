@@ -17,7 +17,14 @@ const nodeBigIntPropertyNames = [
   'minGasPrice',
   'deposit',
   'subunitsPerUnit',
+  // protocol-parameters
+  'minimumGasPrice',
+  'minMinerGasPrice',
+  'nameClaimLockedFee',
 ];
+
+// properties typed as an array of numbers too big for `number` (event topics, aettos)
+const nodeBigIntArrayPropertyNames = ['topics', 'nameClaimFees'];
 
 const middlewareBigIntPropertyNames = [
   // oracles/<id>/responses
@@ -122,7 +129,12 @@ await Promise.all(
           content = content.replaceAll(/(txHash\??:) string/g, '$1 `th_${string}`');
           content = content.replaceAll(/(bytecode\??:) string/g, '$1 `cb_${string}`');
           /* eslint-enable no-template-curly-in-string */
-          content = content.replaceAll('topics: number[]', 'topics: bigint[]');
+          nodeBigIntArrayPropertyNames.forEach((property) => {
+            content = content.replaceAll(
+              new RegExp(`(${property}[?]?:) number\\[\\]`, 'g'),
+              '$1 bigint[]',
+            );
+          });
         }
 
         if (module === 'middleware') {
@@ -185,12 +197,14 @@ await Promise.all(
         );
 
         if (module === 'node') {
-          content = content.replace(
-            /topics: (.+?name: "Sequence".+?)(\s+)name: "Number",/gms,
-            'topics: $1' +
-              '$2// @ts-expect-error we are extending autorest with BigInt support' +
-              '$2name: "BigInt",',
-          );
+          nodeBigIntArrayPropertyNames.forEach((property) => {
+            content = content.replace(
+              new RegExp(`${property}: (.+?name: "Sequence".+?)(\\s+)name: "Number",`, 'gms'),
+              `${property}: $1` +
+                '$2// @ts-expect-error we are extending autorest with BigInt support' +
+                '$2name: "BigInt",',
+            );
+          });
         }
       }
     }

@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { snakeToPascal } from '../utils/string.js';
-import { MIN_GAS_PRICE, Tag, AbiVersion, VmVersion } from '../tx/builder/constants.js';
+import { Tag, AbiVersion, VmVersion } from '../tx/builder/constants.js';
+import { defaultProtocolParameters } from '../tx/builder/protocol-parameters.js';
 import {
   signAndNotify,
   awaitingCompletion,
@@ -261,6 +262,11 @@ export default class ChannelContract extends ChannelSpend {
    * Trigger a force progress contract call
    * This call is going on-chain
    * @param options - Options
+   * @param options.gasPrice - Gas price of the call, defaults to the consensus minimum gas price
+   * of the SDK release (`defaultProtocolParameters.minGasPrice`). A channel talks to node over a
+   * websocket and builds no transaction itself, so it can't request the parameters this node runs
+   * — pass this option explicitly on a network running a higher minimum gas price, otherwise the
+   * call is rejected as underpriced.
    * @param sign - Function which verifies and signs contract force progress transaction
    * @param callbacks - Callbacks
    * @example
@@ -287,7 +293,7 @@ export default class ChannelContract extends ChannelSpend {
       contract,
       abiVersion,
       gasLimit = 1000000,
-      gasPrice = MIN_GAS_PRICE,
+      gasPrice = Number(defaultProtocolParameters.minGasPrice),
     }: CallContractOptions & {
       gasLimit?: number;
       gasPrice?: number;

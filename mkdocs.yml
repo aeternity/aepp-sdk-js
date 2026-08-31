@@ -95,6 +95,7 @@ nav:
   - compatibility.md
   - Changelog: CHANGELOG.md
   - Migration Guides:
+      - guides/migration/15.md
       - guides/migration/14.md
       - guides/migration/13.md
       - guides/migration/12.md

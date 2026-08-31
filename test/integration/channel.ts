@@ -13,7 +13,7 @@ import {
   UnknownChannelStateError,
   AeSdk,
   Channel,
-  buildTx,
+  rebuildUnpackedTx,
   AccountMemory,
 } from '../../src';
 import { notify, SignTx, SignTxWithTag } from '../../src/channel/internal';
@@ -59,7 +59,7 @@ describe('Channel', () => {
   const initiatorSignedTx = async (): Promise<Encoded.Transaction> => {
     const { signedTx } = await initiatorCh.state();
     assertNotNull(signedTx);
-    return buildTx(signedTx);
+    return rebuildUnpackedTx(signedTx);
   };
   const initiatorParams = {
     role: 'initiator',

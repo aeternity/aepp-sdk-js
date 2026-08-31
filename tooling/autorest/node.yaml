@@ -16,6 +16,64 @@ directive:
       remove after fixing https://github.com/aeternity/aeternity/issues/3891
 
   - from: openapi-document
+    where: $.components.schemas
+    transform: >
+      if ($doc.info.title === 'node') return $;
+      function collapse(node) {
+        if (node == null || typeof node !== 'object') return;
+        Object.keys(node).forEach(function (key) {
+          const value = node[key];
+          if (value == null || typeof value !== 'object') return;
+          const variants = value.oneOf;
+          const integer = Array.isArray(variants) && variants.length === 2
+            && variants.filter(function (v) { return v.type === 'integer'; })[0];
+          const hasString = Array.isArray(variants)
+            && variants.filter(function (v) { return v.type === 'string'; }).length === 1;
+          if (integer && hasString) {
+            delete value.oneOf;
+            Object.assign(value, integer);
+          } else if (Array.isArray(value.allOf) && value.allOf.length === 1) {
+            const [only] = value.allOf;
+            delete value.allOf;
+            Object.assign(value, only);
+          } else collapse(value);
+        });
+      }
+      [
+        'ProtocolParameters', 'NodeSettings', 'ProtocolConsensusParameters',
+        'ContractTxBaseGas', 'StateGasPerBlock', 'NameAuctionTimeout', 'ContractVersion',
+      ].forEach(function (key) { collapse({ schema: $[key] }); });
+    reason: >
+      protocol parameters inline the `integer | string` shape of UInt* instead of $ref-ing it,
+      the string alternative is only about the `int-as-string` query parameter the SDK doesn't use
+
+  - from: openapi-document
+    where: $.components.schemas
+    transform: >
+      if ($doc.info.title === 'node') return $;
+      const aettos = [
+        'minimum_gas_price', 'min_miner_gas_price', 'name_claim_fees', 'name_claim_locked_fee',
+      ];
+      function toInteger(node) {
+        if (node == null || typeof node !== 'object') return;
+        Object.keys(node).forEach(function (key) {
+          const value = node[key];
+          if (value == null || typeof value !== 'object') return;
+          if (aettos.indexOf(key) !== -1) {
+            const leaf = value.type === 'array' ? value.items : value;
+            if (leaf.type === 'string') leaf.type = 'integer';
+          }
+          toInteger(value);
+        });
+      }
+      ['NodeSettings', 'ProtocolConsensusParameters']
+        .forEach(function (key) { toInteger({ schema: $[key] }); });
+    reason: >
+      node reports aettos amounts as decimal strings, the largest name fee doesn't fit a double.
+      `postprocessing.js` maps them to `bigint`, and the mapper it patches is the numeric one —
+      the deserializer it installs reads a decimal string as well as a number
+
+  - from: openapi-document
     where: $..[?(@.enum)]
     transform: '$["x-ms-enum"] = { modelAsString: false }'
     reason: thread enums as union of constants instead of arbitrary strings
@@ -53,7 +111,22 @@ directive:
     transform: >
       if ($doc.info.title === 'node') return $;
       const { discriminator, ...base } = $.allOf[0];
-      const transactions = base.properties.type.enum.map(txName => $doc.components.schemas[txName]);
+      const flatten = (schema) => {
+        if (schema.$ref != null) {
+          const path = schema.$ref.replace(/^#\//, '').split('/');
+          return flatten(path.reduce((o, p) => o[p], $doc));
+        }
+        if (schema.allOf == null) {
+          return { properties: schema.properties ?? {}, required: schema.required ?? [] };
+        }
+        const parts = schema.allOf.map(flatten);
+        return {
+          properties: Object.assign({}, ...parts.map(part => part.properties)),
+          required: [...new Set(parts.flatMap(part => part.required))],
+        };
+      };
+      const transactions = base.properties.type.enum
+        .map(txName => flatten($doc.components.schemas[txName]));
       return {
         ...base,
         "description": "A mix of all transaction types.",
@@ -118,12 +191,19 @@ directive:
   - from: openapi-document
     where: $.paths.*.*.responses
     transform: >
-      Object.entries($)
-        .filter(([key]) => key !== '200')
-        .forEach(([, value]) => value['x-ms-error-response'] = true)
+      Object.keys($)
+        .filter((code) => code !== '200')
+        .forEach((code) => {
+          if ($[code].$ref != null) {
+            const path = $[code].$ref.replace(/^#\//, '').split('/');
+            $[code] = { ...path.reduce((o, p) => o[p], $doc) };
+          }
+          $[code]['x-ms-error-response'] = true;
+        });
     reason: >
       throw errors even for explained response with not 200 code
       https://github.com/Azure/autorest.typescript/issues/463#issuecomment-524203041
+      a `$ref`-ed response (`503` is one) ignores keys next to `$ref`, inline it before marking
 
   - from: openapi-document
     where: $..properties.time
@@ -152,7 +232,7 @@ version: 3.7.2
 use-extension:
   '@autorest/typescript': 6.0.55
   '@autorest/modelerfour': 4.27.2
-input-file: https://raw.githubusercontent.com/aeternity/aeternity/v7.3.0-rc5/apps/aehttp/priv/oas3.yaml
+input-file: https://raw.githubusercontent.com/aeternity/aeternity/v7.3.0-rc10/apps/aehttp/priv/oas3.yaml
 output-folder: ../../src/apis/node
 source-code-folder-path: .
 generator: typescript

@@ -6,6 +6,11 @@ import { FullOperationResponse, OperationArguments, OperationSpec } from '@azure
 import { url } from '.';
 import { AeSdkBase, Node, NodeNotFoundError, AccountMemory, buildTx, Tag } from '../../src';
 import { bindRequestCounter } from '../utils';
+import {
+  getCachedProtocolParameters,
+  getGasLimitDivisor,
+  getGasPriceDivisor,
+} from '../../src/tx/builder/protocol-parameters';
 
 describe('Node client', () => {
   let node: Node;
@@ -135,6 +140,67 @@ describe('Node client', () => {
         return { minGasPrice, minutes, utilization };
       }),
     );
+  });
+
+  it('returns protocol parameters the transaction builder can price a transaction by', async function () {
+    // The whole feature rests on these endpoints deserializing from a real node, and the client
+    // for them is hand-patched in `tooling/autorest/node.yaml` and `postprocessing.js`. A unit test
+    // can only check the client against a hand-written body — that is, against what this SDK
+    // believes node answers. `getCachedProtocolParameters` falls back to the parameters of the SDK
+    // release on anything it can't read, so without this test a client broken against the real wire
+    // format would leave every unit and integration test green while the feature is a no-op in
+    // production.
+    let response;
+    let nodeSettings;
+    try {
+      [response, nodeSettings] = await Promise.all([
+        node.getProtocolParameters(),
+        node.getNodeSettings(),
+      ]);
+    } catch (error) {
+      // node too old for the endpoints, or with the `node_info`/`node_settings` groups disabled
+      const status = error instanceof RestError ? error.statusCode : undefined;
+      if (status !== 404 && status !== 403) throw error;
+      this.skip();
+      return;
+    }
+
+    const protocol = response.protocols.find(
+      ({ version }) => version === response.currentProtocolVersion,
+    );
+    expect(protocol, 'node reports the parameters of the protocol it runs').to.be.an('object');
+    if (protocol == null) return;
+    // the values a fee is counted from — a coin amount is a bigint, a gas amount a number.
+    // A regression in the `oneOf` collapse or the bigint mapping shows up as a string here
+    expect(typeof protocol.minimumGasPrice).to.equal('bigint');
+    expect(typeof nodeSettings.minMinerGasPrice).to.equal('bigint');
+    expect(protocol.gasPerByte).to.be.a('number');
+    expect(nodeSettings.blockGasLimit).to.be.a('number');
+    expect(nodeSettings.maxAuthFunGas).to.be.a('number');
+    // the tables, keyed by the transaction type names of `aetx:type_to_swagger_name/1`
+    expect(protocol.txBaseGas.SpendTx).to.be.a('number');
+    expect(protocol.contractTxBaseGas[0].txType).to.be.a('string');
+    expect(protocol.contractTxBaseGas[0].abiVersion).to.be.a('number');
+    expect(protocol.contractTxBaseGas[0].txBaseGas).to.be.a('number');
+    expect(Object.values(protocol.stateGasPerBlock)[0].whole).to.be.a('number');
+
+    // and the conversion the builder actually uses reads all of it without falling back
+    const parameters = await getCachedProtocolParameters(node);
+    expect(parameters.minGasPrice).to.equal(protocol.minimumGasPrice);
+    expect(parameters.gasPerByte).to.equal(protocol.gasPerByte);
+    expect(parameters.txBaseGas[Tag.SpendTx]).to.equal(protocol.txBaseGas.SpendTx);
+    expect(parameters.blockGasLimit).to.equal(nodeSettings.blockGasLimit);
+    expect(parameters.maxAuthFunGas).to.equal(nodeSettings.maxAuthFunGas);
+
+    // The divisors are how much this node's parameters raise the fee and each gas limit above the
+    // ones of the SDK release. They lower the gas price ceiling and the default gas limit by the
+    // same factors, so anything but 1 here means transactions built against this node are priced
+    // or sized differently than they were before the parameters were requested at all. An entry of
+    // `defaultProtocolParameters` this node has outgrown shows up here and nowhere else — every
+    // other assertion in this file compares node against node
+    expect(getGasPriceDivisor(parameters)).to.equal(1);
+    expect(getGasLimitDivisor(parameters, Tag.ContractCallTx)).to.equal(1);
+    expect(getGasLimitDivisor(parameters, Tag.GaMetaTx)).to.equal(1);
   });
 
   it('returns time as Date', async () => {

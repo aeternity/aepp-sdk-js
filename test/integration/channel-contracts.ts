@@ -14,7 +14,7 @@ import {
   AeSdk,
   Contract,
   Channel,
-  buildTx,
+  rebuildUnpackedTx,
   AccountMemory,
 } from '../../src';
 import { SignTxWithTag } from '../../src/channel/internal';
@@ -53,7 +53,7 @@ describe('Channel contracts', () => {
   const initiatorSignedTx = async (): Promise<Encoded.Transaction> => {
     const { signedTx } = await initiatorCh.state();
     assertNotNull(signedTx);
-    return buildTx(signedTx);
+    return rebuildUnpackedTx(signedTx);
   };
   const initiatorParams = {
     role: 'initiator',
