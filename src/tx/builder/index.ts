@@ -57,16 +57,19 @@ export type BuildTxOptions<TxType extends Tag, OmitFields extends string> = Omit
  * @returns tx_-encoded transaction
  */
 export async function buildTxAsync(params: TxParamsAsync): Promise<Encoded.Transaction> {
+  // the caller may build another transaction out of the same object, and `prepare` writing the
+  // value it computed back would make the next build reuse them — the same nonce above all
+  const paramsCopy = { ...params };
   await Promise.all(
-    getSchema(params.tag, params.version).map(async ([key, field]) => {
+    getSchema(paramsCopy.tag, paramsCopy.version).map(async ([key, field]) => {
       if (field.prepare == null) return;
-      // @ts-expect-error the type of `params[key]` can't be determined accurately
-      params[key] = await field.prepare(params[key], params, params);
+      // @ts-expect-error the type of `paramsCopy[key]` can't be determined accurately
+      paramsCopy[key] = await field.prepare(paramsCopy[key], paramsCopy, paramsCopy);
     }),
   );
 
   // @ts-expect-error after preparation properties should be compatible with sync tx builder
-  return buildTx(params);
+  return buildTx(paramsCopy);
 }
 
 /**
