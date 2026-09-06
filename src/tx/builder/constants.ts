@@ -10,8 +10,13 @@ export const DRY_RUN_ACCOUNT = {
 } as const;
 
 /**
+ * The maximum gas of a generalized account authentication function as it was at the moment of the
+ * SDK release. It is a node policy setting rather than a consensus parameter.
  * @category account generalized
- * @deprecated transaction builder will ensure that gas doesn't exceed the maximum value by itself
+ * @deprecated the transaction builder ensures that gas doesn't exceed the maximum by itself, and a
+ * node may accept another maximum than this constant. Use
+ * `(await getCachedProtocolParameters(node)).maxAuthFunGas` for the value the connected node
+ * reports, or `defaultProtocolParameters.maxAuthFunGas` for this one.
  */
 export const MAX_AUTH_FUN_GAS = 50000;
 /**
@@ -23,7 +28,11 @@ export type Int = number | string | BigNumber;
  */
 export type AensName = `${string}.chain`;
 /**
+ * The consensus minimum gas price as it was at the moment of the SDK release.
  * @category transaction builder
+ * @deprecated a node may run another minimum gas price, and this constant is wrong on it. Use
+ * `(await getCachedProtocolParameters(node)).minGasPrice` for the value the connected node
+ * reports, or `defaultProtocolParameters.minGasPrice` for this one.
  */
 export const MIN_GAS_PRICE = 1e9; // TODO: don't use number for ae
 /**

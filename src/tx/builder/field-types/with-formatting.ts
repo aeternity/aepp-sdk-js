@@ -1,5 +1,5 @@
 export default function withFormatting<Input, Output, Binary, Params, Options>(
-  format: (v: Input | undefined) => Input,
+  format: (v: Input | undefined, params: Params) => Input,
   field: {
     serialize: (value: Input, params: Params, options: Options) => Binary;
     deserialize: (value: Binary) => Output;
@@ -12,7 +12,7 @@ export default function withFormatting<Input, Output, Binary, Params, Options>(
     ...field,
 
     serialize(value, params, options) {
-      return field.serialize(format(value), params, options);
+      return field.serialize(format(value, params), params, options);
     },
   };
 }

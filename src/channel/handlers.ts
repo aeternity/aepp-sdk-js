@@ -14,7 +14,7 @@ import {
   ChannelStatus,
   ChannelEvents,
 } from './internal.js';
-import { unpackTx, buildTx } from '../tx/builder/index.js';
+import { unpackTx, buildTx, rebuildUnpackedTx } from '../tx/builder/index.js';
 import { decode, Encoded } from '../utils/encoder.js';
 import {
   IllegalArgumentError,
@@ -32,7 +32,7 @@ export async function appendSignature(
   signFn: SignTx,
 ): Promise<Encoded.Transaction | number | null> {
   const { signatures, encodedTx } = unpackTx(tx, Tag.SignedTx);
-  const payloadTx = buildTx(encodedTx);
+  const payloadTx = rebuildUnpackedTx(encodedTx);
   const result = await signFn(payloadTx);
   if (typeof result === 'string') {
     const { signatures: signatures2 } = unpackTx(result, Tag.SignedTx);
@@ -180,7 +180,7 @@ export async function awaitingReconnection(
   if (message.method === 'channels.info' && message.params.data.event === 'fsm_up') {
     channel._fsmId = message.params.data.fsm_id;
     const { signedTx } = await channel.state();
-    changeState(channel, signedTx == null ? '' : buildTx(signedTx));
+    changeState(channel, signedTx == null ? '' : rebuildUnpackedTx(signedTx));
     return { handler: channelOpen };
   }
   return handleUnexpectedMessage(channel, message, state);
