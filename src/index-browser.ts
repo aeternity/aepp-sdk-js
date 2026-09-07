@@ -51,6 +51,7 @@ export {
   buildTx,
   buildTxAsync,
   buildTxHash,
+  rebuildUnpackedTx,
   unpackTx,
   buildContractIdByContractTx,
 } from './tx/builder/index.js';
@@ -93,6 +94,14 @@ export {
   DRY_RUN_ACCOUNT,
 } from './tx/builder/constants.js';
 export type { Int, AensName } from './tx/builder/constants.js';
+export {
+  defaultProtocolParameters,
+  getCachedProtocolParameters,
+} from './tx/builder/protocol-parameters.js';
+export type {
+  ProtocolParameters,
+  ProtocolParametersOption,
+} from './tx/builder/protocol-parameters.js';
 // TODO: move to constants
 export { ORACLE_TTL_TYPES } from './tx/builder/schema.js';
 export { DelegationTag } from './tx/builder/delegation/schema.js';

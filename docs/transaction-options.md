@@ -16,6 +16,11 @@ await aeSdk.spend(1, recipient, options); // amount, recipient and (optional) op
 Note:
 
 - Without the `options` object the sender would be some other account selected in the instance of AeSdk and the recipient would receive `1 aetto` instead of `1 AE`.
+- `buildTxAsync` doesn't write the values it prepared (`nonce`, `ttl`, `fee`, `gasPrice`, …) back
+  into the object it was given: pass the same object to two builds and the second prepares them
+  again, instead of reusing values priced for the first. Read a prepared value off the built
+  transaction with `unpackTx`. Only direct callers are affected — `spend` and the other high-level
+  methods copy the options object before building.
 
 ## Common options
 
@@ -38,6 +43,50 @@ These options are common and can be provided to every tx-type:
 - `fee` (default: calculated for each tx-type, based on network demand)
   - The minimum fee is dependent on the tx-type.
   - You can provide a higher fee to additionally reward the miners.
+  - The default is also raised to the minimum gas price the miner of the connected node accepts, so
+    that the node the transaction is submitted to is willing to mine it.
+- `protocolParameters` (default: requested from node)
+
+  - Consensus parameters the minimum fee and the maximum gas limit are calculated from. Accepted by
+    every tx-type that has a `fee` or a `gasLimit`.
+  - Requested by `buildTxAsync` at `/v3/protocol-parameters` and `/v3/node-settings`, so that a
+    network running other parameters than the SDK release doesn't get underpriced transactions.
+    Not requested if the transaction provides every value they would price (`fee`, `gasPrice`,
+    `gasLimit`) and nests no transaction that still has to be built — such a build needs no node,
+    as it didn't before. Those values are then checked against `defaultProtocolParameters`
+    instead, so on a network running a **lower** minimum gas price provide this option (or leave
+    one of the priced values out) to have the parameters of node applied.
+  - Falls back to `defaultProtocolParameters` — the values as they were at the moment of the SDK
+    release — for a node that doesn't provide the endpoints, can't be reached, or answers
+    something this SDK release can't read. The two responses are taken as a set, and a single
+    value node doesn't report falls back on its own, so that a node omitting a transaction type
+    doesn't make that type unbuildable.
+  - Provide this option to build a transaction offline for a node running other parameters. It is
+    used for the nested transaction of a `PayingForTx`/`GaMetaTx` as well, unless that transaction
+    is already built, and by `buildAuthTxHash`, which prices the same `gasPrice`.
+  - Parameters that would raise the minimum transaction fee, or the cost of a contract transaction
+    (`gasPrice * gasLimit`), more than 1000 times above the one of the SDK release are rejected, so
+    that a node can't make the SDK build a transaction with an extreme fee. Each limit is on what
+    the parameters produce together. Provide this option to build against such parameters anyway.
+  - Within that limit, the values the SDK picks itself are lowered by the factor node raised them
+    by, so each product stays within the one of the SDK release: the gas price ceiling the
+    `fee`/`gasPrice` default is based on (the transaction may then be priced below the current
+    demand and take longer to be mined — provide `gasPrice`/`fee` to pay more), and the `gasLimit`
+    a transaction defaults to (provide `gasLimit`, or `gasMax`, to choose the amount at risk
+    yourself).
+  - The parameters provided in this option are used as they are — the limits above are exactly what
+    this option is the way out of — beyond a check that they can price a transaction at all. They
+    are as trusted as `fee` and `gasLimit` are, and like them must not be taken from input the
+    application doesn't control: they decide what those very values are checked against.
+  - A transaction that already exists is never re-checked against them, nor against the other
+    consensus limits of the SDK release (the AENS name fee, the name TTL, the pointer count). Use
+    `rebuildUnpackedTx` instead of `buildTx` to serialize the result of an `unpackTx` back, so that
+    a transaction built for another network keeps working — plain `buildTx` prices it as if it were
+    new, and rejects a fee or a gas price below the minimum this process builds against.
+  - Only the parameters the fee and the gas limit are counted from are requested from node. The
+    AENS name fees, the name TTL maximum, the pointer count maximum, and the vm/abi versions a
+    contract may use are still the ones of the SDK release, even though node reports them too.
+
 - `innerTx` (default: `false`)
   - Should be used for signing an inner transaction that will be wrapped in a `PayingForTx`.
 - `verify` (default: `false`)
@@ -58,7 +107,7 @@ The following options are sepcific for each tx-type.
   - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
 - `gasLimit`
   - Maximum amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
-- `gasPrice` (default: based on network demand, minimum: `1e9`)
+- `gasPrice` (default: based on network demand, minimum: the consensus minimum gas price reported by node, `1e9` if not reported or not requested — see `protocolParameters`)
   - To increase chances to get your transaction included quickly you can use a higher gasPrice.
 
 ### NameClaimTx

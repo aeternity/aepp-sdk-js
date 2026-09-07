@@ -2,6 +2,7 @@ import { Encoded } from '../utils/encoder.js';
 import Node from '../Node.js';
 import CompilerBase from '../contract/compiler/Base.js';
 import { Int } from '../tx/builder/constants.js';
+import type { ProtocolParametersOption } from '../tx/builder/protocol-parameters.js';
 import { AciValue, Domain } from '../utils/typed-data.js';
 
 interface AuthData {
@@ -25,6 +26,10 @@ export default abstract class AccountBase {
    * @param options - Options
    * @param options.innerTx - Sign as inner transaction for PayingFor
    * @param options.authData - Object with gaMeta params
+   * @param options.protocolParameters - Consensus parameters to build the wrapping `GaMetaTx` of a
+   * generalized account against, requested from node if not provided. Not forwarded to an account
+   * behind a wallet RPC connection — such an account builds against the parameters of the node the
+   * wallet is connected to
    * @returns Signed transaction
    */
   abstract signTransaction(
@@ -37,7 +42,7 @@ export default abstract class AccountBase {
       onCompiler?: CompilerBase;
       aeppOrigin?: string;
       aeppRpcClientId?: string;
-    },
+    } & ProtocolParametersOption,
   ): Promise<Encoded.Transaction>;
 
   /**

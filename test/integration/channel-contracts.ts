@@ -14,7 +14,7 @@ import {
   AeSdk,
   Contract,
   Channel,
-  buildTx,
+  rebuildUnpackedTx,
   AccountMemory,
 } from '../../src';
 import { SignTxWithTag } from '../../src/channel/internal';
@@ -53,7 +53,7 @@ describe('Channel contracts', () => {
   const initiatorSignedTx = async (): Promise<Encoded.Transaction> => {
     const { signedTx } = await initiatorCh.state();
     assertNotNull(signedTx);
-    return buildTx(signedTx);
+    return rebuildUnpackedTx(signedTx);
   };
   const initiatorParams = {
     role: 'initiator',
@@ -237,6 +237,17 @@ describe('Channel contracts', () => {
   });
 
   it('can call a force progress', async () => {
+    // TODO: remove after issue on the node is fixed:
+    // "aesc_chain_watcher picks the wrong "latest" channel tx when two channel txs
+    // share a generation → channel_changed_on_chain report is silently dropped"
+    //
+    // the node doesn't report `on_chain_tx` if the force progress transaction gets mined at the
+    // same height as the channel create transaction, and its micro block hash happens to be less
+    // than the one of channel create (aesc_chain_watcher picks the latter as the latest channel
+    // transaction, and skips the report as already done)
+    await aeSdk.spend(1, responder.address);
+    await aeSdk.awaitHeight((await aeSdk.getHeight()) + 1);
+
     const forceTx = await initiatorCh.forceProgress(
       {
         amount: 0,

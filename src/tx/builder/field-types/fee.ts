@@ -1,78 +1,77 @@
 import BigNumber from 'bignumber.js';
-import { ArgumentError, IllegalArgumentError } from '../../../utils/errors.js';
-import { Int, MIN_GAS_PRICE, Tag } from '../constants.js';
+import { ArgumentError, IllegalArgumentError, InternalError } from '../../../utils/errors.js';
+import { Int, Tag } from '../constants.js';
+import {
+  defaultProtocolParameters,
+  maxOf,
+  ProtocolParameters,
+  ProtocolParametersOption,
+} from '../protocol-parameters.js';
 import uInt from './u-int.js';
 import coinAmount from './coin-amount.js';
 import { getCachedIncreasedGasPrice } from './gas-price.js';
 import { isKeyOfObject } from '../../../utils/other.js';
+import { serializeAsIsParam, SerializeAsIsParams } from './interface.js';
 import { decode, Encoded } from '../../../utils/encoder.js';
 import type { unpackTx as unpackTxType, buildTx as buildTxType } from '../index.js';
 import Node from '../../../Node.js';
 
-const BASE_GAS = 15000;
-const GAS_PER_BYTE = 20;
-const KEY_BLOCK_INTERVAL = 3;
-
 /**
- * Calculate the base gas
+ * Get the base gas
  * @see {@link https://github.com/aeternity/protocol/blob/master/consensus/README.md#gas}
- * @param txType - The transaction type
+ * @param txObject - The unpacked transaction
+ * @param protocolParameters - The protocol parameters
  * @returns The base gas
- * @example
- * ```js
- * TX_BASE_GAS(Tag.ChannelForceProgressTx) => 30 * 15000
- * ```
  */
-const TX_BASE_GAS = (txType: Tag): number => {
-  const feeFactors = {
-    [Tag.ChannelForceProgressTx]: 30,
-    [Tag.ChannelOffChainTx]: 0,
-    [Tag.ContractCreateTx]: 5,
-    [Tag.ContractCallTx]: 12,
-    [Tag.GaAttachTx]: 5,
-    [Tag.GaMetaTx]: 5,
-    [Tag.PayingForTx]: 1 / 5,
-  } as const;
-  const factor = feeFactors[txType as keyof typeof feeFactors] ?? 1;
-  return factor * BASE_GAS;
-};
+function getTxBaseGas(txObject: any, protocolParameters: ProtocolParameters): number {
+  const { tag }: { tag: Tag } = txObject;
+  const byAbiVersion = protocolParameters.contractTxBaseGas[tag];
+  if (byAbiVersion != null) {
+    const abiVersion = txObject.ctVersion?.abiVersion ?? txObject.abiVersion;
+    // read only what the checks in `protocol-parameters.ts` iterate, so that the two can't
+    // disagree about what the parameters hold — anything inherited is not a base gas
+    const gas = Object.prototype.hasOwnProperty.call(byAbiVersion, abiVersion)
+      ? byAbiVersion[abiVersion as keyof typeof byAbiVersion]
+      : undefined;
+    if (gas != null) return gas;
+    // node charges the maximum base gas for an abi version it doesn't know
+    const knownAbiVersions = Object.values(byAbiVersion);
+    // the maximum of nothing is `-Infinity`, fall through to `txBaseGas` instead
+    if (knownAbiVersions.length !== 0) return maxOf(knownAbiVersions);
+  }
+  const gas = protocolParameters.txBaseGas[tag];
+  if (gas == null) throw new InternalError(`Base gas of ${Tag[tag]} is not known`);
+  return gas;
+}
 
 /**
  * Calculate gas for other types of transactions
  * @see {@link https://github.com/aeternity/protocol/blob/master/consensus/README.md#gas}
  * @param txType - The transaction type
  * @param txSize - The transaction size
- * @returns parameters - The transaction parameters
- * @returns parameters.relativeTtl - The relative ttl
- * @returns parameters.innerTxSize - The size of the inner transaction
+ * @param parameters - The transaction parameters
+ * @param parameters.relativeTtl - The relative ttl
+ * @param parameters.innerTxSize - The size of the inner transaction
+ * @param protocolParameters - The protocol parameters
  * @returns The other gas
- * @example
- * ```js
- * TX_OTHER_GAS(Tag.OracleRespondTx, 10, { relativeTtl: 12, innerTxSize: 0 })
- *  => 10 * 20 + Math.ceil(32000 * 12 / Math.floor(60 * 24 * 365 / 3))
- * ```
  */
-const TX_OTHER_GAS = (
+function getTxOtherGas(
   txType: Tag,
   txSize: number,
   { relativeTtl, innerTxSize }: { relativeTtl: number; innerTxSize: number },
-): number => {
-  switch (txType) {
-    case Tag.OracleRegisterTx:
-    case Tag.OracleExtendTx:
-    case Tag.OracleQueryTx:
-    case Tag.OracleRespondTx:
-      return (
-        txSize * GAS_PER_BYTE +
-        Math.ceil((32000 * relativeTtl) / Math.floor((60 * 24 * 365) / KEY_BLOCK_INTERVAL))
-      );
-    case Tag.GaMetaTx:
-    case Tag.PayingForTx:
-      return (txSize - innerTxSize) * GAS_PER_BYTE;
-    default:
-      return txSize * GAS_PER_BYTE;
-  }
-};
+  protocolParameters: ProtocolParameters,
+): number {
+  const { gasPerByte } = protocolParameters;
+  // the inner transaction of a meta transaction pays for its own bytes in its own fee. The
+  // deduction is separate from the state gas below: node reporting a state gas fraction for
+  // `GaMetaTx`/`PayingForTx` must not cancel it — that would charge the inner transaction twice
+  const isMeta = txType === Tag.GaMetaTx || txType === Tag.PayingForTx;
+  const sizeGas = (isMeta ? txSize - innerTxSize : txSize) * gasPerByte;
+  // oracle transactions pay a state rent for the time their entry occupies the state tree
+  const stateGas = protocolParameters.stateGasPerBlock[txType];
+  if (stateGas == null) return sizeGas;
+  return sizeGas + Math.ceil((stateGas.part * relativeTtl) / stateGas.whole);
+}
 
 function getOracleRelativeTtl(params: any): number {
   const ttlKeys = {
@@ -94,21 +93,27 @@ export function buildGas(
   builtTx: Encoded.Transaction,
   unpackTx: typeof unpackTxType,
   buildTx: typeof buildTxType,
+  protocolParameters: ProtocolParameters,
 ): number {
   const { length } = decode(builtTx);
   const txObject = unpackTx(builtTx);
 
   let innerTxSize = 0;
   if (txObject.tag === Tag.GaMetaTx || txObject.tag === Tag.PayingForTx) {
-    innerTxSize = decode(buildTx(txObject.tx.encodedTx)).length;
+    // this rebuild only measures the size of an already signed inner transaction, its values are
+    // serialized as they are — see `serializeAsIsParam`
+    const innerTx = { ...txObject.tx.encodedTx, [serializeAsIsParam]: true };
+    innerTxSize = decode(buildTx(innerTx as Parameters<typeof buildTx>[0])).length;
   }
 
   return (
-    TX_BASE_GAS(txObject.tag) +
-    TX_OTHER_GAS(txObject.tag, length, {
-      relativeTtl: getOracleRelativeTtl(txObject),
-      innerTxSize,
-    })
+    getTxBaseGas(txObject, protocolParameters) +
+    getTxOtherGas(
+      txObject.tag,
+      length,
+      { relativeTtl: getOracleRelativeTtl(txObject), innerTxSize },
+      protocolParameters,
+    )
   );
 }
 
@@ -121,12 +126,14 @@ function calculateMinFee(
   rebuildTx: (value: BigNumber) => Encoded.Transaction,
   unpackTx: typeof unpackTxType,
   buildTx: typeof buildTxType,
+  protocolParameters: ProtocolParameters,
 ): BigNumber {
+  const minGasPrice = new BigNumber(protocolParameters.minGasPrice.toString());
   let fee = new BigNumber(0);
   let previousFee;
   do {
     previousFee = fee;
-    fee = new BigNumber(MIN_GAS_PRICE).times(buildGas(rebuildTx(fee), unpackTx, buildTx));
+    fee = minGasPrice.times(buildGas(rebuildTx(fee), unpackTx, buildTx, protocolParameters));
   } while (!fee.eq(previousFee));
   return fee;
 }
@@ -136,7 +143,7 @@ function calculateMinFee(
 // if it is not a contract-related transaction. And use this `gasPrice` to calculate `fee`.
 const gasPricePrefix = '_gas-price:';
 
-export interface SerializeAettosParams {
+export interface SerializeAettosParams extends SerializeAsIsParams {
   rebuildTx: (params: any) => Encoded.Transaction;
   unpackTx: typeof unpackTxType;
   buildTx: typeof buildTxType;
@@ -149,31 +156,40 @@ export default {
   async prepare(
     value: Int | undefined,
     params: {},
-    { onNode }: { onNode?: Node },
+    { onNode, protocolParameters }: { onNode?: Node } & ProtocolParametersOption,
   ): Promise<Int | undefined> {
     if (value != null) return value;
     if (onNode == null) {
       throw new ArgumentError('onNode', 'provided (or provide `fee` instead)', onNode);
     }
-    const gasPrice = await getCachedIncreasedGasPrice(onNode);
+    const gasPrice = await getCachedIncreasedGasPrice(onNode, protocolParameters);
     if (gasPrice === 0n) return undefined;
     return gasPricePrefix + gasPrice;
   },
 
   serializeAettos(
     _value: string | undefined,
-    { rebuildTx, unpackTx, buildTx, _computingMinFee }: SerializeAettosParams,
-    { _canIncreaseFee }: { _canIncreaseFee?: boolean },
+    params: SerializeAettosParams,
+    {
+      _canIncreaseFee,
+      protocolParameters = defaultProtocolParameters,
+    }: { _canIncreaseFee?: boolean } & ProtocolParametersOption,
   ): string {
+    const { rebuildTx, unpackTx, buildTx, _computingMinFee } = params;
     if (_computingMinFee != null) return _computingMinFee.toFixed();
+    if (params[serializeAsIsParam] === true && _value != null)
+      return new BigNumber(_value).toFixed();
     const minFee = calculateMinFee(
       (fee) => rebuildTx({ _computingMinFee: fee }),
       unpackTx,
       buildTx,
+      protocolParameters,
     );
     const value =
       _value?.startsWith(gasPricePrefix) === true
-        ? minFee.dividedBy(MIN_GAS_PRICE).times(_value.replace(gasPricePrefix, ''))
+        ? minFee
+            .dividedBy(protocolParameters.minGasPrice.toString())
+            .times(_value.replace(gasPricePrefix, ''))
         : new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
       if (_canIncreaseFee === true) return minFee.toFixed();
@@ -185,7 +201,8 @@ export default {
   serialize(
     value: Parameters<typeof coinAmount.serialize>[0],
     params: Parameters<typeof coinAmount.serialize>[1] & SerializeAettosParams,
-    options: { _canIncreaseFee?: boolean } & Parameters<typeof coinAmount.serialize>[2],
+    options: { _canIncreaseFee?: boolean } & ProtocolParametersOption &
+      Parameters<typeof coinAmount.serialize>[2],
   ): Buffer {
     if (typeof value === 'string' && value.startsWith(gasPricePrefix)) {
       return uInt.serialize(this.serializeAettos(value, params, options));

@@ -1,5 +1,5 @@
 import { Encoded } from '../utils/encoder.js';
-import { buildTx, buildTxHash, unpackTx } from './builder/index.js';
+import { buildTxHash, rebuildUnpackedTx, unpackTx } from './builder/index.js';
 import { Tag } from './builder/constants.js';
 import { verifySignature } from '../utils/crypto.js';
 import { getBufferToSign } from '../account/Memory.js';
@@ -95,7 +95,7 @@ export function getExecutionCost(
   }
   if (params.tag === Tag.GaMetaTx || params.tag === Tag.PayingForTx) {
     res += getExecutionCost(
-      buildTx(params.tx.encodedTx),
+      rebuildUnpackedTx(params.tx.encodedTx),
       params.tag === Tag.PayingForTx ? { innerTx: 'fee-payer' } : {},
     );
   }
@@ -116,16 +116,16 @@ export function getExecutionCostBySignedTx(
 ): bigint {
   const params = unpackTx(transaction, Tag.SignedTx);
   if (params.encodedTx.tag === Tag.GaMetaTx) {
-    return getExecutionCost(buildTx(params.encodedTx), options);
+    return getExecutionCost(rebuildUnpackedTx(params.encodedTx), options);
   }
 
-  const tx = buildTx(params.encodedTx);
+  const tx = rebuildUnpackedTx(params.encodedTx);
   const address = getTransactionSignerAddress(tx);
   const [isInnerTx, isNotInnerTx] = [true, false].map((f) =>
     verifySignature(getBufferToSign(tx, networkId, f), params.signatures[0], address),
   );
   if (!isInnerTx && !isNotInnerTx) throw new TransactionError("Can't verify signature");
-  return getExecutionCost(buildTx(params.encodedTx), {
+  return getExecutionCost(rebuildUnpackedTx(params.encodedTx), {
     ...(isInnerTx && { innerTx: 'freeloader' }),
     ...options,
   });

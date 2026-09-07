@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v14.1.1...v15.0.0) (2026-09-06)
+
+### ⚠ BREAKING CHANGES
+
+- **tx-builder:** `buildTxAsync` doesn't modify the params object it is given. Read a prepared
+  value off the built transaction with `unpackTx` instead. Only direct callers are affected, the
+  high-level methods copy the options object before building.
+
+### Features
+
+- **tx-builder:** get consensus parameters from node ([baea62b](https://github.com/aeternity/aepp-sdk-js/commit/baea62bceff2e3f36bdef40c563440d3a29aefa8))
+- **tx-builder:** support Arcus consensus protocol ([8efb9db](https://github.com/aeternity/aepp-sdk-js/commit/8efb9dbd5fb5e410be97590939221f5650860ee9))
+
+### Bug Fixes
+
+- **node:** mark as compatible with 8.0.0 ([83d070f](https://github.com/aeternity/aepp-sdk-js/commit/83d070f9289ef024b4325a137d9d274c2bd3c469))
+- **tx-builder:** don't write prepared values into given params ([6e15e34](https://github.com/aeternity/aepp-sdk-js/commit/6e15e343ac856bde14f958db684611c9c58b2253))
+
 ### [14.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v14.1.0...v14.1.1) (2026-03-26)
 
 ### Bug Fixes

@@ -3,7 +3,7 @@ import { hash, isEncoded, verifySignature } from '../utils/crypto.js';
 import { TxUnpacked } from './builder/schema.generated.js';
 import { CtVersion, ProtocolToVmAbi } from './builder/field-types/ct-version.js';
 import { Tag, ConsensusProtocolVersion } from './builder/constants.js';
-import { buildTx, unpackTx } from './builder/index.js';
+import { rebuildUnpackedTx, unpackTx } from './builder/index.js';
 import { concatBuffers, isAccountNotFoundError } from '../utils/other.js';
 import { Encoded, Encoding, decode } from '../utils/encoder.js';
 import Node from '../Node.js';
@@ -39,7 +39,7 @@ async function verifyTransactionInternal(
   node: Node,
   parentTxTypes: Tag[],
 ): Promise<ValidatorResult[]> {
-  const address = getTransactionSignerAddress(buildTx(tx));
+  const address = getTransactionSignerAddress(rebuildUnpackedTx(tx));
   const [account, { height }, { consensusProtocolVersion, nodeNetworkId }] = await Promise.all([
     node
       .getAccountByPubkey(address)
@@ -103,7 +103,7 @@ validators.push(
     const prefix = Buffer.from(
       [nodeNetworkId, ...(parentTxTypes.includes(Tag.PayingForTx) ? ['inner_tx'] : [])].join('-'),
     );
-    const txBinary = decode(buildTx(encodedTx));
+    const txBinary = decode(rebuildUnpackedTx(encodedTx));
     const txWithNetworkId = concatBuffers([prefix, txBinary]);
     const txHashWithNetworkId = concatBuffers([prefix, hash(txBinary)]);
     if (
@@ -141,7 +141,7 @@ validators.push(
   },
   async (tx, { account, parentTxTypes, node }) => {
     if (parentTxTypes.length !== 0) return [];
-    const cost = await getExecutionCostUsingNode(buildTx(tx), node).catch(() => 0n);
+    const cost = await getExecutionCostUsingNode(rebuildUnpackedTx(tx), node).catch(() => 0n);
     if (cost <= account.balance) return [];
     return [
       {

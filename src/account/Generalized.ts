@@ -59,7 +59,12 @@ export default class AccountGeneralized extends AccountBase {
 
   override async signTransaction(
     tx: Encoded.Transaction,
-    { authData, onCompiler, onNode }: Parameters<AccountBase['signTransaction']>[1],
+    {
+      authData,
+      onCompiler,
+      onNode,
+      protocolParameters,
+    }: Parameters<AccountBase['signTransaction']>[1],
   ): Promise<Encoded.Transaction> {
     if (authData == null || onCompiler == null || onNode == null) {
       throw new ArgumentError('authData, onCompiler, onNode', 'provided', null);
@@ -96,6 +101,9 @@ export default class AccountGeneralized extends AccountBase {
       fee,
       gasLimit,
       gasPrice,
+      // the wrapping transaction is priced by the same parameters the caller asked the inner one
+      // to be built against, `buildTxAsync` requests them from node if not provided
+      ...(protocolParameters != null && { protocolParameters }),
       onNode,
     });
     return buildTx({ tag: Tag.SignedTx, encodedTx: decode(gaMetaTx), signatures: [] });
