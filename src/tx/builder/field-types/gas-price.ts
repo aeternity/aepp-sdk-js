@@ -5,6 +5,7 @@ import { Int } from '../constants.js';
 import {
   defaultProtocolParameters,
   getCachedProtocolParameters,
+  getFloorGasPrice,
   getGasPriceDivisor,
   ProtocolParameters,
   ProtocolParametersOption,
@@ -93,12 +94,11 @@ export async function getCachedIncreasedGasPrice(
   ]);
   let gasPrice = demandGasPrice;
 
-  // 0n means "the consensus minimum", it is below what the miner of this node accepts
-  const minerFloor =
-    protocolParameters.minMinerGasPrice > protocolParameters.minGasPrice
-      ? protocolParameters.minMinerGasPrice
-      : 0n;
-  if (gasPrice < minerFloor) gasPrice = minerFloor;
+  // 0n means "the consensus minimum", only a miner asking for more lifts it
+  const floorGasPrice = getFloorGasPrice(protocolParameters);
+  if (floorGasPrice > protocolParameters.minGasPrice && gasPrice < floorGasPrice) {
+    gasPrice = floorGasPrice;
+  }
 
   // the ceiling goes down by the factor the parameters raise the fee gas by — see
   // `getGasPriceDivisor`. Counted in thousandths so that a hard fork raising the gas a few percent
@@ -158,7 +158,10 @@ export default {
     { protocolParameters = defaultProtocolParameters }: ProtocolParametersOption,
   ): string {
     const minGasPrice = protocolParameters.minGasPrice.toString();
-    if (value == null) return minGasPrice;
+    // defaulted to the miner minimum the same way `prepare` does it, for a build that gets no
+    // `prepare` — a value the caller provided is still checked against the consensus minimum
+    // alone, that is the way to build for a node other than the one these parameters describe
+    if (value == null) return getFloorGasPrice(protocolParameters).toString();
     if (params[serializeAsIsParam] === true) return value;
     if (new BigNumber(value).lt(minGasPrice)) {
       throw new IllegalArgumentError(`Gas price ${value} must be bigger than ${minGasPrice}`);

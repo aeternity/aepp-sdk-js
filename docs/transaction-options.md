@@ -45,6 +45,8 @@ These options are common and can be provided to every tx-type:
   - You can provide a higher fee to additionally reward the miners.
   - The default is also raised to the minimum gas price the miner of the connected node accepts, so
     that the node the transaction is submitted to is willing to mine it.
+  - The minimum is counted at that same price, and so is the smallest `fee` accepted here. Node
+    refuses a transaction priced below it with `too_low_gas_price_for_miner`.
 - `protocolParameters` (default: requested from node)
 
   - Consensus parameters the minimum fee and the maximum gas limit are calculated from. Accepted by
@@ -109,6 +111,9 @@ The following options are sepcific for each tx-type.
   - Maximum amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
 - `gasPrice` (default: based on network demand, minimum: the consensus minimum gas price reported by node, `1e9` if not reported or not requested — see `protocolParameters`)
   - To increase chances to get your transaction included quickly you can use a higher gasPrice.
+  - The default is raised to the minimum gas price the miner accepts, the same way `fee` is: node
+    prices a contract transaction by the lower of the two. A value provided here is still only
+    checked against the consensus minimum, so it stays the way to build for another node.
 
 ### NameClaimTx
 
