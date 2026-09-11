@@ -79,7 +79,7 @@ const releaseConsensusParameters: NodeResponse['protocols'][number] = {
   contractTxBaseGas: [
     { txType: 'ContractCreateTx', abiVersion: AbiVersion.Sophia, txBaseGas: 75000 },
     { txType: 'ContractCreateTx', abiVersion: AbiVersion.Fate, txBaseGas: 75000 },
-    { txType: 'ContractCallTx', abiVersion: AbiVersion.Sophia, txBaseGas: 180000 },
+    { txType: 'ContractCallTx', abiVersion: AbiVersion.Sophia, txBaseGas: 450000 },
     { txType: 'ContractCallTx', abiVersion: AbiVersion.Fate, txBaseGas: 180000 },
     { txType: 'GAAttachTx', abiVersion: AbiVersion.Sophia, txBaseGas: 75000 },
     { txType: 'GAAttachTx', abiVersion: AbiVersion.Fate, txBaseGas: 75000 },
@@ -481,6 +481,8 @@ describe('Protocol parameters', () => {
       },
       {
         name: 'base gas of a contract transaction type',
+        // the abi version node reports is bounded by the default of that very version — the 450000
+        // of `AbiVersion.Sophia` is not a budget for the 180000 of `AbiVersion.Fate`
         message: 'Node reports the base gas of ContractCallTx at abi version 3 as 180000001,',
         patch: {
           contractTxBaseGas: [
@@ -723,7 +725,7 @@ describe('Protocol parameters', () => {
       // existed, failing to build the transaction at all would be worse
       expect(parameters.txBaseGas[Tag.OracleRegisterTx]).to.equal(15000);
       expect(parameters.contractTxBaseGas[Tag.ContractCallTx]).to.eql({
-        [AbiVersion.Sophia]: 180000,
+        [AbiVersion.Sophia]: 450000,
         [AbiVersion.Fate]: 180000,
       });
       expect(parameters.stateGasPerBlock[Tag.OracleRegisterTx]).to.eql({

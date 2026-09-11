@@ -113,7 +113,7 @@ export const defaultProtocolParameters: ProtocolParameters = freezeParameters({
   },
   contractTxBaseGas: {
     [Tag.ContractCreateTx]: { [AbiVersion.Sophia]: 5 * BASE_GAS, [AbiVersion.Fate]: 5 * BASE_GAS },
-    [Tag.ContractCallTx]: { [AbiVersion.Sophia]: 12 * BASE_GAS, [AbiVersion.Fate]: 12 * BASE_GAS },
+    [Tag.ContractCallTx]: { [AbiVersion.Sophia]: 30 * BASE_GAS, [AbiVersion.Fate]: 12 * BASE_GAS },
     [Tag.GaAttachTx]: { [AbiVersion.Sophia]: 5 * BASE_GAS, [AbiVersion.Fate]: 5 * BASE_GAS },
     [Tag.GaMetaTx]: { [AbiVersion.Sophia]: 5 * BASE_GAS, [AbiVersion.Fate]: 5 * BASE_GAS },
   },
@@ -361,10 +361,13 @@ function checkParametersNotExcessive(parameters: ProtocolParameters): ParameterR
     gasRaises.push(checkNotExcessive(`the base gas of ${Tag[+tag]}`, gas, defaultBaseGasOf(+tag)));
   });
   Object.entries(parameters.contractTxBaseGas).forEach(([tag, byAbiVersion]) => {
-    const sdkValue = defaultBaseGasOf(+tag);
     Object.entries(byAbiVersion).forEach(([abiVersion, gas]) => {
       const name = `the base gas of ${Tag[+tag]} at abi version ${abiVersion}`;
-      gasRaises.push(checkNotExcessive(name, gas, sdkValue));
+      // an abi version the SDK release prices is bounded by its own value — the budget of the
+      // priciest one is not a budget for the others. An abi version it doesn't price is charged
+      // the maximum of the ones it does, see `getTxBaseGas`
+      const sdkValue = d.contractTxBaseGas[+tag as Tag]?.[+abiVersion as AbiVersion];
+      gasRaises.push(checkNotExcessive(name, gas, sdkValue ?? defaultBaseGasOf(+tag)));
     });
   });
   const defaultStateGasRatio = defaultStateGasPerBlock.part / defaultStateGasPerBlock.whole;
