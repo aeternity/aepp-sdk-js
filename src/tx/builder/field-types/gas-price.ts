@@ -157,14 +157,13 @@ export default {
     params: SerializeAsIsParams,
     { protocolParameters = defaultProtocolParameters }: ProtocolParametersOption,
   ): string {
-    const minGasPrice = protocolParameters.minGasPrice.toString();
-    // defaulted to the miner minimum the same way `prepare` does it, for a build that gets no
-    // `prepare` — a value the caller provided is still checked against the consensus minimum
-    // alone, that is the way to build for a node other than the one these parameters describe
-    if (value == null) return getFloorGasPrice(protocolParameters).toString();
+    // defaulted and checked against the floor `prepare` applies, for a build that gets no
+    // `prepare` — see `getFloorGasPrice`. Provide `protocolParameters` to build for another node
+    const floorGasPrice = getFloorGasPrice(protocolParameters).toString();
+    if (value == null) return floorGasPrice;
     if (params[serializeAsIsParam] === true) return value;
-    if (new BigNumber(value).lt(minGasPrice)) {
-      throw new IllegalArgumentError(`Gas price ${value} must be bigger than ${minGasPrice}`);
+    if (new BigNumber(value).lt(floorGasPrice)) {
+      throw new IllegalArgumentError(`Gas price ${value} must be bigger than ${floorGasPrice}`);
     }
     return value;
   },
