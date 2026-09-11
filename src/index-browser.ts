@@ -97,6 +97,7 @@ export type { Int, AensName } from './tx/builder/constants.js';
 export {
   defaultProtocolParameters,
   getCachedProtocolParameters,
+  getFloorGasPrice,
 } from './tx/builder/protocol-parameters.js';
 export type {
   ProtocolParameters,

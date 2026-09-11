@@ -17,7 +17,8 @@ export interface ProtocolParameters {
   readonly minGasPrice: bigint;
   /**
    * Minimum gas price accepted by the miner of the node the SDK is connected to. A transaction
-   * below it is still valid, but this node won't mine it.
+   * below it stays valid by consensus, but this node refuses it from the mempool. Node policy
+   * rather than a consensus parameter.
    */
   readonly minMinerGasPrice: bigint;
   /** Gas per serialized transaction byte counted into the minimum fee */
@@ -112,7 +113,7 @@ export const defaultProtocolParameters: ProtocolParameters = freezeParameters({
   },
   contractTxBaseGas: {
     [Tag.ContractCreateTx]: { [AbiVersion.Sophia]: 5 * BASE_GAS, [AbiVersion.Fate]: 5 * BASE_GAS },
-    [Tag.ContractCallTx]: { [AbiVersion.Sophia]: 12 * BASE_GAS, [AbiVersion.Fate]: 12 * BASE_GAS },
+    [Tag.ContractCallTx]: { [AbiVersion.Sophia]: 30 * BASE_GAS, [AbiVersion.Fate]: 12 * BASE_GAS },
     [Tag.GaAttachTx]: { [AbiVersion.Sophia]: 5 * BASE_GAS, [AbiVersion.Fate]: 5 * BASE_GAS },
     [Tag.GaMetaTx]: { [AbiVersion.Sophia]: 5 * BASE_GAS, [AbiVersion.Fate]: 5 * BASE_GAS },
   },
@@ -360,10 +361,13 @@ function checkParametersNotExcessive(parameters: ProtocolParameters): ParameterR
     gasRaises.push(checkNotExcessive(`the base gas of ${Tag[+tag]}`, gas, defaultBaseGasOf(+tag)));
   });
   Object.entries(parameters.contractTxBaseGas).forEach(([tag, byAbiVersion]) => {
-    const sdkValue = defaultBaseGasOf(+tag);
     Object.entries(byAbiVersion).forEach(([abiVersion, gas]) => {
       const name = `the base gas of ${Tag[+tag]} at abi version ${abiVersion}`;
-      gasRaises.push(checkNotExcessive(name, gas, sdkValue));
+      // an abi version the SDK release prices is bounded by its own value — the budget of the
+      // priciest one is not a budget for the others. An abi version it doesn't price is charged
+      // the maximum of the ones it does, see `getTxBaseGas`
+      const sdkValue = d.contractTxBaseGas[+tag as Tag]?.[+abiVersion as AbiVersion];
+      gasRaises.push(checkNotExcessive(name, gas, sdkValue ?? defaultBaseGasOf(+tag)));
     });
   });
   const defaultStateGasRatio = defaultStateGasPerBlock.part / defaultStateGasPerBlock.whole;
@@ -434,6 +438,19 @@ export function getGasLimitDivisor(parameters: ProtocolParameters, tag: Tag): nu
   const raises = parameterRaises.get(parameters);
   if (raises == null) return 1;
   return tag === Tag.GaMetaTx ? raises.maxAuthFunGas : raises.blockGasLimit;
+}
+
+/**
+ * Gas price the minimum fee is counted at and the `gasPrice` of a contract transaction defaults
+ * to: the miner minimum when it is above the consensus one. Node reads the price a transaction
+ * pays as the lower of its `gasPrice` and its fee over its fee gas, so pricing either below the
+ * miner minimum gets it refused with `too_low_gas_price_for_miner`.
+ * @category transaction builder
+ * @param parameters - Parameters a transaction is built against
+ */
+export function getFloorGasPrice(parameters: ProtocolParameters): bigint {
+  const { minGasPrice, minMinerGasPrice } = parameters;
+  return minMinerGasPrice > minGasPrice ? minMinerGasPrice : minGasPrice;
 }
 
 function mapByTxType<Value, Result>(

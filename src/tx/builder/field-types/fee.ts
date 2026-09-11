@@ -3,6 +3,7 @@ import { ArgumentError, IllegalArgumentError, InternalError } from '../../../uti
 import { Int, Tag } from '../constants.js';
 import {
   defaultProtocolParameters,
+  getFloorGasPrice,
   maxOf,
   ProtocolParameters,
   ProtocolParametersOption,
@@ -128,12 +129,12 @@ function calculateMinFee(
   buildTx: typeof buildTxType,
   protocolParameters: ProtocolParameters,
 ): BigNumber {
-  const minGasPrice = new BigNumber(protocolParameters.minGasPrice.toString());
+  const floorGasPrice = new BigNumber(getFloorGasPrice(protocolParameters).toString());
   let fee = new BigNumber(0);
   let previousFee;
   do {
     previousFee = fee;
-    fee = minGasPrice.times(buildGas(rebuildTx(fee), unpackTx, buildTx, protocolParameters));
+    fee = floorGasPrice.times(buildGas(rebuildTx(fee), unpackTx, buildTx, protocolParameters));
   } while (!fee.eq(previousFee));
   return fee;
 }
@@ -188,7 +189,7 @@ export default {
     const value =
       _value?.startsWith(gasPricePrefix) === true
         ? minFee
-            .dividedBy(protocolParameters.minGasPrice.toString())
+            .dividedBy(getFloorGasPrice(protocolParameters).toString())
             .times(_value.replace(gasPricePrefix, ''))
         : new BigNumber(_value ?? minFee);
     if (minFee.gt(value)) {
