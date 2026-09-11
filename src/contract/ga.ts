@@ -130,9 +130,9 @@ async function buildAuthTxHashInternal(
   let payload = hash(concatBuffers([Buffer.from(nodeNetworkId), decode(transaction)]));
   if (fee == null) throw new ArgumentError('fee', 'provided (in Ceres)', fee);
   if (gasPrice == null) throw new ArgumentError('gasPrice', 'provided (in Ceres)', gasPrice);
-  // the entry checks `gasPrice` against the consensus minimum the same way a transaction does,
-  // so it needs the same parameters — without them a `gasPrice` correct for the network this
-  // node runs is rejected whenever that network runs a lower minimum than the SDK release.
+  // the entry checks `gasPrice` the same way a transaction does, so it needs the same parameters
+  // — without them a `gasPrice` correct for the network this node runs is rejected whenever that
+  // network prices a transaction below the SDK release.
   // Not requested at all when there is nothing to check, so that re-deriving the hash of an
   // existing transaction needs no round trip and works on a transaction of another network
   payload = hash(

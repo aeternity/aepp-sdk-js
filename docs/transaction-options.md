@@ -109,11 +109,10 @@ The following options are sepcific for each tx-type.
   - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
 - `gasLimit`
   - Maximum amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
-- `gasPrice` (default: based on network demand, minimum: the consensus minimum gas price reported by node, `1e9` if not reported or not requested — see `protocolParameters`)
+- `gasPrice` (default: based on network demand, minimum: the miner minimum gas price reported by node, `1e9` if not reported or not requested — see `protocolParameters`)
   - To increase chances to get your transaction included quickly you can use a higher gasPrice.
-  - The default is raised to the minimum gas price the miner accepts, the same way `fee` is: node
-    prices a contract transaction by the lower of the two. A value provided here is still only
-    checked against the consensus minimum, so it stays the way to build for another node.
+  - Node prices a contract transaction by the lower of `gasPrice` and the fee over its gas, so
+    both are held to that minimum. Provide `protocolParameters` to build for another node.
 
 ### NameClaimTx
 

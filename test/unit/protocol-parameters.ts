@@ -1511,9 +1511,7 @@ describe('Protocol parameters', () => {
     } as const;
 
     it('defaults the gas price of a contract transaction to the miner minimum', () => {
-      // node prices a contract transaction by the lower of `gasPrice` and the fee over the fee
-      // gas, so a `gasPrice` left at the consensus minimum makes the miner refuse it whatever the
-      // fee is. This is the build that gets no `prepare`: offline, against the parameters of node
+      // the build that gets no `prepare`: offline, against the parameters of node
       const tx = buildTx({
         ...contractCallParams,
         gasLimit: 100,
@@ -1521,14 +1519,19 @@ describe('Protocol parameters', () => {
       });
       expect(unpackTx(tx, Tag.ContractCallTx).gasPrice).to.equal('1000000000');
       expect(getPaidGasPrice(tx, 180000)).to.equal(1000000000n);
-      // a gas price the caller provides is still checked against the consensus minimum alone
-      const cheap = buildTx({
-        ...contractCallParams,
-        gasLimit: 100,
-        gasPrice: '1000000',
-        protocolParameters: publicNetworkParameters,
-      });
-      expect(unpackTx(cheap, Tag.ContractCallTx).gasPrice).to.equal('1000000');
+    });
+
+    it('refuses a gas price below the one the miner of the node charges', () => {
+      // the fee is counted at the miner minimum either way, so building this would pay that fee
+      // for a transaction the miner refuses anyway
+      expect(() =>
+        buildTx({
+          ...contractCallParams,
+          gasLimit: 100,
+          gasPrice: '1000000',
+          protocolParameters: publicNetworkParameters,
+        }),
+      ).to.throw(IllegalArgumentError, 'Gas price 1000000 must be bigger than 1000000000');
     });
 
     it('rejects a gas price below the raised minimum', () => {
@@ -2459,18 +2462,26 @@ describe('Protocol parameters', () => {
   describe('buildAuthTxHash', () => {
     const nodeInfo = { nodeNetworkId: 'ae_uat', consensusProtocolVersion: 6 };
 
-    function genGaNode(getProtocolParameters: () => Promise<NodeResponse>): Node {
-      return genNode({ getNodeInfo: async () => nodeInfo, getProtocolParameters });
+    function genGaNode(
+      getProtocolParameters: () => Promise<NodeResponse>,
+      getNodeSettings: () => Promise<NodeSettingsResponse> = async () => releaseNodeSettings,
+    ): Node {
+      return genNode({ getNodeInfo: async () => nodeInfo, getProtocolParameters, getNodeSettings });
     }
 
     it('prices the auth data entry by the parameters of node', async () => {
       // `Auth.tx_hash` is a `GaMetaTxAuthData` entry holding a `gasPrice`, and the entry checks it
-      // against the consensus minimum just like a transaction does — without the parameters of
-      // node a `gasPrice` correct for this network is refused whenever it runs a lower minimum
-      const onNode = genGaNode(async () => ({
-        ...releaseResponse,
-        protocols: [{ ...releaseConsensusParameters, minimumGasPrice: 100000000n }],
-      }));
+      // just like a transaction does — without the parameters of node a `gasPrice` correct for
+      // this network is refused whenever it prices a transaction below the SDK release
+      const onNode = genGaNode(
+        async () => ({
+          ...releaseResponse,
+          protocols: [{ ...releaseConsensusParameters, minimumGasPrice: 100000000n }],
+        }),
+        // a node that kept the miner minimum of the SDK release would refuse its own consensus
+        // minimum, and `cheapParameters` below describes the same network
+        async () => ({ ...releaseNodeSettings, minMinerGasPrice: 100000000n }),
+      );
       const transaction = buildTx({ ...spendTxParams, protocolParameters: cheapParameters });
       const hash = await buildAuthTxHash(transaction, {
         fee: '100000000000000',
