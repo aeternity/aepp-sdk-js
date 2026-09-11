@@ -1334,6 +1334,70 @@ describe('Protocol parameters', () => {
       expect(unpackTx(tx, Tag.SpendTx).fee).to.equal('49980000000000');
     });
 
+    /**
+     * A node of a public network: the consensus minimum of Ceres is 1e6, the miner minimum is 1e9
+     * on mainnet, testnet and a dev node alike. The fixtures of the SDK release report both as 1e9,
+     * so nothing else in here exercises the gap between them — see {@link getFloorGasPrice}.
+     */
+    const publicNetworkParameters = { ...defaultProtocolParameters, minGasPrice: 1000000n };
+    const publicNetworkNode = genNode({
+      getProtocolParameters: async () => ({
+        ...releaseResponse,
+        protocols: [{ ...releaseConsensusParameters, minimumGasPrice: 1000000n }],
+      }),
+      // below the 70% utilization at which the demand raises the price above the miner floor
+      getRecentGasPrices: async () => [{ minGasPrice: 1000000000n, utilization: 9 }],
+    });
+
+    /**
+     * `aetx:min_gas_price/3`: the fee over the fee gas rounded up, and the lower of that and
+     * `gasPrice` on a type that has one. `check_minimum_miner_gas_price/6` refuses anything below
+     * `min_miner_gas_price` with `too_low_gas_price_for_miner`. The fee gas is counted from the
+     * serialized size, so this has to be read off the built transaction and not off the fee alone.
+     */
+    function getPaidGasPrice(tx: Encoded.Transaction, baseGas: number): bigint {
+      const { fee, gasPrice } = unpackTx(tx) as { fee: string; gasPrice?: string };
+      const feeGas = BigInt(baseGas + decode(tx).length * 20);
+      const feeGasPrice = (BigInt(fee) + feeGas - 1n) / feeGas;
+      if (gasPrice == null) return feeGasPrice;
+      return BigInt(gasPrice) < feeGasPrice ? BigInt(gasPrice) : feeGasPrice;
+    }
+
+    it('pays the miner minimum gas price on a node whose consensus minimum is below it', async () => {
+      const spend = await buildTxAsync({ ...spendTxParams, ttl: 0, onNode: publicNetworkNode });
+      expect(getPaidGasPrice(spend, 15000)).to.equal(1000000000n);
+      // and the fee is the one the SDK charged before it asked node for the parameters at all
+      expect(unpackTx(spend, Tag.SpendTx).fee).to.equal('16660000000000');
+
+      const call = await buildTxAsync({
+        tag: Tag.ContractCallTx,
+        callerId: address,
+        nonce: 1,
+        ttl: 0,
+        contractId,
+        abiVersion: AbiVersion.Fate,
+        amount: 0,
+        callData,
+        onNode: publicNetworkNode,
+      });
+      expect(getPaidGasPrice(call, 180000)).to.equal(1000000000n);
+    });
+
+    it('refuses a fee below the gas price the miner of the node charges', () => {
+      // valid by the consensus rule of this node, and its own miner would never pick it up
+      const fee = '16660000000';
+      expect(() =>
+        buildTx({ ...spendTxParams, fee, protocolParameters: publicNetworkParameters }),
+      ).to.throw(IllegalArgumentError, `Fee ${fee} must be bigger than 16660000000000`);
+      // the fee at the miner minimum is the smallest one it accepts
+      const tx = buildTx({
+        ...spendTxParams,
+        fee: '16660000000000',
+        protocolParameters: publicNetworkParameters,
+      });
+      expect(getPaidGasPrice(tx, 15000)).to.equal(1000000000n);
+    });
+
     it('computes the minimum fee based on the gas per byte', () => {
       const tx = buildTx({
         ...spendTxParams,
@@ -1443,6 +1507,27 @@ describe('Protocol parameters', () => {
       amount: 0,
       callData,
     } as const;
+
+    it('defaults the gas price of a contract transaction to the miner minimum', () => {
+      // node prices a contract transaction by the lower of `gasPrice` and the fee over the fee
+      // gas, so a `gasPrice` left at the consensus minimum makes the miner refuse it whatever the
+      // fee is. This is the build that gets no `prepare`: offline, against the parameters of node
+      const tx = buildTx({
+        ...contractCallParams,
+        gasLimit: 100,
+        protocolParameters: publicNetworkParameters,
+      });
+      expect(unpackTx(tx, Tag.ContractCallTx).gasPrice).to.equal('1000000000');
+      expect(getPaidGasPrice(tx, 180000)).to.equal(1000000000n);
+      // a gas price the caller provides is still checked against the consensus minimum alone
+      const cheap = buildTx({
+        ...contractCallParams,
+        gasLimit: 100,
+        gasPrice: '1000000',
+        protocolParameters: publicNetworkParameters,
+      });
+      expect(unpackTx(cheap, Tag.ContractCallTx).gasPrice).to.equal('1000000');
+    });
 
     it('rejects a gas price below the raised minimum', () => {
       expect(() =>
@@ -1606,11 +1691,10 @@ describe('Protocol parameters', () => {
     // the parameters above the ones of the SDK release are the easy direction: the inner
     // transaction is rebuilt to measure its size against the parameters of the SDK release, and it
     // was built against them too. A node running parameters *below* them — a devmode or a local
-    // node with a lowered `min_gas_price` — is what the measuring short-circuit is needed for
-    const loweredGasPrice = { ...defaultProtocolParameters, minGasPrice: 100000000n };
-
+    // node with a lowered `min_gas_price`, see `cheapParameters` — is what the measuring
+    // short-circuit is needed for
     it('builds a PayingForTx wrapping a transaction with a fee below the sdk release minimum', () => {
-      const encodedTx = buildTx({ ...spendTxParams, protocolParameters: loweredGasPrice });
+      const encodedTx = buildTx({ ...spendTxParams, protocolParameters: cheapParameters });
       const inner = buildTx({ tag: Tag.SignedTx, encodedTx, signatures: [Buffer.alloc(64)] });
       // the inner fee is a tenth of what the parameters of the SDK release require
       expect(unpackTx(encodedTx, Tag.SpendTx).fee).to.equal('1666000000000');
@@ -1619,7 +1703,7 @@ describe('Protocol parameters', () => {
         nonce: 1,
         payerId: address,
         tx: inner,
-        protocolParameters: loweredGasPrice,
+        protocolParameters: cheapParameters,
       });
       // `buildTx(unpackTx(inner))` can't be used to compare: rebuilding a transaction whose values
       // are below the parameters of the SDK release checks them against those parameters again
@@ -1632,7 +1716,7 @@ describe('Protocol parameters', () => {
         ...contractCallParams,
         gasLimit: 100,
         gasPrice: '100000000',
-        protocolParameters: loweredGasPrice,
+        protocolParameters: cheapParameters,
       });
       const inner = buildTx({ tag: Tag.SignedTx, encodedTx, signatures: [Buffer.alloc(64)] });
       const tx = buildTx({
@@ -1643,7 +1727,7 @@ describe('Protocol parameters', () => {
         gasLimit: 50000,
         gasPrice: '100000000',
         tx: inner,
-        protocolParameters: loweredGasPrice,
+        protocolParameters: cheapParameters,
       });
       expect(unpackTx(tx, Tag.GaMetaTx).tx).to.eql(unpackTx(inner, Tag.SignedTx));
     });

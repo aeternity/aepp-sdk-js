@@ -11,13 +11,15 @@ import type Node from '../../Node.js';
  */
 export interface ProtocolParameters {
   /**
-   * Consensus minimum gas price in aettos, the minimum transaction fee is the transaction's fee
-   * gas multiplied by this value
+   * Consensus minimum gas price in aettos. The minimum transaction fee is the transaction's fee
+   * gas multiplied by the higher of this and `minMinerGasPrice` — see {@link getFloorGasPrice}.
+   * To build for a network accepting a lower gas price, lower both.
    */
   readonly minGasPrice: bigint;
   /**
    * Minimum gas price accepted by the miner of the node the SDK is connected to. A transaction
-   * below it is still valid, but this node won't mine it.
+   * below it stays valid by consensus, but this node refuses it from the mempool. Node policy
+   * rather than a consensus parameter.
    */
   readonly minMinerGasPrice: bigint;
   /** Gas per serialized transaction byte counted into the minimum fee */
@@ -330,8 +332,9 @@ function checkRaiseNotExcessive(what: string, raise: number): void {
 function checkParametersNotExcessive(parameters: ProtocolParameters): ParameterRaises {
   const d = defaultProtocolParameters;
   const defaultMinGasPrice = Number(d.minGasPrice);
-  // a gas price of 0 makes every fee 0 — the network would reject the transaction, and the
-  // `minFee / minGasPrice` of the demand-based fee is a division by zero
+  // no network runs a consensus minimum of 0 (node reports 1e6 since Minerva), and with a miner
+  // minimum of 0 as well it makes every fee 0 and the `minFee / getFloorGasPrice` of the
+  // demand-based fee a division by zero
   if (parameters.minGasPrice < 1n) {
     throw new NodeError(
       `Node reports the minimum gas price as ${parameters.minGasPrice}, a transaction can't be` +
@@ -434,6 +437,19 @@ export function getGasLimitDivisor(parameters: ProtocolParameters, tag: Tag): nu
   const raises = parameterRaises.get(parameters);
   if (raises == null) return 1;
   return tag === Tag.GaMetaTx ? raises.maxAuthFunGas : raises.blockGasLimit;
+}
+
+/**
+ * Gas price the minimum fee is counted at and the `gasPrice` of a contract transaction defaults
+ * to: the miner minimum when it is above the consensus one. Node reads the price a transaction
+ * pays as the lower of its `gasPrice` and its fee over its fee gas, so pricing either below the
+ * miner minimum gets it refused with `too_low_gas_price_for_miner`.
+ * @category transaction builder
+ * @param parameters - Parameters a transaction is built against
+ */
+export function getFloorGasPrice(parameters: ProtocolParameters): bigint {
+  const { minGasPrice, minMinerGasPrice } = parameters;
+  return minMinerGasPrice > minGasPrice ? minMinerGasPrice : minGasPrice;
 }
 
 function mapByTxType<Value, Result>(

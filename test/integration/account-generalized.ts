@@ -12,7 +12,8 @@ import {
   rebuildUnpackedTx,
   Contract,
   ContractMethodsBase,
-  MIN_GAS_PRICE,
+  getCachedProtocolParameters,
+  getFloorGasPrice,
   Encoded,
   ArgumentError,
 } from '../../src';
@@ -130,7 +131,10 @@ describe('Generalized Account', () => {
   it('accepts a function in authData', async () => {
     let spendTx;
     const fee = 1e15;
-    const gasPrice = MIN_GAS_PRICE + 1;
+    // a value of its own, above the smallest one this node accepts — so that the assertions below
+    // can't pass on a gas price the builder defaulted
+    const parameters = await getCachedProtocolParameters(aeSdk.api);
+    const gasPrice = (getFloorGasPrice(parameters) + 1n).toString();
     const { rawTx } = await aeSdk.spend(10000, recipient, {
       authData: async (tx) => {
         spendTx = tx;
@@ -146,7 +150,7 @@ describe('Generalized Account', () => {
     ensureEqual<Tag.GaMetaTx>(txParams.encodedTx.tag, Tag.GaMetaTx);
     expect(rebuildUnpackedTx(txParams.encodedTx.tx.encodedTx)).to.equal(spendTx);
     expect(txParams.encodedTx.fee).to.equal(fee.toString());
-    expect(txParams.encodedTx.gasPrice).to.equal(gasPrice.toString());
+    expect(txParams.encodedTx.gasPrice).to.equal(gasPrice);
   });
 
   it('fails trying to send SignedTx using generalized account', async () => {
