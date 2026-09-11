@@ -49,7 +49,6 @@ export default class AccountMemory extends AccountBase {
   /**
    * @deprecated Use `unsafeSign` method instead
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override async sign(data: string | Uint8Array, options?: any): Promise<Uint8Array> {
     return this.unsafeSign(data, options);
   }
