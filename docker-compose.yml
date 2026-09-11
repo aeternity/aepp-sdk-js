@@ -1,12 +1,11 @@
 services:
   node:
-    # TODO: switch to master after merging https://github.com/aeternity/aeternity/pull/4303
-    image: aeternity/aeternity:v7.3.0-rc5-bundle
-    # TODO: remove 3313 port after merging https://github.com/aeternity/aeternity/pull/4303
+    # the first release serving `/v3/protocol-parameters` and `/v3/node-settings`, required by
+    # `test/integration/node.ts`
+    image: aeternity/aeternity:v7.3.0-bundle
+    # https://github.com/aeternity/aeternity/pull/4303 was closed unmerged, so the dev mode
+    # emitter stays a plugin and `test/emitter` keeps driving it over this port
     ports: [3013:3013, 3113:3113, 3014:3014, 3313:3313]
-    # TODO: remove after releasing https://github.com/aeternity/aeternity/pull/4292
-    healthcheck:
-      interval: 2s
     volumes:
       - ./docker/aeternity.yaml:/home/aeternity/node/aeternity.yaml
     stop_grace_period: 0s

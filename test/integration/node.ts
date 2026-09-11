@@ -11,6 +11,7 @@ import {
   getGasLimitDivisor,
   getGasPriceDivisor,
 } from '../../src/tx/builder/protocol-parameters';
+import semverSatisfies from '../../src/utils/semver-satisfies';
 
 describe('Node client', () => {
   let node: Node;
@@ -161,6 +162,17 @@ describe('Node client', () => {
       // node too old for the endpoints, or with the `node_info`/`node_settings` groups disabled
       const status = error instanceof RestError ? error.statusCode : undefined;
       if (status !== 404 && status !== 403) throw error;
+      // skipping is only right for a node that predates the endpoints, node serves them since
+      // 7.3.0. `semverSatisfies` ignores a prerelease suffix, so a `7.3.0-rc*` is held to the
+      // same bar — it is pinned in `docker-compose.yml` and not expected to be behind it
+      const { nodeVersion } = await node.getStatus();
+      if (semverSatisfies(nodeVersion, '7.3.0')) {
+        throw new Error(
+          `Node ${nodeVersion} answered ${String(status)} for the protocol parameter endpoints.` +
+            ' The transaction builder silently falls back to the parameters of the sdk release' +
+            ' without them, and this test is the only thing that would notice.',
+        );
+      }
       this.skip();
       return;
     }
@@ -187,6 +199,7 @@ describe('Node client', () => {
     // and the conversion the builder actually uses reads all of it without falling back
     const parameters = await getCachedProtocolParameters(node);
     expect(parameters.minGasPrice).to.equal(protocol.minimumGasPrice);
+    expect(parameters.minMinerGasPrice).to.equal(nodeSettings.minMinerGasPrice);
     expect(parameters.gasPerByte).to.equal(protocol.gasPerByte);
     expect(parameters.txBaseGas[Tag.SpendTx]).to.equal(protocol.txBaseGas.SpendTx);
     expect(parameters.blockGasLimit).to.equal(nodeSettings.blockGasLimit);
