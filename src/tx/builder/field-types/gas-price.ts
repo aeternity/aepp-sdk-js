@@ -5,6 +5,7 @@ import { Int } from '../constants.js';
 import {
   defaultProtocolParameters,
   getCachedProtocolParameters,
+  getFloorGasPrice,
   getGasPriceDivisor,
   ProtocolParameters,
   ProtocolParametersOption,
@@ -93,12 +94,11 @@ export async function getCachedIncreasedGasPrice(
   ]);
   let gasPrice = demandGasPrice;
 
-  // 0n means "the consensus minimum", it is below what the miner of this node accepts
-  const minerFloor =
-    protocolParameters.minMinerGasPrice > protocolParameters.minGasPrice
-      ? protocolParameters.minMinerGasPrice
-      : 0n;
-  if (gasPrice < minerFloor) gasPrice = minerFloor;
+  // 0n means "the consensus minimum", only a miner asking for more lifts it
+  const floorGasPrice = getFloorGasPrice(protocolParameters);
+  if (floorGasPrice > protocolParameters.minGasPrice && gasPrice < floorGasPrice) {
+    gasPrice = floorGasPrice;
+  }
 
   // the ceiling goes down by the factor the parameters raise the fee gas by — see
   // `getGasPriceDivisor`. Counted in thousandths so that a hard fork raising the gas a few percent
@@ -157,11 +157,13 @@ export default {
     params: SerializeAsIsParams,
     { protocolParameters = defaultProtocolParameters }: ProtocolParametersOption,
   ): string {
-    const minGasPrice = protocolParameters.minGasPrice.toString();
-    if (value == null) return minGasPrice;
+    // defaulted and checked against the floor `prepare` applies, for a build that gets no
+    // `prepare` — see `getFloorGasPrice`. Provide `protocolParameters` to build for another node
+    const floorGasPrice = getFloorGasPrice(protocolParameters).toString();
+    if (value == null) return floorGasPrice;
     if (params[serializeAsIsParam] === true) return value;
-    if (new BigNumber(value).lt(minGasPrice)) {
-      throw new IllegalArgumentError(`Gas price ${value} must be bigger than ${minGasPrice}`);
+    if (new BigNumber(value).lt(floorGasPrice)) {
+      throw new IllegalArgumentError(`Gas price ${value} must be bigger than ${floorGasPrice}`);
     }
     return value;
   },

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.0.1](https://github.com/aeternity/aepp-sdk-js/compare/v15.0.0...v15.0.1) (2026-10-01)
+
+### Bug Fixes
+
+- **tx-builder:** check a provided gas price against the miner minimum ([2d344f8](https://github.com/aeternity/aepp-sdk-js/commit/2d344f8c8797d211e6dc554bab7f8f7b2326310d))
+- **tx-builder:** correct the base gas of a Sophia-abi contract call ([04b1e04](https://github.com/aeternity/aepp-sdk-js/commit/04b1e048e07eba88d9b2013fb34c4103bbeac85e))
+- **tx-builder:** count the minimum fee at the gas price the miner charges ([609f991](https://github.com/aeternity/aepp-sdk-js/commit/609f991a4b597f325f656ed9efb514a681f23192))
+- **tx-builder:** don't ask node for the protocol while all known ones agree ([5ed6828](https://github.com/aeternity/aepp-sdk-js/commit/5ed6828b68dfe617710fe8496088c9bc79d2268e))
+
 ## [15.0.0](https://github.com/aeternity/aepp-sdk-js/compare/v14.1.1...v15.0.0) (2026-09-06)
 
 ### ⚠ BREAKING CHANGES
@@ -17,7 +26,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-- **node:** mark as compatible with 8.0.0 ([83d070f](https://github.com/aeternity/aepp-sdk-js/commit/83d070f9289ef024b4325a137d9d274c2bd3c469))
 - **tx-builder:** don't write prepared values into given params ([6e15e34](https://github.com/aeternity/aepp-sdk-js/commit/6e15e343ac856bde14f958db684611c9c58b2253))
 
 ### [14.1.1](https://github.com/aeternity/aepp-sdk-js/compare/v14.1.0...v14.1.1) (2026-03-26)

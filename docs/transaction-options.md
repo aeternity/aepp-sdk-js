@@ -45,6 +45,8 @@ These options are common and can be provided to every tx-type:
   - You can provide a higher fee to additionally reward the miners.
   - The default is also raised to the minimum gas price the miner of the connected node accepts, so
     that the node the transaction is submitted to is willing to mine it.
+  - The minimum is counted at that same price, and so is the smallest `fee` accepted here. Node
+    refuses a transaction priced below it with `too_low_gas_price_for_miner`.
 - `protocolParameters` (default: requested from node)
 
   - Consensus parameters the minimum fee and the maximum gas limit are calculated from. Accepted by
@@ -64,6 +66,10 @@ These options are common and can be provided to every tx-type:
   - Provide this option to build a transaction offline for a node running other parameters. It is
     used for the nested transaction of a `PayingForTx`/`GaMetaTx` as well, unless that transaction
     is already built, and by `buildAuthTxHash`, which prices the same `gasPrice`.
+  - The minimum fee is counted at the higher of `minGasPrice` and `minMinerGasPrice`, see
+    `getFloorGasPrice`. To build for a network accepting a lower gas price lower both:
+    `{ ...defaultProtocolParameters, minGasPrice }` alone keeps the miner minimum of the SDK
+    release.
   - Parameters that would raise the minimum transaction fee, or the cost of a contract transaction
     (`gasPrice * gasLimit`), more than 1000 times above the one of the SDK release are rejected, so
     that a node can't make the SDK build a transaction with an extreme fee. Each limit is on what
@@ -107,8 +113,10 @@ The following options are sepcific for each tx-type.
   - You can specify the denomination of the `amount` that will be provided to the contract related transaction.
 - `gasLimit`
   - Maximum amount of gas to be consumed by the transaction. Learn more on [How to estimate gas?](#how-to-estimate-gas)
-- `gasPrice` (default: based on network demand, minimum: the consensus minimum gas price reported by node, `1e9` if not reported or not requested — see `protocolParameters`)
+- `gasPrice` (default: based on network demand, minimum: the higher of the consensus and the miner minimum gas price reported by node, `1e9` if not reported or not requested — see `protocolParameters`)
   - To increase chances to get your transaction included quickly you can use a higher gasPrice.
+  - Node prices a contract transaction by the lower of `gasPrice` and the fee over its gas, so
+    both are held to that minimum. Provide `protocolParameters` to build for another node.
 
 ### NameClaimTx
 
