@@ -52,6 +52,21 @@ export function getProtocolDetails(
   };
 }
 
+/**
+ * Whether all known consensus protocols pick the same versions for `type`, so asking node for its
+ * protocol can't change them.
+ */
+export function isProtocolIndependent(
+  type: 'contract-create' | 'contract-call' | 'oracle-call',
+): boolean {
+  const [first, ...others] = Object.keys(ProtocolToVmAbi).map((protocol) =>
+    getProtocolDetails(+protocol as ConsensusProtocolVersion, type),
+  );
+  return others.every(
+    ({ vmVersion, abiVersion }) => vmVersion === first.vmVersion && abiVersion === first.abiVersion,
+  );
+}
+
 export default {
   serialize(
     value: CtVersion | undefined,
@@ -73,7 +88,7 @@ export default {
   ): Promise<CtVersion | undefined> {
     if (value != null) return value;
     if (options.consensusProtocolVersion != null) return undefined;
-    if (Object.keys(ConsensusProtocolVersion).length === 2) return undefined;
+    if (isProtocolIndependent('contract-create')) return undefined;
     if (options.onNode != null) {
       return getProtocolDetails(
         (await options.onNode.getNodeInfo()).consensusProtocolVersion,

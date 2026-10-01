@@ -28,7 +28,11 @@ import {
   ArgumentError,
   AeSdk,
   packEntry,
+  buildTxAsync,
+  ConsensusProtocolVersion,
+  Node,
 } from '../../src';
+import { ProtocolToVmAbi } from '../../src/tx/builder/field-types/ct-version';
 
 describe('Tx', () => {
   it('reproducible commitment hashes can be generated', async () => {
@@ -411,6 +415,99 @@ describe('Tx', () => {
         const sdk = new AeSdk();
         // @ts-expect-error recipientId field is missed
         await sdk.buildTx({ tag: Tag.SpendTx, senderId: address, amount: 0 });
+      });
+    });
+
+    describe('consensus protocol', () => {
+      const callData = 'cb_KxFE1kQfP4oEp9E=';
+      // every value node could be asked for is provided, except the protocol it runs
+      const transactions = [
+        {
+          tag: Tag.ContractCreateTx,
+          ownerId: address,
+          nonce: 1,
+          ttl: 0,
+          code: 'cb_+GhGA6Csc3MTA1lWna1q0L5k4TgjcQsmHIVhaJ7qU/0CBZqpO8C4O57+RNZEHwA3ADcAGg6CPwEDP/6AeCCSADcBBwcBAQCYLwIRRNZEHxFpbml0EYB4IJIZZ2V0QXJngi8AhTcuMC4xAHO0rKc=',
+          callData,
+          deposit: 0,
+          amount: 0,
+          gasLimit: 100,
+          gasPrice: '1000000000',
+          fee: '100000000000000',
+        },
+        {
+          tag: Tag.ContractCallTx,
+          callerId: address,
+          contractId: 'ct_2uyUQn1dyzrMxjzhSQgZ2rV1dk2D5BCYpquzzBn6hxoSAo7y1d',
+          nonce: 1,
+          ttl: 0,
+          amount: 0,
+          callData,
+          gasLimit: 100,
+          gasPrice: '1000000000',
+          fee: '1000000000000000',
+        },
+        {
+          tag: Tag.OracleRegisterTx,
+          accountId: address,
+          nonce: 1,
+          ttl: 0,
+          queryFormat: 'query',
+          responseFormat: 'response',
+          queryFee: 0,
+          fee: '100000000000000',
+        },
+      ] as const;
+
+      it("doesn't ask node while every protocol it may run picks the same versions", async () => {
+        const onNode = {
+          getNodeInfo: async () => {
+            throw new Error('Unexpected request');
+          },
+        } as unknown as Node;
+        const protocols = Object.values(ConsensusProtocolVersion).filter(
+          (version): version is ConsensusProtocolVersion => typeof version === 'number',
+        );
+        expect(protocols).to.have.length.above(1);
+        for (const params of transactions) {
+          const tx = await buildTxAsync({ ...params, onNode });
+          protocols.forEach((consensusProtocolVersion) =>
+            expect(tx).to.equal(buildTx({ ...params, consensusProtocolVersion })),
+          );
+        }
+      });
+
+      it('asks node only for versions a protocol it may run picks differently', async () => {
+        const tables = ProtocolToVmAbi as unknown as Record<number, unknown>;
+        tables[99] = {
+          ...ProtocolToVmAbi[ConsensusProtocolVersion.Ceres],
+          'contract-create': { vmVersion: [VmVersion.Fate2], abiVersion: [AbiVersion.Fate] },
+          'oracle-call': { vmVersion: [], abiVersion: [AbiVersion.Fate] },
+        };
+        let requests = 0;
+        const onNode = {
+          getNodeInfo: async () => {
+            requests += 1;
+            return { consensusProtocolVersion: 99 };
+          },
+        } as unknown as Node;
+        try {
+          const [create, call, oracle] = await Promise.all(
+            transactions.map(async (params) => unpackTx(await buildTxAsync({ ...params, onNode }))),
+          );
+          expect(requests).to.equal(2);
+          ensureEqual<Tag.ContractCreateTx>(create.tag, Tag.ContractCreateTx);
+          expect(create.ctVersion).to.eql({
+            vmVersion: VmVersion.Fate2,
+            abiVersion: AbiVersion.Fate,
+          });
+          ensureEqual<Tag.ContractCallTx>(call.tag, Tag.ContractCallTx);
+          expect(call.abiVersion).to.equal(AbiVersion.Fate);
+          ensureEqual<Tag.OracleRegisterTx>(oracle.tag, Tag.OracleRegisterTx);
+          expect(oracle.abiVersion).to.equal(AbiVersion.Fate);
+        } finally {
+          delete tables[99];
+        }
       });
     });
   });
