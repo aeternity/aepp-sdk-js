@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "15.0.0",
+  "version": "15.0.1",
   "description": "SDK for the æternity blockchain",
   "homepage": "https://sdk.aeternity.io/",
   "main": "dist/aepp-sdk.cjs",
