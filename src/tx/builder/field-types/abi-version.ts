@@ -1,12 +1,14 @@
 import { Tag, ConsensusProtocolVersion, AbiVersion } from '../constants.js';
-import { getProtocolDetails } from './ct-version.js';
+import { getProtocolDetails, isProtocolIndependent } from './ct-version.js';
 import Node from '../../../Node.js';
+
+function getKind(tag: Tag): 'contract-call' | 'oracle-call' {
+  return Tag.ContractCallTx === tag || Tag.GaMetaTx === tag ? 'contract-call' : 'oracle-call';
+}
 
 export default {
   _getProtocolDetails(c: ConsensusProtocolVersion, tag: Tag): AbiVersion {
-    const kind =
-      Tag.ContractCallTx === tag || Tag.GaMetaTx === tag ? 'contract-call' : 'oracle-call';
-    return getProtocolDetails(c, kind).abiVersion;
+    return getProtocolDetails(c, getKind(tag)).abiVersion;
   },
 
   serialize(
@@ -29,7 +31,7 @@ export default {
   ): Promise<AbiVersion | undefined> {
     if (value != null) return value;
     if (options.consensusProtocolVersion != null) return undefined;
-    if (Object.keys(ConsensusProtocolVersion).length === 2) return undefined;
+    if (isProtocolIndependent(getKind(tag))) return undefined;
     if (options.onNode != null) {
       return this._getProtocolDetails(
         (await options.onNode.getNodeInfo()).consensusProtocolVersion,
