@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { stub } from 'sinon';
 import { RestError } from '@azure/core-rest-pipeline';
 import { FullOperationResponse, OperationArguments, OperationSpec } from '@azure/core-client';
-import { url } from '.';
+import { url, networkId } from '.';
 import { AeSdkBase, Node, NodeNotFoundError, AccountMemory, buildTx, Tag } from '../../src';
 import { bindRequestCounter } from '../utils';
 import {
@@ -161,6 +161,15 @@ describe('Node client', () => {
       // node too old for the endpoints, or with the `node_info`/`node_settings` groups disabled
       const status = error instanceof RestError ? error.statusCode : undefined;
       if (status !== 404 && status !== 403) throw error;
+      // either is up to the operator of a node of another network, but the one of
+      // `docker-compose.yml` is pinned to a release serving them
+      if (networkId === 'ae_dev') {
+        throw new Error(
+          `Node answered ${String(status)} for the protocol parameter endpoints.` +
+            ' The transaction builder silently falls back to the parameters of the sdk release' +
+            ' without them, and this test is the only thing that would notice.',
+        );
+      }
       this.skip();
       return;
     }
@@ -187,6 +196,7 @@ describe('Node client', () => {
     // and the conversion the builder actually uses reads all of it without falling back
     const parameters = await getCachedProtocolParameters(node);
     expect(parameters.minGasPrice).to.equal(protocol.minimumGasPrice);
+    expect(parameters.minMinerGasPrice).to.equal(nodeSettings.minMinerGasPrice);
     expect(parameters.gasPerByte).to.equal(protocol.gasPerByte);
     expect(parameters.txBaseGas[Tag.SpendTx]).to.equal(protocol.txBaseGas.SpendTx);
     expect(parameters.blockGasLimit).to.equal(nodeSettings.blockGasLimit);

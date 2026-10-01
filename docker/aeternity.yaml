@@ -3,7 +3,8 @@
 system:
   dev_mode: true
   plugins:
-    # TODO: remove after merging https://github.com/aeternity/aeternity/pull/4303
+    # https://github.com/aeternity/aeternity/pull/4303 was closed unmerged, so the dev mode emitter
+    # stays a plugin — see the note on port 3313 in `docker-compose.yml`
     - name: aeplugin_dev_mode
 
 http:

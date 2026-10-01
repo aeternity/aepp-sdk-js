@@ -31,8 +31,9 @@ export type AensName = `${string}.chain`;
  * The consensus minimum gas price as it was at the moment of the SDK release.
  * @category transaction builder
  * @deprecated a node may run another minimum gas price, and this constant is wrong on it. Use
- * `(await getCachedProtocolParameters(node)).minGasPrice` for the value the connected node
- * reports, or `defaultProtocolParameters.minGasPrice` for this one.
+ * `getFloorGasPrice(await getCachedProtocolParameters(node))` to price a transaction for the
+ * connected node — the consensus minimum it reports is below what its miner accepts on a public
+ * network. `defaultProtocolParameters.minGasPrice` is this constant.
  */
 export const MIN_GAS_PRICE = 1e9; // TODO: don't use number for ae
 /**
