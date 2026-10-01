@@ -2219,8 +2219,9 @@ falls back to the previous constants. See <code>protocolParameters</code> in
 <p>Two consequences worth knowing about:</p>
 <ul>
 <li>The <code>fee</code>/<code>gasPrice</code> default is raised to the minimum gas price the miner of the connected node
-  accepts, so a transaction is priced to be mined by the node it is submitted to. On a node whose
-  miner minimum is above the consensus minimum this costs more than before.</li>
+  accepts, and a value provided in options is checked against it, so a transaction is priced to be
+  mined by the node it is submitted to. On a node whose miner minimum is above the consensus
+  minimum this costs more than before.</li>
 <li><code>buildTxAsync</code> rejects with a <code>NodeError</code> when the node reports parameters that would price a
   transaction far above the sdk release. Provide <code>protocolParameters</code> in options to build against
   such parameters anyway.</li>
@@ -2229,8 +2230,11 @@ falls back to the previous constants. See <code>protocolParameters</code> in
 <p>They are the values as they were at the moment of the sdk release, and are wrong on a node running
 other parameters. They are still exported.</p>
 <div class="highlight"><pre><span></span><code><span class="gd">- const gasPrice = MIN_GAS_PRICE;</span>
-<span class="gi">+ const { minGasPrice: gasPrice } = await getCachedProtocolParameters(node);</span>
+<span class="gi">+ const gasPrice = getFloorGasPrice(await getCachedProtocolParameters(node));</span>
 </code></pre></div>
+<p><code>MIN_GAS_PRICE</code> is the price a node accepts by default, so <code>getFloorGasPrice</code> is the replacement
+and not the consensus minimum on its own — that one is a thousand times lower on mainnet, and node
+refuses a transaction priced at it with <code>too_low_gas_price_for_miner</code>.</p>
 
 
 
