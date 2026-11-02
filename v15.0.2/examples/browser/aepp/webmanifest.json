@@ -1,0 +1,15 @@
+{
+  "name": "Simple æpp",
+  "short_name": "Simple æpp",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "type": "image/svg"
+    }
+  ],
+  "aeternity_network_ids": ["ae_mainnet", "ae_uat"],
+  "description": "Simple æpp description. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
+  "categories": ["finance"],
+  "author": "aeternity developers",
+  "author_url": "https://github.com/aeternity/aepp-sdk-js"
+}
