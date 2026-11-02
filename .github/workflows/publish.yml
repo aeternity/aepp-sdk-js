@@ -2,7 +2,7 @@ name: Publish to npm
 on:
   release:
     types: [released]
-  # a dry run, to check the publish steps (build, examples) when this file changes
+  # runs the prepublish checks (examples, build) when this file changes
   pull_request:
     paths: [.github/workflows/publish.yml]
 permissions:
@@ -31,8 +31,8 @@ jobs:
       - name: Publish
         if: github.event_name == 'release'
         run: npm publish --access public
-      - name: Publish dry run
+      - name: Run the prepublish checks
         if: github.event_name != 'release'
-        run: npm publish --access public --dry-run
+        run: npm run prepublishOnly
       - run: docker compose logs
         if: always()
