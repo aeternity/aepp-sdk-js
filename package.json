@@ -1,6 +1,6 @@
 {
   "name": "@aeternity/aepp-sdk",
-  "version": "15.0.1",
+  "version": "15.0.2",
   "description": "SDK for the æternity blockchain",
   "homepage": "https://sdk.aeternity.io/",
   "main": "dist/aepp-sdk.cjs",
@@ -59,7 +59,7 @@
     "SDK"
   ],
   "dependencies": {
-    "@aeternity/aepp-calldata": "^1.9.1",
+    "@aeternity/aepp-calldata": "^1.10.0",
     "@azure/core-client": "^1.9.3",
     "@azure/core-rest-pipeline": "^1.19.1",
     "@babel/runtime-corejs3": "^7.27.0",
