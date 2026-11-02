@@ -1,0 +1,38 @@
+name: Publish to npm
+on:
+  release:
+    types: [released]
+  # runs the prepublish checks (examples, build) when this file changes
+  pull_request:
+    paths: [.github/workflows/publish.yml]
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sudo apt update && sudo apt install --no-install-recommends erlang
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.x
+          package-manager-cache: false
+      # trusted publishing needs npm 11.5.1 or newer, node 22 ships npm 10
+      - run: npm install -g npm@11
+      - name: Check the tag matches the package version
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: test "v$(node -p "require('./package.json').version")" = "$TAG"
+      - run: npm ci
+      # the examples run against these services in `prepublishOnly`
+      - run: docker compose up -d --wait --quiet-pull
+      - name: Publish
+        if: github.event_name == 'release'
+        run: npm publish --access public
+      - name: Run the prepublish checks
+        if: github.event_name != 'release'
+        run: npm run prepublishOnly
+      - run: docker compose logs
+        if: always()
