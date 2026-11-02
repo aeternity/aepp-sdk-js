@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.0.2](https://github.com/aeternity/aepp-sdk-js/compare/v15.0.1...v15.0.2) (2026-11-02)
+
+### Bug Fixes
+
+- **deps:** require `@aeternity/aepp-calldata` ^1.10.0, which fixes quadratic decoding of long lists and maps (large contract states took minutes to decode) ([d72d9de](https://github.com/aeternity/aepp-sdk-js/commit/d72d9de83114c8e79b17fc78f4641e92070441cf))
+
 ### [15.0.1](https://github.com/aeternity/aepp-sdk-js/compare/v15.0.0...v15.0.1) (2026-10-01)
 
 ### Bug Fixes
