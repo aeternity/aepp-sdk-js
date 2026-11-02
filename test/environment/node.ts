@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env -S npx tsx
 import { Node, AeSdk, AccountMemory, CompilerHttp, Contract } from '../../src';
 
 const contractSourceCode = `
